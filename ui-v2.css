@@ -62,6 +62,14 @@ figure.dc-ink-slot{margin:0;width:100%;max-width:none}
 .dc-home .dc-notice__track.is-paused{animation-play-state:paused}
 .dc-home #project-title.dc-type-mutation{transform-origin:left center;transform:scaleX(var(--dc-type-x,1));letter-spacing:var(--dc-type-track,-.07em);transition:transform .15s linear,letter-spacing .15s linear}
 
+/* ACTUAL SOURCE — catalog previews are secondary evidence, never cards. */
+.dc-catalog-preview{position:fixed;z-index:120;right:clamp(22px,4vw,68px);top:50%;width:min(34vw,520px);aspect-ratio:4/3;transform:translateY(-50%) scale(.96);opacity:0;pointer-events:none;background:var(--dc-paper);border:1px solid var(--dc-ink);box-shadow:12px 12px 0 var(--dc-acid);transition:opacity .18s ease,transform .28s cubic-bezier(.2,.8,.2,1)}
+.dc-catalog-preview.is-open{opacity:1;transform:translateY(-50%) scale(1)}
+.dc-catalog-preview img{display:block;width:100%;height:calc(100% - 58px);object-fit:cover;mix-blend-mode:multiply}
+.dc-catalog-preview__meta{height:58px;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:0 14px;border-top:1px solid var(--dc-ink);font-size:10px;letter-spacing:.1em;text-transform:uppercase;background:var(--dc-paper);color:var(--dc-ink)}
+.dc-catalog-preview__title{font-weight:900;letter-spacing:-.02em}
+.dc-catalog-mobile-preview{display:none}
+
 @media(max-width:900px){.topbar .nav{gap:13px}.dc-ink-slot,.dc-ink-slot--home,.dc-ink-slot--about,.dc-ink-slot--logic,.dc-event-visual{height:clamp(480px,82vh,760px)}.dc-home .dc-project{padding-bottom:180px}.dc-home .dc-ink-slot--home{width:104vw;margin-left:-2vw;margin-top:-130px;margin-bottom:-80px;transform:rotate(-.3deg)}.dc-home .dc-spheres{padding-top:160px}}
 @media(max-width:700px){
 html,body{max-width:100%;overflow-x:hidden}
@@ -74,6 +82,7 @@ html,body{max-width:100%;overflow-x:hidden}
 .dc-pressure{display:block;max-width:100%;transform:none!important}
 .dc-acid{max-width:100%;}
 .dc-ink-slot,.dc-ink-slot--home,.dc-ink-slot--about,.dc-ink-slot--logic{height:clamp(420px,118vw,580px)}.dc-ink-slot>img,.dc-ink-slot__image{width:100%;height:100%;object-fit:cover}.dc-home .dc-ink-slot>img{object-position:42% center}.dc-about .dc-ink-slot>img{object-position:56% center}.dc-entity-page .dc-ink-slot>img{object-position:48% center}.dc-event-visual{height:clamp(420px,118vw,580px)}.dc-event-visual img{width:100%;height:100%;object-fit:cover;object-position:42% center}.dc-home #events,.dc-home #events + .dc-event,.dc-home section:has(.dc-index){padding-top:90px;padding-bottom:90px}.dc-home .dc-project{padding-top:90px;padding-bottom:125px}.dc-home .dc-ink-slot--home{width:106vw;margin-left:-3vw;margin-top:-72px;margin-bottom:-42px;height:clamp(430px,122vw,620px);transform:rotate(-.65deg)}.dc-home .dc-ink-slot--home::before{top:12px;left:14px;font-size:9px}.dc-home .dc-spheres{padding-top:105px}
+.dc-catalog-preview{display:none!important}.dc-catalog-mobile-preview{display:grid;grid-template-columns:1fr;gap:0;margin:0;border-bottom:1px solid var(--dc-ink);background:var(--dc-paper);color:var(--dc-ink)}.dc-catalog-mobile-preview img{display:block;width:100%;aspect-ratio:4/3;object-fit:cover;mix-blend-mode:multiply}.dc-catalog-mobile-preview span{padding:10px 14px;font-size:10px;letter-spacing:.1em;text-transform:uppercase;border-top:1px solid var(--dc-line)}
 }
 @media(max-width:430px){
 .dc-display-xl{font-size:clamp(42px,11.4vw,49px)!important;line-height:.85!important}
@@ -83,4 +92,4 @@ html,body{max-width:100%;overflow-x:hidden}
 .dc-body{font-size:clamp(17px,4.8vw,20px)}
 }
 @media(hover:none){.dc-pressure:hover{letter-spacing:inherit;transform:none}.dc-index-row::before,.dc-chain-row::before,.dc-sphere::before{display:none}.dc-home .dc-ink-slot--home:hover>img{transform:scale(1.045)}}
-@media(prefers-reduced-motion:reduce){.dc-motion-reveal{opacity:1;transform:none}.dc-motion-reveal.is-visible{transition:none}.dc-drift{transform:none!important}.dc-status-live::before{animation:none}.dc-index-row::before,.dc-chain-row::before,.dc-sphere::before,.topbar .nav a::after{transition:none}.dc-home .dc-ink-slot--home>img{transition:none}.dc-home #project-title.dc-type-mutation{transform:none;letter-spacing:-.07em}}
+@media(prefers-reduced-motion:reduce){.dc-motion-reveal{opacity:1;transform:none}.dc-motion-reveal.is-visible{transition:none}.dc-drift{transform:none!important}.dc-status-live::before{animation:none}.dc-index-row::before,.dc-chain-row::before,.dc-sphere::before,.topbar .nav a::after{transition:none}.dc-home .dc-ink-slot--home>img{transition:none}.dc-home #project-title.dc-type-mutation{transform:none;letter-spacing:-.07em}.dc-catalog-preview{transition:none}}
