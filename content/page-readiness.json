@@ -7,54 +7,16 @@
     "REQUIRES_APPROVAL": "Operational or factual fields must be approved before the page can perform its intended live function."
   },
   "pages": [
-    {
-      "route": "/about/",
-      "state": "FINAL",
-      "source": ["dementor-club/concept/DEGRADATION_AS_A_SERVICE.md", "dementor-club/concept/ecosystem.md"],
-      "blockingFields": [],
-      "note": "Core positioning, service inversion, club role and editorial tone are source-aligned."
-    },
-    {
-      "route": "/community/",
-      "state": "REQUIRES_APPROVAL",
-      "source": ["dementor-club/concept/ecosystem.md", "dementor-club/people/dementors.md"],
-      "blockingFields": ["membership format", "internal channels", "rules and rituals", "participant roles", "joint activities"],
-      "note": "Approved Dementor roster can ship; membership mechanics remain intentionally disabled."
-    },
-    {
-      "route": "/community/valentin/",
-      "state": "PLACEHOLDER",
-      "source": ["dementor-club/people/dementors.md"],
-      "blockingFields": ["public biography", "practice spheres"],
-      "note": "Roster membership and approved-draft course relation are confirmed; biography and spheres are pending."
-    },
-    {
-      "route": "/community/nikita/",
-      "state": "PLACEHOLDER",
-      "source": ["dementor-club/people/dementors.md"],
-      "blockingFields": ["public biography", "practice spheres"],
-      "note": "Profile URL and roster membership are confirmed; no courses or events are approved."
-    },
-    {
-      "route": "/community/evgeniy/",
-      "state": "PLACEHOLDER",
-      "source": ["dementor-club/people/dementors.md"],
-      "blockingFields": ["public biography", "practice spheres"],
-      "note": "Profile URL and roster membership are confirmed; no courses or events are approved."
-    },
-    {
-      "route": "/community/gabil/",
-      "state": "PLACEHOLDER",
-      "source": ["dementor-club/people/dementors.md"],
-      "blockingFields": ["public biography", "practice spheres"],
-      "note": "Profile URL and roster membership are confirmed; no courses or events are approved."
-    },
-    {
-      "route": "/merch/",
-      "state": "REQUIRES_APPROVAL",
-      "source": ["dementor-club/concept/ecosystem.md"],
-      "blockingFields": ["first approved object", "title", "statement", "material", "edition", "price", "sale status", "checkout activation"],
-      "note": "Merch principle and object contract can ship. Working names remain unpublished until a real object is approved."
-    }
+    {"route":"/about/","state":"FINAL","source":["dementor-club/concept/DEGRADATION_AS_A_SERVICE.md","dementor-club/concept/ecosystem.md"],"blockingFields":[],"note":"Core positioning, service inversion, club role and editorial tone are source-aligned."},
+    {"route":"/community/","state":"REQUIRES_APPROVAL","source":["dementor-club/concept/ecosystem.md","dementor-club/people/dementors.md"],"blockingFields":["membership format","internal channels","rules and rituals","participant roles","joint activities"],"note":"Approved Dementor roster can ship; membership mechanics remain intentionally disabled."},
+    {"route":"/community/valentin/","state":"PLACEHOLDER","source":["dementor-club/people/dementors.md"],"blockingFields":["public biography","practice spheres"],"note":"Roster membership and approved-draft course relation are confirmed; biography and spheres are pending."},
+    {"route":"/community/nikita/","state":"PLACEHOLDER","source":["dementor-club/people/dementors.md"],"blockingFields":["public biography","practice spheres"],"note":"Profile URL and roster membership are confirmed; no courses or events are approved."},
+    {"route":"/community/evgeniy/","state":"PLACEHOLDER","source":["dementor-club/people/dementors.md"],"blockingFields":["public biography","practice spheres"],"note":"Profile URL and roster membership are confirmed; no courses or events are approved."},
+    {"route":"/community/gabil/","state":"PLACEHOLDER","source":["dementor-club/people/dementors.md"],"blockingFields":["public biography","practice spheres"],"note":"Profile URL and roster membership are confirmed; no courses or events are approved."},
+    {"route":"/merch/","state":"REQUIRES_APPROVAL","source":["dementor-club/concept/ecosystem.md"],"blockingFields":["first approved object","title","statement","material","edition","price","sale status","checkout activation"],"note":"Merch principle and object contract can ship. Working names remain unpublished until a real object is approved."},
+    {"route":"/donate/","state":"REQUIRES_APPROVAL","source":["dementor-club/operations/PUBLIC_SITE_REQUIRED_PAGES.md"],"blockingFields":["payment provider","recipient","currency","payment URL","recurring support rule"],"note":"Permanent support URL and disabled adapter are ready; no payment details may be inferred."},
+    {"route":"/contacts/","state":"REQUIRES_APPROVAL","source":["dementor-club/operations/PUBLIC_SITE_REQUIRED_PAGES.md"],"blockingFields":["official endpoint","public email and/or approved public channels"],"note":"Contact form is structurally ready and fail-closed until an official channel is approved."},
+    {"route":"/legal/privacy/","state":"FINAL","source":["dementor-club/operations/PUBLIC_SITE_REQUIRED_PAGES.md","current site implementation"],"blockingFields":[],"note":"Valid for current localStorage-only onboarding and disabled external collection. Must be reviewed before enabling new data collection."},
+    {"route":"/legal/terms/","state":"FINAL","source":["dementor-club/operations/PUBLIC_SITE_REQUIRED_PAGES.md","current site implementation"],"blockingFields":[],"note":"Valid for current non-transactional state. Must be legally reviewed before commercial or membership activation."}
   ]
 }
