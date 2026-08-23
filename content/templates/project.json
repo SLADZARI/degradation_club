@@ -1,0 +1,17 @@
+{
+  "id": null,
+  "entityType": "project",
+  "title": null,
+  "slug": null,
+  "status": null,
+  "publicUrl": null,
+  "preview": null,
+  "editorialSource": null,
+  "summary": null,
+  "publicationStatus": null,
+  "provenance": {
+    "branch": null,
+    "path": null
+  },
+  "updatedAt": null
+}
