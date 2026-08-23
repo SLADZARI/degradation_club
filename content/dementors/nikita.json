@@ -1,0 +1,19 @@
+{
+  "id": "DEMENTOR-002",
+  "entityType": "dementor",
+  "title": "Никита",
+  "slug": "nikita",
+  "status": "active-content-pending",
+  "publicUrl": "/community/nikita/",
+  "story": null,
+  "practiceAreas": null,
+  "relatedEvents": [],
+  "relatedCourses": [],
+  "relatedProjects": [],
+  "preview": null,
+  "provenance": {
+    "branch": "dementor-club",
+    "path": "people/dementors.md"
+  },
+  "updatedAt": "2026-08-24"
+}
