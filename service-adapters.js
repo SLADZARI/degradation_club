@@ -13,14 +13,21 @@
     }else{
       contact.addEventListener('submit',async e=>{
         e.preventDefault();
+        if(!contact.reportValidity())return;
         if(submit)submit.disabled=true;status(out,'Отправляем…','working');
+        const controller=new AbortController();
+        const timer=setTimeout(()=>controller.abort(),15000);
         try{
           const body=Object.fromEntries(new FormData(contact).entries());
-          const r=await fetch(cfg.contacts.endpoint,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)});
-          if(!r.ok)throw new Error('request failed');
+          const r=await fetch(cfg.contacts.endpoint,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body),signal:controller.signal});
+          if(!r.ok)throw new Error(`request failed: ${r.status}`);
           contact.reset();status(out,'Сообщение отправлено.','success');
-        }catch(err){status(out,'Не удалось отправить. Попробуйте позже.','error');}
-        finally{if(submit)submit.disabled=false;}
+        }catch(err){
+          status(out,err?.name==='AbortError'?'Сервер не ответил вовремя. Попробуйте позже.':'Не удалось отправить. Попробуйте позже.','error');
+        }finally{
+          clearTimeout(timer);
+          if(submit)submit.disabled=false;
+        }
       });
     }
   }
