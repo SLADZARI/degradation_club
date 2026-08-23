@@ -1,4 +1,13 @@
 (()=>{
+  /* Load the last-resort mobile overflow guard after the shared styles. */
+  if(!document.querySelector('link[data-dc-mobile-overflow]')){
+    const mobileCss=document.createElement('link');
+    mobileCss.rel='stylesheet';
+    mobileCss.href='/mobile-overflow-fix.css';
+    mobileCss.dataset.dcMobileOverflow='1';
+    document.head.appendChild(mobileCss);
+  }
+
   const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const path=location.pathname;
   document.documentElement.dataset.route=path;
@@ -65,6 +74,11 @@
   if(projectTitle){
     projectTitle.classList.add('dc-type-mutation');
     const mutate=()=>{
+      if(matchMedia('(max-width: 700px)').matches){
+        projectTitle.style.setProperty('--dc-type-x','1');
+        projectTitle.style.setProperty('--dc-type-track','-.06em');
+        return;
+      }
       const r=projectTitle.getBoundingClientRect();
       const vh=innerHeight||1;
       const p=Math.max(0,Math.min(1,1-(r.top/vh)));
@@ -72,6 +86,7 @@
       projectTitle.style.setProperty('--dc-type-track',`${(-.07-.02*p).toFixed(3)}em`);
     };
     addEventListener('scroll',mutate,{passive:true});
+    addEventListener('resize',mutate,{passive:true});
     mutate();
   }
 
@@ -81,6 +96,10 @@
     raf=0;
     const y=window.scrollY;
     drift.forEach((el,i)=>{
+      if(matchMedia('(max-width: 700px)').matches){
+        el.style.transform='none';
+        return;
+      }
       const amp=4+(i%3)*2;
       const phase=(i+1)*.7;
       el.style.transform=`translate3d(${Math.sin(y/520+phase)*amp}px,${Math.cos(y/700+phase)*amp*.45}px,0)`;
@@ -88,5 +107,6 @@
     });
   };
   addEventListener('scroll',()=>{if(!raf)raf=requestAnimationFrame(update)},{passive:true});
+  addEventListener('resize',()=>{if(!raf)raf=requestAnimationFrame(update)},{passive:true});
   update();
 })();
