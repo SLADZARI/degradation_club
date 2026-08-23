@@ -14,6 +14,13 @@
 
   const toggle=document.querySelector('.menu-toggle');
   const nav=document.querySelector('.nav');
+  if(nav&&!nav.querySelector('a[href="/archive/"]')){
+    const archive=document.createElement('a');
+    archive.href='/archive/';
+    archive.textContent='Archive';
+    const join=nav.querySelector('a[href="/join/"]');
+    if(join)nav.insertBefore(archive,join);else nav.appendChild(archive);
+  }
   if(toggle&&nav){
     const openLabel='CLOSE';
     const closedLabel=toggle.textContent.trim()||'INDEX';
