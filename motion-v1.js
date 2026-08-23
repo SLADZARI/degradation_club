@@ -50,6 +50,26 @@
     if(target==='/'?path==='/':path.startsWith(target))a.classList.add('active');
   });
 
+  /* DIA 01 — Reclassification. The action changes wording, not factual status. */
+  const heroAction=document.querySelector('.dc-home .dc-hero .dc-action--primary');
+  if(heroAction){
+    const original=heroAction.textContent.trim();
+    const mutate=()=>{heroAction.textContent='УСОМНИТЬСЯ И ПРОДОЛЖИТЬ';heroAction.classList.add('is-reclassified')};
+    const restore=()=>{heroAction.textContent=original;heroAction.classList.remove('is-reclassified')};
+    heroAction.addEventListener('pointerenter',mutate);
+    heroAction.addEventListener('pointerleave',restore);
+    heroAction.addEventListener('focus',mutate);
+    heroAction.addEventListener('blur',restore);
+  }
+
+  /* DIA 02 — Mechanical ticker. Hover reverses the machine; click/tap pauses it. */
+  const ticker=document.querySelector('.dc-home .dc-notice__track');
+  if(ticker){
+    ticker.addEventListener('pointerenter',()=>ticker.classList.add('is-reversing'));
+    ticker.addEventListener('pointerleave',()=>ticker.classList.remove('is-reversing'));
+    ticker.addEventListener('click',()=>ticker.classList.toggle('is-paused'));
+  }
+
   if(reduce)return;
 
   const reveal=[...document.querySelectorAll('main section .dc-shell, main section>.dc-shell, .dc-placeholder__grid, .dc-boundary__grid')];
@@ -65,7 +85,25 @@
     if(i<3)el.classList.add('dc-pressure');
   });
 
-  const drift=[...document.querySelectorAll('.dc-project__aside,.dc-project-hero__meta,.dc-page-hero__meta,.dc-event__status,.dc-ink-slot')];
+  /* DIA 03 — Type Mutation on the featured project headline. */
+  const projectTitle=document.querySelector('.dc-home #project-title');
+  if(projectTitle){
+    projectTitle.classList.add('dc-type-mutation');
+    const mutateType=()=>{
+      const r=projectTitle.getBoundingClientRect();
+      const vh=innerHeight||1;
+      const progress=Math.max(0,Math.min(1,1-(r.top/vh)));
+      const x=1+progress*.085;
+      const track=-.07-progress*.018;
+      projectTitle.style.setProperty('--dc-type-x',x.toFixed(3));
+      projectTitle.style.setProperty('--dc-type-track',`${track.toFixed(3)}em`);
+    };
+    addEventListener('scroll',mutateType,{passive:true});
+    addEventListener('resize',mutateType,{passive:true});
+    mutateType();
+  }
+
+  const drift=[...document.querySelectorAll('.dc-project__aside,.dc-project-hero__meta,.dc-page-hero__meta,.dc-event__status')];
   let raf=0;
   const update=()=>{
     raf=0;
