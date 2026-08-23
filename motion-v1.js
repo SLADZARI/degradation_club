@@ -7,6 +7,13 @@
     mobileCss.dataset.dcMobileOverflow='1';
     document.head.appendChild(mobileCss);
   }
+  if(!document.querySelector('link[data-dc-mobile-qa]')){
+    const qaCss=document.createElement('link');
+    qaCss.rel='stylesheet';
+    qaCss.href='/mobile-qa.css';
+    qaCss.dataset.dcMobileQa='1';
+    document.head.appendChild(qaCss);
+  }
   if(!document.querySelector('link[data-dc-ink-interventions]')){
     const inkCss=document.createElement('link');
     inkCss.rel='stylesheet';
