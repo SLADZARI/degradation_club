@@ -1,0 +1,20 @@
+{
+  "id": "project-001-logic-awareness",
+  "entityType": "project",
+  "slug": "logic-awareness",
+  "title": "Логика и осознанность",
+  "type": "editorial-campaign",
+  "status": "active",
+  "publicUrl": "/projects/logic-awareness/",
+  "preview": "/assets/ink/logic-awareness-02.webp",
+  "summary": "Псевдоофициальная профилактическая кампания о вреде логики, фактов, критического мышления и осознанности.",
+  "editorialSource": "logic-awareness",
+  "publicationStatus": "project-publication-active",
+  "provenance": {
+    "branch": "logic-awareness",
+    "path": "README.md",
+    "role": "canonical-project-editorial-source"
+  },
+  "siteRole": "implementation-mirror",
+  "updatedAt": "2026-08-23"
+}
