@@ -1,11 +1,18 @@
 (()=>{
-  /* Load the last-resort mobile overflow guard after the shared styles. */
+  /* Load shared corrective layers after the page styles. */
   if(!document.querySelector('link[data-dc-mobile-overflow]')){
     const mobileCss=document.createElement('link');
     mobileCss.rel='stylesheet';
     mobileCss.href='/mobile-overflow-fix.css';
     mobileCss.dataset.dcMobileOverflow='1';
     document.head.appendChild(mobileCss);
+  }
+  if(!document.querySelector('link[data-dc-ink-interventions]')){
+    const inkCss=document.createElement('link');
+    inkCss.rel='stylesheet';
+    inkCss.href='/ink-interventions.css';
+    inkCss.dataset.dcInkInterventions='1';
+    document.head.appendChild(inkCss);
   }
 
   const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
