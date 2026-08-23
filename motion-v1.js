@@ -92,6 +92,19 @@
     });
   }
 
+  /* DIA / Reclassification: wording changes, source status does not. */
+  document.querySelectorAll('.dc-reclassify-row[data-reclassify-target][data-reclassify-text]').forEach(row=>{
+    const target=row.querySelector(row.dataset.reclassifyTarget);
+    if(!target)return;
+    const original=target.textContent.trim();
+    const activate=()=>{target.textContent=row.dataset.reclassifyText;row.classList.add('is-reclassified')};
+    const reset=()=>{target.textContent=original;row.classList.remove('is-reclassified')};
+    row.addEventListener('mouseenter',activate);
+    row.addEventListener('mouseleave',reset);
+    row.addEventListener('focus',activate);
+    row.addEventListener('blur',reset);
+  });
+
   const heroPrimary=document.querySelector('.dc-home .dc-hero .dc-action--primary');
   if(heroPrimary){
     const original=heroPrimary.textContent.trim();
