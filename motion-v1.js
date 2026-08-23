@@ -3,29 +3,6 @@
   const path=location.pathname;
   document.documentElement.dataset.route=path;
 
-  /* Raster fallback. Some WebP blobs were committed incorrectly and can fail to decode.
-     First try the normal local WebP path. If it fails, fetch the corresponding base64 text
-     asset from the same deployment and replace the image src with a data URL. */
-  document.querySelectorAll('img[src^="/assets/ink/"]').forEach(img=>{
-    const filename=(img.getAttribute('src')||'').split('/').pop();
-    if(!filename)return;
-    const fallback=async()=>{
-      if(img.dataset.inkFallback==='1')return;
-      img.dataset.inkFallback='1';
-      try{
-        const res=await fetch(`/assets/ink/${filename}.b64`,{cache:'no-store'});
-        if(!res.ok)throw new Error(`HTTP ${res.status}`);
-        const b64=(await res.text()).trim();
-        if(!b64)throw new Error('empty fallback');
-        img.src=`data:image/webp;base64,${b64}`;
-      }catch(err){
-        console.warn('Dementor Ink fallback failed:',filename,err);
-      }
-    };
-    img.addEventListener('error',fallback,{once:true});
-    if(img.complete&&img.naturalWidth===0)fallback();
-  });
-
   const toggle=document.querySelector('.menu-toggle');
   const nav=document.querySelector('.nav');
   if(toggle&&nav){
@@ -47,26 +24,25 @@
     const href=a.getAttribute('href');
     if(!href||href.startsWith('#'))return;
     const target=new URL(href,location.origin).pathname;
-    if(target==='/'?path==='/':path.startsWith(target))a.classList.add('active');
+    if(target==='/'?path==='/' : path.startsWith(target))a.classList.add('active');
   });
 
-  /* DIA 01 — Reclassification. The action changes wording, not factual status. */
-  const heroAction=document.querySelector('.dc-home .dc-hero .dc-action--primary');
-  if(heroAction){
-    const original=heroAction.textContent.trim();
-    const mutate=()=>{heroAction.textContent='УСОМНИТЬСЯ И ПРОДОЛЖИТЬ';heroAction.classList.add('is-reclassified')};
-    const restore=()=>{heroAction.textContent=original;heroAction.classList.remove('is-reclassified')};
-    heroAction.addEventListener('pointerenter',mutate);
-    heroAction.addEventListener('pointerleave',restore);
-    heroAction.addEventListener('focus',mutate);
-    heroAction.addEventListener('blur',restore);
+  const heroPrimary=document.querySelector('.dc-home .dc-hero .dc-action--primary');
+  if(heroPrimary){
+    const original=heroPrimary.textContent.trim();
+    const alt='Усомниться и продолжить';
+    const activate=()=>{heroPrimary.textContent=alt;heroPrimary.classList.add('is-reclassified')};
+    const reset=()=>{heroPrimary.textContent=original;heroPrimary.classList.remove('is-reclassified')};
+    heroPrimary.addEventListener('mouseenter',activate);
+    heroPrimary.addEventListener('mouseleave',reset);
+    heroPrimary.addEventListener('focus',activate);
+    heroPrimary.addEventListener('blur',reset);
   }
 
-  /* DIA 02 — Mechanical ticker. Hover reverses the machine; click/tap pauses it. */
   const ticker=document.querySelector('.dc-home .dc-notice__track');
   if(ticker){
-    ticker.addEventListener('pointerenter',()=>ticker.classList.add('is-reversing'));
-    ticker.addEventListener('pointerleave',()=>ticker.classList.remove('is-reversing'));
+    ticker.addEventListener('mouseenter',()=>ticker.classList.add('is-reversing'));
+    ticker.addEventListener('mouseleave',()=>ticker.classList.remove('is-reversing'));
     ticker.addEventListener('click',()=>ticker.classList.toggle('is-paused'));
   }
 
@@ -85,22 +61,18 @@
     if(i<3)el.classList.add('dc-pressure');
   });
 
-  /* DIA 03 — Type Mutation on the featured project headline. */
-  const projectTitle=document.querySelector('.dc-home #project-title');
+  const projectTitle=document.getElementById('project-title');
   if(projectTitle){
     projectTitle.classList.add('dc-type-mutation');
-    const mutateType=()=>{
+    const mutate=()=>{
       const r=projectTitle.getBoundingClientRect();
       const vh=innerHeight||1;
-      const progress=Math.max(0,Math.min(1,1-(r.top/vh)));
-      const x=1+progress*.085;
-      const track=-.07-progress*.018;
-      projectTitle.style.setProperty('--dc-type-x',x.toFixed(3));
-      projectTitle.style.setProperty('--dc-type-track',`${track.toFixed(3)}em`);
+      const p=Math.max(0,Math.min(1,1-(r.top/vh)));
+      projectTitle.style.setProperty('--dc-type-x',(1+.035*p).toFixed(3));
+      projectTitle.style.setProperty('--dc-type-track',`${(-.07-.02*p).toFixed(3)}em`);
     };
-    addEventListener('scroll',mutateType,{passive:true});
-    addEventListener('resize',mutateType,{passive:true});
-    mutateType();
+    addEventListener('scroll',mutate,{passive:true});
+    mutate();
   }
 
   const drift=[...document.querySelectorAll('.dc-project__aside,.dc-project-hero__meta,.dc-page-hero__meta,.dc-event__status')];
