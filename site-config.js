@@ -20,6 +20,16 @@ window.DEMENTOR_SITE_CONFIG=Object.freeze({
     checkoutProvider:null,
     checkoutUrl:null
   },
+  events:{
+    registrationEnabled:false,
+    registrationProvider:null,
+    registrationUrl:null
+  },
+  community:{
+    membershipEnabled:false,
+    membershipProvider:null,
+    membershipUrl:null
+  },
   onboarding:{
     storageKey:'dementorClubOnboardingV3',
     storage:'localStorage'
