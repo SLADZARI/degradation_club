@@ -1,0 +1,31 @@
+{
+  "id": "event-001-fuengirola",
+  "slug": "fuengirola",
+  "title": "Фуэнхирола",
+  "type": "offline-event",
+  "status": "planned",
+  "location": {
+    "city": "Fuengirola / Фуэнхирола",
+    "country": "Испания"
+  },
+  "publicDescription": "Несколько дней вне привычной гонки за результатом, где не требуется становиться эффективнее, полезнее или лучше версии себя до приезда.",
+  "access": "details-after-join",
+  "dateTime": null,
+  "venue": null,
+  "duration": null,
+  "programme": null,
+  "price": null,
+  "participationTerms": null,
+  "registrationUrl": null,
+  "organizers": null,
+  "participants": null,
+  "relatedProjects": [],
+  "publicUrl": "/events/fuengirola/",
+  "source": {
+    "branch": "dementor-club",
+    "path": "events/fuengirola.md",
+    "role": "canonical-club-event-record"
+  },
+  "siteRole": "implementation-mirror",
+  "updated": "2026-08-23"
+}
