@@ -1,2 +1,2 @@
-Redeploy Dementor Club site after course + Fuengirola home update.
-2026-08-23T17:50+02:00
+Redeploy Dementor Club site after Production branch was switched to dementor-club-site.
+2026-08-23T18:13+02:00
