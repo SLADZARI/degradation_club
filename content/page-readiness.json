@@ -16,6 +16,50 @@
       ],
       "blockingFields": [],
       "note": "Core positioning, service inversion, club role and editorial tone are source-aligned."
+    },
+    {
+      "route": "/community/",
+      "state": "REQUIRES_APPROVAL",
+      "source": [
+        "dementor-club/concept/ecosystem.md",
+        "dementor-club/people/dementors.md"
+      ],
+      "blockingFields": [
+        "membership format",
+        "internal channels",
+        "rules and rituals",
+        "participant roles",
+        "joint activities"
+      ],
+      "note": "Approved Dementor roster can ship; membership mechanics remain intentionally disabled."
+    },
+    {
+      "route": "/community/valentin/",
+      "state": "PLACEHOLDER",
+      "source": ["dementor-club/people/dementors.md"],
+      "blockingFields": ["public biography", "practice spheres"],
+      "note": "Roster membership and approved-draft course relation are confirmed; biography and spheres are pending."
+    },
+    {
+      "route": "/community/nikita/",
+      "state": "PLACEHOLDER",
+      "source": ["dementor-club/people/dementors.md"],
+      "blockingFields": ["public biography", "practice spheres"],
+      "note": "Profile URL and roster membership are confirmed; no courses or events are approved."
+    },
+    {
+      "route": "/community/evgeniy/",
+      "state": "PLACEHOLDER",
+      "source": ["dementor-club/people/dementors.md"],
+      "blockingFields": ["public biography", "practice spheres"],
+      "note": "Profile URL and roster membership are confirmed; no courses or events are approved."
+    },
+    {
+      "route": "/community/gabil/",
+      "state": "PLACEHOLDER",
+      "source": ["dementor-club/people/dementors.md"],
+      "blockingFields": ["public biography", "practice spheres"],
+      "note": "Profile URL and roster membership are confirmed; no courses or events are approved."
     }
   ]
 }
