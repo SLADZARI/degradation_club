@@ -24,6 +24,8 @@ Expected Vercel project setting:
 
 `vercel.json` explicitly disables Git deployments from `main`, `dementor-club` and `logic-awareness` and enables them for `dementor-club-site`.
 
+Production Branch was switched to `dementor-club-site` on 2026-08-23. The next commit to this branch must create a Production Deployment and assign the production alias.
+
 ## Release flow
 
 `dementor-club` → approved content/decision → implementation in `dementor-club-site` → push → Vercel production deployment → public verification.
