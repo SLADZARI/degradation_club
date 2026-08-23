@@ -1,0 +1,46 @@
+/* Public Records-inspired event programme and lifecycle system. */
+.dc-programme{border-top:1px solid var(--dc-line)}
+.dc-programme__lane{display:grid;grid-template-columns:minmax(130px,2fr) minmax(0,10fr);border-bottom:1px solid var(--dc-line)}
+.dc-programme__label{padding:22px clamp(18px,2.2vw,34px);border-right:1px solid var(--dc-line);font-size:10px;letter-spacing:.14em;text-transform:uppercase}
+.dc-programme__label strong{display:block;font-size:11px;margin-top:7px;letter-spacing:.06em}
+.dc-programme__body{min-width:0}
+.dc-programme__empty{min-height:112px;padding:24px clamp(18px,2.2vw,34px);display:flex;align-items:center;justify-content:space-between;gap:24px;color:var(--dc-ink);opacity:.46;font-size:12px;text-transform:uppercase;letter-spacing:.08em}
+.dc-programme__empty span:last-child{font-variant-numeric:tabular-nums}
+.dc-programme .dc-entity-row{border:0;min-height:132px}
+.dc-programme__lane--active .dc-programme__label{background:var(--dc-acid);color:var(--dc-ink)}
+.dc-programme__lane--active .dc-programme__label::after{content:'CURRENT STATE';display:block;margin-top:18px;font-size:9px;letter-spacing:.14em}
+.dc-programme-intro{display:grid;grid-template-columns:repeat(12,1fr);gap:16px;padding-bottom:clamp(44px,6vw,84px)}
+.dc-programme-intro .dc-kicker{grid-column:1/4}.dc-programme-intro .dc-lead{grid-column:5/11;margin:0}
+.dc-programme-note{display:grid;grid-template-columns:repeat(12,1fr);gap:16px;padding-top:clamp(56px,8vw,110px)}
+.dc-programme-note__label{grid-column:1/4}.dc-programme-note__copy{grid-column:5/10;margin:0}
+
+.dc-lifecycle{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));border-top:1px solid var(--dc-line);border-left:1px solid var(--dc-line);margin-top:34px}
+.dc-lifecycle__state{min-height:150px;padding:18px;border-right:1px solid var(--dc-line);border-bottom:1px solid var(--dc-line);display:flex;flex-direction:column;justify-content:space-between;gap:20px;position:relative}
+.dc-lifecycle__state span{font-size:9px;letter-spacing:.13em;text-transform:uppercase;opacity:.5}
+.dc-lifecycle__state strong{font-size:clamp(16px,1.6vw,24px);line-height:.94;letter-spacing:-.03em}
+.dc-lifecycle__state small{font-size:10px;line-height:1.35;opacity:.5}
+.dc-lifecycle__state.is-current{background:var(--dc-acid);color:var(--dc-ink)}
+.dc-lifecycle__state.is-current span,.dc-lifecycle__state.is-current small{opacity:.8}
+.dc-lifecycle__state.is-future{background:rgba(17,17,17,.025)}
+.dc-lifecycle__state.is-future::after{content:'NOT ACTIVE';position:absolute;top:18px;right:16px;font-size:8px;letter-spacing:.1em;opacity:.35}
+.dc-event-relations{display:grid;grid-template-columns:repeat(12,1fr);gap:16px;border-top:1px solid var(--dc-line);padding-top:24px;margin-top:clamp(56px,8vw,110px)}
+.dc-event-relations__label{grid-column:1/4}.dc-event-relations__body{grid-column:5/11;display:grid;gap:0;border-top:1px solid var(--dc-line)}
+.dc-event-relation{display:grid;grid-template-columns:2fr 3fr 1fr;gap:20px;padding:17px 0;border-bottom:1px solid var(--dc-line);font-size:11px;text-transform:uppercase;letter-spacing:.06em}
+.dc-event-relation span:last-child{text-align:right;opacity:.5}
+
+@media(max-width:800px){
+  .dc-programme__lane{grid-template-columns:1fr}
+  .dc-programme__label{border-right:0;border-bottom:1px solid var(--dc-line);display:flex;justify-content:space-between;align-items:center;gap:20px}
+  .dc-programme__label strong{margin-top:0}
+  .dc-programme__lane--active .dc-programme__label::after{display:none}
+  .dc-programme-intro,.dc-programme-note,.dc-event-relations{grid-template-columns:1fr;gap:18px}
+  .dc-programme-intro .dc-kicker,.dc-programme-intro .dc-lead,.dc-programme-note__label,.dc-programme-note__copy,.dc-event-relations__label,.dc-event-relations__body{grid-column:1}
+  .dc-lifecycle{grid-template-columns:1fr 1fr}
+  .dc-lifecycle__state{min-height:126px}
+}
+@media(max-width:430px){
+  .dc-lifecycle{grid-template-columns:1fr}
+  .dc-lifecycle__state{min-height:104px}
+  .dc-event-relation{grid-template-columns:1fr;gap:6px}
+  .dc-event-relation span:last-child{text-align:left}
+}
