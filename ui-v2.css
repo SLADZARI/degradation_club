@@ -8,17 +8,16 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--dc-acid);outline-of
 .dc-drift{will-change:transform}.dc-index-row,.dc-chain-row,.dc-sphere{position:relative;overflow:hidden}.dc-index-row::before,.dc-chain-row::before,.dc-sphere::before{content:"";position:absolute;inset:0;background:var(--dc-acid);transform:translateX(-101%);transition:transform .38s cubic-bezier(.2,.8,.2,1);z-index:0}.dc-index-row:hover::before,.dc-chain-row:hover::before,.dc-sphere:hover::before,.dc-index-row:focus-visible::before{transform:translateX(0)}.dc-index-row>* , .dc-chain-row>* , .dc-sphere>*{position:relative;z-index:1}
 .dc-status-live{display:inline-flex;align-items:center;gap:8px}.dc-status-live::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--dc-acid);box-shadow:0 0 0 0 rgba(216,255,62,.45);animation:dcPulse 2.4s ease-out infinite}@keyframes dcPulse{70%{box-shadow:0 0 0 10px rgba(216,255,62,0)}100%{box-shadow:0 0 0 0 rgba(216,255,62,0)}}
 
-/* Dementor Ink raster integration. Artistic assets are WEBP/PNG/JPG only; never SVG. */
-.dc-ink-slot{position:relative;min-height:clamp(300px,48vw,760px);border-top:1px solid currentColor;border-bottom:1px solid currentColor;overflow:hidden;background-repeat:no-repeat;background-position:center;background-size:cover}
+/* Dementor Ink raster integration. Real IMG elements, no SVG and no CSS-generated grunge. */
+.dc-ink-slot{position:relative;margin:0;min-height:clamp(300px,48vw,760px);border-top:1px solid currentColor;border-bottom:1px solid currentColor;overflow:hidden;background:var(--dc-paper)}
 .dc-ink-slot::before,.dc-ink-slot::after{content:none}
-.dc-home .dc-ink-slot{background-image:url('/assets/ink/home-interruption-01.webp');background-position:center 45%}
-.dc-about .dc-ink-slot{background-image:url('/assets/ink/about-service-01.webp');background-position:center 42%}
-.dc-entity-page .dc-ink-slot{background-image:url('/assets/ink/logic-awareness-01.webp');background-position:center 45%}
-.dc-entity .dc-entity-hero{position:relative;overflow:hidden}
-.dc-entity .dc-entity-hero::after{content:"";position:absolute;z-index:0;right:-3vw;bottom:-6vw;width:min(54vw,900px);aspect-ratio:3/2;background:url('/assets/ink/event-fuengirola-01.webp') center/cover no-repeat;mix-blend-mode:multiply;opacity:.34;pointer-events:none}
-.dc-entity .dc-entity-hero>*{position:relative;z-index:1}
+.dc-ink-slot img{display:block;width:100%;height:100%;min-height:inherit;object-fit:cover;mix-blend-mode:multiply}
+.dc-ink-slot--home img{object-position:center 44%}
+.dc-ink-slot--about img{object-position:center 42%}
+.dc-ink-slot--logic img{object-position:center 45%}
+.dc-ink-slot--event{min-height:clamp(360px,56vw,820px);border-top:0}.dc-ink-slot--event img{object-position:center 52%}
 
-@media(max-width:900px){.topbar .nav{gap:13px}.dc-ink-slot{min-height:520px;background-size:auto 100%}.dc-entity .dc-entity-hero::after{width:72vw;opacity:.24;right:-18vw}}
-@media(max-width:700px){.topbar .nav.open{position:fixed;inset:58px 0 auto 0;background:var(--dc-paper);color:var(--dc-ink);border-bottom:1px solid var(--dc-line);padding:20px;display:grid;grid-template-columns:1fr 1fr;gap:0;z-index:90}.topbar .nav.open a{padding:15px 0;border-top:1px solid var(--dc-line)}.topbar .nav a::after{display:none}.dc-ink-slot{min-height:440px;background-size:auto 100%;background-position:center}.dc-home .dc-ink-slot{background-position:43% center}.dc-about .dc-ink-slot{background-position:58% center}.dc-entity-page .dc-ink-slot{background-position:48% center}.dc-entity .dc-entity-hero::after{width:96vw;right:-42vw;bottom:0;opacity:.18}}
+@media(max-width:900px){.topbar .nav{gap:13px}.dc-ink-slot{min-height:520px}.dc-ink-slot--event{min-height:560px}}
+@media(max-width:700px){.topbar .nav.open{position:fixed;inset:58px 0 auto 0;background:var(--dc-paper);color:var(--dc-ink);border-bottom:1px solid var(--dc-line);padding:20px;display:grid;grid-template-columns:1fr 1fr;gap:0;z-index:90}.topbar .nav.open a{padding:15px 0;border-top:1px solid var(--dc-line)}.topbar .nav a::after{display:none}.dc-ink-slot{min-height:440px}.dc-ink-slot--home img{object-position:43% center}.dc-ink-slot--about img{object-position:58% center}.dc-ink-slot--logic img{object-position:48% center}.dc-ink-slot--event{min-height:460px}.dc-ink-slot--event img{object-position:38% center}}
 @media(hover:none){.dc-pressure:hover{letter-spacing:inherit;transform:none}.dc-index-row::before,.dc-chain-row::before,.dc-sphere::before{display:none}}
 @media(prefers-reduced-motion:reduce){.dc-motion-reveal{opacity:1;transform:none}.dc-motion-reveal.is-visible{transition:none}.dc-drift{transform:none!important}.dc-status-live::before{animation:none}.dc-index-row::before,.dc-chain-row::before,.dc-sphere::before,.topbar .nav a::after{transition:none}}
