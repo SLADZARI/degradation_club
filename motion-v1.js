@@ -3,6 +3,22 @@
   const path=location.pathname;
   document.documentElement.dataset.route=path;
 
+  /* Raster asset fallback: Vercel has intermittently failed to serve freshly added binary files.
+     Keep canonical local paths in HTML, but if an image fails, load the same committed WebP
+     directly from the public GitHub raw endpoint so the visual scene never becomes alt text. */
+  const rawInkBase='https://raw.githubusercontent.com/SLADZARI/degradation_club/43853511eaf159d6e189f457a539230978d50966/assets/ink/';
+  document.querySelectorAll('img[src^="/assets/ink/"]').forEach(img=>{
+    const filename=(img.getAttribute('src')||'').split('/').pop();
+    if(!filename)return;
+    const fallback=()=>{
+      if(img.dataset.inkFallback==='1')return;
+      img.dataset.inkFallback='1';
+      img.src=rawInkBase+filename;
+    };
+    img.addEventListener('error',fallback,{once:true});
+    if(img.complete&&img.naturalWidth===0)fallback();
+  });
+
   const toggle=document.querySelector('.menu-toggle');
   const nav=document.querySelector('.nav');
   if(toggle&&nav){
