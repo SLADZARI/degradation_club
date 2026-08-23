@@ -61,7 +61,7 @@ Requirements:
 - `prefers-reduced-motion: reduce` removes non-essential motion;
 - hover-dependent meaning must remain available on touch.
 
-## 5. Dementor Ink
+## 5. Dementor Ink — raster only
 
 Production asset slots:
 
@@ -70,7 +70,13 @@ Production asset slots:
 - `/assets/ink/logic-awareness-01.webp`
 - `/assets/ink/event-fuengirola-01.webp`
 
-Until approved assets exist, keep the slot explicit. Do not fake Ink with CSS grunge, generic splatter, horror imagery or stock illustrations.
+Artistic illustration delivery is raster-only:
+- WebP default;
+- PNG for alpha/transparency;
+- JPG/WebP for scans and photographic material;
+- **no SVG illustrations and no raster-to-SVG tracing**.
+
+Until approved assets exist, keep the slot explicit. Do not fake Ink with CSS grunge, generic splatter, horror imagery, stock illustrations or vector stand-ins.
 
 ## 6. Metadata
 
@@ -90,7 +96,24 @@ Blocked until production domain and social image are approved:
 
 Never point canonical metadata at an unstable Vercel preview URL.
 
-## 7. Accessibility
+## 7. Social image contract
+
+Final social previews must be raster exports at 1200×630.
+
+Required set:
+- Home
+- About
+- Events
+- Fuengirola
+- Projects
+- Logic & Awareness
+- Community
+- Merch
+- Join
+
+Preferred delivery: JPG or WebP. No SVG social cards.
+
+## 8. Accessibility
 
 Check:
 
@@ -102,7 +125,7 @@ Check:
 - contrast is preserved;
 - text is not encoded only inside images.
 
-## 8. Production hardening
+## 9. Production hardening
 
 `vercel.json` provides:
 
@@ -114,7 +137,7 @@ Check:
 
 A strict CSP is intentionally postponed because the current Join implementation still contains inline style/script blocks. CSP should be introduced after those are externalized.
 
-## 9. SEO/indexing state
+## 10. SEO/indexing state
 
 `robots.txt` currently allows indexing but intentionally contains no sitemap until the canonical domain is approved.
 
@@ -122,7 +145,7 @@ A strict CSP is intentionally postponed because the current Join implementation 
 
 Draft editorial units from `logic-awareness` are not exposed as published site articles until their project source marks them publishable.
 
-## 10. Deployment gate
+## 11. Deployment gate
 
 Production-ready means all are true:
 
@@ -132,9 +155,9 @@ Production-ready means all are true:
 4. routes above return 200 except deliberate 404 tests;
 5. responsive matrix visually checked;
 6. no console/runtime errors;
-7. real Dementor Ink assets installed;
-8. OG image system installed;
+7. real raster Dementor Ink assets installed;
+8. raster OG image system installed;
 9. canonical + sitemap enabled;
 10. final source-of-truth sync recorded.
 
-Current blocker: connected Vercel tool does not return the project and the previously known preview URL cannot be resolved through the connector. Do not claim a verified deployment until this changes.
+Current verified blocker: the connected Vercel team is available but currently lists zero projects. A deployment attempt through the connector also failed at tool-schema validation before deployment. Do not claim a verified deployment until the project is visible and the live routes can be fetched.
