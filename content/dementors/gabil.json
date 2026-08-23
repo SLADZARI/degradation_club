@@ -1,0 +1,19 @@
+{
+  "id": "DEMENTOR-004",
+  "entityType": "dementor",
+  "title": "Габиль",
+  "slug": "gabil",
+  "status": "active-content-pending",
+  "publicUrl": "/community/gabil/",
+  "story": null,
+  "practiceAreas": null,
+  "relatedEvents": [],
+  "relatedCourses": [],
+  "relatedProjects": [],
+  "preview": null,
+  "provenance": {
+    "branch": "dementor-club",
+    "path": "people/dementors.md"
+  },
+  "updatedAt": "2026-08-24"
+}
