@@ -4,50 +4,32 @@
 (()=>{
   if(!location.pathname.startsWith('/join'))return;
 
+  const loadScript=(src,done)=>{
+    const existing=document.querySelector(`script[src="${src}"]`);
+    if(existing){if(done){if(src==='/site-config.js'&&window.DEMENTOR_SITE_CONFIG)done();else existing.addEventListener('load',done,{once:true});}return;}
+    const s=document.createElement('script');s.src=src;s.onload=()=>done?.();document.head.appendChild(s);
+  };
+  const bootSeo=()=>{if(!document.querySelector('script[src="/seo-runtime.js"]'))loadScript('/seo-runtime.js');};
+  window.DEMENTOR_SITE_CONFIG?bootSeo():loadScript('/site-config.js',bootSeo);
+
   /* Storage capability must resolve before the user can start the procedure. */
   document.documentElement.dataset.dcStorage='checking';
   const preflightStyle=document.createElement('style');
   preflightStyle.textContent='html[data-dc-storage="checking"] #sphereGrid{pointer-events:none;opacity:.62}';
   document.head.appendChild(preflightStyle);
   const guard=document.createElement('script');
-  guard.src='/join-storage-guard.js';
-  guard.async=false;
-  guard.onerror=()=>{document.documentElement.dataset.dcStorage='unavailable';};
-  document.head.appendChild(guard);
+  guard.src='/join-storage-guard.js';guard.async=false;guard.onerror=()=>{document.documentElement.dataset.dcStorage='unavailable';};document.head.appendChild(guard);
 
-  if(!document.querySelector('link[href="/utility-v1.css"]')){
-    const utilityCss=document.createElement('link');
-    utilityCss.rel='stylesheet';utilityCss.href='/utility-v1.css';document.head.appendChild(utilityCss);
-  }
+  if(!document.querySelector('link[href="/utility-v1.css"]')){const utilityCss=document.createElement('link');utilityCss.rel='stylesheet';utilityCss.href='/utility-v1.css';document.head.appendChild(utilityCss);}
+  const ensureUtility=()=>{if(document.querySelector('.dc-utility-strip'))return;const strip=document.createElement('div');strip.className='dc-utility-strip';strip.innerHTML='<span class="dc-utility-strip__label">UTILITY / PUBLIC</span><nav class="dc-utility-nav" aria-label="Служебная навигация"><a href="/donate/">Support</a><a href="/contacts/">Contacts</a><a href="/legal/privacy/">Privacy</a><a href="/legal/terms/">Terms</a></nav>';document.body.appendChild(strip);};ensureUtility();
 
-  const ensureUtility=()=>{
-    if(document.querySelector('.dc-utility-strip'))return;
-    const strip=document.createElement('div');strip.className='dc-utility-strip';
-    strip.innerHTML='<span class="dc-utility-strip__label">UTILITY / PUBLIC</span><nav class="dc-utility-nav" aria-label="Служебная навигация"><a href="/donate/">Support</a><a href="/contacts/">Contacts</a><a href="/legal/privacy/">Privacy</a><a href="/legal/terms/">Terms</a></nav>';
-    document.body.appendChild(strip);
-  };
-  ensureUtility();
-
-  const toggle=document.querySelector('.menu-toggle');
-  const nav=document.querySelector('.nav');
-  if(nav&&!nav.querySelector('a[href="/archive/"]')){
-    const archive=document.createElement('a');archive.href='/archive/';archive.textContent='Архив';
-    const join=nav.querySelector('a[href="/join/"]');join?nav.insertBefore(archive,join):nav.appendChild(archive);
-  }
-  if(toggle&&nav){
-    const closed=toggle.textContent.trim()||'MENU';
-    toggle.addEventListener('click',()=>{const open=nav.classList.toggle('open');toggle.setAttribute('aria-expanded',String(open));toggle.textContent=open?'CLOSE':closed});
-    nav.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{nav.classList.remove('open');toggle.setAttribute('aria-expanded','false');toggle.textContent=closed}));
-  }
+  const toggle=document.querySelector('.menu-toggle');const nav=document.querySelector('.nav');
+  if(nav&&!nav.querySelector('a[href="/archive/"]')){const archive=document.createElement('a');archive.href='/archive/';archive.textContent='Архив';const join=nav.querySelector('a[href="/join/"]');join?nav.insertBefore(archive,join):nav.appendChild(archive);}
+  if(toggle&&nav){const closed=toggle.textContent.trim()||'MENU';toggle.addEventListener('click',()=>{const open=nav.classList.toggle('open');toggle.setAttribute('aria-expanded',String(open));toggle.textContent=open?'CLOSE':closed});nav.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{nav.classList.remove('open');toggle.setAttribute('aria-expanded','false');toggle.textContent=closed}));}
 
   document.title='Выберите область деградации — Dementor Club';
-  const description=document.querySelector('meta[name="description"]');
-  if(description)description.content='Девять процедур Dementor Club. Начните с того, что пока работает слишком хорошо.';
-
-  const host=document.getElementById('questionHost');
-  const grid=document.getElementById('sphereGrid');
-  const selector=document.getElementById('selector');
-  if(!host||!grid||!selector)return;
+  const description=document.querySelector('meta[name="description"]');if(description)description.content='Девять процедур Dementor Club. Начните с того, что пока работает слишком хорошо.';
+  const host=document.getElementById('questionHost');const grid=document.getElementById('sphereGrid');const selector=document.getElementById('selector');if(!host||!grid||!selector)return;
 
   const cardCopy={
     'Личность':'Перестаньте наконец искать себя.<br>Есть риск найти.',
@@ -61,9 +43,7 @@
     'Технологии':'Автоматизируем всё,<br>кроме необходимости разбираться зачем.'
   };
 
-  const style=document.createElement('style');
-  style.id='join-procedure-v7';
-  style.textContent=`
+  const style=document.createElement('style');style.id='join-procedure-v7';style.textContent=`
     #selector .intro{padding:72px 0 34px;display:grid;grid-template-columns:minmax(0,1.12fr) minmax(330px,.88fr);gap:76px;align-items:end}
     #selector .intro .join-hero-left{min-width:0}
     #selector .intro h1{font-size:clamp(58px,7.4vw,108px);line-height:.88;letter-spacing:-.07em;margin:0;max-width:760px}
@@ -89,58 +69,13 @@
     #selector>.privacy{display:none!important}
     @media(max-width:820px){#selector .intro{grid-template-columns:1fr;gap:30px;padding-top:42px}#selector .intro h1{font-size:clamp(52px,16vw,82px)}#selector .intro .join-hero-copy{font-size:18px}#selector .sphere{min-height:190px}}
     @media(max-width:430px){#selector .intro h1{font-size:clamp(42px,12vw,52px);line-height:.9;letter-spacing:-.055em}#selector .intro{gap:24px;padding-top:34px}#selector .sphere{min-height:160px;padding:20px}#selector .sphere strong{font-size:26px}}
-  `;
-  document.head.appendChild(style);
+  `;document.head.appendChild(style);
 
-  function decorateStaticSelector(){
-    if(selector.dataset.procedureStatic==='1')return;
-    selector.dataset.procedureStatic='1';
-    const intro=selector.querySelector('.intro');
-    if(intro)intro.innerHTML='<div class="join-hero-left"><h1><span>ВЫБЕРИТЕ</span><span>ОБЛАСТЬ</span><span>ДЕГРАДАЦИИ</span></h1></div><div class="join-hero-copy"><p>Не начинайте с того, что вас беспокоит.</p><p>Начните с того, что пока работает слишком хорошо.</p><strong>Запускать состояние проще на ранней стадии.</strong></div>';
-    if(!selector.querySelector('.grid-eyebrow')){
-      const eyebrow=document.createElement('p');eyebrow.className='grid-eyebrow';eyebrow.textContent='DEMENTOR CLUB / ПЕРВИЧНОЕ РАСПРЕДЕЛЕНИЕ ПО НАПРАВЛЕНИЯМ';grid.before(eyebrow);
-    }
-    if(!selector.querySelector('.join-privacy')){
-      const privacy=document.createElement('p');privacy.className='join-privacy';privacy.innerHTML='Результаты сохраняются локально.<br>Клуб не передаёт вашу растерянность третьим лицам.<br><strong>У нас своей достаточно.</strong>';grid.after(privacy);
-    }
-  }
-
-  function decorateCards(){
-    [...grid.querySelectorAll('.sphere')].forEach(card=>{
-      const title=card.querySelector('strong')?.textContent?.trim();
-      if(!title||!cardCopy[title])return;
-      const body=card.querySelector('p');if(body)body.innerHTML=cardCopy[title];
-      const done=!!card.querySelector('.badge.done');
-      const foot=card.querySelector('.sphere-foot');
-      if(foot)foot.innerHTML=`<span class="procedure-status">${done?'УХУДШЕНИЕ ПОДТВЕРЖДЕНО':'ДЕГРАДАЦИЯ НЕ НАЧАТА'}</span><span class="procedure-cta">${done?'УХУДШИТЬ ЕЩЁ РАЗ →':'НАЧАТЬ ДЕГРАДАЦИЮ →'}</span>`;
-    });
-  }
-
+  function decorateStaticSelector(){if(selector.dataset.procedureStatic==='1')return;selector.dataset.procedureStatic='1';const intro=selector.querySelector('.intro');if(intro)intro.innerHTML='<div class="join-hero-left"><h1><span>ВЫБЕРИТЕ</span><span>ОБЛАСТЬ</span><span>ДЕГРАДАЦИИ</span></h1></div><div class="join-hero-copy"><p>Не начинайте с того, что вас беспокоит.</p><p>Начните с того, что пока работает слишком хорошо.</p><strong>Запускать состояние проще на ранней стадии.</strong></div>';if(!selector.querySelector('.grid-eyebrow')){const eyebrow=document.createElement('p');eyebrow.className='grid-eyebrow';eyebrow.textContent='DEMENTOR CLUB / ПЕРВИЧНОЕ РАСПРЕДЕЛЕНИЕ ПО НАПРАВЛЕНИЯМ';grid.before(eyebrow);}if(!selector.querySelector('.join-privacy')){const privacy=document.createElement('p');privacy.className='join-privacy';privacy.innerHTML='Результаты сохраняются локально.<br>Клуб не передаёт вашу растерянность третьим лицам.<br><strong>У нас своей достаточно.</strong>';grid.after(privacy);}}
+  function decorateCards(){[...grid.querySelectorAll('.sphere')].forEach(card=>{const title=card.querySelector('strong')?.textContent?.trim();if(!title||!cardCopy[title])return;const body=card.querySelector('p');if(body)body.innerHTML=cardCopy[title];const done=!!card.querySelector('.badge.done');const foot=card.querySelector('.sphere-foot');if(foot)foot.innerHTML=`<span class="procedure-status">${done?'УХУДШЕНИЕ ПОДТВЕРЖДЕНО':'ДЕГРАДАЦИЯ НЕ НАЧАТА'}</span><span class="procedure-cta">${done?'УХУДШИТЬ ЕЩЁ РАЗ →':'НАЧАТЬ ДЕГРАДАЦИЮ →'}</span>`;});}
   const permutations=[[2,0,3,1],[1,3,0,2],[3,1,2,0],[0,2,1,3],[2,3,1,0],[1,0,3,2],[3,0,1,2],[0,3,2,1]];
   function hash(str){let h=2166136261;for(let i=0;i<str.length;i++){h^=str.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
-  function shuffleVisibleAnswers(){
-    const answers=host.querySelector('.question .answers');if(!answers)return;
-    const buttons=[...answers.querySelectorAll('.answer')];if(buttons.length!==4)return;
-    const sphere=new URLSearchParams(location.search).get('sphere')||'club';
-    const step=parseInt(document.getElementById('counter')?.textContent||'1',10)||1;
-    const key=`${sphere}:${step}:v7`;if(answers.dataset.shuffleKey===key)return;
-    const perm=permutations[hash(key)%permutations.length];
-    const byScore=new Map(buttons.map(btn=>[Number(btn.dataset.i),btn]));
-    perm.forEach(score=>{const btn=byScore.get(score);if(btn)answers.appendChild(btn)});
-    [...answers.querySelectorAll('.answer')].forEach((btn,i)=>{const letter=btn.querySelector('b');if(letter)letter.textContent=String.fromCharCode(65+i)});
-    answers.dataset.shuffleKey=key;
-  }
-
-  function decorateQuizStage(){
-    const stage=document.getElementById('stageLabel');if(!stage)return;
-    const sphere=new URLSearchParams(location.search).get('sphere');if(!sphere)return;
-    const first=(parseInt(document.getElementById('counter')?.textContent||'1',10)||1)===1;
-    stage.textContent=first?'ЗАФИКСИРОВАТЬ ИСХОДНОЕ СОСТОЯНИЕ':'ПРОЦЕДУРА ДЕГРАДАЦИИ';
-  }
-
-  decorateStaticSelector();decorateCards();shuffleVisibleAnswers();decorateQuizStage();
-  let scheduled=false;
-  const schedule=()=>{if(scheduled)return;scheduled=true;requestAnimationFrame(()=>{scheduled=false;decorateCards();shuffleVisibleAnswers();decorateQuizStage()})};
-  new MutationObserver(schedule).observe(grid,{childList:true,subtree:true});
-  new MutationObserver(schedule).observe(host,{childList:true,subtree:true});
+  function shuffleVisibleAnswers(){const answers=host.querySelector('.question .answers');if(!answers)return;const buttons=[...answers.querySelectorAll('.answer')];if(buttons.length!==4)return;const sphere=new URLSearchParams(location.search).get('sphere')||'club';const step=parseInt(document.getElementById('counter')?.textContent||'1',10)||1;const key=`${sphere}:${step}:v7`;if(answers.dataset.shuffleKey===key)return;const perm=permutations[hash(key)%permutations.length];const byScore=new Map(buttons.map(btn=>[Number(btn.dataset.i),btn]));perm.forEach(score=>{const btn=byScore.get(score);if(btn)answers.appendChild(btn)});[...answers.querySelectorAll('.answer')].forEach((btn,i)=>{const letter=btn.querySelector('b');if(letter)letter.textContent=String.fromCharCode(65+i)});answers.dataset.shuffleKey=key;}
+  function decorateQuizStage(){const stage=document.getElementById('stageLabel');if(!stage)return;const sphere=new URLSearchParams(location.search).get('sphere');if(!sphere)return;const first=(parseInt(document.getElementById('counter')?.textContent||'1',10)||1)===1;stage.textContent=first?'ЗАФИКСИРОВАТЬ ИСХОДНОЕ СОСТОЯНИЕ':'ПРОЦЕДУРА ДЕГРАДАЦИИ';}
+  decorateStaticSelector();decorateCards();shuffleVisibleAnswers();decorateQuizStage();let scheduled=false;const schedule=()=>{if(scheduled)return;scheduled=true;requestAnimationFrame(()=>{scheduled=false;decorateCards();shuffleVisibleAnswers();decorateQuizStage()})};new MutationObserver(schedule).observe(grid,{childList:true,subtree:true});new MutationObserver(schedule).observe(host,{childList:true,subtree:true});
 })();
