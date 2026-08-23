@@ -1,0 +1,27 @@
+name: Site Integrity
+
+on:
+  push:
+    branches:
+      - dementor-club-site
+  pull_request:
+    branches:
+      - dementor-club-site
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout site branch
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate registry, routes and feature state
+        run: node scripts/validate-site.mjs
