@@ -1,0 +1,18 @@
+{
+  "id": null,
+  "entityType": "course",
+  "title": null,
+  "slug": null,
+  "status": null,
+  "publicUrl": null,
+  "preview": null,
+  "delivery": null,
+  "dementor": null,
+  "modules": null,
+  "progressStorage": null,
+  "provenance": {
+    "branch": "dementor-club",
+    "path": null
+  },
+  "updatedAt": null
+}
