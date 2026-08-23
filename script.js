@@ -2,6 +2,15 @@
 // Onboarding V4 stays pinned as the scoring/scenario engine.
 // This layer owns the public presentation: shuffled answers + procedure-style selector.
 (()=>{
+  if(!document.querySelector('link[href="/utility-v1.css"]')){
+    const utilityCss=document.createElement('link');utilityCss.rel='stylesheet';utilityCss.href='/utility-v1.css';document.head.appendChild(utilityCss);
+  }
+  if(!document.querySelector('.dc-utility-strip')){
+    const strip=document.createElement('div');strip.className='dc-utility-strip';
+    strip.innerHTML='<span class="dc-utility-strip__label">UTILITY / PUBLIC</span><nav class="dc-utility-nav" aria-label="Служебная навигация"><a href="/donate/">Support</a><a href="/contacts/">Contacts</a><a href="/legal/privacy/">Privacy</a><a href="/legal/terms/">Terms</a></nav>';
+    document.body.appendChild(strip);
+  }
+
   /* Keep Join inside the same public information architecture even though it has its own runtime. */
   const joinNav=document.querySelector('.nav');
   if(joinNav&&!joinNav.querySelector('a[href="/archive/"]')){
