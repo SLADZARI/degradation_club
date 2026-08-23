@@ -11,7 +11,7 @@ It is not a source of truth for club facts.
 Every addressable public entity uses these fields:
 
 - `id` — stable public identifier, never recycled;
-- `entityType` — `event | project | merch | course | archive-record`;
+- `entityType` — `event | project | merch | course | dementor | archive-record`;
 - `title` — approved public title;
 - `slug` — stable route slug;
 - `status` — approved status from the responsible source branch;
@@ -27,7 +27,9 @@ Typed records may add fields such as:
 - event: `location`, `dateTime`, `venue`, `programme`, `price`, `registrationUrl`, `relatedProjects`;
 - project: `editorialSource`, `summary`, `publicationStatus`;
 - merch: `statement`, `material`, `edition`, `price`, `shopStatus`;
-- course: `delivery`, `dementor`, `modules`, `progressStorage`.
+- course: `delivery`, `dementor`, `modules`, `progressStorage`;
+- dementor: `publicName`, `story`, `practiceAreas`, `relatedEvents`, `relatedCourses`, `relatedProjects`;
+- archive-record: original entity ID, terminal status, evidence and post-event/post-project materials.
 
 Unknown or unapproved values are `null` or omitted. They are never inferred from design copy.
 
@@ -41,7 +43,7 @@ DIA reclassification may change interface wording but must not change the underl
 `dementor-club-site` only mirrors approved facts.
 Canonical responsibility remains with the owning branch:
 
-- club/event/merch/community facts → `dementor-club`;
+- club/event/merch/community/dementor/course facts → `dementor-club`;
 - Logic & Awareness editorial facts → `logic-awareness`;
 - web implementation → `dementor-club-site`.
 
