@@ -6,13 +6,43 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--dc-acid);outline-of
 
 /* CONTRAST CONTRACT — ACID IS ALWAYS A LIGHT SURFACE.
    Never place white/paper text on #d8ff3e. All acid-backed text resolves to INK. */
-.dc-acid,.brand span,.dc-action--primary,.dc-action--acid,.button.primary,.card.accent{color:var(--dc-on-acid)!important}
+.dc-acid,
+.brand span,
+.dc-action--primary,
+.dc-action--acid,
+.button.primary,
+.card.accent{color:var(--dc-on-acid)!important}
+
+/* Strong specificity guard for highlighted words inside inverse/dark sections.
+   This fixes cases where a parent/legacy selector forces white or acid text. */
+.dc-statement .dc-acid,
+.dc-project .dc-acid,
+.dc-about-manifesto .dc-acid,
+.dc-about-principles .dc-acid,
+.dc-boundary .dc-acid,
+.dc-event-lock .dc-acid,
+.dark .dc-acid,
+.dc-statement h1 .dc-acid,
+.dc-statement h2 .dc-acid,
+.dc-project h1 .dc-acid,
+.dc-project h2 .dc-acid,
+.dc-about-manifesto h1 .dc-acid,
+.dc-about-manifesto h2 .dc-acid,
+.dc-boundary h1 .dc-acid,
+.dc-boundary h2 .dc-acid,
+.dc-event-lock h1 .dc-acid,
+.dc-event-lock h2 .dc-acid{color:var(--dc-on-acid)!important;background:var(--dc-acid)!important;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+
 .dc-action--primary,.dc-action--acid,.button.primary{background:var(--dc-acid);border-color:var(--dc-acid)}
-.dc-join,.dc-about-join{color:var(--dc-on-acid)}
+.dc-join,.dc-about-join{color:var(--dc-on-acid)!important}
+.dc-join *:not(.dc-action),.dc-about-join *:not(.dc-action){color:inherit}
+
 .dc-index-row:hover,.dc-entity-row:hover,.dc-chain-row:hover,.dc-sphere:hover,.dc-principle:hover{color:var(--dc-on-acid)!important}
-.dc-index-row:hover *,.dc-entity-row:hover *,.dc-chain-row:hover *,.dc-sphere:hover *,.dc-principle:hover *{color:inherit}
+.dc-index-row:hover *,.dc-entity-row:hover *,.dc-chain-row:hover *,.dc-sphere:hover *,.dc-principle:hover *{color:inherit!important}
+
 /* Dark CTA placed on acid remains intentionally inverse. */
 .dc-join .dc-action,.dc-about-join .dc-action{background:var(--dc-ink);color:var(--dc-paper)!important;border-color:var(--dc-ink)}
+.dc-join .dc-action *,.dc-about-join .dc-action *{color:inherit!important}
 
 .dc-motion-reveal{opacity:0;transform:translateY(28px)}.dc-motion-reveal.is-visible{opacity:1;transform:none;transition:opacity .7s cubic-bezier(.2,.8,.2,1),transform .7s cubic-bezier(.2,.8,.2,1)}
 .dc-pressure{display:inline-block;transform-origin:left center;transition:font-stretch .5s ease,letter-spacing .5s ease,transform .5s cubic-bezier(.2,.8,.2,1)}.dc-pressure:hover{letter-spacing:-.11em;transform:scaleX(1.035)}
