@@ -1,6 +1,7 @@
 (()=>{
   const cfg=window.DEMENTOR_SITE_CONFIG||{};
   const status=(el,text,state='pending')=>{if(!el)return;el.textContent=text;el.dataset.state=state;};
+  const disableLink=(a,text)=>{a.setAttribute('aria-disabled','true');a.removeAttribute('href');a.classList.add('is-disabled');if(text)a.textContent=text;};
 
   const contact=document.querySelector('[data-dc-contact-form]');
   if(contact){
@@ -25,15 +26,22 @@
   }
 
   document.querySelectorAll('[data-dc-donate-action]').forEach(a=>{
-    if(!cfg.donate?.enabled||!cfg.donate?.checkoutUrl){
-      a.setAttribute('aria-disabled','true');a.removeAttribute('href');a.classList.add('is-disabled');
-      a.textContent='Платёжный канал готовится';
-    }else a.href=cfg.donate.checkoutUrl;
+    if(!cfg.donate?.enabled||!cfg.donate?.checkoutUrl)disableLink(a,'Платёжный канал готовится');
+    else a.href=cfg.donate.checkoutUrl;
   });
 
   document.querySelectorAll('[data-dc-checkout-action]').forEach(a=>{
-    if(!cfg.merch?.checkoutEnabled||!cfg.merch?.checkoutUrl){
-      a.setAttribute('aria-disabled','true');a.removeAttribute('href');a.classList.add('is-disabled');
-    }else a.href=cfg.merch.checkoutUrl;
+    if(!cfg.merch?.checkoutEnabled||!cfg.merch?.checkoutUrl)disableLink(a);
+    else a.href=cfg.merch.checkoutUrl;
+  });
+
+  document.querySelectorAll('[data-dc-event-registration]').forEach(a=>{
+    if(!cfg.events?.registrationEnabled||!cfg.events?.registrationUrl)disableLink(a,'Регистрация ещё не открыта');
+    else a.href=cfg.events.registrationUrl;
+  });
+
+  document.querySelectorAll('[data-dc-membership-action]').forEach(a=>{
+    if(!cfg.community?.membershipEnabled||!cfg.community?.membershipUrl)disableLink(a,'Механика членства формируется');
+    else a.href=cfg.community.membershipUrl;
   });
 })();
