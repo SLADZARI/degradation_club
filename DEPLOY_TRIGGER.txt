@@ -1,2 +1,2 @@
-Redeploy Dementor Club site after Production branch was switched to dementor-club-site.
-2026-08-23T18:13+02:00
+Production refresh for versioned Dementor Ink assets.
+2026-08-23T20:38+02:00
