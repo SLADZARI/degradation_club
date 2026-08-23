@@ -25,3 +25,5 @@ jobs:
           node-version: '22'
       - name: Validate registry, routes and feature state
         run: node scripts/validate-site.mjs
+      - name: Validate page content readiness
+        run: node scripts/validate-content-readiness.mjs
