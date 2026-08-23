@@ -1,81 +1,16 @@
 /* Mouthwash composition layer — rhythm, asymmetry, silence, media scale. */
-:root{
-  --dc-rhythm-tight:clamp(54px,6vw,92px);
-  --dc-rhythm-medium:clamp(96px,11vw,170px);
-  --dc-rhythm-wide:clamp(150px,17vw,270px);
-  --dc-rhythm-huge:clamp(210px,23vw,360px);
-}
-
-/* Generic rhythm states. */
-.dc-rhythm-dense{padding-top:var(--dc-rhythm-tight);padding-bottom:var(--dc-rhythm-tight)}
-.dc-rhythm-quiet{padding-top:var(--dc-rhythm-wide);padding-bottom:var(--dc-rhythm-wide)}
-.dc-rhythm-oversized{padding-top:var(--dc-rhythm-huge);padding-bottom:var(--dc-rhythm-huge)}
-.dc-rhythm-index{padding-top:var(--dc-rhythm-medium);padding-bottom:var(--dc-rhythm-medium)}
-.dc-rhythm-hit{padding-top:var(--dc-rhythm-wide);padding-bottom:var(--dc-rhythm-huge)}
-
-/* Silence is allowed to be structurally visible. */
-.dc-silence{min-height:clamp(110px,16vw,260px);pointer-events:none}
-.dc-silence--large{min-height:clamp(170px,23vw,360px)}
-
-/* Media should periodically dominate the page rather than sit politely in a card. */
-.dc-media-break{width:100%;margin-left:0;margin-right:0;position:relative;z-index:2}
-.dc-media-break+section{position:relative;z-index:1}
-
-/* Controlled asymmetry. */
-.dc-offset-left{width:min(82%,1180px);margin-right:auto}
-.dc-offset-right{width:min(79%,1120px);margin-left:auto}
-.dc-narrow-column{width:min(64%,900px)}
-.dc-narrow-column--right{margin-left:auto}
-
-/* About: dense hero → quiet opening → statement → media rupture → index → definition → hit. */
-.dc-about .dc-editorial-opening{padding-top:var(--dc-rhythm-wide);padding-bottom:var(--dc-rhythm-huge)}
-.dc-about .dc-about-manifesto{padding-top:var(--dc-rhythm-medium);padding-bottom:var(--dc-rhythm-wide)}
-.dc-about .dc-about-service{padding-top:var(--dc-rhythm-tight);padding-bottom:var(--dc-rhythm-huge)}
-.dc-about .dc-ink-slot--about{margin-top:clamp(-80px,-5vw,-30px);margin-bottom:clamp(70px,9vw,150px)}
-.dc-about .dc-about-principles{padding-top:var(--dc-rhythm-wide);padding-bottom:var(--dc-rhythm-medium)}
-.dc-about .dc-about-dementor{padding-top:var(--dc-rhythm-huge);padding-bottom:var(--dc-rhythm-wide)}
-.dc-about .dc-about-join{min-height:92svh;display:grid;align-items:center}
-
-/* Projects: oversized editorial opening → dry register → huge pause → boundary hit. */
-.dc-projects-page .dc-editorial-opening{padding-top:var(--dc-rhythm-wide);padding-bottom:var(--dc-rhythm-huge)}
-.dc-projects-page .dc-project-register-section{padding-top:var(--dc-rhythm-tight);padding-bottom:var(--dc-rhythm-medium)}
-.dc-projects-page .dc-project-register-section .dc-shell{max-width:1320px}
-.dc-projects-page .dc-project-register-section .dc-index{margin-top:clamp(46px,6vw,86px)!important}
-.dc-projects-page .dc-projects-rupture{min-height:clamp(130px,20vw,320px)}
-.dc-projects-page .dc-boundary{padding-top:var(--dc-rhythm-huge);padding-bottom:var(--dc-rhythm-huge)}
-
-/* Events: editorial read → pause → programme → quote → archive rule. */
-.dc-events-page .dc-editorial-opening{padding-top:var(--dc-rhythm-wide);padding-bottom:var(--dc-rhythm-huge)}
-.dc-events-page .dc-programme-section{padding-top:var(--dc-rhythm-tight);padding-bottom:var(--dc-rhythm-medium)}
-.dc-events-page .dc-programme{margin-top:clamp(54px,7vw,100px)}
-.dc-events-page .dc-pullquote{margin-top:var(--dc-rhythm-wide);margin-bottom:var(--dc-rhythm-wide)}
-.dc-events-page .dc-programme-note{margin-top:var(--dc-rhythm-huge)}
-
-/* Entity pages: allow media and evidence to change the cadence. */
-.dc-fuengirola-page .dc-entity-hero{min-height:92svh}
-.dc-fuengirola-page .dc-ink-slot--event{margin-top:0;margin-bottom:var(--dc-rhythm-wide)}
-.dc-fuengirola-page .dc-event-detail{padding-top:var(--dc-rhythm-wide);padding-bottom:var(--dc-rhythm-huge)}
-.dc-fuengirola-page .dc-event-lifecycle{padding-top:var(--dc-rhythm-tight);padding-bottom:var(--dc-rhythm-wide)}
-.dc-fuengirola-page .dc-event-lock{min-height:88svh;display:grid;align-items:center}
-
-.dc-logic-page .dc-project-hero{padding-bottom:var(--dc-rhythm-wide)}
-.dc-logic-page .dc-ministry{padding-top:var(--dc-rhythm-wide);padding-bottom:var(--dc-rhythm-huge)}
-.dc-logic-page .dc-ink-slot--logic{margin-top:clamp(-100px,-6vw,-36px);margin-bottom:var(--dc-rhythm-wide)}
-.dc-logic-page .dc-chain__head{padding-top:var(--dc-rhythm-medium);padding-bottom:var(--dc-rhythm-tight)}
-.dc-logic-page .dc-chain{margin-top:clamp(40px,5vw,72px)}
-.dc-logic-page .dc-boundary{padding-top:var(--dc-rhythm-huge);padding-bottom:var(--dc-rhythm-huge)}
-
-.dc-catalog-page .dc-entity-hero{min-height:84svh}
-.dc-catalog-page main>.dc-section{padding-top:var(--dc-rhythm-wide);padding-bottom:var(--dc-rhythm-huge)}
-.dc-catalog-page .dc-catalog-controls{margin-top:clamp(50px,7vw,96px);margin-bottom:clamp(34px,4vw,62px)}
-.dc-catalog-page .dc-catalog-provenance{margin-top:var(--dc-rhythm-huge)}
-
-@media(max-width:700px){
-  :root{--dc-rhythm-tight:58px;--dc-rhythm-medium:82px;--dc-rhythm-wide:104px;--dc-rhythm-huge:132px}
-  .dc-silence{min-height:68px}.dc-silence--large{min-height:92px}
-  .dc-offset-left,.dc-offset-right,.dc-narrow-column{width:100%;margin-left:0;margin-right:0}
-  .dc-about .dc-ink-slot--about,.dc-logic-page .dc-ink-slot--logic{margin-top:-26px;margin-bottom:78px}
-  .dc-about .dc-about-join,.dc-fuengirola-page .dc-event-lock{min-height:auto}
-  .dc-projects-page .dc-projects-rupture{min-height:88px}
-  .dc-events-page .dc-programme-note,.dc-catalog-page .dc-catalog-provenance{margin-top:104px}
-}
+:root{--dc-rhythm-tight:clamp(54px,6vw,92px);--dc-rhythm-medium:clamp(96px,11vw,170px);--dc-rhythm-wide:clamp(150px,17vw,270px);--dc-rhythm-huge:clamp(210px,23vw,360px)}
+.dc-rhythm-dense{padding-top:var(--dc-rhythm-tight);padding-bottom:var(--dc-rhythm-tight)}.dc-rhythm-quiet{padding-top:var(--dc-rhythm-wide);padding-bottom:var(--dc-rhythm-wide)}.dc-rhythm-oversized{padding-top:var(--dc-rhythm-huge);padding-bottom:var(--dc-rhythm-huge)}.dc-rhythm-index{padding-top:var(--dc-rhythm-medium);padding-bottom:var(--dc-rhythm-medium)}.dc-rhythm-hit{padding-top:var(--dc-rhythm-wide);padding-bottom:var(--dc-rhythm-huge)}
+.dc-silence{min-height:clamp(110px,16vw,260px);pointer-events:none}.dc-silence--large{min-height:clamp(170px,23vw,360px)}
+.dc-media-break{width:100%;margin-left:0;margin-right:0;position:relative;z-index:2}.dc-media-break+section{position:relative;z-index:1}
+.dc-offset-left{width:min(82%,1180px);margin-right:auto}.dc-offset-right{width:min(79%,1120px);margin-left:auto}.dc-narrow-column{width:min(64%,900px)}.dc-narrow-column--right{margin-left:auto}
+.dc-about .dc-editorial-opening{padding-top:var(--dc-rhythm-wide);padding-bottom:var(--dc-rhythm-huge)}.dc-about .dc-about-manifesto{padding-top:var(--dc-rhythm-medium);padding-bottom:var(--dc-rhythm-wide)}.dc-about .dc-about-service{padding-top:var(--dc-rhythm-tight);padding-bottom:var(--dc-rhythm-huge)}.dc-about .dc-ink-slot--about{margin-top:clamp(-80px,-5vw,-30px);margin-bottom:clamp(70px,9vw,150px)}.dc-about .dc-about-principles{padding-top:var(--dc-rhythm-wide);padding-bottom:var(--dc-rhythm-medium)}.dc-about .dc-about-dementor{padding-top:var(--dc-rhythm-huge);padding-bottom:var(--dc-rhythm-wide)}.dc-about .dc-about-join{min-height:92svh;display:grid;align-items:center}
+.dc-projects-page .dc-editorial-opening{padding-top:var(--dc-rhythm-wide);padding-bottom:var(--dc-rhythm-huge)}.dc-projects-page .dc-project-register-section{padding-top:var(--dc-rhythm-tight);padding-bottom:var(--dc-rhythm-medium)}.dc-projects-page .dc-project-register-section .dc-shell{max-width:1320px}.dc-projects-page .dc-project-register-section .dc-index{margin-top:clamp(46px,6vw,86px)!important}.dc-projects-page .dc-projects-rupture{min-height:clamp(130px,20vw,320px)}.dc-projects-page .dc-boundary{padding-top:var(--dc-rhythm-huge);padding-bottom:var(--dc-rhythm-huge)}
+.dc-events-page .dc-editorial-opening{padding-top:var(--dc-rhythm-wide);padding-bottom:var(--dc-rhythm-huge)}.dc-events-page .dc-programme-section{padding-top:var(--dc-rhythm-tight);padding-bottom:var(--dc-rhythm-medium)}.dc-events-page .dc-programme{margin-top:clamp(54px,7vw,100px)}.dc-events-page .dc-pullquote{margin-top:var(--dc-rhythm-wide);margin-bottom:var(--dc-rhythm-wide)}.dc-events-page .dc-programme-note{margin-top:var(--dc-rhythm-huge)}
+.dc-fuengirola-page .dc-entity-hero{min-height:92svh}.dc-fuengirola-page .dc-ink-slot--event{margin-top:0;margin-bottom:var(--dc-rhythm-wide)}.dc-fuengirola-page .dc-event-detail{padding-top:var(--dc-rhythm-wide);padding-bottom:var(--dc-rhythm-huge)}.dc-fuengirola-page .dc-event-lifecycle{padding-top:var(--dc-rhythm-tight);padding-bottom:var(--dc-rhythm-wide)}.dc-fuengirola-page .dc-event-lock{min-height:88svh;display:grid;align-items:center}
+.dc-logic-page .dc-project-hero{padding-bottom:var(--dc-rhythm-wide)}.dc-logic-page .dc-ministry{padding-top:var(--dc-rhythm-wide);padding-bottom:var(--dc-rhythm-huge)}.dc-logic-page .dc-ink-slot--logic{margin-top:clamp(-100px,-6vw,-36px);margin-bottom:var(--dc-rhythm-wide)}.dc-logic-page .dc-chain__head{padding-top:var(--dc-rhythm-medium);padding-bottom:var(--dc-rhythm-tight)}.dc-logic-page .dc-chain{margin-top:clamp(40px,5vw,72px)}.dc-logic-page .dc-boundary{padding-top:var(--dc-rhythm-huge);padding-bottom:var(--dc-rhythm-huge)}
+.dc-catalog-page .dc-entity-hero{min-height:84svh}.dc-catalog-page main>.dc-section{padding-top:var(--dc-rhythm-wide);padding-bottom:var(--dc-rhythm-huge)}.dc-catalog-page .dc-catalog-controls{margin-top:clamp(50px,7vw,96px);margin-bottom:clamp(34px,4vw,62px)}.dc-catalog-page .dc-catalog-provenance{margin-top:var(--dc-rhythm-huge)}
+@media(max-width:700px){:root{--dc-rhythm-tight:58px;--dc-rhythm-medium:82px;--dc-rhythm-wide:104px;--dc-rhythm-huge:132px}.dc-silence{min-height:68px}.dc-silence--large{min-height:92px}.dc-offset-left,.dc-offset-right,.dc-narrow-column{width:100%;margin-left:0;margin-right:0}.dc-about .dc-ink-slot--about,.dc-logic-page .dc-ink-slot--logic{margin-top:-26px;margin-bottom:78px}.dc-about .dc-about-join,.dc-fuengirola-page .dc-event-lock{min-height:auto}.dc-projects-page .dc-projects-rupture{min-height:88px}.dc-events-page .dc-programme-note,.dc-catalog-page .dc-catalog-provenance{margin-top:104px}.dc-fuengirola-page .dc-entity-hero,.dc-catalog-page .dc-entity-hero{min-height:auto}.dc-fuengirola-page .dc-event-lifecycle{padding-top:58px;padding-bottom:92px}.dc-logic-page .dc-ministry{padding-top:92px;padding-bottom:118px}}
+@media(max-width:430px){:root{--dc-rhythm-tight:52px;--dc-rhythm-medium:70px;--dc-rhythm-wide:88px;--dc-rhythm-huge:112px}.dc-projects-page .dc-projects-rupture{min-height:68px}.dc-about .dc-ink-slot--about,.dc-logic-page .dc-ink-slot--logic{margin-top:-18px;margin-bottom:64px}.dc-events-page .dc-programme{margin-top:40px}.dc-events-page .dc-programme-note,.dc-catalog-page .dc-catalog-provenance{margin-top:86px}.dc-catalog-page .dc-catalog-controls{margin-top:40px;margin-bottom:26px}}
+@media(max-width:390px){:root{--dc-rhythm-tight:48px;--dc-rhythm-medium:64px;--dc-rhythm-wide:80px;--dc-rhythm-huge:100px}.dc-silence{min-height:52px}.dc-silence--large{min-height:70px}.dc-projects-page .dc-projects-rupture{min-height:56px}}
+@media(max-width:360px){:root{--dc-rhythm-tight:44px;--dc-rhythm-medium:58px;--dc-rhythm-wide:72px;--dc-rhythm-huge:92px}.dc-events-page .dc-programme-note,.dc-catalog-page .dc-catalog-provenance{margin-top:72px}}
