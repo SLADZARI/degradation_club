@@ -1,11 +1,4 @@
 (()=>{
-  const ensureCss=(href,key)=>{
-    if(document.querySelector(`link[data-${key}]`))return;
-    const l=document.createElement('link');l.rel='stylesheet';l.href=href;l.dataset[key.replace(/-([a-z])/g,(_,c)=>c.toUpperCase())]='1';document.head.appendChild(l);
-  };
-  ensureCss('/mouthwash-v1.css','dc-mouthwash');
-  ensureCss('/dia-v1.css','dc-dia');
-
   const mqMobile=()=>matchMedia('(max-width:700px)').matches;
   const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
   const path=location.pathname;
