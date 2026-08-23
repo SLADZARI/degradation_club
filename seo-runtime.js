@@ -38,4 +38,18 @@
     if(!nav.id)nav.id='primary-navigation';
     menu.setAttribute('aria-controls',nav.id);
   }
+
+  if(location.pathname.startsWith('/join')){
+    const ensureStorageFallback=()=>{
+      const state=document.documentElement.dataset.dcStorage;
+      if(state==='available')return;
+      if(state==='checking'||state==='unavailable')document.documentElement.dataset.dcStorage='unavailable';
+      if(document.querySelector('.dc-storage-warning'))return;
+      const host=document.querySelector('.join-shell');if(!host)return;
+      const note=document.createElement('div');note.className='dc-storage-warning';note.setAttribute('role','alert');
+      note.innerHTML='<strong>ЛОКАЛЬНОЕ ХРАНЕНИЕ НЕДОСТУПНО</strong><span>Не удалось подтвердить сохранение профиля в браузере. Запуск процедуры отключён, чтобы не потерять результаты.</span>';
+      host.prepend(note);
+    };
+    setTimeout(()=>{if(document.documentElement.dataset.dcStorage!=='available')ensureStorageFallback();},1600);
+  }
 })();
