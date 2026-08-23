@@ -4,4 +4,5 @@ input:focus-visible,select:focus-visible,textarea:focus-visible,[tabindex]:focus
 a[aria-disabled="true"]{pointer-events:none;opacity:.42;text-decoration:none}
 .dc-service-status[data-state="error"],.dc-storage-warning{font-weight:700}
 .dc-storage-warning{display:grid;gap:6px;margin:0 0 24px;padding:14px 16px;border:1px solid currentColor;font-size:13px;line-height:1.4}.dc-storage-warning strong{font-size:11px;letter-spacing:.08em}
+html[data-dc-storage="unavailable"] #sphereGrid,html[data-dc-storage="unavailable"] #questionHost,html[data-dc-storage="unavailable"] .actions,html[data-dc-storage="unavailable"] #another,html[data-dc-storage="unavailable"] #restart{pointer-events:none;opacity:.38}
 @media(prefers-reduced-motion:reduce){.dc-skip-link{transition:none}}
