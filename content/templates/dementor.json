@@ -1,0 +1,20 @@
+{
+  "id": null,
+  "entityType": "dementor",
+  "title": null,
+  "slug": null,
+  "status": null,
+  "publicUrl": null,
+  "preview": null,
+  "publicName": null,
+  "story": null,
+  "practiceAreas": [],
+  "relatedEvents": [],
+  "relatedCourses": [],
+  "relatedProjects": [],
+  "provenance": {
+    "branch": "dementor-club",
+    "path": "people/dementors.md"
+  },
+  "updatedAt": null
+}
