@@ -3,6 +3,8 @@
 Status: **RASTER PIPELINE / ASSETS PENDING**
 Updated: 2026-08-23
 
+Canonical binary requirements: `docs/RASTER_ASSET_SPEC_v1.md`.
+
 All OpenGraph/social preview artwork is raster-only.
 
 ## Delivery format
@@ -10,6 +12,7 @@ All OpenGraph/social preview artwork is raster-only.
 - canvas: 1200×630 px;
 - preferred: JPG or WebP;
 - PNG only when transparency is genuinely useful before compositing;
+- final social delivery has no alpha;
 - no SVG social artwork;
 - no raster-to-vector tracing;
 - text must remain readable in small Telegram/Threads/X previews;
