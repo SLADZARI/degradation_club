@@ -4,6 +4,16 @@
   const path=location.pathname;
   document.documentElement.dataset.route=path;
 
+  /* Utility navigation: support/contact/legal stay out of the primary cultural nav. */
+  if(!document.querySelector('link[href="/utility-v1.css"]')){
+    const utilityCss=document.createElement('link');utilityCss.rel='stylesheet';utilityCss.href='/utility-v1.css';document.head.appendChild(utilityCss);
+  }
+  if(!document.querySelector('.dc-utility-strip')){
+    const strip=document.createElement('div');strip.className='dc-utility-strip';
+    strip.innerHTML='<span class="dc-utility-strip__label">UTILITY / PUBLIC</span><nav class="dc-utility-nav" aria-label="Служебная навигация"><a href="/donate/">Support</a><a href="/contacts/">Contacts</a><a href="/legal/privacy/">Privacy</a><a href="/legal/terms/">Terms</a></nav>';
+    const footer=document.querySelector('footer');footer?footer.insertAdjacentElement('afterend',strip):document.body.appendChild(strip);
+  }
+
   /* Dementor Ink density map: semantic route contract, no invented raster art. */
   const inkMap={
     '/':{level:3,role:'takeover',target:'.dc-ink-slot--home'},
@@ -16,7 +26,11 @@
     '/archive/':{level:0,role:'silence'},
     '/community/':{level:0,role:'silence'},
     '/merch/':{level:0,role:'silence'},
-    '/join/':{level:0,role:'silence'}
+    '/join/':{level:0,role:'silence'},
+    '/donate/':{level:0,role:'silence'},
+    '/contacts/':{level:0,role:'silence'},
+    '/legal/privacy/':{level:0,role:'silence'},
+    '/legal/terms/':{level:0,role:'silence'}
   };
   const ink=inkMap[path]||{level:0,role:'silence'};
   document.body.classList.add(`dc-ink-l${ink.level}`);
