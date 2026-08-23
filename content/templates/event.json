@@ -1,0 +1,21 @@
+{
+  "id": null,
+  "entityType": "event",
+  "title": null,
+  "slug": null,
+  "status": null,
+  "publicUrl": null,
+  "preview": null,
+  "location": null,
+  "dateTime": null,
+  "venue": null,
+  "programme": null,
+  "price": null,
+  "registrationUrl": null,
+  "relatedProjects": [],
+  "provenance": {
+    "branch": "dementor-club",
+    "path": null
+  },
+  "updatedAt": null
+}
