@@ -3,6 +3,8 @@
 Status: **ASSET PIPELINE / RASTER ONLY / IMAGES PENDING**
 Updated: 2026-08-23
 
+Canonical binary requirements: `docs/RASTER_ASSET_SPEC_v1.md`.
+
 The site must use real Dementor Ink artwork, not CSS grunge, generic texture effects or vector stand-ins.
 
 ## Required production files
