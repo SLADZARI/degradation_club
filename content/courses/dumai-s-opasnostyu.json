@@ -1,0 +1,19 @@
+{
+  "id": "COURSE-001",
+  "entityType": "course",
+  "title": "Думай с опасностью",
+  "slug": "dumai-s-opasnostyu",
+  "status": "approved-draft",
+  "publicUrl": "/courses/dumai-s-opasnostyu/",
+  "delivery": "web-self-paced",
+  "dementor": "DEMENTOR-001",
+  "modules": 7,
+  "progressStorage": "localStorage",
+  "catalogPlacement": "not-approved",
+  "preview": null,
+  "provenance": {
+    "branch": "dementor-club",
+    "path": "courses/dumai-s-opasnostyu.md"
+  },
+  "updatedAt": "2026-08-24"
+}
