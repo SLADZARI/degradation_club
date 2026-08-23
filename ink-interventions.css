@@ -22,8 +22,12 @@
 
 /* L1 / TRACE — system dominates, Ink only leaves evidence. */
 .dc-ink-trace{position:relative;isolation:isolate}
-.dc-ink-trace::after{content:attr(data-ink-label);position:absolute;z-index:2;right:0;top:0;max-width:180px;padding:6px 8px;background:var(--dc-ink);color:var(--dc-paper);font-size:8px;line-height:1.2;letter-spacing:.12em;text-transform:uppercase;transform:translateY(-52%) rotate(var(--dc-ink-tilt-l1));pointer-events:none}
-.dc-ink-trace::before{content:"";position:absolute;z-index:1;right:4%;top:-1px;width:clamp(46px,6vw,92px);height:1px;background:var(--dc-ink);transform:rotate(-1.2deg);transform-origin:right center;pointer-events:none}
+.dc-ink-trace::after{content:attr(data-ink-label);position:absolute;z-index:3;right:0;top:0;max-width:180px;padding:6px 8px;background:var(--dc-ink);color:var(--dc-paper);font-size:8px;line-height:1.2;letter-spacing:.12em;text-transform:uppercase;transform:translateY(-52%) rotate(var(--dc-ink-tilt-l1));pointer-events:none}
+.dc-ink-trace::before{content:"";position:absolute;z-index:2;right:4%;top:-1px;width:clamp(46px,6vw,92px);height:1px;background:var(--dc-ink);transform:rotate(-1.2deg);transform-origin:right center;pointer-events:none}
+.dc-ink-trace-media{position:absolute;z-index:1;right:clamp(18px,3vw,52px);top:50%;width:clamp(86px,9vw,132px);aspect-ratio:4/3;transform:translateY(-42%) rotate(-1.1deg);border:1px solid var(--dc-ink);overflow:hidden;background:var(--dc-paper);pointer-events:none;opacity:.92}
+.dc-ink-trace-media img{display:block;width:100%;height:100%;object-fit:cover;mix-blend-mode:multiply;filter:contrast(1.08)}
+.dc-projects-page .dc-ink-trace-media{right:0;top:calc(100% + 16px)}
+.dc-events-page .dc-ink-trace-media{right:0;top:56%}
 
 /* L2 / CONTAMINATION, LEAK, FIELD RECORD ------------------------------- */
 .dc-ink-slot--about,.dc-ink-slot--logic,.dc-ink-slot--event{z-index:4;width:min(106vw,1720px);margin-left:max(-3vw,calc((100vw - 1720px)/2));border:1px solid var(--dc-ink);box-shadow:0 0 0 1px var(--dc-paper)}
@@ -61,6 +65,7 @@
 @media(max-width:700px){
   .dc-ink-trace::after{right:0;top:2px;max-width:150px;font-size:7px;transform:translateY(-42%)}
   .dc-ink-trace::before{display:none}
+  .dc-ink-trace-media{position:relative;right:auto!important;top:auto!important;width:82px;margin:14px 0 0 auto;transform:rotate(-.7deg)}
 
   .dc-ink-slot--about,.dc-ink-slot--logic,.dc-ink-slot--event{width:100%;margin-left:0;transform:none;border-left:0;border-right:0}
   .dc-ink-slot--about{margin-top:-26px;margin-bottom:-30px}
@@ -79,6 +84,6 @@
 }
 
 @media(prefers-reduced-motion:reduce){
-  .dc-ink-slot--about,.dc-ink-slot--logic,.dc-ink-slot--event,.dc-home .dc-ink-slot--home,.dc-ink-trace::after{transform:none!important}
+  .dc-ink-slot--about,.dc-ink-slot--logic,.dc-ink-slot--event,.dc-home .dc-ink-slot--home,.dc-ink-trace::after,.dc-ink-trace-media{transform:none!important}
   .dc-home .dc-ink-slot--home>img{transition:none!important}
 }
