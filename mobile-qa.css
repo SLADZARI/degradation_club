@@ -1,0 +1,31 @@
+/* Mobile QA guardrails: 360 / 390 / 430 / 768. */
+@media(max-width:768px){
+  html,body{width:100%;max-width:100%;overflow-x:clip}
+  *,*::before,*::after{min-width:0;box-sizing:border-box}
+  img,video,canvas,svg{max-width:100%}
+  .dc-shell,.dc-entity-hero,.dc-page-hero,.dc-about-hero{width:100%;max-width:100%}
+  .dc-display-xl,.dc-display-l{overflow-wrap:normal;word-break:normal;hyphens:none}
+  .dc-index-row,.dc-entity-row{max-width:100%}
+  .dc-action{min-height:48px}
+  .menu-toggle{min-width:54px;min-height:44px}
+}
+@media(max-width:430px){
+  .topbar{padding-left:18px!important;padding-right:18px!important}
+  .brand{white-space:nowrap}
+  .dc-shell{padding-left:18px!important;padding-right:18px!important}
+  .dc-display-xl{font-size:clamp(40px,11vw,47px)!important;line-height:.86!important;letter-spacing:-.065em!important}
+  .dc-display-l{font-size:clamp(33px,9.4vw,40px)!important;line-height:.9!important;letter-spacing:-.055em!important}
+  .dc-entity-row__title,.dc-index-row__title{overflow-wrap:anywhere}
+}
+@media(max-width:390px){
+  .dc-display-xl{font-size:clamp(38px,10.8vw,44px)!important}
+  .dc-display-l{font-size:clamp(31px,9.2vw,37px)!important}
+  .dc-lead{font-size:clamp(21px,6vw,25px)!important}
+}
+@media(max-width:360px){
+  .topbar{padding-left:14px!important;padding-right:14px!important}
+  .dc-shell{padding-left:14px!important;padding-right:14px!important}
+  .dc-display-xl{font-size:clamp(35px,10.4vw,40px)!important}
+  .dc-display-l{font-size:clamp(29px,8.8vw,34px)!important}
+  .dc-kicker,.dc-meta{font-size:9px!important;letter-spacing:.1em!important}
+}
