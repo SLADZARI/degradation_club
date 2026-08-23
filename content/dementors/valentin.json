@@ -1,0 +1,19 @@
+{
+  "id": "DEMENTOR-001",
+  "entityType": "dementor",
+  "title": "Валентин Лосев",
+  "slug": "valentin",
+  "status": "active",
+  "publicUrl": "/community/valentin/",
+  "story": null,
+  "practiceAreas": null,
+  "relatedEvents": [],
+  "relatedCourses": ["COURSE-001"],
+  "relatedProjects": [],
+  "preview": null,
+  "provenance": {
+    "branch": "dementor-club",
+    "path": "people/dementors.md"
+  },
+  "updatedAt": "2026-08-24"
+}
