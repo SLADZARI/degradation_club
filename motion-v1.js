@@ -14,6 +14,13 @@
     inkCss.dataset.dcInkInterventions='1';
     document.head.appendChild(inkCss);
   }
+  if(!document.querySelector('link[data-dc-editorial-system]')){
+    const editorialCss=document.createElement('link');
+    editorialCss.rel='stylesheet';
+    editorialCss.href='/editorial-system.css';
+    editorialCss.dataset.dcEditorialSystem='1';
+    document.head.appendChild(editorialCss);
+  }
 
   const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const path=location.pathname;
