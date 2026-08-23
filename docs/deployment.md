@@ -1,6 +1,7 @@
 # Dementor Club — production deployment contract
 
-Status: approved
+Status: approved architecture / deployment connection currently unverified
+Updated: 2026-08-23
 
 ## Production source
 
@@ -13,24 +14,30 @@ Branch responsibilities remain separate:
 - `logic-awareness` — independent project «Логика и осознанность»;
 - `main` — shared technical/repository level, not a production website source.
 
-## Vercel
+## Vercel target contract
 
-Expected Vercel project setting:
+Expected project setting:
 
 - Repository: `SLADZARI/degradation_club`
 - Production Branch: `dementor-club-site`
 - Root Directory: repository root
-- Production alias: `dementor-club-sharecraftwideo-5699s-projects.vercel.app`
+- Previous known alias: `dementor-club-sharecraftwideo-5699s-projects.vercel.app`
 
 `vercel.json` explicitly disables Git deployments from `main`, `dementor-club` and `logic-awareness` and enables them for `dementor-club-site`.
 
-Production Branch was switched to `dementor-club-site` on 2026-08-23. The next commit to this branch must create a Production Deployment and assign the production alias.
+## Current verified state — 2026-08-23
+
+The connected Vercel account/team resolves successfully, but its project listing currently returns **zero projects**. A direct deployment attempt through the connector also cannot proceed because the deployment action currently exposes an inconsistent runtime schema.
+
+Therefore earlier statements that the production project/branch connection is already active must be treated as **historical/unverified**, not current proof of publication.
+
+Do not claim a production deployment until the project appears in the connected Vercel account and the deployed routes are fetched successfully.
 
 ## Release flow
 
-`dementor-club` → approved content/decision → implementation in `dementor-club-site` → push → Vercel production deployment → public verification.
+`dementor-club` → approved content/decision → implementation in `dementor-club-site` → production deployment → public verification.
 
-A successful Preview deployment is not considered publication. Publication is complete only when the production alias serves the new route/content.
+A successful Preview deployment is not considered publication. Publication is complete only when the stable production alias/domain serves the new route/content.
 
 ## Required smoke checks
 
@@ -38,6 +45,11 @@ After every production deployment verify:
 
 1. `/` returns the current homepage.
 2. `/about/` opens successfully.
-3. `/join/` opens successfully and onboarding can be completed.
-4. Main CTA «Вступить в клуб» leads to `/join/`.
-5. No club source-of-truth or independent project branch is used as the production branch.
+3. `/events/` and `/events/fuengirola/` resolve.
+4. `/projects/` and `/projects/logic-awareness/` resolve.
+5. `/community/`, `/merch/`, `/join/` resolve.
+6. onboarding can be completed and local progress persists.
+7. main navigation has no legacy homepage-anchor routes.
+8. no club source-of-truth or independent project branch is used as the production branch.
+9. production asset requests return the expected raster files.
+10. no claim of publication is made before these checks pass.
