@@ -1,0 +1,21 @@
+{
+  "version": "2026-08-24",
+  "role": "site content readiness registry",
+  "statusDefinitions": {
+    "FINAL": "Current public copy can ship without additional factual approval; later editorial refinement is optional.",
+    "PLACEHOLDER": "Page structure is valid, but substantive content is intentionally incomplete pending source-of-truth material.",
+    "REQUIRES_APPROVAL": "Operational or factual fields must be approved before the page can perform its intended live function."
+  },
+  "pages": [
+    {
+      "route": "/about/",
+      "state": "FINAL",
+      "source": [
+        "dementor-club/concept/DEGRADATION_AS_A_SERVICE.md",
+        "dementor-club/concept/ecosystem.md"
+      ],
+      "blockingFields": [],
+      "note": "Core positioning, service inversion, club role and editorial tone are source-aligned."
+    }
+  ]
+}
