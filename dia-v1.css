@@ -9,13 +9,26 @@
 /* State transition: mechanical, factual status remains in DOM/data. */
 .dc-dia-state{position:relative;transition:background var(--dc-dia-fast) linear,color var(--dc-dia-fast) linear,transform var(--dc-dia-medium) var(--dc-dia-ease)}
 .dc-dia-state::after{content:"";position:absolute;left:0;right:0;bottom:0;height:2px;background:currentColor;transform:scaleX(0);transform-origin:left;transition:transform var(--dc-dia-medium) var(--dc-dia-ease)}
-.dc-dia-state:hover::after,.dc-dia-state:focus-within::after,.dc-dia-state.is-active::after{transform:scaleX(1)}
+.dc-dia-state:hover::after,.dc-dia-state:focus-within::after,.dc-dia-state.is-active::after,.dc-dia-state.is-current::after{transform:scaleX(1)}
 .dc-dia-state.is-current{background:var(--dc-acid);color:var(--dc-ink)}
 .dc-dia-state.is-current:hover,.dc-dia-state.is-current:focus-within{transform:translateX(8px)}
+.dc-dia-state:not(.is-current):hover,.dc-dia-state:not(.is-current):focus-within{transform:translateX(3px)}
 
 /* Reclassification uses interface language only. */
 .dc-reclassify-row{transition:transform var(--dc-dia-medium) var(--dc-dia-ease),letter-spacing var(--dc-dia-medium) var(--dc-dia-ease)}
 .dc-reclassify-row.is-reclassified{transform:translateX(8px)}
+
+/* Catalogue rows behave like mechanical records, not cards. */
+.dc-global-row,.dc-index-row,.dc-entity-row{transition:padding-left var(--dc-dia-medium) var(--dc-dia-ease),padding-right var(--dc-dia-medium) var(--dc-dia-ease),background var(--dc-dia-fast) linear,color var(--dc-dia-fast) linear}
+.dc-global-row>* , .dc-index-row>* , .dc-entity-row>*{transition:transform var(--dc-dia-medium) var(--dc-dia-ease),opacity var(--dc-dia-fast) linear}
+.dc-global-row:hover,.dc-global-row:focus-visible,.dc-index-row:hover,.dc-index-row:focus-visible,.dc-entity-row:hover,.dc-entity-row:focus-visible{padding-left:18px;padding-right:10px}
+.dc-global-row:hover>*:nth-child(2),.dc-global-row:focus-visible>*:nth-child(2),.dc-index-row:hover>*:nth-child(2),.dc-index-row:focus-visible>*:nth-child(2),.dc-entity-row:hover>*:nth-child(2),.dc-entity-row:focus-visible>*:nth-child(2){transform:translateX(6px)}
+.dc-global-row:hover>*:last-child,.dc-global-row:focus-visible>*:last-child,.dc-index-row:hover>*:last-child,.dc-index-row:focus-visible>*:last-child,.dc-entity-row:hover>*:last-child,.dc-entity-row:focus-visible>*:last-child{transform:translateX(5px)}
+
+/* Filter state moves mechanically, but does not alter entity status. */
+.dc-catalog-filter{transition:transform var(--dc-dia-medium) var(--dc-dia-ease),background var(--dc-dia-fast) linear,color var(--dc-dia-fast) linear}
+.dc-catalog-filter:hover,.dc-catalog-filter:focus-visible{transform:translateY(-3px)}
+.dc-catalog-filter.is-active{transform:translateY(-3px)}
 
 /* Pressure is bounded and desktop-only. */
 .dc-pressure{transform-origin:left center;transition:transform var(--dc-dia-medium) var(--dc-dia-ease),letter-spacing var(--dc-dia-medium) var(--dc-dia-ease)}
@@ -33,18 +46,21 @@
 .dc-dia-variant .dc-pullquote{transform:translateX(var(--dc-dia-shift)) rotate(var(--dc-dia-tilt));transform-origin:left center}
 
 /* Mechanical metadata reveal. */
-.dc-dia-meta{position:relative;overflow:hidden}
+.dc-dia-meta{position:relative;overflow:hidden;isolation:isolate}
 .dc-dia-meta::before{content:"";position:absolute;inset:0;background:var(--dc-acid);transform:translateX(-101%);transition:transform var(--dc-dia-medium) steps(4,end);z-index:-1}
 .dc-dia-meta:hover::before,.dc-dia-meta:focus-within::before{transform:translateX(0)}
 
 @media(max-width:700px){
   .dc-pressure,.dc-pressure:hover,.dc-pressure:focus-visible,.dc-type-mutation,.dc-dia-drift{transform:none!important;letter-spacing:inherit!important}
-  .dc-reclassify-row.is-reclassified,.dc-dia-state.is-current:hover,.dc-dia-state.is-current:focus-within{transform:none}
+  .dc-reclassify-row.is-reclassified,.dc-dia-state.is-current:hover,.dc-dia-state.is-current:focus-within,.dc-dia-state:not(.is-current):hover,.dc-dia-state:not(.is-current):focus-within{transform:none}
   .dc-dia-variant .dc-editorial-opening__headline,.dc-dia-variant .dc-pullquote{transform:none}
+  .dc-global-row:hover,.dc-global-row:focus-visible,.dc-index-row:hover,.dc-index-row:focus-visible,.dc-entity-row:hover,.dc-entity-row:focus-visible{padding-left:inherit;padding-right:inherit}
+  .dc-global-row:hover>*:nth-child(2),.dc-global-row:focus-visible>*:nth-child(2),.dc-index-row:hover>*:nth-child(2),.dc-index-row:focus-visible>*:nth-child(2),.dc-entity-row:hover>*:nth-child(2),.dc-entity-row:focus-visible>*:nth-child(2),.dc-global-row:hover>*:last-child,.dc-index-row:hover>*:last-child,.dc-entity-row:hover>*:last-child{transform:none}
+  .dc-catalog-filter:hover,.dc-catalog-filter:focus-visible,.dc-catalog-filter.is-active{transform:none}
 }
 
 @media(prefers-reduced-motion:reduce){
-  .dc-dia-state,.dc-reclassify-row,.dc-pressure,.dc-type-mutation,.dc-dia-meta::before{transition:none!important}
-  .dc-pressure,.dc-type-mutation,.dc-dia-drift,.dc-dia-variant .dc-editorial-opening__headline,.dc-dia-variant .dc-pullquote{transform:none!important}
+  .dc-dia-state,.dc-reclassify-row,.dc-pressure,.dc-type-mutation,.dc-dia-meta::before,.dc-global-row,.dc-index-row,.dc-entity-row,.dc-global-row>*,.dc-index-row>*,.dc-entity-row>*,.dc-catalog-filter{transition:none!important}
+  .dc-pressure,.dc-type-mutation,.dc-dia-drift,.dc-dia-variant .dc-editorial-opening__headline,.dc-dia-variant .dc-pullquote,.dc-dia-state,.dc-global-row>*,.dc-index-row>*,.dc-entity-row>*,.dc-catalog-filter{transform:none!important}
   .dc-dia-state::after{transition:none}
 }
