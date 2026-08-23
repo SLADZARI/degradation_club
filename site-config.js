@@ -1,0 +1,27 @@
+window.DEMENTOR_SITE_CONFIG=Object.freeze({
+  version:'2026-08-23',
+  canonicalOrigin:'https://degradation-club.vercel.app',
+  contacts:{
+    enabled:false,
+    endpoint:null,
+    publicEmail:null,
+    socialLinks:[]
+  },
+  donate:{
+    enabled:false,
+    provider:null,
+    checkoutUrl:null,
+    currency:null,
+    recurring:false
+  },
+  merch:{
+    catalogEnabled:true,
+    checkoutEnabled:false,
+    checkoutProvider:null,
+    checkoutUrl:null
+  },
+  onboarding:{
+    storageKey:'dementorClubOnboardingV3',
+    storage:'localStorage'
+  }
+});
