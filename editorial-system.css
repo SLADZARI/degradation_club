@@ -1,0 +1,47 @@
+/* 032c + Mouthwash layer: editorial hierarchy, reading speeds, controlled silence. */
+:root{
+  --dc-font-reading:Inter,Arial,Helvetica,sans-serif;
+  --dc-font-display:"Arial Narrow","Helvetica Neue",Arial,sans-serif;
+}
+body{font-family:var(--dc-font-reading)}
+.dc-display-xl,.dc-display-l,.dc-index-row__title,.dc-entity-row__title,.dc-sphere__name{font-family:var(--dc-font-display);text-wrap:balance}
+.dc-display-xl,.dc-display-l{overflow-wrap:normal;word-break:normal;hyphens:none}
+.dc-kicker,.dc-meta{font-variant-numeric:tabular-nums}
+.dc-body{max-width:66ch}
+.dc-lead{max-width:29ch}
+
+/* 032c — text behaves like editorial material, not landing-page decoration. */
+.dc-about-service__quote{font-family:var(--dc-font-display);font-size:clamp(38px,5.6vw,92px);line-height:.87;letter-spacing:-.055em;max-width:12ch;margin-top:clamp(90px,11vw,170px)}
+.dc-project__aside blockquote{position:relative;padding-top:26px}
+.dc-project__aside blockquote::before{content:"QUOTE / INTERNAL WARNING";position:absolute;top:0;left:0;font-size:9px;line-height:1;letter-spacing:.15em;font-family:var(--dc-font-reading);font-weight:500;color:var(--dc-paper);opacity:.55}
+.dc-boundary__copy::before,.dc-event-detail__copy::before,.dc-about-dementor__copy::before{display:block;margin-bottom:18px;font-size:9px;letter-spacing:.15em;text-transform:uppercase;opacity:.5}
+.dc-boundary__copy::before{content:"EDITORIAL NOTE / SOURCE BOUNDARY"}
+.dc-event-detail__copy::before{content:"FIELD NOTE / PUBLIC VERSION"}
+.dc-about-dementor__copy::before{content:"DEFINITION / WORKING TERM"}
+
+/* Mouthwash — rhythm beyond Home. */
+.dc-about .dc-about-hero{min-height:calc(100svh - 64px)}
+.dc-about-manifesto{padding-top:clamp(150px,17vw,260px);padding-bottom:clamp(150px,17vw,260px)}
+.dc-about-service{padding-top:clamp(100px,12vw,190px);padding-bottom:clamp(170px,19vw,290px)}
+.dc-about-principles{padding-top:clamp(180px,20vw,310px);padding-bottom:clamp(110px,13vw,210px)}
+.dc-about-dementor{padding-top:clamp(150px,17vw,260px);padding-bottom:clamp(170px,18vw,280px)}
+.dc-about-join{min-height:82vh}
+
+.dc-entity-page .dc-page-hero,.dc-entity .dc-entity-hero{min-height:calc(88svh - 64px)}
+.dc-entity-page main>.dc-section:first-of-type,.dc-entity main>.dc-section:first-of-type{padding-top:clamp(140px,16vw,250px);padding-bottom:clamp(130px,15vw,230px)}
+.dc-entity-page .dc-boundary{padding-top:clamp(170px,19vw,300px);padding-bottom:clamp(150px,17vw,260px)}
+.dc-event-detail{padding-top:clamp(170px,18vw,280px);padding-bottom:clamp(140px,16vw,250px)}
+.dc-event-lock{padding-top:clamp(160px,18vw,280px);padding-bottom:clamp(170px,19vw,300px)}
+
+/* Keep support copy intentionally narrow next to oversized statements. */
+.dc-about-manifesto__copy,.dc-about-service__copy,.dc-about-dementor__copy,.dc-boundary__copy,.dc-event-detail__copy{max-width:52ch}
+.dc-entity-index__head .dc-lead,.dc-index__head .dc-lead{max-width:23ch}
+
+@media(max-width:700px){
+  .dc-display-xl,.dc-display-l{font-family:var(--dc-font-reading);text-wrap:wrap}
+  .dc-body{max-width:none}
+  .dc-lead{max-width:24ch}
+  .dc-about-manifesto,.dc-about-service,.dc-about-principles,.dc-about-dementor,.dc-entity-page main>.dc-section:first-of-type,.dc-entity main>.dc-section:first-of-type,.dc-entity-page .dc-boundary,.dc-event-detail,.dc-event-lock{padding-top:88px;padding-bottom:88px}
+  .dc-about-service__quote{font-family:var(--dc-font-reading);font-size:clamp(34px,10vw,44px);line-height:.92;max-width:100%;margin-top:72px}
+  .dc-project__aside blockquote::before{font-size:8px}
+}
