@@ -17,8 +17,8 @@
     '/about/':{level:2,role:'contamination',target:'.dc-ink-slot--about'},
     '/projects/logic-awareness/':{level:2,role:'leak',target:'.dc-ink-slot--logic'},
     '/events/fuengirola/':{level:2,role:'field-record',target:'.dc-ink-slot--event'},
-    '/events/':{level:1,role:'trace',target:'.dc-programme-intro',label:'INK / L1 / PROGRAMME TRACE'},
-    '/projects/':{level:1,role:'trace',target:'.dc-project-register-section .dc-kicker',label:'INK / L1 / PROJECT TRACE'},
+    '/events/':{level:1,role:'trace',target:'.dc-programme-intro',label:'INK / L1 / PROGRAMME TRACE',media:true},
+    '/projects/':{level:1,role:'trace',target:'.dc-project-register-section .dc-kicker',label:'INK / L1 / PROJECT TRACE',media:true},
     '/catalog/':{level:1,role:'trace',target:'.dc-entity-index__head',label:'INK / L1 / REGISTER TRACE'},
     '/archive/':{level:0,role:'silence'},
     '/community/':{level:0,role:'silence'},
@@ -34,7 +34,25 @@
     if(inkTarget){
       inkTarget.classList.add(`dc-ink-l${ink.level}`);
       inkTarget.dataset.inkRole=ink.role;
-      if(ink.level===1){inkTarget.classList.add('dc-ink-trace');inkTarget.dataset.inkLabel=ink.label||'INK / L1 / TRACE';}
+      if(ink.level===1){
+        inkTarget.classList.add('dc-ink-trace');
+        inkTarget.dataset.inkLabel=ink.label||'INK / L1 / TRACE';
+        if(ink.media){
+          const sourceRow=document.querySelector('.dc-catalog-row[data-preview-src]');
+          if(sourceRow?.dataset.previewSrc){
+            const fragment=document.createElement('span');
+            fragment.className='dc-ink-trace-media';
+            fragment.setAttribute('aria-hidden','true');
+            const image=document.createElement('img');
+            image.src=sourceRow.dataset.previewSrc;
+            image.alt='';
+            image.loading='lazy';
+            image.decoding='async';
+            fragment.appendChild(image);
+            inkTarget.appendChild(fragment);
+          }
+        }
+      }
     }
   }
 
