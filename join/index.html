@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="theme-color" content="#111111" />
+  <title>Вступить в клуб — Dementor Club</title>
+  <meta name="description" content="Предварительное освидетельствование кандидата в Dementor Club при содействии Министерства профилактики здравого смысла." />
+  <meta property="og:title" content="Предварительное освидетельствование — Dementor Club" />
+  <meta property="og:description" content="15 вопросов для выявления признаков самостоятельного мышления." />
+  <meta property="og:type" content="website" />
+  <link rel="stylesheet" href="/styles.css" />
+  <style>
+    :root{--paper:#e9e0c9;--red:#a71919}
+    body{background:#111;color:#f3f1e9}
+    .join-shell{max-width:1180px;margin:0 auto;padding:52px 28px 110px}
+    .join-intro{display:grid;grid-template-columns:1.15fr .85fr;gap:42px;align-items:end;min-height:calc(100vh - 72px);padding:68px 0}
+    .join-intro h1{font-size:clamp(58px,8vw,124px);line-height:.84;letter-spacing:-.075em;margin:22px 0 28px}.join-intro h1 em{font-style:normal;color:#111;background:var(--acid);padding:0 .05em}
+    .join-intro .lead{font-size:clamp(22px,3vw,36px);font-weight:800;letter-spacing:-.035em;max-width:780px}.join-intro .small{max-width:720px;font-size:16px;opacity:.72}
+    .ministry-card{background:var(--paper);color:var(--red);padding:34px;min-height:480px;display:flex;flex-direction:column;justify-content:space-between;transform:rotate(1deg);box-shadow:0 30px 70px rgba(0,0,0,.3);font-family:Georgia,serif}.seal{width:88px;height:88px;border:4px double currentColor;border-radius:50%;display:grid;place-items:center;font-weight:900}.ministry-card strong{font-size:clamp(34px,4vw,58px);line-height:.9}.ministry-card small{max-width:300px;font-size:14px}
+    .quiz{display:none}.quiz.active{display:block}.progress-wrap{position:sticky;top:72px;z-index:10;background:#111;padding:18px 0;border-bottom:1px solid rgba(255,255,255,.18)}.progress-row{display:flex;justify-content:space-between;gap:20px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;opacity:.7}.progress{height:5px;background:rgba(255,255,255,.14);margin-top:12px}.progress span{display:block;height:100%;background:var(--acid);width:0;transition:width .25s ease}
+    .question{padding:74px 0 28px}.question .qnum{font-size:11px;letter-spacing:.14em;opacity:.5}.question h2{font-size:clamp(34px,5vw,68px);line-height:.98;letter-spacing:-.05em;max-width:980px;margin:20px 0 36px}.answers{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid rgba(255,255,255,.22);border-left:1px solid rgba(255,255,255,.22)}.answer{appearance:none;text-align:left;color:inherit;background:transparent;border:0;border-right:1px solid rgba(255,255,255,.22);border-bottom:1px solid rgba(255,255,255,.22);padding:24px;min-height:130px;font:inherit;cursor:pointer;display:flex;gap:16px;align-items:flex-start}.answer:hover,.answer:focus-visible{background:var(--acid);color:#111;outline:none}.answer .letter{font-size:11px;opacity:.55}.answer span:last-child{font-size:18px}
+    .result{display:none;padding:70px 0}.result.active{display:block}.result-stamp{display:inline-block;border:2px solid var(--red);color:var(--red);padding:10px 16px;font-weight:900;letter-spacing:.08em;transform:rotate(-2deg);background:var(--paper)}.result h1{font-size:clamp(54px,8vw,112px);line-height:.86;letter-spacing:-.07em;margin:30px 0}.verdict{font-size:clamp(24px,3vw,40px);max-width:900px;font-weight:800;letter-spacing:-.03em}.scales{margin:60px 0;border-top:1px solid rgba(255,255,255,.2)}.scale{display:grid;grid-template-columns:180px 1fr 68px;gap:18px;align-items:center;border-bottom:1px solid rgba(255,255,255,.2);padding:18px 0}.scale-name{text-transform:uppercase;font-size:11px;letter-spacing:.1em}.bar{height:10px;background:rgba(255,255,255,.12)}.bar i{display:block;height:100%;background:var(--acid)}.scale strong{text-align:right;font-size:18px}.profile-box{background:var(--bg);color:#111;padding:34px;margin:50px 0}.profile-box .kicker{opacity:.55}.profile-box h2{font-size:clamp(38px,5vw,72px);letter-spacing:-.055em;margin:12px 0 20px}.profile-box p{font-size:19px;max-width:850px}.decision{border:1px solid rgba(255,255,255,.25);padding:32px;margin-top:48px}.decision strong{display:block;font-size:clamp(30px,4vw,56px);line-height:.95;letter-spacing:-.045em;margin:10px 0 20px}.privacy{font-size:12px;opacity:.5;max-width:720px;margin-top:34px}
+    @media(max-width:800px){.join-shell{padding-left:18px;padding-right:18px}.join-intro{grid-template-columns:1fr;min-height:auto}.ministry-card{min-height:390px}.answers{grid-template-columns:1fr}.scale{grid-template-columns:105px 1fr 54px}.question{padding-top:48px}}
+  </style>
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="/" aria-label="Dementor Club">DEMENTOR<span>CLUB</span></a>
+  <button class="menu-toggle" aria-label="Открыть меню" aria-expanded="false">MENU</button>
+  <nav class="nav"><a href="/about/">О клубе</a><a href="/#projects">Проекты</a><a href="/#community">Комьюнити</a><a href="/#events">События</a><a class="active" href="/join/">Вступить</a></nav>
+</header>
+
+<main class="join-shell">
+  <section class="join-intro" id="intro">
+    <div>
+      <p class="kicker">МИНИСТЕРСТВО ПРОФИЛАКТИКИ ЗДРАВОГО СМЫСЛА · ФОРМА DC-15</p>
+      <h1>ПРЕДВАРИТЕЛЬНОЕ<br><em>ОСВИДЕТЕЛЬСТВОВАНИЕ</em></h1>
+      <p class="lead">Перед допуском в Dementor Club гражданин обязан пройти обследование на признаки сомнения, самостоятельного мышления и других социально неудобных привычек.</p>
+      <p class="small">15 вопросов. Правильных ответов нет. Это не психологическая диагностика: Министерство просто хочет знать, насколько поздно начинать профилактику.</p>
+      <div class="actions"><button class="button primary" id="start" type="button">Начать обследование</button><a class="button ghost" href="/about/">Сначала прочитать о клубе</a></div>
+    </div>
+    <aside class="ministry-card" aria-label="Предупреждение Министерства">
+      <div class="seal">МПЗС</div>
+      <strong>ОСТОРОЖНО:<br>ВОПРОСЫ<br>МОГУТ ВЫЗВАТЬ<br>ОТВЕТЫ.</strong>
+      <small>При обнаружении собственного мнения не пытайтесь устранить его самостоятельно.</small>
+    </aside>
+  </section>
+
+  <section class="quiz" id="quiz" aria-live="polite">
+    <div class="progress-wrap"><div class="progress-row"><span>Предварительное освидетельствование</span><span id="counter">1 / 15</span></div><div class="progress"><span id="progressBar"></span></div></div>
+    <div id="questionHost"></div>
+  </section>
+
+  <section class="result" id="result" aria-live="polite">
+    <span class="result-stamp">ПРОФИЛАКТИКА ЗАТРУДНЕНА</span>
+    <p class="kicker" style="margin-top:34px">ЗАКЛЮЧЕНИЕ МИНИСТЕРСТВА</p>
+    <h1>ОБНАРУЖЕНЫ<br>ПРИЗНАКИ<br>МЫШЛЕНИЯ.</h1>
+    <p class="verdict">Рекомендуется содержание среди людей с аналогичными симптомами.</p>
+    <div class="scales" id="scales"></div>
+    <div class="profile-box"><p class="kicker">КЛУБНЫЙ ПРОФИЛЬ</p><h2 id="profileTitle"></h2><p id="profileText"></p></div>
+    <div class="decision"><p class="kicker">РЕШЕНИЕ DEMENTOR CLUB</p><strong>ДОПУЩЕН К ДАЛЬНЕЙШЕЙ ДЕГРАДАЦИИ.</strong><p>Заключение выдано. Конкретные закрытые каналы, аккаунты и механика членства будут подключаться отдельно по мере утверждения клубом.</p><div class="actions"><a class="button primary" href="/">Вернуться в клуб</a><button class="button ghost" id="restart" type="button">Пройти ещё раз</button></div></div>
+    <p class="privacy">Результат рассчитывается локально в вашем браузере и не является психологическим, медицинским или профессиональным тестом.</p>
+  </section>
+</main>
+
+<script src="/script.js"></script>
+<script>
+const dims=['doubt','autonomy','action','adaptability','social','absurdity'];
+const dimLabels={doubt:'Сомнение',autonomy:'Автономность',action:'Действие',adaptability:'Изменяемость',social:'Социальность',absurdity:'Абсурдоустойчивость'};
+const questions=[
+{q:'Вы узнали факт, который полностью подтверждает ваше мнение. Что делать?',a:[['Немедленно поделиться. Наконец-то доказательство.',{}],['Проверить, откуда он взялся.',{doubt:2,adaptability:1}],['Поискать данные, которые говорят обратное.',{doubt:3,adaptability:2}],['Ничего. Я и без фактов всё понимал.',{autonomy:1,absurdity:1}]]},
+{q:'Вы пять лет были уверены в чём-то и внезапно обнаружили, что ошибались.',a:[['Пять лет — серьёзный аргумент продолжать.',{absurdity:1}],['Сделаю вид, что всегда думал именно так.',{social:1}],['Изменю мнение.',{adaptability:3,autonomy:1}],['Сначала проверю, действительно ли я ошибался, потом изменю.',{doubt:2,adaptability:3}]]},
+{q:'Все присутствующие согласны друг с другом. Вы — нет.',a:[['Возможно, они знают что-то, чего не знаю я. Промолчу.',{doubt:1}],['Скажу, что не согласен.',{autonomy:3,social:2}],['Спрошу, почему они так считают.',{doubt:3,social:2,adaptability:1}],['Подожду. Возможно, спор начнётся без моего участия.',{doubt:1,absurdity:1}]]},
+{q:'Вам дали инструкцию, которая очевидно не работает.',a:[['Следую инструкции. Ответственность на авторе.',{}],['Жалуюсь на инструкцию.',{social:1}],['Исправляю способ и делаю результат.',{action:3,autonomy:3,adaptability:2}],['Сначала выясняю, зачем вообще существует эта инструкция.',{doubt:3,autonomy:2}]]},
+{q:'Вам предлагают принять участие в странном проекте. Пока непонятно, зачем он нужен.',a:[['Нет цели — нет меня.',{autonomy:1}],['Расскажите подробнее.',{doubt:2,social:1}],['Если люди интересные — попробую.',{social:3,action:1,absurdity:1}],['Отлично. Наконец нормальное предложение.',{absurdity:3,action:2,autonomy:1}]]},
+{q:'Что опаснее всего?',a:[['Ошибиться.',{doubt:1}],['Выглядеть глупо.',{social:1}],['Потратить время впустую.',{action:1,autonomy:1}],['Прожить долго, так и не выяснив, что могло произойти.',{action:3,autonomy:2,absurdity:2}]]},
+{q:'Хорошая дискуссия заканчивается…',a:[['победой.',{autonomy:1}],['согласием.',{social:2}],['новым вопросом.',{doubt:3,absurdity:1}],['иногда тем, что один человек говорит: «Да, я был неправ».',{adaptability:3,social:1}]]},
+{q:'Незнакомый человек говорит: «У меня есть идея». Ваша первая мысль:',a:[['«Сколько нужно денег?»',{action:2}],['«Почему это ещё никто не сделал?»',{doubt:3}],['«Покажи».',{action:3,autonomy:1}],['«Мне уже нравится, что это может закончиться плохо».',{absurdity:3,action:1}]]},
+{q:'Что вы обычно делаете с хорошей идеей?',a:[['Записываю.',{doubt:1}],['Рассказываю.',{social:2}],['Проверяю.',{doubt:2,action:2}],['Делаю что-нибудь, после чего становится понятно, была ли она хорошей.',{action:3,autonomy:2,adaptability:1}]]},
+{q:'Вы пришли на мероприятие и никого не знаете.',a:[['Жду, пока со мной заговорят.',{}],['Нахожу самого странного человека.',{social:2,absurdity:3}],['Знакомлюсь с несколькими людьми.',{social:3,action:1}],['Наблюдаю первые полчаса и пытаюсь понять, что здесь происходит.',{doubt:2,absurdity:1}]]},
+{q:'Человек уверенно сообщает вам очевидную глупость.',a:[['Исправляю.',{autonomy:2,social:1}],['Спрашиваю: «Почему ты так думаешь?»',{doubt:3,social:2}],['Возможно, это я чего-то не понимаю. Проверяю.',{doubt:3,adaptability:2}],['Если глупость достаточно красивая — даю ей развиться.',{absurdity:3,social:1}]]},
+{q:'Вы получили два противоположных совета от людей, которым доверяете.',a:[['Выбираю совет более авторитетного человека.',{}],['Ищу третий совет.',{doubt:2,social:2}],['Формулирую критерии и проверяю оба варианта.',{doubt:3,autonomy:2,adaptability:2}],['Делаю небольшой обратимый эксперимент.',{action:3,autonomy:3,adaptability:2}]]},
+{q:'План перестал работать посередине процесса.',a:[['Продолжаю: менять план поздно.',{}],['Останавливаюсь и жду новых указаний.',{}],['Перестраиваю план по текущим данным.',{adaptability:3,action:2,autonomy:2}],['Сначала проверяю, не изменились ли сами цели.',{doubt:3,adaptability:2,autonomy:1}]]},
+{q:'В компании появилась идея, которую все называют бессмысленной, но она вас цепляет.',a:[['Не трачу время: большинство редко ошибается одновременно.',{}],['Сохраняю идею на потом.',{doubt:1}],['Ищу человека, который согласится проверить её вместе.',{social:3,action:2,autonomy:1}],['Делаю маленький прототип до того, как идея успеет стать серьёзной.',{action:3,autonomy:3,absurdity:2}]]},
+{q:'Есть ли вероятность, что предыдущие ответы вы давали так, чтобы произвести на нас хорошее впечатление?',a:[['Нет.',{autonomy:1}],['Конечно.',{adaptability:2,absurdity:2}],['Возможно.',{doubt:2,adaptability:3}],['После этого вопроса — уже не знаю.',{doubt:2,absurdity:3,adaptability:2}]]}
+];
+const max={};dims.forEach(d=>max[d]=0);questions.forEach(x=>dims.forEach(d=>max[d]+=Math.max(...x.a.map(v=>v[1][d]||0))));
+let i=0,scores={};dims.forEach(d=>scores[d]=0);
+const intro=document.getElementById('intro'),quiz=document.getElementById('quiz'),host=document.getElementById('questionHost'),counter=document.getElementById('counter'),bar=document.getElementById('progressBar'),result=document.getElementById('result');
+function render(){const x=questions[i];counter.textContent=`${i+1} / ${questions.length}`;bar.style.width=`${(i/questions.length)*100}%`;host.innerHTML=`<div class="question"><span class="qnum">ВОПРОС ${String(i+1).padStart(2,'0')}</span><h2>${x.q}</h2><div class="answers">${x.a.map((v,n)=>`<button class="answer" type="button" data-n="${n}"><span class="letter">${'ABCD'[n]}</span><span>${v[0]}</span></button>`).join('')}</div></div>`;host.querySelectorAll('.answer').forEach(b=>b.addEventListener('click',()=>choose(+b.dataset.n)))}
+function choose(n){const w=questions[i].a[n][1];Object.entries(w).forEach(([d,v])=>scores[d]+=v);i++;if(i<questions.length){render();window.scrollTo({top:quiz.offsetTop-60,behavior:'smooth'})}else finish()}
+function pct(d){return Math.round((scores[d]/max[d])*100)}
+const profiles={
+'Исследователь':{score:()=>pct('doubt')*.58+pct('adaptability')*.42,text:'Вы редко удовлетворяетесь первым объяснением. Скорее проверите источник, зададите второй вопрос и при достаточных основаниях способны поменять собственную позицию.'},
+'Деятель':{score:()=>pct('action')*.58+pct('autonomy')*.42,text:'Разговор для вас имеет ограниченный срок годности. Предпочитаете сделать небольшой шаг, получить реальность в ответ и уже потом продолжать теорию.'},
+'Провокатор':{score:()=>pct('doubt')*.5+pct('absurdity')*.5,text:'Вам естественно проверять устойчивость чужих и собственных утверждений. Иногда для этого достаточно хорошего вопроса, иногда — аккуратно перевернуть стол смыслом вниз.'},
+'Наблюдатель':{score:()=>pct('doubt')*.65+(100-pct('social'))*.35,text:'Сначала вы считываете систему, людей и правила игры. Входите позже, зато нередко замечаете то, что участники процесса успели принять за фон.'},
+'Соучастник':{score:()=>pct('social')*.56+pct('action')*.44,text:'Идеи становятся для вас интереснее, когда рядом появляются люди, с которыми их можно проверить. Вы скорее соединяете участников, чем коллекционируете контакты.'},
+'Авантюрист':{score:()=>pct('absurdity')*.4+pct('autonomy')*.3+pct('action')*.3,text:'Неопределённость не обязательно выглядит для вас как ошибка системы. Иногда это приглашение посмотреть, что произойдёт, если всё-таки нажать кнопку.'}
+};
+function finish(){bar.style.width='100%';quiz.classList.remove('active');result.classList.add('active');const scale=document.getElementById('scales');scale.innerHTML=dims.map(d=>`<div class="scale"><span class="scale-name">${dimLabels[d]}</span><div class="bar"><i style="width:${pct(d)}%"></i></div><strong>${pct(d)}%</strong></div>`).join('');const ranked=Object.entries(profiles).map(([name,p])=>({name,...p,value:p.score()})).sort((a,b)=>b.value-a.value);document.getElementById('profileTitle').textContent=`${ranked[0].name} × ${ranked[1].name}`;document.getElementById('profileText').textContent=`${ranked[0].text} ${ranked[1].text}`;window.scrollTo({top:result.offsetTop-70,behavior:'smooth'})}
+document.getElementById('start').addEventListener('click',()=>{intro.style.display='none';quiz.classList.add('active');render();window.scrollTo({top:quiz.offsetTop-70,behavior:'smooth'})});
+document.getElementById('restart').addEventListener('click',()=>{i=0;dims.forEach(d=>scores[d]=0);result.classList.remove('active');quiz.classList.add('active');render();window.scrollTo({top:quiz.offsetTop-70,behavior:'smooth'})});
+</script>
+</body>
+</html>
