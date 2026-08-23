@@ -2,6 +2,16 @@
 // Onboarding V4 stays pinned as the scoring/scenario engine.
 // This layer owns the public presentation: shuffled answers + procedure-style selector.
 (()=>{
+  /* Keep Join inside the same public information architecture even though it has its own runtime. */
+  const joinNav=document.querySelector('.nav');
+  if(joinNav&&!joinNav.querySelector('a[href="/archive/"]')){
+    const archive=document.createElement('a');
+    archive.href='/archive/';
+    archive.textContent='Архив';
+    const join=joinNav.querySelector('a[href="/join/"]');
+    if(join)joinNav.insertBefore(archive,join);else joinNav.appendChild(archive);
+  }
+
   const BASE='https://cdn.jsdelivr.net/gh/SLADZARI/degradation_club@0c34e194b610d72f535fd5ea96c6cd6fbf0d58e8/script.js';
   const base=document.createElement('script');
   base.src=BASE;
@@ -61,6 +71,12 @@
         #selector .intro h1{font-size:clamp(52px,16vw,82px)}
         #selector .intro .join-hero-copy{font-size:18px}
         #selector .sphere{min-height:190px}
+      }
+      @media(max-width:430px){
+        #selector .intro h1{font-size:clamp(42px,12vw,52px);line-height:.9;letter-spacing:-.055em}
+        #selector .intro{gap:24px;padding-top:34px}
+        #selector .sphere{min-height:160px;padding:20px}
+        #selector .sphere strong{font-size:26px}
       }
     `;
     document.head.appendChild(style);
