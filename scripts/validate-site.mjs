@@ -16,9 +16,15 @@ const read=(p)=>fs.readFileSync(path.join(root,p),'utf8');
 const json=(p)=>JSON.parse(read(p));
 
 function routeToHtml(route){
-  if(route==='/') return 'index.html';
-  const clean=route.replace(/^\//,'').replace(/\/$/,'');
+  const cleanRoute=String(route).split('?')[0].split('#')[0]||'/';
+  if(cleanRoute==='/') return 'index.html';
+  const clean=cleanRoute.replace(/^\//,'').replace(/\/$/,'');
   return `${clean}/index.html`;
+}
+
+function htmlToRoute(file){
+  if(file==='index.html')return '/';
+  return `/${file.replace(/\/index\.html$/,'')}/`;
 }
 
 function requireFields(obj,fields,label){
@@ -92,13 +98,8 @@ function validateRegistry(){
   }
 
   const registered=new Set([...records].map(p=>p.replace(/^\//,'')));
-  const physical=walk('content')
-    .filter(p=>p.endsWith('.json'))
-    .filter(p=>p!=='content/registry.json')
-    .filter(p=>!p.includes('/templates/'));
-  for(const file of physical){
-    if(!registered.has(file)) fail(`orphan record: ${file} exists but is not listed in content/registry.json`);
-  }
+  const physical=walk('content').filter(p=>p.endsWith('.json')).filter(p=>p!=='content/registry.json').filter(p=>!p.includes('/templates/'));
+  for(const file of physical){if(!registered.has(file)) fail(`orphan record: ${file} exists but is not listed in content/registry.json`);}
 
   if(registry.emptyRegisters){
     const typeMap={merch:'merch',archive:'archive-record'};
@@ -167,11 +168,7 @@ function validateFeatures(config){
 }
 
 function validateAdapters(){
-  const surfaces=[
-    ['contacts/index.html',true],
-    ['donate/index.html',true],
-    ['merch/index.html',true]
-  ];
+  const surfaces=[['contacts/index.html',true],['donate/index.html',true],['merch/index.html',true]];
   for(const [file,required] of surfaces){
     if(!exists(file)){if(required) fail(`${file} missing`);continue;}
     const html=read(file);
@@ -186,8 +183,46 @@ function validateAdapters(){
     const boot=read('script.js');
     if(!boot.includes('/join-storage-guard.js')) fail('script.js: Join storage guard is not connected');
     if(/cdn\.jsdelivr\.net\/gh\/SLADZARI\/degradation_club/i.test(boot)) fail('script.js: stale pinned CDN onboarding engine is still present');
+    if(!boot.includes('/seo-runtime.js')) fail('script.js: shared SEO/document runtime is not connected');
   }
+  const motion=exists('motion-v1.js')?read('motion-v1.js'):'';
+  if(!motion.includes('/seo-runtime.js')) fail('motion-v1.js: shared SEO/document runtime is not connected');
   pass('runtime adapters/bootstrap validated');
+}
+
+function validateInternalLinks(){
+  const htmlFiles=walk('.').filter(p=>p.endsWith('.html')).filter(p=>!p.includes('/.git/'));
+  let refsChecked=0;
+  for(const file of htmlFiles){
+    const html=read(file);
+    const baseRoute=htmlToRoute(file.replace(/^\.\//,''));
+    const base=new URL(baseRoute,'https://internal.invalid');
+    const refs=[...html.matchAll(/\b(?:href|src)=["']([^"']+)["']/gi)].map(m=>m[1]);
+    for(const ref of refs){
+      if(!ref||/^(?:https?:|mailto:|tel:|data:|javascript:)/i.test(ref))continue;
+      let u;
+      try{u=new URL(ref,base);}catch{fail(`${file}: invalid internal reference ${ref}`);continue;}
+      if(u.origin!=='https://internal.invalid')continue;
+      refsChecked++;
+      const pathname=decodeURIComponent(u.pathname);
+      let target;
+      if(pathname==='/'||pathname.endsWith('/')) target=routeToHtml(pathname);
+      else target=pathname.replace(/^\//,'');
+      if(!exists(target)){fail(`${file}: broken internal reference ${ref} -> ${target}`);continue;}
+      if(u.hash&&target.endsWith('.html')){
+        const id=decodeURIComponent(u.hash.slice(1));
+        if(id){
+          const targetHtml=read(target);
+          const escaped=id.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+          const found=new RegExp(`\\bid=["']${escaped}["']`,'i').test(targetHtml)||new RegExp(`\\bname=["']${escaped}["']`,'i').test(targetHtml);
+          if(!found) fail(`${file}: broken anchor ${ref} (no #${id} in ${target})`);
+        }
+      }
+    }
+  }
+  if(!exists('404.html'))fail('404.html missing');
+  else if(!/name=["']robots["'][^>]*content=["'][^"']*noindex/i.test(read('404.html'))&&!/content=["'][^"']*noindex[^"']*["'][^>]*name=["']robots/i.test(read('404.html')))warn('404.html: no explicit robots noindex meta found');
+  pass(`internal references: ${refsChecked} checked across ${htmlFiles.length} HTML files`);
 }
 
 function validatePublicInvariants(entities,config){
@@ -203,13 +238,10 @@ function validatePublicInvariants(entities,config){
     }
     if(course.catalogPlacement&&course.catalogPlacement!=='not-approved') fail('COURSE-001 approved-draft must not be catalog-approved');
   }
-
   const merchCount=entities.filter(e=>e.entityType==='merch').length;
   if(merchCount===0&&config?.merch?.checkoutEnabled) fail('merch checkout cannot be enabled while registry has 0 merch entities');
-
   const event=byId.get('event-001-fuengirola');
   if(event?.status==='planned'&&config?.events?.registrationEnabled) fail('Fuengirola is planned; registration cannot be enabled before event source status changes');
-
   if(config?.community?.membershipEnabled){
     const community=exists('community/index.html')?read('community/index.html'):'';
     if(/MEMBERSHIP FORMAT<\/span><strong>NOT APPROVED/i.test(community)) fail('membershipEnabled=true while Community still says MEMBERSHIP FORMAT NOT APPROVED');
@@ -222,6 +254,7 @@ const entities=validateRegistry();
 validateSitemap(entities,config);
 validateFeatures(config);
 validateAdapters();
+validateInternalLinks();
 validatePublicInvariants(entities,config);
 
 console.log(`\nDementor Club site validation`);
