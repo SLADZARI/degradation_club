@@ -1,9 +1,12 @@
 {
   "id": "event-001-fuengirola",
+  "entityType": "event",
   "slug": "fuengirola",
   "title": "Фуэнхирола",
   "type": "offline-event",
   "status": "planned",
+  "publicUrl": "/events/fuengirola/",
+  "preview": "/assets/ink/event-fuengirola-02.webp",
   "location": {
     "city": "Fuengirola / Фуэнхирола",
     "country": "Испания"
@@ -20,12 +23,11 @@
   "organizers": null,
   "participants": null,
   "relatedProjects": [],
-  "publicUrl": "/events/fuengirola/",
-  "source": {
+  "provenance": {
     "branch": "dementor-club",
     "path": "events/fuengirola.md",
     "role": "canonical-club-event-record"
   },
   "siteRole": "implementation-mirror",
-  "updated": "2026-08-23"
+  "updatedAt": "2026-08-23"
 }
