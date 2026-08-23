@@ -11,6 +11,33 @@
   const path=location.pathname;
   document.documentElement.dataset.route=path;
 
+  /* Dementor Ink density map: semantic route contract, no invented raster art. */
+  const inkMap={
+    '/':{level:3,role:'takeover',target:'.dc-ink-slot--home'},
+    '/about/':{level:2,role:'contamination',target:'.dc-ink-slot--about'},
+    '/projects/logic-awareness/':{level:2,role:'leak',target:'.dc-ink-slot--logic'},
+    '/events/fuengirola/':{level:2,role:'field-record',target:'.dc-ink-slot--event'},
+    '/events/':{level:1,role:'trace',target:'.dc-programme-intro',label:'INK / L1 / PROGRAMME TRACE'},
+    '/projects/':{level:1,role:'trace',target:'.dc-project-register-section .dc-kicker',label:'INK / L1 / PROJECT TRACE'},
+    '/catalog/':{level:1,role:'trace',target:'.dc-entity-index__head',label:'INK / L1 / REGISTER TRACE'},
+    '/archive/':{level:0,role:'silence'},
+    '/community/':{level:0,role:'silence'},
+    '/merch/':{level:0,role:'silence'},
+    '/join/':{level:0,role:'silence'}
+  };
+  const ink=inkMap[path]||{level:0,role:'silence'};
+  document.body.classList.add(`dc-ink-l${ink.level}`);
+  document.body.dataset.inkLevel=String(ink.level);
+  document.body.dataset.inkRole=ink.role;
+  if(ink.target){
+    const inkTarget=document.querySelector(ink.target);
+    if(inkTarget){
+      inkTarget.classList.add(`dc-ink-l${ink.level}`);
+      inkTarget.dataset.inkRole=ink.role;
+      if(ink.level===1){inkTarget.classList.add('dc-ink-trace');inkTarget.dataset.inkLabel=ink.label||'INK / L1 / TRACE';}
+    }
+  }
+
   const toggle=document.querySelector('.menu-toggle');
   const nav=document.querySelector('.nav');
   if(nav&&!nav.querySelector('a[href="/archive/"]')){
