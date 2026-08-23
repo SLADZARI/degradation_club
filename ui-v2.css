@@ -1,23 +1,35 @@
-:root{--dc-paper:#f2f0e8;--dc-ink:#111;--dc-acid:#d8ff3e;--dc-line:rgba(17,17,17,.2)}
+:root{--dc-paper:#f2f0e8;--dc-ink:#111;--dc-acid:#d8ff3e;--dc-line:rgba(17,17,17,.2);--dc-on-acid:#111}
 .topbar{backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
 .topbar .nav{gap:18px;align-items:center}.topbar .nav a{position:relative;text-transform:uppercase;letter-spacing:.08em;font-size:11px}.topbar .nav a::after{content:"";position:absolute;left:0;right:0;bottom:-7px;height:1px;background:currentColor;transform:scaleX(0);transform-origin:left;transition:transform .3s cubic-bezier(.2,.8,.2,1)}.topbar .nav a:hover::after,.topbar .nav a.active::after{transform:scaleX(1)}
 .menu-toggle{font-variant-numeric:tabular-nums}
 a:focus-visible,button:focus-visible{outline:2px solid var(--dc-acid);outline-offset:4px}.dc-action:focus-visible{outline-color:currentColor;outline-offset:3px}
+
+/* CONTRAST CONTRACT — ACID IS ALWAYS A LIGHT SURFACE.
+   Never place white/paper text on #d8ff3e. All acid-backed text resolves to INK. */
+.dc-acid,.brand span,.dc-action--primary,.dc-action--acid,.button.primary,.card.accent{color:var(--dc-on-acid)!important}
+.dc-action--primary,.dc-action--acid,.button.primary{background:var(--dc-acid);border-color:var(--dc-acid)}
+.dc-join,.dc-about-join{color:var(--dc-on-acid)}
+.dc-index-row:hover,.dc-entity-row:hover,.dc-chain-row:hover,.dc-sphere:hover,.dc-principle:hover{color:var(--dc-on-acid)!important}
+.dc-index-row:hover *,.dc-entity-row:hover *,.dc-chain-row:hover *,.dc-sphere:hover *,.dc-principle:hover *{color:inherit}
+/* Dark CTA placed on acid remains intentionally inverse. */
+.dc-join .dc-action,.dc-about-join .dc-action{background:var(--dc-ink);color:var(--dc-paper)!important;border-color:var(--dc-ink)}
+
 .dc-motion-reveal{opacity:0;transform:translateY(28px)}.dc-motion-reveal.is-visible{opacity:1;transform:none;transition:opacity .7s cubic-bezier(.2,.8,.2,1),transform .7s cubic-bezier(.2,.8,.2,1)}
 .dc-pressure{display:inline-block;transform-origin:left center;transition:font-stretch .5s ease,letter-spacing .5s ease,transform .5s cubic-bezier(.2,.8,.2,1)}.dc-pressure:hover{letter-spacing:-.11em;transform:scaleX(1.035)}
 .dc-drift{will-change:transform}.dc-index-row,.dc-chain-row,.dc-sphere{position:relative;overflow:hidden}.dc-index-row::before,.dc-chain-row::before,.dc-sphere::before{content:"";position:absolute;inset:0;background:var(--dc-acid);transform:translateX(-101%);transition:transform .38s cubic-bezier(.2,.8,.2,1);z-index:0}.dc-index-row:hover::before,.dc-chain-row:hover::before,.dc-sphere:hover::before,.dc-index-row:focus-visible::before{transform:translateX(0)}.dc-index-row>* , .dc-chain-row>* , .dc-sphere>*{position:relative;z-index:1}
 .dc-status-live{display:inline-flex;align-items:center;gap:8px}.dc-status-live::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--dc-acid);box-shadow:0 0 0 0 rgba(216,255,62,.45);animation:dcPulse 2.4s ease-out infinite}@keyframes dcPulse{70%{box-shadow:0 0 0 10px rgba(216,255,62,0)}100%{box-shadow:0 0 0 0 rgba(216,255,62,0)}}
 
-/* Dementor Ink raster integration. Real IMG elements, no SVG and no CSS-generated grunge. */
-.dc-ink-slot{position:relative;margin:0;min-height:clamp(300px,48vw,760px);border-top:1px solid currentColor;border-bottom:1px solid currentColor;overflow:hidden;background:var(--dc-paper)}
+/* Dementor Ink raster integration. Artistic assets are WEBP/PNG/JPG only; never SVG. */
+.dc-ink-slot{position:relative;min-height:clamp(300px,48vw,760px);border-top:1px solid currentColor;border-bottom:1px solid currentColor;overflow:hidden;background:var(--dc-paper)}
 .dc-ink-slot::before,.dc-ink-slot::after{content:none}
-.dc-ink-slot img{display:block;width:100%;height:100%;min-height:inherit;object-fit:cover;mix-blend-mode:multiply}
-.dc-ink-slot--home img{object-position:center 44%}
-.dc-ink-slot--about img{object-position:center 42%}
-.dc-ink-slot--logic img{object-position:center 45%}
-.dc-ink-slot--event{min-height:clamp(360px,56vw,820px);border-top:0}.dc-ink-slot--event img{object-position:center 52%}
+.dc-ink-slot__image{display:block;width:100%;height:100%;min-height:inherit;object-fit:cover;object-position:center;mix-blend-mode:multiply}
+.dc-home .dc-ink-slot__image{object-position:center 45%}
+.dc-about .dc-ink-slot__image{object-position:center 42%}
+.dc-entity-page .dc-ink-slot__image{object-position:center 45%}
+.dc-event-visual{padding:0;background:var(--dc-paper);overflow:hidden;border-top:1px solid var(--dc-line);border-bottom:1px solid var(--dc-line)}
+.dc-event-visual img{display:block;width:100%;height:min(72vw,860px);object-fit:cover;object-position:center 52%;mix-blend-mode:multiply}
 
-@media(max-width:900px){.topbar .nav{gap:13px}.dc-ink-slot{min-height:520px}.dc-ink-slot--event{min-height:560px}}
-@media(max-width:700px){.topbar .nav.open{position:fixed;inset:58px 0 auto 0;background:var(--dc-paper);color:var(--dc-ink);border-bottom:1px solid var(--dc-line);padding:20px;display:grid;grid-template-columns:1fr 1fr;gap:0;z-index:90}.topbar .nav.open a{padding:15px 0;border-top:1px solid var(--dc-line)}.topbar .nav a::after{display:none}.dc-ink-slot{min-height:440px}.dc-ink-slot--home img{object-position:43% center}.dc-ink-slot--about img{object-position:58% center}.dc-ink-slot--logic img{object-position:48% center}.dc-ink-slot--event{min-height:460px}.dc-ink-slot--event img{object-position:38% center}}
+@media(max-width:900px){.topbar .nav{gap:13px}.dc-ink-slot{min-height:520px}.dc-ink-slot__image{object-fit:cover}.dc-event-visual img{height:72vw;min-height:520px}}
+@media(max-width:700px){.topbar .nav.open{position:fixed;inset:58px 0 auto 0;background:var(--dc-paper);color:var(--dc-ink);border-bottom:1px solid var(--dc-line);padding:20px;display:grid;grid-template-columns:1fr 1fr;gap:0;z-index:90}.topbar .nav.open a{padding:15px 0;border-top:1px solid var(--dc-line)}.topbar .nav a::after{display:none}.dc-ink-slot{min-height:440px}.dc-home .dc-ink-slot__image{object-position:43% center}.dc-about .dc-ink-slot__image{object-position:58% center}.dc-entity-page .dc-ink-slot__image{object-position:48% center}.dc-event-visual img{height:560px;min-height:0;object-position:42% center}}
 @media(hover:none){.dc-pressure:hover{letter-spacing:inherit;transform:none}.dc-index-row::before,.dc-chain-row::before,.dc-sphere::before{display:none}}
 @media(prefers-reduced-motion:reduce){.dc-motion-reveal{opacity:1;transform:none}.dc-motion-reveal.is-visible{transition:none}.dc-drift{transform:none!important}.dc-status-live::before{animation:none}.dc-index-row::before,.dc-chain-row::before,.dc-sphere::before,.topbar .nav a::after{transition:none}}
