@@ -1,0 +1,29 @@
+/* Dementor Ink intervention layer — raster only, layout violation without layout breakage. */
+.dc-about,.dc-entity-page,.dc-entity{overflow-x:clip}
+.dc-ink-slot--about,.dc-ink-slot--logic,.dc-ink-slot--event{z-index:4;width:min(106vw,1720px);margin-left:max(-3vw,calc((100vw - 1720px)/2));border:1px solid var(--dc-ink);box-shadow:0 0 0 1px var(--dc-paper);overflow:hidden}
+.dc-ink-slot--about{margin-top:-56px;margin-bottom:-72px;transform:rotate(.32deg)}
+.dc-ink-slot--logic{margin-top:-72px;margin-bottom:-64px;transform:rotate(-.38deg)}
+.dc-ink-slot--event{height:clamp(560px,70vh,880px);margin-top:-34px;margin-bottom:-54px;transform:rotate(.22deg);background:var(--dc-paper)}
+.dc-ink-slot--about::before,.dc-ink-slot--logic::before,.dc-ink-slot--event::before{display:block;position:absolute;z-index:5;top:18px;left:clamp(22px,4vw,64px);padding:7px 9px;background:var(--dc-acid);color:var(--dc-ink);font-size:10px;line-height:1;letter-spacing:.15em;text-transform:uppercase}
+.dc-ink-slot--about::before{content:"INK / SERVICE CONTAMINATION"}
+.dc-ink-slot--logic::before{content:"INK / EVIDENCE LEAK"}
+.dc-ink-slot--event::before{content:"INK / FIELD RECORD"}
+.dc-ink-slot--about::after,.dc-ink-slot--logic::after,.dc-ink-slot--event::after{content:"";display:block;position:absolute;z-index:3;height:1px;background:var(--dc-ink);opacity:.62;pointer-events:none}
+.dc-ink-slot--about::after{left:5%;right:4%;top:38%;transform:rotate(-1.1deg)}
+.dc-ink-slot--logic::after{left:3%;right:7%;top:62%;transform:rotate(1.4deg)}
+.dc-ink-slot--event::after{left:8%;right:2%;top:47%;transform:rotate(-.7deg)}
+.dc-ink-slot--about>img,.dc-ink-slot--logic>img,.dc-ink-slot--event>img{display:block;width:100%;height:100%;object-fit:cover;mix-blend-mode:multiply;transform:scale(1.035);filter:contrast(1.05)}
+.dc-about-principles,.dc-chain__head,.dc-event-detail{position:relative;z-index:2}
+
+@media(max-width:700px){
+  .dc-ink-slot--about,.dc-ink-slot--logic,.dc-ink-slot--event{width:100%;margin-left:0;transform:none;border-left:0;border-right:0}
+  .dc-ink-slot--about{margin-top:-26px;margin-bottom:-30px}
+  .dc-ink-slot--logic{margin-top:-30px;margin-bottom:-28px}
+  .dc-ink-slot--event{height:clamp(420px,118vw,580px);margin-top:-18px;margin-bottom:-24px}
+  .dc-ink-slot--about::before,.dc-ink-slot--logic::before,.dc-ink-slot--event::before{top:12px;left:14px;font-size:9px}
+  .dc-ink-slot--about>img,.dc-ink-slot--logic>img,.dc-ink-slot--event>img{transform:scale(1.02)}
+}
+
+@media(prefers-reduced-motion:reduce){
+  .dc-ink-slot--about,.dc-ink-slot--logic,.dc-ink-slot--event{transform:none}
+}
