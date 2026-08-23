@@ -1,0 +1,20 @@
+{
+  "id": null,
+  "entityType": "merch",
+  "title": null,
+  "slug": null,
+  "status": null,
+  "publicUrl": null,
+  "preview": null,
+  "statement": null,
+  "material": null,
+  "edition": null,
+  "price": null,
+  "shopStatus": null,
+  "purchaseUrl": null,
+  "provenance": {
+    "branch": "dementor-club",
+    "path": null
+  },
+  "updatedAt": null
+}
