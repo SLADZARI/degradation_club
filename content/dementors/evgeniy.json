@@ -1,0 +1,19 @@
+{
+  "id": "DEMENTOR-003",
+  "entityType": "dementor",
+  "title": "Евгений",
+  "slug": "evgeniy",
+  "status": "active-content-pending",
+  "publicUrl": "/community/evgeniy/",
+  "story": null,
+  "practiceAreas": null,
+  "relatedEvents": [],
+  "relatedCourses": [],
+  "relatedProjects": [],
+  "preview": null,
+  "provenance": {
+    "branch": "dementor-club",
+    "path": "people/dementors.md"
+  },
+  "updatedAt": "2026-08-24"
+}
