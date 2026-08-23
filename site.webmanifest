@@ -1,0 +1,11 @@
+{
+  "name": "Dementor Club",
+  "short_name": "Dementor",
+  "description": "Клуб и культурная платформа. Упакуем цели в растерянность и вернём тебе по подписке.",
+  "lang": "ru",
+  "start_url": "/",
+  "scope": "/",
+  "display": "minimal-ui",
+  "background_color": "#f2f0e8",
+  "theme_color": "#d8ff3e"
+}
