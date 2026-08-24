@@ -1,59 +1,137 @@
-/* Ink layout v2 — semantic integration, not standalone image sections. */
+/* Ink layout v2 — semantic grid integration. No text overlays on raster art. */
 .dc-ink-editorial{display:none!important}
 .dc-has-integrated-ink{position:relative;isolation:isolate;overflow:hidden}
-.dc-has-integrated-ink>.dc-ink-integrated{position:absolute;inset:0;z-index:0;margin:0!important;width:100%!important;height:100%!important;border:0!important;box-shadow:none!important;transform:none!important;background:transparent!important;overflow:hidden;pointer-events:none}
-.dc-has-integrated-ink>.dc-ink-integrated::before,.dc-has-integrated-ink>.dc-ink-integrated::after{display:none!important}
-.dc-has-integrated-ink>.dc-ink-integrated img{display:block;width:100%;height:100%;object-fit:cover;transform:none!important;filter:none!important;mix-blend-mode:multiply}
-.dc-has-integrated-ink>*:not(.dc-ink-integrated){position:relative;z-index:2}
+.dc-ink-integrated{margin:0!important;border:0!important;box-shadow:none!important;transform:none!important;background:transparent!important;overflow:hidden;pointer-events:none;min-width:0}
+.dc-ink-integrated::before,.dc-ink-integrated::after{display:none!important}
+.dc-ink-integrated img{display:block;width:100%;height:100%;transform:none!important;filter:none!important;mix-blend-mode:multiply}
 
-/* HOME — first block. Blank paper on the left, Ink subject on the right. */
-.dc-home .dc-hero.dc-has-integrated-ink--home{min-height:clamp(760px,92vh,980px);background:var(--dc-paper)}
-.dc-home .dc-hero>.dc-ink-integrated--home img{object-position:center center}
-.dc-home .dc-hero.dc-has-integrated-ink--home::after{content:"";position:absolute;z-index:1;inset:0;background:linear-gradient(90deg,rgba(242,240,232,.98) 0%,rgba(242,240,232,.90) 31%,rgba(242,240,232,.18) 59%,rgba(242,240,232,0) 75%);pointer-events:none}
-.dc-home .dc-hero.dc-has-integrated-ink--home .dc-hero__title{max-width:68%;position:relative;z-index:3}
-.dc-home .dc-hero.dc-has-integrated-ink--home .dc-hero__bottom{max-width:48%;position:relative;z-index:3}
+/* HOME HERO — copy left, image right. */
+.dc-home .dc-hero.dc-has-integrated-ink--home{grid-template-rows:auto 1fr auto;align-content:stretch;min-height:calc(100svh - 64px)}
+.dc-home .dc-hero.dc-has-integrated-ink--home .dc-hero__meta{grid-column:1/13;grid-row:1;z-index:3}
+.dc-home .dc-hero.dc-has-integrated-ink--home .dc-hero__title{grid-column:1/8;grid-row:2;align-self:center;margin-top:0!important;max-width:none;font-size:clamp(62px,8.2vw,142px);z-index:3}
+.dc-home .dc-hero.dc-has-integrated-ink--home .dc-hero__bottom{grid-column:1/6;grid-row:3;align-self:end;padding-top:24px;max-width:none;z-index:3}
+.dc-home .dc-hero>.dc-ink-integrated--home{grid-column:7/13!important;grid-row:1/4!important;align-self:stretch;width:100%!important;height:100%!important;z-index:1;position:relative!important;inset:auto!important}
+.dc-home .dc-hero>.dc-ink-integrated--home img{object-fit:cover!important;object-position:68% center}
 
-/* ABOUT / SERVICE 002 — image is the visual proof of the reverse service. */
-.dc-about-service.dc-has-integrated-ink--service{min-height:clamp(680px,72vw,900px);background:var(--dc-paper)}
-.dc-about-service>.dc-ink-integrated--service img{object-position:center center}
-.dc-about-service.dc-has-integrated-ink--service::after{content:"";position:absolute;z-index:1;inset:0;background:linear-gradient(90deg,rgba(242,240,232,.98) 0%,rgba(242,240,232,.92) 36%,rgba(242,240,232,.18) 61%,rgba(242,240,232,0) 78%);pointer-events:none}
-.dc-about-service.dc-has-integrated-ink--service .dc-about-service__grid{position:relative;z-index:3}
-.dc-about-service.dc-has-integrated-ink--service .dc-about-service__title,.dc-about-service.dc-has-integrated-ink--service .dc-about-service__copy,.dc-about-service.dc-has-integrated-ink--service .dc-about-service__quote{max-width:48%}
+/* HOME / FUENGIROLA — illustration is the event card's visual half. */
+.dc-home .dc-event[aria-labelledby="event-title"] .dc-shell.dc-has-integrated-ink--home-event{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:var(--dc-gap);align-items:stretch}
+.dc-home .dc-event[aria-labelledby="event-title"] .dc-event__top{grid-column:1/7;grid-row:1}
+.dc-home .dc-event[aria-labelledby="event-title"] .dc-event__body{grid-column:1/7;grid-row:2}
+.dc-home .dc-event[aria-labelledby="event-title"] .dc-ink-integrated--home-event{grid-column:7/13;grid-row:1/3;width:100%!important;height:100%!important;min-height:560px;background:var(--dc-paper)!important;position:relative!important;inset:auto!important}
+.dc-home .dc-event[aria-labelledby="event-title"] .dc-ink-integrated--home-event img{object-fit:cover!important;object-position:center center}
 
-/* LOGIC — head/maze belongs to the Ministry statement. */
-.dc-ministry.dc-has-integrated-ink--logic{min-height:clamp(650px,68vw,880px);background:var(--dc-paper)}
-.dc-ministry>.dc-ink-integrated--logic img{object-position:center center}
-.dc-ministry.dc-has-integrated-ink--logic::after{content:"";position:absolute;z-index:1;inset:0;background:linear-gradient(90deg,rgba(242,240,232,0) 0%,rgba(242,240,232,.08) 42%,rgba(242,240,232,.91) 63%,rgba(242,240,232,.98) 100%);pointer-events:none}
-.dc-ministry.dc-has-integrated-ink--logic .dc-ministry__grid{position:relative;z-index:3}
-.dc-ministry.dc-has-integrated-ink--logic .dc-ministry__statement{margin-left:auto;max-width:48%}
+/* ABOUT / SERVICE 002 — copy and illustration are peers in the same grid. */
+.dc-about-service__grid.dc-has-integrated-ink--service{align-items:start}
+.dc-about-service__grid.dc-has-integrated-ink--service .dc-about-service__label{grid-column:1/3;grid-row:1}
+.dc-about-service__grid.dc-has-integrated-ink--service .dc-about-service__title{grid-column:1/7;grid-row:2;margin-top:28px}
+.dc-about-service__grid.dc-has-integrated-ink--service .dc-about-service__copy{grid-column:1/6;grid-row:3;margin-top:46px}
+.dc-about-service__grid.dc-has-integrated-ink--service .dc-about-service__quote{grid-column:1/7;grid-row:4;margin-top:58px}
+.dc-about-service__grid>.dc-ink-integrated--service{grid-column:7/13;grid-row:1/5;width:100%!important;height:100%!important;min-height:660px;align-self:stretch;position:relative!important;inset:auto!important}
+.dc-about-service__grid>.dc-ink-integrated--service img{object-fit:contain!important;object-position:center center}
 
-/* EVENT — Fuengirola is the location layer of the event hero. */
-.dc-fuengirola-page .dc-entity-hero.dc-has-integrated-ink--fuengirola{min-height:clamp(700px,82vh,920px);background:var(--dc-paper)}
-.dc-fuengirola-page .dc-entity-hero>.dc-ink-integrated--fuengirola img{object-position:center center}
-.dc-fuengirola-page .dc-entity-hero.dc-has-integrated-ink--fuengirola::after{content:"";position:absolute;z-index:1;inset:0;background:linear-gradient(90deg,rgba(242,240,232,.97) 0%,rgba(242,240,232,.83) 38%,rgba(242,240,232,.10) 70%,rgba(242,240,232,0) 100%);pointer-events:none}
-.dc-fuengirola-page .dc-entity-hero.dc-has-integrated-ink--fuengirola .dc-entity-hero__title,.dc-fuengirola-page .dc-entity-hero.dc-has-integrated-ink--fuengirola .dc-entity-hero__bottom{max-width:58%;position:relative;z-index:3}
+/* ABOUT / DEMENTOR — chair left, anti-guru definition right. */
+.dc-about-dementor__grid.dc-has-integrated-ink--authority{align-items:start}
+.dc-about-dementor__grid.dc-has-integrated-ink--authority .dc-about-dementor__label{grid-column:7/13;grid-row:1}
+.dc-about-dementor__grid.dc-has-integrated-ink--authority .dc-about-dementor__title{grid-column:7/13;grid-row:2;margin-top:28px}
+.dc-about-dementor__grid.dc-has-integrated-ink--authority .dc-about-dementor__copy{grid-column:7/13;grid-row:3;margin-top:44px}
+.dc-about-dementor__grid.dc-has-integrated-ink--authority .dc-footnotes{grid-column:7/13;grid-row:4}
+.dc-about-dementor__grid>.dc-ink-integrated--authority{grid-column:1/6;grid-row:1/5;width:100%!important;height:100%!important;min-height:620px;align-self:stretch;position:relative!important;inset:auto!important}
+.dc-about-dementor__grid>.dc-ink-integrated--authority img{object-fit:contain!important;object-position:left center}
 
-/* COMMUNITY — people flow is the hero background, not a separate content claim. */
-.dc-community-hero.dc-has-integrated-ink--community{min-height:clamp(620px,68vw,820px);background:var(--dc-paper)}
-.dc-community-hero>.dc-ink-integrated--community img{object-position:center center}
-.dc-community-hero.dc-has-integrated-ink--community::after{content:"";position:absolute;z-index:1;inset:0;background:linear-gradient(90deg,rgba(242,240,232,.98) 0%,rgba(242,240,232,.90) 34%,rgba(242,240,232,.12) 62%,rgba(242,240,232,0) 82%);pointer-events:none}
-.dc-community-hero.dc-has-integrated-ink--community .dc-shell{position:relative;z-index:3}
-.dc-community-hero.dc-has-integrated-ink--community .dc-community-intro{max-width:46%}
+/* LOGIC — image left, ministry statement right. */
+.dc-ministry__grid.dc-has-integrated-ink--logic{align-items:center}
+.dc-ministry__grid.dc-has-integrated-ink--logic .dc-ministry__label{grid-column:7/13;grid-row:1}
+.dc-ministry__grid.dc-has-integrated-ink--logic .dc-ministry__statement{grid-column:7/13;grid-row:2;margin-top:32px}
+.dc-ministry__grid>.dc-ink-integrated--logic{grid-column:1/7;grid-row:1/3;width:100%!important;height:100%!important;min-height:620px;position:relative!important;inset:auto!important}
+.dc-ministry__grid>.dc-ink-integrated--logic img{object-fit:contain!important;object-position:left center}
 
-/* ABOUT / DEMENTOR DEFINITION — authority object supports the anti-guru thesis. */
-.dc-about-dementor.dc-has-integrated-ink--authority{min-height:clamp(690px,70vw,900px);background:var(--dc-paper)}
-.dc-about-dementor>.dc-ink-integrated--authority img{object-position:left center}
-.dc-about-dementor.dc-has-integrated-ink--authority::after{content:"";position:absolute;z-index:1;inset:0;background:linear-gradient(90deg,rgba(242,240,232,0) 0%,rgba(242,240,232,.12) 42%,rgba(242,240,232,.92) 62%,rgba(242,240,232,.99) 100%);pointer-events:none}
-.dc-about-dementor.dc-has-integrated-ink--authority .dc-about-dementor__grid{position:relative;z-index:3}
-.dc-about-dementor.dc-has-integrated-ink--authority .dc-about-dementor__title,.dc-about-dementor.dc-has-integrated-ink--authority .dc-about-dementor__copy,.dc-about-dementor.dc-has-integrated-ink--authority .dc-footnotes{margin-left:auto;max-width:52%}
+/* FUENGIROLA ENTITY — event copy left, location image right. */
+.dc-fuengirola-page .dc-entity-hero.dc-has-integrated-ink--fuengirola{grid-template-rows:auto 1fr auto;align-content:stretch;min-height:calc(100svh - 64px)}
+.dc-fuengirola-page .dc-entity-hero.dc-has-integrated-ink--fuengirola .dc-entity-hero__meta{grid-column:1/13;grid-row:1;z-index:3}
+.dc-fuengirola-page .dc-entity-hero.dc-has-integrated-ink--fuengirola .dc-entity-hero__title{grid-column:1/7;grid-row:2;align-self:center;margin-top:0;z-index:3}
+.dc-fuengirola-page .dc-entity-hero.dc-has-integrated-ink--fuengirola .dc-entity-hero__bottom{grid-column:1/7;grid-row:3;grid-template-columns:repeat(6,1fr);margin-top:28px;z-index:3}
+.dc-fuengirola-page .dc-entity-hero.dc-has-integrated-ink--fuengirola .dc-entity-hero__lead{grid-column:1/7}
+.dc-fuengirola-page .dc-entity-hero.dc-has-integrated-ink--fuengirola .dc-entity-hero__facts{grid-column:1/4;margin-top:22px}
+.dc-fuengirola-page .dc-entity-hero.dc-has-integrated-ink--fuengirola .dc-entity-hero__action{grid-column:4/7;align-self:end}
+.dc-fuengirola-page .dc-entity-hero>.dc-ink-integrated--fuengirola{grid-column:7/13!important;grid-row:1/4!important;width:100%!important;height:100%!important;z-index:1;position:relative!important;inset:auto!important}
+.dc-fuengirola-page .dc-entity-hero>.dc-ink-integrated--fuengirola img{object-fit:cover!important;object-position:center center}
+
+/* COMMUNITY — hero copy left, people flow right. */
+.dc-community-hero .dc-shell.dc-has-integrated-ink--community{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:16px;align-items:center}
+.dc-community-hero .dc-shell.dc-has-integrated-ink--community>.dc-kicker{grid-column:1/6;grid-row:1}
+.dc-community-hero .dc-shell.dc-has-integrated-ink--community>h1{grid-column:1/6;grid-row:2}
+.dc-community-hero .dc-shell.dc-has-integrated-ink--community .dc-community-intro{grid-column:1/6;grid-row:3;display:block;margin-top:38px}
+.dc-community-hero .dc-shell.dc-has-integrated-ink--community .dc-community-intro p{margin:0 0 20px}
+.dc-community-hero .dc-shell>.dc-ink-integrated--community{grid-column:6/13;grid-row:1/4;width:100%!important;height:100%!important;min-height:560px;position:relative!important;inset:auto!important}
+.dc-community-hero .dc-shell>.dc-ink-integrated--community img{object-fit:cover!important;object-position:66% center}
 
 @media(max-width:900px){
-  .dc-home .dc-hero.dc-has-integrated-ink--home .dc-hero__title,.dc-home .dc-hero.dc-has-integrated-ink--home .dc-hero__bottom,.dc-about-service.dc-has-integrated-ink--service .dc-about-service__title,.dc-about-service.dc-has-integrated-ink--service .dc-about-service__copy,.dc-about-service.dc-has-integrated-ink--service .dc-about-service__quote,.dc-ministry.dc-has-integrated-ink--logic .dc-ministry__statement,.dc-fuengirola-page .dc-entity-hero.dc-has-integrated-ink--fuengirola .dc-entity-hero__title,.dc-fuengirola-page .dc-entity-hero.dc-has-integrated-ink--fuengirola .dc-entity-hero__bottom,.dc-community-hero.dc-has-integrated-ink--community .dc-community-intro,.dc-about-dementor.dc-has-integrated-ink--authority .dc-about-dementor__title,.dc-about-dementor.dc-has-integrated-ink--authority .dc-about-dementor__copy,.dc-about-dementor.dc-has-integrated-ink--authority .dc-footnotes{max-width:none;margin-left:0}
-  .dc-has-integrated-ink>.dc-ink-integrated{position:relative;inset:auto;height:auto!important;aspect-ratio:16/10;margin-top:28px!important;z-index:1}
-  .dc-has-integrated-ink>.dc-ink-integrated img{object-fit:cover}
-  .dc-home .dc-hero.dc-has-integrated-ink--home::after,.dc-about-service.dc-has-integrated-ink--service::after,.dc-ministry.dc-has-integrated-ink--logic::after,.dc-fuengirola-page .dc-entity-hero.dc-has-integrated-ink--fuengirola::after,.dc-community-hero.dc-has-integrated-ink--community::after,.dc-about-dementor.dc-has-integrated-ink--authority::after{display:none}
-  .dc-home .dc-hero>.dc-ink-integrated--home img{object-position:68% center}
-  .dc-ministry>.dc-ink-integrated--logic img{object-position:28% center}
-  .dc-community-hero>.dc-ink-integrated--community img{object-position:66% center}
-  .dc-about-dementor>.dc-ink-integrated--authority img{object-position:left center}
+  .dc-home .dc-hero.dc-has-integrated-ink--home{grid-template-columns:repeat(8,minmax(0,1fr));grid-template-rows:auto auto auto auto;min-height:auto}
+  .dc-home .dc-hero.dc-has-integrated-ink--home .dc-hero__meta{grid-column:1/9;grid-row:1}
+  .dc-home .dc-hero.dc-has-integrated-ink--home .dc-hero__title{grid-column:1/9;grid-row:2;margin-top:54px!important;font-size:clamp(58px,13vw,112px)}
+  .dc-home .dc-hero>.dc-ink-integrated--home{grid-column:1/9!important;grid-row:3!important;height:auto!important;aspect-ratio:16/9;margin-top:34px!important}
+  .dc-home .dc-hero>.dc-ink-integrated--home img{object-fit:contain!important;object-position:center center}
+  .dc-home .dc-hero.dc-has-integrated-ink--home .dc-hero__bottom{grid-column:1/9;grid-row:4;margin-top:28px;max-width:620px}
+
+  .dc-home .dc-event[aria-labelledby="event-title"] .dc-shell.dc-has-integrated-ink--home-event{grid-template-columns:repeat(8,minmax(0,1fr))}
+  .dc-home .dc-event[aria-labelledby="event-title"] .dc-event__top{grid-column:1/9;grid-row:1}
+  .dc-home .dc-event[aria-labelledby="event-title"] .dc-ink-integrated--home-event{grid-column:1/9;grid-row:2;height:auto!important;min-height:0;aspect-ratio:16/9;margin-top:30px!important}
+  .dc-home .dc-event[aria-labelledby="event-title"] .dc-event__body{grid-column:1/9;grid-row:3;margin-top:34px}
+
+  .dc-about-service__grid.dc-has-integrated-ink--service,.dc-about-dementor__grid.dc-has-integrated-ink--authority,.dc-ministry__grid.dc-has-integrated-ink--logic{grid-template-columns:repeat(8,1fr)}
+  .dc-about-service__grid.dc-has-integrated-ink--service .dc-about-service__label{grid-column:1/9;grid-row:1}
+  .dc-about-service__grid.dc-has-integrated-ink--service .dc-about-service__title{grid-column:1/9;grid-row:2}
+  .dc-about-service__grid>.dc-ink-integrated--service{grid-column:1/9;grid-row:3;height:auto!important;min-height:0;aspect-ratio:16/10;margin-top:32px!important}
+  .dc-about-service__grid.dc-has-integrated-ink--service .dc-about-service__copy{grid-column:1/7;grid-row:4;margin-top:34px}
+  .dc-about-service__grid.dc-has-integrated-ink--service .dc-about-service__quote{grid-column:1/9;grid-row:5;margin-top:46px}
+
+  .dc-about-dementor__grid.dc-has-integrated-ink--authority .dc-about-dementor__label{grid-column:1/9;grid-row:1}
+  .dc-about-dementor__grid.dc-has-integrated-ink--authority .dc-about-dementor__title{grid-column:1/9;grid-row:2}
+  .dc-about-dementor__grid>.dc-ink-integrated--authority{grid-column:1/9;grid-row:3;height:auto!important;min-height:0;aspect-ratio:16/10;margin-top:32px!important}
+  .dc-about-dementor__grid.dc-has-integrated-ink--authority .dc-about-dementor__copy{grid-column:1/7;grid-row:4;margin-top:34px}
+  .dc-about-dementor__grid.dc-has-integrated-ink--authority .dc-footnotes{grid-column:1/9;grid-row:5}
+
+  .dc-ministry__grid.dc-has-integrated-ink--logic .dc-ministry__label{grid-column:1/9;grid-row:1}
+  .dc-ministry__grid.dc-has-integrated-ink--logic .dc-ministry__statement{grid-column:1/9;grid-row:2;margin-top:28px}
+  .dc-ministry__grid>.dc-ink-integrated--logic{grid-column:1/9;grid-row:3;height:auto!important;min-height:0;aspect-ratio:16/10;margin-top:32px!important}
+
+  .dc-fuengirola-page .dc-entity-hero.dc-has-integrated-ink--fuengirola{grid-template-columns:repeat(8,minmax(0,1fr));grid-template-rows:auto auto auto auto;min-height:auto}
+  .dc-fuengirola-page .dc-entity-hero.dc-has-integrated-ink--fuengirola .dc-entity-hero__meta{grid-column:1/9;grid-row:1}
+  .dc-fuengirola-page .dc-entity-hero.dc-has-integrated-ink--fuengirola .dc-entity-hero__title{grid-column:1/9;grid-row:2;margin-top:54px}
+  .dc-fuengirola-page .dc-entity-hero>.dc-ink-integrated--fuengirola{grid-column:1/9!important;grid-row:3!important;height:auto!important;aspect-ratio:16/9;margin-top:34px!important}
+  .dc-fuengirola-page .dc-entity-hero.dc-has-integrated-ink--fuengirola .dc-entity-hero__bottom{grid-column:1/9;grid-row:4;grid-template-columns:repeat(8,1fr);margin-top:34px}
+  .dc-fuengirola-page .dc-entity-hero.dc-has-integrated-ink--fuengirola .dc-entity-hero__lead{grid-column:1/9}
+  .dc-fuengirola-page .dc-entity-hero.dc-has-integrated-ink--fuengirola .dc-entity-hero__facts{grid-column:1/5}
+  .dc-fuengirola-page .dc-entity-hero.dc-has-integrated-ink--fuengirola .dc-entity-hero__action{grid-column:5/9}
+
+  .dc-community-hero .dc-shell.dc-has-integrated-ink--community{grid-template-columns:repeat(8,1fr)}
+  .dc-community-hero .dc-shell.dc-has-integrated-ink--community>.dc-kicker{grid-column:1/9;grid-row:1}
+  .dc-community-hero .dc-shell.dc-has-integrated-ink--community>h1{grid-column:1/9;grid-row:2}
+  .dc-community-hero .dc-shell>.dc-ink-integrated--community{grid-column:1/9;grid-row:3;height:auto!important;min-height:0;aspect-ratio:16/9;margin-top:30px!important}
+  .dc-community-hero .dc-shell.dc-has-integrated-ink--community .dc-community-intro{grid-column:1/9;grid-row:4;margin-top:30px}
+}
+
+@media(max-width:560px){
+  .dc-home .dc-hero.dc-has-integrated-ink--home{grid-template-columns:repeat(4,minmax(0,1fr));padding-bottom:28px}
+  .dc-home .dc-hero.dc-has-integrated-ink--home .dc-hero__meta,.dc-home .dc-hero.dc-has-integrated-ink--home .dc-hero__title,.dc-home .dc-hero>.dc-ink-integrated--home,.dc-home .dc-hero.dc-has-integrated-ink--home .dc-hero__bottom{grid-column:1/5!important}
+  .dc-home .dc-hero.dc-has-integrated-ink--home .dc-hero__title{font-size:clamp(54px,17vw,82px);line-height:.82;margin-top:42px!important}
+  .dc-home .dc-hero>.dc-ink-integrated--home{aspect-ratio:1.35/1;margin-top:26px!important}
+  .dc-home .dc-hero>.dc-ink-integrated--home img{object-fit:cover!important;object-position:70% center}
+  .dc-home .dc-event[aria-labelledby="event-title"] .dc-shell.dc-has-integrated-ink--home-event{grid-template-columns:repeat(4,1fr)}
+  .dc-home .dc-event[aria-labelledby="event-title"] .dc-event__top,.dc-home .dc-event[aria-labelledby="event-title"] .dc-ink-integrated--home-event,.dc-home .dc-event[aria-labelledby="event-title"] .dc-event__body{grid-column:1/5}
+  .dc-home .dc-event[aria-labelledby="event-title"] .dc-ink-integrated--home-event{aspect-ratio:1.35/1}
+
+  .dc-about-service__grid.dc-has-integrated-ink--service,.dc-about-dementor__grid.dc-has-integrated-ink--authority,.dc-ministry__grid.dc-has-integrated-ink--logic{grid-template-columns:repeat(4,1fr)}
+  .dc-about-service__grid.dc-has-integrated-ink--service .dc-about-service__label,.dc-about-service__grid.dc-has-integrated-ink--service .dc-about-service__title,.dc-about-service__grid>.dc-ink-integrated--service,.dc-about-service__grid.dc-has-integrated-ink--service .dc-about-service__copy,.dc-about-service__grid.dc-has-integrated-ink--service .dc-about-service__quote,.dc-about-dementor__grid.dc-has-integrated-ink--authority .dc-about-dementor__label,.dc-about-dementor__grid.dc-has-integrated-ink--authority .dc-about-dementor__title,.dc-about-dementor__grid>.dc-ink-integrated--authority,.dc-about-dementor__grid.dc-has-integrated-ink--authority .dc-about-dementor__copy,.dc-about-dementor__grid.dc-has-integrated-ink--authority .dc-footnotes,.dc-ministry__grid.dc-has-integrated-ink--logic .dc-ministry__label,.dc-ministry__grid.dc-has-integrated-ink--logic .dc-ministry__statement,.dc-ministry__grid>.dc-ink-integrated--logic{grid-column:1/5}
+  .dc-about-service__grid>.dc-ink-integrated--service,.dc-about-dementor__grid>.dc-ink-integrated--authority,.dc-ministry__grid>.dc-ink-integrated--logic{aspect-ratio:1.2/1}
+
+  .dc-fuengirola-page .dc-entity-hero.dc-has-integrated-ink--fuengirola{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .dc-fuengirola-page .dc-entity-hero.dc-has-integrated-ink--fuengirola .dc-entity-hero__meta,.dc-fuengirola-page .dc-entity-hero.dc-has-integrated-ink--fuengirola .dc-entity-hero__title,.dc-fuengirola-page .dc-entity-hero>.dc-ink-integrated--fuengirola,.dc-fuengirola-page .dc-entity-hero.dc-has-integrated-ink--fuengirola .dc-entity-hero__bottom{grid-column:1/5!important}
+  .dc-fuengirola-page .dc-entity-hero>.dc-ink-integrated--fuengirola{aspect-ratio:1.35/1}
+  .dc-fuengirola-page .dc-entity-hero.dc-has-integrated-ink--fuengirola .dc-entity-hero__bottom{grid-template-columns:repeat(4,1fr)}
+  .dc-fuengirola-page .dc-entity-hero.dc-has-integrated-ink--fuengirola .dc-entity-hero__lead,.dc-fuengirola-page .dc-entity-hero.dc-has-integrated-ink--fuengirola .dc-entity-hero__facts,.dc-fuengirola-page .dc-entity-hero.dc-has-integrated-ink--fuengirola .dc-entity-hero__action{grid-column:1/5}
+
+  .dc-community-hero .dc-shell.dc-has-integrated-ink--community{grid-template-columns:repeat(4,1fr)}
+  .dc-community-hero .dc-shell.dc-has-integrated-ink--community>.dc-kicker,.dc-community-hero .dc-shell.dc-has-integrated-ink--community>h1,.dc-community-hero .dc-shell>.dc-ink-integrated--community,.dc-community-hero .dc-shell.dc-has-integrated-ink--community .dc-community-intro{grid-column:1/5}
+  .dc-community-hero .dc-shell>.dc-ink-integrated--community{aspect-ratio:1.25/1}
 }
