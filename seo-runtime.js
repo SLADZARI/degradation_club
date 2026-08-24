@@ -16,6 +16,9 @@
   if(!document.querySelector('link[href="/accessibility-v1.css"]')){
     const css=document.createElement('link');css.rel='stylesheet';css.href='/accessibility-v1.css';document.head.appendChild(css);
   }
+  if(!document.querySelector('script[src="/ink-layout-v2.js"]')){
+    const ink=document.createElement('script');ink.src='/ink-layout-v2.js';ink.defer=true;document.head.appendChild(ink);
+  }
 
   const main=document.querySelector('main');
   if(main&&!main.id)main.id='main-content';
