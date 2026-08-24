@@ -1,0 +1,45 @@
+name: Rebuild Ink Assets
+
+on:
+  push:
+    branches: [dementor-club-site]
+    paths:
+      - 'assets/ink/_staging/READY'
+
+permissions:
+  contents: write
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: dementor-club-site
+          fetch-depth: 0
+      - name: Rebuild WebP binaries from staged base64 chunks
+        shell: bash
+        run: |
+          set -euo pipefail
+          names=(
+            home-interruption-03.webp
+            about-service-03.webp
+            logic-awareness-03.webp
+            event-fuengirola-03.webp
+            community-flow-01.webp
+            authority-chair-01.webp
+          )
+          for name in "${names[@]}"; do
+            cat assets/ink/_staging/${name}.part* | tr -d '\n' | base64 -d > assets/ink/${name}
+            test -s assets/ink/${name}
+          done
+          file assets/ink/*.webp
+      - name: Commit rebuilt assets
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add assets/ink/*.webp
+          git rm -r assets/ink/_staging
+          git commit -m 'Add production Dementor Ink raster assets'
+          git push origin HEAD:dementor-club-site
