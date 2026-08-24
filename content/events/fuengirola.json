@@ -7,6 +7,7 @@
   "status": "planned",
   "publicUrl": "/events/fuengirola/",
   "preview": "/assets/ink/event-fuengirola-02.webp",
+  "dementor": "DEMENTOR-004",
   "location": {
     "city": "Fuengirola / Фуэнхирола",
     "country": "Испания"
@@ -20,7 +21,7 @@
   "price": null,
   "participationTerms": null,
   "registrationUrl": null,
-  "organizers": null,
+  "organizers": ["DEMENTOR-004"],
   "participants": null,
   "relatedProjects": [],
   "provenance": {
@@ -29,5 +30,5 @@
     "role": "canonical-club-event-record"
   },
   "siteRole": "implementation-mirror",
-  "updatedAt": "2026-08-23"
+  "updatedAt": "2026-08-24"
 }
