@@ -3,6 +3,9 @@
   if(!document.querySelector('link[href="/ink-layout-v2.css"]')){
     const link=document.createElement('link');link.rel='stylesheet';link.href='/ink-layout-v2.css';document.head.appendChild(link);
   }
+  if(!document.querySelector('link[href="/ink-layout-v2-tuning.css"]')){
+    const tune=document.createElement('link');tune.rel='stylesheet';tune.href='/ink-layout-v2-tuning.css';document.head.appendChild(tune);
+  }
 
   const mountExisting=(figureSelector,targetSelector,role)=>{
     const figure=document.querySelector(figureSelector),target=document.querySelector(targetSelector);
