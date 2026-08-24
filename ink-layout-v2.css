@@ -1,0 +1,58 @@
+/* Ink layout v2 — semantic integration, not standalone image sections. */
+.dc-has-integrated-ink{position:relative;isolation:isolate;overflow:hidden}
+.dc-has-integrated-ink>.dc-ink-integrated{position:absolute;inset:0;z-index:0;margin:0!important;width:100%!important;height:100%!important;border:0!important;box-shadow:none!important;transform:none!important;background:transparent!important;overflow:hidden;pointer-events:none}
+.dc-has-integrated-ink>.dc-ink-integrated::before,.dc-has-integrated-ink>.dc-ink-integrated::after{display:none!important}
+.dc-has-integrated-ink>.dc-ink-integrated img{display:block;width:100%;height:100%;object-fit:cover;transform:none!important;filter:none!important;mix-blend-mode:multiply}
+.dc-has-integrated-ink>*:not(.dc-ink-integrated){position:relative;z-index:2}
+
+/* HOME — first block. Blank paper on the left, Ink subject on the right. */
+.dc-home .dc-hero.dc-has-integrated-ink--home{min-height:clamp(760px,92vh,980px);background:var(--dc-paper)}
+.dc-home .dc-hero>.dc-ink-integrated--home img{object-position:center center}
+.dc-home .dc-hero.dc-has-integrated-ink--home::after{content:"";position:absolute;z-index:1;inset:0;background:linear-gradient(90deg,rgba(242,240,232,.98) 0%,rgba(242,240,232,.90) 31%,rgba(242,240,232,.18) 59%,rgba(242,240,232,0) 75%);pointer-events:none}
+.dc-home .dc-hero.dc-has-integrated-ink--home .dc-hero__title{max-width:68%;position:relative;z-index:3}
+.dc-home .dc-hero.dc-has-integrated-ink--home .dc-hero__bottom{max-width:48%;position:relative;z-index:3}
+
+/* ABOUT / SERVICE 002 — image is the visual proof of the reverse service. */
+.dc-about-service.dc-has-integrated-ink--service{min-height:clamp(680px,72vw,900px);background:var(--dc-paper)}
+.dc-about-service>.dc-ink-integrated--service img{object-position:center center}
+.dc-about-service.dc-has-integrated-ink--service::after{content:"";position:absolute;z-index:1;inset:0;background:linear-gradient(90deg,rgba(242,240,232,.98) 0%,rgba(242,240,232,.92) 36%,rgba(242,240,232,.18) 61%,rgba(242,240,232,0) 78%);pointer-events:none}
+.dc-about-service.dc-has-integrated-ink--service .dc-about-service__grid{position:relative;z-index:3}
+.dc-about-service.dc-has-integrated-ink--service .dc-about-service__title,.dc-about-service.dc-has-integrated-ink--service .dc-about-service__copy,.dc-about-service.dc-has-integrated-ink--service .dc-about-service__quote{max-width:48%}
+
+/* LOGIC — head/maze belongs to the Ministry statement. */
+.dc-ministry.dc-has-integrated-ink--logic{min-height:clamp(650px,68vw,880px);background:var(--dc-paper)}
+.dc-ministry>.dc-ink-integrated--logic img{object-position:center center}
+.dc-ministry.dc-has-integrated-ink--logic::after{content:"";position:absolute;z-index:1;inset:0;background:linear-gradient(90deg,rgba(242,240,232,0) 0%,rgba(242,240,232,.08) 42%,rgba(242,240,232,.91) 63%,rgba(242,240,232,.98) 100%);pointer-events:none}
+.dc-ministry.dc-has-integrated-ink--logic .dc-ministry__grid{position:relative;z-index:3}
+.dc-ministry.dc-has-integrated-ink--logic .dc-ministry__statement{margin-left:auto;max-width:48%}
+
+/* EVENT — Fuengirola is the location layer of the event hero. */
+.dc-fuengirola-page .dc-entity-hero.dc-has-integrated-ink--fuengirola{min-height:clamp(700px,82vh,920px);background:var(--dc-paper)}
+.dc-fuengirola-page .dc-entity-hero>.dc-ink-integrated--fuengirola img{object-position:center center}
+.dc-fuengirola-page .dc-entity-hero.dc-has-integrated-ink--fuengirola::after{content:"";position:absolute;z-index:1;inset:0;background:linear-gradient(90deg,rgba(242,240,232,.97) 0%,rgba(242,240,232,.83) 38%,rgba(242,240,232,.10) 70%,rgba(242,240,232,0) 100%);pointer-events:none}
+.dc-fuengirola-page .dc-entity-hero.dc-has-integrated-ink--fuengirola .dc-entity-hero__title,.dc-fuengirola-page .dc-entity-hero.dc-has-integrated-ink--fuengirola .dc-entity-hero__bottom{max-width:58%;position:relative;z-index:3}
+
+/* COMMUNITY — people flow is the hero background, not a separate content claim. */
+.dc-community-hero.dc-has-integrated-ink--community{min-height:clamp(620px,68vw,820px);background:var(--dc-paper)}
+.dc-community-hero>.dc-ink-integrated--community img{object-position:center center}
+.dc-community-hero.dc-has-integrated-ink--community::after{content:"";position:absolute;z-index:1;inset:0;background:linear-gradient(90deg,rgba(242,240,232,.98) 0%,rgba(242,240,232,.90) 34%,rgba(242,240,232,.12) 62%,rgba(242,240,232,0) 82%);pointer-events:none}
+.dc-community-hero.dc-has-integrated-ink--community .dc-shell{position:relative;z-index:3}
+.dc-community-hero.dc-has-integrated-ink--community .dc-community-intro{max-width:46%}
+
+/* ABOUT / DEMENTOR DEFINITION — authority object supports the anti-guru thesis. */
+.dc-about-dementor.dc-has-integrated-ink--authority{min-height:clamp(690px,70vw,900px);background:var(--dc-paper)}
+.dc-about-dementor>.dc-ink-integrated--authority img{object-position:left center}
+.dc-about-dementor.dc-has-integrated-ink--authority::after{content:"";position:absolute;z-index:1;inset:0;background:linear-gradient(90deg,rgba(242,240,232,0) 0%,rgba(242,240,232,.12) 42%,rgba(242,240,232,.92) 62%,rgba(242,240,232,.99) 100%);pointer-events:none}
+.dc-about-dementor.dc-has-integrated-ink--authority .dc-about-dementor__grid{position:relative;z-index:3}
+.dc-about-dementor.dc-has-integrated-ink--authority .dc-about-dementor__title,.dc-about-dementor.dc-has-integrated-ink--authority .dc-about-dementor__copy,.dc-about-dementor.dc-has-integrated-ink--authority .dc-footnotes{margin-left:auto;max-width:52%}
+
+@media(max-width:900px){
+  .dc-home .dc-hero.dc-has-integrated-ink--home .dc-hero__title,.dc-home .dc-hero.dc-has-integrated-ink--home .dc-hero__bottom,.dc-about-service.dc-has-integrated-ink--service .dc-about-service__title,.dc-about-service.dc-has-integrated-ink--service .dc-about-service__copy,.dc-about-service.dc-has-integrated-ink--service .dc-about-service__quote,.dc-ministry.dc-has-integrated-ink--logic .dc-ministry__statement,.dc-fuengirola-page .dc-entity-hero.dc-has-integrated-ink--fuengirola .dc-entity-hero__title,.dc-fuengirola-page .dc-entity-hero.dc-has-integrated-ink--fuengirola .dc-entity-hero__bottom,.dc-community-hero.dc-has-integrated-ink--community .dc-community-intro,.dc-about-dementor.dc-has-integrated-ink--authority .dc-about-dementor__title,.dc-about-dementor.dc-has-integrated-ink--authority .dc-about-dementor__copy,.dc-about-dementor.dc-has-integrated-ink--authority .dc-footnotes{max-width:none;margin-left:0}
+  .dc-has-integrated-ink>.dc-ink-integrated{position:relative;inset:auto;height:auto!important;aspect-ratio:16/10;margin-top:28px!important;z-index:1}
+  .dc-has-integrated-ink>.dc-ink-integrated img{object-fit:cover}
+  .dc-home .dc-hero.dc-has-integrated-ink--home::after,.dc-about-service.dc-has-integrated-ink--service::after,.dc-ministry.dc-has-integrated-ink--logic::after,.dc-fuengirola-page .dc-entity-hero.dc-has-integrated-ink--fuengirola::after,.dc-community-hero.dc-has-integrated-ink--community::after,.dc-about-dementor.dc-has-integrated-ink--authority::after{display:none}
+  .dc-home .dc-hero>.dc-ink-integrated--home img{object-position:68% center}
+  .dc-ministry>.dc-ink-integrated--logic img{object-position:28% center}
+  .dc-community-hero>.dc-ink-integrated--community img{object-position:66% center}
+  .dc-about-dementor>.dc-ink-integrated--authority img{object-position:left center}
+}
