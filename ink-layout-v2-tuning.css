@@ -1,0 +1,25 @@
+/* Per-scene crop tuning after grid integration. */
+.dc-about-service__grid>.dc-ink-integrated--service img{object-fit:cover!important;object-position:76% center!important}
+.dc-about-dementor__grid>.dc-ink-integrated--authority img{object-fit:cover!important;object-position:18% center!important}
+.dc-ministry__grid>.dc-ink-integrated--logic img{object-fit:cover!important;object-position:22% center!important}
+.dc-community-hero .dc-shell>.dc-ink-integrated--community img{object-fit:cover!important;object-position:70% center!important}
+.dc-home .dc-event[aria-labelledby="event-title"] .dc-ink-integrated--home-event img{object-position:center center!important}
+.dc-fuengirola-page .dc-entity-hero>.dc-ink-integrated--fuengirola img{object-position:center center!important}
+
+@media(max-width:900px){
+  .dc-about-service__grid>.dc-ink-integrated--service img{object-position:72% center!important}
+  .dc-about-dementor__grid>.dc-ink-integrated--authority img{object-position:16% center!important}
+  .dc-ministry__grid>.dc-ink-integrated--logic img{object-position:20% center!important}
+  .dc-community-hero .dc-shell>.dc-ink-integrated--community img{object-position:72% center!important}
+}
+
+@media(max-width:560px){
+  .dc-home .dc-hero.dc-has-integrated-ink--home .dc-hero__title{font-size:clamp(50px,14.8vw,74px)!important;line-height:.84!important;letter-spacing:-.075em!important}
+  .dc-home .dc-hero>.dc-ink-integrated--home img{object-position:72% center!important}
+  .dc-home .dc-event[aria-labelledby="event-title"] .dc-ink-integrated--home-event img{object-position:58% center!important}
+  .dc-about-service__grid>.dc-ink-integrated--service img{object-position:74% center!important}
+  .dc-about-dementor__grid>.dc-ink-integrated--authority img{object-position:14% center!important}
+  .dc-ministry__grid>.dc-ink-integrated--logic img{object-position:18% center!important}
+  .dc-fuengirola-page .dc-entity-hero>.dc-ink-integrated--fuengirola img{object-position:55% center!important}
+  .dc-community-hero .dc-shell>.dc-ink-integrated--community img{object-position:74% center!important}
+}
