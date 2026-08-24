@@ -1,4 +1,17 @@
-.dc-skip-link{position:fixed;left:12px;top:12px;z-index:9999;padding:10px 14px;background:var(--dc-acid,#d8ff3e);color:var(--dc-ink,#111);font:700 12px/1 system-ui,sans-serif;letter-spacing:.06em;text-transform:uppercase;transform:translateY(-180%);transition:transform .15s ease}.dc-skip-link:focus{transform:translateY(0)}
+:root{--dc-on-acid:#111;--dc-on-dark:#f2f0e8}
+
+/* ACCESSIBILITY / CONTRAST CONTRACT
+   ACID (#d8ff3e) is a light signal surface. It may never carry paper/white text.
+   These rules are intentionally !important: component CSS is not allowed to override contrast. */
+:is(.dc-acid,.dc-action--primary,.dc-action--acid,.button.primary,.card.accent,[data-dc-surface="acid"]){color:var(--dc-on-acid)!important}
+:is(.dc-action--primary,.dc-action--acid,.button.primary,.card.accent,[data-dc-surface="acid"]){background-color:var(--dc-acid,#d8ff3e)!important;border-color:var(--dc-acid,#d8ff3e)}
+:is(.dc-acid,[data-dc-surface="acid"]){background-color:var(--dc-acid,#d8ff3e)!important}
+[data-dc-surface="acid"] *{color:inherit!important}
+:is(.dc-statement,.dc-project,.dark,[data-dc-surface="dark"]) :is(.dc-acid,.dc-action--primary,.dc-action--acid,.button.primary,[data-dc-surface="acid"]){color:var(--dc-on-acid)!important}
+:is(.dc-index-row,.dc-entity-row,.dc-chain-row,.dc-sphere,.dc-principle):hover{--dc-hover-fg:var(--dc-on-acid);color:var(--dc-hover-fg)!important}
+:is(.dc-index-row,.dc-entity-row,.dc-chain-row,.dc-sphere,.dc-principle):hover *{color:inherit!important}
+
+.dc-skip-link{position:fixed;left:12px;top:12px;z-index:9999;padding:10px 14px;background:var(--dc-acid,#d8ff3e);color:var(--dc-on-acid);font:700 12px/1 system-ui,sans-serif;letter-spacing:.06em;text-transform:uppercase;transform:translateY(-180%);transition:transform .15s ease}.dc-skip-link:focus{transform:translateY(0)}
 input:focus-visible,select:focus-visible,textarea:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--dc-acid,#d8ff3e);outline-offset:3px}
 [aria-disabled="true"],button:disabled{cursor:not-allowed}
 a[aria-disabled="true"]{pointer-events:none;opacity:.42;text-decoration:none}
