@@ -1,5 +1,5 @@
 window.DEMENTOR_SITE_CONFIG=Object.freeze({
-  version:'2026-08-23',
+  version:'2026-08-24',
   canonicalOrigin:'https://degradation-club.vercel.app',
   contacts:{
     enabled:false,
@@ -35,3 +35,4 @@ window.DEMENTOR_SITE_CONFIG=Object.freeze({
     storage:'localStorage'
   }
 });
+(()=>{if(!document.querySelector('script[src="/dementor-relations-v1.js"]')){const s=document.createElement('script');s.src='/dementor-relations-v1.js';s.defer=true;document.head.appendChild(s)}})();
