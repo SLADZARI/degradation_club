@@ -12,6 +12,47 @@
   const path=location.pathname;
   document.documentElement.dataset.route=path;
 
+  /* Progressive raster integration: keep current production asset until the new one is physically available. */
+  const upgradeRaster=(selector,src)=>{
+    const target=document.querySelector(selector);if(!target)return;
+    const probe=new Image();
+    probe.onload=()=>{target.src=src;target.dataset.inkAsset='current';};
+    probe.src=src;
+  };
+  const rasterMap={
+    '/':['.dc-ink-slot--home img','/assets/ink/home-interruption-03.webp'],
+    '/about/':['.dc-ink-slot--about img','/assets/ink/about-service-03.webp'],
+    '/projects/logic-awareness/':['.dc-ink-slot--logic img','/assets/ink/logic-awareness-03.webp'],
+    '/events/fuengirola/':['.dc-ink-slot--event img','/assets/ink/event-fuengirola-03.webp']
+  };
+  if(rasterMap[path])upgradeRaster(...rasterMap[path]);
+
+  /* New editorial scenes are inserted only after a successful image probe, so missing binaries never create broken UI. */
+  const addEditorialRaster=({src,after,className,alt,label})=>{
+    const anchor=document.querySelector(after);if(!anchor)return;
+    const probe=new Image();
+    probe.onload=()=>{
+      const figure=document.createElement('figure');figure.className=`dc-ink-editorial ${className}`;
+      figure.innerHTML=`<img src="${src}" alt="${alt}" loading="lazy" decoding="async"><figcaption>${label}</figcaption>`;
+      anchor.insertAdjacentElement('afterend',figure);
+    };
+    probe.src=src;
+  };
+  if(path==='/community/')addEditorialRaster({src:'/assets/ink/community-flow-01.webp',after:'.dc-community-hero',className:'dc-ink-editorial--community',alt:'Группа людей движется в одном направлении, рядом отдельно стоит человек с листом',label:'INK / COMMUNITY / PEOPLE IN MOTION'});
+  if(path==='/about/')addEditorialRaster({src:'/assets/ink/authority-chair-01.webp',after:'.dc-about-dementor',className:'dc-ink-editorial--authority',alt:'Офисное кресло, превращённое в ироничный трон',label:'INK / AUTHORITY / DEMENTOR IS NOT A GURU'});
+
+  if(!document.querySelector('#dc-ink-editorial-runtime')){
+    const style=document.createElement('style');style.id='dc-ink-editorial-runtime';style.textContent=`
+      .dc-ink-editorial{position:relative;margin:clamp(54px,8vw,124px) 0;background:#f2f0e8;overflow:hidden;border-block:1px solid rgba(17,17,17,.16)}
+      .dc-ink-editorial img{display:block;width:100%;height:auto;max-height:78vh;object-fit:cover}
+      .dc-ink-editorial figcaption{position:absolute;left:28px;bottom:22px;padding:7px 9px;background:#111;color:#f2f0e8;font:600 10px/1.2 Arial,sans-serif;letter-spacing:.12em}
+      .dc-ink-editorial--community img{aspect-ratio:2.58/1;object-fit:cover}
+      .dc-ink-editorial--authority{width:min(1180px,calc(100% - 56px));margin-left:auto;margin-right:auto;border:1px solid rgba(17,17,17,.18)}
+      .dc-ink-editorial--authority img{aspect-ratio:1.72/1;object-fit:cover}
+      @media(max-width:700px){.dc-ink-editorial{margin:48px 0}.dc-ink-editorial img{max-height:none}.dc-ink-editorial figcaption{position:static;background:#111;padding:9px 16px}.dc-ink-editorial--community img{aspect-ratio:1.35/1;object-position:66% center}.dc-ink-editorial--authority{width:calc(100% - 32px)}.dc-ink-editorial--authority img{aspect-ratio:1.2/1;object-position:left center}}
+    `;document.head.appendChild(style);
+  }
+
   /* Utility navigation: support/contact/legal stay out of the primary cultural nav. */
   if(!document.querySelector('link[href="/utility-v1.css"]')){
     const utilityCss=document.createElement('link');utilityCss.rel='stylesheet';utilityCss.href='/utility-v1.css';document.head.appendChild(utilityCss);
@@ -31,7 +72,8 @@
     '/events/':{level:1,role:'trace',target:'.dc-programme-intro',label:'INK / L1 / PROGRAMME TRACE',media:true},
     '/projects/':{level:1,role:'trace',target:'.dc-project-register-section .dc-kicker',label:'INK / L1 / PROJECT TRACE',media:true},
     '/catalog/':{level:1,role:'trace',target:'.dc-entity-index__head',label:'INK / L1 / REGISTER TRACE'},
-    '/archive/':{level:0,role:'silence'},'/community/':{level:0,role:'silence'},'/merch/':{level:0,role:'silence'},'/join/':{level:0,role:'silence'},'/donate/':{level:0,role:'silence'},'/contacts/':{level:0,role:'silence'},'/legal/privacy/':{level:0,role:'silence'},'/legal/terms/':{level:0,role:'silence'}
+    '/community/':{level:1,role:'people-flow',target:'.dc-community-hero',label:'INK / L1 / PEOPLE FLOW'},
+    '/archive/':{level:0,role:'silence'},'/merch/':{level:0,role:'silence'},'/join/':{level:0,role:'silence'},'/donate/':{level:0,role:'silence'},'/contacts/':{level:0,role:'silence'},'/legal/privacy/':{level:0,role:'silence'},'/legal/terms/':{level:0,role:'silence'}
   };
   const ink=inkMap[path]||{level:0,role:'silence'};
   document.body.classList.add(`dc-ink-l${ink.level}`);document.body.dataset.inkLevel=String(ink.level);document.body.dataset.inkRole=ink.role;
