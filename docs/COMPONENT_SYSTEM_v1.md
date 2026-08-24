@@ -1,7 +1,7 @@
 # Dementor Club — Component & Page System v1
 
 Status: implementation baseline
-Updated: 2026-08-23
+Updated: 2026-08-24
 
 Этот документ переводит утверждённый reference guide в рабочую систему компонентов и шаблонов страниц.
 
@@ -134,6 +134,32 @@ Secondary — paper/ink border.
 
 Текст действия — процедурный, конкретный, иногда bureaucratic deadpan.
 
+### 9.1 Contrast contract — обязательное системное правило
+
+`ACID #d8ff3e` считается **светлой поверхностью**, а не цветом текста.
+
+Разрешённые базовые пары:
+
+- PAPER `#f2f0e8` + INK `#111`;
+- INK `#111` + PAPER `#f2f0e8`;
+- ACID `#d8ff3e` + INK `#111`.
+
+Запрещено во всех компонентах и состояниях:
+
+- PAPER / white text на ACID;
+- светлый текст на `.dc-acid`;
+- светлый текст на `.dc-action--primary`, `.dc-action--acid`, `.button.primary`, `.card.accent`;
+- наследование цвета от тёмной секции внутрь acid-highlight или acid-CTA;
+- hover/focus-состояние, в котором ACID-фон получает светлый foreground.
+
+Правило действует независимо от родителя. Если primary CTA находится внутри тёмной секции, его текст всё равно INK.
+
+Для новых acid-поверхностей использовать существующие классы или `data-dc-surface="acid"`. Системный accessibility layer принудительно закрепляет INK foreground через `!important`; локальный CSS не должен пытаться это переопределять.
+
+Для новых тёмных поверхностей допустим `data-dc-surface="dark"`, но вложенный ACID всё равно остаётся парой ACID + INK.
+
+Минимальная проверка перед merge: нормальное состояние + hover + focus + mobile + dark-parent context.
+
 ## 10. Status chip
 
 Не rounded pill. Использовать текст + border/underline/acid field.
@@ -221,4 +247,7 @@ Administrative UI + state/reclassification behaviours.
 - Cyrillic headline проверен;
 - reduced motion работает;
 - Ink добавляет смысл;
-- каждый новый визуальный приём можно объяснить через approved reference responsibility map.
+- каждый новый визуальный приём можно объяснить через approved reference responsibility map;
+- ACID никогда не содержит PAPER/white foreground;
+- primary CTA читается внутри paper, dark и mixed sections;
+- acid highlight проверен на desktop/mobile и не теряет текст из-за inheritance.
