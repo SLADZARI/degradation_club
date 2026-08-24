@@ -1,12 +1,13 @@
 # Dementor Club — Feature Activation Matrix v1
 
 Status: implementation readiness
+Updated: 2026-08-24
 
 | Feature | Public page | Architecture | Source approval | Provider/data | Current state |
 |---|---|---:|---:|---:|---|
-| Onboarding | `/join/` | READY | READY | localStorage | LIVE |
+| Onboarding | `/join/` | READY | READY | localStorage | LIVE / LIVE QA PENDING |
 | Contact form | `/contacts/` | READY | channel pending | endpoint pending | DISABLED |
-| Donate | `/donate/` | READY | payment mechanic pending | provider pending | DISABLED |
+| Donate | `/donate/` | READY | payment mechanic pending | recipient/provider pending | DISABLED |
 | Merch catalog | `/merch/` + `/catalog/?type=merch` | READY | objects pending | records pending | EMPTY |
 | Merch checkout | object page / adapter | READY | sale mechanic pending | provider pending | DISABLED |
 | Event lifecycle | `/events/` | READY | READY | event records | LIVE |
@@ -42,6 +43,10 @@ Current false flags:
 
 These must not be enabled from design copy alone.
 
-## Known technical follow-up
+## Join runtime status
 
-`/join-storage-guard.js` exists as a capability guard but is not yet wired into the legacy Join boot path. The current onboarding itself is live and stores data in `localStorage`; this guard must be wired during the next safe Join runtime consolidation rather than by risking a partial rewrite of the pinned scoring engine.
+The old duplicate CDN onboarding engine has been removed from the boot path.
+`/join-storage-guard.js` is connected through `/script.js`.
+Join currently uses one scoring engine and a fail-closed localStorage capability preflight.
+
+Remaining Join work is live browser QA, responsive verification and production persistence testing after a successful deployment.
