@@ -7,10 +7,10 @@
   "publicUrl": "/community/gabil/",
   "story": null,
   "practiceAreas": null,
-  "relatedEvents": [],
+  "relatedEvents": ["event-001-fuengirola"],
   "relatedCourses": [],
   "relatedProjects": [],
-  "preview": null,
+  "preview": "/assets/people/dementors/gabil/portrait-ink.webp",
   "provenance": {
     "branch": "dementor-club",
     "path": "people/dementors.md"
