@@ -6,16 +6,106 @@
 .dc-home .dc-event[aria-labelledby="event-title"] .dc-ink-integrated--home-event img{object-position:center center!important}
 .dc-fuengirola-page .dc-entity-hero>.dc-ink-integrated--fuengirola img{object-position:center center!important}
 
+/* HOME HERO FINAL — the supplied art is a full-screen composition with intentional blank paper on the left. */
+@media(min-width:901px){
+  .dc-home .dc-hero.dc-has-integrated-ink--home{
+    position:relative!important;
+    min-height:calc(100svh - 64px)!important;
+    overflow:hidden!important;
+    grid-template-columns:repeat(12,minmax(0,1fr))!important;
+    grid-template-rows:auto 1fr auto!important;
+  }
+  .dc-home .dc-hero>.dc-ink-integrated--home{
+    position:absolute!important;
+    inset:0!important;
+    width:100%!important;
+    height:100%!important;
+    margin:0!important;
+    z-index:0!important;
+  }
+  .dc-home .dc-hero>.dc-ink-integrated--home img{
+    width:100%!important;
+    height:100%!important;
+    object-fit:cover!important;
+    object-position:center bottom!important;
+  }
+  .dc-home .dc-hero.dc-has-integrated-ink--home .dc-hero__meta{
+    grid-column:1/13!important;
+    grid-row:1!important;
+    z-index:3!important;
+  }
+  .dc-home .dc-hero.dc-has-integrated-ink--home .dc-hero__title{
+    grid-column:1/8!important;
+    grid-row:2!important;
+    align-self:center!important;
+    max-width:58vw!important;
+    margin-top:0!important;
+    font-size:clamp(62px,7.6vw,126px)!important;
+    line-height:.80!important;
+    z-index:3!important;
+  }
+  .dc-home .dc-hero.dc-has-integrated-ink--home .dc-hero__bottom{
+    grid-column:1/5!important;
+    grid-row:3!important;
+    align-self:end!important;
+    max-width:560px!important;
+    padding-top:20px!important;
+    z-index:3!important;
+  }
+  .dc-home .dc-hero.dc-has-integrated-ink--home .dc-hero__bottom .dc-body{max-width:470px!important}
+}
+
 @media(max-width:900px){
   .dc-about-service__grid>.dc-ink-integrated--service img{object-position:72% center!important}
   .dc-about-dementor__grid>.dc-ink-integrated--authority img{object-position:16% center!important}
   .dc-ministry__grid>.dc-ink-integrated--logic img{object-position:20% center!important}
   .dc-community-hero .dc-shell>.dc-ink-integrated--community img{object-position:72% center!important}
+
+  /* Tablet/mobile: copy first, supplied illustration whole-width at the bottom. */
+  .dc-home .dc-hero.dc-has-integrated-ink--home{
+    grid-template-rows:auto auto auto auto!important;
+    overflow:hidden!important;
+  }
+  .dc-home .dc-hero.dc-has-integrated-ink--home .dc-hero__meta{grid-row:1!important}
+  .dc-home .dc-hero.dc-has-integrated-ink--home .dc-hero__title{
+    grid-row:2!important;
+    max-width:none!important;
+    margin-top:54px!important;
+    font-size:clamp(58px,12.4vw,104px)!important;
+  }
+  .dc-home .dc-hero.dc-has-integrated-ink--home .dc-hero__bottom{
+    grid-row:3!important;
+    margin-top:34px!important;
+    padding-top:0!important;
+    max-width:650px!important;
+  }
+  .dc-home .dc-hero>.dc-ink-integrated--home{
+    grid-row:4!important;
+    position:relative!important;
+    inset:auto!important;
+    width:100vw!important;
+    height:auto!important;
+    aspect-ratio:auto!important;
+    margin:34px 0 0 calc(50% - 50vw)!important;
+  }
+  .dc-home .dc-hero>.dc-ink-integrated--home img{
+    width:100%!important;
+    height:auto!important;
+    object-fit:contain!important;
+    object-position:center bottom!important;
+  }
 }
 
 @media(max-width:560px){
-  .dc-home .dc-hero.dc-has-integrated-ink--home .dc-hero__title{font-size:clamp(50px,14.8vw,74px)!important;line-height:.84!important;letter-spacing:-.075em!important}
-  .dc-home .dc-hero>.dc-ink-integrated--home img{object-position:72% center!important}
+  .dc-home .dc-hero.dc-has-integrated-ink--home .dc-hero__title{
+    font-size:clamp(50px,14.8vw,74px)!important;
+    line-height:.84!important;
+    letter-spacing:-.075em!important;
+    margin-top:42px!important;
+  }
+  .dc-home .dc-hero.dc-has-integrated-ink--home .dc-hero__bottom{margin-top:28px!important}
+  .dc-home .dc-hero>.dc-ink-integrated--home{margin-top:30px!important}
+
   .dc-home .dc-event[aria-labelledby="event-title"] .dc-ink-integrated--home-event img{object-position:58% center!important}
   .dc-about-service__grid>.dc-ink-integrated--service img{object-position:74% center!important}
   .dc-about-dementor__grid>.dc-ink-integrated--authority img{object-position:14% center!important}
