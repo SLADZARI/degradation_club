@@ -114,7 +114,7 @@ Required fields:
 
 If `base_spec_id` is present, shared material/construction facts are inherited from the base spec and should not be duplicated unless a product intentionally overrides them.
 
-Only `approved / production / available` products may be prepared for public sale. Only `available` may expose a live checkout action.
+Only `approved / production / available` products may be prepared for public presentation. Only `available` may expose a live checkout action.
 
 ## 5. VARIANT / SKU
 
@@ -171,6 +171,44 @@ Required fields:
 
 Until approved images exist, the site may render a factual no-image state. Placeholder art must never be mistaken for a product photograph.
 
+## Canonical storage layout
+
+For v1, canonical product truth stays intentionally simple:
+
+```text
+merch/
+  README.md
+  MERCH_ENTITY_MODEL.md
+  PRODUCT_LIFECYCLE.md
+  collections/
+    ...
+  artworks/
+    ARTWORK_....md
+  specs/
+    ...BASE....md
+  products/
+    PRODUCT....md
+  templates/
+    PRODUCT_TEMPLATE.md
+    BASE_SPEC_TEMPLATE.md
+```
+
+### v1 nesting rule
+
+`VARIANT / SKU` and `OFFER` are separate **logical entities**, but they do not need separate files yet.
+
+In v1 they may live inside the owning PRODUCT record as structured sections/records, provided they keep stable IDs (`sku`, `offer_id`). This matches the existing `OBJECT 002 — ЦЕЛЬ` variant model and avoids unnecessary file explosion.
+
+Split SKU/OFFER into independent files or an inventory/commerce service only when one of these becomes true:
+
+- stock changes independently and frequently;
+- multiple channels/providers sell the same SKU;
+- warehouse/inventory integration appears;
+- payment/provider data should be managed separately from editorial product truth;
+- the number of variants makes the product record impractical.
+
+`ASSET` metadata may similarly stay as an array/reference list in PRODUCT while media volume is small. Physical files themselves live in the site/assets layer, not inside canonical merch text records.
+
 ## Store rules
 
 1. `dementor-club` owns product truth.
@@ -181,6 +219,8 @@ Until approved images exist, the site may render a factual no-image state. Place
 6. Checkout URLs are commerce configuration, not editorial facts.
 7. Inventory and sale status must be explicit; absence of stock data means `unknown`, not `in-stock`.
 8. Images are optional for architecture but required before a public product launch unless the team explicitly approves a media-pending launch state.
+9. Mockup/design-board presence never promotes status automatically.
+10. Status promotion follows `PRODUCT_LIFECYCLE.md`.
 
 ## Current inventory boundary
 
@@ -189,9 +229,23 @@ Approved physical objects already present:
 - `DC-OBJECT-001 — OBJECT 001 — НЕ НАДО`;
 - `DC-OBJECT-002 — OBJECT 002 — ЦЕЛЬ`.
 
-Recovered 2026-08-24 Wear work contains prototype garment specifications and product concepts:
+Recovered core merch concepts remain prototype/PENDING:
 
-- `DC-M-002 — TEE / STATEMENT PIECE` — source status `PENDING`;
-- `DC-M-003 — HOODIE / ANTI STATEMENT PIECE` — source status `PENDING`.
+- `DC-M-001 — CAP / CORE STATEMENT PIECE`;
+- `DC-M-002 — TEE / STATEMENT PIECE`;
+- `DC-M-003 — HOODIE / ANTI STATEMENT PIECE`;
+- `DC-M-004 — MUG / DAILY REMINDER`.
 
-These are captured as `prototype`, not promoted to `approved` or `available`. Retail prices, final size tables, production confirmation, SKU stock and checkout remain unresolved.
+Recovered reusable Wear specs:
+
+- `DC-WEAR-BASE-TEE-01`;
+- `DC-WEAR-BASE-HOODIE-01`.
+
+Recovered core artworks:
+
+- `DC-ARTWORK-007 — ANTI SELF HELP`;
+- `DC-ARTWORK-008 — УПАКУЕМ ЦЕЛИ В РАСТЕРЯННОСТЬ`.
+
+Separate Wear Phase 01 contains six prototype typography artworks.
+
+None of the recovered prototype products is promoted to `approved` or `available`. Retail prices, final size tables, production confirmation, SKU stock and checkout remain unresolved until explicitly approved.
