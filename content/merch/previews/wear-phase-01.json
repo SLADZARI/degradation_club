@@ -1,0 +1,52 @@
+{
+  "id": "DC-WEAR-PHASE-01",
+  "entityType": "merch-preview",
+  "visibility": "private-wip",
+  "status": "prototype",
+  "title": "TEE COLLECTION / PHASE 01",
+  "publicCatalog": false,
+  "artworks": [
+    {
+      "id": "DC-ARTWORK-001",
+      "title": "SUCCESS IS BORING.",
+      "palette": "black / paper",
+      "style": "bold / distressed"
+    },
+    {
+      "id": "DC-ARTWORK-002",
+      "title": "DON'T IMPROVE YOURSELF.",
+      "palette": "paper / black",
+      "style": "brush / raw"
+    },
+    {
+      "id": "DC-ARTWORK-003",
+      "title": "DO LESS.",
+      "palette": "paper / black / acid",
+      "style": "bold / minimal"
+    },
+    {
+      "id": "DC-ARTWORK-004",
+      "title": "PERSONAL GROWTH CANCELLED.",
+      "palette": "paper / black / acid",
+      "style": "stamp / grunge"
+    },
+    {
+      "id": "DC-ARTWORK-005",
+      "title": "OPTIMIZED FOR NOTHING.",
+      "palette": "paper / black / acid",
+      "style": "grunge / highlight"
+    },
+    {
+      "id": "DC-ARTWORK-006",
+      "title": "10X LESS.",
+      "palette": "paper / black / acid",
+      "style": "brush / bold"
+    }
+  ],
+  "productBindings": [],
+  "note": "Artwork-only preview. No tee/hoodie/sweatshirt product is sale-ready until a canonical PRODUCT record fixes garment specs, sizes, price and status.",
+  "provenance": {
+    "sourceBranch": "wip-merch-source-entities",
+    "sourcePath": "merch/collections/WEAR_PHASE_01.md"
+  }
+}
