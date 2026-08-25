@@ -24,6 +24,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Syntax-check merch runtime
+        run: |
+          node --check merch-store-v1.js
+          node --check service-adapters.js
       - name: Validate registry, routes and feature state
         run: node scripts/validate-site.mjs
       - name: Validate merch store model
