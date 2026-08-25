@@ -6,13 +6,15 @@ Updated: 2026-08-25
 
 ## Principle
 
-The store must not treat a visual slogan, a physical garment, a size/color SKU and a checkout link as one entity.
+The store must not treat a visual slogan, a reusable garment specification, a physical product, a size/color SKU and a checkout link as one entity.
 
 Canonical hierarchy:
 
-`COLLECTION / DROP → ARTWORK → PRODUCT → VARIANT / SKU → OFFER → ASSET`
+`COLLECTION / DROP → ARTWORK + BASE SPEC → PRODUCT → VARIANT / SKU → OFFER → ASSET`
 
-This keeps one approved artwork reusable across a T-shirt, hoodie or sweatshirt without duplicating the statement or silently inventing production facts.
+`BASE SPEC` is optional. It is useful for Wear, where several statements may use the same approved T-shirt or hoodie construction. Conceptual Objects such as `НЕ НАДО` and `ЦЕЛЬ` do not need a separate base spec.
+
+This keeps one artwork reusable across T-shirt / hoodie / sweatshirt products and keeps one garment construction reusable across several artworks without duplicating production facts.
 
 ## 1. COLLECTION / DROP
 
@@ -53,15 +55,42 @@ Required fields:
 
 An artwork is **not** a sellable product.
 
-## 3. PRODUCT
+## 3. BASE SPEC
 
-A physical item that binds one artwork to a garment/object specification.
+Reusable physical construction specification. Optional for non-wear objects.
 
 Examples:
 
-- T-shirt + ARTWORK-003;
-- hoodie + ARTWORK-003;
-- brass object `НЕ НАДО`.
+- heavyweight oversized white tee blank;
+- heavyweight oversized black hoodie blank.
+
+Required fields:
+
+- `base_spec_id`
+- `product_type`
+- `status`: `idea / prototype / approved / archived / cancelled`
+- `materials`
+- `weight_gsm`
+- `construction`
+- `fit`
+- `base_colorways`
+- `print_methods`
+- `production_region`
+- `packaging_direction`
+- `care`
+- `updated_at`
+
+A base spec has no statement and no retail price. It is production infrastructure, not a public product by itself.
+
+## 4. PRODUCT
+
+A physical retail item created by binding an artwork and, where relevant, a base spec.
+
+Examples:
+
+- tee base + `DO LESS.` artwork;
+- hoodie base + `ANTI SELF HELP` artwork;
+- brass object `НЕ НАДО` (no base spec, no artwork binding required).
 
 Required fields:
 
@@ -70,14 +99,12 @@ Required fields:
 - `category`
 - `product_type`
 - `artwork_id` or `null`
+- `base_spec_id` or `null`
 - `status`: `idea / prototype / approved / production / available / sold-out / archived / cancelled`
-- `materials`
-- `construction`
-- `fit`
 - `colorways`
 - `size_system`
-- `care`
-- `packaging`
+- `care_override`
+- `packaging_override`
 - `edition`
 - `base_price_eur`
 - `production_cost_ceiling_eur`
@@ -85,9 +112,11 @@ Required fields:
 - `social_assets`
 - `updated_at`
 
+If `base_spec_id` is present, shared material/construction facts are inherited from the base spec and should not be duplicated unless a product intentionally overrides them.
+
 Only `approved / production / available` products may be prepared for public sale. Only `available` may expose a live checkout action.
 
-## 4. VARIANT / SKU
+## 5. VARIANT / SKU
 
 A concrete purchasable configuration.
 
@@ -107,7 +136,7 @@ Required fields:
 
 Price remains canonical in EUR.
 
-## 5. OFFER
+## 6. OFFER
 
 Commerce state, separated from product identity.
 
@@ -125,7 +154,7 @@ Required fields:
 
 A product may be approved while its offer is still `closed`.
 
-## 6. ASSET
+## 7. ASSET
 
 Media is addressable and replaceable without editing product facts.
 
@@ -145,18 +174,24 @@ Until approved images exist, the site may render a factual no-image state. Place
 ## Store rules
 
 1. `dementor-club` owns product truth.
-2. `dementor-club-site` mirrors approved public fields and may also render clearly marked prototype/WIP entities when the page itself is non-public/WIP.
+2. `dementor-club-site` mirrors approved public fields and may keep clearly marked prototype/WIP data outside the public catalog.
 3. Artwork can be reused across garment types.
-4. A T-shirt and hoodie using the same artwork are separate PRODUCTS and have separate SKUs.
-5. Checkout URLs are commerce configuration, not editorial facts.
-6. Inventory and sale status must be explicit; absence of stock data means `unknown`, not `in-stock`.
-7. Images are optional for architecture but required before a public product launch.
+4. A reusable tee/hoodie BASE SPEC can support multiple artwork products.
+5. A T-shirt and hoodie using the same artwork are separate PRODUCTS and have separate SKUs.
+6. Checkout URLs are commerce configuration, not editorial facts.
+7. Inventory and sale status must be explicit; absence of stock data means `unknown`, not `in-stock`.
+8. Images are optional for architecture but required before a public product launch unless the team explicitly approves a media-pending launch state.
 
-## Current canonical inventory boundary
+## Current inventory boundary
 
 Approved physical objects already present:
 
 - `DC-OBJECT-001 — OBJECT 001 — НЕ НАДО`;
 - `DC-OBJECT-002 — OBJECT 002 — ЦЕЛЬ`.
 
-Wear artwork work from 2026-08-24 is captured separately as prototype artwork entities. Garment blanks, hoodie bindings, sizes, materials, prices and SKU inventory remain unapproved until explicitly fixed.
+Recovered 2026-08-24 Wear work contains prototype garment specifications and product concepts:
+
+- `DC-M-002 — TEE / STATEMENT PIECE` — source status `PENDING`;
+- `DC-M-003 — HOODIE / ANTI STATEMENT PIECE` — source status `PENDING`.
+
+These are captured as `prototype`, not promoted to `approved` or `available`. Retail prices, final size tables, production confirmation, SKU stock and checkout remain unresolved.
