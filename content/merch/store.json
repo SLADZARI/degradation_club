@@ -1,0 +1,51 @@
+{
+  "version": "2026-08-25-wip",
+  "currency": {
+    "canonical": "EUR",
+    "display": ["EUR"],
+    "fxEnabled": false
+  },
+  "checkout": {
+    "mode": "direct",
+    "cartEnabled": false,
+    "accountRequired": false
+  },
+  "products": [
+    {
+      "id": "DC-OBJECT-001",
+      "title": "OBJECT 001 — НЕ НАДО",
+      "slug": "ne-nado",
+      "category": "Objects",
+      "line": "EXPENSIVE THINGS WITHOUT MEANING",
+      "status": "approved",
+      "saleStatus": "closed",
+      "fromPriceEur": 220,
+      "publicUrl": "/merch/ne-nado/",
+      "record": "/content/merch/products/object-001-ne-nado.json",
+      "cover": null
+    },
+    {
+      "id": "DC-OBJECT-002",
+      "title": "OBJECT 002 — ЦЕЛЬ",
+      "slug": "tsel",
+      "category": "Objects",
+      "line": "EXPENSIVE THINGS WITHOUT MEANING",
+      "status": "approved",
+      "saleStatus": "closed",
+      "fromPriceEur": 190,
+      "publicUrl": "/merch/tsel/",
+      "record": "/content/merch/products/object-002-tsel.json",
+      "cover": null
+    }
+  ],
+  "privatePreviewRecords": [
+    "/content/merch/previews/wear-phase-01.json"
+  ],
+  "provenance": {
+    "sourceBranch": "dementor-club",
+    "sourcePaths": [
+      "merch/products/OBJECT_001_NE_NADO.md",
+      "merch/products/OBJECT_002_TSEL.md"
+    ]
+  }
+}
