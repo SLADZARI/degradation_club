@@ -1,0 +1,50 @@
+{
+  "id": "DC-OBJECT-001",
+  "entityType": "merch",
+  "productType": "object",
+  "title": "OBJECT 001 — НЕ НАДО",
+  "slug": "ne-nado",
+  "status": "approved",
+  "saleStatus": "closed",
+  "publicUrl": "/merch/ne-nado/",
+  "statement": "Тяжёлый латунный аргумент в пользу того, чтобы ничего лишнего не делать.",
+  "shortLines": [
+    "Назначение: отсутствует.",
+    "Рекомендации по применению: не требуются."
+  ],
+  "line": "EXPENSIVE THINGS WITHOUT MEANING / ДОРОГИЕ ВЕЩИ БЕЗ СМЫСЛА",
+  "material": "Массивная латунь",
+  "finish": "Сатинированная / brushed brass; естественная патина допустима",
+  "edition": {
+    "type": "numbered",
+    "limit": 50
+  },
+  "media": [],
+  "variants": [
+    {
+      "sku": "DC-OBJECT-001-STD",
+      "label": "100 × 40 × 20 mm",
+      "dimensionsMm": [100, 40, 20],
+      "weightKg": {
+        "min": 0.65,
+        "max": 0.70
+      },
+      "basePriceEur": 220,
+      "stockStatus": "unknown",
+      "active": true,
+      "offer": {
+        "saleStatus": "closed",
+        "checkoutProvider": null,
+        "checkoutReference": null,
+        "purchaseUrl": null
+      }
+    }
+  ],
+  "provenance": {
+    "branch": "dementor-club",
+    "path": "merch/products/OBJECT_001_NE_NADO.md",
+    "sourceStatus": "approved",
+    "sourceUpdatedAt": "2026-08-24"
+  },
+  "updatedAt": "2026-08-25"
+}
