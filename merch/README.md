@@ -78,21 +78,40 @@ Dementor Club не строит цены от минимально возмож�
 
 В ветке `wip-merch-source-entities` проектируется расширенная модель магазина:
 
-`COLLECTION / DROP → ARTWORK → PRODUCT → VARIANT / SKU → OFFER → ASSET`
+`COLLECTION / DROP → ARTWORK + BASE SPEC → PRODUCT → VARIANT / SKU → OFFER → ASSET`
 
 См. `merch/MERCH_ENTITY_MODEL.md`.
 
 Это разделяет:
 
 - графический statement / artwork;
-- физическую вещь (например, tee или hoodie);
+- переиспользуемую физическую спецификацию tee/hoodie;
+- конкретный товар (artwork + base spec);
 - конкретный размер/цвет SKU;
 - состояние продажи и checkout;
 - изображения и другие assets.
 
-### Wear Phase 01
+### Recovered core Wear prototypes — 24.08.2026
 
-Визуальная работа от 24.08.2026 зафиксирована как prototype collection `DC-WEAR-PHASE-01`, без автоматического превращения дизайн-мокапов в продаваемые товары.
+Из вчерашнего merch briefboard восстановлены и сохранены без повышения статуса:
+
+- `DC-M-002 — TEE / STATEMENT PIECE` — `prototype`, source label `PENDING`;
+- `DC-M-003 — HOODIE / ANTI STATEMENT PIECE` — `prototype`, source label `PENDING`.
+
+Переиспользуемые base specs:
+
+- `DC-WEAR-BASE-TEE-01` — 100% cotton, 220–240 g/m², unisex oversized, white primary base, silkscreen/water-based print direction;
+- `DC-WEAR-BASE-HOODIE-01` — heavyweight cotton-fleece direction, 400 g/m², unisex oversized, black primary base, silkscreen/embroidery direction.
+
+Для hoodie зафиксирован основной prototype artwork:
+
+- `DC-ARTWORK-007 — ANTI SELF HELP`.
+
+Цены, точные supplier/blank, size chart, SKU, stock и checkout для этих Wear products пока не утверждены.
+
+### Wear Phase 01 — 6 typography statements
+
+Более поздняя визуальная работа 24.08.2026 зафиксирована как prototype collection `DC-WEAR-PHASE-01`, без автоматического превращения дизайн-мокапов в продаваемые товары.
 
 Artwork entities:
 
@@ -103,4 +122,4 @@ Artwork entities:
 - `DC-ARTWORK-005 — OPTIMIZED FOR NOTHING.`
 - `DC-ARTWORK-006 — 10X LESS.`
 
-Физические tee/hoodie products, материалы, размеры, цены, тиражи и stock создаются отдельными PRODUCT/SKU-записями после подтверждения.
+Для публикации каждой футболки/худи artwork должен быть связан с конкретным PRODUCT и его approved BASE SPEC, после чего создаются варианты/SKU и offers.
