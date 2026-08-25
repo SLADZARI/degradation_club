@@ -1,5 +1,5 @@
 {
-  "version": "2026-08-24",
+  "version": "2026-08-25",
   "role": "site implementation registry",
   "entities": [
     {
@@ -54,7 +54,7 @@
       "id": "COURSE-001",
       "entityType": "course",
       "title": "Думай с опасностью",
-      "status": "approved-draft",
+      "status": "active-production-stage-1",
       "publicUrl": "/courses/dumai-s-opasnostyu/",
       "record": "/content/courses/dumai-s-opasnostyu.json",
       "catalogPlacement": "not-approved"
