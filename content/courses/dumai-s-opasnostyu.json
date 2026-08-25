@@ -3,17 +3,21 @@
   "entityType": "course",
   "title": "Думай с опасностью",
   "slug": "dumai-s-opasnostyu",
-  "status": "approved-draft",
+  "status": "active-production-stage-1",
   "publicUrl": "/courses/dumai-s-opasnostyu/",
   "delivery": "web-self-paced",
   "dementor": "DEMENTOR-001",
   "modules": 7,
   "progressStorage": "localStorage",
+  "emailDelivery": "planned-stage-2",
+  "aiAnalysis": "not-used-stage-1",
   "catalogPlacement": "not-approved",
   "preview": null,
   "provenance": {
     "branch": "dementor-club",
-    "path": "courses/dumai-s-opasnostyu.md"
+    "path": "courses/dumai-s-opasnostyu-production-stage-1.md"
   },
-  "updatedAt": "2026-08-24"
+  "approvedBy": "Yauhen",
+  "approvedAt": "2026-08-25",
+  "updatedAt": "2026-08-25"
 }
