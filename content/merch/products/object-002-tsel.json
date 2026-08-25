@@ -1,0 +1,92 @@
+{
+  "id": "DC-OBJECT-002",
+  "entityType": "merch",
+  "productType": "object",
+  "title": "OBJECT 002 — ЦЕЛЬ",
+  "slug": "tsel",
+  "status": "approved",
+  "saleStatus": "closed",
+  "publicUrl": "/merch/tsel/",
+  "statement": "Наконец-то цель, достижение которой не требует никаких действий.",
+  "shortLines": [
+    "Чем больше цель, тем дороже она обходится."
+  ],
+  "line": "EXPENSIVE THINGS WITHOUT MEANING / ДОРОГИЕ ВЕЩИ БЕЗ СМЫСЛА",
+  "material": "Натуральный светлый мрамор; ориентир Carrara или сопоставимый по визуальному качеству натуральный камень",
+  "finish": "Куб; качество граней и полировки подтверждается прототипом",
+  "edition": {
+    "type": "size-dependent",
+    "limit": null,
+    "note": "Точный тираж утверждается отдельно перед производством"
+  },
+  "media": [],
+  "variants": [
+    {
+      "sku": "DC-OBJECT-002-S",
+      "label": "TSEL S",
+      "dimensionsMm": [50, 50, 50],
+      "weightKg": 0.34,
+      "basePriceEur": 190,
+      "stockStatus": "unknown",
+      "active": true,
+      "offer": {
+        "saleStatus": "closed",
+        "checkoutProvider": null,
+        "checkoutReference": null,
+        "purchaseUrl": null
+      }
+    },
+    {
+      "sku": "DC-OBJECT-002-M",
+      "label": "TSEL M",
+      "dimensionsMm": [80, 80, 80],
+      "weightKg": 1.38,
+      "basePriceEur": 690,
+      "stockStatus": "unknown",
+      "active": true,
+      "offer": {
+        "saleStatus": "closed",
+        "checkoutProvider": null,
+        "checkoutReference": null,
+        "purchaseUrl": null
+      }
+    },
+    {
+      "sku": "DC-OBJECT-002-L",
+      "label": "TSEL L",
+      "dimensionsMm": [120, 120, 120],
+      "weightKg": 4.67,
+      "basePriceEur": 2900,
+      "stockStatus": "unknown",
+      "active": true,
+      "offer": {
+        "saleStatus": "closed",
+        "checkoutProvider": null,
+        "checkoutReference": null,
+        "purchaseUrl": null
+      }
+    },
+    {
+      "sku": "DC-OBJECT-002-XL",
+      "label": "TSEL XL",
+      "dimensionsMm": [180, 180, 180],
+      "weightKg": 15.75,
+      "basePriceEur": 14900,
+      "stockStatus": "unknown",
+      "active": true,
+      "offer": {
+        "saleStatus": "closed",
+        "checkoutProvider": null,
+        "checkoutReference": null,
+        "purchaseUrl": null
+      }
+    }
+  ],
+  "provenance": {
+    "branch": "dementor-club",
+    "path": "merch/products/OBJECT_002_TSEL.md",
+    "sourceStatus": "approved",
+    "sourceUpdatedAt": "2026-08-24"
+  },
+  "updatedAt": "2026-08-25"
+}
