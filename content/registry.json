@@ -1,5 +1,5 @@
 {
-  "version": "2026-08-24",
+  "version": "2026-08-25-wip-merch",
   "role": "site implementation registry",
   "entities": [
     {
@@ -17,6 +17,24 @@
       "status": "active",
       "publicUrl": "/projects/logic-awareness/",
       "record": "/content/projects/logic-awareness.json"
+    },
+    {
+      "id": "DC-OBJECT-001",
+      "entityType": "merch",
+      "title": "OBJECT 001 — НЕ НАДО",
+      "status": "approved",
+      "saleStatus": "closed",
+      "publicUrl": "/merch/ne-nado/",
+      "record": "/content/merch/products/object-001-ne-nado.json"
+    },
+    {
+      "id": "DC-OBJECT-002",
+      "entityType": "merch",
+      "title": "OBJECT 002 — ЦЕЛЬ",
+      "status": "approved",
+      "saleStatus": "closed",
+      "publicUrl": "/merch/tsel/",
+      "record": "/content/merch/products/object-002-tsel.json"
     },
     {
       "id": "DEMENTOR-001",
@@ -61,7 +79,7 @@
     }
   ],
   "emptyRegisters": {
-    "merch": 0,
+    "merch": 2,
     "archive": 0
   }
 }
