@@ -1,0 +1,18 @@
+{
+  "id": null,
+  "entityType": "merch-asset",
+  "entityId": null,
+  "role": null,
+  "status": "draft",
+  "path": null,
+  "alt": null,
+  "width": null,
+  "height": null,
+  "mimeType": null,
+  "visibility": "private-wip",
+  "provenance": {
+    "branch": "dementor-club-site",
+    "sourcePath": null
+  },
+  "updatedAt": null
+}
