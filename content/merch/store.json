@@ -1,5 +1,5 @@
 {
-  "version": "2026-08-25-wip",
+  "version": "2026-08-25-wip-v2",
   "currency": {
     "canonical": "EUR",
     "display": ["EUR"],
@@ -10,12 +10,45 @@
     "cartEnabled": false,
     "accountRequired": false
   },
+  "categories": [
+    {
+      "id": "all",
+      "label": "ALL",
+      "publicCount": 2
+    },
+    {
+      "id": "objects",
+      "label": "OBJECTS",
+      "publicCount": 2
+    },
+    {
+      "id": "wear",
+      "label": "WEAR",
+      "publicCount": 0
+    },
+    {
+      "id": "paper",
+      "label": "PAPER",
+      "publicCount": 0
+    },
+    {
+      "id": "editions",
+      "label": "EDITIONS",
+      "publicCount": 0
+    },
+    {
+      "id": "project-editions",
+      "label": "PROJECT EDITIONS",
+      "publicCount": 0
+    }
+  ],
   "products": [
     {
       "id": "DC-OBJECT-001",
       "title": "OBJECT 001 — НЕ НАДО",
       "slug": "ne-nado",
       "category": "Objects",
+      "categoryId": "objects",
       "line": "EXPENSIVE THINGS WITHOUT MEANING",
       "status": "approved",
       "saleStatus": "closed",
@@ -29,6 +62,7 @@
       "title": "OBJECT 002 — ЦЕЛЬ",
       "slug": "tsel",
       "category": "Objects",
+      "categoryId": "objects",
       "line": "EXPENSIVE THINGS WITHOUT MEANING",
       "status": "approved",
       "saleStatus": "closed",
@@ -39,9 +73,15 @@
     }
   ],
   "privatePreviewRecords": [
-    "/content/merch/previews/core-wear-brief-2026-08-24.json",
+    "/content/merch/previews/core-merch-brief-2026-08-24.json",
     "/content/merch/previews/wear-phase-01.json"
   ],
+  "releasePolicy": {
+    "publicProductStatuses": ["approved", "production", "available", "sold-out", "archived"],
+    "buyProductStatus": "available",
+    "buyOfferStatuses": ["open", "preorder"],
+    "unknownStockIsAvailable": false
+  },
   "provenance": {
     "sourceBranch": "dementor-club",
     "sourcePaths": [
@@ -49,6 +89,6 @@
       "merch/products/OBJECT_002_TSEL.md"
     ],
     "wipSourceBranch": "wip-merch-source-entities",
-    "wipNote": "Prototype Wear records exist for architecture review only and are intentionally excluded from products[]."
+    "wipNote": "Prototype cap/tee/hoodie/mug and artwork records exist for architecture review only and are intentionally excluded from products[]."
   }
 }
