@@ -73,3 +73,34 @@ Dementor Club не строит цены от минимально возмож�
 `idea / prototype / approved / production / available / sold-out / archived / cancelled`
 
 Ни один объект со статусом `idea` или `prototype` не должен подаваться на сайте как доступный к покупке.
+
+## WIP entity architecture — 2026-08-25
+
+В ветке `wip-merch-source-entities` проектируется расширенная модель магазина:
+
+`COLLECTION / DROP → ARTWORK → PRODUCT → VARIANT / SKU → OFFER → ASSET`
+
+См. `merch/MERCH_ENTITY_MODEL.md`.
+
+Это разделяет:
+
+- графический statement / artwork;
+- физическую вещь (например, tee или hoodie);
+- конкретный размер/цвет SKU;
+- состояние продажи и checkout;
+- изображения и другие assets.
+
+### Wear Phase 01
+
+Визуальная работа от 24.08.2026 зафиксирована как prototype collection `DC-WEAR-PHASE-01`, без автоматического превращения дизайн-мокапов в продаваемые товары.
+
+Artwork entities:
+
+- `DC-ARTWORK-001 — SUCCESS IS BORING.`
+- `DC-ARTWORK-002 — DON'T IMPROVE YOURSELF.`
+- `DC-ARTWORK-003 — DO LESS.`
+- `DC-ARTWORK-004 — PERSONAL GROWTH CANCELLED.`
+- `DC-ARTWORK-005 — OPTIMIZED FOR NOTHING.`
+- `DC-ARTWORK-006 — 10X LESS.`
+
+Физические tee/hoodie products, материалы, размеры, цены, тиражи и stock создаются отдельными PRODUCT/SKU-записями после подтверждения.
