@@ -4,6 +4,7 @@
   "git": {
     "deploymentEnabled": {
       "dementor-club-site": true,
+      "wip-merch-store-architecture": false,
       "main": false,
       "dementor-club": false,
       "logic-awareness": false
