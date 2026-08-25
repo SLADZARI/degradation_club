@@ -3,6 +3,26 @@
   const status=(el,text,state='pending')=>{if(!el)return;el.textContent=text;el.dataset.state=state;};
   const disableLink=(a,text)=>{a.setAttribute('aria-disabled','true');a.removeAttribute('href');a.classList.add('is-disabled');if(text)a.textContent=text;};
 
+  const applyMerchCheckout=a=>{
+    if(!a)return;
+    a.classList.remove('is-disabled');
+    a.removeAttribute('aria-disabled');
+    const saleStatus=a.dataset.saleStatus||null;
+    const saleOpen=!saleStatus||saleStatus==='open'||saleStatus==='preorder';
+    const url=a.dataset.checkoutUrl||cfg.merch?.checkoutUrl||null;
+    if(!saleOpen||!cfg.merch?.checkoutEnabled||!url){
+      disableLink(a,a.dataset.closedLabel||'CHECKOUT CLOSED');
+      return false;
+    }
+    a.href=url;
+    return true;
+  };
+
+  window.DEMENTOR_SERVICES=Object.freeze({
+    ...(window.DEMENTOR_SERVICES||{}),
+    applyMerchCheckout
+  });
+
   const contact=document.querySelector('[data-dc-contact-form]');
   if(contact){
     const submit=contact.querySelector('[type="submit"]');
@@ -37,10 +57,7 @@
     else a.href=cfg.donate.checkoutUrl;
   });
 
-  document.querySelectorAll('[data-dc-checkout-action]').forEach(a=>{
-    if(!cfg.merch?.checkoutEnabled||!cfg.merch?.checkoutUrl)disableLink(a);
-    else a.href=cfg.merch.checkoutUrl;
-  });
+  document.querySelectorAll('[data-dc-checkout-action]').forEach(applyMerchCheckout);
 
   document.querySelectorAll('[data-dc-event-registration]').forEach(a=>{
     if(!cfg.events?.registrationEnabled||!cfg.events?.registrationUrl)disableLink(a,'Регистрация ещё не открыта');
