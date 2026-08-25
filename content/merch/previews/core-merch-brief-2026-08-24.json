@@ -1,0 +1,93 @@
+{
+  "id": "DC-CORE-MERCH-BRIEF-2026-08-24",
+  "entityType": "merch-preview",
+  "visibility": "private-wip",
+  "status": "prototype",
+  "publicCatalog": false,
+  "baseSpecs": [
+    {
+      "id": "DC-WEAR-BASE-TEE-01",
+      "productType": "tee",
+      "status": "prototype",
+      "material": "100% cotton",
+      "fabricWeightGsm": "220–240",
+      "fit": "unisex / oversized",
+      "primaryColor": "white",
+      "printMethods": ["silkscreen", "water-based print"],
+      "productionDirection": ["Portugal", "Turkey"]
+    },
+    {
+      "id": "DC-WEAR-BASE-HOODIE-01",
+      "productType": "hoodie",
+      "status": "prototype",
+      "material": "heavyweight cotton-fleece direction",
+      "fabricWeightGsm": 400,
+      "fit": "unisex / oversized",
+      "primaryColor": "black",
+      "printMethods": ["silkscreen", "embroidery"],
+      "productionDirection": ["Portugal", "Turkey"]
+    }
+  ],
+  "productConcepts": [
+    {
+      "id": "DC-M-001",
+      "title": "CAP / CORE STATEMENT PIECE",
+      "productType": "cap",
+      "status": "prototype",
+      "sourceStatus": "PENDING",
+      "baseSpecId": null,
+      "artworkId": null,
+      "publicCatalog": false,
+      "priceEur": null
+    },
+    {
+      "id": "DC-M-002",
+      "title": "TEE / STATEMENT PIECE",
+      "productType": "tee",
+      "status": "prototype",
+      "sourceStatus": "PENDING",
+      "baseSpecId": "DC-WEAR-BASE-TEE-01",
+      "artworkId": null,
+      "publicCatalog": false,
+      "priceEur": null
+    },
+    {
+      "id": "DC-M-003",
+      "title": "HOODIE / ANTI STATEMENT PIECE",
+      "productType": "hoodie",
+      "status": "prototype",
+      "sourceStatus": "PENDING",
+      "baseSpecId": "DC-WEAR-BASE-HOODIE-01",
+      "artworkId": "DC-ARTWORK-007",
+      "artworkTitle": "ANTI SELF HELP",
+      "publicCatalog": false,
+      "priceEur": null
+    },
+    {
+      "id": "DC-M-004",
+      "title": "MUG / DAILY REMINDER",
+      "productType": "mug",
+      "status": "prototype",
+      "sourceStatus": "PENDING",
+      "baseSpecId": null,
+      "artworkId": "DC-ARTWORK-008",
+      "artworkTitle": "УПАКУЕМ ЦЕЛИ В РАСТЕРЯННОСТЬ",
+      "publicCatalog": false,
+      "priceEur": null
+    }
+  ],
+  "note": "Recovered from 2026-08-23/24 merch boards. This file exists only for Git/WIP store planning. No prototype product is exposed to the public catalog or checkout.",
+  "provenance": {
+    "sourceBranch": "wip-merch-source-entities",
+    "sourcePaths": [
+      "merch/products/DC_M_001_CAP_CORE_STATEMENT_PIECE.md",
+      "merch/specs/WEAR_BASE_TEE_01.md",
+      "merch/specs/WEAR_BASE_HOODIE_01.md",
+      "merch/products/DC_M_002_TEE_STATEMENT_PIECE.md",
+      "merch/products/DC_M_003_HOODIE_ANTI_STATEMENT_PIECE.md",
+      "merch/products/DC_M_004_MUG_DAILY_REMINDER.md",
+      "merch/artworks/ARTWORK_007_ANTI_SELF_HELP.md",
+      "merch/artworks/ARTWORK_008_PACK_GOALS_IN_CONFUSION.md"
+    ]
+  }
+}
