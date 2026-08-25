@@ -32,19 +32,29 @@ if(store){
   if(store.checkout?.cartEnabled!==false) fail('v1 store must keep cartEnabled=false');
   if(store.checkout?.accountRequired!==false) fail('v1 store must keep accountRequired=false');
   if(!Array.isArray(store.products)) fail('store.products must be an array');
+  if(!Array.isArray(store.categories)||store.categories.length===0) fail('store.categories must be a non-empty array');
 
   const ids=new Set();
   const urls=new Set();
   const skus=new Set();
+  const categoryIds=new Set();
   const registryById=new Map((registry?.entities||[]).map(e=>[e.id,e]));
+
+  for(const category of store.categories||[]){
+    if(!category.id||!category.label) fail('store category requires id and label');
+    if(categoryIds.has(category.id)) fail(`duplicate store category ${category.id}`); else categoryIds.add(category.id);
+    if(!Number.isInteger(category.publicCount)||category.publicCount<0) fail(`store category ${category.id}: publicCount must be non-negative integer`);
+  }
+  if(!categoryIds.has('all')) fail('store.categories must include all');
 
   for(const product of store.products||[]){
     const label=`store product ${product.id||'UNKNOWN'}`;
-    for(const field of ['id','title','status','saleStatus','publicUrl','record']){
+    for(const field of ['id','title','category','categoryId','status','saleStatus','publicUrl','record']){
       if(product[field]===undefined||product[field]===null||product[field]==='') fail(`${label}: missing ${field}`);
     }
     if(ids.has(product.id)) fail(`${label}: duplicate id`); else ids.add(product.id);
     if(urls.has(product.publicUrl)) fail(`${label}: duplicate publicUrl`); else urls.add(product.publicUrl);
+    if(!categoryIds.has(product.categoryId)) fail(`${label}: unknown categoryId ${product.categoryId}`);
     if(!publicProductStatuses.has(product.status)) fail(`${label}: status ${product.status} is not public-store eligible`);
     if(!saleAllowed.has(product.saleStatus)) fail(`${label}: invalid saleStatus ${product.saleStatus}`);
     if(typeof product.fromPriceEur!=='number'||product.fromPriceEur<=0) fail(`${label}: fromPriceEur must be positive number`);
@@ -68,6 +78,7 @@ if(store){
     if(!Array.isArray(record.variants)||record.variants.length===0) fail(`${label}: variants[] required`);
 
     let minPrice=Infinity;
+    let hasLiveOffer=false;
     for(const variant of record.variants||[]){
       const vlabel=`${label} / ${variant.sku||'UNKNOWN SKU'}`;
       if(!variant.sku) fail(`${vlabel}: sku required`);
@@ -77,10 +88,21 @@ if(store){
       if(!stockAllowed.has(variant.stockStatus)) fail(`${vlabel}: invalid stockStatus ${variant.stockStatus}`);
       const offer=variant.offer||{};
       if(!saleAllowed.has(offer.saleStatus)) fail(`${vlabel}: invalid offer.saleStatus ${offer.saleStatus}`);
-      if(['open','preorder'].includes(offer.saleStatus)&&!offer.purchaseUrl) fail(`${vlabel}: ${offer.saleStatus} requires purchaseUrl`);
+      if(['open','preorder'].includes(offer.saleStatus)){
+        hasLiveOffer=true;
+        if(!offer.purchaseUrl) fail(`${vlabel}: ${offer.saleStatus} requires purchaseUrl`);
+        if(record.status!=='available') fail(`${vlabel}: live offer requires product status available`);
+      }
       if(!['open','preorder'].includes(offer.saleStatus)&&offer.purchaseUrl) fail(`${vlabel}: purchaseUrl present while saleStatus=${offer.saleStatus}`);
     }
     if(Number.isFinite(minPrice)&&minPrice!==product.fromPriceEur) fail(`${label}: fromPriceEur ${product.fromPriceEur} != minimum variant price ${minPrice}`);
+    if(hasLiveOffer&&!['open','preorder'].includes(product.saleStatus)) fail(`${label}: variant has live offer but product saleStatus=${product.saleStatus}`);
+    if(['open','preorder'].includes(product.saleStatus)&&record.status!=='available') fail(`${label}: product saleStatus ${product.saleStatus} requires status available`);
+  }
+
+  for(const category of store.categories||[]){
+    const actual=category.id==='all'?(store.products||[]).length:(store.products||[]).filter(p=>p.categoryId===category.id).length;
+    if(category.publicCount!==actual) fail(`store category ${category.id}: publicCount ${category.publicCount} != actual ${actual}`);
   }
 
   const publicIds=new Set((store.products||[]).map(p=>p.id));
@@ -94,9 +116,12 @@ if(store){
     for(const concept of preview.productConcepts||[]){
       if(publicIds.has(concept.id)) fail(`${previewPath}: prototype ${concept.id} also appears in public store products[]`);
       if(concept.publicCatalog!==false) fail(`${previewPath}: productConcept ${concept.id} must keep publicCatalog=false`);
+      if(concept.status!=='prototype') fail(`${previewPath}: productConcept ${concept.id} expected prototype status`);
+      if(concept.priceEur!==null) fail(`${previewPath}: prototype ${concept.id} price must remain null until approved`);
     }
   }
   pass(`store manifest: ${(store.products||[]).length} public products validated`);
+  pass(`store categories: ${(store.categories||[]).length} counts validated`);
   pass(`private previews: ${(store.privatePreviewRecords||[]).length} checked`);
 }
 
@@ -110,9 +135,10 @@ if(exists('site-config.js')){
         const recordPath=String(p.record||'').replace(/^\//,'');
         if(!exists(recordPath))return false;
         const record=json(recordPath);
+        if(record.status!=='available')return false;
         return (record.variants||[]).some(v=>['open','preorder'].includes(v.offer?.saleStatus)&&Boolean(v.offer?.purchaseUrl||cfg.merch.checkoutUrl));
       });
-      if(!hasOpen) fail('merch.checkoutEnabled=true but no open/preorder offer with checkout URL exists');
+      if(!hasOpen) fail('merch.checkoutEnabled=true but no AVAILABLE product has an open/preorder offer with checkout URL');
     }
     pass(`checkout flag: ${cfg?.merch?.checkoutEnabled?'ENABLED':'DISABLED'}`);
   }catch(e){fail(`site-config.js cannot be evaluated: ${e.message}`);}
