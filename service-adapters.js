@@ -7,10 +7,12 @@
     if(!a)return;
     a.classList.remove('is-disabled');
     a.removeAttribute('aria-disabled');
+    const productStatus=a.dataset.productStatus||null;
     const saleStatus=a.dataset.saleStatus||null;
-    const saleOpen=!saleStatus||saleStatus==='open'||saleStatus==='preorder';
+    const productPurchasable=productStatus==='available';
+    const saleOpen=saleStatus==='open'||saleStatus==='preorder';
     const url=a.dataset.checkoutUrl||cfg.merch?.checkoutUrl||null;
-    if(!saleOpen||!cfg.merch?.checkoutEnabled||!url){
+    if(!productPurchasable||!saleOpen||!cfg.merch?.checkoutEnabled||!url){
       disableLink(a,a.dataset.closedLabel||'CHECKOUT CLOSED');
       return false;
     }
