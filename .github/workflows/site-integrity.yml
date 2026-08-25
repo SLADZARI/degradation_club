@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - dementor-club-site
+      - wip-merch-store-architecture
   pull_request:
     branches:
       - dementor-club-site
