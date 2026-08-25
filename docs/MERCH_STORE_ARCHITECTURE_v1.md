@@ -77,14 +77,19 @@ content/merch/
     wear-phase-01.json
 
 content/templates/
+  MERCH_TEMPLATES.md
   merch.json
+  merch-collection.json
   merch-artwork.json
   merch-base-spec.json
+  merch-asset.json
 ```
 
 `store.json → products[]` contains only entities allowed into the public shop index.
 
 `previews/` is non-public design/product state and must never be rendered by the public store runtime unless an explicit WIP/debug mode is later designed.
+
+For v1, SKU and OFFER remain logical entities nested inside the owning `merch.json` PRODUCT record. They should move into separate records/services only when inventory or payment state begins changing independently enough to justify it.
 
 ## Current public store
 
@@ -251,6 +256,8 @@ Until approved files are present:
 - keep public media arrays empty;
 - add real paths only after assets are approved and placed under the agreed asset directory.
 
+`merch-asset.json` defines the future metadata contract for `cover / gallery / detail / scale / packaging / og / social` assets without coupling media files to editorial product truth.
+
 ## Validation
 
 GitHub Actions runs `Site Integrity` on `wip-merch-store-architecture` without deploying anything.
@@ -280,6 +287,10 @@ The merch validator checks:
 For human review use:
 
 `docs/MERCH_REVIEW_CHECKLIST_v1.md`
+
+For implementation template details use:
+
+`content/templates/MERCH_TEMPLATES.md`
 
 ## Release gate
 
