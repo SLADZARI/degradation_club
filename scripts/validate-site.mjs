@@ -98,7 +98,7 @@ function validateRegistry(){
   }
 
   const registered=new Set([...records].map(p=>p.replace(/^\//,'')));
-  const physical=walk('content').filter(p=>p.endsWith('.json')).filter(p=>p!=='content/registry.json').filter(p=>!p.includes('/templates/'));
+  const physical=walk('content').filter(p=>p.endsWith('.json')).filter(p=>p!=='content/registry.json').filter(p=>p!=='content/page-readiness.json').filter(p=>!p.includes('/templates/'));
   for(const file of physical){if(!registered.has(file)) fail(`orphan record: ${file} exists but is not listed in content/registry.json`);}
 
   if(registry.emptyRegisters){
