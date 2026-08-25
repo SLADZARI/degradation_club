@@ -48,7 +48,7 @@ function walk(dir){
 function loadConfig(){
   const file='site-config.js';
   if(!exists(file)){fail('site-config.js missing');return null;}
-  const sandbox={window:{}};
+  const sandbox={window:{},document:{querySelector:()=>({})}};
   try{
     vm.runInNewContext(read(file),sandbox,{filename:file,timeout:1000});
     return sandbox.window.DEMENTOR_SITE_CONFIG||null;
@@ -97,9 +97,6 @@ function validateRegistry(){
     if(!exists(html)) fail(`${label}: public page missing ${html}`);
   }
 
-  // Only entity-record directories participate in orphan detection.
-  // Other JSON under content/ (page readiness, store manifests, private previews,
-  // UI configuration) is implementation data and must not be forced into the public registry.
   const entityRecordPrefixes=[
     'content/events/',
     'content/projects/',
