@@ -91,25 +91,32 @@ Dementor Club не строит цены от минимально возмож�
 - состояние продажи и checkout;
 - изображения и другие assets.
 
-### Recovered core Wear prototypes — 24.08.2026
+## Recovered core merch prototypes — 23–24.08.2026
 
-Из вчерашнего merch briefboard восстановлены и сохранены без повышения статуса:
+Из вчерашних merch-board материалов восстановлены и сохранены без повышения статуса четыре ранние товарные сущности:
 
+- `DC-M-001 — CAP / CORE STATEMENT PIECE` — `prototype`, source label `PENDING`;
 - `DC-M-002 — TEE / STATEMENT PIECE` — `prototype`, source label `PENDING`;
-- `DC-M-003 — HOODIE / ANTI STATEMENT PIECE` — `prototype`, source label `PENDING`.
+- `DC-M-003 — HOODIE / ANTI STATEMENT PIECE` — `prototype`, source label `PENDING`;
+- `DC-M-004 — MUG / DAILY REMINDER` — `prototype`, source label `PENDING`.
 
-Переиспользуемые base specs:
+### Reusable Wear base specs
 
 - `DC-WEAR-BASE-TEE-01` — 100% cotton, 220–240 g/m², unisex oversized, white primary base, silkscreen/water-based print direction;
 - `DC-WEAR-BASE-HOODIE-01` — heavyweight cotton-fleece direction, 400 g/m², unisex oversized, black primary base, silkscreen/embroidery direction.
 
-Для hoodie зафиксирован основной prototype artwork:
+### Recovered core artworks
 
-- `DC-ARTWORK-007 — ANTI SELF HELP`.
+- `DC-ARTWORK-007 — ANTI SELF HELP` — основной prototype artwork для `DC-M-003`;
+- `DC-ARTWORK-008 — УПАКУЕМ ЦЕЛИ В РАСТЕРЯННОСТЬ` — основной prototype artwork для `DC-M-004`.
 
-Цены, точные supplier/blank, size chart, SKU, stock и checkout для этих Wear products пока не утверждены.
+Для `DC-M-001` пока сохранена только сущность и визуальное направление чёрной кепки с малым `DEMENTOR CLUB`: производственная спецификация не найдена.
 
-### Wear Phase 01 — 6 typography statements
+Для `DC-M-002` ранний board показывал несколько конкурирующих графических направлений, поэтому `artwork_id` оставлен `pending` и не привязан автоматически к более поздним футболочным artwork.
+
+Цены, точные supplier/blank, size chart, SKU, stock и checkout для этих prototype products пока не утверждены.
+
+## Wear Phase 01 — 6 typography statements
 
 Более поздняя визуальная работа 24.08.2026 зафиксирована как prototype collection `DC-WEAR-PHASE-01`, без автоматического превращения дизайн-мокапов в продаваемые товары.
 
@@ -123,3 +130,9 @@ Artwork entities:
 - `DC-ARTWORK-006 — 10X LESS.`
 
 Для публикации каждой футболки/худи artwork должен быть связан с конкретным PRODUCT и его approved BASE SPEC, после чего создаются варианты/SKU и offers.
+
+## Promotion rule
+
+Наличие mockup, текста или дизайн-борда не повышает статус товара автоматически.
+
+Переходы между `prototype → approved → production → available` оформляются явно. Для каждого перехода см. `merch/PRODUCT_LIFECYCLE.md`.
