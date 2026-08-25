@@ -126,7 +126,7 @@ if(store){
 }
 
 if(exists('site-config.js')){
-  const sandbox={window:{}};
+  const sandbox={window:{},document:{querySelector:()=>({})}};
   try{
     vm.runInNewContext(read('site-config.js'),sandbox,{filename:'site-config.js',timeout:1000});
     const cfg=sandbox.window.DEMENTOR_SITE_CONFIG;
