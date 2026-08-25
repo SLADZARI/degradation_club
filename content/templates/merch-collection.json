@@ -1,0 +1,19 @@
+{
+  "id": null,
+  "entityType": "merch-collection",
+  "title": null,
+  "status": "prototype",
+  "categoryScope": [],
+  "launchStatus": "not_scheduled",
+  "artworkIds": [],
+  "productIds": [],
+  "coverAssetId": null,
+  "publicUrl": null,
+  "visibility": "private-wip",
+  "publicCatalog": false,
+  "provenance": {
+    "branch": "dementor-club",
+    "path": null
+  },
+  "updatedAt": null
+}
