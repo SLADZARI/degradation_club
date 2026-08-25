@@ -18,6 +18,7 @@
 
 - `docs/DESIGN_PRESENTATION_GUIDE.md` — официальный guide по архитектуре, типографике, композиции, motion, Dementor Ink, mobile и правилам применения референсов.
 - `docs/COMPONENT_SYSTEM_v1.md` — рабочая component/page system.
+- `docs/GLOBAL_HEADER_v1.md` — единый header, desktop navigation, mobile burger и правила локальных product bars.
 - `docs/MOTION_NAV_SEO_IMPLEMENTATION_v1.md` — navigation, motion и metadata baseline.
 - `docs/PRODUCTION_QA_v1.md` — production gate и responsive QA.
 - `docs/deployment.md` — deployment contract.
