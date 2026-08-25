@@ -39,6 +39,7 @@
     }
   ],
   "privatePreviewRecords": [
+    "/content/merch/previews/core-wear-brief-2026-08-24.json",
     "/content/merch/previews/wear-phase-01.json"
   ],
   "provenance": {
@@ -46,6 +47,8 @@
     "sourcePaths": [
       "merch/products/OBJECT_001_NE_NADO.md",
       "merch/products/OBJECT_002_TSEL.md"
-    ]
+    ],
+    "wipSourceBranch": "wip-merch-source-entities",
+    "wipNote": "Prototype Wear records exist for architecture review only and are intentionally excluded from products[]."
   }
 }
