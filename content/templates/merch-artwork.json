@@ -1,0 +1,22 @@
+{
+  "id": null,
+  "entityType": "merch-artwork",
+  "title": null,
+  "statement": null,
+  "status": "prototype",
+  "language": null,
+  "palette": [],
+  "style": [],
+  "printApproach": [],
+  "placementGuidance": null,
+  "designSource": null,
+  "approvedPhrases": [],
+  "prohibitedPresentation": [],
+  "visibility": "private-wip",
+  "publicCatalog": false,
+  "provenance": {
+    "branch": "dementor-club",
+    "path": null
+  },
+  "updatedAt": null
+}
