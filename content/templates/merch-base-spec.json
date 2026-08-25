@@ -1,0 +1,38 @@
+{
+  "id": null,
+  "entityType": "merch-base-spec",
+  "productType": null,
+  "status": "prototype",
+  "material": {
+    "composition": null,
+    "weightGsm": null,
+    "finish": null
+  },
+  "construction": {
+    "fit": null,
+    "silhouette": null,
+    "details": []
+  },
+  "baseColorways": [],
+  "printMethods": [],
+  "sizeSystem": {
+    "labels": [],
+    "measurementChart": null,
+    "shrinkage": null
+  },
+  "care": null,
+  "production": {
+    "supplier": null,
+    "region": null,
+    "moq": null,
+    "leadTime": null
+  },
+  "packagingDirection": null,
+  "visibility": "private-wip",
+  "publicCatalog": false,
+  "provenance": {
+    "branch": "dementor-club",
+    "path": null
+  },
+  "updatedAt": null
+}
