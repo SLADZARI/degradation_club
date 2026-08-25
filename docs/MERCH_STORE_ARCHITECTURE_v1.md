@@ -3,13 +3,13 @@
 Status: WIP / Git review only
 Branch: `wip-merch-store-architecture`
 Updated: 2026-08-25
-Deployment: disabled for this branch by repository Vercel branch policy; do not merge to `dementor-club-site` until review.
+Deployment: explicitly disabled for `wip-merch-store-architecture` in this branch's `vercel.json`; do not merge to `dementor-club-site` until review.
 
 ## Goal
 
 Build a minimal store that can start with two approved physical objects and later add Wear without redesigning commerce logic.
 
-The site remains an implementation layer. Canonical product truth comes from `dementor-club`.
+The site remains an implementation layer. Canonical product truth comes from `dementor-club`; prototype recovery work is staged in `wip-merch-source-entities` until reviewed.
 
 ## MVP user flow
 
@@ -28,17 +28,25 @@ Checkout is an external provider adapter and remains disabled until provider/pay
 - `/merch/tsel/` — OBJECT 002 with size variants.
 - future `/merch/<product-slug>/` — one physical product per route.
 
-Artwork-only records do not receive public product routes.
+Artwork-only, BASE SPEC and prototype records do not receive public product routes.
 
 ## Entity layers
 
-Mirrors canonical model:
+Mirrors WIP canonical model:
 
-`COLLECTION → ARTWORK → PRODUCT → VARIANT/SKU → OFFER → ASSET`
+`COLLECTION → ARTWORK + BASE SPEC → PRODUCT → VARIANT/SKU → OFFER → ASSET`
+
+### ARTWORK
+
+The statement/graphic independent from a garment.
+
+### BASE SPEC
+
+Reusable wear construction: fabric, GSM, fit, base color, print methods and production direction. It has no retail price by itself.
 
 ### PRODUCT
 
-What the object physically is.
+A concrete retail object. For Wear this binds an ARTWORK to a BASE SPEC. Objects such as `НЕ НАДО` and `ЦЕЛЬ` do not require a BASE SPEC.
 
 ### VARIANT / SKU
 
@@ -61,12 +69,24 @@ content/merch/
     object-001-ne-nado.json
     object-002-tsel.json
   previews/
+    core-wear-brief-2026-08-24.json
     wear-phase-01.json
 ```
 
-`store.json` contains only entities allowed into the shop index.
+`store.json → products[]` contains only entities allowed into the shop index.
 
-`previews/` is non-public design state and must never be rendered by the public store runtime unless an explicit WIP/debug mode is used.
+`previews/` is non-public design/product state and must never be rendered by the public store runtime unless an explicit WIP/debug mode is later designed.
+
+Current private WIP includes:
+
+- `DC-M-002 — TEE / STATEMENT PIECE` / prototype / source PENDING;
+- `DC-M-003 — HOODIE / ANTI STATEMENT PIECE` / prototype / source PENDING;
+- tee base direction: 100% cotton, 220–240 g/m², oversized, white;
+- hoodie base direction: heavyweight cotton-fleece, 400 g/m², oversized, black;
+- `DC-ARTWORK-007 — ANTI SELF HELP` for the hoodie concept;
+- six later typography artworks from `TEE COLLECTION / PHASE 01`.
+
+None of the Wear prototype data is in the public `products[]` list.
 
 ## Store index
 
@@ -118,7 +138,7 @@ V1 uses direct checkout, not cart checkout.
 Button activation requires both:
 
 1. `site-config.js → merch.checkoutEnabled = true`;
-2. the selected SKU/OFFER has an approved purchase URL (or a configured global checkout URL).
+2. the selected SKU/OFFER has an approved purchase URL (or a deliberately configured global checkout URL).
 
 Per-SKU URL overrides global URL because TSEL variants may have separate payment links.
 
@@ -136,16 +156,20 @@ Allowed site stock values:
 
 ## Wear integration
 
-The six artworks developed on 2026-08-24 are not yet physical products.
+Recovered Wear is deliberately split into two layers:
 
-The store architecture supports later bindings such as:
+1. reusable tee/hoodie BASE SPEC;
+2. statement ARTWORK;
+3. final PRODUCT binding them together.
 
-- `TEE + DC-ARTWORK-003`;
-- `HOODIE + DC-ARTWORK-003`.
+Examples of future product bindings:
 
-Each binding becomes a separate PRODUCT with its own material, fit, sizes, colorways, price and SKUs.
+- `DC-WEAR-BASE-TEE-01 + DC-ARTWORK-003 (DO LESS.)`;
+- `DC-WEAR-BASE-HOODIE-01 + DC-ARTWORK-007 (ANTI SELF HELP)`.
 
-This prevents a design mockup from silently becoming a sellable hoodie or T-shirt.
+The early `DC-M-002` tee concept currently has `artwork_id: pending` because its briefboard showed several candidate graphics. It must not be silently bound to all six later tee artworks.
+
+Each approved binding becomes a distinct PRODUCT with its own public route, SKU set, price and offer state.
 
 ## Image policy
 
@@ -155,18 +179,25 @@ Until approved files are present:
 
 - render no fabricated product image;
 - show a neutral `IMAGE PENDING / PRODUCT MEDIA IN PRODUCTION` state;
-- keep media arrays empty;
+- keep public media arrays empty;
 - add real paths only after assets are approved and placed under the agreed asset directory.
+
+## Validation boundary
+
+`content/` also contains non-entity JSON such as store manifests, page-readiness and private previews. The site validator now limits orphan-entity checks to explicit entity-record directories rather than treating every JSON file as a public entity.
+
+Product routes are included in `content/page-readiness.json` so content readiness remains source-aware.
 
 ## Release gate
 
 Before merge to `dementor-club-site`:
 
-1. review product copy against canonical source;
-2. review routes and product IDs;
-3. approve website assets or accept explicit image-pending launch state;
-4. decide whether sale remains closed or choose checkout provider;
-5. if checkout opens, configure per-SKU offers/payment links;
-6. privacy/terms check for provider;
-7. run site/content validators;
-8. merge to `dementor-club-site` only after approval.
+1. review WIP source entities and promote only accepted facts into the canonical `dementor-club` branch;
+2. review product copy against canonical source;
+3. review routes and product IDs;
+4. approve website assets or explicitly approve an image-pending launch state;
+5. decide whether sale remains closed or choose checkout provider;
+6. if checkout opens, configure per-SKU offers/payment links;
+7. privacy/terms check for provider;
+8. run site/content validators;
+9. merge to `dementor-club-site` only after approval.
