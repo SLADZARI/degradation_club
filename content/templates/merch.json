@@ -1,20 +1,52 @@
 {
   "id": null,
   "entityType": "merch",
+  "productType": null,
   "title": null,
   "slug": null,
+  "category": null,
+  "categoryId": null,
+  "line": null,
   "status": null,
+  "saleStatus": "closed",
   "publicUrl": null,
-  "preview": null,
   "statement": null,
+  "shortLines": [],
+  "artworkId": null,
+  "baseSpecId": null,
   "material": null,
-  "edition": null,
-  "price": null,
-  "shopStatus": null,
-  "purchaseUrl": null,
+  "finish": null,
+  "edition": {
+    "type": null,
+    "limit": null,
+    "note": null
+  },
+  "media": [],
+  "variants": [
+    {
+      "sku": null,
+      "label": null,
+      "size": null,
+      "color": null,
+      "dimensionsMm": null,
+      "weightKg": null,
+      "basePriceEur": null,
+      "stockStatus": "unknown",
+      "shippingClass": null,
+      "active": false,
+      "offer": {
+        "saleStatus": "closed",
+        "checkoutProvider": null,
+        "checkoutReference": null,
+        "purchaseUrl": null
+      }
+    }
+  ],
   "provenance": {
     "branch": "dementor-club",
-    "path": null
+    "path": null,
+    "sourceStatus": null,
+    "sourceUpdatedAt": null
   },
   "updatedAt": null
 }
