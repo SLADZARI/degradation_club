@@ -1,0 +1,62 @@
+function examCoverage(){const t=norm(state.examQuestions.join(' '));return [/кто|ответ/,/окуп|деньг|выруч/,/юрид|обязат|договор/,/если|ниже|лома/,/выйти|выход/,/подтверж|факт/,/завис|помещ|партн/,/сигнал|покаж/].filter(r=>r.test(t)).length}
+function setErr(id,msg){const e=document.getElementById(id);if(e)e.textContent=msg}
+function bind(){
+ document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>go(b.dataset.go));
+ document.getElementById('brand').onclick=()=>go('landing');
+ document.getElementById('resetUtility').onclick=()=>document.getElementById('modal').classList.add('open');
+ document.getElementById('cancelReset').onclick=()=>document.getElementById('modal').classList.remove('open');
+ document.getElementById('confirmReset').onclick=()=>{localStorage.removeItem(KEY);state=fresh();document.getElementById('modal').classList.remove('open');render()};
+ document.querySelectorAll('[data-single-key]').forEach(b=>b.onclick=()=>bindSingle(b.dataset.singleKey,b.dataset.singleValue));
+ document.querySelectorAll('[data-multi-key]').forEach(b=>b.onclick=()=>{const k=b.dataset.multiKey,v=b.dataset.multiValue,a=state[k]||[],i=a.findIndex(x=>norm(x)===norm(v));if(i>=0)a.splice(i,1);else a.push(v);state[k]=a;save();render()});
+ document.querySelectorAll('[data-focus-custom]').forEach(b=>b.onclick=()=>document.getElementById(b.dataset.focusCustom+'Custom')?.focus());
+ document.querySelectorAll('[data-add-custom]').forEach(b=>b.onclick=()=>{const k=b.dataset.addCustom,i=document.getElementById(k+'Custom'),v=i?.value.trim();if(!v)return;if((state[k]||[]).some(x=>norm(x)===norm(v))){setErr(k==='assumptions'?'assumptionErr':k==='failureModes'?'failureErr':k==='signals'?'signalsErr':k==='examQuestions'?'examErr':'','ЭТОТ ПУНКТ УЖЕ ЕСТЬ.');return}(state[k]||(state[k]=[])).push(v);save();render()});
+ document.querySelectorAll('[data-edit-list]').forEach(i=>i.oninput=e=>{state[e.target.dataset.editList][+e.target.dataset.editIndex]=e.target.value;save()});
+ document.querySelectorAll('[data-del-list]').forEach(b=>b.onclick=()=>{state[b.dataset.delList].splice(+b.dataset.delIndex,1);save();render()});
+ const direct=['decision','expectedOutcome','control1','agreementWho','agreementSaid','agreementInference','agreementKnown','agreementCheck','trustReflection','uncomfortableFailure','uncomfortableWhy','rationalizedSignal','rationalization','recheckTrigger','greenState','yellowState','redLine','proArguments','counterArguments','falsificationFact','errorCost','inactionCost','planB','email'];
+ direct.forEach(k=>{const e=document.getElementById(k);if(e)e.oninput=x=>{state[k]=x.target.value;save()}});
+ const resume=document.getElementById('resume');if(resume)resume.onclick=()=>go(state.resumeScreen&&state.resumeScreen!=='landing'?state.resumeScreen:'caseCreated');
+ const start=document.getElementById('startBtn');if(start)start.onclick=()=>go('email');
+ const think=document.getElementById('thinkBtn');if(think)think.onclick=()=>document.getElementById('already').textContent='Уже начали.';
+ const emailNext=document.getElementById('emailNext');if(emailNext)emailNext.onclick=()=>{const v=String(state.email).trim().toLowerCase();if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)){setErr('emailErr','АДРЕС НЕ УДАЛОСЬ ПРИОБЩИТЬ К ДЕЛУ. ПРОВЕРЬТЕ НАПИСАНИЕ.');return}state.email=v;save();go('rule')};
+ const ruleYes=document.getElementById('ruleYes');if(ruleYes)ruleYes.onclick=()=>go('domain');const ruleNo=document.getElementById('ruleNo');if(ruleNo)ruleNo.onclick=()=>go('landing');
+ document.querySelectorAll('[data-domain]').forEach(b=>b.onclick=()=>{state.domain=b.dataset.domain;save();render()});
+ const domainNext=document.getElementById('domainNext');if(domainNext)domainNext.onclick=()=>state.domain?go('decision'):setErr('domainErr','СНАЧАЛА ВЫБЕРИТЕ КОНТЕКСТ.');
+ const decisionNext=document.getElementById('decisionNext');if(decisionNext)decisionNext.onclick=()=>{if(!textQuality(state.decision,8).ok){setErr('decisionErr','ПОКА ЭТО ТЕМА, А НЕ РЕШЕНИЕ. УТОЧНИТЕ ДЕЙСТВИЕ.');return}go('decisionConfirm')};
+ const decisionConfirmBtn=document.getElementById('decisionConfirmBtn');if(decisionConfirmBtn)decisionConfirmBtn.onclick=()=>go('confidence');
+ const range=document.getElementById('confidence');if(range)range.oninput=e=>{state.initialConfidence=+e.target.value;document.getElementById('cv').textContent=e.target.value+'%';save()};
+ const confidenceNext=document.getElementById('confidenceNext');if(confidenceNext)confidenceNext.onclick=()=>{state.currentConfidence=state.initialConfidence;state.confidenceHistory=[{stage:'onboarding',value:state.initialConfidence}];save();go('valentinOpen')};
+ const openCase=document.getElementById('openCase');if(openCase)openCase.onclick=()=>{state.startedAt=state.startedAt||new Date().toISOString();state.status='active';caseId();save();go('caseCreated')};
+ const expectedNext=document.getElementById('expectedNext');if(expectedNext)expectedNext.onclick=()=>textQuality(state.expectedOutcome,8).ok?go('d1assume'):setErr('expectedErr','НУЖЕН КОНКРЕТНЫЙ ОЖИДАЕМЫЙ РЕЗУЛЬТАТ.');
+ const assumptionNext=document.getElementById('assumptionNext');if(assumptionNext)assumptionNext.onclick=()=>state.assumptions.filter(x=>textQuality(x,3).ok).length>=7?go('d1classify'):setErr('assumptionErr',`ДЕЛО ПОКА НЕ ПРИНИМАЕТСЯ. НУЖНО ЕЩЁ ${Math.max(0,7-state.assumptions.length)} ПРЕДПОСЫЛОК.`);
+ document.querySelectorAll('[data-type-index]').forEach(b=>b.onclick=()=>{state.assumptionTypes[b.dataset.typeIndex]=b.dataset.type;save();render()});
+ const classNext=document.getElementById('classNext');if(classNext)classNext.onclick=()=>{const m=state.assumptions.filter((_,i)=>!state.assumptionTypes[i]).length;if(m){setErr('classErr',`БЕЗ СТАТУСА ОСТАЛОСЬ: ${m}.`);return}go('d1control')};
+ const controlNext=document.getElementById('controlNext');if(controlNext)controlNext.onclick=()=>{if(!textQuality(state.control1,6).ok){setErr('controlErr','НУЖНО ОСНОВАНИЕ, КОТОРОЕ МОЖНО ОБСУЖДАТЬ.');return}const found=evidenceOptions.find(x=>x[1]===state.control1Preset);if(found)state.control1Preset=found[0];computeDay1();go('d1summary')};
+ const agreementNext=document.getElementById('agreementNext');if(agreementNext)agreementNext.onclick=()=>{if(!textQuality(state.agreementWho,3).ok||!textQuality(state.agreementSaid,6).ok){setErr('agreementErr','НУЖНЫ КОНКРЕТНЫЙ ИСТОЧНИК ОБЕЩАНИЯ И САМО ОБЕЩАНИЕ.');return}go('d2dissect')};
+ const dissectNext=document.getElementById('dissectNext');if(dissectNext)dissectNext.onclick=()=>{if([state.agreementInference,state.agreementKnown,state.agreementCheck].some(x=>!textQuality(x,6).ok)){setErr('dissectErr','ОДИН ИЗ ТРЁХ СЛОЁВ ПОКА ПУСТОЙ ИЛИ СЛИШКОМ ОБЩИЙ.');return}go('d2cost')};
+ document.querySelectorAll('[data-trust]').forEach(b=>b.onclick=()=>{const x=b.dataset.trust;state.trustCost=state.trustCost.includes(x)?state.trustCost.filter(y=>y!==x):[...state.trustCost,x];save();render()});
+ const costNext=document.getElementById('costNext');if(costNext)costNext.onclick=()=>state.trustCost.length?go('d2reflect'):setErr('costErr','ВЫБЕРИТЕ ХОТЯ БЫ ОДНУ ЦЕНУ НЕВЫПОЛНЕННОГО ОБЕЩАНИЯ.');
+ const reflectNext=document.getElementById('reflectNext');if(reflectNext)reflectNext.onclick=()=>{if(!textQuality(state.trustReflection,7).ok){setErr('reflectErr','НУЖНО КОНКРЕТНОЕ ИЗМЕНЕНИЕ В ПЛАНЕ.');return}computeDay2();go('d2summary')};
+ const failureNext=document.getElementById('failureNext');if(failureNext)failureNext.onclick=()=>state.failureModes.filter(x=>textQuality(x,3).ok).length>=15?go('d3uncomfortable'):setErr('failureErr',`НУЖНО ЕЩЁ ${Math.max(0,15-state.failureModes.length)} НЕЗАВИСИМЫХ ПРИЧИН.`);
+ const uncomfortableNext=document.getElementById('uncomfortableNext');if(uncomfortableNext)uncomfortableNext.onclick=()=>{if(!textQuality(state.uncomfortableFailure,5).ok||!textQuality(state.uncomfortableWhy,7).ok){setErr('uncomfortableErr','НУЖНА САМА ВЕРСИЯ И ПРИЧИНА, ПОЧЕМУ ЕЁ ХОЧЕТСЯ ОБЕСЦЕНИТЬ.');return}computeDay3();go('d3summary')};
+ const signalsNext=document.getElementById('signalsNext');if(signalsNext)signalsNext.onclick=()=>state.signals.filter(x=>textQuality(x,3).ok).length>=5?go('d4rationalize'):setErr('signalsErr',`НУЖНО ЕЩЁ ${Math.max(0,5-state.signals.length)} СИГНАЛОВ.`);
+ const rationalNext=document.getElementById('rationalNext');if(rationalNext)rationalNext.onclick=()=>{if(!textQuality(state.rationalizedSignal,5).ok||!textQuality(state.rationalization,6).ok){setErr('rationalErr','НУЖЕН СИГНАЛ И ОБЪЯСНЕНИЕ, КОТОРЫМ ВЫ ЕГО ОБЕЗВРЕЖИВАЕТЕ.');return}go('d4trigger')};
+ const triggerNext=document.getElementById('triggerNext');if(triggerNext)triggerNext.onclick=()=>{if(!textQuality(state.recheckTrigger,8).ok){setErr('triggerErr','ТОЧКА ПЕРЕПРОВЕРКИ ДОЛЖНА БЫТЬ НАБЛЮДАЕМОЙ.');return}computeDay4();go('d4summary')};
+ const statesNext=document.getElementById('statesNext');if(statesNext)statesNext.onclick=()=>{if([state.greenState,state.yellowState,state.redLine].some(x=>!textQuality(x,7).ok)){setErr('statesErr','ВСЕ ТРИ СОСТОЯНИЯ ДОЛЖНЫ БЫТЬ КОНКРЕТНЫМИ.');return}go('d5irreversible')};
+ document.querySelectorAll('[data-irrev]').forEach(b=>b.onclick=()=>{const x=b.dataset.irrev;state.irreversible=state.irreversible.includes(x)?state.irreversible.filter(y=>y!==x):[...state.irreversible,x];save();render()});
+ const irrevNext=document.getElementById('irrevNext');if(irrevNext)irrevNext.onclick=()=>state.irreversible.length?go('d5sunk'):setErr('irrevErr','НАЗОВИТЕ ХОТЯ БЫ ОДНУ ТРУДНООБРАТИМУЮ ПОТЕРЮ.');
+ document.querySelectorAll('[data-sunk]').forEach(b=>b.onclick=()=>{state.sunkChoice=b.dataset.sunk;save();render()});
+ const sunkNext=document.getElementById('sunkNext');if(sunkNext)sunkNext.onclick=()=>state.sunkChoice?go('d5redline'):setErr('sunkErr','НУЖНО ВЫБРАТЬ ДЕЙСТВИЕ ПОСЛЕ СРАБАТЫВАНИЯ КРАСНОЙ ЛИНИИ.');
+ const redlineNext=document.getElementById('redlineNext');if(redlineNext)redlineNext.onclick=()=>{if(!textQuality(state.redLine,8).ok||/станет плохо|будет плохо/.test(norm(state.redLine))){setErr('redlineErr','КРАСНАЯ ЛИНИЯ ДОЛЖНА БЫТЬ НАБЛЮДАЕМОЙ.');return}computeDay5();go('d5summary')};
+ const prosNext=document.getElementById('prosNext');if(prosNext)prosNext.onclick=()=>textQuality(state.proArguments,7).ok?go('d6counter'):setErr('prosErr','НУЖЕН КОНКРЕТНЫЙ АРГУМЕНТ.');
+ const counterNext=document.getElementById('counterNext');if(counterNext)counterNext.onclick=()=>textQuality(state.counterArguments,7).ok?go('d6falsify'):setErr('counterErr','НУЖЕН РЕАЛЬНЫЙ АРГУМЕНТ ПРОТИВ.');
+ const falsifyNext=document.getElementById('falsifyNext');if(falsifyNext)falsifyNext.onclick=()=>{if(!textQuality(state.falsificationFact,8).ok){setErr('falsifyErr','НУЖЕН ФАКТ, А НЕ ОБЩЕЕ ОЩУЩЕНИЕ.');return}computeDay6();go('d6summary')};
+ const errorNext=document.getElementById('errorNext');if(errorNext)errorNext.onclick=()=>textQuality(state.errorCost,6).ok?go('d7inaction'):setErr('errorErr','НУЖНА КОНКРЕТНАЯ ЦЕНА ОШИБКИ.');
+ const inactionNext=document.getElementById('inactionNext');if(inactionNext)inactionNext.onclick=()=>textQuality(state.inactionCost,6).ok?go('d7planb'):setErr('inactionErr','НУЖНА КОНКРЕТНАЯ ЦЕНА БЕЗДЕЙСТВИЯ.');
+ const planNext=document.getElementById('planNext');if(planNext)planNext.onclick=()=>{if(!textQuality(state.planB,7).ok){setErr('planErr','PLAN B ПОКА НЕ ПОХОЖ НА ПЛАН.');return}computeDay7();go('d7decision')};
+ document.querySelectorAll('[data-final]').forEach(b=>b.onclick=()=>{state.finalDecision=b.dataset.final;save();render()});
+ const finalNext=document.getElementById('finalNext');if(finalNext)finalNext.onclick=()=>state.finalDecision?go('verdict'):setErr('finalErr','ФИНАЛЬНОЕ РЕШЕНИЕ ВЫБИРАЕТЕ ВЫ.');
+ const examNext=document.getElementById('examNext');if(examNext)examNext.onclick=()=>{if(state.examQuestions.length<5){setErr('examErr','НУЖНО МИНИМУМ 5 ВОПРОСОВ.');return}state.examPassed=examCoverage()>=4;save();go('examResult')};
+ const recoverReset=document.getElementById('recoverReset');if(recoverReset)recoverReset.onclick=()=>{localStorage.removeItem(KEY);state=fresh();render()};
+}
+function render(){const idx=Math.max(0,screensOrder.indexOf(state.screen));document.getElementById('bar').style.width=(idx/(screensOrder.length-1))*100+'%';document.getElementById('topStep').textContent=state.currentDay?`ДЕЛО / ДЕНЬ ${state.currentDay}`:'COURSE / STAGE 1';(screens[state.screen]||screens.landing)();bind()}
+render();
