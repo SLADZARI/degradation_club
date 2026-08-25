@@ -97,9 +97,23 @@ function validateRegistry(){
     if(!exists(html)) fail(`${label}: public page missing ${html}`);
   }
 
+  // Only entity-record directories participate in orphan detection.
+  // Other JSON under content/ (page readiness, store manifests, private previews,
+  // UI configuration) is implementation data and must not be forced into the public registry.
+  const entityRecordPrefixes=[
+    'content/events/',
+    'content/projects/',
+    'content/dementors/',
+    'content/courses/',
+    'content/merch/products/',
+    'content/archive/'
+  ];
   const registered=new Set([...records].map(p=>p.replace(/^\//,'')));
-  const physical=walk('content').filter(p=>p.endsWith('.json')).filter(p=>p!=='content/registry.json').filter(p=>!p.includes('/templates/'));
-  for(const file of physical){if(!registered.has(file)) fail(`orphan record: ${file} exists but is not listed in content/registry.json`);}
+  const physical=walk('content')
+    .filter(p=>p.endsWith('.json'))
+    .filter(p=>entityRecordPrefixes.some(prefix=>p.startsWith(prefix)))
+    .filter(p=>!p.includes('/templates/'));
+  for(const file of physical){if(!registered.has(file)) fail(`orphan entity record: ${file} exists but is not listed in content/registry.json`);}
 
   if(registry.emptyRegisters){
     const typeMap={merch:'merch',archive:'archive-record'};
