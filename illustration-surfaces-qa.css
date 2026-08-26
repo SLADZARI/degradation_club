@@ -14,7 +14,7 @@
 .dc-home .dc-hero__media img{mix-blend-mode:multiply}
 
 .dc-community-page .dc-community-opening,
-.dc-community-page .dc-community-opening__art{background:var(--dc-ink-bg-community-hero)}
+.dc-community-page .dc-community-opening__art{background:var(--dc-ink-bg-community-hero)!important}
 .dc-community-page .dc-community-opening__veil{background:linear-gradient(to bottom,rgba(247,235,213,.92) 0,rgba(247,235,213,.12) 20%,rgba(247,235,213,0) 64%,rgba(247,235,213,.84) 88%,rgba(247,235,213,.97) 100%)}
 
 .dc-about .dc-ink-slot--about{background:var(--dc-ink-bg-about-service)}
