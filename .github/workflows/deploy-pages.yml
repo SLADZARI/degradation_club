@@ -4,8 +4,6 @@ on:
   push:
     branches:
       - dementor-club-site
-    paths:
-      - '.deploy-trigger'
   workflow_dispatch:
 
 permissions:
