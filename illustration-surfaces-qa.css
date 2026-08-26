@@ -58,17 +58,27 @@
 
 .dc-community-page .dc-community-opening,
 .dc-community-page .dc-community-opening__art{background:var(--dc-ink-bg-community-hero)!important}
+.dc-community-page .dc-community-opening__art img{object-fit:contain!important;mix-blend-mode:multiply}
 .dc-community-page .dc-community-opening__veil{background:linear-gradient(to bottom,rgba(247,235,213,.92) 0,rgba(247,235,213,.12) 20%,rgba(247,235,213,0) 64%,rgba(247,235,213,.84) 88%,rgba(247,235,213,.97) 100%)}
 
 .dc-about .dc-ink-slot--about{background:var(--dc-ink-bg-about-service)}
+.dc-about .dc-ink-slot--about img{object-fit:contain!important;mix-blend-mode:multiply}
 .dc-logic-page .dc-ink-slot--logic{background:var(--dc-ink-bg-maze)}
-.dc-ink-surface--authority-chair{background:var(--dc-ink-bg-authority-chair)}
-.dc-ink-surface--community-people{background:var(--dc-ink-bg-community-people)}
+.dc-logic-page .dc-ink-slot--logic img{object-fit:contain!important;mix-blend-mode:multiply}
+.dc-ink-surface--authority-chair,
+.dc-ink-editorial--authority{background:var(--dc-ink-bg-authority-chair)!important}
+.dc-ink-editorial--authority img{object-fit:contain!important;mix-blend-mode:multiply}
+.dc-ink-surface--community-people,
+.dc-ink-editorial--community{background:var(--dc-ink-bg-community-people)!important}
+.dc-ink-editorial--community img{object-fit:contain!important;mix-blend-mode:multiply}
 .dc-fuengirola-page .dc-ink-slot--event,
 .dc-fuengirola-page .dc-media-break{background:var(--dc-ink-bg-fuengirola)}
+.dc-fuengirola-page .dc-ink-slot--event img,
+.dc-fuengirola-page .dc-media-break img{object-fit:contain!important;mix-blend-mode:multiply}
 .dc-fuengirola-page .dc-event-dementor-portrait{background:#EFE6D3}
+.dc-fuengirola-page .dc-event-dementor-portrait img{object-fit:contain;mix-blend-mode:multiply}
 
-/* QA canonicalization: old cached markup must render the approved current portrait. */
+/* Cached markup safety only; canonical QA HTML already uses the current portrait path. */
 .dc-fuengirola-page img[src$='/gabil/portrait-ink.webp']{
   content:url('/assets/people/dementors/gabil/dementor_gabil.webp');
   background:#EFE6D3;
@@ -79,6 +89,8 @@
 @media(max-width:700px){
   .dc-home .dc-home-community__media{min-height:clamp(360px,78vw,620px)}
   .dc-home .dc-home-community__caption{position:static;width:100%;box-sizing:border-box}
+  .dc-ink-editorial--community img,
+  .dc-ink-editorial--authority img{height:auto!important;aspect-ratio:auto!important}
 }
 
 @media(max-width:560px){
