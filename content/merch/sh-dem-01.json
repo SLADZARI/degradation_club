@@ -1,0 +1,11 @@
+{
+  "id":"SH-DEM-01",
+  "entityType":"merch",
+  "drop":"DROP-001",
+  "title":"OVERTHINKING IS MY CARDIO.",
+  "status":"asset-present-content-pending",
+  "salesState":"not_open",
+  "publicUrl":"/merch/drop-001/overthinking-is-my-cardio/",
+  "variants":[{"id":"light","label":"LIGHT","image":{"driveId":"18_2sAwPXt4Gbxu8s832BJQP4Uh3ev9hz","source":"https://drive.google.com/file/d/18_2sAwPXt4Gbxu8s832BJQP4Uh3ev9hz/view"}}],
+  "price":null,"sizes":null,"material":null,"availability":null
+}
