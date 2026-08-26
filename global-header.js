@@ -73,4 +73,11 @@
   addEventListener('click',e=>{if(!header.contains(e.target))closeGroups()});
   addEventListener('keydown',e=>{if(e.key==='Escape'){closeGroups();if(menu?.getAttribute('aria-expanded')==='true')closeMenu(true)}});
   addEventListener('resize',()=>{if(innerWidth>900&&menu?.getAttribute('aria-expanded')==='true')closeMenu()},{passive:true});
+
+  if(!document.querySelector('script[src="/support-v1.js"]')){
+    const support=document.createElement('script');
+    support.src='/support-v1.js';
+    support.defer=true;
+    document.body.appendChild(support);
+  }
 })();
