@@ -37,6 +37,10 @@ img[src*="/people/dementors/evgeniy/portrait-ink"]{background:var(--dc-dementor-
 .dc-dementor-micro__portrait img{display:block;width:100%;height:100%}
 .dc-dementor-micro__body{display:grid;gap:2px}.dc-dementor-micro__body strong{font-size:13px;line-height:1}.dc-dementor-micro__body span{font-size:9px;letter-spacing:.09em;text-transform:uppercase;opacity:.55}
 
+/* Existing Home course copy gets the approved MICRO visual without changing content. */
+.dc-home section.dc-event:has(a[href="/courses/dumai-s-opasnostyu/"]) .dc-event__meta p:last-child{display:grid;grid-template-columns:42px minmax(0,1fr);gap:10px;align-items:center;margin-top:14px}
+.dc-home section.dc-event:has(a[href="/courses/dumai-s-opasnostyu/"]) .dc-event__meta p:last-child::before{content:"";display:block;width:42px;height:50px;background-color:var(--dc-dementor-valentin-bg);background-image:url('/assets/people/dementors/valentin/portrait-ink.webp');background-repeat:no-repeat;background-size:contain;background-position:center bottom;mix-blend-mode:multiply}
+
 /* RELATION */
 .dc-dementor-relation{display:grid;grid-template-columns:minmax(180px,320px) minmax(0,1fr);gap:clamp(24px,5vw,76px);align-items:end;border-top:1px solid var(--dc-line);border-bottom:1px solid var(--dc-line);padding:clamp(28px,4vw,58px) 0}
 .dc-dementor-relation__portrait{aspect-ratio:4/5;overflow:hidden}.dc-dementor-relation__portrait img{display:block;width:100%;height:100%}
@@ -83,7 +87,7 @@ body.dc-fuengirola-page .dc-event-lock__grid img[src*="/people/dementors/gabil/p
   .dc-dementor-feature{grid-template-columns:1fr}.dc-dementor-feature__portrait{min-height:0;aspect-ratio:4/5}.dc-dementor-feature__copy{order:1}.dc-dementor-feature__portrait{order:2}
   body.dc-fuengirola-page .dc-entity-hero{min-height:760px!important;padding-bottom:28px!important}
   body.dc-fuengirola-page .dc-entity-hero::after{top:auto;bottom:0;width:100%;height:56%;background-size:auto 100%;background-position:right top}
-  body.dc-fuengirola-page .dc-entity-hero__title{max-width:100%}
+  body.dc-fuengirola-page .dc-entity-hero__title{max-width:100%!important}
   body.dc-fuengirola-page .dc-entity-hero__bottom{padding-right:0}
   body.dc-fuengirola-page .dc-event-lock__grid:has(img[src*="/people/dementors/gabil/portrait-ink"]){grid-template-columns:1fr!important}
   body.dc-fuengirola-page .dc-event-lock__grid>div:has(img[src*="/people/dementors/gabil/portrait-ink"]){width:min(78vw,340px)}
