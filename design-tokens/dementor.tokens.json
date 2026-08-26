@@ -1,9 +1,9 @@
 {
-  "$schema": "https://design-tokens.github.io/community-group/format/",
   "meta": {
     "name": "Dementor Club Design Tokens",
     "version": "1.0-audit",
     "status": "working",
+    "format": "DTCG-inspired internal registry; CSS expressions are preserved as authored values and this file is not yet schema-validated DTCG",
     "audited": "2026-08-26"
   },
   "color": {
@@ -26,7 +26,7 @@
   },
   "layout": {
     "shell": {
-      "max": { "$value": "1600px", "$type": "dimension", "$description": "Normalized candidate; legacy 1500px exists." }
+      "max": { "$value": "1600px", "$type": "css-dimension", "$description": "Normalized candidate; legacy 1500px exists." }
     },
     "grid": {
       "desktopColumns": { "$value": 12, "$type": "number" },
@@ -35,29 +35,29 @@
     }
   },
   "rhythm": {
-    "tight": { "$value": "clamp(54px,6vw,92px)", "$type": "dimension" },
-    "medium": { "$value": "clamp(96px,11vw,170px)", "$type": "dimension" },
-    "wide": { "$value": "clamp(150px,17vw,270px)", "$type": "dimension" },
-    "huge": { "$value": "clamp(210px,23vw,360px)", "$type": "dimension" }
+    "tight": { "$value": "clamp(54px,6vw,92px)", "$type": "css-dimension" },
+    "medium": { "$value": "clamp(96px,11vw,170px)", "$type": "css-dimension" },
+    "wide": { "$value": "clamp(150px,17vw,270px)", "$type": "css-dimension" },
+    "huge": { "$value": "clamp(210px,23vw,360px)", "$type": "css-dimension" }
   },
   "motion": {
     "ease": {
-      "primary": { "$value": "cubic-bezier(.2,.8,.2,1)", "$type": "cubicBezier" }
+      "primary": { "$value": "cubic-bezier(.2,.8,.2,1)", "$type": "css-easing" }
     },
     "duration": {
-      "fast": { "$value": "220ms", "$type": "duration" },
-      "medium": { "$value": "480ms", "$type": "duration" },
-      "slow": { "$value": "820ms", "$type": "duration" }
+      "fast": { "$value": "220ms", "$type": "css-duration" },
+      "medium": { "$value": "480ms", "$type": "css-duration" },
+      "slow": { "$value": "820ms", "$type": "css-duration" }
     }
   },
   "type": {
     "family": {
-      "reading": { "$value": "Inter, Arial, Helvetica, sans-serif", "$type": "fontFamily", "$description": "Temporary implementation fallback; final family unresolved." },
-      "display": { "$value": "Arial Narrow, Helvetica Neue, Arial, sans-serif", "$type": "fontFamily", "$description": "Temporary implementation fallback; final family unresolved." }
+      "reading": { "$value": "Inter, Arial, Helvetica, sans-serif", "$type": "font-stack", "$description": "Temporary implementation fallback; final family unresolved." },
+      "display": { "$value": "Arial Narrow, Helvetica Neue, Arial, sans-serif", "$type": "font-stack", "$description": "Temporary implementation fallback; final family unresolved." }
     },
     "measure": {
-      "body": { "$value": "66ch", "$type": "dimension" },
-      "lead": { "$value": "29ch", "$type": "dimension" }
+      "body": { "$value": "66ch", "$type": "css-dimension" },
+      "lead": { "$value": "29ch", "$type": "css-dimension" }
     }
   },
   "state": {
@@ -65,11 +65,11 @@
   },
   "illustration": {
     "ink": {
-      "edge": { "$value": "clamp(18px,3vw,48px)", "$type": "dimension" },
+      "edge": { "$value": "clamp(18px,3vw,48px)", "$type": "css-dimension" },
       "tilt": {
-        "l1": { "$value": "0.12deg", "$type": "dimension" },
-        "l2": { "$value": "0.34deg", "$type": "dimension" },
-        "l3": { "$value": "0.46deg", "$type": "dimension" }
+        "l1": { "$value": "0.12deg", "$type": "css-angle" },
+        "l2": { "$value": "0.34deg", "$type": "css-angle" },
+        "l3": { "$value": "0.46deg", "$type": "css-angle" }
       },
       "blendMode": { "$value": "multiply", "$type": "string" },
       "contrast": { "$value": 1.05, "$type": "number" }
