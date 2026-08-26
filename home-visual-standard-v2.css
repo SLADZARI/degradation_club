@@ -1,0 +1,137 @@
+/* Dementor Club — Home visual corrections v2
+   Approved 2026-08-26 from production comparison: Vercel vs GitHub Pages.
+   Purpose: keep the existing Home illustration in the HERO, never as a detached lower block;
+   make accent/selected rows bleed to the viewport while copy stays on the content grid. */
+
+:root{
+  --dc-home-hero-media-width:52%;
+  --dc-home-hero-media-top:72px;
+  --dc-home-hero-media-bottom:18px;
+  --dc-row-accent-bg:var(--dc-acid,#d8ff3e);
+}
+
+/* HOME HERO MEDIA CONTRACT
+   One existing asset, right-side composition, whole drawing retained.
+   `contain` is deliberate: the image may breathe, but must not be cropped. */
+.dc-home .dc-hero{
+  position:relative;
+  isolation:isolate;
+  overflow:hidden;
+}
+.dc-home .dc-hero::after{
+  content:"";
+  position:absolute;
+  z-index:0;
+  top:var(--dc-home-hero-media-top);
+  right:clamp(18px,2vw,32px);
+  bottom:var(--dc-home-hero-media-bottom);
+  width:var(--dc-home-hero-media-width);
+  pointer-events:none;
+  background-image:url('/assets/home-interruption-03.webp');
+  background-repeat:no-repeat;
+  background-position:right bottom;
+  background-size:contain;
+}
+.dc-home .dc-hero__meta,
+.dc-home .dc-hero__title,
+.dc-home .dc-hero__bottom{
+  position:relative;
+  z-index:2;
+}
+.dc-home .dc-hero__title{
+  grid-column:1/8;
+  max-width:58vw;
+}
+.dc-home .dc-hero__bottom{
+  grid-column:1/6;
+  max-width:620px;
+}
+
+/* The old figure remains in HTML for provenance/backward compatibility,
+   but it is not a second visual block anymore. */
+.dc-home .dc-ink-slot--home{
+  display:none!important;
+}
+
+/* FULL-BLEED ACCENT ROW CONTRACT
+   The content grid stays aligned; only the accent surface reaches viewport edges. */
+.dc-home .dc-index-row,
+.dc-home .dc-sphere{
+  position:relative;
+  z-index:0;
+  isolation:isolate;
+}
+.dc-home .dc-index-row::before,
+.dc-home .dc-sphere::before{
+  content:"";
+  position:absolute;
+  z-index:-1;
+  top:-1px;
+  bottom:-1px;
+  left:50%;
+  width:100vw;
+  transform:translateX(-50%);
+  background:transparent;
+  pointer-events:none;
+  transition:background .18s ease;
+}
+.dc-home .dc-index-row:hover,
+.dc-home .dc-index-row:focus-visible{
+  background:transparent!important;
+}
+.dc-home .dc-index-row:hover::before,
+.dc-home .dc-index-row:focus-visible::before,
+.dc-home .dc-sphere:hover::before,
+.dc-home .dc-sphere:focus-within::before{
+  background:var(--dc-row-accent-bg);
+}
+
+/* Keep the previous small horizontal nudge on index rows without shrinking the accent field. */
+.dc-home .dc-index-row:hover,
+.dc-home .dc-index-row:focus-visible{
+  padding-left:10px;
+  padding-right:10px;
+}
+
+@media(max-width:1100px){
+  :root{--dc-home-hero-media-width:48%;--dc-home-hero-media-top:92px}
+  .dc-home .dc-hero__title{grid-column:1/7;max-width:64vw}
+  .dc-home .dc-hero__bottom{grid-column:1/5}
+}
+
+@media(max-width:900px){
+  .dc-home .dc-hero{
+    padding-bottom:min(72vw,620px);
+  }
+  .dc-home .dc-hero::after{
+    top:auto;
+    left:clamp(18px,2vw,32px);
+    right:clamp(18px,2vw,32px);
+    bottom:18px;
+    width:auto;
+    height:min(68vw,580px);
+    background-position:center bottom;
+    background-size:contain;
+  }
+  .dc-home .dc-hero__title,
+  .dc-home .dc-hero__bottom{
+    grid-column:1/9;
+    max-width:none;
+  }
+}
+
+@media(max-width:560px){
+  .dc-home .dc-hero{
+    padding-bottom:min(108vw,520px);
+  }
+  .dc-home .dc-hero::after{
+    left:12px;
+    right:12px;
+    height:min(104vw,500px);
+  }
+}
+
+@media(prefers-reduced-motion:reduce){
+  .dc-home .dc-index-row::before,
+  .dc-home .dc-sphere::before{transition:none}
+}
