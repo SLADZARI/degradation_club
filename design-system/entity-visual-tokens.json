@@ -1,47 +1,33 @@
 {
-  "$schema": "dementor-club/entity-visual-tokens/v1",
+  "$schema": "dementor-club/entity-visual-tokens/v2",
   "source": {
     "driveFolder": "03_Dementor Club Official Site/UI Redesign 2026-08",
     "driveFolderId": "1_4h7JjCQ-zbyRP_NnFfFDzV0VjdIV_kN",
     "reviewedAt": "2026-08-26"
   },
   "dementors": {
-    "valentin": {
-      "background": "#EFE5D3",
-      "cssToken": "--dc-dementor-valentin-bg"
-    },
-    "nikita": {
-      "background": "#F6E9D4",
-      "cssToken": "--dc-dementor-nikita-bg"
-    },
-    "gabil": {
-      "background": "#EFE6D3",
-      "cssToken": "--dc-dementor-gabil-bg"
-    },
-    "evgeniy": {
-      "background": "#F6EDD9",
-      "cssToken": "--dc-dementor-evgeniy-bg"
-    }
+    "valentin": {"background":"#EFE5D3","cssToken":"--dc-dementor-valentin-bg"},
+    "nikita": {"background":"#F6E9D4","cssToken":"--dc-dementor-nikita-bg"},
+    "gabil": {"background":"#EFE6D3","cssToken":"--dc-dementor-gabil-bg"},
+    "evgeniy": {"background":"#F6EDD9","cssToken":"--dc-dementor-evgeniy-bg"}
   },
   "dementorPresentation": {
     "backgroundIsIdentity": true,
-    "roles": ["micro", "inline", "row", "relation", "feature", "hero", "quote-author", "preview"],
-    "portrait": {
-      "objectFit": "cover",
-      "objectPosition": "center top"
-    },
+    "roles": ["micro","inline","row","relation","feature","hero","quote-author","preview"],
+    "portrait": {"objectFit":"contain","objectPosition":"center bottom","mixBlendMode":"multiply"},
     "responsive": {
-      "web": "copy left, dominant portrait right",
-      "tablet": "portrait expands into dominant right field; title/copy may enter portrait field",
-      "mobile": "identity and formula first, portrait below at full content width"
+      "web":"copy left; dominant personal-surface portrait right",
+      "tablet":"portrait expands into dominant right field; copy may overlap visual field",
+      "mobile":"identity/name/formula first; portrait below at full content width"
     }
   },
   "eventPresentation": {
-    "mediaAnchor": "top right",
-    "resizePriority": "height",
-    "responsiveRule": "reuse one approved event image and crop it; never invent a new composition per breakpoint",
-    "cssPosition": "right top",
-    "fitStrategy": "auto 100%",
-    "relation": "Dementor is rendered as a related entity, not as a second hero image"
+    "asset":"/assets/event-fuengirola-03.webp",
+    "mediaAnchor":"top right",
+    "resizePriority":"height",
+    "responsiveRule":"reuse one approved event image and crop it; never invent a new composition per breakpoint",
+    "cssPosition":"right top",
+    "fitStrategy":"background-size: auto 100%",
+    "detailRelation":"Dementor is rendered as a related entity with personal background, not as a second hero"
   }
 }
