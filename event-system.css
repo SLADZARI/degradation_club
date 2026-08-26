@@ -28,6 +28,13 @@
 .dc-event-relation{display:grid;grid-template-columns:2fr 3fr 1fr;gap:20px;padding:17px 0;border-bottom:1px solid var(--dc-line);font-size:11px;text-transform:uppercase;letter-spacing:.06em}
 .dc-event-relation span:last-child{text-align:right;opacity:.5}
 
+/* Fuengirola: Gabil must be present in the opening screen, not buried below the fold. */
+.dc-fuengirola-page .dc-entity-hero{position:relative}
+.dc-fuengirola-page .dc-entity-hero::after{content:"";position:absolute;right:clamp(24px,4vw,70px);top:27%;width:min(27vw,390px);aspect-ratio:4/5;background:url('/assets/people/dementors/gabil/portrait-ink.webp') center/contain no-repeat;pointer-events:none}
+.dc-fuengirola-page .dc-entity-hero__title{max-width:72%}
+.dc-fuengirola-page .dc-entity-hero__bottom{padding-right:min(28vw,410px)}
+.dc-fuengirola-page .dc-kicker{overflow-wrap:anywhere}
+
 @media(max-width:800px){
   .dc-programme__lane{grid-template-columns:1fr}
   .dc-programme__label{border-right:0;border-bottom:1px solid var(--dc-line);display:flex;justify-content:space-between;align-items:center;gap:20px}
@@ -38,9 +45,36 @@
   .dc-lifecycle{grid-template-columns:1fr 1fr}
   .dc-lifecycle__state{min-height:126px}
 }
+
+@media(max-width:560px){
+  .dc-fuengirola-page .dc-entity-hero{min-height:calc(100svh - 58px);padding-top:20px;padding-bottom:22px;align-content:start;display:block;overflow:visible}
+  .dc-fuengirola-page .dc-entity-hero__meta{display:flex;margin-bottom:28px;font-size:9px;line-height:1.2;gap:12px}
+  .dc-fuengirola-page .dc-entity-hero__meta span:last-child{text-align:right}
+  .dc-fuengirola-page .dc-entity-hero__title{font-size:clamp(48px,14vw,64px);line-height:.82;letter-spacing:-.075em;max-width:100%;margin:0 0 20px}
+  .dc-fuengirola-page .dc-entity-hero::after{position:relative;display:block;right:auto;top:auto;width:58%;max-width:230px;aspect-ratio:4/5;margin:0 0 18px 0;background-position:left center}
+  .dc-fuengirola-page .dc-entity-hero__bottom{display:block;padding-right:0;margin-top:0}
+  .dc-fuengirola-page .dc-entity-hero__bottom>div:first-child{max-width:100%}
+  .dc-fuengirola-page .dc-entity-hero__bottom .dc-kicker{font-size:10px;line-height:1.18;letter-spacing:.11em;max-width:100%;margin:0 0 8px;word-break:normal;overflow-wrap:break-word;hyphens:none}
+  .dc-fuengirola-page .dc-entity-hero__lead{font-size:26px;line-height:.98;letter-spacing:-.045em;margin:0 0 18px;max-width:12ch}
+  .dc-fuengirola-page .dc-entity-hero__facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;border-top:1px solid var(--dc-line);padding-top:14px;margin:0 0 18px;font-size:11px;line-height:1.25}
+  .dc-fuengirola-page .dc-entity-hero__facts p{margin:0;min-width:0;overflow-wrap:anywhere}
+  .dc-fuengirola-page .dc-entity-hero__facts strong{font-size:9px;letter-spacing:.06em}
+  .dc-fuengirola-page .dc-entity-hero__action{width:100%;min-height:54px;margin:0;font-size:12px}
+
+  .dc-fuengirola-page .dc-media-break{margin-top:0}
+  .dc-fuengirola-page .dc-event-detail__intro .dc-kicker,
+  .dc-fuengirola-page .dc-event-lock__label{font-size:10px;line-height:1.2;max-width:100%;overflow-wrap:break-word}
+  .dc-fuengirola-page .dc-event-detail__intro .dc-display-l,
+  .dc-fuengirola-page .dc-event-lock__title{font-size:clamp(42px,12.5vw,58px);line-height:.88;letter-spacing:-.055em;margin-top:16px;max-width:100%;overflow-wrap:normal;word-break:normal}
+  .dc-fuengirola-page .dc-event-detail__copy,
+  .dc-fuengirola-page .dc-event-lock__copy{margin-top:28px;font-size:18px;line-height:1.35}
+  .dc-fuengirola-page .dc-pullquote{font-size:clamp(34px,10vw,48px);line-height:.9;overflow-wrap:break-word}
+}
+
 @media(max-width:430px){
   .dc-lifecycle{grid-template-columns:1fr}
   .dc-lifecycle__state{min-height:104px}
   .dc-event-relation{grid-template-columns:1fr;gap:6px}
   .dc-event-relation span:last-child{text-align:left}
+  .dc-fuengirola-page .dc-entity-hero__facts{grid-template-columns:1fr 1fr 1fr}
 }
