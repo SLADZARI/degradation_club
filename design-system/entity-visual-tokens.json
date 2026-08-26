@@ -32,18 +32,23 @@
   },
   "homePresentation": {
     "heroAsset":"/assets/home-interruption-03.webp",
-    "heroMediaRole":"right-side hero media, never a detached downstream figure",
+    "heroMediaRole":"dominant right-side media inside the first screen; never a detached downstream figure",
     "heroFit":"contain",
-    "heroPosition":"right bottom",
-    "heroCropPolicy":"retain the complete approved illustration on desktop; breathing room is preferred to cropping",
-    "desktop":"copy left; media occupies the right field inside the first screen",
-    "mobile":"copy first; the same media remains inside the hero below the copy"
+    "heroPositionWeb":"right center",
+    "heroPositionMobile":"right bottom",
+    "heroCropPolicy":"retain the complete approved illustration; increase the media field before allowing crop",
+    "desktop":"one composition: metadata + headline + supporting copy on the left, dominant media field on the right",
+    "tablet":"same composition with a larger proportional media field and reduced headline width",
+    "mobile":"reflow: copy first, the same media remains inside the hero below the copy"
   },
   "listPresentation": {
-    "accentToken":"--dc-row-accent-bg",
+    "accentToken":"--dc-home-row-accent",
     "accentColor":"#d8ff3e",
     "fullBleedAccent":true,
-    "rule":"selected, hover or focus accent surface spans the full viewport width while row content remains aligned to the page grid",
-    "appliesTo":["index rows","sphere/direction rows","entity registers where an accent row is used"]
+    "contentShiftOnAccent":false,
+    "rule":"hover, focus or selected accent surface spans the viewport while row content stays fixed on the content grid",
+    "legacyMechanism":"translateX accent layer clipped by row overflow is deprecated on Home",
+    "appliesTo":["Home ecosystem index rows","Home sphere/direction rows"],
+    "futureGeneralization":"promote to shared entity register only after visual QA on Events, Projects, Community and Merch indexes"
   }
 }
