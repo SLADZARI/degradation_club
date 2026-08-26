@@ -12,6 +12,11 @@
   "relatedEvents": [],
   "relatedCourses": [],
   "relatedProjects": [],
+  "visualIdentity": {
+    "portrait": null,
+    "background": null,
+    "backgroundToken": null
+  },
   "provenance": {
     "branch": "dementor-club",
     "path": "people/dementors.md"
