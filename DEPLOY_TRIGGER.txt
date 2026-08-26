@@ -2,3 +2,4 @@ Production refresh for versioned Dementor Ink assets.
 2026-08-23T20:38+02:00
 GitHub Pages retry: 2026-08-26T17:38+02:00
 Asset cleanup and new portrait/home rollout: 2026-08-26
+Merch DROP 001 local WebP rollout: 2026-08-26T21:24+02:00
