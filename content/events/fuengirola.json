@@ -3,16 +3,20 @@
   "entityType": "event",
   "slug": "fuengirola",
   "title": "Фуэнхирола",
-  "type": "offline-event",
+  "subtitle": "Лаборатория несовместимых очевидностей",
+  "type": "offline-session",
   "status": "planned",
   "publicUrl": "/events/fuengirola/",
-  "preview": "/assets/ink/event-fuengirola-02.webp",
+  "preview": "/assets/ink/event-fuengirola-03.webp",
   "dementor": "DEMENTOR-004",
+  "capacity": "до 7 участников",
   "location": {
     "city": "Fuengirola / Фуэнхирола",
     "country": "Испания"
   },
-  "publicDescription": "Несколько дней вне привычной гонки за результатом, где не требуется становиться эффективнее, полезнее или лучше версии себя до приезда.",
+  "publicDescription": "Камерная офлайн-сессия Dementor Club с Габилем. Вы приносите ситуацию, про которую уже успели сказать: «Там всё понятно». На встрече эту ясность аккуратно демонтируют и проверяют, спорили ли вы вообще об одном и том же.",
+  "canonicalQuote": "ДЕМОНТИРОВАТЬ ПРЕЖДЕВРЕМЕННУЮ ЯСНОСТЬ",
+  "ctaLabel": "Я УЖЕ ВСЁ ПОНЯЛ",
   "access": "details-after-join",
   "dateTime": null,
   "venue": null,
@@ -30,5 +34,5 @@
     "role": "canonical-club-event-record"
   },
   "siteRole": "implementation-mirror",
-  "updatedAt": "2026-08-24"
+  "updatedAt": "2026-08-26"
 }
