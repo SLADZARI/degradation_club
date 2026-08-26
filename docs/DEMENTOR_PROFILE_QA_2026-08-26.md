@@ -44,11 +44,40 @@ For every future Dementor: portrait + background token are added together before
 - Background is identity, not hover decoration.
 - Card dimensions and typography remain common across all Dementors.
 
+## Illustration surface contract
+
+Approved raster artwork is always paired with its matching container surface so responsive `contain` layouts do not expose a foreign paper color.
+
+Current mapping:
+
+- Home chair — `#F3EDDE`
+- Logic / maze — `#F0E7D7`
+- Authority chair — `#F0E7D7`
+- About service — `#F9EDD5`
+- Community People — `#F1E9D8`
+- Community hero — `#F7EBD5`
+- Fuengirola — `#FAF4E2`
+
+Canonical People asset: `/assets/ink/home-community-01.webp`.
+It renders directly, follows source ratio `2115 / 1402`, and has no fallback image or artificial minimum height.
+
+## Canonical Dementor assets
+
+Public pages use:
+
+- `/assets/people/dementors/valentin/dementor_valentin.webp`
+- `/assets/people/dementors/nikita/dementor_nikita.webp`
+- `/assets/people/dementors/evgeniy/dementor_evgeniy.webp`
+- `/assets/people/dementors/gabil/dementor_gabil.webp`
+
+The internal `/design-system/` UI Lab still has historical `portrait-ink.webp` source references. During QA those legacy paths are compatibility aliases pointing to the exact same canonical WebP blobs. They do not duplicate binary image data and they are not used by public pages.
+
 ## QA branch implementation
 
-Temporary QA stylesheet: `/dementor-profile-qa.css`.
+Temporary profile stylesheet: `/dementor-profile-qa.css`.
+Illustration surface contract: `/illustration-surfaces-qa.css`.
 
-The stylesheet is intentionally loaded only on the Community roster and the four Dementor profile pages in branch `qa-dementor-profile-layout`.
+Both remain isolated to branch `qa-dementor-profile-layout` until visual sign-off.
 
 ## Acceptance checklist before merge
 
@@ -64,4 +93,7 @@ The stylesheet is intentionally loaded only on the Community roster and the four
 - [ ] Header remains readable over each personal background.
 - [ ] Long names and long quotes do not collide with portrait.
 - [ ] Existing profile content and links remain unchanged.
+- [ ] Public pages do not use `portrait-ink.webp`.
+- [ ] Site Integrity is green on current HEAD.
+- [ ] QA branch is not behind `dementor-club-site`.
 - [ ] Production branch remains untouched until sign-off.
