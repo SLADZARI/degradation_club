@@ -29,5 +29,21 @@
     "cssPosition":"right top",
     "fitStrategy":"background-size: auto 100%",
     "detailRelation":"Dementor is rendered as a related entity with personal background, not as a second hero"
+  },
+  "homePresentation": {
+    "heroAsset":"/assets/home-interruption-03.webp",
+    "heroMediaRole":"right-side hero media, never a detached downstream figure",
+    "heroFit":"contain",
+    "heroPosition":"right bottom",
+    "heroCropPolicy":"retain the complete approved illustration on desktop; breathing room is preferred to cropping",
+    "desktop":"copy left; media occupies the right field inside the first screen",
+    "mobile":"copy first; the same media remains inside the hero below the copy"
+  },
+  "listPresentation": {
+    "accentToken":"--dc-row-accent-bg",
+    "accentColor":"#d8ff3e",
+    "fullBleedAccent":true,
+    "rule":"selected, hover or focus accent surface spans the full viewport width while row content remains aligned to the page grid",
+    "appliesTo":["index rows","sphere/direction rows","entity registers where an accent row is used"]
   }
 }
