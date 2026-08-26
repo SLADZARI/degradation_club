@@ -10,3 +10,4 @@ Update this file only when the user explicitly requests deploy/publish/release.
 2026-08-27 — replace inline preorder form with CTA modal flow and OBJECT 001 quickview slider.
 2026-08-27 — publish global SUPPORT DEMENTOR CLUB modal, footer entry and timed active-session prompts at 60s / 240s.
 2026-08-27 — replace legacy /donate/ placeholder with live BLIK support page; Trust Wallet remains COMING SOON pending wallet data.
+2026-08-27 — redeploy /donate/ after restoring required runtime adapter scripts for site validation.
