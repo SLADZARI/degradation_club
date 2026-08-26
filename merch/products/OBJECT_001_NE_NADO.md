@@ -5,100 +5,79 @@
 - `public_name`: `OBJECT 001 — НЕ НАДО`
 - `category`: `Objects`
 - `line`: `EXPENSIVE THINGS WITHOUT MEANING / ДОРОГИЕ ВЕЩИ БЕЗ СМЫСЛА`
-- `status`: `approved`
+- `status`: `approved-object / priced-draft-economics`
 - `drop`: `DEMENTOR CLUB DROP 001 — НИЧЕГО НЕ НАДО`
-- `updated_at`: `2026-08-24`
+- `base_price_eur`: `520`
+- `currency_display`: `EUR`
+- `updated_at`: `2026-08-26`
 
-## Короткая идея
+## Short idea
 
 Тяжёлый латунный объект без необходимой функции.
 
 Главный жест предмета — физически тяжёлое и дорого изготовленное `НЕ НАДО`.
 
-## Публичное описание
+## Public description
 
 # НЕ НАДО
 
 Тяжёлый латунный аргумент в пользу того, чтобы ничего лишнего не делать.
 
+Массивная латунь. Индивидуальная гравировка. Номер экземпляра. Жёсткая коробка.
+
 Назначение: отсутствует.
 
 Рекомендации по применению: не требуются.
 
-## Материал
+`DEMENTOR CLUB / OBJECT 001`
 
-Массивная латунь.
+## Material
 
-## Канонический размер первой версии
+- `material`: `solid brass / массивная латунь`
+- `dimensions`: `100 × 40 × 20 mm`
+- `weight`: `approx. 0.65–0.70 kg`
+- `material_quality_rule`: `real solid brass only; no decorative gold-tone substitute`
 
-`100 × 40 × 20 mm`
+## Finish
 
-Ориентировочный вес: `0.65–0.70 kg`.
+- satin / brushed brass;
+- hand-finished surface;
+- softened edges;
+- natural patina is acceptable as part of ageing;
+- no mirror-polished decorative gold effect unless separately approved.
 
-## Поверхность
+## Marking
 
-- сатинированная / brushed brass;
-- без зеркального золотого блеска;
-- слегка смягчённые края;
-- естественная патина допустима и является частью старения объекта;
-- не использовать дешёвое декоративное «золотое» покрытие вместо настоящей латуни.
+Top surface:
 
-## Маркировка
+`НЕ НАДО`
 
-Верхняя поверхность:
-
-# НЕ НАДО
-
-Нижняя поверхность:
+Bottom surface:
 
 `DEMENTOR CLUB`
 
 `OBJECT 001`
 
-`017 / 050` — индивидуальная нумерация серии.
+individual serial: `001 / 050 … 050 / 050`
 
-Основная надпись выполняется гравировкой / CNC-фрезеровкой, а не наклейкой или печатью.
+Primary marking must be engraving / CNC machining, not sticker or surface print.
 
 ## Edition
 
-Первая серия: до `50` номерных экземпляров.
+- `edition_ceiling`: `50 numbered objects`
+- `production_model`: `may start one-by-one / small batch`
 
-Старт производства допускается меньшей партией по мере возможности клуба.
+The economics model must remain viable when only one object is ordered.
 
-## Каноническая цена
+## Packaging
 
-`base_price_eur: 220`
+Premium rigid minimal box containing:
+- the brass object;
+- protective insert / fitted support;
+- internal product card;
+- serial / object identification.
 
-Цена намеренно премиальная. Объект относится к категории **ДОРОГИЕ ВЕЩИ БЕЗ СМЫСЛА** и не должен ценой конкурировать с обычным сувенирным мерчем.
-
-## Плановая верхняя себестоимость
-
-`production_cost_ceiling_eur: 95`
-
-В эту границу для финансового планирования следует пытаться включать:
-
-- материал;
-- резку/фрезеровку;
-- обработку поверхности;
-- гравировку;
-- индивидуальную нумерацию;
-- упаковку;
-- доставку от производителя;
-- резерв на прототип и брак.
-
-Если реальная малая серия выходит дороже, сначала пересматривается розничная цена или размер серии, а не автоматически удешевляется материал.
-
-## Валюты
-
-Источник правды: `EUR 220`.
-
-На сайте должна быть возможность смены валюты. Все отображаемые цены в PLN/USD/GBP и других валютах рассчитываются из `EUR 220` по актуальному курсу и не записываются как канонические цены товара.
-
-## Упаковка
-
-Жёсткая минималистичная коробка без декоративной роскоши ради роскоши.
-
-Внутренняя карточка:
+Card copy:
 
 `OBJECT 001`
 
@@ -106,17 +85,40 @@
 
 `рекомендации по применению: не требуются`
 
-## Требования к визуальной подаче
+Exact box supplier, construction and insert material remain `MISSING / RFQ REQUIRED`.
 
-Предмет должен фотографироваться как самостоятельный дизайнерский объект: масса, материал, фактура, следы обработки и масштаб должны читаться физически.
+## Pricing / economics
 
-Не подавать его как:
+- `base_price_eur`: `520`
+- `price_role`: `NUMBERED COLLECTIBLE OBJECT`
+- `working_direct_cash_eur`: `133.63`
+- `working_full_one_unit_cost_eur`: `177.78`
+- `production_cost_ceiling_eur`: `220`
+- `customer_shipping`: `separate by default`
+- `cost_status`: `WORKING MODEL / NOT FINAL RFQ`
 
-- сувенир;
-- корпоративный подарок;
-- «прикольный пресс-папье»;
-- дешёвую мотивационную вещь;
-- предмет с большим рекламным логотипом.
+The working full one-unit cost includes the current one-off route: brass + CNC geometry + engraving + finish/patina + box reserve + reject reserve + procurement/coordination + one isolated pickup run + QC/packing + one dispatch run. VAT, payment processing and customer carrier are accounted outside product COGS in the economics model.
+
+The previous EUR 220 retail price and EUR 95 cost ceiling are superseded inside this working merch-pricing branch by the current economics decision: EUR 520 retail and EUR 220 production ceiling.
+
+## Website assets
+
+Drive source folder contains approved working visual set including:
+- hero 3/4;
+- front;
+- top;
+- side;
+- back;
+- macro front/back;
+- scale-hand;
+- lifestyle desk;
+- packaging.
+
+Existing website object route/assets must not be changed from this branch until explicit approval to merge.
+
+## Related project
+
+`DEMENTOR CLUB / OBJECTS`
 
 ## Approved phrases
 
@@ -126,10 +128,18 @@
 - `назначение: отсутствует`
 - `рекомендации по применению: не требуются`
 
-## Website assets
+## Prohibited presentation
 
-Пока не утверждены.
+Do not present as souvenir, corporate gift, funny paperweight, cheap motivational item or gold-coloured decorative object.
 
-## Social assets
+## Missing / next decisions
 
-Пока не утверждены.
+- brass alloy / supplier confirmation;
+- one-off CNC RFQ;
+- engraving RFQ;
+- finish/patina sample approval;
+- exact premium rigid-box supplier/spec;
+- insert material and protective specification;
+- final actual one-unit cost;
+- shipping weight after final packaging;
+- Poland/EU sales tax implementation in checkout.
