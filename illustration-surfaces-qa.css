@@ -42,7 +42,11 @@
   margin:0 auto;
   width:min(100%,1600px);
   min-height:clamp(420px,58vw,900px);
-  background:var(--dc-ink-bg-community-people) url('/assets/ink/home-community-01.webp') center/contain no-repeat;
+  background-color:var(--dc-ink-bg-community-people);
+  background-image:url('/assets/ink/home-community-01.webp'),url('/assets/ink/community-flow-01.webp');
+  background-repeat:no-repeat,no-repeat;
+  background-size:contain,contain;
+  background-position:center,center;
   display:flex;
   align-items:center;
   justify-content:center;
@@ -57,6 +61,7 @@
   min-height:inherit;
   object-position:center;
   opacity:0;
+  pointer-events:none;
 }
 .dc-home .dc-home-community__caption{
   position:absolute;
