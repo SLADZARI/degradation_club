@@ -2,12 +2,7 @@
   "cleanUrls": true,
   "trailingSlash": true,
   "git": {
-    "deploymentEnabled": {
-      "dementor-club-site": true,
-      "main": false,
-      "dementor-club": false,
-      "logic-awareness": false
-    }
+    "deploymentEnabled": false
   },
   "headers": [
     {
