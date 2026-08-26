@@ -6,7 +6,6 @@
   --dc-home-max:1600px;
   --dc-home-gap:16px;
   --dc-home-outer:clamp(18px,2vw,32px);
-  --dc-home-hero-media-width:min(58vw,920px);
   --dc-home-row-accent:var(--dc-acid,#d8ff3e);
 }
 
@@ -46,19 +45,9 @@
 .dc-home .dc-actions{display:flex;flex-wrap:wrap;gap:8px}
 .dc-home .dc-action{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:0 16px;border:1px solid var(--dc-ink,#111);font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
 .dc-home .dc-action--primary{background:var(--dc-acid,#d8ff3e);border-color:var(--dc-acid,#d8ff3e)}
-.dc-home .dc-hero::after{
-  content:"";
-  position:absolute;
-  z-index:1;
-  top:68px;
-  right:0;
-  bottom:26px;
-  width:var(--dc-home-hero-media-width);
-  pointer-events:none;
-  background:url('/assets/home-interruption-03.webp') no-repeat right center;
-  background-size:contain;
-}
-/* Legacy standalone copy of the same image is intentionally retired. */
+.dc-home .dc-hero__media{grid-column:7/13;grid-row:2/4;align-self:stretch;justify-self:stretch;margin:30px 0 0;min-width:0;min-height:0;display:flex;align-items:center;justify-content:flex-end;overflow:hidden;position:relative;z-index:2}
+.dc-home .dc-hero__media img{display:block;width:100%;height:100%;max-width:none;object-fit:contain;object-position:right center;mix-blend-mode:multiply}
+/* Backward-compatible safety: old detached Home Ink slot must never render if cached HTML contains it. */
 .dc-home .dc-ink-slot--home{display:none!important}
 
 .dc-home .dc-notice{overflow:hidden;border-top:1px solid rgba(255,255,255,.18);border-bottom:1px solid rgba(255,255,255,.18);background:var(--dc-ink,#111);color:var(--dc-paper,#f2f0e8)}
@@ -83,7 +72,7 @@
   bottom:-1px!important;
   left:50%!important;
   width:100vw!important;
-  inset-inline:auto!important;
+  right:auto!important;
   background:transparent!important;
   transform:translateX(-50%)!important;
   transition:background .18s ease!important;
@@ -104,11 +93,11 @@
 .dc-home footer{max-width:none;border-top:0}.dc-home .dc-footer{display:grid;grid-template-columns:repeat(12,1fr);gap:var(--dc-home-gap);padding:28px var(--dc-home-outer);align-items:end}.dc-home .dc-footer .brand{grid-column:1/4}.dc-home .dc-footer__line{grid-column:5/10;font-size:13px}.dc-home .dc-footer__version{grid-column:11/13;text-align:right;font-size:11px;opacity:.5}
 
 @media(max-width:1024px){
-  :root{--dc-home-hero-media-width:min(56vw,700px)}
   .dc-home .dc-grid{grid-template-columns:repeat(8,minmax(0,1fr))}
   .dc-home .dc-hero{min-height:760px;grid-template-rows:auto 1fr auto}
   .dc-home .dc-hero__meta{grid-column:1/9}.dc-home .dc-hero__title{grid-column:1/6;max-width:7.2ch}.dc-home .dc-hero__bottom{grid-column:1/5}
-  .dc-home .dc-hero::after{top:82px;bottom:28px}
+  .dc-home .dc-hero__media{grid-column:5/9;grid-row:2/4;margin-top:34px}
+  .dc-home .dc-hero__media img{object-position:right center}
   .dc-home .dc-statement__head,.dc-home .dc-statement__foot,.dc-home .dc-event__top,.dc-home .dc-event__body,.dc-home .dc-index__head,.dc-home .dc-project__grid,.dc-home .dc-spheres__intro,.dc-home .dc-join__top,.dc-home .dc-join__bottom{grid-template-columns:repeat(8,1fr)}
   .dc-home .dc-statement__head .dc-kicker{grid-column:1/3}.dc-home .dc-statement__head .dc-display-l{grid-column:2/9;margin-top:24px}.dc-home .dc-statement__foot p{grid-column:5/9}
   .dc-home .dc-event__label{grid-column:1/3}.dc-home .dc-event__title{grid-column:1/7;margin-top:22px}.dc-home .dc-event__status{grid-column:7/9}.dc-home .dc-event__desc{grid-column:1/6}.dc-home .dc-event__meta{grid-column:6/9}.dc-home .dc-event__action{grid-column:1/9;justify-self:start;margin-top:22px}
@@ -124,7 +113,8 @@
   .dc-home .topbar{min-height:58px}.dc-home .dc-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.dc-home .dc-section{padding-top:70px;padding-bottom:70px}
   .dc-home .dc-hero{min-height:0;display:grid;grid-template-rows:auto auto auto auto;padding-top:20px;padding-bottom:0;overflow:hidden}
   .dc-home .dc-hero__meta{grid-column:1/5;grid-row:1;font-size:10px}.dc-home .dc-hero__title{grid-column:1/5;grid-row:2;max-width:none;margin-top:44px}.dc-home .dc-hero__bottom{grid-column:1/5;grid-row:3;max-width:none;padding-top:48px;padding-bottom:28px}
-  .dc-home .dc-hero::after{position:relative;display:block;grid-column:1/5;grid-row:4;top:auto;right:auto;bottom:auto;width:100%;height:min(112vw,520px);margin-top:8px;background-position:right bottom;background-size:contain}
+  .dc-home .dc-hero__media{grid-column:1/5;grid-row:4;margin:8px 0 0;width:100%;height:min(112vw,520px);display:flex;align-items:flex-end;justify-content:flex-end}
+  .dc-home .dc-hero__media img{width:100%;height:100%;object-fit:contain;object-position:right bottom}
   .dc-home .dc-actions{flex-direction:column;align-items:stretch}.dc-home .dc-action{width:100%}
   .dc-home .dc-statement .dc-shell{min-height:auto}.dc-home .dc-statement__head,.dc-home .dc-statement__foot,.dc-home .dc-event__top,.dc-home .dc-event__body,.dc-home .dc-index__head,.dc-home .dc-project__grid,.dc-home .dc-spheres__intro,.dc-home .dc-join__top,.dc-home .dc-join__bottom{grid-template-columns:repeat(4,1fr)}
   .dc-home .dc-statement__head .dc-kicker,.dc-home .dc-statement__head .dc-display-l,.dc-home .dc-statement__foot p{grid-column:1/5}.dc-home .dc-statement__foot{margin-top:80px}
