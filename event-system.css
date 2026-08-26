@@ -35,6 +35,7 @@
 .dc-fuengirola-page .dc-entity-hero__bottom{padding-right:min(22vw,320px)}
 .dc-fuengirola-page .dc-kicker{overflow-wrap:anywhere}
 .dc-fuengirola-page .dc-event-detail__intro>.dc-pullquote{grid-column:1/13;width:100%;max-width:13ch}
+.dc-fuengirola-page .dc-media-break img,.dc-fuengirola-page .dc-ink-slot--event img{object-position:right top!important}
 
 @media(max-width:800px){
   .dc-programme__lane{grid-template-columns:1fr}
