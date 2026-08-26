@@ -18,6 +18,7 @@
   const prompt=document.createElement('div');prompt.className='dc-support-prompt';prompt.setAttribute('aria-live','polite');document.body.appendChild(prompt);
   let amount=25;
   const syncAmount=()=>modal.querySelectorAll('[data-support-amount]').forEach(el=>el.textContent=`€${amount}`);
+  const suppress=()=>{state.suppressed=true;prompt.classList.remove('is-open');save()};
   const openModal=()=>{prompt.classList.remove('is-open');modal.classList.add('is-open');modal.setAttribute('aria-hidden','false');document.body.style.overflow='hidden'};
   const closeModal=()=>{modal.classList.remove('is-open');modal.setAttribute('aria-hidden','true');document.body.style.overflow=''};
   modal.querySelector('.dc-support-close').addEventListener('click',closeModal);
@@ -26,15 +27,16 @@
   modal.querySelectorAll('.dc-support-amounts button').forEach(btn=>btn.addEventListener('click',()=>{modal.querySelectorAll('.dc-support-amounts button').forEach(x=>x.classList.remove('is-active'));btn.classList.add('is-active');amount=Number(btn.textContent.replace('€',''));modal.querySelector('.dc-support-custom input').value='';syncAmount()}));
   modal.querySelector('.dc-support-custom input').addEventListener('input',e=>{const v=Number(e.target.value);if(v>0){amount=v;modal.querySelectorAll('.dc-support-amounts button').forEach(x=>x.classList.remove('is-active'));syncAmount()}});
   modal.querySelector('.dc-support-primary').addEventListener('click',()=>modal.querySelector('.dc-support-channels').classList.toggle('is-open'));
-  modal.querySelectorAll('[data-support-channel]').forEach(btn=>btn.addEventListener('click',()=>{const key=btn.dataset.supportChannel;modal.querySelectorAll('[data-support-detail]').forEach(x=>x.classList.toggle('is-open',x.dataset.supportDetail===key));if(key==='blik'){state.suppressed=true;save()}}));
+  modal.querySelectorAll('[data-support-channel]').forEach(btn=>btn.addEventListener('click',()=>{const key=btn.dataset.supportChannel;modal.querySelectorAll('[data-support-detail]').forEach(x=>x.classList.toggle('is-open',x.dataset.supportDetail===key));if(key==='blik')suppress()}));
 
   const footer=document.querySelector('.dc-footer, footer');
   if(footer&&!footer.querySelector('.dc-support-footer-slot')){const slot=document.createElement('div');slot.className='dc-support-footer-slot';slot.innerHTML='<button type="button" class="dc-support-link">SUPPORT / ПОДДЕРЖАТЬ ДЕГРАДАЦИЮ</button>';footer.appendChild(slot);slot.querySelector('button').addEventListener('click',openModal)}
 
   const makeFirst=()=>{prompt.innerHTML='<div class="dc-support-prompt__mini"><strong>ПОДДЕРЖАТЬ ДЕГРАДАЦИЮ →</strong><div><button type="button" data-go>SUPPORT</button> <button type="button" class="dc-support-prompt__dismiss" data-dismiss>×</button></div></div>';prompt.classList.add('is-open');prompt.querySelector('[data-go]').addEventListener('click',openModal);prompt.querySelector('[data-dismiss]').addEventListener('click',()=>prompt.classList.remove('is-open'))};
-  const makeSecond=()=>{prompt.innerHTML='<div class="dc-support-prompt__strong"><div class="dc-support-kicker">SUPPORT / 04:00</div><h3>ВЫ УЖЕ 4 МИНУТЫ ЗДЕСЬ.<br>МОЖНО ПОДДЕРЖАТЬ ДЕГРАДАЦИЮ.</h3><div class="dc-support-prompt__actions"><button type="button" data-go>ПОДДЕРЖАТЬ</button><button type="button" class="is-no" data-no>НЕ НАДО</button></div></div>';prompt.classList.add('is-open');prompt.querySelector('[data-go]').addEventListener('click',openModal);prompt.querySelector('[data-no]').addEventListener('click',()=>{prompt.classList.remove('is-open');state.suppressed=true;save()})};
+  const makeSecond=()=>{prompt.innerHTML='<div class="dc-support-prompt__strong"><div class="dc-support-kicker">SUPPORT / 04:00</div><h3>ВЫ УЖЕ 4 МИНУТЫ ЗДЕСЬ.<br>МОЖНО ПОДДЕРЖАТЬ ДЕГРАДАЦИЮ.</h3><div class="dc-support-prompt__actions"><button type="button" data-go>ПОДДЕРЖАТЬ</button><button type="button" class="is-no" data-no>НЕ НАДО</button></div></div>';prompt.classList.add('is-open');prompt.querySelector('[data-go]').addEventListener('click',openModal);prompt.querySelector('[data-no]').addEventListener('click',suppress)};
 
-  document.addEventListener('click',e=>{if(e.target.closest('[data-dc-preorder-open],.dc-merch-cta--primary,.object-preorder,.dc-order-submit')){state.suppressed=true;prompt.classList.remove('is-open');save()}});
+  document.addEventListener('click',e=>{if(e.target.closest('[data-dc-preorder-open],.dc-merch-cta--primary,.dc-commerce-action--primary,.object-preorder,.dc-order-submit,[data-open-preorder],[data-object-preorder]'))suppress()});
+  document.addEventListener('dc:preorder-open',suppress);
 
   setInterval(()=>{if(state.suppressed)return;if(document.visibilityState==='visible'&&document.hasFocus()){state.active+=1;if(!state.first&&state.active>=60){state.first=true;makeFirst()}if(!state.second&&state.active>=240){state.second=true;makeSecond()}save()}},1000);
   syncAmount();
