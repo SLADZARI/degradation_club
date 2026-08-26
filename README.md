@@ -17,17 +17,19 @@
 ## Обязательная дизайн-документация
 
 - `docs/DESIGN_PRESENTATION_GUIDE.md` — официальный guide по архитектуре, типографике, композиции, motion, Dementor Ink, mobile и правилам применения референсов.
+- `docs/ENTITY_PRESENTATION_STANDARD_v1.md` — обязательный presentation contract для Dementor / Event / Course / Project / Merch / Quote / Test / Service states; визуальный эталон — `/design-system/`.
 - `docs/COMPONENT_SYSTEM_v1.md` — рабочая component/page system.
 - `docs/GLOBAL_HEADER_v1.md` — единый header, desktop navigation, mobile burger и правила локальных product bars.
 - `docs/MOTION_NAV_SEO_IMPLEMENTATION_v1.md` — navigation, motion и metadata baseline.
 - `docs/PRODUCTION_QA_v1.md` — production gate и responsive QA.
+- `docs/SITE_HARMONIZATION_AUDIT_2026-08-26.md` — карта применения presentation standard по существующим страницам.
 - `docs/deployment.md` — deployment contract.
 - `docs/PUBLISHING_PLAYBOOK_v1.md` — процедура публикации сущностей.
 - `docs/OPERATIONS_RUNBOOK_v1.md` — operational runbook.
 - `docs/FEATURE_ACTIVATION_MATRIX_v1.md` — READY vs LIVE для внешних функций.
 - `references/REFERENCE_RESPONSIBILITIES.md` — карта ответственности Public Records / Actual Source / 032c / Mouthwash / DIA / Dementor Ink.
 
-Эти документы являются обязательным source-of-truth для новых страниц и редизайна существующих экранов.
+Эти документы являются обязательным source-of-truth для новых страниц и редизайна существующих экранов. Новая сущность не получает новый случайный дизайн: сначала определяется `entity_type`, `presentation_role`, `context` и responsive contract, затем используются общие primitives.
 
 ## Asset rules
 
@@ -52,16 +54,23 @@
 - `/events/fuengirola/`
 - `/projects/`
 - `/projects/logic-awareness/`
+- `/projects/logic-awareness/dossiers/`
+- `/projects/logic-awareness/dossiers/logic/`
+- `/projects/logic-awareness/dossiers/awareness/`
 - `/community/`
 - `/community/valentin/`
 - `/community/nikita/`
 - `/community/evgeniy/`
 - `/community/gabil/`
 - `/merch/`
+- `/objects/001-ne-nado/`
 - `/catalog/`
 - `/archive/`
 - `/join/`
 - `/courses/dumai-s-opasnostyu/`
+- `/courses/ne-komanda/`
+- `/courses/dengi-na-veter/`
+- `/courses/slaboumie-i-otvaga/`
 
 Служебные страницы:
 
@@ -70,6 +79,10 @@
 - `/legal/privacy/`
 - `/legal/terms/`
 - `404.html`
+
+Internal reference:
+
+- `/design-system/` — noindex UI Lab / visual standard; не добавляется в публичную навигацию.
 
 `content/registry.json` — единый implementation registry публичных сущностей. Records обязаны соответствовать `content/ENTITY_CONTRACT.md`.
 
