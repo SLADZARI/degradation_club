@@ -41,7 +41,8 @@
 .dc-home .dc-home-community__media{
   margin:0 auto;
   width:min(100%,1600px);
-  min-height:clamp(420px,58vw,900px);
+  aspect-ratio:2115/1402;
+  min-height:0;
   background:var(--dc-ink-bg-community-people);
   display:flex;
   align-items:center;
@@ -53,8 +54,7 @@
 }
 .dc-home .dc-home-community__media img{
   width:100%;
-  height:auto;
-  max-height:900px;
+  height:100%;
   object-fit:contain;
   object-position:center;
   opacity:1;
@@ -102,15 +102,7 @@
 .dc-fuengirola-page .dc-event-dementor-portrait{background:#EFE6D3}
 .dc-fuengirola-page .dc-event-dementor-portrait img{width:100%;height:auto;object-fit:contain!important;background:#EFE6D3}
 
-/* Safety only for stale cached/event markup. Current canonical HTML uses dementor_gabil.webp. */
-.dc-fuengirola-page img[src$='/gabil/portrait-ink.webp']{
-  content:url('/assets/people/dementors/gabil/dementor_gabil.webp');
-  background:#EFE6D3;
-}
-
 @media(max-width:700px){
-  .dc-home .dc-home-community__media{min-height:clamp(360px,78vw,620px)}
-  .dc-home .dc-home-community__media img{max-height:620px}
   .dc-home .dc-home-community__caption{position:absolute;left:16px;right:auto;bottom:16px;width:auto}
 }
 
