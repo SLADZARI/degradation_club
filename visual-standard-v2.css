@@ -51,13 +51,30 @@ img[src*="/people/dementors/evgeniy/portrait-ink"]{background:var(--dc-dementor-
 .dc-dementor-feature__copy{padding:clamp(28px,5vw,72px);display:flex;flex-direction:column;justify-content:space-between;gap:48px}
 .dc-dementor-feature__portrait{min-height:100%;overflow:hidden}.dc-dementor-feature__portrait img{display:block;width:100%;height:100%}
 
+/* HOME / COURSE FEATURE — existing content, approved Valentin portrait identity. */
+.dc-home section.dc-event:has(a[href="/courses/dumai-s-opasnostyu/"]){position:relative!important;overflow:hidden!important;min-height:clamp(620px,72vh,820px)!important;isolation:isolate}
+.dc-home section.dc-event:has(a[href="/courses/dumai-s-opasnostyu/"])::after{content:"";position:absolute;z-index:0;inset:0 0 0 auto;width:42%;background-color:var(--dc-dementor-valentin-bg);background-image:url('/assets/people/dementors/valentin/portrait-ink.webp');background-repeat:no-repeat;background-size:contain;background-position:center bottom;mix-blend-mode:multiply;pointer-events:none}
+.dc-home section.dc-event:has(a[href="/courses/dumai-s-opasnostyu/"])>.dc-shell{position:relative;z-index:2;padding-right:44%!important}
+.dc-home section.dc-event:has(a[href="/courses/dumai-s-opasnostyu/"]) .dc-event__title{grid-column:3/13!important}
+.dc-home section.dc-event:has(a[href="/courses/dumai-s-opasnostyu/"]) .dc-event__desc{grid-column:3/9!important}
+.dc-home section.dc-event:has(a[href="/courses/dumai-s-opasnostyu/"]) .dc-event__meta{grid-column:3/9!important}
+.dc-home section.dc-event:has(a[href="/courses/dumai-s-opasnostyu/"]) .dc-event__action{grid-column:3/7!important;justify-self:start!important}
+
+/* HOME / EVENT FEATURE — same Fuengirola asset and same top-right / height-first rule as detail hero. */
+.dc-home section.dc-event:has(a[href="/events/fuengirola/"]){position:relative!important;overflow:hidden!important;min-height:clamp(600px,70vh,800px)!important;isolation:isolate}
+.dc-home section.dc-event:has(a[href="/events/fuengirola/"])::after{content:"";position:absolute;z-index:0;inset:0 0 0 auto;width:54%;background-image:url('/assets/event-fuengirola-03.webp');background-repeat:no-repeat;background-size:auto 100%;background-position:right top;pointer-events:none}
+.dc-home section.dc-event:has(a[href="/events/fuengirola/"])>.dc-shell{position:relative;z-index:2;padding-right:46%!important}
+.dc-home section.dc-event:has(a[href="/events/fuengirola/"]) .dc-event__title{grid-column:3/13!important}
+.dc-home section.dc-event:has(a[href="/events/fuengirola/"]) .dc-event__desc{grid-column:3/9!important}
+.dc-home section.dc-event:has(a[href="/events/fuengirola/"]) .dc-event__meta{grid-column:3/9!important}
+.dc-home section.dc-event:has(a[href="/events/fuengirola/"]) .dc-event__action{grid-column:3/7!important;justify-self:start!important}
+
 /* EVENT HERO — reuse the existing approved image. Anchor TOP RIGHT; scale by height; crop, never redesign per breakpoint. */
 body.dc-fuengirola-page .dc-entity-hero{position:relative!important;overflow:hidden!important;min-height:clamp(660px,78vh,920px)!important;isolation:isolate}
 body.dc-fuengirola-page .dc-entity-hero::after{content:"";position:absolute;z-index:0;top:0;right:0;bottom:0;width:min(78vw,1180px);height:100%;pointer-events:none;background:url('/assets/event-fuengirola-03.webp') no-repeat var(--dc-event-media-position);background-size:auto 100%}
 body.dc-fuengirola-page .dc-entity-hero__meta,body.dc-fuengirola-page .dc-entity-hero__title,body.dc-fuengirola-page .dc-entity-hero__bottom{position:relative;z-index:2}
 body.dc-fuengirola-page .dc-entity-hero__title{max-width:76%}
 body.dc-fuengirola-page .dc-entity-hero__bottom{padding-right:34%}
-/* The former separate full-width image remains in markup for semantics/OG parity, but visual presentation is owned by the hero. */
 body.dc-fuengirola-page .dc-ink-slot--event.dc-media-break{display:none!important}
 
 /* Any remaining event media uses the same upper-right crop rule. */
@@ -73,6 +90,10 @@ body.dc-fuengirola-page .dc-event-lock__grid img[src*="/people/dementors/gabil/p
   .dc-dementor-hero__copy{grid-column:1/6!important;z-index:2;align-self:end;padding-bottom:34px}
   .dc-dementor-hero__portrait{grid-column:4/9!important;min-height:700px!important;z-index:1}
   .dc-dementor-feature{grid-template-columns:minmax(0,4fr) minmax(260px,4fr)}
+  .dc-home section.dc-event:has(a[href="/courses/dumai-s-opasnostyu/"])::after{width:48%}
+  .dc-home section.dc-event:has(a[href="/courses/dumai-s-opasnostyu/"])>.dc-shell{padding-right:38%!important}
+  .dc-home section.dc-event:has(a[href="/events/fuengirola/"])::after{width:62%}
+  .dc-home section.dc-event:has(a[href="/events/fuengirola/"])>.dc-shell{padding-right:38%!important}
   body.dc-fuengirola-page .dc-entity-hero::after{width:86vw;background-position:right top}
   body.dc-fuengirola-page .dc-entity-hero__title{max-width:70%}
   body.dc-fuengirola-page .dc-entity-hero__bottom{padding-right:30%}
@@ -85,6 +106,14 @@ body.dc-fuengirola-page .dc-event-lock__grid img[src*="/people/dementors/gabil/p
   .dc-dementor-hero__portrait img{position:relative!important;height:100%!important;min-height:0!important}
   .dc-dementor-relation{grid-template-columns:1fr!important}.dc-dementor-relation__portrait{width:min(78vw,340px)}
   .dc-dementor-feature{grid-template-columns:1fr}.dc-dementor-feature__portrait{min-height:0;aspect-ratio:4/5}.dc-dementor-feature__copy{order:1}.dc-dementor-feature__portrait{order:2}
+
+  .dc-home section.dc-event:has(a[href="/courses/dumai-s-opasnostyu/"]),.dc-home section.dc-event:has(a[href="/events/fuengirola/"]){min-height:0!important;padding-bottom:min(108vw,520px)!important}
+  .dc-home section.dc-event:has(a[href="/courses/dumai-s-opasnostyu/"])>.dc-shell,.dc-home section.dc-event:has(a[href="/events/fuengirola/"])>.dc-shell{padding-right:clamp(18px,2vw,32px)!important}
+  .dc-home section.dc-event:has(a[href="/courses/dumai-s-opasnostyu/"])::after,.dc-home section.dc-event:has(a[href="/events/fuengirola/"])::after{inset:auto 0 0 0;width:100%;height:min(108vw,520px)}
+  .dc-home section.dc-event:has(a[href="/courses/dumai-s-opasnostyu/"])::after{background-size:contain;background-position:center bottom}
+  .dc-home section.dc-event:has(a[href="/events/fuengirola/"])::after{background-size:auto 100%;background-position:right top}
+  .dc-home section.dc-event:has(a[href="/courses/dumai-s-opasnostyu/"]) .dc-event__title,.dc-home section.dc-event:has(a[href="/events/fuengirola/"]) .dc-event__title,.dc-home section.dc-event:has(a[href="/courses/dumai-s-opasnostyu/"]) .dc-event__desc,.dc-home section.dc-event:has(a[href="/events/fuengirola/"]) .dc-event__desc,.dc-home section.dc-event:has(a[href="/courses/dumai-s-opasnostyu/"]) .dc-event__meta,.dc-home section.dc-event:has(a[href="/events/fuengirola/"]) .dc-event__meta,.dc-home section.dc-event:has(a[href="/courses/dumai-s-opasnostyu/"]) .dc-event__action,.dc-home section.dc-event:has(a[href="/events/fuengirola/"]) .dc-event__action{grid-column:1/5!important}
+
   body.dc-fuengirola-page .dc-entity-hero{min-height:760px!important;padding-bottom:28px!important}
   body.dc-fuengirola-page .dc-entity-hero::after{top:auto;bottom:0;width:100%;height:56%;background-size:auto 100%;background-position:right top}
   body.dc-fuengirola-page .dc-entity-hero__title{max-width:100%!important}

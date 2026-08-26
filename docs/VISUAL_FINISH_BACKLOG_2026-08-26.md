@@ -12,9 +12,14 @@ Status date: 2026-08-26
 - [x] Existing Fuengirola image reused in Event HERO; top-right anchor; height-first crop.
 - [x] Existing Fuengirola Dementor section normalized to Relation presentation with Gabil personal background.
 - [x] Global production import activated via `styles.css`.
+- [x] Legacy duplicate visual import removed from course bridge.
+- [x] Home course uses the approved Valentin MICRO pattern.
+- [x] Home course converted to real Dementor FEATURE using the existing Valentin portrait.
+- [x] Home Fuengirola converted to Event FEATURE using the existing event asset and top-right crop rule.
+- [x] Active Home / Events / Courses / Community structure compared against FEATURE / Event / Relation / Micro contracts; remaining judgment is visual screenshot QA, not missing component architecture.
+- [x] Visual contract added to Site Integrity CI: tokens, portraits, hero roles, Feature bindings and Event media rules are regression-gated.
 - [ ] Visual screenshot QA: 1440 / 1024 / 768 / 390 / 320 on actual deployed build.
-- [ ] Verify every current portrait occurrence uses one of the approved presentation roles; remove remaining one-off inline portrait styling when found.
-- [ ] Compare active Home / Events / Courses / Community fragments against Drive FEATURE / Event / relation / Micro specimens and correct any remaining spacing/type deviations.
+- [ ] Verify every remaining one-off portrait occurrence outside Community/Home/Fuengirola uses one of the approved presentation roles; remove inline portrait styling when found.
 
 ## P2 — CONTENT / ENTITY CONSISTENCY
 
