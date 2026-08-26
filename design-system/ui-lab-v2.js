@@ -1,6 +1,8 @@
 (()=>{
   const runtime=document.createElement('style');
   runtime.textContent=`
+    .lab-viewport-set--row{grid-template-columns:1fr!important}
+    .lab-viewport-set--row .lab-frame--tablet{display:block!important}
     .lab-live-preview{position:fixed;z-index:120;right:clamp(20px,4vw,64px);top:50%;width:min(430px,38vw);display:grid;grid-template-columns:160px 1fr;background:#f2f0e8;color:#111;border:1px solid #111;box-shadow:10px 10px 0 #d8ff3e;opacity:0;pointer-events:none;transform:translateY(-50%) scale(.96);transition:opacity .16s ease,transform .22s ease}
     .lab-live-preview.is-open{opacity:1;transform:translateY(-50%) scale(1)}
     .lab-live-preview.is-text-only{grid-template-columns:1fr;width:min(390px,34vw)}
@@ -17,6 +19,20 @@
     @media(prefers-reduced-motion:reduce){.lab-live-preview{transition:none}}
   `;
   document.head.appendChild(runtime);
+
+  /* Every responsive specimen is approved as a trio: WEB / TABLET 768 / MOBILE 390. */
+  document.querySelectorAll('.lab-viewport-set--row').forEach(set=>{
+    if(set.querySelector('.lab-frame--tablet'))return;
+    const web=set.querySelector('.lab-frame--web');
+    const mobileFrame=set.querySelector('.lab-frame--mobile');
+    if(!web||!mobileFrame)return;
+    const tablet=web.cloneNode(true);
+    tablet.classList.remove('lab-frame--web');
+    tablet.classList.add('lab-frame--tablet');
+    const bar=tablet.querySelector('.lab-frame__bar span:first-child');
+    if(bar)bar.textContent='TABLET / 768';
+    set.insertBefore(tablet,mobileFrame);
+  });
 
   const filters=[...document.querySelectorAll('.lab-filter[data-filter]')];
   const rows=[...document.querySelectorAll('#entityRegister .lab-register-row[data-kind]')];
