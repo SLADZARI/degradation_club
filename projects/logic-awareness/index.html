@@ -18,6 +18,9 @@
   <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="/projects-v1.css">
   <link rel="stylesheet" href="/ui-v2.css">
+  <style>
+    .dc-dossier-preview{background:#e7ddc7;color:#171714}.dc-dossier-preview__head{display:grid;grid-template-columns:.55fr 1.45fr;gap:40px;align-items:end;margin-bottom:38px}.dc-dossier-preview__head h2{margin:0}.dc-dossier-preview__grid{display:grid;grid-template-columns:1fr 1fr;border:2px solid #171714}.dc-dossier-teaser{display:grid;grid-template-columns:minmax(150px,.75fr) 1.25fr;color:inherit;text-decoration:none;min-height:430px}.dc-dossier-teaser+.dc-dossier-teaser{border-left:2px solid #171714}.dc-dossier-teaser figure{margin:0;background:#d8cbb2}.dc-dossier-teaser img{width:100%;height:100%;object-fit:cover;filter:grayscale(1) sepia(.18) contrast(.95)}.dc-dossier-teaser__copy{padding:28px;display:flex;flex-direction:column;justify-content:space-between}.dc-dossier-teaser h3{font-size:clamp(2rem,3.4vw,4rem);line-height:.9;margin:12px 0 16px;letter-spacing:-.045em}.dc-dossier-teaser p{line-height:1.45}.dc-dossier-teaser__status{display:block;padding-top:18px;border-top:1px solid #171714;text-transform:uppercase;font-size:.72rem;letter-spacing:.08em}.dc-dossier-preview__action{display:flex;justify-content:flex-end;margin-top:26px}@media(max-width:860px){.dc-dossier-preview__head,.dc-dossier-preview__grid{grid-template-columns:1fr}.dc-dossier-teaser+.dc-dossier-teaser{border-left:0;border-top:2px solid #171714}}@media(max-width:560px){.dc-dossier-teaser{grid-template-columns:1fr}.dc-dossier-teaser figure{min-height:420px}}
+  </style>
 </head>
 <body class="dc-entity-page dc-logic-page">
 <header class="topbar">
@@ -66,6 +69,23 @@
         <div class="dc-chain-row"><span class="dc-meta">04</span><strong>ИЗМЕНЕНИЕ МНЕНИЯ</strong><p class="dc-body">Критическая стадия. Новые данные начинают влиять на решение.</p></div>
         <div class="dc-chain-row"><span class="dc-meta">05</span><strong>ОСОЗНАННОСТЬ</strong><p class="dc-body">Осложнение, при котором вопросы начинают задаваться ещё и себе.</p></div>
       </div>
+    </div>
+  </section>
+
+  <section class="dc-section dc-dossier-preview">
+    <div class="dc-shell">
+      <div class="dc-dossier-preview__head"><div><p class="dc-kicker">ЛИЧНЫЕ ДЕЛА / ПОД НАБЛЮДЕНИЕМ</p></div><h2 class="dc-display-l">ГЛАВНЫЕ ФИГУРАНТЫ<br>ПРОЕКТА</h2></div>
+      <div class="dc-dossier-preview__grid">
+        <a class="dc-dossier-teaser" href="/projects/logic-awareness/dossiers/#logic">
+          <figure><img src="https://lh3.googleusercontent.com/d/1nJ0lBJKn8nuPIqvosQ30nipiaAQjVDvd=w1200" alt="Логика Львовна Последовательная" loading="lazy" decoding="async"></figure>
+          <div class="dc-dossier-teaser__copy"><div><span class="dc-meta">ДЕЛО № Л-017</span><h3>ЛОГИКА<br>ЛЬВОВНА</h3><p>Систематически устанавливает причинно-следственные связи без производственной необходимости. Требует источники. Сравнивает версии. Может признать ошибку.</p></div><span class="dc-dossier-teaser__status">Интеллектуально неблагонадёжная · открыть дело →</span></div>
+        </a>
+        <a class="dc-dossier-teaser" href="/projects/logic-awareness/dossiers/#awareness">
+          <figure><img src="https://lh3.googleusercontent.com/d/14z3j0WZjnSfqIzE0fkaE_5CMkJisfe5C=w1200" alt="Осознанность Петрович Наблюдательный" loading="lazy" decoding="async"></figure>
+          <div class="dc-dossier-teaser__copy"><div><span class="dc-meta">ДЕЛО № О-023</span><h3>ОСОЗНАННОСТЬ<br>ПЕТРОВИЧ</h3><p>Замечен в несанкционированном наблюдении за собственными мыслями, мотивами и реакциями. Перед ответом способен остановиться и подумать.</p></div><span class="dc-dossier-teaser__status">Рефлексивно неблагонадёжный · открыть дело →</span></div>
+        </a>
+      </div>
+      <div class="dc-dossier-preview__action"><a class="dc-action dc-action--acid" href="/projects/logic-awareness/dossiers/">Открыть архив личных дел</a></div>
     </div>
   </section>
 
