@@ -1,0 +1,14 @@
+{
+  "id":"SH-DEM-03",
+  "entityType":"merch",
+  "drop":"DROP-001",
+  "title":"SUCCESS IS BORING.",
+  "status":"asset-present-content-pending",
+  "salesState":"not_open",
+  "publicUrl":"/merch/drop-001/success-is-boring/",
+  "variants":[
+    {"id":"light","label":"LIGHT","image":{"driveId":"14kKDxIk4G3BPYpK3O4DQneAOu1R5QsOS","source":"https://drive.google.com/file/d/14kKDxIk4G3BPYpK3O4DQneAOu1R5QsOS/view"}},
+    {"id":"black","label":"BLACK","image":{"driveId":"1pdZgXrOJFujVZGtC6G5gPjT9tOkyQSJE","source":"https://drive.google.com/file/d/1pdZgXrOJFujVZGtC6G5gPjT9tOkyQSJE/view"}}
+  ],
+  "price":null,"sizes":null,"material":null,"availability":null
+}
