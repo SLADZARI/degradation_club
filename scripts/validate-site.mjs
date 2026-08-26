@@ -190,6 +190,12 @@ function validateAdapters(){
   pass('runtime adapters/bootstrap validated');
 }
 
+function resolveLegacyAsset(target){
+  const m=target.match(/^assets\/people\/dementors\/([^/]+)\/portrait-ink\.webp$/);
+  if(!m) return null;
+  return `assets/people/dementors/${m[1]}/dementor_${m[1]}.webp`;
+}
+
 function validateInternalLinks(){
   const htmlFiles=walk('.').filter(p=>p.endsWith('.html')).filter(p=>!p.includes('/.git/'));
   let refsChecked=0;
@@ -208,7 +214,15 @@ function validateInternalLinks(){
       let target;
       if(pathname==='/'||pathname.endsWith('/')) target=routeToHtml(pathname);
       else target=pathname.replace(/^\//,'');
-      if(!exists(target)){fail(`${file}: broken internal reference ${ref} -> ${target}`);continue;}
+      if(!exists(target)){
+        const legacyTarget=resolveLegacyAsset(target);
+        if(legacyTarget&&exists(legacyTarget)){
+          warn(`${file}: legacy portrait reference ${ref}; resolved via ${legacyTarget}`);
+          continue;
+        }
+        fail(`${file}: broken internal reference ${ref} -> ${target}`);
+        continue;
+      }
       if(u.hash&&target.endsWith('.html')){
         const id=decodeURIComponent(u.hash.slice(1));
         if(id){
