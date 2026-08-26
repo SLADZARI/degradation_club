@@ -1,0 +1,200 @@
+/* Dementor Club — UI Redesign sync v1
+   Source: Google Drive / 03_Dementor Club Official Site / UI Redesign 2026-08
+   Approved rules captured during visual review on 2026-08-26.
+
+   Principles:
+   1. Every Dementor owns a persistent background token used behind their portrait/identity surfaces.
+   2. Event hero media is anchored TOP RIGHT and resized primarily by height; responsive layouts crop instead of inventing a new composition.
+   3. Dementor hero is one composition with explicit WEB / TABLET / MOBILE recomposition.
+   4. Relation / micro / feature reuse the same Dementor identity token. */
+
+:root{
+  --dc-dementor-valentin-bg:#efe5d3;
+  --dc-dementor-nikita-bg:#f6e9d4;
+  --dc-dementor-gabil-bg:#efe6d3;
+  --dc-dementor-evgeniy-bg:#f6edd9;
+  --dc-event-media-position:right top;
+}
+
+/* Future authoring contract: new markup should set data-dementor on the identity surface. */
+[data-dementor="valentin"]{--dc-dementor-bg:var(--dc-dementor-valentin-bg)}
+[data-dementor="nikita"]{--dc-dementor-bg:var(--dc-dementor-nikita-bg)}
+[data-dementor="gabil"]{--dc-dementor-bg:var(--dc-dementor-gabil-bg)}
+[data-dementor="evgeniy"]{--dc-dementor-bg:var(--dc-dementor-evgeniy-bg)}
+
+/* Current markup fallback: infer the token from the approved portrait asset path.
+   This keeps existing content intact while moving the system toward data-dementor. */
+body :has(> img[src*="/people/dementors/valentin/"]),
+body .dc-dementor-card:has(img[src*="/people/dementors/valentin/"]),
+body .lab-dementor-micro:has(img[src*="/people/dementors/valentin/"]),
+body .lab-dementor-inline:has(img[src*="/people/dementors/valentin/"]),
+body .lab-dementor-row:has(img[src*="/people/dementors/valentin/"]),
+body .lab-relation:has(img[src*="/people/dementors/valentin/"]),
+body .lab-dementor-feature:has(img[src*="/people/dementors/valentin/"]),
+body .lab-dementor-hero:has(img[src*="/people/dementors/valentin/"]){--dc-dementor-bg:var(--dc-dementor-valentin-bg)}
+
+body :has(> img[src*="/people/dementors/nikita/"]),
+body .dc-dementor-card:has(img[src*="/people/dementors/nikita/"]),
+body .lab-dementor-micro:has(img[src*="/people/dementors/nikita/"]),
+body .lab-dementor-inline:has(img[src*="/people/dementors/nikita/"]),
+body .lab-dementor-row:has(img[src*="/people/dementors/nikita/"]),
+body .lab-relation:has(img[src*="/people/dementors/nikita/"]),
+body .lab-dementor-feature:has(img[src*="/people/dementors/nikita/"]),
+body .lab-dementor-hero:has(img[src*="/people/dementors/nikita/"]){--dc-dementor-bg:var(--dc-dementor-nikita-bg)}
+
+body :has(> img[src*="/people/dementors/gabil/"]),
+body .dc-dementor-card:has(img[src*="/people/dementors/gabil/"]),
+body .lab-dementor-micro:has(img[src*="/people/dementors/gabil/"]),
+body .lab-dementor-inline:has(img[src*="/people/dementors/gabil/"]),
+body .lab-dementor-row:has(img[src*="/people/dementors/gabil/"]),
+body .lab-relation:has(img[src*="/people/dementors/gabil/"]),
+body .lab-dementor-feature:has(img[src*="/people/dementors/gabil/"]),
+body .lab-dementor-hero:has(img[src*="/people/dementors/gabil/"]){--dc-dementor-bg:var(--dc-dementor-gabil-bg)}
+
+body :has(> img[src*="/people/dementors/evgeniy/"]),
+body .dc-dementor-card:has(img[src*="/people/dementors/evgeniy/"]),
+body .lab-dementor-micro:has(img[src*="/people/dementors/evgeniy/"]),
+body .lab-dementor-inline:has(img[src*="/people/dementors/evgeniy/"]),
+body .lab-dementor-row:has(img[src*="/people/dementors/evgeniy/"]),
+body .lab-relation:has(img[src*="/people/dementors/evgeniy/"]),
+body .lab-dementor-feature:has(img[src*="/people/dementors/evgeniy/"]),
+body .lab-dementor-hero:has(img[src*="/people/dementors/evgeniy/"]){--dc-dementor-bg:var(--dc-dementor-evgeniy-bg)}
+
+body img[src*="/people/dementors/valentin/"]{--dc-dementor-bg:var(--dc-dementor-valentin-bg)}
+body img[src*="/people/dementors/nikita/"]{--dc-dementor-bg:var(--dc-dementor-nikita-bg)}
+body img[src*="/people/dementors/gabil/"]{--dc-dementor-bg:var(--dc-dementor-gabil-bg)}
+body img[src*="/people/dementors/evgeniy/"]{--dc-dementor-bg:var(--dc-dementor-evgeniy-bg)}
+
+/* Personal color is a stable identity surface, not an optional illustration tint. */
+body img[src*="/people/dementors/"]{
+  background-color:var(--dc-dementor-bg,var(--dc-paper))!important;
+}
+body .dc-dementor-card:has(img[src*="/people/dementors/"]),
+body .lab-dementor-micro:has(img[src*="/people/dementors/"]),
+body .lab-dementor-inline:has(img[src*="/people/dementors/"]),
+body .lab-dementor-row:has(img[src*="/people/dementors/"]),
+body .lab-relation:has(img[src*="/people/dementors/"]),
+body .lab-dementor-feature:has(img[src*="/people/dementors/"]),
+body .lab-dementor-hero:has(img[src*="/people/dementors/"]){
+  background-color:var(--dc-dementor-bg,var(--dc-paper))!important;
+}
+body .dc-dementor-card__portrait-link,
+body .dc-dementor-hero__portrait{
+  background-color:var(--dc-dementor-bg,var(--dc-paper))!important;
+}
+
+/* Profile hero gets the same personal surface as all smaller appearances. */
+body:has(.dc-dementor-hero__portrait img[src*="/people/dementors/valentin/"]) .dc-dementor-hero{--dc-dementor-bg:var(--dc-dementor-valentin-bg)}
+body:has(.dc-dementor-hero__portrait img[src*="/people/dementors/nikita/"]) .dc-dementor-hero{--dc-dementor-bg:var(--dc-dementor-nikita-bg)}
+body:has(.dc-dementor-hero__portrait img[src*="/people/dementors/gabil/"]) .dc-dementor-hero{--dc-dementor-bg:var(--dc-dementor-gabil-bg)}
+body:has(.dc-dementor-hero__portrait img[src*="/people/dementors/evgeniy/"]) .dc-dementor-hero{--dc-dementor-bg:var(--dc-dementor-evgeniy-bg)}
+body:has(.dc-dementor-hero__portrait img[src*="/people/dementors/"]) .dc-dementor-hero{
+  background-color:var(--dc-dementor-bg,var(--dc-paper))!important;
+}
+
+/* DEMENTOR HERO — WEB reference.
+   Image owns the right field. Copy stays editorial, not centered card UI. */
+body .dc-dementor-hero__layout{
+  min-height:clamp(560px,72vh,820px)!important;
+  align-items:end!important;
+  position:relative;
+}
+body .dc-dementor-hero__copy{position:relative;z-index:2}
+body .dc-dementor-hero__portrait{
+  align-self:stretch!important;
+  min-height:clamp(520px,68vh,780px)!important;
+  border:0!important;
+}
+body .dc-dementor-hero__portrait img{
+  object-fit:cover!important;
+  object-position:center top!important;
+  mix-blend-mode:multiply;
+}
+
+/* UI Lab specimens use exactly the same identity surface logic. */
+body.dc-ui-lab .lab-portrait-scale__item img,
+body.dc-ui-lab .lab-dementor-micro img,
+body.dc-ui-lab .lab-dementor-inline img,
+body.dc-ui-lab .lab-dementor-row img,
+body.dc-ui-lab .lab-relation img,
+body.dc-ui-lab .lab-dementor-feature img,
+body.dc-ui-lab .lab-dementor-hero img{
+  background-color:var(--dc-dementor-bg,var(--lab-paper,var(--dc-paper)))!important;
+}
+
+/* EVENT HERO MEDIA — approved Drive rule.
+   The event image stays one asset. Across viewports we crop it; we do not redesign it.
+   The crop is anchored to TOP RIGHT and sized primarily by height. */
+body.dc-fuengirola-page .dc-entity-hero{
+  position:relative!important;
+  overflow:hidden!important;
+  min-height:clamp(660px,78vh,920px)!important;
+  isolation:isolate;
+}
+body.dc-fuengirola-page .dc-entity-hero::after{
+  content:""!important;
+  display:block!important;
+  position:absolute!important;
+  z-index:-1!important;
+  top:0!important;
+  right:0!important;
+  bottom:0!important;
+  left:auto!important;
+  width:min(78vw,1180px)!important;
+  height:100%!important;
+  aspect-ratio:auto!important;
+  border:0!important;
+  pointer-events:none!important;
+  background-color:transparent!important;
+  background-image:url('/assets/event-fuengirola-03.webp')!important;
+  background-repeat:no-repeat!important;
+  background-position:var(--dc-event-media-position)!important;
+  background-size:auto 100%!important;
+}
+body.dc-fuengirola-page .dc-entity-hero__meta,
+body.dc-fuengirola-page .dc-entity-hero__title,
+body.dc-fuengirola-page .dc-entity-hero__bottom{position:relative;z-index:2}
+body.dc-fuengirola-page .dc-entity-hero__title{max-width:76%!important}
+body.dc-fuengirola-page .dc-entity-hero__bottom{padding-right:34%!important}
+
+/* TABLET — portrait expands and copy may visually enter its field, as in the approved specimen. */
+@media(max-width:1024px){
+  body .dc-dementor-hero__copy{grid-column:1/6!important;z-index:3}
+  body .dc-dementor-hero__portrait{grid-column:4/9!important;min-height:clamp(500px,72vh,720px)!important}
+  body .dc-dementor-hero__copy .dc-display-xl{position:relative;z-index:4}
+  body.dc-fuengirola-page .dc-entity-hero::after{width:86vw!important;background-size:auto 100%!important;background-position:right top!important}
+  body.dc-fuengirola-page .dc-entity-hero__title{max-width:70%!important}
+  body.dc-fuengirola-page .dc-entity-hero__bottom{padding-right:30%!important}
+}
+
+/* MOBILE — identity and formula first, portrait below; event media remains one cropped top-right asset. */
+@media(max-width:700px){
+  body .dc-dementor-hero__layout{display:grid!important;grid-template-columns:1fr!important;min-height:0!important;gap:18px!important;margin-top:34px!important}
+  body .dc-dementor-hero__copy{grid-column:1!important;grid-row:1!important}
+  body .dc-dementor-hero__portrait{grid-column:1!important;grid-row:2!important;min-height:0!important;width:100%!important;aspect-ratio:4/5!important;margin-top:0!important}
+  body .dc-dementor-hero__portrait img{position:relative!important;inset:auto!important;width:100%!important;height:100%!important;object-fit:cover!important;object-position:center top!important}
+  body .dc-dementor-hero__quote,body .dc-dementor-quote{max-width:10ch}
+
+  body.dc-fuengirola-page .dc-entity-hero{min-height:760px!important;padding-bottom:28px!important}
+  body.dc-fuengirola-page .dc-entity-hero::after{
+    z-index:0!important;
+    top:auto!important;
+    right:0!important;
+    bottom:0!important;
+    width:100%!important;
+    height:56%!important;
+    background-size:auto 100%!important;
+    background-position:right top!important;
+  }
+  body.dc-fuengirola-page .dc-entity-hero__meta,
+  body.dc-fuengirola-page .dc-entity-hero__title,
+  body.dc-fuengirola-page .dc-entity-hero__bottom{z-index:2}
+  body.dc-fuengirola-page .dc-entity-hero__title{max-width:100%!important}
+  body.dc-fuengirola-page .dc-entity-hero__bottom{padding-right:0!important}
+}
+
+@media(max-width:390px){
+  body .dc-dementor-hero__portrait{aspect-ratio:3/4!important}
+  body.dc-fuengirola-page .dc-entity-hero{min-height:720px!important}
+  body.dc-fuengirola-page .dc-entity-hero::after{height:54%!important}
+}
