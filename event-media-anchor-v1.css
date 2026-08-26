@@ -1,7 +1,0 @@
-/* Dementor Club — Event media anchor v1
-   Existing event assets keep their current sizing/crop behavior.
-   Only the crop anchor is standardized: TOP RIGHT, never centered. */
-.dc-fuengirola-page .dc-media-break img,
-.dc-fuengirola-page .dc-ink-slot--event img{
-  object-position:right top!important;
-}
