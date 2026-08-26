@@ -1,0 +1,84 @@
+{
+  "meta": {
+    "name": "Dementor Club Design Tokens",
+    "version": "1.0-audit",
+    "status": "working",
+    "format": "DTCG-inspired internal registry; CSS expressions are preserved as authored values and this file is not yet schema-validated DTCG",
+    "audited": "2026-08-26"
+  },
+  "color": {
+    "paper": { "$value": "#F2F0E8", "$type": "color" },
+    "ink": { "$value": "#111111", "$type": "color" },
+    "acid": { "$value": "#D8FF3E", "$type": "color" },
+    "line": { "$value": "rgba(17,17,17,0.20)", "$type": "color", "$description": "Normalized candidate; legacy .18 still exists." }
+  },
+  "surface": {
+    "primary": { "$value": "{color.paper}", "$type": "color" },
+    "inverse": { "$value": "{color.ink}", "$type": "color" }
+  },
+  "text": {
+    "primary": { "$value": "{color.ink}", "$type": "color" },
+    "inverse": { "$value": "{color.paper}", "$type": "color" },
+    "onSignal": { "$value": "{color.ink}", "$type": "color", "$description": "Accessibility invariant: ACID always carries INK foreground." }
+  },
+  "signal": {
+    "primary": { "$value": "{color.acid}", "$type": "color" }
+  },
+  "layout": {
+    "shell": {
+      "max": { "$value": "1600px", "$type": "css-dimension", "$description": "Normalized candidate; legacy 1500px exists." }
+    },
+    "grid": {
+      "desktopColumns": { "$value": 12, "$type": "number" },
+      "tabletColumns": { "$value": 8, "$type": "number" },
+      "mobileColumns": { "$value": 4, "$type": "number" }
+    }
+  },
+  "rhythm": {
+    "tight": { "$value": "clamp(54px,6vw,92px)", "$type": "css-dimension" },
+    "medium": { "$value": "clamp(96px,11vw,170px)", "$type": "css-dimension" },
+    "wide": { "$value": "clamp(150px,17vw,270px)", "$type": "css-dimension" },
+    "huge": { "$value": "clamp(210px,23vw,360px)", "$type": "css-dimension" }
+  },
+  "motion": {
+    "ease": {
+      "primary": { "$value": "cubic-bezier(.2,.8,.2,1)", "$type": "css-easing" }
+    },
+    "duration": {
+      "fast": { "$value": "220ms", "$type": "css-duration" },
+      "medium": { "$value": "480ms", "$type": "css-duration" },
+      "slow": { "$value": "820ms", "$type": "css-duration" }
+    }
+  },
+  "type": {
+    "family": {
+      "reading": { "$value": "Inter, Arial, Helvetica, sans-serif", "$type": "font-stack", "$description": "Temporary implementation fallback; final family unresolved." },
+      "display": { "$value": "Arial Narrow, Helvetica Neue, Arial, sans-serif", "$type": "font-stack", "$description": "Temporary implementation fallback; final family unresolved." }
+    },
+    "measure": {
+      "body": { "$value": "66ch", "$type": "css-dimension" },
+      "lead": { "$value": "29ch", "$type": "css-dimension" }
+    }
+  },
+  "state": {
+    "disabledOpacity": { "$value": 0.42, "$type": "number", "$description": "Normalization candidate; legacy .4 exists." }
+  },
+  "illustration": {
+    "ink": {
+      "edge": { "$value": "clamp(18px,3vw,48px)", "$type": "css-dimension" },
+      "tilt": {
+        "l1": { "$value": "0.12deg", "$type": "css-angle" },
+        "l2": { "$value": "0.34deg", "$type": "css-angle" },
+        "l3": { "$value": "0.46deg", "$type": "css-angle" }
+      },
+      "blendMode": { "$value": "multiply", "$type": "string" },
+      "contrast": { "$value": 1.05, "$type": "number" }
+    },
+    "density": {
+      "l0": { "$value": "none", "$type": "string" },
+      "l1": { "$value": "trace", "$type": "string" },
+      "l2": { "$value": "intervention", "$type": "string" },
+      "l3": { "$value": "takeover", "$type": "string" }
+    }
+  }
+}
