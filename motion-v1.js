@@ -12,6 +12,24 @@
   const path=location.pathname;
   document.documentElement.dataset.route=path;
 
+  /* Internal design reference access: home footer logo, deliberate 5s hold only. */
+  if(path==='/'){
+    const footerBrand=document.querySelector('.dc-footer .brand');
+    if(footerBrand){
+      let holdTimer=0;
+      let unlocked=false;
+      const clearHold=()=>{if(holdTimer){clearTimeout(holdTimer);holdTimer=0;}footerBrand.removeAttribute('data-dc-system-hold');};
+      const startHold=()=>{clearHold();unlocked=false;footerBrand.setAttribute('data-dc-system-hold','active');holdTimer=window.setTimeout(()=>{holdTimer=0;unlocked=true;footerBrand.removeAttribute('data-dc-system-hold');location.assign('/design-system/');},5000);};
+      footerBrand.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse'&&e.button!==0)return;startHold();});
+      footerBrand.addEventListener('pointerup',clearHold);
+      footerBrand.addEventListener('pointercancel',clearHold);
+      footerBrand.addEventListener('pointerleave',e=>{if(e.pointerType==='mouse')clearHold();});
+      footerBrand.addEventListener('dragstart',clearHold);
+      footerBrand.addEventListener('click',e=>{if(unlocked){e.preventDefault();unlocked=false;}});
+      footerBrand.addEventListener('contextmenu',e=>{if(footerBrand.hasAttribute('data-dc-system-hold'))e.preventDefault();});
+    }
+  }
+
   /* Progressive raster integration: keep current production asset until the new one is physically available. */
   const upgradeRaster=(selector,src)=>{
     const target=document.querySelector(selector);if(!target)return;
