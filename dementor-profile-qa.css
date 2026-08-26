@@ -1,0 +1,161 @@
+/* QA ONLY — Dementor profile alignment against approved web/tablet/mobile/micro mocks.
+   Do not merge to dementor-club-site until visual QA is signed off. */
+
+:root{
+  --dc-dementor-valentin-bg:#EFE5D3;
+  --dc-dementor-nikita-bg:#F6E9D4;
+  --dc-dementor-evgeniy-bg:#F6EDD9;
+  --dc-dementor-gabil-bg:#EFE6D3;
+}
+
+/* Personal identity is data: portrait + background token. */
+body.dc-entity-page:has(.dc-dementor-hero__portrait img[src*="/valentin/"]){--dementor-bg:var(--dc-dementor-valentin-bg)}
+body.dc-entity-page:has(.dc-dementor-hero__portrait img[src*="/nikita/"]){--dementor-bg:var(--dc-dementor-nikita-bg)}
+body.dc-entity-page:has(.dc-dementor-hero__portrait img[src*="/evgeniy/"]){--dementor-bg:var(--dc-dementor-evgeniy-bg)}
+body.dc-entity-page:has(.dc-dementor-hero__portrait img[src*="/gabil/"]){--dementor-bg:var(--dc-dementor-gabil-bg)}
+
+body.dc-entity-page:has(.dc-dementor-hero){background:var(--dementor-bg,var(--dc-paper));color:var(--dc-ink)}
+body.dc-entity-page:has(.dc-dementor-hero) .topbar{background:color-mix(in srgb,var(--dementor-bg) 94%,transparent);border-bottom-color:rgba(17,17,17,.2)}
+
+/* WEB — one coherent first screen, not a framed portrait card. */
+body.dc-entity-page:has(.dc-dementor-hero) .dc-dementor-hero{
+  min-height:calc(100svh - 64px);
+  padding:0;
+  background:var(--dementor-bg);
+  border-bottom:1px solid rgba(17,17,17,.22);
+  overflow:hidden;
+}
+body.dc-entity-page:has(.dc-dementor-hero) .dc-dementor-hero>.dc-shell{
+  min-height:calc(100svh - 64px);
+  display:grid;
+  grid-template-rows:auto 1fr;
+  padding-top:30px;
+  padding-bottom:0;
+}
+body.dc-entity-page:has(.dc-dementor-hero) .dc-dementor-hero__meta{
+  min-height:32px;
+  position:relative;
+  z-index:4;
+}
+body.dc-entity-page:has(.dc-dementor-hero) .dc-dementor-hero__layout{
+  display:grid;
+  grid-template-columns:repeat(12,minmax(0,1fr));
+  grid-template-rows:1fr;
+  gap:16px;
+  align-items:stretch;
+  min-height:0;
+  margin:0;
+  position:relative;
+}
+body.dc-entity-page:has(.dc-dementor-hero) .dc-dementor-hero__copy{
+  grid-column:1/8;
+  grid-row:1;
+  align-self:center;
+  position:relative;
+  z-index:3;
+  padding:clamp(56px,8vh,110px) 0 clamp(48px,7vh,96px);
+}
+body.dc-entity-page:has(.dc-dementor-hero) .dc-dementor-role{margin:0 0 20px}
+body.dc-entity-page:has(.dc-dementor-hero) .dc-dementor-hero__copy .dc-display-xl{
+  font-size:clamp(76px,8.8vw,150px);
+  line-height:.78;
+  letter-spacing:-.082em;
+  max-width:7.8ch;
+  margin:0;
+}
+body.dc-entity-page:has(.dc-dementor-hero) .dc-dementor-quote{
+  max-width:12ch;
+  margin-top:clamp(30px,4vh,54px);
+  font-size:clamp(28px,3vw,52px);
+  line-height:.98;
+}
+body.dc-entity-page:has(.dc-dementor-hero) .dc-dementor-tags{margin-top:24px}
+body.dc-entity-page:has(.dc-dementor-hero) .dc-profile-back{margin-top:28px}
+body.dc-entity-page:has(.dc-dementor-hero) .dc-dementor-hero__portrait{
+  grid-column:7/13;
+  grid-row:1;
+  min-height:0;
+  height:auto;
+  border:0;
+  background:transparent;
+  overflow:visible;
+  position:relative;
+  z-index:2;
+  align-self:stretch;
+}
+body.dc-entity-page:has(.dc-dementor-hero) .dc-dementor-hero__portrait img{
+  position:absolute;
+  inset:auto 0 0 auto;
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  object-position:right bottom;
+  mix-blend-mode:multiply;
+  display:block;
+}
+body.dc-entity-page:has(.dc-dementor-hero) .dc-dementor-hero__portrait::after{display:none}
+
+/* Content returns to club paper after the personal hero. */
+body.dc-entity-page:has(.dc-dementor-hero) main>.dc-section{background:var(--dc-paper);color:var(--dc-ink)}
+body.dc-entity-page:has(.dc-dementor-hero) main>.dc-profile-section-muted{background:rgba(17,17,17,.035)}
+body.dc-entity-page:has(.dc-dementor-hero) footer{background:var(--dc-paper)}
+
+/* MICRO / roster — same identity rule at small scale. */
+.dc-dementor-card:has(a[href="/community/valentin/"]){--dementor-bg:var(--dc-dementor-valentin-bg)}
+.dc-dementor-card:has(a[href="/community/nikita/"]){--dementor-bg:var(--dc-dementor-nikita-bg)}
+.dc-dementor-card:has(a[href="/community/evgeniy/"]){--dementor-bg:var(--dc-dementor-evgeniy-bg)}
+.dc-dementor-card:has(a[href="/community/gabil/"]){--dementor-bg:var(--dc-dementor-gabil-bg)}
+.dc-dementor-card{background:var(--dementor-bg,var(--dc-paper));padding-left:18px;padding-right:18px}
+.dc-dementor-card:hover{background:var(--dementor-bg,var(--dc-paper));padding-left:18px;padding-right:18px}
+.dc-dementor-card__portrait{background:transparent!important;border:0!important;object-fit:contain!important;object-position:center bottom!important;mix-blend-mode:multiply}
+
+/* TABLET — same composition, larger portrait field and controlled text overlap. */
+@media(max-width:900px){
+  body.dc-entity-page:has(.dc-dementor-hero) .dc-dementor-hero{min-height:760px}
+  body.dc-entity-page:has(.dc-dementor-hero) .dc-dementor-hero>.dc-shell{min-height:760px;padding-top:26px}
+  body.dc-entity-page:has(.dc-dementor-hero) .dc-dementor-hero__layout{grid-template-columns:repeat(8,minmax(0,1fr));gap:12px}
+  body.dc-entity-page:has(.dc-dementor-hero) .dc-dementor-hero__copy{grid-column:1/6;padding:70px 0 54px}
+  body.dc-entity-page:has(.dc-dementor-hero) .dc-dementor-hero__portrait{grid-column:5/9}
+  body.dc-entity-page:has(.dc-dementor-hero) .dc-dementor-hero__copy .dc-display-xl{font-size:clamp(66px,11.5vw,112px);max-width:7ch}
+  body.dc-entity-page:has(.dc-dementor-hero) .dc-dementor-quote{font-size:clamp(25px,4vw,42px);max-width:13ch}
+}
+
+/* MOBILE — identity/name/formula first; portrait follows full width. */
+@media(max-width:560px){
+  body.dc-entity-page:has(.dc-dementor-hero) .dc-dementor-hero{min-height:0}
+  body.dc-entity-page:has(.dc-dementor-hero) .dc-dementor-hero>.dc-shell{min-height:0;padding-top:20px;padding-bottom:0}
+  body.dc-entity-page:has(.dc-dementor-hero) .dc-dementor-hero__layout{
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    grid-template-rows:auto minmax(390px,122vw);
+    gap:0 10px;
+  }
+  body.dc-entity-page:has(.dc-dementor-hero) .dc-dementor-hero__copy{
+    grid-column:1/5;
+    grid-row:1;
+    align-self:start;
+    padding:54px 0 26px;
+  }
+  body.dc-entity-page:has(.dc-dementor-hero) .dc-dementor-hero__copy .dc-display-xl{
+    font-size:clamp(58px,19vw,88px)!important;
+    line-height:.78!important;
+    max-width:none;
+  }
+  body.dc-entity-page:has(.dc-dementor-hero) .dc-dementor-quote{font-size:clamp(25px,8.4vw,38px);max-width:12ch;margin-top:28px}
+  body.dc-entity-page:has(.dc-dementor-hero) .dc-dementor-tags{margin-top:20px}
+  body.dc-entity-page:has(.dc-dementor-hero) .dc-profile-back{margin-top:22px}
+  body.dc-entity-page:has(.dc-dementor-hero) .dc-dementor-hero__portrait{
+    grid-column:1/5;
+    grid-row:2;
+    width:calc(100% + 36px);
+    margin-left:-18px;
+    min-height:0;
+  }
+  body.dc-entity-page:has(.dc-dementor-hero) .dc-dementor-hero__portrait img{object-position:center bottom;width:100%;height:100%}
+  .dc-dementor-card{grid-template-columns:58px minmax(0,1fr) 22px!important;padding:12px!important;gap:10px!important}
+  .dc-dementor-card__num{display:none}
+  .dc-dementor-card__portrait-link{grid-column:1}.dc-dementor-card__portrait{width:58px!important;aspect-ratio:4/5}
+  .dc-dementor-card__body{grid-column:2}.dc-dementor-card__arrow{grid-column:3}
+  .dc-dementor-card h3{font-size:clamp(34px,11vw,48px)!important;margin-bottom:8px!important}
+  .dc-dementor-card__line{font-size:10px!important;margin-bottom:8px!important}
+  .dc-dementor-card__relations{display:none!important}
+}
