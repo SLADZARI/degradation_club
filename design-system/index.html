@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="robots" content="noindex,nofollow,noarchive" />
+  <meta name="theme-color" content="#f2f0e8" />
+  <title>Dementor Club — Internal Design System</title>
+  <link rel="stylesheet" href="/styles.css" />
+  <link rel="stylesheet" href="/ui-v2.css" />
+  <link rel="stylesheet" href="/design-system/design-system.css" />
+</head>
+<body class="dc-system-page" data-dc-surface="paper">
+  <header class="dc-system-topbar">
+    <a class="brand" href="/" aria-label="Вернуться на главную">DEMENTOR<span>CLUB</span></a>
+    <div class="dc-meta">INTERNAL / DESIGN SYSTEM / V1</div>
+    <nav class="dc-system-jump" aria-label="Разделы дизайн-системы">
+      <a href="#foundation">00</a><a href="#type">02</a><a href="#entities">07</a><a href="#responsive">17</a><a href="#anti">19</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="dc-system-hero dc-shell" aria-labelledby="system-title">
+      <div class="dc-system-hero__meta dc-meta"><span>REFERENCE PAGE / NOT PUBLIC</span><span>CONTENT MUST NOT BE INVENTED</span></div>
+      <h1 class="dc-display-xl" id="system-title">ОДНА СИСТЕМА.<br>РАЗНЫЕ <span class="dc-acid">СУЩНОСТИ.</span></h1>
+      <div class="dc-system-hero__note">
+        <p class="dc-lead">Эта страница — визуальный эталон для LLM и ручной верстки.</p>
+        <p class="dc-body">Контент сайта не переписывается ради дизайна. Сначала определяется тип сущности, затем применяется presentation contract, компоненты и токены.</p>
+      </div>
+    </section>
+
+    <section class="dc-system-section" id="foundation">
+      <div class="dc-shell">
+        <div class="dc-system-section__head"><span class="dc-kicker">00 / FOUNDATION</span><h2 class="dc-display-l">БАЗОВЫЕ ТОКЕНЫ</h2></div>
+        <div class="dc-token-grid">
+          <div class="dc-token dc-token--paper"><span>PAPER</span><strong>#F2F0E8</strong><small>PRIMARY SURFACE</small></div>
+          <div class="dc-token dc-token--ink"><span>INK</span><strong>#111111</strong><small>PRIMARY FOREGROUND</small></div>
+          <div class="dc-token dc-token--acid"><span>ACID</span><strong>#D8FF3E</strong><small>SIGNAL / ALWAYS WITH INK</small></div>
+          <div class="dc-token"><span>GRID</span><strong>12 / 8 / 4</strong><small>WIDE / COMPACT / MOBILE</small></div>
+        </div>
+        <div class="dc-system-rule"><span>CONTRAST CONTRACT</span><strong>PAPER + INK · INK + PAPER · ACID + INK</strong></div>
+      </div>
+    </section>
+
+    <section class="dc-system-section dc-system-section--dark" id="type" data-dc-surface="dark">
+      <div class="dc-shell">
+        <div class="dc-system-section__head"><span class="dc-kicker">02 / TYPOGRAPHY</span><h2 class="dc-display-l">ТИПОГРАФИКА — ЭТО ИЕРАРХИЯ, НЕ НАБОР СЛУЧАЙНЫХ РАЗМЕРОВ.</h2></div>
+        <div class="dc-type-specimen">
+          <div><span class="dc-meta">DISPLAY XL</span><p class="dc-display-xl">СОМНЕНИЕ</p></div>
+          <div><span class="dc-meta">DISPLAY L</span><p class="dc-display-l">ОТРИЦАТЕЛЬНЫЙ РОСТ</p></div>
+          <div><span class="dc-meta">LEAD</span><p class="dc-lead">Заголовок несёт мысль. Label только классифицирует.</p></div>
+          <div><span class="dc-meta">BODY</span><p class="dc-body">Основной текст остаётся читаемым. Визуальная агрессия не является оправданием плохой читаемости.</p></div>
+          <div><span class="dc-meta">META / KICKER</span><p class="dc-meta">PROJECT / 001 / ACTIVE / UPDATED 26.08.2026</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="dc-system-section" id="entities">
+      <div class="dc-shell">
+        <div class="dc-system-section__head"><span class="dc-kicker">07–13 / ENTITY PRESENTATION</span><h2 class="dc-display-l">ОДНА СУЩНОСТЬ — ПЯТЬ РЕЖИМОВ ОТОБРАЖЕНИЯ.</h2></div>
+        <div class="dc-mode-strip">
+          <span>INDEX</span><span>FEATURE</span><span>DETAIL HERO</span><span>DETAIL BODY</span><span>CROSS-LINK</span>
+        </div>
+
+        <article class="dc-system-entity" data-entity="event">
+          <div class="dc-system-entity__label"><span class="dc-kicker">EVENT / REFERENCE</span><span class="dc-meta">SOURCE / event-001-fuengirola</span></div>
+          <div class="dc-system-feature">
+            <div class="dc-system-feature__main">
+              <div class="dc-meta">OFFLINE SESSION / PLANNED</div>
+              <h3 class="dc-display-l">ФУЭНХИРОЛА</h3>
+              <p class="dc-lead">Лаборатория несовместимых очевидностей</p>
+            </div>
+            <dl class="dc-system-meta-list">
+              <div><dt>CITY</dt><dd>Fuengirola / Фуэнхирола</dd></div>
+              <div><dt>COUNTRY</dt><dd>Испания</dd></div>
+              <div><dt>CAPACITY</dt><dd>до 7 участников</dd></div>
+              <div><dt>ACCESS</dt><dd>DETAILS AFTER JOIN</dd></div>
+              <div><dt>DATE</dt><dd>NULL — НЕ ВЫДУМЫВАТЬ</dd></div>
+            </dl>
+          </div>
+          <div class="dc-system-index-row"><span>EVENT-001</span><strong>ФУЭНХИРОЛА</strong><span>FUENGIROLA / ES</span><span>PLANNED</span><span>→</span></div>
+        </article>
+
+        <article class="dc-system-entity" data-entity="course">
+          <div class="dc-system-entity__label"><span class="dc-kicker">COURSE / REFERENCE</span><span class="dc-meta">SOURCE / COURSE-001</span></div>
+          <div class="dc-system-feature dc-system-feature--reverse">
+            <div class="dc-system-feature__main">
+              <div class="dc-meta">WEB / SELF-PACED / ACTIVE PRODUCTION</div>
+              <h3 class="dc-display-l">ДУМАЙ С ОПАСНОСТЬЮ</h3>
+              <p class="dc-lead">Дементор: Валентин Лосев</p>
+            </div>
+            <dl class="dc-system-meta-list">
+              <div><dt>MODULES</dt><dd>7</dd></div>
+              <div><dt>DELIVERY</dt><dd>WEB SELF-PACED</dd></div>
+              <div><dt>PROGRESS</dt><dd>LOCAL STORAGE</dd></div>
+              <div><dt>AI ANALYSIS</dt><dd>NOT USED / STAGE 1</dd></div>
+              <div><dt>PRICE</dt><dd>NOT IN ENTITY RECORD</dd></div>
+            </dl>
+          </div>
+          <div class="dc-system-index-row"><span>COURSE-001</span><strong>ДУМАЙ С ОПАСНОСТЬЮ</strong><span>VALENTIN LOSEV</span><span>ACTIVE</span><span>→</span></div>
+        </article>
+
+        <article class="dc-system-entity" data-entity="dementor">
+          <div class="dc-system-entity__label"><span class="dc-kicker">DEMENTOR / REFERENCE</span><span class="dc-meta">SOURCE / DEMENTOR-001</span></div>
+          <div class="dc-system-person">
+            <img src="/assets/people/dementors/valentin/portrait-ink.webp" alt="Портрет Валентина Лосева в системе Dementor Ink" loading="lazy" decoding="async" />
+            <div><div class="dc-meta">DEMENTOR / ACTIVE</div><h3 class="dc-display-l">ВАЛЕНТИН ЛОСЕВ</h3><p class="dc-body">Связанный курс: COURSE-001. Story и practice areas в entity record пока не заполнены — интерфейс не должен их сочинять.</p></div>
+          </div>
+        </article>
+
+        <article class="dc-system-entity" data-entity="project">
+          <div class="dc-system-entity__label"><span class="dc-kicker">PROJECT / LOCAL SUBSYSTEM</span><span class="dc-meta">GLOBAL PROVENANCE MUST REMAIN</span></div>
+          <div class="dc-system-project-sample">
+            <div><span class="dc-meta">PROJECT / 001 / ACTIVE</span><h3 class="dc-display-l">ЛОГИКА<br>И ОСОЗНАННОСТЬ</h3><p class="dc-lead">Локальная визуальная система разрешена. Навигация клуба, provenance и accessibility — нет.</p></div>
+            <div class="dc-system-project-stamp">A DEMENTOR CLUB PROJECT</div>
+          </div>
+        </article>
+
+        <article class="dc-system-entity" data-entity="merch">
+          <div class="dc-system-entity__label"><span class="dc-kicker">MERCH / OBJECT CONTRACT</span><span class="dc-meta">STRUCTURE SAMPLE / NO INVENTED FACTS</span></div>
+          <div class="dc-system-object-sample">
+            <div class="dc-system-object-placeholder">OBJECT<br>MEDIA</div>
+            <dl class="dc-system-meta-list"><div><dt>OBJECT / ID</dt><dd>REQUIRED</dd></div><div><dt>TITLE</dt><dd>FROM ENTITY RECORD</dd></div><div><dt>STATEMENT</dt><dd>FROM SOURCE</dd></div><div><dt>EDITION / PRICE / STATUS</dt><dd>ONLY IF APPROVED</dd></div></dl>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="dc-system-section dc-system-section--acid" id="responsive" data-dc-surface="acid">
+      <div class="dc-shell">
+        <div class="dc-system-section__head"><span class="dc-kicker">17 / RESPONSIVE</span><h2 class="dc-display-l">MOBILE — НЕ УМЕНЬШЕННЫЙ DESKTOP.</h2></div>
+        <div class="dc-breakpoint-grid">
+          <div><strong>1440</strong><span>12 columns · full metadata · hover allowed</span></div>
+          <div><strong>1024</strong><span>compact composition · metadata priority</span></div>
+          <div><strong>768</strong><span>8-column logic · reflow, not shrink</span></div>
+          <div><strong>390</strong><span>4 columns · rows · tap/reveal · CTA visible</span></div>
+          <div><strong>320</strong><span>narrow fallback · no clipped essential content</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="dc-system-section" id="anti">
+      <div class="dc-shell">
+        <div class="dc-system-section__head"><span class="dc-kicker">19 / ANTI-PATTERNS</span><h2 class="dc-display-l">ПРАВИЛЬНО / НЕПРАВИЛЬНО</h2></div>
+        <div class="dc-compare-grid">
+          <div class="dc-compare"><span class="dc-compare__status">RIGHT</span><div class="dc-system-index-row"><span>EVENT-001</span><strong>ФУЭНХИРОЛА</strong><span>PLANNED</span><span>→</span></div><p>Index row. Быстро сканируется. Metadata остаётся частью интерфейса.</p></div>
+          <div class="dc-compare dc-compare--wrong"><span class="dc-compare__status">WRONG</span><div class="dc-fake-card"><strong>Фуэнхирола</strong><p>Красивое мероприятие специально для вас.</p><button type="button">Подробнее</button></div><p>Generic SaaS card, выдуманная рекламная формулировка, декоративная геометрия.</p></div>
+          <div class="dc-compare"><span class="dc-compare__status">RIGHT</span><div class="dc-acid dc-system-acid-demo">ACID + INK</div><p>ACID — светлая signal surface.</p></div>
+          <div class="dc-compare dc-compare--wrong"><span class="dc-compare__status">WRONG</span><div class="dc-system-bad-acid">ACID + WHITE</div><p>Светлый foreground на ACID запрещён.</p></div>
+          <div class="dc-compare"><span class="dc-compare__status">RIGHT</span><p class="dc-display-l dc-system-pressure-demo">СОМНЕНИЕ</p><p>Крупный headline сохраняет характер и на mobile.</p></div>
+          <div class="dc-compare dc-compare--wrong"><span class="dc-compare__status">WRONG</span><p class="dc-system-tiny-heading">СОМНЕНИЕ</p><p>Нельзя спасать адаптивность уничтожением типографической идентичности.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="dc-system-section dc-system-section--dark">
+      <div class="dc-shell">
+        <div class="dc-system-section__head"><span class="dc-kicker">LLM / BUILD PROTOCOL</span><h2 class="dc-display-l">СНАЧАЛА ОПРЕДЕЛИ. ПОТОМ ВЕРСТАЙ.</h2></div>
+        <pre class="dc-system-protocol">entity_type:
+entity_id:
+status:
+page_family:
+dominant_thought:
+primary_action:
+required_metadata:
+optional_metadata:
+relations:
+visual_subsystem:
+ink_level:
+motion_behaviour:</pre>
+        <p class="dc-lead">Сущность определяет содержание. Presentation contract — форму. Components — сборку. Tokens — значения. LLM ничего из этого не придумывает.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="dc-system-footer"><a class="brand" href="/">DEMENTOR<span>CLUB</span></a><span>INTERNAL REFERENCE · NOINDEX</span><span>DESIGN SYSTEM / V1</span></footer>
+</body>
+</html>
