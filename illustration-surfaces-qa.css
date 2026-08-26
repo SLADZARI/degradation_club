@@ -1,0 +1,29 @@
+/* QA ONLY — illustration surface colors matched to approved raster paper tones.
+   Keep image and its responsive container on the same base color to avoid visible seams. */
+:root{
+  --dc-ink-bg-home-chair:#F3EDDE;
+  --dc-ink-bg-maze:#F0E7D7;
+  --dc-ink-bg-authority-chair:#F0E7D7;
+  --dc-ink-bg-about-service:#F9EDD5;
+  --dc-ink-bg-community-people:#F1E9D8;
+  --dc-ink-bg-community-hero:#F7EBD5;
+  --dc-ink-bg-fuengirola:#FAF4E2;
+}
+
+.dc-home .dc-hero__media{background:var(--dc-ink-bg-home-chair)}
+.dc-home .dc-hero__media img{mix-blend-mode:multiply}
+
+.dc-community-page .dc-community-opening,
+.dc-community-page .dc-community-opening__art{background:var(--dc-ink-bg-community-hero)}
+.dc-community-page .dc-community-opening__veil{background:linear-gradient(to bottom,rgba(247,235,213,.92) 0,rgba(247,235,213,.12) 20%,rgba(247,235,213,0) 64%,rgba(247,235,213,.84) 88%,rgba(247,235,213,.97) 100%)}
+
+.dc-about .dc-ink-slot--about{background:var(--dc-ink-bg-about-service)}
+.dc-logic-page .dc-ink-slot--logic{background:var(--dc-ink-bg-maze)}
+.dc-ink-surface--authority-chair{background:var(--dc-ink-bg-authority-chair)}
+.dc-ink-surface--community-people{background:var(--dc-ink-bg-community-people)}
+.dc-fuengirola-page .dc-ink-slot--event,
+.dc-fuengirola-page .dc-media-break{background:var(--dc-ink-bg-fuengirola)}
+
+@media(max-width:560px){
+  .dc-community-page .dc-community-opening__veil{background:linear-gradient(to bottom,rgba(247,235,213,.92) 0,rgba(247,235,213,.08) 18%,rgba(247,235,213,0) 58%,rgba(247,235,213,.90) 82%,rgba(247,235,213,.98) 100%)}
+}
