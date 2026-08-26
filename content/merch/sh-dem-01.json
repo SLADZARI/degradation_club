@@ -1,0 +1,19 @@
+{
+  "id":"SH-DEM-01",
+  "entityType":"merch",
+  "drop":"DROP-001",
+  "title":"OVERTHINKING IS MY CARDIO.",
+  "status":"working-assets-present",
+  "salesState":"not_open",
+  "publicUrl":"/merch/drop-001/overthinking-is-my-cardio/",
+  "category":"apparel/t-shirt",
+  "garment":{"type":"short-sleeve crew-neck t-shirt","color":"light/off-white","material":null,"fabricComposition":null,"fabricWeightGsm":null,"fit":null,"sizeRange":null,"blankSupplier":null},
+  "print":{"placement":"front","composition":"seated office figure with large black expressive figure behind","palette":["black","acid yellow-green","garment base"],"phrase":"OVERTHINKING IS MY CARDIO.","marking":"DEMENTOR CLUB + X","technique":null,"inkSpec":null,"dimensions":null,"positionMeasurements":null},
+  "branding":{"neckLabelShownInMockup":true,"neckLabelProductionSpec":null,"careLabel":null},
+  "variants":[{"id":"light","label":"LIGHT","image":{"driveId":"18_2sAwPXt4Gbxu8s832BJQP4Uh3ev9hz","source":"https://drive.google.com/file/d/18_2sAwPXt4Gbxu8s832BJQP4Uh3ev9hz/view"}}],
+  "assets":[{"role":"product","driveId":"18_2sAwPXt4Gbxu8s832BJQP4Uh3ev9hz","name":"sh-dem-01.jpg"},{"role":"sheet","driveId":"1KY7LPEW6Wur0vvjJhTiVDFRHhzM7qQSk","name":"sh-dem-01-ALL.jpg"}],
+  "commercial":{"priceEur":null,"edition":null,"availability":null,"productionCostCeilingEur":null,"shippingWeight":null,"packaging":null},
+  "missingFields":["public_description","material","fabric_composition","fabric_weight_gsm","fit","size_range","blank_supplier","print_technique","print_ink_spec","print_dimensions","print_position_measurements","neck_label_spec","care_label","packaging","edition","price_eur","production_cost_ceiling_eur","availability","shipping_weight"],
+  "provenance":{"branch":"dementor-club","path":"merch/products/SH_DEM_01_OVERTHINKING_IS_MY_CARDIO.md","role":"canonical-merch-record"},
+  "updatedAt":"2026-08-26"
+}

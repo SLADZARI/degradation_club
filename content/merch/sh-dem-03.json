@@ -1,0 +1,19 @@
+{
+  "id":"SH-DEM-03",
+  "entityType":"merch",
+  "drop":"DROP-001",
+  "title":"SUCCESS IS BORING.",
+  "status":"working-assets-present",
+  "salesState":"not_open",
+  "publicUrl":"/merch/drop-001/success-is-boring/",
+  "category":"apparel/t-shirt",
+  "garment":{"type":"short-sleeve crew-neck t-shirt","colors":["light/off-white","black"],"material":null,"fabricComposition":null,"fabricWeightGsm":null,"fit":null,"sizeRange":null,"blankSupplier":null},
+  "print":{"placement":"front","composition":"large typographic front print","paletteByVariant":{"light":["black"],"black":["light/white"]},"phrase":"SUCCESS IS BORING.","marking":"DEMENTOR CLUB + X","technique":null,"inkSpec":null,"dimensions":null,"positionMeasurements":null},
+  "branding":{"neckLabelShownInMockup":true,"neckLabelProductionSpec":null,"careLabel":null},
+  "variants":[{"id":"light","label":"LIGHT","image":{"driveId":"14kKDxIk4G3BPYpK3O4DQneAOu1R5QsOS","source":"https://drive.google.com/file/d/14kKDxIk4G3BPYpK3O4DQneAOu1R5QsOS/view"}},{"id":"black","label":"BLACK","image":{"driveId":"1pdZgXrOJFujVZGtC6G5gPjT9tOkyQSJE","source":"https://drive.google.com/file/d/1pdZgXrOJFujVZGtC6G5gPjT9tOkyQSJE/view"}}],
+  "assets":[{"role":"product-light","driveId":"14kKDxIk4G3BPYpK3O4DQneAOu1R5QsOS","name":"sh-dem-03 1.jpg"},{"role":"product-black","driveId":"1pdZgXrOJFujVZGtC6G5gPjT9tOkyQSJE","name":"sh-dem-03 2.jpg"}],
+  "commercial":{"priceEur":null,"edition":null,"availability":null,"productionCostCeilingEur":null,"shippingWeight":null,"packaging":null},
+  "missingFields":["public_description","material","fabric_composition","fabric_weight_gsm","fit","size_range","blank_supplier","print_technique","print_ink_spec","print_dimensions","print_position_measurements","neck_label_spec","care_label","packaging","edition","price_eur","production_cost_ceiling_eur","availability","shipping_weight"],
+  "provenance":{"branch":"dementor-club","path":"merch/products/SH_DEM_03_SUCCESS_IS_BORING.md","role":"canonical-merch-record"},
+  "updatedAt":"2026-08-26"
+}
