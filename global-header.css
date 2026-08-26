@@ -9,3 +9,9 @@ body.dc-global-menu-open{overflow:hidden}.dc-global-header+.top{top:var(--dc-glo
 @media(max-width:900px){:root{--dc-global-header-h:64px}.dc-global-header{min-height:64px;padding:0 18px;gap:14px}.dc-global-brand{font-size:18px}.dc-global-menu{display:grid}.dc-global-nav{position:fixed;z-index:239;left:0;right:0;top:64px;height:calc(100svh - 64px);display:none;margin:0;padding:20px 18px 30px;background:var(--dc-global-paper);border-bottom:1px solid var(--dc-global-line);overflow:auto;align-content:start}.dc-global-nav.is-open{display:grid;grid-template-columns:1fr}.dc-global-nav>a,.dc-global-group__trigger{display:flex;align-items:center;width:100%;min-height:58px;border-top:1px solid var(--dc-global-line);font-size:18px;letter-spacing:.02em;opacity:1;text-align:left}.dc-global-nav>a::after,.dc-global-group__trigger::after{display:none}.dc-global-group{display:block}.dc-global-subnav{position:static;min-width:0;padding:0 0 8px 18px;border:0;border-left:4px solid var(--dc-global-acid);box-shadow:none;background:transparent}.dc-global-subnav a{min-height:48px;font-size:15px;letter-spacing:.02em}.dc-global-nav>a:last-child{border-bottom:1px solid var(--dc-global-line)}}
 @media(prefers-reduced-motion:reduce){.dc-global-nav a::after,.dc-global-menu__icon::before,.dc-global-menu__icon::after,.dc-global-menu__icon span{transition:none}}
 @media print{.dc-global-header{display:none!important}}
+
+/* BRAND MARK — approved mini sign from Drive Assets/LOGO. */
+.dc-global-brand__mark{display:block;width:24px;height:24px;margin-right:9px;flex:0 0 24px}
+footer .brand{display:inline-flex;align-items:center;gap:9px}
+footer .brand::before{content:"";display:block;width:24px;height:24px;flex:0 0 24px;background:url('/assets/brand/dementor-mark-black.svg') center/contain no-repeat}
+@media(max-width:900px){.dc-global-brand__mark{width:22px;height:22px;flex-basis:22px;margin-right:8px}footer .brand::before{width:22px;height:22px;flex-basis:22px}}

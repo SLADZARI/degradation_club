@@ -4,6 +4,14 @@
   document.documentElement.dataset.dcGlobalHeader='1';
 
   const path=location.pathname;
+
+  if(!document.querySelector('link[rel="icon"][href="/assets/brand/dementor-mark-lime.svg"]')){
+    const favicon=document.createElement('link');
+    favicon.rel='icon';
+    favicon.type='image/svg+xml';
+    favicon.href='/assets/brand/dementor-mark-lime.svg';
+    document.head.appendChild(favicon);
+  }
   const activeFor=href=>href==='/'?path==='/':path.startsWith(href);
   const link=(href,label,extra='')=>`<a href="${href}"${activeFor(href)?' aria-current="page"':''}${extra}>${label}</a>`;
 
@@ -18,7 +26,7 @@
     link('/join/','Join')
   ].join('');
 
-  const markup=`<a class="dc-global-brand" href="/" aria-label="Dementor Club — на главную">DEMENTOR<span>CLUB</span></a><button class="dc-global-menu" type="button" aria-label="Открыть меню" aria-expanded="false" aria-controls="dc-global-nav"><span class="dc-global-menu__icon" aria-hidden="true"><span></span></span><span class="dc-global-sr">Меню</span></button><nav class="dc-global-nav" id="dc-global-nav" aria-label="Главная навигация">${navHtml}</nav>`;
+  const markup=`<a class="dc-global-brand" href="/" aria-label="Dementor Club — на главную"><img class="dc-global-brand__mark" src="/assets/brand/dementor-mark-black.svg" alt="" aria-hidden="true" width="24" height="24">DEMENTOR<span>CLUB</span></a><button class="dc-global-menu" type="button" aria-label="Открыть меню" aria-expanded="false" aria-controls="dc-global-nav"><span class="dc-global-menu__icon" aria-hidden="true"><span></span></span><span class="dc-global-sr">Меню</span></button><nav class="dc-global-nav" id="dc-global-nav" aria-label="Главная навигация">${navHtml}</nav>`;
 
   let header=document.querySelector('header.topbar');
   if(header){
