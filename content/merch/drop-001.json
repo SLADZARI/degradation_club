@@ -1,0 +1,19 @@
+{
+  "id": "DROP-001",
+  "entityType": "merch-drop",
+  "title": "Classic Dementor T-Shirts",
+  "status": "working",
+  "salesState": "not_open",
+  "source": {
+    "type": "google-drive",
+    "folder": "https://drive.google.com/drive/folders/1VrDU_fSYg0N7uCpVwNRhCMN9EJvJHiPg"
+  },
+  "products": ["SH-DEM-01", "SH-DEM-02", "SH-DEM-03"],
+  "commercial": {
+    "price": null,
+    "sizes": null,
+    "material": null,
+    "availability": null,
+    "checkout": null
+  }
+}
