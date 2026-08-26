@@ -23,12 +23,14 @@
   margin:0 auto;
   width:min(100%,1600px);
   min-height:clamp(420px,58vw,900px);
-  background:var(--dc-ink-bg-community-people);
+  background:var(--dc-ink-bg-community-people) url('/assets/ink/home-community-01.webp') center/contain no-repeat;
   display:flex;
   align-items:center;
   justify-content:center;
   overflow:hidden;
   position:relative;
+  color:inherit;
+  text-decoration:none;
 }
 .dc-home .dc-home-community__media img{
   width:100%;
@@ -38,6 +40,7 @@
   object-fit:contain;
   object-position:center;
   mix-blend-mode:multiply;
+  opacity:0;
 }
 .dc-home .dc-home-community__caption{
   position:absolute;
@@ -48,6 +51,7 @@
   background:var(--dc-ink,#111);
   color:var(--dc-paper,#f2f0e8);
   font-size:10px;
+  font-weight:800;
   letter-spacing:.12em;
   text-transform:uppercase;
 }
@@ -63,6 +67,14 @@
 .dc-fuengirola-page .dc-ink-slot--event,
 .dc-fuengirola-page .dc-media-break{background:var(--dc-ink-bg-fuengirola)}
 .dc-fuengirola-page .dc-event-dementor-portrait{background:#EFE6D3}
+
+/* QA canonicalization: old cached markup must render the approved current portrait. */
+.dc-fuengirola-page img[src$='/gabil/portrait-ink.webp']{
+  content:url('/assets/people/dementors/gabil/dementor_gabil.webp');
+  background:#EFE6D3;
+  object-fit:contain;
+  mix-blend-mode:multiply;
+}
 
 @media(max-width:700px){
   .dc-home .dc-home-community__media{min-height:clamp(360px,78vw,620px)}
