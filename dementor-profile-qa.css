@@ -14,10 +14,11 @@
 .dc-dementor--gabil{--dementor-bg:var(--dc-dementor-gabil-bg)}
 
 .dc-dementor-profile{background:var(--dementor-bg,var(--dc-paper));color:var(--dc-ink)}
-.dc-dementor-profile .topbar{background:color-mix(in srgb,var(--dementor-bg) 94%,transparent);border-bottom-color:rgba(17,17,17,.2)}
+.dc-dementor-profile .topbar{background:var(--dementor-bg);background:color-mix(in srgb,var(--dementor-bg) 94%,transparent);border-bottom-color:rgba(17,17,17,.2)}
 
 /* WEB — one coherent first screen, not a framed portrait card. */
 .dc-dementor-profile .dc-dementor-hero{
+  min-height:calc(100vh - 64px);
   min-height:calc(100svh - 64px);
   padding:0;
   background:var(--dementor-bg);
@@ -25,6 +26,7 @@
   overflow:hidden;
 }
 .dc-dementor-profile .dc-dementor-hero>.dc-shell{
+  min-height:calc(100vh - 64px);
   min-height:calc(100svh - 64px);
   display:grid;
   grid-template-rows:auto 1fr;
