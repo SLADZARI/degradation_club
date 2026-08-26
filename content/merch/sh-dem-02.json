@@ -1,0 +1,11 @@
+{
+  "id":"SH-DEM-02",
+  "entityType":"merch",
+  "drop":"DROP-001",
+  "title":"PERSONAL GROWTH CANCELLED.",
+  "status":"asset-present-content-pending",
+  "salesState":"not_open",
+  "publicUrl":"/merch/drop-001/personal-growth-cancelled/",
+  "variants":[{"id":"light","label":"LIGHT","image":{"driveId":"1W_V9XAninkPyxyjI0YFbqlsWrZhWWU5W","source":"https://drive.google.com/file/d/1W_V9XAninkPyxyjI0YFbqlsWrZhWWU5W/view"}}],
+  "price":null,"sizes":null,"material":null,"availability":null
+}
