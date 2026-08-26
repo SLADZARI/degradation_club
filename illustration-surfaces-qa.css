@@ -1,4 +1,4 @@
-/* QA ONLY — illustration surface colors matched to approved raster paper tones.
+/* Illustration surface colors matched to approved raster paper tones.
    Keep image and its responsive container on the same base color to avoid visible seams. */
 :root{
   --dc-ink-bg-home-chair:#F3EDDE;
@@ -8,6 +8,7 @@
   --dc-ink-bg-community-people:#F1E9D8;
   --dc-ink-bg-community-hero:#F7EBD5;
   --dc-ink-bg-fuengirola:#FAF4E2;
+  --dc-ink-bg-dementor-gabil:#EFE6D3;
 }
 
 /* Canonical image-box behaviour: artwork is preserved, the box supplies the paper tone. */
@@ -99,8 +100,8 @@
 .dc-fuengirola-page .dc-media-break{background:var(--dc-ink-bg-fuengirola)}
 .dc-fuengirola-page .dc-ink-slot--event img,
 .dc-fuengirola-page .dc-media-break img{width:100%;height:auto;object-fit:contain!important;object-position:center}
-.dc-fuengirola-page .dc-event-dementor-portrait{background:#EFE6D3}
-.dc-fuengirola-page .dc-event-dementor-portrait img{width:100%;height:auto;object-fit:contain!important;background:#EFE6D3}
+.dc-fuengirola-page .dc-event-dementor-portrait{background:var(--dc-ink-bg-dementor-gabil)}
+.dc-fuengirola-page .dc-event-dementor-portrait img{width:100%;height:auto;object-fit:contain!important;background:var(--dc-ink-bg-dementor-gabil)}
 
 @media(max-width:700px){
   .dc-home .dc-home-community__caption{position:absolute;left:16px;right:auto;bottom:16px;width:auto}
