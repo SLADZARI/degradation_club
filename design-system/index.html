@@ -5,174 +5,306 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <meta name="robots" content="noindex,nofollow,noarchive" />
   <meta name="theme-color" content="#f2f0e8" />
-  <title>Dementor Club — Internal Design System</title>
+  <title>Dementor Club — UI Lab v2</title>
   <link rel="stylesheet" href="/styles.css" />
   <link rel="stylesheet" href="/ui-v2.css" />
-  <link rel="stylesheet" href="/design-system/design-system.css" />
+  <link rel="stylesheet" href="/design-system/ui-lab-v2.css" />
 </head>
-<body class="dc-system-page" data-dc-surface="paper">
-  <header class="dc-system-topbar">
-    <a class="brand" href="/" aria-label="Вернуться на главную">DEMENTOR<span>CLUB</span></a>
-    <div class="dc-meta">INTERNAL / DESIGN SYSTEM / V1</div>
-    <nav class="dc-system-jump" aria-label="Разделы дизайн-системы">
-      <a href="#foundation">00</a><a href="#type">02</a><a href="#entities">07</a><a href="#responsive">17</a><a href="#anti">19</a>
-    </nav>
-  </header>
+<body class="dc-ui-lab" data-dc-surface="paper">
+<header class="lab-topbar">
+  <a class="brand" href="/" aria-label="Dementor Club">DEMENTOR<span>CLUB</span></a>
+  <div class="lab-topbar__meta dc-meta">INTERNAL / UI LAB / WORKING STANDARD / NOINDEX</div>
+  <nav class="lab-jump" aria-label="UI Lab sections">
+    <a href="#foundation">00</a><a href="#dementors">10</a><a href="#events">20</a><a href="#courses">30</a><a href="#projects">40</a><a href="#register">60</a><a href="#quotes">70</a><a href="#tests">80</a><a href="#system">90</a><a href="#contexts">140</a><a href="#rules">160</a>
+  </nav>
+</header>
 
-  <main>
-    <section class="dc-system-hero dc-shell" aria-labelledby="system-title">
-      <div class="dc-system-hero__meta dc-meta"><span>REFERENCE PAGE / NOT PUBLIC</span><span>CONTENT MUST NOT BE INVENTED</span></div>
-      <h1 class="dc-display-xl" id="system-title">ОДНА СИСТЕМА.<br>РАЗНЫЕ <span class="dc-acid">СУЩНОСТИ.</span></h1>
-      <div class="dc-system-hero__note">
-        <p class="dc-lead">Эта страница — визуальный эталон для LLM и ручной верстки.</p>
-        <p class="dc-body">Контент сайта не переписывается ради дизайна. Сначала определяется тип сущности, затем применяется presentation contract, компоненты и токены.</p>
-      </div>
-    </section>
+<main>
+<section class="lab-hero lab-shell">
+  <div class="lab-hero__meta dc-meta"><span>REFERENCE / INTERNAL ONLY</span><span>BRANCH / agent/dementor-ui-lab-v3</span></div>
+  <h1 class="dc-display-xl">НЕ СТРАНИЦА.<br><span class="dc-acid">СЛОВАРЬ</span><br>ВЁРСТКИ.</h1>
+  <div class="lab-hero__bottom">
+    <p class="dc-lead">Любая сущность Dementor Club должна появляться только через утверждённую presentation role.</p>
+    <p class="dc-body">Эта лаборатория показывает не только цвета и размеры, а реальные способы появления дементора, события, курса, проекта, цитаты, теста, service-state и relation на web / tablet / mobile. Факты берутся из source-of-truth. Specimen-состояния всегда помечаются как specimen.</p>
+  </div>
+</section>
 
-    <section class="dc-system-section" id="foundation">
-      <div class="dc-shell">
-        <div class="dc-system-section__head"><span class="dc-kicker">00 / FOUNDATION</span><h2 class="dc-display-l">БАЗОВЫЕ ТОКЕНЫ</h2></div>
-        <div class="dc-token-grid">
-          <div class="dc-token dc-token--paper"><span>PAPER</span><strong>#F2F0E8</strong><small>PRIMARY SURFACE</small></div>
-          <div class="dc-token dc-token--ink"><span>INK</span><strong>#111111</strong><small>PRIMARY FOREGROUND</small></div>
-          <div class="dc-token dc-token--acid"><span>ACID</span><strong>#D8FF3E</strong><small>SIGNAL / ALWAYS WITH INK</small></div>
-          <div class="dc-token"><span>GRID</span><strong>12 / 8 / 4</strong><small>WIDE / COMPACT / MOBILE</small></div>
-        </div>
-        <div class="dc-system-rule"><span>CONTRAST CONTRACT</span><strong>PAPER + INK · INK + PAPER · ACID + INK</strong></div>
-      </div>
-    </section>
+<section class="lab-section" id="foundation">
+  <div class="lab-shell">
+    <div class="lab-head"><span class="dc-kicker">00 / FOUNDATION</span><h2 class="dc-display-l">НЕСКОЛЬКО ПРИМИТИВОВ.<br>МНОГО КОНТЕКСТОВ.</h2></div>
+    <div class="lab-token-grid">
+      <div class="lab-token lab-token--paper"><span>PAPER</span><strong>#F2F0E8</strong><small>PRIMARY SURFACE</small></div>
+      <div class="lab-token lab-token--ink"><span>INK</span><strong>#111111</strong><small>PRIMARY FOREGROUND</small></div>
+      <div class="lab-token lab-token--acid"><span>ACID</span><strong>#D8FF3E</strong><small>SIGNAL / ALWAYS INK TEXT</small></div>
+      <div class="lab-token"><span>GRID</span><strong>12 / 8 / 4</strong><small>WEB / TABLET / MOBILE</small></div>
+    </div>
+    <div class="lab-rule"><span>CONTRAST CONTRACT</span><strong>PAPER + INK · INK + PAPER · ACID + INK</strong></div>
+    <div class="lab-subhead"><h3>TYPE ROLES</h3><p class="lab-note">LLM выбирает роль, а не произвольный font-size.</p></div>
+    <div class="lab-type-grid">
+      <div><span class="dc-meta">DISPLAY XL</span><p class="dc-display-xl">СОМНЕНИЕ</p></div>
+      <div><span class="dc-meta">DISPLAY L</span><p class="dc-display-l">ОТРИЦАТЕЛЬНЫЙ РОСТ</p></div>
+      <div><span class="dc-meta">LEAD</span><p class="dc-lead">Один крупный смысловой ввод.</p></div>
+      <div><span class="dc-meta">BODY</span><p class="dc-body">Читаемый основной текст. Визуальная агрессия не отменяет читаемость.</p></div>
+      <div><span class="dc-meta">META</span><p class="dc-meta">TYPE / STATUS / ID / LOCATION / DATE / SOURCE</p></div>
+    </div>
+  </div>
+</section>
 
-    <section class="dc-system-section dc-system-section--dark" id="type" data-dc-surface="dark">
-      <div class="dc-shell">
-        <div class="dc-system-section__head"><span class="dc-kicker">02 / TYPOGRAPHY</span><h2 class="dc-display-l">ТИПОГРАФИКА — ЭТО ИЕРАРХИЯ, НЕ НАБОР СЛУЧАЙНЫХ РАЗМЕРОВ.</h2></div>
-        <div class="dc-type-specimen">
-          <div><span class="dc-meta">DISPLAY XL</span><p class="dc-display-xl">СОМНЕНИЕ</p></div>
-          <div><span class="dc-meta">DISPLAY L</span><p class="dc-display-l">ОТРИЦАТЕЛЬНЫЙ РОСТ</p></div>
-          <div><span class="dc-meta">LEAD</span><p class="dc-lead">Заголовок несёт мысль. Label только классифицирует.</p></div>
-          <div><span class="dc-meta">BODY</span><p class="dc-body">Основной текст остаётся читаемым. Визуальная агрессия не является оправданием плохой читаемости.</p></div>
-          <div><span class="dc-meta">META / KICKER</span><p class="dc-meta">PROJECT / 001 / ACTIVE / UPDATED 26.08.2026</p></div>
-        </div>
-      </div>
-    </section>
+<section class="lab-section lab-section--soft" id="dementors">
+  <div class="lab-shell">
+    <div class="lab-head"><span class="dc-kicker">10 / DEMENTOR SYSTEM</span><h2 class="dc-display-l">ДЕМЕНТОР — НЕ ОДНА КАРТОЧКА.<br>ЭТО ШЕСТЬ РОЛЕЙ.</h2></div>
 
-    <section class="dc-system-section" id="entities">
-      <div class="dc-shell">
-        <div class="dc-system-section__head"><span class="dc-kicker">07–13 / ENTITY PRESENTATION</span><h2 class="dc-display-l">ОДНА СУЩНОСТЬ — ПЯТЬ РЕЖИМОВ ОТОБРАЖЕНИЯ.</h2></div>
-        <div class="dc-mode-strip">
-          <span>INDEX</span><span>FEATURE</span><span>DETAIL HERO</span><span>DETAIL BODY</span><span>CROSS-LINK</span>
-        </div>
+    <div class="lab-subhead"><h3>PORTRAIT SCALE</h3><p class="lab-note">Один и тот же asset должен оставаться узнаваемым от micro до hero. Здесь scale-калибровка на портрете Габиля.</p></div>
+    <div class="lab-portrait-scale">
+      <div class="lab-portrait-scale__item"><img src="/assets/people/dementors/gabil/portrait-ink.webp" alt="Габиль"><span>MICRO / 32</span></div>
+      <div class="lab-portrait-scale__item"><img src="/assets/people/dementors/gabil/portrait-ink.webp" alt="Габиль"><span>INLINE / 56</span></div>
+      <div class="lab-portrait-scale__item"><img src="/assets/people/dementors/gabil/portrait-ink.webp" alt="Габиль"><span>ROW / 92</span></div>
+      <div class="lab-portrait-scale__item"><img src="/assets/people/dementors/gabil/portrait-ink.webp" alt="Габиль"><span>RELATION / 128</span></div>
+      <div class="lab-portrait-scale__item"><img src="/assets/people/dementors/gabil/portrait-ink.webp" alt="Габиль"><span>FEATURE / 220</span></div>
+      <div class="lab-portrait-scale__item"><img src="/assets/people/dementors/gabil/portrait-ink.webp" alt="Габиль"><span>HERO / 320+</span></div>
+    </div>
 
-        <article class="dc-system-entity" data-entity="event">
-          <div class="dc-system-entity__label"><span class="dc-kicker">EVENT / REFERENCE</span><span class="dc-meta">SOURCE / event-001-fuengirola</span></div>
-          <div class="dc-system-feature">
-            <div class="dc-system-feature__main">
-              <div class="dc-meta">OFFLINE SESSION / PLANNED</div>
-              <h3 class="dc-display-l">ФУЭНХИРОЛА</h3>
-              <p class="dc-lead">Лаборатория несовместимых очевидностей</p>
-            </div>
-            <dl class="dc-system-meta-list">
-              <div><dt>CITY</dt><dd>Fuengirola / Фуэнхирола</dd></div>
-              <div><dt>COUNTRY</dt><dd>Испания</dd></div>
-              <div><dt>CAPACITY</dt><dd>до 7 участников</dd></div>
-              <div><dt>ACCESS</dt><dd>DETAILS AFTER JOIN</dd></div>
-              <div><dt>DATE</dt><dd>NULL — НЕ ВЫДУМЫВАТЬ</dd></div>
-            </dl>
-          </div>
-          <div class="dc-system-index-row"><span>EVENT-001</span><strong>ФУЭНХИРОЛА</strong><span>FUENGIROLA / ES</span><span>PLANNED</span><span>→</span></div>
-        </article>
+    <div class="lab-subhead"><h3>MICRO / AUTHOR / PARTICIPANT</h3><p class="lab-note">Короткое авторство, участник, metadata relation. Имя обязательно, портрет вспомогательный.</p></div>
+    <div class="lab-dementor-micro-list">
+      <a class="lab-dementor-micro" href="/community/valentin/"><img src="/assets/people/dementors/valentin/portrait-ink.webp" alt=""><span>Валентин Лосев</span></a>
+      <a class="lab-dementor-micro" href="/community/nikita/"><img src="/assets/people/dementors/nikita/portrait-ink.webp" alt=""><span>Никита</span></a>
+      <a class="lab-dementor-micro" href="/community/evgeniy/"><img src="/assets/people/dementors/evgeniy/portrait-ink.webp" alt=""><span>Евгений</span></a>
+      <a class="lab-dementor-micro" href="/community/gabil/"><img src="/assets/people/dementors/gabil/portrait-ink.webp" alt=""><span>Габиль</span></a>
+    </div>
 
-        <article class="dc-system-entity" data-entity="course">
-          <div class="dc-system-entity__label"><span class="dc-kicker">COURSE / REFERENCE</span><span class="dc-meta">SOURCE / COURSE-001</span></div>
-          <div class="dc-system-feature dc-system-feature--reverse">
-            <div class="dc-system-feature__main">
-              <div class="dc-meta">WEB / SELF-PACED / ACTIVE PRODUCTION</div>
-              <h3 class="dc-display-l">ДУМАЙ С ОПАСНОСТЬЮ</h3>
-              <p class="dc-lead">Дементор: Валентин Лосев</p>
-            </div>
-            <dl class="dc-system-meta-list">
-              <div><dt>MODULES</dt><dd>7</dd></div>
-              <div><dt>DELIVERY</dt><dd>WEB SELF-PACED</dd></div>
-              <div><dt>PROGRESS</dt><dd>LOCAL STORAGE</dd></div>
-              <div><dt>AI ANALYSIS</dt><dd>NOT USED / STAGE 1</dd></div>
-              <div><dt>PRICE</dt><dd>NOT IN ENTITY RECORD</dd></div>
-            </dl>
-          </div>
-          <div class="dc-system-index-row"><span>COURSE-001</span><strong>ДУМАЙ С ОПАСНОСТЬЮ</strong><span>VALENTIN LOSEV</span><span>ACTIVE</span><span>→</span></div>
-        </article>
+    <div class="lab-subhead"><h3>INLINE</h3><p class="lab-note">Внутри события, курса, статьи или related metadata. Не превращать в mini hero.</p></div>
+    <div class="lab-viewport-set lab-viewport-set--row">
+      <div class="lab-frame lab-frame--web"><div class="lab-frame__bar"><span>WEB</span><span>INLINE</span></div><div class="lab-frame__body"><a class="lab-dementor-inline" href="/community/valentin/"><img src="/assets/people/dementors/valentin/portrait-ink.webp" alt="Валентин Лосев"><div><span>DEMENTOR / COURSE RELATION</span><strong>ВАЛЕНТИН ЛОСЕВ</strong></div><b>→</b></a></div></div>
+      <div class="lab-frame lab-frame--mobile"><div class="lab-frame__bar"><span>MOBILE / 390</span><span>INLINE</span></div><div class="lab-frame__body"><a class="lab-dementor-inline" href="/community/valentin/"><img src="/assets/people/dementors/valentin/portrait-ink.webp" alt="Валентин Лосев"><div><span>DEMENTOR / COURSE</span><strong>ВАЛЕНТИН ЛОСЕВ</strong></div><b>→</b></a></div></div>
+    </div>
 
-        <article class="dc-system-entity" data-entity="dementor">
-          <div class="dc-system-entity__label"><span class="dc-kicker">DEMENTOR / REFERENCE</span><span class="dc-meta">SOURCE / DEMENTOR-001</span></div>
-          <div class="dc-system-person">
-            <img src="/assets/people/dementors/valentin/portrait-ink.webp" alt="Портрет Валентина Лосева в системе Dementor Ink" loading="lazy" decoding="async" />
-            <div><div class="dc-meta">DEMENTOR / ACTIVE</div><h3 class="dc-display-l">ВАЛЕНТИН ЛОСЕВ</h3><p class="dc-body">Связанный курс: COURSE-001. Story и practice areas в entity record пока не заполнены — интерфейс не должен их сочинять.</p></div>
-          </div>
-        </article>
+    <div class="lab-subhead"><h3>ROW / ROSTER</h3><p class="lab-note">Основная форма списка дементоров. Desktop содержит status/relation. Mobile меняет композицию, а не уменьшает строку.</p></div>
+    <div class="lab-viewport-set lab-viewport-set--row">
+      <div class="lab-frame lab-frame--web"><div class="lab-frame__bar"><span>WEB</span><span>ROSTER</span></div><div class="lab-frame__body">
+        <a class="lab-dementor-row" href="/community/valentin/"><span>01</span><img src="/assets/people/dementors/valentin/portrait-ink.webp" alt="Валентин Лосев"><strong>ВАЛЕНТИН ЛОСЕВ</strong><span class="lab-dementor-row__state">ACTIVE / COURSE-001</span><span>→</span></a>
+        <a class="lab-dementor-row" href="/community/nikita/"><span>02</span><img src="/assets/people/dementors/nikita/portrait-ink.webp" alt="Никита"><strong>НИКИТА</strong><span class="lab-dementor-row__state">CONTENT PENDING</span><span>→</span></a>
+        <a class="lab-dementor-row" href="/community/evgeniy/"><span>03</span><img src="/assets/people/dementors/evgeniy/portrait-ink.webp" alt="Евгений"><strong>ЕВГЕНИЙ</strong><span class="lab-dementor-row__state">CONTENT PENDING</span><span>→</span></a>
+        <a class="lab-dementor-row" href="/community/gabil/"><span>04</span><img src="/assets/people/dementors/gabil/portrait-ink.webp" alt="Габиль"><strong>ГАБИЛЬ</strong><span class="lab-dementor-row__state">EVENT-001</span><span>→</span></a>
+      </div></div>
+      <div class="lab-frame lab-frame--mobile"><div class="lab-frame__bar"><span>MOBILE / 390</span><span>ROSTER</span></div><div class="lab-frame__body">
+        <a class="lab-dementor-row" href="/community/gabil/"><span>04</span><img src="/assets/people/dementors/gabil/portrait-ink.webp" alt="Габиль"><strong>ГАБИЛЬ</strong><span class="lab-dementor-row__state">EVENT-001</span><span>→</span></a>
+      </div></div>
+    </div>
 
-        <article class="dc-system-entity" data-entity="project">
-          <div class="dc-system-entity__label"><span class="dc-kicker">PROJECT / LOCAL SUBSYSTEM</span><span class="dc-meta">GLOBAL PROVENANCE MUST REMAIN</span></div>
-          <div class="dc-system-project-sample">
-            <div><span class="dc-meta">PROJECT / 001 / ACTIVE</span><h3 class="dc-display-l">ЛОГИКА<br>И ОСОЗНАННОСТЬ</h3><p class="dc-lead">Локальная визуальная система разрешена. Навигация клуба, provenance и accessibility — нет.</p></div>
-            <div class="dc-system-project-stamp">A DEMENTOR CLUB PROJECT</div>
-          </div>
-        </article>
+    <div class="lab-subhead"><h3>RELATION</h3><p class="lab-note">Связь внутри другой сущности. Сначала роль в текущем контексте, затем имя, затем переход в профиль.</p></div>
+    <div class="lab-context-grid">
+      <a class="lab-relation" href="/community/gabil/"><img src="/assets/people/dementors/gabil/portrait-ink.webp" alt="Габиль"><div class="lab-relation__copy"><small>EVENT / DEMENTOR</small><strong>ГАБИЛЬ</strong><p>Связан с event-001-fuengirola</p></div><span class="lab-relation__arrow">→</span></a>
+      <a class="lab-relation" href="/community/valentin/"><img src="/assets/people/dementors/valentin/portrait-ink.webp" alt="Валентин Лосев"><div class="lab-relation__copy"><small>COURSE / DEMENTOR</small><strong>ВАЛЕНТИН ЛОСЕВ</strong><p>Связан с COURSE-001</p></div><span class="lab-relation__arrow">→</span></a>
+    </div>
 
-        <article class="dc-system-entity" data-entity="merch">
-          <div class="dc-system-entity__label"><span class="dc-kicker">MERCH / OBJECT CONTRACT</span><span class="dc-meta">STRUCTURE SAMPLE / NO INVENTED FACTS</span></div>
-          <div class="dc-system-object-sample">
-            <div class="dc-system-object-placeholder">OBJECT<br>MEDIA</div>
-            <dl class="dc-system-meta-list"><div><dt>OBJECT / ID</dt><dd>REQUIRED</dd></div><div><dt>TITLE</dt><dd>FROM ENTITY RECORD</dd></div><div><dt>STATEMENT</dt><dd>FROM SOURCE</dd></div><div><dt>EDITION / PRICE / STATUS</dt><dd>ONLY IF APPROVED</dd></div></dl>
-          </div>
-        </article>
-      </div>
-    </section>
+    <div class="lab-subhead"><h3>FEATURE</h3><p class="lab-note">Большой editorial-блок внутри другой страницы. Не более одного dominant person feature в viewport.</p></div>
+    <div class="lab-frame lab-frame--web"><div class="lab-frame__bar"><span>WEB</span><span>FEATURE / REAL QUOTE</span></div><div class="lab-frame__body"><div class="lab-dementor-feature"><img src="/assets/people/dementors/gabil/portrait-ink.webp" alt="Габиль"><div><span class="dc-meta">DEMENTOR / GROUPS</span><h4>ГАБИЛЬ</h4><blockquote>«Не торопитесь становиться командой. Возможно, вам просто хорошо вместе.»</blockquote></div></div></div></div>
 
-    <section class="dc-system-section dc-system-section--acid" id="responsive" data-dc-surface="acid">
-      <div class="dc-shell">
-        <div class="dc-system-section__head"><span class="dc-kicker">17 / RESPONSIVE</span><h2 class="dc-display-l">MOBILE — НЕ УМЕНЬШЕННЫЙ DESKTOP.</h2></div>
-        <div class="dc-breakpoint-grid">
-          <div><strong>1440</strong><span>12 columns · full metadata · hover allowed</span></div>
-          <div><strong>1024</strong><span>compact composition · metadata priority</span></div>
-          <div><strong>768</strong><span>8-column logic · reflow, not shrink</span></div>
-          <div><strong>390</strong><span>4 columns · rows · tap/reveal · CTA visible</span></div>
-          <div><strong>320</strong><span>narrow fallback · no clipped essential content</span></div>
-        </div>
-      </div>
-    </section>
+    <div class="lab-subhead"><h3>HERO</h3><p class="lab-note">Полноценная персональная страница. Если doctrine/quote не утверждены, UI показывает pending, а не сочиняет содержание.</p></div>
+    <div class="lab-viewport-set lab-viewport-set--row">
+      <div class="lab-frame lab-frame--web"><div class="lab-frame__bar"><span>WEB</span><span>DEMENTOR HERO</span></div><div class="lab-frame__body"><div class="lab-dementor-hero"><div><span class="dc-meta">DEMENTOR / 01 / ACTIVE</span><h4>ВАЛЕНТИН<br>ЛОСЕВ</h4><blockquote class="lab-quote-pending">Главная авторская формула фиксируется.</blockquote></div><img src="/assets/people/dementors/valentin/portrait-ink.webp" alt="Валентин Лосев"></div></div></div>
+      <div class="lab-frame lab-frame--mobile"><div class="lab-frame__bar"><span>MOBILE / 390</span><span>DEMENTOR HERO</span></div><div class="lab-frame__body"><div class="lab-dementor-hero"><div><span class="dc-meta">DEMENTOR / 01 / ACTIVE</span><h4>ВАЛЕНТИН<br>ЛОСЕВ</h4><blockquote class="lab-quote-pending">Главная авторская формула фиксируется.</blockquote></div><img src="/assets/people/dementors/valentin/portrait-ink.webp" alt="Валентин Лосев"></div></div></div>
+    </div>
+  </div>
+</section>
 
-    <section class="dc-system-section" id="anti">
-      <div class="dc-shell">
-        <div class="dc-system-section__head"><span class="dc-kicker">19 / ANTI-PATTERNS</span><h2 class="dc-display-l">ПРАВИЛЬНО / НЕПРАВИЛЬНО</h2></div>
-        <div class="dc-compare-grid">
-          <div class="dc-compare"><span class="dc-compare__status">RIGHT</span><div class="dc-system-index-row"><span>EVENT-001</span><strong>ФУЭНХИРОЛА</strong><span>PLANNED</span><span>→</span></div><p>Index row. Быстро сканируется. Metadata остаётся частью интерфейса.</p></div>
-          <div class="dc-compare dc-compare--wrong"><span class="dc-compare__status">WRONG</span><div class="dc-fake-card"><strong>Фуэнхирола</strong><p>Красивое мероприятие специально для вас.</p><button type="button">Подробнее</button></div><p>Generic SaaS card, выдуманная рекламная формулировка, декоративная геометрия.</p></div>
-          <div class="dc-compare"><span class="dc-compare__status">RIGHT</span><div class="dc-acid dc-system-acid-demo">ACID + INK</div><p>ACID — светлая signal surface.</p></div>
-          <div class="dc-compare dc-compare--wrong"><span class="dc-compare__status">WRONG</span><div class="dc-system-bad-acid">ACID + WHITE</div><p>Светлый foreground на ACID запрещён.</p></div>
-          <div class="dc-compare"><span class="dc-compare__status">RIGHT</span><p class="dc-display-l dc-system-pressure-demo">СОМНЕНИЕ</p><p>Крупный headline сохраняет характер и на mobile.</p></div>
-          <div class="dc-compare dc-compare--wrong"><span class="dc-compare__status">WRONG</span><p class="dc-system-tiny-heading">СОМНЕНИЕ</p><p>Нельзя спасать адаптивность уничтожением типографической идентичности.</p></div>
-        </div>
-      </div>
-    </section>
+<section class="lab-section" id="register">
+  <div class="lab-shell">
+    <div class="lab-head"><span class="dc-kicker">60 / ENTITY REGISTER</span><h2 class="dc-display-l">ОДНА ГРАММАТИКА СПИСКОВ.<br>РАЗНЫЕ СУЩНОСТИ.</h2></div>
+    <p class="dc-lead">Ни Event, ни Course, ни Dementor не получают отдельную случайную «карточочную» систему для списков. Register меняет набор metadata, но сохраняет ритм.</p>
+    <div class="lab-register-toolbar" aria-label="Фильтр UI specimen">
+      <button class="lab-filter is-active" type="button" data-filter="all">ALL</button><button class="lab-filter" type="button" data-filter="event">EVENT</button><button class="lab-filter" type="button" data-filter="course">COURSE</button><button class="lab-filter" type="button" data-filter="project">PROJECT</button><button class="lab-filter" type="button" data-filter="dementor">DEMENTOR</button>
+    </div>
+    <div class="lab-register" id="entityRegister">
+      <a class="lab-register-row" data-kind="event" href="/events/fuengirola/"><span>EVENT-001</span><strong>ФУЭНХИРОЛА</strong><span>FUENGIROLA / ES</span><span class="lab-register-row__state">PLANNED</span><span>→</span></a>
+      <a class="lab-register-row" data-kind="course" href="/courses/dumai-s-opasnostyu/"><span>COURSE-001</span><strong>ДУМАЙ С ОПАСНОСТЬЮ</strong><span>WEB SELF-PACED</span><span class="lab-register-row__state">ACTIVE PRODUCTION</span><span>→</span></a>
+      <a class="lab-register-row" data-kind="project" href="/projects/logic-awareness/"><span>PROJECT-001</span><strong>ЛОГИКА И ОСОЗНАННОСТЬ</strong><span>PROJECT</span><span class="lab-register-row__state">ACTIVE</span><span>→</span></a>
+      <a class="lab-register-row" data-kind="dementor" href="/community/valentin/"><span>DEMENTOR-001</span><strong>ВАЛЕНТИН ЛОСЕВ</strong><span>DEMENTOR</span><span class="lab-register-row__state">ACTIVE</span><span>→</span></a>
+      <a class="lab-register-row" data-kind="dementor" href="/community/nikita/"><span>DEMENTOR-002</span><strong>НИКИТА</strong><span>DEMENTOR</span><span class="lab-register-row__state">CONTENT PENDING</span><span>→</span></a>
+      <a class="lab-register-row" data-kind="dementor" href="/community/evgeniy/"><span>DEMENTOR-003</span><strong>ЕВГЕНИЙ</strong><span>DEMENTOR</span><span class="lab-register-row__state">CONTENT PENDING</span><span>→</span></a>
+      <a class="lab-register-row" data-kind="dementor" href="/community/gabil/"><span>DEMENTOR-004</span><strong>ГАБИЛЬ</strong><span>DEMENTOR</span><span class="lab-register-row__state">EVENT-001</span><span>→</span></a>
+    </div>
 
-    <section class="dc-system-section dc-system-section--dark">
-      <div class="dc-shell">
-        <div class="dc-system-section__head"><span class="dc-kicker">LLM / BUILD PROTOCOL</span><h2 class="dc-display-l">СНАЧАЛА ОПРЕДЕЛИ. ПОТОМ ВЕРСТАЙ.</h2></div>
-        <pre class="dc-system-protocol">entity_type:
-entity_id:
-status:
-page_family:
-dominant_thought:
-primary_action:
-required_metadata:
-optional_metadata:
-relations:
-visual_subsystem:
-ink_level:
-motion_behaviour:</pre>
-        <p class="dc-lead">Сущность определяет содержание. Presentation contract — форму. Components — сборку. Tokens — значения. LLM ничего из этого не придумывает.</p>
-      </div>
-    </section>
-  </main>
+    <div class="lab-subhead"><h3>PREVIEW / POPUP</h3><p class="lab-note">Desktop: hover/focus preview. Mobile: tap/reveal. Preview не содержит данных, которых нет в entity record.</p></div>
+    <div class="lab-viewport-set lab-viewport-set--row">
+      <div class="lab-frame lab-frame--web"><div class="lab-frame__bar"><span>WEB</span><span>DETACHED PREVIEW</span></div><div class="lab-frame__body"><div class="lab-preview-popover"><img src="/assets/ink/event-fuengirola-03.webp" alt="Фуэнхирола"><div class="lab-preview-popover__copy"><span>EVENT / PLANNED</span><strong>ФУЭНХИРОЛА</strong><span>FUENGIROLA / SPAIN · ACCESS AFTER JOIN</span></div></div></div></div>
+      <div class="lab-frame lab-frame--mobile"><div class="lab-frame__bar"><span>MOBILE / 390</span><span>TAP / REVEAL</span></div><div class="lab-frame__body"><div class="lab-mobile-reveal"><img src="/assets/ink/event-fuengirola-03.webp" alt="Фуэнхирола"><span class="dc-meta">EVENT / PLANNED</span><h3>ФУЭНХИРОЛА</h3><p class="dc-body">Fuengirola / Испания · подробности после вступления.</p><a class="lab-action" href="/events/fuengirola/">Открыть событие →</a></div></div></div>
+    </div>
+  </div>
+</section>
 
-  <footer class="dc-system-footer"><a class="brand" href="/">DEMENTOR<span>CLUB</span></a><span>INTERNAL REFERENCE · NOINDEX</span><span>DESIGN SYSTEM / V1</span></footer>
+<section class="lab-section lab-section--ink" id="events" data-dc-surface="dark">
+  <div class="lab-shell">
+    <div class="lab-head"><span class="dc-kicker">20 / EVENT SYSTEM</span><h2 class="dc-display-l">СОБЫТИЕ МЕНЯЕТ МАСШТАБ.<br>НЕ МЕНЯЕТ ФАКТЫ.</h2></div>
+    <div class="lab-subhead"><h3>LINK / INLINE / ROW</h3><p class="lab-note">Три компактных режима. Внутренние списки и related content используют row, а не произвольную promo-card.</p></div>
+    <p class="dc-body">В тексте: <a class="lab-entity-link" href="/events/fuengirola/">Фуэнхирола →</a></p>
+    <a class="lab-entity-inline" href="/events/fuengirola/"><div class="lab-entity-inline__title"><span>EVENT / PLANNED</span><strong>ФУЭНХИРОЛА</strong></div><div class="lab-entity-inline__meta">SPAIN<br>ACCESS AFTER JOIN</div></a>
+    <a class="lab-entity-row" href="/events/fuengirola/"><span>EVENT-001</span><strong>ФУЭНХИРОЛА</strong><span>OFFLINE SESSION</span><span>PLANNED / SPAIN</span><span>→</span></a>
+
+    <div class="lab-subhead"><h3>FEATURE</h3><p class="lab-note">Home / project related / current activity. Один event feature = одна dominant thought.</p></div>
+    <div class="lab-frame lab-frame--web"><div class="lab-frame__bar"><span>WEB</span><span>EVENT FEATURE</span></div><div class="lab-frame__body"><div class="lab-entity-feature"><div><span class="dc-meta">OFFLINE SESSION / PLANNED</span><h4>ФУЭНХИРОЛА</h4><p class="dc-lead">Лаборатория несовместимых очевидностей</p><dl class="lab-facts"><div><dt>LOCATION</dt><dd>Fuengirola / Испания</dd></div><div><dt>CAPACITY</dt><dd>до 7 участников</dd></div><div><dt>DATE</dt><dd>NULL — не выдумывать</dd></div><div><dt>ACCESS</dt><dd>details-after-join</dd></div></dl></div><div class="lab-entity-feature__media"><img src="/assets/ink/event-fuengirola-03.webp" alt="Фуэнхирола"></div></div></div></div>
+
+    <div class="lab-subhead"><h3>DETAIL HERO / WEB + MOBILE</h3><p class="lab-note">Дементор в hero — relation marker, а не второй конкурирующий hero.</p></div>
+    <div class="lab-viewport-set lab-viewport-set--row">
+      <div class="lab-frame lab-frame--web"><div class="lab-frame__bar"><span>WEB</span><span>EVENT HERO</span></div><div class="lab-frame__body"><div class="lab-event-hero"><div><span class="dc-meta">EVENT-001 / PLANNED / OFFLINE</span><h4>ФУЭНХИРОЛА</h4><p class="dc-lead">Лаборатория несовместимых очевидностей</p><div class="lab-relation"><img src="/assets/people/dementors/gabil/portrait-ink.webp" alt="Габиль"><div class="lab-relation__copy"><small>DEMENTOR</small><strong>ГАБИЛЬ</strong><p>Организатор / participant relation from entity record</p></div><span class="lab-relation__arrow">→</span></div></div><div class="lab-event-hero__visual"><img src="/assets/ink/event-fuengirola-03.webp" alt="Фуэнхирола"></div></div></div></div>
+      <div class="lab-frame lab-frame--mobile"><div class="lab-frame__bar"><span>MOBILE / 390</span><span>EVENT HERO</span></div><div class="lab-frame__body"><div class="lab-event-hero"><div><span class="dc-meta">EVENT-001 / PLANNED</span><h4>ФУЭНХИРОЛА</h4><p class="dc-lead">Лаборатория несовместимых очевидностей</p><div class="lab-relation"><img src="/assets/people/dementors/gabil/portrait-ink.webp" alt="Габиль"><div class="lab-relation__copy"><small>DEMENTOR</small><strong>ГАБИЛЬ</strong></div><span class="lab-relation__arrow">→</span></div></div><div class="lab-event-hero__visual"><img src="/assets/ink/event-fuengirola-03.webp" alt="Фуэнхирола"></div></div></div></div>
+    </div>
+
+    <div class="lab-subhead"><h3>LIFECYCLE VOCABULARY</h3><p class="lab-note">Это словарь допустимых состояний, НЕ фактические состояния Фуэнхиролы. Текущий факт: PLANNED.</p></div>
+    <div class="lab-lifecycle"><div class="lab-life"><span>STATE</span><strong>IDEA</strong></div><div class="lab-life is-current"><span>CURRENT FACT</span><strong>PLANNED</strong></div><div class="lab-life"><span>STATE</span><strong>ANNOUNCED</strong></div><div class="lab-life"><span>STATE</span><strong>REGISTRATION</strong></div><div class="lab-life"><span>STATE</span><strong>SOLD OUT</strong></div><div class="lab-life"><span>STATE</span><strong>COMPLETED</strong></div><div class="lab-life"><span>STATE</span><strong>CANCELLED</strong></div></div>
+
+    <div class="lab-subhead"><h3>PROGRAMME / EMPTY STATE</h3><p class="lab-note">У Фуэнхиролы programme = null. Поэтому стандарт обязан красиво показывать отсутствие утверждённой программы, а не генерировать её.</p></div>
+    <div class="lab-programme"><div class="lab-programme-row is-empty"><span>PROGRAMME</span><div><strong>ПРОГРАММА ПОКА НЕ ОПУБЛИКОВАНА</strong><p>Entity field `programme` = null. Никаких придуманных пунктов.</p></div></div></div>
+  </div>
+</section>
+
+<section class="lab-section" id="courses">
+  <div class="lab-shell">
+    <div class="lab-head"><span class="dc-kicker">30 / COURSE SYSTEM</span><h2 class="dc-display-l">КУРС — ЭТО СУЩНОСТЬ<br>И СОСТОЯНИЕ ПРОХОЖДЕНИЯ.</h2></div>
+    <p class="dc-body">В registry как каноническая course-сущность сейчас зарегистрирован COURSE-001. Другие папки в `/courses/` не используются здесь как подтверждённые курсы.</p>
+
+    <div class="lab-subhead"><h3>LINK / ROW</h3><p class="lab-note">Course в mixed activity и профиле дементора.</p></div>
+    <p class="dc-body">В тексте: <a class="lab-entity-link" href="/courses/dumai-s-opasnostyu/">«Думай с опасностью» →</a></p>
+    <a class="lab-entity-row" href="/courses/dumai-s-opasnostyu/"><span>COURSE-001</span><strong>ДУМАЙ С ОПАСНОСТЬЮ</strong><span>WEB SELF-PACED</span><span>7 MODULES / ACTIVE</span><span>→</span></a>
+
+    <div class="lab-subhead"><h3>FEATURE / DEMENTOR RELATION</h3><p class="lab-note">Автор/ведущий курса визуально является relation, а не частью заголовка.</p></div>
+    <div class="lab-entity-feature"><div><span class="dc-meta">COURSE-001 / ACTIVE PRODUCTION STAGE 1</span><h4>ДУМАЙ С<br>ОПАСНОСТЬЮ</h4><p class="dc-lead">Web self-paced · 7 modules · progress stored locally</p></div><a class="lab-relation" href="/community/valentin/"><img src="/assets/people/dementors/valentin/portrait-ink.webp" alt="Валентин Лосев"><div class="lab-relation__copy"><small>COURSE / DEMENTOR</small><strong>ВАЛЕНТИН ЛОСЕВ</strong><p>DEMENTOR-001</p></div><span class="lab-relation__arrow">→</span></a></div>
+
+    <div class="lab-subhead"><h3>DETAIL HERO / WEB + MOBILE</h3><p class="lab-note">Course hero несёт статус продукта, delivery и relation. Не рекламные преимущества, если их нет в record.</p></div>
+    <div class="lab-viewport-set lab-viewport-set--row">
+      <div class="lab-frame lab-frame--web"><div class="lab-frame__bar"><span>WEB</span><span>COURSE HERO</span></div><div class="lab-frame__body"><div class="lab-course-hero"><div><span class="dc-meta">COURSE-001 / WEB SELF-PACED</span><h4>ДУМАЙ С<br>ОПАСНОСТЬЮ</h4><p class="dc-lead">7 модулей. Progress storage: localStorage.</p></div><div class="lab-course-side"><div><span>STATUS</span><strong>ACTIVE PRODUCTION</strong></div><div><span>DEMENTOR</span><strong>DEMENTOR-001</strong></div><div><span>AI ANALYSIS</span><strong>NOT USED / STAGE 1</strong></div><div><span>EMAIL</span><strong>PLANNED / STAGE 2</strong></div></div></div></div></div>
+      <div class="lab-frame lab-frame--mobile"><div class="lab-frame__bar"><span>MOBILE / 390</span><span>COURSE HERO</span></div><div class="lab-frame__body"><div class="lab-course-hero"><div><span class="dc-meta">COURSE-001</span><h4>ДУМАЙ С<br>ОПАСНОСТЬЮ</h4><p class="dc-lead">7 модулей · web self-paced</p></div><div class="lab-course-side"><div><span>STATUS</span><strong>ACTIVE</strong></div><div><span>DEMENTOR</span><strong>VALENTIN</strong></div></div></div></div></div>
+    </div>
+
+    <div class="lab-subhead"><h3>MODULE LIST</h3><p class="lab-note">Названия модулей здесь намеренно не выдумываются: это layout specimen. Номер и state существуют отдельно от title from course data.</p></div>
+    <div class="lab-module-list"><div class="lab-module"><span>01</span><strong>TITLE FROM COURSE DATA</strong><span class="lab-module__state">AVAILABLE</span></div><div class="lab-module"><span>02</span><strong>TITLE FROM COURSE DATA</strong><span class="lab-module__state">CURRENT</span></div><div class="lab-module"><span>03</span><strong>TITLE FROM COURSE DATA</strong><span class="lab-module__state">NEXT</span></div></div>
+
+    <div class="lab-subhead"><h3>PROGRESS</h3><p class="lab-note">UI specimen, не фактический прогресс пользователя. Реальное значение берётся только из localStorage/session state.</p></div>
+    <div class="lab-progress"><div class="lab-progress__top"><span>COURSE PROGRESS / SPECIMEN</span><strong>3 / 7</strong></div><div class="lab-progress__bar"><i></i></div></div>
+  </div>
+</section>
+
+<section class="lab-section lab-section--soft" id="projects">
+  <div class="lab-shell">
+    <div class="lab-head"><span class="dc-kicker">40 / PROJECT SYSTEM</span><h2 class="dc-display-l">ЛОКАЛЬНАЯ IDENTITY.<br>ГЛОБАЛЬНАЯ ПРОИСХОДИМОСТЬ.</h2></div>
+    <a class="lab-entity-row" href="/projects/logic-awareness/"><span>PROJECT-001</span><strong>ЛОГИКА И ОСОЗНАННОСТЬ</strong><span>INDEPENDENT PROJECT</span><span>ACTIVE</span><span>→</span></a>
+    <div class="lab-project-hero"><div><span class="dc-meta">PROJECT-001 / ACTIVE / LOCAL SUBSYSTEM</span><h4>ЛОГИКА<br>И ОСОЗНАННОСТЬ</h4><p class="dc-lead">Локальная стилистика проекта может менять цвет, плакатную логику и editorial behaviour, но не ломает global navigation, provenance и accessibility.</p></div><div class="lab-project-hero__stamp">A DEMENTOR CLUB PROJECT</div></div>
+  </div>
+</section>
+
+<section class="lab-section" id="quotes">
+  <div class="lab-shell">
+    <div class="lab-head"><span class="dc-kicker">70 / QUOTE SYSTEM</span><h2 class="dc-display-l">ЦИТАТА — ЭТО CONTENT TYPE.<br>НЕ ДЕКОРАТИВНЫЙ ТЕКСТ.</h2></div>
+    <div class="lab-subhead"><h3>PULLQUOTE</h3><p class="lab-note">Editorial break. Авторство показывается только если оно подтверждено.</p></div>
+    <blockquote class="lab-quote-pull">«НЕ ТОРОПИТЕСЬ СТАНОВИТЬСЯ КОМАНДОЙ.»</blockquote>
+
+    <div class="lab-subhead"><h3>ATTRIBUTED</h3><p class="lab-note">Реальная цитата из текущего профиля Габиля.</p></div>
+    <div class="lab-quote-attributed"><blockquote>«Люди могут годами собираться ради продукта. Иногда продуктом оказывается возможность собираться.»</blockquote><cite>Габиль · Dementor-004</cite></div>
+
+    <div class="lab-subhead"><h3>PORTRAIT QUOTE / WEB + MOBILE</h3><p class="lab-note">Портрет усиливает авторство, но не должен занимать больше внимания, чем сама цитата.</p></div>
+    <div class="lab-viewport-set lab-viewport-set--row">
+      <div class="lab-frame lab-frame--web"><div class="lab-frame__bar"><span>WEB</span><span>QUOTE / PORTRAIT</span></div><div class="lab-frame__body"><div class="lab-quote-person"><img src="/assets/people/dementors/gabil/portrait-ink.webp" alt="Габиль"><div><blockquote>«Не торопитесь становиться командой. Возможно, вам просто хорошо вместе.»</blockquote><cite>Габиль · Dementor-004</cite></div></div></div></div>
+      <div class="lab-frame lab-frame--mobile"><div class="lab-frame__bar"><span>MOBILE / 390</span><span>QUOTE / PORTRAIT</span></div><div class="lab-frame__body"><div class="lab-quote-person"><img src="/assets/people/dementors/gabil/portrait-ink.webp" alt="Габиль"><div><blockquote>«Не торопитесь становиться командой. Возможно, вам просто хорошо вместе.»</blockquote><cite>Габиль</cite></div></div></div></div>
+    </div>
+
+    <div class="lab-subhead"><h3>INLINE</h3><p class="lab-note">Для статьи, метода, курса. Не превращать каждый абзац в pullquote.</p></div>
+    <p class="lab-quote-inline">«Люди могут годами собираться ради продукта…» — Габиль</p>
+
+    <div class="lab-subhead"><h3>PENDING AUTHORSHIP</h3><p class="lab-note">Валентину нельзя автоматически приписывать красивую формулу, если source её ещё не зафиксировал.</p></div>
+    <div class="lab-quote-pending"><span class="dc-meta">DEMENTOR-001 / QUOTE STATUS</span><strong>ГЛАВНАЯ АВТОРСКАЯ ФОРМУЛА ФИКСИРУЕТСЯ.</strong></div>
+  </div>
+</section>
+
+<section class="lab-section lab-section--ink" id="tests" data-dc-surface="dark">
+  <div class="lab-shell">
+    <div class="lab-head"><span class="dc-kicker">80 / TESTS & FORMS</span><h2 class="dc-display-l">ВОПРОС, ВЫБОР, СОСТОЯНИЕ,<br>РЕЗУЛЬТАТ.</h2></div>
+    <p class="dc-body">Ниже UI specimen. Формулировки варианта ответа не являются утверждённым контентом теста и используются только для проверки вёрстки.</p>
+
+    <div class="lab-subhead"><h3>ANSWER STATES</h3><p class="lab-note">Default / hover / selected / disabled должны быть системными, а не локально придуманными в каждом тесте.</p></div>
+    <div class="lab-control-grid">
+      <button class="lab-choice" type="button"><b>A</b><span>Вариант ответа / default</span></button>
+      <button class="lab-choice is-hover" type="button"><b>B</b><span>Вариант ответа / hover or focus</span></button>
+      <button class="lab-choice is-selected" type="button"><b>C</b><span>Вариант ответа / selected</span></button>
+      <button class="lab-choice" type="button" disabled><b>D</b><span>Вариант ответа / disabled</span></button>
+    </div>
+
+    <div class="lab-subhead"><h3>QUESTION / WEB + MOBILE</h3><p class="lab-note">Core phrase сохраняет иерархию. На mobile ответы становятся одним столбцом.</p></div>
+    <div class="lab-viewport-set lab-viewport-set--row">
+      <div class="lab-frame lab-frame--web"><div class="lab-frame__bar"><span>WEB</span><span>QUESTION</span></div><div class="lab-frame__body"><div class="lab-question"><div class="lab-question__meta"><span>SPECIMEN / QUESTION 03</span><span>3 / 8</span></div><div class="lab-test-progress"><i></i></div><h4>КАКОЙ ВАРИАНТ ВЫ ВЫБИРАЕТЕ?</h4><div class="lab-control-grid"><button class="lab-choice" type="button"><b>A</b><span>Первый вариант ответа</span></button><button class="lab-choice is-selected" type="button"><b>B</b><span>Выбранный вариант ответа</span></button><button class="lab-choice" type="button"><b>C</b><span>Третий вариант ответа</span></button><button class="lab-choice" type="button"><b>D</b><span>Четвёртый вариант ответа</span></button></div><div class="lab-actions"><button class="lab-action" type="button">← Назад</button><button class="lab-action lab-action--primary" type="button">Продолжить →</button></div></div></div></div>
+      <div class="lab-frame lab-frame--mobile"><div class="lab-frame__bar"><span>MOBILE / 390</span><span>QUESTION</span></div><div class="lab-frame__body"><div class="lab-question"><div class="lab-question__meta"><span>QUESTION 03</span><span>3 / 8</span></div><div class="lab-test-progress"><i></i></div><h4>КАКОЙ ВАРИАНТ ВЫ ВЫБИРАЕТЕ?</h4><div class="lab-control-grid"><button class="lab-choice" type="button"><b>A</b><span>Первый вариант ответа</span></button><button class="lab-choice is-selected" type="button"><b>B</b><span>Выбранный вариант ответа</span></button><button class="lab-choice" type="button"><b>C</b><span>Третий вариант ответа</span></button></div><div class="lab-actions"><button class="lab-action" type="button">← Назад</button><button class="lab-action lab-action--primary" type="button">Дальше →</button></div></div></div></div>
+    </div>
+
+    <div class="lab-subhead"><h3>RESULT</h3><p class="lab-note">Результат отделяет dominant result от объяснения и следующих действий.</p></div>
+    <div class="lab-result"><div class="lab-result__score"><span class="dc-meta">RESULT / SPECIMEN</span><strong>3</strong><span>LEVEL / EXAMPLE</span></div><div class="lab-result__copy"><span class="dc-meta">ЗАКЛЮЧЕНИЕ / SPECIMEN</span><h4>НАЗВАНИЕ РЕЗУЛЬТАТА</h4><p class="dc-body">Explanation from test data. Здесь не генерируются диагнозы или новые значения шкалы.</p><div class="lab-actions"><button class="lab-action lab-action--primary" type="button">Следующий шаг</button><button class="lab-action" type="button">Пройти заново</button></div></div></div>
+  </div>
+</section>
+
+<section class="lab-section" id="system">
+  <div class="lab-shell">
+    <div class="lab-head"><span class="dc-kicker">90 / SERVICE STATES</span><h2 class="dc-display-l">СИСТЕМА ТОЖЕ ГОВОРИТ<br>ГОЛОСОМ КЛУБА.</h2></div>
+    <div class="lab-message-stack">
+      <div class="lab-message"><span class="lab-message__kind">INFO</span><div><strong>ДАННЫЕ ХРАНЯТСЯ ЛОКАЛЬНО.</strong><p>Нейтральная техническая информация.</p></div><span class="lab-message__mark">i</span></div>
+      <div class="lab-message lab-message--signal"><span class="lab-message__kind">SAVED / SUCCESS</span><div><strong>РЕЗУЛЬТАТ СОХРАНЁН.</strong><p>Success не требует зелёной SaaS-карточки.</p></div><span class="lab-message__mark">✓</span></div>
+      <div class="lab-message"><span class="lab-message__kind">WARNING</span><div><strong>ВЫ ПОКИДАЕТЕ НЕЗАВЕРШЁННУЮ ПРОЦЕДУРУ.</strong><p>Предупреждение через иерархию и rule, не через оранжевый alert.</p></div><span class="lab-message__mark">!</span></div>
+      <div class="lab-message lab-message--dark"><span class="lab-message__kind">LOCKED</span><div><strong>ПОДРОБНОСТИ ДОСТУПНЫ ПОСЛЕ ВСТУПЛЕНИЯ.</strong><p>Используется только когда это реальное access rule сущности.</p></div><span class="lab-message__mark">×</span></div>
+      <div class="lab-message"><span class="lab-message__kind">ERROR</span><div><strong>НЕ УДАЛОСЬ СОХРАНИТЬ РЕЗУЛЬТАТ.</strong><p>Понятный факт + следующий возможный шаг.</p></div><span class="lab-message__mark">!</span></div>
+      <div class="lab-message"><span class="lab-message__kind">OFFLINE</span><div><strong>СОЕДИНЕНИЕ ОТСУТСТВУЕТ.</strong><p>Не скрывать состояние сети за анимацией.</p></div><span class="lab-message__mark">—</span></div>
+      <div class="lab-message lab-message--signal"><span class="lab-message__kind">COMPLETE</span><div><strong>ПРОЦЕДУРА ЗАВЕРШЕНА.</strong><p>Completion + дальнейшее действие отдельно.</p></div><span class="lab-message__mark">✓</span></div>
+    </div>
+
+    <div class="lab-subhead"><h3>EMPTY</h3><p class="lab-note">Пустой список — это состояние данных. Не заполнять его фальшивой активностью.</p></div>
+    <div class="lab-empty"><div><span class="dc-meta">EVENT REGISTER / EMPTY SPECIMEN</span><strong>ПРЕДСТОЯЩИХ СОБЫТИЙ ПОКА НЕТ.</strong><p>Когда register пуст, интерфейс честно сообщает это и не создаёт фиктивный event.</p></div></div>
+
+    <div class="lab-subhead"><h3>INTERACTION STATES</h3><p class="lab-note">Любой новый interactive component проверяется минимум в этих состояниях.</p></div>
+    <div class="lab-state-grid"><div class="lab-state"><span>DEFAULT</span><strong>COMPONENT</strong></div><div class="lab-state lab-state--hover"><span>HOVER</span><strong>COMPONENT</strong></div><div class="lab-state lab-state--focus"><span>FOCUS</span><strong>COMPONENT</strong></div><div class="lab-state lab-state--selected"><span>SELECTED</span><strong>COMPONENT</strong></div><div class="lab-state lab-state--disabled"><span>DISABLED</span><strong>COMPONENT</strong></div><div class="lab-state lab-state--loading"><span>PROCESSING</span><strong>COMPONENT</strong></div></div>
+  </div>
+</section>
+
+<section class="lab-section lab-section--soft" id="contexts">
+  <div class="lab-shell">
+    <div class="lab-head"><span class="dc-kicker">140 / CONTEXT BENCH</span><h2 class="dc-display-l">ОДНА СУЩНОСТЬ.<br>РАЗНЫЕ МЕСТА НА САЙТЕ.</h2></div>
+    <div class="lab-context-grid">
+      <div class="lab-context"><span>EVENT PAGE → DEMENTOR RELATION</span><h4>ФУЭНХИРОЛА</h4><a class="lab-relation" href="/community/gabil/"><img src="/assets/people/dementors/gabil/portrait-ink.webp" alt="Габиль"><div class="lab-relation__copy"><small>DEMENTOR</small><strong>ГАБИЛЬ</strong></div><span class="lab-relation__arrow">→</span></a></div>
+      <div class="lab-context"><span>COURSE PAGE → DEMENTOR RELATION</span><h4>ДУМАЙ С ОПАСНОСТЬЮ</h4><a class="lab-relation" href="/community/valentin/"><img src="/assets/people/dementors/valentin/portrait-ink.webp" alt="Валентин Лосев"><div class="lab-relation__copy"><small>DEMENTOR</small><strong>ВАЛЕНТИН ЛОСЕВ</strong></div><span class="lab-relation__arrow">→</span></a></div>
+      <div class="lab-context"><span>DEMENTOR PROFILE → EVENT</span><h4>ГАБИЛЬ / ACTIVITY</h4><a class="lab-entity-inline" href="/events/fuengirola/"><div class="lab-entity-inline__title"><span>EVENT / PLANNED</span><strong>ФУЭНХИРОЛА</strong></div><div class="lab-entity-inline__meta">SPAIN<br>→</div></a></div>
+      <div class="lab-context"><span>DEMENTOR PROFILE → COURSE</span><h4>ВАЛЕНТИН / COURSES</h4><a class="lab-entity-inline" href="/courses/dumai-s-opasnostyu/"><div class="lab-entity-inline__title"><span>COURSE / ACTIVE</span><strong>ДУМАЙ С ОПАСНОСТЬЮ</strong></div><div class="lab-entity-inline__meta">7 MODULES<br>→</div></a></div>
+      <div class="lab-context"><span>GLOBAL ACTIVITY → MIXED REGISTER</span><h4>СЕЙЧАС В КЛУБЕ</h4><a class="lab-entity-row" href="/events/fuengirola/"><span>E</span><strong>ФУЭНХИРОЛА</strong><span>EVENT</span><span>PLANNED</span><span>→</span></a><a class="lab-entity-row" href="/courses/dumai-s-opasnostyu/"><span>C</span><strong>ДУМАЙ С ОПАСНОСТЬЮ</strong><span>COURSE</span><span>ACTIVE</span><span>→</span></a></div>
+      <div class="lab-context"><span>QUOTE → AUTHOR RELATION</span><h4>ЦИТАТА</h4><div class="lab-quote-person"><img src="/assets/people/dementors/gabil/portrait-ink.webp" alt="Габиль"><div><blockquote>«Не торопитесь становиться командой.»</blockquote><cite>Габиль</cite></div></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="lab-section" id="rules">
+  <div class="lab-shell">
+    <div class="lab-head"><span class="dc-kicker">150 / WRONG vs RIGHT</span><h2 class="dc-display-l">СИСТЕМА ДОЛЖНА ЗАПРЕЩАТЬ<br>ПЛОХИЕ РЕШЕНИЯ.</h2></div>
+    <div class="lab-wrong-right">
+      <div class="lab-compare"><span class="lab-compare__label">RIGHT</span><a class="lab-entity-row" href="/events/fuengirola/"><span>EVENT</span><strong>ФУЭНХИРОЛА</strong><span>SPAIN</span><span>PLANNED</span><span>→</span></a><p class="dc-body">Register row: считывается быстро, metadata видима.</p></div>
+      <div class="lab-compare lab-compare--wrong"><span class="lab-compare__label">WRONG</span><div class="lab-fake-card"><strong>Фуэнхирола</strong><p>Уникальное событие в невероятной атмосфере.</p><button type="button">Подробнее</button></div><p class="dc-body">Generic card + invented marketing copy + чужая визуальная грамматика.</p></div>
+      <div class="lab-compare"><span class="lab-compare__label">RIGHT</span><div class="lab-message lab-message--signal"><span class="lab-message__kind">SAVED</span><div><strong>РЕЗУЛЬТАТ СОХРАНЁН.</strong></div><span class="lab-message__mark">✓</span></div><p class="dc-body">Service state остаётся частью Dementor system.</p></div>
+      <div class="lab-compare lab-compare--wrong"><span class="lab-compare__label">WRONG</span><div class="lab-fake-card"><strong style="color:#25a244">Success!</strong><p>Your changes have been saved successfully.</p></div><p class="dc-body">Generic SaaS success alert.</p></div>
+    </div>
+
+    <div class="lab-subhead"><h3>160 / LLM BUILD CONTRACT</h3><p class="lab-note">LLM не выбирает дизайн из воздуха. Она заполняет contract.</p></div>
+    <pre class="lab-protocol">entity_type: event | course | dementor | project | merch
+entity_id: exact source id
+presentation_role: link | micro | inline | row | relation | feature | hero | detail | preview
+context: home | index | entity-detail | related | activity | test | article
+status: exact factual state
+primary_action: source-approved action only
+metadata: render only populated / approved fields
+quote: requires explicit source + author
+viewport_contract: web + tablet + mobile
+empty_state: explicit, never fabricate entities
+interaction_states: default / hover / focus / selected / disabled / processing
+visual_subsystem: club | project-local
+ink_level: 0..3 by page contract
+motion: only approved behaviours</pre>
+    <p class="dc-lead">Entity определяет содержание. Presentation role определяет форму. Context определяет плотность. Responsive contract определяет перестройку. LLM не проектирует эти четыре вещи заново.</p>
+  </div>
+</section>
+</main>
+
+<footer class="lab-footer"><a class="brand" href="/">DEMENTOR<span>CLUB</span></a><span>UI LAB V2 · INTERNAL · NO DEPLOY INTENT</span><span>WORKING BRANCH</span></footer>
+<script src="/design-system/ui-lab-v2.js" defer></script>
 </body>
 </html>
