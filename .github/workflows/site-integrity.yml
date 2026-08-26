@@ -1,9 +1,6 @@
 name: Site Integrity
 
 on:
-  push:
-    branches:
-      - dementor-club-site
   pull_request:
     branches:
       - dementor-club-site
