@@ -1,0 +1,41 @@
+/* Dementor Club — course bridge v1
+   Keeps each course's local voice while binding it to the club presentation contract. */
+:root{--course-paper:var(--dc-paper,#f2f0e8);--course-ink:var(--dc-ink,#111);--course-acid:var(--dc-acid,#d8ff3e);--course-line:rgba(17,17,17,.2)}
+body.dc-course-product{background:var(--course-paper);color:var(--course-ink);font-family:Inter,Arial,Helvetica,sans-serif}
+body.dc-course-product main{min-width:0}
+body.dc-course-product .topbar{z-index:260}
+body.dc-course-product .top{top:72px;z-index:200}
+body.dc-course-product .top .wrap{max-width:1500px;margin:auto}
+body.dc-course-product .course-brand{font-family:inherit;text-transform:uppercase;letter-spacing:-.02em}
+body.dc-course-product .utility,body.dc-course-product .badge{border-radius:0!important}
+body.dc-course-product .progress{border-radius:0!important}
+body.dc-course-product .progress i{background:var(--course-acid)!important}
+body.dc-course-product .modal-box{background:var(--course-paper);color:var(--course-ink);border-radius:0!important;border:1px solid var(--course-ink);box-shadow:12px 12px 0 var(--course-acid)!important}
+body.dc-course-product button,body.dc-course-product a[class*="btn"],body.dc-course-product .money-btn,body.dc-course-product .dc-planned-button{border-radius:0!important}
+
+/* Course identity belongs inside the content, not in replacement navigation. */
+body.dc-course-product .dc-course-shell,body.dc-course-product .money-shell{max-width:1500px}
+body.dc-course-product .money-meta,body.dc-course-product .dc-course-topline{border-bottom:1px solid currentColor;padding-bottom:14px;text-transform:uppercase;letter-spacing:.08em;font-size:10px}
+body.dc-course-product .money-hero h1,body.dc-course-product .dc-course-hero h1{letter-spacing:-.075em;line-height:.82}
+body.dc-course-product .money-card,body.dc-course-product .dc-method-grid article,body.dc-course-product .dc-fit-grid article{border-radius:0!important;box-shadow:none!important}
+body.dc-course-product .money-card textarea{border-radius:0!important;border:0!important;border-bottom:1px solid currentColor!important;box-shadow:none!important}
+body.dc-course-product .money-feedback,body.dc-course-product .dc-status-note,body.dc-course-product .dc-safety-note{border-top:1px solid currentColor;border-bottom:1px solid currentColor;padding:14px 0;font-size:11px;letter-spacing:.07em;text-transform:uppercase}
+body.dc-course-product .money-flow,body.dc-course-product .dc-course-flow,body.dc-course-product .dc-price-rules,body.dc-course-product .dc-sequence{border-radius:0!important}
+body.dc-course-product .money-flow>div,body.dc-course-product .dc-course-flow>article,body.dc-course-product .dc-price-rules>div{border-radius:0!important}
+body.dc-course-product .money-quote,body.dc-course-product blockquote{border-radius:0!important}
+
+/* Interactive COURSE-001 surfaces */
+body.dc-course-product--danger #app .screen,body.dc-course-product--danger #app .panel,body.dc-course-product--danger #app .card{border-radius:0!important;box-shadow:none!important}
+body.dc-course-product--danger #app button,body.dc-course-product--danger #app .choice,body.dc-course-product--danger #app .option{border-radius:0!important}
+body.dc-course-product--danger #app input,body.dc-course-product--danger #app textarea,body.dc-course-product--danger #app select{border-radius:0!important;box-shadow:none!important}
+
+@media(max-width:900px){body.dc-course-product .top{top:64px}}
+@media(max-width:700px){
+  body.dc-course-product .top{position:sticky;top:64px}
+  body.dc-course-product .top .wrap{padding-left:16px;padding-right:16px}
+  body.dc-course-product .money-hero h1,body.dc-course-product .dc-course-hero h1{font-size:clamp(48px,14vw,64px)!important;line-height:.83!important;max-width:100%;overflow-wrap:normal;word-break:normal}
+  body.dc-course-product .money-hero-grid,body.dc-course-product .dc-course-hero-grid,body.dc-course-product .dc-course-split{grid-template-columns:1fr!important}
+  body.dc-course-product .money-actions,body.dc-course-product .dc-course-actions{display:grid!important;grid-template-columns:1fr!important}
+  body.dc-course-product .money-actions>*,body.dc-course-product .dc-course-actions>*{width:100%}
+}
+@media(prefers-reduced-motion:reduce){body.dc-course-product *,body.dc-course-product *::before,body.dc-course-product *::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
