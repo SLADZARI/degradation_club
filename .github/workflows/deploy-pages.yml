@@ -1,9 +1,6 @@
 name: Deploy GitHub Pages
 
 on:
-  push:
-    branches:
-      - dementor-club-site
   workflow_dispatch:
 
 permissions:
