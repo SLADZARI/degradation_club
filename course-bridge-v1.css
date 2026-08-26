@@ -1,6 +1,6 @@
-@import url('/ui-redesign-drive-v1.css');
 /* Dementor Club — course bridge v1
-   Keeps each course's local voice while binding it to the club presentation contract. */
+   Keeps each course's local voice while binding it to the club presentation contract.
+   Visual identity is owned by /visual-standard-v2.css; do not import legacy visual layers here. */
 :root{--course-paper:var(--dc-paper,#f2f0e8);--course-ink:var(--dc-ink,#111);--course-acid:var(--dc-acid,#d8ff3e);--course-line:rgba(17,17,17,.2)}
 body.dc-course-product{background:var(--course-paper);color:var(--course-ink);font-family:Inter,Arial,Helvetica,sans-serif}
 body.dc-course-product main{min-width:0}

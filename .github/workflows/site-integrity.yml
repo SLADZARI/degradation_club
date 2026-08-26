@@ -27,3 +27,5 @@ jobs:
         run: node scripts/validate-site.mjs
       - name: Validate page content readiness
         run: node scripts/validate-content-readiness.mjs
+      - name: Validate visual contract
+        run: node scripts/validate-visual-contract.mjs
