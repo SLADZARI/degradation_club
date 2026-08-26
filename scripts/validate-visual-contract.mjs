@@ -33,13 +33,12 @@ must(home.includes('/courses/dumai-s-opasnostyu/'), 'Home course feature missing
 must(home.includes('/events/fuengirola/'), 'Home event feature missing');
 must(visual.includes(".dc-home section.dc-event:has(a[href=\"/courses/dumai-s-opasnostyu/\"])::after"), 'Home course FEATURE portrait layer missing');
 must(visual.includes(".dc-home section.dc-event:has(a[href=\"/events/fuengirola/\"])::after"), 'Home Event FEATURE media layer missing');
-must(visual.includes("/assets/people/dementors/valentin/portrait-ink.webp"), 'Valentin portrait binding missing');
-must(event.includes('/assets/event-fuengirola-03.webp'), 'Fuengirola approved event asset missing');
-must(event.includes('/assets/people/dementors/gabil/portrait-ink.webp'), 'Fuengirola Gabil relation portrait missing');
+must(visual.includes("/assets/people/dementors/valentin/dementor_valentin.webp"), 'Valentin portrait binding missing');
+must(event.includes('/assets/ink/event-fuengirola-03.webp'), 'Fuengirola approved event asset missing');
+must(event.includes('/assets/people/dementors/gabil/dementor_gabil.webp'), 'Fuengirola Gabil relation portrait missing');
 
 const portraitPath = (name) => `/assets/people/dementors/${name}/dementor_${name}.webp`;
-const portraitAlias = (name) => `/assets/people/dementors/${name}/portrait-ink.webp`;
-const hasPortrait = (html, name) => html.includes(portraitPath(name)) || html.includes(portraitAlias(name));
+const hasPortrait = (html, name) => html.includes(portraitPath(name));
 
 for (const name of ['valentin','nikita','gabil','evgeniy']) {
   const p = `community/${name}/index.html`;
@@ -63,6 +62,6 @@ console.log('✓ 4 Dementor identity background tokens');
 console.log('✓ global visual layer active; legacy course import absent');
 console.log('✓ HERO / MICRO / RELATION / FEATURE contracts present');
 console.log('✓ Home course/person FEATURE and Home event FEATURE bound to approved assets');
-console.log('✓ Fuengirola media = existing asset / top-right / height-first');
+console.log('✓ Fuengirola media = canonical asset / top-right / height-first');
 console.log('✓ Community roster + 4 profile heroes use canonical portraits');
 console.log('0 error(s)');
