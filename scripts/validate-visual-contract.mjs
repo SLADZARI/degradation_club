@@ -37,15 +37,19 @@ must(visual.includes("/assets/people/dementors/valentin/portrait-ink.webp"), 'Va
 must(event.includes('/assets/event-fuengirola-03.webp'), 'Fuengirola approved event asset missing');
 must(event.includes('/assets/people/dementors/gabil/portrait-ink.webp'), 'Fuengirola Gabil relation portrait missing');
 
+const portraitPath = (name) => `/assets/people/dementors/${name}/dementor_${name}.webp`;
+const portraitAlias = (name) => `/assets/people/dementors/${name}/portrait-ink.webp`;
+const hasPortrait = (html, name) => html.includes(portraitPath(name)) || html.includes(portraitAlias(name));
+
 for (const name of ['valentin','nikita','gabil','evgeniy']) {
   const p = `community/${name}/index.html`;
   const html = read(p);
   must(html.includes('dc-dementor-hero'), `${p}: standard Dementor hero missing`);
-  must(html.includes(`/assets/people/dementors/${name}/portrait-ink.webp`), `${p}: canonical portrait missing`);
+  must(hasPortrait(html, name), `${p}: canonical portrait missing`);
 }
 
 for (const name of ['valentin','nikita','gabil','evgeniy']) {
-  must(community.includes(`/assets/people/dementors/${name}/portrait-ink.webp`), `Community roster missing ${name} portrait`);
+  must(hasPortrait(community, name), `Community roster missing ${name} portrait`);
 }
 
 if (fail.length) {
