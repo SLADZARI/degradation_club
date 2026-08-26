@@ -7,3 +7,4 @@ Update this file only when the user explicitly requests deploy/publish/release.
 2026-08-26T23:29+02:00 — publish approved DROP 001 pricing, premium T-shirt specs and OBJECT 001 €520 pricing.
 2026-08-27 — publish PREORDER, size guide and BLIK payment for DROP 001 and OBJECT 001.
 2026-08-27 — publish reusable preorder form component and design-system specimen.
+2026-08-27 — replace inline preorder form with CTA modal flow and OBJECT 001 quickview slider.
