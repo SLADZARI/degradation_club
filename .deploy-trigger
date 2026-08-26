@@ -1,2 +1,4 @@
 Deploy trigger for Dementor Club site.
 Update this file only when the user explicitly requests deploy/publish/release.
+
+2026-08-26T21:24+02:00 — publish merch DROP 001 assets and local image links via GitHub Pages.
