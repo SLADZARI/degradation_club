@@ -17,4 +17,16 @@ Current scope:
 
 Current calculator: `index.html`
 
+System roadmap: `ROADMAP.md`
+
+The roadmap extends the direction from product economics into:
+- company P&L / EBITDA;
+- CAPEX and break-even logic;
+- contribution/value-added ledger;
+- Spory and conversion rules;
+- Dementor wallet;
+- economic optimisation radar;
+- Polish JDG tax/accounting layer;
+- DAO/equity/transferable ownership as an explicit future hypothesis only.
+
 Important: this branch is intentionally isolated from `dementor-club-site`. Do not merge or deploy until the economics model is reviewed and explicitly approved.
