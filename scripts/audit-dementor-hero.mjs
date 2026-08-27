@@ -32,10 +32,13 @@ const css=fs.readFileSync('dementor-profile.css','utf8');
 const cssContracts=[
   ['formula frame','.dc-dementor-profile .dc-dementor-quote'],
   ['desktop portrait','.dc-dementor-profile .dc-dementor-hero__portrait'],
-  ['tablet breakpoint','@media(max-width:1280px) and (min-width:561px)'],
+  ['large-tablet breakpoint','@media(max-width:1280px) and (min-width:901px)'],
+  ['approved 768 tablet breakpoint','@media(max-width:900px) and (min-width:561px)'],
   ['mobile breakpoint','@media(max-width:560px)'],
   ['mobile image row','grid-row:2'],
   ['approved formula border','border:1px dashed'],
+  ['web copy baseline anchor','align-self:end'],
+  ['real topbar subtraction','calc(100svh - 72px)'],
 ];
 for(const [label,token] of cssContracts){
   if(!css.includes(token)) errors.push(`dementor-profile.css: missing ${label}`);
@@ -46,4 +49,4 @@ if(errors.length){
   for(const e of errors) console.error(`- ${e}`);
   process.exit(1);
 }
-console.log(`Dementor HERO audit passed: ${profiles.length} profiles / WEB + TABLET + MOBILE contract`);
+console.log(`Dementor HERO audit passed: ${profiles.length} profiles / WEB + TABLET + MOBILE calibrated contract`);
