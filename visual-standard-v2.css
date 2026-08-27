@@ -60,13 +60,56 @@ img[src*="/people/dementors/evgeniy/dementor_evgeniy"]{background:var(--dc-demen
 .dc-home section.dc-event:has(a[href="/events/fuengirola/"]) .dc-event__meta{grid-column:3/9!important}
 .dc-home section.dc-event:has(a[href="/events/fuengirola/"]) .dc-event__action{grid-column:3/7!important;justify-self:start!important}
 
-/* EVENT HERO — reuse the existing approved image. Anchor TOP RIGHT; scale by height; crop, never redesign per breakpoint. */
-body.dc-fuengirola-page .dc-entity-hero{position:relative!important;overflow:hidden!important;min-height:clamp(660px,78vh,920px)!important;isolation:isolate;background:var(--dc-ink-bg-fuengirola)}
-body.dc-fuengirola-page .dc-entity-hero::after{content:"";position:absolute;z-index:0;top:0;right:0;bottom:0;width:min(78vw,1180px);height:100%;pointer-events:none;background:url('/assets/ink/event-fuengirola-03.webp') no-repeat var(--dc-event-media-position);background-size:auto 100%}
-body.dc-fuengirola-page .dc-entity-hero__meta,body.dc-fuengirola-page .dc-entity-hero__title,body.dc-fuengirola-page .dc-entity-hero__bottom{position:relative;z-index:2}
-body.dc-fuengirola-page .dc-entity-hero__title{max-width:76%}
-body.dc-fuengirola-page .dc-entity-hero__bottom{padding-right:34%}
+/* EVENT HERO — approved UI Redesign composition. One DOM image, one text stack, one relation card. */
+body.dc-fuengirola-page .dc-entity-hero{
+  position:relative!important;
+  min-height:630px!important;
+  padding:0!important;
+  overflow:hidden!important;
+  isolation:isolate;
+  background:var(--dc-ink-bg-fuengirola);
+}
+body.dc-fuengirola-page .dc-entity-hero::after{content:none!important}
+body.dc-fuengirola-page .dc-event-hero__media{position:absolute;inset:18px 20px 18px;z-index:0;margin:0;overflow:hidden;background:var(--dc-ink-bg-fuengirola)}
+body.dc-fuengirola-page .dc-event-hero__media img{display:block;width:100%;height:100%;object-fit:cover;object-position:right top;mix-blend-mode:multiply}
+body.dc-fuengirola-page .dc-entity-hero__meta{position:absolute;z-index:2;top:66px;left:40px;font-size:15px;letter-spacing:0;color:var(--dc-ink);opacity:1}
+body.dc-fuengirola-page .dc-entity-hero__title{position:absolute;z-index:2;top:124px;left:40px;margin:0;max-width:none!important;font-size:clamp(96px,9.2vw,146px);line-height:.78;letter-spacing:-.075em;color:var(--dc-ink)}
+body.dc-fuengirola-page .dc-event-hero__subtitle{position:absolute;z-index:2;top:244px;left:40px;margin:0;font-size:16px;line-height:1.2;font-weight:500;color:var(--dc-ink)}
+body.dc-fuengirola-page .dc-event-hero__relation{position:absolute;z-index:3;left:40px;bottom:40px;width:min(770px,64vw);min-height:174px;padding:18px;display:grid;grid-template-columns:118px minmax(0,1fr) 40px;gap:18px;align-items:center;background:var(--dc-paper);border:1px solid var(--dc-line);color:var(--dc-ink)}
+body.dc-fuengirola-page .dc-event-hero__relation-portrait{width:118px;aspect-ratio:4/5;overflow:hidden;background:var(--dc-dementor-gabil-bg)}
+body.dc-fuengirola-page .dc-event-hero__relation-portrait img{display:block!important;width:100%!important;height:100%!important;max-width:none!important;object-fit:cover!important;object-position:center!important;mix-blend-mode:multiply}
+body.dc-fuengirola-page .dc-event-hero__relation-copy{display:grid;align-content:center;gap:10px;min-width:0}
+body.dc-fuengirola-page .dc-event-hero__relation-copy small{font-size:10px;letter-spacing:.08em;text-transform:uppercase}
+body.dc-fuengirola-page .dc-event-hero__relation-copy strong{font-size:clamp(44px,4vw,58px);line-height:.85;letter-spacing:-.055em}
+body.dc-fuengirola-page .dc-event-hero__relation-copy span{font-size:12px;line-height:1.25}
+body.dc-fuengirola-page .dc-event-hero__relation-arrow{justify-self:end;align-self:end;font-size:34px;line-height:1}
 body.dc-fuengirola-page .dc-ink-slot--event.dc-media-break{display:none!important}
+
+@media(max-width:900px) and (min-width:561px){
+  body.dc-fuengirola-page .dc-entity-hero{min-height:590px!important}
+  body.dc-fuengirola-page .dc-event-hero__media{inset:16px}
+  body.dc-fuengirola-page .dc-entity-hero__meta{top:72px;left:34px;font-size:15px}
+  body.dc-fuengirola-page .dc-entity-hero__title{top:130px;left:34px;font-size:clamp(92px,13.6vw,108px)}
+  body.dc-fuengirola-page .dc-event-hero__subtitle{top:238px;left:34px;font-size:15px}
+  body.dc-fuengirola-page .dc-event-hero__relation{left:34px;right:32px;bottom:39px;width:auto;min-height:168px;grid-template-columns:108px minmax(0,1fr) 32px;padding:16px;gap:16px}
+  body.dc-fuengirola-page .dc-event-hero__relation-portrait{width:108px}
+  body.dc-fuengirola-page .dc-event-hero__relation-copy strong{font-size:48px}
+}
+
+@media(max-width:560px){
+  body.dc-fuengirola-page .dc-entity-hero{min-height:0!important;padding:0 15px 15px!important;display:flex;flex-direction:column;overflow:visible!important}
+  body.dc-fuengirola-page .dc-event-hero__media{position:relative;inset:auto;order:1;width:100%;height:auto;aspect-ratio:360/270;margin:15px 0 0}
+  body.dc-fuengirola-page .dc-event-hero__media img{object-position:right top}
+  body.dc-fuengirola-page .dc-entity-hero__meta{position:relative;order:2;top:auto;left:auto;margin:24px 0 0;font-size:15px}
+  body.dc-fuengirola-page .dc-entity-hero__title{position:relative;order:3;top:auto;left:auto;margin:18px 0 0;font-size:clamp(58px,17.2vw,70px);line-height:.8}
+  body.dc-fuengirola-page .dc-event-hero__subtitle{position:relative;order:4;top:auto;left:auto;margin:16px 0 0;font-size:16px;line-height:1.2}
+  body.dc-fuengirola-page .dc-event-hero__relation{position:relative;order:5;left:auto;right:auto;bottom:auto;width:100%;min-height:134px;margin:18px 0 0;padding:12px;grid-template-columns:86px minmax(0,1fr);gap:18px;border-color:var(--dc-line)}
+  body.dc-fuengirola-page .dc-event-hero__relation-portrait{width:86px}
+  body.dc-fuengirola-page .dc-event-hero__relation-copy{gap:8px}
+  body.dc-fuengirola-page .dc-event-hero__relation-copy strong{font-size:34px}
+  body.dc-fuengirola-page .dc-event-hero__relation-copy span{display:none}
+  body.dc-fuengirola-page .dc-event-hero__relation-arrow{display:none}
+}
 
 /* Any remaining event media uses the same upper-right crop rule. */
 .dc-ink-slot--event,.dc-media-break{overflow:hidden}.dc-ink-slot--event>img,.dc-media-break>img{width:100%;height:100%;object-fit:cover!important;object-position:right top!important}

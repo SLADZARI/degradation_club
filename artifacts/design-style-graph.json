@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-27T13:29:20.930Z",
+  "generatedAt": "2026-08-27T13:50:43.245Z",
   "globalImports": [
     "/visual-tokens.css",
     "/illustration-surfaces.css",
@@ -1098,7 +1098,7 @@
     {
       "file": "/visual-standard-v2.css",
       "pseudo": 13,
-      "important": 56,
+      "important": 69,
       "has": 44,
       "z": [
         "0",
@@ -1106,9 +1106,12 @@
         "0",
         "2",
         "0",
-        "2"
+        "2",
+        "2",
+        "2",
+        "3"
       ],
-      "blend": 3,
+      "blend": 5,
       "isolation": 3,
       "bgImages": [
         "/assets/people/dementors/valentin/dementor_valentin.webp",
@@ -1338,7 +1341,6 @@
       "important": 3,
       "has": 0,
       "z": [
-        "4",
         "3",
         "2"
       ],
@@ -1495,6 +1497,29 @@
       "bgImages": []
     },
     {
+      "file": "/visual-standard-v2.css",
+      "pseudo": 13,
+      "important": 69,
+      "has": 44,
+      "z": [
+        "0",
+        "2",
+        "0",
+        "2",
+        "0",
+        "2",
+        "2",
+        "2",
+        "3"
+      ],
+      "blend": 5,
+      "isolation": 3,
+      "bgImages": [
+        "/assets/people/dementors/valentin/dementor_valentin.webp",
+        "/assets/ink/event-fuengirola-03.webp"
+      ]
+    },
+    {
       "file": "/ui-redesign-drive-v1.css",
       "pseudo": 4,
       "important": 77,
@@ -1512,26 +1537,6 @@
       "isolation": 1,
       "bgImages": [
         "/assets/event-fuengirola-03.webp"
-      ]
-    },
-    {
-      "file": "/visual-standard-v2.css",
-      "pseudo": 13,
-      "important": 56,
-      "has": 44,
-      "z": [
-        "0",
-        "2",
-        "0",
-        "2",
-        "0",
-        "2"
-      ],
-      "blend": 3,
-      "isolation": 3,
-      "bgImages": [
-        "/assets/people/dementors/valentin/dementor_valentin.webp",
-        "/assets/ink/event-fuengirola-03.webp"
       ]
     },
     {
@@ -1803,7 +1808,6 @@
       "important": 3,
       "has": 0,
       "z": [
-        "4",
         "3",
         "2"
       ],
