@@ -34,6 +34,8 @@ jobs:
         run: node scripts/audit-compatibility-layers.mjs
       - name: Run mobile guardrail ownership audit
         run: node scripts/audit-mobile-guardrails.mjs
+      - name: Run ui-v2 pressure audit
+        run: node scripts/audit-ui-pressure.mjs
       - name: Print generated graph
         run: cat artifacts/design-style-graph.json
       - uses: actions/upload-artifact@v4
