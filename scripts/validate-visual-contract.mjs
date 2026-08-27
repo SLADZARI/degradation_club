@@ -5,6 +5,8 @@ const fail = [];
 const must = (ok, message) => { if (!ok) fail.push(message); };
 
 const visual = read('visual-standard-v2.css');
+const visualTokens = read('visual-tokens.css');
+const illustrationSurfaces = read('illustration-surfaces.css');
 const styles = read('styles.css');
 const bridge = read('course-bridge-v1.css');
 const home = read('index.html');
@@ -18,9 +20,11 @@ const tokens = {
   evgeniy: '#F6EDD9'
 };
 for (const [name, color] of Object.entries(tokens)) {
-  must(visual.includes(`--dc-dementor-${name}-bg:${color}`), `missing ${name} background token ${color}`);
+  must(visualTokens.includes(`--dc-dementor-${name}-bg:${color}`), `missing ${name} background token ${color}`);
 }
 
+must(styles.includes("@import url('/visual-tokens.css');"), 'visual-tokens.css is not loaded globally');
+must(styles.includes("@import url('/illustration-surfaces.css');"), 'illustration-surfaces.css is not loaded globally');
 must(styles.includes("@import url('/visual-standard-v2.css');"), 'visual-standard-v2.css is not loaded globally');
 must(!bridge.includes("ui-redesign-drive-v1.css"), 'legacy ui-redesign-drive-v1.css import still active in course bridge');
 must(visual.includes('--dc-event-media-position:right top'), 'event media anchor is not top-right');
@@ -29,6 +33,7 @@ must(visual.includes('.dc-dementor-micro'), 'MICRO contract missing');
 must(visual.includes('.dc-dementor-relation'), 'RELATION contract missing');
 must(visual.includes('.dc-dementor-feature'), 'FEATURE contract missing');
 must(visual.includes('.dc-dementor-hero__portrait'), 'HERO portrait contract missing');
+must(illustrationSurfaces.includes('var(--dc-ink-bg-fuengirola)'), 'Fuengirola illustration surface token binding missing');
 must(home.includes('/courses/dumai-s-opasnostyu/'), 'Home course feature missing');
 must(home.includes('/events/fuengirola/'), 'Home event feature missing');
 must(visual.includes(".dc-home section.dc-event:has(a[href=\"/courses/dumai-s-opasnostyu/\"])::after"), 'Home course FEATURE portrait layer missing');
@@ -58,6 +63,7 @@ if (fail.length) {
 }
 
 console.log('Dementor Club visual contract validation');
+console.log('✓ canonical visual token runtime + illustration surfaces active');
 console.log('✓ 4 Dementor identity background tokens');
 console.log('✓ global visual layer active; legacy course import absent');
 console.log('✓ HERO / MICRO / RELATION / FEATURE contracts present');
