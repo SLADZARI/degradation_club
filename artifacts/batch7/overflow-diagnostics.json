@@ -2814,8 +2814,8 @@
         },
         "first": {
           "selector": "section.dc-project-hero.dc-section",
-          "top": 56,
-          "bottom": 863.96875,
+          "top": 32,
+          "bottom": 839.96875,
           "position": "static"
         }
       }
@@ -5187,8 +5187,8 @@
         },
         "first": {
           "selector": "section.dc-project-hero.dc-section",
-          "top": -65,
-          "bottom": 755.15625,
+          "top": 32,
+          "bottom": 852.15625,
           "position": "static"
         }
       }

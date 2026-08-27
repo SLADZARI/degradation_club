@@ -147,7 +147,7 @@ Top offenders:
 ## /projects/logic-awareness/ @ m390 (390px)
 - scrollWidth: 490
 - html/body overflow-x: clip / clip
-- topbar/first: {"topbar":{"top":0,"bottom":64,"height":64,"position":"sticky"},"first":{"selector":"section.dc-project-hero.dc-section","top":56,"bottom":863.96875,"position":"static"}}
+- topbar/first: {"topbar":{"top":0,"bottom":64,"height":64,"position":"sticky"},"first":{"selector":"section.dc-project-hero.dc-section","top":32,"bottom":839.96875,"position":"static"}}
 
 Top offenders:
 - div.dc-carousel-grid.dc-content-series | L 0 R 390 W 390 | scroll 3509/390 | overflow auto | ws normal | fs 16px | 
@@ -278,7 +278,7 @@ Top offenders:
 ## /projects/logic-awareness/ @ m430 (430px)
 - scrollWidth: 490
 - html/body overflow-x: clip / clip
-- topbar/first: {"topbar":{"top":0,"bottom":64,"height":64,"position":"sticky"},"first":{"selector":"section.dc-project-hero.dc-section","top":-65,"bottom":755.15625,"position":"static"}}
+- topbar/first: {"topbar":{"top":0,"bottom":64,"height":64,"position":"sticky"},"first":{"selector":"section.dc-project-hero.dc-section","top":32,"bottom":852.15625,"position":"static"}}
 
 Top offenders:
 - div.dc-carousel-grid.dc-content-series | L 0 R 430 W 430 | scroll 3858/430 | overflow auto | ws normal | fs 16px | 
