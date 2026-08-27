@@ -1,5 +1,6 @@
 {
   "$schema": "dementor-club/entity-visual-tokens/v2",
+  "runtime": "/visual-tokens.css",
   "source": {
     "driveFolder": "03_Dementor Club Official Site/UI Redesign 2026-08",
     "driveFolderId": "1_4h7JjCQ-zbyRP_NnFfFDzV0VjdIV_kN",
