@@ -20,7 +20,9 @@ jobs:
         with:
           node-version: 20
       - name: Apply Ink surface migration
-        run: node scripts/batch3-ink-surfaces.mjs
+        run: |
+          node scripts/batch3-ink-surfaces.mjs
+          node scripts/fix-batch3-event-fallback.mjs
       - name: Run design audits
         run: |
           node scripts/audit-style-graph.mjs
