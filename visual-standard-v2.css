@@ -1,10 +1,6 @@
 /* Dementor Club — visual implementation layer v2
    Source: approved UI Redesign 2026-08 mockups + user comments. */
 :root{
-  --dc-dementor-valentin-bg:#EFE5D3;
-  --dc-dementor-nikita-bg:#F6E9D4;
-  --dc-dementor-gabil-bg:#EFE6D3;
-  --dc-dementor-evgeniy-bg:#F6EDD9;
   --dc-event-media-position:right top;
 }
 
@@ -62,7 +58,7 @@ img[src*="/people/dementors/evgeniy/dementor_evgeniy"]{background:var(--dc-demen
 
 /* HOME / EVENT FEATURE — same Fuengirola asset and same top-right / height-first rule as detail hero. */
 .dc-home section.dc-event:has(a[href="/events/fuengirola/"]){position:relative!important;overflow:hidden!important;min-height:clamp(600px,70vh,800px)!important;isolation:isolate}
-.dc-home section.dc-event:has(a[href="/events/fuengirola/"])::after{content:"";position:absolute;z-index:0;inset:0 0 0 auto;width:54%;background-color:#FAF4E2;background-image:url('/assets/ink/event-fuengirola-03.webp');background-repeat:no-repeat;background-size:auto 100%;background-position:right top;pointer-events:none}
+.dc-home section.dc-event:has(a[href="/events/fuengirola/"])::after{content:"";position:absolute;z-index:0;inset:0 0 0 auto;width:54%;background-color:var(--dc-ink-bg-fuengirola);background-image:url('/assets/ink/event-fuengirola-03.webp');background-repeat:no-repeat;background-size:auto 100%;background-position:right top;pointer-events:none}
 .dc-home section.dc-event:has(a[href="/events/fuengirola/"])>.dc-shell{position:relative;z-index:2;padding-right:46%!important}
 .dc-home section.dc-event:has(a[href="/events/fuengirola/"]) .dc-event__title{grid-column:3/13!important}
 .dc-home section.dc-event:has(a[href="/events/fuengirola/"]) .dc-event__desc{grid-column:3/9!important}
@@ -70,7 +66,7 @@ img[src*="/people/dementors/evgeniy/dementor_evgeniy"]{background:var(--dc-demen
 .dc-home section.dc-event:has(a[href="/events/fuengirola/"]) .dc-event__action{grid-column:3/7!important;justify-self:start!important}
 
 /* EVENT HERO — reuse the existing approved image. Anchor TOP RIGHT; scale by height; crop, never redesign per breakpoint. */
-body.dc-fuengirola-page .dc-entity-hero{position:relative!important;overflow:hidden!important;min-height:clamp(660px,78vh,920px)!important;isolation:isolate;background:#FAF4E2}
+body.dc-fuengirola-page .dc-entity-hero{position:relative!important;overflow:hidden!important;min-height:clamp(660px,78vh,920px)!important;isolation:isolate;background:var(--dc-ink-bg-fuengirola)}
 body.dc-fuengirola-page .dc-entity-hero::after{content:"";position:absolute;z-index:0;top:0;right:0;bottom:0;width:min(78vw,1180px);height:100%;pointer-events:none;background:url('/assets/ink/event-fuengirola-03.webp') no-repeat var(--dc-event-media-position);background-size:auto 100%}
 body.dc-fuengirola-page .dc-entity-hero__meta,body.dc-fuengirola-page .dc-entity-hero__title,body.dc-fuengirola-page .dc-entity-hero__bottom{position:relative;z-index:2}
 body.dc-fuengirola-page .dc-entity-hero__title{max-width:76%}
