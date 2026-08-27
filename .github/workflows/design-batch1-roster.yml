@@ -44,4 +44,5 @@ jobs:
             exit 0
           fi
           git commit -m "Batch 1: separate Community roster from profile CSS [roster-auto]"
+          git pull --rebase origin design-audit-batch-2026-08-27
           git push origin HEAD:design-audit-batch-2026-08-27
