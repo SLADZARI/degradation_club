@@ -1,0 +1,24 @@
+/* Dementor roster identity/component bridge.
+   Full profile HERO geometry is intentionally not defined here.
+   Identity colors remain in /visual-tokens.css. */
+
+/* MICRO / roster — same identity rule at small scale. */
+.dc-dementor-card--valentin{--dementor-bg:var(--dc-dementor-valentin-bg)}
+.dc-dementor-card--nikita{--dementor-bg:var(--dc-dementor-nikita-bg)}
+.dc-dementor-card--evgeniy{--dementor-bg:var(--dc-dementor-evgeniy-bg)}
+.dc-dementor-card--gabil{--dementor-bg:var(--dc-dementor-gabil-bg)}
+.dc-dementor-card[class*="dc-dementor-card--"]{background:var(--dementor-bg,var(--dc-paper));padding-left:18px;padding-right:18px}
+.dc-dementor-card[class*="dc-dementor-card--"]:hover{background:var(--dementor-bg,var(--dc-paper));padding-left:18px;padding-right:18px}
+.dc-dementor-card[class*="dc-dementor-card--"] .dc-dementor-card__portrait{background:transparent!important;border:0!important;object-fit:contain!important;object-position:center bottom!important;mix-blend-mode:multiply}
+
+@media(max-width:560px){
+  .dc-dementor-card[class*="dc-dementor-card--"]{grid-template-columns:58px minmax(0,1fr) 22px!important;padding:12px!important;gap:10px!important}
+  .dc-dementor-card[class*="dc-dementor-card--"] .dc-dementor-card__num{display:none}
+  .dc-dementor-card[class*="dc-dementor-card--"] .dc-dementor-card__portrait-link{grid-column:1}
+  .dc-dementor-card[class*="dc-dementor-card--"] .dc-dementor-card__portrait{width:58px!important;aspect-ratio:4/5}
+  .dc-dementor-card[class*="dc-dementor-card--"] .dc-dementor-card__body{grid-column:2}
+  .dc-dementor-card[class*="dc-dementor-card--"] .dc-dementor-card__arrow{grid-column:3}
+  .dc-dementor-card[class*="dc-dementor-card--"] h3{font-size:clamp(34px,11vw,48px)!important;margin-bottom:8px!important}
+  .dc-dementor-card[class*="dc-dementor-card--"] .dc-dementor-card__line{font-size:10px!important;margin-bottom:8px!important}
+  .dc-dementor-card[class*="dc-dementor-card--"] .dc-dementor-card__relations{display:none!important}
+}

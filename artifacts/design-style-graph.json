@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-27T13:27:44.178Z",
+  "generatedAt": "2026-08-27T13:28:47.462Z",
   "globalImports": [
     "/visual-tokens.css",
     "/illustration-surfaces.css",
@@ -182,10 +182,10 @@
         "/projects-v1.css",
         "/dementors-v1.css",
         "/community-v2.css",
-        "/dementor-profile.css"
+        "/dementor-roster.css"
       ],
       "activeStyles": [
-        "/dementor-profile.css",
+        "/dementor-roster.css",
         "/community-v2.css",
         "/dementors-v1.css",
         "/projects-v1.css",
@@ -1001,6 +1001,7 @@
     "/courses/dumai-s-opasnostyu/production.css",
     "/courses/slaboumie-i-otvaga/course.css",
     "/dementor-profile.css",
+    "/dementor-roster.css",
     "/dementors-v1.css",
     "/design-system/ui-lab-v2.css",
     "/dia-v1.css",
@@ -1212,20 +1213,6 @@
       "bgImages": []
     },
     {
-      "file": "/dementor-profile.css",
-      "pseudo": 1,
-      "important": 16,
-      "has": 0,
-      "z": [
-        "4",
-        "3",
-        "2"
-      ],
-      "blend": 2,
-      "isolation": 0,
-      "bgImages": []
-    },
-    {
       "file": "/dia-v1.css",
       "pseudo": 10,
       "important": 5,
@@ -1235,6 +1222,16 @@
       ],
       "blend": 0,
       "isolation": 1,
+      "bgImages": []
+    },
+    {
+      "file": "/dementor-roster.css",
+      "pseudo": 0,
+      "important": 13,
+      "has": 0,
+      "z": [],
+      "blend": 1,
+      "isolation": 0,
       "bgImages": []
     },
     {
@@ -1332,6 +1329,20 @@
       "has": 0,
       "z": [],
       "blend": 0,
+      "isolation": 0,
+      "bgImages": []
+    },
+    {
+      "file": "/dementor-profile.css",
+      "pseudo": 1,
+      "important": 3,
+      "has": 0,
+      "z": [
+        "4",
+        "3",
+        "2"
+      ],
+      "blend": 1,
       "isolation": 0,
       "bgImages": []
     },
@@ -1667,20 +1678,6 @@
       "bgImages": []
     },
     {
-      "file": "/dementor-profile.css",
-      "pseudo": 1,
-      "important": 16,
-      "has": 0,
-      "z": [
-        "4",
-        "3",
-        "2"
-      ],
-      "blend": 2,
-      "isolation": 0,
-      "bgImages": []
-    },
-    {
       "file": "/dia-v1.css",
       "pseudo": 10,
       "important": 5,
@@ -1690,6 +1687,16 @@
       ],
       "blend": 0,
       "isolation": 1,
+      "bgImages": []
+    },
+    {
+      "file": "/dementor-roster.css",
+      "pseudo": 0,
+      "important": 13,
+      "has": 0,
+      "z": [],
+      "blend": 1,
+      "isolation": 0,
       "bgImages": []
     },
     {
@@ -1787,6 +1794,20 @@
       "has": 0,
       "z": [],
       "blend": 0,
+      "isolation": 0,
+      "bgImages": []
+    },
+    {
+      "file": "/dementor-profile.css",
+      "pseudo": 1,
+      "important": 3,
+      "has": 0,
+      "z": [
+        "4",
+        "3",
+        "2"
+      ],
+      "blend": 1,
       "isolation": 0,
       "bgImages": []
     },
