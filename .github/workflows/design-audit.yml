@@ -18,6 +18,8 @@ jobs:
         run: node scripts/audit-style-graph.mjs
       - name: Run Dementor HERO contract audit
         run: node scripts/audit-dementor-hero.mjs
+      - name: Run Event HERO contract audit
+        run: node scripts/audit-event-hero.mjs
       - name: Print generated graph
         run: cat artifacts/design-style-graph.json
       - uses: actions/upload-artifact@v4
