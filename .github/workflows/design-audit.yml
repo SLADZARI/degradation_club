@@ -28,6 +28,8 @@ jobs:
         run: node scripts/audit-inline-styles.mjs
       - name: Run cascade pressure audit
         run: node scripts/audit-cascade-pressure.mjs
+      - name: Run presentation pressure audit
+        run: node scripts/audit-presentation-pressure.mjs
       - name: Print generated graph
         run: cat artifacts/design-style-graph.json
       - uses: actions/upload-artifact@v4
