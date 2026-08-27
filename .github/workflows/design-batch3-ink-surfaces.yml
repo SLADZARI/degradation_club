@@ -1,0 +1,42 @@
+name: Design Batch 3 Ink Surfaces
+
+on:
+  push:
+    branches:
+      - design-audit-batch-2026-08-27
+
+permissions:
+  contents: write
+
+jobs:
+  ink-surfaces:
+    if: ${{ !contains(github.event.head_commit.message, '[ink-surfaces-auto]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Apply Ink surface migration
+        run: node scripts/batch3-ink-surfaces.mjs
+      - name: Run design audits
+        run: |
+          node scripts/audit-style-graph.mjs
+          node scripts/audit-dementor-hero.mjs
+          node scripts/audit-event-hero.mjs
+          node scripts/audit-feature-relation.mjs
+          node scripts/audit-ink-surfaces.mjs
+      - name: Commit Ink surface migration
+        run: |
+          git config user.name "Dementor Design Audit"
+          git config user.email "design-audit@users.noreply.github.com"
+          git add ui-v2.css illustration-surfaces.css community-v2.css visual-standard-v2.css artifacts/design-style-graph.json
+          if git diff --cached --quiet; then
+            echo "No Ink surface migration changes"
+            exit 0
+          fi
+          git commit -m "Batch 3: normalize Ink surfaces and Community opening [ink-surfaces-auto]"
+          git pull --rebase origin design-audit-batch-2026-08-27
+          git push origin HEAD:design-audit-batch-2026-08-27
