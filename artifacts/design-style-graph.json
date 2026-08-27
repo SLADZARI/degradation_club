@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-27T15:19:29.062Z",
+  "generatedAt": "2026-08-27T15:28:38.473Z",
   "globalImports": [
     "/visual-tokens.css",
     "/illustration-surfaces.css",
@@ -1085,27 +1085,6 @@
   },
   "activeCssRiskStats": [
     {
-      "file": "/visual-standard-v2.css",
-      "pseudo": 12,
-      "important": 52,
-      "has": 35,
-      "z": [
-        "0",
-        "2",
-        "0",
-        "2",
-        "2",
-        "2",
-        "3"
-      ],
-      "blend": 6,
-      "isolation": 2,
-      "bgImages": [
-        "/assets/people/dementors/valentin/dementor_valentin.webp",
-        "/assets/ink/event-fuengirola-03.webp"
-      ]
-    },
-    {
       "file": "/presentation-standard-v1.css",
       "pseudo": 2,
       "important": 51,
@@ -1132,6 +1111,27 @@
       "blend": 2,
       "isolation": 0,
       "bgImages": []
+    },
+    {
+      "file": "/visual-standard-v2.css",
+      "pseudo": 12,
+      "important": 0,
+      "has": 35,
+      "z": [
+        "0",
+        "2",
+        "0",
+        "2",
+        "2",
+        "2",
+        "3"
+      ],
+      "blend": 6,
+      "isolation": 2,
+      "bgImages": [
+        "/assets/people/dementors/valentin/dementor_valentin.webp",
+        "/assets/ink/event-fuengirola-03.webp"
+      ]
     },
     {
       "file": "/course-bridge-v1.css",
@@ -1516,27 +1516,6 @@
       ]
     },
     {
-      "file": "/visual-standard-v2.css",
-      "pseudo": 12,
-      "important": 52,
-      "has": 35,
-      "z": [
-        "0",
-        "2",
-        "0",
-        "2",
-        "2",
-        "2",
-        "3"
-      ],
-      "blend": 6,
-      "isolation": 2,
-      "bgImages": [
-        "/assets/people/dementors/valentin/dementor_valentin.webp",
-        "/assets/ink/event-fuengirola-03.webp"
-      ]
-    },
-    {
       "file": "/ink-layout-v2.css",
       "pseudo": 2,
       "important": 75,
@@ -1582,6 +1561,27 @@
       "blend": 2,
       "isolation": 0,
       "bgImages": []
+    },
+    {
+      "file": "/visual-standard-v2.css",
+      "pseudo": 12,
+      "important": 0,
+      "has": 35,
+      "z": [
+        "0",
+        "2",
+        "0",
+        "2",
+        "2",
+        "2",
+        "3"
+      ],
+      "blend": 6,
+      "isolation": 2,
+      "bgImages": [
+        "/assets/people/dementors/valentin/dementor_valentin.webp",
+        "/assets/ink/event-fuengirola-03.webp"
+      ]
     },
     {
       "file": "/course-bridge-v1.css",
