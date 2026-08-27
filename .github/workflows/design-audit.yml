@@ -40,6 +40,8 @@ jobs:
         run: node scripts/audit-component-owner-hardening.mjs
       - name: Run route owner sweep audit
         run: node scripts/audit-route-owner-sweep.mjs
+      - name: Run shared systems audit
+        run: node scripts/audit-shared-systems.mjs
       - name: Print generated graph
         run: cat artifacts/design-style-graph.json
       - uses: actions/upload-artifact@v4
