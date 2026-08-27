@@ -1,12 +1,5 @@
-/* QA ONLY — Dementor profile alignment against approved web/tablet/mobile/micro mocks.
-   Do not merge to dementor-club-site until visual QA is signed off. */
-
-:root{
-  --dc-dementor-valentin-bg:#EFE5D3;
-  --dc-dementor-nikita-bg:#F6E9D4;
-  --dc-dementor-evgeniy-bg:#F6EDD9;
-  --dc-dementor-gabil-bg:#EFE6D3;
-}
+/* Dementor profile component contract.
+   Identity colors are defined centrally in /visual-tokens.css. */
 
 .dc-dementor--valentin{--dementor-bg:var(--dc-dementor-valentin-bg)}
 .dc-dementor--nikita{--dementor-bg:var(--dc-dementor-nikita-bg)}
@@ -14,7 +7,7 @@
 .dc-dementor--gabil{--dementor-bg:var(--dc-dementor-gabil-bg)}
 
 .dc-dementor-profile{background:var(--dementor-bg,var(--dc-paper));color:var(--dc-ink)}
-.dc-dementor-profile .topbar{background:var(--dementor-bg);background:color-mix(in srgb,var(--dementor-bg) 94%,transparent);border-bottom-color:rgba(17,17,17,.2)}
+.dc-dementor-profile .topbar{background:var(--dementor-bg);background:color-mix(in srgb,var(--dementor-bg) 94%,transparent);border-bottom-color:var(--dc-line)}
 
 /* WEB — one coherent first screen, not a framed portrait card. */
 .dc-dementor-profile .dc-dementor-hero{
@@ -22,7 +15,7 @@
   min-height:calc(100svh - 64px);
   padding:0;
   background:var(--dementor-bg);
-  border-bottom:1px solid rgba(17,17,17,.22);
+  border-bottom:1px solid var(--dc-line);
   overflow:hidden;
 }
 .dc-dementor-profile .dc-dementor-hero>.dc-shell{
@@ -97,7 +90,6 @@
 }
 .dc-dementor-profile .dc-dementor-hero__portrait::after{display:none}
 
-/* Content returns to club paper after the personal hero. */
 .dc-dementor-profile main>.dc-section{background:var(--dc-paper);color:var(--dc-ink)}
 .dc-dementor-profile main>.dc-profile-section-muted{background:rgba(17,17,17,.035)}
 .dc-dementor-profile footer{background:var(--dc-paper)}
@@ -111,7 +103,6 @@
 .dc-dementor-card[class*="dc-dementor-card--"]:hover{background:var(--dementor-bg,var(--dc-paper));padding-left:18px;padding-right:18px}
 .dc-dementor-card[class*="dc-dementor-card--"] .dc-dementor-card__portrait{background:transparent!important;border:0!important;object-fit:contain!important;object-position:center bottom!important;mix-blend-mode:multiply}
 
-/* 1280-ish laptops: keep copy and portrait from colliding. */
 @media(max-width:1280px) and (min-width:901px){
   .dc-dementor-profile .dc-dementor-hero__copy{grid-column:1/7}
   .dc-dementor-profile .dc-dementor-hero__portrait{grid-column:6/13}
@@ -120,7 +111,6 @@
   .dc-dementor--gabil .dc-dementor-quote{font-size:clamp(22px,2.25vw,32px);max-width:19ch}
 }
 
-/* TABLET — same composition, larger portrait field and controlled overlap. */
 @media(max-width:900px){
   .dc-dementor-profile .dc-dementor-hero{min-height:760px}
   .dc-dementor-profile .dc-dementor-hero>.dc-shell{min-height:760px;padding-top:26px}
@@ -132,7 +122,6 @@
   .dc-dementor--gabil .dc-dementor-quote{font-size:clamp(21px,3.2vw,30px);max-width:18ch}
 }
 
-/* MOBILE — identity/name/formula first; portrait follows full width. */
 @media(max-width:560px){
   .dc-dementor-profile .dc-dementor-hero{min-height:0}
   .dc-dementor-profile .dc-dementor-hero>.dc-shell{min-height:0;padding-top:20px;padding-bottom:0}
