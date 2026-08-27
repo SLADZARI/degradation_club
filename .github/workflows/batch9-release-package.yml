@@ -1,0 +1,78 @@
+name: Batch 9 Release Package
+
+on:
+  push:
+    branches:
+      - release/dementor-club-site-2026-08-28-final
+
+permissions:
+  contents: write
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Integrate current production-only changes
+        run: |
+          git fetch origin dementor-club-site
+          git checkout origin/dementor-club-site -- .deploy-trigger cart/index.html dementor-account-sync-v1.js dementor-cart-v1.js docs/SUPABASE_BACKEND_v1.md global-header.js join-storage-guard.js merch-cart-bridge-v1.js profile/index.html site-config.js sitemap.xml
+      - name: Remove audit-only material from release package
+        run: |
+          rm -rf artifacts
+          rm -f .github/workflows/design-*.yml
+          rm -f scripts/audit-*.mjs scripts/batch*.mjs scripts/fix-batch*.mjs
+          rm -f docs/BATCH7_RECHECK_2026-08-27.md
+          rm -f docs/DESIGN_AUDIT_*.md docs/DESIGN_AUDIT_PACK_2026-08-27.md
+      - name: Install Playwright for release verification
+        run: |
+          npm init -y >/dev/null 2>&1 || true
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Start release static server
+        run: |
+          python3 -m http.server 4173 --bind 127.0.0.1 > /tmp/dementor-release-http.log 2>&1 &
+          sleep 2
+      - name: Run focused release smoke
+        run: |
+          node - <<'NODE'
+          const { chromium } = require('playwright');
+          const routes=['/','/about/','/community/','/community/valentin/','/community/gabil/','/events/','/events/fuengirola/','/courses/dumai-s-opasnostyu/','/courses/ne-komanda/','/projects/','/projects/logic-awareness/','/merch/','/join/','/cart/','/profile/'];
+          const widths=[390,1440];
+          const base='http://127.0.0.1:4173';
+          const browser=await chromium.launch({headless:true});
+          const failures=[];
+          for(const width of widths){
+            const ctx=await browser.newContext({viewport:{width,height:width===390?844:1100},reducedMotion:'reduce'});
+            for(const route of routes){
+              const p=await ctx.newPage();
+              const errs=[]; p.on('pageerror',e=>errs.push(String(e.message||e)));
+              let res=null, navErr=null;
+              try{res=await p.goto(base+route,{waitUntil:'networkidle',timeout:20000});}catch(e){navErr=String(e.message||e)}
+              const m=navErr?null:await p.evaluate(w=>({sw:Math.max(document.documentElement.scrollWidth,document.body?.scrollWidth||0),broken:[...document.images].filter(i=>(i.getAttribute('src')||'').trim()&&i.complete&&i.naturalWidth===0).map(i=>i.getAttribute('src')),main:!!document.querySelector('main'),h1:!!document.querySelector('h1')}),width);
+              if(navErr || !res || (res.status()>=400) || errs.length || m?.broken.length || (m && m.sw>w+6) || !m?.main || !m?.h1){failures.push({route,width,status:res?.status()||null,navErr,errs,metrics:m});}
+              await p.close();
+            }
+            await ctx.close();
+          }
+          await browser.close();
+          console.log(JSON.stringify({cases:routes.length*widths.length,failures},null,2));
+          if(failures.length) process.exit(2);
+          NODE
+      - name: Remove packaging workflow from release branch
+        run: |
+          rm -f .github/workflows/batch9-release-package.yml
+          rm -f package.json package-lock.json
+      - name: Commit clean release candidate
+        run: |
+          git config user.name "Dementor Release"
+          git config user.email "release@users.noreply.github.com"
+          git add -A
+          git commit -m "Batch 9: clean release candidate [release-package]"
+          git push origin HEAD:release/dementor-club-site-2026-08-28-final
