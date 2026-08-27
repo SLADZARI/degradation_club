@@ -1,6 +1,13 @@
 window.DEMENTOR_SITE_CONFIG=Object.freeze({
-  version:'2026-08-26',
+  version:'2026-08-27',
   canonicalOrigin:'https://degradation-club.vercel.app',
+  supabase:{
+    enabled:true,
+    url:'https://mmekfydwbvptbdatwitj.supabase.co',
+    publishableKey:'sb_publishable_a7e_Ndwwii8lyt_xmezoVw_ijxfh_yg',
+    authProvider:'google',
+    assessmentVersion:'dc9-v1'
+  },
   contacts:{
     enabled:false,
     endpoint:null,
@@ -32,7 +39,8 @@ window.DEMENTOR_SITE_CONFIG=Object.freeze({
   },
   onboarding:{
     storageKey:'dementorClubOnboardingV3',
-    storage:'localStorage'
+    storage:'localStorage',
+    accountSync:true
   }
 });
 if(typeof document!=='undefined'){
