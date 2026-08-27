@@ -1,17 +1,6 @@
-/* Illustration surface colors matched to approved raster paper tones.
-   Keep image and its responsive container on the same base color to avoid visible seams. */
-:root{
-  --dc-ink-bg-home-chair:#F3EDDE;
-  --dc-ink-bg-maze:#F0E7D7;
-  --dc-ink-bg-authority-chair:#F0E7D7;
-  --dc-ink-bg-about-service:#F9EDD5;
-  --dc-ink-bg-community-people:#F1E9D8;
-  --dc-ink-bg-community-hero:#F7EBD5;
-  --dc-ink-bg-fuengirola:#FAF4E2;
-  --dc-ink-bg-dementor-gabil:#EFE6D3;
-}
+/* Illustration surface component contract.
+   Colors are defined centrally in /visual-tokens.css; this file only defines behavior. */
 
-/* Canonical image-box behaviour: artwork is preserved, the box supplies the paper tone. */
 .dc-ink-slot,
 .dc-ink-editorial,
 .dc-home-community__media,
@@ -35,7 +24,7 @@
 
 .dc-home .dc-home-community{
   background:var(--dc-ink-bg-community-people);
-  border-block:1px solid rgba(17,17,17,.18);
+  border-block:1px solid var(--dc-line);
   padding:0;
   overflow:hidden;
 }
@@ -67,8 +56,8 @@
   bottom:clamp(18px,2vw,32px);
   margin:0;
   padding:7px 9px;
-  background:var(--dc-ink,#111);
-  color:var(--dc-paper,#f2f0e8);
+  background:var(--dc-ink);
+  color:var(--dc-paper);
   font-size:10px;
   font-weight:800;
   letter-spacing:.12em;
@@ -89,7 +78,6 @@
 .dc-logic-page .dc-ink-slot--logic{background:var(--dc-ink-bg-maze)}
 .dc-logic-page .dc-ink-slot--logic img{object-fit:contain!important}
 
-/* Legacy runtime still inserts the authority chair on About; normalize it to the approved surface contract. */
 .dc-about .dc-ink-editorial--authority,
 .dc-ink-surface--authority-chair{background:var(--dc-ink-bg-authority-chair)!important}
 .dc-about .dc-ink-editorial--authority img{width:100%;height:auto;aspect-ratio:auto!important;object-fit:contain!important;object-position:center!important}
@@ -100,8 +88,8 @@
 .dc-fuengirola-page .dc-media-break{background:var(--dc-ink-bg-fuengirola)}
 .dc-fuengirola-page .dc-ink-slot--event img,
 .dc-fuengirola-page .dc-media-break img{width:100%;height:auto;object-fit:contain!important;object-position:center}
-.dc-fuengirola-page .dc-event-dementor-portrait{background:var(--dc-ink-bg-dementor-gabil)}
-.dc-fuengirola-page .dc-event-dementor-portrait img{width:100%;height:auto;object-fit:contain!important;background:var(--dc-ink-bg-dementor-gabil)}
+.dc-fuengirola-page .dc-event-dementor-portrait{background:var(--dc-dementor-gabil-bg)}
+.dc-fuengirola-page .dc-event-dementor-portrait img{width:100%;height:auto;object-fit:contain!important;background:var(--dc-dementor-gabil-bg)}
 
 @media(max-width:700px){
   .dc-home .dc-home-community__caption{position:absolute;left:16px;right:auto;bottom:16px;width:auto}
