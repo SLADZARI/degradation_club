@@ -1,50 +1,23 @@
 name: Design Batch 1 Cascade Cleanup
 
 on:
-  push:
-    branches:
-      - design-audit-batch-2026-08-27
-
-permissions:
-  contents: write
+  workflow_dispatch:
 
 jobs:
-  cleanup:
+  verify:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: Apply deterministic cascade cleanup
-        run: node scripts/batch1-cascade-cleanup.mjs
-      - name: Re-run style graph audit
-        run: node scripts/audit-style-graph.mjs
-      - name: Verify redundant global links are gone
+      - name: Verify cascade cleanup remains applied
         run: |
+          node scripts/audit-style-graph.mjs
           node - <<'NODE'
           const fs=require('fs');
           const graph=JSON.parse(fs.readFileSync('artifacts/design-style-graph.json','utf8'));
-          if(graph.duplicateStylesheetRoutes.length){
-            console.error('Remaining duplicate global stylesheet routes:', graph.duplicateStylesheetRoutes.map(x=>x.file));
-            process.exit(1);
-          }
-          if(graph.globalImports.includes('/home-visual-standard-v2.css')){
-            console.error('Deprecated home-visual-standard-v2.css import still present');
-            process.exit(1);
-          }
+          if(graph.duplicateStylesheetRoutes.length) process.exit(1);
+          if(graph.globalImports.includes('/home-visual-standard-v2.css')) process.exit(1);
           console.log('Batch 1 cascade gate passed');
           NODE
-      - name: Commit cleanup if needed
-        run: |
-          if git diff --quiet; then
-            echo "No cleanup changes"
-            exit 0
-          fi
-          git config user.name "Dementor Design Audit"
-          git config user.email "design-audit@users.noreply.github.com"
-          git add -A
-          git commit -m "Batch 1: remove duplicate visual cascade layers [batch1-auto]"
-          git push origin HEAD:design-audit-batch-2026-08-27
