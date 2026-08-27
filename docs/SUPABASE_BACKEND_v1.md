@@ -1,226 +1,138 @@
 # Dementor Club — Supabase Backend v1
 
-Status: ACTIVE BACKEND BASELINE
+Status: ACTIVE BACKEND BASELINE / GOOGLE OAUTH PENDING LIVE TEST
 Date: 2026-08-27
 Supabase project: `EDU Modern Pilgrims`
 Project ref: `mmekfydwbvptbdatwitj`
 
-## Purpose
-
-Supabase stores operational/dynamic and user-specific state only.
+## Core rule
 
 **Git remains source-of-truth for what exists.**
 **Supabase stores what happens to/with a specific person.**
 
-Canonical club content, entity definitions, approved copy, event/course/project definitions and public URLs continue to live in `dementor-club` and are implemented by `dementor-club-site`.
-
-Supabase MUST NOT become a parallel CMS for approved club content.
+Canonical club content, entity definitions, approved copy, event/course/project/product definitions and public URLs remain in `dementor-club` and are implemented by `dementor-club-site`. Supabase is not a CMS.
 
 ## Preserved infrastructure
 
 - Supabase Auth
-- Google OAuth provider already used by existing test users
+- Google OAuth provider previously used by test users
 - `auth.users`
 - `auth.identities`
 - automatic `auth.users -> public.profiles` projection
+- existing Google/Auth users backfilled into `public.profiles`
 
-Existing Google/Auth users were backfilled into the new `public.profiles` table.
-
-## Identity boundary
-
-Authentication is not membership.
-
-A user may have a `public.profiles` record without being a Dementor Club member, having an accepted join application, event registration or course enrollment.
-
-Public actions may also exist without authentication where explicitly designed that way. Their `profile_id` can be nullable.
+Authentication is not membership. A profile can exist without accepted membership, event registration or course enrollment.
 
 ## Local-first diagnostic model
 
-The nine-sphere diagnostic experience remains local-first.
+Local runtime key: `dementorClubOnboardingV3`.
 
-`localStorage` key: `dementorClubOnboardingV3`
+1. Diagnostics work without account.
+2. Local state remains usable if Supabase is unavailable.
+3. Google sign-in upgrades persistence; it is not a gate.
+4. On sign-in local and remote state merge.
+5. Per-sphere completed results merge by `result.date`; newest wins.
+6. Existing local progress is never discarded just because remote state exists.
+7. Diagnostic version is recorded.
 
-Rules:
+Current version: `dc9-v1`.
 
-1. A visitor may start and complete diagnostics without creating an account.
-2. Local state must remain usable when Supabase is unavailable.
-3. Google sign-in is an optional persistence/synchronization upgrade, not a gate to the experience.
-4. Once authenticated, the local profile is merged with the user's durable Supabase snapshot.
-5. Per-sphere completed results are merged by their result timestamp (`result.date`), newest wins.
-6. Existing local progress must never be discarded merely because remote state exists.
-7. The diagnostic algorithm/version is recorded so future question sets do not silently rewrite historical meaning.
+Tables:
+- `profiles`
+- `assessment_snapshots` — current durable accumulated map
+- `assessment_runs` — completed run history with `assessment_version`, `result_json`, optional `answers_json`, timestamps and dedupe `source_key`
 
-The first synced diagnostic version is `dc9-v1`.
+Browser adapter: `/dementor-account-sync-v1.js`.
 
-## Active public schema
+Routes:
+- `/join/` — local-first diagnostic + optional Google persistence
+- `/profile/` — account dashboard, nine-sphere map, run history and orders
 
-### `public.profiles`
-Identity projection for authenticated users.
+## Commerce model
 
-Fields:
-- `id` -> `auth.users.id`
-- `email`
-- `full_name`
-- `avatar_url`
-- `created_at`
-- `updated_at`
+Local cart key: `dementorClubCartV1`.
 
-RLS:
-- authenticated user may SELECT own profile
-- authenticated user may UPDATE own profile
-- no anonymous reads
+The approved product/preorder model remains canonical in Git. The current payment method remains manual BLIK; no payment-provider semantics were invented or changed.
 
-### `public.assessment_snapshots`
-Current durable copy of a user's accumulated diagnostic state.
+Flow:
 
-Fields:
-- `profile_id` (PK -> `profiles.id`)
-- `assessment_version`
-- `state_json`
-- `client_updated_at`
-- `updated_at`
+anonymous product selection -> localStorage cart -> optional Google sign-in -> merge to durable user cart -> draft preorder record.
+
+Tables:
+- `carts`
+- `cart_items`
+- `orders`
+- `order_items`
 
 RLS:
-- authenticated user may SELECT/INSERT/UPDATE only own row
-- no anonymous access
+- all commerce tables are authenticated/own-user only
+- no anonymous database access
+- anonymous cart stays local only
 
-`state_json` mirrors the local diagnostic runtime shape (`results` + optional `active`) so local and remote state can round-trip without creating a second scoring engine.
+Browser adapter: `/dementor-cart-v1.js`.
+Bridge from the existing preorder selector: `/merch-cart-bridge-v1.js`.
+Route: `/cart/`.
 
-### `public.assessment_runs`
-Append-oriented history of completed sphere runs.
+`orders` currently supports the existing manual preorder process. `checkoutEnabled` remains false. A draft order is not a paid or confirmed order.
 
-Fields:
-- `profile_id`
-- `sphere_id`
-- `assessment_version`
-- `result_json`
-- `answers_json` nullable
-- `started_at` nullable
-- `completed_at`
-- `source_key`
-- `created_at`
+## Other operational tables
 
-`source_key` is unique per user and prevents duplicate history rows when the same local result is synchronized more than once.
+- `join_applications`
+- `event_registrations`
+- `course_enrollments`
+- `contact_requests`
 
-For runs completed while the sync runtime is active, `answers_json` captures the answer path immediately before the diagnostic runtime clears its active state. Older local results can be backfilled as historical baselines without answer detail.
-
-RLS:
-- authenticated user may SELECT/INSERT only own rows
-- no anonymous access
-
-### `public.join_applications`
-Operational applications to join the club.
-
-Important: this does not define membership mechanics. It only stores submitted applications once a public application UI is approved.
-
-### `public.event_registrations`
-Event registrations.
-
-`event_id` is a stable canonical entity ID originating from Git. Supabase does not duplicate event editorial content.
-
-### `public.course_enrollments`
-Course/program applications and enrollment state.
-
-`course_id` is a stable canonical entity ID originating from Git.
-
-### `public.contact_requests`
-Inbound contact submissions.
-
-No public SELECT policy exists by design.
+Their public feature flags remain disabled until their UX is explicitly activated.
 
 ## Auth trigger
 
-Trigger:
-`auth.users` AFTER INSERT -> `public.handle_new_user()`
+`auth.users` AFTER INSERT -> `public.handle_new_user()`.
 
-The function creates/updates only `public.profiles`.
-
-It no longer creates EDU employee entities or assigns an `employee` role.
-
-`public.handle_new_user()` remains `SECURITY DEFINER` for the auth trigger, but direct execution has been revoked from `PUBLIC`, `anon` and `authenticated`.
-
-## Website runtime
-
-`/dementor-account-sync-v1.js` is the browser adapter for the diagnostic profile layer.
-
-Responsibilities:
-- initialize Supabase with the publishable key only;
-- expose Google sign-in/sign-out UI on `/join`;
-- keep diagnostics fully usable before authentication;
-- observe the existing localStorage runtime instead of duplicating the scoring engine;
-- merge local and remote snapshots after sign-in;
-- synchronize the current snapshot while authenticated;
-- persist completed runs and answer paths when available;
-- restore a newer remote profile on another device and reload the diagnostic UI once so the existing runtime reads the merged local state.
-
-The browser MUST NEVER receive a Supabase secret/service-role key.
-
-The SDK is pinned to `@supabase/supabase-js@2.112.4` for reproducible browser behavior.
+The function only creates/updates `public.profiles`. It does not create EDU employee entities. Direct RPC execution is revoked from `PUBLIC`, `anon` and `authenticated`.
 
 ## Legacy EDU archive
 
-The former EDU test model was not deleted.
-
-It was moved intact into schema:
-
-`legacy_edu`
-
-Archived tables include:
-- companies
-- departments
-- profiles
-- mentor_assignments
-- employee_profiles
-- sessions
-- session_summaries
-- session_links
-- tasks
-- recommendations
-- feedback
-
-`legacy_edu` is not part of the Dementor Club runtime. Access for `anon` and `authenticated` has been revoked.
-
-Do not extend or optimize this archive unless data recovery is explicitly required.
+Former EDU test tables were moved intact to `legacy_edu`. The schema is not part of runtime and access for `anon` and `authenticated` is revoked.
 
 ## Applied migrations
 
 1. `archive_edu_and_create_dementor_core`
 2. `secure_legacy_edu_archive`
 3. `add_dementor_assessment_sync`
+4. `add_dementor_commerce_state`
 
 ## Security baseline
 
-All active public Dementor Club tables have RLS enabled.
+All active public Dementor Club tables use RLS. Browser code receives only the Supabase publishable key, never secret/service-role credentials.
 
-The previous critical issue where `public.profiles` had policies but RLS disabled has been removed from the active schema.
-
-Remaining Supabase advisor findings currently relate to the cold `legacy_edu` archive, fresh unused indexes, or optional password-auth hardening (`Leaked Password Protection`). Google OAuth operation does not depend on password login.
+Remaining advisor notices may relate to the cold `legacy_edu` archive, fresh unused indexes, or optional password-auth hardening. Google OAuth does not use password login.
 
 ## Storage / Realtime / Edge Functions
 
-At this baseline:
+- Storage: not required for current identity/diagnostic/cart runtime
+- Realtime: not required
+- Edge Functions: not required before payment-provider/server webhook integration
 
-- Storage: no club buckets configured
-- Realtime: not used by club runtime
-- Edge Functions: none required for diagnostic synchronization
+## Google production activation checklist
 
-Do not introduce these services without a concrete product requirement.
+Production site origin:
+`https://degradation-club.vercel.app`
 
-## Commerce extension
+Supabase project URL:
+`https://mmekfydwbvptbdatwitj.supabase.co`
 
-The same identity model can later support a local-first cart:
+Google OAuth callback URI that must exist in Google Cloud OAuth client:
+`https://mmekfydwbvptbdatwitj.supabase.co/auth/v1/callback`
 
-anonymous `localStorage` cart -> Google sign-in -> merge into user cart -> durable cross-device cart.
+Supabase Auth redirect allow-list must permit:
+- `https://degradation-club.vercel.app/join/`
+- `https://degradation-club.vercel.app/profile/`
+- `https://degradation-club.vercel.app/cart/`
 
-Supabase may store cart/order state, but payment processing must remain with a dedicated payment provider. Product definitions and approved merch content remain canonical in Git.
+Google Authorized JavaScript origin:
+`https://degradation-club.vercel.app`
 
-## Website activation rule
-
-Backend existence does **not** automatically make unrelated features LIVE.
-
-Do not set membership/event/contact/checkout feature flags to LIVE until their public UX, canonical entity mapping, privacy text and end-to-end behavior are approved and tested.
-
-Diagnostic profile synchronization is a separate capability from membership application.
+Do not add `service_role` credentials to Google, Git or browser code.
 
 ## Architectural rule
 
