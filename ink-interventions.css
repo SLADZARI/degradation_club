@@ -14,12 +14,6 @@
 .dc-ink-l2{--dc-ink-density:2}
 .dc-ink-l3{--dc-ink-density:3}
 
-/* Shared scene contract. */
-.dc-ink-slot{position:relative;isolation:isolate;background:var(--dc-paper);overflow:hidden}
-.dc-ink-slot>img,.dc-ink-slot__image{display:block;width:100%;height:100%;object-fit:cover;mix-blend-mode:multiply;filter:contrast(1.05)}
-.dc-ink-slot::before{position:absolute;z-index:6;top:18px;left:var(--dc-ink-edge);padding:7px 9px;background:var(--dc-acid);color:var(--dc-ink);font-size:10px;line-height:1;letter-spacing:.15em;text-transform:uppercase;pointer-events:none}
-.dc-ink-slot::after{content:"";position:absolute;z-index:4;height:1px;background:var(--dc-ink);opacity:.62;pointer-events:none}
-
 /* L1 / TRACE — system dominates, Ink only leaves evidence. */
 .dc-ink-trace{position:relative;isolation:isolate}
 .dc-ink-trace::after{content:attr(data-ink-label);position:absolute;z-index:3;right:0;top:0;max-width:180px;padding:6px 8px;background:var(--dc-ink);color:var(--dc-paper);font-size:8px;line-height:1.2;letter-spacing:.12em;text-transform:uppercase;transform:translateY(-52%) rotate(var(--dc-ink-tilt-l1));pointer-events:none}
@@ -28,31 +22,6 @@
 .dc-ink-trace-media img{display:block;width:100%;height:100%;object-fit:cover;mix-blend-mode:multiply;filter:contrast(1.08)}
 .dc-projects-page .dc-ink-trace-media{right:0;top:calc(100% + 16px)}
 .dc-events-page .dc-ink-trace-media{right:0;top:56%}
-
-/* L2 / CONTAMINATION, LEAK, FIELD RECORD ------------------------------- */
-.dc-ink-slot--about,.dc-ink-slot--logic,.dc-ink-slot--event{z-index:4;width:min(106vw,1720px);margin-left:max(-3vw,calc((100vw - 1720px)/2));border:1px solid var(--dc-ink);box-shadow:0 0 0 1px var(--dc-paper)}
-
-.dc-ink-slot--about{margin-top:-56px;margin-bottom:-72px;transform:rotate(var(--dc-ink-tilt-l2))}
-.dc-ink-slot--about::before{content:"INK / SERVICE CONTAMINATION"}
-.dc-ink-slot--about::after{left:5%;right:4%;top:38%;transform:rotate(-1.1deg)}
-.dc-ink-slot--about>img{transform:scale(1.035)}
-
-.dc-ink-slot--logic{margin-top:-72px;margin-bottom:-64px;transform:rotate(calc(var(--dc-ink-tilt-l2) * -1))}
-.dc-ink-slot--logic::before{content:"INK / EVIDENCE LEAK"}
-.dc-ink-slot--logic::after{left:3%;right:7%;top:62%;transform:rotate(1.4deg)}
-.dc-ink-slot--logic>img{transform:scale(1.04)}
-
-.dc-ink-slot--event{height:clamp(560px,70vh,880px);margin-top:-34px;margin-bottom:-54px;transform:rotate(.22deg)}
-.dc-ink-slot--event::before{content:"INK / FIELD RECORD"}
-.dc-ink-slot--event::after{left:8%;right:2%;top:47%;transform:rotate(-.7deg)}
-.dc-ink-slot--event>img{transform:scale(1.03)}
-
-/* L3 / TAKEOVER — rare, page-scale rupture. */
-.dc-home .dc-ink-slot--home{z-index:5;width:108vw;margin-left:-4vw;margin-top:clamp(-210px,-15vw,-120px);margin-bottom:clamp(-150px,-9vw,-80px);height:clamp(640px,80vh,980px);transform:rotate(calc(var(--dc-ink-tilt-l3) * -1));border:1px solid var(--dc-ink);box-shadow:0 0 0 1px var(--dc-paper);overflow:hidden}
-.dc-home .dc-ink-slot--home::before{content:"INK / L3 / UNAUTHORIZED INTERVENTION";display:block;top:18px;left:clamp(24px,4vw,70px)}
-.dc-home .dc-ink-slot--home::after{display:block;left:7%;right:3%;top:51%;transform:rotate(1.7deg);opacity:.7}
-.dc-home .dc-ink-slot--home>img{transform:scale(1.045);transition:transform 1.3s cubic-bezier(.2,.8,.2,1),filter .8s ease;filter:contrast(1.06)}
-.dc-home .dc-ink-slot--home:hover>img{transform:scale(1.075) translateX(-.7%)}
 
 /* Neighboring content must remain structurally above/below the intervention. */
 .dc-about-principles,.dc-chain__head,.dc-event-detail,.dc-project-register-section,.dc-programme-section{position:relative;z-index:2}
@@ -65,25 +34,11 @@
 @media(max-width:700px){
   .dc-ink-trace::after{right:0;top:2px;max-width:150px;font-size:7px;transform:translateY(-42%)}
   .dc-ink-trace::before{display:none}
-  .dc-ink-trace-media{position:relative;right:auto!important;top:auto!important;width:82px;margin:14px 0 0 auto;transform:rotate(-.7deg)}
-
-  .dc-ink-slot--about,.dc-ink-slot--logic,.dc-ink-slot--event{width:100%;margin-left:0;transform:none;border-left:0;border-right:0}
-  .dc-ink-slot--about{margin-top:-26px;margin-bottom:-30px}
-  .dc-ink-slot--logic{margin-top:-30px;margin-bottom:-28px}
-  .dc-ink-slot--event{height:clamp(420px,118vw,580px);margin-top:-18px;margin-bottom:-24px}
-  .dc-ink-slot::before{top:12px;left:14px;font-size:9px}
-  .dc-ink-slot--about>img,.dc-ink-slot--logic>img,.dc-ink-slot--event>img{transform:scale(1.02)}
-
-  .dc-home .dc-ink-slot--home{width:100%;margin-left:0;margin-top:-72px;margin-bottom:-42px;height:clamp(430px,122vw,620px);transform:none;border-left:0;border-right:0}
-  .dc-home .dc-ink-slot--home::before{top:12px;left:14px;font-size:8px}
-  .dc-home .dc-ink-slot--home>img{transform:scale(1.025)}
+  .dc-ink-trace-media{position:relative;right:auto;top:auto;width:82px;margin:14px 0 0 auto;transform:rotate(-.7deg)}
 }
 
 @media(hover:none){
-  .dc-home .dc-ink-slot--home:hover>img{transform:scale(1.025)}
 }
 
 @media(prefers-reduced-motion:reduce){
-  .dc-ink-slot--about,.dc-ink-slot--logic,.dc-ink-slot--event,.dc-home .dc-ink-slot--home,.dc-ink-trace::after,.dc-ink-trace-media{transform:none!important}
-  .dc-home .dc-ink-slot--home>img{transition:none!important}
 }

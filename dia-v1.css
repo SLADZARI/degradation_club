@@ -47,9 +47,9 @@ html[data-dia-variant="3"] .dc-caption{max-width:92%}
 .dc-dia-meta:hover::before,.dc-dia-meta:focus-within::before{transform:translateX(0)}
 
 @media(max-width:700px){
-  .dc-pressure,.dc-pressure:hover,.dc-pressure:focus-visible,.dc-type-mutation,.dc-dia-drift{transform:none!important;letter-spacing:inherit!important}
+  .dc-pressure,.dc-pressure:hover,.dc-pressure:focus-visible,.dc-type-mutation,.dc-dia-drift{transform:none;letter-spacing:inherit}
   .dc-reclassify-row.is-reclassified,.dc-dia-state.is-current:hover,.dc-dia-state.is-current:focus-within,.dc-dia-state:not(.is-current):hover,.dc-dia-state:not(.is-current):focus-within{transform:none}
-  .dc-dia-variant .dc-editorial-opening__headline,.dc-dia-variant .dc-pullquote,.dc-dia-variant .dc-caption,.dc-dia-variant .dc-ink-slot--about,.dc-dia-variant .dc-ink-slot--logic,.dc-dia-variant .dc-ink-slot--event{transform:none!important}
+  .dc-dia-variant .dc-editorial-opening__headline,.dc-dia-variant .dc-pullquote,.dc-dia-variant .dc-caption,.dc-dia-variant .dc-ink-slot--about,.dc-dia-variant .dc-ink-slot--logic,.dc-dia-variant .dc-ink-slot--event{transform:none}
   .dc-global-row:hover,.dc-global-row:focus-visible,.dc-index-row:hover,.dc-index-row:focus-visible,.dc-entity-row:hover,.dc-entity-row:focus-visible{padding-left:inherit;padding-right:inherit}
   .dc-global-row:hover>*:nth-child(2),.dc-global-row:focus-visible>*:nth-child(2),.dc-index-row:hover>*:nth-child(2),.dc-index-row:focus-visible>*:nth-child(2),.dc-entity-row:hover>*:nth-child(2),.dc-entity-row:focus-visible>*:nth-child(2),.dc-global-row:hover>*:last-child,.dc-index-row:hover>*:last-child,.dc-entity-row:hover>*:last-child{transform:none}
   .dc-catalog-filter:hover,.dc-catalog-filter:focus-visible,.dc-catalog-filter.is-active{transform:none}

@@ -1,0 +1,24 @@
+{
+  "generatedAt": "2026-08-27T19:26:13.445Z",
+  "files": {
+    "dia-v1.css": {
+      "before": 5,
+      "after": 2,
+      "note": "Only reduced-motion hard stops may remain"
+    },
+    "mouthwash-v1.css": {
+      "before": 1,
+      "after": 0
+    },
+    "ink-interventions.css": {
+      "before": 4,
+      "after": 0,
+      "note": "Generic dc-ink-slot ownership removed; trace interventions retained"
+    },
+    "styles.css": {
+      "before": 6,
+      "after": 0,
+      "note": "Legacy primitives retained; force overrides removed"
+    }
+  }
+}

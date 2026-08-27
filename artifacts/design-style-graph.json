@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-27T19:14:19.323Z",
+  "generatedAt": "2026-08-27T19:26:13.517Z",
   "globalImports": [
     "/visual-tokens.css",
     "/illustration-surfaces.css",
@@ -987,7 +987,6 @@
       "/event-system.css",
       "/home-v1.css",
       "/illustration-surfaces.css",
-      "/ink-interventions.css",
       "/mobile-guardrails.css",
       "/mouthwash-v1.css",
       "/ui-v2.css",
@@ -1015,7 +1014,6 @@
       "/event-system.css",
       "/home-v1.css",
       "/illustration-surfaces.css",
-      "/ink-interventions.css",
       "/mobile-guardrails.css",
       "/mouthwash-v1.css",
       "/ui-v2.css",
@@ -1063,28 +1061,9 @@
       "bgImages": []
     },
     {
-      "file": "/ink-interventions.css",
-      "pseudo": 17,
-      "important": 4,
-      "has": 0,
-      "z": [
-        "6",
-        "4",
-        "3",
-        "2",
-        "1",
-        "4",
-        "5",
-        "2"
-      ],
-      "blend": 2,
-      "isolation": 2,
-      "bgImages": []
-    },
-    {
       "file": "/dia-v1.css",
       "pseudo": 10,
-      "important": 5,
+      "important": 2,
       "has": 0,
       "z": [
         "-1"
@@ -1133,18 +1112,6 @@
       "bgImages": []
     },
     {
-      "file": "/styles.css",
-      "pseudo": 0,
-      "important": 6,
-      "has": 0,
-      "z": [
-        "20"
-      ],
-      "blend": 0,
-      "isolation": 0,
-      "bgImages": []
-    },
-    {
       "file": "/catalog-v1.css",
       "pseudo": 4,
       "important": 0,
@@ -1154,6 +1121,21 @@
       ],
       "blend": 0,
       "isolation": 0,
+      "bgImages": []
+    },
+    {
+      "file": "/ink-interventions.css",
+      "pseudo": 4,
+      "important": 0,
+      "has": 0,
+      "z": [
+        "3",
+        "2",
+        "1",
+        "2"
+      ],
+      "blend": 1,
+      "isolation": 1,
       "bgImages": []
     },
     {
@@ -1280,19 +1262,6 @@
       "bgImages": []
     },
     {
-      "file": "/mouthwash-v1.css",
-      "pseudo": 0,
-      "important": 1,
-      "has": 0,
-      "z": [
-        "2",
-        "1"
-      ],
-      "blend": 0,
-      "isolation": 0,
-      "bgImages": []
-    },
-    {
       "file": "/community-v2.css",
       "pseudo": 0,
       "important": 0,
@@ -1346,6 +1315,31 @@
       "z": [
         "9999",
         "5"
+      ],
+      "blend": 0,
+      "isolation": 0,
+      "bgImages": []
+    },
+    {
+      "file": "/mouthwash-v1.css",
+      "pseudo": 0,
+      "important": 0,
+      "has": 0,
+      "z": [
+        "2",
+        "1"
+      ],
+      "blend": 0,
+      "isolation": 0,
+      "bgImages": []
+    },
+    {
+      "file": "/styles.css",
+      "pseudo": 0,
+      "important": 0,
+      "has": 0,
+      "z": [
+        "20"
       ],
       "blend": 0,
       "isolation": 0,
@@ -1500,28 +1494,9 @@
       ]
     },
     {
-      "file": "/ink-interventions.css",
-      "pseudo": 17,
-      "important": 4,
-      "has": 0,
-      "z": [
-        "6",
-        "4",
-        "3",
-        "2",
-        "1",
-        "4",
-        "5",
-        "2"
-      ],
-      "blend": 2,
-      "isolation": 2,
-      "bgImages": []
-    },
-    {
       "file": "/dia-v1.css",
       "pseudo": 10,
-      "important": 5,
+      "important": 2,
       "has": 0,
       "z": [
         "-1"
@@ -1570,18 +1545,6 @@
       "bgImages": []
     },
     {
-      "file": "/styles.css",
-      "pseudo": 0,
-      "important": 6,
-      "has": 0,
-      "z": [
-        "20"
-      ],
-      "blend": 0,
-      "isolation": 0,
-      "bgImages": []
-    },
-    {
       "file": "/catalog-v1.css",
       "pseudo": 4,
       "important": 0,
@@ -1591,6 +1554,21 @@
       ],
       "blend": 0,
       "isolation": 0,
+      "bgImages": []
+    },
+    {
+      "file": "/ink-interventions.css",
+      "pseudo": 4,
+      "important": 0,
+      "has": 0,
+      "z": [
+        "3",
+        "2",
+        "1",
+        "2"
+      ],
+      "blend": 1,
+      "isolation": 1,
       "bgImages": []
     },
     {
@@ -1729,19 +1707,6 @@
       "bgImages": []
     },
     {
-      "file": "/mouthwash-v1.css",
-      "pseudo": 0,
-      "important": 1,
-      "has": 0,
-      "z": [
-        "2",
-        "1"
-      ],
-      "blend": 0,
-      "isolation": 0,
-      "bgImages": []
-    },
-    {
       "file": "/community-v2.css",
       "pseudo": 0,
       "important": 0,
@@ -1808,6 +1773,31 @@
       "z": [
         "9999",
         "5"
+      ],
+      "blend": 0,
+      "isolation": 0,
+      "bgImages": []
+    },
+    {
+      "file": "/mouthwash-v1.css",
+      "pseudo": 0,
+      "important": 0,
+      "has": 0,
+      "z": [
+        "2",
+        "1"
+      ],
+      "blend": 0,
+      "isolation": 0,
+      "bgImages": []
+    },
+    {
+      "file": "/styles.css",
+      "pseudo": 0,
+      "important": 0,
+      "has": 0,
+      "z": [
+        "20"
       ],
       "blend": 0,
       "isolation": 0,
