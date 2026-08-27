@@ -210,8 +210,8 @@
   .dc-dementor-profile .dc-dementor-hero__copy .dc-display-xl{
     margin:0;
     max-width:100%;
-    font-size:clamp(50px,15.6vw,66px)!important;
-    line-height:.76!important;
+    font-size:clamp(50px,15.6vw,66px);
+    line-height:.76;
     letter-spacing:-.075em;
     overflow-wrap:normal;
     word-break:normal;
@@ -245,6 +245,6 @@
 
 @media(max-width:390px){
   .dc-dementor-profile .dc-dementor-role{font-size:14px;margin-bottom:14px}
-  .dc-dementor-profile .dc-dementor-hero__copy .dc-display-xl{font-size:clamp(48px,15.2vw,60px)!important}
+  .dc-dementor-profile .dc-dementor-hero__copy .dc-display-xl{font-size:clamp(48px,15.2vw,60px)}
   .dc-dementor-profile .dc-dementor-quote{width:68%;min-height:142px;padding:17px 22px}
 }

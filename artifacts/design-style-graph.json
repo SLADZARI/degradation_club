@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-27T19:03:14.134Z",
+  "generatedAt": "2026-08-27T19:14:19.323Z",
   "globalImports": [
     "/visual-tokens.css",
     "/illustration-surfaces.css",
@@ -1045,19 +1045,6 @@
       ]
     },
     {
-      "file": "/course-bridge-v1.css",
-      "pseudo": 2,
-      "important": 39,
-      "has": 0,
-      "z": [
-        "260",
-        "200"
-      ],
-      "blend": 0,
-      "isolation": 0,
-      "bgImages": []
-    },
-    {
       "file": "/ui-v2.css",
       "pseudo": 23,
       "important": 0,
@@ -1107,16 +1094,6 @@
       "bgImages": []
     },
     {
-      "file": "/courses/slaboumie-i-otvaga/course.css",
-      "pseudo": 0,
-      "important": 12,
-      "has": 0,
-      "z": [],
-      "blend": 0,
-      "isolation": 0,
-      "bgImages": []
-    },
-    {
       "file": "/editorial-system.css",
       "pseudo": 10,
       "important": 0,
@@ -1156,18 +1133,6 @@
       "bgImages": []
     },
     {
-      "file": "/design-system/ui-lab-v2.css",
-      "pseudo": 2,
-      "important": 4,
-      "has": 0,
-      "z": [
-        "80"
-      ],
-      "blend": 12,
-      "isolation": 0,
-      "bgImages": []
-    },
-    {
       "file": "/styles.css",
       "pseudo": 0,
       "important": 6,
@@ -1182,70 +1147,10 @@
     {
       "file": "/catalog-v1.css",
       "pseudo": 4,
-      "important": 1,
+      "important": 0,
       "has": 0,
       "z": [
         "-1"
-      ],
-      "blend": 0,
-      "isolation": 0,
-      "bgImages": []
-    },
-    {
-      "file": "/courses/dengi-na-veter/course.css",
-      "pseudo": 0,
-      "important": 5,
-      "has": 0,
-      "z": [],
-      "blend": 0,
-      "isolation": 0,
-      "bgImages": []
-    },
-    {
-      "file": "/dementor-profile.css",
-      "pseudo": 1,
-      "important": 3,
-      "has": 0,
-      "z": [
-        "3",
-        "2"
-      ],
-      "blend": 1,
-      "isolation": 0,
-      "bgImages": []
-    },
-    {
-      "file": "/community-v2.css",
-      "pseudo": 0,
-      "important": 3,
-      "has": 0,
-      "z": [
-        "0",
-        "2",
-        "1"
-      ],
-      "blend": 1,
-      "isolation": 0,
-      "bgImages": []
-    },
-    {
-      "file": "/courses/dumai-s-opasnostyu/course-shell.css",
-      "pseudo": 0,
-      "important": 3,
-      "has": 0,
-      "z": [],
-      "blend": 0,
-      "isolation": 0,
-      "bgImages": []
-    },
-    {
-      "file": "/courses/dumai-s-opasnostyu/production.css",
-      "pseudo": 2,
-      "important": 1,
-      "has": 0,
-      "z": [
-        "30",
-        "100"
       ],
       "blend": 0,
       "isolation": 0,
@@ -1258,6 +1163,44 @@
       "has": 0,
       "z": [],
       "blend": 0,
+      "isolation": 0,
+      "bgImages": []
+    },
+    {
+      "file": "/course-bridge-v1.css",
+      "pseudo": 2,
+      "important": 0,
+      "has": 0,
+      "z": [
+        "260",
+        "200"
+      ],
+      "blend": 0,
+      "isolation": 0,
+      "bgImages": []
+    },
+    {
+      "file": "/courses/dumai-s-opasnostyu/production.css",
+      "pseudo": 2,
+      "important": 0,
+      "has": 0,
+      "z": [
+        "30",
+        "100"
+      ],
+      "blend": 0,
+      "isolation": 0,
+      "bgImages": []
+    },
+    {
+      "file": "/design-system/ui-lab-v2.css",
+      "pseudo": 2,
+      "important": 0,
+      "has": 0,
+      "z": [
+        "80"
+      ],
+      "blend": 12,
       "isolation": 0,
       "bgImages": []
     },
@@ -1314,6 +1257,19 @@
       "bgImages": []
     },
     {
+      "file": "/dementor-profile.css",
+      "pseudo": 1,
+      "important": 0,
+      "has": 0,
+      "z": [
+        "3",
+        "2"
+      ],
+      "blend": 1,
+      "isolation": 0,
+      "bgImages": []
+    },
+    {
       "file": "/merch-drop-v2.css",
       "pseudo": 1,
       "important": 0,
@@ -1337,16 +1293,16 @@
       "bgImages": []
     },
     {
-      "file": "/support-v1.css",
+      "file": "/community-v2.css",
       "pseudo": 0,
-      "important": 1,
+      "important": 0,
       "has": 0,
       "z": [
-        "1600",
+        "0",
         "2",
-        "1500"
+        "1"
       ],
-      "blend": 0,
+      "blend": 1,
       "isolation": 0,
       "bgImages": []
     },
@@ -1390,6 +1346,20 @@
       "z": [
         "9999",
         "5"
+      ],
+      "blend": 0,
+      "isolation": 0,
+      "bgImages": []
+    },
+    {
+      "file": "/support-v1.css",
+      "pseudo": 0,
+      "important": 0,
+      "has": 0,
+      "z": [
+        "1600",
+        "2",
+        "1500"
       ],
       "blend": 0,
       "isolation": 0,
@@ -1485,19 +1455,6 @@
       ]
     },
     {
-      "file": "/course-bridge-v1.css",
-      "pseudo": 2,
-      "important": 39,
-      "has": 0,
-      "z": [
-        "260",
-        "200"
-      ],
-      "blend": 0,
-      "isolation": 0,
-      "bgImages": []
-    },
-    {
       "file": "/global-header.css",
       "pseudo": 20,
       "important": 16,
@@ -1574,16 +1531,6 @@
       "bgImages": []
     },
     {
-      "file": "/courses/slaboumie-i-otvaga/course.css",
-      "pseudo": 0,
-      "important": 12,
-      "has": 0,
-      "z": [],
-      "blend": 0,
-      "isolation": 0,
-      "bgImages": []
-    },
-    {
       "file": "/editorial-system.css",
       "pseudo": 10,
       "important": 0,
@@ -1623,18 +1570,6 @@
       "bgImages": []
     },
     {
-      "file": "/design-system/ui-lab-v2.css",
-      "pseudo": 2,
-      "important": 4,
-      "has": 0,
-      "z": [
-        "80"
-      ],
-      "blend": 12,
-      "isolation": 0,
-      "bgImages": []
-    },
-    {
       "file": "/styles.css",
       "pseudo": 0,
       "important": 6,
@@ -1649,70 +1584,10 @@
     {
       "file": "/catalog-v1.css",
       "pseudo": 4,
-      "important": 1,
+      "important": 0,
       "has": 0,
       "z": [
         "-1"
-      ],
-      "blend": 0,
-      "isolation": 0,
-      "bgImages": []
-    },
-    {
-      "file": "/courses/dengi-na-veter/course.css",
-      "pseudo": 0,
-      "important": 5,
-      "has": 0,
-      "z": [],
-      "blend": 0,
-      "isolation": 0,
-      "bgImages": []
-    },
-    {
-      "file": "/dementor-profile.css",
-      "pseudo": 1,
-      "important": 3,
-      "has": 0,
-      "z": [
-        "3",
-        "2"
-      ],
-      "blend": 1,
-      "isolation": 0,
-      "bgImages": []
-    },
-    {
-      "file": "/community-v2.css",
-      "pseudo": 0,
-      "important": 3,
-      "has": 0,
-      "z": [
-        "0",
-        "2",
-        "1"
-      ],
-      "blend": 1,
-      "isolation": 0,
-      "bgImages": []
-    },
-    {
-      "file": "/courses/dumai-s-opasnostyu/course-shell.css",
-      "pseudo": 0,
-      "important": 3,
-      "has": 0,
-      "z": [],
-      "blend": 0,
-      "isolation": 0,
-      "bgImages": []
-    },
-    {
-      "file": "/courses/dumai-s-opasnostyu/production.css",
-      "pseudo": 2,
-      "important": 1,
-      "has": 0,
-      "z": [
-        "30",
-        "100"
       ],
       "blend": 0,
       "isolation": 0,
@@ -1725,6 +1600,44 @@
       "has": 0,
       "z": [],
       "blend": 0,
+      "isolation": 0,
+      "bgImages": []
+    },
+    {
+      "file": "/course-bridge-v1.css",
+      "pseudo": 2,
+      "important": 0,
+      "has": 0,
+      "z": [
+        "260",
+        "200"
+      ],
+      "blend": 0,
+      "isolation": 0,
+      "bgImages": []
+    },
+    {
+      "file": "/courses/dumai-s-opasnostyu/production.css",
+      "pseudo": 2,
+      "important": 0,
+      "has": 0,
+      "z": [
+        "30",
+        "100"
+      ],
+      "blend": 0,
+      "isolation": 0,
+      "bgImages": []
+    },
+    {
+      "file": "/design-system/ui-lab-v2.css",
+      "pseudo": 2,
+      "important": 0,
+      "has": 0,
+      "z": [
+        "80"
+      ],
+      "blend": 12,
       "isolation": 0,
       "bgImages": []
     },
@@ -1781,6 +1694,19 @@
       "bgImages": []
     },
     {
+      "file": "/dementor-profile.css",
+      "pseudo": 1,
+      "important": 0,
+      "has": 0,
+      "z": [
+        "3",
+        "2"
+      ],
+      "blend": 1,
+      "isolation": 0,
+      "bgImages": []
+    },
+    {
       "file": "/design-system/design-system.css",
       "pseudo": 0,
       "important": 1,
@@ -1816,16 +1742,16 @@
       "bgImages": []
     },
     {
-      "file": "/support-v1.css",
+      "file": "/community-v2.css",
       "pseudo": 0,
-      "important": 1,
+      "important": 0,
       "has": 0,
       "z": [
-        "1600",
+        "0",
         "2",
-        "1500"
+        "1"
       ],
-      "blend": 0,
+      "blend": 1,
       "isolation": 0,
       "bgImages": []
     },
@@ -1882,6 +1808,20 @@
       "z": [
         "9999",
         "5"
+      ],
+      "blend": 0,
+      "isolation": 0,
+      "bgImages": []
+    },
+    {
+      "file": "/support-v1.css",
+      "pseudo": 0,
+      "important": 0,
+      "has": 0,
+      "z": [
+        "1600",
+        "2",
+        "1500"
       ],
       "blend": 0,
       "isolation": 0,

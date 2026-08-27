@@ -5,7 +5,7 @@
 .dc-catalog-filter:hover,.dc-catalog-filter:focus-visible,.dc-catalog-filter.is-active{background:var(--dc-acid);color:var(--dc-ink)}
 .dc-global-register{border-top:1px solid var(--dc-ink);margin-top:clamp(38px,5vw,72px)}
 .dc-global-row{display:grid;grid-template-columns:80px minmax(0,2fr) minmax(140px,.8fr) minmax(160px,1fr) 28px;gap:18px;align-items:center;min-height:96px;padding:18px 0;border-bottom:1px solid var(--dc-line);position:relative}
-.dc-global-row[hidden]{display:none!important}
+.dc-global-row[hidden]{display:none}
 .dc-global-row__id,.dc-global-row__type,.dc-global-row__status{font-size:10px;letter-spacing:.09em;text-transform:uppercase}
 .dc-global-row__title{font-size:clamp(27px,3.2vw,52px);font-weight:900;letter-spacing:-.045em;line-height:.92}
 .dc-global-row__status{justify-self:start;border:1px solid currentColor;padding:6px 8px}
