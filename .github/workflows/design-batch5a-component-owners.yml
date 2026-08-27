@@ -1,0 +1,49 @@
+name: Design Batch 5A Component Owners
+
+on:
+  push:
+    branches:
+      - design-audit-batch-2026-08-27
+
+permissions:
+  contents: write
+
+jobs:
+  component-owners:
+    if: ${{ !contains(github.event.head_commit.message, '[component-owners-auto]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Apply component owner hardening
+        run: node scripts/batch5a-component-owner-hardening.mjs
+      - name: Run full design audits
+        run: |
+          node scripts/audit-style-graph.mjs
+          node scripts/audit-dementor-hero.mjs
+          node scripts/audit-event-hero.mjs
+          node scripts/audit-feature-relation.mjs
+          node scripts/audit-ink-surfaces.mjs
+          node scripts/audit-inline-styles.mjs
+          node scripts/audit-cascade-pressure.mjs
+          node scripts/audit-presentation-pressure.mjs
+          node scripts/audit-compatibility-layers.mjs
+          node scripts/audit-mobile-guardrails.mjs
+          node scripts/audit-ui-pressure.mjs
+          node scripts/audit-component-owner-hardening.mjs
+      - name: Commit component owner hardening
+        run: |
+          git config user.name "Dementor Design Audit"
+          git config user.email "design-audit@users.noreply.github.com"
+          git add home-v1.css dementor-roster.css event-system.css illustration-surfaces.css artifacts/design-style-graph.json
+          if git diff --cached --quiet; then
+            echo "No component owner changes"
+            exit 0
+          fi
+          git commit -m "Batch 5A: harden component owners [component-owners-auto]"
+          git pull --rebase origin design-audit-batch-2026-08-27
+          git push origin HEAD:design-audit-batch-2026-08-27
