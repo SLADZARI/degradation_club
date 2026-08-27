@@ -5,11 +5,11 @@ const css=fs.readFileSync('visual-standard-v2.css','utf8');
 const errors=[];
 
 const htmlRequired=[
-  'class="dc-event-hero__media"',
-  'class="dc-event-hero__subtitle"',
-  'class="dc-event-hero__relation"',
-  'class="dc-event-hero__relation-portrait"',
-  'class="dc-event-hero__relation-copy"',
+  'dc-event-hero__media',
+  'dc-event-hero__subtitle',
+  'dc-event-hero__relation',
+  'dc-event-hero__relation-portrait',
+  'dc-event-hero__relation-copy',
   '/assets/ink/event-fuengirola-03.webp',
   '/assets/people/dementors/gabil/dementor_gabil.webp',
   'EVENT-001 / PLANNED / OFFLINE',
@@ -19,11 +19,11 @@ for(const token of htmlRequired){
 }
 
 const hero=html.indexOf('<section class="dc-entity-hero"');
-const media=html.indexOf('class="dc-event-hero__media"',hero);
-const meta=html.indexOf('class="dc-entity-hero__meta',hero);
+const media=html.indexOf('dc-event-hero__media',hero);
+const meta=html.indexOf('dc-entity-hero__meta',hero);
 const title=html.indexOf('id="fuengirola-title"',hero);
-const subtitle=html.indexOf('class="dc-event-hero__subtitle"',hero);
-const relation=html.indexOf('class="dc-event-hero__relation"',hero);
+const subtitle=html.indexOf('dc-event-hero__subtitle',hero);
+const relation=html.indexOf('dc-event-hero__relation ',hero);
 if(!(hero>=0 && media>hero && meta>media && title>meta && subtitle>title && relation>subtitle)){
   errors.push('Fuengirola hero DOM order must be media -> meta -> title -> subtitle -> relation');
 }
