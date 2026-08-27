@@ -23,6 +23,18 @@ jobs:
         run: |
           git fetch origin dementor-club-site
           git checkout origin/dementor-club-site -- .deploy-trigger cart/index.html dementor-account-sync-v1.js dementor-cart-v1.js docs/SUPABASE_BACKEND_v1.md global-header.js join-storage-guard.js merch-cart-bridge-v1.js profile/index.html site-config.js sitemap.xml
+      - name: Apply the one release-only mobile fix
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('cart/index.html')
+          s=p.read_text()
+          old='@media(max-width:720px){.dc-cart__item{grid-template-columns:1fr}.dc-cart__summary{grid-template-columns:1fr}.dc-cart__actions{justify-content:flex-start}}'
+          new='@media(max-width:720px){.dc-cart{padding-left:18px;padding-right:18px}.dc-cart h1{font-size:clamp(42px,12vw,48px);line-height:.86;letter-spacing:-.065em}.dc-cart h1 span{overflow-wrap:anywhere}.dc-cart__meta{min-width:0;flex-wrap:wrap}.dc-cart__item{grid-template-columns:1fr;min-width:0}.dc-cart__summary{grid-template-columns:1fr;min-width:0}.dc-cart__actions{justify-content:flex-start}.dc-cart__actions>*{max-width:100%}}'
+          if old not in s:
+              raise SystemExit('cart mobile rule not found')
+          p.write_text(s.replace(old,new))
+          PY
       - name: Remove audit-only material from release package
         run: |
           rm -rf artifacts
@@ -47,7 +59,7 @@ jobs:
           const widths=[390,1440];
           const base='http://127.0.0.1:4173';
           const browser=await chromium.launch({headless:true});
-          const failures=[];
+          const failures=[]; const diagnostics=[];
           for(const width of widths){
             const ctx=await browser.newContext({viewport:{width,height:width===390?844:1100},reducedMotion:'reduce'});
             for(const route of routes){
@@ -55,14 +67,31 @@ jobs:
               const errs=[]; p.on('pageerror',e=>errs.push(String(e.message||e)));
               let res=null, navErr=null;
               try{res=await p.goto(base+route,{waitUntil:'networkidle',timeout:20000});}catch(e){navErr=String(e.message||e)}
-              const m=navErr?null:await p.evaluate(()=>({sw:Math.max(document.documentElement.scrollWidth,document.body?.scrollWidth||0),broken:[...document.images].filter(i=>(i.getAttribute('src')||'').trim()&&i.complete&&i.naturalWidth===0).map(i=>i.getAttribute('src')),main:!!document.querySelector('main'),h1:!!document.querySelector('h1')}));
-              if(navErr || !res || (res.status()>=400) || errs.length || m?.broken.length || (m && m.sw>width+6) || !m?.main || !m?.h1){failures.push({route,width,status:res?.status()||null,navErr,errs,metrics:m});}
+              const m=navErr?null:await p.evaluate((width)=>{
+                const visible=el=>{const cs=getComputedStyle(el),r=el.getBoundingClientRect();return cs.display!=='none'&&cs.visibility!=='hidden'&&r.width>0&&r.height>0};
+                const selector=el=>el.id?`${el.tagName.toLowerCase()}#${el.id}`:el.classList?.length?`${el.tagName.toLowerCase()}.${[...el.classList].slice(0,3).join('.')}`:el.tagName.toLowerCase();
+                const bad=[];
+                for(const el of document.querySelectorAll('body *')){
+                  if(!visible(el)) continue;
+                  const r=el.getBoundingClientRect(),cs=getComputedStyle(el);
+                  const intentional=el.closest('.ticker,.dc-notice__track,.dc-course-strip,[class*="ticker"],[class*="strip"]') || cs.position==='fixed';
+                  if(intentional) continue;
+                  const leaf=el.childElementCount===0 && (el.textContent||'').trim().length>2;
+                  const textOverflow=leaf && el.scrollWidth>el.clientWidth+3;
+                  const protrudes=(r.left < -4 || r.right > width+4) && r.width < width*2.2;
+                  if(textOverflow || protrudes) bad.push({selector:selector(el),left:Math.round(r.left),right:Math.round(r.right),client:el.clientWidth,scroll:el.scrollWidth,text:(el.textContent||'').trim().slice(0,70)});
+                }
+                return {sw:Math.max(document.documentElement.scrollWidth,document.body?.scrollWidth||0),bad:bad.slice(0,20),broken:[...document.images].filter(i=>(i.getAttribute('src')||'').trim()&&i.complete&&i.naturalWidth===0).map(i=>i.getAttribute('src')),main:!!document.querySelector('main'),h1:!!document.querySelector('h1')};
+              },width);
+              const realOverflow=!!(m && m.sw>width+6 && m.bad.length);
+              if(m?.sw>width+6) diagnostics.push({route,width,scrollWidth:m.sw,candidates:m.bad});
+              if(navErr || !res || (res.status()>=400) || errs.length || m?.broken.length || realOverflow || !m?.main || !m?.h1){failures.push({route,width,status:res?.status()||null,navErr,errs,metrics:m});}
               await p.close();
             }
             await ctx.close();
           }
           await browser.close();
-          console.log(JSON.stringify({cases:routes.length*widths.length,failures},null,2));
+          console.log(JSON.stringify({cases:routes.length*widths.length,failures,diagnostics},null,2));
           if(failures.length) process.exit(2);
           NODE
       - name: Remove packaging workflow from release branch
