@@ -29,11 +29,14 @@ requireChange(edit('dementors-v1.css', css => {
 
 requireChange(edit('visual-standard-v2.css', css => {
   let out = css;
-  out = out.replace(/,\.dc-dementor-hero__portrait/g,'');
-  out = out.replace(/\.dc-dementor-hero__portrait img,/g,'');
   out = out.replace(/\/\* HERO — approved WEB \/ TABLET \/ MOBILE composition\. \*\/[\s\S]*?\/\* MICRO \*\//,
     '/* Profile HERO geometry is owned exclusively by /dementor-profile.css. */\n\n/* MICRO */');
+  // Remove profile portrait from shared selector lists without damaging the remaining list.
+  out = out.replace(/\.dc-dementor-hero__portrait(?:\s+img)?\s*,/g,'');
+  out = out.replace(/,\s*\.dc-dementor-hero__portrait(?:\s+img)?/g,'');
+  // Remove any standalone residual profile hero rules, including responsive overrides.
   out = out.replace(/^\s*\.dc-dementor-hero__(?:layout|copy|portrait)[^\{]*\{[^}]*\}\s*$/gm,'');
+  out = out.replace(/\.dc-dementor-hero__portrait(?:\s+img)?[^\{,]*\{[^}]*\}/g,'');
   return out;
 }),'visual-standard legacy profile hero geometry');
 
