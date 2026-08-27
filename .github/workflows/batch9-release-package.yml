@@ -41,8 +41,8 @@ jobs:
           sleep 2
       - name: Run focused release smoke
         run: |
-          node --input-type=commonjs - <<'NODE'
-          const { chromium } = require('playwright');
+          node --input-type=module - <<'NODE'
+          import { chromium } from 'playwright';
           const routes=['/','/about/','/community/','/community/valentin/','/community/gabil/','/events/','/events/fuengirola/','/courses/dumai-s-opasnostyu/','/courses/ne-komanda/','/projects/','/projects/logic-awareness/','/merch/','/join/','/cart/','/profile/'];
           const widths=[390,1440];
           const base='http://127.0.0.1:4173';
