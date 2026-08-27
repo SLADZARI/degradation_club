@@ -1,6 +1,6 @@
 {
   "summary": {
-    "generatedAt": "2026-08-27T20:35:04.180Z",
+    "generatedAt": "2026-08-27T20:49:32.244Z",
     "baseUrl": "http://127.0.0.1:4173",
     "routes": 34,
     "viewports": [
@@ -1620,188 +1620,188 @@
       "severity": "fail",
       "metrics": {
         "viewportWidth": 390,
-        "scrollWidth": 490,
+        "scrollWidth": 390,
         "horizontalOverflow": true,
         "protrusions": [
           {
             "selector": "figure.is-near",
-            "left": 379,
-            "right": 698,
-            "width": 319
+            "left": 350,
+            "right": 642,
+            "width": 292
           },
           {
             "selector": "img",
-            "left": 379,
-            "right": 698,
-            "width": 319
+            "left": 350,
+            "right": 642,
+            "width": 292
           },
           {
             "selector": "figcaption",
-            "left": 379,
-            "right": 698,
-            "width": 319
+            "left": 350,
+            "right": 642,
+            "width": 292
           },
           {
             "selector": "figure",
-            "left": 732,
-            "right": 1040,
-            "width": 309
+            "left": 674,
+            "right": 957,
+            "width": 283
           },
           {
             "selector": "img",
-            "left": 732,
-            "right": 1040,
-            "width": 309
+            "left": 674,
+            "right": 957,
+            "width": 283
           },
           {
             "selector": "figcaption",
-            "left": 732,
-            "right": 1040,
-            "width": 309
+            "left": 674,
+            "right": 957,
+            "width": 283
           },
           {
             "selector": "figure",
-            "left": 1079,
-            "right": 1388,
-            "width": 309
+            "left": 993,
+            "right": 1276,
+            "width": 283
           },
           {
             "selector": "img",
-            "left": 1079,
-            "right": 1388,
-            "width": 309
+            "left": 993,
+            "right": 1276,
+            "width": 283
           },
           {
             "selector": "figcaption",
-            "left": 1079,
-            "right": 1388,
-            "width": 309
+            "left": 993,
+            "right": 1276,
+            "width": 283
           },
           {
             "selector": "figure",
-            "left": 1426,
-            "right": 1735,
-            "width": 309
+            "left": 1313,
+            "right": 1595,
+            "width": 283
           },
           {
             "selector": "img",
-            "left": 1426,
-            "right": 1735,
-            "width": 309
+            "left": 1313,
+            "right": 1595,
+            "width": 283
           },
           {
             "selector": "figcaption",
-            "left": 1426,
-            "right": 1735,
-            "width": 309
+            "left": 1313,
+            "right": 1595,
+            "width": 283
           },
           {
             "selector": "figure",
-            "left": 1774,
-            "right": 2082,
-            "width": 309
+            "left": 1632,
+            "right": 1914,
+            "width": 283
           },
           {
             "selector": "img",
-            "left": 1774,
-            "right": 2082,
-            "width": 309
+            "left": 1632,
+            "right": 1914,
+            "width": 283
           },
           {
             "selector": "figcaption",
-            "left": 1774,
-            "right": 2082,
-            "width": 309
+            "left": 1632,
+            "right": 1914,
+            "width": 283
           },
           {
             "selector": "figure",
-            "left": 2121,
-            "right": 2430,
-            "width": 309
+            "left": 1951,
+            "right": 2234,
+            "width": 283
           },
           {
             "selector": "img",
-            "left": 2121,
-            "right": 2430,
-            "width": 309
+            "left": 1951,
+            "right": 2234,
+            "width": 283
           },
           {
             "selector": "figcaption",
-            "left": 2121,
-            "right": 2430,
-            "width": 309
+            "left": 1951,
+            "right": 2234,
+            "width": 283
           },
           {
             "selector": "figure",
-            "left": 2469,
-            "right": 2777,
-            "width": 309
+            "left": 2270,
+            "right": 2553,
+            "width": 283
           },
           {
             "selector": "img",
-            "left": 2469,
-            "right": 2777,
-            "width": 309
+            "left": 2270,
+            "right": 2553,
+            "width": 283
           },
           {
             "selector": "figcaption",
-            "left": 2469,
-            "right": 2777,
-            "width": 309
+            "left": 2270,
+            "right": 2553,
+            "width": 283
           },
           {
             "selector": "figure",
-            "left": 2816,
-            "right": 3124,
-            "width": 309
+            "left": 2589,
+            "right": 2872,
+            "width": 283
           },
           {
             "selector": "img",
-            "left": 2816,
-            "right": 3124,
-            "width": 309
+            "left": 2589,
+            "right": 2872,
+            "width": 283
           },
           {
             "selector": "figcaption",
-            "left": 2816,
-            "right": 3124,
-            "width": 309
+            "left": 2589,
+            "right": 2872,
+            "width": 283
           },
           {
             "selector": "figure",
-            "left": 3163,
-            "right": 3472,
-            "width": 309
+            "left": 2909,
+            "right": 3191,
+            "width": 283
           },
           {
             "selector": "img",
-            "left": 3163,
-            "right": 3472,
-            "width": 309
+            "left": 2909,
+            "right": 3191,
+            "width": 283
           },
           {
             "selector": "figcaption",
-            "left": 3163,
-            "right": 3472,
-            "width": 309
+            "left": 2909,
+            "right": 3191,
+            "width": 283
           },
           {
             "selector": "figure.is-near",
-            "left": 379,
-            "right": 698,
-            "width": 319
+            "left": 350,
+            "right": 642,
+            "width": 292
           },
           {
             "selector": "img",
-            "left": 379,
-            "right": 698,
-            "width": 319
+            "left": 350,
+            "right": 642,
+            "width": 292
           },
           {
             "selector": "figcaption",
-            "left": 379,
-            "right": 698,
-            "width": 319
+            "left": 350,
+            "right": 642,
+            "width": 292
           }
         ],
         "clippedText": [],
@@ -1861,126 +1861,126 @@
             "src": "/assets/projects/logic-awareness/series/01-beliefs-vs-facts/frame-01.webp",
             "fit": "fill",
             "position": "50% 50%",
-            "w": 335,
-            "h": 502
+            "w": 307,
+            "h": 459
           },
           {
             "src": "/assets/projects/logic-awareness/series/01-beliefs-vs-facts/frame-02.webp",
             "fit": "fill",
             "position": "50% 50%",
-            "w": 319,
-            "h": 477
+            "w": 292,
+            "h": 437
           },
           {
             "src": "/assets/projects/logic-awareness/series/01-beliefs-vs-facts/frame-03.webp",
             "fit": "fill",
             "position": "50% 50%",
-            "w": 309,
+            "w": 283,
             "h": 2
           },
           {
             "src": "/assets/projects/logic-awareness/series/01-beliefs-vs-facts/frame-04.webp",
             "fit": "fill",
             "position": "50% 50%",
-            "w": 309,
+            "w": 283,
             "h": 2
           },
           {
             "src": "/assets/projects/logic-awareness/series/01-beliefs-vs-facts/frame-05.webp",
             "fit": "fill",
             "position": "50% 50%",
-            "w": 309,
+            "w": 283,
             "h": 2
           },
           {
             "src": "/assets/projects/logic-awareness/series/01-beliefs-vs-facts/frame-06.webp",
             "fit": "fill",
             "position": "50% 50%",
-            "w": 309,
+            "w": 283,
             "h": 2
           },
           {
             "src": "/assets/projects/logic-awareness/series/01-beliefs-vs-facts/frame-07.webp",
             "fit": "fill",
             "position": "50% 50%",
-            "w": 309,
+            "w": 283,
             "h": 2
           },
           {
             "src": "/assets/projects/logic-awareness/series/01-beliefs-vs-facts/frame-08.webp",
             "fit": "fill",
             "position": "50% 50%",
-            "w": 309,
+            "w": 283,
             "h": 2
           },
           {
             "src": "/assets/projects/logic-awareness/series/01-beliefs-vs-facts/frame-09.webp",
             "fit": "fill",
             "position": "50% 50%",
-            "w": 309,
+            "w": 283,
             "h": 2
           },
           {
             "src": "/assets/projects/logic-awareness/series/01-beliefs-vs-facts/frame-10.webp",
             "fit": "fill",
             "position": "50% 50%",
-            "w": 309,
+            "w": 283,
             "h": 2
           },
           {
             "src": "/assets/projects/logic-awareness/series/03-personal-resource/frame-01.webp",
             "fit": "fill",
             "position": "50% 50%",
-            "w": 335,
-            "h": 447
+            "w": 307,
+            "h": 409
           },
           {
             "src": "/assets/projects/logic-awareness/series/03-personal-resource/frame-02.webp",
             "fit": "fill",
             "position": "50% 50%",
-            "w": 319,
-            "h": 424
+            "w": 292,
+            "h": 389
           },
           {
             "src": "/assets/projects/logic-awareness/series/03-personal-resource/frame-03.webp",
             "fit": "fill",
             "position": "50% 50%",
-            "w": 309,
+            "w": 283,
             "h": 2
           },
           {
             "src": "/assets/projects/logic-awareness/series/03-personal-resource/frame-04.webp",
             "fit": "fill",
             "position": "50% 50%",
-            "w": 309,
+            "w": 283,
             "h": 2
           },
           {
             "src": "/assets/projects/logic-awareness/series/03-personal-resource/frame-05.webp",
             "fit": "fill",
             "position": "50% 50%",
-            "w": 309,
+            "w": 283,
             "h": 2
           },
           {
             "src": "/assets/projects/logic-awareness/series/03-personal-resource/frame-06.webp",
             "fit": "fill",
             "position": "50% 50%",
-            "w": 309,
+            "w": 283,
             "h": 2
           },
           {
             "src": "/assets/projects/logic-awareness/series/03-personal-resource/frame-07.webp",
             "fit": "fill",
             "position": "50% 50%",
-            "w": 309,
+            "w": 283,
             "h": 2
           },
           {
             "src": "/assets/projects/logic-awareness/series/03-personal-resource/frame-08.webp",
             "fit": "fill",
             "position": "50% 50%",
-            "w": 309,
+            "w": 283,
             "h": 2
           }
         ]
@@ -3699,188 +3699,188 @@
       "severity": "fail",
       "metrics": {
         "viewportWidth": 430,
-        "scrollWidth": 490,
+        "scrollWidth": 430,
         "horizontalOverflow": true,
         "protrusions": [
           {
             "selector": "figure.is-near",
-            "left": 417,
-            "right": 768,
-            "width": 351
+            "left": 389,
+            "right": 714,
+            "width": 325
           },
           {
             "selector": "img",
-            "left": 417,
-            "right": 768,
-            "width": 351
+            "left": 389,
+            "right": 714,
+            "width": 325
           },
           {
             "selector": "figcaption",
-            "left": 417,
-            "right": 768,
-            "width": 351
+            "left": 389,
+            "right": 714,
+            "width": 325
           },
           {
             "selector": "figure",
-            "left": 804,
-            "right": 1144,
-            "width": 340
+            "left": 748,
+            "right": 1063,
+            "width": 315
           },
           {
             "selector": "img",
-            "left": 804,
-            "right": 1144,
-            "width": 340
+            "left": 748,
+            "right": 1063,
+            "width": 315
           },
           {
             "selector": "figcaption",
-            "left": 804,
-            "right": 1144,
-            "width": 340
+            "left": 748,
+            "right": 1063,
+            "width": 315
           },
           {
             "selector": "figure",
-            "left": 1186,
-            "right": 1526,
-            "width": 340
+            "left": 1103,
+            "right": 1418,
+            "width": 315
           },
           {
             "selector": "img",
-            "left": 1186,
-            "right": 1526,
-            "width": 340
+            "left": 1103,
+            "right": 1418,
+            "width": 315
           },
           {
             "selector": "figcaption",
-            "left": 1186,
-            "right": 1526,
-            "width": 340
+            "left": 1103,
+            "right": 1418,
+            "width": 315
           },
           {
             "selector": "figure",
-            "left": 1568,
-            "right": 1908,
-            "width": 340
+            "left": 1457,
+            "right": 1772,
+            "width": 315
           },
           {
             "selector": "img",
-            "left": 1568,
-            "right": 1908,
-            "width": 340
+            "left": 1457,
+            "right": 1772,
+            "width": 315
           },
           {
             "selector": "figcaption",
-            "left": 1568,
-            "right": 1908,
-            "width": 340
+            "left": 1457,
+            "right": 1772,
+            "width": 315
           },
           {
             "selector": "figure",
-            "left": 1950,
-            "right": 2290,
-            "width": 340
+            "left": 1812,
+            "right": 2127,
+            "width": 315
           },
           {
             "selector": "img",
-            "left": 1950,
-            "right": 2290,
-            "width": 340
+            "left": 1812,
+            "right": 2127,
+            "width": 315
           },
           {
             "selector": "figcaption",
-            "left": 1950,
-            "right": 2290,
-            "width": 340
+            "left": 1812,
+            "right": 2127,
+            "width": 315
           },
           {
             "selector": "figure",
-            "left": 2331,
-            "right": 2672,
-            "width": 340
+            "left": 2166,
+            "right": 2481,
+            "width": 315
           },
           {
             "selector": "img",
-            "left": 2331,
-            "right": 2672,
-            "width": 340
+            "left": 2166,
+            "right": 2481,
+            "width": 315
           },
           {
             "selector": "figcaption",
-            "left": 2331,
-            "right": 2672,
-            "width": 340
+            "left": 2166,
+            "right": 2481,
+            "width": 315
           },
           {
             "selector": "figure",
-            "left": 2713,
-            "right": 3053,
-            "width": 340
+            "left": 2520,
+            "right": 2835,
+            "width": 315
           },
           {
             "selector": "img",
-            "left": 2713,
-            "right": 3053,
-            "width": 340
+            "left": 2520,
+            "right": 2835,
+            "width": 315
           },
           {
             "selector": "figcaption",
-            "left": 2713,
-            "right": 3053,
-            "width": 340
+            "left": 2520,
+            "right": 2835,
+            "width": 315
           },
           {
             "selector": "figure",
-            "left": 3095,
-            "right": 3435,
-            "width": 340
+            "left": 2875,
+            "right": 3190,
+            "width": 315
           },
           {
             "selector": "img",
-            "left": 3095,
-            "right": 3435,
-            "width": 340
+            "left": 2875,
+            "right": 3190,
+            "width": 315
           },
           {
             "selector": "figcaption",
-            "left": 3095,
-            "right": 3435,
-            "width": 340
+            "left": 2875,
+            "right": 3190,
+            "width": 315
           },
           {
             "selector": "figure",
-            "left": 3477,
-            "right": 3817,
-            "width": 340
+            "left": 3229,
+            "right": 3544,
+            "width": 315
           },
           {
             "selector": "img",
-            "left": 3477,
-            "right": 3817,
-            "width": 340
+            "left": 3229,
+            "right": 3544,
+            "width": 315
           },
           {
             "selector": "figcaption",
-            "left": 3477,
-            "right": 3817,
-            "width": 340
+            "left": 3229,
+            "right": 3544,
+            "width": 315
           },
           {
             "selector": "figure.is-near",
-            "left": 417,
-            "right": 768,
-            "width": 351
+            "left": 389,
+            "right": 714,
+            "width": 325
           },
           {
             "selector": "img",
-            "left": 417,
-            "right": 768,
-            "width": 351
+            "left": 389,
+            "right": 714,
+            "width": 325
           },
           {
             "selector": "figcaption",
-            "left": 417,
-            "right": 768,
-            "width": 351
+            "left": 389,
+            "right": 714,
+            "width": 325
           }
         ],
         "clippedText": [],
@@ -3940,126 +3940,126 @@
             "src": "/assets/projects/logic-awareness/series/01-beliefs-vs-facts/frame-01.webp",
             "fit": "fill",
             "position": "50% 50%",
-            "w": 370,
-            "h": 553
+            "w": 342,
+            "h": 512
           },
           {
             "src": "/assets/projects/logic-awareness/series/01-beliefs-vs-facts/frame-02.webp",
             "fit": "fill",
             "position": "50% 50%",
-            "w": 351,
-            "h": 526
+            "w": 325,
+            "h": 487
           },
           {
             "src": "/assets/projects/logic-awareness/series/01-beliefs-vs-facts/frame-03.webp",
             "fit": "fill",
             "position": "50% 50%",
-            "w": 340,
+            "w": 315,
             "h": 2
           },
           {
             "src": "/assets/projects/logic-awareness/series/01-beliefs-vs-facts/frame-04.webp",
             "fit": "fill",
             "position": "50% 50%",
-            "w": 340,
+            "w": 315,
             "h": 2
           },
           {
             "src": "/assets/projects/logic-awareness/series/01-beliefs-vs-facts/frame-05.webp",
             "fit": "fill",
             "position": "50% 50%",
-            "w": 340,
+            "w": 315,
             "h": 2
           },
           {
             "src": "/assets/projects/logic-awareness/series/01-beliefs-vs-facts/frame-06.webp",
             "fit": "fill",
             "position": "50% 50%",
-            "w": 340,
+            "w": 315,
             "h": 2
           },
           {
             "src": "/assets/projects/logic-awareness/series/01-beliefs-vs-facts/frame-07.webp",
             "fit": "fill",
             "position": "50% 50%",
-            "w": 340,
+            "w": 315,
             "h": 2
           },
           {
             "src": "/assets/projects/logic-awareness/series/01-beliefs-vs-facts/frame-08.webp",
             "fit": "fill",
             "position": "50% 50%",
-            "w": 340,
+            "w": 315,
             "h": 2
           },
           {
             "src": "/assets/projects/logic-awareness/series/01-beliefs-vs-facts/frame-09.webp",
             "fit": "fill",
             "position": "50% 50%",
-            "w": 340,
+            "w": 315,
             "h": 2
           },
           {
             "src": "/assets/projects/logic-awareness/series/01-beliefs-vs-facts/frame-10.webp",
             "fit": "fill",
             "position": "50% 50%",
-            "w": 340,
+            "w": 315,
             "h": 2
           },
           {
             "src": "/assets/projects/logic-awareness/series/03-personal-resource/frame-01.webp",
             "fit": "fill",
             "position": "50% 50%",
-            "w": 370,
-            "h": 492
+            "w": 342,
+            "h": 456
           },
           {
             "src": "/assets/projects/logic-awareness/series/03-personal-resource/frame-02.webp",
             "fit": "fill",
             "position": "50% 50%",
-            "w": 351,
-            "h": 468
+            "w": 325,
+            "h": 433
           },
           {
             "src": "/assets/projects/logic-awareness/series/03-personal-resource/frame-03.webp",
             "fit": "fill",
             "position": "50% 50%",
-            "w": 340,
+            "w": 315,
             "h": 2
           },
           {
             "src": "/assets/projects/logic-awareness/series/03-personal-resource/frame-04.webp",
             "fit": "fill",
             "position": "50% 50%",
-            "w": 340,
+            "w": 315,
             "h": 2
           },
           {
             "src": "/assets/projects/logic-awareness/series/03-personal-resource/frame-05.webp",
             "fit": "fill",
             "position": "50% 50%",
-            "w": 340,
+            "w": 315,
             "h": 2
           },
           {
             "src": "/assets/projects/logic-awareness/series/03-personal-resource/frame-06.webp",
             "fit": "fill",
             "position": "50% 50%",
-            "w": 340,
+            "w": 315,
             "h": 2
           },
           {
             "src": "/assets/projects/logic-awareness/series/03-personal-resource/frame-07.webp",
             "fit": "fill",
             "position": "50% 50%",
-            "w": 340,
+            "w": 315,
             "h": 2
           },
           {
             "src": "/assets/projects/logic-awareness/series/03-personal-resource/frame-08.webp",
             "fit": "fill",
             "position": "50% 50%",
-            "w": 340,
+            "w": 315,
             "h": 2
           }
         ]

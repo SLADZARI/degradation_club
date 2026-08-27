@@ -1,6 +1,6 @@
 # Batch 7 — Responsive visual sign-off
 
-Generated: 2026-08-27T20:35:04.180Z
+Generated: 2026-08-27T20:49:32.244Z
 
 Routes: **34** · Viewports: **5** · Cases: **170**
 
@@ -25,7 +25,7 @@ PASS **159** · WARN **0** · FAIL **11**
 - screenshot: `artifacts/batch7/screenshots/design-system__support__m390.png`
 
 ### FAIL — /projects/logic-awareness/ @ m390 (390px)
-- horizontal overflow: scrollWidth 490
+- horizontal overflow: scrollWidth 390
 - protrusions: figure.is-near, img, figcaption, figure, img
 - screenshot: `artifacts/batch7/screenshots/projects__logic-awareness__m390.png`
 
@@ -35,7 +35,7 @@ PASS **159** · WARN **0** · FAIL **11**
 - screenshot: `artifacts/batch7/screenshots/design-system__support__m430.png`
 
 ### FAIL — /projects/logic-awareness/ @ m430 (430px)
-- horizontal overflow: scrollWidth 490
+- horizontal overflow: scrollWidth 430
 - protrusions: figure.is-near, img, figcaption, figure, img
 - screenshot: `artifacts/batch7/screenshots/projects__logic-awareness__m430.png`
 
