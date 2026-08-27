@@ -10,22 +10,17 @@ img[src*="/people/dementors/nikita/dementor_nikita"]{background:var(--dc-demento
 img[src*="/people/dementors/gabil/dementor_gabil"]{background:var(--dc-dementor-gabil-bg)!important}
 img[src*="/people/dementors/evgeniy/dementor_evgeniy"]{background:var(--dc-dementor-evgeniy-bg)!important}
 
-:where(.dc-dementor-card__portrait-link,.dc-dementor-hero__portrait,.dc-dementor-relation__portrait,.dc-dementor-micro__portrait,.dc-dementor-feature__portrait):has(img[src*="/valentin/dementor_valentin"]){background:var(--dc-dementor-valentin-bg)!important}
-:where(.dc-dementor-card__portrait-link,.dc-dementor-hero__portrait,.dc-dementor-relation__portrait,.dc-dementor-micro__portrait,.dc-dementor-feature__portrait):has(img[src*="/nikita/dementor_nikita"]){background:var(--dc-dementor-nikita-bg)!important}
-:where(.dc-dementor-card__portrait-link,.dc-dementor-hero__portrait,.dc-dementor-relation__portrait,.dc-dementor-micro__portrait,.dc-dementor-feature__portrait):has(img[src*="/gabil/dementor_gabil"]){background:var(--dc-dementor-gabil-bg)!important}
-:where(.dc-dementor-card__portrait-link,.dc-dementor-hero__portrait,.dc-dementor-relation__portrait,.dc-dementor-micro__portrait,.dc-dementor-feature__portrait):has(img[src*="/evgeniy/dementor_evgeniy"]){background:var(--dc-dementor-evgeniy-bg)!important}
+:where(.dc-dementor-card__portrait-link,.dc-dementor-relation__portrait,.dc-dementor-micro__portrait,.dc-dementor-feature__portrait):has(img[src*="/valentin/dementor_valentin"]){background:var(--dc-dementor-valentin-bg)!important}
+:where(.dc-dementor-card__portrait-link,.dc-dementor-relation__portrait,.dc-dementor-micro__portrait,.dc-dementor-feature__portrait):has(img[src*="/nikita/dementor_nikita"]){background:var(--dc-dementor-nikita-bg)!important}
+:where(.dc-dementor-card__portrait-link,.dc-dementor-relation__portrait,.dc-dementor-micro__portrait,.dc-dementor-feature__portrait):has(img[src*="/gabil/dementor_gabil"]){background:var(--dc-dementor-gabil-bg)!important}
+:where(.dc-dementor-card__portrait-link,.dc-dementor-relation__portrait,.dc-dementor-micro__portrait,.dc-dementor-feature__portrait):has(img[src*="/evgeniy/dementor_evgeniy"]){background:var(--dc-dementor-evgeniy-bg)!important}
 
 /* PORTRAIT ASSET RULE: retain the whole ink drawing; the personal background is the crop field. */
-.dc-dementor-card__portrait,.dc-dementor-hero__portrait img,.dc-dementor-relation__portrait img,.dc-dementor-feature__portrait img,.dc-dementor-micro__portrait img{
+.dc-dementor-card__portrait,.dc-dementor-relation__portrait img,.dc-dementor-feature__portrait img,.dc-dementor-micro__portrait img{
   object-fit:contain!important;object-position:center bottom!important;mix-blend-mode:multiply
 }
 
-/* HERO — approved WEB / TABLET / MOBILE composition. */
-.dc-dementor-hero{overflow:hidden}
-.dc-dementor-hero__layout{align-items:stretch!important;margin-top:clamp(44px,7vw,110px)!important}
-.dc-dementor-hero__copy{display:flex;flex-direction:column;justify-content:flex-end;position:relative;z-index:2}
-.dc-dementor-hero__portrait{grid-column:8/13!important;min-height:clamp(560px,64vw,900px)!important;border:0!important;align-self:end}
-.dc-dementor-hero__portrait img{inset:auto 0 0!important;height:100%!important}
+/* Profile HERO geometry is owned exclusively by /dementor-profile.css. */
 
 /* MICRO */
 .dc-dementor-micro{display:inline-grid;grid-template-columns:42px auto;gap:10px;align-items:center;color:inherit;text-decoration:none}
@@ -82,9 +77,9 @@ body.dc-fuengirola-page .dc-event-lock__grid>div:has(img[src*="/people/dementors
 body.dc-fuengirola-page .dc-event-lock__grid img[src*="/people/dementors/gabil/dementor_gabil"]{max-width:none!important;width:100%!important;height:100%!important;object-fit:contain!important;object-position:center bottom!important;display:block!important}
 
 @media(max-width:1024px){
-  .dc-dementor-hero__layout{position:relative;min-height:700px!important}
-  .dc-dementor-hero__copy{grid-column:1/6!important;z-index:2;align-self:end;padding-bottom:34px}
-  .dc-dementor-hero__portrait{grid-column:4/9!important;min-height:700px!important;z-index:1}
+
+
+
   .dc-dementor-feature{grid-template-columns:minmax(0,4fr) minmax(260px,4fr)}
   .dc-home section.dc-event:has(a[href="/courses/dumai-s-opasnostyu/"])::after{width:48%}
   .dc-home section.dc-event:has(a[href="/courses/dumai-s-opasnostyu/"])>.dc-shell{padding-right:38%!important}
@@ -96,10 +91,10 @@ body.dc-fuengirola-page .dc-event-lock__grid img[src*="/people/dementors/gabil/d
 }
 
 @media(max-width:700px){
-  .dc-dementor-hero__layout{display:flex!important;flex-direction:column!important;min-height:0!important;margin-top:42px!important}
-  .dc-dementor-hero__copy{order:1!important;padding-bottom:26px!important}
-  .dc-dementor-hero__portrait{order:2!important;width:100%!important;min-height:0!important;aspect-ratio:4/5!important}
-  .dc-dementor-hero__portrait img{position:relative!important;height:100%!important;min-height:0!important}
+
+
+
+
   .dc-dementor-relation{grid-template-columns:1fr!important}.dc-dementor-relation__portrait{width:min(78vw,340px)}
   .dc-dementor-feature{grid-template-columns:1fr}.dc-dementor-feature__portrait{min-height:0;aspect-ratio:4/5}.dc-dementor-feature__copy{order:1}.dc-dementor-feature__portrait{order:2}
 
@@ -117,4 +112,4 @@ body.dc-fuengirola-page .dc-event-lock__grid img[src*="/people/dementors/gabil/d
   body.dc-fuengirola-page .dc-event-lock__grid:has(img[src*="/people/dementors/gabil/dementor_gabil"]){grid-template-columns:1fr!important}
   body.dc-fuengirola-page .dc-event-lock__grid>div:has(img[src*="/people/dementors/gabil/dementor_gabil"]){width:min(78vw,340px)}
 }
-@media(max-width:390px){.dc-dementor-hero__portrait{aspect-ratio:3/4!important}body.dc-fuengirola-page .dc-entity-hero{min-height:720px!important}body.dc-fuengirola-page .dc-entity-hero::after{height:54%}}
+@media(max-width:390px){body.dc-fuengirola-page .dc-entity-hero{min-height:720px!important}body.dc-fuengirola-page .dc-entity-hero::after{height:54%}}

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-27T13:24:11.625Z",
+  "generatedAt": "2026-08-27T13:25:24.109Z",
   "globalImports": [
     "/visual-tokens.css",
     "/illustration-surfaces.css",
@@ -1037,19 +1037,13 @@
   "selectorOwners": {
     "dementor hero portrait": [
       "/dementor-profile.css",
-      "/dementors-v1.css",
-      "/presentation-standard-v1.css",
-      "/ui-redesign-drive-v1.css",
-      "/visual-standard-v2.css"
+      "/ui-redesign-drive-v1.css"
     ],
     "dementor hero layout": [
       "/dementor-profile.css",
-      "/dementors-v1.css",
-      "/ui-redesign-drive-v1.css",
-      "/visual-standard-v2.css"
+      "/ui-redesign-drive-v1.css"
     ],
     "Fuengirola hero pseudo layer": [
-      "/event-system.css",
       "/ui-redesign-drive-v1.css",
       "/visual-standard-v2.css"
     ],
@@ -1073,18 +1067,12 @@
   },
   "activeSelectorOwners": {
     "dementor hero portrait": [
-      "/dementor-profile.css",
-      "/dementors-v1.css",
-      "/presentation-standard-v1.css",
-      "/visual-standard-v2.css"
+      "/dementor-profile.css"
     ],
     "dementor hero layout": [
-      "/dementor-profile.css",
-      "/dementors-v1.css",
-      "/visual-standard-v2.css"
+      "/dementor-profile.css"
     ],
     "Fuengirola hero pseudo layer": [
-      "/event-system.css",
       "/visual-standard-v2.css"
     ],
     "Home feature/event structural selector": [
@@ -1109,18 +1097,15 @@
     {
       "file": "/visual-standard-v2.css",
       "pseudo": 13,
-      "important": 81,
+      "important": 56,
       "has": 44,
       "z": [
-        "2",
         "0",
         "2",
         "0",
         "2",
         "0",
-        "2",
-        "2",
-        "1"
+        "2"
       ],
       "blend": 3,
       "isolation": 3,
@@ -1135,7 +1120,7 @@
       "important": 51,
       "has": 0,
       "z": [],
-      "blend": 2,
+      "blend": 1,
       "isolation": 0,
       "bgImages": []
     },
@@ -1263,18 +1248,6 @@
       "bgImages": []
     },
     {
-      "file": "/event-system.css",
-      "pseudo": 6,
-      "important": 5,
-      "has": 0,
-      "z": [],
-      "blend": 0,
-      "isolation": 0,
-      "bgImages": [
-        "/assets/people/dementors/gabil/dementor_gabil.webp"
-      ]
-    },
-    {
       "file": "/illustration-surfaces.css",
       "pseudo": 0,
       "important": 11,
@@ -1302,6 +1275,16 @@
       "z": [
         "9999"
       ],
+      "blend": 0,
+      "isolation": 0,
+      "bgImages": []
+    },
+    {
+      "file": "/event-system.css",
+      "pseudo": 3,
+      "important": 5,
+      "has": 0,
+      "z": [],
       "blend": 0,
       "isolation": 0,
       "bgImages": []
@@ -1412,18 +1395,6 @@
       "bgImages": []
     },
     {
-      "file": "/dementors-v1.css",
-      "pseudo": 1,
-      "important": 0,
-      "has": 0,
-      "z": [
-        "1"
-      ],
-      "blend": 1,
-      "isolation": 0,
-      "bgImages": []
-    },
-    {
       "file": "/merch-drop-v2.css",
       "pseudo": 1,
       "important": 0,
@@ -1457,6 +1428,16 @@
         "1500"
       ],
       "blend": 0,
+      "isolation": 0,
+      "bgImages": []
+    },
+    {
+      "file": "/dementors-v1.css",
+      "pseudo": 0,
+      "important": 0,
+      "has": 0,
+      "z": [],
+      "blend": 1,
       "isolation": 0,
       "bgImages": []
     },
@@ -1503,29 +1484,6 @@
       "bgImages": []
     },
     {
-      "file": "/visual-standard-v2.css",
-      "pseudo": 13,
-      "important": 81,
-      "has": 44,
-      "z": [
-        "2",
-        "0",
-        "2",
-        "0",
-        "2",
-        "0",
-        "2",
-        "2",
-        "1"
-      ],
-      "blend": 3,
-      "isolation": 3,
-      "bgImages": [
-        "/assets/people/dementors/valentin/dementor_valentin.webp",
-        "/assets/ink/event-fuengirola-03.webp"
-      ]
-    },
-    {
       "file": "/ui-redesign-drive-v1.css",
       "pseudo": 4,
       "important": 77,
@@ -1543,6 +1501,26 @@
       "isolation": 1,
       "bgImages": [
         "/assets/event-fuengirola-03.webp"
+      ]
+    },
+    {
+      "file": "/visual-standard-v2.css",
+      "pseudo": 13,
+      "important": 56,
+      "has": 44,
+      "z": [
+        "0",
+        "2",
+        "0",
+        "2",
+        "0",
+        "2"
+      ],
+      "blend": 3,
+      "isolation": 3,
+      "bgImages": [
+        "/assets/people/dementors/valentin/dementor_valentin.webp",
+        "/assets/ink/event-fuengirola-03.webp"
       ]
     },
     {
@@ -1570,7 +1548,7 @@
       "important": 51,
       "has": 0,
       "z": [],
-      "blend": 2,
+      "blend": 1,
       "isolation": 0,
       "bgImages": []
     },
@@ -1725,18 +1703,6 @@
       "bgImages": []
     },
     {
-      "file": "/event-system.css",
-      "pseudo": 6,
-      "important": 5,
-      "has": 0,
-      "z": [],
-      "blend": 0,
-      "isolation": 0,
-      "bgImages": [
-        "/assets/people/dementors/gabil/dementor_gabil.webp"
-      ]
-    },
-    {
       "file": "/illustration-surfaces.css",
       "pseudo": 0,
       "important": 11,
@@ -1764,6 +1730,16 @@
       "z": [
         "9999"
       ],
+      "blend": 0,
+      "isolation": 0,
+      "bgImages": []
+    },
+    {
+      "file": "/event-system.css",
+      "pseudo": 3,
+      "important": 5,
+      "has": 0,
+      "z": [],
       "blend": 0,
       "isolation": 0,
       "bgImages": []
@@ -1874,18 +1850,6 @@
       "bgImages": []
     },
     {
-      "file": "/dementors-v1.css",
-      "pseudo": 1,
-      "important": 0,
-      "has": 0,
-      "z": [
-        "1"
-      ],
-      "blend": 1,
-      "isolation": 0,
-      "bgImages": []
-    },
-    {
       "file": "/design-system/design-system.css",
       "pseudo": 0,
       "important": 1,
@@ -1944,6 +1908,16 @@
         "50"
       ],
       "blend": 0,
+      "isolation": 0,
+      "bgImages": []
+    },
+    {
+      "file": "/dementors-v1.css",
+      "pseudo": 0,
+      "important": 0,
+      "has": 0,
+      "z": [],
+      "blend": 1,
       "isolation": 0,
       "bgImages": []
     },

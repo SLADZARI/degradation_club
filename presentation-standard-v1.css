@@ -53,7 +53,6 @@ body .dc-dementor-card__arrow{font-size:25px;text-align:right}
 body .dc-profile-item{border-radius:0!important;box-shadow:none!important}
 body a.dc-profile-item{transition:none}
 body .dc-profile-item__num{font-variant-numeric:tabular-nums}
-body .dc-dementor-hero__portrait img{mix-blend-mode:multiply;object-fit:contain;background:var(--dc-paper)}
 
 /* QUOTE SYSTEM */
 body .dc-quote-card{border-radius:0!important;box-shadow:none!important;background:transparent;border-top:1px solid currentColor;border-bottom:1px solid currentColor;padding:30px 0;margin:0}
