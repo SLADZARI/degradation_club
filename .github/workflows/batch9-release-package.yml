@@ -23,7 +23,7 @@ jobs:
         run: |
           git fetch origin dementor-club-site
           git checkout origin/dementor-club-site -- .deploy-trigger cart/index.html dementor-account-sync-v1.js dementor-cart-v1.js docs/SUPABASE_BACKEND_v1.md global-header.js join-storage-guard.js merch-cart-bridge-v1.js profile/index.html site-config.js sitemap.xml
-      - name: Apply the one release-only mobile fix
+      - name: Apply final release-only mobile fixes
         run: |
           python3 - <<'PY'
           from pathlib import Path
@@ -34,6 +34,13 @@ jobs:
           if old not in s:
               raise SystemExit('cart mobile rule not found')
           p.write_text(s.replace(old,new))
+
+          e=Path('event-system.css')
+          es=e.read_text()
+          marker='/* RELEASE RC / FUENGIROLA MOBILE PULLQUOTE */'
+          if marker not in es:
+              es += '\n\n'+marker+'\n@media(max-width:560px){.dc-fuengirola-page .dc-event-detail__intro>.dc-pullquote,.dc-fuengirola-page .dc-shell>.dc-pullquote{font-size:clamp(28px,8vw,32px);line-height:.96;letter-spacing:-.035em;overflow-wrap:anywhere;word-break:normal;text-wrap:wrap}}\n'
+              e.write_text(es)
           PY
       - name: Remove audit-only material from release package
         run: |
@@ -74,7 +81,8 @@ jobs:
                 for(const el of document.querySelectorAll('body *')){
                   if(!visible(el)) continue;
                   const r=el.getBoundingClientRect(),cs=getComputedStyle(el);
-                  const intentional=el.closest('.ticker,.dc-notice__track,.dc-course-strip,[class*="ticker"],[class*="strip"]') || cs.position==='fixed';
+                  const assistive=el.closest('.dc-global-sr,.sr-only,.visually-hidden,[aria-hidden="true"]');
+                  const intentional=assistive || el.closest('.ticker,.dc-notice__track,.dc-course-strip,[class*="ticker"],[class*="strip"]') || cs.position==='fixed';
                   if(intentional) continue;
                   const leaf=el.childElementCount===0 && (el.textContent||'').trim().length>2;
                   const textOverflow=leaf && el.scrollWidth>el.clientWidth+3;
