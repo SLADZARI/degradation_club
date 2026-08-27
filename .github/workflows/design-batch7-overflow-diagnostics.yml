@@ -1,0 +1,32 @@
+name: Design Batch 7 Overflow Diagnostics
+on:
+  push:
+    branches: [design-audit-batch-2026-08-27]
+permissions:
+  contents: write
+jobs:
+  diagnose:
+    if: ${{ !contains(github.event.head_commit.message, '[batch7-diagnostics]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: |
+          npm init -y >/dev/null 2>&1 || true
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - run: |
+          python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/dc-http.log 2>&1 &
+          sleep 2
+      - run: node scripts/batch7-overflow-diagnostics.mjs
+      - run: |
+          git config user.name "Dementor Design Audit"
+          git config user.email "design-audit@users.noreply.github.com"
+          git add artifacts/batch7/overflow-diagnostics.json artifacts/batch7/OVERFLOW_DIAGNOSTICS.md
+          git commit -m "Batch 7: overflow diagnostics [batch7-auto] [batch7-diagnostics]" || exit 0
+          git pull --rebase origin design-audit-batch-2026-08-27
+          git push origin HEAD:design-audit-batch-2026-08-27
