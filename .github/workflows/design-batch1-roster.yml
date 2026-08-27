@@ -1,30 +1,19 @@
 name: Design Batch 1 Roster Split
 
 on:
-  push:
-    branches:
-      - design-audit-batch-2026-08-27
-
-permissions:
-  contents: write
+  workflow_dispatch:
 
 jobs:
-  split:
-    if: ${{ !contains(github.event.head_commit.message, '[roster-auto]') }}
+  verify:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: Split roster identity from profile CSS
-        run: node scripts/batch1-roster-split.mjs
-      - name: Re-run active style graph
-        run: node scripts/audit-style-graph.mjs
-      - name: Gate Community stylesheet ownership
+      - name: Verify Community stylesheet ownership
         run: |
+          node scripts/audit-style-graph.mjs
           node - <<'NODE'
           const fs=require('fs');
           const g=JSON.parse(fs.readFileSync('artifacts/design-style-graph.json','utf8'));
@@ -34,15 +23,3 @@ jobs:
           if(!row.activeStyles.includes('/dementor-roster.css')) throw new Error('Community does not activate roster CSS');
           console.log('Community roster/profile split gate passed');
           NODE
-      - name: Commit roster split
-        run: |
-          git config user.name "Dementor Design Audit"
-          git config user.email "design-audit@users.noreply.github.com"
-          git add community/index.html dementor-profile.css dementor-roster.css artifacts/design-style-graph.json
-          if git diff --cached --quiet; then
-            echo "No roster split changes"
-            exit 0
-          fi
-          git commit -m "Batch 1: separate Community roster from profile CSS [roster-auto]"
-          git pull --rebase origin design-audit-batch-2026-08-27
-          git push origin HEAD:design-audit-batch-2026-08-27
