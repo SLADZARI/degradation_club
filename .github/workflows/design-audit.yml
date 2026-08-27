@@ -38,6 +38,8 @@ jobs:
         run: node scripts/audit-ui-pressure.mjs
       - name: Run component owner hardening audit
         run: node scripts/audit-component-owner-hardening.mjs
+      - name: Run route owner sweep audit
+        run: node scripts/audit-route-owner-sweep.mjs
       - name: Print generated graph
         run: cat artifacts/design-style-graph.json
       - uses: actions/upload-artifact@v4
