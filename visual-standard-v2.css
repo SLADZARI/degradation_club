@@ -131,9 +131,6 @@ body.dc-fuengirola-page .dc-ink-slot--event.dc-media-break{display:none!importan
   body.dc-fuengirola-page .dc-event-hero__relation-arrow{display:none}
 }
 
-/* Any remaining event media uses the same upper-right crop rule. */
-.dc-ink-slot--event,.dc-media-break{overflow:hidden}.dc-ink-slot--event>img,.dc-media-break>img{width:100%;height:100%;object-fit:cover!important;object-position:right top!important}
-
 @media(max-width:1024px){
   .dc-home section.dc-event:has(a[href="/courses/dumai-s-opasnostyu/"])::after{width:48%}
   .dc-home section.dc-event:has(a[href="/courses/dumai-s-opasnostyu/"])>.dc-shell{padding-right:38%!important}

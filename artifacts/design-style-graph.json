@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-27T14:39:50.521Z",
+  "generatedAt": "2026-08-27T14:55:17.391Z",
   "globalImports": [
     "/visual-tokens.css",
     "/illustration-surfaces.css",
@@ -1098,7 +1098,7 @@
     {
       "file": "/visual-standard-v2.css",
       "pseudo": 12,
-      "important": 54,
+      "important": 52,
       "has": 35,
       "z": [
         "0",
@@ -1128,7 +1128,7 @@
     },
     {
       "file": "/ui-v2.css",
-      "pseudo": 25,
+      "pseudo": 23,
       "important": 24,
       "has": 2,
       "z": [
@@ -1140,7 +1140,7 @@
         "120",
         "90"
       ],
-      "blend": 4,
+      "blend": 2,
       "isolation": 0,
       "bgImages": []
     },
@@ -1236,22 +1236,22 @@
       "bgImages": []
     },
     {
+      "file": "/illustration-surfaces.css",
+      "pseudo": 2,
+      "important": 11,
+      "has": 0,
+      "z": [],
+      "blend": 4,
+      "isolation": 0,
+      "bgImages": []
+    },
+    {
       "file": "/courses/slaboumie-i-otvaga/course.css",
       "pseudo": 0,
       "important": 12,
       "has": 0,
       "z": [],
       "blend": 0,
-      "isolation": 0,
-      "bgImages": []
-    },
-    {
-      "file": "/illustration-surfaces.css",
-      "pseudo": 0,
-      "important": 11,
-      "has": 0,
-      "z": [],
-      "blend": 2,
       "isolation": 0,
       "bgImages": []
     },
@@ -1353,10 +1353,10 @@
       "has": 0,
       "z": [
         "0",
-        "1",
-        "2"
+        "2",
+        "1"
       ],
-      "blend": 2,
+      "blend": 1,
       "isolation": 0,
       "bgImages": []
     },
@@ -1517,7 +1517,7 @@
     {
       "file": "/visual-standard-v2.css",
       "pseudo": 12,
-      "important": 54,
+      "important": 52,
       "has": 35,
       "z": [
         "0",
@@ -1566,7 +1566,7 @@
     },
     {
       "file": "/ui-v2.css",
-      "pseudo": 25,
+      "pseudo": 23,
       "important": 24,
       "has": 2,
       "z": [
@@ -1578,7 +1578,7 @@
         "120",
         "90"
       ],
-      "blend": 4,
+      "blend": 2,
       "isolation": 0,
       "bgImages": []
     },
@@ -1701,22 +1701,22 @@
       "bgImages": []
     },
     {
+      "file": "/illustration-surfaces.css",
+      "pseudo": 2,
+      "important": 11,
+      "has": 0,
+      "z": [],
+      "blend": 4,
+      "isolation": 0,
+      "bgImages": []
+    },
+    {
       "file": "/courses/slaboumie-i-otvaga/course.css",
       "pseudo": 0,
       "important": 12,
       "has": 0,
       "z": [],
       "blend": 0,
-      "isolation": 0,
-      "bgImages": []
-    },
-    {
-      "file": "/illustration-surfaces.css",
-      "pseudo": 0,
-      "important": 11,
-      "has": 0,
-      "z": [],
-      "blend": 2,
       "isolation": 0,
       "bgImages": []
     },
@@ -1818,10 +1818,10 @@
       "has": 0,
       "z": [
         "0",
-        "1",
-        "2"
+        "2",
+        "1"
       ],
-      "blend": 2,
+      "blend": 1,
       "isolation": 0,
       "bgImages": []
     },
