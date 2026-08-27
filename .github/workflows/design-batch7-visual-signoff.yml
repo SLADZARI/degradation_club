@@ -1,0 +1,51 @@
+name: Design Batch 7 Visual Sign-off
+
+on:
+  push:
+    branches:
+      - design-audit-batch-2026-08-27
+  workflow_dispatch:
+
+jobs:
+  visual-signoff:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install Playwright
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Start static site
+        run: |
+          python3 -m http.server 4173 --bind 127.0.0.1 > /tmp/dc-http.log 2>&1 &
+          echo $! > /tmp/dc-http.pid
+          sleep 2
+      - name: Run full CSS design audit
+        run: |
+          node scripts/audit-style-graph.mjs
+          node scripts/audit-dementor-hero.mjs
+          node scripts/audit-event-hero.mjs
+          node scripts/audit-feature-relation.mjs
+          node scripts/audit-ink-surfaces.mjs
+          node scripts/audit-inline-styles.mjs
+          node scripts/audit-cascade-pressure.mjs
+          node scripts/audit-presentation-pressure.mjs
+          node scripts/audit-compatibility-layers.mjs
+          node scripts/audit-mobile-guardrails.mjs
+          node scripts/audit-ui-pressure.mjs
+          node scripts/audit-component-owner-hardening.mjs
+          node scripts/audit-route-owner-sweep.mjs
+          node scripts/audit-shared-systems.mjs
+      - name: Run responsive visual sign-off
+        run: node scripts/audit-visual-signoff.mjs
+      - name: Upload Batch 7 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: batch7-visual-signoff
+          path: artifacts/batch7-visual-signoff
+          retention-days: 14
