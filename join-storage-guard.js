@@ -7,15 +7,7 @@
     localStorage.removeItem(key);
   }catch(e){available=false;}
   document.documentElement.dataset.dcStorage=available?'available':'unavailable';
-  if(available){
-    if(!document.querySelector('script[src="/dementor-account-sync-v1.js"]')){
-      const sync=document.createElement('script');
-      sync.src='/dementor-account-sync-v1.js';
-      sync.defer=true;
-      document.head.appendChild(sync);
-    }
-    return;
-  }
+  if(available)return;
 
   const style=document.createElement('style');
   style.textContent=`
