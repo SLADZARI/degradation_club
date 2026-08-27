@@ -1,0 +1,55 @@
+name: Design Batch 1 Owner Consolidation
+
+on:
+  push:
+    branches:
+      - design-audit-batch-2026-08-27
+
+permissions:
+  contents: write
+
+jobs:
+  consolidate:
+    if: ${{ !contains(github.event.head_commit.message, '[owner-auto]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Consolidate component ownership
+        run: node scripts/batch1-owner-consolidation.mjs
+      - name: Re-run active style graph
+        run: node scripts/audit-style-graph.mjs
+      - name: Gate critical selector ownership
+        run: |
+          node - <<'NODE'
+          const fs=require('fs');
+          const g=JSON.parse(fs.readFileSync('artifacts/design-style-graph.json','utf8'));
+          const expected={
+            'dementor hero portrait':['/dementor-profile.css'],
+            'dementor hero layout':['/dementor-profile.css'],
+            'Fuengirola hero pseudo layer':['/visual-standard-v2.css']
+          };
+          for(const [key,want] of Object.entries(expected)){
+            const got=g.activeSelectorOwners[key]||[];
+            if(JSON.stringify(got)!==JSON.stringify(want)){
+              console.error(`${key}: expected ${want.join(', ')}, got ${got.join(', ')}`);
+              process.exit(1);
+            }
+          }
+          console.log('Critical selector ownership gate passed');
+          NODE
+      - name: Commit owner cleanup
+        run: |
+          git config user.name "Dementor Design Audit"
+          git config user.email "design-audit@users.noreply.github.com"
+          git add presentation-standard-v1.css dementors-v1.css visual-standard-v2.css event-system.css artifacts/design-style-graph.json
+          if git diff --cached --quiet; then
+            echo "No owner cleanup changes"
+            exit 0
+          fi
+          git commit -m "Batch 1: consolidate component style ownership [owner-auto]"
+          git push origin HEAD:design-audit-batch-2026-08-27
