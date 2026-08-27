@@ -36,6 +36,8 @@ jobs:
         run: node scripts/audit-mobile-guardrails.mjs
       - name: Run ui-v2 pressure audit
         run: node scripts/audit-ui-pressure.mjs
+      - name: Run component owner hardening audit
+        run: node scripts/audit-component-owner-hardening.mjs
       - name: Print generated graph
         run: cat artifacts/design-style-graph.json
       - uses: actions/upload-artifact@v4
