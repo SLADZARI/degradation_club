@@ -14,3 +14,4 @@ Update this file only when the user explicitly requests deploy/publish/release.
 2026-08-27T11:37+02:00 — publish vetted Dementor profiles, Community People asset, canonical visual tokens, illustration surfaces and Fuengirola/Gabil layout.
 2026-08-27T23:55+02:00 — publish Supabase-backed profile sync, account routes, cart state and preorder draft flow after PR #17 merge.
 2026-08-28T00:57+02:00 — deploy join account sync loader fix so Google profile controls render on /join/.
+2026-08-28T01:03+02:00 — deploy OAuth redirect fix preserving /degradation_club base path on GitHub Pages.
