@@ -8,40 +8,12 @@ window.DEMENTOR_SITE_CONFIG=Object.freeze({
     authProvider:'google',
     assessmentVersion:'dc9-v1'
   },
-  contacts:{
-    enabled:false,
-    endpoint:null,
-    publicEmail:null,
-    socialLinks:[]
-  },
-  donate:{
-    enabled:false,
-    provider:null,
-    checkoutUrl:null,
-    currency:null,
-    recurring:false
-  },
-  merch:{
-    catalogEnabled:true,
-    checkoutEnabled:false,
-    checkoutProvider:null,
-    checkoutUrl:null
-  },
-  events:{
-    registrationEnabled:false,
-    registrationProvider:null,
-    registrationUrl:null
-  },
-  community:{
-    membershipEnabled:false,
-    membershipProvider:null,
-    membershipUrl:null
-  },
-  onboarding:{
-    storageKey:'dementorClubOnboardingV3',
-    storage:'localStorage',
-    accountSync:true
-  }
+  contacts:{enabled:false,endpoint:null,publicEmail:null,socialLinks:[]},
+  donate:{enabled:false,provider:null,checkoutUrl:null,currency:null,recurring:false},
+  merch:{catalogEnabled:true,cartEnabled:true,cartStorageKey:'dementorClubCartV1',checkoutEnabled:false,checkoutProvider:null,checkoutUrl:null,preorderPaymentMethod:'BLIK'},
+  events:{registrationEnabled:false,registrationProvider:null,registrationUrl:null},
+  community:{membershipEnabled:false,membershipProvider:null,membershipUrl:null},
+  onboarding:{storageKey:'dementorClubOnboardingV3',storage:'localStorage',accountSync:true}
 });
 if(typeof document!=='undefined'){
   (()=>{
