@@ -1,175 +1,143 @@
 # Dementor Club — Supabase Backend v1
 
-Status: ACTIVE BACKEND BASELINE
+Status: ACTIVE BACKEND BASELINE / GOOGLE OAUTH PENDING LIVE TEST
 Date: 2026-08-27
 Supabase project: `EDU Modern Pilgrims`
 Project ref: `mmekfydwbvptbdatwitj`
 
-## Purpose
-
-Supabase stores operational/dynamic state only.
+## Core rule
 
 **Git remains source-of-truth for what exists.**
-**Supabase stores what happens.**
+**Supabase stores what happens to/with a specific person.**
 
-Canonical club content, entity definitions, approved copy, event/course/project definitions and public URLs continue to live in `dementor-club` and are implemented by `dementor-club-site`.
-
-Supabase MUST NOT become a parallel CMS for approved club content.
+Canonical club content, entity definitions, approved copy, event/course/project/product definitions and public URLs remain in `dementor-club` and are implemented by `dementor-club-site`. Supabase is not a CMS.
 
 ## Preserved infrastructure
 
 - Supabase Auth
-- Google OAuth provider already used by existing test users
+- Google OAuth provider previously used by test users
 - `auth.users`
 - `auth.identities`
 - automatic `auth.users -> public.profiles` projection
+- existing Google/Auth users backfilled into `public.profiles`
 
-Existing Google/Auth users were backfilled into the new `public.profiles` table.
+Authentication is not membership. A profile can exist without accepted membership, event registration or course enrollment.
 
-## Identity boundary
+## Local-first diagnostic model
 
-Authentication is not membership.
+Local runtime key: `dementorClubOnboardingV3`.
 
-A user may have a `public.profiles` record without being a Dementor Club member, having an accepted join application, event registration or course enrollment.
+1. Diagnostics work without account.
+2. Local state remains usable if Supabase is unavailable.
+3. Google sign-in upgrades persistence; it is not a gate.
+4. On sign-in local and remote state merge.
+5. Per-sphere completed results merge by `result.date`; newest wins.
+6. Existing local progress is never discarded just because remote state exists.
+7. Diagnostic version is recorded.
 
-Public forms may also exist without authentication. Their `profile_id` is nullable by design.
+Current version: `dc9-v1`.
 
-## Active public schema
+Tables:
+- `profiles`
+- `assessment_snapshots` — current durable accumulated map
+- `assessment_runs` — completed run history with `assessment_version`, `result_json`, optional `answers_json`, timestamps and dedupe `source_key`
 
-### `public.profiles`
-Identity projection for authenticated users.
+Browser adapter: `/dementor-account-sync-v1.js`.
 
-Fields:
-- `id` -> `auth.users.id`
-- `email`
-- `full_name`
-- `avatar_url`
-- `created_at`
-- `updated_at`
+Routes:
+- `/join/` — local-first diagnostic + optional Google persistence
+- `/profile/` — account dashboard, nine-sphere map, run history and orders
+
+## Commerce model
+
+Local cart key: `dementorClubCartV1`.
+
+The approved product/preorder model remains canonical in Git. The current payment method remains manual BLIK; no payment-provider semantics were invented or changed.
+
+Flow:
+
+anonymous product selection -> localStorage cart -> optional Google sign-in -> merge to durable user cart -> draft preorder record.
+
+Tables:
+- `carts`
+- `cart_items`
+- `orders`
+- `order_items`
 
 RLS:
-- authenticated user may SELECT own profile
-- authenticated user may UPDATE own profile
-- no anonymous reads
+- all commerce tables are authenticated/own-user only
+- no anonymous database access
+- anonymous cart stays local only
 
-### `public.join_applications`
-Operational applications to join the club.
+Browser adapter: `/dementor-cart-v1.js`.
+Bridge from the existing preorder selector: `/merch-cart-bridge-v1.js`.
+Route: `/cart/`.
 
-Important: this does not define membership mechanics. It only stores submitted applications once a public application UI is approved.
+`orders` currently supports the existing manual preorder process. `checkoutEnabled` remains false. A draft order is not a paid or confirmed order.
 
-Fields include:
-- `profile_id` nullable
-- `email`
-- `full_name`
-- `answers jsonb`
-- `status`
-- `source`
-- timestamps
+## Other operational tables
 
-### `public.event_registrations`
-Event registrations.
+- `join_applications`
+- `event_registrations`
+- `course_enrollments`
+- `contact_requests`
 
-`event_id` is a stable canonical entity ID originating from Git. Supabase does not duplicate event editorial content.
-
-### `public.course_enrollments`
-Course/program applications and enrollment state.
-
-`course_id` is a stable canonical entity ID originating from Git.
-
-### `public.contact_requests`
-Inbound contact submissions.
-
-No public SELECT policy exists by design.
+Their public feature flags remain disabled until their UX is explicitly activated.
 
 ## Auth trigger
 
-Trigger:
-`auth.users` AFTER INSERT -> `public.handle_new_user()`
+`auth.users` AFTER INSERT -> `public.handle_new_user()`.
 
-The function creates/updates only `public.profiles`.
-
-It no longer creates EDU employee entities or assigns an `employee` role.
-
-`public.handle_new_user()` remains `SECURITY DEFINER` for the auth trigger, but direct execution has been revoked from `PUBLIC`, `anon` and `authenticated`.
+The function only creates/updates `public.profiles`. It does not create EDU employee entities. Direct RPC execution is revoked from `PUBLIC`, `anon` and `authenticated`.
 
 ## Legacy EDU archive
 
-The former EDU test model was not deleted.
-
-It was moved intact into schema:
-
-`legacy_edu`
-
-Archived tables include:
-- companies
-- departments
-- profiles
-- mentor_assignments
-- employee_profiles
-- sessions
-- session_summaries
-- session_links
-- tasks
-- recommendations
-- feedback
-
-`legacy_edu` is not part of the Dementor Club runtime. Access for `anon` and `authenticated` has been revoked.
-
-Do not extend or optimize this archive unless data recovery is explicitly required.
+Former EDU test tables were moved intact to `legacy_edu`. The schema is not part of runtime and access for `anon` and `authenticated` is revoked.
 
 ## Applied migrations
 
 1. `archive_edu_and_create_dementor_core`
 2. `secure_legacy_edu_archive`
+3. `add_dementor_assessment_sync`
+4. `add_dementor_commerce_state`
 
 ## Security baseline
 
-All active public Dementor Club tables have RLS enabled.
+All active public Dementor Club tables use RLS. Browser code receives only the Supabase publishable key, never secret/service-role credentials.
 
-The previous critical issue where `public.profiles` had policies but RLS disabled has been removed from the active schema.
-
-Remaining Supabase advisor findings currently relate to the cold `legacy_edu` archive or to optional password-auth hardening (`Leaked Password Protection`). Google OAuth operation does not depend on password login.
+Remaining advisor notices may relate to the cold `legacy_edu` archive, fresh unused indexes, or optional password-auth hardening. Google OAuth does not use password login.
 
 ## Storage / Realtime / Edge Functions
 
-At this baseline:
+- Storage: not required for current identity/diagnostic/cart runtime
+- Realtime: not required
+- Edge Functions: not required before payment-provider/server webhook integration
 
-- Storage: no club buckets configured
-- Realtime: not used by club runtime
-- Edge Functions: none required yet
+## Google production activation checklist
 
-Do not introduce these services without a concrete product requirement.
+Production site origin:
+`https://degradation-club.vercel.app`
 
-## Website activation rule
+Supabase project URL:
+`https://mmekfydwbvptbdatwitj.supabase.co`
 
-The website currently contains UI readiness and feature flags for external services.
+Google OAuth callback URI that must exist in Google Cloud OAuth client:
+`https://mmekfydwbvptbdatwitj.supabase.co/auth/v1/callback`
 
-Backend existence does **not** automatically make a feature LIVE.
+Supabase Auth redirect allow-list must permit:
+- `https://degradation-club.vercel.app/join/`
+- `https://degradation-club.vercel.app/profile/`
+- `https://degradation-club.vercel.app/cart/`
 
-Do not set membership/event/contact feature flags to LIVE until:
+Google Authorized JavaScript origin:
+`https://degradation-club.vercel.app`
 
-1. the public UX and required fields are approved;
-2. the site adapter is connected;
-3. canonical entity IDs are mapped correctly;
-4. end-to-end submission is tested;
-5. privacy/legal copy matches the actual stored data.
-
-The current `/join/` page is a local diagnostic/onboarding experience using `localStorage`; it is not yet an approved membership application form. Do not silently upload its diagnostic results to Supabase.
-
-## Next activation order
-
-Recommended order:
-
-1. approved Join application form -> `join_applications`
-2. event registration -> `event_registrations`
-3. contacts -> `contact_requests`
-4. course applications/enrollment -> `course_enrollments`
-5. optional member account/history later
+Do not add `service_role` credentials to Google, Git or browser code.
 
 ## Architectural rule
 
 `dementor-club` -> approved entity/content -> `dementor-club-site`
 
-`dementor-club-site` -> user action -> Supabase operational state
+`dementor-club-site` -> user action / personal state -> Supabase
 
 Supabase must never become authority for club doctrine, approved event facts, project descriptions, mentor pages or editorial content.

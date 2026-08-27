@@ -7,7 +7,15 @@
     localStorage.removeItem(key);
   }catch(e){available=false;}
   document.documentElement.dataset.dcStorage=available?'available':'unavailable';
-  if(available)return;
+  if(available){
+    if(!document.querySelector('script[src="/dementor-account-sync-v1.js"]')){
+      const sync=document.createElement('script');
+      sync.src='/dementor-account-sync-v1.js';
+      sync.defer=true;
+      document.head.appendChild(sync);
+    }
+    return;
+  }
 
   const style=document.createElement('style');
   style.textContent=`
@@ -28,7 +36,7 @@
     const note=document.createElement('div');
     note.className='dc-storage-warning';
     note.setAttribute('role','alert');
-    note.innerHTML='<strong>ЛОКАЛЬНОЕ ХРАНЕНИЕ НЕДОСТУПНО</strong><span>Этот onboarding хранит профиль только в localStorage браузера. Сейчас браузер запрещает запись, поэтому запуск процедуры отключён. Разрешите хранение данных сайта или откройте страницу в обычном режиме браузера.</span>';
+    note.innerHTML='<strong>ЛОКАЛЬНОЕ ХРАНЕНИЕ НЕДОСТУПНО</strong><span>Этот onboarding хранит профиль в localStorage браузера и при входе синхронизирует его с аккаунтом Dementor Club. Сейчас браузер запрещает локальную запись, поэтому запуск процедуры отключён. Разрешите хранение данных сайта или откройте страницу в обычном режиме браузера.</span>';
     host.prepend(note);
   };
   document.readyState==='loading'?document.addEventListener('DOMContentLoaded',show,{once:true}):show();
