@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-27T15:28:38.473Z",
+  "generatedAt": "2026-08-27T18:21:29.875Z",
   "globalImports": [
     "/visual-tokens.css",
     "/illustration-surfaces.css",
@@ -1085,16 +1085,6 @@
   },
   "activeCssRiskStats": [
     {
-      "file": "/presentation-standard-v1.css",
-      "pseudo": 2,
-      "important": 51,
-      "has": 0,
-      "z": [],
-      "blend": 1,
-      "isolation": 0,
-      "bgImages": []
-    },
-    {
       "file": "/ui-v2.css",
       "pseudo": 23,
       "important": 24,
@@ -1385,6 +1375,16 @@
       "bgImages": []
     },
     {
+      "file": "/presentation-standard-v1.css",
+      "pseudo": 2,
+      "important": 0,
+      "has": 0,
+      "z": [],
+      "blend": 1,
+      "isolation": 0,
+      "bgImages": []
+    },
+    {
       "file": "/about-v1.css",
       "pseudo": 1,
       "important": 0,
@@ -1532,16 +1532,6 @@
       ],
       "blend": 1,
       "isolation": 1,
-      "bgImages": []
-    },
-    {
-      "file": "/presentation-standard-v1.css",
-      "pseudo": 2,
-      "important": 51,
-      "has": 0,
-      "z": [],
-      "blend": 1,
-      "isolation": 0,
       "bgImages": []
     },
     {
@@ -1858,6 +1848,16 @@
         "1"
       ],
       "blend": 0,
+      "isolation": 0,
+      "bgImages": []
+    },
+    {
+      "file": "/presentation-standard-v1.css",
+      "pseudo": 2,
+      "important": 0,
+      "has": 0,
+      "z": [],
+      "blend": 1,
       "isolation": 0,
       "bgImages": []
     },
