@@ -1,0 +1,24 @@
+name: Design Audit
+
+on:
+  push:
+    branches:
+      - design-audit-batch-2026-08-27
+  workflow_dispatch:
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Run style graph audit
+        run: node scripts/audit-style-graph.mjs
+      - name: Print generated graph
+        run: cat artifacts/design-style-graph.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: design-style-graph
+          path: artifacts/design-style-graph.json
