@@ -7,7 +7,7 @@
   };
   const ensureCss=()=>{if(!document.querySelector('link[href="/utility-v1.css"]')){const l=document.createElement('link');l.rel='stylesheet';l.href='/utility-v1.css';document.head.appendChild(l)}};
   const card=(key,label='ДЕМЕНТОР')=>{const p=people[key];const a=document.createElement('a');a.className='dc-dementor-link';a.href=`/community/${p.slug}/`;a.setAttribute('aria-label',`${label}: ${p.name}. Открыть профиль дементора`);a.innerHTML=`<img src="${p.portrait}" alt="${p.name} — Dementor Ink portrait" loading="lazy" decoding="async"><span class="dc-dementor-link__copy"><small>${label}</small><strong>${p.name}</strong><em>Открыть профиль →</em></span>`;return a};
-  const add=(target,key,label,position='append')=>{if(!target||target.querySelector?.('.dc-dementor-link'))return;const c=card(key,label);position==='after'?target.insertAdjacentElement('afterend',c):position==='before'?target.insertAdjacentElement('beforebegin',c):target.appendChild(c)};
+  const add=(target,key,label,position='append')=>{if(!target||target.querySelector?.('.dc-dementor-link,.dc-dementor-relation,.dc-event-hero__relation'))return;const c=card(key,label);position==='after'?target.insertAdjacentElement('afterend',c):position==='before'?target.insertAdjacentElement('beforebegin',c):target.appendChild(c)};
   const path=location.pathname;
   const onReady=()=>{
     ensureCss();

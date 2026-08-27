@@ -169,3 +169,29 @@ body.dc-fuengirola-page .dc-ink-slot--event.dc-media-break{display:none}
 @media(max-width:560px){
   body.dc-fuengirola-page .dc-entity-hero__title{font-size:clamp(48px,14.7vw,58px);line-height:.82;letter-spacing:-.065em}
 }
+
+
+/* BATCH7 FINAL / FUENGIROLA MOBILE CONTAINMENT */
+@media(max-width:560px){
+  body.dc-fuengirola-page .dc-entity-hero__title{
+    min-width:0;
+    max-width:100%;
+    font-size:clamp(46px,13.8vw,56px);
+    line-height:.83;
+    letter-spacing:-.06em;
+    overflow-wrap:anywhere;
+  }
+  body.dc-fuengirola-page .dc-pullquote{
+    min-width:0;
+    max-width:100%;
+    font-size:clamp(30px,8.6vw,36px);
+    line-height:.96;
+    letter-spacing:-.045em;
+    overflow-wrap:anywhere;
+  }
+  body.dc-fuengirola-page .dc-event-hero__relation,
+  body.dc-fuengirola-page .dc-event-hero__relation-copy,
+  body.dc-fuengirola-page .dc-event-hero__relation-copy>*{
+    min-width:0;
+  }
+}

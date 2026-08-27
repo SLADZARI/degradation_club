@@ -30,3 +30,66 @@
   .lab-context h4{font-size:clamp(38px,10vw,54px)}
   .lab-relation strong{font-size:clamp(28px,7vw,42px)}
 }
+
+
+/* BATCH7 FINAL / UI LAB MOBILE CONTAINMENT */
+@media(max-width:560px){
+  .dc-ui-lab .lab-shell{padding-left:16px;padding-right:16px;overflow:hidden}
+  .dc-ui-lab .lab-head{grid-template-columns:1fr;gap:14px}
+  .dc-ui-lab .lab-head h2,
+  .dc-ui-lab .lab-subhead h3,
+  .dc-ui-lab .lab-event-hero h4,
+  .dc-ui-lab .lab-course-hero h4,
+  .dc-ui-lab .lab-project-hero h4,
+  .dc-ui-lab .lab-entity-feature h4,
+  .dc-ui-lab .lab-dementor-feature h4,
+  .dc-ui-lab .lab-dementor-hero h4{
+    min-width:0;
+    max-width:100%;
+    font-size:clamp(38px,10.6vw,46px);
+    line-height:.86;
+    letter-spacing:-.055em;
+    overflow-wrap:anywhere;
+  }
+  .dc-ui-lab .lab-event-hero,
+  .dc-ui-lab .lab-course-hero,
+  .dc-ui-lab .lab-project-hero,
+  .dc-ui-lab .lab-entity-feature,
+  .dc-ui-lab .lab-dementor-feature,
+  .dc-ui-lab .lab-dementor-hero,
+  .dc-ui-lab .lab-context-grid{
+    grid-template-columns:1fr;
+    min-width:0;
+  }
+  .dc-ui-lab .lab-relation{
+    grid-template-columns:76px minmax(0,1fr);
+    gap:12px;
+    min-width:0;
+    padding:12px;
+  }
+  .dc-ui-lab .lab-relation img{width:76px}
+  .dc-ui-lab .lab-relation__arrow{display:none}
+  .dc-ui-lab .lab-relation__copy,
+  .dc-ui-lab .lab-relation__copy>*{min-width:0;max-width:100%;overflow-wrap:anywhere}
+  .dc-ui-lab .lab-register-row{
+    grid-template-columns:72px minmax(0,1fr) 24px;
+    gap:10px;
+    min-width:0;
+  }
+  .dc-ui-lab .lab-register-row>span:nth-of-type(2),
+  .dc-ui-lab .lab-register-row__state{display:none}
+  .dc-ui-lab .lab-register-row strong{
+    min-width:0;
+    max-width:100%;
+    font-size:clamp(18px,5.4vw,24px);
+    overflow-wrap:anywhere;
+  }
+  .dc-ui-lab .lab-lifecycle{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .dc-ui-lab .lab-life{min-width:0;min-height:110px;padding:10px}
+  .dc-ui-lab .lab-life span,.dc-ui-lab .lab-life strong{min-width:0;overflow-wrap:anywhere}
+  .dc-ui-lab .lab-preview-popover{grid-template-columns:92px minmax(0,1fr);min-width:0}
+  .dc-ui-lab .lab-preview-popover img{width:92px;height:120px}
+  .dc-ui-lab .lab-preview-popover__copy strong{font-size:22px;overflow-wrap:anywhere}
+  .dc-ui-lab .lab-viewport-set--row{grid-template-columns:1fr}
+  .dc-ui-lab .lab-frame{min-width:0;width:100%}
+}
