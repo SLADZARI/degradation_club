@@ -1,0 +1,44 @@
+name: Design Batch 4B Cascade Pressure
+
+on:
+  push:
+    branches:
+      - design-audit-batch-2026-08-27
+
+permissions:
+  contents: write
+
+jobs:
+  cascade-pressure:
+    if: ${{ !contains(github.event.head_commit.message, '[cascade-pressure-auto]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Apply cascade pressure cleanup
+        run: node scripts/batch4b-reduce-cascade-pressure.mjs
+      - name: Run full design audits
+        run: |
+          node scripts/audit-style-graph.mjs
+          node scripts/audit-dementor-hero.mjs
+          node scripts/audit-event-hero.mjs
+          node scripts/audit-feature-relation.mjs
+          node scripts/audit-ink-surfaces.mjs
+          node scripts/audit-inline-styles.mjs
+          node scripts/audit-cascade-pressure.mjs
+      - name: Commit cascade pressure cleanup
+        run: |
+          git config user.name "Dementor Design Audit"
+          git config user.email "design-audit@users.noreply.github.com"
+          git add visual-standard-v2.css artifacts/design-style-graph.json
+          if git diff --cached --quiet; then
+            echo "No cascade pressure changes"
+            exit 0
+          fi
+          git commit -m "Batch 4B: reduce canonical cascade pressure [cascade-pressure-auto]"
+          git pull --rebase origin design-audit-batch-2026-08-27
+          git push origin HEAD:design-audit-batch-2026-08-27
