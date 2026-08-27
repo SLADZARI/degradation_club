@@ -1,0 +1,52 @@
+name: Design Batch 6 Shared Systems
+
+on:
+  push:
+    branches:
+      - design-audit-batch-2026-08-27
+
+permissions:
+  contents: write
+
+jobs:
+  shared-systems:
+    if: ${{ !contains(github.event.head_commit.message, '[shared-systems-auto]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Apply shared systems consolidation
+        run: node scripts/batch6-shared-systems.mjs
+      - name: Refresh style graph
+        run: node scripts/audit-style-graph.mjs
+      - name: Run full design audits
+        run: |
+          node scripts/audit-dementor-hero.mjs
+          node scripts/audit-event-hero.mjs
+          node scripts/audit-feature-relation.mjs
+          node scripts/audit-ink-surfaces.mjs
+          node scripts/audit-inline-styles.mjs
+          node scripts/audit-cascade-pressure.mjs
+          node scripts/audit-presentation-pressure.mjs
+          node scripts/audit-compatibility-layers.mjs
+          node scripts/audit-mobile-guardrails.mjs
+          node scripts/audit-ui-pressure.mjs
+          node scripts/audit-component-owner-hardening.mjs
+          node scripts/audit-route-owner-sweep.mjs
+          node scripts/audit-shared-systems.mjs
+      - name: Commit shared systems consolidation
+        run: |
+          git config user.name "Dementor Design Audit"
+          git config user.email "design-audit@users.noreply.github.com"
+          git add dia-v1.css mouthwash-v1.css ink-interventions.css styles.css artifacts/design-style-graph.json artifacts/design-batch6-shared-systems-report.json
+          if git diff --cached --quiet; then
+            echo "No Batch 6 changes"
+            exit 0
+          fi
+          git commit -m "Batch 6: consolidate shared cross-route systems [shared-systems-auto]"
+          git pull --rebase origin design-audit-batch-2026-08-27
+          git push origin HEAD:design-audit-batch-2026-08-27
