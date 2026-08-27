@@ -77,6 +77,7 @@ for (const vp of viewports) {
       };
       const protrusions = [];
       const clippedText = [];
+      const textOverflow = [];
       const all = [...document.querySelectorAll('body *')];
       for (const el of all) {
         if (!visible(el)) continue;
@@ -89,6 +90,10 @@ for (const vp of viewports) {
         }
         const text = (el.childElementCount === 0 ? el.textContent : '').trim();
         const srOnly = /(^|\s)(dc-global-sr|sr-only|visually-hidden)(\s|$)/.test(el.className || '');
+        const intentionalText = el.closest('.dc-notice__track,.ticker,.dc-course-strip,[class*=\"ticker\"],[class*=\"strip\"]');
+        if (!srOnly && !intentionalText && text.length > 2 && el.scrollWidth > el.clientWidth + 3) {
+          textOverflow.push({ selector: selectorOf(el), text: text.slice(0, 80), clientWidth: el.clientWidth, scrollWidth: el.scrollWidth });
+        }
         if (!srOnly && text.length > 2 && ['hidden','clip'].includes(cs.overflowX) && el.scrollWidth > el.clientWidth + 3) {
           clippedText.push({ selector: selectorOf(el), text: text.slice(0, 80), clientWidth: el.clientWidth, scrollWidth: el.scrollWidth });
         }
@@ -113,8 +118,9 @@ for (const vp of viewports) {
       return {
         viewportWidth: width,
         scrollWidth,
-        horizontalOverflow: scrollWidth > width + 4,
+        horizontalOverflow: scrollWidth > width + 4 && (protrusions.length > 0 || textOverflow.length > 0),
         protrusions: protrusions.slice(0, 30),
+        textOverflow: textOverflow.slice(0, 30),
         clippedText: clippedText.slice(0, 30),
         brokenImages,
         topbarOverlap,
@@ -158,7 +164,7 @@ for (const r of bad) {
   md += `### ${r.severity.toUpperCase()} — ${r.route} @ ${r.viewport.name} (${r.viewport.width}px)\n`;
   if (r.loadError) md += `- load: ${r.loadError}\n`;
   if (r.status && r.status >= 400) md += `- HTTP: ${r.status}\n`;
-  if (r.metrics?.horizontalOverflow) md += `- horizontal overflow: scrollWidth ${r.metrics.scrollWidth}\n`;
+  if (r.metrics?.horizontalOverflow) md += `- horizontal overflow: scrollWidth ${r.metrics.scrollWidth}; text-overflow ${r.metrics.textOverflow?.slice(0,5).map(x=>x.selector).join(', ') || 'none'}\n`;
   if (r.metrics?.brokenImages?.length) md += `- broken images: ${r.metrics.brokenImages.map(x=>x.src).join(', ')}\n`;
   if (r.metrics?.clippedText?.length) md += `- clipped text: ${r.metrics.clippedText.slice(0,5).map(x=>x.selector).join(', ')}\n`;
   if (r.metrics?.topbarOverlap) md += `- topbar/main overlap detected\n`;

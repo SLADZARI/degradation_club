@@ -163,3 +163,9 @@ body.dc-fuengirola-page .dc-ink-slot--event.dc-media-break{display:none}
   body.dc-fuengirola-page .dc-event-lock__grid>div:has(img[src*="/people/dementors/gabil/dementor_gabil"]){width:min(78vw,340px)}
 }
 @media(max-width:390px){body.dc-fuengirola-page .dc-entity-hero{min-height:720px}body.dc-fuengirola-page .dc-entity-hero::after{height:54%}}
+
+
+/* BATCH7 / FUENGIROLA MOBILE TITLE CONTAINMENT */
+@media(max-width:560px){
+  body.dc-fuengirola-page .dc-entity-hero__title{font-size:clamp(48px,14.7vw,58px);line-height:.82;letter-spacing:-.065em}
+}

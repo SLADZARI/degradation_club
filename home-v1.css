@@ -128,3 +128,9 @@
 
 @media(hover:none){.dc-home .dc-index-row::before,.dc-home .dc-sphere::before{display:none}}
 @media(prefers-reduced-motion:reduce){.dc-home .dc-notice__track{animation:none}.dc-home .dc-index-row::before,.dc-home .dc-sphere::before{transition:none}}
+
+
+/* BATCH7 / MOBILE HERO TEXT CONTAINMENT */
+@media(max-width:700px){
+  .dc-home .dc-hero__title{font-size:clamp(48px,14vw,58px);line-height:.82;letter-spacing:-.07em}
+}
