@@ -29,10 +29,11 @@ for(const token of [
   'border-top:6px solid var(--dc-acid)',
 ]) if(!css.includes(token)) errors.push(`visual-standard-v2.css missing ${token}`);
 
-const featureOwners=(css.match(/\.dc-dementor-feature\{/g)||[]).length;
-if(featureOwners!==1) errors.push(`FEATURE base owner count must be 1, got ${featureOwners}`);
-const relationOwners=(css.match(/\.dc-dementor-relation\{/g)||[]).length;
-if(relationOwners!==1) errors.push(`RELATION base owner count must be 1, got ${relationOwners}`);
+const cssFiles=fs.readdirSync('.').filter(name=>name.endsWith('.css'));
+const featureOwners=cssFiles.filter(name=>fs.readFileSync(name,'utf8').includes('.dc-dementor-feature{'));
+if(featureOwners.length!==1 || featureOwners[0]!=='visual-standard-v2.css') errors.push(`FEATURE owner must be visual-standard-v2.css only, got ${featureOwners.join(', ')||'none'}`);
+const relationOwners=cssFiles.filter(name=>fs.readFileSync(name,'utf8').includes('.dc-dementor-relation{'));
+if(relationOwners.length!==1 || relationOwners[0]!=='visual-standard-v2.css') errors.push(`RELATION owner must be visual-standard-v2.css only, got ${relationOwners.join(', ')||'none'}`);
 
 if(errors.length){
   console.error('FEATURE / RELATION audit failed');
