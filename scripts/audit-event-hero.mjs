@@ -29,7 +29,7 @@ if(!(hero>=0 && media>hero && meta>media && title>meta && subtitle>title && rela
 }
 
 const cssRequired=[
-  'body.dc-fuengirola-page .dc-entity-hero::after{content:none!important}',
+  'body.dc-fuengirola-page .dc-entity-hero::after{content:none}',
   'body.dc-fuengirola-page .dc-event-hero__media',
   'body.dc-fuengirola-page .dc-event-hero__relation',
   '@media(max-width:900px) and (min-width:561px)',
@@ -47,9 +47,13 @@ if(/\.dc-entity-hero::after\{[^}]*background:url\('\/assets\/ink\/event-fuengiro
   errors.push('Fuengirola event image must be DOM media, not ::after background');
 }
 
+if(/body\.dc-fuengirola-page \.dc-(?:entity-hero|event-hero)[^{]*\{[^}]*!important/.test(css)){
+  errors.push('Event HERO canonical contract must not depend on !important');
+}
+
 if(errors.length){
   console.error('Event HERO audit failed');
   for(const e of errors) console.error(`- ${e}`);
   process.exit(1);
 }
-console.log('Event HERO audit passed: Fuengirola WEB + TABLET + MOBILE contract');
+console.log('Event HERO audit passed: Fuengirola WEB + TABLET + MOBILE override-free contract');
