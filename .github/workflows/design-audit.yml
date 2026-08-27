@@ -20,6 +20,8 @@ jobs:
         run: node scripts/audit-dementor-hero.mjs
       - name: Run Event HERO contract audit
         run: node scripts/audit-event-hero.mjs
+      - name: Run FEATURE and RELATION contract audit
+        run: node scripts/audit-feature-relation.mjs
       - name: Print generated graph
         run: cat artifacts/design-style-graph.json
       - uses: actions/upload-artifact@v4
