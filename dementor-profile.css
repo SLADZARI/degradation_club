@@ -12,16 +12,16 @@
 
 /* HERO / shared contract */
 .dc-dementor-profile .dc-dementor-hero{
-  min-height:calc(100vh - 64px);
-  min-height:calc(100svh - 64px);
+  min-height:calc(100vh - 72px);
+  min-height:calc(100svh - 72px);
   padding:0;
   background:var(--dementor-bg);
   border-bottom:1px solid var(--dc-line);
   overflow:hidden;
 }
 .dc-dementor-profile .dc-dementor-hero>.dc-shell{
-  min-height:calc(100vh - 64px);
-  min-height:calc(100svh - 64px);
+  min-height:calc(100vh - 72px);
+  min-height:calc(100svh - 72px);
   display:block;
   padding-top:0;
   padding-bottom:0;
@@ -29,8 +29,8 @@
 /* Approved comps do not show a second PROFILE/meta row. */
 .dc-dementor-profile .dc-dementor-hero__meta{display:none}
 .dc-dementor-profile .dc-dementor-hero__layout{
-  min-height:calc(100vh - 64px);
-  min-height:calc(100svh - 64px);
+  min-height:calc(100vh - 72px);
+  min-height:calc(100svh - 72px);
   display:grid;
   grid-template-columns:repeat(12,minmax(0,1fr));
   gap:16px;
@@ -38,13 +38,14 @@
   position:relative;
   margin:0;
 }
+/* WEB reference: copy is bottom-anchored while portrait is vertically centred. */
 .dc-dementor-profile .dc-dementor-hero__copy{
   grid-column:1/7;
   position:relative;
   z-index:3;
-  align-self:center;
+  align-self:end;
   min-width:0;
-  padding:48px 0 40px;
+  padding:0 0 24px;
 }
 .dc-dementor-profile .dc-dementor-role{
   margin:0 0 12px;
@@ -112,8 +113,8 @@
 .dc-dementor-profile main>.dc-profile-section-muted{background:rgba(17,17,17,.035)}
 .dc-dementor-profile footer{background:var(--dc-paper)}
 
-/* TABLET — approved controlled overlap: copy over left edge of portrait. */
-@media(max-width:1280px) and (min-width:561px){
+/* LARGE TABLET / compact desktop. */
+@media(max-width:1280px) and (min-width:901px){
   .dc-dementor-profile .dc-dementor-hero{min-height:700px}
   .dc-dementor-profile .dc-dementor-hero>.dc-shell{min-height:700px}
   .dc-dementor-profile .dc-dementor-hero__layout{
@@ -123,7 +124,8 @@
   }
   .dc-dementor-profile .dc-dementor-hero__copy{
     grid-column:1/7;
-    padding:96px 0 28px;
+    align-self:end;
+    padding:0 0 28px;
   }
   .dc-dementor-profile .dc-dementor-role{font-size:15px;margin-bottom:14px}
   .dc-dementor-profile .dc-dementor-hero__copy .dc-display-xl{
@@ -143,6 +145,43 @@
     width:100%;
     max-width:468px;
     justify-self:end;
+    aspect-ratio:468/528;
+  }
+}
+
+/* TABLET reference (767×590): portrait centred vertically, copy anchored to baseline. */
+@media(max-width:900px) and (min-width:561px){
+  .dc-dementor-profile .dc-dementor-hero,
+  .dc-dementor-profile .dc-dementor-hero>.dc-shell,
+  .dc-dementor-profile .dc-dementor-hero__layout{min-height:590px}
+  .dc-dementor-profile .dc-dementor-hero__layout{
+    grid-template-columns:repeat(12,minmax(0,1fr));
+    align-items:center;
+  }
+  .dc-dementor-profile .dc-dementor-hero__copy{
+    grid-column:1/7;
+    align-self:end;
+    padding:0 0 28px;
+  }
+  .dc-dementor-profile .dc-dementor-role{font-size:15px;margin-bottom:14px}
+  .dc-dementor-profile .dc-dementor-hero__copy .dc-display-xl{
+    font-size:clamp(72px,13.6vw,104px);
+    line-height:.78;
+    max-width:5.9ch;
+  }
+  .dc-dementor-profile .dc-dementor-quote{
+    width:min(268px,92%);
+    min-height:126px;
+    margin-top:26px;
+    padding:20px 24px;
+    font-size:clamp(28px,4.7vw,36px);
+  }
+  .dc-dementor-profile .dc-dementor-hero__portrait{
+    grid-column:4/13;
+    width:468px;
+    max-width:calc(100vw - 299px);
+    justify-self:end;
+    margin-right:24px;
     aspect-ratio:468/528;
   }
 }
