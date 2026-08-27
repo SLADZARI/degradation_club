@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-27T13:52:22.752Z",
+  "generatedAt": "2026-08-27T14:39:50.521Z",
   "globalImports": [
     "/visual-tokens.css",
     "/illustration-surfaces.css",
@@ -1097,12 +1097,10 @@
   "activeCssRiskStats": [
     {
       "file": "/visual-standard-v2.css",
-      "pseudo": 13,
-      "important": 69,
-      "has": 44,
+      "pseudo": 12,
+      "important": 54,
+      "has": 35,
       "z": [
-        "0",
-        "2",
         "0",
         "2",
         "0",
@@ -1111,8 +1109,8 @@
         "2",
         "3"
       ],
-      "blend": 5,
-      "isolation": 3,
+      "blend": 6,
+      "isolation": 2,
       "bgImages": [
         "/assets/people/dementors/valentin/dementor_valentin.webp",
         "/assets/ink/event-fuengirola-03.webp"
@@ -1497,29 +1495,6 @@
       "bgImages": []
     },
     {
-      "file": "/visual-standard-v2.css",
-      "pseudo": 13,
-      "important": 69,
-      "has": 44,
-      "z": [
-        "0",
-        "2",
-        "0",
-        "2",
-        "0",
-        "2",
-        "2",
-        "2",
-        "3"
-      ],
-      "blend": 5,
-      "isolation": 3,
-      "bgImages": [
-        "/assets/people/dementors/valentin/dementor_valentin.webp",
-        "/assets/ink/event-fuengirola-03.webp"
-      ]
-    },
-    {
       "file": "/ui-redesign-drive-v1.css",
       "pseudo": 4,
       "important": 77,
@@ -1537,6 +1512,27 @@
       "isolation": 1,
       "bgImages": [
         "/assets/event-fuengirola-03.webp"
+      ]
+    },
+    {
+      "file": "/visual-standard-v2.css",
+      "pseudo": 12,
+      "important": 54,
+      "has": 35,
+      "z": [
+        "0",
+        "2",
+        "0",
+        "2",
+        "2",
+        "2",
+        "3"
+      ],
+      "blend": 6,
+      "isolation": 2,
+      "bgImages": [
+        "/assets/people/dementors/valentin/dementor_valentin.webp",
+        "/assets/ink/event-fuengirola-03.webp"
       ]
     },
     {
