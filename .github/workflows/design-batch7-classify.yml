@@ -1,0 +1,25 @@
+name: Design Batch 7 Classify
+on:
+  push:
+    branches: [design-audit-batch-2026-08-27]
+permissions:
+  contents: write
+jobs:
+  classify:
+    if: ${{ !contains(github.event.head_commit.message, '[batch7-classified]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: node scripts/batch7-classify-report.mjs
+      - run: |
+          git config user.name "Dementor Design Audit"
+          git config user.email "design-audit@users.noreply.github.com"
+          git add artifacts/batch7/classified.json artifacts/batch7/CLASSIFIED.md
+          git commit -m "Batch 7: classify visual blockers [batch7-auto] [batch7-classified]" || exit 0
+          git pull --rebase origin design-audit-batch-2026-08-27
+          git push origin HEAD:design-audit-batch-2026-08-27
