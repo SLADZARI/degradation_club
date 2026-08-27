@@ -1,9 +1,7 @@
-@import url('/mobile-overflow-fix.css');
 @import url('/ink-interventions.css');
 @import url('/editorial-system.css');
 @import url('/mouthwash-v1.css');
 @import url('/dia-v1.css');
-@import url('/mobile-qa.css');
 @import url('/accessibility-v1.css');
 
 :root{--dc-paper:#f2f0e8;--dc-ink:#111;--dc-acid:#d8ff3e;--dc-line:rgba(17,17,17,.2);--dc-on-acid:#111}
