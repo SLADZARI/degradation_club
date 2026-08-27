@@ -30,7 +30,7 @@
 
 /* Fuengirola */
 .dc-fuengirola-page .dc-entity-hero{position:relative}
-.dc-fuengirola-page .dc-entity-hero::after{content:"";position:absolute;right:clamp(24px,4vw,70px);top:27%;width:min(20vw,290px);aspect-ratio:4/5;border:1px solid var(--dc-line);background:var(--dc-paper) url('/assets/people/dementors/gabil/portrait-ink.webp') center/contain no-repeat;pointer-events:none}
+.dc-fuengirola-page .dc-entity-hero::after{content:"";position:absolute;right:clamp(24px,4vw,70px);top:27%;width:min(20vw,290px);aspect-ratio:4/5;border:1px solid var(--dc-line);background:var(--dc-dementor-gabil-bg) url('/assets/people/dementors/gabil/dementor_gabil.webp') center/contain no-repeat;pointer-events:none}
 .dc-fuengirola-page .dc-entity-hero__title{max-width:72%}
 .dc-fuengirola-page .dc-entity-hero__bottom{padding-right:min(22vw,320px)}
 .dc-fuengirola-page .dc-kicker{overflow-wrap:anywhere}

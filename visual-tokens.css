@@ -1,0 +1,24 @@
+/* Dementor Club visual tokens — canonical runtime layer.
+   Components consume these values; component styles should not redefine them. */
+:root{
+  /* Core */
+  --dc-paper:#f2f0e8;
+  --dc-ink:#111111;
+  --dc-acid:#d8ff3e;
+  --dc-line:rgba(17,17,17,.20);
+
+  /* Dementor identity surfaces */
+  --dc-dementor-valentin-bg:#EFE5D3;
+  --dc-dementor-nikita-bg:#F6E9D4;
+  --dc-dementor-evgeniy-bg:#F6EDD9;
+  --dc-dementor-gabil-bg:#EFE6D3;
+
+  /* Illustration paper surfaces */
+  --dc-ink-bg-home-chair:#F3EDDE;
+  --dc-ink-bg-maze:#F0E7D7;
+  --dc-ink-bg-authority-chair:#F0E7D7;
+  --dc-ink-bg-about-service:#F9EDD5;
+  --dc-ink-bg-community-people:#F1E9D8;
+  --dc-ink-bg-community-hero:#F7EBD5;
+  --dc-ink-bg-fuengirola:#FAF4E2;
+}

@@ -1,15 +1,25 @@
 {
   "$schema": "dementor-club/entity-visual-tokens/v2",
+  "runtime": "/visual-tokens.css",
   "source": {
     "driveFolder": "03_Dementor Club Official Site/UI Redesign 2026-08",
     "driveFolderId": "1_4h7JjCQ-zbyRP_NnFfFDzV0VjdIV_kN",
-    "reviewedAt": "2026-08-26"
+    "reviewedAt": "2026-08-27"
   },
   "dementors": {
     "valentin": {"background":"#EFE5D3","cssToken":"--dc-dementor-valentin-bg"},
     "nikita": {"background":"#F6E9D4","cssToken":"--dc-dementor-nikita-bg"},
     "gabil": {"background":"#EFE6D3","cssToken":"--dc-dementor-gabil-bg"},
     "evgeniy": {"background":"#F6EDD9","cssToken":"--dc-dementor-evgeniy-bg"}
+  },
+  "illustrationSurfaces": {
+    "homeChair": {"asset":"/assets/ink/home_01.webp","background":"#F3EDDE","cssToken":"--dc-ink-bg-home-chair"},
+    "logicMaze": {"asset":"/assets/ink/logic-awareness-03.webp","background":"#F0E7D7","cssToken":"--dc-ink-bg-maze"},
+    "authorityChair": {"asset":"/assets/ink/authority-chair-01.webp","background":"#F0E7D7","cssToken":"--dc-ink-bg-authority-chair"},
+    "aboutService": {"asset":"/assets/about-service-03.webp","background":"#F9EDD5","cssToken":"--dc-ink-bg-about-service"},
+    "communityPeople": {"asset":"/assets/ink/home-community-01.webp","background":"#F1E9D8","cssToken":"--dc-ink-bg-community-people"},
+    "communityHero": {"asset":"/assets/ink/community-hero-01.webp","background":"#F7EBD5","cssToken":"--dc-ink-bg-community-hero"},
+    "fuengirola": {"asset":"/assets/ink/event-fuengirola-03.webp","background":"#FAF4E2","cssToken":"--dc-ink-bg-fuengirola"}
   },
   "dementorPresentation": {
     "backgroundIsIdentity": true,
@@ -22,7 +32,8 @@
     }
   },
   "eventPresentation": {
-    "asset":"/assets/event-fuengirola-03.webp",
+    "asset":"/assets/ink/event-fuengirola-03.webp",
+    "background":"#FAF4E2",
     "mediaAnchor":"top right",
     "resizePriority":"height",
     "responsiveRule":"reuse one approved event image and crop it; never invent a new composition per breakpoint",
@@ -31,7 +42,8 @@
     "detailRelation":"Dementor is rendered as a related entity with personal background, not as a second hero"
   },
   "homePresentation": {
-    "heroAsset":"/assets/home-interruption-03.webp",
+    "heroAsset":"/assets/ink/home_01.webp",
+    "background":"#F3EDDE",
     "heroMediaRole":"dominant right-side media inside the first screen; never a detached downstream figure",
     "heroFit":"contain",
     "heroPositionWeb":"right center",

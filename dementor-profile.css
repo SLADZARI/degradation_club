@@ -1,0 +1,174 @@
+/* Dementor profile component contract.
+   Identity colors are defined centrally in /visual-tokens.css. */
+
+.dc-dementor--valentin{--dementor-bg:var(--dc-dementor-valentin-bg)}
+.dc-dementor--nikita{--dementor-bg:var(--dc-dementor-nikita-bg)}
+.dc-dementor--evgeniy{--dementor-bg:var(--dc-dementor-evgeniy-bg)}
+.dc-dementor--gabil{--dementor-bg:var(--dc-dementor-gabil-bg)}
+
+.dc-dementor-profile{background:var(--dementor-bg,var(--dc-paper));color:var(--dc-ink)}
+.dc-dementor-profile .topbar{background:var(--dementor-bg);background:color-mix(in srgb,var(--dementor-bg) 94%,transparent);border-bottom-color:var(--dc-line)}
+
+/* WEB — one coherent first screen, not a framed portrait card. */
+.dc-dementor-profile .dc-dementor-hero{
+  min-height:calc(100vh - 64px);
+  min-height:calc(100svh - 64px);
+  padding:0;
+  background:var(--dementor-bg);
+  border-bottom:1px solid var(--dc-line);
+  overflow:hidden;
+}
+.dc-dementor-profile .dc-dementor-hero>.dc-shell{
+  min-height:calc(100vh - 64px);
+  min-height:calc(100svh - 64px);
+  display:grid;
+  grid-template-rows:auto 1fr;
+  padding-top:30px;
+  padding-bottom:0;
+}
+.dc-dementor-profile .dc-dementor-hero__meta{min-height:32px;position:relative;z-index:4}
+.dc-dementor-profile .dc-dementor-hero__layout{
+  display:grid;
+  grid-template-columns:repeat(12,minmax(0,1fr));
+  grid-template-rows:1fr;
+  gap:16px;
+  align-items:stretch;
+  min-height:0;
+  margin:0;
+  position:relative;
+}
+.dc-dementor-profile .dc-dementor-hero__copy{
+  grid-column:1/8;
+  grid-row:1;
+  align-self:center;
+  position:relative;
+  z-index:3;
+  min-width:0;
+  padding:clamp(52px,7.2vh,96px) 0 clamp(46px,6vh,82px);
+}
+.dc-dementor-profile .dc-dementor-role{margin:0 0 20px}
+.dc-dementor-profile .dc-dementor-hero__copy .dc-display-xl{
+  font-size:clamp(72px,8.4vw,142px);
+  line-height:.8;
+  letter-spacing:-.078em;
+  max-width:8ch;
+  margin:0;
+  text-wrap:balance;
+}
+.dc-dementor-profile .dc-dementor-quote{
+  max-width:13ch;
+  margin-top:clamp(28px,3.8vh,48px);
+  font-size:clamp(27px,2.75vw,48px);
+  line-height:1;
+  text-wrap:balance;
+}
+.dc-dementor--gabil .dc-dementor-quote{max-width:18ch;font-size:clamp(23px,2.2vw,38px)}
+.dc-dementor-profile .dc-dementor-tags{margin-top:22px}
+.dc-dementor-profile .dc-profile-back{margin-top:26px}
+.dc-dementor-profile .dc-dementor-hero__portrait{
+  grid-column:7/13;
+  grid-row:1;
+  min-height:0;
+  height:auto;
+  border:0;
+  background:transparent;
+  overflow:visible;
+  position:relative;
+  z-index:2;
+  align-self:stretch;
+  margin:0;
+}
+.dc-dementor-profile .dc-dementor-hero__portrait img{
+  position:absolute;
+  inset:auto 0 0 auto;
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  object-position:right bottom;
+  mix-blend-mode:multiply;
+  display:block;
+}
+.dc-dementor-profile .dc-dementor-hero__portrait::after{display:none}
+
+.dc-dementor-profile main>.dc-section{background:var(--dc-paper);color:var(--dc-ink)}
+.dc-dementor-profile main>.dc-profile-section-muted{background:rgba(17,17,17,.035)}
+.dc-dementor-profile footer{background:var(--dc-paper)}
+
+/* MICRO / roster — same identity rule at small scale. */
+.dc-dementor-card--valentin{--dementor-bg:var(--dc-dementor-valentin-bg)}
+.dc-dementor-card--nikita{--dementor-bg:var(--dc-dementor-nikita-bg)}
+.dc-dementor-card--evgeniy{--dementor-bg:var(--dc-dementor-evgeniy-bg)}
+.dc-dementor-card--gabil{--dementor-bg:var(--dc-dementor-gabil-bg)}
+.dc-dementor-card[class*="dc-dementor-card--"]{background:var(--dementor-bg,var(--dc-paper));padding-left:18px;padding-right:18px}
+.dc-dementor-card[class*="dc-dementor-card--"]:hover{background:var(--dementor-bg,var(--dc-paper));padding-left:18px;padding-right:18px}
+.dc-dementor-card[class*="dc-dementor-card--"] .dc-dementor-card__portrait{background:transparent!important;border:0!important;object-fit:contain!important;object-position:center bottom!important;mix-blend-mode:multiply}
+
+@media(max-width:1280px) and (min-width:901px){
+  .dc-dementor-profile .dc-dementor-hero__copy{grid-column:1/7}
+  .dc-dementor-profile .dc-dementor-hero__portrait{grid-column:6/13}
+  .dc-dementor-profile .dc-dementor-hero__copy .dc-display-xl{font-size:clamp(70px,8.1vw,112px)}
+  .dc-dementor-profile .dc-dementor-quote{font-size:clamp(25px,2.7vw,40px)}
+  .dc-dementor--gabil .dc-dementor-quote{font-size:clamp(22px,2.25vw,32px);max-width:19ch}
+}
+
+@media(max-width:900px){
+  .dc-dementor-profile .dc-dementor-hero{min-height:760px}
+  .dc-dementor-profile .dc-dementor-hero>.dc-shell{min-height:760px;padding-top:26px}
+  .dc-dementor-profile .dc-dementor-hero__layout{grid-template-columns:repeat(8,minmax(0,1fr));gap:12px}
+  .dc-dementor-profile .dc-dementor-hero__copy{grid-column:1/6;padding:64px 0 48px}
+  .dc-dementor-profile .dc-dementor-hero__portrait{grid-column:5/9}
+  .dc-dementor-profile .dc-dementor-hero__copy .dc-display-xl{font-size:clamp(62px,11vw,104px);max-width:7ch}
+  .dc-dementor-profile .dc-dementor-quote{font-size:clamp(24px,3.8vw,38px);max-width:13ch}
+  .dc-dementor--gabil .dc-dementor-quote{font-size:clamp(21px,3.2vw,30px);max-width:18ch}
+}
+
+@media(max-width:560px){
+  .dc-dementor-profile .dc-dementor-hero{min-height:0}
+  .dc-dementor-profile .dc-dementor-hero>.dc-shell{min-height:0;padding-top:20px;padding-bottom:0}
+  .dc-dementor-profile .dc-dementor-hero__meta{font-size:9px}
+  .dc-dementor-profile .dc-dementor-hero__layout{
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    grid-template-rows:auto minmax(360px,116vw);
+    gap:0 10px;
+  }
+  .dc-dementor-profile .dc-dementor-hero__copy{
+    grid-column:1/5;
+    grid-row:1;
+    align-self:start;
+    padding:46px 0 24px;
+  }
+  .dc-dementor-profile .dc-dementor-hero__copy .dc-display-xl{
+    font-size:clamp(54px,18vw,84px)!important;
+    line-height:.8!important;
+    max-width:none;
+    overflow-wrap:anywhere;
+  }
+  .dc-dementor-profile .dc-dementor-quote{font-size:clamp(24px,7.8vw,34px);max-width:13ch;margin-top:26px}
+  .dc-dementor--gabil .dc-dementor-quote{font-size:clamp(21px,6.3vw,28px);max-width:18ch}
+  .dc-dementor-profile .dc-dementor-tags{margin-top:18px}
+  .dc-dementor-profile .dc-profile-back{margin-top:20px}
+  .dc-dementor-profile .dc-dementor-hero__portrait{
+    grid-column:1/5;
+    grid-row:2;
+    width:calc(100% + 36px);
+    margin-left:-18px;
+    min-height:0;
+  }
+  .dc-dementor-profile .dc-dementor-hero__portrait img{object-position:center bottom;width:100%;height:100%}
+  .dc-dementor-card[class*="dc-dementor-card--"]{grid-template-columns:58px minmax(0,1fr) 22px!important;padding:12px!important;gap:10px!important}
+  .dc-dementor-card[class*="dc-dementor-card--"] .dc-dementor-card__num{display:none}
+  .dc-dementor-card[class*="dc-dementor-card--"] .dc-dementor-card__portrait-link{grid-column:1}
+  .dc-dementor-card[class*="dc-dementor-card--"] .dc-dementor-card__portrait{width:58px!important;aspect-ratio:4/5}
+  .dc-dementor-card[class*="dc-dementor-card--"] .dc-dementor-card__body{grid-column:2}
+  .dc-dementor-card[class*="dc-dementor-card--"] .dc-dementor-card__arrow{grid-column:3}
+  .dc-dementor-card[class*="dc-dementor-card--"] h3{font-size:clamp(34px,11vw,48px)!important;margin-bottom:8px!important}
+  .dc-dementor-card[class*="dc-dementor-card--"] .dc-dementor-card__line{font-size:10px!important;margin-bottom:8px!important}
+  .dc-dementor-card[class*="dc-dementor-card--"] .dc-dementor-card__relations{display:none!important}
+}
+
+@media(max-width:390px){
+  .dc-dementor-profile .dc-dementor-hero__layout{grid-template-rows:auto minmax(330px,120vw)}
+  .dc-dementor-profile .dc-dementor-hero__copy{padding-top:38px}
+  .dc-dementor-profile .dc-dementor-hero__copy .dc-display-xl{font-size:clamp(50px,17vw,68px)!important}
+  .dc-dementor-profile .dc-dementor-role{font-size:10px}
+}
