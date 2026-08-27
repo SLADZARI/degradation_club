@@ -1,6 +1,6 @@
 # Batch 7 — Responsive visual sign-off
 
-Generated: 2026-08-27T20:06:41.800Z
+Generated: 2026-08-27T20:18:55.020Z
 
 Routes: **34** · Viewports: **5** · Cases: **170**
 
