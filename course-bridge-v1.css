@@ -43,3 +43,13 @@ body.dc-course-product--danger #app .choice.selected{box-shadow:none;background:
   .money-actions>*,.dc-course-actions>*{width:100%}
 }
 @media(prefers-reduced-motion:reduce){body.dc-course-product *,body.dc-course-product *::before,body.dc-course-product *::after,.money-hero *,body.dc-courage-course *{animation-duration:.01ms;animation-iteration-count:1;transition-duration:.01ms}}
+
+/* BATCH7 RESPONSIVE SIGN-OFF */
+/* NE KOMANDA uses the shared Dementor visual vocabulary but owns course geometry here. */
+@media(min-width:901px) and (max-width:1180px){
+  .dc-dementor--gabil .dc-dementor-hero{overflow:hidden}
+  .dc-dementor--gabil .dc-dementor-hero__layout{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(300px,.95fr);gap:28px;align-items:center;min-width:0}
+  .dc-dementor--gabil .dc-dementor-hero__copy,.dc-dementor--gabil .dc-dementor-hero__portrait{min-width:0;max-width:100%}
+  .dc-dementor--gabil .dc-dementor-hero__portrait{overflow:hidden}
+  .dc-dementor--gabil .dc-dementor-hero__portrait img{display:block;width:100%;max-width:100%;height:auto;object-fit:contain}
+}

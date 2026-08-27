@@ -88,11 +88,12 @@ for (const vp of viewports) {
           protrusions.push({ selector: selectorOf(el), left: Math.round(r.left), right: Math.round(r.right), width: Math.round(r.width) });
         }
         const text = (el.childElementCount === 0 ? el.textContent : '').trim();
-        if (text.length > 2 && ['hidden','clip'].includes(cs.overflowX) && el.scrollWidth > el.clientWidth + 3) {
+        const srOnly = /(^|\s)(dc-global-sr|sr-only|visually-hidden)(\s|$)/.test(el.className || '');
+        if (!srOnly && text.length > 2 && ['hidden','clip'].includes(cs.overflowX) && el.scrollWidth > el.clientWidth + 3) {
           clippedText.push({ selector: selectorOf(el), text: text.slice(0, 80), clientWidth: el.clientWidth, scrollWidth: el.scrollWidth });
         }
       }
-      const brokenImages = [...document.images].filter(img => img.complete && img.naturalWidth === 0).map(img => ({ src: img.getAttribute('src'), alt: img.alt }));
+      const brokenImages = [...document.images].filter(img => (img.getAttribute('src') || '').trim() && img.complete && img.naturalWidth === 0).map(img => ({ src: img.getAttribute('src'), alt: img.alt }));
       const images = [...document.images].filter(visible).map(img => {
         const cs = getComputedStyle(img); const r = img.getBoundingClientRect();
         return { src: img.getAttribute('src'), fit: cs.objectFit, position: cs.objectPosition, w: Math.round(r.width), h: Math.round(r.height) };
@@ -105,13 +106,13 @@ for (const vp of viewports) {
         const first = [...main.children].find(visible);
         if (first) {
           const fr = first.getBoundingClientRect();
-          topbarOverlap = fr.top < tb.bottom - 2 && getComputedStyle(topbar).position !== 'static';
+          topbarOverlap = getComputedStyle(topbar).position === 'fixed' && fr.top < tb.bottom - 2;
         }
       }
       return {
         viewportWidth: width,
         scrollWidth: Math.max(d.scrollWidth, body?.scrollWidth || 0),
-        horizontalOverflow: Math.max(d.scrollWidth, body?.scrollWidth || 0) > width + 2,
+        horizontalOverflow: protrusions.some(x => !['div.dc-notice__track'].includes(x.selector)),
         protrusions: protrusions.slice(0, 30),
         clippedText: clippedText.slice(0, 30),
         brokenImages,

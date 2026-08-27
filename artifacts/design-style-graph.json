@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-27T19:26:13.517Z",
+  "generatedAt": "2026-08-27T20:15:48.722Z",
   "globalImports": [
     "/visual-tokens.css",
     "/illustration-surfaces.css",
@@ -965,10 +965,12 @@
   ],
   "selectorOwners": {
     "dementor hero portrait": [
+      "/course-bridge-v1.css",
       "/dementor-profile.css",
       "/ui-redesign-drive-v1.css"
     ],
     "dementor hero layout": [
+      "/course-bridge-v1.css",
       "/dementor-profile.css",
       "/ui-redesign-drive-v1.css"
     ],
@@ -995,9 +997,11 @@
   },
   "activeSelectorOwners": {
     "dementor hero portrait": [
+      "/course-bridge-v1.css",
       "/dementor-profile.css"
     ],
     "dementor hero layout": [
+      "/course-bridge-v1.css",
       "/dementor-profile.css"
     ],
     "Fuengirola hero pseudo layer": [

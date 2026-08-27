@@ -17,3 +17,9 @@
 .dc-catalog-provenance p{margin:0}
 @media(max-width:700px){.dc-catalog-controls{display:grid;grid-template-columns:1fr 1fr}.dc-catalog-filter{border-bottom:1px solid var(--dc-line);min-height:46px}.dc-global-row{grid-template-columns:54px 1fr 24px;gap:10px;padding:18px 0}.dc-global-row__title{font-size:clamp(27px,8.5vw,38px)}.dc-global-row__type,.dc-global-row__status{grid-column:2/3}.dc-global-row__arrow{grid-column:3;grid-row:1/4}.dc-catalog-provenance{grid-template-columns:1fr}}
 @media(prefers-reduced-motion:reduce){.dc-global-row::before{transition:none}}
+
+/* BATCH7 RESPONSIVE SIGN-OFF */
+@media(max-width:700px){
+  .dc-catalog-page .dc-catalog-provenance>*{min-width:0;overflow-wrap:anywhere}
+  .dc-catalog-page .dc-entity-hero__title{max-width:100%}
+}

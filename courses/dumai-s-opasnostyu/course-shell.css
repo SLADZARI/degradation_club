@@ -2,3 +2,10 @@
 @media(max-width:900px){.top .wrap{min-height:56px}.top{top:var(--dc-global-header-h,64px)}.top .course-brand{font-size:11px;max-width:48vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.screen,.valentin-beat{min-height:calc(100svh - var(--dc-global-header-h,64px) - 60px)}}
 @media(max-width:430px){.top .meta{gap:6px}.top .utility{font-size:9px}.top .course-brand{max-width:44vw}}
 @media print{.top{top:0}}
+
+/* BATCH7 RESPONSIVE SIGN-OFF */
+@media(max-width:560px){
+  body.dc-course-product--danger #app .wrap{min-width:0;max-width:100%}
+  body.dc-course-product--danger #app h1{font-size:clamp(48px,13vw,54px);line-height:.84;max-width:100%}
+  body.dc-course-product--danger #app .acid-mark{box-decoration-break:clone;-webkit-box-decoration-break:clone}
+}
