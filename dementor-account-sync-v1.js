@@ -1,7 +1,7 @@
 // Dementor Club — local-first account + diagnostic sync.
 // Local onboarding remains the immediate runtime; Supabase is the durable identity/history layer.
 (()=>{
-  if(!location.pathname.startsWith('/join')) return;
+  if(!location.pathname.includes('/join')) return;
 
   const STORAGE='dementorClubOnboardingV3';
   const ASSESSMENT_VERSION='dc9-v1';
@@ -31,6 +31,14 @@
     return {results,active:local.active||remote.active||null};
   }
   function makeSourceKey(sphere,result){return `${ASSESSMENT_VERSION}:${sphere}:${result?.date||'undated'}`}
+  function appBase(){
+    const marker='/degradation_club';
+    return location.pathname===marker||location.pathname.startsWith(`${marker}/`)?marker:'';
+  }
+  function appUrl(path){
+    const clean=String(path||'/').startsWith('/')?String(path||'/'):`/${path}`;
+    return `${location.origin}${appBase()}${clean}`;
+  }
 
   async function waitConfig(){
     for(let i=0;i<80;i++){
@@ -176,7 +184,7 @@
       panel.querySelector('[data-dc-login]')?.addEventListener('click',async()=>{
         try{
           setStatus('ПЕРЕХОД К GOOGLE…');
-          const {error}=await client.auth.signInWithOAuth({provider:'google',options:{redirectTo:`${location.origin}/join/`}});
+          const {error}=await client.auth.signInWithOAuth({provider:'google',options:{redirectTo:appUrl('/join/')}});
           if(error)throw error;
         }catch(e){showError(e)}
       });
