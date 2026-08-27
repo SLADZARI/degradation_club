@@ -1,0 +1,29 @@
+name: Batch 9 Cleanup
+
+on:
+  push:
+    branches:
+      - release/dementor-club-site-2026-08-28-final
+
+permissions:
+  contents: write
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Remove transient test dependencies
+        run: |
+          rm -rf node_modules
+          rm -f package.json package-lock.json
+          rm -f .github/workflows/batch9-cleanup.yml
+      - name: Commit clean release tree
+        run: |
+          git config user.name "Dementor Release"
+          git config user.email "release@users.noreply.github.com"
+          git add -A
+          git commit -m "Batch 9: remove transient test dependencies [release-clean]"
+          git push origin HEAD:release/dementor-club-site-2026-08-28-final
