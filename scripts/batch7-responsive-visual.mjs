@@ -109,10 +109,11 @@ for (const vp of viewports) {
           topbarOverlap = getComputedStyle(topbar).position === 'fixed' && fr.top < tb.bottom - 2;
         }
       }
+      const scrollWidth = Math.max(d.scrollWidth, body?.scrollWidth || 0);
       return {
         viewportWidth: width,
-        scrollWidth: Math.max(d.scrollWidth, body?.scrollWidth || 0),
-        horizontalOverflow: protrusions.some(x => !['div.dc-notice__track'].includes(x.selector)),
+        scrollWidth,
+        horizontalOverflow: scrollWidth > width + 4,
         protrusions: protrusions.slice(0, 30),
         clippedText: clippedText.slice(0, 30),
         brokenImages,
