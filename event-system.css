@@ -35,7 +35,7 @@
 
 .dc-fuengirola-page .dc-kicker{overflow-wrap:anywhere}
 .dc-fuengirola-page .dc-event-detail__intro>.dc-pullquote{grid-column:1/13;width:100%;max-width:13ch}
-.dc-fuengirola-page .dc-media-break img,.dc-fuengirola-page .dc-ink-slot--event img{object-position:right top!important}
+.dc-fuengirola-page .dc-media-break img,.dc-fuengirola-page .dc-ink-slot--event img{object-position:right top}
 
 @media(max-width:800px){
   .dc-programme__lane{grid-template-columns:1fr}
@@ -72,10 +72,10 @@
 
   /* Pullquotes are full-width grid items. Without this they collapse into one mobile grid column. */
   .dc-fuengirola-page .dc-event-detail__intro>.dc-pullquote,
-  .dc-fuengirola-page .dc-shell>.dc-pullquote{grid-column:1/-1!important;width:100%;max-width:100%;font-size:clamp(34px,9.8vw,44px);line-height:.92;letter-spacing:-.045em;overflow-wrap:normal;word-break:normal;hyphens:none;text-wrap:balance}
+  .dc-fuengirola-page .dc-shell>.dc-pullquote{grid-column:1/-1;width:100%;max-width:100%;font-size:clamp(34px,9.8vw,44px);line-height:.92;letter-spacing:-.045em;overflow-wrap:normal;word-break:normal;hyphens:none;text-wrap:balance}
 
   /* Gabil remains a compact event marker on mobile, not a second hero image. */
-  .dc-fuengirola-page a[href="/community/gabil/"] img{max-width:128px!important;width:128px!important;height:auto!important}
+  .dc-fuengirola-page a[href="/community/gabil/"] img{max-width:128px;width:128px;height:auto}
 }
 
 @media(max-width:430px){

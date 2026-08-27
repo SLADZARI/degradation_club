@@ -65,30 +65,30 @@
 }
 
 .dc-community-page .dc-community-opening,
-.dc-community-page .dc-community-opening__art{background:var(--dc-ink-bg-community-hero)!important}
-.dc-community-page .dc-community-opening__art img{width:100%;height:100%;object-fit:contain!important;object-position:center bottom}
+.dc-community-page .dc-community-opening__art{background:var(--dc-ink-bg-community-hero)}
+.dc-community-page .dc-community-opening__art img{width:100%;height:100%;object-fit:contain;object-position:center bottom}
 
 /* Community already has an approved hero. Suppress the legacy runtime-inserted duplicate people-flow scene. */
-.dc-community-page .dc-ink-editorial--community{display:none!important}
+.dc-community-page .dc-ink-editorial--community{display:none}
 
 .dc-about .dc-ink-slot--about{background:var(--dc-ink-bg-about-service)}
-.dc-about .dc-ink-slot--about img{object-fit:contain!important}
+.dc-about .dc-ink-slot--about img{object-fit:contain}
 
 .dc-logic-page .dc-ink-slot--logic{background:var(--dc-ink-bg-maze)}
-.dc-logic-page .dc-ink-slot--logic img{object-fit:contain!important}
+.dc-logic-page .dc-ink-slot--logic img{object-fit:contain}
 
 .dc-about .dc-ink-editorial--authority,
-.dc-ink-surface--authority-chair{background:var(--dc-ink-bg-authority-chair)!important}
-.dc-about .dc-ink-editorial--authority img{width:100%;height:auto;aspect-ratio:auto!important;object-fit:contain!important;object-position:center!important}
+.dc-ink-surface--authority-chair{background:var(--dc-ink-bg-authority-chair)}
+.dc-about .dc-ink-editorial--authority img{width:100%;height:auto;aspect-ratio:auto;object-fit:contain;object-position:center}
 
 .dc-ink-surface--community-people{background:var(--dc-ink-bg-community-people)}
 
 .dc-fuengirola-page .dc-ink-slot--event,
 .dc-fuengirola-page .dc-media-break{background:var(--dc-ink-bg-fuengirola)}
 .dc-fuengirola-page .dc-ink-slot--event img,
-.dc-fuengirola-page .dc-media-break img{width:100%;height:auto;object-fit:contain!important;object-position:center}
+.dc-fuengirola-page .dc-media-break img{width:100%;height:auto;object-fit:contain;object-position:center}
 .dc-fuengirola-page .dc-event-dementor-portrait{background:var(--dc-dementor-gabil-bg)}
-.dc-fuengirola-page .dc-event-dementor-portrait img{width:100%;height:auto;object-fit:contain!important;background:var(--dc-dementor-gabil-bg)}
+.dc-fuengirola-page .dc-event-dementor-portrait img{width:100%;height:auto;object-fit:contain;background:var(--dc-dementor-gabil-bg)}
 
 @media(max-width:700px){
   .dc-home .dc-home-community__caption{position:absolute;left:16px;right:auto;bottom:16px;width:auto}

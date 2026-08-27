@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-27T18:41:27.947Z",
+  "generatedAt": "2026-08-27T19:03:14.134Z",
   "globalImports": [
     "/visual-tokens.css",
     "/illustration-surfaces.css",
@@ -1058,23 +1058,6 @@
       "bgImages": []
     },
     {
-      "file": "/home-v1.css",
-      "pseudo": 10,
-      "important": 22,
-      "has": 0,
-      "z": [
-        "3",
-        "3",
-        "3",
-        "2",
-        "0!important",
-        "1"
-      ],
-      "blend": 1,
-      "isolation": 2,
-      "bgImages": []
-    },
-    {
       "file": "/ui-v2.css",
       "pseudo": 23,
       "important": 0,
@@ -1124,26 +1107,6 @@
       "bgImages": []
     },
     {
-      "file": "/dementor-roster.css",
-      "pseudo": 0,
-      "important": 13,
-      "has": 0,
-      "z": [],
-      "blend": 1,
-      "isolation": 0,
-      "bgImages": []
-    },
-    {
-      "file": "/illustration-surfaces.css",
-      "pseudo": 2,
-      "important": 11,
-      "has": 0,
-      "z": [],
-      "blend": 4,
-      "isolation": 0,
-      "bgImages": []
-    },
-    {
       "file": "/courses/slaboumie-i-otvaga/course.css",
       "pseudo": 0,
       "important": 12,
@@ -1164,6 +1127,23 @@
       "bgImages": []
     },
     {
+      "file": "/home-v1.css",
+      "pseudo": 10,
+      "important": 0,
+      "has": 0,
+      "z": [
+        "3",
+        "3",
+        "3",
+        "2",
+        "0",
+        "1"
+      ],
+      "blend": 1,
+      "isolation": 2,
+      "bgImages": []
+    },
+    {
       "file": "/accessibility-v1.css",
       "pseudo": 0,
       "important": 8,
@@ -1171,16 +1151,6 @@
       "z": [
         "9999"
       ],
-      "blend": 0,
-      "isolation": 0,
-      "bgImages": []
-    },
-    {
-      "file": "/event-system.css",
-      "pseudo": 3,
-      "important": 5,
-      "has": 0,
-      "z": [],
       "blend": 0,
       "isolation": 0,
       "bgImages": []
@@ -1282,6 +1252,26 @@
       "bgImages": []
     },
     {
+      "file": "/event-system.css",
+      "pseudo": 3,
+      "important": 0,
+      "has": 0,
+      "z": [],
+      "blend": 0,
+      "isolation": 0,
+      "bgImages": []
+    },
+    {
+      "file": "/illustration-surfaces.css",
+      "pseudo": 2,
+      "important": 0,
+      "has": 0,
+      "z": [],
+      "blend": 4,
+      "isolation": 0,
+      "bgImages": []
+    },
+    {
       "file": "/mobile-guardrails.css",
       "pseudo": 2,
       "important": 0,
@@ -1357,6 +1347,16 @@
         "1500"
       ],
       "blend": 0,
+      "isolation": 0,
+      "bgImages": []
+    },
+    {
+      "file": "/dementor-roster.css",
+      "pseudo": 0,
+      "important": 0,
+      "has": 0,
+      "z": [],
+      "blend": 1,
       "isolation": 0,
       "bgImages": []
     },
@@ -1513,23 +1513,6 @@
       ]
     },
     {
-      "file": "/home-v1.css",
-      "pseudo": 10,
-      "important": 22,
-      "has": 0,
-      "z": [
-        "3",
-        "3",
-        "3",
-        "2",
-        "0!important",
-        "1"
-      ],
-      "blend": 1,
-      "isolation": 2,
-      "bgImages": []
-    },
-    {
       "file": "/ui-v2.css",
       "pseudo": 23,
       "important": 0,
@@ -1591,26 +1574,6 @@
       "bgImages": []
     },
     {
-      "file": "/dementor-roster.css",
-      "pseudo": 0,
-      "important": 13,
-      "has": 0,
-      "z": [],
-      "blend": 1,
-      "isolation": 0,
-      "bgImages": []
-    },
-    {
-      "file": "/illustration-surfaces.css",
-      "pseudo": 2,
-      "important": 11,
-      "has": 0,
-      "z": [],
-      "blend": 4,
-      "isolation": 0,
-      "bgImages": []
-    },
-    {
       "file": "/courses/slaboumie-i-otvaga/course.css",
       "pseudo": 0,
       "important": 12,
@@ -1631,6 +1594,23 @@
       "bgImages": []
     },
     {
+      "file": "/home-v1.css",
+      "pseudo": 10,
+      "important": 0,
+      "has": 0,
+      "z": [
+        "3",
+        "3",
+        "3",
+        "2",
+        "0",
+        "1"
+      ],
+      "blend": 1,
+      "isolation": 2,
+      "bgImages": []
+    },
+    {
       "file": "/accessibility-v1.css",
       "pseudo": 0,
       "important": 8,
@@ -1638,16 +1618,6 @@
       "z": [
         "9999"
       ],
-      "blend": 0,
-      "isolation": 0,
-      "bgImages": []
-    },
-    {
-      "file": "/event-system.css",
-      "pseudo": 3,
-      "important": 5,
-      "has": 0,
-      "z": [],
       "blend": 0,
       "isolation": 0,
       "bgImages": []
@@ -1745,6 +1715,26 @@
         "100"
       ],
       "blend": 0,
+      "isolation": 0,
+      "bgImages": []
+    },
+    {
+      "file": "/event-system.css",
+      "pseudo": 3,
+      "important": 0,
+      "has": 0,
+      "z": [],
+      "blend": 0,
+      "isolation": 0,
+      "bgImages": []
+    },
+    {
+      "file": "/illustration-surfaces.css",
+      "pseudo": 2,
+      "important": 0,
+      "has": 0,
+      "z": [],
+      "blend": 4,
       "isolation": 0,
       "bgImages": []
     },
@@ -1849,6 +1839,16 @@
         "50"
       ],
       "blend": 0,
+      "isolation": 0,
+      "bgImages": []
+    },
+    {
+      "file": "/dementor-roster.css",
+      "pseudo": 0,
+      "important": 0,
+      "has": 0,
+      "z": [],
+      "blend": 1,
       "isolation": 0,
       "bgImages": []
     },
