@@ -31,13 +31,8 @@
     return {results,active:local.active||remote.active||null};
   }
   function makeSourceKey(sphere,result){return `${ASSESSMENT_VERSION}:${sphere}:${result?.date||'undated'}`}
-  function appBase(){
-    const marker='/degradation_club';
-    return location.pathname===marker||location.pathname.startsWith(`${marker}/`)?marker:'';
-  }
-  function appUrl(path){
-    const clean=String(path||'/').startsWith('/')?String(path||'/'):`/${path}`;
-    return `${location.origin}${appBase()}${clean}`;
+  function currentPageUrl(){
+    return new URL(location.pathname,location.origin).href;
   }
 
   async function waitConfig(){
@@ -184,7 +179,7 @@
       panel.querySelector('[data-dc-login]')?.addEventListener('click',async()=>{
         try{
           setStatus('ПЕРЕХОД К GOOGLE…');
-          const {error}=await client.auth.signInWithOAuth({provider:'google',options:{redirectTo:appUrl('/join/')}});
+          const {error}=await client.auth.signInWithOAuth({provider:'google',options:{redirectTo:currentPageUrl()}});
           if(error)throw error;
         }catch(e){showError(e)}
       });
@@ -196,7 +191,7 @@
     panel.querySelector('[data-dc-sync]')?.addEventListener('click',()=>queueSync(0,true));
     panel.querySelector('[data-dc-logout]')?.addEventListener('click',async()=>{await client.auth.signOut();session=null;renderAccount()});
   }
-  function escapeHtml(value){return String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+  function escapeHtml(value){return String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot',"'":'&#39;'}[c]))}
 
   installStorageTap();
   renderAccount();
