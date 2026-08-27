@@ -1,9 +1,9 @@
 (()=>{
   const people={
-    valentin:{name:'Валентин Лосев',slug:'valentin',portrait:'/assets/people/dementors/valentin/portrait-ink.webp'},
-    nikita:{name:'Никита',slug:'nikita',portrait:'/assets/people/dementors/nikita/portrait-ink.webp'},
-    evgeniy:{name:'Евгений',slug:'evgeniy',portrait:'/assets/people/dementors/evgeniy/portrait-ink.webp'},
-    gabil:{name:'Габиль',slug:'gabil',portrait:'/assets/people/dementors/gabil/portrait-ink.webp'}
+    valentin:{name:'Валентин Лосев',slug:'valentin',portrait:'/assets/people/dementors/valentin/dementor_valentin.webp'},
+    nikita:{name:'Никита',slug:'nikita',portrait:'/assets/people/dementors/nikita/dementor_nikita.webp'},
+    evgeniy:{name:'Евгений',slug:'evgeniy',portrait:'/assets/people/dementors/evgeniy/dementor_evgeniy.webp'},
+    gabil:{name:'Габиль',slug:'gabil',portrait:'/assets/people/dementors/gabil/dementor_gabil.webp'}
   };
   const ensureCss=()=>{if(!document.querySelector('link[href="/utility-v1.css"]')){const l=document.createElement('link');l.rel='stylesheet';l.href='/utility-v1.css';document.head.appendChild(l)}};
   const card=(key,label='ДЕМЕНТОР')=>{const p=people[key];const a=document.createElement('a');a.className='dc-dementor-link';a.href=`/community/${p.slug}/`;a.setAttribute('aria-label',`${label}: ${p.name}. Открыть профиль дементора`);a.innerHTML=`<img src="${p.portrait}" alt="${p.name} — Dementor Ink portrait" loading="lazy" decoding="async"><span class="dc-dementor-link__copy"><small>${label}</small><strong>${p.name}</strong><em>Открыть профиль →</em></span>`;return a};
