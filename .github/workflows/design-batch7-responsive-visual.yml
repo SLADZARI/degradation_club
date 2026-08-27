@@ -1,0 +1,59 @@
+name: Design Batch 7 Responsive Visual
+
+on:
+  push:
+    branches:
+      - design-audit-batch-2026-08-27
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  visual-signoff:
+    if: ${{ !contains(github.event.head_commit.message, '[batch7-auto]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install Playwright
+        run: |
+          npm init -y >/dev/null 2>&1 || true
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Start static server
+        run: |
+          python3 -m http.server 4173 --bind 127.0.0.1 > /tmp/dementor-http.log 2>&1 &
+          echo $! > /tmp/dementor-http.pid
+          sleep 2
+      - name: Run Batch 7 visual audit
+        id: visual
+        continue-on-error: true
+        run: node scripts/batch7-responsive-visual.mjs
+      - name: Upload screenshots and report
+        uses: actions/upload-artifact@v4
+        with:
+          name: batch7-responsive-visual
+          path: artifacts/batch7
+          retention-days: 14
+      - name: Commit machine report
+        run: |
+          git config user.name "Dementor Design Audit"
+          git config user.email "design-audit@users.noreply.github.com"
+          git add artifacts/batch7/report.json artifacts/batch7/REPORT.md
+          if git diff --cached --quiet; then
+            echo "No Batch 7 report changes"
+          else
+            git commit -m "Batch 7: responsive visual audit report [batch7-auto]"
+            git pull --rebase origin design-audit-batch-2026-08-27
+            git push origin HEAD:design-audit-batch-2026-08-27
+          fi
+      - name: Fail on visual blockers
+        if: steps.visual.outcome == 'failure'
+        run: |
+          echo "Batch 7 found visual blockers. See uploaded report/screenshots."
+          exit 1
