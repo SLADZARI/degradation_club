@@ -3,7 +3,7 @@
   "source": {
     "driveFolder": "03_Dementor Club Official Site/UI Redesign 2026-08",
     "driveFolderId": "1_4h7JjCQ-zbyRP_NnFfFDzV0VjdIV_kN",
-    "reviewedAt": "2026-08-26"
+    "reviewedAt": "2026-08-27"
   },
   "dementors": {
     "valentin": {"background":"#EFE5D3","cssToken":"--dc-dementor-valentin-bg"},
@@ -16,9 +16,9 @@
     "logicMaze": {"asset":"/assets/ink/logic-awareness-03.webp","background":"#F0E7D7","cssToken":"--dc-ink-bg-maze"},
     "authorityChair": {"asset":"/assets/ink/authority-chair-01.webp","background":"#F0E7D7","cssToken":"--dc-ink-bg-authority-chair"},
     "aboutService": {"asset":"/assets/about-service-03.webp","background":"#F9EDD5","cssToken":"--dc-ink-bg-about-service"},
-    "communityPeople": {"asset":"/assets/ink/community-people-01.webp","background":"#F1E9D8","cssToken":"--dc-ink-bg-community-people","status":"pending-asset-upload"},
+    "communityPeople": {"asset":"/assets/ink/home-community-01.webp","background":"#F1E9D8","cssToken":"--dc-ink-bg-community-people"},
     "communityHero": {"asset":"/assets/ink/community-hero-01.webp","background":"#F7EBD5","cssToken":"--dc-ink-bg-community-hero"},
-    "fuengirola": {"asset":"/assets/event-fuengirola-03.webp","background":"#FAF4E2","cssToken":"--dc-ink-bg-fuengirola"}
+    "fuengirola": {"asset":"/assets/ink/event-fuengirola-03.webp","background":"#FAF4E2","cssToken":"--dc-ink-bg-fuengirola"}
   },
   "dementorPresentation": {
     "backgroundIsIdentity": true,
@@ -31,7 +31,7 @@
     }
   },
   "eventPresentation": {
-    "asset":"/assets/event-fuengirola-03.webp",
+    "asset":"/assets/ink/event-fuengirola-03.webp",
     "background":"#FAF4E2",
     "mediaAnchor":"top right",
     "resizePriority":"height",
