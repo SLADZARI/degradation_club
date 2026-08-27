@@ -20,7 +20,6 @@ walk(ROOT);
 const rel = p => '/' + path.relative(ROOT,p).replaceAll('\\','/');
 const read = p => fs.readFileSync(p,'utf8');
 const uniq = a => [...new Set(a)];
-const byRel = new Map(cssFiles.map(p=>[rel(p),p]));
 
 function normalizeCssHref(href, ownerFile){
   if (!href || /^(https?:)?\/\//i.test(href) || href.startsWith('data:')) return null;
@@ -51,7 +50,6 @@ function resolveClosure(initial){
   return [...seen];
 }
 
-const globalStyles = read(path.join(ROOT,'styles.css'));
 const globalImports = importGraph['/styles.css'] || [];
 
 const routeRows = [];
@@ -122,7 +120,7 @@ const out = {
   selectorOwners,
   activeSelectorOwners,
   activeCssRiskStats,
-  cssRiskStats
+  cssRiskStats:cssStats
 };
 
 fs.mkdirSync(path.join(ROOT,'artifacts'),{recursive:true});
