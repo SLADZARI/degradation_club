@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-27T13:18:07.619Z",
+  "generatedAt": "2026-08-27T13:20:30.791Z",
   "globalImports": [
     "/visual-tokens.css",
     "/illustration-surfaces.css",
@@ -8,7 +8,1032 @@
     "/visual-standard-v2.css"
   ],
   "routesScanned": 34,
+  "routeStyles": [
+    {
+      "file": "/404.html",
+      "linked": [
+        "/styles.css"
+      ],
+      "activeStyles": [
+        "/styles.css",
+        "/visual-standard-v2.css",
+        "/presentation-standard-v1.css",
+        "/course-bridge-v1.css",
+        "/ui-v2.css",
+        "/accessibility-v1.css",
+        "/mobile-qa.css",
+        "/dia-v1.css",
+        "/mouthwash-v1.css",
+        "/editorial-system.css",
+        "/ink-interventions.css",
+        "/mobile-overflow-fix.css",
+        "/illustration-surfaces.css",
+        "/visual-tokens.css"
+      ],
+      "duplicatedGlobal": [],
+      "repeated": []
+    },
+    {
+      "file": "/about/index.html",
+      "linked": [
+        "/styles.css",
+        "/about-v1.css"
+      ],
+      "activeStyles": [
+        "/about-v1.css",
+        "/styles.css",
+        "/visual-standard-v2.css",
+        "/presentation-standard-v1.css",
+        "/course-bridge-v1.css",
+        "/ui-v2.css",
+        "/accessibility-v1.css",
+        "/mobile-qa.css",
+        "/dia-v1.css",
+        "/mouthwash-v1.css",
+        "/editorial-system.css",
+        "/ink-interventions.css",
+        "/mobile-overflow-fix.css",
+        "/illustration-surfaces.css",
+        "/visual-tokens.css"
+      ],
+      "duplicatedGlobal": [],
+      "repeated": []
+    },
+    {
+      "file": "/archive/index.html",
+      "linked": [
+        "/styles.css",
+        "/entity-v1.css",
+        "/event-system.css"
+      ],
+      "activeStyles": [
+        "/event-system.css",
+        "/entity-v1.css",
+        "/styles.css",
+        "/visual-standard-v2.css",
+        "/presentation-standard-v1.css",
+        "/course-bridge-v1.css",
+        "/ui-v2.css",
+        "/accessibility-v1.css",
+        "/mobile-qa.css",
+        "/dia-v1.css",
+        "/mouthwash-v1.css",
+        "/editorial-system.css",
+        "/ink-interventions.css",
+        "/mobile-overflow-fix.css",
+        "/illustration-surfaces.css",
+        "/visual-tokens.css"
+      ],
+      "duplicatedGlobal": [],
+      "repeated": []
+    },
+    {
+      "file": "/catalog/index.html",
+      "linked": [
+        "/styles.css",
+        "/entity-v1.css",
+        "/catalog-v1.css"
+      ],
+      "activeStyles": [
+        "/catalog-v1.css",
+        "/entity-v1.css",
+        "/styles.css",
+        "/visual-standard-v2.css",
+        "/presentation-standard-v1.css",
+        "/course-bridge-v1.css",
+        "/ui-v2.css",
+        "/accessibility-v1.css",
+        "/mobile-qa.css",
+        "/dia-v1.css",
+        "/mouthwash-v1.css",
+        "/editorial-system.css",
+        "/ink-interventions.css",
+        "/mobile-overflow-fix.css",
+        "/illustration-surfaces.css",
+        "/visual-tokens.css"
+      ],
+      "duplicatedGlobal": [],
+      "repeated": []
+    },
+    {
+      "file": "/community/evgeniy/index.html",
+      "linked": [
+        "/styles.css",
+        "/projects-v1.css",
+        "/dementors-v1.css",
+        "/dementor-profile.css"
+      ],
+      "activeStyles": [
+        "/dementor-profile.css",
+        "/dementors-v1.css",
+        "/projects-v1.css",
+        "/styles.css",
+        "/visual-standard-v2.css",
+        "/presentation-standard-v1.css",
+        "/course-bridge-v1.css",
+        "/ui-v2.css",
+        "/accessibility-v1.css",
+        "/mobile-qa.css",
+        "/dia-v1.css",
+        "/mouthwash-v1.css",
+        "/editorial-system.css",
+        "/ink-interventions.css",
+        "/mobile-overflow-fix.css",
+        "/illustration-surfaces.css",
+        "/visual-tokens.css"
+      ],
+      "duplicatedGlobal": [],
+      "repeated": []
+    },
+    {
+      "file": "/community/gabil/index.html",
+      "linked": [
+        "/styles.css",
+        "/projects-v1.css",
+        "/dementors-v1.css",
+        "/dementor-profile.css"
+      ],
+      "activeStyles": [
+        "/dementor-profile.css",
+        "/dementors-v1.css",
+        "/projects-v1.css",
+        "/styles.css",
+        "/visual-standard-v2.css",
+        "/presentation-standard-v1.css",
+        "/course-bridge-v1.css",
+        "/ui-v2.css",
+        "/accessibility-v1.css",
+        "/mobile-qa.css",
+        "/dia-v1.css",
+        "/mouthwash-v1.css",
+        "/editorial-system.css",
+        "/ink-interventions.css",
+        "/mobile-overflow-fix.css",
+        "/illustration-surfaces.css",
+        "/visual-tokens.css"
+      ],
+      "duplicatedGlobal": [],
+      "repeated": []
+    },
+    {
+      "file": "/community/index.html",
+      "linked": [
+        "/styles.css",
+        "/projects-v1.css",
+        "/dementors-v1.css",
+        "/community-v2.css",
+        "/dementor-profile.css"
+      ],
+      "activeStyles": [
+        "/dementor-profile.css",
+        "/community-v2.css",
+        "/dementors-v1.css",
+        "/projects-v1.css",
+        "/styles.css",
+        "/visual-standard-v2.css",
+        "/presentation-standard-v1.css",
+        "/course-bridge-v1.css",
+        "/ui-v2.css",
+        "/accessibility-v1.css",
+        "/mobile-qa.css",
+        "/dia-v1.css",
+        "/mouthwash-v1.css",
+        "/editorial-system.css",
+        "/ink-interventions.css",
+        "/mobile-overflow-fix.css",
+        "/illustration-surfaces.css",
+        "/visual-tokens.css"
+      ],
+      "duplicatedGlobal": [],
+      "repeated": []
+    },
+    {
+      "file": "/community/nikita/index.html",
+      "linked": [
+        "/styles.css",
+        "/projects-v1.css",
+        "/dementors-v1.css",
+        "/dementor-profile.css"
+      ],
+      "activeStyles": [
+        "/dementor-profile.css",
+        "/dementors-v1.css",
+        "/projects-v1.css",
+        "/styles.css",
+        "/visual-standard-v2.css",
+        "/presentation-standard-v1.css",
+        "/course-bridge-v1.css",
+        "/ui-v2.css",
+        "/accessibility-v1.css",
+        "/mobile-qa.css",
+        "/dia-v1.css",
+        "/mouthwash-v1.css",
+        "/editorial-system.css",
+        "/ink-interventions.css",
+        "/mobile-overflow-fix.css",
+        "/illustration-surfaces.css",
+        "/visual-tokens.css"
+      ],
+      "duplicatedGlobal": [],
+      "repeated": []
+    },
+    {
+      "file": "/community/valentin/index.html",
+      "linked": [
+        "/styles.css",
+        "/projects-v1.css",
+        "/dementors-v1.css",
+        "/dementor-profile.css"
+      ],
+      "activeStyles": [
+        "/dementor-profile.css",
+        "/dementors-v1.css",
+        "/projects-v1.css",
+        "/styles.css",
+        "/visual-standard-v2.css",
+        "/presentation-standard-v1.css",
+        "/course-bridge-v1.css",
+        "/ui-v2.css",
+        "/accessibility-v1.css",
+        "/mobile-qa.css",
+        "/dia-v1.css",
+        "/mouthwash-v1.css",
+        "/editorial-system.css",
+        "/ink-interventions.css",
+        "/mobile-overflow-fix.css",
+        "/illustration-surfaces.css",
+        "/visual-tokens.css"
+      ],
+      "duplicatedGlobal": [],
+      "repeated": []
+    },
+    {
+      "file": "/contacts/index.html",
+      "linked": [
+        "/styles.css",
+        "/entity-v1.css"
+      ],
+      "activeStyles": [
+        "/entity-v1.css",
+        "/styles.css",
+        "/visual-standard-v2.css",
+        "/presentation-standard-v1.css",
+        "/course-bridge-v1.css",
+        "/ui-v2.css",
+        "/accessibility-v1.css",
+        "/mobile-qa.css",
+        "/dia-v1.css",
+        "/mouthwash-v1.css",
+        "/editorial-system.css",
+        "/ink-interventions.css",
+        "/mobile-overflow-fix.css",
+        "/illustration-surfaces.css",
+        "/visual-tokens.css"
+      ],
+      "duplicatedGlobal": [],
+      "repeated": []
+    },
+    {
+      "file": "/courses/dengi-na-veter/index.html",
+      "linked": [
+        "/styles.css",
+        "/courses/dengi-na-veter/course.css"
+      ],
+      "activeStyles": [
+        "/courses/dengi-na-veter/course.css",
+        "/styles.css",
+        "/visual-standard-v2.css",
+        "/presentation-standard-v1.css",
+        "/course-bridge-v1.css",
+        "/ui-v2.css",
+        "/accessibility-v1.css",
+        "/mobile-qa.css",
+        "/dia-v1.css",
+        "/mouthwash-v1.css",
+        "/editorial-system.css",
+        "/ink-interventions.css",
+        "/mobile-overflow-fix.css",
+        "/illustration-surfaces.css",
+        "/visual-tokens.css"
+      ],
+      "duplicatedGlobal": [],
+      "repeated": []
+    },
+    {
+      "file": "/courses/dumai-s-opasnostyu/index.html",
+      "linked": [
+        "/styles.css",
+        "/courses/dumai-s-opasnostyu/production.css",
+        "/courses/dumai-s-opasnostyu/course-shell.css",
+        "/course-bridge-v1.css"
+      ],
+      "activeStyles": [
+        "/course-bridge-v1.css",
+        "/courses/dumai-s-opasnostyu/course-shell.css",
+        "/courses/dumai-s-opasnostyu/production.css",
+        "/styles.css",
+        "/visual-standard-v2.css",
+        "/presentation-standard-v1.css",
+        "/ui-v2.css",
+        "/accessibility-v1.css",
+        "/mobile-qa.css",
+        "/dia-v1.css",
+        "/mouthwash-v1.css",
+        "/editorial-system.css",
+        "/ink-interventions.css",
+        "/mobile-overflow-fix.css",
+        "/illustration-surfaces.css",
+        "/visual-tokens.css"
+      ],
+      "duplicatedGlobal": [],
+      "repeated": []
+    },
+    {
+      "file": "/courses/ne-komanda/index.html",
+      "linked": [
+        "/styles.css",
+        "/projects-v1.css",
+        "/dementors-v1.css"
+      ],
+      "activeStyles": [
+        "/dementors-v1.css",
+        "/projects-v1.css",
+        "/styles.css",
+        "/visual-standard-v2.css",
+        "/presentation-standard-v1.css",
+        "/course-bridge-v1.css",
+        "/ui-v2.css",
+        "/accessibility-v1.css",
+        "/mobile-qa.css",
+        "/dia-v1.css",
+        "/mouthwash-v1.css",
+        "/editorial-system.css",
+        "/ink-interventions.css",
+        "/mobile-overflow-fix.css",
+        "/illustration-surfaces.css",
+        "/visual-tokens.css"
+      ],
+      "duplicatedGlobal": [],
+      "repeated": []
+    },
+    {
+      "file": "/courses/slaboumie-i-otvaga/index.html",
+      "linked": [
+        "/styles.css",
+        "/courses/slaboumie-i-otvaga/course.css"
+      ],
+      "activeStyles": [
+        "/courses/slaboumie-i-otvaga/course.css",
+        "/styles.css",
+        "/visual-standard-v2.css",
+        "/presentation-standard-v1.css",
+        "/course-bridge-v1.css",
+        "/ui-v2.css",
+        "/accessibility-v1.css",
+        "/mobile-qa.css",
+        "/dia-v1.css",
+        "/mouthwash-v1.css",
+        "/editorial-system.css",
+        "/ink-interventions.css",
+        "/mobile-overflow-fix.css",
+        "/illustration-surfaces.css",
+        "/visual-tokens.css"
+      ],
+      "duplicatedGlobal": [],
+      "repeated": []
+    },
+    {
+      "file": "/design-system/index.html",
+      "linked": [
+        "/styles.css",
+        "/design-system/ui-lab-v2.css"
+      ],
+      "activeStyles": [
+        "/design-system/ui-lab-v2.css",
+        "/styles.css",
+        "/visual-standard-v2.css",
+        "/presentation-standard-v1.css",
+        "/course-bridge-v1.css",
+        "/ui-v2.css",
+        "/accessibility-v1.css",
+        "/mobile-qa.css",
+        "/dia-v1.css",
+        "/mouthwash-v1.css",
+        "/editorial-system.css",
+        "/ink-interventions.css",
+        "/mobile-overflow-fix.css",
+        "/illustration-surfaces.css",
+        "/visual-tokens.css"
+      ],
+      "duplicatedGlobal": [],
+      "repeated": []
+    },
+    {
+      "file": "/design-system/preorder/index.html",
+      "linked": [
+        "/styles.css",
+        "/merch-preorder-v1.css"
+      ],
+      "activeStyles": [
+        "/merch-preorder-v1.css",
+        "/styles.css",
+        "/visual-standard-v2.css",
+        "/presentation-standard-v1.css",
+        "/course-bridge-v1.css",
+        "/ui-v2.css",
+        "/accessibility-v1.css",
+        "/mobile-qa.css",
+        "/dia-v1.css",
+        "/mouthwash-v1.css",
+        "/editorial-system.css",
+        "/ink-interventions.css",
+        "/mobile-overflow-fix.css",
+        "/illustration-surfaces.css",
+        "/visual-tokens.css"
+      ],
+      "duplicatedGlobal": [],
+      "repeated": []
+    },
+    {
+      "file": "/design-system/support/index.html",
+      "linked": [
+        "/styles.css",
+        "/support-v1.css"
+      ],
+      "activeStyles": [
+        "/support-v1.css",
+        "/styles.css",
+        "/visual-standard-v2.css",
+        "/presentation-standard-v1.css",
+        "/course-bridge-v1.css",
+        "/ui-v2.css",
+        "/accessibility-v1.css",
+        "/mobile-qa.css",
+        "/dia-v1.css",
+        "/mouthwash-v1.css",
+        "/editorial-system.css",
+        "/ink-interventions.css",
+        "/mobile-overflow-fix.css",
+        "/illustration-surfaces.css",
+        "/visual-tokens.css"
+      ],
+      "duplicatedGlobal": [],
+      "repeated": []
+    },
+    {
+      "file": "/donate/index.html",
+      "linked": [
+        "/styles.css",
+        "/entity-v1.css"
+      ],
+      "activeStyles": [
+        "/entity-v1.css",
+        "/styles.css",
+        "/visual-standard-v2.css",
+        "/presentation-standard-v1.css",
+        "/course-bridge-v1.css",
+        "/ui-v2.css",
+        "/accessibility-v1.css",
+        "/mobile-qa.css",
+        "/dia-v1.css",
+        "/mouthwash-v1.css",
+        "/editorial-system.css",
+        "/ink-interventions.css",
+        "/mobile-overflow-fix.css",
+        "/illustration-surfaces.css",
+        "/visual-tokens.css"
+      ],
+      "duplicatedGlobal": [],
+      "repeated": []
+    },
+    {
+      "file": "/events/fuengirola/index.html",
+      "linked": [
+        "/styles.css",
+        "/entity-v1.css",
+        "/event-system.css"
+      ],
+      "activeStyles": [
+        "/event-system.css",
+        "/entity-v1.css",
+        "/styles.css",
+        "/visual-standard-v2.css",
+        "/presentation-standard-v1.css",
+        "/course-bridge-v1.css",
+        "/ui-v2.css",
+        "/accessibility-v1.css",
+        "/mobile-qa.css",
+        "/dia-v1.css",
+        "/mouthwash-v1.css",
+        "/editorial-system.css",
+        "/ink-interventions.css",
+        "/mobile-overflow-fix.css",
+        "/illustration-surfaces.css",
+        "/visual-tokens.css"
+      ],
+      "duplicatedGlobal": [],
+      "repeated": []
+    },
+    {
+      "file": "/events/index.html",
+      "linked": [
+        "/styles.css",
+        "/entity-v1.css",
+        "/event-system.css"
+      ],
+      "activeStyles": [
+        "/event-system.css",
+        "/entity-v1.css",
+        "/styles.css",
+        "/visual-standard-v2.css",
+        "/presentation-standard-v1.css",
+        "/course-bridge-v1.css",
+        "/ui-v2.css",
+        "/accessibility-v1.css",
+        "/mobile-qa.css",
+        "/dia-v1.css",
+        "/mouthwash-v1.css",
+        "/editorial-system.css",
+        "/ink-interventions.css",
+        "/mobile-overflow-fix.css",
+        "/illustration-surfaces.css",
+        "/visual-tokens.css"
+      ],
+      "duplicatedGlobal": [],
+      "repeated": []
+    },
+    {
+      "file": "/index.html",
+      "linked": [
+        "/styles.css",
+        "/home-v1.css"
+      ],
+      "activeStyles": [
+        "/home-v1.css",
+        "/styles.css",
+        "/visual-standard-v2.css",
+        "/presentation-standard-v1.css",
+        "/course-bridge-v1.css",
+        "/ui-v2.css",
+        "/accessibility-v1.css",
+        "/mobile-qa.css",
+        "/dia-v1.css",
+        "/mouthwash-v1.css",
+        "/editorial-system.css",
+        "/ink-interventions.css",
+        "/mobile-overflow-fix.css",
+        "/illustration-surfaces.css",
+        "/visual-tokens.css"
+      ],
+      "duplicatedGlobal": [],
+      "repeated": []
+    },
+    {
+      "file": "/join/index.html",
+      "linked": [
+        "/styles.css"
+      ],
+      "activeStyles": [
+        "/styles.css",
+        "/visual-standard-v2.css",
+        "/presentation-standard-v1.css",
+        "/course-bridge-v1.css",
+        "/ui-v2.css",
+        "/accessibility-v1.css",
+        "/mobile-qa.css",
+        "/dia-v1.css",
+        "/mouthwash-v1.css",
+        "/editorial-system.css",
+        "/ink-interventions.css",
+        "/mobile-overflow-fix.css",
+        "/illustration-surfaces.css",
+        "/visual-tokens.css"
+      ],
+      "duplicatedGlobal": [],
+      "repeated": []
+    },
+    {
+      "file": "/legal/privacy/index.html",
+      "linked": [
+        "/styles.css",
+        "/entity-v1.css"
+      ],
+      "activeStyles": [
+        "/entity-v1.css",
+        "/styles.css",
+        "/visual-standard-v2.css",
+        "/presentation-standard-v1.css",
+        "/course-bridge-v1.css",
+        "/ui-v2.css",
+        "/accessibility-v1.css",
+        "/mobile-qa.css",
+        "/dia-v1.css",
+        "/mouthwash-v1.css",
+        "/editorial-system.css",
+        "/ink-interventions.css",
+        "/mobile-overflow-fix.css",
+        "/illustration-surfaces.css",
+        "/visual-tokens.css"
+      ],
+      "duplicatedGlobal": [],
+      "repeated": []
+    },
+    {
+      "file": "/legal/terms/index.html",
+      "linked": [
+        "/styles.css",
+        "/entity-v1.css"
+      ],
+      "activeStyles": [
+        "/entity-v1.css",
+        "/styles.css",
+        "/visual-standard-v2.css",
+        "/presentation-standard-v1.css",
+        "/course-bridge-v1.css",
+        "/ui-v2.css",
+        "/accessibility-v1.css",
+        "/mobile-qa.css",
+        "/dia-v1.css",
+        "/mouthwash-v1.css",
+        "/editorial-system.css",
+        "/ink-interventions.css",
+        "/mobile-overflow-fix.css",
+        "/illustration-surfaces.css",
+        "/visual-tokens.css"
+      ],
+      "duplicatedGlobal": [],
+      "repeated": []
+    },
+    {
+      "file": "/merch/drop-001/overthinking-is-my-cardio/index.html",
+      "linked": [
+        "/styles.css",
+        "/entity-v1.css",
+        "/merch-drop-v2.css",
+        "/merch-preorder-v1.css"
+      ],
+      "activeStyles": [
+        "/merch-preorder-v1.css",
+        "/merch-drop-v2.css",
+        "/entity-v1.css",
+        "/styles.css",
+        "/visual-standard-v2.css",
+        "/presentation-standard-v1.css",
+        "/course-bridge-v1.css",
+        "/ui-v2.css",
+        "/accessibility-v1.css",
+        "/mobile-qa.css",
+        "/dia-v1.css",
+        "/mouthwash-v1.css",
+        "/editorial-system.css",
+        "/ink-interventions.css",
+        "/mobile-overflow-fix.css",
+        "/illustration-surfaces.css",
+        "/visual-tokens.css"
+      ],
+      "duplicatedGlobal": [],
+      "repeated": []
+    },
+    {
+      "file": "/merch/drop-001/personal-growth-cancelled/index.html",
+      "linked": [
+        "/styles.css",
+        "/entity-v1.css",
+        "/merch-drop-v2.css",
+        "/merch-preorder-v1.css"
+      ],
+      "activeStyles": [
+        "/merch-preorder-v1.css",
+        "/merch-drop-v2.css",
+        "/entity-v1.css",
+        "/styles.css",
+        "/visual-standard-v2.css",
+        "/presentation-standard-v1.css",
+        "/course-bridge-v1.css",
+        "/ui-v2.css",
+        "/accessibility-v1.css",
+        "/mobile-qa.css",
+        "/dia-v1.css",
+        "/mouthwash-v1.css",
+        "/editorial-system.css",
+        "/ink-interventions.css",
+        "/mobile-overflow-fix.css",
+        "/illustration-surfaces.css",
+        "/visual-tokens.css"
+      ],
+      "duplicatedGlobal": [],
+      "repeated": []
+    },
+    {
+      "file": "/merch/drop-001/success-is-boring/index.html",
+      "linked": [
+        "/styles.css",
+        "/entity-v1.css",
+        "/merch-drop-v2.css",
+        "/merch-preorder-v1.css"
+      ],
+      "activeStyles": [
+        "/merch-preorder-v1.css",
+        "/merch-drop-v2.css",
+        "/entity-v1.css",
+        "/styles.css",
+        "/visual-standard-v2.css",
+        "/presentation-standard-v1.css",
+        "/course-bridge-v1.css",
+        "/ui-v2.css",
+        "/accessibility-v1.css",
+        "/mobile-qa.css",
+        "/dia-v1.css",
+        "/mouthwash-v1.css",
+        "/editorial-system.css",
+        "/ink-interventions.css",
+        "/mobile-overflow-fix.css",
+        "/illustration-surfaces.css",
+        "/visual-tokens.css"
+      ],
+      "duplicatedGlobal": [],
+      "repeated": []
+    },
+    {
+      "file": "/merch/index.html",
+      "linked": [
+        "/styles.css",
+        "/entity-v1.css",
+        "/projects-v1.css",
+        "/merch-drop-v2.css",
+        "/merch-preorder-v1.css"
+      ],
+      "activeStyles": [
+        "/merch-preorder-v1.css",
+        "/merch-drop-v2.css",
+        "/projects-v1.css",
+        "/entity-v1.css",
+        "/styles.css",
+        "/visual-standard-v2.css",
+        "/presentation-standard-v1.css",
+        "/course-bridge-v1.css",
+        "/ui-v2.css",
+        "/accessibility-v1.css",
+        "/mobile-qa.css",
+        "/dia-v1.css",
+        "/mouthwash-v1.css",
+        "/editorial-system.css",
+        "/ink-interventions.css",
+        "/mobile-overflow-fix.css",
+        "/illustration-surfaces.css",
+        "/visual-tokens.css"
+      ],
+      "duplicatedGlobal": [],
+      "repeated": []
+    },
+    {
+      "file": "/objects/001-ne-nado/index.html",
+      "linked": [
+        "/styles.css",
+        "/entity-v1.css",
+        "/objects-v1.css",
+        "/merch-preorder-v1.css"
+      ],
+      "activeStyles": [
+        "/merch-preorder-v1.css",
+        "/objects-v1.css",
+        "/entity-v1.css",
+        "/styles.css",
+        "/visual-standard-v2.css",
+        "/presentation-standard-v1.css",
+        "/course-bridge-v1.css",
+        "/ui-v2.css",
+        "/accessibility-v1.css",
+        "/mobile-qa.css",
+        "/dia-v1.css",
+        "/mouthwash-v1.css",
+        "/editorial-system.css",
+        "/ink-interventions.css",
+        "/mobile-overflow-fix.css",
+        "/illustration-surfaces.css",
+        "/visual-tokens.css"
+      ],
+      "duplicatedGlobal": [],
+      "repeated": []
+    },
+    {
+      "file": "/projects/index.html",
+      "linked": [
+        "/styles.css",
+        "/projects-v1.css"
+      ],
+      "activeStyles": [
+        "/projects-v1.css",
+        "/styles.css",
+        "/visual-standard-v2.css",
+        "/presentation-standard-v1.css",
+        "/course-bridge-v1.css",
+        "/ui-v2.css",
+        "/accessibility-v1.css",
+        "/mobile-qa.css",
+        "/dia-v1.css",
+        "/mouthwash-v1.css",
+        "/editorial-system.css",
+        "/ink-interventions.css",
+        "/mobile-overflow-fix.css",
+        "/illustration-surfaces.css",
+        "/visual-tokens.css"
+      ],
+      "duplicatedGlobal": [],
+      "repeated": []
+    },
+    {
+      "file": "/projects/logic-awareness/dossiers/awareness/index.html",
+      "linked": [
+        "/styles.css",
+        "/projects-v1.css"
+      ],
+      "activeStyles": [
+        "/projects-v1.css",
+        "/styles.css",
+        "/visual-standard-v2.css",
+        "/presentation-standard-v1.css",
+        "/course-bridge-v1.css",
+        "/ui-v2.css",
+        "/accessibility-v1.css",
+        "/mobile-qa.css",
+        "/dia-v1.css",
+        "/mouthwash-v1.css",
+        "/editorial-system.css",
+        "/ink-interventions.css",
+        "/mobile-overflow-fix.css",
+        "/illustration-surfaces.css",
+        "/visual-tokens.css"
+      ],
+      "duplicatedGlobal": [],
+      "repeated": []
+    },
+    {
+      "file": "/projects/logic-awareness/dossiers/index.html",
+      "linked": [
+        "/styles.css",
+        "/projects-v1.css"
+      ],
+      "activeStyles": [
+        "/projects-v1.css",
+        "/styles.css",
+        "/visual-standard-v2.css",
+        "/presentation-standard-v1.css",
+        "/course-bridge-v1.css",
+        "/ui-v2.css",
+        "/accessibility-v1.css",
+        "/mobile-qa.css",
+        "/dia-v1.css",
+        "/mouthwash-v1.css",
+        "/editorial-system.css",
+        "/ink-interventions.css",
+        "/mobile-overflow-fix.css",
+        "/illustration-surfaces.css",
+        "/visual-tokens.css"
+      ],
+      "duplicatedGlobal": [],
+      "repeated": []
+    },
+    {
+      "file": "/projects/logic-awareness/dossiers/logic/index.html",
+      "linked": [
+        "/styles.css",
+        "/projects-v1.css"
+      ],
+      "activeStyles": [
+        "/projects-v1.css",
+        "/styles.css",
+        "/visual-standard-v2.css",
+        "/presentation-standard-v1.css",
+        "/course-bridge-v1.css",
+        "/ui-v2.css",
+        "/accessibility-v1.css",
+        "/mobile-qa.css",
+        "/dia-v1.css",
+        "/mouthwash-v1.css",
+        "/editorial-system.css",
+        "/ink-interventions.css",
+        "/mobile-overflow-fix.css",
+        "/illustration-surfaces.css",
+        "/visual-tokens.css"
+      ],
+      "duplicatedGlobal": [],
+      "repeated": []
+    },
+    {
+      "file": "/projects/logic-awareness/index.html",
+      "linked": [
+        "/styles.css",
+        "/projects-v1.css"
+      ],
+      "activeStyles": [
+        "/projects-v1.css",
+        "/styles.css",
+        "/visual-standard-v2.css",
+        "/presentation-standard-v1.css",
+        "/course-bridge-v1.css",
+        "/ui-v2.css",
+        "/accessibility-v1.css",
+        "/mobile-qa.css",
+        "/dia-v1.css",
+        "/mouthwash-v1.css",
+        "/editorial-system.css",
+        "/ink-interventions.css",
+        "/mobile-overflow-fix.css",
+        "/illustration-surfaces.css",
+        "/visual-tokens.css"
+      ],
+      "duplicatedGlobal": [],
+      "repeated": []
+    }
+  ],
   "duplicateStylesheetRoutes": [],
+  "inlineStyleRoutes": [
+    {
+      "file": "/404.html",
+      "blocks": 1
+    },
+    {
+      "file": "/contacts/index.html",
+      "blocks": 1
+    },
+    {
+      "file": "/design-system/preorder/index.html",
+      "blocks": 1
+    },
+    {
+      "file": "/design-system/support/index.html",
+      "blocks": 1
+    },
+    {
+      "file": "/donate/index.html",
+      "blocks": 1
+    },
+    {
+      "file": "/join/index.html",
+      "blocks": 1
+    },
+    {
+      "file": "/projects/logic-awareness/dossiers/awareness/index.html",
+      "blocks": 1
+    },
+    {
+      "file": "/projects/logic-awareness/dossiers/index.html",
+      "blocks": 1
+    },
+    {
+      "file": "/projects/logic-awareness/dossiers/logic/index.html",
+      "blocks": 1
+    },
+    {
+      "file": "/projects/logic-awareness/index.html",
+      "blocks": 1
+    }
+  ],
+  "activeCss": [
+    "/about-v1.css",
+    "/accessibility-v1.css",
+    "/catalog-v1.css",
+    "/community-v2.css",
+    "/course-bridge-v1.css",
+    "/courses/dengi-na-veter/course.css",
+    "/courses/dumai-s-opasnostyu/course-shell.css",
+    "/courses/dumai-s-opasnostyu/production.css",
+    "/courses/slaboumie-i-otvaga/course.css",
+    "/dementor-profile.css",
+    "/dementors-v1.css",
+    "/design-system/ui-lab-v2.css",
+    "/dia-v1.css",
+    "/editorial-system.css",
+    "/entity-v1.css",
+    "/event-system.css",
+    "/home-v1.css",
+    "/illustration-surfaces.css",
+    "/ink-interventions.css",
+    "/merch-drop-v2.css",
+    "/merch-preorder-v1.css",
+    "/mobile-overflow-fix.css",
+    "/mobile-qa.css",
+    "/mouthwash-v1.css",
+    "/objects-v1.css",
+    "/presentation-standard-v1.css",
+    "/projects-v1.css",
+    "/styles.css",
+    "/support-v1.css",
+    "/ui-v2.css",
+    "/visual-standard-v2.css",
+    "/visual-tokens.css"
+  ],
+  "inactiveCss": [
+    "/courses/dumai-s-opasnostyu/course.css",
+    "/design-system/design-system.css",
+    "/global-header.css",
+    "/home-visual-standard-v2.css",
+    "/ink-layout-v2-tuning.css",
+    "/ink-layout-v2.css",
+    "/ui-redesign-drive-v1.css",
+    "/utility-v1.css"
+  ],
   "selectorOwners": {
     "dementor hero portrait": [
       "/dementor-profile.css",
@@ -46,6 +1071,409 @@
       "/visual-standard-v2.css"
     ]
   },
+  "activeSelectorOwners": {
+    "dementor hero portrait": [
+      "/dementor-profile.css",
+      "/dementors-v1.css",
+      "/presentation-standard-v1.css",
+      "/visual-standard-v2.css"
+    ],
+    "dementor hero layout": [
+      "/dementor-profile.css",
+      "/dementors-v1.css",
+      "/visual-standard-v2.css"
+    ],
+    "Fuengirola hero pseudo layer": [
+      "/event-system.css",
+      "/visual-standard-v2.css"
+    ],
+    "Home feature/event structural selector": [
+      "/visual-standard-v2.css"
+    ],
+    "generic ink slot": [
+      "/about-v1.css",
+      "/community-v2.css",
+      "/dementors-v1.css",
+      "/dia-v1.css",
+      "/event-system.css",
+      "/home-v1.css",
+      "/illustration-surfaces.css",
+      "/ink-interventions.css",
+      "/mobile-overflow-fix.css",
+      "/mouthwash-v1.css",
+      "/ui-v2.css",
+      "/visual-standard-v2.css"
+    ]
+  },
+  "activeCssRiskStats": [
+    {
+      "file": "/visual-standard-v2.css",
+      "pseudo": 13,
+      "important": 81,
+      "has": 44,
+      "z": [
+        "2",
+        "0",
+        "2",
+        "0",
+        "2",
+        "0",
+        "2",
+        "2",
+        "1"
+      ],
+      "blend": 3,
+      "isolation": 3,
+      "bgImages": [
+        "/assets/people/dementors/valentin/dementor_valentin.webp",
+        "/assets/ink/event-fuengirola-03.webp"
+      ]
+    },
+    {
+      "file": "/presentation-standard-v1.css",
+      "pseudo": 2,
+      "important": 51,
+      "has": 0,
+      "z": [],
+      "blend": 2,
+      "isolation": 0,
+      "bgImages": []
+    },
+    {
+      "file": "/ui-v2.css",
+      "pseudo": 25,
+      "important": 24,
+      "has": 2,
+      "z": [
+        "0",
+        "1",
+        "4",
+        "3",
+        "2",
+        "120",
+        "90"
+      ],
+      "blend": 4,
+      "isolation": 0,
+      "bgImages": []
+    },
+    {
+      "file": "/course-bridge-v1.css",
+      "pseudo": 2,
+      "important": 39,
+      "has": 0,
+      "z": [
+        "260",
+        "200"
+      ],
+      "blend": 0,
+      "isolation": 0,
+      "bgImages": []
+    },
+    {
+      "file": "/home-v1.css",
+      "pseudo": 10,
+      "important": 22,
+      "has": 0,
+      "z": [
+        "3",
+        "3",
+        "3",
+        "2",
+        "0!important",
+        "1"
+      ],
+      "blend": 1,
+      "isolation": 2,
+      "bgImages": []
+    },
+    {
+      "file": "/mobile-qa.css",
+      "pseudo": 2,
+      "important": 21,
+      "has": 0,
+      "z": [],
+      "blend": 0,
+      "isolation": 0,
+      "bgImages": []
+    },
+    {
+      "file": "/ink-interventions.css",
+      "pseudo": 17,
+      "important": 4,
+      "has": 0,
+      "z": [
+        "6",
+        "4",
+        "3",
+        "2",
+        "1",
+        "4",
+        "5",
+        "2"
+      ],
+      "blend": 2,
+      "isolation": 2,
+      "bgImages": []
+    },
+    {
+      "file": "/mobile-overflow-fix.css",
+      "pseudo": 0,
+      "important": 20,
+      "has": 0,
+      "z": [],
+      "blend": 0,
+      "isolation": 0,
+      "bgImages": []
+    },
+    {
+      "file": "/dementor-profile.css",
+      "pseudo": 1,
+      "important": 16,
+      "has": 0,
+      "z": [
+        "4",
+        "3",
+        "2"
+      ],
+      "blend": 2,
+      "isolation": 0,
+      "bgImages": []
+    },
+    {
+      "file": "/dia-v1.css",
+      "pseudo": 10,
+      "important": 5,
+      "has": 0,
+      "z": [
+        "-1"
+      ],
+      "blend": 0,
+      "isolation": 1,
+      "bgImages": []
+    },
+    {
+      "file": "/courses/slaboumie-i-otvaga/course.css",
+      "pseudo": 0,
+      "important": 12,
+      "has": 0,
+      "z": [],
+      "blend": 0,
+      "isolation": 0,
+      "bgImages": []
+    },
+    {
+      "file": "/event-system.css",
+      "pseudo": 6,
+      "important": 5,
+      "has": 0,
+      "z": [],
+      "blend": 0,
+      "isolation": 0,
+      "bgImages": [
+        "/assets/people/dementors/gabil/dementor_gabil.webp"
+      ]
+    },
+    {
+      "file": "/illustration-surfaces.css",
+      "pseudo": 0,
+      "important": 11,
+      "has": 0,
+      "z": [],
+      "blend": 2,
+      "isolation": 0,
+      "bgImages": []
+    },
+    {
+      "file": "/editorial-system.css",
+      "pseudo": 10,
+      "important": 0,
+      "has": 0,
+      "z": [],
+      "blend": 0,
+      "isolation": 0,
+      "bgImages": []
+    },
+    {
+      "file": "/accessibility-v1.css",
+      "pseudo": 0,
+      "important": 8,
+      "has": 0,
+      "z": [
+        "9999"
+      ],
+      "blend": 0,
+      "isolation": 0,
+      "bgImages": []
+    },
+    {
+      "file": "/design-system/ui-lab-v2.css",
+      "pseudo": 2,
+      "important": 4,
+      "has": 0,
+      "z": [
+        "80"
+      ],
+      "blend": 12,
+      "isolation": 0,
+      "bgImages": []
+    },
+    {
+      "file": "/styles.css",
+      "pseudo": 0,
+      "important": 6,
+      "has": 0,
+      "z": [
+        "20"
+      ],
+      "blend": 0,
+      "isolation": 0,
+      "bgImages": []
+    },
+    {
+      "file": "/catalog-v1.css",
+      "pseudo": 4,
+      "important": 1,
+      "has": 0,
+      "z": [
+        "-1"
+      ],
+      "blend": 0,
+      "isolation": 0,
+      "bgImages": []
+    },
+    {
+      "file": "/courses/dengi-na-veter/course.css",
+      "pseudo": 0,
+      "important": 5,
+      "has": 0,
+      "z": [],
+      "blend": 0,
+      "isolation": 0,
+      "bgImages": []
+    },
+    {
+      "file": "/community-v2.css",
+      "pseudo": 0,
+      "important": 3,
+      "has": 0,
+      "z": [
+        "0",
+        "1",
+        "2"
+      ],
+      "blend": 2,
+      "isolation": 0,
+      "bgImages": []
+    },
+    {
+      "file": "/courses/dumai-s-opasnostyu/course-shell.css",
+      "pseudo": 0,
+      "important": 3,
+      "has": 0,
+      "z": [],
+      "blend": 0,
+      "isolation": 0,
+      "bgImages": []
+    },
+    {
+      "file": "/courses/dumai-s-opasnostyu/production.css",
+      "pseudo": 2,
+      "important": 1,
+      "has": 0,
+      "z": [
+        "30",
+        "100"
+      ],
+      "blend": 0,
+      "isolation": 0,
+      "bgImages": []
+    },
+    {
+      "file": "/objects-v1.css",
+      "pseudo": 2,
+      "important": 0,
+      "has": 0,
+      "z": [
+        "1"
+      ],
+      "blend": 0,
+      "isolation": 0,
+      "bgImages": []
+    },
+    {
+      "file": "/about-v1.css",
+      "pseudo": 1,
+      "important": 0,
+      "has": 0,
+      "z": [],
+      "blend": 0,
+      "isolation": 0,
+      "bgImages": []
+    },
+    {
+      "file": "/dementors-v1.css",
+      "pseudo": 1,
+      "important": 0,
+      "has": 0,
+      "z": [
+        "1"
+      ],
+      "blend": 1,
+      "isolation": 0,
+      "bgImages": []
+    },
+    {
+      "file": "/merch-drop-v2.css",
+      "pseudo": 1,
+      "important": 0,
+      "has": 0,
+      "z": [],
+      "blend": 0,
+      "isolation": 0,
+      "bgImages": []
+    },
+    {
+      "file": "/mouthwash-v1.css",
+      "pseudo": 0,
+      "important": 1,
+      "has": 0,
+      "z": [
+        "2",
+        "1"
+      ],
+      "blend": 0,
+      "isolation": 0,
+      "bgImages": []
+    },
+    {
+      "file": "/support-v1.css",
+      "pseudo": 0,
+      "important": 1,
+      "has": 0,
+      "z": [
+        "1600",
+        "2",
+        "1500"
+      ],
+      "blend": 0,
+      "isolation": 0,
+      "bgImages": []
+    },
+    {
+      "file": "/merch-preorder-v1.css",
+      "pseudo": 0,
+      "important": 0,
+      "has": 0,
+      "z": [
+        "9999",
+        "5"
+      ],
+      "blend": 0,
+      "isolation": 0,
+      "bgImages": []
+    }
+  ],
   "cssRiskStats": [
     {
       "file": "/ink-layout-v2-tuning.css",
