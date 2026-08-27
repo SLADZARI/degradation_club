@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-27T14:55:17.391Z",
+  "generatedAt": "2026-08-27T15:19:29.062Z",
   "globalImports": [
     "/visual-tokens.css",
     "/illustration-surfaces.css",
@@ -12,9 +12,11 @@
     {
       "file": "/404.html",
       "linked": [
-        "/styles.css"
+        "/styles.css",
+        "/404-inline.css"
       ],
       "activeStyles": [
+        "/404-inline.css",
         "/styles.css",
         "/visual-standard-v2.css",
         "/presentation-standard-v1.css",
@@ -271,9 +273,11 @@
       "file": "/contacts/index.html",
       "linked": [
         "/styles.css",
-        "/entity-v1.css"
+        "/entity-v1.css",
+        "/contacts/inline-v1.css"
       ],
       "activeStyles": [
+        "/contacts/inline-v1.css",
         "/entity-v1.css",
         "/styles.css",
         "/visual-standard-v2.css",
@@ -432,9 +436,11 @@
       "file": "/design-system/preorder/index.html",
       "linked": [
         "/styles.css",
-        "/merch-preorder-v1.css"
+        "/merch-preorder-v1.css",
+        "/design-system/preorder/inline-v1.css"
       ],
       "activeStyles": [
+        "/design-system/preorder/inline-v1.css",
         "/merch-preorder-v1.css",
         "/styles.css",
         "/visual-standard-v2.css",
@@ -458,9 +464,11 @@
       "file": "/design-system/support/index.html",
       "linked": [
         "/styles.css",
-        "/support-v1.css"
+        "/support-v1.css",
+        "/design-system/support/inline-v1.css"
       ],
       "activeStyles": [
+        "/design-system/support/inline-v1.css",
         "/support-v1.css",
         "/styles.css",
         "/visual-standard-v2.css",
@@ -484,9 +492,11 @@
       "file": "/donate/index.html",
       "linked": [
         "/styles.css",
-        "/entity-v1.css"
+        "/entity-v1.css",
+        "/donate/inline-v1.css"
       ],
       "activeStyles": [
+        "/donate/inline-v1.css",
         "/entity-v1.css",
         "/styles.css",
         "/visual-standard-v2.css",
@@ -591,9 +601,11 @@
     {
       "file": "/join/index.html",
       "linked": [
-        "/styles.css"
+        "/styles.css",
+        "/join/inline-v1.css"
       ],
       "activeStyles": [
+        "/join/inline-v1.css",
         "/styles.css",
         "/visual-standard-v2.css",
         "/presentation-standard-v1.css",
@@ -846,9 +858,11 @@
       "file": "/projects/logic-awareness/dossiers/awareness/index.html",
       "linked": [
         "/styles.css",
-        "/projects-v1.css"
+        "/projects-v1.css",
+        "/projects/logic-awareness/dossiers/awareness/inline-v1.css"
       ],
       "activeStyles": [
+        "/projects/logic-awareness/dossiers/awareness/inline-v1.css",
         "/projects-v1.css",
         "/styles.css",
         "/visual-standard-v2.css",
@@ -872,9 +886,11 @@
       "file": "/projects/logic-awareness/dossiers/index.html",
       "linked": [
         "/styles.css",
-        "/projects-v1.css"
+        "/projects-v1.css",
+        "/projects/logic-awareness/dossiers/inline-v1.css"
       ],
       "activeStyles": [
+        "/projects/logic-awareness/dossiers/inline-v1.css",
         "/projects-v1.css",
         "/styles.css",
         "/visual-standard-v2.css",
@@ -898,9 +914,11 @@
       "file": "/projects/logic-awareness/dossiers/logic/index.html",
       "linked": [
         "/styles.css",
-        "/projects-v1.css"
+        "/projects-v1.css",
+        "/projects/logic-awareness/dossiers/logic/inline-v1.css"
       ],
       "activeStyles": [
+        "/projects/logic-awareness/dossiers/logic/inline-v1.css",
         "/projects-v1.css",
         "/styles.css",
         "/visual-standard-v2.css",
@@ -924,9 +942,11 @@
       "file": "/projects/logic-awareness/index.html",
       "linked": [
         "/styles.css",
-        "/projects-v1.css"
+        "/projects-v1.css",
+        "/projects/logic-awareness/inline-v1.css"
       ],
       "activeStyles": [
+        "/projects/logic-awareness/inline-v1.css",
         "/projects-v1.css",
         "/styles.css",
         "/visual-standard-v2.css",
@@ -948,53 +968,14 @@
     }
   ],
   "duplicateStylesheetRoutes": [],
-  "inlineStyleRoutes": [
-    {
-      "file": "/404.html",
-      "blocks": 1
-    },
-    {
-      "file": "/contacts/index.html",
-      "blocks": 1
-    },
-    {
-      "file": "/design-system/preorder/index.html",
-      "blocks": 1
-    },
-    {
-      "file": "/design-system/support/index.html",
-      "blocks": 1
-    },
-    {
-      "file": "/donate/index.html",
-      "blocks": 1
-    },
-    {
-      "file": "/join/index.html",
-      "blocks": 1
-    },
-    {
-      "file": "/projects/logic-awareness/dossiers/awareness/index.html",
-      "blocks": 1
-    },
-    {
-      "file": "/projects/logic-awareness/dossiers/index.html",
-      "blocks": 1
-    },
-    {
-      "file": "/projects/logic-awareness/dossiers/logic/index.html",
-      "blocks": 1
-    },
-    {
-      "file": "/projects/logic-awareness/index.html",
-      "blocks": 1
-    }
-  ],
+  "inlineStyleRoutes": [],
   "activeCss": [
+    "/404-inline.css",
     "/about-v1.css",
     "/accessibility-v1.css",
     "/catalog-v1.css",
     "/community-v2.css",
+    "/contacts/inline-v1.css",
     "/course-bridge-v1.css",
     "/courses/dengi-na-veter/course.css",
     "/courses/dumai-s-opasnostyu/course-shell.css",
@@ -1003,14 +984,18 @@
     "/dementor-profile.css",
     "/dementor-roster.css",
     "/dementors-v1.css",
+    "/design-system/preorder/inline-v1.css",
+    "/design-system/support/inline-v1.css",
     "/design-system/ui-lab-v2.css",
     "/dia-v1.css",
+    "/donate/inline-v1.css",
     "/editorial-system.css",
     "/entity-v1.css",
     "/event-system.css",
     "/home-v1.css",
     "/illustration-surfaces.css",
     "/ink-interventions.css",
+    "/join/inline-v1.css",
     "/merch-drop-v2.css",
     "/merch-preorder-v1.css",
     "/mobile-overflow-fix.css",
@@ -1019,6 +1004,10 @@
     "/objects-v1.css",
     "/presentation-standard-v1.css",
     "/projects-v1.css",
+    "/projects/logic-awareness/dossiers/awareness/inline-v1.css",
+    "/projects/logic-awareness/dossiers/inline-v1.css",
+    "/projects/logic-awareness/dossiers/logic/inline-v1.css",
+    "/projects/logic-awareness/inline-v1.css",
     "/styles.css",
     "/support-v1.css",
     "/ui-v2.css",
@@ -1449,6 +1438,18 @@
       "has": 0,
       "z": [],
       "blend": 1,
+      "isolation": 0,
+      "bgImages": []
+    },
+    {
+      "file": "/join/inline-v1.css",
+      "pseudo": 0,
+      "important": 0,
+      "has": 0,
+      "z": [
+        "8"
+      ],
+      "blend": 0,
       "isolation": 0,
       "bgImages": []
     },
@@ -1939,6 +1940,18 @@
       "has": 0,
       "z": [],
       "blend": 1,
+      "isolation": 0,
+      "bgImages": []
+    },
+    {
+      "file": "/join/inline-v1.css",
+      "pseudo": 0,
+      "important": 0,
+      "has": 0,
+      "z": [
+        "8"
+      ],
+      "blend": 0,
       "isolation": 0,
       "bgImages": []
     },
