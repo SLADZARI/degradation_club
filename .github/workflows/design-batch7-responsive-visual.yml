@@ -6,17 +6,12 @@ on:
       - design-audit-batch-2026-08-27
   workflow_dispatch:
 
-permissions:
-  contents: write
-
 jobs:
   visual-signoff:
-    if: ${{ !contains(github.event.head_commit.message, '[batch7-auto]') }}
     runs-on: ubuntu-latest
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -35,23 +30,12 @@ jobs:
         continue-on-error: true
         run: node scripts/batch7-responsive-visual.mjs
       - name: Upload screenshots and report
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: batch7-responsive-visual
           path: artifacts/batch7
           retention-days: 14
-      - name: Commit machine report
-        run: |
-          git config user.name "Dementor Design Audit"
-          git config user.email "design-audit@users.noreply.github.com"
-          git add artifacts/batch7/report.json artifacts/batch7/REPORT.md
-          if git diff --cached --quiet; then
-            echo "No Batch 7 report changes"
-          else
-            git commit -m "Batch 7: responsive visual audit report [batch7-auto]"
-            git pull --rebase origin design-audit-batch-2026-08-27
-            git push origin HEAD:design-audit-batch-2026-08-27
-          fi
       - name: Fail on visual blockers
         if: steps.visual.outcome == 'failure'
         run: |
