@@ -1,6 +1,6 @@
 {
   "summary": {
-    "generatedAt": "2026-08-27T20:18:55.020Z",
+    "generatedAt": "2026-08-27T20:35:04.180Z",
     "baseUrl": "http://127.0.0.1:4173",
     "routes": 34,
     "viewports": [
@@ -31,16 +31,16 @@
       }
     ],
     "totalCases": 170,
-    "pass": 57,
-    "warn": 4,
-    "fail": 109,
+    "pass": 159,
+    "warn": 0,
+    "fail": 11,
     "failuresByType": {
       "load": 0,
       "http": 0,
-      "overflow": 26,
-      "brokenImages": 15,
-      "clippedText": 93,
-      "topbarOverlap": 5,
+      "overflow": 11,
+      "brokenImages": 0,
+      "clippedText": 0,
+      "topbarOverlap": 0,
       "consoleErrors": 0,
       "pageErrors": 0
     }
@@ -57,20 +57,13 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 390,
         "scrollWidth": 400,
-        "horizontalOverflow": true,
+        "horizontalOverflow": false,
         "protrusions": [],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -131,20 +124,13 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 390,
         "scrollWidth": 390,
         "horizontalOverflow": false,
         "protrusions": [],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -170,27 +156,13 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 390,
-        "scrollWidth": 599,
-        "horizontalOverflow": true,
-        "protrusions": [
-          {
-            "selector": "span.dc-acid",
-            "left": 18,
-            "right": 454,
-            "width": 436
-          }
-        ],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "scrollWidth": 437,
+        "horizontalOverflow": false,
+        "protrusions": [],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -230,20 +202,13 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 390,
         "scrollWidth": 390,
         "horizontalOverflow": false,
         "protrusions": [],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -269,39 +234,14 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 390,
-        "scrollWidth": 442,
-        "horizontalOverflow": true,
-        "protrusions": [
-          {
-            "selector": "span.dc-acid",
-            "left": 18,
-            "right": 456,
-            "width": 438
-          },
-          {
-            "selector": "code",
-            "left": 18,
-            "right": 438,
-            "width": 420
-          }
-        ],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
-        "brokenImages": [
-          {
-            "src": null,
-            "alt": ""
-          }
-        ],
+        "scrollWidth": 390,
+        "horizontalOverflow": false,
+        "protrusions": [],
+        "clippedText": [],
+        "brokenImages": [],
         "topbarOverlap": false,
         "images": [
           {
@@ -326,20 +266,13 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 390,
         "scrollWidth": 390,
         "horizontalOverflow": false,
         "protrusions": [],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -400,20 +333,13 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 390,
         "scrollWidth": 390,
         "horizontalOverflow": false,
         "protrusions": [],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -446,20 +372,13 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 390,
         "scrollWidth": 390,
         "horizontalOverflow": false,
         "protrusions": [],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -492,20 +411,13 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 390,
         "scrollWidth": 390,
         "horizontalOverflow": false,
         "protrusions": [],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -538,20 +450,13 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 390,
         "scrollWidth": 390,
         "horizontalOverflow": false,
         "protrusions": [],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -584,20 +489,13 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 390,
-        "scrollWidth": 475,
-        "horizontalOverflow": true,
+        "scrollWidth": 390,
+        "horizontalOverflow": false,
         "protrusions": [],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -623,20 +521,13 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 390,
-        "scrollWidth": 447,
-        "horizontalOverflow": true,
+        "scrollWidth": 390,
+        "horizontalOverflow": false,
         "protrusions": [],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -669,27 +560,13 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 390,
-        "scrollWidth": 416,
-        "horizontalOverflow": true,
-        "protrusions": [
-          {
-            "selector": "span.acid-mark",
-            "left": 14,
-            "right": 416,
-            "width": 402
-          }
-        ],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 43
-          }
-        ],
+        "scrollWidth": 390,
+        "horizontalOverflow": false,
+        "protrusions": [],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -715,20 +592,13 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 390,
         "scrollWidth": 390,
         "horizontalOverflow": false,
         "protrusions": [],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -761,20 +631,13 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 390,
-        "scrollWidth": 485,
-        "horizontalOverflow": true,
+        "scrollWidth": 390,
+        "horizontalOverflow": false,
         "protrusions": [],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -807,19 +670,12 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 390,
-        "scrollWidth": 587,
-        "horizontalOverflow": true,
-        "protrusions": [
-          {
-            "selector": "blockquote",
-            "left": 406,
-            "right": 442,
-            "width": 36
-          }
-        ],
+        "scrollWidth": 491,
+        "horizontalOverflow": false,
+        "protrusions": [],
         "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
@@ -1178,11 +1034,11 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "warn",
+      "severity": "fail",
       "metrics": {
         "viewportWidth": 390,
         "scrollWidth": 390,
-        "horizontalOverflow": false,
+        "horizontalOverflow": true,
         "protrusions": [
           {
             "selector": "span",
@@ -1209,27 +1065,13 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 390,
-        "scrollWidth": 468,
-        "horizontalOverflow": true,
-        "protrusions": [
-          {
-            "selector": "span",
-            "left": 34,
-            "right": 468,
-            "width": 434
-          }
-        ],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "scrollWidth": 390,
+        "horizontalOverflow": false,
+        "protrusions": [],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -1255,26 +1097,14 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 390,
         "scrollWidth": 390,
         "horizontalOverflow": false,
         "protrusions": [],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
-        "brokenImages": [
-          {
-            "src": null,
-            "alt": ""
-          }
-        ],
+        "clippedText": [],
+        "brokenImages": [],
         "topbarOverlap": false,
         "images": [
           {
@@ -1313,33 +1143,13 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 390,
-        "scrollWidth": 456,
-        "horizontalOverflow": true,
-        "protrusions": [
-          {
-            "selector": "span.dc-acid",
-            "left": 18,
-            "right": 411,
-            "width": 393
-          },
-          {
-            "selector": "span.dc-acid",
-            "left": 36,
-            "right": 519,
-            "width": 483
-          }
-        ],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "scrollWidth": 439,
+        "horizontalOverflow": false,
+        "protrusions": [],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -1363,13 +1173,6 @@
             "position": "50% 50%",
             "w": 128,
             "h": 152
-          },
-          {
-            "src": "/assets/ink/event-fuengirola-03.webp",
-            "fit": "cover",
-            "position": "50% 50%",
-            "w": 360,
-            "h": 240
           },
           {
             "src": "/assets/people/dementors/gabil/portrait-ink.webp",
@@ -1400,20 +1203,13 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 390,
         "scrollWidth": 390,
         "horizontalOverflow": false,
         "protrusions": [],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -1439,20 +1235,13 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 390,
         "scrollWidth": 390,
         "horizontalOverflow": false,
         "protrusions": [],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -1478,20 +1267,13 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 390,
         "scrollWidth": 390,
         "horizontalOverflow": false,
         "protrusions": [],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -1517,20 +1299,13 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 390,
         "scrollWidth": 390,
         "horizontalOverflow": false,
         "protrusions": [],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -1584,20 +1359,13 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 390,
         "scrollWidth": 390,
         "horizontalOverflow": false,
         "protrusions": [],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -1630,20 +1398,13 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 390,
         "scrollWidth": 390,
         "horizontalOverflow": false,
         "protrusions": [],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -1676,20 +1437,13 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 390,
         "scrollWidth": 390,
         "horizontalOverflow": false,
         "protrusions": [],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -1729,20 +1483,13 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 390,
         "scrollWidth": 390,
         "horizontalOverflow": false,
         "protrusions": [],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -1831,26 +1578,14 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 390,
         "scrollWidth": 390,
         "horizontalOverflow": false,
         "protrusions": [],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
-        "brokenImages": [
-          {
-            "src": null,
-            "alt": ""
-          }
-        ],
+        "clippedText": [],
+        "brokenImages": [],
         "topbarOverlap": false,
         "images": [
           {
@@ -2069,16 +1804,9 @@
             "width": 319
           }
         ],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "clippedText": [],
         "brokenImages": [],
-        "topbarOverlap": true,
+        "topbarOverlap": false,
         "images": [
           {
             "src": "/assets/brand/dementor-mark-black.svg",
@@ -2270,20 +1998,13 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 390,
         "scrollWidth": 390,
         "horizontalOverflow": false,
         "protrusions": [],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -2323,20 +2044,13 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 390,
         "scrollWidth": 390,
         "horizontalOverflow": false,
         "protrusions": [],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -2376,20 +2090,13 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 390,
         "scrollWidth": 390,
         "horizontalOverflow": false,
         "protrusions": [],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -2429,20 +2136,13 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 430,
         "scrollWidth": 430,
         "horizontalOverflow": false,
         "protrusions": [],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -2503,20 +2203,13 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 430,
         "scrollWidth": 430,
         "horizontalOverflow": false,
         "protrusions": [],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -2542,27 +2235,13 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 430,
-        "scrollWidth": 659,
-        "horizontalOverflow": true,
-        "protrusions": [
-          {
-            "selector": "span.dc-acid",
-            "left": 18,
-            "right": 498,
-            "width": 480
-          }
-        ],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "scrollWidth": 480,
+        "horizontalOverflow": false,
+        "protrusions": [],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -2602,20 +2281,13 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 430,
         "scrollWidth": 430,
         "horizontalOverflow": false,
         "protrusions": [],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -2641,39 +2313,14 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 430,
-        "scrollWidth": 442,
-        "horizontalOverflow": true,
-        "protrusions": [
-          {
-            "selector": "span.dc-acid",
-            "left": 18,
-            "right": 501,
-            "width": 483
-          },
-          {
-            "selector": "code",
-            "left": 18,
-            "right": 438,
-            "width": 420
-          }
-        ],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
-        "brokenImages": [
-          {
-            "src": null,
-            "alt": ""
-          }
-        ],
+        "scrollWidth": 430,
+        "horizontalOverflow": false,
+        "protrusions": [],
+        "clippedText": [],
+        "brokenImages": [],
         "topbarOverlap": false,
         "images": [
           {
@@ -2698,20 +2345,13 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 430,
         "scrollWidth": 430,
         "horizontalOverflow": false,
         "protrusions": [],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -2772,20 +2412,13 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 430,
         "scrollWidth": 430,
         "horizontalOverflow": false,
         "protrusions": [],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -2818,20 +2451,13 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 430,
         "scrollWidth": 430,
         "horizontalOverflow": false,
         "protrusions": [],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -2864,20 +2490,13 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 430,
         "scrollWidth": 430,
         "horizontalOverflow": false,
         "protrusions": [],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -2910,20 +2529,13 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 430,
         "scrollWidth": 430,
         "horizontalOverflow": false,
         "protrusions": [],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -2956,20 +2568,13 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 430,
-        "scrollWidth": 522,
-        "horizontalOverflow": true,
+        "scrollWidth": 430,
+        "horizontalOverflow": false,
         "protrusions": [],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -2995,20 +2600,13 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 430,
-        "scrollWidth": 447,
-        "horizontalOverflow": true,
+        "scrollWidth": 430,
+        "horizontalOverflow": false,
         "protrusions": [],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -3041,20 +2639,13 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 430,
         "scrollWidth": 430,
         "horizontalOverflow": false,
         "protrusions": [],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 43
-          }
-        ],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -3080,20 +2671,13 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 430,
         "scrollWidth": 430,
         "horizontalOverflow": false,
         "protrusions": [],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -3126,20 +2710,13 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 430,
-        "scrollWidth": 485,
-        "horizontalOverflow": true,
+        "scrollWidth": 430,
+        "horizontalOverflow": false,
         "protrusions": [],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -3172,19 +2749,12 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 430,
-        "scrollWidth": 607,
-        "horizontalOverflow": true,
-        "protrusions": [
-          {
-            "selector": "blockquote",
-            "left": 426,
-            "right": 462,
-            "width": 36
-          }
-        ],
+        "scrollWidth": 493,
+        "horizontalOverflow": false,
+        "protrusions": [],
         "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
@@ -3543,11 +3113,11 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "warn",
+      "severity": "fail",
       "metrics": {
         "viewportWidth": 430,
         "scrollWidth": 430,
-        "horizontalOverflow": false,
+        "horizontalOverflow": true,
         "protrusions": [
           {
             "selector": "span",
@@ -3574,27 +3144,13 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 430,
-        "scrollWidth": 468,
-        "horizontalOverflow": true,
-        "protrusions": [
-          {
-            "selector": "span",
-            "left": 34,
-            "right": 468,
-            "width": 434
-          }
-        ],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "scrollWidth": 430,
+        "horizontalOverflow": false,
+        "protrusions": [],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -3620,26 +3176,14 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 430,
         "scrollWidth": 430,
         "horizontalOverflow": false,
         "protrusions": [],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
-        "brokenImages": [
-          {
-            "src": null,
-            "alt": ""
-          }
-        ],
+        "clippedText": [],
+        "brokenImages": [],
         "topbarOverlap": false,
         "images": [
           {
@@ -3678,33 +3222,13 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 430,
-        "scrollWidth": 501,
-        "horizontalOverflow": true,
-        "protrusions": [
-          {
-            "selector": "span.dc-acid",
-            "left": 18,
-            "right": 451,
-            "width": 433
-          },
-          {
-            "selector": "span.dc-acid",
-            "left": 36,
-            "right": 569,
-            "width": 533
-          }
-        ],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "scrollWidth": 458,
+        "horizontalOverflow": false,
+        "protrusions": [],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -3728,13 +3252,6 @@
             "position": "50% 50%",
             "w": 128,
             "h": 152
-          },
-          {
-            "src": "/assets/ink/event-fuengirola-03.webp",
-            "fit": "cover",
-            "position": "50% 50%",
-            "w": 400,
-            "h": 267
           },
           {
             "src": "/assets/people/dementors/gabil/portrait-ink.webp",
@@ -3765,20 +3282,13 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 430,
         "scrollWidth": 430,
         "horizontalOverflow": false,
         "protrusions": [],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -3804,20 +3314,13 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 430,
         "scrollWidth": 430,
         "horizontalOverflow": false,
         "protrusions": [],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -3843,20 +3346,13 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 430,
         "scrollWidth": 430,
         "horizontalOverflow": false,
         "protrusions": [],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -3882,20 +3378,13 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 430,
         "scrollWidth": 430,
         "horizontalOverflow": false,
         "protrusions": [],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -3949,20 +3438,13 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 430,
         "scrollWidth": 430,
         "horizontalOverflow": false,
         "protrusions": [],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -3995,20 +3477,13 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 430,
         "scrollWidth": 430,
         "horizontalOverflow": false,
         "protrusions": [],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -4041,20 +3516,13 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 430,
         "scrollWidth": 430,
         "horizontalOverflow": false,
         "protrusions": [],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -4094,20 +3562,13 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 430,
         "scrollWidth": 430,
         "horizontalOverflow": false,
         "protrusions": [],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -4196,26 +3657,14 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 430,
         "scrollWidth": 430,
         "horizontalOverflow": false,
         "protrusions": [],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
-        "brokenImages": [
-          {
-            "src": null,
-            "alt": ""
-          }
-        ],
+        "clippedText": [],
+        "brokenImages": [],
         "topbarOverlap": false,
         "images": [
           {
@@ -4434,16 +3883,9 @@
             "width": 351
           }
         ],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "clippedText": [],
         "brokenImages": [],
-        "topbarOverlap": true,
+        "topbarOverlap": false,
         "images": [
           {
             "src": "/assets/brand/dementor-mark-black.svg",
@@ -4635,20 +4077,13 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 430,
         "scrollWidth": 430,
         "horizontalOverflow": false,
         "protrusions": [],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -4688,20 +4123,13 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 430,
         "scrollWidth": 430,
         "horizontalOverflow": false,
         "protrusions": [],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -4741,20 +4169,13 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 430,
         "scrollWidth": 430,
         "horizontalOverflow": false,
         "protrusions": [],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -4798,7 +4219,7 @@
       "metrics": {
         "viewportWidth": 768,
         "scrollWidth": 768,
-        "horizontalOverflow": false,
+        "horizontalOverflow": true,
         "protrusions": [
           {
             "selector": "figure.dc-ink-integrated.dc-ink-integrated--home-event",
@@ -4813,14 +4234,7 @@
             "width": 458
           }
         ],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -4881,20 +4295,13 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 768,
         "scrollWidth": 768,
         "horizontalOverflow": false,
         "protrusions": [],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -4920,20 +4327,13 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 768,
         "scrollWidth": 768,
         "horizontalOverflow": false,
         "protrusions": [],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -4973,20 +4373,13 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 768,
         "scrollWidth": 768,
         "horizontalOverflow": false,
         "protrusions": [],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -5012,26 +4405,14 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 768,
         "scrollWidth": 768,
         "horizontalOverflow": false,
         "protrusions": [],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
-        "brokenImages": [
-          {
-            "src": null,
-            "alt": ""
-          }
-        ],
+        "clippedText": [],
+        "brokenImages": [],
         "topbarOverlap": false,
         "images": [
           {
@@ -5063,20 +4444,13 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 768,
         "scrollWidth": 768,
         "horizontalOverflow": false,
         "protrusions": [],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -5137,20 +4511,13 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 768,
         "scrollWidth": 768,
         "horizontalOverflow": false,
         "protrusions": [],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -5183,20 +4550,13 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 768,
         "scrollWidth": 768,
         "horizontalOverflow": false,
         "protrusions": [],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -5229,20 +4589,13 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 768,
         "scrollWidth": 768,
         "horizontalOverflow": false,
         "protrusions": [],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -5275,20 +4628,13 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 768,
         "scrollWidth": 768,
         "horizontalOverflow": false,
         "protrusions": [],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -5321,20 +4667,13 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 768,
         "scrollWidth": 768,
         "horizontalOverflow": false,
         "protrusions": [],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -5360,20 +4699,13 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 768,
         "scrollWidth": 768,
         "horizontalOverflow": false,
         "protrusions": [],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -5406,20 +4738,13 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 768,
         "scrollWidth": 768,
         "horizontalOverflow": false,
         "protrusions": [],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 43
-          }
-        ],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -5445,20 +4770,13 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 768,
         "scrollWidth": 768,
         "horizontalOverflow": false,
         "protrusions": [],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -5491,20 +4809,13 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 768,
         "scrollWidth": 768,
         "horizontalOverflow": false,
         "protrusions": [],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -5537,11 +4848,11 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 768,
-        "scrollWidth": 822,
-        "horizontalOverflow": true,
+        "scrollWidth": 768,
+        "horizontalOverflow": false,
         "protrusions": [],
         "clippedText": [],
         "brokenImages": [],
@@ -5925,20 +5236,13 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 768,
         "scrollWidth": 768,
         "horizontalOverflow": false,
         "protrusions": [],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -5964,26 +5268,14 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 768,
         "scrollWidth": 768,
         "horizontalOverflow": false,
         "protrusions": [],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
-        "brokenImages": [
-          {
-            "src": null,
-            "alt": ""
-          }
-        ],
+        "clippedText": [],
+        "brokenImages": [],
         "topbarOverlap": false,
         "images": [
           {
@@ -6033,7 +5325,7 @@
       "metrics": {
         "viewportWidth": 768,
         "scrollWidth": 768,
-        "horizontalOverflow": false,
+        "horizontalOverflow": true,
         "protrusions": [
           {
             "selector": "span.dc-acid",
@@ -6042,14 +5334,7 @@
             "width": 469
           }
         ],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -6065,7 +5350,7 @@
             "fit": "cover",
             "position": "100% 0%",
             "w": 736,
-            "h": 476
+            "h": 558
           },
           {
             "src": "/assets/people/dementors/gabil/dementor_gabil.webp",
@@ -6073,13 +5358,6 @@
             "position": "50% 50%",
             "w": 108,
             "h": 135
-          },
-          {
-            "src": "/assets/ink/event-fuengirola-03.webp",
-            "fit": "cover",
-            "position": "50% 50%",
-            "w": 768,
-            "h": 512
           },
           {
             "src": "/assets/people/dementors/gabil/portrait-ink.webp",
@@ -6110,20 +5388,13 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 768,
         "scrollWidth": 768,
         "horizontalOverflow": false,
         "protrusions": [],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -6149,20 +5420,13 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 768,
         "scrollWidth": 768,
         "horizontalOverflow": false,
         "protrusions": [],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -6188,20 +5452,13 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 768,
         "scrollWidth": 768,
         "horizontalOverflow": false,
         "protrusions": [],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -6227,20 +5484,13 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 768,
         "scrollWidth": 768,
         "horizontalOverflow": false,
         "protrusions": [],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -6294,20 +5544,13 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 768,
         "scrollWidth": 768,
         "horizontalOverflow": false,
         "protrusions": [],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -6340,20 +5583,13 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 768,
         "scrollWidth": 768,
         "horizontalOverflow": false,
         "protrusions": [],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -6386,20 +5622,13 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 768,
         "scrollWidth": 768,
         "horizontalOverflow": false,
         "protrusions": [],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -6439,20 +5668,13 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 768,
         "scrollWidth": 768,
         "horizontalOverflow": false,
         "protrusions": [],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -6541,26 +5763,14 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 768,
         "scrollWidth": 768,
         "horizontalOverflow": false,
         "protrusions": [],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
-        "brokenImages": [
-          {
-            "src": null,
-            "alt": ""
-          }
-        ],
+        "clippedText": [],
+        "brokenImages": [],
         "topbarOverlap": false,
         "images": [
           {
@@ -6603,7 +5813,7 @@
       "metrics": {
         "viewportWidth": 768,
         "scrollWidth": 768,
-        "horizontalOverflow": false,
+        "horizontalOverflow": true,
         "protrusions": [
           {
             "selector": "figure.is-near",
@@ -6786,16 +5996,9 @@
             "width": 470
           }
         ],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "clippedText": [],
         "brokenImages": [],
-        "topbarOverlap": true,
+        "topbarOverlap": false,
         "images": [
           {
             "src": "/assets/brand/dementor-mark-black.svg",
@@ -6987,20 +6190,13 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 768,
         "scrollWidth": 768,
         "horizontalOverflow": false,
         "protrusions": [],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -7040,20 +6236,13 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 768,
         "scrollWidth": 768,
         "horizontalOverflow": false,
         "protrusions": [],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -7093,20 +6282,13 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 768,
         "scrollWidth": 768,
         "horizontalOverflow": false,
         "protrusions": [],
-        "clippedText": [
-          {
-            "selector": "span.dc-global-sr",
-            "text": "Меню",
-            "clientWidth": 1,
-            "scrollWidth": 36
-          }
-        ],
+        "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
         "images": [
@@ -7323,19 +6505,14 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 1024,
         "scrollWidth": 1024,
         "horizontalOverflow": false,
         "protrusions": [],
         "clippedText": [],
-        "brokenImages": [
-          {
-            "src": null,
-            "alt": ""
-          }
-        ],
+        "brokenImages": [],
         "topbarOverlap": false,
         "images": [
           {
@@ -7693,19 +6870,12 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 1024,
-        "scrollWidth": 1110,
-        "horizontalOverflow": true,
-        "protrusions": [
-          {
-            "selector": "img",
-            "left": 60,
-            "right": 1110,
-            "width": 1050
-          }
-        ],
+        "scrollWidth": 1024,
+        "horizontalOverflow": false,
+        "protrusions": [],
         "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
@@ -7719,10 +6889,10 @@
           },
           {
             "src": "/assets/people/dementors/gabil/dementor_gabil.webp",
-            "fit": "fill",
+            "fit": "contain",
             "position": "50% 50%",
-            "w": 1050,
-            "h": 1245
+            "w": 374,
+            "h": 443
           }
         ]
       },
@@ -7778,11 +6948,11 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 1024,
-        "scrollWidth": 1079,
-        "horizontalOverflow": true,
+        "scrollWidth": 1024,
+        "horizontalOverflow": false,
         "protrusions": [],
         "clippedText": [],
         "brokenImages": [],
@@ -8198,19 +7368,14 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 1024,
         "scrollWidth": 1024,
         "horizontalOverflow": false,
         "protrusions": [],
         "clippedText": [],
-        "brokenImages": [
-          {
-            "src": null,
-            "alt": ""
-          }
-        ],
+        "brokenImages": [],
         "topbarOverlap": false,
         "images": [
           {
@@ -8256,11 +7421,11 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "warn",
+      "severity": "fail",
       "metrics": {
         "viewportWidth": 1024,
         "scrollWidth": 1024,
-        "horizontalOverflow": false,
+        "horizontalOverflow": true,
         "protrusions": [
           {
             "selector": "div.dc-entity-hero__meta.dc-meta.dc-dia-meta",
@@ -8291,7 +7456,7 @@
             "fit": "cover",
             "position": "100% 0%",
             "w": 984,
-            "h": 800
+            "h": 594
           },
           {
             "src": "/assets/people/dementors/gabil/dementor_gabil.webp",
@@ -8299,13 +7464,6 @@
             "position": "50% 50%",
             "w": 118,
             "h": 148
-          },
-          {
-            "src": "/assets/ink/event-fuengirola-03.webp",
-            "fit": "cover",
-            "position": "50% 50%",
-            "w": 1024,
-            "h": 836
           },
           {
             "src": "/assets/people/dementors/gabil/portrait-ink.webp",
@@ -8492,11 +7650,11 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 1024,
-        "scrollWidth": 1033,
-        "horizontalOverflow": true,
+        "scrollWidth": 1024,
+        "horizontalOverflow": false,
         "protrusions": [],
         "clippedText": [],
         "brokenImages": [],
@@ -8616,37 +7774,12 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 1024,
-        "scrollWidth": 1124,
-        "horizontalOverflow": true,
-        "protrusions": [
-          {
-            "selector": "figure.dc-object-media.hero",
-            "left": 20,
-            "right": 1124,
-            "width": 1104
-          },
-          {
-            "selector": "img",
-            "left": 21,
-            "right": 1123,
-            "width": 1102
-          },
-          {
-            "selector": "figure.dc-object-media.hero",
-            "left": 20,
-            "right": 1124,
-            "width": 1104
-          },
-          {
-            "selector": "img",
-            "left": 21,
-            "right": 1123,
-            "width": 1102
-          }
-        ],
+        "scrollWidth": 1024,
+        "horizontalOverflow": false,
+        "protrusions": [],
         "clippedText": [],
         "brokenImages": [],
         "topbarOverlap": false,
@@ -8669,7 +7802,7 @@
             "src": "/assets/objects/object-001/object-001-hero-3q.webp",
             "fit": "cover",
             "position": "50% 50%",
-            "w": 1102,
+            "w": 565,
             "h": 826
           },
           {
@@ -8718,7 +7851,7 @@
             "src": "/assets/objects/object-001/object-001-lifestyle-desk.webp",
             "fit": "cover",
             "position": "50% 50%",
-            "w": 1102,
+            "w": 565,
             "h": 826
           }
         ]
@@ -8736,19 +7869,14 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 1024,
         "scrollWidth": 1024,
         "horizontalOverflow": false,
         "protrusions": [],
         "clippedText": [],
-        "brokenImages": [
-          {
-            "src": null,
-            "alt": ""
-          }
-        ],
+        "brokenImages": [],
         "topbarOverlap": false,
         "images": [
           {
@@ -8791,7 +7919,7 @@
       "metrics": {
         "viewportWidth": 1024,
         "scrollWidth": 1024,
-        "horizontalOverflow": false,
+        "horizontalOverflow": true,
         "protrusions": [
           {
             "selector": "figure.is-near",
@@ -8976,7 +8104,7 @@
         ],
         "clippedText": [],
         "brokenImages": [],
-        "topbarOverlap": true,
+        "topbarOverlap": false,
         "images": [
           {
             "src": "/assets/brand/dementor-mark-black.svg",
@@ -9483,19 +8611,14 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 1440,
         "scrollWidth": 1440,
         "horizontalOverflow": false,
         "protrusions": [],
         "clippedText": [],
-        "brokenImages": [
-          {
-            "src": null,
-            "alt": ""
-          }
-        ],
+        "brokenImages": [],
         "topbarOverlap": false,
         "images": [
           {
@@ -10351,19 +9474,14 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 1440,
         "scrollWidth": 1440,
         "horizontalOverflow": false,
         "protrusions": [],
         "clippedText": [],
-        "brokenImages": [
-          {
-            "src": null,
-            "alt": ""
-          }
-        ],
+        "brokenImages": [],
         "topbarOverlap": false,
         "images": [
           {
@@ -10409,11 +9527,11 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "warn",
+      "severity": "fail",
       "metrics": {
         "viewportWidth": 1440,
         "scrollWidth": 1440,
-        "horizontalOverflow": false,
+        "horizontalOverflow": true,
         "protrusions": [
           {
             "selector": "div.dc-entity-hero__meta.dc-meta.dc-dia-meta",
@@ -10444,7 +9562,7 @@
             "fit": "cover",
             "position": "100% 0%",
             "w": 1400,
-            "h": 1000
+            "h": 594
           },
           {
             "src": "/assets/people/dementors/gabil/dementor_gabil.webp",
@@ -10452,13 +9570,6 @@
             "position": "50% 50%",
             "w": 118,
             "h": 148
-          },
-          {
-            "src": "/assets/ink/event-fuengirola-03.webp",
-            "fit": "cover",
-            "position": "50% 50%",
-            "w": 1440,
-            "h": 1036
           },
           {
             "src": "/assets/people/dementors/gabil/portrait-ink.webp",
@@ -10645,11 +9756,11 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 1440,
-        "scrollWidth": 1448,
-        "horizontalOverflow": true,
+        "scrollWidth": 1440,
+        "horizontalOverflow": false,
         "protrusions": [],
         "clippedText": [],
         "brokenImages": [],
@@ -10797,7 +9908,7 @@
             "src": "/assets/objects/object-001/object-001-hero-3q.webp",
             "fit": "cover",
             "position": "50% 50%",
-            "w": 1369,
+            "w": 798,
             "h": 1026
           },
           {
@@ -10846,7 +9957,7 @@
             "src": "/assets/objects/object-001/object-001-lifestyle-desk.webp",
             "fit": "cover",
             "position": "50% 50%",
-            "w": 1369,
+            "w": 798,
             "h": 1026
           }
         ]
@@ -10864,19 +9975,14 @@
       "loadError": null,
       "consoleErrors": [],
       "pageErrors": [],
-      "severity": "fail",
+      "severity": "pass",
       "metrics": {
         "viewportWidth": 1440,
         "scrollWidth": 1440,
         "horizontalOverflow": false,
         "protrusions": [],
         "clippedText": [],
-        "brokenImages": [
-          {
-            "src": null,
-            "alt": ""
-          }
-        ],
+        "brokenImages": [],
         "topbarOverlap": false,
         "images": [
           {
@@ -10919,7 +10025,7 @@
       "metrics": {
         "viewportWidth": 1440,
         "scrollWidth": 1440,
-        "horizontalOverflow": false,
+        "horizontalOverflow": true,
         "protrusions": [
           {
             "selector": "figure.is-near",
@@ -11104,7 +10210,7 @@
         ],
         "clippedText": [],
         "brokenImages": [],
-        "topbarOverlap": true,
+        "topbarOverlap": false,
         "images": [
           {
             "src": "/assets/brand/dementor-mark-black.svg",
