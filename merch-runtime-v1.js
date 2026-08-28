@@ -5,27 +5,14 @@ if(cfg?.enabled&&cfg.url&&cfg.publishableKey){
   const client=window.DEMENTOR_SUPABASE_CLIENT||createClient(cfg.url,cfg.publishableKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false,flowType:'pkce'}});window.DEMENTOR_SUPABASE_CLIENT=client;
   const {data,error}=await client.from('dc_merch_items').select('sku,title,item_type,base_price_eur,sales_state,public_visible,updated_at').eq('public_visible',true);
   if(!error){
-    const items=new Map((data||[]).map(x=>[x.sku,x]));
-    const money=v=>v==null?'PRICE / TBD':`€${Number(v).toLocaleString('en-US',{maximumFractionDigits:2})}`;
-    const state=v=>String(v||'not_open').replace(/_/g,' ').toUpperCase();
-    const path=location.pathname;
+    const items=new Map((data||[]).map(x=>[x.sku,x]));const money=v=>v==null?'PRICE / TBD':`€${Number(v).toLocaleString('en-US',{maximumFractionDigits:2})}`;const state=v=>String(v||'not_open').replace(/_/g,' ').toUpperCase();const path=location.pathname;
     const fact=(label,value)=>document.querySelectorAll('.dc-product__fact,.dc-object-fact').forEach(row=>{const l=row.querySelector('span');if(l&&l.textContent.trim().toLowerCase()===label.toLowerCase()){const out=row.querySelector('strong');if(out)out.textContent=value}});
     if(path.endsWith('/merch/')||path.endsWith('/merch/index.html')){
-      const obj=items.get('DC-OBJECT-001');if(obj){const row=[...document.querySelectorAll('.dc-entity-row')].find(x=>x.textContent.includes('НЕ НАДО'));if(row){const st=row.querySelector('.dc-entity-row__status');if(st)st.textContent=`${money(obj.base_price_eur)} / ${state(obj.sales_state)}`}}
-      const skus=['SH-DEM-01','SH-DEM-02','SH-DEM-03'];document.querySelectorAll('.dc-drop-card').forEach((card,i)=>{const item=items.get(skus[i]);if(!item)return;const spans=card.querySelectorAll('.dc-drop-card__state span');if(spans[0])spans[0].textContent=money(item.base_price_eur);if(spans[1])spans[1].textContent=state(item.sales_state)});
+      const obj=items.get('DC-OBJECT-001');const objRow=[...document.querySelectorAll('.dc-entity-row')].find(x=>x.textContent.includes('НЕ НАДО'));if(objRow){if(!obj)objRow.hidden=true;else{const st=objRow.querySelector('.dc-entity-row__status');if(st)st.textContent=`${money(obj.base_price_eur)} / ${state(obj.sales_state)}`}}
+      const skus=['SH-DEM-01','SH-DEM-02','SH-DEM-03'];document.querySelectorAll('.dc-drop-card').forEach((card,i)=>{const item=items.get(skus[i]);if(!item){card.hidden=true;return}const spans=card.querySelectorAll('.dc-drop-card__state span');if(spans[0])spans[0].textContent=money(item.base_price_eur);if(spans[1])spans[1].textContent=state(item.sales_state)});
+      const states=[...items.values()].map(x=>x.sales_state);const open=states.filter(x=>['available','preorder'].includes(x)).length;const facts=document.querySelectorAll('.dc-entity-hero__facts p');if(facts[1])facts[1].textContent=open?`OPEN ITEMS / ${open}`:'SALES / NOT OPEN';if(facts[2])facts[2].textContent=`LIVE ITEMS / ${items.size}`;
     }
-    const routes={'/objects/001-ne-nado/':'DC-OBJECT-001','/merch/drop-001/overthinking-is-my-cardio/':'SH-DEM-01','/merch/drop-001/personal-growth-cancelled/':'SH-DEM-02','/merch/drop-001/success-is-boring/':'SH-DEM-03'};
-    const route=Object.keys(routes).find(r=>path.endsWith(r)||path.endsWith(r+'index.html'));
-    if(route){
-      const item=items.get(routes[route]);if(item){
-        const price=money(item.base_price_eur),sales=state(item.sales_state);document.documentElement.dataset.dcMerchState=item.sales_state;
-        document.querySelectorAll('[data-dc-live-price]').forEach(el=>el.textContent=price);document.querySelectorAll('[data-dc-live-state]').forEach(el=>el.textContent=sales);
-        fact('Price',price.replace('PRICE / ',''));fact('Availability',sales);
-        const heroPrice=document.querySelector('.dc-object-hero__price');if(heroPrice)heroPrice.textContent=price.replace('PRICE / ','');
-        const heroState=document.querySelector('.dc-object-hero__state');if(heroState)heroState.innerHTML=`SALES / ${sales}<br>EDITION / 50<br>OWNER MARK / REQUIRED BEFORE CONSUMER PREORDER`;
-        const meta=document.querySelector('.dc-product__meta span:last-child,.dc-object-hero__meta span:last-child');if(meta)meta.textContent=`${item.sku} / ${price} / ${sales}`;
-        document.querySelectorAll('[data-dc-commerce-action]').forEach(el=>{const open=['available','preorder'].includes(item.sales_state)&&window.DEMENTOR_SITE_CONFIG?.merch?.checkoutEnabled;el.hidden=!open;el.setAttribute('aria-disabled',String(!open))});
-      }
-    }
+    const routes={'/objects/001-ne-nado/':'DC-OBJECT-001','/merch/drop-001/overthinking-is-my-cardio/':'SH-DEM-01','/merch/drop-001/personal-growth-cancelled/':'SH-DEM-02','/merch/drop-001/success-is-boring/':'SH-DEM-03'};const route=Object.keys(routes).find(r=>path.endsWith(r)||path.endsWith(r+'index.html'));
+    if(route){const item=items.get(routes[route]);if(!item){document.querySelector('main')?.setAttribute('hidden','');return}const price=money(item.base_price_eur),sales=state(item.sales_state);document.documentElement.dataset.dcMerchState=item.sales_state;fact('Price',price.replace('PRICE / ',''));fact('Availability',sales);const heroPrice=document.querySelector('.dc-object-hero__price');if(heroPrice)heroPrice.textContent=price.replace('PRICE / ','');const heroState=document.querySelector('.dc-object-hero__state');if(heroState)heroState.innerHTML=`SALES / ${sales}<br>EDITION / 50<br>OWNER MARK / REQUIRED BEFORE CONSUMER PREORDER`;const meta=document.querySelector('.dc-product__meta span:last-child,.dc-object-hero__meta span:last-child');if(meta)meta.textContent=`${item.sku} / ${price} / ${sales}`;document.querySelectorAll('[data-dc-commerce-action]').forEach(el=>{const canCheckout=['available','preorder'].includes(item.sales_state)&&window.DEMENTOR_SITE_CONFIG?.merch?.checkoutEnabled;el.hidden=!canCheckout;el.setAttribute('aria-disabled',String(!canCheckout))})}
   }else console.warn('[DC merch runtime]',error);
 }
