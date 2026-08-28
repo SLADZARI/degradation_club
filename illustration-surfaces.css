@@ -65,36 +65,48 @@
 }
 
 .dc-community-page .dc-community-opening,
-.dc-community-page .dc-community-opening__art{background:var(--dc-ink-bg-community-hero)!important}
-.dc-community-page .dc-community-opening__art img{width:100%;height:100%;object-fit:contain!important;object-position:center bottom}
-.dc-community-page .dc-community-opening__veil{background:linear-gradient(to bottom,rgba(247,235,213,.92) 0,rgba(247,235,213,.12) 20%,rgba(247,235,213,0) 64%,rgba(247,235,213,.84) 88%,rgba(247,235,213,.97) 100%)}
+.dc-community-page .dc-community-opening__art{background:var(--dc-ink-bg-community-hero)}
+.dc-community-page .dc-community-opening__art img{width:100%;height:100%;object-fit:contain;object-position:center bottom}
 
 /* Community already has an approved hero. Suppress the legacy runtime-inserted duplicate people-flow scene. */
-.dc-community-page .dc-ink-editorial--community{display:none!important}
+.dc-community-page .dc-ink-editorial--community{display:none}
 
 .dc-about .dc-ink-slot--about{background:var(--dc-ink-bg-about-service)}
-.dc-about .dc-ink-slot--about img{object-fit:contain!important}
+.dc-about .dc-ink-slot--about img{object-fit:contain}
 
 .dc-logic-page .dc-ink-slot--logic{background:var(--dc-ink-bg-maze)}
-.dc-logic-page .dc-ink-slot--logic img{object-fit:contain!important}
+.dc-logic-page .dc-ink-slot--logic img{object-fit:contain}
 
 .dc-about .dc-ink-editorial--authority,
-.dc-ink-surface--authority-chair{background:var(--dc-ink-bg-authority-chair)!important}
-.dc-about .dc-ink-editorial--authority img{width:100%;height:auto;aspect-ratio:auto!important;object-fit:contain!important;object-position:center!important}
+.dc-ink-surface--authority-chair{background:var(--dc-ink-bg-authority-chair)}
+.dc-about .dc-ink-editorial--authority img{width:100%;height:auto;aspect-ratio:auto;object-fit:contain;object-position:center}
 
 .dc-ink-surface--community-people{background:var(--dc-ink-bg-community-people)}
 
 .dc-fuengirola-page .dc-ink-slot--event,
 .dc-fuengirola-page .dc-media-break{background:var(--dc-ink-bg-fuengirola)}
 .dc-fuengirola-page .dc-ink-slot--event img,
-.dc-fuengirola-page .dc-media-break img{width:100%;height:auto;object-fit:contain!important;object-position:center}
+.dc-fuengirola-page .dc-media-break img{width:100%;height:auto;object-fit:contain;object-position:center}
 .dc-fuengirola-page .dc-event-dementor-portrait{background:var(--dc-dementor-gabil-bg)}
-.dc-fuengirola-page .dc-event-dementor-portrait img{width:100%;height:auto;object-fit:contain!important;background:var(--dc-dementor-gabil-bg)}
+.dc-fuengirola-page .dc-event-dementor-portrait img{width:100%;height:auto;object-fit:contain;background:var(--dc-dementor-gabil-bg)}
 
 @media(max-width:700px){
   .dc-home .dc-home-community__caption{position:absolute;left:16px;right:auto;bottom:16px;width:auto}
 }
 
 @media(max-width:560px){
-  .dc-community-page .dc-community-opening__veil{background:linear-gradient(to bottom,rgba(247,235,213,.92) 0,rgba(247,235,213,.08) 18%,rgba(247,235,213,0) 58%,rgba(247,235,213,.90) 82%,rgba(247,235,213,.98) 100%)}
-}
+  }
+
+
+/* GENERIC INK SLOT — canonical owner. */
+figure.dc-ink-slot{margin:0;width:100%;max-width:none}
+.dc-ink-slot{position:relative;height:clamp(560px,72vh,900px);border-top:1px solid currentColor;border-bottom:1px solid currentColor;overflow:hidden;background:var(--dc-paper)}
+.dc-ink-slot::before,.dc-ink-slot::after{content:none}
+.dc-ink-slot>img,.dc-ink-slot__image{display:block;width:100%;height:100%;max-width:none;object-fit:contain;object-position:center;mix-blend-mode:multiply}
+.dc-ink-slot--home{height:clamp(620px,76vh,940px)}
+.dc-ink-slot--about{height:clamp(560px,68vh,840px)}
+.dc-ink-slot--logic{height:clamp(600px,72vh,900px)}
+.dc-event-visual{margin:0;padding:0;height:clamp(560px,68vh,860px);background:var(--dc-paper);overflow:hidden;border-top:1px solid var(--dc-line);border-bottom:1px solid var(--dc-line)}
+.dc-event-visual img{display:block;width:100%;height:100%;max-width:none;object-fit:contain;object-position:center;mix-blend-mode:multiply}
+@media(max-width:900px){.dc-ink-slot,.dc-ink-slot--home,.dc-ink-slot--about,.dc-ink-slot--logic,.dc-event-visual{height:clamp(480px,82vh,760px)}}
+@media(max-width:700px){.dc-ink-slot,.dc-ink-slot--home,.dc-ink-slot--about,.dc-ink-slot--logic,.dc-event-visual{height:clamp(420px,118vw,580px)}.dc-ink-slot>img,.dc-ink-slot__image,.dc-event-visual img{width:100%;height:100%;object-fit:contain;object-position:center}}

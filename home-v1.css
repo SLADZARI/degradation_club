@@ -48,7 +48,7 @@
 .dc-home .dc-hero__media{grid-column:7/13;grid-row:2/4;align-self:stretch;justify-self:stretch;margin:30px 0 0;min-width:0;min-height:0;display:flex;align-items:center;justify-content:flex-end;overflow:hidden;position:relative;z-index:2}
 .dc-home .dc-hero__media img{display:block;width:100%;height:100%;max-width:none;object-fit:contain;object-position:right center;mix-blend-mode:multiply}
 /* Backward-compatible safety: old detached Home Ink slot must never render if cached HTML contains it. */
-.dc-home .dc-ink-slot--home{display:none!important}
+.dc-home .dc-ink-slot--home{display:none}
 
 .dc-home .dc-notice{overflow:hidden;border-top:1px solid rgba(255,255,255,.18);border-bottom:1px solid rgba(255,255,255,.18);background:var(--dc-ink,#111);color:var(--dc-paper,#f2f0e8)}
 .dc-home .dc-notice__track{display:flex;width:max-content;animation:dcTicker 26s linear infinite}.dc-home .dc-notice__item{padding:14px 26px;border-right:1px solid rgba(255,255,255,.18);font-size:11px;letter-spacing:.12em;white-space:nowrap}@keyframes dcTicker{to{transform:translateX(-50%)}}
@@ -63,25 +63,25 @@
 /* FULL-BLEED ROW CONTRACT.
    Old translateX hover from ui-v2 is explicitly neutralized on Home.
    Surface bleeds to viewport; content never shifts off the grid. */
-.dc-home .dc-index-row,.dc-home .dc-sphere{position:relative!important;overflow:visible!important;isolation:isolate;background:transparent!important}
+.dc-home .dc-index-row,.dc-home .dc-sphere{position:relative;overflow:visible;isolation:isolate;background:transparent}
 .dc-home .dc-index-row::before,.dc-home .dc-sphere::before{
-  content:""!important;
-  position:absolute!important;
-  z-index:0!important;
-  top:-1px!important;
-  bottom:-1px!important;
-  left:50%!important;
-  width:100vw!important;
-  right:auto!important;
-  background:transparent!important;
-  transform:translateX(-50%)!important;
-  transition:background .18s ease!important;
+  content:"";
+  position:absolute;
+  z-index:0;
+  top:-1px;
+  bottom:-1px;
+  left:50%;
+  width:100vw;
+  right:auto;
+  background:transparent;
+  transform:translateX(-50%);
+  transition:background .18s ease;
   pointer-events:none;
 }
 .dc-home .dc-index-row>*,.dc-home .dc-sphere>*{position:relative;z-index:1}
 @media(hover:hover) and (pointer:fine){
-  .dc-home .dc-index-row:hover,.dc-home .dc-index-row:focus-visible{background:transparent!important;padding-left:0!important;padding-right:0!important}
-  .dc-home .dc-index-row:hover::before,.dc-home .dc-index-row:focus-visible::before,.dc-home .dc-sphere:hover::before,.dc-home .dc-sphere:focus-within::before{background:var(--dc-home-row-accent)!important;transform:translateX(-50%)!important}
+  .dc-home .dc-index-row:hover,.dc-home .dc-index-row:focus-visible{background:transparent;padding-left:0;padding-right:0}
+  .dc-home .dc-index-row:hover::before,.dc-home .dc-index-row:focus-visible::before,.dc-home .dc-sphere:hover::before,.dc-home .dc-sphere:focus-within::before{background:var(--dc-home-row-accent);transform:translateX(-50%)}
 }
 
 .dc-home .dc-project{background:var(--dc-ink,#111);color:var(--dc-paper,#f2f0e8);overflow:hidden}.dc-home .dc-project__grid{display:grid;grid-template-columns:repeat(12,1fr);gap:var(--dc-home-gap)}.dc-home .dc-project__copy{grid-column:1/8}.dc-home .dc-project__aside{grid-column:9/13;border-left:1px solid rgba(255,255,255,.2);padding-left:28px;display:flex;flex-direction:column;justify-content:space-between;min-height:520px}.dc-home .dc-project .dc-display-l{margin-top:34px}.dc-home .dc-project__aside blockquote{border:0;margin:0;padding:0;font-size:clamp(30px,3.4vw,54px);line-height:1;letter-spacing:-.045em}.dc-home .dc-project__aside .dc-meta{color:var(--dc-paper,#f2f0e8)}
@@ -126,5 +126,24 @@
   .dc-home .dc-footer{grid-template-columns:repeat(4,1fr)}.dc-home .dc-footer .brand,.dc-home .dc-footer__line,.dc-home .dc-footer__version{grid-column:1/5}.dc-home .dc-footer__line{margin-top:28px}.dc-home .dc-footer__version{text-align:left;margin-top:12px}
 }
 
-@media(hover:none){.dc-home .dc-index-row::before,.dc-home .dc-sphere::before{display:none!important}}
-@media(prefers-reduced-motion:reduce){.dc-home .dc-notice__track{animation:none}.dc-home .dc-index-row::before,.dc-home .dc-sphere::before{transition:none!important}}
+@media(hover:none){.dc-home .dc-index-row::before,.dc-home .dc-sphere::before{display:none}}
+@media(prefers-reduced-motion:reduce){.dc-home .dc-notice__track{animation:none}.dc-home .dc-index-row::before,.dc-home .dc-sphere::before{transition:none}}
+
+
+/* BATCH7 / MOBILE HERO TEXT CONTAINMENT */
+@media(max-width:700px){
+  .dc-home .dc-hero__title{font-size:clamp(48px,14vw,58px);line-height:.82;letter-spacing:-.07em}
+}
+
+
+/* BATCH7 FINAL / HOME MOBILE EVENT TITLE */
+@media(max-width:560px){
+  .dc-home .dc-event__title{
+    min-width:0;
+    max-width:100%;
+    font-size:clamp(40px,12.8vw,52px);
+    line-height:.86;
+    letter-spacing:-.065em;
+    overflow-wrap:anywhere;
+  }
+}

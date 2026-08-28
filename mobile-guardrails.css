@@ -1,0 +1,19 @@
+/* Dementor Club — canonical mobile structural guardrails.
+   Scope: viewport safety only. Typography scale and component geometry stay with their owners. */
+@media(max-width:768px){
+  html,body{width:100%;max-width:100%;overflow-x:clip}
+  *,*::before,*::after{min-width:0;box-sizing:border-box}
+  img,video,canvas,svg{max-width:100%}
+  main,header,footer,section,figure,.dc-shell,.dc-grid,.dc-entity-hero,.dc-page-hero,.dc-about-hero{max-width:100%;min-width:0}
+  .dc-display-xl,.dc-display-l,.dc-hero__title,.dc-about-hero__title,.dc-project-hero__title,.dc-entity-hero__title,.dc-event__title,.dc-about-manifesto__title,.dc-about-service__title,.dc-about-dementor__title,.dc-event-lock__title{max-width:100%;min-width:0;overflow-wrap:normal;word-break:normal;hyphens:none}
+  .dc-index-row,.dc-entity-row{max-width:100%}
+  .dc-action{min-height:48px}
+  .menu-toggle{min-width:54px;min-height:44px}
+}
+@media(max-width:700px){
+  .dc-pressure,.dc-type-mutation{max-width:100%;transform:none}
+  .dc-home #project-title{transform:none}
+  .dc-home .dc-ink-slot--home{width:100%;margin-left:0;margin-right:0;transform:rotate(-.35deg);transform-origin:center center}
+  h1,h2,h3,blockquote,.dc-sphere__name,.dc-index-row__title{max-width:100%;min-width:0}
+  .dc-notice{width:100%;max-width:100%;overflow:hidden}
+}
