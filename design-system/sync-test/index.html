@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <title>Dementor Sync Diagnostics</title>
+  <style>
+    :root{--paper:#f2f0e8;--ink:#111;--acid:#d8ff3e;--muted:#8d8d86;--bad:#ff8a8a}
+    *{box-sizing:border-box}body{margin:0;background:#111;color:var(--paper);font:15px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace;padding:24px}.shell{max-width:1080px;margin:0 auto}.meta{font-size:11px;letter-spacing:.09em;text-transform:uppercase;opacity:.58;margin-bottom:18px}h1{font-size:clamp(38px,6vw,72px);line-height:.9;letter-spacing:-.055em;margin:0 0 18px}.lead{max-width:820px;opacity:.7;margin-bottom:22px}.actions{display:flex;gap:7px;flex-wrap:wrap;margin:18px 0 22px}button,a.tool{font:inherit;padding:11px 14px;background:var(--acid);color:#111;border:0;font-weight:800;cursor:pointer;text-decoration:none;display:inline-block}.danger{background:transparent!important;color:var(--paper)!important;border:1px solid #777!important}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.box{border:1px solid #555;padding:15px;min-height:160px;white-space:pre-wrap;overflow-wrap:anywhere}.box h2{font-size:11px;letter-spacing:.09em;text-transform:uppercase;opacity:.58;margin:0 0 12px}.status{font-size:18px;font-weight:800}.ok{color:var(--acid)}.bad{color:var(--bad)}.muted{opacity:.62}.trace{margin-top:12px;min-height:120px}.full{grid-column:1/-1}.warning{border-color:#8d7d4a;background:#17150d}.note{font-size:12px;opacity:.55;margin-top:18px}@media(max-width:760px){.grid{grid-template-columns:1fr}.full{grid-column:auto}}
+  </style>
+</head>
+<body>
+<main class="shell">
+  <div class="meta">INTERNAL / DESIGN SYSTEM / DATA SYNC DIAGNOSTICS / NOINDEX</div>
+  <h1>DEMENTOR<br>SYNC TEST</h1>
+  <p class="lead">Проверяет production-путь данных без создания отдельной модели: browser localStorage → assessment_snapshots → reload / другое устройство. По умолчанию только читает. PUSH/PULL меняют реальные данные текущего профиля и поэтому выполняются только вручную.</p>
+  <div class="actions">
+    <a class="tool" href="../admin/">SYSTEM TOOLS</a>
+    <a class="tool" href="../auth-test/">AUTH TEST</a>
+    <button id="refresh">REFRESH STATE</button>
+    <button id="reload">RELOAD TEST</button>
+    <button id="push">PUSH LOCAL → REMOTE</button>
+    <button id="pull">PULL REMOTE → LOCAL</button>
+  </div>
+
+  <section class="grid">
+    <div class="box"><h2>01 / AUTH</h2><div id="auth" class="status">BOOT…</div></div>
+    <div class="box"><h2>02 / VERDICT</h2><div id="verdict" class="status">WAITING…</div></div>
+    <div class="box"><h2>03 / LOCAL STATE</h2><div id="local">—</div></div>
+    <div class="box"><h2>04 / REMOTE SNAPSHOT</h2><div id="remote">—</div></div>
+    <div class="box"><h2>05 / ASSESSMENT RUNS</h2><div id="runs">—</div></div>
+    <div class="box"><h2>06 / CROSS-DEVICE</h2><div id="cross">—</div></div>
+    <div class="box full warning"><h2>WRITE SAFETY</h2><div>PUSH перезаписывает assessment_snapshots текущим browser state. PULL перезаписывает dementorClubOnboardingV3 удалённым snapshot. Перед записью страница показывает confirm(). История assessment_runs этим тестом не создаётся и не изменяется.</div></div>
+    <div class="box full trace"><h2>TRACE</h2><div id="trace"></div></div>
+  </section>
+  <div class="note">VERSION / SYNC-DIAG-V1 · PRODUCTION TABLES / assessment_snapshots + assessment_runs · TOKENS ARE NEVER RENDERED</div>
+</main>
+
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.4/+esm';
+const SUPABASE_URL='https://mmekfydwbvptbdatwitj.supabase.co';
+const SUPABASE_KEY='sb_publishable_a7e_Ndwwii8lyt_xmezoVw_ijxfh_yg';
+const STORAGE='dementorClubOnboardingV3';
+const VERSION='dc9-v1';
+const $=id=>document.getElementById(id);
+const trace=[];
+const log=(step,detail={})=>{trace.push({time:new Date().toISOString(),step,...detail});$('trace').textContent=trace.map(x=>`${x.time.slice(11,19)}  ${x.step}  ${JSON.stringify(Object.fromEntries(Object.entries(x).filter(([k])=>!['time','step'].includes(k))))}`).join('\n');};
+const safeParse=value=>{try{return value?JSON.parse(value):null}catch(_){return null}};
+const readLocal=()=>safeParse(localStorage.getItem(STORAGE));
+const summarize=state=>{
+  const results=state?.results&&typeof state.results==='object'?state.results:{};
+  const entries=Object.entries(results);
+  return {
+    present:Boolean(state),
+    result_count:entries.length,
+    spheres:entries.map(([id,r])=>({id,date:r?.date||null})),
+    active_sphere:state?.active?.sphere||null,
+    bytes:state?JSON.stringify(state).length:0
+  };
+};
+const canonical=state=>JSON.stringify(state||null);
+const client=createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,flowType:'pkce'}});
+let session=null,remoteState=null;
+
+async function getAuth(){
+  const {data,error}=await client.auth.getSession();
+  if(error)throw error;
+  session=data.session||null;
+  if(!session){$('auth').innerHTML='<span class="bad">NO SESSION</span>\nОткрой AUTH TEST и войди через Google.';return false;}
+  const {data:u,error:ue}=await client.auth.getUser();
+  if(ue)throw ue;
+  $('auth').innerHTML=`<span class="ok">SIGNED IN</span>\n${u.user?.email||''}\nuser_id: ${u.user?.id||''}`;
+  return true;
+}
+async function readRemote(){
+  const {data,error}=await client.from('assessment_snapshots').select('assessment_version,state_json,client_updated_at,updated_at').eq('profile_id',session.user.id).maybeSingle();
+  if(error)throw error;
+  remoteState=data?.state_json||null;
+  return data||null;
+}
+async function readRuns(){
+  const {count,error}=await client.from('assessment_runs').select('*',{count:'exact',head:true}).eq('profile_id',session.user.id);
+  if(error)throw error;
+  return count||0;
+}
+function renderComparison(localState,remoteRow,runCount){
+  const ls=summarize(localState),rs=summarize(remoteRow?.state_json||null);
+  $('local').textContent=JSON.stringify(ls,null,2);
+  $('remote').textContent=JSON.stringify({assessment_version:remoteRow?.assessment_version||null,client_updated_at:remoteRow?.client_updated_at||null,updated_at:remoteRow?.updated_at||null,...rs},null,2);
+  $('runs').textContent=`history_rows: ${runCount}\nprofile_id: ${session.user.id}`;
+  const same=canonical(localState)===canonical(remoteRow?.state_json||null);
+  const both=Boolean(localState)&&Boolean(remoteRow?.state_json);
+  if(same&&both){$('verdict').innerHTML='<span class="ok">LOCAL = REMOTE</span>\nSnapshot синхронизирован.';$('cross').innerHTML='<span class="ok">READY</span>\nНа другом устройстве войди тем же Google и нажми REFRESH STATE / либо открой JOIN: remote snapshot уже существует.';}
+  else if(!localState&&!remoteRow?.state_json){$('verdict').textContent='EMPTY / EMPTY\nНет результатов для проверки.';$('cross').textContent='Сначала пройди хотя бы одну сферу на JOIN.';}
+  else if(localState&&!remoteRow?.state_json){$('verdict').innerHTML='<span class="bad">LOCAL ONLY</span>\nНужно PUSH или обычная production-синхронизация JOIN.';$('cross').textContent='Remote snapshot отсутствует — второму устройству нечего восстанавливать.';}
+  else if(!localState&&remoteRow?.state_json){$('verdict').innerHTML='<span class="bad">REMOTE ONLY</span>\nМожно проверить PULL на этом браузере.';$('cross').innerHTML='<span class="ok">REMOTE EXISTS</span>\nЭто состояние подходит для теста восстановления на чистом устройстве.';}
+  else{$('verdict').innerHTML='<span class="bad">DIFFERENT</span>\nLocal и remote отличаются.';$('cross').textContent='Сравни даты результатов. Выбери осознанно PUSH или PULL; тест не делает merge автоматически.';}
+}
+async function refresh(){
+  try{
+    log('refresh-start');
+    if(!await getAuth()){log('no-session');return;}
+    const localState=readLocal();
+    const remoteRow=await readRemote();
+    const runCount=await readRuns();
+    renderComparison(localState,remoteRow,runCount);
+    log('refresh-done',{local:summarize(localState),remote:summarize(remoteRow?.state_json||null),runCount});
+  }catch(e){log('error',{message:e.message,code:e.code||null});$('verdict').innerHTML=`<span class="bad">ERROR</span>\n${e.message}`;}
+}
+async function push(){
+  try{
+    if(!await getAuth())return;
+    const localState=readLocal();
+    if(!localState)return alert('LOCAL STATE EMPTY — нечего отправлять.');
+    if(!confirm('PUSH LOCAL → REMOTE перезапишет assessment_snapshots текущего профиля состоянием этого браузера. Продолжить?'))return;
+    const now=new Date().toISOString();
+    const {error}=await client.from('assessment_snapshots').upsert({profile_id:session.user.id,assessment_version:VERSION,state_json:localState,client_updated_at:now,updated_at:now},{onConflict:'profile_id'});
+    if(error)throw error;
+    log('push-done',{local:summarize(localState)});await refresh();
+  }catch(e){log('push-error',{message:e.message,code:e.code||null});alert(e.message);}
+}
+async function pull(){
+  try{
+    if(!await getAuth())return;
+    const row=await readRemote();
+    if(!row?.state_json)return alert('REMOTE SNAPSHOT EMPTY — нечего восстанавливать.');
+    if(!confirm('PULL REMOTE → LOCAL перезапишет dementorClubOnboardingV3 в этом браузере. Продолжить?'))return;
+    localStorage.setItem(STORAGE,JSON.stringify(row.state_json));
+    log('pull-done',{remote:summarize(row.state_json)});await refresh();
+  }catch(e){log('pull-error',{message:e.message,code:e.code||null});alert(e.message);}
+}
+$('refresh').onclick=refresh;
+$('reload').onclick=()=>{sessionStorage.setItem('dcSyncReloadTest','1');location.reload();};
+$('push').onclick=push;
+$('pull').onclick=pull;
+if(sessionStorage.getItem('dcSyncReloadTest')==='1'){sessionStorage.removeItem('dcSyncReloadTest');log('reload-test-return');}
+client.auth.onAuthStateChange((event,s)=>log('auth-state',{event,hasSession:Boolean(s)}));
+await refresh();
+</script>
+</body>
+</html>
