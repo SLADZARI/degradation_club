@@ -9,7 +9,7 @@
   <meta property="og:title" content="Слабоумие и отвага — Dementor Club">
   <meta property="og:description" content="Курс, который трудно выбрать рационально. Выбор курса уже является частью курса.">
   <meta property="og:type" content="website">
-  <meta property="og:image" content="https://i.ytimg.com/vi/hyQibuGFE3g/hqdefault.jpg">
+  <meta property="og:image" content="https://i.ytimg.com/vi/hyQibuGFE3g/maxresdefault.jpg">
   <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="/course-bridge-v1.css">
   <link rel="stylesheet" href="./course.css">
@@ -51,14 +51,15 @@
           </aside>
         </div>
 
-        <div class="dc-course-video-stage">
-          <iframe
-            src="https://www.youtube-nocookie.com/embed/hyQibuGFE3g?rel=0&playsinline=1"
-            title="Слабоумие и отвага — видео курса"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            referrerpolicy="strict-origin-when-cross-origin"
-            allowfullscreen>
-          </iframe>
+        <div class="dc-course-video-stage" data-course-video data-video-id="hyQibuGFE3g">
+          <img class="dc-course-video-poster" src="https://i.ytimg.com/vi/hyQibuGFE3g/maxresdefault.jpg" onerror="this.onerror=null;this.src='https://i.ytimg.com/vi/hyQibuGFE3g/hqdefault.jpg'" alt="" aria-hidden="true">
+          <div class="dc-course-video-tint" aria-hidden="true"></div>
+          <div class="dc-course-video-corner">COURSE FILM / 01</div>
+          <button class="dc-course-video-play" type="button" data-course-video-play aria-label="Смотреть видео курса Слабоумие и отвага">
+            <span class="dc-course-video-play-meta">Смотреть прямо здесь</span>
+            <span class="dc-course-video-play-title"><span class="dc-course-video-play-icon" aria-hidden="true">▶</span><span>Смотреть клип</span></span>
+            <span class="dc-course-video-play-sub">Обложка исчезнет. Видео останется внутри страницы.</span>
+          </button>
         </div>
 
         <div class="dc-course-video-caption">
@@ -221,5 +222,6 @@
     <p class="muted">PLANNED / 2026</p>
   </footer>
   <script src="/motion-v1.js" defer></script>
+  <script src="./hero-video.js" defer></script>
 </body>
 </html>
