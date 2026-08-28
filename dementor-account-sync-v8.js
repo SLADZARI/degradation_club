@@ -1,4 +1,4 @@
-// Dementor Club — account + assessment sync v8.
+// Dementor Club — account + assessment sync v8.1.
 // OAuth callback is handled outside /join/ at /auth/callback/.
 (()=>{
   if(!location.pathname.includes('/join'))return;
@@ -8,7 +8,7 @@
   const STORAGE='dementorClubOnboardingV3';
   const VERSION='dc9-v1';
   const TRACE=[];
-  let client=null,session=null,syncTimer=null,applyingRemote=false,syncInFlight=null;
+  let client=null,session=null,syncTimer=null,applyingRemote=false,syncInFlight=null,syncPending=false,syncPendingMerge=false;
 
   const sleep=ms=>new Promise(r=>setTimeout(r,ms));
   const clone=v=>v==null?v:JSON.parse(JSON.stringify(v));
@@ -24,7 +24,7 @@
   function trace(step,detail={}){
     const safe={...detail};delete safe.access_token;delete safe.refresh_token;delete safe.token;delete safe.session;
     const entry={t:new Date().toISOString(),step,...safe};TRACE.push(entry);window.__DC_AUTH_TRACE__=TRACE;
-    if(new URLSearchParams(location.search).get('authdebug')==='1')console.log('[DC AUTH V8]',entry);
+    if(new URLSearchParams(location.search).get('authdebug')==='1')console.log('[DC AUTH V8.1]',entry);
   }
   async function waitConfig(){for(let i=0;i<100;i++){const cfg=window.DEMENTOR_SITE_CONFIG?.supabase;if(cfg?.enabled&&cfg.url&&cfg.publishableKey)return cfg;await sleep(40)}throw new Error('Supabase configuration unavailable')}
   function panel(){
@@ -33,14 +33,14 @@
     el=document.createElement('div');el.className='dc-account-panel';el.setAttribute('aria-live','polite');const shell=document.querySelector('.join-shell');shell?shell.prepend(el):document.body.prepend(el);return el;
   }
   const setStatus=t=>{const e=document.querySelector('[data-dc-account-status]');if(e)e.textContent=t};
-  const fail=e=>{trace('error',{message:e?.message||String(e),code:e?.code||null});console.error('[Dementor Sync V8]',e);setStatus(`ОШИБКА ВХОДА / СИНХРОНИЗАЦИИ${e?.message?' · '+e.message:''}`)};
+  const fail=e=>{trace('error',{message:e?.message||String(e),code:e?.code||null});console.error('[Dementor Sync V8.1]',e);setStatus(`ОШИБКА ВХОДА / СИНХРОНИЗАЦИИ${e?.message?' · '+e.message:''}`)};
   function render(){
     const el=panel();
     if(!client){el.innerHTML='<div class="dc-account-panel__meta"><strong>ПРОФИЛЬ</strong><span data-dc-account-status>ПОДКЛЮЧЕНИЕ…</span></div>';return}
     if(!session){el.innerHTML='<div class="dc-account-panel__meta"><strong>ВАША КАРТА ХРАНИТСЯ НА ЭТОМ УСТРОЙСТВЕ</strong><span data-dc-account-status>Войдите через Google, чтобы синхронизировать её между устройствами.</span></div><div class="dc-account-panel__actions"><button type="button" data-dc-login>СОХРАНИТЬ ПРОФИЛЬ / GOOGLE</button></div>';el.querySelector('[data-dc-login]')?.addEventListener('click',login);return}
     const m=session.user.user_metadata||{};const name=m.full_name||m.name||session.user.email||'Участник';
     el.innerHTML=`<div class="dc-account-panel__meta"><strong>${esc(name)}</strong><span data-dc-account-status>СИНХРОНИЗИРОВАНО</span></div><div class="dc-account-panel__actions"><button type="button" data-dc-sync>СИНХРОНИЗИРОВАТЬ</button><button type="button" data-dc-logout>ВЫЙТИ</button></div>`;
-    el.querySelector('[data-dc-sync]')?.addEventListener('click',()=>queueSync(0,true));
+    el.querySelector('[data-dc-sync]')?.addEventListener('click',()=>requestSync(true));
     el.querySelector('[data-dc-logout]')?.addEventListener('click',async()=>{await client.auth.signOut();session=null;render()});
   }
   function callbackUrl(){const base=location.pathname.startsWith('/degradation_club/')?'/degradation_club':'';return location.origin+base+'/auth/callback/'}
@@ -55,31 +55,69 @@
   async function ensureBaselines(state){for(const [sphere,result] of Object.entries(state?.results||{}))if(result?.date)await persistRun(sphere,result,null)}
   async function readRemoteSnapshot(){const {data,error}=await client.from('assessment_snapshots').select('state_json').eq('profile_id',session.user.id).maybeSingle();if(error)throw error;return data?.state_json||null}
   async function writeSnapshot(state){const now=new Date().toISOString();const {error}=await client.from('assessment_snapshots').upsert({profile_id:session.user.id,assessment_version:VERSION,state_json:state,client_updated_at:now,updated_at:now},{onConflict:'profile_id'});if(error)throw error}
-  async function syncNow(mergeRemote=false){
-    if(!session||!client)return;
-    if(syncInFlight)return syncInFlight;
-    syncInFlight=(async()=>{
-      trace('sync-start',{mergeRemote});
-      const local=readLocal();let state=local,remote=null;
-      if(mergeRemote){
-        remote=await readRemoteSnapshot();
-        if(remote){
-          state=mergeStates(local,remote);
-          if(stable(state)!==stable(local)){
-            applyingRemote=true;localStorage.setItem(STORAGE,JSON.stringify(state));applyingRemote=false;lastState=clone(state);
-          }
+
+  async function syncPass(mergeRemote=false){
+    trace('sync-pass-start',{mergeRemote});
+    const local=readLocal();let state=local,remote=null;
+    if(mergeRemote){
+      remote=await readRemoteSnapshot();
+      if(remote){
+        state=mergeStates(local,remote);
+        if(stable(state)!==stable(local)){
+          applyingRemote=true;localStorage.setItem(STORAGE,JSON.stringify(state));applyingRemote=false;lastState=clone(state);
         }
       }
-      await ensureBaselines(state);
-      if(remote&&stable(state)===stable(remote))trace('snapshot-write-skip',{reason:'unchanged'});else await writeSnapshot(state);
-      trace('sync-done',{results:Object.keys(state?.results||{}).length});setStatus('СИНХРОНИЗИРОВАНО');
+    }
+    await ensureBaselines(state);
+    if(remote&&stable(state)===stable(remote))trace('snapshot-write-skip',{reason:'unchanged'});else await writeSnapshot(state);
+    trace('sync-pass-done',{results:Object.keys(state?.results||{}).length,active:state?.active?.sphere||null});
+    setStatus('СИНХРОНИЗИРОВАНО');
+  }
+
+  async function requestSync(mergeRemote=false){
+    if(!session||!client)return;
+    if(syncInFlight){
+      syncPending=true;
+      syncPendingMerge=syncPendingMerge||mergeRemote;
+      trace('sync-rerun-queued',{mergeRemote});
+      return syncInFlight;
+    }
+    syncInFlight=(async()=>{
+      let nextMerge=mergeRemote;
+      do{
+        syncPending=false;
+        const passMerge=nextMerge||syncPendingMerge;
+        syncPendingMerge=false;
+        await syncPass(passMerge);
+        nextMerge=false;
+      }while(syncPending);
     })();
     try{return await syncInFlight}finally{syncInFlight=null}
   }
-  function queueSync(delay=250,mergeRemote=false){clearTimeout(syncTimer);syncTimer=setTimeout(()=>syncNow(mergeRemote).catch(fail),delay)}
+
+  function queueSync(delay=250,mergeRemote=false){clearTimeout(syncTimer);syncTimer=setTimeout(()=>requestSync(mergeRemote).catch(fail),delay)}
   function installStorageTap(){
     const original=Storage.prototype.setItem;if(original.__dcSyncV8Wrapped)return;
-    const wrapped=function(key,value){const r=original.apply(this,arguments);if(this===localStorage&&key===STORAGE&&!applyingRemote){const prev=clone(lastState);let next=null;try{next=JSON.parse(value)}catch(_){}if(next){lastState=clone(next);if(session)queueSync(250,false);const a=prev?.active,res=a?.sphere?next?.results?.[a.sphere]:null;if(a?.sphere&&!next.active&&res?.date)persistRun(a.sphere,res,a).catch(fail)}}return r};
+    const wrapped=function(key,value){
+      const r=original.apply(this,arguments);
+      if(this===localStorage&&key===STORAGE&&!applyingRemote){
+        const prev=clone(lastState);let next=null;try{next=JSON.parse(value)}catch(_){}
+        if(next){
+          lastState=clone(next);
+          const a=prev?.active,res=a?.sphere?next?.results?.[a.sphere]:null;
+          const completed=Boolean(a?.sphere&&!next.active&&res?.date);
+          if(session){
+            if(completed){
+              clearTimeout(syncTimer);
+              persistRun(a.sphere,res,a)
+                .then(()=>requestSync(false))
+                .catch(fail);
+            }else queueSync(250,false);
+          }
+        }
+      }
+      return r;
+    };
     wrapped.__dcSyncV8Wrapped=true;Storage.prototype.setItem=wrapped;
   }
   async function boot(){
@@ -87,10 +125,10 @@
     const cfg=await waitConfig();
     const mod=await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.4/+esm');
     client=mod.createClient(cfg.url,cfg.publishableKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false,flowType:'pkce'}});window.DEMENTOR_SUPABASE_CLIENT=client;
-    client.auth.onAuthStateChange((event,next)=>{trace('auth-state',{event,hasSession:Boolean(next)});session=next||null;render();if(session&&event==='TOKEN_REFRESHED')queueSync(0,true)});
+    client.auth.onAuthStateChange((event,next)=>{trace('auth-state',{event,hasSession:Boolean(next)});session=next||null;render();if(session&&event==='TOKEN_REFRESHED')requestSync(true).catch(fail)});
     const {data,error}=await client.auth.getSession();if(error)throw error;session=data.session||null;
     if(session){const u=await client.auth.getUser();if(u.error)throw u.error}
-    render();if(session)await syncNow(true);trace('boot-done',{signedIn:Boolean(session)});
+    render();if(session)await requestSync(true);trace('boot-done',{signedIn:Boolean(session)});
   }
   installStorageTap();boot().catch(fail);
 })();
