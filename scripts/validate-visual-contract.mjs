@@ -5,6 +5,7 @@ const fail = [];
 const must = (ok, message) => { if (!ok) fail.push(message); };
 
 const visual = read('visual-standard-v2.css');
+const profile = read('dementor-profile.css');
 const visualTokens = read('visual-tokens.css');
 const illustrationSurfaces = read('illustration-surfaces.css');
 const styles = read('styles.css');
@@ -32,7 +33,7 @@ must(visual.includes("background-size:auto 100%"), 'event media is not height-fi
 must(visual.includes('.dc-dementor-micro'), 'MICRO contract missing');
 must(visual.includes('.dc-dementor-relation'), 'RELATION contract missing');
 must(visual.includes('.dc-dementor-feature'), 'FEATURE contract missing');
-must(visual.includes('.dc-dementor-hero__portrait'), 'HERO portrait contract missing');
+must(profile.includes('.dc-dementor-profile .dc-dementor-hero__portrait'), 'HERO portrait contract missing from canonical profile owner');
 must(illustrationSurfaces.includes('var(--dc-ink-bg-fuengirola)'), 'Fuengirola illustration surface token binding missing');
 must(home.includes('/courses/dumai-s-opasnostyu/'), 'Home course feature missing');
 must(home.includes('/events/fuengirola/'), 'Home event feature missing');
