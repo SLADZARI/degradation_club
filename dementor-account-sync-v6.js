@@ -41,14 +41,35 @@
     throw new Error('Supabase configuration unavailable');
   }
 
+  function trackPanelHeight(el){
+    const update=()=>{
+      const shell=el.closest('.join-shell');
+      if(shell)shell.style.setProperty('--dc-account-panel-h',`${Math.ceil(el.getBoundingClientRect().height)+6}px`);
+    };
+    update();
+    if('ResizeObserver'in window)new ResizeObserver(update).observe(el);
+  }
+
   function panel(){
     let el=document.querySelector('.dc-account-panel');if(el)return el;
     const st=document.createElement('style');
-    st.textContent='.dc-account-panel{margin:18px 0 6px;padding:14px 16px;border:1px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;font-size:12px}.dc-account-panel__meta{display:grid;gap:3px}.dc-account-panel__meta strong{font-size:12px;letter-spacing:.06em}.dc-account-panel__meta span{opacity:.58}.dc-account-panel__actions{display:flex;gap:8px;flex-wrap:wrap}.dc-account-panel button{appearance:none;border:1px solid currentColor;background:transparent;color:inherit;padding:9px 11px;font:inherit;font-size:11px;font-weight:800;letter-spacing:.06em;cursor:pointer}.dc-account-panel button:hover{background:var(--acid);color:#111;border-color:var(--acid)}';
+    st.textContent='.dc-account-panel{position:sticky;top:var(--dc-global-header-h,72px);z-index:230;margin:18px 0 6px;padding:14px 16px;border:1px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;font-size:12px;background:#111;box-shadow:0 8px 0 #111}.dc-account-panel__meta{display:grid;gap:3px}.dc-account-panel__meta strong{font-size:12px;letter-spacing:.06em}.dc-account-panel__meta span{opacity:.58}.dc-account-panel__actions{display:flex;gap:8px;flex-wrap:wrap}.dc-account-panel button{appearance:none;border:1px solid currentColor;background:transparent;color:inherit;padding:9px 11px;font:inherit;font-size:11px;font-weight:800;letter-spacing:.06em;cursor:pointer}.dc-account-panel button:hover{background:var(--acid);color:#111;border-color:var(--acid)}.join-shell .progress-wrap{top:calc(var(--dc-global-header-h,72px) + var(--dc-account-panel-h,64px))}@media(max-width:900px){.dc-account-panel{top:var(--dc-global-header-h,64px);margin-top:10px}.dc-account-panel__meta{min-width:0}.dc-account-panel__meta strong,.dc-account-panel__meta span{overflow-wrap:anywhere}}';
     document.head.appendChild(st);
     el=document.createElement('div');el.className='dc-account-panel';el.setAttribute('aria-live','polite');
     const shell=document.querySelector('.join-shell');shell?shell.prepend(el):document.body.prepend(el);
+    trackPanelHeight(el);
     return el;
+  }
+
+  function updatePrivacyCopy(){
+    const items=[...document.querySelectorAll('.privacy')];
+    items.forEach((el,i)=>{
+      if(!el.dataset.dcOriginalHtml)el.dataset.dcOriginalHtml=el.innerHTML;
+      if(!session){el.innerHTML=el.dataset.dcOriginalHtml;return;}
+      el.innerHTML=i===0
+        ?'Результаты сохраняются локально и синхронизируются с вашим профилем Dementor Club через Google. Это клубная диагностическая механика, а не психологический, медицинский или профессиональный тест.'
+        :`Данные сохраняются локально под ключом <code>${STORAGE}</code> и синхронизируются с вашим профилем Dementor Club. Очистка localStorage не удалит уже синхронизированные результаты.`;
+    });
   }
 
   const setStatus=t=>{const e=document.querySelector('[data-dc-account-status]');if(e)e.textContent=t};
@@ -56,6 +77,7 @@
 
   function render(){
     const el=panel();
+    updatePrivacyCopy();
     if(!client){
       el.innerHTML='<div class="dc-account-panel__meta"><strong>ПРОФИЛЬ</strong><span data-dc-account-status>ПОДКЛЮЧЕНИЕ…</span></div>';
       return;
