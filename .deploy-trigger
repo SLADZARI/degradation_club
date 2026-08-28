@@ -52,3 +52,4 @@ Update this file only when the user explicitly requests deploy/publish/release.
 2026-08-28T18:34+02:00 — retry Dementor Workspace deploy after fixing internal #home anchor validation.
 2026-08-28 — user requested publish latest production layout to GitHub Pages.
 2026-08-28T18:42+02:00 — deploy production read-only /workspace/ with Supabase membership, role, entity assignments and RLS-backed DC data.
+2026-08-28T19:30+02:00 — deploy universal personal Workspace v0.2: registered guest, member, Dementor/Owner Admin progressive states, personal activity archive and canonical Dementor portraits.
