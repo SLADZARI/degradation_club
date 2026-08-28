@@ -44,13 +44,16 @@ Modern Pilgrims не является «верхним уровнем Dementor C
 
 У человека могут существовать независимые memberships в обоих пространствах.
 
-Базовые роли пространства Modern Pilgrims для проектирования:
+Базовые роли пространства Modern Pilgrims:
 
 - `OWNER_ADMIN` — полный platform/portfolio access;
-- `TEAM_MEMBER` — участник внутренней команды;
-- отсутствие membership — нет доступа к внутренней платформе целиком.
+- `TEAM_MEMBER` — участник внутренней команды Modern Pilgrims;
+- `PILGRIMS_PARTNER` — внешний клиент/партнёр Modern Pilgrims с собственным клиентским кабинетом и project-scoped доступом;
+- отсутствие membership — нет доступа к внутренней платформе Modern Pilgrims.
 
-Project access выдаётся отдельно и не требует полного `TEAM_MEMBER`.
+`PILGRIMS_PARTNER` не является `TEAM_MEMBER` и не получает внутренний Team / Operating Board автоматически.
+
+Project access выдаётся отдельно и определяет, какие конкретно проекты видит партнёр.
 
 ---
 
@@ -87,9 +90,11 @@ Dementor Club:
 - имеет `CLUB_MEMBER` и `AUTHENTICATED` capabilities по наследованию.
 
 Modern Pilgrims:
-- не получает полный доступ к platform/team board автоматически;
-- получает project-scoped membership только в BEREG;
-- точный project role при реализации: `COLLABORATOR` как минимальная безопасная исходная модель, пока отдельно не утверждены полномочия project lead/editor.
+- `PILGRIMS_PARTNER`;
+- клиентский/партнёрский профиль Modern Pilgrims;
+- не получает полный Team / Operating Board;
+- получает project-scoped membership в BEREG;
+- project role: `COLLABORATOR` как базовая модель до отдельного утверждения более широких полномочий.
 
 ### Габиль
 
@@ -98,9 +103,11 @@ Dementor Club:
 - имеет `CLUB_MEMBER` и `AUTHENTICATED` capabilities по наследованию.
 
 Modern Pilgrims:
-- не получает полный доступ к platform/team board автоматически;
-- получает project-scoped membership только в «Обитель» / Mycelium-контуре;
-- точный project role при реализации: `COLLABORATOR` как минимальная безопасная исходная модель, пока отдельно не утверждены полномочия project lead/editor.
+- `PILGRIMS_PARTNER`;
+- клиентский/партнёрский профиль Modern Pilgrims;
+- не получает полный Team / Operating Board;
+- получает project-scoped membership в «Обитель» / Mycelium-контуре;
+- project role: `COLLABORATOR` как базовая модель до отдельного утверждения более широких полномочий.
 
 ---
 
@@ -111,38 +118,41 @@ Modern Pilgrims:
 - Жене;
 - Никите.
 
-Валентин и Габиль не получают portfolio-wide visibility только потому, что работают с Modern Pilgrims над отдельным проектом.
-
-Их доступ должен быть ограничен собственным project scope.
+`PILGRIMS_PARTNER` видит не portfolio board, а собственный partner/client portal и только те проекты, где есть активная `project_membership`.
 
 Пример:
 
 ```text
-Женя   → Modern Pilgrims / ALL
-Никита → Modern Pilgrims / ALL
-Валентин → Modern Pilgrims / BEREG only
-Габиль → Modern Pilgrims / OBITEL only
+Женя      → Modern Pilgrims / ALL
+Никита    → Modern Pilgrims / ALL
+Валентин  → Partner Portal + BEREG only
+Габиль    → Partner Portal + OBITEL only
 ```
 
 Если позже появляется новый совместный проект, добавляется новая `project_membership`, а не расширяется глобальная роль.
 
 ---
 
-## 4. Dementor → Pilgrim
+## 4. Partner → Pilgrim / Dementor → Pilgrim
 
 `DEMENTOR` не является младшей ступенью `PILGRIM`.
+
+`PILGRIMS_PARTNER` также не является внутренним членом команды.
 
 Это разные типы участия:
 
 - Dementor — роль внутри культурной платформы Dementor Club;
+- Pilgrims Partner — внешний клиент/партнёр Modern Pilgrims;
 - Pilgrim / Team Member — участие во внутренней операционной экосистеме Modern Pilgrims.
 
-Поэтому переход только явный:
+Для Валентина и Габиля естественный путь выглядит так:
 
 ```text
-DEMENTOR
-↓
-project collaboration / accumulated contribution
+DEMENTOR CLUB / DEMENTOR
++
+MODERN PILGRIMS / PILGRIMS_PARTNER
++
+PROJECT COLLABORATION
 ↓
 PILGRIM CANDIDATE
 ↓
@@ -150,21 +160,23 @@ INVITATION
 ↓
 ACCEPTED
 ↓
-MODERN PILGRIMS TEAM_MEMBER
+MODERN PILGRIMS / TEAM_MEMBER
 ```
 
 Переход:
 - не автоматический;
 - не зависит от результата DC-9;
 - не происходит из-за длительности участия;
-- не происходит из-за project membership;
+- не происходит только из-за project membership или partner status;
 - требует отдельного решения/приглашения Modern Pilgrims.
 
-После перехода Dementor role не исчезает. У человека могут одновременно существовать:
+После перехода роли не исчезают автоматически. У человека могут одновременно существовать:
 
 `Dementor Club / DEMENTOR`
 +
 `Modern Pilgrims / TEAM_MEMBER`
++
+project memberships.
 
 ---
 
@@ -176,6 +188,7 @@ MODERN PILGRIMS TEAM_MEMBER
 - выдавать `DEMENTOR` system role;
 - открывать admin/system tools;
 - открывать Team Board;
+- создавать `PILGRIMS_PARTNER`;
 - создавать project membership;
 - переводить пользователя в Modern Pilgrims.
 
@@ -222,6 +235,10 @@ access_audit_log
 - `granted_at`
 - `revoked_at`
 
+Modern Pilgrims roles:
+
+`OWNER_ADMIN | TEAM_MEMBER | PILGRIMS_PARTNER`
+
 ### projects
 
 Проект принадлежит одному space.
@@ -246,7 +263,7 @@ access_audit_log
 
 ### transition_invitations
 
-Отдельная сущность для явного Dementor → Pilgrim приглашения.
+Отдельная сущность для явного Partner/Dementor → Pilgrim приглашения.
 
 Не превращать её в hidden flag на `profiles`.
 
@@ -271,6 +288,8 @@ access_audit_log
 если такое назначение отдельно не существует.
 
 Для Жени и Никиты оба назначения существуют явно.
+
+`Modern Pilgrims / PILGRIMS_PARTNER` даёт доступ к partner/client portal, но не к внутреннему portfolio/team scope. Конкретные проекты определяются `project_memberships`.
 
 ---
 
@@ -309,15 +328,9 @@ Long-press Design/System Tools может оставаться discovery-мех�
 
 Добавляет только утверждённые member-only возможности клуба.
 
-Конкретный membership product/mechanics пока не придумывать до отдельного решения.
-
 ### DEMENTOR
 
-Добавляет Dementor-only внутренние функции, когда они будут утверждены:
-
-- собственный Dementor profile management;
-- связанные события/курсы/проекты;
-- доступ к выделенным рабочим материалам клуба.
+Добавляет Dementor-only внутренние функции, когда они будут утверждены.
 
 Не даёт Modern Pilgrims Team Board автоматически.
 
@@ -330,7 +343,40 @@ Long-press Design/System Tools может оставаться discovery-мех�
 
 ---
 
-## 10. Статус реализации
+## 10. Что должно быть доступно по уровням Modern Pilgrims
+
+### PILGRIMS_PARTNER
+
+Клиентский/партнёрский профиль.
+
+Может получать:
+- partner/client portal;
+- собственный профиль;
+- список собственных проектов;
+- project-scoped state/results/decisions/materials;
+- project communication/actions, если разрешены project role.
+
+Не получает автоматически:
+- portfolio-wide Operating Board;
+- внутреннюю Team board;
+- внутренний people/roles registry;
+- чужие проекты;
+- platform admin;
+- право выдавать роли.
+
+### TEAM_MEMBER
+
+Внутренний участник Modern Pilgrims.
+
+Точный набор cross-project capabilities остаётся отдельным продуктовым решением.
+
+### OWNER_ADMIN
+
+Полный platform/portfolio/team access и управление memberships/access.
+
+---
+
+## 11. Статус реализации
 
 ### Уже доказано в production Dementor Club
 
@@ -347,30 +393,33 @@ Long-press Design/System Tools может оставаться discovery-мех�
 
 - `spaces`;
 - `space_memberships`;
+- `PILGRIMS_PARTNER`;
+- partner/client portal;
 - `projects` как access scopes общей базы;
 - `project_memberships`;
 - role-aware RLS;
 - role-aware middleware;
 - Team Board project scoping;
-- Dementor → Pilgrim invitations;
+- Partner/Dementor → Pilgrim invitations;
 - admin UI для выдачи/отзыва ролей.
 
 Не считать эту спецификацию задеплоенной системой.
 
 ---
 
-## 11. Следующий gate перед реализацией
+## 12. Следующий gate перед реализацией
 
 До SQL migration согласовать:
 
 1. финальные enum names;
-2. project roles;
-3. точные permissions каждой роли;
-4. какой UI Modern Pilgrims показывается project collaborators;
-5. где физически живёт «Обитель» в Modern Pilgrims source-of-truth;
-6. способ связывания существующих проектов с общей `projects` registry;
-7. кто имеет право выдавать `TEAM_MEMBER` и `DEMENTOR`;
-8. audit requirements.
+2. точные permissions `PILGRIMS_PARTNER`;
+3. точные permissions `TEAM_MEMBER`;
+4. project roles;
+5. partner portal UI/data surface;
+6. где физически живёт «Обитель» в Modern Pilgrims source-of-truth;
+7. способ связывания существующих проектов с общей `projects` registry;
+8. кто имеет право выдавать `TEAM_MEMBER`, `PILGRIMS_PARTNER` и `DEMENTOR`;
+9. audit requirements.
 
 После этого:
 
