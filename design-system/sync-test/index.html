@@ -31,10 +31,11 @@
     <div class="box"><h2>04 / REMOTE SNAPSHOT</h2><div id="remote">—</div></div>
     <div class="box"><h2>05 / ASSESSMENT RUNS</h2><div id="runs">—</div></div>
     <div class="box"><h2>06 / CROSS-DEVICE</h2><div id="cross">—</div></div>
+    <div class="box full"><h2>07 / REAL DIFF</h2><div id="diff">—</div></div>
     <div class="box full warning"><h2>WRITE SAFETY</h2><div>PUSH перезаписывает assessment_snapshots текущим browser state. PULL перезаписывает dementorClubOnboardingV3 удалённым snapshot. Перед записью страница показывает confirm(). История assessment_runs этим тестом не создаётся и не изменяется.</div></div>
     <div class="box full trace"><h2>TRACE</h2><div id="trace"></div></div>
   </section>
-  <div class="note">VERSION / SYNC-DIAG-V1 · PRODUCTION TABLES / assessment_snapshots + assessment_runs · TOKENS ARE NEVER RENDERED</div>
+  <div class="note">VERSION / SYNC-DIAG-V2 · SEMANTIC KEY-SORTED COMPARISON · PRODUCTION TABLES / assessment_snapshots + assessment_runs · TOKENS ARE NEVER RENDERED</div>
 </main>
 
 <script type="module">
@@ -50,90 +51,61 @@ const safeParse=value=>{try{return value?JSON.parse(value):null}catch(_){return 
 const readLocal=()=>safeParse(localStorage.getItem(STORAGE));
 const summarize=state=>{
   const results=state?.results&&typeof state.results==='object'?state.results:{};
-  const entries=Object.entries(results);
-  return {
-    present:Boolean(state),
-    result_count:entries.length,
-    spheres:entries.map(([id,r])=>({id,date:r?.date||null})),
-    active_sphere:state?.active?.sphere||null,
-    bytes:state?JSON.stringify(state).length:0
-  };
+  const entries=Object.entries(results).sort(([a],[b])=>a.localeCompare(b));
+  return {present:Boolean(state),result_count:entries.length,spheres:entries.map(([id,r])=>({id,date:r?.date||null})),active_sphere:state?.active?.sphere||null,bytes:state?JSON.stringify(state).length:0};
 };
-const canonical=state=>JSON.stringify(state||null);
+const normalize=value=>{
+  if(Array.isArray(value))return value.map(normalize);
+  if(value&&typeof value==='object')return Object.keys(value).sort().reduce((out,key)=>{out[key]=normalize(value[key]);return out;},{});
+  return value;
+};
+const canonical=state=>JSON.stringify(normalize(state||null));
+const resultDiff=(localState,remoteState)=>{
+  const l=localState?.results||{},r=remoteState?.results||{};
+  const ids=[...new Set([...Object.keys(l),...Object.keys(r)])].sort();
+  const rows=[];
+  ids.forEach(id=>{
+    if(!(id in l))rows.push(`${id}: REMOTE ONLY`);
+    else if(!(id in r))rows.push(`${id}: LOCAL ONLY`);
+    else if(canonical(l[id])!==canonical(r[id]))rows.push(`${id}: CONTENT DIFF · local ${l[id]?.date||'—'} · remote ${r[id]?.date||'—'}`);
+  });
+  if(canonical(localState?.active||null)!==canonical(remoteState?.active||null))rows.push(`active: DIFFERENT · local ${localState?.active?.sphere||'null'} · remote ${remoteState?.active?.sphere||'null'}`);
+  return rows;
+};
 const client=createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,flowType:'pkce'}});
 let session=null,remoteState=null;
 
 async function getAuth(){
-  const {data,error}=await client.auth.getSession();
-  if(error)throw error;
-  session=data.session||null;
+  const {data,error}=await client.auth.getSession();if(error)throw error;session=data.session||null;
   if(!session){$('auth').innerHTML='<span class="bad">NO SESSION</span>\nОткрой AUTH TEST и войди через Google.';return false;}
-  const {data:u,error:ue}=await client.auth.getUser();
-  if(ue)throw ue;
-  $('auth').innerHTML=`<span class="ok">SIGNED IN</span>\n${u.user?.email||''}\nuser_id: ${u.user?.id||''}`;
-  return true;
+  const {data:u,error:ue}=await client.auth.getUser();if(ue)throw ue;
+  $('auth').innerHTML=`<span class="ok">SIGNED IN</span>\n${u.user?.email||''}\nuser_id: ${u.user?.id||''}`;return true;
 }
 async function readRemote(){
   const {data,error}=await client.from('assessment_snapshots').select('assessment_version,state_json,client_updated_at,updated_at').eq('profile_id',session.user.id).maybeSingle();
-  if(error)throw error;
-  remoteState=data?.state_json||null;
-  return data||null;
+  if(error)throw error;remoteState=data?.state_json||null;return data||null;
 }
-async function readRuns(){
-  const {count,error}=await client.from('assessment_runs').select('*',{count:'exact',head:true}).eq('profile_id',session.user.id);
-  if(error)throw error;
-  return count||0;
-}
+async function readRuns(){const {count,error}=await client.from('assessment_runs').select('*',{count:'exact',head:true}).eq('profile_id',session.user.id);if(error)throw error;return count||0;}
 function renderComparison(localState,remoteRow,runCount){
-  const ls=summarize(localState),rs=summarize(remoteRow?.state_json||null);
+  const remoteState=remoteRow?.state_json||null,ls=summarize(localState),rs=summarize(remoteState);
   $('local').textContent=JSON.stringify(ls,null,2);
   $('remote').textContent=JSON.stringify({assessment_version:remoteRow?.assessment_version||null,client_updated_at:remoteRow?.client_updated_at||null,updated_at:remoteRow?.updated_at||null,...rs},null,2);
   $('runs').textContent=`history_rows: ${runCount}\nprofile_id: ${session.user.id}`;
-  const same=canonical(localState)===canonical(remoteRow?.state_json||null);
-  const both=Boolean(localState)&&Boolean(remoteRow?.state_json);
-  if(same&&both){$('verdict').innerHTML='<span class="ok">LOCAL = REMOTE</span>\nSnapshot синхронизирован.';$('cross').innerHTML='<span class="ok">READY</span>\nНа другом устройстве войди тем же Google и нажми REFRESH STATE / либо открой JOIN: remote snapshot уже существует.';}
-  else if(!localState&&!remoteRow?.state_json){$('verdict').textContent='EMPTY / EMPTY\nНет результатов для проверки.';$('cross').textContent='Сначала пройди хотя бы одну сферу на JOIN.';}
-  else if(localState&&!remoteRow?.state_json){$('verdict').innerHTML='<span class="bad">LOCAL ONLY</span>\nНужно PUSH или обычная production-синхронизация JOIN.';$('cross').textContent='Remote snapshot отсутствует — второму устройству нечего восстанавливать.';}
-  else if(!localState&&remoteRow?.state_json){$('verdict').innerHTML='<span class="bad">REMOTE ONLY</span>\nМожно проверить PULL на этом браузере.';$('cross').innerHTML='<span class="ok">REMOTE EXISTS</span>\nЭто состояние подходит для теста восстановления на чистом устройстве.';}
-  else{$('verdict').innerHTML='<span class="bad">DIFFERENT</span>\nLocal и remote отличаются.';$('cross').textContent='Сравни даты результатов. Выбери осознанно PUSH или PULL; тест не делает merge автоматически.';}
+  const same=canonical(localState)===canonical(remoteState),both=Boolean(localState)&&Boolean(remoteState),diffs=resultDiff(localState,remoteState);
+  $('diff').textContent=diffs.length?diffs.join('\n'):'NO SEMANTIC DIFFERENCES';
+  if(same&&both){$('verdict').innerHTML='<span class="ok">LOCAL = REMOTE</span>\nСемантически идентичны; порядок ключей не учитывается.';$('cross').innerHTML='<span class="ok">READY</span>\nRemote snapshot пригоден для восстановления на другом устройстве.';}
+  else if(!localState&&!remoteState){$('verdict').textContent='EMPTY / EMPTY\nНет результатов для проверки.';$('cross').textContent='Сначала пройди хотя бы одну сферу на JOIN.';}
+  else if(localState&&!remoteState){$('verdict').innerHTML='<span class="bad">LOCAL ONLY</span>\nНужно PUSH или обычная production-синхронизация JOIN.';$('cross').textContent='Remote snapshot отсутствует — второму устройству нечего восстанавливать.';}
+  else if(!localState&&remoteState){$('verdict').innerHTML='<span class="bad">REMOTE ONLY</span>\nМожно проверить PULL на этом браузере.';$('cross').innerHTML='<span class="ok">REMOTE EXISTS</span>\nЭто состояние подходит для теста восстановления на чистом устройстве.';}
+  else{$('verdict').innerHTML='<span class="bad">REAL DIFFERENCE</span>\nСмотри блок 07 / REAL DIFF.';$('cross').textContent='Есть содержательное расхождение. Не нажимай PUSH/PULL, пока не выбрана правильная сторона.';}
 }
 async function refresh(){
-  try{
-    log('refresh-start');
-    if(!await getAuth()){log('no-session');return;}
-    const localState=readLocal();
-    const remoteRow=await readRemote();
-    const runCount=await readRuns();
-    renderComparison(localState,remoteRow,runCount);
-    log('refresh-done',{local:summarize(localState),remote:summarize(remoteRow?.state_json||null),runCount});
-  }catch(e){log('error',{message:e.message,code:e.code||null});$('verdict').innerHTML=`<span class="bad">ERROR</span>\n${e.message}`;}
+  try{log('refresh-start');if(!await getAuth()){log('no-session');return;}const localState=readLocal();const remoteRow=await readRemote();const runCount=await readRuns();renderComparison(localState,remoteRow,runCount);log('refresh-done',{local:summarize(localState),remote:summarize(remoteRow?.state_json||null),runCount});}
+  catch(e){log('error',{message:e.message,code:e.code||null});$('verdict').innerHTML=`<span class="bad">ERROR</span>\n${e.message}`;}
 }
-async function push(){
-  try{
-    if(!await getAuth())return;
-    const localState=readLocal();
-    if(!localState)return alert('LOCAL STATE EMPTY — нечего отправлять.');
-    if(!confirm('PUSH LOCAL → REMOTE перезапишет assessment_snapshots текущего профиля состоянием этого браузера. Продолжить?'))return;
-    const now=new Date().toISOString();
-    const {error}=await client.from('assessment_snapshots').upsert({profile_id:session.user.id,assessment_version:VERSION,state_json:localState,client_updated_at:now,updated_at:now},{onConflict:'profile_id'});
-    if(error)throw error;
-    log('push-done',{local:summarize(localState)});await refresh();
-  }catch(e){log('push-error',{message:e.message,code:e.code||null});alert(e.message);}
-}
-async function pull(){
-  try{
-    if(!await getAuth())return;
-    const row=await readRemote();
-    if(!row?.state_json)return alert('REMOTE SNAPSHOT EMPTY — нечего восстанавливать.');
-    if(!confirm('PULL REMOTE → LOCAL перезапишет dementorClubOnboardingV3 в этом браузере. Продолжить?'))return;
-    localStorage.setItem(STORAGE,JSON.stringify(row.state_json));
-    log('pull-done',{remote:summarize(row.state_json)});await refresh();
-  }catch(e){log('pull-error',{message:e.message,code:e.code||null});alert(e.message);}
-}
-$('refresh').onclick=refresh;
-$('reload').onclick=()=>{sessionStorage.setItem('dcSyncReloadTest','1');location.reload();};
-$('push').onclick=push;
-$('pull').onclick=pull;
+async function push(){try{if(!await getAuth())return;const localState=readLocal();if(!localState)return alert('LOCAL STATE EMPTY — нечего отправлять.');if(!confirm('PUSH LOCAL → REMOTE перезапишет assessment_snapshots текущего профиля состоянием этого браузера. Продолжить?'))return;const now=new Date().toISOString();const {error}=await client.from('assessment_snapshots').upsert({profile_id:session.user.id,assessment_version:VERSION,state_json:localState,client_updated_at:now,updated_at:now},{onConflict:'profile_id'});if(error)throw error;log('push-done',{local:summarize(localState)});await refresh();}catch(e){log('push-error',{message:e.message,code:e.code||null});alert(e.message);}}
+async function pull(){try{if(!await getAuth())return;const row=await readRemote();if(!row?.state_json)return alert('REMOTE SNAPSHOT EMPTY — нечего восстанавливать.');if(!confirm('PULL REMOTE → LOCAL перезапишет dementorClubOnboardingV3 в этом браузере. Продолжить?'))return;localStorage.setItem(STORAGE,JSON.stringify(row.state_json));log('pull-done',{remote:summarize(row.state_json)});await refresh();}catch(e){log('pull-error',{message:e.message,code:e.code||null});alert(e.message);}}
+$('refresh').onclick=refresh;$('reload').onclick=()=>{sessionStorage.setItem('dcSyncReloadTest','1');location.reload();};$('push').onclick=push;$('pull').onclick=pull;
 if(sessionStorage.getItem('dcSyncReloadTest')==='1'){sessionStorage.removeItem('dcSyncReloadTest');log('reload-test-return');}
 client.auth.onAuthStateChange((event,s)=>log('auth-state',{event,hasSession:Boolean(s)}));
 await refresh();
