@@ -12,3 +12,7 @@
 /* Final production asset wiring / 2026-08-28 */
 .dc-home-project__portrait-pair img{content:url('/assets/projects/logic-awareness/home/identity-pair-final.webp')}
 .dc-home-project__cta,.dc-home-project__cta:visited{color:#111!important;text-decoration:none!important}.dc-home-project__cta:hover,.dc-home-project__cta:focus-visible{color:#111!important}
+
+/* Community production geometry lock: caption is a strip, never a panel. */
+.dc-home .dc-home-community__caption{height:clamp(64px,5.8vw,88px)!important;min-height:0!important;max-height:88px!important;inset:auto auto auto auto!important;left:clamp(24px,7vw,110px)!important;top:39%!important;right:auto!important;bottom:auto!important;width:min(72vw,980px)!important;padding:0 clamp(22px,2.4vw,38px)!important;display:flex!important;align-items:center!important;justify-content:space-between!important;overflow:hidden!important}
+@media(max-width:700px){.dc-home .dc-home-community__link{min-height:clamp(580px,150vw,740px)!important}.dc-home .dc-home-community__media{object-fit:contain!important;object-position:center center!important}.dc-home .dc-home-community__caption{left:0!important;right:0!important;top:50%!important;bottom:auto!important;width:100%!important;height:54px!important;min-height:54px!important;max-height:54px!important;padding:0 16px!important;transform:translateY(-50%)!important;font-size:clamp(14px,4vw,17px)!important}.dc-home .dc-home-community__caption-text{white-space:nowrap!important}.dc-home .dc-home-community__arrow{margin-left:auto!important}}
