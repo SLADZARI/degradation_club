@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<title>Dementor Club — System Tests</title>
+<style>
+:root{--paper:#f2f0e8;--ink:#111;--acid:#d8ff3e;--bad:#b42121;--warn:#806b00}*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font-family:Arial,Helvetica,sans-serif}.shell{max-width:1180px;margin:0 auto;padding:44px 24px 80px}.meta{font:800 10px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.1em;text-transform:uppercase;opacity:.55}h1{font-size:clamp(52px,8vw,104px);line-height:.85;letter-spacing:-.065em;margin:18px 0 22px}.lead{max-width:760px;font-size:18px;line-height:1.4}.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:28px 0}.toolbar button,.toolbar a{border:1px solid #111;background:var(--acid);color:#111;padding:12px 15px;text-decoration:none;font:900 11px Arial,sans-serif;cursor:pointer}.toolbar a{background:transparent}.summary{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid #111;border-left:1px solid #111;margin:28px 0}.summary>div{padding:18px;border-right:1px solid #111;border-bottom:1px solid #111}.summary span{display:block;font:800 9px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.09em;opacity:.55}.summary strong{display:block;margin-top:7px;font-size:30px}.tests{border-top:1px solid #111}.test{display:grid;grid-template-columns:72px minmax(180px,.7fr) 1.4fr 120px;gap:18px;align-items:start;padding:18px 0;border-bottom:1px solid #111}.test__id{font:800 10px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.08em}.test h2{font-size:22px;line-height:1;margin:0}.test p{margin:4px 0 0;font-size:13px;line-height:1.45}.state{justify-self:end;border:1px solid #111;padding:7px 9px;font:900 10px/1 Arial,sans-serif}.state.pass{background:var(--acid)}.state.fail{background:var(--bad);color:white}.state.warn{background:#f0d95b}.detail{font:12px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre-wrap;overflow-wrap:anywhere;opacity:.78}.foot{margin-top:28px;font:11px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;opacity:.55}@media(max-width:760px){.summary{grid-template-columns:1fr 1fr}.test{grid-template-columns:54px 1fr}.test .detail,.test .state{grid-column:2}.state{justify-self:start}}
+</style>
+</head>
+<body>
+<main class="shell">
+<div class="meta">INTERNAL / OWNER_ADMIN / SYSTEM TESTS / READ ONLY</div>
+<h1>ПРОВЕРИТЬ,<br>ЧТО НЕ<br>РАЗВАЛИЛОСЬ.</h1>
+<p class="lead">Два сценария: пользовательский контур и owner/admin контур. Тесты ничего не записывают в production-данные.</p>
+<div class="toolbar"><button id="run">RUN ALL TESTS</button><a href="../">SYSTEM TOOLS</a><a href="../../../workspace/">MY ACCOUNT</a></div>
+<section class="summary"><div><span>STATUS</span><strong id="status">WAITING</strong></div><div><span>PASS</span><strong id="pass">0</strong></div><div><span>WARN</span><strong id="warn">0</strong></div><div><span>FAIL</span><strong id="fail">0</strong></div></section>
+<section class="tests" id="tests"></section>
+<div class="foot">SYSTEM-TESTS-V1 · AUTH + RLS CONTRACT + DC-9 PERSISTENCE + MEMBERSHIP APPLICATION + MERCH/PROGRAM RUNTIME + ROUTE SMOKE · NO WRITE OPERATIONS</div>
+</main>
+<script type="module" src="../../owner-admin-gate-v1.js"></script>
+<script type="module">
+import {createClient} from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.4/+esm';
+const URL='https://mmekfydwbvptbdatwitj.supabase.co',KEY='sb_publishable_a7e_Ndwwii8lyt_xmezoVw_ijxfh_yg';
+const client=window.DEMENTOR_SUPABASE_CLIENT||createClient(URL,KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false,flowType:'pkce'}});window.DEMENTOR_SUPABASE_CLIENT=client;
+const host=document.getElementById('tests'),status=document.getElementById('status');
+const results=[];const add=(id,title,state,detail)=>{results.push({id,title,state,detail});render()};
+const render=()=>{host.innerHTML=results.map(r=>`<article class="test"><div class="test__id">${r.id}</div><div><h2>${r.title}</h2></div><div class="detail">${String(r.detail||'')}</div><div class="state ${r.state}">${r.state.toUpperCase()}</div></article>`).join('');const p=results.filter(x=>x.state==='pass').length,w=results.filter(x=>x.state==='warn').length,f=results.filter(x=>x.state==='fail').length;document.getElementById('pass').textContent=p;document.getElementById('warn').textContent=w;document.getElementById('fail').textContent=f;status.textContent=f?'FAIL':results.length?'PASS':'WAITING'};
+const base=location.pathname.startsWith('/degradation_club/')?'/degradation_club':'';
+const safe=async(fn)=>{try{return await fn()}catch(e){return{error:e}}};
+async function run(){results.length=0;render();
+  const auth=await safe(async()=>{const {data:{session},error}=await client.auth.getSession();if(error)throw error;if(!session)throw new Error('NO SESSION');const {data:user,error:ue}=await client.auth.getUser();if(ue)throw ue;const {data:roles,error:re}=await client.from('dc_role_assignments').select('role,status,valid_from,valid_to').eq('profile_id',user.user.id).eq('role','owner_admin');if(re)throw re;const active=(roles||[]).some(r=>r.status==='active'&&(!r.valid_from||Date.parse(r.valid_from)<=Date.now())&&(!r.valid_to||Date.parse(r.valid_to)>Date.now()));if(!active)throw new Error('OWNER_ADMIN NOT ACTIVE');return{user:user.user,email:user.user.email}});add('A1','AUTH / OWNER_ADMIN',auth.error?'fail':'pass',auth.error?auth.error.message:`${auth.email}\nuser_id: ${auth.user.id}`);
+
+  const rpc=await safe(async()=>{const {data,error}=await client.rpc('dc_owner_admin_system_checks');if(error)throw error;return data});add('A2','RLS / ACCESS CONTRACT',rpc.error?'fail':Object.values(rpc.rls||{}).every(Boolean)?'pass':'fail',rpc.error?rpc.error.message:JSON.stringify(rpc.rls,null,2));
+
+  const membership=rpc.error?null:rpc.membership_application;const membershipOk=membership&&membership.anonymous_insert_policy_absent&&membership.authenticated_insert_policy_present&&membership.own_select_policy_present&&membership.one_submitted_index_present;add('A3','MEMBERSHIP APPLICATION',membershipOk?'pass':'fail',membership?JSON.stringify(membership,null,2):'RPC unavailable');
+
+  const dc9=await safe(async()=>{const {data:{session}}=await client.auth.getSession();const uid=session.user.id;const [{data:runs,error:re},{data:snap,error:se}]=await Promise.all([client.from('assessment_runs').select('sphere_id,result_json,completed_at').eq('profile_id',uid).limit(100),client.from('assessment_snapshots').select('state_json,updated_at').eq('profile_id',uid).maybeSingle()]);if(re)throw re;if(se)throw se;return{runs:runs||[],snapshot:snap||null}});const localCount=(()=>{try{return Object.keys(JSON.parse(localStorage.getItem('dementorClubOnboardingV3')||'{}').results||{}).length}catch{return 0}})();const remoteCount=dc9.error?0:Object.keys(dc9.snapshot?.state_json?.results||{}).length;const dc9State=dc9.error?'fail':dc9.runs.length||remoteCount||localCount?'pass':'warn';add('B1','DC-9 / PERSISTENCE',dc9State,dc9.error?dc9.error.message:`assessment_runs: ${dc9.runs.length}\nremote_snapshot_results: ${remoteCount}\nlocal_results: ${localCount}\n${dc9State==='warn'?'Контур доступен, но у этого аккаунта пока нет результатов.':''}`);
+
+  const runtime=rpc.error?null:rpc.runtime;const runtimeOk=runtime&&runtime.program_entities>=4&&runtime.event_entities>=1&&runtime.merch_items>=1;add('B2','ENTITY / MERCH RUNTIME',runtimeOk?'pass':'fail',runtime?JSON.stringify(runtime,null,2):'RPC unavailable');
+
+  const personal=await safe(async()=>{const {data:{session}}=await client.auth.getSession();const uid=session.user.id;const qs=await Promise.all([client.from('dc_program_certificates').select('id').eq('profile_id',uid).limit(10),client.from('dc_progress_signals').select('id').eq('profile_id',uid).limit(10),client.from('course_enrollments').select('id').eq('profile_id',uid).limit(10)]);for(const q of qs)if(q.error)throw q.error;return{certificates:qs[0].data?.length||0,signals:qs[1].data?.length||0,enrollments:qs[2].data?.length||0}});add('B3','PROGRAM / PERSONAL ARCHIVE',personal.error?'fail':'pass',personal.error?personal.error.message:JSON.stringify(personal,null,2));
+
+  const routes=['/join/','/join/apply/','/workspace/','/merch/','/join-progress-map-v2.js','/join-membership-application-v1.js'];const routeResult=await safe(async()=>{const rows=[];for(const path of routes){const r=await fetch(base+path,{cache:'no-store'});rows.push({path,status:r.status,ok:r.ok})}return rows});const routeOk=!routeResult.error&&routeResult.every(x=>x.ok);add('B4','PRODUCTION ROUTES',routeOk?'pass':'fail',routeResult.error?routeResult.error.message:routeResult.map(x=>`${x.ok?'OK':'FAIL'} ${x.status} ${x.path}`).join('\n'));
+}
+document.getElementById('run').onclick=run;window.addEventListener('dc:owner-admin-ready',run,{once:true});setTimeout(()=>{if(document.documentElement.dataset.dcOwnerAdmin==='1'&&!results.length)run()},600);
+</script>
+</body>
+</html>
