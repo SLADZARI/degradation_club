@@ -67,6 +67,12 @@ function sitemapUrls(){
   return {set,list};
 }
 
+function canonicalUrl(route,origin){
+  const base=String(origin||'').replace(/\/$/,'');
+  const clean=String(route||'/').startsWith('/')?String(route||'/'):`/${route}`;
+  return `${base}${clean}`;
+}
+
 function validateRegistry(){
   if(!exists('content/registry.json')){fail('content/registry.json missing');return [];}
   let registry;
@@ -116,19 +122,19 @@ function validateRegistry(){
 
 function validateSitemap(entities,config){
   const {set:urls,list}=sitemapUrls();
-  const origin=config?.canonicalOrigin||'https://degradation-club.vercel.app';
+  const origin=(config?.canonicalOrigin||'https://sladzari.github.io/degradation_club').replace(/\/$/,'');
   for(const raw of list){
     let u;
     try{u=new URL(raw);}catch{fail(`sitemap: invalid URL ${raw}`);continue;}
-    if(u.origin!==origin) fail(`sitemap: ${raw} does not use canonicalOrigin ${origin}`);
+    if(!(u.href===`${origin}/`||u.href.startsWith(`${origin}/`))) fail(`sitemap: ${raw} does not use canonicalOrigin ${origin}`);
   }
   for(const entity of entities){
-    const full=new URL(entity.publicUrl,origin).href;
+    const full=canonicalUrl(entity.publicUrl,origin);
     if(!urls.has(full)) fail(`sitemap: missing entity URL ${full}`);
   }
   const required=['/','/about/','/events/','/projects/','/community/','/merch/','/join/','/archive/','/catalog/','/donate/','/contacts/','/legal/privacy/','/legal/terms/'];
   for(const route of required){
-    const full=new URL(route,origin).href;
+    const full=canonicalUrl(route,origin);
     if(!urls.has(full)) fail(`sitemap: missing required route ${full}`);
     const html=routeToHtml(route);
     if(!exists(html)) fail(`required route ${route}: page missing ${html}`);
