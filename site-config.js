@@ -1,6 +1,6 @@
 window.DEMENTOR_SITE_CONFIG=Object.freeze({
-  version:'2026-08-28.8',
-  canonicalOrigin:'https://degradation-club.vercel.app',
+  version:'2026-08-28.9',
+  canonicalOrigin:'https://sladzari.github.io/degradation_club',
   supabase:{
     enabled:true,
     url:'https://mmekfydwbvptbdatwitj.supabase.co',
