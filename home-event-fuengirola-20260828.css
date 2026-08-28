@@ -1,9 +1,11 @@
-/* HOME / EVENT / FUENGIROLA — approved desktop + mobile banner, 2026-08-28 */
-.dc-home .dc-event{
+/* HOME / EVENT / FUENGIROLA — geometry lock to approved banner */
+.dc-home .dc-event.dc-section{
   position:relative!important;
+  display:block!important;
   width:100%!important;
-  aspect-ratio:1259/561!important;
+  height:44.56vw!important;
   min-height:560px!important;
+  max-height:760px!important;
   margin:0!important;
   padding:0!important;
   overflow:hidden!important;
@@ -12,42 +14,96 @@
   isolation:isolate!important;
 }
 .dc-home .dc-event::before{
-  content:"";
-  position:absolute;
-  inset:0;
-  z-index:1;
-  pointer-events:none;
-  background:linear-gradient(90deg,#FAF4E3 0%,#FAF4E3 31%,rgba(250,244,227,.95) 38%,rgba(250,244,227,.78) 46%,rgba(250,244,227,.38) 57%,rgba(250,244,227,0) 70%);
+  content:""!important;
+  position:absolute!important;
+  inset:0!important;
+  z-index:1!important;
+  pointer-events:none!important;
+  background:linear-gradient(90deg,#FAF4E3 0%,#FAF4E3 30%,rgba(250,244,227,.97) 38%,rgba(250,244,227,.82) 46%,rgba(250,244,227,.42) 56%,rgba(250,244,227,0) 69%)!important;
 }
 .dc-home .dc-event>.dc-shell{
-  position:relative!important;
+  position:absolute!important;
+  inset:0!important;
   z-index:2!important;
-  width:50%!important;
-  max-width:none!important;
-  min-height:100%!important;
+  display:block!important;
+  width:100%!important;
   height:100%!important;
+  max-width:none!important;
+  min-height:0!important;
   margin:0!important;
-  padding:6.2% 0 5.6% 5.1%!important;
-  display:grid!important;
-  grid-template-rows:auto auto 1fr!important;
-  align-items:start!important;
+  padding:0!important;
 }
-.dc-home .dc-event__top{display:block!important;width:100%!important;max-width:none!important;margin:0!important;padding:0!important}
-.dc-home .dc-event__label{margin:0 0 20px!important;font-size:12px!important;line-height:1.05!important;letter-spacing:.18em!important;font-weight:700!important}
-.dc-home .dc-event__title{margin:0!important;font-size:clamp(72px,7.2vw,114px)!important;line-height:.8!important;letter-spacing:-.073em!important;font-weight:900!important;text-transform:uppercase!important;color:#111!important;white-space:nowrap!important}
+.dc-home .dc-event__top{
+  position:absolute!important;
+  left:3.6%!important;
+  top:6.7%!important;
+  width:52%!important;
+  max-width:none!important;
+  margin:0!important;
+  padding:0!important;
+  display:block!important;
+}
+.dc-home .dc-event__label{
+  margin:0 0 18px!important;
+  font-size:clamp(9px,.72vw,12px)!important;
+  line-height:1.05!important;
+  letter-spacing:.18em!important;
+  font-weight:700!important;
+  text-transform:uppercase!important;
+}
+.dc-home .dc-event__title{
+  margin:0!important;
+  font-size:clamp(72px,7.2vw,114px)!important;
+  line-height:.80!important;
+  letter-spacing:-.073em!important;
+  font-weight:900!important;
+  text-transform:uppercase!important;
+  color:#111!important;
+  white-space:nowrap!important;
+}
 .dc-home .dc-event__status{display:none!important}
-.dc-home .dc-event__body{display:flex!important;flex-direction:column!important;width:100%!important;max-width:430px!important;height:100%!important;margin:clamp(42px,6vh,74px) 0 0!important;padding:0!important}
-.dc-home .dc-event__desc{margin:0!important;max-width:11.2ch!important;font-size:clamp(28px,2.55vw,40px)!important;line-height:1.02!important;font-weight:900!important;letter-spacing:-.045em!important}
-.dc-home .dc-event__meta{margin:auto 0 0!important;max-width:31ch!important;font-size:16px!important;line-height:1.34!important}
-.dc-home .dc-event__meta p{margin:0!important}.dc-home .dc-event__meta p+p{margin-top:18px!important}
+.dc-home .dc-event__body{
+  position:absolute!important;
+  inset:0!important;
+  display:block!important;
+  width:100%!important;
+  height:100%!important;
+  max-width:none!important;
+  margin:0!important;
+  padding:0!important;
+}
+.dc-home .dc-event__desc{
+  position:absolute!important;
+  left:3.6%!important;
+  top:37.5%!important;
+  margin:0!important;
+  max-width:11ch!important;
+  font-size:clamp(26px,2.45vw,38px)!important;
+  line-height:1.02!important;
+  font-weight:900!important;
+  letter-spacing:-.045em!important;
+}
+.dc-home .dc-event__meta{
+  position:absolute!important;
+  left:3.6%!important;
+  top:65.5%!important;
+  margin:0!important;
+  max-width:31ch!important;
+  font-size:clamp(14px,1.15vw,18px)!important;
+  line-height:1.30!important;
+}
+.dc-home .dc-event__meta p{margin:0!important}
+.dc-home .dc-event__meta p+p{margin-top:18px!important}
 .dc-home .dc-event__action{
-  position:relative!important;
+  position:absolute!important;
+  left:3.6%!important;
+  top:83.6%!important;
   display:inline-flex!important;
   align-items:center!important;
   justify-content:center!important;
   width:245px!important;
   min-height:60px!important;
-  margin-top:22px!important;
+  margin:0!important;
   padding:0 26px!important;
   background:var(--dc-acid)!important;
   border:1px solid #111!important;
@@ -59,81 +115,71 @@
   text-transform:uppercase!important;
   overflow:visible!important;
 }
-/* Mentor card is visually attached to the CTA without changing the event content model. */
 .dc-home .dc-event__action::before{
-  content:"";
-  position:absolute;
-  left:calc(100% + 18px);
-  top:0;
-  width:50px;
-  height:58px;
-  border:1px solid rgba(17,17,17,.45);
-  background:url('/assets/people/dementors/gabil/dementor_gabil.webp') center center/cover no-repeat;
+  content:""!important;
+  position:absolute!important;
+  left:calc(100% + 18px)!important;
+  top:0!important;
+  width:50px!important;
+  height:58px!important;
+  border:1px solid rgba(17,17,17,.45)!important;
+  background:url('/assets/people/dementors/gabil/dementor_gabil.webp') center center/cover no-repeat!important;
 }
 .dc-home .dc-event__action::after{
-  content:"Габиль Тагиев\A дементор";
-  white-space:pre;
-  position:absolute;
-  left:calc(100% + 80px);
-  top:9px;
-  width:150px;
-  text-align:left;
-  color:#111;
-  font-size:14px;
-  line-height:1.15;
-  font-weight:800;
-  letter-spacing:0;
-  text-transform:none;
+  content:"Габиль Тагиев\A дементор"!important;
+  white-space:pre!important;
+  position:absolute!important;
+  left:calc(100% + 80px)!important;
+  top:9px!important;
+  width:150px!important;
+  text-align:left!important;
+  color:#111!important;
+  font-size:14px!important;
+  line-height:1.15!important;
+  font-weight:800!important;
+  letter-spacing:0!important;
+  text-transform:none!important;
 }
-
 @media(max-width:900px) and (min-width:701px){
-  .dc-home .dc-event__title{font-size:clamp(62px,7.8vw,82px)!important}
-  .dc-home .dc-event>.dc-shell{width:56%!important;padding-left:4.5%!important}
-  .dc-home .dc-event::before{background:linear-gradient(90deg,#FAF4E3 0%,#FAF4E3 34%,rgba(250,244,227,.92) 48%,rgba(250,244,227,.42) 62%,rgba(250,244,227,0) 78%)}
+  .dc-home .dc-event.dc-section{height:56vw!important;min-height:540px!important}
+  .dc-home .dc-event__title{font-size:clamp(60px,7.8vw,82px)!important}
+  .dc-home .dc-event__desc{top:36%!important;font-size:clamp(25px,3vw,34px)!important}
+  .dc-home .dc-event__meta{top:64%!important}
+  .dc-home .dc-event__action{top:82%!important}
 }
-
 @media(max-width:700px){
-  .dc-home .dc-event{
-    aspect-ratio:auto!important;
+  .dc-home .dc-event.dc-section{
+    height:auto!important;
     min-height:0!important;
-    background-color:#FAF4E3!important;
-    background-size:100% auto!important;
-    background-position:center bottom!important;
-    background-repeat:no-repeat!important;
+    max-height:none!important;
+    background:#FAF4E3!important;
+    overflow:hidden!important;
   }
   .dc-home .dc-event::before{display:none!important}
   .dc-home .dc-event>.dc-shell{
+    position:relative!important;
+    inset:auto!important;
     width:100%!important;
     height:auto!important;
     min-height:0!important;
-    margin:0!important;
     padding:28px 20px calc(64vw + 24px)!important;
-    display:block!important;
-    background:#FAF4E3!important;
+    background:#FAF4E3 url('/assets/home/events/fuengirola-banner.webp') center bottom/100% auto no-repeat!important;
   }
-  .dc-home .dc-event__top,.dc-home .dc-event__body{width:100%!important;max-width:none!important}
+  .dc-home .dc-event__top,.dc-home .dc-event__body{position:relative!important;inset:auto!important;width:100%!important;height:auto!important}
   .dc-home .dc-event__label{margin-bottom:24px!important;font-size:10px!important;letter-spacing:.16em!important}
   .dc-home .dc-event__title{font-size:clamp(50px,14.5vw,62px)!important;line-height:.82!important;white-space:normal!important}
-  .dc-home .dc-event__body{display:block!important;height:auto!important;margin-top:28px!important;padding:0!important}
-  .dc-home .dc-event__desc{font-size:clamp(24px,7vw,29px)!important;line-height:1.02!important;max-width:10.2ch!important}
-  .dc-home .dc-event__meta{margin-top:28px!important;font-size:14px!important;line-height:1.34!important;max-width:none!important}
+  .dc-home .dc-event__desc{position:relative!important;left:auto!important;top:auto!important;margin:28px 0 0!important;font-size:clamp(24px,7vw,29px)!important;line-height:1.02!important;max-width:10.2ch!important}
+  .dc-home .dc-event__meta{position:relative!important;left:auto!important;top:auto!important;margin-top:28px!important;font-size:14px!important;line-height:1.34!important;max-width:none!important}
   .dc-home .dc-event__action{
+    position:relative!important;
+    left:auto!important;
+    top:auto!important;
     width:100%!important;
     min-height:54px!important;
     margin-top:96px!important;
     padding:0 18px!important;
     font-size:12px!important;
   }
-  .dc-home .dc-event__action::before{
-    left:0!important;
-    top:-78px!important;
-    width:48px!important;
-    height:56px!important;
-  }
-  .dc-home .dc-event__action::after{
-    left:68px!important;
-    top:-68px!important;
-    width:180px!important;
-    font-size:14px!important;
-  }
+  .dc-home .dc-event__action::before{left:0!important;top:-78px!important;width:48px!important;height:56px!important}
+  .dc-home .dc-event__action::after{left:68px!important;top:-68px!important;width:180px!important;font-size:14px!important}
 }
