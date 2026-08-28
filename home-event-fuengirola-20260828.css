@@ -3,13 +3,18 @@
   position:relative!important;
   display:block!important;
   width:100%!important;
-  height:44.56vw!important;
-  min-height:560px!important;
-  max-height:760px!important;
+  aspect-ratio:1259/561!important;
+  height:auto!important;
+  min-height:0!important;
+  max-height:none!important;
   margin:0!important;
   padding:0!important;
   overflow:hidden!important;
-  background:#FAF4E3 url('/assets/home/events/fuengirola-banner.webp') center center/cover no-repeat!important;
+  background-color:#FAF4E3!important;
+  background-image:url('/assets/home/events/fuengirola-banner.webp')!important;
+  background-position:center center!important;
+  background-size:100% 100%!important;
+  background-repeat:no-repeat!important;
   color:#111!important;
   isolation:isolate!important;
 }
@@ -19,7 +24,13 @@
   inset:0!important;
   z-index:1!important;
   pointer-events:none!important;
-  background:linear-gradient(90deg,#FAF4E3 0%,#FAF4E3 30%,rgba(250,244,227,.97) 38%,rgba(250,244,227,.82) 46%,rgba(250,244,227,.42) 56%,rgba(250,244,227,0) 69%)!important;
+  background:linear-gradient(90deg,
+    #FAF4E3 0%,
+    #FAF4E3 22%,
+    rgba(250,244,227,.82) 30%,
+    rgba(250,244,227,.48) 38%,
+    rgba(250,244,227,.18) 46%,
+    rgba(250,244,227,0) 55%)!important;
 }
 .dc-home .dc-event>.dc-shell{
   position:absolute!important;
@@ -32,6 +43,7 @@
   min-height:0!important;
   margin:0!important;
   padding:0!important;
+  background:transparent!important;
 }
 .dc-home .dc-event__top{
   position:absolute!important;
@@ -42,6 +54,7 @@
   margin:0!important;
   padding:0!important;
   display:block!important;
+  background:transparent!important;
 }
 .dc-home .dc-event__label{
   margin:0 0 18px!important;
@@ -71,11 +84,12 @@
   max-width:none!important;
   margin:0!important;
   padding:0!important;
+  background:transparent!important;
 }
 .dc-home .dc-event__desc{
   position:absolute!important;
   left:3.6%!important;
-  top:37.5%!important;
+  top:38%!important;
   margin:0!important;
   max-width:11ch!important;
   font-size:clamp(26px,2.45vw,38px)!important;
@@ -86,7 +100,8 @@
 .dc-home .dc-event__meta{
   position:absolute!important;
   left:3.6%!important;
-  top:65.5%!important;
+  bottom:15.5%!important;
+  top:auto!important;
   margin:0!important;
   max-width:31ch!important;
   font-size:clamp(14px,1.15vw,18px)!important;
@@ -97,7 +112,8 @@
 .dc-home .dc-event__action{
   position:absolute!important;
   left:3.6%!important;
-  top:83.6%!important;
+  bottom:4.8%!important;
+  top:auto!important;
   display:inline-flex!important;
   align-items:center!important;
   justify-content:center!important;
@@ -141,14 +157,15 @@
   text-transform:none!important;
 }
 @media(max-width:900px) and (min-width:701px){
-  .dc-home .dc-event.dc-section{height:56vw!important;min-height:540px!important}
+  .dc-home .dc-event.dc-section{aspect-ratio:16/9!important}
   .dc-home .dc-event__title{font-size:clamp(60px,7.8vw,82px)!important}
   .dc-home .dc-event__desc{top:36%!important;font-size:clamp(25px,3vw,34px)!important}
-  .dc-home .dc-event__meta{top:64%!important}
-  .dc-home .dc-event__action{top:82%!important}
+  .dc-home .dc-event__meta{bottom:17%!important}
+  .dc-home .dc-event__action{bottom:5%!important}
 }
 @media(max-width:700px){
   .dc-home .dc-event.dc-section{
+    aspect-ratio:auto!important;
     height:auto!important;
     min-height:0!important;
     max-height:none!important;
@@ -163,17 +180,22 @@
     height:auto!important;
     min-height:0!important;
     padding:28px 20px calc(64vw + 24px)!important;
-    background:#FAF4E3 url('/assets/home/events/fuengirola-banner.webp') center bottom/100% auto no-repeat!important;
+    background-color:#FAF4E3!important;
+    background-image:url('/assets/home/events/fuengirola-banner.webp')!important;
+    background-position:center bottom!important;
+    background-size:100% auto!important;
+    background-repeat:no-repeat!important;
   }
   .dc-home .dc-event__top,.dc-home .dc-event__body{position:relative!important;inset:auto!important;width:100%!important;height:auto!important}
   .dc-home .dc-event__label{margin-bottom:24px!important;font-size:10px!important;letter-spacing:.16em!important}
   .dc-home .dc-event__title{font-size:clamp(50px,14.5vw,62px)!important;line-height:.82!important;white-space:normal!important}
   .dc-home .dc-event__desc{position:relative!important;left:auto!important;top:auto!important;margin:28px 0 0!important;font-size:clamp(24px,7vw,29px)!important;line-height:1.02!important;max-width:10.2ch!important}
-  .dc-home .dc-event__meta{position:relative!important;left:auto!important;top:auto!important;margin-top:28px!important;font-size:14px!important;line-height:1.34!important;max-width:none!important}
+  .dc-home .dc-event__meta{position:relative!important;left:auto!important;top:auto!important;bottom:auto!important;margin-top:28px!important;font-size:14px!important;line-height:1.34!important;max-width:none!important}
   .dc-home .dc-event__action{
     position:relative!important;
     left:auto!important;
     top:auto!important;
+    bottom:auto!important;
     width:100%!important;
     min-height:54px!important;
     margin-top:96px!important;
