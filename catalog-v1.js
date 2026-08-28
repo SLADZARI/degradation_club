@@ -24,6 +24,8 @@
 
   controls.forEach(button=>button.addEventListener('click',()=>apply(button.dataset.catalogFilter)));
   const requested=new URLSearchParams(location.search).get('type');
-  const allowed=new Set(['all','event','project','merch','archive']);
-  apply(allowed.has(requested)?requested:'all');
+  const aliases={merch:'object',course:'program',practice:'program',experience:'program'};
+  const normalized=aliases[requested]||requested;
+  const allowed=new Set(['all','program','event','project','object']);
+  apply(allowed.has(normalized)?normalized:'all');
 })();
