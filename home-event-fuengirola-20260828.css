@@ -3,11 +3,16 @@
   position:relative!important;
   width:100%!important;
   aspect-ratio:1259/561!important;
-  min-height:560px!important;
+  height:auto!important;
+  min-height:0!important;
   margin:0!important;
   padding:0!important;
   overflow:hidden!important;
-  background:#FAF4E3 url('/assets/home/events/fuengirola-banner.webp') center center/cover no-repeat!important;
+  background-color:#FAF4E3!important;
+  background-image:url('/assets/home/events/fuengirola-banner.webp')!important;
+  background-position:center center!important;
+  background-size:100% 100%!important;
+  background-repeat:no-repeat!important;
   color:#111!important;
   isolation:isolate!important;
 }
@@ -20,11 +25,11 @@
   pointer-events:none!important;
   background:linear-gradient(90deg,
     #FAF4E3 0%,
-    #FAF4E3 31%,
-    rgba(250,244,227,.95) 38%,
-    rgba(250,244,227,.78) 46%,
-    rgba(250,244,227,.38) 57%,
-    rgba(250,244,227,0) 70%)!important;
+    #FAF4E3 24%,
+    rgba(250,244,227,.82) 32%,
+    rgba(250,244,227,.48) 40%,
+    rgba(250,244,227,.18) 48%,
+    rgba(250,244,227,0) 56%)!important;
 }
 
 .dc-home .dc-event>.dc-shell{
@@ -33,7 +38,7 @@
   width:50%!important;
   max-width:none!important;
   height:100%!important;
-  min-height:560px!important;
+  min-height:0!important;
   margin:0!important;
   padding:6.2% 0 5.6% 5.1%!important;
   display:grid!important;
@@ -155,7 +160,7 @@
 @media(max-width:900px) and (min-width:701px){
   .dc-home .dc-event__title{font-size:clamp(62px,7.8vw,82px)!important}
   .dc-home .dc-event>.dc-shell{width:56%!important;padding-left:4.5%!important}
-  .dc-home .dc-event::before{background:linear-gradient(90deg,#FAF4E3 0%,#FAF4E3 34%,rgba(250,244,227,.92) 48%,rgba(250,244,227,.42) 62%,rgba(250,244,227,0) 78%)!important}
+  .dc-home .dc-event::before{background:linear-gradient(90deg,#FAF4E3 0%,#FAF4E3 30%,rgba(250,244,227,.78) 42%,rgba(250,244,227,.34) 54%,rgba(250,244,227,0) 66%)!important}
 }
 
 @media(max-width:700px){
@@ -163,7 +168,11 @@
     width:100%!important;
     min-height:0!important;
     aspect-ratio:auto!important;
-    background:#FAF4E3!important;
+    background-color:#FAF4E3!important;
+    background-image:url('/assets/home/events/fuengirola-banner.webp')!important;
+    background-position:center bottom!important;
+    background-size:100% auto!important;
+    background-repeat:no-repeat!important;
     overflow:hidden!important;
   }
 
@@ -175,9 +184,9 @@
     height:auto!important;
     min-height:0!important;
     margin:0!important;
-    padding:28px 20px 0!important;
+    padding:28px 20px calc(64vw + 24px)!important;
     display:block!important;
-    background:#FAF4E3!important;
+    background:transparent!important;
   }
 
   .dc-home .dc-event__top,
@@ -241,13 +250,5 @@
     font-size:14px!important;
   }
 
-  /* In the approved mobile source the event artwork is a separate lower block. */
-  .dc-home .dc-event>.dc-shell::after{
-    content:""!important;
-    display:block!important;
-    width:calc(100% + 40px)!important;
-    aspect-ratio:375/240!important;
-    margin:24px -20px 0!important;
-    background:url('/assets/home/events/fuengirola-banner.webp') center 56%/cover no-repeat!important;
-  }
+  .dc-home .dc-event>.dc-shell::after{display:none!important}
 }
