@@ -35,6 +35,25 @@ Forbidden: dark overlay, `mix-blend-mode:multiply`, filters, opacity reduction, 
 
 Implementation already present in this branch through `home-v1.css`; the previous Home CSS contract is preserved as `home-v1-base-20260828.css` so the batch remains reversible while other blocks are added.
 
+### HOME / PROJECT / LOGIC & AWARENESS
+
+Status: APPROVED FOR BATCH
+Route: Home → `/projects/logic-awareness/`
+Block contract: `docs/homepage-refresh/logic-awareness/README.md`
+Reference markup: `docs/homepage-refresh/logic-awareness/index.html`
+Reference styles: `docs/homepage-refresh/logic-awareness/logic-awareness-home-block.css`
+
+Approved behavior:
+- desktop two-column project block with separate identity rail;
+- responsive guards at 1350px and 1050px so the title never collides with the identity rail;
+- mobile becomes one continuous vertical composition;
+- title remains fully inside viewport;
+- identity portrait pair is shown whole and scaled, not cropped;
+- latest approved higher-resolution portrait pair replaces the previous prototype asset;
+- no new project claims or mechanics are introduced.
+
+The exact binary assets from the approved local prototype are fingerprinted in the block contract and will be promoted to their production asset paths during final batch packaging. Do not release the block independently before that asset promotion and whole-Home QA.
+
 ## Batch workflow
 
 For every next Home block:
@@ -52,6 +71,7 @@ For every next Home block:
 | Block | Status | Notes |
 |---|---|---|
 | Community / People / Activity | APPROVED | Implemented in batch; existing asset reused |
+| Logic & Awareness / Project 001 | APPROVED | Approved v2 prototype staged under `docs/homepage-refresh/logic-awareness/`; binary asset promotion pending final pack |
 | Other Home blocks | PENDING REVIEW | Add here as they are approved |
 
 ## Release rule
