@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <title>Подключение профиля — Dementor Club</title>
+  <style>
+    :root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;background:#111;color:#f2f0e8;font:700 14px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace}.box{width:min(620px,calc(100vw - 32px));border:1px solid #555;padding:24px}.accent{color:#d7ff3f}.muted{opacity:.62;margin-top:10px}.bad{color:#ff8a8a}
+  </style>
+</head>
+<body>
+  <main class="box">
+    <div class="accent" id="status">ПОДКЛЮЧАЕМ ПРОФИЛЬ…</div>
+    <div class="muted" id="detail">Google → Supabase → Dementor Club</div>
+  </main>
+<script type="module">
+import {createClient} from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.4/+esm';
+const SUPABASE_URL='https://mmekfydwbvptbdatwitj.supabase.co';
+const SUPABASE_KEY='sb_publishable_a7e_Ndwwii8lyt_xmezoVw_ijxfh_yg';
+const status=document.getElementById('status');
+const detail=document.getElementById('detail');
+const base=location.pathname.startsWith('/degradation_club/')?'/degradation_club':'';
+const target=location.origin+base+'/join/';
+const params=new URLSearchParams(location.search);
+const code=params.get('code');
+const oauthError=params.get('error_description')||params.get('error');
+const client=createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false,flowType:'pkce'}});
+try{
+  if(oauthError)throw new Error(oauthError);
+  if(code){
+    const {data,error}=await client.auth.exchangeCodeForSession(code);
+    if(error)throw error;
+    if(!data?.session)throw new Error('Supabase не вернул сессию после PKCE exchange.');
+  }
+  const {data,error}=await client.auth.getSession();
+  if(error)throw error;
+  if(!data?.session)throw new Error('Сессия не сохранена после входа.');
+  const user=await client.auth.getUser();
+  if(user.error)throw user.error;
+  status.textContent='ПРОФИЛЬ ПОДКЛЮЧЁН';
+  detail.textContent='Возвращаемся в Dementor Club…';
+  location.replace(target);
+}catch(error){
+  status.className='bad';
+  status.textContent='НЕ УДАЛОСЬ ЗАВЕРШИТЬ ВХОД';
+  detail.textContent=error?.message||String(error);
+}
+</script>
+</body>
+</html>
