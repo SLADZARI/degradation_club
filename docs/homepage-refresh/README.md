@@ -1,16 +1,16 @@
 # Dementor Club — Homepage Refresh Batch
 
-STATUS: working integration batch
+STATUS: DEPLOYMENT PREPARATION
 DATE: 2026-08-28
 BRANCH: `agent/homepage-refresh-batch-2026-08-28`
-BASE: current `dementor-club-site` state at the moment the batch was opened
-TARGET: one coordinated update of the Home page after all blocks are reviewed and approved
+BASE: `dementor-club-site`
+TARGET: one coordinated update of the Home page after final asset promotion and whole-Home QA
 
 ## Purpose
 
-All current Home-page visual/layout corrections are accumulated in this branch and this folder before the next coordinated update of `dementor-club-site`.
+All approved Home-page visual/layout corrections are accumulated in this branch before one coordinated update of `dementor-club-site`.
 
-Do not scatter new Home block experiments across unrelated branches or merge them piecemeal into production. Each approved block should be added here first, checked together with neighbouring Home sections, then merged as one batch.
+Do not scatter Home block experiments across unrelated branches or merge them piecemeal into production. Approved blocks live here first, are checked together with neighbouring Home sections, and then ship as one batch.
 
 ## Source-of-truth order
 
@@ -18,13 +18,13 @@ Do not scatter new Home block experiments across unrelated branches or merge the
 2. This homepage refresh batch — approved Home composition and implementation changes waiting for coordinated release.
 3. `dementor-club-site` — production web implementation after the batch is accepted.
 
-Existing assets should be reused wherever the approved visual already exists. Do not regenerate artwork merely because a block is being recomposed.
+Existing assets are reused wherever an approved visual already exists. New binaries are promoted only when a block has been visually approved.
 
 ## Included now
 
 ### HOME / COMMUNITY ENTRY
 
-Status: APPROVED FOR BATCH
+Status: DEPLOY READY
 Route: Home → `/community/`
 Asset: `/assets/ink/home-community-01.webp`
 Surface: `#F1E9D8`
@@ -33,11 +33,11 @@ Desktop: large illustration-led block with CTA over the image.
 Mobile: preserve the whole illustration; `object-fit: contain`; no crop.
 Forbidden: dark overlay, `mix-blend-mode:multiply`, filters, opacity reduction, raster CTA / duplicate caption image.
 
-Implementation already present in this branch through `home-v1.css`; the previous Home CSS contract is preserved as `home-v1-base-20260828.css` so the batch remains reversible while other blocks are added.
+Implementation is already present in this branch through `home-v1.css`; the previous Home CSS contract is preserved as `home-v1-base-20260828.css` so the batch remains reversible.
 
 ### HOME / PROJECT / LOGIC & AWARENESS
 
-Status: APPROVED FOR BATCH
+Status: DEPLOYMENT PREPARED / ASSETS BLOCKED
 Route: Home → `/projects/logic-awareness/`
 Block contract: `docs/homepage-refresh/logic-awareness/README.md`
 Reference markup: `docs/homepage-refresh/logic-awareness/index.html`
@@ -52,28 +52,35 @@ Approved behavior:
 - latest approved higher-resolution portrait pair replaces the previous prototype asset;
 - no new project claims or mechanics are introduced.
 
-The exact binary assets from the approved local prototype are fingerprinted in the block contract and will be promoted to their production asset paths during final batch packaging. Do not release the block independently before that asset promotion and whole-Home QA.
+The production CSS implementation has now been staged in `home-v1.css` against the existing Home markup. It expects the approved binaries at:
 
-## Batch workflow
+- `/assets/projects/logic-awareness/home/identity-pair-v2.webp`
+- `/assets/projects/logic-awareness/home/secret-stamp.png`
 
-For every next Home block:
+These two files are the only remaining release blocker for this block. Do not merge the batch until both paths resolve to the approved assets and whole-Home QA passes.
 
-1. inspect current production block and existing assets;
-2. confirm approved content from `dementor-club`;
-3. reuse existing image/assets where possible;
-4. assemble desktop + mobile composition in this branch;
-5. record the decision in this file or a block-specific file under `docs/homepage-refresh/`;
-6. test the whole Home page, not the block in isolation;
-7. only after the batch is complete, merge/update `dementor-club-site` in one coordinated release.
+## Deployment preparation
 
-## Planned batch register
+Detailed checklist: `docs/homepage-refresh/DEPLOYMENT_PREP.md`
+
+## Batch register
 
 | Block | Status | Notes |
 |---|---|---|
-| Community / People / Activity | APPROVED | Implemented in batch; existing asset reused |
-| Logic & Awareness / Project 001 | APPROVED | Approved v2 prototype staged under `docs/homepage-refresh/logic-awareness/`; binary asset promotion pending final pack |
-| Other Home blocks | PENDING REVIEW | Add here as they are approved |
+| Community / People / Activity | DEPLOY READY | CSS integrated; existing asset reused; mobile contain |
+| Logic & Awareness / Project 001 | PREPARED / BLOCKED | CSS integrated; two approved binary assets must be promoted |
 
 ## Release rule
 
-The batch is complete only when desktop/mobile composition, neighbouring block rhythm, links, existing assets, accessibility and visual regressions are checked together. Individual block approval does not by itself authorize a piecemeal Home release.
+The batch is release-authorized only when:
+
+1. both Logic & Awareness binary asset paths resolve;
+2. desktop widths 1600 / 1440 / 1280 / 1024 are checked;
+3. mobile widths 430 / 390 / 375 / 360 are checked;
+4. Community artwork is never cropped on mobile;
+5. Logic title never crosses the identity rail or viewport;
+6. links resolve to `/community/` and `/projects/logic-awareness/`;
+7. no duplicate raster CTA, overlay or old project composition remains visible;
+8. the full Home rhythm is reviewed with neighbouring sections;
+9. repository integrity checks pass;
+10. the batch is merged to `dementor-club-site` as one coordinated release.
