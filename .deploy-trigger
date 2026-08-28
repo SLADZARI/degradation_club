@@ -34,3 +34,4 @@ Update this file only when the user explicitly requests deploy/publish/release.
 2026-08-28T12:54+02:00 — retry authdebug deploy after fixing course-cover example validation blockers.
 2026-08-28T13:06+02:00 — retry authdebug deploy after removing the last example anchor validation blocker.
 2026-08-28T13:22+02:00 — deploy isolated PKCE auth-test to separate OAuth configuration from join runtime.
+2026-08-28T13:27+02:00 — replace production join auth with verified PKCE account-sync v7.
