@@ -10,7 +10,7 @@
   <script src="../site-config.js"></script>
 </head>
 <body class="dc-system-page dcw-body">
-  <div class="dcw-live-banner">DEMENTOR CLUB · PERSONAL WORKSPACE · LIVE READ ONLY v0.2</div>
+  <div class="dcw-live-banner">DEMENTOR CLUB · PERSONAL WORKSPACE · LIVE v0.3</div>
   <div class="dcw-app">
     <aside class="dcw-sidebar">
       <a class="dcw-brand" href="./"><span>DEMENTOR</span><strong>CLUB</strong></a>
@@ -21,30 +21,15 @@
         <button type="button" data-route="work" data-work-nav hidden>MY WORK</button>
         <button type="button" data-route="profile">MY PROFILE</button>
       </nav>
-      <div class="dcw-boundary">
-        <span>SYSTEM</span>
-        <strong>DEMENTOR CLUB</strong>
-        <small>Один аккаунт. Статус и рабочие возможности добавляются поверх базового личного кабинета.</small>
-      </div>
-      <div class="dcw-session" id="sessionBox">
-        <span>SESSION</span>
-        <strong>ПРОВЕРКА…</strong>
-      </div>
+      <div class="dcw-boundary"><span>SYSTEM</span><strong>DEMENTOR CLUB</strong><small>Один аккаунт. Статус и рабочие возможности добавляются поверх базового личного кабинета.</small></div>
+      <div class="dcw-session" id="sessionBox"><span>SESSION</span><strong>ПРОВЕРКА…</strong></div>
     </aside>
-
     <main class="dcw-main">
-      <header class="dcw-topbar">
-        <div>
-          <span class="dcw-kicker">DEMENTOR CLUB / PERSONAL WORKSPACE</span>
-          <strong id="topTitle">HOME</strong>
-        </div>
-        <div class="dcw-top-meta"><span>SUPABASE AUTH</span><span class="dcw-dot"></span><span>RLS</span></div>
-      </header>
-      <div id="appView" class="dcw-view" aria-live="polite">
-        <section class="dcw-gate"><div class="dcw-spinner"></div><h1>ПОДКЛЮЧАЕМ АККАУНТ</h1><p>Google → Supabase session → личные данные → membership → roles → assignments</p></section>
-      </div>
+      <header class="dcw-topbar"><div><span class="dcw-kicker">DEMENTOR CLUB / PERSONAL WORKSPACE</span><strong id="topTitle">HOME</strong></div><div class="dcw-top-meta"><span>SUPABASE AUTH</span><span class="dcw-dot"></span><span>RLS</span></div></header>
+      <div id="appView" class="dcw-view" aria-live="polite"><section class="dcw-gate"><div class="dcw-spinner"></div><h1>ПОДКЛЮЧАЕМ АККАУНТ</h1><p>Google → Supabase session → personal data → membership → roles → assignments</p></section></div>
     </main>
   </div>
   <script type="module" src="./workspace.js"></script>
+  <script type="module" src="./workspace-enhancements-v1.js"></script>
 </body>
 </html>
