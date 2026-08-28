@@ -6,7 +6,7 @@ const out = path.join(root, '_site');
 const base = '/degradation_club';
 const skip = new Set(['.git', '_site', 'node_modules']);
 const textExt = new Set(['.html', '.css', '.js', '.mjs', '.json', '.xml', '.webmanifest', '.txt', '.md']);
-const rewritePassthrough = new Set(['dementor-account-sync-v1.js']);
+const isRewritePassthrough = (name) => /^dementor-account-sync-v\d+\.js$/.test(name);
 
 fs.rmSync(out, { recursive: true, force: true });
 fs.mkdirSync(out, { recursive: true });
@@ -33,7 +33,7 @@ function copyDir(src, dst) {
     const ext = path.extname(entry.name).toLowerCase();
     if (textExt.has(ext)) {
       const text = fs.readFileSync(from, 'utf8');
-      fs.writeFileSync(to, rewritePassthrough.has(entry.name) ? text : rewrite(text));
+      fs.writeFileSync(to, isRewritePassthrough(entry.name) ? text : rewrite(text));
     } else {
       fs.copyFileSync(from, to);
     }
