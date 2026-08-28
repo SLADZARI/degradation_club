@@ -38,3 +38,4 @@ Update this file only when the user explicitly requests deploy/publish/release.
 2026-08-28T13:31+02:00 — move auth diagnostics under design-system, add hidden admin system tools hub and footer long-press entry.
 2026-08-28T13:39+02:00 — deploy auth storage persistence diagnostics with RELOAD TEST and safe localStorage inspection.
 2026-08-28T13:52+02:00 — deploy internal SYNC TEST for browser state ↔ assessment_snapshots ↔ assessment_runs and cross-device verification.
+2026-08-28T14:06+02:00 — deploy SYNC TEST v2 with semantic key-sorted comparison and explicit real diff output.
