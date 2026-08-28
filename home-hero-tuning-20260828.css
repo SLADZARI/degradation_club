@@ -1,0 +1,11 @@
+/* HOME HERO tuning / 2026-08-28 — user-reviewed adjustments */
+.dc-home .dc-hero{background:#F3EADD!important}
+.dc-home .dc-hero__media{z-index:1!important}
+.dc-home .dc-hero__media img{transform:scale(.94)!important;transform-origin:center center!important}
+.dc-home .dc-hero__title,.dc-home .dc-hero__meta,.dc-home .dc-hero__bottom{position:relative!important;z-index:5!important}
+@media(max-width:700px){
+  .dc-home .dc-hero{background:#F3EADD!important}
+  .dc-home .dc-hero__media{z-index:1!important}
+  .dc-home .dc-hero__media img{transform:scale(.94)!important;transform-origin:center top!important}
+  .dc-home .dc-hero__title,.dc-home .dc-hero__meta,.dc-home .dc-hero__bottom{position:relative!important;z-index:5!important}
+}
