@@ -24,3 +24,4 @@ Update this file only when the user explicitly requests deploy/publish/release.
 2026-08-28T02:18+02:00 — deploy auth diagnostics v5 with visible staged trace and manual session/snapshot tests.
 2026-08-28T02:22+02:00 — deploy isolated /auth-test/ OAuth diagnostic page to separate Supabase auth from /join/ runtime.
 2026-08-28 — publish verified production account sync v6; remove auth-test/debug runtimes and add transient JWT retry.
+2026-08-28T09:44+02:00 — publish PR #18 release candidate after full design audit and release smoke.
