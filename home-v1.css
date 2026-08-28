@@ -1,15 +1,20 @@
-/* Dementor Club — Home presentation contract v3
-   Keeps the previous Home contract intact and adds the approved Community entry block.
+/* Dementor Club — Home presentation contract v4
+   Deployment staging layer for the coordinated Homepage Refresh batch.
+   Approved blocks: Community entry + Logic & Awareness project.
    Approved: 2026-08-28. */
 @import url('/home-v1-base-20260828.css');
 
 :root{
   --dc-community-paper:#F1E9D8;
+  --dc-logic-line:rgba(242,240,232,.20);
+  --dc-logic-muted:rgba(242,240,232,.52);
 }
 
-/* HOME / COMMUNITY ENTRY — approved composition.
+/* =========================================================
+   HOME / COMMUNITY ENTRY — APPROVED FOR BATCH
    Existing clean asset only: /assets/ink/home-community-01.webp
-   One HTML caption layer, no overlays, no filters, no raster CTA. */
+   One HTML caption layer, no overlays, no filters, no raster CTA.
+   ========================================================= */
 .dc-home .dc-home-community{
   position:relative;
   width:100%;
@@ -89,5 +94,262 @@
     gap:14px;
     font-size:clamp(15px,4.1vw,18px);
     letter-spacing:.035em;
+  }
+}
+
+/* =========================================================
+   HOME / PROJECT / LOGIC & AWARENESS — APPROVED FOR BATCH
+
+   Uses the existing production markup in index.html. The block is recomposed
+   entirely in CSS so the Homepage batch stays reversible.
+
+   Deployment assets expected at:
+   /assets/projects/logic-awareness/home/identity-pair-v2.webp
+   /assets/projects/logic-awareness/home/secret-stamp.png
+
+   Until those two exact approved binaries are promoted, this branch is
+   deployment-prepared but NOT release-authorized.
+   ========================================================= */
+.dc-home .dc-project{
+  --dc-logic-pad:clamp(26px,3.1vw,52px);
+  width:100%;
+  padding:0;
+  background:var(--dc-ink,#111);
+  color:var(--dc-paper,#f2f0e8);
+  border-top:1px solid rgba(242,240,232,.08);
+  border-bottom:1px solid rgba(242,240,232,.08);
+  overflow:hidden;
+}
+.dc-home .dc-project>.dc-shell{
+  width:100%;
+  max-width:none;
+  margin:0;
+  padding:0;
+}
+.dc-home .dc-project__grid{
+  display:grid;
+  grid-template-columns:minmax(0,1.5fr) minmax(390px,.95fr);
+  min-height:clamp(720px,60vw,920px);
+}
+.dc-home .dc-project__copy{
+  position:relative;
+  min-width:0;
+  padding:clamp(70px,7vw,108px) var(--dc-logic-pad) clamp(68px,7vw,104px);
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+}
+.dc-home .dc-project__copy>.dc-kicker{
+  margin:0 0 clamp(38px,4vw,58px);
+  font-size:clamp(10px,.78vw,12px);
+  line-height:1.05;
+  letter-spacing:.14em;
+}
+.dc-home .dc-project #project-title{
+  position:relative;
+  width:100%;
+  max-width:840px;
+  margin:0;
+  font-size:clamp(68px,6.25vw,104px);
+  line-height:.80;
+  font-weight:900;
+  letter-spacing:-.064em;
+  text-transform:uppercase;
+  overflow-wrap:normal;
+}
+.dc-home .dc-project #project-title::after{
+  content:"";
+  position:absolute;
+  z-index:3;
+  width:clamp(190px,18vw,280px);
+  aspect-ratio:278/139;
+  top:-5%;
+  left:54%;
+  background:url('/assets/projects/logic-awareness/home/secret-stamp.png') center/contain no-repeat;
+  transform:rotate(8deg);
+  transform-origin:center;
+  pointer-events:none;
+}
+.dc-home .dc-project__copy>.dc-lead{
+  margin:clamp(34px,3.7vw,52px) 0 0;
+  max-width:720px;
+  font-size:clamp(25px,2.35vw,38px);
+  line-height:.99;
+  font-weight:800;
+  letter-spacing:-.032em;
+}
+.dc-home .dc-project__copy>.dc-body{
+  margin:clamp(26px,2.6vw,38px) 0 0;
+  max-width:740px;
+  font-size:clamp(16px,1.25vw,20px);
+  line-height:1.34;
+}
+.dc-home .dc-project__copy>.dc-action{
+  margin-top:clamp(28px,2.5vw,38px);
+  min-height:64px;
+  padding:0 28px;
+}
+.dc-home .dc-project__aside{
+  min-width:0;
+  border-left:1px solid var(--dc-logic-line);
+  padding:clamp(58px,5vw,78px) clamp(28px,2.5vw,42px) clamp(42px,4vw,58px);
+  display:flex;
+  flex-direction:column;
+  background-image:url('/assets/projects/logic-awareness/home/identity-pair-v2.webp');
+  background-repeat:no-repeat;
+  background-position:clamp(28px,2.5vw,42px) clamp(122px,10vw,154px);
+  background-size:min(78%,360px) auto;
+}
+.dc-home .dc-project__aside>.dc-meta{
+  margin:0;
+  color:var(--dc-logic-muted);
+  font-size:clamp(10px,.78vw,12px);
+  line-height:1.05;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+}
+.dc-home .dc-project__aside>blockquote{
+  margin:auto 0 0;
+  max-width:8.5ch;
+  padding:clamp(330px,26vw,390px) 0 0;
+  border:0;
+  font-size:clamp(43px,4.35vw,68px);
+  line-height:.88;
+  font-weight:400;
+  letter-spacing:-.05em;
+  text-transform:uppercase;
+}
+.dc-home .dc-project__aside>blockquote+ .dc-meta{
+  margin-top:34px;
+}
+
+@media(max-width:1350px){
+  .dc-home .dc-project__grid{
+    grid-template-columns:minmax(0,1.42fr) minmax(360px,.92fr);
+  }
+  .dc-home .dc-project #project-title{
+    font-size:clamp(62px,6vw,90px);
+  }
+  .dc-home .dc-project #project-title::after{
+    width:clamp(180px,17vw,240px);
+    left:52%;
+  }
+  .dc-home .dc-project__aside>blockquote{
+    font-size:clamp(40px,4.15vw,60px);
+  }
+}
+
+@media(max-width:1050px){
+  .dc-home .dc-project__grid{
+    grid-template-columns:minmax(0,1.25fr) minmax(330px,.9fr);
+  }
+  .dc-home .dc-project__copy{
+    padding-left:32px;
+    padding-right:30px;
+  }
+  .dc-home .dc-project #project-title{
+    font-size:clamp(56px,6vw,74px);
+  }
+  .dc-home .dc-project__copy>.dc-lead{
+    font-size:clamp(24px,2.6vw,30px);
+  }
+  .dc-home .dc-project__copy>.dc-body{
+    font-size:16px;
+  }
+}
+
+@media(max-width:700px){
+  .dc-home .dc-project__grid{
+    display:block;
+    min-height:0;
+  }
+  .dc-home .dc-project__copy{
+    padding:24px 16px 58px;
+  }
+  .dc-home .dc-project__copy>.dc-kicker{
+    margin-bottom:62px;
+    font-size:8px;
+  }
+  .dc-home .dc-project #project-title{
+    width:100%;
+    max-width:none;
+    font-size:clamp(43px,13.2vw,56px);
+    line-height:.82;
+    letter-spacing:-.055em;
+  }
+  .dc-home .dc-project #project-title::after{
+    width:42vw;
+    max-width:172px;
+    min-width:138px;
+    top:-44%;
+    left:28%;
+  }
+  .dc-home .dc-project__copy>.dc-lead{
+    margin-top:42px;
+    max-width:none;
+    font-size:clamp(21px,6vw,26px);
+    line-height:1;
+  }
+  .dc-home .dc-project__copy>.dc-body{
+    margin-top:26px;
+    max-width:none;
+    font-size:14px;
+    line-height:1.26;
+  }
+  .dc-home .dc-project__copy>.dc-action{
+    margin-top:28px;
+    min-height:54px;
+    padding:0 20px;
+    font-size:12px;
+  }
+  .dc-home .dc-project__aside{
+    margin:0 16px;
+    padding:0 0 34px 24px;
+    min-height:780px;
+    border-left:1px solid var(--dc-logic-line);
+    background-position:24px 64px;
+    background-size:min(calc(100% - 24px),330px) auto;
+  }
+  .dc-home .dc-project__aside>.dc-meta:first-child{
+    font-size:8px;
+    line-height:1.1;
+  }
+  .dc-home .dc-project__aside>blockquote{
+    margin:auto 0 0;
+    padding-top:350px;
+    max-width:8ch;
+    font-size:clamp(38px,11.7vw,50px);
+    line-height:.89;
+    letter-spacing:-.05em;
+  }
+  .dc-home .dc-project__aside>blockquote+ .dc-meta{
+    margin-top:34px;
+    font-size:8px;
+  }
+}
+
+@media(max-width:390px){
+  .dc-home .dc-project__copy{
+    padding-left:14px;
+    padding-right:14px;
+  }
+  .dc-home .dc-project #project-title{
+    font-size:41px;
+  }
+  .dc-home .dc-project #project-title::after{
+    min-width:128px;
+    width:40vw;
+    left:30%;
+  }
+  .dc-home .dc-project__copy>.dc-lead{
+    font-size:20px;
+  }
+  .dc-home .dc-project__aside{
+    margin:0 14px;
+    padding-left:20px;
+    background-position:20px 62px;
+  }
+  .dc-home .dc-project__aside>blockquote{
+    font-size:37px;
   }
 }
