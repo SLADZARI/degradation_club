@@ -1,5 +1,5 @@
 window.DEMENTOR_SITE_CONFIG=Object.freeze({
-  version:'2026-08-28.17',
+  version:'2026-08-28.18',
   canonicalOrigin:'https://sladzari.github.io/degradation_club',
   supabase:{
     enabled:true,
@@ -22,8 +22,9 @@ if(typeof document!=='undefined'){
     if(!document.querySelector('link[href="/global-header.css"]')){const l=document.createElement('link');l.rel='stylesheet';l.href='/global-header.css';document.head.appendChild(l)}
     if(!document.querySelector('script[src="/global-header.js"]')){const s=document.createElement('script');s.src='/global-header.js';s.defer=true;document.head.appendChild(s)}
     if(!document.querySelector('script[src="/dementor-relations-v1.js"]')){const s=document.createElement('script');s.src='/dementor-relations-v1.js';s.defer=true;document.head.appendChild(s)}
-    if(location.pathname.includes('/join')&&!document.querySelector('script[data-dc-account-sync-v8]')){
-      const a=document.createElement('script');a.src='/dementor-account-sync-v8.js?v=20260828-17';a.defer=true;a.dataset.dcAccountSyncV8='20260828-17';document.head.appendChild(a);
+    if(location.pathname.includes('/join')){
+      if(!document.querySelector('script[data-dc-account-sync-v8]')){const a=document.createElement('script');a.src='/dementor-account-sync-v8.js?v=20260828-17';a.defer=true;a.dataset.dcAccountSyncV8='20260828-17';document.head.appendChild(a)}
+      if(!document.querySelector('script[data-dc-join-data-copy]')){const c=document.createElement('script');c.src='/join-data-copy-v1.js?v=20260828-18';c.defer=true;c.dataset.dcJoinDataCopy='20260828-18';document.head.appendChild(c)}
     }
     if(location.pathname.endsWith('/projects/logic-awareness/')&&!document.querySelector('script[src="/content-series-v1.js"]')){const s=document.createElement('script');s.src='/content-series-v1.js';s.defer=true;document.head.appendChild(s)}
 
