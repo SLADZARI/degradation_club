@@ -1,5 +1,5 @@
 window.DEMENTOR_SITE_CONFIG=Object.freeze({
-  version:'2026-08-28.16',
+  version:'2026-08-28.17',
   canonicalOrigin:'https://sladzari.github.io/degradation_club',
   supabase:{
     enabled:true,
@@ -23,7 +23,7 @@ if(typeof document!=='undefined'){
     if(!document.querySelector('script[src="/global-header.js"]')){const s=document.createElement('script');s.src='/global-header.js';s.defer=true;document.head.appendChild(s)}
     if(!document.querySelector('script[src="/dementor-relations-v1.js"]')){const s=document.createElement('script');s.src='/dementor-relations-v1.js';s.defer=true;document.head.appendChild(s)}
     if(location.pathname.includes('/join')&&!document.querySelector('script[data-dc-account-sync-v8]')){
-      const a=document.createElement('script');a.src='/dementor-account-sync-v8.js?v=20260828-16';a.defer=true;a.dataset.dcAccountSyncV8='20260828-16';document.head.appendChild(a);
+      const a=document.createElement('script');a.src='/dementor-account-sync-v8.js?v=20260828-17';a.defer=true;a.dataset.dcAccountSyncV8='20260828-17';document.head.appendChild(a);
     }
     if(location.pathname.endsWith('/projects/logic-awareness/')&&!document.querySelector('script[src="/content-series-v1.js"]')){const s=document.createElement('script');s.src='/content-series-v1.js';s.defer=true;document.head.appendChild(s)}
 
