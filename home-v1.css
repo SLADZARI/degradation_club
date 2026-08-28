@@ -1,149 +1,93 @@
-/* Dementor Club — Home presentation contract v2
-   Consolidated from approved Design & Presentation Rules + current production UI.
-   Scope: Home composition only. Shared entity/component behavior stays in presentation-standard-v1.css. */
+/* Dementor Club — Home presentation contract v3
+   Keeps the previous Home contract intact and adds the approved Community entry block.
+   Approved: 2026-08-28. */
+@import url('/home-v1-base-20260828.css');
 
 :root{
-  --dc-home-max:1600px;
-  --dc-home-gap:16px;
-  --dc-home-outer:clamp(18px,2vw,32px);
-  --dc-home-row-accent:var(--dc-acid,#d8ff3e);
+  --dc-community-paper:#F1E9D8;
 }
 
-.dc-home{background:var(--dc-paper,#f2f0e8);color:var(--dc-ink,#111)}
-.dc-home .topbar{min-height:64px;padding:0 var(--dc-home-outer);background:rgba(242,240,232,.94);border-bottom:1px solid var(--dc-line,rgba(17,17,17,.2))}
-.dc-home .brand{font-size:18px;letter-spacing:-.055em}
-.dc-home .nav{font-size:11px;letter-spacing:.08em}
-.dc-home .nav a{opacity:.56}.dc-home .nav a:hover{opacity:1}
-
-/* HOME LAYOUT PRIMITIVES — scoped, no global duplication. */
-.dc-home .dc-shell{width:min(100%,var(--dc-home-max));margin:0 auto;padding-left:var(--dc-home-outer);padding-right:var(--dc-home-outer)}
-.dc-home .dc-grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:var(--dc-home-gap)}
-.dc-home .dc-section{padding-top:clamp(72px,8vw,132px);padding-bottom:clamp(72px,8vw,132px)}
-.dc-home .dc-kicker,.dc-home .dc-meta{font-size:11px;line-height:1.15;text-transform:uppercase;letter-spacing:.13em}
-.dc-home .dc-kicker{opacity:.66}.dc-home .dc-meta{opacity:.54}
-.dc-home .dc-display-xl{font-size:clamp(64px,7.8vw,132px);line-height:.80;letter-spacing:-.078em;font-weight:900;margin:0}
-.dc-home .dc-display-l{font-size:clamp(48px,7.4vw,118px);line-height:.85;letter-spacing:-.07em;font-weight:900;margin:0}
-.dc-home .dc-lead{font-size:clamp(25px,2.2vw,38px);line-height:1.04;letter-spacing:-.045em;font-weight:750}
-.dc-home .dc-body{font-size:clamp(17px,1.2vw,20px);line-height:1.35}
-.dc-home .dc-acid{background:var(--dc-acid,#d8ff3e);padding:0 .05em}
-
-/* HERO — one composition: copy left, dominant ink scene right. */
-.dc-home .dc-hero{
-  min-height:calc(100svh - 64px);
-  grid-template-rows:auto minmax(360px,1fr) auto;
-  align-content:stretch;
+/* HOME / COMMUNITY ENTRY — approved composition.
+   Existing clean asset only: /assets/ink/home-community-01.webp
+   One HTML caption layer, no overlays, no filters, no raster CTA. */
+.dc-home .dc-home-community{
   position:relative;
-  isolation:isolate;
+  width:100%;
   overflow:hidden;
-  padding-top:32px;
-  padding-bottom:34px;
+  background:var(--dc-community-paper);
 }
-.dc-home .dc-hero__meta{grid-column:1/13;grid-row:1;display:flex;justify-content:space-between;gap:24px;position:relative;z-index:3}
-.dc-home .dc-hero__title{grid-column:1/8;grid-row:2;align-self:center;position:relative;z-index:3;max-width:8.2ch;margin:0}
-.dc-home .dc-hero__bottom{grid-column:1/6;grid-row:3;align-self:end;position:relative;z-index:3;max-width:560px;padding-top:24px}
-.dc-home .dc-hero__bottom .dc-lead{margin:0 0 16px}.dc-home .dc-hero__bottom .dc-body{max-width:520px;margin:0 0 24px}
-.dc-home .dc-actions{display:flex;flex-wrap:wrap;gap:8px}
-.dc-home .dc-action{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:0 16px;border:1px solid var(--dc-ink,#111);font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
-.dc-home .dc-action--primary{background:var(--dc-acid,#d8ff3e);border-color:var(--dc-acid,#d8ff3e)}
-.dc-home .dc-hero__media{grid-column:7/13;grid-row:2/4;align-self:stretch;justify-self:stretch;margin:30px 0 0;min-width:0;min-height:0;display:flex;align-items:center;justify-content:flex-end;overflow:hidden;position:relative;z-index:2}
-.dc-home .dc-hero__media img{display:block;width:100%;height:100%;max-width:none;object-fit:contain;object-position:right center;mix-blend-mode:multiply}
-/* Backward-compatible safety: old detached Home Ink slot must never render if cached HTML contains it. */
-.dc-home .dc-ink-slot--home{display:none}
-
-.dc-home .dc-notice{overflow:hidden;border-top:1px solid rgba(255,255,255,.18);border-bottom:1px solid rgba(255,255,255,.18);background:var(--dc-ink,#111);color:var(--dc-paper,#f2f0e8)}
-.dc-home .dc-notice__track{display:flex;width:max-content;animation:dcTicker 26s linear infinite}.dc-home .dc-notice__item{padding:14px 26px;border-right:1px solid rgba(255,255,255,.18);font-size:11px;letter-spacing:.12em;white-space:nowrap}@keyframes dcTicker{to{transform:translateX(-50%)}}
-
-.dc-home .dc-statement{background:var(--dc-ink,#111);color:var(--dc-paper,#f2f0e8)}
-.dc-home .dc-statement .dc-shell{min-height:74vh;display:grid;align-content:space-between}.dc-home .dc-statement__head{display:grid;grid-template-columns:repeat(12,1fr);gap:var(--dc-home-gap)}.dc-home .dc-statement__head .dc-kicker{grid-column:1/4}.dc-home .dc-statement__head .dc-display-l{grid-column:4/13}.dc-home .dc-statement__foot{display:grid;grid-template-columns:repeat(12,1fr);gap:var(--dc-home-gap);align-items:end}.dc-home .dc-statement__foot p{grid-column:9/13;margin:0}
-
-.dc-home .dc-event{border-bottom:1px solid var(--dc-line,rgba(17,17,17,.2))}.dc-home .dc-event__top{display:grid;grid-template-columns:repeat(12,1fr);gap:var(--dc-home-gap);align-items:start}.dc-home .dc-event__label{grid-column:1/3}.dc-home .dc-event__title{grid-column:3/10}.dc-home .dc-event__status{grid-column:11/13;text-align:right}.dc-home .dc-event__body{display:grid;grid-template-columns:repeat(12,1fr);gap:var(--dc-home-gap);align-items:end;margin-top:56px}.dc-home .dc-event__desc{grid-column:3/8}.dc-home .dc-event__meta{grid-column:9/11}.dc-home .dc-event__action{grid-column:11/13;justify-self:end}
-
-.dc-home .dc-index{border-top:1px solid var(--dc-line,rgba(17,17,17,.2))}.dc-home .dc-index__head{display:grid;grid-template-columns:repeat(12,1fr);gap:var(--dc-home-gap);padding-bottom:24px}.dc-home .dc-index__head .dc-kicker{grid-column:1/3}.dc-home .dc-index__head .dc-lead{grid-column:3/9;margin:0}
-
-/* FULL-BLEED ROW CONTRACT.
-   Old translateX hover from ui-v2 is explicitly neutralized on Home.
-   Surface bleeds to viewport; content never shifts off the grid. */
-.dc-home .dc-index-row,.dc-home .dc-sphere{position:relative;overflow:visible;isolation:isolate;background:transparent}
-.dc-home .dc-index-row::before,.dc-home .dc-sphere::before{
-  content:"";
+.dc-home .dc-home-community__media{
+  position:relative;
+  display:block;
+  width:100%;
+  min-height:clamp(620px,56.25vw,900px);
+  overflow:hidden;
+  background:var(--dc-community-paper);
+}
+.dc-home .dc-home-community__media>img{
   position:absolute;
-  z-index:0;
-  top:-1px;
-  bottom:-1px;
-  left:50%;
-  width:100vw;
-  right:auto;
-  background:transparent;
-  transform:translateX(-50%);
-  transition:background .18s ease;
-  pointer-events:none;
+  inset:0;
+  display:block;
+  width:100%;
+  height:100%;
+  max-width:none;
+  object-fit:cover;
+  object-position:center center;
+  opacity:1;
+  filter:none;
+  mix-blend-mode:normal;
 }
-.dc-home .dc-index-row>*,.dc-home .dc-sphere>*{position:relative;z-index:1}
-@media(hover:hover) and (pointer:fine){
-  .dc-home .dc-index-row:hover,.dc-home .dc-index-row:focus-visible{background:transparent;padding-left:0;padding-right:0}
-  .dc-home .dc-index-row:hover::before,.dc-home .dc-index-row:focus-visible::before,.dc-home .dc-sphere:hover::before,.dc-home .dc-sphere:focus-within::before{background:var(--dc-home-row-accent);transform:translateX(-50%)}
+.dc-home .dc-home-community__caption{
+  position:absolute;
+  z-index:2;
+  left:clamp(24px,8.6vw,138px);
+  top:38%;
+  width:min(70vw,1040px);
+  min-height:clamp(66px,6.2vw,92px);
+  padding:0 clamp(24px,2.5vw,42px);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:24px;
+  background:var(--dc-ink,#111);
+  color:var(--dc-paper,#f2f0e8);
+  border:0;
+  box-shadow:none;
+  font-size:clamp(23px,2.25vw,38px);
+  line-height:1;
+  font-weight:850;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+  white-space:nowrap;
 }
-
-.dc-home .dc-project{background:var(--dc-ink,#111);color:var(--dc-paper,#f2f0e8);overflow:hidden}.dc-home .dc-project__grid{display:grid;grid-template-columns:repeat(12,1fr);gap:var(--dc-home-gap)}.dc-home .dc-project__copy{grid-column:1/8}.dc-home .dc-project__aside{grid-column:9/13;border-left:1px solid rgba(255,255,255,.2);padding-left:28px;display:flex;flex-direction:column;justify-content:space-between;min-height:520px}.dc-home .dc-project .dc-display-l{margin-top:34px}.dc-home .dc-project__aside blockquote{border:0;margin:0;padding:0;font-size:clamp(30px,3.4vw,54px);line-height:1;letter-spacing:-.045em}.dc-home .dc-project__aside .dc-meta{color:var(--dc-paper,#f2f0e8)}
-
-.dc-home .dc-spheres__intro{display:grid;grid-template-columns:repeat(12,1fr);gap:var(--dc-home-gap);margin-bottom:56px}.dc-home .dc-spheres__intro .dc-kicker{grid-column:1/3}.dc-home .dc-spheres__intro .dc-display-l{grid-column:3/11}.dc-home .dc-spheres__list{border-top:1px solid var(--dc-line,rgba(17,17,17,.2))}.dc-home .dc-sphere{display:grid;grid-template-columns:64px 1fr 1.2fr;gap:24px;padding:22px 0;border-bottom:1px solid var(--dc-line,rgba(17,17,17,.2));align-items:start}.dc-home .dc-sphere__name{font-size:clamp(28px,3.7vw,54px);line-height:.95;letter-spacing:-.05em;font-weight:820}.dc-home .dc-sphere__desc{font-size:16px;line-height:1.3;max-width:520px}
-
-.dc-home .dc-join{background:var(--dc-acid,#d8ff3e);min-height:72vh;display:grid;align-content:space-between}.dc-home .dc-join__top{display:grid;grid-template-columns:repeat(12,1fr);gap:var(--dc-home-gap)}.dc-home .dc-join__top .dc-kicker{grid-column:1/4}.dc-home .dc-join__top .dc-display-l{grid-column:4/13}.dc-home .dc-join__bottom{display:grid;grid-template-columns:repeat(12,1fr);gap:var(--dc-home-gap);align-items:end}.dc-home .dc-join__bottom .dc-body{grid-column:8/11;margin:0}.dc-home .dc-join__bottom .dc-action{grid-column:11/13;justify-self:end;background:var(--dc-ink,#111);color:var(--dc-paper,#f2f0e8)}
-
-.dc-home footer{max-width:none;border-top:0}.dc-home .dc-footer{display:grid;grid-template-columns:repeat(12,1fr);gap:var(--dc-home-gap);padding:28px var(--dc-home-outer);align-items:end}.dc-home .dc-footer .brand{grid-column:1/4}.dc-home .dc-footer__line{grid-column:5/10;font-size:13px}.dc-home .dc-footer__version{grid-column:11/13;text-align:right;font-size:11px;opacity:.5}
 
 @media(max-width:1024px){
-  .dc-home .dc-grid{grid-template-columns:repeat(8,minmax(0,1fr))}
-  .dc-home .dc-hero{min-height:760px;grid-template-rows:auto 1fr auto}
-  .dc-home .dc-hero__meta{grid-column:1/9}.dc-home .dc-hero__title{grid-column:1/6;max-width:7.2ch}.dc-home .dc-hero__bottom{grid-column:1/5}
-  .dc-home .dc-hero__media{grid-column:5/9;grid-row:2/4;margin-top:34px}
-  .dc-home .dc-hero__media img{object-position:right center}
-  .dc-home .dc-statement__head,.dc-home .dc-statement__foot,.dc-home .dc-event__top,.dc-home .dc-event__body,.dc-home .dc-index__head,.dc-home .dc-project__grid,.dc-home .dc-spheres__intro,.dc-home .dc-join__top,.dc-home .dc-join__bottom{grid-template-columns:repeat(8,1fr)}
-  .dc-home .dc-statement__head .dc-kicker{grid-column:1/3}.dc-home .dc-statement__head .dc-display-l{grid-column:2/9;margin-top:24px}.dc-home .dc-statement__foot p{grid-column:5/9}
-  .dc-home .dc-event__label{grid-column:1/3}.dc-home .dc-event__title{grid-column:1/7;margin-top:22px}.dc-home .dc-event__status{grid-column:7/9}.dc-home .dc-event__desc{grid-column:1/6}.dc-home .dc-event__meta{grid-column:6/9}.dc-home .dc-event__action{grid-column:1/9;justify-self:start;margin-top:22px}
-  .dc-home .dc-index__head .dc-kicker{grid-column:1/3}.dc-home .dc-index__head .dc-lead{grid-column:1/8;margin-top:18px}
-  .dc-home .dc-project__copy{grid-column:1/9}.dc-home .dc-project__aside{grid-column:1/9;border-left:0;border-top:1px solid rgba(255,255,255,.2);padding:28px 0 0;margin-top:56px;min-height:360px}
-  .dc-home .dc-spheres__intro .dc-kicker{grid-column:1/3}.dc-home .dc-spheres__intro .dc-display-l{grid-column:1/9;margin-top:22px}
-  .dc-home .dc-join__top .dc-kicker{grid-column:1/3}.dc-home .dc-join__top .dc-display-l{grid-column:1/9;margin-top:24px}.dc-home .dc-join__bottom .dc-body{grid-column:1/6}.dc-home .dc-join__bottom .dc-action{grid-column:6/9}
-  .dc-home .dc-sphere{grid-template-columns:44px 1fr}.dc-home .dc-sphere__desc{grid-column:2}
-  .dc-home .dc-footer{grid-template-columns:repeat(8,1fr)}.dc-home .dc-footer .brand{grid-column:1/4}.dc-home .dc-footer__line{grid-column:4/7}.dc-home .dc-footer__version{grid-column:7/9}
+  .dc-home .dc-home-community__caption{
+    left:5vw;
+    width:78vw;
+    top:39%;
+  }
 }
 
 @media(max-width:700px){
-  .dc-home .topbar{min-height:58px}.dc-home .dc-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.dc-home .dc-section{padding-top:70px;padding-bottom:70px}
-  .dc-home .dc-hero{min-height:0;display:grid;grid-template-rows:auto auto auto auto;padding-top:20px;padding-bottom:0;overflow:hidden}
-  .dc-home .dc-hero__meta{grid-column:1/5;grid-row:1;font-size:10px}.dc-home .dc-hero__title{grid-column:1/5;grid-row:2;max-width:none;margin-top:44px}.dc-home .dc-hero__bottom{grid-column:1/5;grid-row:3;max-width:none;padding-top:48px;padding-bottom:28px}
-  .dc-home .dc-hero__media{grid-column:1/5;grid-row:4;margin:8px 0 0;width:100%;height:min(112vw,520px);display:flex;align-items:flex-end;justify-content:flex-end}
-  .dc-home .dc-hero__media img{width:100%;height:100%;object-fit:contain;object-position:right bottom}
-  .dc-home .dc-actions{flex-direction:column;align-items:stretch}.dc-home .dc-action{width:100%}
-  .dc-home .dc-statement .dc-shell{min-height:auto}.dc-home .dc-statement__head,.dc-home .dc-statement__foot,.dc-home .dc-event__top,.dc-home .dc-event__body,.dc-home .dc-index__head,.dc-home .dc-project__grid,.dc-home .dc-spheres__intro,.dc-home .dc-join__top,.dc-home .dc-join__bottom{grid-template-columns:repeat(4,1fr)}
-  .dc-home .dc-statement__head .dc-kicker,.dc-home .dc-statement__head .dc-display-l,.dc-home .dc-statement__foot p{grid-column:1/5}.dc-home .dc-statement__foot{margin-top:80px}
-  .dc-home .dc-event__label{grid-column:1/3}.dc-home .dc-event__status{grid-column:3/5}.dc-home .dc-event__title,.dc-home .dc-event__desc,.dc-home .dc-event__meta,.dc-home .dc-event__action{grid-column:1/5}.dc-home .dc-event__status{text-align:right}.dc-home .dc-event__body{margin-top:42px}.dc-home .dc-event__meta{margin-top:26px}
-  .dc-home .dc-index__head .dc-kicker,.dc-home .dc-index__head .dc-lead{grid-column:1/5}
-  .dc-home .dc-project__copy,.dc-home .dc-project__aside{grid-column:1/5}.dc-home .dc-project__aside{min-height:300px}
-  .dc-home .dc-spheres__intro .dc-kicker,.dc-home .dc-spheres__intro .dc-display-l{grid-column:1/5}.dc-home .dc-sphere{grid-template-columns:32px 1fr;gap:10px}.dc-home .dc-sphere__desc{grid-column:2;font-size:15px}
-  .dc-home .dc-join{min-height:80vh}.dc-home .dc-join__top .dc-kicker,.dc-home .dc-join__top .dc-display-l,.dc-home .dc-join__bottom .dc-body,.dc-home .dc-join__bottom .dc-action{grid-column:1/5}.dc-home .dc-join__bottom{margin-top:80px}.dc-home .dc-join__bottom .dc-action{margin-top:28px}
-  .dc-home .dc-footer{grid-template-columns:repeat(4,1fr)}.dc-home .dc-footer .brand,.dc-home .dc-footer__line,.dc-home .dc-footer__version{grid-column:1/5}.dc-home .dc-footer__line{margin-top:28px}.dc-home .dc-footer__version{text-align:left;margin-top:12px}
-}
-
-@media(hover:none){.dc-home .dc-index-row::before,.dc-home .dc-sphere::before{display:none}}
-@media(prefers-reduced-motion:reduce){.dc-home .dc-notice__track{animation:none}.dc-home .dc-index-row::before,.dc-home .dc-sphere::before{transition:none}}
-
-
-/* BATCH7 / MOBILE HERO TEXT CONTAINMENT */
-@media(max-width:700px){
-  .dc-home .dc-hero__title{font-size:clamp(48px,14vw,58px);line-height:.82;letter-spacing:-.07em}
-}
-
-
-/* BATCH7 FINAL / HOME MOBILE EVENT TITLE */
-@media(max-width:560px){
-  .dc-home .dc-event__title{
-    min-width:0;
-    max-width:100%;
-    font-size:clamp(40px,12.8vw,52px);
-    line-height:.86;
-    letter-spacing:-.065em;
-    overflow-wrap:anywhere;
+  .dc-home .dc-home-community__media{
+    min-height:clamp(620px,158vw,780px);
+    background:var(--dc-community-paper);
+  }
+  .dc-home .dc-home-community__media>img{
+    object-fit:contain;
+    object-position:center center;
+  }
+  .dc-home .dc-home-community__caption{
+    left:0;
+    right:0;
+    top:auto;
+    bottom:15.5%;
+    width:100%;
+    min-height:56px;
+    padding:0 18px;
+    gap:14px;
+    font-size:clamp(15px,4.1vw,18px);
+    letter-spacing:.035em;
   }
 }
