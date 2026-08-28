@@ -48,3 +48,4 @@ Update this file only when the user explicitly requests deploy/publish/release.
 2026-08-28T16:45+02:00 — replace the two homepage blocks with the approved standalone HTML/CSS prototypes verbatim in structure and geometry; publish exact Community v3 and Logic & Awareness v2 integration.
 2026-08-28T17:53+02:00 — publish direct transfer of all three approved standalone homepage blocks: Think with Danger course v3, Community v3, and Logic & Awareness v2; skip WebP verification/optimization in this pass.
 2026-08-28T17:56+02:00 — retry after route/reference validation: preserve #events anchor and deploy the transferred layouts using already-present raster assets only; no WebP processing.
+2026-08-28T18:31+02:00 — deploy internal Dementor Workspace prototype for Valentin, Nikita, Evgeniy and Gabil under /design-system/dementor-workspace/.
