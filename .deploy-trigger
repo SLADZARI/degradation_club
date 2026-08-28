@@ -29,3 +29,4 @@ Update this file only when the user explicitly requests deploy/publish/release.
 2026-08-28T12:08+02:00 — publish legal Terms/Privacy v0.2, OBJECT 001 OWNER MARK preorder flow and GitHub Pages canonical origin fix.
 2026-08-28T12:15+02:00 — retry deploy after aligning sitemap, robots and validator with GitHub Pages base path.
 2026-08-28T12:42+02:00 — deploy OAuth return preboot so GitHub Pages /join/ persists the Supabase session before account sync boots.
+2026-08-28T12:46+02:00 — remove preboot race, restore one GoTrueClient and publish authdebug trace for end-to-end OAuth diagnosis.
