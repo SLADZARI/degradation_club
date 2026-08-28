@@ -12,3 +12,4 @@ Update this file only when the user explicitly requests deploy/publish/release.
 2026-08-28T22:34+02:00 — publish approved Fuengirola homepage event banner layout with desktop/mobile composition and Gabil mentor card.
 2026-08-28T22:42+02:00 — publish account-required interactive flows, persisted program checkpoints/certificates, Supabase merch live control, and support prompt dismiss fix.
 2026-08-28T22:47+02:00 — import existing local completed program state into the authenticated workspace certificate/progress layer.
+2026-08-28T22:49+02:00 — redeploy browser-safe merch runtime after ES-module syntax audit.
