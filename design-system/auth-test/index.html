@@ -7,38 +7,79 @@
   <title>Dementor Auth Diagnostics</title>
   <style>
     body{margin:0;background:#111;color:#f2f0e8;font:16px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace;padding:24px}
-    main{max-width:900px;margin:0 auto}.box{border:1px solid #666;padding:16px;margin:14px 0;white-space:pre-wrap;overflow-wrap:anywhere}button,a.tool{font:inherit;padding:12px 16px;background:#d7ff3f;color:#111;border:0;font-weight:800;cursor:pointer;margin-right:8px;text-decoration:none;display:inline-block}.muted{opacity:.65}.ok{color:#d7ff3f}.bad{color:#ff8a8a}.meta{font-size:12px;letter-spacing:.08em;text-transform:uppercase;opacity:.55;margin-bottom:18px}
+    main{max-width:900px;margin:0 auto}.box{border:1px solid #666;padding:16px;margin:14px 0;white-space:pre-wrap;overflow-wrap:anywhere}button,a.tool{font:inherit;padding:12px 16px;background:#d7ff3f;color:#111;border:0;font-weight:800;cursor:pointer;margin:0 8px 8px 0;text-decoration:none;display:inline-block}.muted{opacity:.65}.ok{color:#d7ff3f}.bad{color:#ff8a8a}.meta{font-size:12px;letter-spacing:.08em;text-transform:uppercase;opacity:.55;margin-bottom:18px}.label{font-size:12px;letter-spacing:.08em;text-transform:uppercase;opacity:.55;margin-top:18px}
   </style>
 </head>
 <body>
 <main>
   <div class="meta">INTERNAL / DESIGN SYSTEM / AUTH DIAGNOSTICS / NOINDEX</div>
   <h1>DEMENTOR AUTH TEST</h1>
-  <p class="muted">Изолированный тест: один Supabase client, PKCE, стандартный detectSessionInUrl. Токены на экран не выводятся.</p>
-  <p><a class="tool" href="../admin/">SYSTEM TOOLS</a><button id="login">GOOGLE LOGIN</button><button id="logout">LOGOUT</button></p>
+  <p class="muted">Тестирует не только OAuth, но и persistence: session → browser storage → reload → restored session. Значения токенов не выводятся.</p>
+  <p><a class="tool" href="../admin/">SYSTEM TOOLS</a><button id="login">GOOGLE LOGIN</button><button id="reload">RELOAD TEST</button><button id="snapshot">STORAGE SNAPSHOT</button><button id="logout">LOGOUT</button></p>
   <div class="box" id="status">BOOT…</div>
+  <div class="label">AUTH STORAGE / SAFE METADATA ONLY</div>
+  <div class="box" id="storage">READING…</div>
+  <div class="label">TRACE</div>
   <div class="box" id="trace"></div>
 </main>
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.4/+esm';
 const SUPABASE_URL='https://mmekfydwbvptbdatwitj.supabase.co';
 const SUPABASE_KEY='sb_publishable_a7e_Ndwwii8lyt_xmezoVw_ijxfh_yg';
+const PROJECT_REF='mmekfydwbvptbdatwitj';
+const EXPECTED_AUTH_KEY=`sb-${PROJECT_REF}-auth-token`;
 const status=document.getElementById('status');
 const traceEl=document.getElementById('trace');
+const storageEl=document.getElementById('storage');
 const trace=[];
+const safeStorage=()=>{
+  const rows=[];
+  try{
+    for(let i=0;i<localStorage.length;i++){
+      const key=localStorage.key(i)||'';
+      if(!key.includes(PROJECT_REF)&&!key.toLowerCase().includes('supabase')&&!key.toLowerCase().includes('auth'))continue;
+      const value=localStorage.getItem(key);
+      rows.push({scope:'localStorage',key,present:value!==null,length:value?.length||0});
+    }
+  }catch(e){rows.push({scope:'localStorage',error:e.message});}
+  try{
+    for(let i=0;i<sessionStorage.length;i++){
+      const key=sessionStorage.key(i)||'';
+      if(!key.includes(PROJECT_REF)&&!key.toLowerCase().includes('supabase')&&!key.toLowerCase().includes('auth'))continue;
+      const value=sessionStorage.getItem(key);
+      rows.push({scope:'sessionStorage',key,present:value!==null,length:value?.length||0});
+    }
+  }catch(e){rows.push({scope:'sessionStorage',error:e.message});}
+  return rows;
+};
+const renderStorage=(reason='snapshot')=>{
+  const rows=safeStorage();
+  const expected=rows.find(x=>x.scope==='localStorage'&&x.key===EXPECTED_AUTH_KEY);
+  storageEl.textContent=`reason: ${reason}\nexpected_key: ${EXPECTED_AUTH_KEY}\nexpected_present: ${Boolean(expected?.present)}\nexpected_length: ${expected?.length||0}\nkeys: ${JSON.stringify(rows,null,2)}`;
+  return {expectedPresent:Boolean(expected?.present),expectedLength:expected?.length||0,keyCount:rows.length};
+};
 const log=(step,detail={})=>{const safe={...detail};delete safe.access_token;delete safe.refresh_token;delete safe.token;delete safe.session;trace.push({time:new Date().toISOString(),step,...safe});traceEl.textContent=trace.map(x=>`${x.time.slice(11,19)}  ${x.step}  ${JSON.stringify(Object.fromEntries(Object.entries(x).filter(([k])=>!['time','step'].includes(k))))}`).join('\n');};
 const redirectTo='https://sladzari.github.io/degradation_club/design-system/auth-test/';
-log('page-load',{href:location.origin+location.pathname+location.search,hasCode:new URLSearchParams(location.search).has('code'),hasHash:Boolean(location.hash)});
+log('page-load',{href:location.origin+location.pathname+location.search,hasCode:new URLSearchParams(location.search).has('code'),hasHash:Boolean(location.hash),...renderStorage('before-client')});
 const client=createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,flowType:'pkce'}});
 window.authTestClient=client;
-log('client-created',{flow:'pkce',detectSessionInUrl:true,redirectTo});
-client.auth.onAuthStateChange((event,session)=>{log('auth-state',{event,hasSession:Boolean(session),email:session?.user?.email||null});if(session)status.innerHTML=`<span class="ok">SIGNED IN</span>\n${session.user.email||''}\nuser_id: ${session.user.id}`;else status.textContent='NO SESSION';});
+log('client-created',{flow:'pkce',detectSessionInUrl:true,redirectTo,...renderStorage('after-client')});
+client.auth.onAuthStateChange((event,session)=>{
+  const storage=renderStorage(`auth-state:${event}`);
+  log('auth-state',{event,hasSession:Boolean(session),email:session?.user?.email||null,...storage});
+  if(session)status.innerHTML=`<span class="ok">SIGNED IN</span>\n${session.user.email||''}\nuser_id: ${session.user.id}\n\nNOW PRESS “RELOAD TEST”`;
+  else status.textContent='NO SESSION';
+});
 const initial=await client.auth.getSession();
-log('getSession',{ok:!initial.error,hasSession:Boolean(initial.data?.session),error:initial.error?.message||null});
-if(initial.data?.session)status.innerHTML=`<span class="ok">SIGNED IN</span>\n${initial.data.session.user.email||''}\nuser_id: ${initial.data.session.user.id}`;else status.textContent='NO SESSION';
-if(initial.data?.session){const u=await client.auth.getUser();log('getUser',{ok:!u.error,email:u.data?.user?.email||null,error:u.error?.message||null});}
-document.getElementById('login').onclick=async()=>{log('login-click',{redirectTo});const r=await client.auth.signInWithOAuth({provider:'google',options:{redirectTo}});log('provider-response',{hasUrl:Boolean(r.data?.url),error:r.error?.message||null});if(r.error)status.innerHTML=`<span class="bad">${r.error.message}</span>`;};
-document.getElementById('logout').onclick=async()=>{const r=await client.auth.signOut();log('logout',{error:r.error?.message||null});location.reload();};
+log('getSession',{ok:!initial.error,hasSession:Boolean(initial.data?.session),error:initial.error?.message||null,...renderStorage('after-getSession')});
+if(initial.data?.session)status.innerHTML=`<span class="ok">SIGNED IN</span>\n${initial.data.session.user.email||''}\nuser_id: ${initial.data.session.user.id}\n\nSESSION RESTORED ON THIS LOAD`;else status.textContent='NO SESSION';
+if(initial.data?.session){const u=await client.auth.getUser();log('getUser',{ok:!u.error,email:u.data?.user?.email||null,error:u.error?.message||null,...renderStorage('after-getUser')});}
+window.addEventListener('pagehide',()=>{try{sessionStorage.setItem('dcAuthDiagBeforeUnload',JSON.stringify({at:new Date().toISOString(),storage:safeStorage()}));}catch(_){}});
+try{const prev=JSON.parse(sessionStorage.getItem('dcAuthDiagBeforeUnload')||'null');if(prev)log('previous-pagehide',{at:prev.at,keys:prev.storage});}catch(_){}
+document.getElementById('login').onclick=async()=>{log('login-click',{redirectTo,...renderStorage('login-click')});const r=await client.auth.signInWithOAuth({provider:'google',options:{redirectTo}});log('provider-response',{hasUrl:Boolean(r.data?.url),error:r.error?.message||null,...renderStorage('provider-response')});if(r.error)status.innerHTML=`<span class="bad">${r.error.message}</span>`;};
+document.getElementById('reload').onclick=()=>{log('reload-click',renderStorage('before-manual-reload'));location.reload();};
+document.getElementById('snapshot').onclick=()=>{log('storage-snapshot',renderStorage('manual-snapshot'));};
+document.getElementById('logout').onclick=async()=>{const r=await client.auth.signOut();log('logout',{error:r.error?.message||null,...renderStorage('after-logout')});location.reload();};
 </script>
 </body>
 </html>
