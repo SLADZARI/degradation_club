@@ -33,3 +33,4 @@ Update this file only when the user explicitly requests deploy/publish/release.
 2026-08-28T12:50+02:00 — persist authdebug mode through Google OAuth return without losing callback hash.
 2026-08-28T12:54+02:00 — retry authdebug deploy after fixing course-cover example validation blockers.
 2026-08-28T13:06+02:00 — retry authdebug deploy after removing the last example anchor validation blocker.
+2026-08-28T13:22+02:00 — deploy isolated PKCE auth-test to separate OAuth configuration from join runtime.
