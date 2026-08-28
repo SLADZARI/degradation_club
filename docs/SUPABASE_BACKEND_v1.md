@@ -1,7 +1,7 @@
 # Dementor Club — Supabase Backend v1
 
-Status: ACTIVE BACKEND BASELINE / GOOGLE OAUTH PENDING LIVE TEST
-Date: 2026-08-27
+Status: ACTIVE BACKEND BASELINE / GOOGLE OAUTH VERIFIED
+Date: 2026-08-28
 Supabase project: `EDU Modern Pilgrims`
 Project ref: `mmekfydwbvptbdatwitj`
 
@@ -15,13 +15,32 @@ Canonical club content, entity definitions, approved copy, event/course/project/
 ## Preserved infrastructure
 
 - Supabase Auth
-- Google OAuth provider previously used by test users
+- Google OAuth provider
 - `auth.users`
 - `auth.identities`
 - automatic `auth.users -> public.profiles` projection
 - existing Google/Auth users backfilled into `public.profiles`
 
 Authentication is not membership. A profile can exist without accepted membership, event registration or course enrollment.
+
+## Verified authentication baseline
+
+Google OAuth was end-to-end verified on 2026-08-28:
+
+`Google -> Supabase Auth -> authorized callback -> browser session -> public.profiles -> assessment sync`
+
+Verified behavior:
+- callback returns to the requested `/join/` route;
+- browser receives the implicit-flow auth payload and establishes a persistent Supabase session;
+- session survives page reload;
+- authenticated user can read their own `public.profiles` row under RLS;
+- `/join/` can read/write `assessment_snapshots` and persist `assessment_runs`;
+- no service-role credential is exposed to browser code.
+
+Production account runtime: `/dementor-account-sync-v6.js`.
+It uses one Supabase client, explicit implicit-flow hash restoration, persistent session storage and a short silent retry for the transient `PGRST303 / JWT issued at future` condition observed immediately after a fresh sign-in.
+
+The temporary public `/auth-test/` page and diagnostic auth runtimes were removed after verification.
 
 ## Local-first diagnostic model
 
@@ -41,8 +60,6 @@ Tables:
 - `profiles`
 - `assessment_snapshots` — current durable accumulated map
 - `assessment_runs` — completed run history with `assessment_version`, `result_json`, optional `answers_json`, timestamps and dedupe `source_key`
-
-Browser adapter: `/dementor-account-sync-v1.js`.
 
 Routes:
 - `/join/` — local-first diagnostic + optional Google persistence
@@ -84,11 +101,13 @@ Route: `/cart/`.
 
 Their public feature flags remain disabled until their UX is explicitly activated.
 
-## Auth trigger
+## Auth trigger and profile access
 
 `auth.users` AFTER INSERT -> `public.handle_new_user()`.
 
 The function only creates/updates `public.profiles`. It does not create EDU employee entities. Direct RPC execution is revoked from `PUBLIC`, `anon` and `authenticated`.
+
+`authenticated` has table-level `SELECT` and `UPDATE` grants on `public.profiles`; RLS policies still restrict each user to their own row. This grant is required in addition to RLS policy definitions.
 
 ## Legacy EDU archive
 
@@ -100,6 +119,7 @@ Former EDU test tables were moved intact to `legacy_edu`. The schema is not part
 2. `secure_legacy_edu_archive`
 3. `add_dementor_assessment_sync`
 4. `add_dementor_commerce_state`
+5. `grant_authenticated_profiles_read_update`
 
 ## Security baseline
 
@@ -113,24 +133,28 @@ Remaining advisor notices may relate to the cold `legacy_edu` archive, fresh unu
 - Realtime: not required
 - Edge Functions: not required before payment-provider/server webhook integration
 
-## Google production activation checklist
+## Google OAuth configuration
 
-Production site origin:
+Canonical production site origin:
 `https://degradation-club.vercel.app`
+
+Current GitHub Pages verification origin:
+`https://sladzari.github.io`
 
 Supabase project URL:
 `https://mmekfydwbvptbdatwitj.supabase.co`
 
-Google OAuth callback URI that must exist in Google Cloud OAuth client:
+Google OAuth callback URI:
 `https://mmekfydwbvptbdatwitj.supabase.co/auth/v1/callback`
 
-Supabase Auth redirect allow-list must permit:
-- `https://degradation-club.vercel.app/join/`
-- `https://degradation-club.vercel.app/profile/`
-- `https://degradation-club.vercel.app/cart/`
+Supabase Auth redirect allow-list includes the production Vercel routes and the GitHub Pages namespace used for current deployment verification.
 
-Google Authorized JavaScript origin:
-`https://degradation-club.vercel.app`
+Verified GitHub Pages join redirect:
+`https://sladzari.github.io/degradation_club/join/`
+
+Google Authorized JavaScript origins include:
+- `https://degradation-club.vercel.app`
+- `https://sladzari.github.io`
 
 Do not add `service_role` credentials to Google, Git or browser code.
 
