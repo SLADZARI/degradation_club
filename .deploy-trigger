@@ -20,3 +20,4 @@ Update this file only when the user explicitly requests deploy/publish/release.
 2026-08-29T00:22+02:00 — publish stable yellow/white DC-9 states, public result-save flow, and authenticated membership application with coupled 100% regression allocator.
 2026-08-29T00:26+02:00 — publish Fuengirola responsive artwork fix: preserve full desktop image and restore mobile artwork.
 2026-08-29T00:34+02:00 — publish OWNER_ADMIN System Tools entry in accounts, role-gated admin hub and live read-only production smoke tests.
+2026-08-29T00:48+02:00 — fix System Tests B4 production asset paths and move DC-9 V2 runtime under the /join namespace.
