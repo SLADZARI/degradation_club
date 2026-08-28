@@ -26,3 +26,4 @@ Update this file only when the user explicitly requests deploy/publish/release.
 2026-08-28 — publish verified production account sync v6; remove auth-test/debug runtimes and add transient JWT retry.
 2026-08-28T09:44+02:00 — publish PR #18 release candidate after full design audit and release smoke.
 2026-08-28T09:47+02:00 — retry deploy after aligning visual-contract validation with canonical profile CSS ownership.
+2026-08-28T12:08+02:00 — publish legal Terms/Privacy v0.2, OBJECT 001 OWNER MARK preorder flow and GitHub Pages canonical origin fix.
