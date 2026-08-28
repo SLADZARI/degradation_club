@@ -1,5 +1,5 @@
 window.DEMENTOR_SITE_CONFIG=Object.freeze({
-  version:'2026-08-28.20',
+  version:'2026-08-28.21',
   canonicalOrigin:'https://sladzari.github.io/degradation_club',
   supabase:{
     enabled:true,
@@ -13,7 +13,7 @@ window.DEMENTOR_SITE_CONFIG=Object.freeze({
   merch:{catalogEnabled:true,cartEnabled:true,cartStorageKey:'dementorClubCartV1',checkoutEnabled:false,checkoutProvider:null,checkoutUrl:null,preorderPaymentMethod:null,runtimeSource:'supabase'},
   events:{registrationEnabled:false,registrationProvider:null,registrationUrl:null},
   community:{membershipEnabled:false,membershipProvider:null,membershipUrl:null},
-  onboarding:{storageKey:'dementorClubOnboardingV3',storage:'localStorage',accountSync:true,authRequired:true},
+  onboarding:{storageKey:'dementorClubOnboardingV3',storage:'localStorage',accountSync:true,authRequired:true,progressMap:true},
   internalTools:{enabled:true,holdMs:1200,path:'/design-system/admin/'}
 });
 if(typeof document!=='undefined'){
@@ -36,6 +36,7 @@ if(typeof document!=='undefined'){
     if(path.includes('/join')){
       addScript('/dementor-account-sync-v8.js?v=20260828-17');
       addScript('/join-data-copy-v1.js?v=20260828-18');
+      if(cfg.onboarding?.progressMap)addScript('/join-progress-map-v1.js',{module:true});
     }
     if(path.endsWith('/projects/logic-awareness/'))addScript('/content-series-v1.js');
 
