@@ -22,3 +22,4 @@ Update this file only when the user explicitly requests deploy/publish/release.
 2026-08-28T01:55+02:00 — deploy account sync v3 with explicit PKCE code exchange and deterministic session restoration.
 2026-08-28T02:10+02:00 — deploy account sync v4 with explicit implicit-flow hash restore and version-agnostic auth runtime passthrough.
 2026-08-28T02:18+02:00 — deploy auth diagnostics v5 with visible staged trace and manual session/snapshot tests.
+2026-08-28T02:22+02:00 — deploy isolated /auth-test/ OAuth diagnostic page to separate Supabase auth from /join/ runtime.
