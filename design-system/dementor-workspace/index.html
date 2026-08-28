@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Dementor Workspace Prototype</title>
+<link rel="stylesheet" href="../design-system.css">
+<link rel="stylesheet" href="./workspace.css">
+</head>
+<body class="dc-system-page dcw-body">
+<div class="dcw-prototype-banner">INTERNAL PROTOTYPE · NO AUTH · NO DATABASE · NO DEPLOY TRIGGER</div>
+<div class="dcw-app">
+  <aside class="dcw-sidebar">
+    <a class="dcw-brand" href="#home" data-route="home"><span>DEMENTOR</span><strong>CLUB</strong></a>
+    <nav class="dcw-nav" aria-label="Workspace">
+      <button data-route="home" class="is-active">HOME</button>
+      <button data-route="work">MY WORK</button>
+      <button data-route="profile">MY PROFILE</button>
+    </nav>
+    <div class="dcw-boundary">
+      <span>SYSTEM</span>
+      <strong>DEMENTOR CLUB</strong>
+      <small>В этом workspace никогда не показываются BEREG, OBITEL, Seven Clicks и сущности других систем.</small>
+    </div>
+    <div class="dcw-person-switcher">
+      <label for="personSelect">DEMENTOR</label>
+      <select id="personSelect" aria-label="Выбрать дементора">
+        <option value="valentin">Валентин</option>
+        <option value="nikita">Никита</option>
+        <option value="evgeniy">Евгений</option>
+        <option value="gabil">Габиль</option>
+      </select>
+      <div id="personRole" class="dcw-role">DEMENTOR</div>
+    </div>
+  </aside>
+
+  <main class="dcw-main">
+    <header class="dcw-topbar">
+      <div>
+        <span class="dcw-kicker">DEMENTOR WORKSPACE / PROTOTYPE V0.1</span>
+        <strong id="topTitle">HOME</strong>
+      </div>
+      <div class="dcw-top-meta"><span>SHARED AUTH ONLY</span><span class="dcw-dot"></span><span>ASSIGNMENT-DRIVEN UI</span></div>
+    </header>
+    <div id="appView" class="dcw-view"></div>
+  </main>
+</div>
+<script src="./workspace.js"></script>
+</body>
+</html>
