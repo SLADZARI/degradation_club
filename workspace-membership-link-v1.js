@@ -1,0 +1,1 @@
+(()=>{if(!location.pathname.includes('/workspace'))return;const base=location.pathname.startsWith('/degradation_club/')?'/degradation_club':'';document.addEventListener('click',e=>{const btn=e.target.closest?.('[data-membership-info]');if(!btn)return;e.preventDefault();e.stopImmediatePropagation();location.assign(base+'/join/apply/')},{capture:true});})();
