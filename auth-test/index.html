@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Dementor Auth Test</title>
+  <style>
+    body{margin:0;background:#111;color:#f2f0e8;font:16px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace;padding:24px}
+    main{max-width:900px;margin:0 auto}.box{border:1px solid #666;padding:16px;margin:14px 0;white-space:pre-wrap;overflow-wrap:anywhere}button{font:inherit;padding:12px 16px;background:#d7ff3f;color:#111;border:0;font-weight:800;cursor:pointer;margin-right:8px}.muted{opacity:.65}.ok{color:#d7ff3f}.bad{color:#ff8a8a}
+  </style>
+</head>
+<body>
+<main>
+  <h1>DEMENTOR AUTH TEST</h1>
+  <p class="muted">Изолированный тест: один Supabase client, PKCE, стандартный detectSessionInUrl. Токены на экран не выводятся.</p>
+  <p><button id="login">GOOGLE LOGIN</button><button id="logout">LOGOUT</button></p>
+  <div class="box" id="status">BOOT…</div>
+  <div class="box" id="trace"></div>
+</main>
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.4/+esm';
+const SUPABASE_URL='https://mmekfydwbvptbdatwitj.supabase.co';
+const SUPABASE_KEY='sb_publishable_a7e_Ndwwii8lyt_xmezoVw_ijxfh_yg';
+const status=document.getElementById('status');
+const traceEl=document.getElementById('trace');
+const trace=[];
+const log=(step,detail={})=>{const safe={...detail};delete safe.access_token;delete safe.refresh_token;delete safe.token;delete safe.session;trace.push({time:new Date().toISOString(),step,...safe});traceEl.textContent=trace.map(x=>`${x.time.slice(11,19)}  ${x.step}  ${JSON.stringify(Object.fromEntries(Object.entries(x).filter(([k])=>!['time','step'].includes(k))))}`).join('\n');};
+const redirectTo='https://sladzari.github.io/degradation_club/auth-test/';
+log('page-load',{href:location.origin+location.pathname+location.search,hasCode:new URLSearchParams(location.search).has('code'),hasHash:Boolean(location.hash)});
+const client=createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,flowType:'pkce'}});
+window.authTestClient=client;
+log('client-created',{flow:'pkce',detectSessionInUrl:true,redirectTo});
+client.auth.onAuthStateChange((event,session)=>{log('auth-state',{event,hasSession:Boolean(session),email:session?.user?.email||null});if(session)status.innerHTML=`<span class="ok">SIGNED IN</span>\n${session.user.email||''}\nuser_id: ${session.user.id}`;else status.textContent='NO SESSION';});
+const initial=await client.auth.getSession();
+log('getSession',{ok:!initial.error,hasSession:Boolean(initial.data?.session),error:initial.error?.message||null});
+if(initial.data?.session)status.innerHTML=`<span class="ok">SIGNED IN</span>\n${initial.data.session.user.email||''}\nuser_id: ${initial.data.session.user.id}`;else status.textContent='NO SESSION';
+if(initial.data?.session){const u=await client.auth.getUser();log('getUser',{ok:!u.error,email:u.data?.user?.email||null,error:u.error?.message||null});}
+document.getElementById('login').onclick=async()=>{sessionStorage.setItem('dcAuthTestStarted','1');log('login-click',{redirectTo});const r=await client.auth.signInWithOAuth({provider:'google',options:{redirectTo}});log('provider-response',{hasUrl:Boolean(r.data?.url),error:r.error?.message||null});if(r.error)status.innerHTML=`<span class="bad">${r.error.message}</span>`;};
+document.getElementById('logout').onclick=async()=>{const r=await client.auth.signOut();log('logout',{error:r.error?.message||null});location.reload();};
+</script>
+</body>
+</html>
