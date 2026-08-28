@@ -1,5 +1,5 @@
 window.DEMENTOR_SITE_CONFIG=Object.freeze({
-  version:'2026-08-28.21',
+  version:'2026-08-28.22',
   canonicalOrigin:'https://sladzari.github.io/degradation_club',
   supabase:{
     enabled:true,
@@ -12,8 +12,8 @@ window.DEMENTOR_SITE_CONFIG=Object.freeze({
   donate:{enabled:false,provider:null,checkoutUrl:null,currency:null,recurring:false},
   merch:{catalogEnabled:true,cartEnabled:true,cartStorageKey:'dementorClubCartV1',checkoutEnabled:false,checkoutProvider:null,checkoutUrl:null,preorderPaymentMethod:null,runtimeSource:'supabase'},
   events:{registrationEnabled:false,registrationProvider:null,registrationUrl:null},
-  community:{membershipEnabled:false,membershipProvider:null,membershipUrl:null},
-  onboarding:{storageKey:'dementorClubOnboardingV3',storage:'localStorage',accountSync:true,authRequired:true,progressMap:true},
+  community:{membershipEnabled:true,membershipProvider:'join_application',membershipUrl:'/join/apply/'},
+  onboarding:{storageKey:'dementorClubOnboardingV3',storage:'localStorage',accountSync:true,authRequired:false,progressMap:true},
   internalTools:{enabled:true,holdMs:1200,path:'/design-system/admin/'}
 });
 if(typeof document!=='undefined'){
@@ -29,14 +29,15 @@ if(typeof document!=='undefined'){
     normalizeCanonicalMetadata();
     addScript('/global-header.js');if(!document.querySelector('link[href="/global-header.css"]')){const l=document.createElement('link');l.rel='stylesheet';l.href='/global-header.css';document.head.appendChild(l)}
     addScript('/dementor-relations-v1.js');
-    const interactiveAuthRequired=path.includes('/join')||path.includes('/courses/dumai-s-opasnostyu/')||path.includes('/courses/dengi-na-veter/');
+    const isJoinAssessment=/\/join\/?(?:index\.html)?$/.test(path);
+    const interactiveAuthRequired=path.includes('/courses/dumai-s-opasnostyu/')||path.includes('/courses/dengi-na-veter/');
     if(interactiveAuthRequired)addScript('/required-auth-v1.js',{module:true});
     if(path.includes('/courses/dumai-s-opasnostyu/')||path.includes('/courses/dengi-na-veter/'))addScript('/program-account-sync-v1.js',{module:true});
     if(path.includes('/merch/')||path.includes('/objects/'))addScript('/merch-runtime-v1.js',{module:true});
-    if(path.includes('/join')){
+    if(isJoinAssessment){
       addScript('/dementor-account-sync-v8.js?v=20260828-17');
       addScript('/join-data-copy-v1.js?v=20260828-18');
-      if(cfg.onboarding?.progressMap)addScript('/join-progress-map-v1.js',{module:true});
+      if(cfg.onboarding?.progressMap)addScript('/join-progress-map-v2.js?v=20260828-22',{module:true});
     }
     if(path.endsWith('/projects/logic-awareness/'))addScript('/content-series-v1.js');
 
