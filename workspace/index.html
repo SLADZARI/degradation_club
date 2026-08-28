@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <title>Workspace — Dementor Club</title>
+  <link rel="stylesheet" href="../design-system/design-system.css">
+  <link rel="stylesheet" href="./workspace.css">
+  <script src="../site-config.js"></script>
+</head>
+<body class="dc-system-page dcw-body">
+  <div class="dcw-live-banner">DEMENTOR CLUB · PRIVATE WORKSPACE · READ ONLY V0.1</div>
+  <div class="dcw-app">
+    <aside class="dcw-sidebar">
+      <a class="dcw-brand" href="./"><span>DEMENTOR</span><strong>CLUB</strong></a>
+      <nav class="dcw-nav" aria-label="Workspace">
+        <button type="button" data-route="home" class="is-active">HOME</button>
+        <button type="button" data-route="work">MY WORK</button>
+        <button type="button" data-route="profile">MY PROFILE</button>
+      </nav>
+      <div class="dcw-boundary">
+        <span>SYSTEM</span>
+        <strong>DEMENTOR CLUB</strong>
+        <small>Здесь читаются только Dementor Club memberships и assignments. Другие продукты не запрашиваются.</small>
+      </div>
+      <div class="dcw-session" id="sessionBox">
+        <span>SESSION</span>
+        <strong>ПРОВЕРКА…</strong>
+      </div>
+    </aside>
+
+    <main class="dcw-main">
+      <header class="dcw-topbar">
+        <div>
+          <span class="dcw-kicker">DEMENTOR WORKSPACE / LIVE READ-ONLY</span>
+          <strong id="topTitle">HOME</strong>
+        </div>
+        <div class="dcw-top-meta"><span>SUPABASE AUTH</span><span class="dcw-dot"></span><span>RLS</span></div>
+      </header>
+      <div id="appView" class="dcw-view" aria-live="polite">
+        <section class="dcw-gate"><div class="dcw-spinner"></div><h1>ПРОВЕРЯЕМ ДОСТУП</h1><p>Google → Supabase session → Dementor Club membership → assignments</p></section>
+      </div>
+    </main>
+  </div>
+  <script type="module" src="./workspace.js"></script>
+</body>
+</html>
