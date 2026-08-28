@@ -41,3 +41,4 @@ Update this file only when the user explicitly requests deploy/publish/release.
 2026-08-28T14:06+02:00 — deploy SYNC TEST v2 with semantic key-sorted comparison and explicit real diff output.
 2026-08-28T14:14+02:00 — deploy account sync v7.1 with semantic equality, in-flight coalescing and unchanged snapshot write skipping.
 2026-08-28T14:27+02:00 — deploy dedicated /auth/callback/ PKCE exchange and race-free account sync v8 for production /join/.
+2026-08-28T14:51+02:00 — deploy account sync v8.1: immediate completed-assessment snapshot sync and guaranteed rerun after in-flight state changes.
