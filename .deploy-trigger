@@ -50,3 +50,4 @@ Update this file only when the user explicitly requests deploy/publish/release.
 2026-08-28T17:56+02:00 — retry after route/reference validation: preserve #events anchor and deploy the transferred layouts using already-present raster assets only; no WebP processing.
 2026-08-28T18:31+02:00 — deploy internal Dementor Workspace prototype for Valentin, Nikita, Evgeniy and Gabil under /design-system/dementor-workspace/.
 2026-08-28T18:34+02:00 — retry Dementor Workspace deploy after fixing internal #home anchor validation.
+2026-08-28 — user requested publish latest production layout to GitHub Pages.
