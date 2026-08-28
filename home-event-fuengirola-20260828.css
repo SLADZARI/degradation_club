@@ -1,10 +1,12 @@
 /* HOME / EVENT / FUENGIROLA — transferred from approved standalone preview */
 .dc-home .dc-event.dc-section{
   position:relative!important;
+  display:block!important;
   width:100%!important;
   aspect-ratio:1259/561!important;
   height:auto!important;
   min-height:0!important;
+  max-height:none!important;
   margin:0!important;
   padding:0!important;
   overflow:hidden!important;
@@ -17,6 +19,7 @@
   isolation:isolate!important;
 }
 
+/* Only a soft veil remains over the photo. No opaque paper plate. */
 .dc-home .dc-event::before{
   content:""!important;
   position:absolute!important;
@@ -24,12 +27,12 @@
   z-index:1!important;
   pointer-events:none!important;
   background:linear-gradient(90deg,
-    #FAF4E3 0%,
-    #FAF4E3 24%,
-    rgba(250,244,227,.82) 32%,
-    rgba(250,244,227,.48) 40%,
-    rgba(250,244,227,.18) 48%,
-    rgba(250,244,227,0) 56%)!important;
+    rgba(250,244,227,.94) 0%,
+    rgba(250,244,227,.84) 14%,
+    rgba(250,244,227,.62) 27%,
+    rgba(250,244,227,.34) 39%,
+    rgba(250,244,227,.12) 48%,
+    rgba(250,244,227,0) 57%)!important;
 }
 
 .dc-home .dc-event>.dc-shell{
@@ -160,20 +163,23 @@
 @media(max-width:900px) and (min-width:701px){
   .dc-home .dc-event__title{font-size:clamp(62px,7.8vw,82px)!important}
   .dc-home .dc-event>.dc-shell{width:56%!important;padding-left:4.5%!important}
-  .dc-home .dc-event::before{background:linear-gradient(90deg,#FAF4E3 0%,#FAF4E3 30%,rgba(250,244,227,.78) 42%,rgba(250,244,227,.34) 54%,rgba(250,244,227,0) 66%)!important}
+  .dc-home .dc-event::before{background:linear-gradient(90deg,rgba(250,244,227,.92) 0%,rgba(250,244,227,.72) 25%,rgba(250,244,227,.34) 45%,rgba(250,244,227,0) 64%)!important}
 }
 
 @media(max-width:700px){
   .dc-home .dc-event.dc-section{
+    display:block!important;
     width:100%!important;
+    height:auto!important;
     min-height:0!important;
+    max-height:none!important;
     aspect-ratio:auto!important;
     background-color:#FAF4E3!important;
     background-image:url('/assets/home/events/fuengirola-banner.webp')!important;
     background-position:center bottom!important;
     background-size:100% auto!important;
     background-repeat:no-repeat!important;
-    overflow:hidden!important;
+    overflow:visible!important;
   }
 
   .dc-home .dc-event::before{display:none!important}
@@ -183,9 +189,11 @@
     width:100%!important;
     height:auto!important;
     min-height:0!important;
+    max-height:none!important;
     margin:0!important;
-    padding:28px 20px calc(64vw + 24px)!important;
+    padding:28px 20px calc(67vw + 34px)!important;
     display:block!important;
+    box-sizing:border-box!important;
     background:transparent!important;
   }
 
