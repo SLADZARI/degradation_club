@@ -45,3 +45,4 @@ Update this file only when the user explicitly requests deploy/publish/release.
 2026-08-28T15:02+02:00 — publish truthful Join persistence copy; auth/sync baseline closed and access-control hierarchy fixed in dementor-club source of truth.
 2026-08-28T16:16+02:00 — publish coordinated homepage refresh: Community / People / Activity and Logic & Awareness / Project 001 after PR #19 merge.
 2026-08-28T16:26+02:00 — redeploy homepage refresh with generated cache-busted home-v1.css URL after production still showed the previous presentation.
+2026-08-28T16:45+02:00 — replace the two homepage blocks with the approved standalone HTML/CSS prototypes verbatim in structure and geometry; publish exact Community v3 and Logic & Awareness v2 integration.
