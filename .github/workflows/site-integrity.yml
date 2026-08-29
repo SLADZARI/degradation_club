@@ -7,6 +7,7 @@ on:
   push:
     branches:
       - dementor-club-production
+      - dementor-club-qa
       - release/dementor-production-2026-08-29-rc
   workflow_dispatch:
 
@@ -37,6 +38,9 @@ jobs:
 
       - name: Build production artifact without deploying
         run: node scripts/build-pages.mjs
+
+      - name: Validate production navigation boundaries
+        run: node scripts/validate-production-navigation.mjs
 
       - name: Validate production analytics and consent
         run: node scripts/validate-production-analytics.mjs
