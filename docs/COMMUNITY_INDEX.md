@@ -1,8 +1,9 @@
 # Dementor Club — Community Index
 
-STATUS: WORKING STRUCTURE / APPROVED BOUNDARY
-DATE: 2026-08-28
-SOURCE OF TRUTH: `dementor-club`
+STATUS: WORKING STRUCTURE / APPROVED BOUNDARY  
+DATE: 2026-08-28  
+Updated: 2026-08-30  
+SOURCE OF TRUTH: `dementor-club`  
 PUBLIC ROUTE: `/community/`
 
 ## Role
@@ -22,19 +23,48 @@ The current site implementation already exposes these Community-facing groups:
 
 The page may connect people to approved courses, practices, events and projects.
 
+## Approved Community participation v1
+
+The first approved closed-Community participation mechanic is defined in:
+
+`community/MEMBER_ENTRY_AND_ARTIFACT_FLOW_V1.md`
+
+Core approved distinctions:
+
+- authenticated User ≠ Member;
+- Member ≠ Dementor;
+- Community membership v1 becomes available after completion of all 9 sphere onboardings plus required identity/legal gates;
+- v1 membership activates automatically when those gates are satisfied;
+- a newly admitted Member receives one first Artifact slot;
+- the first implemented Artifact form is a Community notice / `type = notice`;
+- first-entry Community activation is completed after the Member publishes the first Artifact;
+- Member Artifacts are closed-Community content by default;
+- Artifact reactions/responses may create activity but do not automatically create an Event, Course, Project or Dementor role.
+
+The authenticated Board is a Community surface under this root, not a second Community root. Recommended implementation route:
+
+`/community/board/`
+
 ## Boundary
 
-Community presentation must not invent:
+Community presentation must not invent mechanics beyond approved source-of-truth records.
 
-- membership mechanics;
-- access rules;
-- internal channels;
+Specifically, do not invent or silently expand:
+
+- membership mechanics beyond v1;
+- additional access rules;
+- paid membership/access;
+- participant role hierarchy;
+- automatic Dementor status;
+- Artifact reward/slot economy beyond the initial approved slot;
+- automatic Artifact promotion;
+- public Community Board access;
+- unapproved Telegram/channel rules;
 - pricing;
-- rituals;
-- participant roles;
-- approval/status mechanics.
+- rituals beyond the approved first-Artifact entry mechanic;
+- approval/status mechanics not defined by source-of-truth.
 
-If those mechanics are not approved in club source-of-truth materials, the public page must explicitly present them as unavailable/in development rather than imply they exist.
+If a mechanic is not approved, the public/site surface must present it as unavailable/in development or omit it rather than imply it exists.
 
 ## Home entry
 
@@ -44,11 +74,17 @@ The approved Home Community block routes directly to this page:
 
 Visual implementation contract is documented separately in `docs/COMMUNITY_HOME_BLOCK.md`.
 
-## Future entity model
+## Approved/future entity model
 
-When approved, Community index records may include:
+Community records may now include the approved base entity:
 
+- **Artifact** — a persistent Member/Club contribution record; first implementation form is `notice`.
+
+Existing/future Community relations may include:
+
+- person / Member;
 - person / Dementor;
+- Artifact;
 - activity / practice;
 - related event;
 - related project;
@@ -56,3 +92,5 @@ When approved, Community index records may include:
 - archive/result record.
 
 Every record must retain its factual status and provenance. Internal ideas are not public entities.
+
+An Artifact can later become source/evidence for another approved entity, but promotion must be explicit and the original Artifact must retain its identity and provenance.
