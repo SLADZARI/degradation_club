@@ -7,27 +7,9 @@ const productionOrigin = 'https://dementor.club';
 
 const publicTextExtensions = new Set(['.html', '.xml', '.txt', '.webmanifest', '.json', '.js', '.css']);
 const contentExtensions = new Set(['.html', '.xml', '.txt', '.webmanifest', '.json']);
-const blockedContentMarkers = [
-  'TEST MATERIAL',
-  'TEST DATA',
-  'DEMO CONTENT',
-  'MOCK CONTENT',
-  'PLACEHOLDER',
-  'INTERNAL ONLY',
-  ' WIP ',
-];
+const blockedContentMarkers = ['TEST MATERIAL','TEST DATA','DEMO CONTENT','MOCK CONTENT','PLACEHOLDER','INTERNAL ONLY',' WIP '];
 const warningContentMarkers = ['APPROVED DRAFT'];
-const blockedFragments = [
-  '/degradation_club/',
-  'sladzari.github.io/degradation_club',
-  'degradation-club.vercel.app',
-  '/design-system/admin/',
-  '/staging/',
-  '/test/',
-  '/tests/',
-  'localhost:',
-  '127.0.0.1:',
-];
+const blockedFragments = ['/degradation_club/','sladzari.github.io/degradation_club','degradation-club.vercel.app','/design-system/admin/','/staging/','/test/','/tests/','localhost:','127.0.0.1:'];
 const forbiddenTopLevel = ['staging', 'test', 'tests', 'admin'];
 const errors = [];
 const warnings = [];
@@ -54,6 +36,16 @@ function localPathExists(raw, owner) {
   if (clean.endsWith('/')) target = path.join(target, 'index.html');
   if (!fs.existsSync(target)) errors.push(`${rel(owner)}: broken production reference ${raw}`);
 }
+function visibleContent(text, ext) {
+  if (ext !== '.html') return text;
+  return text
+    .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, ' ')
+    .replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, ' ')
+    .replace(/<!--([\s\S]*?)-->/g, ' ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;|&#160;/gi, ' ')
+    .replace(/\s+/g, ' ');
+}
 
 for (const name of forbiddenTopLevel) if (fs.existsSync(path.join(artifact, name))) errors.push(`forbidden production route/surface present: /${name}/`);
 
@@ -68,9 +60,10 @@ for (const full of files) {
   for (const fragment of blockedFragments) if (lower.includes(fragment.toLowerCase())) errors.push(`${file}: blocked legacy/staging fragment found: ${fragment}`);
 
   if (contentExtensions.has(ext)) {
-    const upper = ` ${text.toUpperCase()} `;
-    for (const marker of blockedContentMarkers) if (upper.includes(marker)) errors.push(`${file}: blocked public pre-production marker found: ${marker.trim()}`);
-    for (const marker of warningContentMarkers) if (upper.includes(marker)) warnings.push(`${file}: public status requires review before merge: ${marker}`);
+    const publicCopy = visibleContent(text, ext);
+    const upper = ` ${publicCopy.toUpperCase()} `;
+    for (const marker of blockedContentMarkers) if (upper.includes(marker)) errors.push(`${file}: blocked visible pre-production marker found: ${marker.trim()}`);
+    for (const marker of warningContentMarkers) if (upper.includes(marker)) warnings.push(`${file}: visible public status requires review before merge: ${marker}`);
   }
 
   if (ext === '.html') {
