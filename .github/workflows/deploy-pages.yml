@@ -7,11 +7,6 @@ on:
         description: 'Type APPROVED to deploy dementor.club'
         required: true
         type: string
-  push:
-    branches:
-      - dementor-club-production
-    paths:
-      - '.github/production-release.txt'
 
 permissions:
   contents: read
@@ -24,21 +19,12 @@ concurrency:
 
 jobs:
   build:
-    if: github.ref == 'refs/heads/dementor-club-production'
+    if: github.ref == 'refs/heads/dementor-club-production' && inputs.release_confirmation == 'APPROVED'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
       - name: Checkout production branch
         uses: actions/checkout@v4
-
-      - name: Validate explicit release approval
-        shell: bash
-        run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            test "${{ inputs.release_confirmation }}" = "APPROVED"
-          else
-            grep -qx 'STATUS=APPROVED' .github/production-release.txt
-          fi
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -69,7 +55,7 @@ jobs:
           path: ./_site
 
   deploy:
-    if: github.ref == 'refs/heads/dementor-club-production'
+    if: github.ref == 'refs/heads/dementor-club-production' && inputs.release_confirmation == 'APPROVED'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
