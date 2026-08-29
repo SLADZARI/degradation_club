@@ -21,8 +21,6 @@ const forbiddenArtifactPaths = [
   'docs',
   'references',
   'scripts',
-  'components',
-  'design-system',
   'test',
   'tests',
   'fixtures',
@@ -34,15 +32,22 @@ const forbiddenArtifactPaths = [
   'DEPLOY_TRIGGER.txt',
   'cart',
 ];
+const allowedInternalRuntimeAssets = new Set([
+  'components/course-cover-v1.css',
+  'design-system/design-system.css',
+  'design-system/dementor-workspace/workspace.css',
+]);
 const technicalRouteAllowlist = new Set([
   '/auth/callback/',
   '/profile/',
 ]);
 const publicTextExtensions = new Set(['.html', '.xml', '.txt', '.webmanifest', '.json', '.js', '.css']);
+const staticRefExtensions = '(?:css|js|mjs|json|xml|txt|webmanifest|png|jpe?g|webp|gif|svg|ico|avif|woff2?|ttf|otf|mp4|webm|mp3|wav)';
 const errors = [];
 const shippedHtmlRoutes = new Set();
 
 const artifactPath = rel => path.join(artifactRoot, rel);
+const toPosix = value => value.replaceAll('\\', '/');
 
 if (!fs.existsSync(artifactRoot)) {
   console.error('PRODUCTION RELEASE BLOCKED');
@@ -54,10 +59,93 @@ for (const rel of forbiddenArtifactPaths) {
   if (fs.existsSync(artifactPath(rel))) errors.push(`${rel}: internal/staging material must not exist in production artifact`);
 }
 
+function collectFiles(dir, base = dir) {
+  const files = [];
+  if (!fs.existsSync(dir)) return files;
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const full = path.join(dir, entry.name);
+    if (entry.isDirectory()) files.push(...collectFiles(full, base));
+    else files.push(toPosix(path.relative(base, full)));
+  }
+  return files;
+}
+
+for (const internalRoot of ['components', 'design-system']) {
+  const dir = artifactPath(internalRoot);
+  for (const sub of collectFiles(dir)) {
+    const rel = `${internalRoot}/${sub}`;
+    if (!allowedInternalRuntimeAssets.has(rel)) {
+      errors.push(`${rel}: unapproved internal dependency leaked into production artifact`);
+    }
+  }
+}
+for (const rel of allowedInternalRuntimeAssets) {
+  if (!fs.existsSync(artifactPath(rel))) errors.push(`${rel}: approved runtime dependency is missing from production artifact`);
+}
+
 function htmlFileToRoute(rel) {
   if (rel === 'index.html') return '/';
   if (rel.endsWith('/index.html')) return `/${rel.slice(0, -'/index.html'.length)}/`;
   return `/${rel}`;
+}
+
+function isExternalRef(ref) {
+  return !ref || ref.startsWith('#') || ref.startsWith('//') || /^(?:https?:|data:|mailto:|tel:|javascript:|blob:)/i.test(ref);
+}
+
+function cleanRef(ref) {
+  const value = String(ref || '').trim();
+  if (isExternalRef(value)) return null;
+  const clean = value.split('#', 1)[0].split('?', 1)[0];
+  if (!clean) return null;
+  try { return decodeURI(clean); } catch { return clean; }
+}
+
+function resolveArtifactRef(sourceRel, rawRef) {
+  const ref = cleanRef(rawRef);
+  if (!ref) return null;
+  const sourceDir = path.posix.dirname(toPosix(sourceRel));
+  let targetRel = ref.startsWith('/')
+    ? path.posix.normalize(ref.slice(1))
+    : path.posix.normalize(path.posix.join(sourceDir, ref));
+  if (targetRel === '.' || targetRel === '') targetRel = 'index.html';
+  if (targetRel.startsWith('../')) return { ref, targetRel, exists: false };
+
+  const exact = artifactPath(targetRel);
+  if (fs.existsSync(exact) && fs.statSync(exact).isFile()) return { ref, targetRel, exists: true };
+  if (fs.existsSync(exact) && fs.statSync(exact).isDirectory()) {
+    const indexRel = path.posix.join(targetRel, 'index.html');
+    return { ref, targetRel: indexRel, exists: fs.existsSync(artifactPath(indexRel)) };
+  }
+  if (!path.posix.extname(targetRel)) {
+    const indexRel = path.posix.join(targetRel, 'index.html');
+    if (fs.existsSync(artifactPath(indexRel))) return { ref, targetRel: indexRel, exists: true };
+  }
+  return { ref, targetRel, exists: false };
+}
+
+function validateRef(sourceRel, rawRef, kind) {
+  const resolved = resolveArtifactRef(sourceRel, rawRef);
+  if (resolved && !resolved.exists) {
+    errors.push(`${sourceRel}: broken ${kind} reference ${resolved.ref} -> ${resolved.targetRel}`);
+  }
+}
+
+function validatePublicReferences(rel, text, ext) {
+  if (ext === '.html') {
+    for (const match of text.matchAll(/\b(?:href|src|poster)\s*=\s*["']([^"']+)["']/gi)) validateRef(rel, match[1], 'HTML');
+    for (const match of text.matchAll(/\bsrcset\s*=\s*["']([^"']+)["']/gi)) {
+      for (const part of match[1].split(',')) validateRef(rel, part.trim().split(/\s+/)[0], 'srcset');
+    }
+  }
+  if (ext === '.css') {
+    for (const match of text.matchAll(/@import\s+(?:url\()?\s*["']?([^"')\s;]+)["']?/gi)) validateRef(rel, match[1], 'CSS import');
+    for (const match of text.matchAll(/url\(\s*["']?([^"')]+)["']?\s*\)/gi)) validateRef(rel, match[1], 'CSS url');
+  }
+  if (ext === '.js') {
+    const jsAssetPattern = new RegExp(`["'\\`]((?:/|\\.\\.?/)[^"'\\`\\s$]+?\\.${staticRefExtensions})["'\\`]`, 'gi');
+    for (const match of text.matchAll(jsAssetPattern)) validateRef(rel, match[1], 'JS asset');
+  }
 }
 
 function walk(dir) {
@@ -71,7 +159,7 @@ function walk(dir) {
     const ext = path.extname(entry.name).toLowerCase();
     if (!publicTextExtensions.has(ext)) continue;
 
-    const rel = path.relative(artifactRoot, full).replaceAll('\\', '/');
+    const rel = toPosix(path.relative(artifactRoot, full));
     const text = fs.readFileSync(full, 'utf8');
 
     if (ext === '.html') shippedHtmlRoutes.add(htmlFileToRoute(rel));
@@ -84,10 +172,30 @@ function walk(dir) {
     for (const marker of blockedMarkers) {
       if (upper.includes(marker)) errors.push(`${rel}: blocked pre-production marker found: ${marker.trim()}`);
     }
+
+    validatePublicReferences(rel, text, ext);
   }
 }
 
 walk(artifactRoot);
+
+for (const requiredRuntimePath of [
+  'site-config.js',
+  'auth/callback/index.html',
+  'workspace/index.html',
+  'required-auth-v1.js',
+  'program-account-sync-v1.js',
+  'merch-runtime-v1.js',
+]) {
+  if (!fs.existsSync(artifactPath(requiredRuntimePath))) errors.push(`${requiredRuntimePath}: required production runtime file is missing`);
+}
+
+const siteConfigPath = artifactPath('site-config.js');
+if (fs.existsSync(siteConfigPath)) {
+  const siteConfig = fs.readFileSync(siteConfigPath, 'utf8');
+  if (!siteConfig.includes("canonicalOrigin:'https://dementor.club'")) errors.push('site-config.js: canonicalOrigin must be https://dementor.club');
+  if (!siteConfig.includes('supabase:{enabled:true')) errors.push('site-config.js: Supabase production runtime must be enabled');
+}
 
 const readinessPath = path.join(root, 'content/page-readiness.json');
 if (!fs.existsSync(readinessPath)) {
@@ -134,8 +242,8 @@ if (!fs.existsSync(sitemapPath)) {
 if (errors.length) {
   console.error('PRODUCTION RELEASE BLOCKED');
   for (const error of errors) console.error(`- ${error}`);
-  console.error('\nProduction requires explicit content approval and an artifact free of staging/test material.');
+  console.error('\nProduction requires explicit content approval, complete runtime references and an artifact free of staging/test material.');
   process.exit(1);
 }
 
-console.log(`Production release guard passed: ${shippedHtmlRoutes.size} HTML routes covered.`);
+console.log(`Production release guard passed: ${shippedHtmlRoutes.size} HTML routes covered; runtime references closed.`);
