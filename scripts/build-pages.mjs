@@ -12,6 +12,11 @@ const skip = new Set([
   'docs',
   'references',
   'scripts',
+  'design-system',
+  'staging',
+  'test',
+  'tests',
+  'admin',
 ]);
 
 fs.rmSync(out, { recursive: true, force: true });
@@ -54,9 +59,18 @@ function injectEntityRecommendationSystem(dir) {
   }
 }
 
+function hardenProductionRuntime() {
+  const configPath = path.join(out, 'site-config.js');
+  if (!fs.existsSync(configPath)) return;
+  let source = fs.readFileSync(configPath, 'utf8');
+  source = source.replace(/internalTools:\{enabled:true,holdMs:\d+,path:'[^']*'\}/, "internalTools:{enabled:false,holdMs:0,path:null}");
+  fs.writeFileSync(configPath, source);
+}
+
 copyDir(root, out);
 injectEntityRecommendationSystem(out);
+hardenProductionRuntime();
 fs.writeFileSync(path.join(out, '.nojekyll'), '');
 fs.writeFileSync(path.join(out, 'CNAME'), 'dementor.club\n');
 
-console.log(`GitHub Pages artifact ready for ${productionOrigin} at ${out}`);
+console.log(`GitHub Pages production artifact ready for ${productionOrigin} at ${out}`);
