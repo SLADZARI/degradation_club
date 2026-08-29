@@ -1,5 +1,8 @@
-STATUS=BLOCKED
+STATUS=READY_FOR_MANUAL_APPROVAL
 DOMAIN=dementor.club
 SOURCE_BRANCH=dementor-club-production
-RELEASE=2026-08-29-custom-domain-bootstrap-r3
-BLOCK_REASON=Production branch is separated and manual deploy is enabled, but non-final public pages still require explicit production approval and GitHub branch protection/ruleset is not yet enforced at repository settings level.
+RELEASE=2026-08-29-custom-domain-bootstrap-r4
+CI_STATUS=GREEN
+DEPLOY_MODE=MANUAL_ONLY
+RELEASE_GUARD=PASSED
+PENDING=Human final visual review; explicit manual production approval; GitHub branch ruleset still not enforced in repository settings
