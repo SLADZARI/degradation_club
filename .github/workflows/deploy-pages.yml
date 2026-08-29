@@ -34,17 +34,17 @@ jobs:
       - name: Validate registry, routes and feature state
         run: node scripts/validate-site.mjs
 
-      - name: Validate page content readiness
+      - name: Validate page content readiness registry
         run: node scripts/validate-content-readiness.mjs
 
       - name: Validate visual contract
         run: node scripts/validate-visual-contract.mjs
 
-      - name: Validate production release guard
-        run: node scripts/validate-production-release.mjs
-
-      - name: Build Pages artifact
+      - name: Build production Pages artifact
         run: node scripts/build-pages.mjs
+
+      - name: Validate production artifact and release gate
+        run: node scripts/validate-production-release.mjs
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
