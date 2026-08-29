@@ -25,6 +25,15 @@ const skipTopLevel = new Set([
   'cart',
 ]);
 
+// These files are runtime dependencies of approved public/product surfaces.
+// Their source folders stay excluded so internal design-system/component pages
+// can never leak into the production artifact.
+const productionDependencies = [
+  'components/course-cover-v1.css',
+  'design-system/design-system.css',
+  'design-system/dementor-workspace/workspace.css',
+];
+
 const skipRootFiles = new Set([
   '.deploy-trigger',
   'DEPLOY_TRIGGER.txt',
@@ -40,6 +49,13 @@ fs.mkdirSync(out, { recursive: true });
 function normalizeProductionText(text) {
   let result = text;
   for (const legacy of legacyOrigins) result = result.replaceAll(legacy, productionOrigin);
+  // A future home raster is intentionally probed in staging. Production must
+  // never issue a 404 while that binary is still absent, so retain the approved
+  // current home raster until the replacement is physically committed.
+  result = result.replaceAll('/assets/ink/home-interruption-03.webp', '/assets/ink/home_01.webp');
+  // The design-system route is an internal staging surface and is intentionally
+  // absent from production. Keep the hidden hold gesture inert in production.
+  result = result.replaceAll("location.assign('/design-system/')", "window.DEMENTOR_SITE_CONFIG?.internalTools?.enabled&&location.assign('/design-system/')");
   return result;
 }
 
@@ -76,8 +92,26 @@ function copyDir(src, dst) {
   }
 }
 
+function copyProductionDependency(rel) {
+  const from = path.join(root, rel);
+  const to = path.join(out, rel);
+  if (!fs.existsSync(from) || !fs.statSync(from).isFile()) {
+    throw new Error(`Approved production dependency is missing: ${rel}`);
+  }
+  fs.mkdirSync(path.dirname(to), { recursive: true });
+  const ext = path.extname(rel).toLowerCase();
+  if (textExt.has(ext)) {
+    fs.writeFileSync(to, normalizeProductionText(fs.readFileSync(from, 'utf8')));
+  } else {
+    fs.copyFileSync(from, to);
+  }
+}
+
 copyDir(root, out);
+for (const rel of productionDependencies) copyProductionDependency(rel);
+
 fs.writeFileSync(path.join(out, '.nojekyll'), '');
 fs.writeFileSync(path.join(out, 'CNAME'), 'dementor.club\n');
 
 console.log(`GitHub Pages artifact ready for ${productionOrigin} at ${out}`);
+console.log(`Approved runtime dependencies shipped: ${productionDependencies.length}`);
