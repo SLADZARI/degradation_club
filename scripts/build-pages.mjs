@@ -112,9 +112,9 @@ function injectProductionPublicModules() {
     html = injectOnce(html, '/entity-recommendations-v1.css', '<link rel="stylesheet" href="/entity-recommendations-v1.css">', '</head>');
     html = injectOnce(html, '/entity-recommendations-v1.js', '<script src="/entity-recommendations-v1.js" defer></script>', '</body>');
 
-    if (rel === 'about/index.html') {
-      html = injectOnce(html, '/about-definition-v1.css', '<link rel="stylesheet" href="/about-definition-v1.css">', '</head>');
-    }
+    // About v10 owns its complete page layout in /about-v1.css. The previous
+    // about-definition-v1.css production override is intentionally not injected:
+    // keeping it would overwrite the approved v10 Dementor composition.
     if (rel === 'projects/logic-awareness/index.html') {
       html = injectOnce(html, '/logic-awareness-covers-v1.js', '<script src="/logic-awareness-covers-v1.js" defer></script>', '</body>');
     }
@@ -148,4 +148,4 @@ fs.writeFileSync(path.join(out, 'CNAME'), 'dementor.club\n');
 
 console.log(`GitHub Pages production candidate ready for ${productionOrigin} at ${out}`);
 console.log(`Approved runtime dependencies shipped: ${productionDependencies.length}`);
-console.log('Production-only modules injected: recommendations, approved visual overrides, consent-gated analytics.');
+console.log('Production-only modules injected: recommendations, project visual overrides, consent-gated analytics.');
