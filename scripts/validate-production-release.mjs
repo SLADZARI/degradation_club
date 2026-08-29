@@ -2,36 +2,54 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const root = process.cwd();
+const artifactRoot = path.join(root, '_site');
 const productionOrigin = 'https://dementor.club';
-const legacyOrigin = 'https://sladzari.github.io/degradation_club';
-
-const excludedTopLevel = new Set([
-  '.git',
-  '.github',
-  '_site',
-  'node_modules',
-  'docs',
-  'references',
-  'scripts',
-  'design-system',
-  'archive',
-]);
-
-const publicTextExtensions = new Set(['.html', '.xml', '.txt', '.webmanifest', '.json']);
+const legacyOrigins = [
+  'https://sladzari.github.io/degradation_club',
+  'https://degradation-club.vercel.app',
+];
 const blockedMarkers = [
   'TEST MATERIAL',
   'TEST DATA',
-  'PLACEHOLDER',
   'INTERNAL ONLY',
+  'LOREM IPSUM',
+  'DEMO CONTENT',
   'APPROVED DRAFT',
   ' WIP ',
 ];
-
+const forbiddenArtifactPaths = [
+  'docs',
+  'references',
+  'scripts',
+  'components',
+  'design-system',
+  'test',
+  'tests',
+  'fixtures',
+  'content/page-readiness.json',
+  '.github',
+  'README.md',
+  'DRIVE.md',
+  '.deploy-trigger',
+  'DEPLOY_TRIGGER.txt',
+];
+const publicTextExtensions = new Set(['.html', '.xml', '.txt', '.webmanifest', '.json', '.js', '.css']);
 const errors = [];
+
+const artifactPath = rel => path.join(artifactRoot, rel);
+
+if (!fs.existsSync(artifactRoot)) {
+  console.error('PRODUCTION RELEASE BLOCKED');
+  console.error('- _site artifact is missing; build must run before the production guard.');
+  process.exit(1);
+}
+
+for (const rel of forbiddenArtifactPaths) {
+  if (fs.existsSync(artifactPath(rel))) errors.push(`${rel}: internal/staging material must not exist in production artifact`);
+}
 
 function walk(dir) {
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-    if (dir === root && excludedTopLevel.has(entry.name)) continue;
     const full = path.join(dir, entry.name);
     if (entry.isDirectory()) {
       walk(full);
@@ -41,44 +59,59 @@ function walk(dir) {
     const ext = path.extname(entry.name).toLowerCase();
     if (!publicTextExtensions.has(ext)) continue;
 
-    const rel = path.relative(root, full);
+    const rel = path.relative(artifactRoot, full).replaceAll('\\', '/');
     const text = fs.readFileSync(full, 'utf8');
 
-    if (text.includes(legacyOrigin)) {
-      errors.push(`${rel}: legacy GitHub Pages origin remains (${legacyOrigin})`);
+    for (const legacy of legacyOrigins) {
+      if (text.includes(legacy)) errors.push(`${rel}: legacy origin remains (${legacy})`);
     }
 
     const upper = ` ${text.toUpperCase()} `;
     for (const marker of blockedMarkers) {
-      if (upper.includes(marker)) {
-        errors.push(`${rel}: blocked pre-production marker found: ${marker.trim()}`);
-      }
+      if (upper.includes(marker)) errors.push(`${rel}: blocked pre-production marker found: ${marker.trim()}`);
     }
   }
 }
 
-walk(root);
+walk(artifactRoot);
 
-const robotsPath = path.join(root, 'robots.txt');
-if (fs.existsSync(robotsPath)) {
-  const robots = fs.readFileSync(robotsPath, 'utf8');
-  if (!robots.includes(`${productionOrigin}/sitemap.xml`)) {
-    errors.push(`robots.txt: sitemap must point to ${productionOrigin}/sitemap.xml`);
+const readinessPath = path.join(root, 'content/page-readiness.json');
+if (!fs.existsSync(readinessPath)) {
+  errors.push('content/page-readiness.json: source readiness registry missing');
+} else {
+  const readiness = JSON.parse(fs.readFileSync(readinessPath, 'utf8'));
+  for (const page of readiness.pages || []) {
+    if (page.state === 'FINAL') continue;
+    if (page.productionAllowed === true) continue;
+    errors.push(`${page.route}: readiness state ${page.state} is not explicitly approved for production`);
   }
 }
 
-const sitemapPath = path.join(root, 'sitemap.xml');
-if (fs.existsSync(sitemapPath)) {
+const cnamePath = artifactPath('CNAME');
+if (!fs.existsSync(cnamePath) || fs.readFileSync(cnamePath, 'utf8').trim() !== 'dementor.club') {
+  errors.push('CNAME: production artifact must contain exactly dementor.club');
+}
+
+const robotsPath = artifactPath('robots.txt');
+if (!fs.existsSync(robotsPath)) {
+  errors.push('robots.txt: missing from production artifact');
+} else {
+  const robots = fs.readFileSync(robotsPath, 'utf8');
+  if (!robots.includes(`${productionOrigin}/sitemap.xml`)) errors.push(`robots.txt: sitemap must point to ${productionOrigin}/sitemap.xml`);
+}
+
+const sitemapPath = artifactPath('sitemap.xml');
+if (!fs.existsSync(sitemapPath)) {
+  errors.push('sitemap.xml: missing from production artifact');
+} else {
   const sitemap = fs.readFileSync(sitemapPath, 'utf8');
-  if (!sitemap.includes(`<loc>${productionOrigin}/</loc>`)) {
-    errors.push(`sitemap.xml: production origin ${productionOrigin} is missing`);
-  }
+  if (!sitemap.includes(`<loc>${productionOrigin}/</loc>`)) errors.push(`sitemap.xml: production origin ${productionOrigin} is missing`);
 }
 
 if (errors.length) {
   console.error('PRODUCTION RELEASE BLOCKED');
   for (const error of errors) console.error(`- ${error}`);
-  console.error('\nTest/demo/draft material must be removed or explicitly converted to approved public content before production.');
+  console.error('\nProduction requires explicit content approval and an artifact free of staging/test material.');
   process.exit(1);
 }
 
