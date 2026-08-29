@@ -1,11 +1,14 @@
 # SH-DEM-02 — PERSONAL GROWTH CANCELLED.
 
 - `product_id`: SH-DEM-02
+- `entity_type`: wear
 - `name`: PERSONAL GROWTH CANCELLED.
 - `public_name`: PERSONAL GROWTH CANCELLED.
+- `public_url`: /merch/drop-001/personal-growth-cancelled/
 - `category`: apparel / t-shirt
 - `line`: Classic Dementor T-Shirts
 - `status`: working-assets-present
+- `sales_state`: not-open
 - `drop`: DROP 001
 - `short_idea`: `PERSONAL GROWTH CANCELLED.`
 - `public_description`: null
@@ -21,11 +24,16 @@
 - `currency_display`: EUR
 - `production_notes`: null
 - `website_assets`: Google Drive `1W_V9XAninkPyxyjI0YFbqlsWrZhWWU5W` (`sh-dem-02.jpg`)
+- `primary_asset`: /assets/merch/drop-001/sh-dem-02-light.webp
 - `social_assets`: null
 - `related_project`: Dementor Club / Merch
+- `related_entities`: null
+- `recommendation_tags`: personal-growth; self-improvement; anti-optimization
+- `placement_tags`: HOME_INLINE; MERCH_CROSSSELL; FOOTER_ROTATION
+- `recommendation_priority`: 55
 - `approved_phrases`: `PERSONAL GROWTH CANCELLED.`; `DEMENTOR CLUB`
 - `prohibited_presentation`: do not infer fabric composition, GSM, fit, size range, print technique, price, edition or availability from the mockup
-- `updated_at`: 2026-08-26
+- `updated_at`: 2026-08-29
 
 ## Visual specification confirmed from uploaded mockup
 
