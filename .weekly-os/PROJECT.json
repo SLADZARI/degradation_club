@@ -1,0 +1,36 @@
+{
+  "schemaVersion": "1.0",
+  "projectId": "dementor-club",
+  "projectName": "Dementor Club",
+  "system": "MODERN_PILGRIMS",
+  "repository": "SLADZARI/degradation_club",
+  "defaultBranch": "main",
+  "workingBranch": "dementor-club",
+  "weeklyOs": {
+    "entrypoint": "/.weekly-os/PROJECT.json",
+    "reportDirectory": "/.weekly-os/reports",
+    "latestReport": "/.weekly-os/reports/latest.json"
+  },
+  "authority": {
+    "implementation": ["app", "src", "supabase"],
+    "productDocs": [
+      "operations/DEMENTOR_ENTITY_MAP_AND_WORKSPACE_MODULES_V0.1.md",
+      "operations/IDENTITY_MEMBERSHIP_AND_ENTITY_BOUNDARY_V0.2.md",
+      "operations/UNIVERSAL_WORKSPACE_WIREFRAME_SPEC_V0.1.md"
+    ]
+  },
+  "gptInstructions": {
+    "readFirst": [
+      "/.weekly-os/PROJECT.json",
+      "operations/IDENTITY_MEMBERSHIP_AND_ENTITY_BOUNDARY_V0.2.md",
+      "operations/DEMENTOR_ENTITY_MAP_AND_WORKSPACE_MODULES_V0.1.md"
+    ],
+    "doNotInfer": [
+      "Modern Pilgrims membership from Dementor Club membership",
+      "Modern Pilgrims roles from dc_* runtime state",
+      "person attribution from shared Git identity"
+    ],
+    "writeAutoReportTo": "/.weekly-os/reports/latest.json"
+  },
+  "updatedAt": "2026-08-29"
+}
