@@ -34,7 +34,28 @@ function copyDir(src, dst) {
   }
 }
 
+function injectEntityRecommendationSystem(dir) {
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const full = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      injectEntityRecommendationSystem(full);
+      continue;
+    }
+    if (!entry.isFile() || !entry.name.endsWith('.html')) continue;
+
+    let html = fs.readFileSync(full, 'utf8');
+    if (!html.includes('/entity-recommendations-v1.css')) {
+      html = html.replace('</head>', '<link rel="stylesheet" href="/entity-recommendations-v1.css">\n</head>');
+    }
+    if (!html.includes('/entity-recommendations-v1.js')) {
+      html = html.replace('</body>', '<script src="/entity-recommendations-v1.js" defer></script>\n</body>');
+    }
+    fs.writeFileSync(full, html);
+  }
+}
+
 copyDir(root, out);
+injectEntityRecommendationSystem(out);
 fs.writeFileSync(path.join(out, '.nojekyll'), '');
 fs.writeFileSync(path.join(out, 'CNAME'), 'dementor.club\n');
 
