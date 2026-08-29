@@ -1,0 +1,5 @@
+STATUS=APPROVED
+DOMAIN=dementor.club
+SOURCE_BRANCH=dementor-club-production
+RELEASE=2026-08-29-custom-domain-bootstrap
+PURPOSE=Publish dedicated production branch after staging separation and custom-domain path fix
