@@ -1,5 +1,5 @@
 window.DEMENTOR_SITE_CONFIG=Object.freeze({
-  version:'2026-08-29.03',
+  version:'2026-08-30.01',
   canonicalOrigin:'https://dementor.club',
   supabase:{
     enabled:true,
@@ -14,7 +14,8 @@ window.DEMENTOR_SITE_CONFIG=Object.freeze({
   events:{registrationEnabled:false,registrationProvider:null,registrationUrl:null},
   community:{membershipEnabled:true,membershipProvider:'join_application',membershipUrl:'/join/apply/'},
   onboarding:{storageKey:'dementorClubOnboardingV3',storage:'localStorage',accountSync:true,authRequired:false,progressMap:true},
-  internalTools:{enabled:false,holdMs:1200,path:'/design-system/admin/'}
+  // Source/QA may expose diagnostics. scripts/build-pages.mjs hardens this to false in production artifacts.
+  internalTools:{enabled:true,holdMs:1200,path:'/design-system/admin/'}
 });
 if(typeof document!=='undefined'){
   (()=>{
@@ -34,7 +35,11 @@ if(typeof document!=='undefined'){
     if(interactiveAuthRequired)addScript('/required-auth-v1.js',{module:true});
     if(path.includes('/courses/dumai-s-opasnostyu/')||path.includes('/courses/dengi-na-veter/'))addScript('/program-account-sync-v1.js',{module:true});
     if(path.includes('/merch/')||path.includes('/objects/'))addScript('/merch-runtime-v1.js',{module:true});
-    if(path.includes('/workspace')){addScript('/workspace-membership-link-v1.js');addScript('/workspace-owner-admin-tools-v1.js',{module:true});}
+    if(path.includes('/workspace')){
+      addScript('/workspace-membership-link-v1.js');
+      // QA/staging only. The production artifact forces internalTools.enabled=false.
+      if(cfg.internalTools?.enabled)addScript('/workspace-owner-admin-tools-v1.js',{module:true});
+    }
     if(isJoinAssessment){
       addScript('/dementor-account-sync-v8.js?v=20260828-17');
       addScript('/join-data-copy-v1.js?v=20260828-18');
