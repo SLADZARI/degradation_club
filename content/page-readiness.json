@@ -1,31 +1,256 @@
 {
-  "version":"2026-08-26",
-  "role":"site content readiness registry",
-  "statusDefinitions":{"FINAL":"Current public copy can ship without additional factual approval; later editorial refinement is optional.","PLACEHOLDER":"Page structure is valid, but substantive content is intentionally incomplete pending source-of-truth material.","REQUIRES_APPROVAL":"Operational or factual fields must be approved before the page can perform its intended live function."},
-  "pages":[
-    {"route":"/","state":"FINAL","source":["dementor-club/concept/DEGRADATION_AS_A_SERVICE.md","dementor-club/concept/ecosystem.md","dementor-club/events/fuengirola.md","logic-awareness/README.md","dementor-club/courses/dumai-s-opasnostyu.md","dementor-club/courses/dumai-s-opasnostyu-production-stage-1.md"],"blockingFields":[],"note":"Landing page reflects current approved club position and current entity statuses; COURSE-001 is active as Production Stage 1, while catalog placement remains separately not approved; event remains PLANNED."},
-    {"route":"/about/","state":"FINAL","source":["dementor-club/concept/DEGRADATION_AS_A_SERVICE.md","dementor-club/concept/ecosystem.md"],"blockingFields":[],"note":"Core positioning, service inversion, club role and editorial tone are source-aligned."},
-    {"route":"/events/","state":"FINAL","source":["dementor-club/events/fuengirola.md"],"blockingFields":[],"note":"Public event programme accurately exposes one PLANNED event and empty future states."},
-    {"route":"/events/fuengirola/","state":"PLACEHOLDER","source":["dementor-club/events/fuengirola.md"],"blockingFields":["date and time","venue","duration","programme","price","participation terms","registration mechanics","organizers and participants"],"note":"Approved planned-state description can ship; missing event facts remain explicitly unpublished."},
-    {"route":"/projects/","state":"FINAL","source":["dementor-club/concept/ecosystem.md","logic-awareness/README.md"],"blockingFields":[],"note":"Projects index exposes only the currently approved public project and preserves independent project ownership."},
-    {"route":"/projects/logic-awareness/","state":"FINAL","source":["logic-awareness/README.md"],"blockingFields":[],"note":"Public project positioning matches the independent logic-awareness editorial branch; unpublished drafts are not surfaced as club facts."},
-    {"route":"/community/","state":"REQUIRES_APPROVAL","source":["dementor-club/concept/ecosystem.md","dementor-club/people/dementors.md"],"blockingFields":["membership format","internal channels","rules and rituals","participant roles","joint activities"],"note":"Approved Dementor roster can ship; membership mechanics remain intentionally disabled."},
-    {"route":"/community/valentin/","state":"PLACEHOLDER","source":["dementor-club/people/dementors.md","dementor-club/courses/dumai-s-opasnostyu-production-stage-1.md"],"blockingFields":["public biography","practice spheres"],"note":"Roster membership and active Production Stage 1 course relation are confirmed; biography and practice spheres are still pending."},
-    {"route":"/community/nikita/","state":"PLACEHOLDER","source":["dementor-club/people/dementors.md"],"blockingFields":["public biography","practice spheres"],"note":"Profile URL and roster membership are confirmed; no courses or events are approved."},
-    {"route":"/community/evgeniy/","state":"PLACEHOLDER","source":["dementor-club/people/dementors.md"],"blockingFields":["public biography","practice spheres"],"note":"Profile URL and roster membership are confirmed; no courses or events are approved."},
-    {"route":"/community/gabil/","state":"PLACEHOLDER","source":["dementor-club/people/dementors.md"],"blockingFields":["public biography","practice spheres"],"note":"Profile URL and roster membership are confirmed; no courses or events are approved."},
-    {"route":"/merch/","state":"REQUIRES_APPROVAL","source":["dementor-club/concept/ecosystem.md","dementor-club/merch/PRODUCT_CARD_SCHEMA.md","dementor-club/merch/products/SH_DEM_01_OVERTHINKING_IS_MY_CARDIO.md","dementor-club/merch/products/SH_DEM_02_PERSONAL_GROWTH_CANCELLED.md","dementor-club/merch/products/SH_DEM_03_SUCCESS_IS_BORING.md"],"blockingFields":["t-shirt materials","fabric GSM","fit","size range","print technique","print dimensions","packaging","edition","prices","availability","checkout activation"],"note":"DROP 001 has three working product entities and four visual variants. Missing production and commercial fields are intentionally visible and sales remain closed."},
-    {"route":"/merch/drop-001/overthinking-is-my-cardio/","state":"REQUIRES_APPROVAL","source":["dementor-club/merch/products/SH_DEM_01_OVERTHINKING_IS_MY_CARDIO.md"],"blockingFields":["public description","fabric composition","fabric GSM","fit","size range","blank supplier","print technique","print ink spec","print dimensions and position","neck label spec","care label","packaging","edition","price","production cost ceiling","availability","shipping weight"],"note":"Visual product specification is captured from the approved mockup; production and commercial fields remain explicitly missing."},
-    {"route":"/merch/drop-001/personal-growth-cancelled/","state":"REQUIRES_APPROVAL","source":["dementor-club/merch/products/SH_DEM_02_PERSONAL_GROWTH_CANCELLED.md"],"blockingFields":["public description","fabric composition","fabric GSM","fit","size range","blank supplier","print technique","print ink spec","print dimensions and position","neck label spec","care label","packaging","edition","price","production cost ceiling","availability","shipping weight"],"note":"Visual product specification is captured from the approved mockup; production and commercial fields remain explicitly missing."},
-    {"route":"/merch/drop-001/success-is-boring/","state":"REQUIRES_APPROVAL","source":["dementor-club/merch/products/SH_DEM_03_SUCCESS_IS_BORING.md"],"blockingFields":["public description","fabric composition","fabric GSM","fit","size range","blank supplier","print technique","print ink spec","print dimensions and position","neck label spec","care label","packaging","edition","price","production cost ceiling","availability","shipping weight"],"note":"Two visual colour variants are captured; production and commercial fields remain explicitly missing."},
-    {"route":"/join/","state":"FINAL","source":["dementor-club/operations/ONBOARDING_SYSTEM.md","dementor-club/operations/CONTENT_TAXONOMY_AND_DEMENTOR_LEVELS.md"],"blockingFields":[],"note":"Current nine-sphere onboarding matches the canonical profile-onboarding model. Results remain local and do not imply membership."},
-    {"route":"/courses/dumai-s-opasnostyu/","state":"FINAL","source":["dementor-club/courses/dumai-s-opasnostyu.md","dementor-club/courses/dumai-s-opasnostyu-production-stage-1.md"],"blockingFields":[],"note":"Production Stage 1 is approved and can ship publicly. Catalog placement remains a separate decision."},
-    {"route":"/catalog/","state":"FINAL","source":["dementor-club-site/content/registry.json"],"blockingFields":[],"note":"Service registry is factual and intentionally sparse; empty categories are valid data states."},
-    {"route":"/archive/","state":"FINAL","source":["dementor-club-site event lifecycle contract"],"blockingFields":[],"note":"Empty archive is correct until an event becomes COMPLETED or CANCELLED."},
-    {"route":"/donate/","state":"REQUIRES_APPROVAL","source":["dementor-club/operations/PUBLIC_SITE_REQUIRED_PAGES.md"],"blockingFields":["payment provider","recipient","currency","payment URL","recurring support rule"],"note":"Permanent support URL and disabled adapter are ready; no payment details may be inferred."},
-    {"route":"/contacts/","state":"REQUIRES_APPROVAL","source":["dementor-club/operations/PUBLIC_SITE_REQUIRED_PAGES.md"],"blockingFields":["official endpoint","public email and/or approved public channels"],"note":"Contact form is structurally ready and fail-closed until an official channel is approved."},
-    {"route":"/legal/privacy/","state":"FINAL","source":["dementor-club/operations/PUBLIC_SITE_REQUIRED_PAGES.md","current site implementation"],"blockingFields":[],"note":"Valid for current localStorage-only interactions; must be reviewed before new data collection."},
-    {"route":"/legal/terms/","state":"FINAL","source":["dementor-club/operations/PUBLIC_SITE_REQUIRED_PAGES.md","current site implementation"],"blockingFields":[],"note":"Valid for current non-transactional state. Must be legally reviewed before commercial or membership activation."},
-    {"route":"/404.html","state":"FINAL","source":["dementor-club-site implementation"],"blockingFields":[],"note":"Technical not-found route; excluded from sitemap and intended for noindex behaviour."}
+  "version": "2026-08-29",
+  "role": "site content readiness registry",
+  "statusDefinitions": {
+    "FINAL": "Current public copy can ship without additional factual approval; later editorial refinement is optional.",
+    "PLACEHOLDER": "Page structure is valid, but substantive content is intentionally incomplete pending source-of-truth material.",
+    "REQUIRES_APPROVAL": "Operational or factual fields remain blocked; the page may ship only when productionAllowed is explicitly true and the blocked fields stay omitted or disabled."
+  },
+  "pages": [
+    {
+      "route": "/",
+      "state": "FINAL",
+      "source": ["dementor-club/concept/DEGRADATION_AS_A_SERVICE.md", "dementor-club/concept/ecosystem.md", "dementor-club/events/fuengirola.md", "logic-awareness/README.md", "dementor-club/courses/dumai-s-opasnostyu.md", "dementor-club/courses/dumai-s-opasnostyu-production-stage-1.md"],
+      "blockingFields": [],
+      "note": "Landing page reflects current approved club position and entity statuses."
+    },
+    {
+      "route": "/about/",
+      "state": "FINAL",
+      "source": ["dementor-club/concept/DEGRADATION_AS_A_SERVICE.md", "dementor-club/concept/ecosystem.md"],
+      "blockingFields": [],
+      "note": "Core positioning, service inversion, club role and editorial tone are source-aligned."
+    },
+    {
+      "route": "/events/",
+      "state": "FINAL",
+      "source": ["dementor-club/events/fuengirola.md"],
+      "blockingFields": [],
+      "note": "Public event programme exposes the approved PLANNED event state."
+    },
+    {
+      "route": "/events/fuengirola/",
+      "state": "PLACEHOLDER",
+      "productionAllowed": true,
+      "source": ["dementor-club/events/fuengirola.md"],
+      "blockingFields": ["date and time", "venue", "duration", "price", "participation terms", "registration mechanics", "additional organisers and participants"],
+      "note": "Public planned-state page is explicitly allowed by source. Only approved location, capacity, Dementor, concept and public description may ship; unknown operational details remain omitted."
+    },
+    {
+      "route": "/projects/",
+      "state": "FINAL",
+      "source": ["dementor-club/concept/ecosystem.md", "logic-awareness/README.md"],
+      "blockingFields": [],
+      "note": "Projects index exposes only approved public project references."
+    },
+    {
+      "route": "/projects/logic-awareness/",
+      "state": "FINAL",
+      "source": ["logic-awareness/README.md"],
+      "blockingFields": [],
+      "note": "Public positioning matches the independent project source."
+    },
+    {
+      "route": "/projects/logic-awareness/dossiers/",
+      "state": "FINAL",
+      "source": ["logic-awareness/characters/logic-and-awareness-dossiers.md"],
+      "blockingFields": [],
+      "note": "Character dossier source is explicitly approved for project/site use."
+    },
+    {
+      "route": "/projects/logic-awareness/dossiers/logic/",
+      "state": "FINAL",
+      "source": ["logic-awareness/characters/logic-and-awareness-dossiers.md"],
+      "blockingFields": [],
+      "note": "Logic dossier is explicitly approved for project/site use."
+    },
+    {
+      "route": "/projects/logic-awareness/dossiers/awareness/",
+      "state": "FINAL",
+      "source": ["logic-awareness/characters/logic-and-awareness-dossiers.md"],
+      "blockingFields": [],
+      "note": "Awareness dossier is explicitly approved for project/site use."
+    },
+    {
+      "route": "/community/",
+      "state": "REQUIRES_APPROVAL",
+      "productionAllowed": true,
+      "source": ["dementor-club/concept/ecosystem.md", "dementor-club/people/dementors.md", "dementor-club/operations/MEMBERSHIP_APPLICATION_AND_DC9_PUBLIC_FLOW_V0.1.md"],
+      "blockingFields": ["full membership rules", "internal channels", "rituals", "participant roles", "joint activity rules"],
+      "note": "Approved public Dementor roster and current activity may ship. Membership application is separate from membership; unapproved internal mechanics must stay absent."
+    },
+    {
+      "route": "/community/valentin/",
+      "state": "PLACEHOLDER",
+      "productionAllowed": true,
+      "source": ["dementor-club/people/dementors.md", "dementor-club/courses/dumai-s-opasnostyu-production-stage-1.md"],
+      "blockingFields": ["public biography", "practice spheres", "unapproved methods"],
+      "note": "Public roster identity and approved course relation may ship; pending biography/practice material must remain hidden."
+    },
+    {
+      "route": "/community/nikita/",
+      "state": "PLACEHOLDER",
+      "productionAllowed": true,
+      "source": ["dementor-club/people/dementors.md", "dementor-club/courses/dengi-na-veter.md"],
+      "blockingFields": ["public biography", "practice spheres", "unapproved methods"],
+      "note": "Public roster identity, author formula and approved in-development course relation may ship; pending biography/practice material must remain hidden."
+    },
+    {
+      "route": "/community/evgeniy/",
+      "state": "PLACEHOLDER",
+      "productionAllowed": true,
+      "source": ["dementor-club/people/dementors.md", "dementor-club/courses/slaboumie-i-otvaga.md"],
+      "blockingFields": ["public biography", "practice spheres", "unapproved biographical claims"],
+      "note": "Public roster identity, approved doctrine/method names and planned course relation may ship; pending biography/practice material must remain hidden."
+    },
+    {
+      "route": "/community/gabil/",
+      "state": "PLACEHOLDER",
+      "productionAllowed": true,
+      "source": ["dementor-club/people/dementors.md", "dementor-club/courses/ne-komanda.md", "dementor-club/events/fuengirola.md"],
+      "blockingFields": ["public biography", "practice spheres", "unapproved methods"],
+      "note": "Public roster identity plus approved active practice and planned event relations may ship; pending biography/practice material must remain hidden."
+    },
+    {
+      "route": "/merch/",
+      "state": "REQUIRES_APPROVAL",
+      "productionAllowed": true,
+      "source": ["dementor-club/merch/README.md", "dementor-club/merch/products/OBJECT_001_NE_NADO.md", "dementor-club/merch/products/SH_DEM_01_OVERTHINKING_IS_MY_CARDIO.md", "dementor-club/merch/products/SH_DEM_02_PERSONAL_GROWTH_CANCELLED.md", "dementor-club/merch/products/SH_DEM_03_SUCCESS_IS_BORING.md", "dementor-club/operations/ACCOUNT_PROGRESS_AND_MERCH_RUNTIME_V0.1.md"],
+      "blockingFields": ["shirt production specifications", "shirt prices", "shirt availability", "checkout activation"],
+      "note": "Merch direction, approved Object 001 and working visual assets may be shown. Cart and checkout are disabled; missing commercial/production fields must not be inferred."
+    },
+    {
+      "route": "/objects/001-ne-nado/",
+      "state": "FINAL",
+      "source": ["dementor-club/merch/products/OBJECT_001_NE_NADO.md", "dementor-club/operations/ACCOUNT_PROGRESS_AND_MERCH_RUNTIME_V0.1.md"],
+      "blockingFields": [],
+      "note": "OBJECT 001 is approved for public presentation; current sales_state is not_open, so the production page must remain non-purchasable."
+    },
+    {
+      "route": "/merch/drop-001/overthinking-is-my-cardio/",
+      "state": "REQUIRES_APPROVAL",
+      "productionAllowed": true,
+      "source": ["dementor-club/merch/products/SH_DEM_01_OVERTHINKING_IS_MY_CARDIO.md", "dementor-club/operations/ACCOUNT_PROGRESS_AND_MERCH_RUNTIME_V0.1.md"],
+      "blockingFields": ["public description", "fabric composition", "fabric GSM", "fit", "size range", "print technique", "production specification", "price", "edition", "availability", "checkout"],
+      "note": "Approved phrase and working visual asset may ship only as a non-commerce current-state page. Price is TBD and sales remain not_open."
+    },
+    {
+      "route": "/merch/drop-001/personal-growth-cancelled/",
+      "state": "REQUIRES_APPROVAL",
+      "productionAllowed": true,
+      "source": ["dementor-club/merch/products/SH_DEM_02_PERSONAL_GROWTH_CANCELLED.md", "dementor-club/operations/ACCOUNT_PROGRESS_AND_MERCH_RUNTIME_V0.1.md"],
+      "blockingFields": ["public description", "fabric composition", "fabric GSM", "fit", "size range", "print technique", "production specification", "price", "edition", "availability", "checkout"],
+      "note": "Working visual asset may ship only as a non-commerce current-state page. Missing fields are not approved and sales remain not_open."
+    },
+    {
+      "route": "/merch/drop-001/success-is-boring/",
+      "state": "REQUIRES_APPROVAL",
+      "productionAllowed": true,
+      "source": ["dementor-club/merch/products/SH_DEM_03_SUCCESS_IS_BORING.md", "dementor-club/operations/ACCOUNT_PROGRESS_AND_MERCH_RUNTIME_V0.1.md"],
+      "blockingFields": ["public description", "fabric composition", "fabric GSM", "fit", "size range", "print technique", "production specification", "price", "edition", "availability", "checkout"],
+      "note": "Working visual variants may ship only as a non-commerce current-state page. Missing fields are not approved and sales remain not_open."
+    },
+    {
+      "route": "/join/",
+      "state": "FINAL",
+      "source": ["dementor-club/operations/ONBOARDING_SYSTEM.md", "dementor-club/operations/CONTENT_TAXONOMY_AND_DEMENTOR_LEVELS.md", "dementor-club/operations/MEMBERSHIP_APPLICATION_AND_DC9_PUBLIC_FLOW_V0.1.md"],
+      "blockingFields": [],
+      "note": "DC-9 public flow and account-save boundary are approved; a diagnostic result does not imply membership."
+    },
+    {
+      "route": "/join/apply/",
+      "state": "FINAL",
+      "source": ["dementor-club/operations/MEMBERSHIP_APPLICATION_AND_DC9_PUBLIC_FLOW_V0.1.md"],
+      "blockingFields": [],
+      "note": "Authenticated membership application flow is approved and implemented; submission never creates club membership automatically."
+    },
+    {
+      "route": "/courses/dumai-s-opasnostyu/",
+      "state": "FINAL",
+      "source": ["dementor-club/courses/dumai-s-opasnostyu.md", "dementor-club/courses/dumai-s-opasnostyu-production-stage-1.md"],
+      "blockingFields": [],
+      "note": "Production Stage 1 is approved and can ship publicly."
+    },
+    {
+      "route": "/courses/dengi-na-veter/",
+      "state": "REQUIRES_APPROVAL",
+      "productionAllowed": true,
+      "source": ["dementor-club/courses/dengi-na-veter.md", "dementor-club/operations/ACCOUNT_PROGRESS_AND_MERCH_RUNTIME_V0.1.md"],
+      "blockingFields": ["commercial purchase flow", "final course length", "future voice-answer functionality", "final release status"],
+      "note": "Approved concept and digital card-course MVP may ship explicitly as IN DEVELOPMENT. The page must not represent the future/commercial version as already available."
+    },
+    {
+      "route": "/courses/ne-komanda/",
+      "state": "FINAL",
+      "source": ["dementor-club/courses/ne-komanda.md", "dementor-club/people/dementors.md"],
+      "blockingFields": [],
+      "note": "Active recurring practice, Dementor and Monday 10:00 Europe/Madrid schedule are source-approved; unconfirmed price/admission details remain absent."
+    },
+    {
+      "route": "/courses/slaboumie-i-otvaga/",
+      "state": "REQUIRES_APPROVAL",
+      "productionAllowed": true,
+      "source": ["dementor-club/courses/slaboumie-i-otvaga.md", "dementor-club/people/dementors.md"],
+      "blockingFields": ["date", "specific aeroclub", "price", "registration or payment activation"],
+      "note": "Approved concept explicitly allows a public PLANNED page. Warsaw/Gdansk and approved program framing may ship; blocked operational facts must remain unpublished."
+    },
+    {
+      "route": "/catalog/",
+      "state": "FINAL",
+      "source": ["dementor-club-site/content/registry.json", "dementor-club/operations/DEMENTOR_CLUB_ENTITY_ONTOLOGY_V0.1.md"],
+      "blockingFields": [],
+      "note": "Public entity register mirrors approved/current source states."
+    },
+    {
+      "route": "/archive/",
+      "state": "FINAL",
+      "source": ["dementor-club-site event lifecycle contract"],
+      "blockingFields": [],
+      "note": "Empty archive is correct until an event becomes completed or cancelled."
+    },
+    {
+      "route": "/workspace/",
+      "state": "FINAL",
+      "source": ["dementor-club/operations/DC_WORKSPACE_READONLY_ACCESS_V0.1.md", "dementor-club/operations/PERSONAL_WORKSPACE_PROGRESSIVE_ACCESS_V0.2.md"],
+      "blockingFields": [],
+      "note": "Production read-only personal workspace is approved; route remains private-product UI with noindex/nofollow/noarchive and server/RLS authorization boundaries."
+    },
+    {
+      "route": "/donate/",
+      "state": "REQUIRES_APPROVAL",
+      "productionAllowed": true,
+      "source": ["dementor-club/operations/PUBLIC_SITE_REQUIRED_PAGES.md"],
+      "blockingFields": ["payment provider", "recipient", "currency", "payment URL", "recurring support rule"],
+      "note": "Approved structural support page may ship with payment mechanics disabled and no invented credentials or amounts."
+    },
+    {
+      "route": "/contacts/",
+      "state": "REQUIRES_APPROVAL",
+      "productionAllowed": true,
+      "source": ["dementor-club/operations/PUBLIC_SITE_REQUIRED_PAGES.md"],
+      "blockingFields": ["official endpoint", "public email and/or approved public channels"],
+      "note": "Approved structural contact page may ship fail-closed while no public contact channel is approved."
+    },
+    {
+      "route": "/legal/privacy/",
+      "state": "FINAL",
+      "source": ["dementor-club/operations/PUBLIC_SITE_REQUIRED_PAGES.md", "current site implementation"],
+      "blockingFields": [],
+      "note": "Current public legal surface; must be reviewed whenever actual data collection behaviour changes."
+    },
+    {
+      "route": "/legal/terms/",
+      "state": "FINAL",
+      "source": ["dementor-club/operations/PUBLIC_SITE_REQUIRED_PAGES.md", "current site implementation"],
+      "blockingFields": [],
+      "note": "Current public terms surface; commercial activation requires a separate review."
+    },
+    {
+      "route": "/404.html",
+      "state": "FINAL",
+      "source": ["dementor-club-site implementation"],
+      "blockingFields": [],
+      "note": "Technical not-found page; excluded from sitemap and noindex."
+    }
   ]
 }
