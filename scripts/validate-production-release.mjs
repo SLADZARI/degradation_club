@@ -33,8 +33,12 @@ const forbiddenArtifactPaths = [
   '.deploy-trigger',
   'DEPLOY_TRIGGER.txt',
 ];
+const technicalRouteAllowlist = new Set([
+  '/auth/callback/',
+]);
 const publicTextExtensions = new Set(['.html', '.xml', '.txt', '.webmanifest', '.json', '.js', '.css']);
 const errors = [];
+const shippedHtmlRoutes = new Set();
 
 const artifactPath = rel => path.join(artifactRoot, rel);
 
@@ -46,6 +50,12 @@ if (!fs.existsSync(artifactRoot)) {
 
 for (const rel of forbiddenArtifactPaths) {
   if (fs.existsSync(artifactPath(rel))) errors.push(`${rel}: internal/staging material must not exist in production artifact`);
+}
+
+function htmlFileToRoute(rel) {
+  if (rel === 'index.html') return '/';
+  if (rel.endsWith('/index.html')) return `/${rel.slice(0, -'/index.html'.length)}/`;
+  return `/${rel}`;
 }
 
 function walk(dir) {
@@ -61,6 +71,8 @@ function walk(dir) {
 
     const rel = path.relative(artifactRoot, full).replaceAll('\\', '/');
     const text = fs.readFileSync(full, 'utf8');
+
+    if (ext === '.html') shippedHtmlRoutes.add(htmlFileToRoute(rel));
 
     for (const legacy of legacyOrigins) {
       if (text.includes(legacy)) errors.push(`${rel}: legacy origin remains (${legacy})`);
@@ -80,10 +92,19 @@ if (!fs.existsSync(readinessPath)) {
   errors.push('content/page-readiness.json: source readiness registry missing');
 } else {
   const readiness = JSON.parse(fs.readFileSync(readinessPath, 'utf8'));
+  const readinessRoutes = new Set();
+
   for (const page of readiness.pages || []) {
+    readinessRoutes.add(page.route);
     if (page.state === 'FINAL') continue;
     if (page.productionAllowed === true) continue;
     errors.push(`${page.route}: readiness state ${page.state} is not explicitly approved for production`);
+  }
+
+  for (const route of [...shippedHtmlRoutes].sort()) {
+    if (readinessRoutes.has(route)) continue;
+    if (technicalRouteAllowlist.has(route)) continue;
+    errors.push(`${route}: shipped HTML route has no explicit readiness record`);
   }
 }
 
@@ -115,4 +136,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log('Production release guard passed.');
+console.log(`Production release guard passed: ${shippedHtmlRoutes.size} HTML routes covered.`);
