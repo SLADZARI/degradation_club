@@ -27,3 +27,32 @@
     overflow-wrap:anywhere;
   }
 }
+
+/* SERVICE / 002 — clean illustration field */
+.dc-about-service{
+  background:#F9EDD5;
+  border-bottom:0;
+  padding-bottom:0;
+}
+.dc-about-service + .dc-ink-slot--about{
+  margin:0;
+  min-height:0;
+  background:#F9EDD5;
+  border:0;
+  overflow:hidden;
+}
+.dc-about-service + .dc-ink-slot--about::before{
+  display:none;
+}
+.dc-about-service + .dc-ink-slot--about img{
+  display:block;
+  width:100%;
+  height:auto;
+  margin:0;
+  border:0;
+  outline:0;
+  box-shadow:none;
+  filter:none;
+  mix-blend-mode:normal;
+  background:#F9EDD5;
+}
