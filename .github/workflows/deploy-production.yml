@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       release_confirmation:
-        description: 'Type APPROVED to deploy dementor.club'
+        description: 'Type APPROVED to deploy dementor.club from dementor-club-production'
         required: true
         type: string
 
@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - name: Checkout production branch
+      - name: Checkout canonical production branch
         uses: actions/checkout@v4
         with:
           ref: dementor-club-production
@@ -44,6 +44,9 @@ jobs:
 
       - name: Build production Pages artifact
         run: node scripts/build-pages.mjs
+
+      - name: Validate production analytics and consent
+        run: node scripts/validate-production-analytics.mjs
 
       - name: Validate production artifact and release gate
         run: node scripts/validate-production-release.mjs
