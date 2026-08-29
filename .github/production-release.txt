@@ -1,5 +1,6 @@
-STATUS=APPROVED
+STATUS=BLOCKED
 DOMAIN=dementor.club
 SOURCE_BRANCH=dementor-club-production
 RELEASE=2026-08-29-custom-domain-bootstrap-r2
-PURPOSE=Publish dedicated production branch after staging separation, custom-domain path fix and canonical-origin update
+LAST_ATTEMPT_RUN=33246325109
+BLOCK_REASON=Production guard found legacy GitHub Pages origins and visible/internal placeholder-draft markers; candidate requires cleanup and final public-content approval before manual release
