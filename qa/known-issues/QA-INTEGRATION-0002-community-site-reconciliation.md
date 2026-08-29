@@ -1,6 +1,6 @@
 # QA-INTEGRATION-0002 — Community / site ↔ QA reconciliation
 
-Status: PARTIALLY_RECONCILED_PENDING_PAGE_SYNC
+Status: PAGE_SYNC_COMPLETE_PENDING_BROWSER
 Severity: P1
 Type: RELEASE INTEGRATION / BRANCH DIVERGENCE
 Environment: `dementor-club-site` + `dementor-club-qa`
@@ -20,8 +20,8 @@ The branches must not be merged wholesale because doing so can restore stale pub
 ### Global header
 
 Reconciled manually:
-- Community is now a direct top-level navigation link.
-- The stale `Community → People / Courses` dropdown has been removed.
+- Community is a direct top-level navigation link.
+- The stale `Community → People / Courses` dropdown is removed.
 - Course routes still mark Community as active.
 - QA Account hardening is preserved: Account points to Personal Workspace.
 - Cart stays hidden unless `cartEnabled === true`.
@@ -38,13 +38,22 @@ Reconciled manually:
 
 QA commit: `799ab2a6ce85cdbeaad00d8335ff2013663e8833`.
 
-## Still pending
+### Community page and CSS
 
-The QA branch still contains the older Community page implementation. Before creating the next production candidate, synchronize the approved Community page from `dementor-club-site` into QA together with its current CSS/assets, while preserving QA-only environment boundaries.
+Synchronized into QA from the approved `dementor-club-site` implementation without merging the branches wholesale.
 
-Do not resolve this by merging the whole branch.
+Exact public blobs now used in QA:
+- `community/index.html` → `97e697ab56105a9c0697e88f3eebbbd567bceb2f`;
+- `community-v2.css` → `79f0648f620f6d5784e850949110a9f828adbf8e`.
 
-## Required browser evidence after page sync
+The supplied hero asset was already identical on both branches:
+- `assets/ink/community-hero-01.webp` → `4a96112bf5339510c27436609e67ba50f1705936`.
+
+QA reconciliation commit: `e4e62ffd38ed41489a11f023f6ae9d195395e4d8`.
+
+This means the QA candidate now combines the approved Community UX with the existing Workspace/Auth/System Tools hardening layer.
+
+## Browser evidence still required
 
 Community:
 - desktop 1440/1024;
@@ -56,10 +65,12 @@ Community:
 - all people/format/activity links resolve;
 - Logic & Awareness opens from the top.
 
-Workspace regression remains separately tracked in `QA-RUNTIME-0001-workspace-club-navigation.md`.
+Workspace regression remains separately tracked in `QA-RUNTIME-0001-workspace-club-navigation.md` and still requires:
+- `HOME → MY CLUB → HOME → MY CLUB ×20`;
+- Activity / Profile / Work;
+- anonymous `/workspace/`;
+- console/network/session checks.
 
 ## Release rule
 
-Production remains untouched until both:
-1. Community/site reconciliation is complete in QA;
-2. browser-level Workspace and Community regression evidence passes.
+Production remains untouched until browser-level Workspace and Community regression evidence passes and the protected production candidate is explicitly approved.
