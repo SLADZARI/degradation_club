@@ -11,10 +11,10 @@
   <script src="../site-config.js"></script>
 </head>
 <body class="dc-system-page dcw-body">
-  <div class="dcw-live-banner">DEMENTOR CLUB · PERSONAL WORKSPACE · LIVE v0.3.1</div>
+  <div class="dcw-live-banner">DEMENTOR CLUB · PERSONAL WORKSPACE · QA HARDENING v0.4.0</div>
   <div class="dcw-app">
     <aside class="dcw-sidebar">
-      <a class="dcw-brand" href="./"><span>DEMENTOR</span><strong>CLUB</strong></a>
+      <a class="dcw-brand" href="/"><span>DEMENTOR</span><strong>CLUB</strong></a>
       <nav class="dcw-nav" aria-label="Личный кабинет">
         <button type="button" data-route="home" class="is-active">HOME</button>
         <button type="button" data-route="club">MY CLUB</button>
@@ -23,14 +23,33 @@
         <button type="button" data-route="profile">MY PROFILE</button>
       </nav>
       <div class="dcw-boundary"><span>SYSTEM</span><strong>DEMENTOR CLUB</strong><small>Один аккаунт. Статус и рабочие возможности добавляются поверх базового личного кабинета.</small></div>
-      <div class="dcw-session" id="sessionBox"><span>SESSION</span><strong>ПРОВЕРКА…</strong></div>
+      <div class="dcw-session" id="sessionBox"><span>SESSION</span><strong>НЕ ВЫПОЛНЕН ВХОД</strong></div>
     </aside>
     <main class="dcw-main">
-      <header class="dcw-topbar"><div><span class="dcw-kicker">DEMENTOR CLUB / PERSONAL WORKSPACE</span><strong id="topTitle">HOME</strong></div><div class="dcw-top-meta"><span>SUPABASE AUTH</span><span class="dcw-dot"></span><span>RLS</span></div></header>
-      <div id="appView" class="dcw-view" aria-live="polite"><section class="dcw-gate"><div class="dcw-spinner"></div><h1>ПОДКЛЮЧАЕМ АККАУНТ</h1><p>Google → Supabase session → personal data → membership → roles → assignments</p></section></div>
+      <header class="dcw-topbar"><div><span class="dcw-kicker">DEMENTOR CLUB / PERSONAL WORKSPACE</span><strong id="topTitle">ACCOUNT</strong></div><div class="dcw-top-meta"><span>SUPABASE AUTH</span><span class="dcw-dot"></span><span>RLS</span></div></header>
+      <div id="appView" class="dcw-view" aria-live="polite">
+        <section class="dcw-gate" data-workspace-fallback>
+          <div class="dcw-denied">
+            <div class="dcw-kicker">PERSONAL WORKSPACE / ACCOUNT REQUIRED</div>
+            <h2>ЛИЧНЫЙ КАБИНЕТ</h2>
+            <p>Войдите через Google, чтобы открыть результаты тестов, курсы, членство и профиль.</p>
+            <div class="dcw-actions-row">
+              <button type="button" class="dcw-login" data-login>ВОЙТИ ЧЕРЕЗ GOOGLE</button>
+              <a class="dcw-secondary" href="/">НА САЙТ</a>
+            </div>
+            <div class="dcw-note" data-workspace-boot-note>Проверяем сохранённую сессию…</div>
+          </div>
+        </section>
+      </div>
     </main>
   </div>
-  <script src="./workspace-listener-guard-v1.js"></script>
+  <script>
+    window.__DC_WORKSPACE_BOOT_TIMEOUT__=setTimeout(()=>{
+      const note=document.querySelector('[data-workspace-boot-note]');
+      if(!note||document.documentElement.dataset.dcWorkspaceReady==='1')return;
+      note.innerHTML='Не удалось быстро подключить аккаунт. Можно <button type="button" class="dcw-secondary" onclick="location.reload()">ПОВТОРИТЬ</button> или вернуться на сайт.';
+    },8000);
+  </script>
   <script type="module" src="./workspace.js"></script>
   <script type="module" src="./workspace-enhancements-v1.js"></script>
   <script src="./workspace-analytics-hook-v1.js" defer></script>
