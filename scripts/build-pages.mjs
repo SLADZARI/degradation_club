@@ -53,6 +53,9 @@ function normalizeProductionText(text) {
   // never issue a 404 while that binary is still absent, so retain the approved
   // current home raster until the replacement is physically committed.
   result = result.replaceAll('/assets/ink/home-interruption-03.webp', '/assets/ink/home_01.webp');
+  // The design-system route is an internal staging surface and is intentionally
+  // absent from production. Keep the hidden hold gesture inert in production.
+  result = result.replaceAll("location.assign('/design-system/')", "window.DEMENTOR_SITE_CONFIG?.internalTools?.enabled&&location.assign('/design-system/')");
   return result;
 }
 
