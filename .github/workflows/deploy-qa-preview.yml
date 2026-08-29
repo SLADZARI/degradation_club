@@ -1,0 +1,88 @@
+name: Deploy Dementor QA Preview
+
+on:
+  push:
+    branches:
+      - dementor-club-qa
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  QA_VERCEL_PROJECT: dementor-club-qa
+  QA_VERCEL_SCOPE: sharecraftwideo-5699s-projects
+
+concurrency:
+  group: dementor-club-qa-preview
+  cancel-in-progress: true
+
+jobs:
+  validate-package-deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout QA branch
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Validate registry and routes
+        run: node scripts/validate-site.mjs
+
+      - name: Validate content readiness
+        run: node scripts/validate-content-readiness.mjs
+
+      - name: Validate visual contract
+        run: node scripts/validate-visual-contract.mjs
+
+      - name: Build QA preview artifact
+        run: node scripts/build-qa.mjs
+
+      - name: Upload QA artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dementor-club-qa-${{ github.sha }}
+          path: _qa_site
+          retention-days: 7
+
+      - name: Require Vercel QA credential
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          if [ -z "$VERCEL_TOKEN" ]; then
+            echo "::error::VERCEL_TOKEN is not configured. Add it as a repository/environment secret to enable isolated QA preview deployment."
+            exit 1
+          fi
+
+      - name: Ensure isolated QA project exists
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          npx --yes vercel@latest project add "$QA_VERCEL_PROJECT" \
+            --scope "$QA_VERCEL_SCOPE" \
+            --token "$VERCEL_TOKEN" >/dev/null 2>&1 || true
+
+      - name: Deploy QA preview to Vercel
+        id: deploy
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          URL=$(npx --yes vercel@latest deploy _qa_site \
+            --yes \
+            --scope "$QA_VERCEL_SCOPE" \
+            --project "$QA_VERCEL_PROJECT" \
+            --token "$VERCEL_TOKEN")
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
+          echo "QA preview: $URL"
+          printf '%s\n' "$URL" > qa-preview-url.txt
+
+      - name: Upload QA preview URL
+        uses: actions/upload-artifact@v4
+        with:
+          name: dementor-club-qa-url-${{ github.sha }}
+          path: qa-preview-url.txt
+          retention-days: 7
