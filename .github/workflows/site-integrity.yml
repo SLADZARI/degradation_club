@@ -7,6 +7,7 @@ on:
   push:
     branches:
       - dementor-club-production
+      - release/dementor-production-2026-08-29-rc
   workflow_dispatch:
 
 permissions:
