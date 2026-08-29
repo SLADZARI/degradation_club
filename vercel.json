@@ -4,6 +4,12 @@
   "git": {
     "deploymentEnabled": false
   },
+  "rewrites": [
+    {
+      "source": "/community/artifact/:id/",
+      "destination": "/community/artifact/?id=:id"
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",
