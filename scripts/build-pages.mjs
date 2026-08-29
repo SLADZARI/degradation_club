@@ -4,34 +4,72 @@ import path from 'node:path';
 const root = process.cwd();
 const out = path.join(root, '_site');
 const productionOrigin = 'https://dementor.club';
-const skip = new Set([
-  '.git',
-  '.github',
-  '_site',
-  'node_modules',
-  'docs',
-  'references',
-  'scripts',
-  'design-system',
-  'staging',
-  'test',
-  'tests',
-  'admin',
+const legacyOrigins = [
+  'https://sladzari.github.io/degradation_club',
+  'https://degradation-club.vercel.app',
+];
+
+const skipTopLevel = new Set([
+  '.git', '.github', '_site', 'node_modules', 'docs', 'references', 'scripts',
+  'components', 'design-system', 'staging', 'test', 'tests', 'fixtures', 'admin', 'cart',
 ]);
-const textual = new Set(['.html','.css','.js','.json','.xml','.txt','.webmanifest']);
+
+const productionDependencies = [
+  'components/course-cover-v1.css',
+  'design-system/design-system.css',
+  'design-system/dementor-workspace/workspace.css',
+];
+
+const skipRootFiles = new Set([
+  '.deploy-trigger', 'DEPLOY_TRIGGER.txt', 'DRIVE.md', 'README.md',
+]);
+const textExt = new Set(['.html', '.css', '.js', '.json', '.xml', '.txt', '.webmanifest']);
 
 fs.rmSync(out, { recursive: true, force: true });
 fs.mkdirSync(out, { recursive: true });
 
+function normalizeProductionText(text) {
+  let result = text;
+  for (const legacy of legacyOrigins) result = result.replaceAll(legacy, productionOrigin);
+  result = result.replaceAll('/degradation_club/', '/');
+  result = result.replaceAll('/assets/ink/home-interruption-03.webp', '/assets/ink/home_01.webp');
+  return result;
+}
+
+function shouldSkipFile(src, entryName) {
+  const rel = path.relative(root, src).replaceAll('\\', '/');
+  if (path.dirname(src) === root && skipRootFiles.has(entryName)) return true;
+  if (entryName.toLowerCase().endsWith('.md')) return true;
+  if (entryName.toLowerCase().endsWith('.example.html')) return true;
+  if (rel === 'content/page-readiness.json') return true;
+  return false;
+}
+
 function copyDir(src, dst) {
   fs.mkdirSync(dst, { recursive: true });
   for (const entry of fs.readdirSync(src, { withFileTypes: true })) {
-    if (skip.has(entry.name)) continue;
+    if (src === root && skipTopLevel.has(entry.name)) continue;
     const from = path.join(src, entry.name);
     const to = path.join(dst, entry.name);
-    if (entry.isDirectory()) copyDir(from, to);
+    if (entry.isDirectory()) {
+      copyDir(from, to);
+      continue;
+    }
+    if (shouldSkipFile(from, entry.name)) continue;
+    const ext = path.extname(entry.name).toLowerCase();
+    if (textExt.has(ext)) fs.writeFileSync(to, normalizeProductionText(fs.readFileSync(from, 'utf8')));
     else fs.copyFileSync(from, to);
   }
+}
+
+function copyProductionDependency(rel) {
+  const from = path.join(root, rel);
+  const to = path.join(out, rel);
+  if (!fs.existsSync(from) || !fs.statSync(from).isFile()) throw new Error(`Approved production dependency is missing: ${rel}`);
+  fs.mkdirSync(path.dirname(to), { recursive: true });
+  const ext = path.extname(rel).toLowerCase();
+  if (textExt.has(ext)) fs.writeFileSync(to, normalizeProductionText(fs.readFileSync(from, 'utf8')));
+  else fs.copyFileSync(from, to);
 }
 
 function walk(dir, fn) {
@@ -41,35 +79,15 @@ function walk(dir, fn) {
   }
 }
 
-function normalizeProductionOrigins() {
-  walk(out, full => {
-    if (!textual.has(path.extname(full).toLowerCase())) return;
-    let source = fs.readFileSync(full, 'utf8');
-    source = source
-      .replaceAll('https://degradation-club.vercel.app', productionOrigin)
-      .replaceAll('https://sladzari.github.io/degradation_club', productionOrigin);
-    fs.writeFileSync(full, source);
-  });
-}
-
 function injectProductionModules() {
   walk(out, full => {
     if (!full.endsWith('.html')) return;
     const rel = path.relative(out, full).replaceAll('\\','/');
     let html = fs.readFileSync(full, 'utf8');
-
-    if (!html.includes('/entity-recommendations-v1.css')) {
-      html = html.replace('</head>', '<link rel="stylesheet" href="/entity-recommendations-v1.css">\n</head>');
-    }
-    if (!html.includes('/entity-recommendations-v1.js')) {
-      html = html.replace('</body>', '<script src="/entity-recommendations-v1.js" defer></script>\n</body>');
-    }
-    if (rel === 'about/index.html' && !html.includes('/about-definition-v1.css')) {
-      html = html.replace('</head>', '<link rel="stylesheet" href="/about-definition-v1.css">\n</head>');
-    }
-    if (rel === 'projects/logic-awareness/index.html' && !html.includes('/logic-awareness-covers-v1.js')) {
-      html = html.replace('</body>', '<script src="/logic-awareness-covers-v1.js" defer></script>\n</body>');
-    }
+    if (!html.includes('/entity-recommendations-v1.css')) html = html.replace('</head>', '<link rel="stylesheet" href="/entity-recommendations-v1.css">\n</head>');
+    if (!html.includes('/entity-recommendations-v1.js')) html = html.replace('</body>', '<script src="/entity-recommendations-v1.js" defer></script>\n</body>');
+    if (rel === 'about/index.html' && !html.includes('/about-definition-v1.css')) html = html.replace('</head>', '<link rel="stylesheet" href="/about-definition-v1.css">\n</head>');
+    if (rel === 'projects/logic-awareness/index.html' && !html.includes('/logic-awareness-covers-v1.js')) html = html.replace('</body>', '<script src="/logic-awareness-covers-v1.js" defer></script>\n</body>');
     fs.writeFileSync(full, html);
   });
 }
@@ -83,20 +101,27 @@ function hardenProductionRuntime() {
     source = source.replace("link.href=canonical+path.replace(/^\\/degradation_club/,'')", 'link.href=canonical+path');
     fs.writeFileSync(configPath, source);
   }
-
   const motionPath = path.join(out, 'motion-v1.js');
   if (fs.existsSync(motionPath)) {
     let source = fs.readFileSync(motionPath, 'utf8');
     source = source.replace("location.assign('/design-system/');", 'unlocked=false;');
+    source = source.replace("window.DEMENTOR_SITE_CONFIG?.internalTools?.enabled&&location.assign('/design-system/')", 'unlocked=false');
     fs.writeFileSync(motionPath, source);
+  }
+  const ownerTools = path.join(out, 'workspace-owner-admin-tools-v1.js');
+  if (fs.existsSync(ownerTools)) {
+    let source = fs.readFileSync(ownerTools, 'utf8');
+    source = source.replaceAll('/design-system/admin/', '/workspace/');
+    fs.writeFileSync(ownerTools, source);
   }
 }
 
 copyDir(root, out);
-normalizeProductionOrigins();
+for (const rel of productionDependencies) copyProductionDependency(rel);
 injectProductionModules();
 hardenProductionRuntime();
 fs.writeFileSync(path.join(out, '.nojekyll'), '');
 fs.writeFileSync(path.join(out, 'CNAME'), 'dementor.club\n');
 
-console.log(`GitHub Pages production artifact ready for ${productionOrigin} at ${out}`);
+console.log(`GitHub Pages production candidate ready for ${productionOrigin} at ${out}`);
+console.log(`Approved runtime dependencies shipped: ${productionDependencies.length}`);
