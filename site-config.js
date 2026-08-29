@@ -1,6 +1,6 @@
 window.DEMENTOR_SITE_CONFIG=Object.freeze({
-  version:'2026-08-29.01',
-  canonicalOrigin:'https://sladzari.github.io/degradation_club',
+  version:'2026-08-29.02',
+  canonicalOrigin:'https://dementor.club',
   supabase:{
     enabled:true,
     url:'https://mmekfydwbvptbdatwitj.supabase.co',
@@ -22,9 +22,9 @@ if(typeof document!=='undefined'){
     const path=location.pathname;
     const addScript=(src,{module=false,key=null}={})=>{if(document.querySelector(`script[src="${src}"]`)||(key&&document.querySelector(`script[data-${key}]`)))return;const s=document.createElement('script');s.src=src;if(module)s.type='module';else s.defer=true;if(key)s.dataset[key.replace(/-([a-z])/g,(_,c)=>c.toUpperCase())]='1';document.head.appendChild(s)};
     const normalizeCanonicalMetadata=()=>{
-      const canonical=cfg.canonicalOrigin.replace(/\/$/,'');const legacy='https://degradation-club.vercel.app';
-      document.querySelectorAll('meta[property="og:url"],meta[property="og:image"],meta[name="twitter:image"]').forEach(meta=>{const value=meta.getAttribute('content')||'';if(value.startsWith(legacy))meta.setAttribute('content',canonical+value.slice(legacy.length))});
-      if(!document.querySelector('link[rel="canonical"]')&&location.origin.includes('sladzari.github.io')){const link=document.createElement('link');link.rel='canonical';link.href=canonical+path.replace(/^\/degradation_club/,'');document.head.appendChild(link)}
+      const canonical=cfg.canonicalOrigin.replace(/\/$/,'');const legacyOrigins=['https://degradation-club.vercel.app','https://sladzari.github.io/degradation_club'];
+      document.querySelectorAll('meta[property="og:url"],meta[property="og:image"],meta[name="twitter:image"]').forEach(meta=>{const value=meta.getAttribute('content')||'';for(const legacy of legacyOrigins){if(value.startsWith(legacy)){meta.setAttribute('content',canonical+value.slice(legacy.length));break;}}});
+      if(!document.querySelector('link[rel="canonical"]')){const link=document.createElement('link');link.rel='canonical';link.href=canonical+path.replace(/^\/degradation_club/,'');document.head.appendChild(link)}
     };
     normalizeCanonicalMetadata();
     addScript('/global-header.js');if(!document.querySelector('link[href="/global-header.css"]')){const l=document.createElement('link');l.rel='stylesheet';l.href='/global-header.css';document.head.appendChild(l)}
@@ -45,7 +45,7 @@ if(typeof document!=='undefined'){
     const installInternalToolsHold=()=>{
       if(!cfg.internalTools?.enabled||document.documentElement.dataset.dcAdminHold==='1')return;
       document.documentElement.dataset.dcAdminHold='1';const targets=[...document.querySelectorAll('footer,.dc-utility-strip')];if(!targets.length)return;
-      const base=path.startsWith('/degradation_club/')?'/degradation_club':'';const destination=base+cfg.internalTools.path;
+      const destination=cfg.internalTools.path;
       targets.forEach(target=>{let timer=null,fired=false;const cancel=()=>{if(timer){clearTimeout(timer);timer=null;}};target.addEventListener('pointerdown',event=>{if(event.pointerType==='mouse'&&event.button!==0)return;fired=false;cancel();timer=setTimeout(()=>{timer=null;fired=true;if(navigator.vibrate)navigator.vibrate(35);location.assign(destination)},cfg.internalTools.holdMs||1200)});target.addEventListener('pointerup',cancel);target.addEventListener('pointercancel',cancel);target.addEventListener('pointerleave',cancel);target.addEventListener('click',event=>{if(!fired)return;event.preventDefault();event.stopImmediatePropagation();fired=false},{capture:true})});
     };
     if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',installInternalToolsHold,{once:true});else installInternalToolsHold();
