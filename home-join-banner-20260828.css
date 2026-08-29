@@ -33,7 +33,7 @@
   width:clamp(420px,46vw,650px);
   aspect-ratio:504/339;
   background:url('/assets/home/join/join_baner_image.webp') center/contain no-repeat;
-  transform:translate3d(var(--dc-join-x,-8vw),0,0);
+  transform:translate3d(var(--dc-join-x,-12vw),0,0);
   will-change:transform;
   pointer-events:none;
 }
@@ -66,56 +66,47 @@
   text-transform:uppercase!important;
   color:#111!important;
 }
-.dc-home .dc-join__bottom{
-  grid-column:3!important;
-  grid-row:3!important;
-  align-self:end!important;
-  justify-self:stretch!important;
-  position:relative!important;
-  z-index:5!important;
-  display:grid!important;
-  grid-template-columns:minmax(0,1fr) auto!important;
-  gap:clamp(24px,3vw,56px)!important;
-  align-items:end!important;
-  width:min(100%,620px)!important;
-  margin:0!important;
-}
-.dc-home .dc-join__bottom .dc-body{
-  margin:0!important;
-  max-width:30ch!important;
-  font-size:clamp(15px,1.22vw,19px)!important;
-  line-height:1.32!important;
-  color:#111!important;
-}
-.dc-home .dc-join__bottom .dc-action{
-  min-width:136px!important;
-  min-height:48px!important;
-  padding:0 20px!important;
-  display:inline-flex!important;
-  align-items:center!important;
-  justify-content:center!important;
-  background:#111!important;
-  border:1px solid #111!important;
-  color:#f2f0e8!important;
-  text-decoration:none!important;
-  font-size:10px!important;
-  line-height:1!important;
-  letter-spacing:.06em!important;
-  font-weight:900!important;
-  text-transform:uppercase!important;
-  white-space:nowrap!important;
-}
-@supports (animation-timeline:view()){
-  .dc-home .dc-join::before{
-    animation:dcJoinTraverse linear both;
-    animation-timeline:view();
-    animation-range:entry 0% exit 100%;
+
+/* Desktop: keep copy + CTA inside the banner, pinned to the right edge. */
+@media(min-width:701px){
+  .dc-home .dc-join__bottom{
+    position:absolute!important;
+    z-index:6!important;
+    right:clamp(28px,4.4vw,72px)!important;
+    bottom:clamp(34px,5vw,72px)!important;
+    width:clamp(240px,22vw,330px)!important;
+    margin:0!important;
+    display:block!important;
   }
-  @keyframes dcJoinTraverse{
-    from{transform:translate3d(-16vw,0,0)}
-    to{transform:translate3d(34vw,0,0)}
+  .dc-home .dc-join__bottom .dc-body{
+    margin:0!important;
+    max-width:24ch!important;
+    font-size:clamp(15px,1.22vw,19px)!important;
+    line-height:1.32!important;
+    color:#111!important;
+  }
+  .dc-home .dc-join__bottom .dc-action{
+    width:max-content!important;
+    min-width:168px!important;
+    min-height:58px!important;
+    margin-top:28px!important;
+    padding:0 26px!important;
+    display:inline-flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    background:#111!important;
+    border:1px solid #111!important;
+    color:#f2f0e8!important;
+    text-decoration:none!important;
+    font-size:12px!important;
+    line-height:1!important;
+    letter-spacing:.06em!important;
+    font-weight:900!important;
+    text-transform:uppercase!important;
+    white-space:nowrap!important;
   }
 }
+
 @media(max-width:700px){
   .dc-home .dc-join{min-height:720px!important}
   .dc-home .dc-join .dc-shell{
@@ -148,6 +139,8 @@
     display:block!important;
     width:100%!important;
     margin:28px 0 0!important;
+    position:relative!important;
+    z-index:5!important;
   }
   .dc-home .dc-join__bottom .dc-body{
     max-width:23ch!important;
@@ -166,11 +159,5 @@
     bottom:-1%;
     transform:translate3d(var(--dc-join-x,-10vw),0,0);
   }
-  @supports (animation-timeline:view()){
-    @keyframes dcJoinTraverse{
-      from{transform:translate3d(-28vw,0,0)}
-      to{transform:translate3d(22vw,0,0)}
-    }
-  }
 }
-@media(prefers-reduced-motion:reduce){.dc-home .dc-join::before{animation:none!important;transform:none!important}}
+@media(prefers-reduced-motion:reduce){.dc-home .dc-join::before{transform:none!important}}
