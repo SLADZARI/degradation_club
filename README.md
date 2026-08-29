@@ -1,6 +1,17 @@
 # Dementor Club — Official Site
 
-Отдельная ветка официального сайта клуба.
+Рабочая ветка официального сайта клуба.
+
+## Branch role
+
+`dementor-club-site` = **STAGING / WORKING SITE**.
+
+Здесь находятся реализация, визуальные тесты, responsive-проверки, интеграции и подготовка релизов. Эта ветка не является production source и обычный push в неё не должен публиковать `dementor.club`.
+
+Публичный production snapshot хранится отдельно в `dementor-club-production`.
+
+Полный release contract: `docs/deployment.md`.
+Главное правило утверждения: `dementor-club/operations/PRODUCTION_RELEASE_POLICY_V1.md`.
 
 ## Что хранится здесь
 
@@ -30,6 +41,20 @@
 - `references/REFERENCE_RESPONSIBILITIES.md` — карта ответственности Public Records / Actual Source / 032c / Mouthwash / DIA / Dementor Ink.
 
 Эти документы являются обязательным source-of-truth для новых страниц и редизайна существующих экранов. Новая сущность не получает новый случайный дизайн: сначала определяется `entity_type`, `presentation_role`, `context` и responsive contract, затем используются общие primitives.
+
+## Test material ≠ public content
+
+Макеты разрешено проектировать и утверждать на тестовом материале.
+
+Это утверждает **дизайн и композицию**, но не превращает test/demo/mock/placeholder/draft данные в публичный контент.
+
+Перед production обязательно:
+
+1. заменить тестовый материал на отдельно утверждённые публичные данные;
+2. повторно проверить макет уже с реальным контентом;
+3. пройти production QA;
+4. получить явное release approval;
+5. только после этого обновить `dementor-club-production` и выполнить отдельное production release action.
 
 ## Asset rules
 
@@ -88,13 +113,16 @@ Internal reference:
 
 ## Release validation
 
-Перед публикацией обязательно выполнить:
+Перед production-кандидатом обязательно выполнить:
 
 ```bash
 node scripts/validate-site.mjs
+node scripts/validate-content-readiness.mjs
+node scripts/validate-visual-contract.mjs
+node scripts/validate-production-release.mjs
 ```
 
-Validator проверяет:
+Validator stack проверяет:
 
 - registry ↔ records;
 - уникальность ID и URL;
@@ -106,9 +134,10 @@ Validator проверяет:
 - порядок подключения service adapters;
 - отсутствие старого CDN onboarding engine;
 - Join storage guard;
-- статусные инварианты, включая `approved-draft` и event registration.
+- статусные инварианты;
+- визуальный contract;
+- отсутствие legacy production origin и очевидного test/demo contamination в production release.
 
-GitHub Actions workflow: `.github/workflows/site-integrity.yml`.
 Любая validation error является release blocker. Warning требует проверки, но не блокирует процесс автоматически.
 
 ## External feature activation
@@ -120,16 +149,21 @@ GitHub Actions workflow: `.github/workflows/site-integrity.yml`.
 - Donate payment;
 - Merch checkout;
 - Event registration;
-- Community membership.
+- Community membership — только согласно актуальному source-of-truth и provider state.
 
 UI readiness не является фактом публичной доступности функции.
 
 ## Deployment status
 
-Production branch contract: `dementor-club-site` only.
+Canonical domain: `https://dementor.club`.
 
-Known production project/domain: `degradation-club` / `https://degradation-club.vercel.app/`.
-Последняя доступная проверка commit status показала ошибку Vercel `build-rate-limit`; это инфраструктурный deployment blocker, а не подтверждение ошибки site validator. Не считать последний HEAD опубликованным, пока live deployment не проверен отдельно.
+Production branch contract: `dementor-club-production` only.
+
+`dementor-club-site` is staging and does not publish the production domain on ordinary pushes.
+
+Production release is explicit-only and is blocked when the validation stack finds release contamination or inconsistent production metadata.
+
+Do not claim a new version published until the production workflow succeeds and the live domain is smoke-tested.
 
 ## Storage split
 
