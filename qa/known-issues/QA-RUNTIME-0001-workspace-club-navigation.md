@@ -1,6 +1,6 @@
 # QA-RUNTIME-0001 — Workspace / MY CLUB navigation hang
 
-Status: OPEN
+Status: FIXED_IN_QA_PENDING_BROWSER
 Severity: P1
 Type: RUNTIME / NAVIGATION
 Environment: production reproduction, fix work only in `dementor-club-qa`
@@ -11,25 +11,21 @@ Route: `/workspace/`
 
 Authenticated workspace loads HOME correctly. Clicking `MY CLUB` / the `КЛУБ` dashboard action can leave the transition hanging and the browser in a continuing loading state.
 
-## Current production evidence
+## QA fix applied
 
-The workspace router currently re-runs `bind()` after every render and scans all `[data-route]` nodes to attach new click listeners. A separate `workspace-listener-guard-v1.js` globally monkey-patches `EventTarget.prototype.addEventListener` to suppress repeat bindings on persistent sidebar navigation.
+The render-time `bind()` model has been removed from active workspace runtime and replaced by one delegated click listener. The legacy `workspace-listener-guard-v1.js` global `EventTarget.prototype.addEventListener` monkey-patch has been deleted from the QA branch.
 
-This combination is a brittle legacy navigation contract and is the first suspect for repeated, blocked or inconsistent route clicks. The club route itself is synchronous and should not require a fresh Supabase request.
+The club route remains synchronous. Dementor portraits now use `loading="lazy"` + `decoding="async"`.
 
-## QA classification
+Related hardening in the same QA fix-pack:
+- logged-out `/workspace/` now has a real HTML shell before Supabase resolves;
+- auth/session bootstrap is bounded and exposes retry/error state instead of an infinite spinner;
+- core identity/profile loading is separated from optional membership/tests/courses/orders/join data;
+- optional data-source failures no longer intentionally abort the whole workspace;
+- production Account navigation no longer exposes disabled Cart;
+- production internal System Tools links are disabled by environment policy.
 
-This is a P1 blocker under `docs/QA_RELEASE_CONTRACT_v1.md` because an authenticated primary workspace route is not reliably navigable.
-
-## Required fix direction
-
-1. Replace render-time listener rebinding with one stable delegated navigation listener.
-2. Remove the global EventTarget monkey-patch once delegation is active.
-3. Keep route rendering synchronous; no full-page reload for internal workspace tabs.
-4. Lazy/decode secondary club portrait media so image loading cannot block perceived navigation.
-5. Preserve Supabase auth/session/RLS behavior unchanged.
-
-## Regression acceptance
+## Regression acceptance still required
 
 - HOME → MY CLUB renders once and remains responsive.
 - MY CLUB → HOME → MY CLUB works for at least 20 repeated transitions without duplicated handlers or increasing latency.
@@ -39,8 +35,12 @@ This is a P1 blocker under `docs/QA_RELEASE_CONTRACT_v1.md` because an authentic
 - no new console errors;
 - no persistent network request required for internal route rendering;
 - auth/session remains intact;
-- production is not changed until QA passes and a protected production PR is approved.
+- production is not changed until browser QA passes and a protected production PR is approved.
+
+## Automated evidence
+
+`Production Candidate Integrity` now runs on `dementor-club-qa` and includes a production navigation-boundary guard. Run #381 passed all static/build gates for QA head `93e4f879b308993c38b04dd0057a59e6acf57418`.
 
 ## Evidence still required
 
-Authenticated browser console + Network evidence should be captured during QA to confirm whether any additional request/asset failure contributes to the visible loading indicator.
+Authenticated and anonymous browser-level regression evidence. Static/build CI passing is not sufficient to close this P1 issue.
