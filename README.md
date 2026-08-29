@@ -1,35 +1,58 @@
 # Dementor Club — Official Site
 
-Отдельная ветка официального сайта клуба.
+Production snapshot официального сайта клуба.
+
+## Branch role
+
+`dementor-club-production` = **PRODUCTION SNAPSHOT**.
+
+Это единственная ветка, из которой разрешена публикация официального сайта на `https://dementor.club`.
+
+Рабочая разработка, визуальные тесты и макеты выполняются в `dementor-club-site`. Изменения попадают сюда только после прохождения approval + QA.
+
+Полный release contract: `docs/deployment.md`.
+Главное правило утверждения: `dementor-club/operations/PRODUCTION_RELEASE_POLICY_V1.md`.
+
+## Production rule
+
+`STAGING ≠ PRODUCTION`.
+
+Макет может быть утверждён на тестовом материале. Это утверждает дизайн, композицию и responsive-поведение, но **не утверждает тестовый материал к публикации**.
+
+До production обязательно:
+
+1. source facts/content approved в ответственном source-of-truth;
+2. layout approved на staging;
+3. test/demo/mock/placeholder content заменён на отдельно утверждённый public content;
+4. final candidate просмотрен снова уже с реальным контентом;
+5. production validators пройдены;
+6. получено явное release approval;
+7. только после этого выполняется production release action.
 
 ## Что хранится здесь
 
-- исходный код сайта;
+- production candidate/site snapshot;
 - UI-компоненты и стили;
 - маршруты и страницы;
 - SEO/metadata;
-- интеграции;
+- production-safe интеграции;
 - контентные маппинги из ветки `dementor-club`;
-- техническая документация;
-- deployment notes;
-- `DRIVE.md` — связь с папкой материалов сайта на Google Drive.
+- deployment/QA документация.
 
 ## Обязательная дизайн-документация
 
-- `docs/DESIGN_PRESENTATION_GUIDE.md` — официальный guide по архитектуре, типографике, композиции, motion, Dementor Ink, mobile и правилам применения референсов.
-- `docs/ENTITY_PRESENTATION_STANDARD_v1.md` — обязательный presentation contract для Dementor / Event / Course / Project / Merch / Quote / Test / Service states; визуальный эталон — `/design-system/`.
-- `docs/COMPONENT_SYSTEM_v1.md` — рабочая component/page system.
-- `docs/GLOBAL_HEADER_v1.md` — единый header, desktop navigation, mobile burger и правила локальных product bars.
-- `docs/MOTION_NAV_SEO_IMPLEMENTATION_v1.md` — navigation, motion и metadata baseline.
-- `docs/PRODUCTION_QA_v1.md` — production gate и responsive QA.
-- `docs/SITE_HARMONIZATION_AUDIT_2026-08-26.md` — карта применения presentation standard по существующим страницам.
-- `docs/deployment.md` — deployment contract.
-- `docs/PUBLISHING_PLAYBOOK_v1.md` — процедура публикации сущностей.
-- `docs/OPERATIONS_RUNBOOK_v1.md` — operational runbook.
-- `docs/FEATURE_ACTIVATION_MATRIX_v1.md` — READY vs LIVE для внешних функций.
-- `references/REFERENCE_RESPONSIBILITIES.md` — карта ответственности Public Records / Actual Source / 032c / Mouthwash / DIA / Dementor Ink.
-
-Эти документы являются обязательным source-of-truth для новых страниц и редизайна существующих экранов. Новая сущность не получает новый случайный дизайн: сначала определяется `entity_type`, `presentation_role`, `context` и responsive contract, затем используются общие primitives.
+- `docs/DESIGN_PRESENTATION_GUIDE.md`
+- `docs/ENTITY_PRESENTATION_STANDARD_v1.md`
+- `docs/COMPONENT_SYSTEM_v1.md`
+- `docs/GLOBAL_HEADER_v1.md`
+- `docs/MOTION_NAV_SEO_IMPLEMENTATION_v1.md`
+- `docs/PRODUCTION_QA_v1.md`
+- `docs/SITE_HARMONIZATION_AUDIT_2026-08-26.md`
+- `docs/deployment.md`
+- `docs/PUBLISHING_PLAYBOOK_v1.md`
+- `docs/OPERATIONS_RUNBOOK_v1.md`
+- `docs/FEATURE_ACTIVATION_MATRIX_v1.md`
+- `references/REFERENCE_RESPONSIBILITIES.md`
 
 ## Asset rules
 
@@ -40,96 +63,47 @@
 
 ## Source-of-truth
 
-Смыслы, правила клуба, продукты и утверждённые тексты сначала фиксируются в ветке `dementor-club`. Правила публичной подачи — в `dementor-club/brand/PRESENTATION_RULES.md`. Эта ветка отвечает только за их веб-реализацию.
+Смыслы, правила клуба, продукты и утверждённые тексты сначала фиксируются в ветке `dementor-club`. Production branch не является местом принятия смысловых решений.
 
-«Логика и осознанность» развивается независимо в `logic-awareness`; сайт представляет проект, но не переписывает и не публикует его draft-материалы как утверждённые.
+«Логика и осознанность» развивается независимо в `logic-awareness`; production website представляет только publishable/approved состояние проекта.
 
-## Current public architecture
+## Production domain
 
-Основные разделы:
+Canonical origin:
 
-- `/`
-- `/about/`
-- `/events/`
-- `/events/fuengirola/`
-- `/projects/`
-- `/projects/logic-awareness/`
-- `/projects/logic-awareness/dossiers/`
-- `/projects/logic-awareness/dossiers/logic/`
-- `/projects/logic-awareness/dossiers/awareness/`
-- `/community/`
-- `/community/valentin/`
-- `/community/nikita/`
-- `/community/evgeniy/`
-- `/community/gabil/`
-- `/merch/`
-- `/objects/001-ne-nado/`
-- `/catalog/`
-- `/archive/`
-- `/join/`
-- `/courses/dumai-s-opasnostyu/`
-- `/courses/ne-komanda/`
-- `/courses/dengi-na-veter/`
-- `/courses/slaboumie-i-otvaga/`
+`https://dementor.club`
 
-Служебные страницы:
-
-- `/donate/`
-- `/contacts/`
-- `/legal/privacy/`
-- `/legal/terms/`
-- `404.html`
-
-Internal reference:
-
-- `/design-system/` — noindex UI Lab / visual standard; не добавляется в публичную навигацию.
-
-`content/registry.json` — единый implementation registry публичных сущностей. Records обязаны соответствовать `content/ENTITY_CONTRACT.md`.
+Legacy `https://sladzari.github.io/degradation_club/` не является canonical production origin и не должен попадать в production artifact.
 
 ## Release validation
 
-Перед публикацией обязательно выполнить:
+Production workflow выполняет:
 
 ```bash
 node scripts/validate-site.mjs
+node scripts/validate-content-readiness.mjs
+node scripts/validate-visual-contract.mjs
+node scripts/validate-production-release.mjs
 ```
 
-Validator проверяет:
+Любая validation error блокирует deployment.
 
-- registry ↔ records;
-- уникальность ID и URL;
-- provenance;
-- существование entity pages;
-- registry ↔ sitemap;
-- sitemap ↔ canonical origin ↔ robots;
-- feature flags в `site-config.js`;
-- порядок подключения service adapters;
-- отсутствие старого CDN onboarding engine;
-- Join storage guard;
-- статусные инварианты, включая `approved-draft` и event registration.
+Production workflow: `.github/workflows/deploy-pages.yml`.
 
-GitHub Actions workflow: `.github/workflows/site-integrity.yml`.
-Любая validation error является release blocker. Warning требует проверки, но не блокирует процесс автоматически.
+Обычные push с изменениями сайта не публикуют домен. Release требует отдельного явного approval action согласно `docs/deployment.md`.
 
 ## External feature activation
 
-Все внешние функции включаются через `site-config.js`.
-До утверждения провайдера/endpoint они должны оставаться disabled:
+UI readiness ≠ feature live.
 
-- Contacts submit;
-- Donate payment;
-- Merch checkout;
-- Event registration;
-- Community membership.
-
-UI readiness не является фактом публичной доступности функции.
+Contacts, Donate, Merch checkout, Event registration и Membership/other integrations включаются только после утверждения реального provider/endpoint и соответствующего source-of-truth состояния.
 
 ## Deployment status
 
-Production branch contract: `dementor-club-site` only.
+Production branch: `dementor-club-production`.
+Canonical domain: `https://dementor.club`.
 
-Known production project/domain: `degradation-club` / `https://degradation-club.vercel.app/`.
-Последняя доступная проверка commit status показала ошибку Vercel `build-rate-limit`; это инфраструктурный deployment blocker, а не подтверждение ошибки site validator. Не считать последний HEAD опубликованным, пока live deployment не проверен отдельно.
+Не считать новый production опубликованным, пока workflow не завершился успешно и live routes не прошли smoke verification.
 
 ## Storage split
 
