@@ -49,6 +49,10 @@ fs.mkdirSync(out, { recursive: true });
 function normalizeProductionText(text) {
   let result = text;
   for (const legacy of legacyOrigins) result = result.replaceAll(legacy, productionOrigin);
+  // A future home raster is intentionally probed in staging. Production must
+  // never issue a 404 while that binary is still absent, so retain the approved
+  // current home raster until the replacement is physically committed.
+  result = result.replaceAll('/assets/ink/home-interruption-03.webp', '/assets/ink/home_01.webp');
   return result;
 }
 
