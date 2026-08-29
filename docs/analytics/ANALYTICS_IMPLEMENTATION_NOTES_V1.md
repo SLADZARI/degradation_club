@@ -1,0 +1,1 @@
+Implementation branch marker for Analytics Event Map v1. See ANALYTICS_EVENT_MAP_V1.md for the contract.
