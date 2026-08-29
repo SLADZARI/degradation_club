@@ -22,3 +22,4 @@ Update this file only when the user explicitly requests deploy/publish/release.
 2026-08-29T00:34+02:00 — publish OWNER_ADMIN System Tools entry in accounts, role-gated admin hub and live read-only production smoke tests.
 2026-08-29T00:48+02:00 — fix System Tests B4 production asset paths and move DC-9 V2 runtime under the /join namespace.
 2026-08-29T01:06+02:00 — fix personal workspace freeze caused by repeated sidebar route listener accumulation; deploy navigation guard v1.
+2026-08-29T09:25+02:00 — publish Fuengirola soft-gradient/no-plate layout plus top-level Home CSS cache bust.
