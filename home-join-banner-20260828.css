@@ -107,6 +107,19 @@
   }
 }
 
+/* The tray moves left → right as the Join section passes through the viewport. */
+@supports (animation-timeline:view()){
+  .dc-home .dc-join::before{
+    animation:dcJoinTrayTraverse linear both;
+    animation-timeline:view();
+    animation-range:entry 0% exit 100%;
+  }
+  @keyframes dcJoinTrayTraverse{
+    from{transform:translate3d(-18vw,0,0)}
+    to{transform:translate3d(42vw,0,0)}
+  }
+}
+
 @media(max-width:700px){
   .dc-home .dc-join{min-height:720px!important}
   .dc-home .dc-join .dc-shell{
@@ -159,5 +172,11 @@
     bottom:-1%;
     transform:translate3d(var(--dc-join-x,-10vw),0,0);
   }
+  @supports (animation-timeline:view()){
+    @keyframes dcJoinTrayTraverse{
+      from{transform:translate3d(-28vw,0,0)}
+      to{transform:translate3d(22vw,0,0)}
+    }
+  }
 }
-@media(prefers-reduced-motion:reduce){.dc-home .dc-join::before{transform:none!important}}
+@media(prefers-reduced-motion:reduce){.dc-home .dc-join::before{animation:none!important;transform:none!important}}
