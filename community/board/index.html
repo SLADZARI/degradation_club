@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <meta name="theme-color" content="#111111">
+  <title>Доска — Dementor Club Community</title>
+  <meta name="description" content="Закрытая доска объявлений участников Dementor Club.">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/community/board/board.css">
+  <script src="/site-config.js"></script>
+</head>
+<body class="dc-board-page">
+<header class="topbar"><a class="brand" href="/">DEMENTOR<span>CLUB</span></a><button class="menu-toggle" aria-label="Открыть индекс" aria-expanded="false">INDEX</button><nav class="nav"><a href="/about/">Club</a><a href="/events/">Events</a><a href="/projects/">Projects</a><a class="active" href="/community/">Community</a><a href="/merch/">Merch</a><a href="/join/">Join</a></nav></header>
+<main>
+  <section class="dc-board-hero">
+    <div class="dc-board-shell">
+      <div class="dc-board-meta"><span>COMMUNITY / PRIVATE BOARD</span><span id="boardStatus">CHECKING ACCESS</span></div>
+      <h1>ОБЩАЯ<br><span>ДОСКА.</span></h1>
+      <div class="dc-board-hero-bottom"><p id="boardLead">Здесь остаются предложения, после которых иногда что-то действительно происходит.</p><div id="memberBadge" class="dc-member-badge"></div></div>
+    </div>
+  </section>
+
+  <section class="dc-board-entry" id="entrySection">
+    <div class="dc-board-shell">
+      <div id="entryHost" aria-live="polite"><div class="dc-board-state">ПРОВЕРЯЕМ, ЕСТЬ ЛИ У ВАС МЕСТО НА ДОСКЕ…</div></div>
+    </div>
+  </section>
+
+  <section class="dc-board-wall">
+    <div class="dc-board-shell">
+      <div class="dc-board-wall-head"><div><p>ARTIFACTS / ACTIVE</p><h2>ЧТО УЖЕ<br>ПРИКОЛОТИЛИ.</h2></div><div class="dc-board-count" id="artifactCount">—</div></div>
+      <div id="boardHost" class="dc-board-grid" aria-live="polite"><div class="dc-board-state">ЗАГРУЖАЕМ ДОСКУ…</div></div>
+    </div>
+  </section>
+</main>
+<script type="module" src="/community/board/board.js"></script>
+</body>
+</html>
