@@ -10,7 +10,6 @@
 
   const path=location.pathname.replace(/\/+/g,'/');
   const seen=new Set();
-  const sessionKey='dc-rec-popup-seen-v1';
 
   function context(){
     if(path==='/') return {tags:['home','potential','self-improvement'],slot:'HOME_INLINE',mode:'major',before:'.dc-join'};
@@ -18,7 +17,7 @@
     if(path.startsWith('/courses/dumai-s-opasnostyu')) return {tags:['thinking','overthinking','course'],slot:'COURSE_RELATED',mode:'major',before:'.dc-footer'};
     if(path.startsWith('/events/fuengirola')) return {tags:['event','success'],slot:'EVENT_RELATED',mode:'minor',before:'.dc-footer'};
     if(path.startsWith('/merch/drop-001/')) return {tags:['wear'],slot:'MERCH_CROSSSELL',mode:'minor',before:'.dc-footer',excludePath:true};
-    if(path.startsWith('/objects/')) return {tags:['wear','artifact'],slot:'MERCH_CROSSSELL',mode:'minor',before:'.dc-footer'};
+    if(path.startsWith('/objects/')) return {tags:['wear','artifact'],slot:'MERCH_CROSSSELL',mode:'minor',before:'.dc-footer',excludePath:true};
     if(path.startsWith('/join/')){
       const ready=document.querySelector('[data-join-result-ready="true"]');
       if(ready) return {tags:['onboarding','potential','self-improvement'],slot:'POST_JOIN_RESULT',mode:'major',after:ready};
@@ -36,11 +35,7 @@
   }
 
   function choose(ctx){
-    return entities
-      .filter(e=>!seen.has(e.id))
-      .map(e=>({e,s:score(e,ctx)}))
-      .filter(x=>Number.isFinite(x.s))
-      .sort((a,b)=>b.s-a.s)[0]?.e||null;
+    return entities.filter(e=>!seen.has(e.id)).map(e=>({e,s:score(e,ctx)})).filter(x=>Number.isFinite(x.s)).sort((a,b)=>b.s-a.s)[0]?.e||null;
   }
 
   function labelFor(slot){
