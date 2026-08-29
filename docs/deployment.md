@@ -28,7 +28,7 @@ Before production, test material must be replaced by separately approved public 
 
 ## Canonical release flow
 
-`responsible source` → `dementor-club` approved fact/decision → implementation in `dementor-club-site` → layout approval on test material → replace test material with approved public material → final visual/content QA → copy/merge into `dementor-club-production` → explicit release action → live verification.
+`responsible source` → `dementor-club` approved fact/decision → implementation in `dementor-club-site` → layout approval on test material → replace test material with approved public material → final visual/content QA → copy/merge into `dementor-club-production` → explicit manual production release → live verification.
 
 ## GitHub Pages target contract
 
@@ -42,18 +42,24 @@ The old repository-path origin `https://sladzari.github.io/degradation_club/` is
 
 ## Deployment trigger
 
-Production deployment is explicit-only. Ordinary pushes to working code do not publish the site.
+Production deployment is **manual only**.
 
 Workflow: `.github/workflows/deploy-pages.yml`
 
-Allowed release actions:
+To publish, an operator must intentionally:
 
-1. manual `workflow_dispatch` on `dementor-club-production` with `release_confirmation=APPROVED`; or
-2. an explicit update of `.github/production-release.txt` on `dementor-club-production`, containing an exact line `STATUS=APPROVED`.
+1. open the production workflow;
+2. select ref `dementor-club-production`;
+3. start `Run workflow`;
+4. enter exact confirmation `APPROVED`.
 
-The release-marker file is intentionally the only push path that can trigger production. A push that changes application/site files but does not touch this marker does not deploy.
+The deploy jobs additionally verify that the selected ref is exactly `refs/heads/dementor-club-production`.
 
-A push to `dementor-club-site` can never deploy `dementor.club` because the deploy job is hard-gated to `refs/heads/dementor-club-production`.
+There is no push trigger. Therefore:
+
+- a normal push to `dementor-club-site` cannot publish `dementor.club`;
+- a normal push to `dementor-club-production` also cannot publish `dementor.club`;
+- production requires a separate conscious release action after approval.
 
 ## Automated production guards
 
@@ -70,7 +76,7 @@ Any validation error is a release blocker.
 
 ## Required human approval before production
 
-Confirm all of the following before updating/deploying `dementor-club-production`:
+Confirm all of the following before running production deployment:
 
 1. source facts and statuses are approved;
 2. layout/design has been approved on staging;
@@ -100,18 +106,17 @@ This repository setting is part of the intended production model even if it is n
 
 1. `https://dementor.club/` returns the current homepage with CSS and images loaded.
 2. `/about/` opens successfully.
-3. `/events/` and approved event routes resolve.
-4. `/projects/` and approved project routes resolve.
-5. approved community/merch/join routes resolve.
-6. intended interactive flows work without exposing disabled functions as active.
-7. main navigation has no legacy repository-path URLs.
-8. production asset requests resolve from root paths such as `/assets/...`.
-9. `robots.txt` and `sitemap.xml` use `https://dementor.club`.
-10. no test/demo/draft material became public accidentally.
-11. no claim of successful publication is made before these checks pass.
+3. approved event/project/community/merch routes resolve.
+4. `/join/` behaves as intended.
+5. main navigation has no legacy repository-path URLs.
+6. production asset requests resolve from root paths such as `/assets/...`.
+7. `robots.txt` and `sitemap.xml` use `https://dementor.club`.
+8. no test/demo/draft material became public accidentally.
+9. external features match their actual approved live state.
+10. no claim of successful publication is made before these checks pass.
 
 ## Rollback
 
-If a critical issue is found, restore `dementor-club-production` to the last verified production commit and execute a new explicit release action.
+If a critical issue is found, restore `dementor-club-production` to the last verified production commit and run the manual production workflow again.
 
 Do not use `dementor-club-site` as an emergency production source.
