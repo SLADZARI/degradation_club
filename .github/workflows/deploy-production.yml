@@ -1,0 +1,69 @@
+name: Deploy Dementor Production
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_confirmation:
+        description: 'Type APPROVED to deploy dementor.club'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: dementor-club-production-pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    if: inputs.release_confirmation == 'APPROVED'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout production branch
+        uses: actions/checkout@v4
+        with:
+          ref: dementor-club-production
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Validate registry, routes and feature state
+        run: node scripts/validate-site.mjs
+
+      - name: Validate page content readiness registry
+        run: node scripts/validate-content-readiness.mjs
+
+      - name: Validate visual contract
+        run: node scripts/validate-visual-contract.mjs
+
+      - name: Build production Pages artifact
+        run: node scripts/build-pages.mjs
+
+      - name: Validate production artifact and release gate
+        run: node scripts/validate-production-release.mjs
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./_site
+
+  deploy:
+    if: inputs.release_confirmation == 'APPROVED'
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
