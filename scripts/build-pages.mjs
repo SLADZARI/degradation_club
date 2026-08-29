@@ -3,47 +3,39 @@ import path from 'node:path';
 
 const root = process.cwd();
 const out = path.join(root, '_site');
-const base = '/degradation_club';
-const homeCssVersion = '20260828-1626';
-const skip = new Set(['.git', '_site', 'node_modules']);
-const textExt = new Set(['.html', '.css', '.js', '.mjs', '.json', '.xml', '.webmanifest', '.txt', '.md']);
-const isRewritePassthrough = (name) => /^dementor-account-sync-v\d+\.js$/.test(name);
+const productionOrigin = 'https://dementor.club';
+const skip = new Set([
+  '.git',
+  '.github',
+  '_site',
+  'node_modules',
+  'docs',
+  'references',
+  'scripts',
+]);
 
 fs.rmSync(out, { recursive: true, force: true });
 fs.mkdirSync(out, { recursive: true });
-
-function rewrite(text) {
-  let outText = text;
-  // Root URL exactly "/" in quoted attributes/strings.
-  outText = outText.replace(/(["'])\/\1/g, `$1${base}/$1`);
-  // Root-relative quoted paths such as href="/about/", src='/assets/x', url('/styles.css'), fetch('/content/x.json').
-  outText = outText.replace(/(["'])\/(?!\/)(?=[A-Za-z0-9_.-])/g, `$1${base}/`);
-  // Homepage refresh is CSS-only against stable markup. Version the stylesheet URL
-  // in the generated Pages artifact so CDN/browser caches cannot retain the old presentation.
-  outText = outText.replaceAll(`${base}/home-v1.css`, `${base}/home-v1.css?v=${homeCssVersion}`);
-  return outText;
-}
 
 function copyDir(src, dst) {
   fs.mkdirSync(dst, { recursive: true });
   for (const entry of fs.readdirSync(src, { withFileTypes: true })) {
     if (skip.has(entry.name)) continue;
+
     const from = path.join(src, entry.name);
     const to = path.join(dst, entry.name);
+
     if (entry.isDirectory()) {
       copyDir(from, to);
       continue;
     }
-    const ext = path.extname(entry.name).toLowerCase();
-    if (textExt.has(ext)) {
-      const text = fs.readFileSync(from, 'utf8');
-      fs.writeFileSync(to, isRewritePassthrough(entry.name) ? text : rewrite(text));
-    } else {
-      fs.copyFileSync(from, to);
-    }
+
+    fs.copyFileSync(from, to);
   }
 }
 
 copyDir(root, out);
 fs.writeFileSync(path.join(out, '.nojekyll'), '');
-console.log(`GitHub Pages artifact ready at ${out} with base ${base}/`);
+fs.writeFileSync(path.join(out, 'CNAME'), 'dementor.club\n');
+
+console.log(`GitHub Pages artifact ready for ${productionOrigin} at ${out}`);
