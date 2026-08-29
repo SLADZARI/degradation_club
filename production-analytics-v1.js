@@ -7,6 +7,7 @@
   const GA_ID='G-QTZY2GKZ4R';
   const CLARITY_ID='y9yuo1zabw';
   const CONSENT_KEY='dc_analytics_consent_v1';
+  const AUTH_PENDING_KEY='dc_auth_complete_pending_v1';
   const ALLOWED_EVENTS=new Set([
     'join_start','join_sphere_open','assessment_complete','auth_start','auth_complete','workspace_open',
     'project_open','course_open','course_cta_click','event_open','event_cta_click','merch_open','merch_cta_click',
@@ -46,10 +47,42 @@
     window.gtag('event','page_view',{page_title:document.title,page_location:location.href,page_path:page});
   };
 
+  const successSeen=new Set();
+  const trackAssessmentSuccess=()=>{
+    if(location.pathname!='/join/')return;
+    const params=new URLSearchParams(location.search);
+    const sphere=params.get('sphere');
+    if(params.get('result')!=='1'||!sphere)return;
+    const key=`assessment:${sphere}:${location.pathname}${location.search}`;
+    if(successSeen.has(key))return;
+    if(api.track('assessment_complete',{entity_type:'assessment',entity_id:sphere,placement:'join-result'}))successSeen.add(key);
+  };
+  const flushPendingAuth=()=>{
+    let pending=null;
+    try{pending=sessionStorage.getItem(AUTH_PENDING_KEY);}catch{}
+    if(!pending)return;
+    if(api.track('auth_complete',{entity_type:'account',entity_id:'supabase-google',placement:'auth-callback'})){
+      try{sessionStorage.removeItem(AUTH_PENDING_KEY);}catch{}
+    }
+  };
+  const workspaceMemberState=detail=>{
+    const value=detail?.member_state;
+    return typeof value==='string'&&value?value:'authenticated';
+  };
+  const trackWorkspaceReady=detail=>{
+    const ready=detail||window.__DC_WORKSPACE_READY_DETAIL__;
+    if(!ready||location.pathname!='/workspace/')return;
+    const memberState=workspaceMemberState(ready);
+    const key=`workspace:${memberState}:${location.pathname}`;
+    if(successSeen.has(key))return;
+    if(api.track('workspace_open',{entity_type:'workspace',entity_id:'personal-workspace',placement:'workspace-ready',member_state:memberState}))successSeen.add(key);
+  };
+  const flushSuccessSignals=()=>{trackAssessmentSuccess();flushPendingAuth();trackWorkspaceReady();};
+
   const installNavigationTracking=()=>{
     if(window.__DC_ANALYTICS_NAV_TRACKING__)return;
     window.__DC_ANALYTICS_NAV_TRACKING__=true;
-    const notify=()=>queueMicrotask(sendPageView);
+    const notify=()=>queueMicrotask(()=>{sendPageView();trackAssessmentSuccess();});
     for(const method of ['pushState','replaceState']){
       const original=history[method];
       if(typeof original!=='function')continue;
@@ -71,7 +104,7 @@
     script.async=true;
     script.src=`https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(GA_ID)}`;
     script.dataset.dcGa4=GA_ID;
-    script.addEventListener('load',()=>{sendPageView();installNavigationTracking();installSemanticTracking();},{once:true});
+    script.addEventListener('load',()=>{sendPageView();installNavigationTracking();installSemanticTracking();flushSuccessSignals();},{once:true});
     document.head.appendChild(script);
   };
 
@@ -107,6 +140,8 @@
     window.clarity('set','dc_page',location.pathname);
     const entity=routeEntity(location.pathname);
     if(entity){window.clarity('set','dc_entity_type',entity[1]);window.clarity('set','dc_entity_id',entity[2]);}
+    const ready=window.__DC_WORKSPACE_READY_DETAIL__;
+    if(ready?.member_state)window.clarity('set','dc_member_state',String(ready.member_state));
   };
 
   const linkPlacement=el=>{
@@ -134,6 +169,7 @@
     window.__DC_SEMANTIC_TRACKING__=true;
     trackRouteEntity();
     tagClarityPage();
+    addEventListener('dc:workspace-ready',event=>{trackWorkspaceReady(event.detail);tagClarityPage();});
     document.addEventListener('click',event=>{
       const el=event.target.closest('a,button,[role="button"]');
       if(!el)return;
