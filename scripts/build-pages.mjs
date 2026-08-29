@@ -86,7 +86,8 @@ function injectProductionModules() {
     let html = fs.readFileSync(full, 'utf8');
     if (!html.includes('/entity-recommendations-v1.css')) html = html.replace('</head>', '<link rel="stylesheet" href="/entity-recommendations-v1.css">\n</head>');
     if (!html.includes('/entity-recommendations-v1.js')) html = html.replace('</body>', '<script src="/entity-recommendations-v1.js" defer></script>\n</body>');
-    if (rel === 'about/index.html' && !html.includes('/about-definition-v1.css')) html = html.replace('</head>', '<link rel="stylesheet" href="/about-definition-v1.css">\n</head>');
+    // About v10 owns its complete page layout in /about-v1.css. Do not inject
+    // the legacy about-definition-v1.css override over the approved composition.
     if (rel === 'projects/logic-awareness/index.html' && !html.includes('/logic-awareness-covers-v1.js')) html = html.replace('</body>', '<script src="/logic-awareness-covers-v1.js" defer></script>\n</body>');
     fs.writeFileSync(full, html);
   });
