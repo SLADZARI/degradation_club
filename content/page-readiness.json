@@ -115,7 +115,7 @@
       "route": "/merch/",
       "state": "REQUIRES_APPROVAL",
       "productionAllowed": true,
-      "source": ["dementor-club/merch/README.md", "dementor-club/merch/products/OBJECT_001_NE_NADO.md", "dementor-club/merch/products/SH_DEM_01_OVERTHINKING_IS_MY_CARDIO.md", "dementor-club/merch/products/SH_DEM_02_PERSONAL_GROWTH_CANCELLED.md", "dementor-club/merch/products/SH_DEM_03_SUCCESS_IS_BORING.md", "dementor-club/operations/ACCOUNT_PROGRESS_AND_MERCH_RUNTIME_V0.1.md"],
+      "source": ["dementor-club/merch/README.md", "dementor-club/merch/products/OBJECT_001_NE_NADO.md", "dementor-club/merch/products/SH_DEM_01_OVERTHINKING_IS_MY_CARDIO.md", "dementor-club/merch/products/SH_DEM_02_PERSONAL_GROWTH_CANCELLED.md", "dementor-club/merch/products/SH_DEM_03_SUCCESS_IS_BORING.md", "dementor-club/merch/products/SH_DEM_04_POTENTIAL_TOO_LONG_REVEALED.md", "dementor-club/operations/ACCOUNT_PROGRESS_AND_MERCH_RUNTIME_V0.1.md"],
       "blockingFields": ["shirt production specifications", "shirt prices", "shirt availability", "checkout activation"],
       "note": "Merch direction, approved Object 001 and working visual assets may be shown. Cart and checkout are disabled; missing commercial/production fields must not be inferred."
     },
@@ -149,6 +149,14 @@
       "source": ["dementor-club/merch/products/SH_DEM_03_SUCCESS_IS_BORING.md", "dementor-club/operations/ACCOUNT_PROGRESS_AND_MERCH_RUNTIME_V0.1.md"],
       "blockingFields": ["public description", "fabric composition", "fabric GSM", "fit", "size range", "print technique", "production specification", "price", "edition", "availability", "checkout"],
       "note": "Working visual variants may ship only as a non-commerce current-state page. Missing fields are not approved and sales remain not_open."
+    },
+    {
+      "route": "/merch/drop-001/potential-too-long-revealed/",
+      "state": "REQUIRES_APPROVAL",
+      "productionAllowed": true,
+      "source": ["dementor-club/merch/products/SH_DEM_04_POTENTIAL_TOO_LONG_REVEALED.md", "dementor-club/operations/ACCOUNT_PROGRESS_AND_MERCH_RUNTIME_V0.1.md"],
+      "blockingFields": ["public description", "fabric composition", "fabric GSM", "fit", "size range", "print technique", "production specification", "price", "edition", "availability", "checkout"],
+      "note": "Approved phrase and working visual asset may ship only as a non-commerce current-state page. Price is TBD, availability remains not_open and checkout stays disabled."
     },
     {
       "route": "/join/",
