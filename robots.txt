@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://sladzari.github.io/degradation_club/sitemap.xml
+Sitemap: https://dementor.club/sitemap.xml
