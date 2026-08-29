@@ -1,4 +1,4 @@
-name: Deploy GitHub Pages Production
+name: Deploy Dementor Production
 
 on:
   workflow_dispatch:
@@ -42,6 +42,9 @@ jobs:
 
       - name: Build production Pages artifact
         run: node scripts/build-pages.mjs
+
+      - name: Validate production analytics and consent
+        run: node scripts/validate-production-analytics.mjs
 
       - name: Validate production artifact and release gate
         run: node scripts/validate-production-release.mjs
