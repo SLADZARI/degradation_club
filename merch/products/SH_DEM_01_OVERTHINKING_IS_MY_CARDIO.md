@@ -1,11 +1,14 @@
 # SH-DEM-01 — OVERTHINKING IS MY CARDIO.
 
 - `product_id`: SH-DEM-01
+- `entity_type`: wear
 - `name`: OVERTHINKING IS MY CARDIO.
 - `public_name`: OVERTHINKING IS MY CARDIO.
+- `public_url`: /merch/drop-001/overthinking-is-my-cardio/
 - `category`: apparel / t-shirt
 - `line`: Classic Dementor T-Shirts
 - `status`: working-assets-present
+- `sales_state`: not-open
 - `drop`: DROP 001
 - `short_idea`: `OVERTHINKING IS MY CARDIO.`
 - `public_description`: null
@@ -21,11 +24,16 @@
 - `currency_display`: EUR
 - `production_notes`: null
 - `website_assets`: Google Drive `18_2sAwPXt4Gbxu8s832BJQP4Uh3ev9hz` (`sh-dem-01.jpg`) + `1KY7LPEW6Wur0vvjJhTiVDFRHhzM7qQSk` (`sh-dem-01-ALL.jpg`)
+- `primary_asset`: /assets/merch/drop-001/sh-dem-01-light.webp
 - `social_assets`: null
 - `related_project`: Dementor Club / Merch
+- `related_entities`: null
+- `recommendation_tags`: thinking; overthinking; self-analysis
+- `placement_tags`: COURSE_RELATED; MERCH_CROSSSELL; FOOTER_ROTATION
+- `recommendation_priority`: 60
 - `approved_phrases`: `OVERTHINKING IS MY CARDIO.`; `DEMENTOR CLUB`
 - `prohibited_presentation`: do not infer fabric composition, GSM, fit, size range, print technique, price, edition or availability from the mockup
-- `updated_at`: 2026-08-26
+- `updated_at`: 2026-08-29
 
 ## Visual specification confirmed from uploaded mockup
 
