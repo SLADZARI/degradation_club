@@ -29,13 +29,19 @@
 
 ### Design authority order
 
-1. `docs/DEMENTOR_DESIGN_CANON_v10.md` — **главный визуальный канон сайта / DESIGN AUTHORITY**. Если более старый guide, legacy CSS, исторический эксперимент или component override противоречит v10, **v10 wins**.
-2. `dementor-club/concept/ABOUT_PAGE_APPROVED_V10.md` — утверждённая reference implementation канона на реальной странице About.
-3. `docs/ENTITY_PRESENTATION_STANDARD_v1.md` — обязательный presentation contract для Dementor / Event / Course / Project / Merch / Quote / Test / Service states; визуальный эталон — `/design-system/`.
-4. `docs/COMPONENT_SYSTEM_v1.md` — рабочая component/page system.
-5. `docs/GLOBAL_HEADER_v1.md` — единый header, desktop navigation, mobile burger и правила локальных product bars.
-6. `docs/MOTION_NAV_SEO_IMPLEMENTATION_v1.md` — navigation, motion и metadata baseline.
-7. `docs/DESIGN_PRESENTATION_GUIDE.md` — background/reference guide по архитектуре, типографике, композиции, motion, Dementor Ink, mobile и источникам референсов; он не может переопределять v10.
+1. `docs/DEMENTOR_DESIGN_CANON_CURRENT.md` — **AUTHORITATIVE POINTER**. Всегда определяет, какая версия канона является CURRENT.
+2. Версия канона, указанная в `DEMENTOR_DESIGN_CANON_CURRENT.md` — **главный визуальный закон / DESIGN AUTHORITY**.
+3. Approved reference implementation, указанная активным каноном.
+4. `docs/ENTITY_PRESENTATION_STANDARD_v1.md` — обязательный presentation contract для Dementor / Event / Course / Project / Merch / Quote / Test / Service states; визуальный эталон — `/design-system/`.
+5. `docs/COMPONENT_SYSTEM_v1.md` — рабочая component/page system.
+6. `docs/GLOBAL_HEADER_v1.md` — единый header, desktop navigation, mobile burger и правила локальных product bars.
+7. `docs/MOTION_NAV_SEO_IMPLEMENTATION_v1.md` — navigation, motion и metadata baseline.
+8. `docs/DESIGN_PRESENTATION_GUIDE.md` — background/reference guide; он не может переопределять CURRENT canon.
+9. Legacy CSS, исторические эксперименты и dated design branches.
+
+Текущий pointer сейчас указывает на `docs/DEMENTOR_DESIGN_CANON_v10.md`, reference implementation — `dementor-club/concept/ABOUT_PAGE_APPROVED_V10.md`.
+
+Если позднее будет утверждён `v11`, `v12` или другая версия, старые approved canon-файлы не удаляются и не переопределяются задним числом. Активная версия меняется только обновлением `DEMENTOR_DESIGN_CANON_CURRENT.md` после явного design approval.
 
 Дополнительные обязательные operational документы:
 
@@ -49,7 +55,7 @@
 
 Эти документы являются обязательным source-of-truth для новых страниц и редизайна существующих экранов. Новая сущность не получает новый случайный дизайн: сначала определяется `entity_type`, `presentation_role`, `context` и responsive contract, затем используются общие primitives.
 
-Для LLM обязательное правило: перед изменением визуальной архитектуры прочитать `docs/DEMENTOR_DESIGN_CANON_v10.md` и сверить решение с `ABOUT_PAGE_APPROVED_V10.md`. Реализованный эксперимент сам по себе не становится новым каноном.
+Для LLM обязательное правило: перед изменением визуальной архитектуры сначала прочитать `docs/DEMENTOR_DESIGN_CANON_CURRENT.md`, затем активный канон и его reference implementation. Реализованный эксперимент, более новый файл или новая страница сами по себе не становятся новым каноном.
 
 ## Test material ≠ public content
 
