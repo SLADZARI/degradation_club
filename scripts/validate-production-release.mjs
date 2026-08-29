@@ -192,8 +192,8 @@ for (const requiredRuntimePath of [
 const siteConfigPath = artifactPath('site-config.js');
 if (fs.existsSync(siteConfigPath)) {
   const siteConfig = fs.readFileSync(siteConfigPath, 'utf8');
-  if (!siteConfig.includes("canonicalOrigin:'https://dementor.club'")) errors.push('site-config.js: canonicalOrigin must be https://dementor.club');
-  if (!siteConfig.includes('supabase:{enabled:true')) errors.push('site-config.js: Supabase production runtime must be enabled');
+  if (!siteConfig.includes("canonicalOrigin:'https://dementor.club'") && !/canonicalOrigin\s*:\s*['"]https:\/\/dementor\.club['"]/.test(siteConfig)) errors.push('site-config.js: canonicalOrigin must be https://dementor.club');
+  if (!/supabase\s*:\s*\{[\s\S]*?enabled\s*:\s*true/.test(siteConfig)) errors.push('site-config.js: Supabase production runtime must be enabled');
 }
 
 const readinessPath = path.join(root, 'content/page-readiness.json');
