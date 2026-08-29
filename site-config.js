@@ -1,5 +1,5 @@
 window.DEMENTOR_SITE_CONFIG=Object.freeze({
-  version:'2026-08-29.02',
+  version:'2026-08-30.01',
   canonicalOrigin:'https://dementor.club',
   supabase:{
     enabled:true,
@@ -12,7 +12,7 @@ window.DEMENTOR_SITE_CONFIG=Object.freeze({
   donate:{enabled:false,provider:null,checkoutUrl:null,currency:null,recurring:false},
   merch:{catalogEnabled:true,cartEnabled:true,cartStorageKey:'dementorClubCartV1',checkoutEnabled:false,checkoutProvider:null,checkoutUrl:null,preorderPaymentMethod:null,runtimeSource:'supabase'},
   events:{registrationEnabled:false,registrationProvider:null,registrationUrl:null},
-  community:{membershipEnabled:true,membershipProvider:'join_application',membershipUrl:'/join/apply/'},
+  community:{membershipEnabled:true,membershipProvider:'dc_member_entry_v1',membershipUrl:'/join/member/',boardUrl:'/community/board/',artifactMediaBucket:'dc-community-artifacts'},
   onboarding:{storageKey:'dementorClubOnboardingV3',storage:'localStorage',accountSync:true,authRequired:false,progressMap:true},
   internalTools:{enabled:true,holdMs:1200,path:'/design-system/admin/'}
 });
@@ -38,6 +38,7 @@ if(typeof document!=='undefined'){
     if(isJoinAssessment){
       addScript('/dementor-account-sync-v8.js?v=20260828-17');
       addScript('/join-data-copy-v1.js?v=20260828-18');
+      addScript('/join/community-entry-bridge-v1.js?v=20260830-01');
       if(cfg.onboarding?.progressMap)addScript('/join/join-progress-map-v2.js?v=20260829-01',{module:true});
     }
     if(path.endsWith('/projects/logic-awareness/'))addScript('/content-series-v1.js');
