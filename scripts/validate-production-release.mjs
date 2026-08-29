@@ -42,7 +42,6 @@ const technicalRouteAllowlist = new Set([
   '/profile/',
 ]);
 const publicTextExtensions = new Set(['.html', '.xml', '.txt', '.webmanifest', '.json', '.js', '.css']);
-const staticRefExtensions = '(?:css|js|mjs|json|xml|txt|webmanifest|png|jpe?g|webp|gif|svg|ico|avif|woff2?|ttf|otf|mp4|webm|mp3|wav)';
 const errors = [];
 const shippedHtmlRoutes = new Set();
 
@@ -143,7 +142,7 @@ function validatePublicReferences(rel, text, ext) {
     for (const match of text.matchAll(/url\(\s*["']?([^"')]+)["']?\s*\)/gi)) validateRef(rel, match[1], 'CSS url');
   }
   if (ext === '.js') {
-    const jsAssetPattern = new RegExp(`["'\\`]((?:/|\\.\\.?/)[^"'\\`\\s$]+?\\.${staticRefExtensions})["'\\`]`, 'gi');
+    const jsAssetPattern = /["']((?:\/|\.\.?\/)[^"'\s$]+?\.(?:css|js|mjs|json|xml|txt|webmanifest|png|jpe?g|webp|gif|svg|ico|avif|woff2?|ttf|otf|mp4|webm|mp3|wav))["']/gi;
     for (const match of text.matchAll(jsAssetPattern)) validateRef(rel, match[1], 'JS asset');
   }
 }
