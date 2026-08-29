@@ -38,14 +38,6 @@ jobs:
       - name: Build production artifact without deploying
         run: node scripts/build-pages.mjs
 
-      - name: Upload QA production artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: community-v1-production-candidate
-          path: _site
-          if-no-files-found: error
-          retention-days: 1
-
       - name: Validate production analytics and consent
         run: node scripts/validate-production-analytics.mjs
 
