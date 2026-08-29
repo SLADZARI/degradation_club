@@ -20,7 +20,11 @@ export const DC_ARTIFACT_BUCKET='dc-community-artifacts';
 export const esc=value=>String(value??'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
 export const formatDate=value=>{if(!value)return '—';try{return new Intl.DateTimeFormat('ru-RU',{day:'2-digit',month:'short',year:'numeric'}).format(new Date(value))}catch{return String(value)}};
 export const basePath=()=>location.pathname.startsWith('/degradation_club/')?'/degradation_club':'';
-export const route=path=>`${basePath()}${path.startsWith('/')?path:`/${path}`}`;
+export const route=path=>{
+  const base=basePath();
+  const normalized=path.startsWith('/')?path:`/${path}`;
+  return base&&normalized.startsWith(`${base}/`)?normalized:`${base}${normalized}`;
+};
 
 export function getConfig(){
   const cfg=window.DEMENTOR_SITE_CONFIG?.supabase;
