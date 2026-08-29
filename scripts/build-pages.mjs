@@ -22,6 +22,7 @@ const skipTopLevel = new Set([
   'test',
   'tests',
   'fixtures',
+  'cart',
 ]);
 
 const skipRootFiles = new Set([
