@@ -37,5 +37,8 @@ jobs:
       - name: Build production artifact without deploying
         run: node scripts/build-pages.mjs
 
+      - name: Validate production analytics and consent
+        run: node scripts/validate-production-analytics.mjs
+
       - name: Validate production artifact and release gate
         run: node scripts/validate-production-release.mjs
