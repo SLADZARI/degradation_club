@@ -1,11 +1,14 @@
 # SH-DEM-03 — SUCCESS IS BORING.
 
 - `product_id`: SH-DEM-03
+- `entity_type`: wear
 - `name`: SUCCESS IS BORING.
 - `public_name`: SUCCESS IS BORING.
+- `public_url`: /merch/drop-001/success-is-boring/
 - `category`: apparel / t-shirt
 - `line`: Classic Dementor T-Shirts
 - `status`: working-assets-present
+- `sales_state`: not-open
 - `drop`: DROP 001
 - `short_idea`: `SUCCESS IS BORING.`
 - `public_description`: null
@@ -21,11 +24,16 @@
 - `currency_display`: EUR
 - `production_notes`: null
 - `website_assets`: Google Drive `14kKDxIk4G3BPYpK3O4DQneAOu1R5QsOS` (`sh-dem-03 1.jpg`) + `1pdZgXrOJFujVZGtC6G5gPjT9tOkyQSJE` (`sh-dem-03 2.jpg`)
+- `primary_asset`: /assets/merch/drop-001/sh-dem-03-light.webp
 - `social_assets`: null
 - `related_project`: Dementor Club / Merch
+- `related_entities`: null
+- `recommendation_tags`: success; achievement; anti-optimization
+- `placement_tags`: EVENT_RELATED; MERCH_CROSSSELL; FOOTER_ROTATION
+- `recommendation_priority`: 50
 - `approved_phrases`: `SUCCESS IS BORING.`; `DEMENTOR CLUB`
 - `prohibited_presentation`: do not infer fabric composition, GSM, fit, size range, print technique, price, edition or availability from the mockup
-- `updated_at`: 2026-08-26
+- `updated_at`: 2026-08-29
 
 ## Visual specification confirmed from uploaded mockups
 
