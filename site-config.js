@@ -1,5 +1,5 @@
 window.DEMENTOR_SITE_CONFIG=Object.freeze({
-  version:'2026-08-29.02',
+  version:'2026-08-29.03',
   canonicalOrigin:'https://dementor.club',
   supabase:{
     enabled:true,
@@ -10,11 +10,11 @@ window.DEMENTOR_SITE_CONFIG=Object.freeze({
   },
   contacts:{enabled:false,endpoint:null,publicEmail:null,socialLinks:[]},
   donate:{enabled:false,provider:null,checkoutUrl:null,currency:null,recurring:false},
-  merch:{catalogEnabled:true,cartEnabled:true,cartStorageKey:'dementorClubCartV1',checkoutEnabled:false,checkoutProvider:null,checkoutUrl:null,preorderPaymentMethod:null,runtimeSource:'supabase'},
+  merch:{catalogEnabled:true,cartEnabled:false,cartStorageKey:'dementorClubCartV1',checkoutEnabled:false,checkoutProvider:null,checkoutUrl:null,preorderPaymentMethod:null,runtimeSource:'supabase'},
   events:{registrationEnabled:false,registrationProvider:null,registrationUrl:null},
   community:{membershipEnabled:true,membershipProvider:'join_application',membershipUrl:'/join/apply/'},
   onboarding:{storageKey:'dementorClubOnboardingV3',storage:'localStorage',accountSync:true,authRequired:false,progressMap:true},
-  internalTools:{enabled:true,holdMs:1200,path:'/design-system/admin/'}
+  internalTools:{enabled:false,holdMs:1200,path:'/design-system/admin/'}
 });
 if(typeof document!=='undefined'){
   (()=>{
