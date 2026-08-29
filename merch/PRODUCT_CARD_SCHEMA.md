@@ -5,11 +5,14 @@
 ## Обязательные поля
 
 - `product_id`
+- `entity_type`
 - `name`
 - `public_name`
+- `public_url`
 - `category`
 - `line`
 - `status`
+- `sales_state`
 - `drop`
 - `short_idea`
 - `public_description`
@@ -25,11 +28,31 @@
 - `currency_display`
 - `production_notes`
 - `website_assets`
+- `primary_asset`
 - `social_assets`
 - `related_project`
+- `related_entities`
+- `recommendation_tags`
+- `placement_tags`
+- `recommendation_priority`
 - `approved_phrases`
 - `prohibited_presentation`
 - `updated_at`
+
+## Recommendation metadata
+
+Поля рекомендации не превращают сайт в отдельный источник правды. Они описывают, где уже существующий товар разрешено показывать в экосистеме.
+
+- `entity_type` — `object / wear / paper / edition / project-edition`;
+- `public_url` — стабильный публичный URL товара;
+- `sales_state` — публичное коммерческое состояние (`not-open / coming / available / sold-out / archived`);
+- `primary_asset` — основной site-ready asset;
+- `related_entities` — явные связи с course/event/project/product IDs;
+- `recommendation_tags` — контекстные теги для ранжирования;
+- `placement_tags` — разрешённые named slots;
+- `recommendation_priority` — относительный приоритет среди одинаково релевантных сущностей, без отмены контекстной релевантности.
+
+Архитектура placements и ограничения описаны в `merch/ENTITY_PLACEMENT_AND_RECOMMENDATION_RULES.md`.
 
 ## Цена
 
