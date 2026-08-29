@@ -1,9 +1,13 @@
-name: Site Integrity
+name: Site Integrity / Release Readiness
 
 on:
+  push:
+    branches:
+      - dementor-club-site
   pull_request:
     branches:
       - dementor-club-site
+      - dementor-club-production
   workflow_dispatch:
 
 permissions:
@@ -12,9 +16,9 @@ permissions:
 jobs:
   validate:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
     steps:
-      - name: Checkout site branch
+      - name: Checkout candidate branch
         uses: actions/checkout@v4
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -26,3 +30,7 @@ jobs:
         run: node scripts/validate-content-readiness.mjs
       - name: Validate visual contract
         run: node scripts/validate-visual-contract.mjs
+      - name: Build production candidate artifact
+        run: node scripts/build-pages.mjs
+      - name: Validate production artifact release gate
+        run: node scripts/validate-production-release.mjs
