@@ -32,9 +32,11 @@ const forbiddenArtifactPaths = [
   'DRIVE.md',
   '.deploy-trigger',
   'DEPLOY_TRIGGER.txt',
+  'cart',
 ];
 const technicalRouteAllowlist = new Set([
   '/auth/callback/',
+  '/profile/',
 ]);
 const publicTextExtensions = new Set(['.html', '.xml', '.txt', '.webmanifest', '.json', '.js', '.css']);
 const errors = [];
