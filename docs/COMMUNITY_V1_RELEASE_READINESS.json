@@ -10,8 +10,8 @@
         "dementor-club/operations/ONBOARDING_SYSTEM.md",
         "dementor-club/community/MEMBER_ENTRY_AND_ARTIFACT_FLOW_V1.md"
       ],
-      "blockingFields": ["runtime visual QA at target widths", "real OAuth end-to-end smoke test"],
-      "note": "The 9/9 result gate and independent Sphere Map semantics are source-approved. Route may exist in a production candidate, but release approval remains blocked until browser/OAuth QA is completed."
+      "blockingFields": ["real deployed Google OAuth end-to-end smoke test"],
+      "note": "9/9 result gate, independent Sphere Map semantics and responsive production-artifact layout are verified. Release approval remains blocked until the deployed OAuth return path is exercised with a real account."
     },
     {
       "route": "/join/member/",
@@ -21,8 +21,8 @@
         "dementor-club/community/MEMBER_ENTRY_AND_ARTIFACT_FLOW_V1.md",
         "dementor-club/docs/COMMUNITY_INDEX.md"
       ],
-      "blockingFields": ["runtime visual QA at target widths", "real OAuth membership activation smoke test"],
-      "note": "Minimal Member identity and automatic server-gated membership are source-approved. The route remains release-gated until live OAuth and responsive QA are complete."
+      "blockingFields": ["real deployed OAuth membership activation smoke test"],
+      "note": "Minimal Member identity, automatic server-gated membership and responsive production-artifact layout are verified. Live deployed membership activation remains required."
     },
     {
       "route": "/community/board/",
@@ -32,8 +32,8 @@
         "dementor-club/community/MEMBER_ENTRY_AND_ARTIFACT_FLOW_V1.md",
         "dementor-club/docs/COMMUNITY_INDEX.md"
       ],
-      "blockingFields": ["runtime visual QA at target widths", "two-Member reaction/response smoke test", "archive-to-slot restoration smoke test"],
-      "note": "Closed Member Board and first Artifact mechanic are source-approved. No historical seed content may be invented; runtime interaction QA remains required before release approval."
+      "blockingFields": ["real deployed first-Artifact browser smoke test", "two-Member reaction/response browser smoke test", "deployed browser archive-to-slot restoration smoke test"],
+      "note": "Closed Member Board, responsive layout and rollback-only server lifecycle are verified. No historical seed content is invented; real multi-user browser interaction remains required before release approval."
     },
     {
       "route": "/community/artifact/",
@@ -43,8 +43,8 @@
         "dementor-club/community/MEMBER_ENTRY_AND_ARTIFACT_FLOW_V1.md",
         "dementor-club/docs/COMMUNITY_INDEX.md"
       ],
-      "blockingFields": ["runtime visual QA at target widths", "stable URL smoke test on GitHub Pages", "reaction/response authorization smoke test"],
-      "note": "Addressable Artifact detail is part of the approved Community runtime. Production-candidate inclusion is allowed while final browser/RLS interaction QA remains outstanding."
+      "blockingFields": ["stable /community/artifact/<uuid>/ smoke test on actual GitHub Pages runtime", "two-Member reaction/response browser authorization smoke test"],
+      "note": "Addressable Artifact detail, responsive production-artifact layout and server authorization model are verified. Actual Pages routing and multi-user browser interaction remain outstanding."
     }
   ]
 }
