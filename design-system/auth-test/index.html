@@ -12,9 +12,9 @@
 </head>
 <body>
 <main>
-  <div class="meta">INTERNAL / DESIGN SYSTEM / AUTH DIAGNOSTICS / NOINDEX</div>
+  <div class="meta">INTERNAL / QA-STAGING / AUTH DIAGNOSTICS / NOINDEX</div>
   <h1>DEMENTOR AUTH TEST</h1>
-  <p class="muted">Тестирует не только OAuth, но и persistence: session → browser storage → reload → restored session. Значения токенов не выводятся.</p>
+  <p class="muted">Тестирует OAuth и persistence: session → browser storage → reload → restored session. Redirect всегда строится от текущего origin. Значения токенов не выводятся.</p>
   <p><a class="tool" href="../admin/">SYSTEM TOOLS</a><button id="login">GOOGLE LOGIN</button><button id="reload">RELOAD TEST</button><button id="snapshot">STORAGE SNAPSHOT</button><button id="logout">LOGOUT</button></p>
   <div class="box" id="status">BOOT…</div>
   <div class="label">AUTH STORAGE / SAFE METADATA ONLY</div>
@@ -59,7 +59,8 @@ const renderStorage=(reason='snapshot')=>{
   return {expectedPresent:Boolean(expected?.present),expectedLength:expected?.length||0,keyCount:rows.length};
 };
 const log=(step,detail={})=>{const safe={...detail};delete safe.access_token;delete safe.refresh_token;delete safe.token;delete safe.session;trace.push({time:new Date().toISOString(),step,...safe});traceEl.textContent=trace.map(x=>`${x.time.slice(11,19)}  ${x.step}  ${JSON.stringify(Object.fromEntries(Object.entries(x).filter(([k])=>!['time','step'].includes(k))))}`).join('\n');};
-const redirectTo='https://sladzari.github.io/degradation_club/design-system/auth-test/';
+const base=location.pathname.startsWith('/degradation_club/')?'/degradation_club':'';
+const redirectTo=location.origin+base+'/design-system/auth-test/';
 log('page-load',{href:location.origin+location.pathname+location.search,hasCode:new URLSearchParams(location.search).has('code'),hasHash:Boolean(location.hash),...renderStorage('before-client')});
 const client=createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,flowType:'pkce'}});
 window.authTestClient=client;
