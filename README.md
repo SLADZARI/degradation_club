@@ -27,11 +27,18 @@
 
 ## Обязательная дизайн-документация
 
-- `docs/DESIGN_PRESENTATION_GUIDE.md` — официальный guide по архитектуре, типографике, композиции, motion, Dementor Ink, mobile и правилам применения референсов.
-- `docs/ENTITY_PRESENTATION_STANDARD_v1.md` — обязательный presentation contract для Dementor / Event / Course / Project / Merch / Quote / Test / Service states; визуальный эталон — `/design-system/`.
-- `docs/COMPONENT_SYSTEM_v1.md` — рабочая component/page system.
-- `docs/GLOBAL_HEADER_v1.md` — единый header, desktop navigation, mobile burger и правила локальных product bars.
-- `docs/MOTION_NAV_SEO_IMPLEMENTATION_v1.md` — navigation, motion и metadata baseline.
+### Design authority order
+
+1. `docs/DEMENTOR_DESIGN_CANON_v10.md` — **главный визуальный канон сайта / DESIGN AUTHORITY**. Если более старый guide, legacy CSS, исторический эксперимент или component override противоречит v10, **v10 wins**.
+2. `dementor-club/concept/ABOUT_PAGE_APPROVED_V10.md` — утверждённая reference implementation канона на реальной странице About.
+3. `docs/ENTITY_PRESENTATION_STANDARD_v1.md` — обязательный presentation contract для Dementor / Event / Course / Project / Merch / Quote / Test / Service states; визуальный эталон — `/design-system/`.
+4. `docs/COMPONENT_SYSTEM_v1.md` — рабочая component/page system.
+5. `docs/GLOBAL_HEADER_v1.md` — единый header, desktop navigation, mobile burger и правила локальных product bars.
+6. `docs/MOTION_NAV_SEO_IMPLEMENTATION_v1.md` — navigation, motion и metadata baseline.
+7. `docs/DESIGN_PRESENTATION_GUIDE.md` — background/reference guide по архитектуре, типографике, композиции, motion, Dementor Ink, mobile и источникам референсов; он не может переопределять v10.
+
+Дополнительные обязательные operational документы:
+
 - `docs/PRODUCTION_QA_v1.md` — production gate и responsive QA.
 - `docs/SITE_HARMONIZATION_AUDIT_2026-08-26.md` — карта применения presentation standard по существующим страницам.
 - `docs/deployment.md` — deployment contract.
@@ -41,6 +48,8 @@
 - `references/REFERENCE_RESPONSIBILITIES.md` — карта ответственности Public Records / Actual Source / 032c / Mouthwash / DIA / Dementor Ink.
 
 Эти документы являются обязательным source-of-truth для новых страниц и редизайна существующих экранов. Новая сущность не получает новый случайный дизайн: сначала определяется `entity_type`, `presentation_role`, `context` и responsive contract, затем используются общие primitives.
+
+Для LLM обязательное правило: перед изменением визуальной архитектуры прочитать `docs/DEMENTOR_DESIGN_CANON_v10.md` и сверить решение с `ABOUT_PAGE_APPROVED_V10.md`. Реализованный эксперимент сам по себе не становится новым каноном.
 
 ## Test material ≠ public content
 
