@@ -25,6 +25,7 @@ create table if not exists public.dc_artifact_board_positions (
 alter table public.dc_artifact_board_positions enable row level security;
 revoke all on table public.dc_artifact_board_positions from public, anon, authenticated;
 grant select on table public.dc_artifact_board_positions to authenticated;
+grant update (x,y) on table public.dc_artifact_board_positions to authenticated;
 
 drop policy if exists dc_artifact_board_positions_select_members on public.dc_artifact_board_positions;
 create policy dc_artifact_board_positions_select_members
@@ -39,6 +40,36 @@ using (
     where a.id = artifact_id
       and a.visibility = 'community'
       and a.status in ('active','expired','archived')
+  )
+);
+
+drop policy if exists dc_artifact_board_positions_update_own on public.dc_artifact_board_positions;
+create policy dc_artifact_board_positions_update_own
+on public.dc_artifact_board_positions
+for update
+to authenticated
+using (
+  (select public.dc_member_activated_v1())
+  and exists (
+    select 1
+    from public.dc_artifacts a
+    where a.id = artifact_id
+      and a.author_profile_id = (select auth.uid())
+      and a.visibility = 'community'
+      and a.status = 'active'
+      and (a.expires_at is null or a.expires_at > now())
+  )
+)
+with check (
+  (select public.dc_member_activated_v1())
+  and exists (
+    select 1
+    from public.dc_artifacts a
+    where a.id = artifact_id
+      and a.author_profile_id = (select auth.uid())
+      and a.visibility = 'community'
+      and a.status = 'active'
+      and (a.expires_at is null or a.expires_at > now())
   )
 );
 
@@ -128,70 +159,29 @@ for each row
 when (new.status = 'active' and new.visibility = 'community')
 execute function public.dc_ensure_artifact_board_position_v1();
 
--- Narrow movement API. The client cannot UPDATE the table directly.
--- Version checking prevents one stale browser from silently overwriting a newer move.
-create or replace function public.dc_move_own_artifact_v1(
-  p_artifact_id uuid,
-  p_x double precision,
-  p_y double precision,
-  p_expected_version bigint default null
-)
-returns jsonb
+-- Client updates only x/y. The database owns version/timestamp bookkeeping.
+create or replace function public.dc_touch_artifact_board_position_v1()
+returns trigger
 language plpgsql
-security definer
+security invoker
 set search_path = ''
 as $$
-declare
-  v_uid uuid := auth.uid();
-  v_current public.dc_artifact_board_positions%rowtype;
-  v_next_version bigint;
 begin
-  if v_uid is null then raise exception 'AUTH_REQUIRED'; end if;
-  if not public.dc_member_activated_v1() then raise exception 'FIRST_ARTIFACT_REQUIRED'; end if;
-  if p_x is null or p_y is null or p_x < 0 or p_x > 5000 or p_y < 0 or p_y > 3500 then
-    raise exception 'BOARD_POSITION_INVALID';
-  end if;
-
-  if not exists (
-    select 1
-    from public.dc_artifacts a
-    where a.id = p_artifact_id
-      and a.author_profile_id = v_uid
-      and a.visibility = 'community'
-      and a.status = 'active'
-      and (a.expires_at is null or a.expires_at > now())
-  ) then
-    raise exception 'ARTIFACT_NOT_MOVABLE';
-  end if;
-
-  select * into v_current
-  from public.dc_artifact_board_positions p
-  where p.artifact_id = p_artifact_id
-  for update;
-
-  if v_current.artifact_id is null then raise exception 'BOARD_POSITION_NOT_FOUND'; end if;
-  if p_expected_version is not null and p_expected_version <> v_current.position_version then
-    raise exception 'BOARD_POSITION_CONFLICT';
-  end if;
-
-  update public.dc_artifact_board_positions
-  set x = p_x,
-      y = p_y,
-      position_version = position_version + 1,
-      moved_at = now()
-  where artifact_id = p_artifact_id
-  returning position_version into v_next_version;
-
-  return jsonb_build_object(
-    'artifact_id',p_artifact_id,
-    'x',p_x,
-    'y',p_y,
-    'position_version',v_next_version
-  );
+  new.artifact_id := old.artifact_id;
+  new.board_id := old.board_id;
+  new.rotation := old.rotation;
+  new.size_class := old.size_class;
+  new.placed_at := old.placed_at;
+  new.position_version := old.position_version + 1;
+  new.moved_at := now();
+  return new;
 end;
 $$;
 
-revoke all on function public.dc_move_own_artifact_v1(uuid,double precision,double precision,bigint) from public, anon;
-grant execute on function public.dc_move_own_artifact_v1(uuid,double precision,double precision,bigint) to authenticated;
+drop trigger if exists dc_artifact_board_position_touch_v1 on public.dc_artifact_board_positions;
+create trigger dc_artifact_board_position_touch_v1
+before update of x,y on public.dc_artifact_board_positions
+for each row
+execute function public.dc_touch_artifact_board_position_v1();
 
 commit;
