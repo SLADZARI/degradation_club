@@ -10,6 +10,12 @@ const communityBridge=read('join/community-entry-bridge-v1.js');
 const auth=read('required-auth-v1.js');
 const valentinIndex=read('courses/dumai-s-opasnostyu/index.html');
 const accountIdentity=read('course-account-identity-v1.js');
+const siteConfig=read('site-config.js');
+const accountSync=read('dementor-account-sync-v9.js');
+const sphereCompat=read('join/dc9-sphere-compat-v1.js');
+const resultIndex=read('join/result/index.html');
+const memberIndex=read('join/member/index.html');
+const workspaceMembership=read('workspace-membership-link-v1.js');
 
 // Exact regression that froze /join/: an observer watched the whole grid subtree while
 // decorateCards() replaced sphere-foot innerHTML, so its own writes retriggered itself.
@@ -25,6 +31,25 @@ requireText(join,'#selector .sphere-foot > .badge{display:none}','Join completio
 // Community progress must never observe the whole document subtree.
 forbid(communityBridge,/observe\(document\.documentElement,\{[^}]*subtree\s*:\s*true/i,'Community progress observer');
 requireText(communityBridge,'dataset.signature','Community progress idempotence');
+
+// DC-9 server boundary is canonical even while the legacy assessment UI still uses
+// `self-development` locally.
+requireText(siteConfig,'/dementor-account-sync-v9.js','Join canonical account sync');
+forbid(siteConfig,/dementor-account-sync-v8\.js/,'Legacy account sync injection');
+requireText(accountSync,"const canonicalSphere=id=>id===LEGACY_SELF?CANON_SELF:id",'DC-9 canonical sphere mapping');
+requireText(accountSync,"sphere_id:canonical",'Canonical assessment run write');
+requireText(accountSync,"state_json:canonical",'Canonical assessment snapshot write');
+requireText(sphereCompat,"const CANONICAL='self_development'",'Community sphere compatibility');
+requireText(resultIndex,'/join/dc9-sphere-compat-v1.js','Result compatibility preboot');
+requireText(memberIndex,'/join/dc9-sphere-compat-v1.js','Membership compatibility preboot');
+
+// Guest workspace must never revive the deprecated /join/apply/ flow or a body-wide
+// self-mutating observer. The canonical Community v1 gate owns membership entry.
+forbid(workspaceMembership,/\/join\/apply\//,'Deprecated workspace membership route');
+forbid(workspaceMembership,/observe\(document\.body,\{[^}]*subtree\s*:\s*true/i,'Workspace membership body observer');
+requireText(workspaceMembership,"destination=base+'/join/result/'",'Workspace canonical membership route');
+requireText(workspaceMembership,"observe(root,{childList:true})",'Workspace direct-child observer');
+requireText(siteConfig,'workspace-membership-link-v1.js?v=20260830-02','Workspace membership cache bust');
 
 // Authenticated interactive products expose one account identity.
 requireText(auth,'window.DEMENTOR_AUTH_USER','Required auth identity');
