@@ -18,7 +18,7 @@ function projectionClass(item){
 }
 
 function statusLabel(item){
-  const map={active:'ACTIVE',announced:'ANNOUNCED',registration:'REGISTRATION',planned:'PLANNED','approved-draft':'APPROVED DRAFT','mvp-in-development':'IN DEVELOPMENT'};
+  const map={active:'ACTIVE',announced:'ANNOUNCED',registration:'REGISTRATION',planned:'PLANNED','approved-draft':'FORMING / APPROVED','mvp-in-development':'IN DEVELOPMENT'};
   return map[item.status]||String(item.status||'').toUpperCase();
 }
 
