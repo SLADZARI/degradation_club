@@ -1,7 +1,6 @@
 (()=>{
   if(!location.pathname.includes('/courses/dumai-s-opasnostyu/'))return;
   const STORAGE='dementor_dumai_course_stage1';
-  let stopped=false;
 
   const accountEmail=()=>String(window.DEMENTOR_AUTH_USER?.email||'').trim().toLowerCase();
   const patchStoredState=email=>{
@@ -20,7 +19,7 @@
     if(!email)return false;
     patchStoredState(email);
     const input=document.getElementById('email');
-    if(!input)return true;
+    if(!input)return false;
     if(input.value!==email){input.value=email;input.dispatchEvent(new Event('input',{bubbles:true}));}
     input.readOnly=true;
     input.setAttribute('aria-readonly','true');
@@ -35,7 +34,7 @@
     return true;
   };
 
-  const sync=()=>{if(stopped)return;decorateEmailScreen()};
+  const sync=()=>decorateEmailScreen();
   window.addEventListener('dc-auth-ready',sync);
   const app=document.getElementById('app');
   if(app)new MutationObserver(sync).observe(app,{childList:true});
@@ -43,6 +42,7 @@
   let tries=0;
   const timer=setInterval(()=>{
     tries++;
-    if(decorateEmailScreen()||tries>=80){clearInterval(timer);stopped=true;}
+    if(accountEmail()||tries>=80)clearInterval(timer);
+    decorateEmailScreen();
   },100);
 })();
