@@ -6,11 +6,13 @@
     ['relationships','Отношения'],['control','Контроль'],['information','Информация'],
     ['self_development','Саморазвитие'],['meaning','Смысл'],['technology','Технологии']
   ];
+  const ALIASES={self_development:['self_development','self-development']};
   const base=location.pathname.startsWith('/degradation_club/')?'/degradation_club':'';
   const resultDestination=base+'/join/result/';
   const joinDestination=base+'/join/';
   const read=()=>{try{return JSON.parse(localStorage.getItem(STORAGE)||'null')||{results:{}}}catch{return{results:{}}}};
-  const completed=()=>{const state=read();return SPHERES.filter(([id])=>state.results?.[id]?.date)};
+  const hasResult=(state,id)=>{const ids=ALIASES[id]||[id];return ids.some(key=>state.results?.[key]?.date)};
+  const completed=()=>{const state=read();return SPHERES.filter(([id])=>hasResult(state,id))};
   const ensureStyles=()=>{
     if(document.getElementById('dcCommunityProgressStyles'))return;
     const style=document.createElement('style');style.id='dcCommunityProgressStyles';style.textContent=`

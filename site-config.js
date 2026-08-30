@@ -1,5 +1,5 @@
 window.DEMENTOR_SITE_CONFIG=Object.freeze({
-  version:'2026-08-30.03',
+  version:'2026-08-30.04',
   canonicalOrigin:'https://dementor.club',
   supabase:{
     enabled:true,
@@ -38,7 +38,8 @@ if(typeof document!=='undefined'){
     if(isJoinAssessment){
       addScript('/dementor-account-sync-v8.js?v=20260828-17');
       addScript('/join-data-copy-v1.js?v=20260828-18');
-      addScript('/join/community-entry-bridge-v1.js?v=20260830-03');
+      addScript('/join/community-entry-bridge-v1.js?v=20260830-04');
+      addScript('/join/join-hotfix-v1.js?v=20260830-01');
       if(cfg.onboarding?.progressMap)addScript('/join/join-progress-map-v2.js?v=20260829-01',{module:true});
     }
     if(path.endsWith('/projects/logic-awareness/'))addScript('/content-series-v1.js');
