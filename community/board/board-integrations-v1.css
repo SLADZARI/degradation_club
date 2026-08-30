@@ -1,0 +1,17 @@
+.dc-board-filters{display:flex;flex-wrap:wrap;gap:7px;margin:0 0 24px;padding:0 0 4px}
+.dc-board-filter{appearance:none;border:1px solid #111;background:#f4f0e7;color:#111;padding:8px 10px;min-height:36px;font:800 10px/1 ui-monospace,SFMono-Regular,Menlo,monospace;text-transform:uppercase;cursor:pointer;box-shadow:2px 2px 0 #111}
+.dc-board-filter:hover,.dc-board-filter.active{background:#d8ff3e}
+.dc-board-filter:focus-visible{outline:3px solid #111;outline-offset:3px}
+.dc-board-filtered{opacity:.12!important;filter:grayscale(.8);pointer-events:none;transition:opacity .18s ease}
+.dc-projection{border:1px solid #111;background:#fffdf7;box-shadow:5px 5px 0 #111;padding:18px;min-height:230px;display:flex;flex-direction:column;gap:12px;transform:rotate(var(--dc-card-rotation,.18deg))}
+.dc-projection--event:not(.is-forming){background:#d8ff3e;border-width:2px}
+.dc-projection--course{background:#fff}
+.dc-projection--practice{background:#f4f0e7}
+.dc-projection.is-forming{background:#f4f0e7;border-style:dashed;box-shadow:3px 3px 0 #111}
+.dc-projection__authority{align-self:flex-start;border:1px solid #111;padding:4px 6px;font:900 9px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.04em;background:#111;color:#fff}
+.dc-projection.is-forming .dc-projection__authority{background:transparent;color:#111;border-style:dashed}
+.dc-projection h3{margin:0;font-size:clamp(28px,3vw,52px);line-height:.9;letter-spacing:-.045em;text-transform:uppercase}
+.dc-projection__line{border-top:1px dashed #111;border-bottom:1px dashed #111;padding:8px 0;font:800 11px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace;text-transform:uppercase}
+.dc-board-action--activation-locked{opacity:.42!important;background:repeating-linear-gradient(-45deg,transparent,transparent 5px,rgba(17,17,17,.08) 5px,rgba(17,17,17,.08) 10px)!important;cursor:not-allowed!important}
+.dc-board-error--activation{margin:0 0 14px;padding:10px 12px;border:1px solid #111;background:#fffdf7;color:#8b1d1d;box-shadow:3px 3px 0 #111}
+@media(max-width:720px){.dc-board-filters{overflow-x:auto;flex-wrap:nowrap;padding-bottom:8px;scrollbar-width:thin}.dc-board-filter{white-space:nowrap;min-height:44px}.dc-projection{min-height:200px}}
