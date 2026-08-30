@@ -1,6 +1,8 @@
+-- DEFERRED / NOT IN ACTIVE MIGRATION QUEUE
 -- Dementor Club Community — participation-before-reaction gate.
--- Safe additive hardening on top of the existing Community v1 runtime.
--- Keeps current direct table writes from board.js; authorization is enforced by RLS.
+--
+-- This migration is intentionally deferred. It is preserved here for local Supabase CLI + Docker QA
+-- and must not be applied as part of the Board position persistence hotfix.
 
 begin;
 
@@ -26,7 +28,6 @@ $$;
 revoke all on function public.dc_member_activated_v1() from public, anon;
 grant execute on function public.dc_member_activated_v1() to authenticated;
 
--- Reaction insert: active Member + first Artifact already published + readable active target.
 drop policy if exists dc_artifact_reactions_insert_own on public.dc_artifact_reactions;
 create policy dc_artifact_reactions_insert_own
 on public.dc_artifact_reactions
@@ -45,7 +46,6 @@ with check (
   )
 );
 
--- A Member who has activated Community may remove their own reaction.
 drop policy if exists dc_artifact_reactions_delete_own on public.dc_artifact_reactions;
 create policy dc_artifact_reactions_delete_own
 on public.dc_artifact_reactions
@@ -56,7 +56,6 @@ using (
   and (select public.dc_member_activated_v1())
 );
 
--- Response insert: preserve current self-response prohibition and target-state checks.
 drop policy if exists dc_artifact_responses_insert_own on public.dc_artifact_responses;
 create policy dc_artifact_responses_insert_own
 on public.dc_artifact_responses
@@ -77,7 +76,6 @@ with check (
   )
 );
 
--- Preserve withdrawal/update semantics, now with the same activation boundary.
 drop policy if exists dc_artifact_responses_update_own on public.dc_artifact_responses;
 create policy dc_artifact_responses_update_own
 on public.dc_artifact_responses
@@ -92,7 +90,6 @@ with check (
   and status in ('submitted','withdrawn')
 );
 
--- Current data was checked before preparing this migration: no duplicate submitted responses.
 create unique index if not exists dc_artifact_responses_one_submitted_per_member_idx
 on public.dc_artifact_responses (artifact_id, responder_profile_id)
 where status = 'submitted';

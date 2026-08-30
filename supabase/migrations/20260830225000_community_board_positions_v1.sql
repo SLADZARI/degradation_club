@@ -2,6 +2,10 @@
 -- Coordinates are presentation state only; Artifact semantics/lifecycle remain in dc_artifacts.
 -- Existing dc_publish_artifact_v1 stays authoritative. An AFTER trigger assigns a Board position
 -- in the same transaction, so Telegram/outbox logic in the production frontend remains untouched.
+--
+-- IMPORTANT: this migration is intentionally standalone. It does NOT depend on the deferred
+-- dc_member_activated_v1() participation gate. Movement authorization is limited to an active
+-- Member moving their own currently active, published Community Artifact.
 
 begin;
 
@@ -49,7 +53,7 @@ on public.dc_artifact_board_positions
 for update
 to authenticated
 using (
-  (select public.dc_member_activated_v1())
+  (select public.dc_membership_active())
   and exists (
     select 1
     from public.dc_artifacts a
@@ -57,11 +61,12 @@ using (
       and a.author_profile_id = (select auth.uid())
       and a.visibility = 'community'
       and a.status = 'active'
+      and a.published_at is not null
       and (a.expires_at is null or a.expires_at > now())
   )
 )
 with check (
-  (select public.dc_member_activated_v1())
+  (select public.dc_membership_active())
   and exists (
     select 1
     from public.dc_artifacts a
@@ -69,6 +74,7 @@ with check (
       and a.author_profile_id = (select auth.uid())
       and a.visibility = 'community'
       and a.status = 'active'
+      and a.published_at is not null
       and (a.expires_at is null or a.expires_at > now())
   )
 );
@@ -84,6 +90,7 @@ with ranked as (
   from public.dc_artifacts a
   where a.visibility = 'community'
     and a.status = 'active'
+    and a.published_at is not null
     and (a.expires_at is null or a.expires_at > now())
 )
 insert into public.dc_artifact_board_positions (
@@ -117,7 +124,10 @@ declare
   v_y double precision;
   v_rotation double precision;
 begin
-  if new.status <> 'active' or new.visibility <> 'community' then
+  if new.status <> 'active'
+     or new.visibility <> 'community'
+     or new.published_at is null
+     or (new.expires_at is not null and new.expires_at <= now()) then
     return new;
   end if;
 
@@ -154,9 +164,9 @@ revoke all on function public.dc_ensure_artifact_board_position_v1() from public
 
 drop trigger if exists dc_artifact_board_position_on_publish_v1 on public.dc_artifacts;
 create trigger dc_artifact_board_position_on_publish_v1
-after insert or update of status, visibility on public.dc_artifacts
+after insert or update of status, visibility, published_at, expires_at on public.dc_artifacts
 for each row
-when (new.status = 'active' and new.visibility = 'community')
+when (new.status = 'active' and new.visibility = 'community' and new.published_at is not null)
 execute function public.dc_ensure_artifact_board_position_v1();
 
 -- Client updates only x/y. The database owns version/timestamp bookkeeping.
@@ -177,6 +187,8 @@ begin
   return new;
 end;
 $$;
+
+revoke all on function public.dc_touch_artifact_board_position_v1() from public, anon, authenticated;
 
 drop trigger if exists dc_artifact_board_position_touch_v1 on public.dc_artifact_board_positions;
 create trigger dc_artifact_board_position_touch_v1
