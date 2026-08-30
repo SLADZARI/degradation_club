@@ -14,19 +14,39 @@ const json = (body: unknown, status = 200) => new Response(JSON.stringify(body),
 
 const clip = (value: string, max: number) => value.length <= max ? value : `${value.slice(0, Math.max(0, max - 1)).trimEnd()}…`;
 
+function getAdminKey() {
+  const legacy = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  if (legacy) return legacy;
+
+  const current = Deno.env.get("SUPABASE_SECRET_KEYS");
+  if (!current) return null;
+
+  try {
+    const keys = JSON.parse(current);
+    if (keys && typeof keys === "object") {
+      if (typeof keys.default === "string" && keys.default) return keys.default;
+      const first = Object.values(keys).find((value) => typeof value === "string" && value);
+      return typeof first === "string" ? first : null;
+    }
+  } catch {
+    return null;
+  }
+  return null;
+}
+
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   if (req.method !== "POST") return json({ error: "Method not allowed" }, 405);
 
   const supabaseUrl = Deno.env.get("SUPABASE_URL");
-  const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  const adminKey = getAdminKey();
   const botToken = Deno.env.get("TELEGRAM_BOT_TOKEN");
   const chatId = Deno.env.get("TELEGRAM_COMMUNITY_CHAT_ID");
 
-  if (!supabaseUrl || !serviceRoleKey) return json({ error: "Supabase runtime secrets are unavailable" }, 500);
+  if (!supabaseUrl || !adminKey) return json({ error: "Supabase runtime secrets are unavailable" }, 500);
   if (!botToken || !chatId) return json({ error: "Telegram secrets are not configured" }, 500);
 
-  const admin = createClient(supabaseUrl, serviceRoleKey, {
+  const admin = createClient(supabaseUrl, adminKey, {
     auth: { persistSession: false, autoRefreshToken: false },
   });
 
