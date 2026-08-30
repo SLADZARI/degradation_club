@@ -3,12 +3,14 @@ import {BOARD_FILTERS,entityToBoardProjection,isProjectionVisible,matchesBoardFi
 
 const boardHost=document.getElementById('boardHost');
 const filterHost=document.getElementById('boardFilters');
+const artifactCount=document.getElementById('artifactCount');
 let client=null;
 let activeFilter='all';
 let projections=[];
 let rendering=false;
 
 function projectionClass(item){
+  if(item.isForming)return 'dc-projection dc-projection--forming';
   if(item.sourceType==='event')return 'dc-projection dc-projection--event';
   if(item.sourceType==='course')return 'dc-projection dc-projection--course';
   if(item.sourceType==='practice')return 'dc-projection dc-projection--practice';
@@ -26,7 +28,7 @@ function renderProjection(item){
   const action=route?`<a class="dc-board-action small" href="${esc(route)}">ОТКРЫТЬ →</a>`:'';
   return `<article class="${projectionClass(item)}" data-board-source="platform" data-source-id="${esc(item.sourceId)}" data-source-type="${esc(item.sourceType)}" data-forming="${item.isForming?'1':'0'}">
     <div class="dc-notice__meta"><span>DEMENTOR CLUB / ${esc(item.sourceType.toUpperCase())}</span><span>${esc(statusLabel(item))}</span></div>
-    <div class="dc-projection__authority">PLATFORM PROJECTION</div>
+    <div class="dc-projection__authority">${item.isForming?'FORMING / PLATFORM':'PLATFORM PROJECTION'}</div>
     <h3>${esc(item.title)}</h3>
     ${item.body?`<p class="dc-notice__body">${esc(item.body)}</p>`:''}
     ${location}
@@ -43,6 +45,12 @@ function markMemberCards(){
   });
 }
 
+function syncCount(){
+  if(!artifactCount||!boardHost)return;
+  const count=boardHost.querySelectorAll('[data-board-source="member"],[data-board-source="platform"]').length;
+  artifactCount.textContent=String(count).padStart(2,'0');
+}
+
 function applyFilter(){
   markMemberCards();
   boardHost?.querySelectorAll('[data-board-source]').forEach(card=>{
@@ -55,10 +63,11 @@ function applyFilter(){
     card.classList.toggle('dc-board-filtered',!matchesBoardFilter(item,activeFilter));
   });
   filterHost?.querySelectorAll('[data-board-filter]').forEach(b=>b.classList.toggle('active',b.dataset.boardFilter===activeFilter));
+  syncCount();
 }
 
 function ensureProjections(){
-  if(!boardHost||rendering||!projections.length)return;
+  if(!boardHost||rendering||!projections.length){syncCount();return}
   if(boardHost.querySelector('[data-board-source="platform"]')){applyFilter();return}
   rendering=true;
   boardHost.insertAdjacentHTML('beforeend',projections.map(renderProjection).join(''));
