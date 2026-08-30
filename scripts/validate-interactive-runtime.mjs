@@ -1,9 +1,11 @@
 import fs from 'node:fs';
+import {spawnSync} from 'node:child_process';
 
 const read=path=>fs.readFileSync(path,'utf8');
 const fail=message=>{console.error(`RUNTIME SAFETY ERROR: ${message}`);process.exitCode=1};
 const requireText=(source,text,label)=>{if(!source.includes(text))fail(`${label}: missing ${text}`)};
 const forbid=(source,pattern,label)=>{if(pattern.test(source))fail(`${label}: forbidden pattern ${pattern}`)};
+const requireSyntax=path=>{const result=spawnSync(process.execPath,['--check',path],{encoding:'utf8'});if(result.status!==0)fail(`${path}: JavaScript syntax check failed\n${result.stderr||result.stdout||''}`)};
 
 const join=read('script.js');
 const communityBridge=read('join/community-entry-bridge-v1.js');
@@ -21,6 +23,11 @@ const boardRuntime=read('community/board/board.js');
 const boardIndex=read('community/board/index.html');
 const boardQaCss=read('community/board/board-qa-fix-v1.css');
 const artifactHardening=read('supabase/migrations/20260830095500_community_artifact_qa_hardening.sql');
+
+// Parse the changed module files. Production build copies static modules and does not
+// necessarily execute/parse every authenticated route during build time.
+requireSyntax('community/board/board.js');
+requireSyntax('join/member/member.js');
 
 // Exact regression that froze /join/: an observer watched the whole grid subtree while
 // decorateCards() replaced sphere-foot innerHTML, so its own writes retriggered itself.
