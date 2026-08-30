@@ -1,1 +1,35 @@
-(()=>{if(!location.pathname.includes('/workspace'))return;const base=location.pathname.startsWith('/degradation_club/')?'/degradation_club':'';const decorate=()=>{document.querySelectorAll('[data-membership-info]').forEach(btn=>{const submitted=[...document.querySelectorAll('.dcw-note')].some(n=>/join_application:\s*submitted/i.test(n.textContent||''));btn.textContent=submitted?'ОТКРЫТЬ ЗАЯВКУ':'ПОДАТЬ ЗАЯВКУ В КЛУБ'})};document.addEventListener('click',e=>{const btn=e.target.closest?.('[data-membership-info]');if(!btn)return;e.preventDefault();e.stopImmediatePropagation();location.assign(base+'/join/apply/')},{capture:true});new MutationObserver(()=>queueMicrotask(decorate)).observe(document.body,{childList:true,subtree:true});decorate();})();
+// Dementor Club — workspace → canonical Community v1 entry compatibility.
+(()=>{
+  if(!location.pathname.includes('/workspace'))return;
+  const base=location.pathname.startsWith('/degradation_club/')?'/degradation_club':'';
+  const destination=base+'/join/result/';
+  const root=document.getElementById('appView');
+  if(!root)return;
+
+  const decorate=()=>{
+    const btn=root.querySelector('[data-membership-info]');
+    if(!btn||btn.dataset.dcCommunityV1==='1')return;
+    btn.dataset.dcCommunityV1='1';
+    btn.textContent='ПРОДОЛЖИТЬ ВСТУПЛЕНИЕ →';
+    const block=btn.closest('.dcw-panel,.dcw-card,.dcw-access-card')||btn.parentElement?.parentElement;
+    const note=block?.querySelector('.dcw-note');
+    if(note){note.hidden=false;note.textContent='Community v1: сначала проверяем карту DC-9. После 9/9 система попросит минимальную идентификацию и активирует membership автоматически.';}
+  };
+
+  document.addEventListener('click',event=>{
+    const btn=event.target.closest?.('[data-membership-info]');
+    if(!btn)return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    location.assign(destination);
+  },{capture:true});
+
+  let queued=false;
+  const schedule=()=>{
+    if(queued)return;
+    queued=true;
+    queueMicrotask(()=>{queued=false;decorate()});
+  };
+  new MutationObserver(schedule).observe(root,{childList:true});
+  decorate();
+})();
