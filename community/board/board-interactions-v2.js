@@ -5,8 +5,16 @@ const entryHost=document.getElementById('entryHost');
 const client=getClient();
 let activationState=null;
 
+const LOCAL_ERRORS={
+  FIRST_ARTIFACT_REQUIRED:'На доске нет зрителей. Чтобы откликнуться на чужое, сначала оставьте своё объявление.',
+  RESPONSE_ALREADY_SUBMITTED:'Вы уже откликнулись на это объявление.',
+  ARTIFACT_NOT_AVAILABLE:'Это объявление уже недоступно для взаимодействия.'
+};
+
 function showInlineError(message,target=boardHost){
-  const text=errorMessage(message);
+  const raw=String(message?.message||message||'UNKNOWN_ERROR');
+  const localKey=Object.keys(LOCAL_ERRORS).find(key=>raw.includes(key));
+  const text=localKey?LOCAL_ERRORS[localKey]:errorMessage(message);
   const box=document.createElement('div');
   box.className='dc-board-error dc-board-error--inline';
   box.textContent=text;
@@ -112,8 +120,6 @@ function validateComposerFile(form,event){
   return true;
 }
 
-// Capture before legacy board.js listeners. This lets the integration branch use
-// server-authoritative v2 RPCs without rewriting the stable v1 Board in one step.
 document.addEventListener('click',event=>{
   const reaction=event.target.closest?.('[data-reaction]');
   if(reaction){
