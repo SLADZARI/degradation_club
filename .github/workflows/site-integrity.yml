@@ -35,6 +35,9 @@ jobs:
       - name: Validate visual contract
         run: node scripts/validate-visual-contract.mjs
 
+      - name: Validate interactive runtime safety
+        run: node scripts/validate-interactive-runtime.mjs
+
       - name: Build production artifact without deploying
         run: node scripts/build-pages.mjs
 
