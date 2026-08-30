@@ -4,7 +4,7 @@
 
 begin;
 
-create or replace function public.dc_member_activated_v1(p_profile_id uuid default auth.uid())
+create or replace function public.dc_member_activated_v1()
 returns boolean
 language sql
 stable
@@ -12,19 +12,19 @@ security definer
 set search_path = ''
 as $$
   select
-    p_profile_id is not null
-    and public.dc_membership_active(p_profile_id)
+    auth.uid() is not null
+    and public.dc_membership_active(auth.uid())
     and exists (
       select 1
       from public.dc_artifacts a
-      where a.author_profile_id = p_profile_id
+      where a.author_profile_id = auth.uid()
         and a.published_at is not null
         and a.status <> 'removed'
     );
 $$;
 
-revoke all on function public.dc_member_activated_v1(uuid) from public, anon;
-grant execute on function public.dc_member_activated_v1(uuid) to authenticated;
+revoke all on function public.dc_member_activated_v1() from public, anon;
+grant execute on function public.dc_member_activated_v1() to authenticated;
 
 -- Reaction insert: active Member + first Artifact already published + readable active target.
 drop policy if exists dc_artifact_reactions_insert_own on public.dc_artifact_reactions;
