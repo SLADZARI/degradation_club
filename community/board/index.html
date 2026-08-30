@@ -6,9 +6,10 @@
   <meta name="robots" content="noindex,nofollow,noarchive">
   <meta name="theme-color" content="#111111">
   <title>Доска — Dementor Club Community</title>
-  <meta name="description" content="Закрытая доска объявлений участников Dementor Club.">
+  <meta name="description" content="Общая доска живой активности Dementor Club: участники, мероприятия, курсы, практики и проекты.">
   <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="/community/board/board.css">
+  <link rel="stylesheet" href="/community/board/board-integrations-v1.css">
   <script src="/site-config.js"></script>
 </head>
 <body class="dc-board-page">
@@ -16,9 +17,9 @@
 <main>
   <section class="dc-board-hero">
     <div class="dc-board-shell">
-      <div class="dc-board-meta"><span>COMMUNITY / PRIVATE BOARD</span><span id="boardStatus">CHECKING ACCESS</span></div>
+      <div class="dc-board-meta"><span>COMMUNITY / LIVING BOARD</span><span id="boardStatus">CHECKING ACCESS</span></div>
       <h1>ОБЩАЯ<br><span>ДОСКА.</span></h1>
-      <div class="dc-board-hero-bottom"><p id="boardLead">Здесь остаются предложения, после которых иногда что-то действительно происходит.</p><div id="memberBadge" class="dc-member-badge"></div></div>
+      <div class="dc-board-hero-bottom"><p id="boardLead">Здесь одновременно живут объявления участников и подтверждённая активность самой платформы.</p><div id="memberBadge" class="dc-member-badge"></div></div>
     </div>
   </section>
 
@@ -30,11 +31,13 @@
 
   <section class="dc-board-wall">
     <div class="dc-board-shell">
-      <div class="dc-board-wall-head"><div><p>ARTIFACTS / ACTIVE</p><h2>ЧТО УЖЕ<br>ПРИКОЛОТИЛИ.</h2></div><div class="dc-board-count" id="artifactCount">—</div></div>
+      <div class="dc-board-wall-head"><div><p>BOARD / LIVE FIELD</p><h2>ЧТО СЕЙЧАС<br>ПРОИСХОДИТ.</h2></div><div class="dc-board-count" id="artifactCount">—</div></div>
+      <nav class="dc-board-filters" id="boardFilters" aria-label="Фильтры доски"></nav>
       <div id="boardHost" class="dc-board-grid" aria-live="polite"><div class="dc-board-state">ЗАГРУЖАЕМ ДОСКУ…</div></div>
     </div>
   </section>
 </main>
 <script type="module" src="/community/board/board.js"></script>
+<script type="module" src="/community/board/board-integrations-v1.js"></script>
 </body>
 </html>
