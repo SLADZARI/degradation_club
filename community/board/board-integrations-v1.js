@@ -24,7 +24,7 @@ function renderProjection(item){
   const route=item.publicRoute;
   const location=item.location?`<div class="dc-projection__line">${esc(item.location)}</div>`:'';
   const action=route?`<a class="dc-board-action small" href="${esc(route)}">ОТКРЫТЬ →</a>`:'';
-  return `<article class="${projectionClass(item)}" data-board-source="platform" data-source-type="${esc(item.sourceType)}" data-forming="${item.isForming?'1':'0'}">
+  return `<article class="${projectionClass(item)}" data-board-source="platform" data-source-id="${esc(item.sourceId)}" data-source-type="${esc(item.sourceType)}" data-forming="${item.isForming?'1':'0'}">
     <div class="dc-notice__meta"><span>DEMENTOR CLUB / ${esc(item.sourceType.toUpperCase())}</span><span>${esc(statusLabel(item))}</span></div>
     <div class="dc-projection__authority">PLATFORM PROJECTION</div>
     <h3>${esc(item.title)}</h3>
