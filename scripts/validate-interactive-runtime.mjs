@@ -16,8 +16,11 @@ const accountIdentity=read('course-account-identity-v1.js');
 forbid(join,/observe\(grid,\{[^}]*subtree\s*:\s*true/i,'Join grid observer');
 forbid(join,/observe\(host,\{[^}]*subtree\s*:\s*true/i,'Join question observer');
 forbid(join,/foot\.innerHTML\s*=/,'Join sphere-foot decorator');
+forbid(join,/foot\.querySelectorAll\([^\n]*\.badge[^\n]*\.remove\(/,'Join completion badge removal');
 requireText(join,"data-procedure-ui",'Join idempotent decorator');
 requireText(join,"observe(grid,{childList:true})",'Join direct-child observer');
+requireText(join,"card.classList.contains('dc9-has-result')",'Join server progress compatibility');
+requireText(join,'#selector .sphere-foot > .badge{display:none}','Join completion badge retained as hidden state');
 
 // Community progress must never observe the whole document subtree.
 forbid(communityBridge,/observe\(document\.documentElement,\{[^}]*subtree\s*:\s*true/i,'Community progress observer');
