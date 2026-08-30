@@ -83,4 +83,17 @@ $$;
 revoke all on function public.dc_enqueue_artifact_distribution_v1(uuid,text) from public, anon;
 grant execute on function public.dc_enqueue_artifact_distribution_v1(uuid,text) to authenticated;
 
+-- Close the deployment race: if an Artifact was published after the new frontend
+-- went live but before this migration was applied, queue it now. This does not make
+-- Telegram authoritative and it does not change Artifact publication state.
+insert into public.dc_distribution_outbox (artifact_id, channel, payload)
+select
+  a.id,
+  'telegram',
+  jsonb_build_object('artifact_id', a.id, 'source', 'community_board_v1_backfill')
+from public.dc_artifacts a
+where a.status = 'active'
+  and a.visibility = 'community'
+on conflict (artifact_id, channel) do nothing;
+
 commit;
