@@ -26,17 +26,22 @@
     `;document.head.appendChild(style);
   };
   const render=()=>{
+    const resultEl=document.getElementById('result');
     const actions=document.querySelector('#result .actions');
-    if(!actions||getComputedStyle(document.getElementById('result')).display==='none')return;
-    ensureStyles();
+    if(!resultEl||!actions||getComputedStyle(resultEl).display==='none')return;
     const done=completed();const n=done.length;const complete=n===SPHERES.length;
-    let panel=document.getElementById('dcCommunityProgress');
-    if(!panel){panel=document.createElement('section');panel.id='dcCommunityProgress';panel.className='dc-community-progress';actions.parentNode.insertBefore(panel,actions)}
     const doneNames=done.map(([,name])=>name);
+    const signature=JSON.stringify({n,complete,doneNames});
+    let panel=document.getElementById('dcCommunityProgress');
+    if(panel?.dataset.signature===signature)return;
+    ensureStyles();
+    if(!panel){panel=document.createElement('section');panel.id='dcCommunityProgress';panel.className='dc-community-progress';actions.parentNode.insertBefore(panel,actions)}
+    panel.dataset.signature=signature;
     panel.innerHTML=`<div><div class="dc-community-progress__meta">DC-9 / ВАША КАРТА</div><div class="dc-community-progress__count">${n} / 9</div><p class="dc-community-progress__copy">${complete?'Карта завершена. Теперь можно получить итоговое заключение и перейти к входу в Community.':'Сфера сохранена. Для входа в Community v1 нужно собрать все девять независимых результатов.'}</p>${doneNames.length?`<div class="dc-community-progress__list">Завершено: ${doneNames.join(' · ')}</div>`:''}</div><a class="dc-community-progress__cta" href="${complete?resultDestination:joinDestination}">${complete?'ПОЛУЧИТЬ ИТОГОВОЕ ЗАКЛЮЧЕНИЕ →':'ПРОДОЛЖИТЬ ДИАГНОСТИКУ →'}</a>`;
-    let legacy=document.getElementById('dcCommunityEntryBridge');legacy?.remove();
+    document.getElementById('dcCommunityEntryBridge')?.remove();
   };
-  const observer=new MutationObserver(render);observer.observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:['class','style']});
+  const resultEl=document.getElementById('result');
+  if(resultEl){const observer=new MutationObserver(render);observer.observe(resultEl,{attributes:true,attributeFilter:['class','style']})}
   window.addEventListener('storage',event=>{if(event.key===STORAGE)render()});
   render();setInterval(render,1200);
 })();
