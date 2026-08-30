@@ -197,17 +197,35 @@ if (fs.existsSync(siteConfigPath)) {
 }
 
 const readinessPath = path.join(root, 'content/page-readiness.json');
+const readinessOverlayPaths = [
+  path.join(root, 'docs/COMMUNITY_V1_RELEASE_READINESS.json'),
+];
 if (!fs.existsSync(readinessPath)) {
   errors.push('content/page-readiness.json: source readiness registry missing');
 } else {
-  const readiness = JSON.parse(fs.readFileSync(readinessPath, 'utf8'));
-  const readinessRoutes = new Set();
+  const registries = [JSON.parse(fs.readFileSync(readinessPath, 'utf8'))];
+  for (const overlayPath of readinessOverlayPaths) {
+    if (fs.existsSync(overlayPath)) registries.push(JSON.parse(fs.readFileSync(overlayPath, 'utf8')));
+  }
 
-  for (const page of readiness.pages || []) {
-    readinessRoutes.add(page.route);
-    if (page.state === 'FINAL') continue;
-    if (page.productionAllowed === true) continue;
-    errors.push(`${page.route}: readiness state ${page.state} is not explicitly approved for production`);
+  const readinessRoutes = new Set();
+  for (const registry of registries) {
+    for (const page of registry.pages || []) {
+      if (!page.route) {
+        errors.push('readiness overlay: entry missing route');
+        continue;
+      }
+      if (readinessRoutes.has(page.route)) {
+        errors.push(`${page.route}: duplicate readiness route across registries`);
+        continue;
+      }
+      readinessRoutes.add(page.route);
+      if (!Array.isArray(page.source) || page.source.length === 0) errors.push(`${page.route}: readiness source list required`);
+      if (!Array.isArray(page.blockingFields)) errors.push(`${page.route}: readiness blockingFields must be an array`);
+      if (page.state === 'FINAL') continue;
+      if (page.productionAllowed === true) continue;
+      errors.push(`${page.route}: readiness state ${page.state} is not explicitly approved for production`);
+    }
   }
 
   for (const route of [...shippedHtmlRoutes].sort()) {
