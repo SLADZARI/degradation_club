@@ -10,7 +10,7 @@ Scope: `/join/result/`, `/join/member/`, `/community/board/`, `/community/artifa
 **PRODUCTION VALIDATORS: PASS**  
 **RESPONSIVE ARTIFACT LAYOUT QA: PASS**  
 **SERVER ARTIFACT LIFECYCLE TRANSACTION: PASS**  
-**LIVE OAUTH / TWO-MEMBER BROWSER E2E: PENDING**
+**LIVE OAUTH / TWO-MEMBER BROWSER E2E: PARTIAL / POST-DEPLOY VERIFICATION**
 
 This document records release evidence only. It does not change Community product semantics.
 
@@ -106,18 +106,30 @@ Before this QA pass the following were also verified:
 - persisted Artifact/external identity URLs are restricted to `http://` / `https://`;
 - old `join_applications` data is preserved as legacy history and not reused by the new Member-entry flow.
 
-## 5. Remaining release blockers
+## 5. Join → Community discoverability fix
 
-The following cannot be claimed from the current evidence and remain mandatory before PR #46 leaves Draft:
+Live product testing exposed a UX blocker after completing a sphere: the result screen did not make the route toward the 9/9 gate and Community sufficiently visible.
 
-1. real Google OAuth browser smoke on a reachable candidate host;
-2. real user flow `9/9 → result → member entry → Board → first Artifact` using the deployed origin/callback;
-3. second active Member reaction + response interaction in-browser;
-4. stable `/community/artifact/<uuid>/` route smoke on the actual GitHub Pages runtime;
-5. browser archive action → restored slot on the deployed candidate.
+The release candidate now injects a high-contrast DC-9 progress panel on every sphere result:
 
-No fake OAuth session or invented second Member is used to mark these complete.
+- shows `N / 9` completed spheres;
+- lists completed sphere names;
+- for `N < 9`, provides `ПРОДОЛЖИТЬ ДИАГНОСТИКУ →`;
+- for `9 / 9`, provides `ПОЛУЧИТЬ ИТОГОВОЕ ЗАКЛЮЧЕНИЕ →` leading to `/join/result/` and the Community entry flow.
 
-## Release rule
+The bridge cache key was bumped to `20260830-03` so the corrected transition is not hidden by an older cached script.
 
-Do not merge PR #46 or run the manual production dispatcher until the remaining live-browser blockers above are completed or explicitly reclassified by project authority.
+## 6. Post-deploy verification items
+
+The following checks are **not claimed complete** by this document and must be verified immediately after production publication:
+
+1. full real browser path `9/9 → /join/result/ → Google OAuth → /join/member/ → Board` on `dementor.club`;
+2. first Artifact creation in the production browser;
+3. second active Member reaction + response authorization in-browser;
+4. stable `/community/artifact/<uuid>/` route on the actual GitHub Pages runtime;
+5. browser archive action → restored Artifact slot;
+6. anonymous/incognito access does not reveal Board, Community Artifact detail, or private media.
+
+## Release decision
+
+On 2026-08-30 project authority explicitly approved publication after the Join → Community discoverability fix. The remaining live-browser checks above are therefore reclassified from pre-merge blockers to immediate post-deploy verification items; they are not being marked as passed without evidence.
