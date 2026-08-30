@@ -4,6 +4,8 @@
 .dc-board-filtered{opacity:.13!important;filter:grayscale(.8);pointer-events:none;transition:opacity .18s ease}
 .dc-projection{border:1px solid #111;background:#fffdf7;box-shadow:5px 5px 0 #111;padding:18px;min-height:230px;display:flex;flex-direction:column;gap:12px;transform:rotate(.18deg)}
 .dc-projection--event{background:#d8ff3e;border-width:2px}
+.dc-projection--forming{background:#f7f3e9;border:2px dashed #111;box-shadow:5px 5px 0 rgba(17,17,17,.65)}
+.dc-projection--forming .dc-projection__authority{background:#f7f3e9;color:#111;border-style:dashed}
 .dc-projection--course{background:#fff}
 .dc-projection--practice{background:#f4f0e7}
 .dc-projection__authority{align-self:flex-start;border:1px solid #111;padding:4px 6px;font:900 9px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.04em;background:#111;color:#fff}
