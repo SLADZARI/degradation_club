@@ -133,3 +133,192 @@ The following checks are **not claimed complete** by this document and must be v
 ## Release decision
 
 On 2026-08-30 project authority explicitly approved publication after the Join → Community discoverability fix. The remaining live-browser checks above are therefore reclassified from pre-merge blockers to immediate post-deploy verification items; they are not being marked as passed without evidence.
+
+## 7. Live production non-member flow — 2026-08-30
+
+Source: real production browser walkthrough on `dementor.club` with a previously authenticated non-member account; screenshots supplied during the QA session. This section is evidence + review proposals only. **No runtime/product changes are authorized by this section.**
+
+### Verified PASS
+
+The following path was completed successfully in production:
+
+1. DC-9 result page resolved all nine canonical spheres and showed `КАРТА СОБРАНА`;
+2. `/join/member/` loaded for the ordinary non-member account instead of returning to diagnostics;
+3. display name, nickname/contact identity and legal acknowledgements could be submitted;
+4. membership activated successfully and the UI showed `ДОПУСК ПОЛУЧЕН`;
+5. Community Board opened as `MEMBER / ACTIVE` with `SLOTS 1`;
+6. first-Artifact composer opened successfully.
+
+This closes the earlier production blocker around `self-development` vs `self_development` for the tested account path.
+
+### FAILED / REVIEW REQUIRED — first Artifact publication
+
+The first browser publication attempt did **not** create an Artifact.
+
+Observed input included a bare external URL similar to:
+
+```text
+linkedin.com/in/...
+```
+
+The UI accepted the value, but the database correctly rejected it because `dc_artifacts_external_url_check` requires an explicit `http://` or `https://` scheme. The raw PostgreSQL message was then rendered to the Member:
+
+```text
+new row for relation "dc_artifacts" violates check constraint "dc_artifacts_external_url_check"
+```
+
+#### QA-ART-01 — P1: URL validation exists only at the server boundary
+
+Current behavior:
+
+- composer field is plain text with `inputmode=url`;
+- bare domains are accepted by the browser UI;
+- draft creation fails in the RPC/database constraint;
+- the Member receives a raw implementation error instead of actionable copy.
+
+**Proposal for review:**
+
+- validate before calling `dc_create_artifact_draft_v1` / `dc_update_artifact_draft_v1`;
+- either normalize an unambiguous bare domain to `https://…` or require explicit HTTPS and show an inline message;
+- prefer HTTPS for new links;
+- map server constraint failures to a user-facing message such as `Добавьте полный адрес, начиная с https://`;
+- do not remove the database constraint; it remains the final security boundary.
+
+#### QA-ART-02 — P1: failed publication destroys the composer state
+
+Current `boardError()` replaces the whole `entryHost`. Therefore the failed draft attempt removes the composer and the Member loses all unsaved form values from the visible UI.
+
+**Proposal for review:**
+
+- keep validation/server errors inside the composer (`composerState` or field-level error);
+- preserve title/body/link/date/file selection wherever the browser permits;
+- only replace the full entry surface for fatal Board/session errors.
+
+#### QA-ART-03 — P1/P2: past expiry is accepted by the client
+
+The production walkthrough entered `20.08.2026 11:45` on 30.08.2026. The browser accepted it. The URL constraint failed first, so the expiry error was not reached, but server publication rules would reject an already expired Artifact.
+
+**Proposal for review:**
+
+- set the datetime input minimum to the current local time;
+- validate again before draft/publication RPC;
+- show a direct message: `Срок действия должен быть в будущем`;
+- keep the server-side `ARTIFACT_ALREADY_EXPIRED` guard as the final authority.
+
+### Identity validation gap observed before membership activation
+
+#### QA-MEMBER-01 — P2: provider and contact can contradict each other
+
+The walkthrough selected `Telegram` while entering a LinkedIn URL. Current `member.js` validates only that a contact exists and whether it syntactically begins with `http://` / `https://`; it does not verify that the selected provider matches the URL/handle.
+
+**Proposal for review:** choose one of two product directions:
+
+A. remove the provider selector and infer `Telegram / Instagram / LinkedIn / website / other` from the entered value when possible; or  
+B. keep the selector but validate obvious mismatches before activation.
+
+Recommended for v1: **infer when possible, ask only when ambiguous.**
+
+### File / image behavior verified
+
+The composer currently permits one attachment with MIME types:
+
+- JPG;
+- PNG;
+- WebP;
+- PDF;
+- TXT.
+
+Both the client and the private `dc-community-artifacts` Storage bucket currently use an 8 MiB limit.
+
+Important runtime order:
+
+```text
+create/update draft
+→ upload file to private Supabase Storage
+→ attach media row
+→ publish Artifact
+```
+
+Because the tested attempt failed during `create draft` on the URL constraint, the selected screenshot was **never uploaded**. Post-test database/storage inspection showed:
+
+```text
+recent artifacts: 0
+recent artifact media: 0
+recent Community storage objects: 0
+```
+
+Telegram is not part of this upload path. Current source of truth is the private Supabase bucket.
+
+#### QA-MEDIA-01 — proposal for review: reduce first-release attachment surface
+
+Product suggestion from live QA: reduce the attachment ceiling from 8 MiB to **4 MiB**.
+
+Recommended v1 review option:
+
+- 4 MiB maximum;
+- images first: JPG / PNG / WebP;
+- decide separately whether PDF / TXT should remain before Telegram forwarding is introduced;
+- if arbitrary documents remain supported later, add a malware/scanning policy before redistributing them outside the private Community surface.
+
+No limit or MIME change has been applied by this QA report.
+
+### External-link safety — product proposal
+
+A strict allowlist of meeting providers would be safe but too restrictive for a generic Artifact, because an Artifact can be a meeting, thought, practice, invitation or experiment.
+
+Recommended review direction:
+
+1. generic Artifact link: HTTPS only + client validation + `noopener/noreferrer` + clear external-link treatment;
+2. if/when an Artifact is explicitly classified as a meeting/event, offer a dedicated meeting-link field with an approved-provider allowlist (for example Google Meet / Zoom / Microsoft Teams / Calendly or another approved set);
+3. unknown generic domains may receive a warning/interstitial rather than being silently trusted;
+4. do not treat a URL allowlist as malware scanning.
+
+### Prompt comprehension proposal
+
+The first-Artifact question works conceptually, but the phrase `Если бы вы были дементором…` assumes the Member already understands the role/cultural construct.
+
+**Proposal for review:** add a small `? / ЧТО ЭТО ЗНАЧИТ?` affordance next to the prompt. It should open an inline popover/modal rather than navigating away from the composer. Suggested content structure:
+
+- 1–2 sentences defining the thought experiment;
+- three concrete examples: `встреча / практика / предложение`;
+- optional internal link to the canonical Dementor explanation/profile layer;
+- explicit note: answering this does **not** make the Member a Dementor.
+
+### Board state
+
+`ДОСКА ПОКА ПОДОЗРИТЕЛЬНО ЧИСТАЯ` is currently **expected**, not a functional error: no fabricated seed Artifacts were inserted. Historical/club material should only be seeded from confirmed source-backed records.
+
+Product review remains open on whether the first production Board should be pre-seeded with a small source-backed club archive so a newly activated Member does not arrive into an empty cultural surface.
+
+### Telegram — next integration boundary, not current behavior
+
+No Artifact/file is currently forwarded to Telegram.
+
+Recommended future integration contract for review:
+
+```text
+Artifact successfully published in Supabase
+→ create distribution/outbox event
+→ Telegram worker renders a Telegram-specific version
+→ optional image is read server-side from private Storage
+→ Telegram message/topic identifiers are stored as downstream distribution metadata
+```
+
+Telegram should remain downstream distribution/discussion infrastructure, not semantic authority or primary file storage.
+
+### Updated post-deploy matrix
+
+| Check | Status |
+|---|---|
+| 9/9 → result → member entry | PASS |
+| membership activation | PASS |
+| Board access as new Member | PASS |
+| first Artifact composer opens | PASS |
+| first Artifact publication | FAIL — QA-ART-01 / QA-ART-02 |
+| file upload on tested attempt | NOT REACHED — correctly no object created |
+| second Member reaction/response | NOT TESTED |
+| stable Artifact pretty URL | NOT TESTED because no Artifact published |
+| archive → slot restore in browser | NOT TESTED |
+| anonymous/incognito privacy | NOT TESTED |
+
+The first Artifact browser path therefore remains **PARTIAL**, not PASS.
