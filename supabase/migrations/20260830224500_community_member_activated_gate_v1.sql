@@ -8,7 +8,7 @@ create or replace function public.dc_member_activated_v1()
 returns boolean
 language sql
 stable
-security definer
+security invoker
 set search_path = ''
 as $$
   select
