@@ -1,5 +1,5 @@
 window.DEMENTOR_SITE_CONFIG=Object.freeze({
-  version:'2026-08-30.05',
+  version:'2026-08-30.06',
   canonicalOrigin:'https://dementor.club',
   supabase:{
     enabled:true,
@@ -34,9 +34,9 @@ if(typeof document!=='undefined'){
     if(interactiveAuthRequired)addScript('/required-auth-v1.js',{module:true});
     if(path.includes('/courses/dumai-s-opasnostyu/')||path.includes('/courses/dengi-na-veter/'))addScript('/program-account-sync-v1.js',{module:true});
     if(path.includes('/merch/')||path.includes('/objects/'))addScript('/merch-runtime-v1.js',{module:true});
-    if(path.includes('/workspace')){addScript('/workspace-membership-link-v1.js');addScript('/workspace-owner-admin-tools-v1.js',{module:true});}
+    if(path.includes('/workspace')){addScript('/workspace-membership-link-v1.js?v=20260830-02');addScript('/workspace-owner-admin-tools-v1.js',{module:true});}
     if(isJoinAssessment){
-      addScript('/dementor-account-sync-v8.js?v=20260828-17');
+      addScript('/dementor-account-sync-v9.js?v=20260830-01');
       addScript('/join-data-copy-v1.js?v=20260828-18');
       addScript('/join/community-entry-bridge-v1.js?v=20260830-05');
       addScript('/join/join-hotfix-v1.js?v=20260830-01');
