@@ -327,4 +327,77 @@ The v1 first-entry loop is complete when a real user can:
 10. see it linked to their Member presence;
 11. receive at least one supported reaction/response from another active Member.
 
+## 20. Production QA clarifications — approved 2026-08-30
+
+The following implementation clarifications are approved after the first real non-member production flow. They refine v1 without changing the semantic model above.
+
+### 20.1 External links
+
+- The database remains the final authority and must continue to accept only `http://` / `https://` Artifact URLs.
+- The client must validate before RPC and may safely normalize a hostname-like value by adding `https://`.
+- Invalid links must produce a human-readable field error, never expose raw PostgreSQL constraint text to the Member.
+- External links open with safe browser semantics (`noopener` / `noreferrer` where applicable).
+- A generic Artifact is not restricted to meeting providers. A future explicit Event/meeting field may use a narrower provider allowlist.
+
+### 20.2 Composer error preservation
+
+- Validation or server errors must not replace/remove the composer.
+- Already entered title, body, link and expiry values remain visible and editable after an error.
+- File selection may need to be re-selected only when required by browser security; this should be explained in UI rather than silently losing state.
+
+### 20.3 Expiry
+
+- The client must not allow an Artifact expiry in the past.
+- Persistent Artifacts keep expiry empty.
+- The server remains authoritative even when client validation exists.
+
+### 20.4 Member contact identity
+
+- Provider/contact mismatch must not be silently accepted when the provider can be inferred from a URL or handle.
+- LinkedIn / Instagram / Telegram URLs should select the matching provider automatically.
+- When the value cannot be inferred reliably, the Member may choose provider manually.
+- The stored identity remains private by default and is not automatically published on the Board.
+
+### 20.5 First-release media policy
+
+For the first stable Community Artifact release:
+
+- one attachment maximum;
+- maximum file size: **4 MiB**;
+- accepted types: **JPG / PNG / WebP**;
+- PDF / TXT and other generic files are not accepted in this first stable release;
+- media remains in the private Community Storage bucket;
+- a failed draft/publication must not leave an orphan media record/object where cleanup is possible.
+
+This is a security/operational restriction, not a permanent Artifact taxonomy rule.
+
+### 20.6 “Если бы вы были дементором…” explainer
+
+The first-Artifact prompt must have a compact contextual explanation available without leaving the composer.
+
+The explainer must make clear:
+
+- this is an imaginative framing for proposing an action/idea;
+- answering does **not** grant Dementor status;
+- examples may include a meeting, practice, proposal, experiment or useful provocation;
+- a link may lead to the canonical Community/Dementor explanation, but the essential meaning must be readable inside the popup itself.
+
+### 20.7 Board seed content
+
+The Board should not be populated with invented activity merely to avoid an empty state.
+
+When source-backed Club objects are available, the implementation should show a small set of factual Club/historical Artifacts with explicit provenance. Current Club projects/objects may be used only when their title/status/source are already approved. If no such record has been prepared with provenance, the honest empty state remains preferable.
+
+### 20.8 Telegram delivery boundary
+
+Artifact publication remains successful based on platform/Supabase state alone.
+
+Approved integration direction:
+
+`PUBLISHED ARTIFACT → DISTRIBUTION OUTBOX → TELEGRAM WORKER → TELEGRAM MESSAGE / DISCUSSION REFERENCE`
+
+Telegram failure must not roll back or invalidate an already published Artifact. Telegram message/topic identifiers are downstream references, not semantic authority.
+
+This clarification approves preparing an outbox-compatible integration boundary; it does not require one Telegram chat/topic per Artifact and does not make Telegram a source-of-truth.
+
 This document defines the approved product mechanic. Technical schema, RLS, component implementation and Telegram distribution are downstream implementation layers and must not change this meaning silently.
