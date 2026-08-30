@@ -57,10 +57,10 @@ function applyFilter(){
   filterHost?.querySelectorAll('[data-board-filter]').forEach(b=>b.classList.toggle('active',b.dataset.boardFilter===activeFilter));
 }
 
-function appendProjections(){
-  if(!boardHost||rendering)return;
+function ensureProjections(){
+  if(!boardHost||rendering||!projections.length)return;
+  if(boardHost.querySelector('[data-board-source="platform"]')){applyFilter();return}
   rendering=true;
-  boardHost.querySelectorAll('[data-board-source="platform"]').forEach(el=>el.remove());
   boardHost.insertAdjacentHTML('beforeend',projections.map(renderProjection).join(''));
   applyFilter();
   rendering=false;
@@ -90,7 +90,7 @@ async function loadPlatformProjections(){
   projections=(entitiesResult.data||[])
     .map(entity=>entityToBoardProjection(entity,events.get(entity.id),programs.get(entity.id)))
     .filter(isProjectionVisible);
-  appendProjections();
+  ensureProjections();
 }
 
 async function init(){
@@ -102,7 +102,7 @@ async function init(){
     const observer=new MutationObserver(()=>{
       if(rendering)return;
       clearTimeout(timer);
-      timer=setTimeout(()=>{markMemberCards();appendProjections()},80);
+      timer=setTimeout(()=>{markMemberCards();ensureProjections()},80);
     });
     observer.observe(boardHost,{childList:true});
   }
