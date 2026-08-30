@@ -44,16 +44,16 @@ export function entityToBoardProjection(entity,event,program){
     isForming,
     isPlatform:true,
     isMember:false,
-    publicRoute:routeForEntity(entity,program)
+    publicRoute:routeForEntity(entity)
   };
 }
 
-export function routeForEntity(entity,program){
+export function routeForEntity(entity){
   if(entity.entity_type==='event')return `/events/${entity.slug}/`;
-  if(entity.entity_type==='program'){
-    if(program?.program_type==='course')return `/courses/${entity.slug}/`;
-    return `/programs/${entity.slug}/`;
-  }
+  // Current site exposes all program families (course / practice / experience)
+  // under /courses/:slug/. Board projections follow the implemented route,
+  // while sourceType still preserves the semantic subtype for filtering.
+  if(entity.entity_type==='program')return `/courses/${entity.slug}/`;
   if(entity.entity_type==='project')return `/projects/${entity.slug}/`;
   return null;
 }
