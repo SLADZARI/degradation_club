@@ -1,6 +1,29 @@
 import { withSupabase } from "npm:@supabase/server@^1";
 
 const clip = (value: string, max: number) => value.length <= max ? value : `${value.slice(0, Math.max(0, max - 1)).trimEnd()}…`;
+const allowedOrigins = new Set(["https://dementor.club", "https://www.dementor.club"]);
+
+function corsHeaders(req: Request) {
+  const origin = req.headers.get("origin");
+  const allowOrigin = origin && allowedOrigins.has(origin) ? origin : "https://dementor.club";
+  return {
+    "Access-Control-Allow-Origin": allowOrigin,
+    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Access-Control-Max-Age": "86400",
+    "Vary": "Origin",
+  };
+}
+
+function withCors(req: Request, response: Response) {
+  const headers = new Headers(response.headers);
+  for (const [key, value] of Object.entries(corsHeaders(req))) headers.set(key, value);
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  });
+}
 
 const app = withSupabase({ auth: "user" }, async (_req: Request, ctx: any) => {
   const admin = ctx.supabaseAdmin;
@@ -167,26 +190,26 @@ const app = withSupabase({ auth: "user" }, async (_req: Request, ctx: any) => {
 
 export default {
   async fetch(req: Request) {
-    if (req.method === "OPTIONS") return new Response(null, { status: 204 });
+    if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: corsHeaders(req) });
 
     const botToken = Deno.env.get("TELEGRAM_BOT_TOKEN");
     const chatId = Deno.env.get("TELEGRAM_COMMUNITY_CHAT_ID");
 
     if (!botToken && !chatId) {
-      return Response.json({ error: "Telegram secrets missing", stage: "pre-wrapper", botTokenPresent: false, chatIdPresent: false }, { status: 530 });
+      return withCors(req, Response.json({ error: "Telegram secrets missing", stage: "pre-wrapper", botTokenPresent: false, chatIdPresent: false }, { status: 530 }));
     }
     if (!botToken) {
-      return Response.json({ error: "Telegram bot token missing", stage: "pre-wrapper", botTokenPresent: false, chatIdPresent: true }, { status: 531 });
+      return withCors(req, Response.json({ error: "Telegram bot token missing", stage: "pre-wrapper", botTokenPresent: false, chatIdPresent: true }, { status: 531 }));
     }
     if (!chatId) {
-      return Response.json({ error: "Telegram chat id missing", stage: "pre-wrapper", botTokenPresent: true, chatIdPresent: false }, { status: 532 });
+      return withCors(req, Response.json({ error: "Telegram chat id missing", stage: "pre-wrapper", botTokenPresent: true, chatIdPresent: false }, { status: 532 }));
     }
 
     try {
-      return await app.fetch(req);
+      return withCors(req, await app.fetch(req));
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
-      return Response.json({ error: "Supabase wrapper failed", stage: "with-supabase", detail: clip(message, 500) }, { status: 535 });
+      return withCors(req, Response.json({ error: "Supabase wrapper failed", stage: "with-supabase", detail: clip(message, 500) }, { status: 535 }));
     }
   },
 };
