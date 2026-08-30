@@ -82,7 +82,6 @@ with check (
 create index if not exists dc_artifact_board_positions_viewport_idx
   on public.dc_artifact_board_positions (board_id, x, y);
 
--- Backfill current active Community Artifacts before enabling automatic placement.
 with ranked as (
   select
     a.id as artifact_id,
@@ -169,7 +168,6 @@ for each row
 when (new.status = 'active' and new.visibility = 'community' and new.published_at is not null)
 execute function public.dc_ensure_artifact_board_position_v1();
 
--- Client updates only x/y. The database owns version/timestamp bookkeeping.
 create or replace function public.dc_touch_artifact_board_position_v1()
 returns trigger
 language plpgsql
