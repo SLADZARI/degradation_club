@@ -98,16 +98,15 @@ async function persistOwnPosition(card){
   const artifactId=card.dataset.artifact;
   const version=Number(card.dataset.positionVersion||1);
   const x=parseFloat(card.style.left),y=parseFloat(card.style.top);
-  const {data,error}=await client.rpc('dc_move_own_artifact_v1',{
-    p_artifact_id:artifactId,
-    p_x:x,
-    p_y:y,
-    p_expected_version:version
-  });
+  const {data,error}=await client.from('dc_artifact_board_positions')
+    .update({x,y})
+    .eq('artifact_id',artifactId)
+    .eq('position_version',version)
+    .select('artifact_id,x,y,rotation,size_class,position_version')
+    .maybeSingle();
   if(error||!data){console.warn('[DC Spatial] move rejected/conflicted',error?.message||'POSITION_CONFLICT');await loadPositions();placeCards();return}
-  const nextVersion=Number(data.position_version||version+1);
-  card.dataset.positionVersion=String(nextVersion);
-  positions.set(artifactId,{...(positions.get(artifactId)||{}),artifact_id:artifactId,x:Number(data.x??x),y:Number(data.y??y),position_version:nextVersion});
+  card.dataset.positionVersion=String(data.position_version);
+  positions.set(artifactId,data);
 }
 
 function installOwnDrag(){
