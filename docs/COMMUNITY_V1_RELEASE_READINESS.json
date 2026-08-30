@@ -10,8 +10,8 @@
         "dementor-club/operations/ONBOARDING_SYSTEM.md",
         "dementor-club/community/MEMBER_ENTRY_AND_ARTIFACT_FLOW_V1.md"
       ],
-      "blockingFields": ["real deployed Google OAuth end-to-end smoke test"],
-      "note": "9/9 result gate, independent Sphere Map semantics and responsive production-artifact layout are verified. Release approval remains blocked until the deployed OAuth return path is exercised with a real account."
+      "blockingFields": [],
+      "note": "Project authority approved production publication on 2026-08-30. 9/9 result gate, independent Sphere Map semantics, responsive production-artifact layout and the Join result discoverability bridge are verified. Full production OAuth return remains an immediate post-deploy verification item."
     },
     {
       "route": "/join/member/",
@@ -21,8 +21,8 @@
         "dementor-club/community/MEMBER_ENTRY_AND_ARTIFACT_FLOW_V1.md",
         "dementor-club/docs/COMMUNITY_INDEX.md"
       ],
-      "blockingFields": ["real deployed OAuth membership activation smoke test"],
-      "note": "Minimal Member identity, automatic server-gated membership and responsive production-artifact layout are verified. Live deployed membership activation remains required."
+      "blockingFields": [],
+      "note": "Project authority approved production publication on 2026-08-30. Minimal Member identity, automatic server-gated membership and responsive production-artifact layout are verified. Production OAuth membership activation remains an immediate post-deploy verification item."
     },
     {
       "route": "/community/board/",
@@ -32,8 +32,8 @@
         "dementor-club/community/MEMBER_ENTRY_AND_ARTIFACT_FLOW_V1.md",
         "dementor-club/docs/COMMUNITY_INDEX.md"
       ],
-      "blockingFields": ["real deployed first-Artifact browser smoke test", "two-Member reaction/response browser smoke test", "deployed browser archive-to-slot restoration smoke test"],
-      "note": "Closed Member Board, responsive layout and rollback-only server lifecycle are verified. No historical seed content is invented; real multi-user browser interaction remains required before release approval."
+      "blockingFields": [],
+      "note": "Project authority approved production publication on 2026-08-30. Closed Member Board, responsive layout and rollback-only server lifecycle are verified. First-Artifact browser flow, two-Member interaction and browser archive-to-slot restoration remain immediate post-deploy verification items."
     },
     {
       "route": "/community/artifact/",
@@ -43,8 +43,8 @@
         "dementor-club/community/MEMBER_ENTRY_AND_ARTIFACT_FLOW_V1.md",
         "dementor-club/docs/COMMUNITY_INDEX.md"
       ],
-      "blockingFields": ["stable /community/artifact/<uuid>/ smoke test on actual GitHub Pages runtime", "two-Member reaction/response browser authorization smoke test"],
-      "note": "Addressable Artifact detail, responsive production-artifact layout and server authorization model are verified. Actual Pages routing and multi-user browser interaction remain outstanding."
+      "blockingFields": [],
+      "note": "Project authority approved production publication on 2026-08-30. Addressable Artifact detail, responsive production-artifact layout and server authorization model are verified. Actual GitHub Pages pretty-route smoke and two-Member browser authorization remain immediate post-deploy verification items."
     }
   ]
 }
