@@ -16,20 +16,54 @@
 <main class="dc-result-shell">
   <section class="dc-result-hero">
     <div class="dc-result-meta"><span>DC-9 / RESULT</span><span id="resultCount">— / 9</span></div>
-    <h1>КАРТА<br><span class="dc-acid-word">СОБРАНА.</span></h1>
-    <p class="dc-result-lead" id="heroLead">Проверяем девять независимых сфер. Никакого среднего балла не будет.</p>
+    <div class="dc-result-hero__copy">
+      <h1>КАРТА<br><span class="dc-acid-word">СОБРАНА.</span></h1>
+      <p class="dc-result-lead" id="heroLead">Девять сфер. Никакого среднего балла. Только ваша персональная геометрия происходящего.</p>
+    </div>
+    <aside class="dc-verdict" id="verdictBlock" aria-live="polite">
+      <span class="dc-verdict__label">ПРЕДВАРИТЕЛЬНЫЙ ВЕРДИКТ</span>
+      <strong id="verdictTitle">ИЗУЧАЕМ УЛИКИ.</strong>
+      <p id="verdictCopy">Дементоры смотрят. Спорить пока рано.</p>
+    </aside>
   </section>
 
-  <section class="dc-result-register" aria-labelledby="mapTitle">
-    <div class="dc-result-section-head"><p>PROFILE / SPHERES</p><h2 id="mapTitle">ДЕВЯТЬ ОТДЕЛЬНЫХ<br>ЗАКЛЮЧЕНИЙ.</h2></div>
+  <section class="dc-map" aria-labelledby="mapTitle">
+    <div class="dc-result-section-head">
+      <p>PROFILE / SPHERE MAP</p>
+      <h2 id="mapTitle">ВАША ФОРМА<br>НЕ ОБЯЗАНА БЫТЬ КРУГЛОЙ.</h2>
+    </div>
+    <div class="dc-map-grid">
+      <div class="dc-radar-stage" id="radarStage" aria-live="polite">
+        <div class="dc-state">СОБИРАЕМ ГЕОМЕТРИЮ…</div>
+      </div>
+      <div class="dc-sphere-inspector" id="sphereInspector">
+        <span class="dc-inspector__meta">НАЖМИТЕ НА СФЕРУ</span>
+        <strong>ПОТЫКАЙТЕ В СЕБЯ.</strong>
+        <p>Здесь появится короткий комментарий клуба. Он не диагноз. Даже если иногда очень похож.</p>
+      </div>
+    </div>
+    <div class="dc-share-actions" id="shareActions" hidden>
+      <button class="dc-result-action" type="button" id="downloadMap">СКАЧАТЬ КАРТУ</button>
+      <button class="dc-result-action" type="button" id="shareMap">ПОДЕЛИТЬСЯ</button>
+      <span class="dc-share-note" id="shareNote">PNG собирается из ваших фактических результатов прямо в браузере.</span>
+    </div>
+  </section>
+
+  <section class="dc-result-register" aria-labelledby="registerTitle">
+    <div class="dc-result-section-head"><p>PROFILE / SPHERES</p><h2 id="registerTitle">ДЕВЯТЬ ОТДЕЛЬНЫХ<br>ЗАКЛЮЧЕНИЙ.</h2></div>
     <div id="sphereRegister" class="dc-sphere-register" aria-live="polite"><div class="dc-state">ЗАГРУЖАЕМ КАРТУ…</div></div>
+  </section>
+
+  <section class="dc-club-note" id="clubNote" hidden>
+    <div class="dc-club-note__label">РЕКОМЕНДАЦИЯ КЛУБА / НЕ МЕДИЦИНСКАЯ</div>
+    <p id="clubNoteText"></p>
   </section>
 
   <section class="dc-result-next" id="nextBlock" aria-live="polite">
     <div class="dc-result-section-head"><p>NEXT / COMMUNITY</p><h2 id="nextTitle">ПРОВЕРЯЕМ<br>ДОПУСК.</h2></div>
     <div class="dc-next-copy" id="nextCopy">Результат Community gate зависит от завершения всех девяти сфер и вашей авторизации.</div>
     <div class="dc-next-actions" id="nextActions"></div>
-    <p class="dc-result-note">AI-резюме профиля появится позже и не блокирует вход. Здесь используются только фактические результаты DC-9.</p>
+    <p class="dc-result-note">AI-интерпретация может появиться позже и не блокирует вход. Здесь используются только фактические результаты DC-9.</p>
   </section>
 </main>
 <script type="module" src="/join/result/result.js"></script>
