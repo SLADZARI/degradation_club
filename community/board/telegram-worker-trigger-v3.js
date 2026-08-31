@@ -7,9 +7,12 @@
   const minInterval=15000;
 
   const schedule=(delay=500)=>{
-    clearTimeout(timer);
+    if(timer)return;
     const cooldown=Math.max(0,minInterval-(Date.now()-lastRun));
-    timer=setTimeout(run,Math.max(delay,cooldown));
+    timer=setTimeout(()=>{
+      timer=null;
+      run();
+    },Math.max(delay,cooldown));
   };
 
   async function run(){
@@ -37,8 +40,14 @@
     }
   }
 
-  window.addEventListener('load',()=>schedule(250),{once:true});
-  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')schedule(100)});
-  document.getElementById('boardHost')&&new MutationObserver(()=>schedule(200)).observe(document.getElementById('boardHost'),{childList:true,subtree:true});
+  const start=()=>schedule(250);
+  if(document.readyState==='complete')start();
+  else window.addEventListener('load',start,{once:true});
+
+  document.addEventListener('submit',event=>{
+    if(event.target?.id!=='artifactForm')return;
+    setTimeout(()=>schedule(0),3000);
+  },true);
+
   schedule(1000);
 })();
