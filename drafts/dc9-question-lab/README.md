@@ -9,25 +9,15 @@ Base: `dementor-club`
 
 Working laboratory for the Dementor Club DC-9 onboarding question system.
 
-It stores:
-
-- scenes and answers;
-- hidden semantics / pattern taxonomy;
-- impact and guards;
-- editorial QA;
-- scoring experiments;
-- result/routing hypotheses;
-- playtest candidates.
-
 Nothing here becomes production truth until explicitly promoted into `dementor-club`.
 
 ## Canonical authorities
 
 In `dementor-club`:
 
-- `operations/ONBOARDING_SCENARIO_RULES.md` — what the scene measures / hidden semantic canon;
-- `operations/QUESTION_PRESENTATION_HUMOR_STANDARD.md` — **how public questions must sound: brevity, deadpan, human contradiction, reality shift, answer style, narrator, quotable lines and humor rhythm**;
-- `operations/ONBOARDING_SYSTEM.md` — onboarding system;
+- `operations/ONBOARDING_SCENARIO_RULES.md` — hidden diagnostic semantics;
+- `operations/QUESTION_PRESENTATION_HUMOR_STANDARD.md` v1.2 — brevity, deadpan, human contradiction, reality shift, narrator, quotable lines and humor rhythm;
+- `operations/ONBOARDING_SYSTEM.md` — onboarding architecture;
 - `operations/CONTENT_TAXONOMY_AND_DEMENTOR_LEVELS.md` — diagnostic meaning;
 - `operations/DC9_RESULT_SYSTEM_V0.1.md` — approved result contract.
 
@@ -37,17 +27,9 @@ Implementation remains in `dementor-club-site` only after approval.
 
 **ACTIVE:** `METHODOLOGY_V0.4_DRAFT.md`
 
-Working rule:
+Public rule:
 
-> **The user must feel Dementor Club on the question screen.**
-
-The humor may be quiet, but the question already needs a small reality shift / deadpan detail. Strong scenes additionally look for a human contradiction:
-
-`wanted X → got X → old system activates anyway`
-
-### Public screen rule
-
-`current moment → exact detail → human contradiction / small Dementor shift → four compact exits`
+`current moment → exact detail → human contradiction / Dementor shift → four compact exits`
 
 Not:
 
@@ -57,116 +39,103 @@ Not:
 
 - premise + detail usually `~35–45 words max`;
 - answer usually `~8–16 words`;
-- Q1 must be understandable in roughly `5–8 seconds`.
+- Q1 should be understandable in roughly `5–8 seconds`.
 
-These are editorial targets, not runtime validators.
-
-## Humor gates added in v1.2 canon
+## Humor gates
 
 ### Contradiction Gate
 
-When naturally possible, the scene should expose the human contradiction between what a person wanted and what happens after they get it.
+Strong social comedy searches for:
 
-Sphere target: roughly **30–40% of thematic scenes**.
+`wanted X → got X → old system activates anyway`
+
+Sphere target: roughly **30–40% of thematic scenes** where natural.
 
 ### Quotable Line Gate
 
-Every question should have a potential reusable line in scene / answer / system reaction.
+Every question should have potential reusable wording in scene / answer / system reaction.
 
 Sphere target: at least **two genuinely strong quotable lines**.
 
 Quotability never overrides natural speech or diagnostic honesty.
 
-## First-question rule
+## Full-bank rewrite
 
-Q1 of every sphere is an onboarding into the language of the quiz.
+**CURRENT MASTER DRAFT:** `BANK_V0.5_FULL_54_REWRITE.md`
 
-It must be:
+This is the first complete rewrite of all `54/54` DC-9 screens under the current canon.
 
-- fast;
-- light;
-- recognizable;
-- slightly strange already;
-- compact;
-- preferably contradiction-led;
-- carrying at least one potential quotable line;
-- free of theory and biography dump.
+It preserves:
 
-If Q1 feels like psychometrics, it fails even with strong semantic QA.
+- `9` spheres;
+- `4` thematic tags per sphere;
+- `9` intentionality guards;
+- `9` responsibility guards;
+- frozen baseline hidden semantic direction `0 → 3`;
+- production scoring/result contract unchanged.
+
+Public rhythm inside every sphere:
+
+1. Q1 — quick funny entry;
+2. Q2 — recognizable everyday scene;
+3. Q3 — social absurdity;
+4. Q4 — stronger absurdity;
+5. intentionality guard — near-serious stress test;
+6. responsibility guard — consequence already happened.
+
+The previous single-question Personality work (`q1_role_v02/v03/v04`) remains historical/editorial reference. It is no longer the only active task.
 
 ## Working structure
 
-- `METHODOLOGY_V0.4_DRAFT.md` — **active concise contradiction-aware authoring method**;
-- `METHODOLOGY_V0.3_DRAFT.md` — previous method retained as history / superseded for public authoring;
+- `BANK_V0.5_FULL_54_REWRITE.md` — **current complete 54-question candidate bank**;
+- `METHODOLOGY_V0.4_DRAFT.md` — active contradiction-aware authoring method;
+- `METHODOLOGY_V0.3_DRAFT.md` — superseded public-authoring method retained for history;
+- `EDITORIAL_QA_RUBRIC.md` — instant-read, contradiction, quotable-line and semantic/presentation QA;
 - `PATTERN_TAXONOMY_V0.1_DRAFT.md` — internal pattern vocabulary;
 - `QUESTION_SCHEMA.md` — draft question record shape;
 - `SCORING_WEIGHT_MODEL_V0.2_DRAFT.md` — earlier weighted model;
-- `SCORING_PATTERN_MODEL_V0.3_DRAFT.md` — separates `pattern_stage` from `canonical_evidence`;
-- `QUESTION_PRESENTATION_PATTERNS.md` — reusable UI/diagnostic patterns, subordinate to canonical humor standard;
-- `EDITORIAL_QA_RUBRIC.md` — current QA with instant-read, contradiction, quotable-line and Q1 gates;
+- `SCORING_PATTERN_MODEL_V0.3_DRAFT.md` — pattern/evidence experiment;
+- `QUESTION_PRESENTATION_PATTERNS.md` — reusable presentation patterns;
 - `RESULT_AND_ROUTING_HYPOTHESES.md` — non-canonical result/routing ideas;
-- `baseline/CURRENT_PRODUCTION_BANK_2026-08-31.md` — frozen production bank;
+- `baseline/CURRENT_PRODUCTION_BANK_2026-08-31.md` — frozen production bank used for semantic comparison;
 - `baseline/CURRENT_AUDIT_2026-08-31.md` — baseline audit;
-- `spheres/01_personality_workbench.md` — Personality workbench;
-- `spheres/01_personality_q1_role_candidates.md` — raw Q1 reaction pool;
-- `spheres/01_personality_q1_role_v02.md` — previous long semantic candidate;
-- `spheres/01_personality_q1_role_v03.md` — concise first humor pass;
-- `spheres/01_personality_q1_role_v04.md` — **current contradiction-driven Q1 candidate**.
+- `spheres/01_personality_q1_role_v04.md` — previous focused Q1 contradiction candidate retained for comparison.
 
 ## Workflow
 
-`CURRENT → AUDIT → WORKBENCH → CANDIDATE → SEMANTIC GATE → INSTANT-READ GATE → CONTRADICTION/COMEDY GATE → PRESENTATION/HUMOR GATE → BLIND PLAYTEST → APPROVED DRAFT → CANON → SITE`
-
-Only promoted content may move to production canon.
+`FROZEN BASELINE → FULL REWRITE → SEMANTIC CROSS-CHECK → INSTANT-READ QA → CONTRADICTION/COMEDY QA → GUARD INTEGRITY → BLIND PLAYTEST BY SPHERE → APPROVED DRAFT → CANON → SITE`
 
 ## Non-negotiable principles
 
-1. User chooses behavior, never abstract self-description.
-2. Public screen shows a current incident, not editorial explanation.
-3. Q1 teaches the game before it carries maximum depth.
-4. The question itself already contains a quiet Dementor signal.
-5. Strong scenes search for human contradiction before inventing a punchline.
+1. Public screen shows a current incident, not editorial explanation.
+2. User chooses behavior, never abstract self-description.
+3. Q1 teaches the game before maximizing diagnostic depth.
+4. The question itself carries a Dementor signal.
+5. Strong scenes search for human contradiction before inventing punchlines.
 6. All four answers remain defensible human choices.
 7. No stable moral ladder / Club-preferred answer.
-8. Answer order is shuffled at runtime.
-9. Hidden tag/pattern/evidence/impact/guard never leaks publicly.
-10. `pattern_stage` is descriptive, not automatically a Dementor score.
-11. Humor targets the social system, not the user.
-12. Diagnostic depth comes from the decision, not text volume.
-13. Quotable lines are reusable output, not forced slogans.
-14. More questions are not automatically better.
-15. Impact = cost of error + personal stake.
-16. No universal psychotype or aggregate Dementor score.
-17. Routing only to real approved Club entities after separate approval.
-
-## Current scoring research
-
-Production scoring remains unchanged.
-
-Question-lab experiments still separate:
-
-- `pattern_stage` — form / entrenchment of strategy;
-- `canonical_evidence` — candidate contribution to sphere semantics;
-- impact I1–I7 — question-level weight.
-
-Working impact coefficients:
-
-`I1=.70 · I2=.80 · I3=.90 · I4=1.00 · I5=1.15 · I6=1.30 · I7=1.50`
-
-No production formula change is approved by this lab.
+8. Answer order must be shuffled at runtime.
+9. Hidden tag/score/evidence/impact/guard never leaks publicly.
+10. Humor targets the social system, not the user.
+11. Diagnostic depth comes from the choice, not text volume.
+12. Quotable lines are reusable output, not forced slogans.
+13. Guards remain guards; humor must not destroy their stress-test function.
+14. No universal psychotype or aggregate Dementor score.
+15. No production/site change until explicit promotion.
 
 ## Current active task
 
-Current gold-standard candidate:
+Audit `BANK_V0.5_FULL_54_REWRITE.md` as a whole bank, not question-by-question invention from scratch.
 
-`spheres/01_personality_q1_role_v04.md`
+Required next gates:
 
-Next gate:
-
-1. blind read for speed and actual laugh/smile response;
-2. check whether A is still perceived as the Club-preferred answer;
-3. verify experienced organizers can sincerely choose C/D;
-4. test whether D reads as a real thought rather than authorial punchline;
-5. ask which line is remembered after one read;
-6. re-score under the new 65-point rubric;
-7. only then freeze Q1 and move to Q2.
+1. semantic cross-check `54/54` against frozen baseline;
+2. verify each thematic question still measures its original tag;
+3. verify each intentionality guard still tests motive under attractive/easy exception;
+4. verify each responsibility guard tests ownership after consequence;
+5. instant-read / length audit;
+6. contradiction coverage audit by sphere;
+7. quotable-line coverage audit by sphere;
+8. obvious-Club-answer / straw-man audit;
+9. blind playtest by sphere;
+10. only then decide what can move to `approved-draft`.
