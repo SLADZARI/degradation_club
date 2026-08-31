@@ -59,21 +59,13 @@ Therefore high thematic answers cannot produce a high final level when intention
 
 ## Legacy key compatibility
 
-The current staging questionnaire historically stores Саморазвитие under the legacy local key:
-
-`self-development`
-
-The canonical runtime / database sphere id is:
-
-`self_development`
+The canonical runtime / database sphere id is `self_development`. Historical local results may contain `self-development`.
 
 All result-read, progress-map and local→Supabase synchronization layers must normalize:
 
 `self-development → self_development`
 
 When legacy and canonical records both exist, the newest dated result wins. Compatibility must remain until historical local profiles have safely migrated.
-
-This alias is a storage/runtime compatibility rule only. Public and semantic sphere identity remains `self_development` / Саморазвитие.
 
 ## Non-negotiable semantic boundary
 
@@ -93,44 +85,45 @@ Level 5 means only the diagnostic state `Дементор` inside that specific 
 
 ## Presentation layer
 
-The result page may show:
+The public result page must be simpler than the internal result payload.
 
-- all nine sphere levels;
-- level names 0–5;
-- canonical sphere icons;
-- the Sphere Map / radar geometry;
-- canonical tag levels when useful;
-- intentionality/responsibility quality state when useful;
-- short club-style editorial copy associated with a sphere + level;
+The stored `tagLevels`, `intent`, `responsibility` and `base` remain part of the factual model, but they are not required on the first public result screen. They may be used for future detailed/profile views, interpretation logic or QA evidence.
+
+The public result page shows:
+
+- full Sphere Map / radar;
+- readable mobile 01–09 legend;
 - three visually highlighted sphere results;
-- a shareable personal dossier;
+- remaining six sphere results in compact form;
+- shareable personal dossier;
 - Community CTA after 9/9.
 
 ### Highlighted three
 
 The three highlighted results are presentation only, never a diagnostic rank.
 
-Approved deterministic rule for v0.1:
+Approved deterministic contrast rule for v0.1:
 
-1. `A` = highest completed sphere level; tie-break by canonical sphere order;
-2. `B` = lowest completed sphere level; tie-break by canonical sphere order;
-3. `C` = most pronounced remaining result by absolute distance from midpoint `2.5`; tie-break by higher final level, then canonical sphere order.
+1. highest completed sphere level;
+2. lowest completed sphere level;
+3. most pronounced remaining result by absolute distance from midpoint `2.5`; tie-break by higher final level, then canonical sphere order.
+
+No public A/B/C labels are used. Highlighted points on the radar are simple black dots. Sphere numbers `01–09` remain the only visible indexing system.
 
 If fewer than three spheres are complete, available results are ordered by distance from midpoint, then higher level, then canonical sphere order.
 
-The A/B/C markers exist only to connect radar → highlighted cards → dossier. They must never reuse sphere numbers `01–09`, because sphere numbering has a separate canonical meaning.
+This is `presentation prominence` only. It does not create importance, quality, membership relevance or aggregate interpretation.
 
-This rule is described internally as `presentation prominence` / contrast. It does not create importance, quality, membership relevance or an aggregate interpretation.
+## Approved public UX order after 9/9
 
-## Recommended public UX order after 9/9
+1. Completion state `9 / 9` and `ВОТ ВАША КАРТА.`
+2. Sphere Map + compact mobile legend.
+3. Three highlighted results: icon, sphere, final level, level name and one short editorial line.
+4. Remaining six results: icon, sphere, final level and one short editorial line.
+5. Compact personal dossier preview + `СКАЧАТЬ ДОСЬЕ` / `ПОДЕЛИТЬСЯ`.
+6. Strong Community CTA.
 
-1. Completion state: `9 / 9`.
-2. Full Sphere Map.
-3. Three highlighted independent results with icon, level, level name and short editorial line.
-4. Canonical tag values and intentionality/responsibility remain available as secondary evidence, visually subordinate to the main result line.
-5. Remaining six sphere results, already expanded; no mandatory clicking to understand the result.
-6. Personal dossier / share object.
-7. Strong Community CTA.
+Do not repeat tags, guard axes or diagnostic explanations throughout the public page. Do not add a separate club-manifesto block between results and dossier unless it has a proven user task.
 
 Public framing uses `ДЕВЯТЬ СФЕР. ОДНА КАРТА.` and must not imply a single psychotype/profile score.
 
@@ -143,16 +136,14 @@ Recommended contents:
 - `DEMENTOR CLUB / DC-9`;
 - `МОЯ КАРТА`;
 - Sphere Map;
-- A/B/C highlighted independent sphere results;
+- three highlighted independent sphere results;
 - sphere icons;
 - exact final levels;
 - short editorial lines;
 - `9 СФЕР / БЕЗ ОБЩЕГО БАЛЛА`;
 - `DEMENTOR.CLUB`.
 
-A/B/C markers in the exported dossier must match the same three spheres shown on the page.
-
-Do not place developer explanations inside the dossier.
+Highlighted radar points are black dots without A/B/C labels. Do not place developer explanations inside the dossier.
 
 ## Community boundary
 
@@ -164,22 +155,30 @@ The result page must send the user to the approved membership route and must not
 
 ## Responsive / QA
 
-Validate independently at 1440 / 1024 / 768 / 390 / 320.
+Validate independently at 1440 / 1024 / 768 / 390 / 375 / 320.
 
 Required:
 
 - no horizontal overflow;
-- no clipped radar labels;
+- no clipped public copy;
 - mobile radar receives a separate readable 01–09 legend instead of relying on tiny SVG labels;
-- A/B/C markers cannot be confused with sphere numbers;
-- no hidden result information requiring JS interaction to understand the completed result;
-- all nine results visible without mandatory interaction;
+- no public A/B/C marker system;
+- all nine results remain visible without mandatory interaction;
+- mobile page should avoid repeating the same analytical payload in multiple formats;
 - share preview fits mobile viewport;
 - Community CTA remains the strongest final action;
 - `prefers-reduced-motion` disables decorative CTA breathing/pulse;
 - exported dossier matches screen values;
 - 9/9 remains 9/9 for historical `self-development` local results after normalization.
 
-## Editorial copy status
+## Current staging QA snapshot
 
-The result-page presentation copy and A/B/C contrast structure are approved for staging implementation. Sphere-specific humorous lines remain presentation copy: they must never change the stored level, tags, guard values or Community gate. Production publication still requires browser QA and explicit release approval.
+After the mobile-first simplification pass on 2026-08-31, the representative 375 px Chromium snapshot measures approximately:
+
+- page height: ~3800 px (previous overloaded version ~6800 px);
+- visible copy: ~234 words (previous overloaded version ~482 words);
+- document width: 375 px / no horizontal overflow;
+- primary dossier buttons: full mobile width;
+- Community headline intentionally resolves to two lines at 375 and 320 px.
+
+This snapshot is implementation evidence, not production approval. Production publication still requires real staging/browser/provider QA and explicit release approval.
