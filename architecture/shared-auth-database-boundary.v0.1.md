@@ -128,6 +128,16 @@ EDIT
 DECIDE
 ```
 
+## Vocabulary conflict — stop semantic mutation
+
+FACT: the existing Dementor Club × Modern Pilgrims architecture document uses `PILGRIMS_PARTNER` as the named Modern Pilgrims client/partner role.
+
+FACT: the live Supabase constraint for `mp_system_memberships.system_role` does not contain `PILGRIMS_PARTNER`; it currently permits `PARTNER` and `CLIENT` instead.
+
+CONFLICT: `PILGRIMS_PARTNER` vs `PARTNER` / `CLIENT` is unresolved canonical vocabulary.
+
+DECISION REQUIRED: choose one canonical semantic model and then either update the approved architecture through change control or migrate the runtime vocabulary. Until that decision, no Valentin membership row should be created by guessing which value is equivalent.
+
 ## BEREG runtime fact
 
 `mp_project_refs` already contains:
@@ -206,7 +216,7 @@ No runtime row should be inserted until those exact semantics are approved.
 
 ## Current gaps / required checks before implementation
 
-- Decide canonical MP system role for client owners: `PARTNER` vs `CLIENT`.
+- Resolve canonical MP system role vocabulary: architecture `PILGRIMS_PARTNER` vs runtime `PARTNER` / `CLIENT`.
 - Decide project relation for Valentin: `OWNER` vs `CLIENT_COUNTERPART`.
 - Decide whether client owner access uses `OWNER` or `DECISION` access profile.
 - Define artifact keys for BEREG portal surfaces before granting artifact access.
