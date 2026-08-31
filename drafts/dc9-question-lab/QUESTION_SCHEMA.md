@@ -1,8 +1,10 @@
 # DC-9 Question Record Schema
 
-Status: **DRAFT**
+Status: **DRAFT v0.3**
 
-Every question in the lab should be stored with the same fields so content, scoring and UX can be reviewed separately.
+Every question in the lab should be stored with the same fields so content, scoring, diagnostic meaning and UX can be reviewed separately.
+
+This schema does **not** replace the current production contract.
 
 ## Record
 
@@ -10,112 +12,193 @@ Every question in the lab should be stored with the same fields so content, scor
 id: DC9-PER-001
 sphere: personality
 sphere_order: 1
-status: baseline | rewrite | candidate | playtest | approved-draft | rejected | promoted
+status: baseline | rewrite | workbench | candidate | playtest | approved-draft | rejected | promoted
 version: 1
 
 kind: thematic | intentionality_guard | responsibility_guard
 canonical_tag: self_irony | role_refusal | boundaries | imperfection
+pattern_target: role_maintenance
 
 scene:
   title: "Short recognizable situation"
-  detail: "One dry Dementor Club / administrative line"
+  detail: "Optional factual/social constraint; not necessarily a joke"
   stakes: "What can actually be gained, lost or exposed"
 
 answers:
   - text: "..."
-    score: 0
-    rationale_internal: "Why this serves successful-success"
+    pattern_id: role_released
+    pattern_stage: 0
+    canonical_evidence: 1.00
+    rationale_internal: "Direct reaction; role no longer controls decision"
   - text: "..."
-    score: 1
-    rationale_internal: "..."
+    pattern_id: adaptive_role_contact
+    pattern_stage: 1
+    canonical_evidence: 0.67
+    rationale_internal: "Ordinary adaptation / light preservation"
   - text: "..."
-    score: 2
-    rationale_internal: "..."
+    pattern_id: structured_role_maintenance
+    pattern_stage: 2
+    canonical_evidence: 0.33
+    rationale_internal: "Repeatable protective mechanism"
   - text: "..."
-    score: 3
-    rationale_internal: "Why the construction loses power"
+    pattern_id: role_as_principle
+    pattern_stage: 3
+    canonical_evidence: 0.00
+    rationale_internal: "Mechanism defended as principle/worldview"
 
 impact:
   band: I1 | I2 | I3 | I4 | I5 | I6 | I7
   coefficient: 0.70 | 0.80 | 0.90 | 1.00 | 1.15 | 1.30 | 1.50
-  reason: "Why this situation deserves this diagnostic weight"
+  cost_of_error: "..."
+  personal_stake: "money/status/identity/relationship/obligation/reversibility/etc"
+  reason: "Why this deserves this evidence weight"
 
 presentation:
-  pattern: PATTERN_ID
+  pattern: P01 | P02 | P03 | P04 | P05 | P06 | P07 | P08 | P09 | P10 | P11 | P12
+  diagnostic_function: "What ambiguity/bias this wrapper removes"
+  satirical_function: "Where the Club humor/payoff comes from"
   optional_microcopy: "..."
-  interaction_note: "No illustration required"
+  interaction_note: "No unique illustration required"
+
+payoff:
+  transition_candidate: "Optional short system line after a block"
+  result_language_candidates:
+    - "..."
 
 qa:
   recognizability: 1-5
   real_conflict: 1-5
   non_obviousness: 1-5
-  dementor_specificity: 1-5
-  answer_balance: 1-5
+  pattern_clarity: 1-5
+  boundary_01_23: 1-5
+  answer_realism_balance: 1-5
   brevity: 1-5
-  emotional_tension: 1-5
+  diagnostic_stake: 1-5
   replay_resistance: 1-5
+  satirical_payoff: 1-5
+  total: 10-50
+  fatal_issue: null
   notes: "..."
 ```
 
+## Critical semantics
+
+### `pattern_stage`
+
+Editorial hypothesis describing how formed/entrenched a strategy is:
+
+- `0` — direct reaction without protective construction;
+- `1` — ordinary adaptation / explanation;
+- `2` — structured repeatable mechanism;
+- `3` — mechanism becomes principle / worldview / identity.
+
+It is **descriptive**, not a goodness or Dementor scale.
+
+### `canonical_evidence`
+
+Compatibility hypothesis describing how strongly the chosen behavior supports the current canonical sphere direction:
+
+- `0.00` — strongly serves the relevant successful-success construction;
+- `0.33` — weak refusal / small violation;
+- `0.67` — meaningful refusal;
+- `1.00` — construction clearly loses power over the decision.
+
+This field is experimental and must not be promoted until mapping reliability is validated.
+
+### Important
+
+There is no rule that higher `pattern_stage` means higher `canonical_evidence`.
+
+They may correlate positively, negatively or non-monotonically depending on the pattern being tested.
+
+This separation is required to avoid turning the answer list into `0 = stupid / 3 = correct Club ideology`.
+
 ## Seven impact bands
 
-Impact is about the **weight of the situation**, not the moral quality of the answer.
+Impact is about **cost of error + personal stake**, not theatrical drama and not the quality of the answer.
 
 | Band | Meaning | Typical situation | Draft coefficient |
 |---|---|---|---:|
-| I1 | trivial / almost costless | small preference, minor embarrassment | 0.70 |
-| I2 | low | mild social friction or small inconvenience | 0.80 |
-| I3 | noticeable | real time/money/reputation tradeoff | 0.90 |
-| I4 | meaningful | choice has a visible consequence | 1.00 |
-| I5 | high | relationship/work/status cost is plausible | 1.15 |
-| I6 | very high | substantial loss, responsibility or identity pressure | 1.30 |
-| I7 | critical | strong consequence where the declared principle is genuinely tested | 1.50 |
+| I1 | negligible | tiny preference, almost no consequence | 0.70 |
+| I2 | low | mild inconvenience / easily reversible | 0.80 |
+| I3 | noticeable | real time/social/comfort tradeoff | 0.90 |
+| I4 | meaningful | recurring cost or real obligation | 1.00 |
+| I5 | high | money, relationship, reputation or identity stake | 1.15 |
+| I6 | very high | major opportunity/status/identity cost; difficult reversal | 1.30 |
+| I7 | critical | very high personal consequence or strongly irreversible commitment | 1.50 |
 
-These coefficients are intentionally compressed. `I7` must not count seven times more than `I1`; otherwise one dramatic scene can overwhelm the whole sphere.
+These coefficients are intentionally compressed. `I7` must not count seven times more than `I1`.
 
 ## Question count
 
-There is no fixed rule that every sphere must contain exactly the same number of thematic scenes in the draft lab.
+There is no fixed rule that every sphere contains the same number of scenes.
 
-Working target:
+Working shape:
 
-- **minimum:** 4 thematic evidence scenes + 2 guards;
-- **normal:** 5–6 thematic scenes + 2 guards;
-- **maximum before strong justification:** 7 thematic scenes + 2 guards.
+- minimum evidence shape: 4 distinct thematic scenes + 2 guards;
+- add optional scenes only when a construct lacks independent evidence;
+- stop when new questions become repetitions rather than new evidence.
 
-A sphere may stop earlier when all canonical tags are adequately evidenced and additional questions become repetitive.
-
-A sphere may use more scenes when a tag is broad or one high-impact question needs a lower-stakes counterexample to distinguish stable behavior from heroic self-image.
+The active Personality gold-standard hypothesis is six scored scenes total: four thematic + two behavioral guards.
 
 ## Coverage rule
 
-Each canonical tag needs either:
+Every thematic scene must add evidence not already provided by another scene.
 
-- one strong `I4–I7` scene; or
-- two complementary `I1–I3` scenes.
+A broad tag may use more than one scene, but question count does not determine importance. Aggregation must normalize within the canonical tag/evidence model.
 
 No tag should be represented only by an abstract opinion question.
 
 ## Answer rules
 
 - Exactly four behavioral answers by default.
-- Hidden score range remains `0–3`.
-- Scores are semantic, not positional.
+- All four should be plausible for intelligent real people.
+- No straw-man answer exists only to lose.
 - Public order must be randomized.
-- Answer lengths should be close enough that the “smartest” answer is not visually obvious.
-- `2` should often represent competent/adult behavior.
-- `3` must go beyond competence and remove the relevant successful-success obligation from the decision.
+- Hidden semantics are not positional.
+- Similar length/tone/sophistication should prevent writing-quality leakage.
+- Humor should not depend on choosing a funny option.
+- `pattern_stage 2` should represent a repeatable mechanism.
+- `pattern_stage 3` should represent a principle/worldview, but is not automatically high canonical evidence.
+
+## Mandatory workbench before answer freeze
+
+For every question answer explicitly:
+
+1. What exactly do we measure?
+2. What separates 0 from 1?
+3. What separates 2 from 3?
+4. What is the real price of the choice?
+5. Can the user guess the Club-preferred answer?
+6. Do all answers sound like real people?
+7. Is there a later satirical payoff?
+8. Does the question add new information?
+
+## Strong scene methods
+
+Prefer some questions that reduce aspirational self-report:
+
+- `P07 Already happened / Ты уже сделал`;
+- `P08 Profitable exception`;
+- `P11 Nobody will know`;
+- `P04 Witness`;
+- `P05 Receipt/evidence`;
+- `P12 Forced allocation`.
 
 ## Guard rules
 
-Guards are still scenes, not explanations of motivation.
+Guards are behavioral scenes, not direct motivation questions.
 
-Intentionality asks through behavior: did the person choose the refusal, or merely fail / tire / lose capacity?
+Intentionality: test whether the chosen refusal survives when returning to the old rule is easy/profitable.
 
-Responsibility asks through behavior: after refusing a construction, does the person still own consequences and prior commitments?
+Responsibility: test what happens after a prior commitment or consequence already exists.
+
+Reputation-removal may be used when public image contaminates the construct.
 
 ## Versioning
 
 Never overwrite a useful candidate without history.
 
 Use stable IDs and increment `version`. Rejected versions may remain as learning evidence with a short rejection reason.
+
+Only `promoted` content can be copied into the canonical branch after explicit approval.
