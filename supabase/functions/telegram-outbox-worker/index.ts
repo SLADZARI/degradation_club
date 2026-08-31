@@ -1,4 +1,5 @@
 import { withSupabase } from "npm:@supabase/server@^1";
+import { corsHeaders as supabaseCorsHeaders } from "jsr:@supabase/supabase-js@2.112.4/cors";
 
 const clip = (value: string, max: number) => value.length <= max ? value : `${value.slice(0, Math.max(0, max - 1)).trimEnd()}…`;
 const allowedOrigins = new Set(["https://dementor.club", "https://www.dementor.club"]);
@@ -7,8 +8,8 @@ function corsHeaders(req: Request) {
   const origin = req.headers.get("origin");
   const allowOrigin = origin && allowedOrigins.has(origin) ? origin : "https://dementor.club";
   return {
+    ...supabaseCorsHeaders,
     "Access-Control-Allow-Origin": allowOrigin,
-    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
     "Access-Control-Allow-Methods": "POST, OPTIONS",
     "Access-Control-Max-Age": "86400",
     "Vary": "Origin",
