@@ -17,6 +17,7 @@ if(cfg?.enabled&&cfg.url&&cfg.publishableKey&&location.pathname.includes('/join'
     information:{slug:'dumai-s-opasnostyu',title:'Думай с опасностью',person:'Валентин'}
   };
   const titleToId=Object.fromEntries(Object.entries(TITLES).map(([k,v])=>[v.toLowerCase(),k]));
+  const canonicalSphereId=id=>String(id||'')==='self-development'?'self_development':String(id||'');
   const base=location.pathname.startsWith('/degradation_club/')?'/degradation_club':'';
   const programUrl=slug=>`${base}/courses/${slug}/`;
   const callbackUrl=()=>location.origin+base+'/auth/callback/?next='+encodeURIComponent(base+'/join/');
@@ -24,10 +25,11 @@ if(cfg?.enabled&&cfg.url&&cfg.publishableKey&&location.pathname.includes('/join'
   const levelOf=r=>{const raw=r?.result_json?.level??r?.result_json?.levelNumber??r?.result_json?.level_number;const n=Number(raw);return Number.isFinite(n)?Math.max(0,Math.min(5,n)):null};
   const when=r=>Date.parse(r?.completed_at||r?.created_at||r?.result_json?.date||0)||0;
   const readLocal=()=>{try{return JSON.parse(localStorage.getItem('dementorClubOnboardingV3')||'null')||{results:{}}}catch{return{results:{}}}};
+  const normalizedLocal=()=>{const raw=readLocal()?.results||{},out={};for(const [rawId,result] of Object.entries(raw)){const id=canonicalSphereId(rawId);if(!ORDER.includes(id))continue;const current=out[id];if(!current||(Date.parse(result?.date||0)||0)>=(Date.parse(current?.date||0)||0))out[id]=result}return out};
   let serverLatest=new Map(),latest=new Map(),certs=new Set(),refreshing=false,lastRenderKey='';
 
   function mergeLatest(){
-    const out=new Map();const local=readLocal()?.results||{};
+    const out=new Map();const local=normalizedLocal();
     ORDER.forEach(id=>{const lr=local[id]?{sphere_id:id,result_json:local[id],completed_at:local[id].date,local_only:!user}:null;const sr=serverLatest.get(id)||null;if(lr&&sr)out.set(id,when(lr)>=when(sr)?lr:sr);else if(lr||sr)out.set(id,lr||sr)});latest=out;
   }
   async function fetchServer(){if(!user||refreshing)return;refreshing=true;try{
@@ -35,7 +37,7 @@ if(cfg?.enabled&&cfg.url&&cfg.publishableKey&&location.pathname.includes('/join'
       client.from('assessment_runs').select('sphere_id,result_json,completed_at,created_at').eq('profile_id',user.id).order('completed_at',{ascending:false}).limit(100),
       client.from('dc_program_certificates').select('program_slug').eq('profile_id',user.id)
     ]);if(rerr)throw rerr;if(cerr)throw cerr;
-    const next=new Map();for(const r of runs||[])if(r.sphere_id&&!next.has(r.sphere_id))next.set(r.sphere_id,r);serverLatest=next;certs=new Set((certRows||[]).map(x=>x.program_slug));
+    const next=new Map();for(const row of runs||[]){const id=canonicalSphereId(row.sphere_id);if(ORDER.includes(id)&&!next.has(id))next.set(id,{...row,sphere_id:id})}serverLatest=next;certs=new Set((certRows||[]).map(x=>x.program_slug));
   }catch(e){console.warn('[DC9 map v2]',e)}finally{refreshing=false;mergeLatest();decorate()}}
   function ensureSummary(grid){let box=document.querySelector('.dc9-map-summary');if(box)return box;box=document.createElement('section');box.className='dc9-map-summary';grid.before(box);return box}
   function resultMetrics(r){const j=r?.result_json||{};const tags=Array.isArray(j.tagLevels)?j.tagLevels:[];return [['Осознанность отказа',j.intent],['Ответственность за последствия',j.responsibility],...tags.map((v,i)=>[`Признак ${String(i+1).padStart(2,'0')}`,v])].filter(x=>x[1]!=null)}
