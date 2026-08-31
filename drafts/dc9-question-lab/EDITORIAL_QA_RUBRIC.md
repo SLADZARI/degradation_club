@@ -4,6 +4,15 @@ Status: **DRAFT WORKING STANDARD**
 
 Every candidate question receives a compact editorial score before playtest.
 
+## Canonical presentation authority
+
+Public wording MUST additionally pass the canonical standard in the `dementor-club` source-of-truth branch:
+
+- `operations/QUESTION_PRESENTATION_HUMOR_STANDARD.md` — canonical voice, deadpan, absurdity, social satire, question construction, answer construction, system reactions and humor rhythm.
+- `operations/ONBOARDING_SCENARIO_RULES.md` — canonical diagnostic semantics.
+
+A question is not playtest-ready unless it passes **both** semantic and presentation/humor gates.
+
 ## Core rule
 
 > **Хороший вопрос Dementor Club не заставляет пользователя выбрать смешной ответ.**  
@@ -121,12 +130,73 @@ Maximum: `50`.
 
 Working interpretation:
 
-- `43–50` — strong candidate for playtest;
+- `43–50` — strong candidate for playtest **only if canonical presentation gate also passes**;
 - `36–42` — usable after focused edit;
 - `28–35` — rewrite required;
 - `<28` — reject or rebuild from a new scene.
 
-A high total does NOT override a fatal semantic issue.
+A high total does NOT override a fatal semantic or presentation issue.
+
+# Canonical presentation / humor gate — mandatory
+
+Before `candidate → playtest`, answer all seven questions from `QUESTION_PRESENTATION_HUMOR_STANDARD.md`:
+
+| Check | Pass condition |
+| --- | --- |
+| 1. Можно ли представить ситуацию в реальной жизни? | Да; даже если реальность слегка сдвинута |
+| 2. Есть ли одна точная бытовая деталь? | Да; конкретное время, цена, сообщение, предмет, число, действие и т.п. |
+| 3. Абсурд появляется постепенно? | Да; вопрос не стартует сразу как скетч |
+| 4. Все четыре ответа внутренне логичны? | Да; ни одного answer-as-punchline |
+| 5. Нельзя сразу угадать «правильный ответ Dementor Club»? | Нельзя; если можно — rewrite |
+| 6. Смешно без объяснения психологической механики? | Да; humor exists in situation/classification, not theory |
+| 7. Возникает после шутки неприятное узнавание? | Да; пользователь узнаёт систему и себя внутри неё |
+
+### Mandatory voice check
+
+The narrator must read as:
+
+- intelligent;
+- calm;
+- slightly tired;
+- unsurprised;
+- aware of absurdity;
+- too polite to point at it immediately.
+
+If the narrator feels like a comedian, game-show host, therapist, coach or meme account, the presentation fails.
+
+### Scene construction check
+
+Preferred progression:
+
+`обычная ситуация → точная бытовая деталь → лёгкий сдвиг нормальности → внутренне безупречный абсурд → четыре человеческих выхода`
+
+Not every scene needs a large absurd turn. Humor rhythm across a sphere should remain varied.
+
+### Answer construction check
+
+Preferred editorial composition:
+
+- two ordinary human reactions;
+- one strange but rational reaction;
+- one internally flawless absurd reaction.
+
+This is a presentation heuristic, not a scoring mapping. Any answer may carry any hidden semantic meaning after shuffle.
+
+### System reaction check
+
+System reaction must:
+
+- be short;
+- dryly record what happened;
+- not explain the psychology;
+- not reveal whether the answer was desirable;
+- not appear after every answer if that makes the rhythm repetitive.
+
+Reference style:
+
+- `Понятно. Шнурки признаны необязательными.`
+- `Ответ принят. Причина встречи по-прежнему устанавливается.`
+- `Зафиксировано. Дальнейшее вмешательство пока не требуется.`
 
 ## Fatal issues
 
@@ -134,6 +204,7 @@ Reject or rebuild a question if any of the following is true:
 
 - one answer is obviously "the Club answer";
 - one or more answers are caricatures written only to lose;
+- one answer exists only as the authorial punchline;
 - the strongest answer is only generic maturity, therapy language or competent management;
 - the question asks the user to self-describe an abstract trait instead of choosing behavior;
 - public wording exposes score/tag/guard mechanics;
@@ -141,7 +212,13 @@ Reject or rebuild a question if any of the following is true:
 - the scene is harmful or irresponsible when taken literally;
 - the question duplicates another scene without adding independent evidence;
 - editors cannot state what distinguishes 0/1 and 2/3 without using "better/worse";
-- the humor depends on the user choosing an intentionally funny answer.
+- the humor depends on the user choosing an intentionally funny answer;
+- the scene begins as overt surrealism instead of recognizable reality unless there is a specific justified reason;
+- absurdity does not measure anything;
+- system reaction explains the user instead of politely recording the event;
+- the text laughs at the user rather than the social system;
+- the scene uses self-help / pseudo-psychology wording such as `здоровые границы`, `ресурсное состояние`, `паттерн`, `рационализирую` in public answer copy;
+- the humor is so dense that the entire quiz has no normal background.
 
 ## Per-question workbench — mandatory before rewrite approval
 
@@ -153,7 +230,11 @@ Reject or rebuild a question if any of the following is true:
 | What is the price of the choice? | Explicit stake or reason why low-stake evidence is useful |
 | Can the Club-preferred answer be guessed? | If yes, rewrite |
 | Do answers sound like real people? | All four must |
-| Is there a later satirical payoff? | Required |
+| What is the exact everyday detail? | Required |
+| Where does reality shift? | Explicit but not necessarily large |
+| What is the later/system satirical payoff? | Required |
+| Does the humor work without psychological explanation? | Required |
+| Does the question produce uncomfortable recognition? | Preferably yes; required for final approval |
 | Does the question add new information? | If no, remove or replace |
 
 The v0.3 `0–3` pattern-stage interpretation is a **draft editorial hypothesis** and does not silently replace the approved production scoring contract.
@@ -171,9 +252,12 @@ A sphere is ready for playtest when:
 7. at least one scene uses an anti-image condition where reputation cannot explain the answer when appropriate (`никто не узнает`);
 8. answer order can be shuffled without changing meaning;
 9. presentation patterns vary enough to avoid repetitive reading;
-10. total question count is justified by evidence coverage, not symmetry;
-11. the sphere produces result-language material without creating a personality typology;
-12. any content-routing idea remains a separate product hypothesis until approved.
+10. humor rhythm is not uniform: normal background exists between stronger absurd beats;
+11. system reactions are occasional rather than mechanically repeated after every answer;
+12. total question count is justified by evidence coverage, not symmetry;
+13. the sphere produces result-language material without creating a personality typology;
+14. every question passes the canonical presentation/humor gate;
+15. any content-routing idea remains a separate product hypothesis until approved.
 
 ## Current baseline audit snapshot
 
