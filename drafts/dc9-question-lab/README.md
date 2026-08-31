@@ -2,147 +2,148 @@
 
 Status: **DRAFT / NOT PRODUCTION / NOT CANON**
 
-Branch: `draft/dc9-question-lab`
+Branch: `draft/dc9-question-lab`  
 Base: `dementor-club`
 
 ## Purpose
 
-This branch is the working laboratory for the Dementor Club DC-9 onboarding question system.
+Working laboratory for the Dementor Club DC-9 onboarding question system.
 
-It exists to collect, compare, rewrite and QA:
+It stores:
 
-- all question scenes;
-- all answer options;
-- hidden answer semantics;
-- protective-pattern taxonomy;
-- question impact / weight;
-- intentionality and responsibility guards;
-- editorial evaluation;
-- per-question presentation mechanics that do not require illustrations;
-- result-language hypotheses;
-- candidate scoring changes before they are approved;
-- future Club-routing hypotheses without inventing public mechanics.
+- scenes and answers;
+- hidden semantics / pattern taxonomy;
+- impact and guards;
+- editorial QA;
+- scoring experiments;
+- result/routing hypotheses;
+- playtest candidates.
 
-Nothing in this directory is production truth until explicitly promoted into the canonical `dementor-club` branch.
+Nothing here becomes production truth until explicitly promoted into `dementor-club`.
 
-## Authority boundary
+## Canonical authorities
 
-Canonical sources remain in `dementor-club`:
+In `dementor-club`:
 
-- `operations/ONBOARDING_SCENARIO_RULES.md` — canonical scenario / hidden diagnostic semantics;
-- `operations/QUESTION_PRESENTATION_HUMOR_STANDARD.md` — **canonical public voice, deadpan, absurdity, answer presentation, system reactions and humor rhythm**;
+- `operations/ONBOARDING_SCENARIO_RULES.md` — what the scene measures / hidden semantic canon;
+- `operations/QUESTION_PRESENTATION_HUMOR_STANDARD.md` — **how public questions must sound: brevity, deadpan, reality shift, answer style, narrator, humor rhythm**;
 - `operations/ONBOARDING_SYSTEM.md` — onboarding system;
 - `operations/CONTENT_TAXONOMY_AND_DEMENTOR_LEVELS.md` — diagnostic meaning;
-- `operations/DC9_RESULT_SYSTEM_V0.1.md` — current approved result contract.
+- `operations/DC9_RESULT_SYSTEM_V0.1.md` — approved result contract.
 
-Implementation remains in `dementor-club-site` only after content/scoring approval.
+Implementation remains in `dementor-club-site` only after approval.
 
-This lab MUST NOT silently change production semantics.
+## Current authoring method
 
-Every candidate question must pass two independent gates before playtest/promotion:
+**ACTIVE:** `METHODOLOGY_V0.4_DRAFT.md`
 
-1. **semantic gate** — `ONBOARDING_SCENARIO_RULES.md`;
-2. **presentation/humor gate** — `QUESTION_PRESENTATION_HUMOR_STANDARD.md`.
+v0.4 replaces the v0.3 authoring assumption that a premise may be completely serious and humor can arrive mainly after the answer.
+
+New working rule:
+
+> **The user must feel Dementor Club on the question screen.**
+
+The humor may be quiet, but the question already needs a small reality shift / deadpan detail. Public copy must be short.
+
+### Public screen rule
+
+`current moment → exact detail → small Dementor shift → four compact exits`
+
+Not:
+
+`biography → construct explanation → long setup → choice`
+
+### Working length target
+
+- premise + detail usually `~35–45 words max`;
+- answer usually `~8–16 words`;
+- Q1 must be understandable in roughly `5–8 seconds`.
+
+These are editorial targets, not runtime validators.
+
+## First-question rule
+
+Q1 of every sphere is an onboarding into the language of the quiz.
+
+It must be:
+
+- fast;
+- light;
+- recognizable;
+- slightly strange already;
+- compact;
+- free of theory and biography dump.
+
+If Q1 feels like psychometrics, it fails even with strong semantic QA.
 
 ## Working structure
 
-- `METHODOLOGY_V0.3_DRAFT.md` — current editorial hypothesis: normal scenes, plausible answers, pattern-stage semantics, satire after the choice.
-- `PATTERN_TAXONOMY_V0.1_DRAFT.md` — internal vocabulary for mechanisms such as role maintenance, control buffer, sunk-cost defense and principle justification; not a psychotype system.
-- `QUESTION_SCHEMA.md` — draft record shape for questions.
-- `SCORING_WEIGHT_MODEL_V0.2_DRAFT.md` — earlier weighted model that still assumes monotonic Dementor answer score.
-- `SCORING_PATTERN_MODEL_V0.3_DRAFT.md` — compatibility experiment separating `pattern_stage` from canonical diagnostic evidence.
-- `QUESTION_PRESENTATION_PATTERNS.md` — reusable no-image implementation/diagnostic patterns; subordinate to the canonical humor/presentation standard.
-- `EDITORIAL_QA_RUBRIC.md` — quality gates and mandatory per-question workbench, including the canonical 7-question humor gate.
-- `RESULT_AND_ROUTING_HYPOTHESES.md` — non-canonical technical-result language and future content-routing ideas.
-- `baseline/CURRENT_PRODUCTION_BANK_2026-08-31.md` — frozen reference of current production question bank.
-- `baseline/CURRENT_AUDIT_2026-08-31.md` — editorial/product audit of the current bank.
-- `spheres/01_personality.md` — earlier full v2 rewrite retained for comparison.
-- `spheres/01_personality_workbench.md` — active gold-standard workflow; question-by-question, not whole-sphere rewrite.
-- `spheres/01_personality_q1_role_candidates.md` — reaction pool and first Q1 clustering pass.
-- `spheres/01_personality_q1_role_v02.md` — current semantic candidate; must now re-pass the newly canonical presentation/humor gate before playtest freeze.
-- later sphere workbenches follow only after the Personality method is proven.
+- `METHODOLOGY_V0.4_DRAFT.md` — **active concise humor-first authoring method**;
+- `METHODOLOGY_V0.3_DRAFT.md` — previous method retained as history / superseded for public authoring;
+- `PATTERN_TAXONOMY_V0.1_DRAFT.md` — internal pattern vocabulary;
+- `QUESTION_SCHEMA.md` — draft question record shape;
+- `SCORING_WEIGHT_MODEL_V0.2_DRAFT.md` — earlier weighted model;
+- `SCORING_PATTERN_MODEL_V0.3_DRAFT.md` — separates `pattern_stage` from `canonical_evidence`;
+- `QUESTION_PRESENTATION_PATTERNS.md` — reusable UI/diagnostic patterns, subordinate to canonical humor standard;
+- `EDITORIAL_QA_RUBRIC.md` — current QA with instant-read and Q1 gates;
+- `RESULT_AND_ROUTING_HYPOTHESES.md` — non-canonical result/routing ideas;
+- `baseline/CURRENT_PRODUCTION_BANK_2026-08-31.md` — frozen production bank;
+- `baseline/CURRENT_AUDIT_2026-08-31.md` — baseline audit;
+- `spheres/01_personality_workbench.md` — Personality workbench;
+- `spheres/01_personality_q1_role_candidates.md` — raw Q1 reaction pool;
+- `spheres/01_personality_q1_role_v02.md` — previous long semantic candidate, retained for comparison;
+- `spheres/01_personality_q1_role_v03.md` — **current concise humor-first Q1 candidate**.
 
 ## Workflow
 
-`CURRENT → AUDIT → WORKBENCH → CANDIDATE → SEMANTIC GATE → PRESENTATION/HUMOR GATE → PLAYTEST → APPROVED DRAFT → CANON → SITE`
+`CURRENT → AUDIT → WORKBENCH → CANDIDATE → SEMANTIC GATE → INSTANT-READ GATE → PRESENTATION/HUMOR GATE → BLIND PLAYTEST → APPROVED DRAFT → CANON → SITE`
 
-A question moves through statuses:
-
-`baseline / rewrite / workbench / candidate / playtest / approved-draft / rejected / promoted`
-
-Only `promoted` content may be copied into the canonical branch.
+Only promoted content may move to production canon.
 
 ## Non-negotiable principles
 
-1. User chooses behavior in a concrete situation; they do not self-report how Dementor they are.
-2. A good question does not require a funny answer; a normal answer can later receive a funny diagnosis.
-3. All four answers must be psychologically plausible.
-4. Public options must not reveal a moral ladder or a stable Club-preferred answer.
-5. Answer position never equals hidden semantics; options are shuffled at runtime.
-6. Tag, pattern, score/evidence, impact, weight and guard mechanics are hidden from the public layer.
-7. `pattern_stage` describes how a strategy becomes a system/principle; it is not automatically a Dementor score.
-8. Pattern labels are internal editorial tools, not personality types or diagnoses.
-9. Public wording must follow the canonical Dementor narrator: intelligent, calm, slightly tired, unsurprised, aware of absurdity but too polite to explain the joke.
-10. A canonical scene should grow from recognizable reality through one exact everyday detail into a controlled reality shift / internally coherent absurdity.
-11. Humor must target the system the user participates in, not humiliate the user.
-12. Variable question counts are allowed in the lab, but every sphere must reach a minimum evidence threshold.
-13. More questions are not automatically better. The experience must stay tense, recognizable and short enough to finish.
-14. Question impact is based on cost of error + personal stake, not theatrical drama.
-15. Result language must not create a universal psychotype or aggregate Dementor score.
-16. Future routing may point only to real approved Club entities and must be approved separately.
+1. User chooses behavior, never abstract self-description.
+2. Public screen shows a current incident, not editorial explanation.
+3. Q1 teaches the game before it carries maximum depth.
+4. The question itself already contains a quiet Dementor signal.
+5. All four answers remain defensible human choices.
+6. No stable moral ladder / Club-preferred answer.
+7. Answer order is shuffled at runtime.
+8. Hidden tag/pattern/evidence/impact/guard never leaks publicly.
+9. `pattern_stage` is descriptive, not automatically a Dementor score.
+10. Humor targets the social system, not the user.
+11. Diagnostic depth comes from the decision, not text volume.
+12. More questions are not automatically better.
+13. Impact = cost of error + personal stake.
+14. No universal psychotype or aggregate Dementor score.
+15. Routing only to real approved Club entities after separate approval.
 
-## Current scoring research state
+## Current scoring research
 
-### Production baseline
+Production scoring remains unchanged.
 
-Current production still uses the approved monotonic semantic answer score `0–3` and the existing guard-cap result contract.
+Question-lab experiments still separate:
 
-### v0.2 draft
+- `pattern_stage` — form / entrenchment of strategy;
+- `canonical_evidence` — candidate contribution to sphere semantics;
+- impact I1–I7 — question-level weight.
 
-Tests variable question counts and impact weights while retaining the production-style semantic answer score.
-
-### v0.3 draft hypothesis
-
-Tests a separate editorial field:
-
-`pattern_stage 0–3`
-
-where the stages describe how a strategy is formed:
-
-- 0 — direct reaction;
-- 1 — ordinary adaptation / explanation;
-- 2 — structured mechanism;
-- 3 — mechanism becomes principle/worldview.
-
-This is **not automatically the sphere score**.
-
-A separate candidate `canonical_evidence` mapping is being tested so that an entrenched pattern is not automatically interpreted as “more Dementor”.
-
-## Impact I1–I7
-
-Impact is separate from answer semantics.
-
-It is based on:
-
-- cost of being wrong;
-- personal stake.
-
-Working coefficients remain experimental:
+Working impact coefficients:
 
 `I1=.70 · I2=.80 · I3=.90 · I4=1.00 · I5=1.15 · I6=1.30 · I7=1.50`
 
+No production formula change is approved by this lab.
+
 ## Current active task
 
-Do not rewrite all six Personality scenes at once.
+Current gold-standard candidate:
 
-Q1 `Role maintenance` remains the active gold-standard candidate. Its previous semantic/editorial QA was `44/50`, but the newly approved canonical humor standard creates a new required gate.
+`spheres/01_personality_q1_role_v03.md`
 
-Before Q1 can be frozen for playtest:
+Next gate:
 
-1. re-check the scene against the canonical progression `ordinary → exact detail → reality shift → controlled absurdity`;
-2. verify all four answers remain real choices and none is merely a punchline;
-3. verify the Club-preferred answer is not obvious;
-4. add/confirm an appropriate dry system reaction without exposing hidden semantics;
-5. verify uncomfortable recognition rather than simple joke recognition;
-6. then run blind-check;
-7. only after that mark `approved-draft` and move to Q2 `value through activity / free time`.
+1. blind read for speed;
+2. check whether A is privileged simply because it is shortest;
+3. verify Q1 feels like Dementor Club before any system reaction;
+4. re-score under the new 55-point rubric;
+5. only then freeze Q1 and move to Q2.
