@@ -50,9 +50,31 @@ function copyDir(src, dst) {
   }
 }
 
+function injectQaHud(dir) {
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const target = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      injectQaHud(target);
+      continue;
+    }
+    if (!entry.name.toLowerCase().endsWith('.html')) continue;
+    let html = fs.readFileSync(target, 'utf8');
+    if (html.includes('/qa/qa-hud-v1.js')) continue;
+    const script = '<script src="/qa/qa-hud-v1.js" defer></script>';
+    if (/<\/body>/i.test(html)) html = html.replace(/<\/body>/i, `${script}\n</body>`);
+    else html += `\n${script}\n`;
+    fs.writeFileSync(target, html);
+  }
+}
+
 fs.rmSync(out, { recursive: true, force: true });
 fs.mkdirSync(out, { recursive: true });
 copyDir(root, out);
+
+// QA-only instrumentation is injected into the generated QA artifact, not source pages.
+// This keeps production/staging semantics and markup untouched while giving screenshots
+// deterministic route/surface/block/build context during manual review.
+injectQaHud(out);
 
 // QA is intentionally not production-hardened. Internal tools may stay enabled
 // according to QA_ENVIRONMENT_POLICY_v1.md. Production-only CNAME/analytics
