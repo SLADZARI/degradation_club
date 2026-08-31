@@ -1,267 +1,275 @@
 # DC-9 Editorial QA Rubric
 
-Status: **DRAFT WORKING STANDARD**
+Status: **DRAFT WORKING STANDARD**  
+Date: 2026-08-31
 
-Every candidate question receives a compact editorial score before playtest.
+## Canonical authorities
 
-## Canonical presentation authority
+Every candidate must pass both:
 
-Public wording MUST additionally pass the canonical standard in the `dementor-club` source-of-truth branch:
+- `operations/ONBOARDING_SCENARIO_RULES.md` — semantic / diagnostic canon;
+- `operations/QUESTION_PRESENTATION_HUMOR_STANDARD.md` — public voice, brevity, humor and scene construction canon.
 
-- `operations/QUESTION_PRESENTATION_HUMOR_STANDARD.md` — canonical voice, deadpan, absurdity, social satire, question construction, answer construction, system reactions and humor rhythm.
-- `operations/ONBOARDING_SCENARIO_RULES.md` — canonical diagnostic semantics.
-
-A question is not playtest-ready unless it passes **both** semantic and presentation/humor gates.
+A high diagnostic score does not rescue a boring public question.
 
 ## Core rule
 
 > **Хороший вопрос Dementor Club не заставляет пользователя выбрать смешной ответ.**  
-> **Он заставляет пользователя выбрать нормальный ответ, который впоследствии оказывается смешным диагнозом.**
+> **Он даёт короткую нормальную ситуацию, слегка портит в ней реальность, а человек выбирает логичный выход.**
 
-If the humor is already carried by a caricature answer, the question is usually too easy to reverse-engineer.
+The public screen must feel like an incident, not a case study.
 
-## 1. Recognizability — 1–5
+# 0. Instant-read gate — PASS / FAIL
 
-Can a person understand the situation immediately without knowing Dementor Club theory?
+Before numerical scoring, check:
+
+1. Can the scene be understood in roughly 5–8 seconds?
+2. Is premise + detail usually within ~35–45 words?
+3. Can another sentence be removed without losing the choice?
+4. Does the user see the current moment rather than a biography/explanation?
+5. Is there already a quiet Dementor shift on the question screen?
+
+If Q1 fails any of these badly → **rewrite before scoring**.
+
+This gate is intentionally stricter for the first question of every sphere.
+
+# 1. Recognizability — 1–5
 
 - 1 — abstract / theoretical;
 - 3 — understandable but generic;
-- 5 — concrete, familiar, easy to imagine oneself in.
+- 5 — immediate everyday recognition.
 
-## 2. Real conflict — 1–5
+# 2. Compression — 1–5
 
-Does the question contain an actual tradeoff rather than four stylistic ways to say the same thing?
+Does the question do enough with little text?
 
-- 1 — no cost or conflict;
-- 3 — mild tradeoff;
+- 1 — explanatory paragraph / biography dump;
+- 3 — acceptable but can be cut;
+- 5 — only decision-relevant words remain.
+
+Fatal sign: the scene can be shortened by half with no diagnostic loss.
+
+# 3. Real conflict — 1–5
+
+- 1 — no real tradeoff;
+- 3 — mild conflict;
 - 5 — two or more plausible values genuinely collide.
 
-## 3. Non-obviousness — 1–5
+# 4. Dementor shift on screen — 1–5
 
-Can the user easily spot the Club-preferred / socially approved / "correct" answer?
+Does the user already feel the club language before choosing?
 
-- 1 — obvious moral ladder;
-- 3 — one answer still looks notably wiser;
-- 5 — all four options are psychologically plausible and no option announces itself as the test winner.
+- 1 — pure psychometric prose;
+- 3 — dry detail but little tonal identity;
+- 5 — one exact, quiet, deadpan reality shift makes the scene unmistakably Dementor without becoming a sketch.
 
-## 4. Pattern clarity — 1–5
+Examples of useful shifts:
 
-Does the question measure one specific behavioral or protective pattern rather than a vague trait?
+- `Даже время всех устраивает.`
+- `Исправление биографии пока никто не запросил.`
+- `Ботинки исправны. Горы претензий не предъявляли.`
 
-- 1 — mixes several unrelated constructs;
-- 3 — primary pattern is visible but alternatives are muddy;
-- 5 — the scene isolates a clear mechanism while answers remain natural.
+# 5. Non-obviousness — 1–5
 
-This criterion is evaluated separately from the approved production sphere scoring. In the v0.3 question-lab hypothesis, answers may additionally carry `pattern_stage 0–3`.
+Can the user spot a Club-preferred answer?
 
-## 5. 0/1 and 2/3 separation — 1–5
+- 1 — obvious ladder;
+- 3 — one answer looks wiser;
+- 5 — no answer announces itself as winner.
 
-Can an editor explain the internal boundaries without relying on "worse/better"?
+# 6. Pattern clarity — 1–5
 
-Working v0.3 hypothesis:
+Does the scene isolate one hidden mechanism?
 
-- `0` — direct reaction;
-- `1` — ordinary social adaptation / explanation;
-- `2` — structured repeatable mechanism;
-- `3` — mechanism has become a principle / worldview / identity.
+- 1 — vague trait soup;
+- 3 — primary mechanism visible but muddy;
+- 5 — clear hidden mechanism, natural public scene.
 
-- 1 — ladder is basically bad→good;
-- 3 — some meaningful differentiation;
-- 5 — both boundaries are behaviorally clear and psychologically plausible.
+# 7. 0/1 and 2/3 separation — 1–5
 
-## 6. Answer realism and balance — 1–5
+Working lab hypothesis:
 
-Do all four options sound like real people, with comparable tone, length and sophistication?
+- 0 — direct reaction;
+- 1 — ordinary adaptation;
+- 2 — repeatable mechanism;
+- 3 — mechanism becomes principle/worldview.
 
-- 1 — one or more straw-man answers / score leaks through writing quality;
-- 3 — mostly plausible but one option is conspicuously wiser or sillier;
-- 5 — each answer has a credible internal logic and no answer is included only as a joke.
+Score 5 only if both boundaries are behaviorally clear without saying better/worse.
 
-## 7. Brevity — 1–5
+# 8. Answer realism and compactness — 1–5
 
-Does the scene create enough context with minimal reading?
+- 1 — straw-man, joke answer or essay answer;
+- 3 — mostly plausible, uneven length;
+- 5 — four real, compact, parallel human choices.
 
-- 1 — exhausting;
-- 3 — acceptable;
-- 5 — one screen, immediate comprehension, no lost diagnostic context.
+Working answer-length target: usually **8–16 words**.
 
-The question may contain a compact message, fact row, witness line or stakes strip if it removes ambiguity rather than adding decoration.
+# 9. Diagnostic stake — 1–5
 
-## 8. Diagnostic stake — 1–5
-
-Does the choice expose the pattern under a meaningful cost or constraint?
-
-Impact should be judged through:
+Impact is based on:
 
 1. cost of being wrong;
-2. personal stake — money, status, identity, relationship, obligation, irreversibility or opportunity cost.
+2. personal stake.
 
-- 1 — sterile / nothing changes regardless of answer;
-- 3 — mild social, time or comfort cost;
-- 5 — the tested mechanism is challenged by a real competing stake.
+Do not create stake with extra prose; create it with consequence.
 
-## 9. Replay resistance — 1–5
+# 10. Replay resistance — 1–5
 
-After several questions, can the user simply reverse-engineer "choose the most Dementor answer"?
+Strong methods:
 
-- 1 — transparent ladder;
-- 3 — partly gameable;
-- 5 — meaning is contextual, options are mixed, presentation does not leak mechanics.
-
-Strong anti-gaming patterns include:
-
-- consequence already happened;
+- already happened;
 - profitable exception;
 - nobody will know;
-- external witness;
-- hard factual constraint.
+- witness;
+- fact / receipt;
+- forced allocation.
 
-## 10. Satirical payoff — 1–5
+# 11. Satirical payoff — 1–5
 
-Does the scene create material for a later Dementor diagnosis without needing joke answers?
+Does a normal choice create material for later dry classification?
 
-- 1 — no payoff or humor is already exhausted in the answer choices;
-- 3 — possible result line exists;
-- 5 — a completely normal answer can later be classified in a dry, absurd, specific way.
+Score 5 when:
 
-## Editorial total
+- the scene is already slightly funny;
+- answers remain believable;
+- system/result can make the recognition sharper.
 
-Maximum: `50`.
+## Working total
 
-Working interpretation:
+Maximum: `55` after the PASS/FAIL instant-read gate.
 
-- `43–50` — strong candidate for playtest **only if canonical presentation gate also passes**;
-- `36–42` — usable after focused edit;
-- `28–35` — rewrite required;
-- `<28` — reject or rebuild from a new scene.
+Interpretation:
 
-A high total does NOT override a fatal semantic or presentation issue.
+- `47–55` — strong playtest candidate;
+- `40–46` — focused edit;
+- `32–39` — rewrite;
+- `<32` — rebuild.
 
-# Canonical presentation / humor gate — mandatory
+Numerical total never overrides a fatal issue.
 
-Before `candidate → playtest`, answer all seven questions from `QUESTION_PRESENTATION_HUMOR_STANDARD.md`:
+# First-question gate — mandatory
+
+Q1 of every sphere must additionally pass all of these:
 
 | Check | Pass condition |
 | --- | --- |
-| 1. Можно ли представить ситуацию в реальной жизни? | Да; даже если реальность слегка сдвинута |
-| 2. Есть ли одна точная бытовая деталь? | Да; конкретное время, цена, сообщение, предмет, число, действие и т.п. |
-| 3. Абсурд появляется постепенно? | Да; вопрос не стартует сразу как скетч |
-| 4. Все четыре ответа внутренне логичны? | Да; ни одного answer-as-punchline |
-| 5. Нельзя сразу угадать «правильный ответ Dementor Club»? | Нельзя; если можно — rewrite |
-| 6. Смешно без объяснения психологической механики? | Да; humor exists in situation/classification, not theory |
-| 7. Возникает после шутки неприятное узнавание? | Да; пользователь узнаёт систему и себя внутри неё |
+| Fast | Understandable almost instantly |
+| Light | No biography / theoretical setup |
+| Specific | One concrete detail |
+| Dementor | Humor/shift already present |
+| Compact answers | Four quick choices |
+| No theory | No construct explanation |
+| Pull | User wants to see Q2 |
 
-### Mandatory voice check
+If Q1 feels like a questionnaire, assessment or introductory essay → reject.
 
-The narrator must read as:
+# Canonical presentation / humor gate
+
+Before `candidate → playtest`:
+
+1. Can this happen in recognizable life?
+2. Is there one exact everyday detail?
+3. Does reality shift naturally?
+4. Are all four answers internally logical?
+5. Is the Club answer non-obvious?
+6. Does the humor work without psychology explanation?
+7. Does recognition arrive after the joke?
+8. Is the question short enough for the moment it asks the user to process?
+9. Does the question itself already carry a Dementor signal?
+10. Does it add independent evidence?
+
+# Voice gate
+
+Narrator must feel:
 
 - intelligent;
 - calm;
 - slightly tired;
 - unsurprised;
-- aware of absurdity;
-- too polite to point at it immediately.
+- politely aware of absurdity.
 
-If the narrator feels like a comedian, game-show host, therapist, coach or meme account, the presentation fails.
+Reject narrator voice that feels like:
 
-### Scene construction check
+- comedian;
+- game-show host;
+- therapist;
+- coach;
+- meme account.
 
-Preferred progression:
-
-`обычная ситуация → точная бытовая деталь → лёгкий сдвиг нормальности → внутренне безупречный абсурд → четыре человеческих выхода`
-
-Not every scene needs a large absurd turn. Humor rhythm across a sphere should remain varied.
-
-### Answer construction check
-
-Preferred editorial composition:
-
-- two ordinary human reactions;
-- one strange but rational reaction;
-- one internally flawless absurd reaction.
-
-This is a presentation heuristic, not a scoring mapping. Any answer may carry any hidden semantic meaning after shuffle.
-
-### System reaction check
+# System reaction gate
 
 System reaction must:
 
 - be short;
-- dryly record what happened;
-- not explain the psychology;
-- not reveal whether the answer was desirable;
-- not appear after every answer if that makes the rhythm repetitive.
+- record, not interpret;
+- never reveal score or desirability;
+- not appear mechanically after every answer.
 
-Reference style:
+Reference:
 
 - `Понятно. Шнурки признаны необязательными.`
 - `Ответ принят. Причина встречи по-прежнему устанавливается.`
 - `Зафиксировано. Дальнейшее вмешательство пока не требуется.`
 
-## Fatal issues
+# Fatal issues
 
-Reject or rebuild a question if any of the following is true:
+Reject / rebuild if:
 
-- one answer is obviously "the Club answer";
-- one or more answers are caricatures written only to lose;
-- one answer exists only as the authorial punchline;
-- the strongest answer is only generic maturity, therapy language or competent management;
-- the question asks the user to self-describe an abstract trait instead of choosing behavior;
-- public wording exposes score/tag/guard mechanics;
-- answer position is statically tied to hidden scoring;
-- the scene is harmful or irresponsible when taken literally;
-- the question duplicates another scene without adding independent evidence;
-- editors cannot state what distinguishes 0/1 and 2/3 without using "better/worse";
-- the humor depends on the user choosing an intentionally funny answer;
-- the scene begins as overt surrealism instead of recognizable reality unless there is a specific justified reason;
-- absurdity does not measure anything;
-- system reaction explains the user instead of politely recording the event;
-- the text laughs at the user rather than the social system;
-- the scene uses self-help / pseudo-psychology wording such as `здоровые границы`, `ресурсное состояние`, `паттерн`, `рационализирую` in public answer copy;
-- the humor is so dense that the entire quiz has no normal background.
+- Q1 contains a biography dump;
+- too much text appears before the first choice;
+- the scene can be halved with no loss;
+- the question itself has no Dementor signal;
+- all humor is postponed to result;
+- one answer is clearly the authorial punchline;
+- one answer is obviously the Club answer;
+- the strongest answer is merely generic maturity / competent management;
+- public wording exposes hidden mechanics;
+- answer position maps to score;
+- the scene is harmful/irresponsible when literal;
+- the question duplicates evidence;
+- 0/1 or 2/3 can only be explained as better/worse;
+- public copy uses self-help / pseudo-psychology;
+- system reaction explains the person instead of recording the event;
+- scene design relies on text volume to create diagnostic depth.
 
-## Per-question workbench — mandatory before rewrite approval
+# Mandatory per-question workbench
 
 | Check | Required answer |
 | --- | --- |
-| What exactly are we measuring? | One concrete pattern/mechanism |
-| What separates 0 from 1? | Direct reaction vs ordinary adaptation |
-| What separates 2 from 3? | Mechanism vs principle/worldview |
-| What is the price of the choice? | Explicit stake or reason why low-stake evidence is useful |
-| Can the Club-preferred answer be guessed? | If yes, rewrite |
-| Do answers sound like real people? | All four must |
-| What is the exact everyday detail? | Required |
-| Where does reality shift? | Explicit but not necessarily large |
-| What is the later/system satirical payoff? | Required |
-| Does the humor work without psychological explanation? | Required |
-| Does the question produce uncomfortable recognition? | Preferably yes; required for final approval |
-| Does the question add new information? | If no, remove or replace |
+| What exactly are we measuring? | One hidden mechanism |
+| What is happening now? | Current scene, not biography |
+| Exact detail? | Message/time/price/object/fact |
+| Dementor shift? | One short line/detail |
+| Can it be cut? | If yes, cut |
+| What separates 0/1? | Direct vs adaptation |
+| What separates 2/3? | Mechanism vs principle |
+| Price of choice? | Explicit stake |
+| Club answer guessable? | If yes, rewrite |
+| Four real people? | Required |
+| Humor before result? | Required for thematic questions |
+| Later payoff? | Required |
+| New evidence? | If no, delete |
 
-The v0.3 `0–3` pattern-stage interpretation is a **draft editorial hypothesis** and does not silently replace the approved production scoring contract.
-
-## Sphere-level QA
+# Sphere-level QA
 
 A sphere is ready for playtest when:
 
-1. all four canonical tags have sufficient independent evidence;
-2. thematic scenes measure genuinely different forms of behavior, not four restatements of one topic;
-3. no tag is represented only by abstract self-report;
-4. at least one lower-stakes and one higher-stakes scene are present overall;
-5. intentionality is behaviorally tested, preferably through a profitable/easy exception;
-6. responsibility is behaviorally tested after a consequence or prior commitment already exists;
-7. at least one scene uses an anti-image condition where reputation cannot explain the answer when appropriate (`никто не узнает`);
-8. answer order can be shuffled without changing meaning;
-9. presentation patterns vary enough to avoid repetitive reading;
-10. humor rhythm is not uniform: normal background exists between stronger absurd beats;
-11. system reactions are occasional rather than mechanically repeated after every answer;
-12. total question count is justified by evidence coverage, not symmetry;
-13. the sphere produces result-language material without creating a personality typology;
-14. every question passes the canonical presentation/humor gate;
-15. any content-routing idea remains a separate product hypothesis until approved.
+1. four thematic constructs are genuinely different;
+2. Q1 passes the strict first-question gate;
+3. all questions fit one-screen reading comfortably;
+4. lower- and higher-stake evidence both exist;
+5. intentionality is behaviorally tested;
+6. responsibility is behaviorally tested;
+7. anti-image / nobody-will-know is used when useful;
+8. answer order can be shuffled;
+9. humor rhythm varies;
+10. normal background exists between stronger absurd beats;
+11. system reactions are occasional;
+12. question count is justified by evidence, not symmetry;
+13. result language does not create a psychotype;
+14. routing remains separate unless explicitly approved.
 
 ## Current baseline audit snapshot
-
-Editorial/product estimate before rewrite:
 
 - Personality — 6/10
 - Work — 6/10
@@ -273,13 +281,4 @@ Editorial/product estimate before rewrite:
 - Meaning — 8/10
 - Technology — 5/10
 
-Priority order for deep rewrite:
-
-1. Information
-2. Control
-3. Relationships / Technology
-4. Work / Personality
-5. Consumption / Self-development
-6. Meaning as current reference quality
-
-These ratings are editorial judgement, not canonical diagnostic values.
+These are editorial estimates, not diagnostic values.
