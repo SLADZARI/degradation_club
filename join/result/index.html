@@ -10,8 +10,6 @@
   <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="/join/result/result.css">
   <link rel="stylesheet" href="/join/result/result-mobile-legend-v1.css">
-  <link rel="stylesheet" href="/join/result/result-refinements-v2.css">
-  <style>.dc-radar-focus line{stroke:var(--ink);stroke-width:2}</style>
   <script src="/site-config.js"></script>
 </head>
 <body class="dc-result-page">
@@ -29,30 +27,22 @@
 
   <section class="dc-map" aria-labelledby="mapTitle">
     <div class="dc-result-section-head">
-      <p>01 / SPHERE MAP</p>
-      <div><h2 id="mapTitle">ДЕВЯТЬ СФЕР.<br>ОДНА КАРТА.</h2><p class="dc-section-lead">A / B / C ведут к трём самым выразительным результатам ниже.</p></div>
+      <p>01 / КАРТА</p>
+      <div><h2 id="mapTitle">ДЕВЯТЬ СФЕР.<br>ОДНА КАРТА.</h2></div>
     </div>
-    <div class="dc-map-grid">
-      <div class="dc-radar-stage" id="radarStage" aria-live="polite"><div class="dc-state">СОБИРАЕМ ГЕОМЕТРИЮ…</div></div>
-      <aside class="dc-map-aside"><strong id="mapAsideTitle">ПОКА СМОТРИМ.</strong><p id="mapAsideCopy">Когда будут готовы результаты, здесь появятся самые заметные места карты.</p></aside>
-    </div>
+    <div class="dc-radar-stage" id="radarStage" aria-live="polite"><div class="dc-state">СОБИРАЕМ ГЕОМЕТРИЮ…</div></div>
     <div class="dc-highlight-grid" id="highlightGrid" aria-live="polite"></div>
   </section>
 
   <section class="dc-result-register" aria-labelledby="registerTitle">
-    <div class="dc-result-section-head"><p>02 / ОСТАЛЬНЫЕ СФЕРЫ</p><div><h2 id="registerTitle">ОСТАЛЬНОЕ<br>ТОЖЕ СЧИТАЕТСЯ.</h2><p class="dc-section-lead">Три уже наверху. Здесь — остальные результаты.</p></div></div>
+    <div class="dc-result-section-head compact"><p>02 / ОСТАЛЬНЫЕ</p><div><h2 id="registerTitle">ЕЩЁ ШЕСТЬ.</h2></div></div>
     <div id="sphereRegister" class="dc-sphere-register" aria-live="polite"><div class="dc-state">ЗАГРУЖАЕМ РЕЗУЛЬТАТЫ…</div></div>
   </section>
 
-  <section class="dc-club-note" id="clubNote" hidden>
-    <div class="dc-club-note__label">03 / ОТ КЛУБА</div>
-    <p>ДЕВЯТЬ СФЕР УЖЕ ДОСТАТОЧНО. ДЕСЯТУЮ ИЗ ВАС СОБИРАТЬ НЕ БУДЕМ.</p>
-  </section>
-
   <section class="dc-dossier" id="dossierSection" hidden aria-labelledby="dossierTitle">
-    <div class="dc-result-section-head"><p>04 / ЛИЧНОЕ ДОСЬЕ</p><div><h2 id="dossierTitle">ВАШ РЕЗУЛЬТАТ.<br>ОДНИМ ЛИСТОМ.</h2></div></div>
+    <div class="dc-result-section-head compact"><p>03 / ЛИЧНОЕ ДОСЬЕ</p><div><h2 id="dossierTitle">ЗАБРАТЬ С СОБОЙ.</h2></div></div>
     <div class="dc-dossier-card" id="dossierCard">
-      <div class="dc-dossier-top">DEMENTOR CLUB / DC-9 / ЛИЧНОЕ ДОСЬЕ</div>
+      <div class="dc-dossier-top">DEMENTOR CLUB / DC-9</div>
       <div class="dc-dossier-title"><span>МОЯ КАРТА.</span></div>
       <div class="dc-dossier-content"><div class="dc-dossier-radar" id="dossierRadar"></div><div class="dc-dossier-rows" id="dossierRows"></div></div>
       <div class="dc-dossier-foot"><span>9 СФЕР / БЕЗ ОБЩЕГО БАЛЛА</span><span>DEMENTOR.CLUB</span></div>
@@ -63,9 +53,9 @@
 
   <section class="dc-result-next" id="nextBlock" aria-live="polite">
     <div class="dc-community-cta">
-      <div class="dc-result-meta"><span>05 / COMMUNITY</span><span id="communityState">ПРОВЕРЯЕМ ДОПУСК</span></div>
+      <div class="dc-result-meta"><span>04 / COMMUNITY</span><span id="communityState">ПРОВЕРЯЕМ ДОПУСК</span></div>
       <h2 id="nextTitle">КАРТА ГОТОВА.<br>МОЖНО ВНУТРЬ.</h2>
-      <p id="nextCopy">Следующий шаг — оформить участие и перейти к общей доске клуба.</p>
+      <p id="nextCopy">Следующий шаг — оформить участие и перейти к Community.</p>
       <div id="nextActions"></div>
     </div>
   </section>
