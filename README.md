@@ -107,6 +107,8 @@
 - `/catalog/`
 - `/archive/`
 - `/join/`
+- `/join/result/`
+- `/join/member/`
 - `/courses/dumai-s-opasnostyu/`
 - `/courses/ne-komanda/`
 - `/courses/dengi-na-veter/`
@@ -134,6 +136,7 @@ Internal reference:
 node scripts/validate-site.mjs
 node scripts/validate-content-readiness.mjs
 node scripts/validate-visual-contract.mjs
+node scripts/validate-dc9-result-model.mjs
 node scripts/validate-production-release.mjs
 ```
 
@@ -149,6 +152,7 @@ Validator stack проверяет:
 - порядок подключения service adapters;
 - отсутствие старого CDN onboarding engine;
 - Join storage guard;
+- DC-9 canonical 9-sphere order, legacy `self-development` migration, result-model/icon mapping and no aggregate result score;
 - статусные инварианты;
 - визуальный contract;
 - отсутствие legacy production origin и очевидного test/demo contamination в production release.
