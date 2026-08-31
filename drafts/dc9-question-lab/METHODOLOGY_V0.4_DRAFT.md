@@ -83,6 +83,8 @@ Required Q1 properties:
 - very short setup;
 - one concrete detail;
 - one quiet Dementor shift;
+- preferably one human contradiction;
+- at least one potential quotable line;
 - four compact answers;
 - no theory;
 - no biography dump;
@@ -120,19 +122,63 @@ Example:
 
 > «Всё готово. Просто приходи».
 
-### 4. Add one Dementor shift
+### 4. Search for the human contradiction
+
+Before inventing an absurd line, ask:
+
+> **What did the person want — and what happens when they actually get it?**
+
+Strong structure:
+
+`wanted X → got X → old system activates anyway`
+
+Examples:
+
+- wanted others to cope → they coped → starts checking;
+- wanted free time → got it → fills it immediately;
+- wanted less consumption → buys a course about consuming less;
+- wanted automation → now manually supervises automation;
+- wanted awareness → cannot peacefully do something stupid.
+
+This is the preferred comedy engine for **30–40% of thematic scenes per sphere**, when the construct allows it naturally.
+
+If a scene has no contradiction, record why another humor engine is stronger: bureaucratic logic, literal over-solution, sunk cost, social ritual, factual mismatch, etc.
+
+### 5. Add one Dementor shift
 
 It should be dry and short.
 
-Example:
+Weak:
 
 > Это выглядит подозрительно.
 
-### 5. Write 8–12 realistic reactions
+Stronger when contradiction allows:
+
+> Люди справились без вас. Пока наблюдаем.
+
+or:
+
+> Вас впервые никто не подвёл. Ситуация требует проверки.
+
+### 6. Find the quotable line
+
+Before answers, mark one candidate line that could survive outside the quiz.
+
+It may live in:
+
+- scene;
+- answer;
+- system reaction.
+
+Do **not** force an aphorism into every answer.
+
+Every question should have a potential quotable line; at least **two questions per sphere** should contain a genuinely strong reusable line.
+
+### 7. Write 8–12 realistic reactions
 
 Do not begin from score positions.
 
-### 6. Select four answers
+### 8. Select four answers
 
 All four must be defensible by a real person.
 
@@ -144,7 +190,7 @@ Preferred public composition:
 
 This composition is not tied to hidden score order.
 
-### 7. Attach hidden semantics only after wording works
+### 9. Attach hidden semantics only after wording works
 
 Then assign:
 
@@ -171,7 +217,13 @@ Internal editorial stages remain experimental:
 
 ## Humor placement
 
-Use three levels:
+Use four levels:
+
+### Human contradiction
+
+Preferred engine when available.
+
+The joke comes from the person receiving what they claimed to want and discovering that the old system still needs work.
 
 ### Scene humor
 
@@ -199,7 +251,7 @@ The strongest joke can still live in the result, but the journey must not feel l
 
 Recommended:
 
-1. quick / funny / low-stake entry;
+1. quick / funny / low-stake entry, preferably contradiction-led;
 2. recognizable social scene;
 3. stronger identity or factual conflict;
 4. slightly stranger scene;
@@ -241,7 +293,10 @@ But present them compactly.
 | What exactly are we measuring? | One hidden mechanism |
 | What is happening right now? | One current scene, not biography |
 | What one detail proves it? | Message/time/price/object/fact |
+| What did the person want? | Explicit human desire / stated goal if relevant |
+| What happens when they get it? | Contradiction or reason this scene uses another engine |
 | Where is the Dementor shift? | One short line/detail |
+| What is the potential quotable line? | Scene / answer / system reaction |
 | Can premise be cut further? | If yes, cut it |
 | What separates 0/1? | Direct vs adaptation |
 | What separates 2/3? | Mechanism vs principle |
@@ -264,7 +319,9 @@ Reject / rewrite if:
 - one answer is the joke;
 - one answer is visibly the Club answer;
 - system reaction interprets psychology;
-- diagnostic sophistication is achieved by text volume rather than scene design.
+- diagnostic sophistication is achieved by text volume rather than scene design;
+- a sphere avoids human contradiction almost entirely without a reason;
+- a quotable line is forced at the cost of natural speech or diagnostic honesty.
 
 ## Gold-standard goal for Personality
 
@@ -279,8 +336,11 @@ The sphere still covers:
 
 But the public experience should feel like **six quick incidents**, not six case studies.
 
+At least two thematic Personality scenes should use a clear contradiction engine.
+
 ## Authoring mantra
 
 > **Не объяснять конструкцию. Показать момент.**  
-> **Не добавлять юмор после теста. Слегка испортить реальность уже сейчас.**  
-> **Не доказывать глубину текстом. Доказывать её выбором.**
+> **Найти, чего человек хотел — и что он делает, когда это получил.**  
+> **Слегка испортить реальность уже сейчас.**  
+> **Оставить после сцены хотя бы одну фразу, которую хочется унести с собой.**
