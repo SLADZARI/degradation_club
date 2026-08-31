@@ -14,6 +14,7 @@ It exists to collect, compare, rewrite and QA:
 - all question scenes;
 - all answer options;
 - hidden answer semantics;
+- protective-pattern taxonomy;
 - question impact / weight;
 - intentionality and responsibility guards;
 - editorial evaluation;
@@ -40,6 +41,7 @@ This lab MUST NOT silently change production semantics.
 ## Working structure
 
 - `METHODOLOGY_V0.3_DRAFT.md` — current editorial hypothesis: normal scenes, plausible answers, pattern-stage semantics, satire after the choice.
+- `PATTERN_TAXONOMY_V0.1_DRAFT.md` — internal vocabulary for mechanisms such as role maintenance, control buffer, sunk-cost defense and principle justification; not a psychotype system.
 - `QUESTION_SCHEMA.md` — draft record shape for questions.
 - `SCORING_WEIGHT_MODEL_V0.2_DRAFT.md` — earlier weighted model that still assumes monotonic Dementor answer score.
 - `SCORING_PATTERN_MODEL_V0.3_DRAFT.md` — compatibility experiment separating `pattern_stage` from canonical diagnostic evidence.
@@ -50,6 +52,8 @@ This lab MUST NOT silently change production semantics.
 - `baseline/CURRENT_AUDIT_2026-08-31.md` — editorial/product audit of the current bank.
 - `spheres/01_personality.md` — earlier full v2 rewrite retained for comparison.
 - `spheres/01_personality_workbench.md` — active gold-standard workflow; question-by-question, not whole-sphere rewrite.
+- `spheres/01_personality_q1_role_candidates.md` — reaction pool and first Q1 clustering pass.
+- `spheres/01_personality_q1_role_v02.md` — current playtest-ready Q1 candidate.
 - later sphere workbenches follow only after the Personality method is proven.
 
 ## Workflow
@@ -69,12 +73,14 @@ Only `promoted` content may be copied into the canonical branch.
 3. All four answers must be psychologically plausible.
 4. Public options must not reveal a moral ladder or a stable Club-preferred answer.
 5. Answer position never equals hidden semantics; options are shuffled at runtime.
-6. Tag, score/evidence, impact, weight and guard mechanics are hidden from the public layer.
-7. Variable question counts are allowed in the lab, but every sphere must reach a minimum evidence threshold.
-8. More questions are not automatically better. The experience must stay tense, recognizable and short enough to finish.
-9. Question impact is based on cost of error + personal stake, not theatrical drama.
-10. Result language must not create a universal psychotype or aggregate Dementor score.
-11. Future routing may point only to real approved Club entities and must be approved separately.
+6. Tag, pattern, score/evidence, impact, weight and guard mechanics are hidden from the public layer.
+7. `pattern_stage` describes how a strategy becomes a system/principle; it is not automatically a Dementor score.
+8. Pattern labels are internal editorial tools, not personality types or diagnoses.
+9. Variable question counts are allowed in the lab, but every sphere must reach a minimum evidence threshold.
+10. More questions are not automatically better. The experience must stay tense, recognizable and short enough to finish.
+11. Question impact is based on cost of error + personal stake, not theatrical drama.
+12. Result language must not create a universal psychotype or aggregate Dementor score.
+13. Future routing may point only to real approved Club entities and must be approved separately.
 
 ## Current scoring research state
 
@@ -120,14 +126,11 @@ Working coefficients remain experimental:
 
 Do not rewrite all six Personality scenes at once.
 
-Use `spheres/01_personality_workbench.md` and process one question at a time.
+Q1 `Role maintenance` is now at playtest-ready candidate v0.2 with provisional editorial QA `44/50`.
 
-For Q1:
+Next gate for Q1:
 
-1. generate 8–12 realistic reactions;
-2. cluster by hidden strategy;
-3. choose four plausible competing answers;
-4. assign `pattern_stage`;
-5. separately assign candidate canonical evidence;
-6. run editorial QA;
-7. freeze only after review.
+1. blind-check whether any answer is perceived as the obvious Club answer;
+2. verify that competent organizers can sincerely choose C/D without feeling caricatured;
+3. only then mark `approved-draft`;
+4. after Q1 is frozen, move to Q2 `value through activity / free time` using the same workbench method.
