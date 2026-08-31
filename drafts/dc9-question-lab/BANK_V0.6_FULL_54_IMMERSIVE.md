@@ -1,6 +1,6 @@
-# DC-9 Full Question Bank v0.6.2 — immersive + interaction consolidation
+# DC-9 Full Question Bank v0.6.3 — blind-read + interaction adapter consolidation
 
-Status: **FULL DRAFT / NOT CANON / NOT PRODUCTION / BLIND PLAYTEST NEXT**  
+Status: **FULL DRAFT / NOT CANON / NOT PRODUCTION / BLIND PLAYTEST READY**  
 Date: 2026-08-31  
 Branch: `draft/dc9-question-lab`
 
@@ -8,14 +8,20 @@ Basis:
 - `BANK_V0.6_HUMOR_PASS_FULL_54.md` — targeted humor pass;
 - `BANK_V0.5_IMMERSION_PASS_V0.1.md` — 54/54 camera audit;
 - `IMMERSIVE_SCENE_TONE_V0.1_DRAFT.md` — current internal revision **Immersive Scene Tone v0.2**;
-- `CLUB_WORLD_LAYER_V0.1_DRAFT.md` — restrained club-world placement hypothesis;
+- `CLUB_WORLD_LAYER_V0.1_DRAFT.md` — restrained Club World hypothesis;
 - `operations/QUESTION_PRESENTATION_HUMOR_STANDARD.md` v1.2;
 - `operations/ONBOARDING_SCENARIO_RULES.md` — hidden semantic canon;
 - `operations/DC9_RESULT_SYSTEM_V0.1.md` — scoring/result contract.
 
-## v0.6.2 contract
+## v0.6.3 contract
 
-This pass consolidates **public camera, language, scene dramaturgy and mechanic hypotheses**. It does not change hidden diagnostics or scoring.
+This pass does **not** conceptually rewrite the bank. The language is considered found.
+
+This revision concentrates on three gates:
+
+1. **blind public read** — remove the author's voice from answers that look too obviously Club-approved;
+2. **interaction equivalence** — every future interactive screen must collapse back into exactly one canonical hidden `0/1/2/3` state;
+3. **mechanical restraint** — four internal interaction grammars only, without turning a reference distribution into a quota.
 
 Preserved:
 - 9 spheres;
@@ -26,60 +32,129 @@ Preserved:
 - public answer shuffling requirement;
 - approved scoring/result contract unchanged.
 
-### Public camera
+Public camera rule:
 
-`moment already in progress → concrete signal → human detail → mini-turn → quiet Dementor fixation → choice`
+`moment already in progress → concrete signal → human detail → mini-turn → quiet Dementor fixation → choice/action`
 
 Default voice:
-- second-person singular mostly through the verb: `смотришь / открываешь / слышишь / отвечаешь`;
-- formal `вы` is absent from public scene voice;
-- explicit `ты` is rare and usually appears only inside natural dialogue;
+- second person singular mostly through the verb: `смотришь / открываешь / слышишь / отвечаешь`;
+- public scenes avoid formal `вы`;
+- explicit `ты` is rare and mainly appears inside natural dialogue;
 - present tense where natural;
 - gender-neutral construction throughout scene and answer copy where possible;
-- exact time appears only when it creates pressure, contrast or a useful first frame;
+- exact time is used only when it creates pressure, contrast or a useful first frame;
 - a timestamp never substitutes for an actual scene.
 
-### Humor
-
-- humor must already live in the scene, not only in the system reaction;
-- satire comes from an observed contradiction, precise detail or over-logical consequence;
+Humor rule:
+- satire comes from observed contradiction, not from an authorial clever line pasted onto a neutral case;
 - strong anchors stay intact;
-- narrator does not explain the joke;
-- guards are quieter, but remain lived scenes rather than psychometric questions;
-- one clever line never justifies a weak or abstract situation.
+- guards are quieter, but still remain lived scenes rather than psychometric questions;
+- an elegant quotable phrase is **not automatically a good answer option**. Answers should sound like something a person might actually click.
 
-### Interaction grammar — hypotheses only
+### Fixation placement rule
 
-No mechanics are implemented by this document. They are editorial proposals to be tested after semantic and blind-read QA.
+Bold Dementor lines below are **copy assets, not a mandatory pre-choice slot**.
 
-The entire 54-screen bank uses only four interaction grammars:
+At runtime a fixation may appear:
+- before the choice;
+- after the choice as system reaction;
+- as UI status;
+- or be omitted where the scene already carries the joke.
 
-1. `SCENE CHOICE` — four human exits. Default format and the format for all 18 guards.
-2. `THRESHOLD / ХВАТИТ` — one behavior escalates step by step; the user stops at the point that feels sufficient.
-3. `ALLOCATION` — a limited resource forces something to be kept, removed or deprioritized. Tap/click is preferred over mandatory drag-and-drop.
-4. `CONSEQUENCE / ПУСТЬ ПОЛЕЖИТ` — a choice is made, then the world answers. Sometimes waiting helps; sometimes it makes things worse.
+The bank intentionally does **not** require the rhythm `scene → clever bold line → answers` on every screen.
 
-Target distribution:
-- `SCENE CHOICE` — 36;
-- `THRESHOLD / ХВАТИТ` — 8;
-- `ALLOCATION` — 5;
-- `CONSEQUENCE / ПУСТЬ ПОЛЕЖИТ` — 5.
+## Interaction grammar — internal names only
 
-Two recurring interface actions may become signature language:
-- **ХВАТИТ** — stops an escalating process;
-- **ПУСТЬ ПОЛЕЖИТ** — postpones intervention and lets the scene answer back.
+Allowed internal grammars:
 
-`ВМЕШАТЕЛЬСТВО %` is a possible **system reaction**, not a separate slider mechanic.
+1. `SCENE CHOICE` — four canonical exits;
+2. `THRESHOLD` — user reveals where enough becomes too much / where to stop;
+3. `ALLOCATION` — user keeps, removes or distributes a constrained resource;
+4. `CONSEQUENCE` — user acts, the world replies, then the screen resolves.
 
-False-system UI is a tone layer, not diagnostic evidence. It may comment on a choice, but must not reveal a preferred answer.
+These names are implementation vocabulary, not public copy.
 
-### Club World
+There is **no mandatory public button `ХВАТИТ`** and no mandatory public button `ПУСТЬ ПОЛЕЖИТ`.
+Public labels come from the scene. `НЕ НАДО` remains a Club World object/action only where context supports it.
 
-Current placements remain sparse:
-- `OBJECT 001 — НЕ НАДО`;
-- one generic Dementor Club gathering.
+`ВМЕШАТЕЛЬСТВО %`, timers, stamps, loaders and similar elements are presentation/system reactions, **not additional diagnostic mechanics**.
 
-They do not change score direction, award a preferred answer or function as CTA.
+### Reference distribution, not quota
+
+The current candidate mix may resemble roughly `36 Scene Choice / 8 Threshold / 5 Allocation / 5 Consequence`, but this is only a **reference distribution for prototyping**.
+
+It is explicitly **not a constraint**. A later blind playtest may produce `38/7/4/5`, `35/9/4/6` or another mix if the semantics fit better.
+
+Rule:
+
+> Mechanic follows the question. The question is never rewritten merely to fill a mechanic quota.
+
+## Interaction → canonical evidence adapter
+
+Every screen must still emit **exactly one** canonical hidden state `0/1/2/3` for its original tag or guard.
+
+No interaction may create additional evidence, bonus points or a new scale.
+
+### SCENE CHOICE adapter
+
+Direct mapping:
+
+`selected public exit → canonical answer id → one hidden 0/1/2/3`
+
+Nothing changes from the current scoring model.
+
+### THRESHOLD adapter
+
+Before implementation the editor must define an explicit lookup table:
+
+`observable stop state → canonical answer id 0/1/2/3`
+
+Requirements:
+- threshold steps must belong to one behavioral axis;
+- stop states may be grouped into four equivalence bands;
+- the mapping is authored per question, not inferred from raw step count;
+- no continuous score is produced;
+- if a natural four-state partition cannot be defended, the screen stays `SCENE CHOICE`.
+
+Example shape only:
+
+`stop before action / light check / structured check / full takeover → canonical 3/2/1/0`
+
+The direction is **question-specific** and must match the frozen semantic bank.
+
+### ALLOCATION adapter
+
+Allocation never means “sum the good cards”.
+
+Before implementation:
+- define the permitted allocation outcome space;
+- group all reachable outcomes into exactly four mutually exclusive canonical classes;
+- map each class to one original answer id `0/1/2/3`;
+- verify that every reachable combination maps once and only once.
+
+If combinations cannot be classified without inventing a new trait or additive score, the interaction is rejected for that question.
+
+### CONSEQUENCE adapter
+
+A consequence screen may contain:
+
+`initial action → world response → final reaction`
+
+But the entire path returns **one** canonical evidence state.
+
+Do not score phase A and phase B separately.
+
+Required authoring artifact before implementation:
+
+`(initial action, revealed consequence, final reaction) → canonical answer id 0/1/2/3`
+
+The revealed world outcome may challenge the user's strategy, but it must not secretly reward the ideology of “do less” or “check more”.
+
+### Guard rule
+
+All 18 guards remain `SCENE CHOICE` for the current candidate build.
+
+Reason: guards test motive and responsibility. Interaction novelty must not contaminate that evidence.
 
 ---
 
@@ -103,16 +178,16 @@ Rule preserved: **Меньше поддерживать образ — боль�
 
 **Репутация получила техническое обслуживание.**
 
-- `0` — Объясняю, что платформа опять чудит. Причину важно установить.
-- `1` — Начинаю заново, будто первые пять минут не считаются.
-- `2` — «Прекрасно, репетиция была бесплатной» — и продолжаю.
-- `3` — Запоминаю случай для будущих историй. Неловкость уже оплачена.
+- `0` — Объясняю, что платформа опять чудит. Важно восстановить причинно-следственную связь.
+- `1` — Продолжаю с того места, где остальные меня наконец услышали.
+- `2` — Говорю: «Прекрасно, репетиция была бесплатной» — и продолжаю.
+- `3` — Запоминаю случай и продолжаю. Пять минут уже потеряны, ещё десять на оправдание жалко.
 
-**Mechanic hypothesis:** `SCENE CHOICE` — базовый выбор + короткая сухая фиксация системы.
+**Interaction candidate:** `SCENE CHOICE`.
 
 ## Q2 · #отказотроли · everyday
 
-Садишься за стол с компанией. Меню ещё не открыто.
+Садишься за стол с компанией. Меню ещё даже не открыто.
 
 Кто-то уже протягивает телефон:
 
@@ -122,12 +197,12 @@ Rule preserved: **Меньше поддерживать образ — боль�
 
 **Старая должность оказалась бессрочной.**
 
-- `0` — Беру телефон и организую. Так хотя бы всё состоится.
-- `1` — Предлагаю два места и прошу остальных выбрать.
-- `2` — Говорю, что сегодня не веду процесс, и жду предложений.
-- `3` — Остаюсь участником. Вечер попробует справиться без руководства.
+- `0` — Беру телефон и организую. Люди хотя бы знают, чего ожидать.
+- `1` — Предлагаю два места и прошу остальных выбрать. Формально я почти не организую.
+- `2` — Говорю, что сегодня не веду процесс, и жду чужих предложений.
+- `3` — Говорю, что сегодня выбирает кто-то другой, и не подхватываю организацию обратно.
 
-**Mechanic hypothesis:** `THRESHOLD / ХВАТИТ` — место → бронь → маршрут → запасной вариант; остановиться можно на любом шаге.
+**Interaction candidate:** `THRESHOLD` — последовательность вмешательств; stop-state must map to the original four role-maintenance states.
 
 ## Q3 · #границы · social contradiction
 
@@ -145,12 +220,12 @@ Rule preserved: **Меньше поддерживать образ — боль�
 
 **Машина в переговорах участвует. Сон — пока нет.**
 
-- `0` — Соглашаюсь. Из-за пары часов сна отказывать как-то мелочно.
-- `1` — Соглашаюсь и заранее понимаю, что буду злиться.
-- `2` — Отказываю и предлагаю другой реальный вариант.
-- `3` — Просто отказываю. Наличие машины не является согласием.
+- `0` — Соглашаюсь. Отказывать из-за пары часов сна как-то мелочно.
+- `1` — Соглашаюсь и всю дорогу внутренне составляю счёт.
+- `2` — Говорю, что не вывезу, и предлагаю другой реальный вариант.
+- `3` — Пишу, что утром не смогу. Машина есть, согласия на поездку всё равно нет.
 
-**Mechanic hypothesis:** `SCENE CHOICE` — входящее сообщение; важен мотив ответа, не скорость клика.
+**Interaction candidate:** `SCENE CHOICE` — message presentation is UI, not a separate mechanic.
 
 ## Q4 · #несовершенство · stronger absurd
 
@@ -164,12 +239,12 @@ Rule preserved: **Меньше поддерживать образ — боль�
 
 **Дефект отказывается становиться проектом.**
 
-- `0` — Напрягаюсь сильнее. Не может же имя победить взрослого человека.
-- `1` — Скрываю проблему и стараюсь обходиться без имён.
-- `2` — Переспрашиваю и пользуюсь заметками там, где это важно.
-- `3` — Оставляю этот дефект в штате, пока последствия управляемы.
+- `0` — Удваиваю усилия. Не может же имя человека победить взрослого человека.
+- `1` — Стараюсь скрывать проблему и реже обращаться к людям по имени.
+- `2` — Предупреждаю, переспрашиваю и использую заметки там, где это важно.
+- `3` — Переспрашиваю имя, если нужно. Похоже, это теперь рабочий способ.
 
-**Mechanic hypothesis:** `SCENE CHOICE` — здесь важна стратегия обращения с несовершенством, а не игровой навык.
+**Interaction candidate:** `SCENE CHOICE`.
 
 ## Intentionality guard · near-serious
 
@@ -183,10 +258,10 @@ Rule preserved: **Меньше поддерживать образ — боль�
 
 - `0` — Возвращаюсь. Если роль снова выгодна, вопрос закрыт.
 - `1` — Возвращаюсь частично. Так проще не объяснять перемены.
-- `2` — Сначала вспоминаю цену, которую эта роль уже имела.
-- `3` — Не беру роль обратно только ради одобрения, если причина отказа осталась.
+- `2` — Смотрю, какую цену снова придётся платить за эту роль.
+- `3` — Не беру роль обратно только из-за похвалы, если причина отказаться от неё всё ещё на месте.
 
-**Mechanic hypothesis:** `SCENE CHOICE` — guard без спецмеханики.
+**Interaction candidate:** `SCENE CHOICE`.
 
 ## Responsibility guard · consequence already happened
 
@@ -199,11 +274,11 @@ Rule preserved: **Меньше поддерживать образ — боль�
 Теперь это уже не теория.
 
 - `0` — Это проблема тех, кто слишком привык на меня рассчитывать.
-- `1` — Всем придётся привыкнуть. Новые правила уже есть.
+- `1` — Ну я теперь такой человек. Всем придётся адаптироваться.
 - `2` — Разбираю свою часть последствий и исправляю то, что могу.
-- `3` — Решение не отменяю автоматически, но последствия оставляю на себе.
+- `3` — Смотрю, что именно сломалось из-за моего решения, и беру эту часть на себя, не возвращая роль автоматически.
 
-**Mechanic hypothesis:** `SCENE CHOICE` — consequence уже встроен в сцену; дополнительная игра не нужна.
+**Interaction candidate:** `SCENE CHOICE`.
 
 ---
 
@@ -225,12 +300,12 @@ Rule preserved: **Делать меньше не равно делать хуж�
 
 **Рабочее время осталось без работы. Инцидент зарегистрирован.**
 
-- `0` — Нахожу полезную задачу. Свободное рабочее время выглядит подозрительно.
-- `1` — Начинаю улучшать то, что уже и так готово.
-- `2` — Оставляю окно свободным, если обязательства закрыты.
-- `3` — Считаю свободные два часа нормальным результатом хорошо устроенной работы.
+- `0` — Нахожу полезную задачу. Сидеть свободным в рабочее время подозрительно.
+- `1` — Спокойно улучшаю то, что и так уже готово.
+- `2` — Оставляю окно свободным, если обязательства действительно закрыты.
+- `3` — Ничего не добавляю. Если всё закрыто, до созвона просто свободно.
 
-**Mechanic hypothesis:** `THRESHOLD / ХВАТИТ` — система предлагает всё новые «полезные» мелочи; остановиться можно в любой момент.
+**Interaction candidate:** `SCENE CHOICE`; a timer may exist as presentation only.
 
 ## Q2 · #делегирование · everyday
 
@@ -244,12 +319,12 @@ Rule preserved: **Делать меньше не равно делать хуж�
 
 **Делегирование столкнулось с качеством в естественной среде.**
 
-- `0` — Забираю задачу. Быстрее сделать самому.
-- `1` — Не забираю, но регулярно подсказываю по ходу.
-- `2` — Фиксирую результат и контрольные точки. Остальное не трогаю.
-- `3` — Принимаю другой способ, пока результат и риски в норме.
+- `0` — Забираю задачу. Быстрее сделать самому, чем потом переделывать.
+- `1` — Оставляю задачу у коллеги, но регулярно подсказываю по ходу.
+- `2` — Фиксирую результат и контрольные точки, остальное не трогаю.
+- `3` — Не лезу, пока результат нормальный и договорённости соблюдаются.
 
-**Mechanic hypothesis:** `THRESHOLD / ХВАТИТ` — комментарий → уточнение → правка → забрать задачу; фиксируется момент вмешательства.
+**Interaction candidate:** `THRESHOLD` — intervention steps, mapped back to the four delegation states.
 
 ## Q3 · #результат · social absurdity
 
@@ -264,11 +339,11 @@ Rule preserved: **Делать меньше не равно делать хуж�
 **Процесс требует больше процесса.**
 
 - `0` — Защищаю команду: по процедуре всё сделано правильно.
-- `1` — Добавляю контроль, чтобы отклонение замечали раньше.
+- `1` — Добавляю контроль, чтобы в следующий раз отклонение заметили раньше.
 - `2` — Ищу место, где процедура перестала помогать результату.
-- `3` — Убираю процесс, если его главный результат — существование процесса.
+- `3` — Убираю часть процесса и смотрю, изменится ли хоть что-то в результате.
 
-**Mechanic hypothesis:** `ALLOCATION` — бюджет позволяет оставить только три элемента процесса из шести.
+**Interaction candidate:** `ALLOCATION` — constrained set of process elements; all reachable keep/remove combinations need a four-class equivalence table.
 
 ## Q4 · #антигероизм · stronger absurd
 
@@ -284,16 +359,16 @@ Rule preserved: **Делать меньше не равно делать хуж�
 
 **Система повторно обнаружила героев.**
 
-- `0` — Подключаюсь. В критический момент команда должна собраться.
-- `1` — Спасаю сейчас. Причины разберём когда-нибудь потом.
-- `2` — Подключаюсь, только если цена срыва выше цены ночи. Потом меняю систему.
-- `3` — Второй такой пожар считаю дефектом системы, а не культурой компании.
+- `0` — Иду спасать. В критический момент команда должна собраться.
+- `1` — Спасаю сейчас. Разбор причин оставлю на более спокойную жизнь.
+- `2` — Спасаю только если цена срыва выше цены ночи, а потом меняю причину повторения.
+- `3` — Если это второй такой раз, сначала хочу понять, почему ночь снова стала частью плана.
 
-**Mechanic hypothesis:** `SCENE CHOICE` — сильная сцена уже содержит повторяемость; не усложнять.
+**Interaction candidate:** `CONSEQUENCE` — initial response → reveal previous/repeated incident → final reaction; entire path maps to one canonical state.
 
 ## Intentionality guard · near-serious
 
-На личной встрече руководитель говорит:
+На разговоре с руководителем звучит:
 
 > «Тебя стало меньше видно».
 
@@ -301,12 +376,12 @@ Rule preserved: **Делать меньше не равно делать хуж�
 
 Самые загруженные по-прежнему выглядят как кандидаты на повышение.
 
-- `0` — Возвращаю занятость. Карьерный сигнал тоже результат.
+- `0` — Оставляю занятость. Карьерный сигнал тоже результат.
 - `1` — Убираю только то, чего никто не заметит.
-- `2` — Оставляю лишнее убранным и отдельно делаю результат видимым.
-- `3` — Не возвращаю бессмысленную работу ради доказательства собственной нужности.
+- `2` — Убираю лишнее и отдельно решаю проблему видимости результата.
+- `3` — Не возвращаю пустую занятость только ради того, чтобы снова выглядеть очень занятым.
 
-**Mechanic hypothesis:** `SCENE CHOICE` — guard без спецмеханики.
+**Interaction candidate:** `SCENE CHOICE`.
 
 ## Responsibility guard · consequence already happened
 
@@ -316,12 +391,12 @@ Rule preserved: **Делать меньше не равно делать хуж�
 
 Старого процесса уже нет.
 
-- `0` — Иду разбираться с человеком, которому делегировал. Он подвёл.
-- `1` — Возвращаю старый процесс целиком. Упрощение не сработало.
-- `2` — Нахожу, где новая схема не удержала риск, и исправляю это место.
-- `3` — Исполнение было чужим. Ответственность за выбранную схему — моя.
+- `0` — Разбираюсь с человеком, которому делегировал. Он подвёл.
+- `1` — Значит, упрощение было слишком смелым. Возвращаю старый процесс целиком.
+- `2` — Разбираю, где моя архитектура не удержала риск, и корректирую её.
+- `3` — Исполнение было чужим, но схему выбрал я. Сначала разбираюсь со своей частью.
 
-**Mechanic hypothesis:** `SCENE CHOICE` — не превращать responsibility guard в игру «найди виноватого».
+**Interaction candidate:** `SCENE CHOICE`.
 
 ---
 
@@ -341,18 +416,18 @@ Rule preserved: **Отказ от покупки должен освобожда
 
 **Старая повседневность пока не жаловалась.**
 
-- `0` — Беру новый, если разница реально заметна в использовании.
-- `1` — Иду читать обзоры. Возможно, старая камера всё это время мешала.
-- `2` — Меняю, только если выгода оправдывает деньги и хлопоты.
-- `3` — Новизна сама по себе не создаёт мне задачу на замену.
+- `0` — Беру новый, если разница действительно заметна в использовании.
+- `1` — Начинаю читать обзоры. Возможно, старая камера всё это время была проблемой.
+- `2` — Меняю только если выгода оправдывает деньги, перенос и хлопоты.
+- `3` — Оставляю старый. Пока он решает задачу, менять просто не из-за чего.
 
-**Mechanic hypothesis:** `SCENE CHOICE` — не превращать покупку в свайп «правильно/неправильно».
+**Interaction candidate:** `SCENE CHOICE`.
 
 ## Q2 · #непокупка · everyday · CLUB WORLD
 
 22:41. День был так себе.
 
-В корзине уже **OBJECT 001 — «НЕ НАДО»**. Утром его в планах не было.
+В корзине уже **OBJECT 001 — «НЕ НАДО»**. Утром этой вещи в планах не было.
 
 Бесплатная доставка заканчивается через 11 минут.
 
@@ -362,10 +437,10 @@ Rule preserved: **Отказ от покупки должен освобожда
 
 - `0` — Покупаю. Иногда маленькая радость — нормальное решение.
 - `1` — Покупаю что-нибудь полезное, чтобы импульс выглядел хозяйственно.
-- `2` — Оставляю корзину до завтра и проверяю, нужна ли вещь утром.
-- `3` — Ничего не делаю. Корзина вполне переживёт ночь.
+- `2` — Откладываю оплату и проверяю, хочется ли эта вещь завтра.
+- `3` — Закрываю корзину до утра. Если вещь всё ещё нужна завтра, вернусь.
 
-**Mechanic hypothesis:** `CONSEQUENCE / ПУСТЬ ПОЛЕЖИТ` — решение сейчас или утром; утром мир отвечает, но не всегда одинаково.
+**Interaction candidate:** `CONSEQUENCE` — contextual action labels may include `ОПЛАТИТЬ / ОСТАВИТЬ ДО УТРА`; no mandatory global wording.
 
 ## Q3 · #антистатус · social absurdity
 
@@ -373,18 +448,18 @@ Rule preserved: **Отказ от покупки должен освобожда
 
 По привычке телефоны ложатся на стол экраном вверх.
 
-У трёх человек — новая модель. Старый телефон вибрирует, показывает письмо и делает всё, ради чего оказался на встрече.
+У трёх человек — новая модель. Старый телефон вибрирует, показывает письмо и делает всё, ради чего пришёл на встречу.
 
 Один взгляд задерживается на корпусе чуть дольше, чем нужно.
 
 **Связь есть. Положение в обществе уточняется.**
 
-- `0` — Обновляю, если в этой среде это действительно влияет на восприятие.
+- `0` — Обновляю, если в этой среде это реально влияет на восприятие.
 - `1` — Поддерживаю приемлемый уровень, чтобы не объяснять лишнего.
-- `2` — Беру статусную вещь, только если нужен ещё и сам предмет.
-- `3` — Спокойно выгляжу менее правильно, если сам объект не нужен.
+- `2` — Беру статусную вещь только если мне ещё нужен сам предмет.
+- `3` — Оставляю всё как есть. Объяснять свой телефон не собираюсь.
 
-**Mechanic hypothesis:** `SCENE CHOICE` — важен мотив отношения к статусу, не манипуляция предметом.
+**Interaction candidate:** `SCENE CHOICE`.
 
 ## Q4 · #использование · stronger absurd
 
@@ -392,18 +467,18 @@ Rule preserved: **Отказ от покупки должен освобожда
 
 Дорогая вещь лежит там четырнадцатый месяц.
 
-Каждый раз у кнопки «Продать» в голове снова появляется цена покупки.
+Каждый раз, когда доходишь до кнопки «Продать», в голове снова появляется цена покупки.
 
 Вещь за это время ничего не сделала.
 
 **Прошлые деньги продолжают жить в шкафу бесплатно.**
 
 - `0` — Оставляю. За такие деньги отдавать жалко.
-- `1` — Даю себе месяц, чтобы наконец начать пользоваться.
+- `1` — Назначаю себе период, когда обязан начать пользоваться.
 - `2` — Продаю или отдаю, если вещь реально не участвует в жизни.
-- `3` — Прошлая цена больше не продлевает срок хранения.
+- `3` — Продаю. То, сколько она стоила тогда, сейчас уже ничего не меняет.
 
-**Mechanic hypothesis:** `ALLOCATION` — ограниченное место в шкафу: вещь должна занять один из слотов `оставить / использовать / продать`.
+**Interaction candidate:** `ALLOCATION` only if the interface introduces a real constrained set of possessions; otherwise keep `SCENE CHOICE`. No drag interaction by default.
 
 ## Intentionality guard · near-serious
 
@@ -413,12 +488,12 @@ Rule preserved: **Отказ от покупки должен освобожда
 
 Осталось шесть минут, чтобы снова сделать её разумной.
 
-- `0` — Беру. При такой цене отказ уже теряет смысл.
-- `1` — Беру, если удаётся быстро найти практическую пользу.
-- `2` — Проверяю, нужна ли вещь без слова «скидка».
-- `3` — Выгодная цена сама по себе не делает ненужную вещь нужной.
+- `0` — Беру. При такой цене отказ уже не имеет смысла.
+- `1` — Беру, если смогу объяснить себе практическую пользу.
+- `2` — Проверяю, нужна ли мне вещь без слова «скидка».
+- `3` — Если без скидки вещь не нужна, скидка решения не меняет.
 
-**Mechanic hypothesis:** `SCENE CHOICE` — guard; countdown остаётся частью сцены, но не меняет evidence.
+**Interaction candidate:** `SCENE CHOICE`.
 
 ## Responsibility guard · consequence already happened
 
@@ -429,11 +504,11 @@ Rule preserved: **Отказ от покупки должен освобожда
 Экономия есть. Удобство остальных начало участвовать в расчёте.
 
 - `0` — Привыкнут. Покупать всё подряд точно хуже.
-- `1` — Терпим дальше. Возвращать решение неприятно.
-- `2` — Покупаю то, без чего ограничение уже мешает жить.
-- `3` — Моя экономия не становится обязательной аскезой для остальных.
+- `1` — Терпим дальше: неприятно признавать, что минимализм получился дорогим по времени.
+- `2` — Возвращаю то, без чего ограничение перестало быть полезным.
+- `3` — Покупаю то, без чего дома уже неудобно не только мне. Идею экономии оставляю, этот запрет — нет.
 
-**Mechanic hypothesis:** `SCENE CHOICE` — consequence уже случился; guard остаётся чистым.
+**Interaction candidate:** `SCENE CHOICE`.
 
 ---
 
@@ -457,10 +532,10 @@ Rule preserved: **Меньше социального ритуала не рав
 
 - `0` — Продолжаю выяснять, что именно не так.
 - `1` — Становлюсь осторожнее и жду дополнительных сигналов.
-- `2` — Уточняю ещё раз прямо, дальше опираюсь на ответ.
-- `3` — Не превращаю отношения в постоянную экспертизу скрытых сообщений.
+- `2` — Уточняю один раз прямо и дальше опираюсь на ответ.
+- `3` — Принимаю «нормально» за ответ. Если не нормально — пусть скажут словами.
 
-**Mechanic hypothesis:** `SCENE CHOICE` — anchor; оставить простым.
+**Interaction candidate:** `SCENE CHOICE`.
 
 ## Q2 · #границы · everyday
 
@@ -475,11 +550,11 @@ Rule preserved: **Меньше социального ритуала не рав
 Телефон ждёт.
 
 - `0` — Соглашаюсь. Близкие для этого и нужны.
-- `1` — Соглашаюсь и уже понимаю, что потом буду злиться.
-- `2` — Говорю, что реально могу дать сегодня, а что не вывезу.
-- `3` — Близость не открывает автоматический доступ к ресурсу, которого сейчас нет.
+- `1` — Соглашаюсь и заранее знаю, что потом буду злиться.
+- `2` — Говорю, что реально могу дать, а что сегодня не вывезу.
+- `3` — Говорю, что сегодня не могу. Близость эту конкретную вечернюю батарейку не заряжает.
 
-**Mechanic hypothesis:** `SCENE CHOICE` — здесь важна граница и её мотив, а не конструктор фразы.
+**Interaction candidate:** `SCENE CHOICE` — composing a message is presentation, not a fifth mechanic.
 
 ## Q3 · #неспасательство · social absurdity
 
@@ -495,12 +570,12 @@ Rule preserved: **Меньше социального ритуала не рав
 
 **Отдел решений работает стабильно. Исполнение не подключено.**
 
-- `0` — Снова помогаю. Возможно, сейчас поддержки действительно не хватило.
-- `1` — Помогаю ещё раз, хотя уже знаю знакомый финал.
-- `2` — Подключаюсь только к той части, где человек тоже действует.
-- `3` — Не беру чужие последствия на постоянное обслуживание под названием «забота».
+- `0` — Снова помогаю. Может, в этот раз человеку действительно нужно больше поддержки.
+- `1` — Помогаю, хотя уже понимаю, что всё повторится.
+- `2` — Подключаюсь только к той части, где человек сам что-то делает.
+- `3` — Новый план не предлагаю. Сначала пусть будет сделано хоть что-то из старого.
 
-**Mechanic hypothesis:** `THRESHOLD / ХВАТИТ` — совет → план → специалист → сообщение → сделать вместо человека; пользователь останавливает помощь.
+**Interaction candidate:** `THRESHOLD` — user chooses the point at which repeated help stops; adapter maps the stop state to the four canonical nonsaving states.
 
 ## Q4 · #конфликт · stronger absurd
 
@@ -513,11 +588,11 @@ Rule preserved: **Меньше социального ритуала не рав
 **Мир сохранён. Контакт временно отсутствует.**
 
 - `0` — Не начинаю разговор. Иногда лучше не раскачивать ситуацию.
-- `1` — Жду более подходящего момента. Он должен где-то быть.
-- `2` — Поднимаю тему, если она продолжает влиять на отношения.
-- `3` — Отсутствие открытого конфликта не считаю доказательством мира.
+- `1` — Жду идеального момента. Он должен где-то быть.
+- `2` — Поднимаю тему, если она реально продолжает влиять на отношения.
+- `3` — Начинаю разговор. Три дня тишины уже не очень похожи на мир.
 
-**Mechanic hypothesis:** `CONSEQUENCE / ПУСТЬ ПОЛЕЖИТ` — можно отложить разговор; следующий beat показывает, что произошло с тишиной.
+**Interaction candidate:** `CONSEQUENCE` — waiting may either cool the situation or make the silence costlier; path scores once.
 
 ## Intentionality guard · near-serious
 
@@ -529,12 +604,12 @@ Rule preserved: **Меньше социального ритуала не рав
 
 Вернуться к прежней удобной манере очень легко.
 
-- `0` — Возвращаю прежнюю удобную версию. Связь важнее экспериментов.
-- `1` — Говорю прямо только там, где связь точно выдержит.
-- `2` — Проверяю, где нужна прямота, а где просто перестал учитывать другого.
-- `3` — Не возвращаю скрытые сделки ради связи, но корректирую лишнюю резкость.
+- `0` — Возвращаюсь к прежней удобной версии. Отношения важнее экспериментов.
+- `1` — Становлюсь прямее только там, где есть уверенность, что связь это выдержит.
+- `2` — Проверяю, где прямота нужна, а где просто перестаёт учитываться другой человек.
+- `3` — Форму могу поменять. Возвращаться к недосказанности только ради привычного комфорта не хочу.
 
-**Mechanic hypothesis:** `SCENE CHOICE` — guard без спецмеханики.
+**Interaction candidate:** `SCENE CHOICE`.
 
 ## Responsibility guard · consequence already happened
 
@@ -546,10 +621,10 @@ Rule preserved: **Меньше социального ритуала не рав
 
 - `0` — Если это правда, форма вторична.
 - `1` — Реакция другого человека всё-таки не полностью моя ответственность.
-- `2` — Признаю лишнюю резкость и исправляю способ, не отменяя содержание.
-- `3` — Отвечаю и за честность, и за то, как именно ею воспользовался.
+- `2` — Исправляю способ и признаю лишний ущерб, не отменяя содержание.
+- `3` — Пишу ещё раз: смысл не меняю, за лишнюю жёсткость отвечаю отдельно.
 
-**Mechanic hypothesis:** `SCENE CHOICE` — responsibility guard остаётся прямым.
+**Interaction candidate:** `SCENE CHOICE`.
 
 ---
 
@@ -572,11 +647,11 @@ Rule preserved: **Дементор контроля не теряет контр
 **Метод вызывает вопросы личного характера.**
 
 - `0` — Привожу таблицу к нормальному виду. Потом всем будет проще.
-- `1` — Оставляю основу, но поправляю ключевые места по ходу.
-- `2` — Проверяю результат и договорённые границы. Остальное не трогаю.
-- `3` — Другой способ оставляю другим способом, пока результат в норме.
+- `1` — Оставляю, но поправляю ключевые места по ходу.
+- `2` — Проверяю результат и заранее оговорённые границы, остальное не трогаю.
+- `3` — Ничего не переставляю. Формулы работают, результат сходится.
 
-**Mechanic hypothesis:** `THRESHOLD / ХВАТИТ` — исправить одну ячейку → заголовки → цвета → структуру; остановиться можно на любом шаге.
+**Interaction candidate:** `THRESHOLD` — progressive opportunities to correct the file; stop-state maps to the four trust states.
 
 ## Q2 · #неопределённость · everyday
 
@@ -591,11 +666,11 @@ Rule preserved: **Дементор контроля не теряет контр
 **Полная ясность ожидается после дедлайна.**
 
 - `0` — Жду. Лучше позже, чем ошибиться на неполных данных.
-- `1` — Собираю всё, что ещё можно успеть найти сегодня.
-- `2` — Проверяю, достаточно ли данных именно для обратимого решения.
-- `3` — Не покупаю определённость дороже, чем стоит возможная ошибка.
+- `1` — Собираю ещё всё, что успею найти сегодня.
+- `2` — Определяю, достаточно ли данных именно для обратимого решения.
+- `3` — Принимаю решение сейчас, если его можно отменить и цена ошибки понятна.
 
-**Mechanic hypothesis:** `CONSEQUENCE / ПУСТЬ ПОЛЕЖИТ` — подтвердить сейчас или ждать; следующий beat показывает цену ожидания, не выдавая «правильную» философию.
+**Interaction candidate:** `THRESHOLD` — analysis steps until decision; no continuous certainty score.
 
 ## Q3 · #отпускание · social absurdity
 
@@ -609,12 +684,12 @@ Rule preserved: **Дементор контроля не теряет контр
 
 **Редактура продолжилась после публикации.**
 
-- `0` — Перечитываю и заранее готовлю исправление впечатления.
-- `1` — Анализирую формулировки, пока не получу идеальную версию.
+- `0` — Перечитываю и продумываю, как исправить впечатление заранее.
+- `1` — Анализирую, где именно ошибка, пока не получится понятная версия.
 - `2` — Фиксирую вывод на будущее и жду реального ответа.
-- `3` — Не продолжаю управлять сообщением после кнопки «Отправить».
+- `3` — Ничего следом не отправляю. Жду, что ответит человек.
 
-**Mechanic hypothesis:** `THRESHOLD / ХВАТИТ` — каждое «перечитать ещё раз» открывает новую возможную правку; пользователь останавливается сам.
+**Interaction candidate:** `CONSEQUENCE` — re-open/rewrite impulse followed by actual recipient response; path maps once.
 
 ## Q4 · #выборочныйконтроль · stronger absurd
 
@@ -629,11 +704,11 @@ Rule preserved: **Дементор контроля не теряет контр
 **Автономность системы контролируется вручную.**
 
 - `0` — Проверяю все десять. Один пропущенный сбой может стоить дороже часа.
-- `1` — Проверяю реже, но контроль оставляю по каждому.
-- `2` — Делю процессы на критические, важные и обратимые.
-- `3` — Контролирую критическое, наблюдаю важное, остальное оставляю без ручного надзора.
+- `1` — Сокращаю частоту, но оставляю контроль по каждому.
+- `2` — Разделяю процессы на критические, важные и обратимые по цене ошибки.
+- `3` — Оставляю ручной контроль только там, где ошибка действительно дорогая.
 
-**Mechanic hypothesis:** `ALLOCATION` — ограниченный бюджет проверок распределяется между десятью процессами.
+**Interaction candidate:** `ALLOCATION` — finite control budget distributed across processes; outcome combinations require an authored four-class adapter.
 
 ## Intentionality guard · near-serious
 
@@ -644,11 +719,11 @@ Rule preserved: **Дементор контроля не теряет контр
 После них действительно спокойнее. Все десять индикаторов зелёные.
 
 - `0` — Оставляю контроль. Спокойствие тоже имеет цену.
-- `1` — Сокращаю только проверки, которые уже не успокаивают.
-- `2` — Сравниваю цену риска с ценой ежедневного контроля.
-- `3` — Само чувство контроля не считаю достаточной причиной проверять всё.
+- `1` — Сокращаю только то, что перестало успокаивать.
+- `2` — Сравниваю реальную цену риска с реальной ценой контроля.
+- `3` — Если проверки почти не меняют риск, полтора часа в день за спокойствие для меня слишком дорого.
 
-**Mechanic hypothesis:** `SCENE CHOICE` — guard без балансового симулятора.
+**Interaction candidate:** `SCENE CHOICE`.
 
 ## Responsibility guard · consequence already happened
 
@@ -659,11 +734,11 @@ Rule preserved: **Дементор контроля не теряет контр
 Панель снова предлагает включить контроль для всех десяти.
 
 - `0` — Возвращаю контроль везде. Эксперимент окончен.
-- `1` — Этому процессу больше не доверяю и возвращаю постоянную проверку.
-- `2` — Пересматриваю оценку риска именно для этого процесса.
-- `3` — Принимаю последствия решения и меняю критерии, а не отменяю отпускание целиком.
+- `1` — Больше этому человеку или процессу не доверяю.
+- `2` — Проверяю, ошибся ли я в оценке риска и обратимости.
+- `3` — Разбираю этот сбой и меняю критерии там, где ошибся. Все десять обратно не включаю автоматически.
 
-**Mechanic hypothesis:** `SCENE CHOICE` — consequence уже внутри guard.
+**Interaction candidate:** `SCENE CHOICE`.
 
 ---
 
@@ -686,11 +761,11 @@ Rule preserved: **Сомнение должно улучшать модель м
 **Мир снова оказался удобно устроен. Проверка опциональна.**
 
 - `0` — Сохраняю. Ещё одно подтверждение того, что и так было понятно.
-- `1` — Быстро ищу очевидный подвох или исключение.
-- `2` — Отделяю само событие от объяснения в заголовке.
-- `3` — Сначала выясняю, что произошло, потом разрешаю своей теории победить.
+- `1` — Быстро ищу, нет ли очевидного исключения или подвоха.
+- `2` — Отделяю сам факт события от объяснения в заголовке.
+- `3` — Открываю статью и сначала смотрю, что вообще произошло.
 
-**Mechanic hypothesis:** `SCENE CHOICE` — различаются стратегии чтения, а не глубина прокрутки.
+**Interaction candidate:** `SCENE CHOICE`.
 
 ## Q2 · #факты · everyday
 
@@ -704,12 +779,12 @@ Rule preserved: **Сомнение должно улучшать модель м
 
 **Данные портят драматургию.**
 
-- `0` — Ищу трактовку, при которой история всё ещё держится.
-- `1` — Сначала перепроверяю качество самих цифр.
+- `0` — Проверяю трактовку: цифры тоже можно читать по-разному.
+- `1` — Сначала проверяю качество самих данных.
 - `2` — Если данные надёжны, переписываю историю.
-- `3` — Красивое объяснение не использую как аргумент против хороших данных.
+- `3` — Если цифры нормальные, меняю слайд. Каким бы красивым он ни был.
 
-**Mechanic hypothesis:** `SCENE CHOICE` — смысл в отношении к факту, не в перетаскивании слайдов.
+**Interaction candidate:** `ALLOCATION` only if the prototype uses a constrained evidence set for the slide; otherwise `SCENE CHOICE` is safer.
 
 ## Q3 · #источники · social absurdity
 
@@ -723,12 +798,12 @@ Rule preserved: **Сомнение должно улучшать модель м
 
 **Первоисточник находится примерно в четырёх пересказах отсюда.**
 
-- `0` — Для общего понимания мне хватает знакомого пересказчика.
-- `1` — Проверяю хотя бы, кто пересказал и на что ссылается.
-- `2` — Для важного вывода дохожу до исследования или исходных данных.
-- `3` — Доверие к человеку не заменяет проверяемость конкретного утверждения.
+- `0` — Если пересказчик обычно адекватный, этого достаточно для общего понимания.
+- `1` — Смотрю хотя бы, кто именно пересказал и на что он ссылается.
+- `2` — Для важного вывода дохожу до исходного исследования или данных.
+- `3` — Если вывод важный, иду до исходника. Если нет — не делаю из пересказа факт.
 
-**Mechanic hypothesis:** `THRESHOLD / ХВАТИТ` — цепочка пересказов раскрывается по одному уровню; пользователь сам решает, где достаточно.
+**Interaction candidate:** `THRESHOLD` — source chain; each stopping layer maps to one canonical source-verification state.
 
 ## Q4 · #сменамнения · stronger absurd
 
@@ -742,10 +817,10 @@ Rule preserved: **Сомнение должно улучшать модель м
 
 - `0` — Защищаю основную позицию: новые данные не отменяют всю картину.
 - `1` — Корректирую формулировки так, чтобы центральная линия сохранилась.
-- `2` — Пишу, что уверенность снизилась и что именно изменилось.
-- `3` — Меняю мнение публично, если старая модель стала хуже.
+- `2` — Пишу, что моя уверенность снизилась и что именно изменилось.
+- `3` — Добавляю обновление к посту и прямо пишу, что изменилось в моей позиции.
 
-**Mechanic hypothesis:** `SCENE CHOICE` — не превращать смену мнения в редактор текста.
+**Interaction candidate:** `SCENE CHOICE`.
 
 ## Intentionality guard · near-serious
 
@@ -757,12 +832,12 @@ Rule preserved: **Сомнение должно улучшать модель м
 
 Никто результата не ждёт.
 
-- `0` — Не трачу вечер. Для практического вывода уверенности уже хватает.
-- `1` — Проверяю, только если позже есть риск выглядеть наивно.
+- `0` — Не трачу вечер. Для практического вывода уже достаточно уверенности.
+- `1` — Проверяю только если есть риск выглядеть наивно позже.
 - `2` — Проверяю, если на этом реально строится важное решение.
-- `3` — Проверяю ради качества картины, а не только ради защиты позиции.
+- `3` — Если от этого зависит важное решение, трачу час даже без внешней необходимости доказать свою правоту.
 
-**Mechanic hypothesis:** `SCENE CHOICE` — guard; цена проверки дана в сцене.
+**Interaction candidate:** `SCENE CHOICE`.
 
 ## Responsibility guard · consequence already happened
 
@@ -770,14 +845,14 @@ Rule preserved: **Сомнение должно улучшать модель м
 
 Потеряны время и деньги.
 
-В приложении — ровно те допущения, которые были известны в момент выбора.
+В приложении к отчёту — ровно те допущения, которые были известны в момент выбора.
 
 - `0` — Значит, надо было ждать полной ясности.
-- `1` — В следующий раз интуитивно выберу более безопасный вариант.
-- `2` — Проверяю, были ли разумны допущения и риск на тот момент.
-- `3` — Отвечаю за решение и обновляю модель, не переписывая прошлую неопределённость.
+- `1` — В следующий раз выберу более безопасный вариант интуитивно.
+- `2` — Проверяю, были ли разумны мои допущения и уровень риска на тот момент.
+- `3` — Смотрю, что в тех допущениях было разумно, а что нет, и меняю следующий способ решения. Задним числом полной ясности всё равно не было.
 
-**Mechanic hypothesis:** `SCENE CHOICE` — hindsight не должен превращаться в отдельную игру.
+**Interaction candidate:** `SCENE CHOICE`.
 
 ---
 
@@ -801,12 +876,12 @@ Rule preserved: **Отказ от бесконечной оптимизации 
 
 **Неиспользованный потенциал требует немедленного обслуживания.**
 
-- `0` — Беру следующий уровень. Если можно лучше, зачем останавливаться.
+- `0` — Беру следующий уровень. Если можно лучше, почему останавливаться.
 - `1` — Продолжаю заниматься, но уже без прежнего темпа.
-- `2` — Поддерживаю уровень, который реально нужен жизни.
-- `3` — Неиспользованный потенциал не считаю автоматически возникшим долгом.
+- `2` — Поддерживаю уровень, который реально нужен моей жизни.
+- `3` — Оставляю текущий уровень. Он пока закрывает всё, что мне нужно.
 
-**Mechanic hypothesis:** `SCENE CHOICE` — сам факт «63%» уже создаёт давление; отдельная шкала только подскажет ответ.
+**Interaction candidate:** `THRESHOLD` — progression from current level toward 100%; stop-state maps to the four sufficiency states.
 
 ## Q2 · #неоптимизация · everyday
 
@@ -821,11 +896,11 @@ Rule preserved: **Отказ от бесконечной оптимизации 
 **Отдых получил панель управления.**
 
 - `0` — Открываю всё. Если данные помогут, почему нет.
-- `1` — Смотрю только пару привычных метрик.
-- `2` — Измеряю то, что связано с конкретной проблемой.
-- `3` — Не измеряю состояние только ради возможности знать о нём больше.
+- `1` — Смотрю пару показателей и на этом останавливаюсь.
+- `2` — Смотрю метрики только если есть конкретная проблема, которую собираюсь менять.
+- `3` — Закрываю приложение. Сегодня у сна нет задачи, которую надо чинить.
 
-**Mechanic hypothesis:** `THRESHOLD / ХВАТИТ` — графики открываются по одному; пользователь останавливает измерение сам.
+**Interaction candidate:** `THRESHOLD` — number/depth of opened metrics; no wellness score added.
 
 ## Q3 · #практика · social absurdity
 
@@ -840,11 +915,11 @@ Rule preserved: **Отказ от бесконечной оптимизации 
 **Практика временно отложена из-за подготовки к практике.**
 
 - `0` — Читаю дальше. Лучше сначала собрать целостную систему.
-- `1` — Составляю подробный план внедрения подходящих идей.
-- `2` — Выбираю одну идею и проверяю её в жизни.
-- `3` — Один работающий опыт предпочитаю десяти новым объяснениям опыта.
+- `1` — Строю подробный план внедрения всех подходящих идей.
+- `2` — Выбираю одну идею и проверяю её в реальной жизни.
+- `3` — Закрываю рекомендации и пробую одну вещь сегодня.
 
-**Mechanic hypothesis:** `ALLOCATION` — времени хватает либо на одну практику, либо на дополнительную подготовку; ресурс ограничен.
+**Interaction candidate:** `ALLOCATION` only if the interface genuinely constrains attention to a small set of actions; otherwise `SCENE CHOICE`.
 
 ## Q4 · #неидеальность · stronger absurd
 
@@ -857,11 +932,11 @@ Rule preserved: **Отказ от бесконечной оптимизации 
 **Стул пережил все реформы.**
 
 - `0` — Ищу следующий способ. Нельзя же просто оставить это так.
-- `1` — Хотя бы продолжаю держать привычку под наблюдением.
+- `1` — Хотя бы держу привычку под постоянным наблюдением.
 - `2` — Оставляю её, если цена исправления выше реального эффекта.
-- `3` — Не каждая бытовая несовершенность получает отдельный проект улучшения.
+- `3` — Оставляю стул в покое. Пока это никому не мешает.
 
-**Mechanic hypothesis:** `SCENE CHOICE` — anchor; не превращать стул в мини-игру.
+**Interaction candidate:** `SCENE CHOICE`.
 
 ## Intentionality guard · near-serious
 
@@ -875,10 +950,10 @@ Rule preserved: **Отказ от бесконечной оптимизации 
 
 - `0` — Иду. Отказываться от роста из принципа ещё глупее.
 - `1` — Иду, чтобы не отстать, но постараюсь без фанатизма.
-- `2` — Сначала проверяю, есть ли у меня задача для этого курса.
-- `3` — Полезный инструмент не возвращает автоматически культ оптимизации.
+- `2` — Проверяю, есть ли у меня конкретная задача, которую курс решает.
+- `3` — Если конкретной задачи нет, курс пропускаю, даже если он хороший.
 
-**Mechanic hypothesis:** `SCENE CHOICE` — guard; без поля «назови задачу», которое меняет тип evidence.
+**Interaction candidate:** `SCENE CHOICE`.
 
 ## Responsibility guard · consequence already happened
 
@@ -889,11 +964,11 @@ Rule preserved: **Отказ от бесконечной оптимизации 
 На первой же задаче становится видно: уровня уже не хватает.
 
 - `0` — Значит, решение остановить развитие было ошибкой.
-- `1` — Терплю. Невозможно поддерживать всё.
-- `2` — Возвращаю практику под конкретную рабочую задачу.
-- `3` — Достаточность включает поддержку того, что снова стало реально важным.
+- `1` — Терплю: нельзя же бесконечно всё поддерживать.
+- `2` — Возвращаю необходимую практику под конкретную задачу.
+- `3` — Возвращаю практику именно для этого навыка. Остальные снова улучшать за компанию не начинаю.
 
-**Mechanic hypothesis:** `SCENE CHOICE` — guard без отдельного тренажёра навыка.
+**Interaction candidate:** `SCENE CHOICE`.
 
 ---
 
@@ -919,10 +994,10 @@ Rule preserved: **Отсутствие великого ответа не дол
 
 - `0` — Хорошо, но всё-таки хочется, чтобы время вело к чему-то большему.
 - `1` — Иногда такие вечера допустимы. Не всё же должно быть полезно.
-- `2` — Локальной ценности вполне хватает как причины для вечера.
-- `3` — Приятное человеческое время не обязано защищать бизнес-план существования.
+- `2` — Считаю локальную ценность достаточной причиной для вечера.
+- `3` — Не ищу дополнительной пользы. Было хорошо — этого достаточно.
 
-**Mechanic hypothesis:** `SCENE CHOICE` — отсутствие score внутри сцены уже часть шутки; не добавлять ещё один формат.
+**Interaction candidate:** `SCENE CHOICE`.
 
 ## Q2 · #бессмысленность · everyday
 
@@ -939,9 +1014,9 @@ Rule preserved: **Отсутствие великого ответа не дол
 - `0` — Ищу ответ. Без направления легко растратить время.
 - `1` — Собираю хотя бы рабочую версию смысла на этот период.
 - `2` — Допускаю, что некоторое время можно жить без большой формулы.
-- `3` — Отсутствие метафизического ответа не объявляю чрезвычайной ситуацией.
+- `3` — Не придумываю ответ на ходу. Сейчас большой формулы просто нет.
 
-**Mechanic hypothesis:** `SCENE CHOICE` — сильная сцена; не заставлять пользователя сочинять «смысл».
+**Interaction candidate:** `SCENE CHOICE`.
 
 ## Q3 · #присутствие · social absurdity
 
@@ -955,12 +1030,12 @@ Rule preserved: **Отсутствие великого ответа не дол
 
 **День не предоставил KPI.**
 
-- `0` — Всё равно кажется, что день ушёл впустую.
-- `1` — Добавляю хотя бы одно полезное действие перед сном.
-- `2` — Считаю прожитый день частью жизни, а не контейнером результатов.
-- `3` — Настоящее не обязано быть инвестиционным раундом будущего себя.
+- `0` — Всё равно ощущаю, что день ушёл впустую.
+- `1` — Добавляю хотя бы одно полезное действие, чтобы было за что зацепиться.
+- `2` — Считаю пережитый день частью жизни, а не только контейнером результатов.
+- `3` — Закрываю список задач. На сегодня день уже случился.
 
-**Mechanic hypothesis:** `CONSEQUENCE / ПУСТЬ ПОЛЕЖИТ` — закрыть день сейчас или добавить «ещё одну полезную вещь»; следующий beat показывает цену выбора без морали.
+**Interaction candidate:** `SCENE CHOICE`; `закрыть день` may be the visual action.
 
 ## Q4 · #собственныйвыбор · stronger absurd
 
@@ -974,12 +1049,12 @@ Rule preserved: **Отсутствие великого ответа не дол
 
 **Сценарий одобрен. Пользователь не синхронизирован.**
 
-- `0` — В основном иду по нему. Проверенные сценарии редко возникают случайно.
-- `1` — Беру основу и подстраиваю детали под себя.
-- `2` — Отделяю своё от того, что просто хорошо выглядит.
-- `3` — Могу потерять понятный маршрут ради собственного выбора без гарантий.
+- `0` — Следую в основном ему. Массово проверенные сценарии редко возникают случайно.
+- `1` — Беру основу и адаптирую детали под себя.
+- `2` — Разделяю, что в этой формуле действительно моё, а что просто хорошо выглядит.
+- `3` — Не беру этот маршрут только потому, что он у всех на виду.
 
-**Mechanic hypothesis:** `ALLOCATION` — из готового «пакета хорошей жизни» можно оставить только ограниченное число элементов.
+**Interaction candidate:** `ALLOCATION` — remove/keep elements of a ready-made life scenario; reachable sets require a four-class semantic adapter.
 
 ## Intentionality guard · near-serious
 
@@ -989,12 +1064,12 @@ Rule preserved: **Отсутствие великого ответа не дол
 
 Даже если вера в эту линию уже закончилась.
 
-- `0` — Возвращаю большую цель. Она хотя бы задаёт направление.
-- `1` — Оставляю рабочую историю, даже если уже не до конца в неё верю.
-- `2` — Не подгоняю жизнь под объяснение, которое перестало быть моим.
-- `3` — Выбираю конкретные обязательства и без истории, которая делает их грандиозными.
+- `0` — Возвращаю большую цель. Она хотя бы собирает жизнь в направление.
+- `1` — Оставляю рабочую версию истории, даже если уже не до конца в неё верю.
+- `2` — Не подгоняю жизнь под красивое объяснение, если оно перестало быть моим.
+- `3` — Оставляю конкретные планы и обязательства, даже если красивой общей истории для них сейчас нет.
 
-**Mechanic hypothesis:** `SCENE CHOICE` — guard без выбора между декоративными «история/факты».
+**Interaction candidate:** `SCENE CHOICE`.
 
 ## Responsibility guard · consequence already happened
 
@@ -1008,10 +1083,10 @@ Rule preserved: **Отсутствие великого ответа не дол
 
 - `0` — Возможно, ничего не делать и есть честный выбор.
 - `1` — Делаю только то, к чему сейчас есть внутреннее желание.
-- `2` — Возвращаю конкретное обязательство, даже без большой цели.
-- `3` — Отсутствие высшего смысла не использую как алиби для неучастия.
+- `2` — Возвращаю конкретные обязательства, даже если великой цели у них нет.
+- `3` — Отправляю документ и возвращаю конкретный срок. Большую цель ради этого придумывать обратно не нужно.
 
-**Mechanic hypothesis:** `SCENE CHOICE` — consequence уже достаточно сильный; не добавлять игру.
+**Interaction candidate:** `SCENE CHOICE`.
 
 ---
 
@@ -1033,12 +1108,12 @@ Rule preserved: **Технология должна убирать лишнее 
 
 **Третий год экономим первый час.**
 
-- `0` — Продолжаю вручную. Так надёжно и привычно.
-- `1` — Автоматизирую часть, но всё равно перепроверяю строка за строкой.
-- `2` — Автоматизирую и ставлю понятные проверки на ошибку.
-- `3` — Повторяемое ручное действие считаю кандидатом на исчезновение, если результат проверяем.
+- `0` — Продолжаю вручную. Так надёжно и уже привычно.
+- `1` — Автоматизирую часть, но финально всё перепроверяю строка за строкой.
+- `2` — Автоматизирую и задаю понятные проверки на ошибку.
+- `3` — Наконец трачу час и убираю эти 25 минут из каждой пятницы.
 
-**Mechanic hypothesis:** `SCENE CHOICE` — счётчик накопленного времени можно показать как system reaction, не отдельную механику.
+**Interaction candidate:** `SCENE CHOICE`; cumulative-time counter is presentation only.
 
 ## Q2 · #инструментальность · everyday
 
@@ -1052,12 +1127,12 @@ Rule preserved: **Технология должна убирать лишнее 
 
 **Будущее работает с задержкой.**
 
-- `0` — Перехожу. Навык всё равно пригодится, когда сервис станет стандартом.
-- `1` — Использую оба, пока не станет ясно, какой реально удобнее.
-- `2` — Остаюсь на старом там, где новый не даёт выгоды.
-- `3` — Новизну не считаю самостоятельной функцией продукта.
+- `0` — Перехожу. Навык всё равно пригодится, когда инструмент станет стандартом.
+- `1` — Использую оба, пока не станет ясно, кто победил историю.
+- `2` — Остаюсь на старом там, где новый не даёт реальной выгоды.
+- `3` — Остаюсь на старом, пока новый реально не станет лучше для моей задачи.
 
-**Mechanic hypothesis:** `SCENE CHOICE` — сравнение инструментов остаётся частью сцены, а не тестом скорости интерфейса.
+**Interaction candidate:** `SCENE CHOICE`; side-by-side timing can be presentation.
 
 ## Q3 · #цифроваяавтономия · social absurdity
 
@@ -1073,12 +1148,12 @@ Business Plus сейчас нужен главным образом для эк�
 
 **Выход предусмотрен архитектурой монетизации.**
 
-- `0` — Остаюсь. Если сервис хороший, зависимость сама по себе не проблема.
-- `1` — Иногда сохраняю отдельно то, что кажется важным.
-- `2` — Проверяю возможность выхода и переноса данных заранее.
-- `3` — Удобство не покупаю ценой невозможности покинуть систему.
+- `0` — Остаюсь. Если сервис хороший, зависимость не проблема сама по себе.
+- `1` — Иногда делаю резервные копии того, что кажется важным.
+- `2` — Проверяю реальную возможность выхода и переноса данных заранее.
+- `3` — Проверяю экспорт заранее. Если выйти нельзя, это уже часть цены сервиса.
 
-**Mechanic hypothesis:** `SCENE CHOICE` — paywall уже является событием; не превращать в квест по меню.
+**Interaction candidate:** `SCENE CHOICE`; clicking through Export is presentation unless an authored four-state adapter is demonstrated.
 
 ## Q4 · #нетехнофетиш · stronger absurd
 
@@ -1092,27 +1167,27 @@ AI заканчивает за четыре минуты то, на что об�
 
 **Профессия сократилась быстрее самооценки.**
 
-- `0` — Продолжаю делать вручную там, где мой процесс качественнее.
-- `1` — Использую AI как помощника, но почти всё переписываю.
+- `0` — Продолжаю делать вручную там, где качество моего процесса выше.
+- `1` — Использую AI как помощника, но почти всё переписываю сам.
 - `2` — Передаю машине ту часть, которую могу надёжно проверить.
-- `3` — Не защищаю ручной труд только потому, что раньше он доказывал нужность.
+- `3` — Оставляю AI эту часть и не возвращаю ручной способ только ради привычного ощущения работы.
 
-**Mechanic hypothesis:** `CONSEQUENCE / ПУСТЬ ПОЛЕЖИТ` — после автоматизации появляется 3:56 свободного времени; выбор, что с ним делать, даёт второй beat.
+**Interaction candidate:** `CONSEQUENCE` — automation frees time, then the next beat exposes what the user does with the freed time; entire path maps once to `#нетехнофетиш`.
 
 ## Intentionality guard · near-serious
 
 В профессиональном чате все обсуждают новый AI-инструмент.
 
-У коллег он уже появляется в профилях и презентациях.
+У коллег он уже появляется в bio и презентациях.
 
 Реальную работу пока почти не улучшает. На освоение уйдёт несколько вечеров.
 
 - `0` — Осваиваю. Быть в контексте технологии — часть профессии.
 - `1` — Осваиваю минимально, чтобы не выпадать из разговора.
-- `2` — Проверяю, какую конкретную работу он может улучшить.
-- `3` — Не внедряю инструмент ради демонстрации современности, если работа не меняется.
+- `2` — Проверяю, какую конкретную работу он улучшает сейчас или в обозримом будущем.
+- `3` — Если конкретной пользы пока нет, не трачу несколько вечеров только ради отметки «тоже использую».
 
-**Mechanic hypothesis:** `SCENE CHOICE` — guard; статус и практическая польза уже даны в конфликте.
+**Interaction candidate:** `SCENE CHOICE`.
 
 ## Responsibility guard · consequence already happened
 
@@ -1122,16 +1197,16 @@ AI заканчивает за четыре минуты то, на что об�
 
 Схема, уровень проверки и границы применения были выбраны вручную.
 
-- `0` — Основная вина на сервисе: он не должен был так ошибаться.
-- `1` — Меняю поставщика. Этому инструменту больше не доверяю.
-- `2` — Разбираю свою часть выбора, проверки и применения.
-- `3` — Делегирование действия машине не считаю делегированием ответственности.
+- `0` — Основная вина на сервисе: он не должен был ошибаться так сильно.
+- `1` — Меняю поставщика. Доверие к этому инструменту закончено.
+- `2` — Разбираю свою часть выбора, проверки и границ применения.
+- `3` — Сначала разбираю собственную схему и уровень проверки. То, что ошиблась модель, эту часть не отменяет.
 
-**Mechanic hypothesis:** `SCENE CHOICE` — responsibility guard без «распредели виноватых».
+**Interaction candidate:** `SCENE CHOICE`.
 
 ---
 
-# v0.6.2 QA summary
+# v0.6.3 QA summary
 
 ## Structural preservation
 
@@ -1141,21 +1216,34 @@ AI заканчивает за четыре минуты то, на что об�
 - responsibility guards: `9/9`;
 - total: `54/54`.
 
-## Camera / language consolidation
+## Camera pass 54/54
 
 Applied bank-wide:
 - external case description → moment already happening;
 - formal `вы` removed from public scene voice;
 - second-person singular carried mostly by verbs, not repeated `ты`;
-- avoidable gendered constructions removed;
-- exact time retained only where it adds pressure, pace or comedy;
-- scene detail must increase recognition, conflict or comic contradiction;
-- abstract editorial language removed where a direct human action could carry the same meaning;
-- answers shortened where possible without changing hidden `0 → 3` direction;
-- repeated moralizing formulations reduced so the preferred Club answer is less visible.
+- gendered past-tense constructions removed where they create avoidable friction;
+- every screen checked for a concrete trigger/detail and mini-turn;
+- exact time retained only where it adds tension, pace or comedy;
+- cosmetic timestamp + case description is not treated as immersion.
 
-## Humor anchors preserved
+## Blind answer-camouflage pass
 
+Primary correction in v0.6.3:
+- reduced aphoristic / manifesto-like wording in many hidden `3` answers;
+- converted abstract principles into observable next actions where possible;
+- kept semantic direction intact;
+- preserved quotable language mainly in the scene/system layer rather than making the preferred-looking answer suspiciously elegant.
+
+Blind-read question for every future edit:
+
+> Can a user identify the author's preferred answer from style alone?
+
+If yes, rewrite the answer before rewriting the scene.
+
+## Humor consolidation
+
+Tone anchors preserved:
 - `Процесс требует больше процесса.`
 - cup / `всё нормально` scene;
 - `Мир сохранён. Контакт временно отсутствует.`
@@ -1166,30 +1254,42 @@ Applied bank-wide:
 - Business Plus export;
 - `Профессия сократилась быстрее самооценки.`
 
-## Interaction hypothesis audit
+The bank no longer treats every bold line as a mandatory pre-answer punchline. Runtime placement is deliberately open.
 
-Exactly four grammars are used:
+## Interaction safety
 
-- `SCENE CHOICE`: 36
-- `THRESHOLD / ХВАТИТ`: 8
-- `ALLOCATION`: 5
-- `CONSEQUENCE / ПУСТЬ ПОЛЕЖИТ`: 5
+The four grammars are authoring/implementation primitives, not four new scoring systems.
 
-All 18 guards remain `SCENE CHOICE`.
+Required before any non-Scene-Choice screen ships:
 
-Mechanics are proposals only. They do not change tags, scoring, hidden direction or result contract.
+1. write the interaction state space;
+2. prove all reachable states are covered;
+3. map them into exactly four canonical answer-equivalence classes;
+4. verify semantic direction against the frozen baseline;
+5. emit exactly one evidence state;
+6. reject the interactive version if this mapping feels artificial.
 
-## Guard integrity
+Reference mechanic distribution is not canon and may change after playtest.
 
-Guards remain intentionally quieter:
-- intentionality guard tests why the behavior survives when an attractive counter-pressure appears;
-- responsibility guard starts after a real consequence already happened;
-- no guard is converted into a dexterity, speed, drag-and-drop or resource-management test.
+## Club World placements
 
-## Next gate
+Current pilot placements remain `2/54`:
 
-1. semantic cross-check every `0–3` mapping against frozen baseline;
-2. blind read only public text, with tags/scores/mechanics hidden;
-3. mark any answer that still sounds like an author explaining the “wise” option;
-4. test whether `THRESHOLD`, `ALLOCATION` and `CONSEQUENCE` produce the same semantic evidence as the current four-option wording;
-5. only then prototype mechanics in UI.
+1. `03-Q2` — `OBJECT 001 — НЕ НАДО` inside an ordinary purchase scene;
+2. `08-Q1` — generic Dementor Club gathering inside a local-meaning scene.
+
+Before adding more, blind-test:
+- understandable without prior Club knowledge;
+- memorable without explanation;
+- does not feel like an ad;
+- produces curiosity rather than requiring lore.
+
+Only after that consider a sparse expansion toward roughly `4–6/54`, using confirmed Club entities only.
+
+## Next gates
+
+1. **Blind public read 54/54** without tags, hidden numbers or interaction notes.
+2. **Write concrete equivalence tables only for interactive candidates selected for the first prototype.** Do not spec adapters for hypothetical mechanics that may be dropped.
+3. Build **one sphere prototype**, not the full bank, containing `SCENE CHOICE + one THRESHOLD + one ALLOCATION or CONSEQUENCE`.
+4. Check whether the three interactions still feel like one bureaucratic machine rather than three mini-games.
+5. If these gates pass, consider `v0.6.x → approved-draft`; do not reopen conceptual literary rewriting without a playtest failure.
