@@ -24,6 +24,7 @@ function clampLevel(value){const n=Number(value);return Number.isFinite(n)?Math.
 function clampGuard(value){const n=Number(value);return Number.isFinite(n)?Math.max(0,Math.min(3,Math.round(n))):null}
 function point(cx,cy,r,index,total){const a=(-Math.PI/2)+(Math.PI*2*index/total);return[cx+Math.cos(a)*r,cy+Math.sin(a)*r]}
 function polygonPoints(cx,cy,r,total,scale=1){return Array.from({length:total},(_,i)=>point(cx,cy,r*scale,i,total).join(',')).join(' ')}
+function focusPoint(cx,cy,r,item,total){const actualScale=(item.level??0)/5;const markerScale=Math.max(actualScale,.115);return{actual:point(cx,cy,r*actualScale,item.index,total),marker:point(cx,cy,r*markerScale,item.index,total),offset:markerScale!==actualScale}}
 function action(label,href,{primary=false,id=''}={}){return `<a ${id?`id="${id}"`:''} class="dc-result-action${primary?' primary':''}" href="${esc(href)}">${esc(label)}</a>`}
 function button(label,id,{primary=false}={}){return `<button class="dc-result-action${primary?' primary':''}" type="button" id="${id}">${esc(label)}</button>`}
 
@@ -44,7 +45,7 @@ function qualityText(item){
   const guards=[item.intent,item.responsibility].filter(v=>v!=null);
   if(guards.length<2)return 'КОНТРОЛЬНЫЕ ОСИ НЕ ЗАПИСАНЫ';
   const min=Math.min(...guards);
-  if(min<2)return `ИТОГ ОГРАНИЧЕН КОНТРОЛЕМ КАЧЕСТВА · ОСОЗНАННОСТЬ ${item.intent}/3 · ОТВЕТСТВЕННОСТЬ ${item.responsibility}/3`;
+  if(min<2)return `ИТОГ ОГРАНИЧЕН · ОСОЗНАННОСТЬ ${item.intent}/3 · ОТВЕТСТВЕННОСТЬ ${item.responsibility}/3`;
   return `ОСОЗНАННОСТЬ ${item.intent}/3 · ОТВЕТСТВЕННОСТЬ ${item.responsibility}/3`;
 }
 
@@ -59,7 +60,7 @@ function renderRadar(items,highlights,{dossier=false}={}){
   const axes=items.map((_,i)=>{const[x,y]=point(cx,cy,r,i,total);return `<line class="dc-radar-axis" x1="${cx}" y1="${cy}" x2="${x}" y2="${y}"/>`}).join('');
   const shape=items.map((item,i)=>point(cx,cy,r*((item.level??0)/5),i,total).join(',')).join(' ');
   const labels=dossier?'':items.map((item,i)=>{const[lx,ly]=point(cx,cy,r+58,i,total);const anchor=lx<cx-30?'end':lx>cx+30?'start':'middle';return `<text class="dc-radar-label" x="${lx}" y="${ly}" text-anchor="${anchor}">${esc(item.title.toUpperCase())}</text><text class="dc-radar-level" x="${lx}" y="${ly+17}" text-anchor="${anchor}">${item.level==null?'—':item.level+'/5'}</text>`}).join('');
-  const focus=highlights.map((item,rank)=>{const[x,y]=point(cx,cy,r*((item.level??0)/5),item.index,total);return `<g class="dc-radar-focus"><circle cx="${x}" cy="${y}" r="17"/><text x="${x}" y="${y+4}" text-anchor="middle">${String(rank+1).padStart(2,'0')}</text></g>`}).join('');
+  const focus=highlights.map((item,rank)=>{const pos=focusPoint(cx,cy,r,item,total);const[ax,ay]=pos.actual;const[mx,my]=pos.marker;return `<g class="dc-radar-focus">${pos.offset?`<line x1="${ax}" y1="${ay}" x2="${mx}" y2="${my}"/>`:''}<circle cx="${mx}" cy="${my}" r="17"/><text x="${mx}" y="${my+4}" text-anchor="middle">${String(rank+1).padStart(2,'0')}</text></g>`}).join('');
   return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Карта девяти сфер DC-9">${rings}${axes}<polygon class="dc-radar-shape" points="${shape}"/>${labels}${focus}</svg>`;
 }
 
@@ -81,7 +82,7 @@ function renderAll(items){
   radarStage.innerHTML=renderRadar(items,highlights);
   if(highlights.length){
     mapAsideTitle.textContent='САМЫЕ ЗАМЕТНЫЕ МЕСТА.';
-    mapAsideCopy.textContent=highlights.map(x=>`${x.title} ${x.level}/5`).join(' · ')+'. Это визуальное выделение, не новый рейтинг.';
+    mapAsideCopy.textContent=highlights.map(x=>`${x.title} ${x.level}/5`).join(' · ')+'. Остальное — ниже.';
     highlightGrid.innerHTML=highlights.map(renderHighlightCard).join('');
   }else{
     mapAsideTitle.textContent='ПОКА СМОТРИМ.';mapAsideCopy.textContent='Пройдите хотя бы одну сферу.';highlightGrid.innerHTML='';
@@ -108,7 +109,7 @@ async function dossierSvg(items,highlights){
   const rings=[.2,.4,.6,.8,1].map(scale=>`<polygon points="${polygonPoints(cx,cy,r,total,scale)}" fill="none" stroke="#111" stroke-opacity=".18" stroke-width="2"/>`).join('');
   const axes=items.map((_,i)=>{const[x,y]=point(cx,cy,r,i,total);return `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="#111" stroke-opacity=".18" stroke-width="2"/>`}).join('');
   const shape=items.map((item,i)=>point(cx,cy,r*((item.level??0)/5),i,total).join(',')).join(' ');
-  const focus=highlights.map((item,rank)=>{const[x,y]=point(cx,cy,r*(item.level/5),item.index,total);return `<circle cx="${x}" cy="${y}" r="18" fill="#111"/><text x="${x}" y="${y+5}" text-anchor="middle" font-family="Arial" font-size="12" font-weight="900" fill="#f2f0e8">${String(rank+1).padStart(2,'0')}</text>`}).join('');
+  const focus=highlights.map((item,rank)=>{const pos=focusPoint(cx,cy,r,item,total);const[ax,ay]=pos.actual;const[mx,my]=pos.marker;return `${pos.offset?`<line x1="${ax}" y1="${ay}" x2="${mx}" y2="${my}" stroke="#111" stroke-width="2"/>`:''}<circle cx="${mx}" cy="${my}" r="18" fill="#111"/><text x="${mx}" y="${my+5}" text-anchor="middle" font-family="Arial" font-size="12" font-weight="900" fill="#f2f0e8">${String(rank+1).padStart(2,'0')}</text>`}).join('');
   const icons=await Promise.all(highlights.map(x=>iconDataUri(x.icon)));
   const rows=highlights.map((item,rank)=>{
     const y=910+rank*112;const lines=wrapText(item.quip,43).slice(0,2);const tspans=lines.map((line,i)=>`<tspan x="455" dy="${i?30:0}">${esc(line)}</tspan>`).join('');
