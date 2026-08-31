@@ -1,6 +1,6 @@
 # DC-9 Result System v0.1
 
-Status: **DRAFT / IMPLEMENTATION CANDIDATE / REVIEW REQUIRED**  
+Status: **APPROVED PRESENTATION CONTRACT / IMPLEMENTATION QA REQUIRED**  
 Date: 2026-08-31
 
 ## Purpose
@@ -108,25 +108,31 @@ The result page may show:
 
 ### Highlighted three
 
-A `Top 3` block is presentation only, never a diagnostic rank.
+The three highlighted results are presentation only, never a diagnostic rank.
 
-Candidate deterministic rule for v0.1:
+Approved deterministic rule for v0.1:
 
-1. calculate each sphere's distance from midpoint `2.5`;
-2. select the three largest absolute distances;
-3. tie-break by higher final level;
-4. final tie-break by canonical sphere order.
+1. `A` = highest completed sphere level; tie-break by canonical sphere order;
+2. `B` = lowest completed sphere level; tie-break by canonical sphere order;
+3. `C` = most pronounced remaining result by absolute distance from midpoint `2.5`; tie-break by higher final level, then canonical sphere order.
 
-This rule must be described internally as `presentation prominence`, not importance, quality or membership relevance.
+If fewer than three spheres are complete, available results are ordered by distance from midpoint, then higher level, then canonical sphere order.
+
+The A/B/C markers exist only to connect radar → highlighted cards → dossier. They must never reuse sphere numbers `01–09`, because sphere numbering has a separate canonical meaning.
+
+This rule is described internally as `presentation prominence` / contrast. It does not create importance, quality, membership relevance or an aggregate interpretation.
 
 ## Recommended public UX order after 9/9
 
 1. Completion state: `9 / 9`.
 2. Full Sphere Map.
-3. Three highlighted independent results with icon, level, level name, source-backed tag values and short editorial line.
-4. Remaining six sphere results, already expanded; no mandatory clicking to understand the result.
-5. Personal dossier / share object.
-6. Strong Community CTA.
+3. Three highlighted independent results with icon, level, level name and short editorial line.
+4. Canonical tag values and intentionality/responsibility remain available as secondary evidence, visually subordinate to the main result line.
+5. Remaining six sphere results, already expanded; no mandatory clicking to understand the result.
+6. Personal dossier / share object.
+7. Strong Community CTA.
+
+Public framing uses `ДЕВЯТЬ СФЕР. ОДНА КАРТА.` and must not imply a single psychotype/profile score.
 
 ## Dossier
 
@@ -137,12 +143,14 @@ Recommended contents:
 - `DEMENTOR CLUB / DC-9`;
 - `МОЯ КАРТА`;
 - Sphere Map;
-- three highlighted independent sphere results;
+- A/B/C highlighted independent sphere results;
 - sphere icons;
 - exact final levels;
 - short editorial lines;
 - `9 СФЕР / БЕЗ ОБЩЕГО БАЛЛА`;
 - `DEMENTOR.CLUB`.
+
+A/B/C markers in the exported dossier must match the same three spheres shown on the page.
 
 Do not place developer explanations inside the dossier.
 
@@ -162,6 +170,8 @@ Required:
 
 - no horizontal overflow;
 - no clipped radar labels;
+- mobile radar receives a separate readable 01–09 legend instead of relying on tiny SVG labels;
+- A/B/C markers cannot be confused with sphere numbers;
 - no hidden result information requiring JS interaction to understand the completed result;
 - all nine results visible without mandatory interaction;
 - share preview fits mobile viewport;
@@ -172,4 +182,4 @@ Required:
 
 ## Editorial copy status
 
-Sphere-specific humorous lines beyond the existing canonical diagnostic verdicts are **presentation copy** and require editorial approval before production. They must never change the stored level, tags, guard values or Community gate.
+The result-page presentation copy and A/B/C contrast structure are approved for staging implementation. Sphere-specific humorous lines remain presentation copy: they must never change the stored level, tags, guard values or Community gate. Production publication still requires browser QA and explicit release approval.
