@@ -19,11 +19,13 @@
   const normalizeRoute = () => window.location.pathname || '/';
   const route = normalizeRoute();
   const defaultSurface = (routeMap.find(([pattern]) => pattern.test(route)) || [null, 'UNKNOWN'])[1];
+  const issueCounterKey = 'dementor.qa.issueCounter';
 
   const state = {
     surface: document.body?.dataset?.qaSurface || defaultSurface,
     block: document.body?.dataset?.qaBlock || 'PAGE',
     appState: document.body?.dataset?.qaState || 'UNKNOWN',
+    issueId: null,
     selected: null,
     inspector: false,
   };
@@ -44,6 +46,7 @@
   hud.innerHTML = `
     <div class="qah"><span><strong>DEMENTOR QA</strong> <span class="qa-mini">v1</span></span><button type="button" data-action="collapse">−</button></div>
     <div class="qab">
+      <div class="qa-row"><span class="qa-key">QA ID</span><span class="qa-value qa-id" data-field="issue">—</span></div>
       <div class="qa-row"><span class="qa-key">Route</span><span class="qa-value" data-field="route"></span></div>
       <div class="qa-row"><span class="qa-key">Surface</span><span class="qa-value" data-field="surface"></span></div>
       <div class="qa-row"><span class="qa-key">Block</span><span class="qa-value qa-id" data-field="block"></span></div>
@@ -53,6 +56,7 @@
       <div class="qa-actions">
         <button type="button" data-action="inspect">Inspect block</button>
         <button type="button" data-action="copy">Copy QA context</button>
+        <button type="button" data-action="issue">New QA ID</button>
       </div>
     </div>`;
   document.body.appendChild(hud);
@@ -73,6 +77,7 @@
   };
 
   const render = () => {
+    field('issue').textContent = state.issueId || '—';
     field('route').textContent = route;
     field('surface').textContent = state.surface;
     field('block').textContent = state.block;
@@ -82,6 +87,7 @@
 
   const context = () => ({
     qa: 'DEMENTOR_CLUB',
+    issueId: state.issueId,
     route,
     surface: state.surface,
     block: state.block,
@@ -90,6 +96,21 @@
     build: field('build').textContent,
     url: window.location.href,
   });
+
+  const copyText = async (text, fallbackTitle = 'Copy QA context') => {
+    try { await navigator.clipboard.writeText(text); return true; }
+    catch { window.prompt(fallbackTitle, text); return false; }
+  };
+
+  const nextIssueId = () => {
+    let current = Number.parseInt(localStorage.getItem(issueCounterKey) || '0', 10);
+    if (!Number.isFinite(current) || current < 0) current = 0;
+    current += 1;
+    localStorage.setItem(issueCounterKey, String(current));
+    state.issueId = `DCQA-${String(current).padStart(3, '0')}`;
+    render();
+    return state.issueId;
+  };
 
   fetch('/QA_BUILD.txt', { cache: 'no-store' })
     .then((r) => (r.ok ? r.text() : Promise.reject(new Error('missing'))))
@@ -111,9 +132,16 @@
     }
     if (action === 'copy') {
       const payload = JSON.stringify(context(), null, 2);
-      try { await navigator.clipboard.writeText(payload); button.textContent = 'Copied'; }
-      catch { window.prompt('Copy QA context', payload); }
+      await copyText(payload);
+      button.textContent = 'Copied';
       setTimeout(() => { button.textContent = 'Copy QA context'; }, 1200);
+    }
+    if (action === 'issue') {
+      const issueId = nextIssueId();
+      const payload = JSON.stringify(context(), null, 2);
+      await copyText(payload, 'Copy new QA issue context');
+      button.textContent = issueId;
+      setTimeout(() => { button.textContent = 'New QA ID'; }, 1600);
     }
   });
 
@@ -135,6 +163,7 @@
     setState(next) { state.appState = next || 'UNKNOWN'; render(); },
     setSurface(next) { state.surface = next || defaultSurface; render(); },
     setBlock(next) { state.block = next || 'PAGE'; render(); },
+    newIssue: nextIssueId,
     context,
   };
   render();
