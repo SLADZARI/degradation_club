@@ -59,11 +59,11 @@ Sphere target: at least **two genuinely strong quotable lines**.
 
 Quotability never overrides natural speech or diagnostic honesty.
 
-## Full-bank rewrite
+## Current full bank
 
-**CURRENT MASTER DRAFT:** `BANK_V0.5_FULL_54_REWRITE.md`
+**CURRENT PLAYTEST DRAFT:** `BANK_V0.6_HUMOR_PASS_FULL_54.md`
 
-This is the first complete rewrite of all `54/54` DC-9 screens under the current canon.
+v0.6 is a targeted editorial pass over v0.5, not a new generation.
 
 It preserves:
 
@@ -71,23 +71,58 @@ It preserves:
 - `4` thematic tags per sphere;
 - `9` intentionality guards;
 - `9` responsibility guards;
-- frozen baseline hidden semantic direction `0 → 3`;
+- hidden semantic direction `0 → 3`;
 - production scoring/result contract unchanged.
 
-Public rhythm inside every sphere:
+What changed from v0.5:
 
-1. Q1 — quick funny entry;
-2. Q2 — recognizable everyday scene;
-3. Q3 — social absurdity;
-4. Q4 — stronger absurdity;
-5. intentionality guard — near-serious stress test;
-6. responsibility guard — consequence already happened.
+- 6 weak scenes rebuilt substantially;
+- weaker B/B+ scenes cleaned locally;
+- self-help / management language reduced;
+- more physical detail and human contradiction;
+- strong A/A+ reference scenes preserved;
+- first restrained `Club World` placements added.
 
-The previous single-question Personality work (`q1_role_v02/v03/v04`) remains historical/editorial reference. It is no longer the only active task.
+`BANK_V0.5_FULL_54_REWRITE.md` remains the previous full-bank baseline for comparison.
+
+## Club World Layer
+
+**DRAFT PRODUCT RULE:** `CLUB_WORLD_LAYER_V0.1_DRAFT.md`
+
+Purpose: let a small number of scored scenes happen inside real Dementor Club objects / projects / event contexts so the user learns the culture by experience rather than explanation.
+
+Working density: approximately `4–7 / 54`, irregularly distributed.
+
+Hard rules:
+
+- diagnostic tag/guard comes first;
+- only approved Club entities;
+- no CTA or sales copy inside scored questions;
+- no bonus for loyalty / familiarity;
+- no invented membership, event, price or community mechanic;
+- a stranger to Dementor Club must still understand the question.
+
+v0.6 currently contains only two placements:
+
+- `03-Q2` — real `OBJECT 001 — НЕ НАДО`;
+- `08-Q1` — generic approved Offline Events / Club meeting context.
+
+`Логика и осознанность` should only enter the bank after its exact scene material is verified against the independent `logic-awareness` source-of-truth.
+
+## Public rhythm inside a sphere
+
+Editorial rhythm:
+
+`улыбка → узнавание → социальный укол → controlled absurdity → соблазн → последствия`
+
+The six-screen structure is useful internally, but public scenes should vary in entrance, length and interaction so nine spheres do not feel cloned.
 
 ## Working structure
 
-- `BANK_V0.5_FULL_54_REWRITE.md` — **current complete 54-question candidate bank**;
+- `BANK_V0.6_HUMOR_PASS_FULL_54.md` — **current complete 54-question playtest candidate**;
+- `BANK_V0.5_HUMOR_SCENARIO_QA.md` — full comedy/scenario audit that produced v0.6;
+- `BANK_V0.5_FULL_54_REWRITE.md` — previous full 54-question bank;
+- `CLUB_WORLD_LAYER_V0.1_DRAFT.md` — restrained internal product/context placement rules;
 - `METHODOLOGY_V0.4_DRAFT.md` — active contradiction-aware authoring method;
 - `METHODOLOGY_V0.3_DRAFT.md` — superseded public-authoring method retained for history;
 - `EDITORIAL_QA_RUBRIC.md` — instant-read, contradiction, quotable-line and semantic/presentation QA;
@@ -98,12 +133,11 @@ The previous single-question Personality work (`q1_role_v02/v03/v04`) remains hi
 - `QUESTION_PRESENTATION_PATTERNS.md` — reusable presentation patterns;
 - `RESULT_AND_ROUTING_HYPOTHESES.md` — non-canonical result/routing ideas;
 - `baseline/CURRENT_PRODUCTION_BANK_2026-08-31.md` — frozen production bank used for semantic comparison;
-- `baseline/CURRENT_AUDIT_2026-08-31.md` — baseline audit;
-- `spheres/01_personality_q1_role_v04.md` — previous focused Q1 contradiction candidate retained for comparison.
+- `baseline/CURRENT_AUDIT_2026-08-31.md` — baseline audit.
 
 ## Workflow
 
-`FROZEN BASELINE → FULL REWRITE → SEMANTIC CROSS-CHECK → INSTANT-READ QA → CONTRADICTION/COMEDY QA → GUARD INTEGRITY → BLIND PLAYTEST BY SPHERE → APPROVED DRAFT → CANON → SITE`
+`FROZEN BASELINE → v0.5 FULL REWRITE → HUMOR QA → v0.6 TARGETED PASS → SEMANTIC CROSS-CHECK → BLIND PLAYTEST BY SPHERE → APPROVED DRAFT → CANON → SITE`
 
 ## Non-negotiable principles
 
@@ -120,22 +154,20 @@ The previous single-question Personality work (`q1_role_v02/v03/v04`) remains hi
 11. Diagnostic depth comes from the choice, not text volume.
 12. Quotable lines are reusable output, not forced slogans.
 13. Guards remain guards; humor must not destroy their stress-test function.
-14. No universal psychotype or aggregate Dementor score.
-15. No production/site change until explicit promotion.
+14. Club World never outranks diagnostic integrity.
+15. No universal psychotype or aggregate Dementor score.
+16. No production/site change until explicit promotion.
 
 ## Current active task
 
-Audit `BANK_V0.5_FULL_54_REWRITE.md` as a whole bank, not question-by-question invention from scratch.
+Do not regenerate the bank again.
 
-Required next gates:
+Next gates for `BANK_V0.6_HUMOR_PASS_FULL_54.md`:
 
 1. semantic cross-check `54/54` against frozen baseline;
-2. verify each thematic question still measures its original tag;
-3. verify each intentionality guard still tests motive under attractive/easy exception;
-4. verify each responsibility guard tests ownership after consequence;
-5. instant-read / length audit;
-6. contradiction coverage audit by sphere;
-7. quotable-line coverage audit by sphere;
-8. obvious-Club-answer / straw-man audit;
-9. blind playtest by sphere;
-10. only then decide what can move to `approved-draft`.
+2. obvious Club-preferred-answer / straw-man audit;
+3. verify that humor edits did not change hidden desirability;
+4. blind playtest by sphere;
+5. record where users laugh / hesitate / instantly detect the desired answer;
+6. test the two Club World scenes for subtlety and comprehension by non-members;
+7. only then decide what can move to `approved-draft`.
