@@ -5,12 +5,12 @@ documentType: RUNBOOK
 projectStage: BUILD
 gate: G6_VALIDATION
 status: DRAFT
-version: 0.1
+version: 0.2
 updated: 2026-08-31
 owner: Modern Pilgrims
 sourceSystem: GIT
 authorityType: IMPLEMENTATION_AUTHORITY
-supersedes: null
+supersedes: 0.1
 ---
 
 # Dementor Club — QA Session Runbook
@@ -20,6 +20,8 @@ Use with the QA preview built from `dementor-club-qa`.
 ## Rule
 
 During the discovery pass: do not fix while walking. Capture first, normalize/deduplicate second, implement third.
+
+The QA HUD is intentionally minimal and frozen for this pre-ad pass. Do not add automatic scroll tracking, DOM overlays, recorder features or other QA infrastructure unless a real testing blocker proves they are necessary.
 
 ## Reviewer workflow
 
@@ -31,7 +33,13 @@ For every issue, provide only:
 4. what should happen;
 5. screenshot.
 
-The QA HUD supplies route/surface/block/viewport/build context. Use `Inspect block` when the screenshot needs a more precise block label, then `Copy QA context` if text context is useful.
+The QA HUD supplies route/surface/block/state/viewport/build context.
+
+- `Inspect block` — tap it, then tap the problem area to capture a more precise block label.
+- `Copy QA context` — copies the current technical context.
+- `New QA ID` — creates the next local `DCQA-###` identifier and copies that identifier together with the current QA context.
+
+The ID counter is only a capture convenience on the current browser/device. The canonical deduplicated issue list remains `qa/QA_REGISTER.v0.1.md`.
 
 ## Screenshot naming
 
