@@ -12,7 +12,18 @@ export const DC9_RESULT_MODEL=Object.freeze([
   {id:'technology',number:'09',title:'Технологии',icon:'/assets/dc9-icons/09-technology.svg',tags:['#автоматизация','#инструментальность','#цифроваяавтономия','#нетехнофетиш'],quips:['Ручной труд пока успешно изображает моральное превосходство.','Автоматизация допускается, но под постоянным присмотром человека.','Инструмент уже иногда остаётся просто инструментом.','Новизне приходится объяснять, зачем она здесь.','Технология работает на задачу, а не наоборот.','Вы автоматизировали лишнее и не стали поклоняться кнопке.']}
 ]);
 
-export const presentationProminence=items=>[...items].filter(x=>x.result).sort((a,b)=>{
-  const ad=Math.abs(a.level-2.5),bd=Math.abs(b.level-2.5);
-  return bd-ad||b.level-a.level||a.index-b.index;
-}).slice(0,3);
+// Presentation-only selection: show contrast, not a hidden aggregate diagnosis.
+// A = strongest high result, B = strongest low result, C = next most pronounced remaining result.
+export const presentationProminence=items=>{
+  const completed=[...items].filter(x=>x.result&&Number.isFinite(Number(x.level)));
+  if(completed.length<=3)return completed.sort((a,b)=>Math.abs(b.level-2.5)-Math.abs(a.level-2.5)||b.level-a.level||a.index-b.index);
+  const high=[...completed].sort((a,b)=>b.level-a.level||a.index-b.index)[0];
+  const low=[...completed].sort((a,b)=>a.level-b.level||a.index-b.index)[0];
+  const selected=[];
+  if(high)selected.push(high);
+  if(low&&low.id!==high?.id)selected.push(low);
+  const used=new Set(selected.map(x=>x.id));
+  const next=completed.filter(x=>!used.has(x.id)).sort((a,b)=>Math.abs(b.level-2.5)-Math.abs(a.level-2.5)||b.level-a.level||a.index-b.index)[0];
+  if(next)selected.push(next);
+  return selected.slice(0,3);
+};
