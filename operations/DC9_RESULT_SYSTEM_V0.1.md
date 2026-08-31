@@ -57,6 +57,24 @@ Current calculation implemented in `/join/`:
 
 Therefore high thematic answers cannot produce a high final level when intentionality or responsibility is weak.
 
+## Legacy key compatibility
+
+The current staging questionnaire historically stores Саморазвитие under the legacy local key:
+
+`self-development`
+
+The canonical runtime / database sphere id is:
+
+`self_development`
+
+All result-read, progress-map and local→Supabase synchronization layers must normalize:
+
+`self-development → self_development`
+
+When legacy and canonical records both exist, the newest dated result wins. Compatibility must remain until historical local profiles have safely migrated.
+
+This alias is a storage/runtime compatibility rule only. Public and semantic sphere identity remains `self_development` / Саморазвитие.
+
 ## Non-negotiable semantic boundary
 
 The Sphere Map is a set of nine independent results.
@@ -82,6 +100,7 @@ The result page may show:
 - canonical sphere icons;
 - the Sphere Map / radar geometry;
 - canonical tag levels when useful;
+- intentionality/responsibility quality state when useful;
 - short club-style editorial copy associated with a sphere + level;
 - three visually highlighted sphere results;
 - a shareable personal dossier;
@@ -104,7 +123,7 @@ This rule must be described internally as `presentation prominence`, not importa
 
 1. Completion state: `9 / 9`.
 2. Full Sphere Map.
-3. Three highlighted independent results with icon, level, level name and short editorial line.
+3. Three highlighted independent results with icon, level, level name, source-backed tag values and short editorial line.
 4. Remaining six sphere results, already expanded; no mandatory clicking to understand the result.
 5. Personal dossier / share object.
 6. Strong Community CTA.
@@ -143,12 +162,13 @@ Required:
 
 - no horizontal overflow;
 - no clipped radar labels;
-- no hidden result information requiring JS to exist;
+- no hidden result information requiring JS interaction to understand the completed result;
 - all nine results visible without mandatory interaction;
 - share preview fits mobile viewport;
 - Community CTA remains the strongest final action;
 - `prefers-reduced-motion` disables decorative CTA breathing/pulse;
-- exported dossier matches screen values.
+- exported dossier matches screen values;
+- 9/9 remains 9/9 for historical `self-development` local results after normalization.
 
 ## Editorial copy status
 
