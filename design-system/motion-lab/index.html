@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="robots" content="noindex,nofollow,noarchive" />
+  <meta name="theme-color" content="#f2f0e8" />
+  <title>Dementor Club — Motion Lab v1</title>
+  <link rel="stylesheet" href="/styles.css" />
+  <style>
+    :root{--paper:#f2f0e8;--ink:#111;--acid:#d8ff3e;--line:rgba(17,17,17,.22);--muted:rgba(17,17,17,.58)}
+    *{box-sizing:border-box}
+    html{scroll-behavior:auto;background:var(--paper);color:var(--ink)}
+    body{margin:0;background:var(--paper);color:var(--ink);font-family:Arial,Helvetica,sans-serif}
+    button,a{color:inherit}
+    .ml-topbar{position:sticky;top:0;z-index:50;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:18px;padding:12px 18px;border-bottom:1px solid var(--ink);background:rgba(242,240,232,.94);backdrop-filter:blur(10px)}
+    .ml-brand{font-weight:900;letter-spacing:-.05em;text-decoration:none}.ml-brand span{font-weight:400}
+    .ml-topbar__meta,.ml-meta{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
+    .ml-topbar__meta{text-align:center;color:var(--muted)}
+    .ml-controls{display:flex;gap:8px}.ml-btn{appearance:none;border:1px solid var(--ink);background:transparent;padding:8px 10px;font:700 10px/1 Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;cursor:pointer}.ml-btn:hover,.ml-btn.is-active{background:var(--ink);color:var(--paper)}
+    .ml-shell{width:min(1440px,calc(100% - 36px));margin:0 auto}
+    .ml-hero{min-height:80vh;display:grid;align-content:space-between;padding:54px 0 34px;border-bottom:1px solid var(--ink)}
+    .ml-hero__status{display:flex;justify-content:space-between;gap:20px}
+    .ml-hero h1{margin:8vh 0 5vh;font-size:clamp(66px,12vw,190px);line-height:.78;letter-spacing:-.085em;font-weight:900;text-transform:uppercase;max-width:12ch}
+    .ml-acid{background:var(--acid);padding:0 .04em}
+    .ml-hero__foot{display:grid;grid-template-columns:1.2fr .8fr;gap:10vw;align-items:end}
+    .ml-lead{margin:0;font-size:clamp(22px,3vw,42px);line-height:1.03;letter-spacing:-.045em;max-width:22ch}
+    .ml-copy{margin:0;max-width:52ch;font-size:14px;line-height:1.5}
+    .ml-section{padding:72px 0;border-bottom:1px solid var(--ink)}
+    .ml-head{display:grid;grid-template-columns:140px 1fr;gap:28px;margin-bottom:34px}.ml-head h2{margin:0;font-size:clamp(36px,6.5vw,92px);line-height:.88;letter-spacing:-.065em;text-transform:uppercase;max-width:14ch}.ml-head p{grid-column:2;margin:0;max-width:70ch;font-size:14px;line-height:1.5;color:var(--muted)}
+    .ml-stage{position:relative;min-height:420px;border:1px solid var(--ink);overflow:hidden;background:var(--paper)}
+    .ml-stage__bar{display:flex;justify-content:space-between;padding:9px 12px;border-bottom:1px solid var(--ink);font:700 10px/1 Arial,sans-serif;letter-spacing:.12em;text-transform:uppercase}
+    .ml-stage__body{position:relative;min-height:370px;padding:clamp(22px,4vw,48px);display:grid;align-items:center}
+    .ml-note{margin-top:10px;display:flex;justify-content:space-between;gap:20px;font-size:11px;line-height:1.4;color:var(--muted)}
+    .ml-note strong{color:var(--ink)}
+
+    /* 01 / DOCUMENT REVEAL */
+    .reveal-demo{display:flex;flex-direction:column;align-items:flex-start;gap:6px}
+    .reveal-line{position:relative;display:inline-block;overflow:hidden;font-size:clamp(44px,8vw,118px);line-height:.82;letter-spacing:-.075em;font-weight:900;text-transform:uppercase}
+    .reveal-line>span{display:block;transform:translateY(108%)}
+    .reveal-line::after{content:"";position:absolute;inset:0;background:var(--ink);transform:translateX(-101%)}
+    .reveal-demo.run .reveal-line>span{animation:revealText .75s cubic-bezier(.77,0,.18,1) forwards}
+    .reveal-demo.run .reveal-line::after{animation:revealMask .85s cubic-bezier(.77,0,.18,1) forwards}
+    .reveal-demo.run .reveal-line:nth-child(2)>span,.reveal-demo.run .reveal-line:nth-child(2)::after{animation-delay:.12s}
+    .reveal-demo.run .reveal-line:nth-child(3)>span,.reveal-demo.run .reveal-line:nth-child(3)::after{animation-delay:.24s}
+    @keyframes revealText{0%,44%{transform:translateY(108%)}100%{transform:translateY(0)}}
+    @keyframes revealMask{0%{transform:translateX(-101%)}48%{transform:translateX(0)}100%{transform:translateX(101%)}}
+
+    /* 02 / TYPE MALFUNCTION */
+    .malfunction{font-size:clamp(48px,8vw,116px);line-height:.86;letter-spacing:-.075em;font-weight:900;text-transform:uppercase;max-width:11ch}
+    .malfunction .wrong{position:relative;display:inline-block;background:var(--acid);padding:0 .05em;transition:transform .16s steps(2,end),letter-spacing .16s steps(2,end)}
+    .malfunction:hover .wrong,.malfunction.run .wrong{transform:translate(13px,-7px) rotate(-1.2deg);letter-spacing:-.13em}
+    .malfunction .wrong::after{content:"СОМНИТЕЛЬНО";position:absolute;left:0;top:100%;font:700 10px/1 Arial,sans-serif;letter-spacing:.12em;background:var(--ink);color:var(--paper);padding:6px 7px;opacity:0;transform:translateY(-5px)}
+    .malfunction:hover .wrong::after,.malfunction.run .wrong::after{opacity:1;transform:translateY(0)}
+
+    /* 03 / RECLASSIFICATION SCRAMBLE */
+    .reclassify{display:grid;gap:16px}.reclassify-row{display:grid;grid-template-columns:70px 1fr auto;gap:16px;align-items:center;padding:18px 0;border-bottom:1px solid var(--ink);cursor:pointer}.reclassify-row:first-child{border-top:1px solid var(--ink)}
+    .reclassify-row strong{font-size:clamp(25px,4vw,56px);letter-spacing:-.045em}.reclassify-row span:last-child{font:700 10px/1 Arial,sans-serif;letter-spacing:.1em;text-transform:uppercase}
+    .reclassify-row:hover{background:var(--acid)}
+
+    /* 04 / INK CONTAMINATION */
+    .ink-wrap{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:30px;align-items:end}
+    .ink-frame{position:relative;overflow:hidden;border:1px solid var(--ink);background:#ddd;cursor:pointer}.ink-frame img{display:block;width:100%;aspect-ratio:1.8/1;object-fit:cover;filter:url(#inkDistort)}
+    .ink-frame::after{content:"INK / CONTAMINATION / HOLD";position:absolute;left:12px;bottom:12px;background:var(--ink);color:var(--paper);padding:7px 8px;font:700 10px/1 Arial,sans-serif;letter-spacing:.1em}
+    .ink-copy{font-size:13px;line-height:1.45}.ink-copy strong{display:block;font-size:18px;margin-bottom:7px}
+
+    /* 05 / INDEX WIPE */
+    .index{border-top:1px solid var(--ink)}.index-row{position:relative;display:grid;grid-template-columns:80px 1fr 160px 40px;gap:14px;align-items:center;padding:19px 0;border-bottom:1px solid var(--ink);text-decoration:none;overflow:hidden}.index-row::before{content:"";position:absolute;inset:0;background:var(--acid);transform:translateX(-101%);transition:transform .28s cubic-bezier(.77,0,.18,1)}.index-row>*{position:relative;z-index:1}.index-row:hover::before,.index-row:focus-visible::before{transform:translateX(0)}.index-row strong{font-size:clamp(22px,3.4vw,48px);letter-spacing:-.045em}.index-row span{font-size:10px;letter-spacing:.1em;text-transform:uppercase}
+
+    /* 06 / INDEX PREVIEW */
+    .preview-area{position:relative;min-height:360px}.preview-list{width:min(760px,100%);border-top:1px solid var(--ink)}.preview-row{display:grid;grid-template-columns:56px 1fr auto;gap:18px;padding:18px 0;border-bottom:1px solid var(--ink);cursor:crosshair}.preview-row strong{font-size:clamp(22px,4vw,52px);letter-spacing:-.05em}.preview-card{position:absolute;right:0;top:30px;width:min(34vw,360px);border:1px solid var(--ink);background:var(--paper);opacity:0;transform:translate(0,15px) rotate(.5deg);pointer-events:none;transition:opacity .12s,transform .12s}.preview-card.is-open{opacity:1;transform:translate(0,0) rotate(-.6deg)}.preview-card img{display:block;width:100%;aspect-ratio:1/1;object-fit:cover}.preview-card span{display:block;padding:8px 10px;background:var(--ink);color:var(--paper);font:700 10px/1 Arial,sans-serif;letter-spacing:.1em}
+
+    /* 07 / SCROLL MASK */
+    .scroll-scene{height:110vh;position:relative}.scroll-sticky{position:sticky;top:70px;height:calc(100vh - 90px);overflow:hidden;border:1px solid var(--ink);background:var(--ink)}.scroll-sticky img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:grayscale(1);clip-path:inset(var(--mask-y,48%) var(--mask-x,48%) round 0)}.scroll-word{position:absolute;inset:0;display:grid;place-items:center;color:var(--paper);font-size:clamp(76px,18vw,250px);font-weight:900;letter-spacing:-.1em;mix-blend-mode:difference;pointer-events:none}.scroll-meter{position:absolute;left:12px;top:12px;background:var(--acid);padding:7px 9px;font:700 10px/1 Arial,sans-serif;letter-spacing:.1em}
+
+    /* 08 / MECHANICAL STATE */
+    .mechanical{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--ink)}.state{min-height:230px;padding:20px;border-right:1px solid var(--ink);display:flex;flex-direction:column;justify-content:space-between}.state:last-child{border-right:0}.state__dot{width:14px;height:14px;border-radius:50%;background:var(--ink)}.state.is-current .state__dot{background:var(--acid);box-shadow:0 0 0 1px var(--ink);animation:mechanicalPulse 1.1s steps(2,end) infinite}.state strong{font-size:clamp(26px,4vw,56px);line-height:.9;letter-spacing:-.05em}.state small{font:700 10px/1.2 Arial,sans-serif;letter-spacing:.1em;color:var(--muted)}@keyframes mechanicalPulse{50%{transform:scale(.45)}}
+
+    body.motion-off *,body.motion-off *::before,body.motion-off *::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+    body.motion-off .reveal-line>span{transform:none!important}body.motion-off .reveal-line::after{display:none}
+
+    @media(max-width:760px){.ml-topbar{grid-template-columns:1fr auto}.ml-topbar__meta{display:none}.ml-shell{width:calc(100% - 28px)}.ml-hero{min-height:72vh;padding-top:36px}.ml-hero__status{display:block}.ml-hero h1{font-size:clamp(58px,20vw,96px)}.ml-hero__foot{grid-template-columns:1fr;gap:26px}.ml-section{padding:54px 0}.ml-head{grid-template-columns:1fr;gap:12px}.ml-head p{grid-column:1}.ml-stage__body{padding:22px;min-height:330px}.ink-wrap{grid-template-columns:1fr}.index-row{grid-template-columns:48px 1fr 30px}.index-row span:nth-child(3){display:none}.preview-card{position:relative;top:auto;right:auto;width:100%;margin-top:18px}.preview-area{min-height:auto}.scroll-scene{height:95vh}.scroll-sticky{top:64px;height:calc(100vh - 80px)}.mechanical{grid-template-columns:1fr}.state{min-height:150px;border-right:0;border-bottom:1px solid var(--ink)}.state:last-child{border-bottom:0}.ml-note{display:block}.ml-note span{display:block;margin-bottom:5px}}
+    @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}.reveal-line>span{transform:none}.reveal-line::after{display:none}.state.is-current .state__dot{animation:none}}
+  </style>
+</head>
+<body>
+<header class="ml-topbar">
+  <a class="ml-brand" href="/design-system/">DEMENTOR<span>CLUB</span> / MOTION LAB</a>
+  <div class="ml-topbar__meta">INTERNAL / NOINDEX / STAGING ONLY / MOTION SPECIMEN</div>
+  <div class="ml-controls"><button class="ml-btn" id="motionToggle" type="button">MOTION / ON</button><button class="ml-btn" id="replayAll" type="button">REPLAY</button></div>
+</header>
+
+<main>
+  <section class="ml-hero ml-shell">
+    <div class="ml-hero__status ml-meta"><span>DEMENTOR MOTION LAB / V1</span><span>8 SPECIMENS / NO EXTERNAL LIBRARIES</span></div>
+    <h1>ДВИЖЕНИЕ.<br><span class="ml-acid">БЕЗ</span><br>ЦИРКА.</h1>
+    <div class="ml-hero__foot"><p class="ml-lead">Система сначала ведёт себя нормально. Потом один раз делает что-то подозрительное.</p><p class="ml-copy">Изолированная лаборатория для отбора motion-примитивов. Здесь ничего не становится каноном автоматически. Цель — выбрать 2–4 поведения, которые усиливают Dementor Club, а не превращают сайт в демонстрацию эффектов.</p></div>
+  </section>
+
+  <section class="ml-section" id="document-reveal"><div class="ml-shell">
+    <div class="ml-head"><span class="ml-meta">01 / DOCUMENT REVEAL</span><h2>БУМАГА ОТКРЫВАЕТ ФРАЗУ.</h2><p>Вместо стандартного fade-in — короткая механика печатной/редакционной маски. Подходит для одного крупного входа в секцию.</p></div>
+    <div class="ml-stage"><div class="ml-stage__bar"><span>SPECIMEN / STRONG</span><button class="ml-btn replay" data-target="revealDemo" type="button">REPLAY</button></div><div class="ml-stage__body"><div class="reveal-demo" id="revealDemo"><div class="reveal-line"><span>МЫ НЕ</span></div><div class="reveal-line"><span>ОБЕЩАЕМ</span></div><div class="reveal-line"><span>ПОМОЧЬ.</span></div></div></div></div>
+    <div class="ml-note"><span><strong>FIT / 9.5</strong> — hero, section opener, manifesto.</span><span>LIMIT / 1–2 раза на странице.</span></div>
+  </div></section>
+
+  <section class="ml-section" id="type-malfunction"><div class="ml-shell">
+    <div class="ml-head"><span class="ml-meta">02 / TYPE MALFUNCTION</span><h2>ОДНО СЛОВО НЕ СОГЛАСИЛОСЬ.</h2><p>Не анимация букв, а маленькая ошибка классификации. Наведи на acid-слово или нажми Replay.</p></div>
+    <div class="ml-stage"><div class="ml-stage__bar"><span>SPECIMEN / CONTROLLED VIOLATION</span><button class="ml-btn replay" data-target="malfunctionDemo" type="button">REPLAY</button></div><div class="ml-stage__body"><div class="malfunction" id="malfunctionDemo">ВАШЕ РЕШЕНИЕ ВЫГЛЯДИТ <span class="wrong">РАЗУМНО</span>.</div></div></div>
+    <div class="ml-note"><span><strong>FIT / 9</strong> — крупная фраза, CTA context.</span><span>LIMIT / только одно слово.</span></div>
+  </div></section>
+
+  <section class="ml-section" id="reclassification"><div class="ml-shell">
+    <div class="ml-head"><span class="ml-meta">03 / RECLASSIFICATION</span><h2>ИНТЕРФЕЙС ПЕРЕДУМАЛ.</h2><p>Бюрократическая строка при взаимодействии получает другую формулировку. Это уже близко к вашей существующей reclassify-механике, но здесь добавлен короткий scramble-переход.</p></div>
+    <div class="ml-stage"><div class="ml-stage__bar"><span>SPECIMEN / TEXT BEHAVIOUR</span><span>HOVER / TAP</span></div><div class="ml-stage__body"><div class="reclassify">
+      <div class="reclassify-row" data-original="Участник клуба" data-alt="Человек пока присутствует"><span class="ml-meta">01</span><strong>Участник клуба</strong><span>STATUS / ACTIVE</span></div>
+      <div class="reclassify-row" data-original="Полезная встреча" data-alt="Время было потрачено"><span class="ml-meta">02</span><strong>Полезная встреча</strong><span>RESULT / PENDING</span></div>
+      <div class="reclassify-row" data-original="Принято решение" data-alt="Создано ощущение решения"><span class="ml-meta">03</span><strong>Принято решение</strong><span>CONFIDENCE / LOW</span></div>
+    </div></div></div>
+    <div class="ml-note"><span><strong>FIT / 9</strong> — CTA, statuses, registry rows.</span><span>LIMIT / смысл важнее визуального шума.</span></div>
+  </div></section>
+
+  <section class="ml-section" id="ink-contamination"><div class="ml-shell">
+    <div class="ml-head"><span class="ml-meta">04 / INK CONTAMINATION</span><h2>ИЗОБРАЖЕНИЕ НА МГНОВЕНИЕ ПОРТИТ СИСТЕМУ.</h2><p>Нативный SVG displacement. Не постоянная жидкость и не glitch: короткое загрязнение изображения при hover/tap.</p></div>
+    <svg width="0" height="0" aria-hidden="true"><filter id="inkDistort"><feTurbulence id="turbulence" type="fractalNoise" baseFrequency="0.008 0.02" numOctaves="2" seed="7" result="noise"/><feDisplacementMap id="displace" in="SourceGraphic" in2="noise" scale="0" xChannelSelector="R" yChannelSelector="B"/></filter></svg>
+    <div class="ml-stage"><div class="ml-stage__bar"><span>SPECIMEN / DEMENTOR INK</span><span>HOVER / HOLD</span></div><div class="ml-stage__body"><div class="ink-wrap"><div class="ink-frame" id="inkFrame"><img src="/assets/people/dementors/gabil/portrait-ink.webp" alt="Dementor Ink specimen"></div><div class="ink-copy"><strong>Контаминация, не эффект.</strong>Изображение остаётся статичным почти всё время. Нарушение появляется только как реакция системы и сразу исчезает.</div></div></div></div>
+    <div class="ml-note"><span><strong>FIT / 10</strong> — Dementor Ink / editorial image.</span><span>LIMIT / один dominant image moment.</span></div>
+  </div></section>
+
+  <section class="ml-section" id="index-wipe"><div class="ml-shell">
+    <div class="ml-head"><span class="ml-meta">05 / INDEX WIPE</span><h2>КИСЛОТА ВМЕШИВАЕТСЯ ПО ДЕЛУ.</h2><p>Административный индекс остаётся строгим. Acid появляется только при выборе строки и показывает активность, а не украшает всё подряд.</p></div>
+    <div class="ml-stage"><div class="ml-stage__bar"><span>SPECIMEN / INDEX</span><span>HOVER / FOCUS</span></div><div class="ml-stage__body"><div class="index">
+      <a class="index-row" href="#index-wipe"><span>01</span><strong>НЕ КОМАНДА</strong><span>COURSE / ACTIVE</span><b>→</b></a>
+      <a class="index-row" href="#index-wipe"><span>02</span><strong>ФУЭНХИРОЛА</strong><span>EVENT / ARCHIVE</span><b>→</b></a>
+      <a class="index-row" href="#index-wipe"><span>03</span><strong>ЛОГИКА И ОСОЗНАННОСТЬ</strong><span>PROJECT / ACTIVE</span><b>→</b></a>
+    </div></div></div>
+    <div class="ml-note"><span><strong>FIT / 9.5</strong> — Archive, Projects, Community.</span><span>LIMIT / acid остаётся signal state.</span></div>
+  </div></section>
+
+  <section class="ml-section" id="preview"><div class="ml-shell">
+    <div class="ml-head"><span class="ml-meta">06 / INDEX PREVIEW</span><h2>СПИСОК ПОКАЗЫВАЕТ ДОКАЗАТЕЛЬСТВО.</h2><p>На desktop строка вызывает фото-preview. На mobile preview становится частью потока. Это не декоративный cursor, а быстрый контекст.</p></div>
+    <div class="ml-stage"><div class="ml-stage__bar"><span>SPECIMEN / PREVIEW</span><span>HOVER / TAP</span></div><div class="ml-stage__body"><div class="preview-area"><div class="preview-list">
+      <div class="preview-row" data-label="DEMENTOR / GABIL"><span>01</span><strong>ГАБИЛЬ</strong><span>→</span></div>
+      <div class="preview-row" data-label="STATUS / PERSON PRESENT"><span>02</span><strong>ЧЕЛОВЕК ПРИСУТСТВУЕТ</strong><span>→</span></div>
+      <div class="preview-row" data-label="REFERENCE / INK"><span>03</span><strong>СЛЕДЫ ДЕЯТЕЛЬНОСТИ</strong><span>→</span></div>
+    </div><div class="preview-card" id="previewCard"><img src="/assets/people/dementors/gabil/portrait-ink.webp" alt="Preview specimen"><span id="previewLabel">DEMENTOR / GABIL</span></div></div></div></div>
+    <div class="ml-note"><span><strong>FIT / 9</strong> — registry / catalog.</span><span>LIMIT / preview должен нести новую информацию.</span></div>
+  </div></section>
+
+  <section class="ml-section" id="scroll-mask"><div class="ml-shell">
+    <div class="ml-head"><span class="ml-meta">07 / SCROLL MASK</span><h2>ОДИН SIGNATURE MOMENT.</h2><p>Scroll открывает изображение через строгую геометрическую маску. Это самый «дорогой» эффект лаборатории, поэтому его смысл — только один большой переход на странице.</p></div>
+    <div class="scroll-scene" id="scrollScene"><div class="scroll-sticky" id="scrollSticky"><img src="/assets/people/dementors/gabil/portrait-ink.webp" alt="Scroll mask specimen"><div class="scroll-word">НЕ НАДО</div><div class="scroll-meter" id="scrollMeter">MASK / 00%</div></div></div>
+    <div class="ml-note"><span><strong>FIT / 8</strong> — только hero→editorial transition.</span><span>LIMIT / максимум один раз на странице.</span></div>
+  </div></section>
+
+  <section class="ml-section" id="mechanical"><div class="ml-shell">
+    <div class="ml-head"><span class="ml-meta">08 / MECHANICAL STATE</span><h2>ДВИЖЕТСЯ ТОЛЬКО ТО, ЧТО ЖИВО.</h2><p>Статусная анимация остаётся механической и дискретной. Никакого glow: current-state буквально подаёт минимальный сигнал.</p></div>
+    <div class="mechanical"><div class="state"><div class="state__dot"></div><small>01 / CREATED</small><strong>СОЗДАНО</strong></div><div class="state is-current"><div class="state__dot"></div><small>02 / VALIDATED / CURRENT</small><strong>ПРОВЕРЯЕТСЯ</strong></div><div class="state"><div class="state__dot"></div><small>03 / REALIZED</small><strong>СЛУЧИЛОСЬ</strong></div></div>
+    <div class="ml-note"><span><strong>FIT / 8.5</strong> — status / lifecycle / operational states.</span><span>LIMIT / только действительно current state.</span></div>
+  </div></section>
+
+  <section class="ml-section"><div class="ml-shell"><div class="ml-head"><span class="ml-meta">99 / DECISION</span><h2>КАНОН НЕ МЕНЯЛСЯ.</h2><p>Эта страница — только sandbox. Предлагаемый shortlist после визуальной проверки: 01 Document Reveal, 03 Reclassification, 04 Ink Contamination, 05 Index Wipe. Остальные — резерв, пока не доказали необходимость на конкретной странице.</p></div></div></section>
+</main>
+
+<script>
+(()=>{
+  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const body=document.body;
+  const toggle=document.getElementById('motionToggle');
+  if(reduce){body.classList.add('motion-off');toggle.textContent='MOTION / OS REDUCED';toggle.classList.add('is-active')}
+  toggle.addEventListener('click',()=>{body.classList.toggle('motion-off');toggle.classList.toggle('is-active');toggle.textContent=body.classList.contains('motion-off')?'MOTION / OFF':'MOTION / ON'});
+
+  const replay=(el)=>{if(!el||body.classList.contains('motion-off'))return;el.classList.remove('run');void el.offsetWidth;el.classList.add('run');setTimeout(()=>el.classList.remove('run'),1300)};
+  document.querySelectorAll('.replay').forEach(btn=>btn.addEventListener('click',()=>replay(document.getElementById(btn.dataset.target))));
+  document.getElementById('replayAll').addEventListener('click',()=>{replay(document.getElementById('revealDemo'));replay(document.getElementById('malfunctionDemo'));window.scrollTo({top:document.getElementById('document-reveal').offsetTop-60,behavior:body.classList.contains('motion-off')?'auto':'smooth'})});
+  const firstReveal=document.getElementById('revealDemo');const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){replay(firstReveal);io.disconnect()}}),{threshold:.55});io.observe(firstReveal);
+
+  const chars='?/_—0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const scramble=(node,to)=>{if(body.classList.contains('motion-off')){node.textContent=to;return}const from=node.textContent;let frame=0;const total=14;const tick=()=>{frame++;node.textContent=[...to].map((c,i)=>{if(c===' ')return ' ';const p=frame/total;return p>i/Math.max(1,to.length)?c:chars[(Math.random()*chars.length)|0]}).join('');if(frame<total)requestAnimationFrame(tick);else node.textContent=to};requestAnimationFrame(tick)};
+  document.querySelectorAll('.reclassify-row').forEach(row=>{const label=row.querySelector('strong');let alt=false;const go=()=>{alt=!alt;scramble(label,alt?row.dataset.alt:row.dataset.original)};row.addEventListener('mouseenter',()=>{if(!alt)go()});row.addEventListener('mouseleave',()=>{if(alt)go()});row.addEventListener('click',go)});
+
+  const frame=document.getElementById('inkFrame');const displacement=document.getElementById('displace');let inkRAF=0;
+  const contaminate=()=>{if(body.classList.contains('motion-off'))return;cancelAnimationFrame(inkRAF);const start=performance.now();const duration=520;const draw=(now)=>{const p=Math.min(1,(now-start)/duration);const wave=Math.sin(p*Math.PI);displacement.setAttribute('scale',String(Math.round(wave*52)));if(p<1)inkRAF=requestAnimationFrame(draw);else displacement.setAttribute('scale','0')};inkRAF=requestAnimationFrame(draw)};
+  frame.addEventListener('mouseenter',contaminate);frame.addEventListener('pointerdown',contaminate);
+
+  const card=document.getElementById('previewCard'),label=document.getElementById('previewLabel');
+  document.querySelectorAll('.preview-row').forEach(row=>{const open=()=>{label.textContent=row.dataset.label;card.classList.add('is-open')};const close=()=>card.classList.remove('is-open');row.addEventListener('mouseenter',open);row.addEventListener('mouseleave',close);row.addEventListener('focus',open);row.addEventListener('blur',close);row.addEventListener('click',()=>card.classList.toggle('is-open'))});
+
+  const scene=document.getElementById('scrollScene'),sticky=document.getElementById('scrollSticky'),meter=document.getElementById('scrollMeter');
+  const updateScroll=()=>{const r=scene.getBoundingClientRect();const travel=Math.max(1,scene.offsetHeight-innerHeight*.72);const p=Math.max(0,Math.min(1,-r.top/travel));const inset=(48*(1-p));sticky.style.setProperty('--mask-y',inset.toFixed(2)+'%');sticky.style.setProperty('--mask-x',(inset*.82).toFixed(2)+'%');meter.textContent='MASK / '+String(Math.round(p*100)).padStart(2,'0')+'%'};
+  addEventListener('scroll',updateScroll,{passive:true});addEventListener('resize',updateScroll);updateScroll();
+})();
+</script>
+</body>
+</html>
