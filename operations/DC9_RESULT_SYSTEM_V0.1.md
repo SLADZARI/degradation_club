@@ -3,6 +3,35 @@
 Status: **APPROVED PRESENTATION CONTRACT / IMPLEMENTATION QA REQUIRED**  
 Date: 2026-08-31
 
+## Current visual reference
+
+**Graph Linked Cards v5** is the current approved working reference for the DC-9 result page.
+
+Reference name: `DC-9 Result — Graph Linked Cards v5`  
+Reference artifact: `dementor-dc9-graph-linked-cards-v5.html`  
+Status: **CURRENT WORKING REFERENCE**  
+Supersedes for further result-page development: earlier DC-9 result layout experiments and v1–v4 visual prototypes.
+
+All further DC-9 result design, responsive work, dossier work and site implementation should begin from Graph Linked Cards v5 unless an explicit later approval replaces it.
+
+Graph Linked Cards v5 fixes the following presentation principles:
+
+- the radar itself is readable and connected to the result list;
+- radar axes use the canonical `01–09` sphere numbering;
+- each radar axis also shows the final `/5` value;
+- the strongest visible sphere results may be marked by simple black dots on the radar;
+- the legend below the radar resolves `01–09 → sphere name → score`;
+- highlighted legend cells may use the acid field to connect them visually to radar peaks;
+- public A/B/C markers are not used;
+- result cards do not repeat sphere numbers;
+- result cards use the sphere icon instead of decorative empty circles;
+- card hierarchy is `icon → sphere → final level → level name → short editorial line`;
+- internal `tagLevels / intent / responsibility / base` remain in the factual model but do not clutter the main result cards;
+- the page order remains `hero → linked graph → highlighted results → remaining results → dossier → Community`;
+- mobile layouts must preserve graph readability rather than hiding the graph semantics in a separate unexplained visual.
+
+This reference is a presentation baseline, not a new diagnostic model. It does not modify the nine-sphere taxonomy, score calculation, Community gate, or membership semantics defined below.
+
 ## Purpose
 
 This document defines the result-layer boundary for the completed DC-9 Sphere Map. It does not replace `operations/ONBOARDING_SYSTEM.md` or `operations/CONTENT_TAXONOMY_AND_DEMENTOR_LEVELS.md`.
@@ -92,7 +121,8 @@ The stored `tagLevels`, `intent`, `responsibility` and `base` remain part of the
 The public result page shows:
 
 - full Sphere Map / radar;
-- readable mobile 01–09 legend;
+- canonical `01–09` axis numbers and final `/5` values on the graph;
+- readable `01–09 → sphere → score` legend;
 - three visually highlighted sphere results;
 - remaining six sphere results in compact form;
 - shareable personal dossier;
@@ -117,11 +147,15 @@ This is `presentation prominence` only. It does not create importance, quality, 
 ## Approved public UX order after 9/9
 
 1. Completion state `9 / 9` and `ВОТ ВАША КАРТА.`
-2. Sphere Map + compact mobile legend.
-3. Three highlighted results: icon, sphere, final level, level name and one short editorial line.
-4. Remaining six results: icon, sphere, final level and one short editorial line.
+2. Graph Linked Sphere Map with `01–09`, `/5` values and linked legend.
+3. Three highlighted results: sphere icon, sphere name, final level, level name and one short editorial line.
+4. Remaining six results: sphere icon, sphere name, final level, level name where useful, and one short editorial line.
 5. Compact personal dossier preview + `СКАЧАТЬ ДОСЬЕ` / `ПОДЕЛИТЬСЯ`.
 6. Strong Community CTA.
+
+Do not repeat sphere numbers inside result cards. Numbers are navigation/indexing for the graph and legend only.
+
+Do not use decorative empty circles in result cards. Use the canonical sphere pictogram instead.
 
 Do not repeat tags, guard axes or diagnostic explanations throughout the public page. Do not add a separate club-manifesto block between results and dossier unless it has a proven user task.
 
@@ -161,8 +195,10 @@ Required:
 
 - no horizontal overflow;
 - no clipped public copy;
-- mobile radar receives a separate readable 01–09 legend instead of relying on tiny SVG labels;
+- graph axis numbers and `/5` values remain readable on mobile;
+- legend remains the textual resolution layer for the graph;
 - no public A/B/C marker system;
+- result cards contain no redundant sphere numbering;
 - all nine results remain visible without mandatory interaction;
 - mobile page should avoid repeating the same analytical payload in multiple formats;
 - share preview fits mobile viewport;
@@ -173,12 +209,6 @@ Required:
 
 ## Current staging QA snapshot
 
-After the mobile-first simplification pass on 2026-08-31, the representative 375 px Chromium snapshot measures approximately:
+Graph Linked Cards v5 becomes the baseline for all further responsive QA. Earlier page-height and copy-volume measurements from v4 remain historical evidence only and must not be treated as the current design target.
 
-- page height: ~3800 px (previous overloaded version ~6800 px);
-- visible copy: ~234 words (previous overloaded version ~482 words);
-- document width: 375 px / no horizontal overflow;
-- primary dossier buttons: full mobile width;
-- Community headline intentionally resolves to two lines at 375 and 320 px.
-
-This snapshot is implementation evidence, not production approval. Production publication still requires real staging/browser/provider QA and explicit release approval.
+Production publication still requires real staging/browser/provider QA and explicit release approval.
