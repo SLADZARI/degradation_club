@@ -7,6 +7,30 @@
     localStorage.removeItem(key);
   }catch(e){available=false;}
   document.documentElement.dataset.dcStorage=available?'available':'unavailable';
+
+  // Temporary compatibility bridge for the historical Self-development id.
+  // Old /join/ code writes `self-development`; account/runtime authority uses `self_development`.
+  // Keep both aliases synchronized until the inline onboarding engine is migrated in one controlled change.
+  const syncLegacySphereAlias=()=>{
+    if(!available)return;
+    try{
+      const storageKey='dementorClubOnboardingV3';
+      const db=JSON.parse(localStorage.getItem(storageKey)||'null');
+      if(!db?.results)return;
+      const legacy=db.results['self-development'];
+      const canonical=db.results.self_development;
+      if(!legacy&&!canonical)return;
+      const stamp=x=>Date.parse(x?.date||0)||0;
+      const latest=!canonical||stamp(legacy)>stamp(canonical)?legacy:canonical;
+      let changed=false;
+      if(latest&&JSON.stringify(db.results['self-development'])!==JSON.stringify(latest)){db.results['self-development']=latest;changed=true}
+      if(latest&&JSON.stringify(db.results.self_development)!==JSON.stringify(latest)){db.results.self_development=latest;changed=true}
+      if(changed)localStorage.setItem(storageKey,JSON.stringify(db));
+    }catch(e){console.warn('[DC9 legacy sphere alias]',e)}
+  };
+  syncLegacySphereAlias();
+  if(available)setInterval(syncLegacySphereAlias,1200);
+
   if(available)return;
 
   const style=document.createElement('style');
