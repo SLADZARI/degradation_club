@@ -1,4 +1,4 @@
-# DC-9 Full Question Bank v0.6.3 — blind-read + interaction adapter consolidation
+# DC-9 Full Question Bank v0.6.4 — targeted blind-playtest corrections
 
 Status: **FULL DRAFT / NOT CANON / NOT PRODUCTION / BLIND PLAYTEST READY**  
 Date: 2026-08-31  
@@ -13,15 +13,17 @@ Basis:
 - `operations/ONBOARDING_SCENARIO_RULES.md` — hidden semantic canon;
 - `operations/DC9_RESULT_SYSTEM_V0.1.md` — scoring/result contract.
 
-## v0.6.3 contract
+## v0.6.4 contract
 
-This pass does **not** conceptually rewrite the bank. The language is considered found.
+This pass does **not** reopen the whole bank. It applies targeted blind-playtest corrections only where the public scene felt unclear, too technical, repetitive or insufficiently Dementor in tone.
 
-This revision concentrates on three gates:
-
-1. **blind public read** — remove the author's voice from answers that look too obviously Club-approved;
-2. **interaction equivalence** — every future interactive screen must collapse back into exactly one canonical hidden `0/1/2/3` state;
-3. **mechanical restraint** — four internal interaction grammars only, without turning a reference distribution into a quota.
+Primary corrections in this revision:
+- clarify scene geography and causal flow where a detail distracted from the human situation;
+- replace technical workplace vocabulary with ordinary language where the same semantic evidence can be preserved;
+- preserve immersion while restoring sharper social satire and recognisable human absurdity;
+- use `OBJECT 001 — НЕ НАДО` as a sparse recurring Club World refrain where it strengthens the scene;
+- keep post-choice system lines out of the pre-choice scene when their timing is part of the joke;
+- no mass rewrite of screens already working in blind read.
 
 Preserved:
 - 9 spheres;
@@ -49,7 +51,8 @@ Humor rule:
 - satire comes from observed contradiction, not from an authorial clever line pasted onto a neutral case;
 - strong anchors stay intact;
 - guards are quieter, but still remain lived scenes rather than psychometric questions;
-- an elegant quotable phrase is **not automatically a good answer option**. Answers should sound like something a person might actually click.
+- an elegant quotable phrase is **not automatically a good answer option**. Answers should sound like something a person might actually click;
+- first priority is a funny recognisable human situation; diagnostic precision and UI treatment must sit inside it, not replace it.
 
 ### Fixation placement rule
 
@@ -83,7 +86,7 @@ Public labels come from the scene. `НЕ НАДО` remains a Club World object/a
 
 The current candidate mix may resemble roughly `36 Scene Choice / 8 Threshold / 5 Allocation / 5 Consequence`, but this is only a **reference distribution for prototyping**.
 
-It is explicitly **not a constraint**. A later blind playtest may produce `38/7/4/5`, `35/9/4/6` or another mix if the semantics fit better.
+It is explicitly **not a constraint**.
 
 Rule:
 
@@ -97,11 +100,7 @@ No interaction may create additional evidence, bonus points or a new scale.
 
 ### SCENE CHOICE adapter
 
-Direct mapping:
-
 `selected public exit → canonical answer id → one hidden 0/1/2/3`
-
-Nothing changes from the current scoring model.
 
 ### THRESHOLD adapter
 
@@ -115,12 +114,6 @@ Requirements:
 - the mapping is authored per question, not inferred from raw step count;
 - no continuous score is produced;
 - if a natural four-state partition cannot be defended, the screen stays `SCENE CHOICE`.
-
-Example shape only:
-
-`stop before action / light check / structured check / full takeover → canonical 3/2/1/0`
-
-The direction is **question-specific** and must match the frozen semantic bank.
 
 ### ALLOCATION adapter
 
@@ -144,17 +137,9 @@ But the entire path returns **one** canonical evidence state.
 
 Do not score phase A and phase B separately.
 
-Required authoring artifact before implementation:
-
-`(initial action, revealed consequence, final reaction) → canonical answer id 0/1/2/3`
-
-The revealed world outcome may challenge the user's strategy, but it must not secretly reward the ideology of “do less” or “check more”.
-
 ### Guard rule
 
 All 18 guards remain `SCENE CHOICE` for the current candidate build.
-
-Reason: guards test motive and responsibility. Interaction novelty must not contaminate that evidence.
 
 ---
 
@@ -187,20 +172,22 @@ Rule preserved: **Меньше поддерживать образ — боль�
 
 ## Q2 · #отказотроли · everyday
 
-Садишься за стол с компанией. Меню ещё даже не открыто.
+Приходишь к компании. Все уже на месте.
 
-Кто-то уже протягивает телефон:
+Стол забронирован. Место выбрали без тебя. После ужина тоже уже решили, куда идти.
 
-> «Ну ты же обычно решаешь, куда дальше».
+Никто не спрашивает:
 
-Сегодня хотелось просто поесть.
+> «Ну что дальше?»
 
-**Старая должность оказалась бессрочной.**
+Сегодня от тебя, кажется, требуется только сесть.
 
-- `0` — Беру телефон и организую. Люди хотя бы знают, чего ожидать.
-- `1` — Предлагаю два места и прошу остальных выбрать. Формально я почти не организую.
-- `2` — Говорю, что сегодня не веду процесс, и жду чужих предложений.
-- `3` — Говорю, что сегодня выбирает кто-то другой, и не подхватываю организацию обратно.
+**Самоорганизация обнаружена. Причины выясняются.**
+
+- `0` — Всё равно уточняю бронь и что дальше. Так спокойнее.
+- `1` — Предлагаю пару улучшений. Раз уж вижу, где можно удобнее.
+- `2` — Сажусь и не перехватываю организацию, пока не попросят.
+- `3` — Сажусь. Если вечер развалится без моего участия, узнаем опытным путём.
 
 **Interaction candidate:** `THRESHOLD` — последовательность вмешательств; stop-state must map to the original four role-maintenance states.
 
@@ -229,7 +216,9 @@ Rule preserved: **Меньше поддерживать образ — боль�
 
 ## Q4 · #несовершенство · stronger absurd
 
-Третий человек за вечер представляется по имени.
+День рождения. Бар шумный, людей больше, чем имён в оперативной памяти.
+
+Ну вот. Третий человек за вечер представляется по имени.
 
 Через сорок секунд имя снова исчезает.
 
@@ -267,16 +256,18 @@ Rule preserved: **Меньше поддерживать образ — боль�
 
 09:12. В чате семнадцать новых сообщений.
 
-Встреча сорвалась.
+Вчера решаешь никого не собирать, не напоминать время и не проверять адрес. Взрослые люди разберутся.
 
-Часть причины действительно связана с тем, что привычная роль больше не выполняется.
+Не разобрались.
 
-Теперь это уже не теория.
+Один приехал не туда. Второй ждал подтверждения. Третий решил, что встречу вообще отменили.
 
-- `0` — Это проблема тех, кто слишком привык на меня рассчитывать.
-- `1` — Ну я теперь такой человек. Всем придётся адаптироваться.
-- `2` — Разбираю свою часть последствий и исправляю то, что могу.
-- `3` — Смотрю, что именно сломалось из-за моего решения, и беру эту часть на себя, не возвращая роль автоматически.
+**Самостоятельность группы прошла полевые испытания.**
+
+- `0` — Ну а что. Все взрослые. Я не диспетчер.
+- `1` — Значит, всё-таки без меня никак. Возвращаю привычный порядок.
+- `2` — Разбираю, что именно стоило передать яснее, и исправляю эту часть.
+- `3` — Исправляю свою часть сбоя, но обратно пожизненным организатором не становлюсь.
 
 **Interaction candidate:** `SCENE CHOICE`.
 
@@ -328,19 +319,21 @@ Rule preserved: **Делать меньше не равно делать хуж�
 
 ## Q3 · #результат · social absurdity
 
-На ретро открывают итог квартала.
+В конце месяца собираются обсудить проект.
 
-Результата нет.
+Самого результата нет.
 
-Зато формы заполнены на 100%, три статуса проведены, новый порядок отчётности соблюдён.
+Зато три отчёта готовы, все статусы обновлены, таблицы заполнены и каждая встреча прошла точно по расписанию.
 
-Кто-то предлагает добавить четвёртый статус.
+Кто-то говорит:
+
+> «Надо встречаться чаще. Тогда не будем так запускать».
 
 **Процесс требует больше процесса.**
 
-- `0` — Защищаю команду: по процедуре всё сделано правильно.
-- `1` — Добавляю контроль, чтобы в следующий раз отклонение заметили раньше.
-- `2` — Ищу место, где процедура перестала помогать результату.
+- `0` — Защищаю работу: всё, что было договорено по порядку, сделано.
+- `1` — Добавляю ещё одну проверку, чтобы раньше замечать проблему.
+- `2` — Ищу момент, где обсуждение начало заменять саму работу.
 - `3` — Убираю часть процесса и смотрю, изменится ли хоть что-то в результате.
 
 **Interaction candidate:** `ALLOCATION` — constrained set of process elements; all reachable keep/remove combinations need a four-class equivalence table.
@@ -385,16 +378,18 @@ Rule preserved: **Делать меньше не равно делать хуж�
 
 ## Responsibility guard · consequence already happened
 
-09:36. Новый процесс падает на реальном заказе.
+09:36. Клиент пишет: в заказе ошибка.
 
-Ошибка проходит именно через новую схему и делегированную часть.
+Месяц назад порядок работы упростили: часть проверки убрали, часть передали другому человеку.
 
-Старого процесса уже нет.
+Ошибка прошла как раз там, где раньше была ручная проверка.
 
-- `0` — Разбираюсь с человеком, которому делегировал. Он подвёл.
-- `1` — Значит, упрощение было слишком смелым. Возвращаю старый процесс целиком.
-- `2` — Разбираю, где моя архитектура не удержала риск, и корректирую её.
-- `3` — Исполнение было чужим, но схему выбрал я. Сначала разбираюсь со своей частью.
+Старый порядок уже не вернуть одним нажатием кнопки.
+
+- `0` — Иду разбираться с человеком, которому передали этот шаг. Он пропустил ошибку.
+- `1` — Возвращаю весь старый порядок. Упрощение себя не оправдало.
+- `2` — Возвращаю проверку именно туда, где риск оказался выше, чем думали.
+- `3` — Сначала разбираю, что в новом порядке спроектировали плохо. Чужая ошибка этот вопрос не отменяет.
 
 **Interaction candidate:** `SCENE CHOICE`.
 
@@ -433,14 +428,14 @@ Rule preserved: **Отказ от покупки должен освобожда
 
 Название товара уже выразило позицию. Кнопка «Оплатить» всё ещё активна.
 
-**Товар частично выполнил функцию до покупки.**
-
 - `0` — Покупаю. Иногда маленькая радость — нормальное решение.
 - `1` — Покупаю что-нибудь полезное, чтобы импульс выглядел хозяйственно.
 - `2` — Откладываю оплату и проверяю, хочется ли эта вещь завтра.
 - `3` — Закрываю корзину до утра. Если вещь всё ещё нужна завтра, вернусь.
 
 **Interaction candidate:** `CONSEQUENCE` — contextual action labels may include `ОПЛАТИТЬ / ОСТАВИТЬ ДО УТРА`; no mandatory global wording.
+
+**Post-choice fixation asset:** **Товар частично выполнил функцию до покупки.**
 
 ## Q3 · #антистатус · social absurdity
 
@@ -454,10 +449,10 @@ Rule preserved: **Отказ от покупки должен освобожда
 
 **Связь есть. Положение в обществе уточняется.**
 
-- `0` — Обновляю, если в этой среде это реально влияет на восприятие.
-- `1` — Поддерживаю приемлемый уровень, чтобы не объяснять лишнего.
-- `2` — Беру статусную вещь только если мне ещё нужен сам предмет.
-- `3` — Оставляю всё как есть. Объяснять свой телефон не собираюсь.
+- `0` — Обновляю. Если на встрече оценивают телефон, пусть хотя бы оценивают свежий.
+- `1` — Оставляю старый, но кладу экраном вниз. Маленькая дипломатия.
+- `2` — Меняю только если нужен сам телефон, а не уважение к его корпусу.
+- `3` — Телефон звонит, почта открывается. Общество как-нибудь переживёт.
 
 **Interaction candidate:** `SCENE CHOICE`.
 
@@ -503,10 +498,12 @@ Rule preserved: **Отказ от покупки должен освобожда
 
 Экономия есть. Удобство остальных начало участвовать в расчёте.
 
+**НЕ НАДО сработало. Теперь дома не хватает того, что всё-таки надо.**
+
 - `0` — Привыкнут. Покупать всё подряд точно хуже.
-- `1` — Терпим дальше: неприятно признавать, что минимализм получился дорогим по времени.
+- `1` — Терпим дальше: неприятно признавать, что экономия получилась дорогой по времени.
 - `2` — Возвращаю то, без чего ограничение перестало быть полезным.
-- `3` — Покупаю то, без чего дома уже неудобно не только мне. Идею экономии оставляю, этот запрет — нет.
+- `3` — Покупаю то, без чего дома уже неудобно не только мне. Остальное по-прежнему может быть «не надо».
 
 **Interaction candidate:** `SCENE CHOICE`.
 
@@ -539,22 +536,24 @@ Rule preserved: **Меньше социального ритуала не рав
 
 ## Q2 · #границы · everyday
 
-19:26. Куртка уже снята. Еда греется.
+Суббота, 11:08.
 
-Телефон звонит:
+В общем чате уже решили, что вечером все собираются у тебя.
 
-> «Можешь сегодня помочь? Мне больше не к кому».
+Узнаёшь об этом из сообщения:
 
-После этой недели ресурса хватает примерно на душ, еду и смотреть в одну точку.
+> «Мы к семи, ок?»
 
-Телефон ждёт.
+В холодильнике половина лимона и свет.
 
-- `0` — Соглашаюсь. Близкие для этого и нужны.
-- `1` — Соглашаюсь и заранее знаю, что потом буду злиться.
-- `2` — Говорю, что реально могу дать, а что сегодня не вывезу.
-- `3` — Говорю, что сегодня не могу. Близость эту конкретную вечернюю батарейку не заряжает.
+Квартира, судя по переписке, согласилась раньше тебя.
 
-**Interaction candidate:** `SCENE CHOICE` — composing a message is presentation, not a fifth mechanic.
+- `0` — Отвечаю «ок» и начинаю закупаться. Раз уже договорились, неудобно ломать планы.
+- `1` — Соглашаюсь, но весь день злюсь, что меня вообще не спросили.
+- `2` — Пишу, что сегодня не получится, и предлагаю другое место или другой день.
+- `3` — Пишу: «Нет, сегодня у меня не собираемся». Где собираться дальше — уже не моя часть задачи.
+
+**Interaction candidate:** `SCENE CHOICE` — здесь важна граница и её мотив, а не конструктор фразы.
 
 ## Q3 · #неспасательство · social absurdity
 
@@ -1136,24 +1135,30 @@ Rule preserved: **Технология должна убирать лишнее 
 
 ## Q3 · #цифроваяавтономия · social absurdity
 
-Нужно выгрузить свои данные из удобного сервиса.
+Пять лет фотографии сами складывались в облачный сервис.
 
-Внутри уже заметки, история и рабочий процесс.
+Там уже отпуск, дети, кот, случайные потолки и всё остальное, что подтверждает существование семьи.
 
-Открываешь Export.
+Покупаешь новый телефон и решаешь заодно сохранить оригиналы на диск.
 
-Экспорт доступен в **Business Plus**.
+Нажимаешь **«Скачать всё»**.
 
-Business Plus сейчас нужен главным образом для экспорта.
+На экране появляется:
 
-**Выход предусмотрен архитектурой монетизации.**
+> «Массовая выгрузка доступна в Premium Archive».
 
-- `0` — Остаюсь. Если сервис хороший, зависимость не проблема сама по себе.
-- `1` — Иногда делаю резервные копии того, что кажется важным.
-- `2` — Проверяю реальную возможность выхода и переноса данных заранее.
-- `3` — Проверяю экспорт заранее. Если выйти нельзя, это уже часть цены сервиса.
+По одной фотографии скачивать бесплатно.
 
-**Interaction candidate:** `SCENE CHOICE`; clicking through Export is presentation unless an authored four-state adapter is demonstrated.
+Их 18 642.
+
+**Фотографии ваши. Выход — по подписке.**
+
+- `0` — Оставляю как есть. Сервис удобный, зачем усложнять.
+- `1` — Скачиваю по одной самое важное. Остальное пусть лежит.
+- `2` — Проверяю, можно ли забрать всё без потерь, прежде чем складывать туда ещё.
+- `3` — Если свои фотографии нельзя нормально забрать, ищу другой сервис до следующей тысячи снимков.
+
+**Interaction candidate:** `SCENE CHOICE`; paywall is the scene, not a technical export puzzle.
 
 ## Q4 · #нетехнофетиш · stronger absurd
 
@@ -1176,15 +1181,15 @@ AI заканчивает за четыре минуты то, на что об�
 
 ## Intentionality guard · near-serious
 
-В профессиональном чате все обсуждают новый AI-инструмент.
+В профессиональном чате все обсуждают новую систему для работы.
 
-У коллег он уже появляется в bio и презентациях.
+У коллег она уже появляется в профилях и презентациях.
 
 Реальную работу пока почти не улучшает. На освоение уйдёт несколько вечеров.
 
-- `0` — Осваиваю. Быть в контексте технологии — часть профессии.
+- `0` — Осваиваю. Быть в контексте новой системы — часть профессии.
 - `1` — Осваиваю минимально, чтобы не выпадать из разговора.
-- `2` — Проверяю, какую конкретную работу он улучшает сейчас или в обозримом будущем.
+- `2` — Проверяю, какую конкретную работу система улучшает сейчас или в обозримом будущем.
 - `3` — Если конкретной пользы пока нет, не трачу несколько вечеров только ради отметки «тоже использую».
 
 **Interaction candidate:** `SCENE CHOICE`.
@@ -1206,7 +1211,7 @@ AI заканчивает за четыре минуты то, на что об�
 
 ---
 
-# v0.6.3 QA summary
+# v0.6.4 QA summary
 
 ## Structural preservation
 
@@ -1216,34 +1221,38 @@ AI заканчивает за четыре минуты то, на что об�
 - responsibility guards: `9/9`;
 - total: `54/54`.
 
+## Targeted blind-playtest corrections
+
+Changed only the screens explicitly failing the latest public read:
+- 02 — clarified role-release scene; removed distracting phone hand-off;
+- 04 — added a real location and conversational entry;
+- 06 — replaced abstract role language with a concrete failed coordination story;
+- 09 — replaced `ретро` with ordinary end-of-month project discussion;
+- 12 — replaced architecture/process jargon with a concrete client-order error;
+- 14 — moved `Товар частично выполнил функцию до покупки` to a post-choice reaction asset;
+- 15 — sharpened anti-status answers with stronger social satire;
+- 18 — returned `НЕ НАДО` as a sparse Club World refrain;
+- 20 — replaced the repeated «можешь помочь?» boundary scene with an uninvited-home-gathering situation;
+- 51 — replaced technical export language with a family-photo cloud lock-in scene;
+- 53 — replaced AI-specific social pressure with a generic new work system.
+
 ## Camera pass 54/54
 
-Applied bank-wide:
+Preserved bank-wide:
 - external case description → moment already happening;
 - formal `вы` removed from public scene voice;
 - second-person singular carried mostly by verbs, not repeated `ты`;
 - gendered past-tense constructions removed where they create avoidable friction;
-- every screen checked for a concrete trigger/detail and mini-turn;
-- exact time retained only where it adds tension, pace or comedy;
-- cosmetic timestamp + case description is not treated as immersion.
+- exact time retained only where it adds tension, pace or comedy.
 
-## Blind answer-camouflage pass
-
-Primary correction in v0.6.3:
-- reduced aphoristic / manifesto-like wording in many hidden `3` answers;
-- converted abstract principles into observable next actions where possible;
-- kept semantic direction intact;
-- preserved quotable language mainly in the scene/system layer rather than making the preferred-looking answer suspiciously elegant.
-
-Blind-read question for every future edit:
+## Blind answer-camouflage rule
 
 > Can a user identify the author's preferred answer from style alone?
 
 If yes, rewrite the answer before rewriting the scene.
 
-## Humor consolidation
+## Humor anchors preserved
 
-Tone anchors preserved:
 - `Процесс требует больше процесса.`
 - cup / `всё нормально` scene;
 - `Мир сохранён. Контакт временно отсутствует.`
@@ -1251,17 +1260,11 @@ Tone anchors preserved:
 - `Учёные доказали` source chain;
 - `Практика временно отложена из-за подготовки к практике.`
 - dinner / evening without KPI;
-- Business Plus export;
 - `Профессия сократилась быстрее самооценки.`
-
-The bank no longer treats every bold line as a mandatory pre-answer punchline. Runtime placement is deliberately open.
 
 ## Interaction safety
 
-The four grammars are authoring/implementation primitives, not four new scoring systems.
-
-Required before any non-Scene-Choice screen ships:
-
+Before any non-Scene-Choice screen ships:
 1. write the interaction state space;
 2. prove all reachable states are covered;
 3. map them into exactly four canonical answer-equivalence classes;
@@ -1269,27 +1272,19 @@ Required before any non-Scene-Choice screen ships:
 5. emit exactly one evidence state;
 6. reject the interactive version if this mapping feels artificial.
 
-Reference mechanic distribution is not canon and may change after playtest.
-
 ## Club World placements
 
-Current pilot placements remain `2/54`:
+Current pilot remains sparse:
+- `03-Q2` — `OBJECT 001 — НЕ НАДО`;
+- `03 Responsibility guard` — `НЕ НАДО` refrain;
+- `08-Q1` — generic Dementor Club gathering.
 
-1. `03-Q2` — `OBJECT 001 — НЕ НАДО` inside an ordinary purchase scene;
-2. `08-Q1` — generic Dementor Club gathering inside a local-meaning scene.
+Do not expand further before another blind read.
 
-Before adding more, blind-test:
-- understandable without prior Club knowledge;
-- memorable without explanation;
-- does not feel like an ad;
-- produces curiosity rather than requiring lore.
+## Next gate
 
-Only after that consider a sparse expansion toward roughly `4–6/54`, using confirmed Club entities only.
+Run the blind public playtest again. Do not reopen a global rewrite. Mark only cards that fail one of three questions:
 
-## Next gates
-
-1. **Blind public read 54/54** without tags, hidden numbers or interaction notes.
-2. **Write concrete equivalence tables only for interactive candidates selected for the first prototype.** Do not spec adapters for hypothetical mechanics that may be dropped.
-3. Build **one sphere prototype**, not the full bank, containing `SCENE CHOICE + one THRESHOLD + one ALLOCATION or CONSEQUENCE`.
-4. Check whether the three interactions still feel like one bureaucratic machine rather than three mini-games.
-5. If these gates pass, consider `v0.6.x → approved-draft`; do not reopen conceptual literary rewriting without a playtest failure.
+1. **Что бы я нажал?**
+2. **Вижу ли я «правильный» ответ?**
+3. **Хочется ли следующий экран?**
