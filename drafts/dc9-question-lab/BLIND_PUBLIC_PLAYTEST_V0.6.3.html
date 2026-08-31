@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>DC-9 Blind Public Playtest</title>
+<style>
+:root{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#171717;background:#eee7d8}
+*{box-sizing:border-box}body{margin:0}.wrap{max-width:840px;margin:0 auto;padding:28px 18px 80px}.top{display:flex;justify-content:space-between;gap:16px;align-items:center;margin-bottom:28px;font-size:13px}.brand{font-weight:800;letter-spacing:.08em;text-transform:uppercase}.progress{opacity:.65}.card{background:#f7f1e5;border:1px solid rgba(0,0,0,.18);box-shadow:0 12px 40px rgba(0,0,0,.08);padding:28px;border-radius:4px}.scene{font-size:20px;line-height:1.48}.scene p{margin:0 0 14px}.scene blockquote{margin:16px 0;padding:12px 16px;border-left:3px solid #9b1d20;background:rgba(155,29,32,.05)}.scene strong{font-weight:800}.answers{display:grid;gap:10px;margin-top:24px}.answer{width:100%;text-align:left;background:#fffaf0;border:1px solid rgba(0,0,0,.22);padding:15px 16px;font-size:16px;line-height:1.35;cursor:pointer;border-radius:3px}.answer:hover{transform:translateY(-1px);border-color:#111}.answer.selected{outline:2px solid #111;background:#fff}.tester{margin-top:24px;padding-top:20px;border-top:1px dashed rgba(0,0,0,.3);display:none}.tester.show{display:block}.tester h3{margin:0 0 12px;font-size:14px;text-transform:uppercase;letter-spacing:.06em}.row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0}.tester button,.next{border:1px solid #111;background:transparent;padding:11px 12px;cursor:pointer;font:inherit}.tester button.active{background:#111;color:#fff}.next{width:100%;margin-top:16px;background:#111;color:#fff;font-weight:700}.note{font-size:13px;opacity:.65;margin-top:18px}.error{padding:20px;background:#fff0f0;border:1px solid #b22}.done{text-align:center;padding:48px 10px}.done h1{font-size:34px;margin:0 0 12px}.done p{line-height:1.5}.export{white-space:pre-wrap;text-align:left;background:#fff;padding:14px;border:1px solid #bbb;margin-top:20px;font-size:12px;max-height:300px;overflow:auto}
+@media(max-width:600px){.card{padding:20px}.scene{font-size:18px}.row{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><div class="brand">Dementor Club · DC-9</div><div class="progress" id="progress">загрузка</div></div>
+  <main id="app" class="card"><div>Загружаем вопросы…</div></main>
+</div>
+<script>
+const SOURCE='https://raw.githubusercontent.com/SLADZARI/degradation_club/draft/dc9-question-lab/drafts/dc9-question-lab/BANK_V0.6_FULL_54_IMMERSIVE.md';
+const app=document.getElementById('app');
+const progress=document.getElementById('progress');
+let screens=[], index=0, log=[];
+function esc(s){return s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]))}
+function inline(s){return esc(s).replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/`([^`]+)`/g,'<code>$1</code>')}
+function shuffle(a){const x=[...a];for(let i=x.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[x[i],x[j]]=[x[j],x[i]]}return x}
+function parse(md){
+  const lines=md.split(/\r?\n/); const out=[]; let cur=null; let inQuestion=false;
+  const flush=()=>{if(cur&&cur.answers.length===4)out.push(cur);cur=null};
+  for(const raw of lines){const line=raw.trimEnd();
+    if(/^## (Q[1-4]|Intentionality guard|Responsibility guard)/.test(line)){flush();cur={scene:[],answers:[]};inQuestion=true;continue}
+    if(!inQuestion||!cur)continue;
+    if(/^\*\*Interaction candidate:/.test(line)){flush();inQuestion=false;continue}
+    if(/^---$/.test(line)||/^# /.test(line)){flush();inQuestion=false;continue}
+    const m=line.match(/^- `([0-3])` — (.+)$/); if(m){cur.answers.push({canonical:m[1],text:m[2]});continue}
+    if(line.startsWith('**Interaction candidate:**')){flush();inQuestion=false;continue}
+    if(line===''&&cur.scene.length&&cur.scene[cur.scene.length-1]==='')continue;
+    cur.scene.push(line)
+  } flush(); return out;
+}
+function sceneHTML(lines){let html='', quote=[];const flushQuote=()=>{if(quote.length){html+='<blockquote>'+quote.map(x=>'<div>'+inline(x.replace(/^>\s?/,''))+'</div>').join('')+'</blockquote>';quote=[]}};
+ for(const l of lines){if(l.startsWith('>')){quote.push(l);continue}flushQuote();if(l==='')continue;html+='<p>'+inline(l)+'</p>'}flushQuote();return html}
+function render(){
+ if(index>=screens.length){finish();return}
+ const s=screens[index], opts=shuffle(s.answers).map((a,i)=>({...a,label:'ABCD'[i]})); s.current=opts;
+ progress.textContent=`${index+1} / ${screens.length}`;
+ app.innerHTML=`<section class="scene">${sceneHTML(s.scene)}</section><div class="answers">${opts.map(o=>`<button class="answer" data-canonical="${o.canonical}" data-label="${o.label}"><b>${o.label}.</b> ${inline(o.text)}</button>`).join('')}</div><section class="tester"><h3>После выбора</h3><div>Вижу ли я «правильный» ответ?</div><div class="row"><button data-test="obvious" data-v="yes">Да</button><button data-test="obvious" data-v="no">Нет</button></div><div>Хочется ли следующий экран?</div><div class="row"><button data-test="next" data-v="yes">Да</button><button data-test="next" data-v="no">Нет</button></div><button class="next" id="nextBtn">Следующий экран →</button></section><div class="note">Здесь нет тегов, скрытых 0–3, названий механик и редакционных комментариев. Порядок ответов перемешивается при каждом показе.</div>`;
+ let rec={screen:index+1,clicked:null,canonical:null,obvious:null,wantNext:null};
+ app.querySelectorAll('.answer').forEach(b=>b.onclick=()=>{app.querySelectorAll('.answer').forEach(x=>x.classList.remove('selected'));b.classList.add('selected');rec.clicked=b.dataset.label;rec.canonical=b.dataset.canonical;app.querySelector('.tester').classList.add('show')});
+ app.querySelectorAll('[data-test]').forEach(b=>b.onclick=()=>{const k=b.dataset.test==='obvious'?'obvious':'wantNext';rec[k]=b.dataset.v;b.parentElement.querySelectorAll('button').forEach(x=>x.classList.remove('active'));b.classList.add('active')});
+ document.getElementById('nextBtn').onclick=()=>{if(!rec.clicked)return alert('Сначала выбери ответ.');log.push(rec);index++;render()}
+}
+function finish(){progress.textContent='54 / 54';const obvious=log.filter(x=>x.obvious==='yes').length, drop=log.filter(x=>x.wantNext==='no').length;app.innerHTML=`<div class="done"><h1>Опрос завершён.</h1><p>Ответов, где «правильный» вариант был заметен: <b>${obvious}</b>.<br>Экранов, после которых не хотелось продолжать: <b>${drop}</b>.</p><p>Canonical mapping записан только в локальный лог для редакторской сверки и нигде не показывался во время прохождения.</p><div class="export">${esc(JSON.stringify(log,null,2))}</div></div>`}
+fetch(SOURCE,{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('HTTP '+r.status);return r.text()}).then(md=>{screens=parse(md);if(screens.length!==54)throw new Error('Ожидалось 54 экрана, найдено '+screens.length);render()}).catch(e=>{app.innerHTML=`<div class="error"><b>Не удалось загрузить master-bank.</b><br>${esc(e.message)}<br><br>Blind-view намеренно не дублирует 54 вопроса: он читает текущий BANK_V0.6_FULL_54_IMMERSIVE.md как единственный source of truth.</div>`;progress.textContent='ошибка'})
+</script>
+</body>
+</html>
