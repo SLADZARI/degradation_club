@@ -4,7 +4,8 @@
 **BRANCH:** `agent/dementor-lab-vertical-slice-v0.3`  
 **BASE:** `dementor-club-site`  
 **PRODUCT CONTRACT:** `projects/dementor-lab/DEMENTOR_LAB_PRODUCT_FLOW_INTERACTION_SPEC_v0.3.md` on `dementor-club`  
-**ENGINE CONTRACT:** `projects/dementor-lab/DEMENTOR_LAB_GAME_ARCHITECTURE_V0.1.md` on `dementor-club`
+**ENGINE CONTRACT:** `projects/dementor-lab/DEMENTOR_LAB_GAME_ARCHITECTURE_V0.1.md` on `dementor-club`  
+**CHARACTER CONTRACT:** `projects/dementor-lab/DEMENTOR_LAB_CHARACTER_SYSTEM_V0.1.md` on `dementor-club`
 
 ## Stage objective
 
@@ -37,6 +38,7 @@ dementor-lab/
     dialogue/
       phrase-bank.*
     render/
+      character-registry.*
       character-renderer.*
     app/
       mobile-interaction.*
@@ -61,6 +63,10 @@ Exact extension/framework may follow the existing site stack. Responsibility bou
 - Objective is one contract shared by setup, runtime and result.
 - Result is trace-derived, not generic psychology.
 - Production renderer owns SVG state changes; graph runtime does not manipulate SVG DOM.
+- Current production roster contains exactly two base bodies: `character-01` and `character-02`.
+- Each base body owns its rig, outfit and shoes.
+- Headwear, glasses, facial-hair category and general accessory are shared appearance categories.
+- A third base-character SVG must not enter runtime by file accumulation; it requires an explicit product/registry decision.
 
 ## Mobile implementation invariants
 
@@ -80,6 +86,7 @@ Exact extension/framework may follow the existing site stack. Responsibility bou
 Do not add before vertical-slice gate:
 
 - extra scenario packs;
+- additional base character bodies beyond the approved two;
 - user accounts;
 - social sharing;
 - LLM dialogue;
@@ -112,6 +119,7 @@ Stage 1 is complete when:
 - modular runtime exists;
 - one scenario runs deterministically;
 - PERSON/BRAIN/TALK use the same Character;
+- the two approved base characters use the character registry and their own rig metadata;
 - BRAIN editing works on phone;
 - STATE / MEMORY persists;
 - TRACE describes actual traversal;
