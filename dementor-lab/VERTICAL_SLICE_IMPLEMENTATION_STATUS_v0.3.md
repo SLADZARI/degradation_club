@@ -2,7 +2,8 @@
 
 **Branch:** `agent/dementor-lab-vertical-slice-v0.3`  
 **Product contract:** `dementor-club/projects/dementor-lab/DEMENTOR_LAB_PRODUCT_FLOW_INTERACTION_SPEC_v0.3.md`  
-**Character contract:** `dementor-club/projects/dementor-lab/DEMENTOR_LAB_CHARACTER_SYSTEM_V0.1.md`
+**Character contract:** `dementor-club/projects/dementor-lab/DEMENTOR_LAB_CHARACTER_SYSTEM_V0.1.md`  
+**Opponent contract:** `dementor-club/projects/dementor-lab/DEMENTOR_LAB_OPPONENT_SYSTEM_V0.1.md`
 
 ## Implemented in modular runtime
 
@@ -10,7 +11,7 @@
 - BehaviorGraph family compatibility + human validation.
 - Executable STATE/MEMORY (`resentment`, `trust`).
 - Deterministic authored Scenario `КРИТИКА ИДЕИ`.
-- Two real actor graphs: Геннадий Львович and Марта.
+- Two real actor graphs collide in every Encounter; opponent is never a scripted phrase sequence.
 - Encounter state with turn, transcript, traces, patches and result.
 - Deterministic graph path selection.
 - ExecutionTrace with visited nodes, impulse, reaction, metric deltas, memory changes and loops.
@@ -27,7 +28,7 @@
 
 ## Base character system
 
-The vertical slice now has a fixed production roster of exactly two base visual characters:
+The vertical slice has a fixed production roster of exactly two base visual characters:
 
 - `character-01` — base character 01;
 - `character-02` — base character 02 / female visual archetype.
@@ -53,25 +54,53 @@ The renderer reads rig metadata from the active SVG rather than assuming one uni
 
 Prototype/reference character SVGs must not accumulate in the production character asset folder. Adding a third base body requires an explicit product/registry decision.
 
+## Opponent system
+
+Fresh experiments now generate a compact opponent baseline through:
+
+```text
+src/opponent/presets.mjs
+src/opponent/generator.mjs
+```
+
+A generated opponent independently receives:
+
+- one of the two approved base visual characters;
+- randomized compatible appearance flags;
+- a name;
+- one authored real BehaviorGraph preset.
+
+Initial authored opponent presets:
+
+- `CONTACT_SKEPTIC` — «СНАЧАЛА РАЗБЕРУСЬ»;
+- `RIGHT_BACK` — «НЕТ, ЭТО Я СЕЙЧАС ОБЪЯСНЮ»;
+- `KEEP_PEACE` — «ЛИШЬ БЫ НЕ РУГАЛИСЬ».
+
+SETUP shows the opponent name, preset label and a short behavioral tendency description. **ДРУГОГО →** rerolls the opponent only before PLAY.
+
+The generator is seedable for QA. Randomization is frozen once the first Encounter baseline begins. Counterfactual replay restores the same opponent body, appearance, brain preset and initial state; it never silently rerolls the opponent.
+
+Appearance and brain preset are sampled independently, preserving `VISUAL CHARACTER ≠ BEHAVIOR GRAPH`.
+
 ## Wired vertical-slice UI
 
 The implementation branch has a real modular entry page at `dementor-lab/index.html`.
 
 Current connected flow:
 
-`PERSON → BRAIN → SETUP → TALK → predictive HOT PATCH → same-turn resume → RESULT → one-node rerun → BEFORE/AFTER`
+`PERSON → BRAIN → SETUP + OPPONENT → TALK → predictive HOT PATCH → same-turn resume → RESULT → one-node rerun → BEFORE/AFTER`
 
 UI responsibilities:
 
 - PERSON chooses one of the two base visual bodies and edits appearance only.
 - BRAIN edits actual player graph params (`BE RIGHT weight`, `REPEAT count`).
-- SETUP exposes one authored Scenario and objective contract.
-- TALK reads live Encounter state from `VerticalSliceController`.
+- SETUP exposes Scenario, objective and the generated opponent baseline.
+- TALK reads both real actor states from `VerticalSliceController`.
 - AUTO and STEP both call the same runtime.
 - TRACE reads actual `ExecutionTrace`.
 - HOT PATCH edits the actual graph and then resumes the pending turn.
 - RESULT is trace-derived.
-- Rerun recreates the same Scenario baseline, asks for one graph change, and compares terminal state through `compareRuns()`.
+- Rerun recreates the same Scenario and opponent baseline, asks for one player-graph change, and compares terminal state through `compareRuns()`.
 
 The UI does not maintain a second copy of encounter semantics.
 
@@ -83,13 +112,13 @@ The BRAIN loop breakpoint is aligned with the architecture baseline at predicted
 
 ## Test coverage present in branch
 
-The deterministic suite covers Encounter/HOT PATCH, replay/result, renderer behavior, mobile readability, UI contracts and character-asset contracts.
+The deterministic suite covers Encounter/HOT PATCH, replay/result, renderer behavior, mobile readability, UI contracts, character-asset contracts and seeded opponent generation.
 
-Browser smoke additionally verifies the phone-sized end-to-end flow and base-character/appearance switching contract.
+Browser smoke verifies the phone-sized end-to-end flow, two-character appearance contract, opponent SETUP description, generated opponent rig persistence and same-opponent counterfactual replay.
 
 ## Current gate
 
-Implementation breadth remains frozen. Continue with QA and visual accuracy rather than adding new game systems.
+Implementation breadth is frozen again after the explicitly approved opponent extension. Continue with QA and FUN PASS rather than adding more systems.
 
 Required checks before integration PR:
 
@@ -99,9 +128,11 @@ Required checks before integration PR:
 4. UI objective wording matches Scenario objective.
 5. TRACE matches actual graph path.
 6. Result explains actual final trace.
-7. Replay uses the same Scenario and shows a real BEFORE/AFTER delta.
+7. Replay uses the same Scenario, same opponent baseline and shows a real BEFORE/AFTER delta.
 8. Both base characters render correctly with their own rigs/outfit/shoes.
 9. Shared appearance state behaves consistently between both base characters.
-10. Mobile Safari and Android Chrome remain readable and operable.
+10. Opponent description matches its actual preset tendency without replacing trace causality.
+11. Mobile Safari and Android Chrome remain readable and operable.
+12. Gate D FUN PASS confirms a new adult player understands who they built, who they are facing, why behavior happened and wants to rerun.
 
-No deploy yet. No new game systems until this gate passes.
+No deploy yet.
