@@ -17,7 +17,7 @@
 - Predictive HOT PATCH interception before dangerous traversal is committed.
 - HOT PATCH reduce-repeat / reduce-impulse / insert-pause / rewire operations.
 - Patch preserves turn, metrics, memory and transcript.
-- Terminal checks include BRAIN, ENERGY, TENSION and CONTACT-by-objective.
+- Terminal checks follow approved contract: BRAIN, ENERGY, CONTACT when objective-terminal, plus turn limit/scenario rules. TENSION remains a live pressure metric, not a universal terminal by itself.
 - Phrase-bank dialogue remains a rendering layer rather than graph cause.
 - Trace-derived three-stage Result data.
 - Same-scenario replay comparison helper.
@@ -50,7 +50,7 @@ The UI does not maintain a second copy of encounter semantics.
 
 The earlier prototype/runtime ordering could apply a turn, reach terminal state and only then consider HOT PATCH. The modular runtime now predicts the dangerous traversal first. If the breakpoint qualifies, the Encounter enters `HOT_PATCH` **without consuming the turn or mutating metrics/memory/transcript**. After the patch, the same actor retries the pending turn against the changed graph.
 
-This better matches the approved contract: HOT PATCH is an intercept and resumes the same Encounter rather than becoming a post-failure repair screen.
+The BRAIN loop breakpoint is aligned with the architecture baseline at predicted `BRAIN ≥ 88` with repeated loop activity.
 
 ## Test coverage present in branch
 
