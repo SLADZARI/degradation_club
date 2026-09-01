@@ -21,6 +21,16 @@ export function visualStateFromMetrics(s){
   };
 }
 
+export function resolveVisualState(character={}){
+  const derived=visualStateFromMetrics(character.state||{});
+  const override=character.face||{};
+  return {
+    ...derived,
+    ...override,
+    motion:{...derived.motion,...(override.motion||{})}
+  };
+}
+
 export class CharacterRenderer{
   constructor({side,root}){
     this.side=side;this.root=root;this.svg=root?.querySelector('svg')||null;
@@ -39,7 +49,7 @@ export class CharacterRenderer{
   }
   render(character){
     if(!character||!this.svg)return;
-    const face=character.face||visualStateFromMetrics(character.state||{});
+    const face=resolveVisualState(character);
     const m=face.motion||{};
     this.variants('eyes',face.eyes||'neutral');
     this.variants('brows',face.brows||'neutral');
