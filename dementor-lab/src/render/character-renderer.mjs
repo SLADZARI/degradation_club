@@ -13,6 +13,15 @@ export function visualStateFromMetrics(s){
 }
 export function resolveVisualState(character={}){const derived=visualStateFromMetrics(character.state||{}),override=character.face||{};return {...derived,...override,motion:{...derived.motion,...(override.motion||{})}}}
 export const APPEARANCE_LAYERS=Object.freeze(['hat','glasses','beard','accessory','outfit','shoes']);
+export const APPEARANCE_VARIANTS=Object.freeze({
+  hat:{key:'hatVariant',prefix:'hat',legacy:'hat'},
+  glasses:{key:'glassesVariant',prefix:'glasses',legacy:'glasses'},
+  facialHair:{key:'facialHairVariant',prefix:'facial-hair',legacy:'beard'},
+  accessory:{key:'accessoryVariant',prefix:'accessory',legacy:'accessory'},
+  outfit:{key:'outfitVariant',prefix:'outfit',legacy:'outfit'},
+  shoes:{key:'shoesVariant',prefix:'shoes',legacy:'shoes'}
+});
+const COLOR_KEYS=Object.freeze({outfitPrimary:'outfit-primary',outfitSecondary:'outfit-secondary',shoesPrimary:'shoes-primary'});
 const DEFAULT_RIG=Object.freeze({head:[352,270],shoulderLeft:[275,345],shoulderRight:[425,345],hipLeft:[311,590],hipRight:[393,591]});
 
 function readRig(svg,fallback=null){
@@ -29,7 +38,35 @@ export class CharacterRenderer{
   refresh(){this.svg=this.root?.querySelector('svg')||null;this.rig=readRig(this.svg,this.rigFallback);return this}
   el(name){if(!this.svg)return null;const escaped=CSS.escape(name),prefixed=CSS.escape(`${this.side}-${name}`);return this.svg.querySelector(`#${prefixed}`)||this.svg.querySelector(`#${escaped}`)}
   variants(group,active){const groups={eyes:['neutral','tense','sleepy','overheat'],brows:['neutral','tense','angry'],mouth:['neutral','soft','tense','open']};(groups[group]||[]).forEach(v=>{const el=this.el(`${group}-${v}`);if(el)el.style.opacity=v===active?'1':'0'})}
-  appearance(visual={}){const state=visual.appearance||{};APPEARANCE_LAYERS.forEach(name=>{const el=this.el(name);if(el)el.style.display=state[name]===false?'none':''})}
+  variantElements(prefix){
+    if(!this.svg)return [];
+    const selectors=[`[id^="${CSS.escape(prefix)}-"]`,`[id^="${CSS.escape(`${this.side}-${prefix}`)}-"]`];
+    return [...new Set(selectors.flatMap(selector=>[...this.svg.querySelectorAll(selector)]))];
+  }
+  setVariant(prefix,active){
+    const variants=this.variantElements(prefix);
+    variants.forEach(el=>{const id=el.id.replace(new RegExp(`^${this.side}-`),'');el.style.display=id===active?'':'none'});
+    return variants.length>0;
+  }
+  setColorTarget(id,value){
+    if(!value)return;
+    const root=this.el(id);if(!root)return;
+    const paint=el=>{const fill=el.getAttribute?.('fill');if(fill!=='none')el.style.fill=value};
+    paint(root);root.querySelectorAll?.('[fill]').forEach(paint);
+  }
+  appearance(visual={}){
+    const state=visual.appearance||{};
+    if(state.variantContract){
+      Object.values(APPEARANCE_VARIANTS).forEach(({key,prefix,legacy})=>{
+        const selected=state[key]??null;
+        const hasVariants=this.setVariant(prefix,selected);
+        const legacyEl=this.el(legacy);if(legacyEl)legacyEl.style.display=hasVariants?'none':selected?'':'none';
+      });
+      const colors=state.colors||{};Object.entries(COLOR_KEYS).forEach(([key,id])=>this.setColorTarget(id,colors[key]));
+      return;
+    }
+    APPEARANCE_LAYERS.forEach(name=>{const el=this.el(name);if(el)el.style.display=state[name]===false?'none':''});
+  }
   render(character){
     if(!character)return;if(!this.svg)this.refresh();if(!this.svg)return;
     const face=resolveVisualState(character),m=face.motion||{},rig=this.rig||DEFAULT_RIG;
