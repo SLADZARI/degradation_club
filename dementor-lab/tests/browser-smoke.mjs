@@ -8,24 +8,28 @@ const page=await context.newPage();
 
 await page.goto(baseURL,{waitUntil:'networkidle'});
 assert.equal(await page.locator('#top-status').textContent(),'PERSON');
+assert.equal(await page.locator('#person-preview svg').count(),1,'new semantic character asset is mounted');
+assert.equal(await page.locator('[data-part]').count(),6,'appearance panel exposes six semantic parts');
+assert.equal(await page.locator('#person-preview #hat').isVisible(),true,'hat starts visible');
+await page.locator('[data-part="hat"]').click();
+assert.equal(await page.locator('#person-preview #hat').isVisible(),false,'appearance panel toggles real SVG layer');
+await page.locator('[data-part="hat"]').click();
+assert.equal(await page.locator('#person-preview #hat').isVisible(),true,'appearance layer can be restored');
+
 await page.locator('#to-brain').click();
 assert.equal(await page.locator('#top-status').textContent(),'BRAIN');
 assert.ok(await page.locator('#brain-graph .brain-node').count()>=5);
-
 await page.locator('#to-setup').click();
 assert.equal(await page.locator('#top-status').textContent(),'SETUP');
 await page.locator('[data-mode="step"]').click();
 await page.locator('#play').click();
 assert.equal(await page.locator('#top-status').textContent(),'TALK');
+assert.equal(await page.locator('#actor-a svg').count(),1,'player character persists into TALK');
 
 let hotPatchSeen=false;
 for(let i=0;i<16;i++){
-  if(await page.locator('#overlay:not([hidden]) [data-patch="repeat"]').count()){
-    hotPatchSeen=true;
-    break;
-  }
-  await page.locator('#next-turn').click();
-  await page.waitForTimeout(30);
+  if(await page.locator('#overlay:not([hidden]) [data-patch="repeat"]').count()){hotPatchSeen=true;break}
+  await page.locator('#next-turn').click();await page.waitForTimeout(30);
 }
 assert.equal(hotPatchSeen,true,'predictive HOT PATCH should appear in authored scenario');
 const turnBeforePatch=Number(await page.locator('#turn').textContent());
@@ -35,13 +39,11 @@ assert.equal(Number(await page.locator('#turn').textContent()),turnBeforePatch,'
 let resultSeen=false;
 for(let i=0;i<28;i++){
   if((await page.locator('#top-status').textContent())==='RESULT'){resultSeen=true;break}
-  await page.locator('#next-turn').click();
-  await page.waitForTimeout(30);
+  await page.locator('#next-turn').click();await page.waitForTimeout(30);
 }
 assert.equal(resultSeen,true,'authored scenario should reach RESULT');
 assert.ok((await page.locator('#result-cause').textContent()).trim().length>0);
 assert.ok((await page.locator('#result-node').textContent()).trim().length>0);
-
 await page.locator('#rerun').click();
 assert.equal(await page.locator('#top-status').textContent(),'BRAIN');
 assert.equal(await page.locator('#replay-note').isVisible(),true);
