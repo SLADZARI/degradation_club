@@ -6,7 +6,7 @@ import { NODE_SPECS } from '../core/model.mjs';
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const app=$('#app'),overlay=$('#overlay'),topStatus=$('#top-status');
 let look='plain',mode='auto',actors=createCriticismActors(),controller=null,autoTimer=null;
-let baselineEncounter=null,replayMode=false;
+let baselineEncounter=null,replayMode=false,firstRunConfig=null,replayTargetType=null;
 
 function show(screen){
   app.dataset.screen=screen;topStatus.textContent=screen.toUpperCase();
@@ -20,12 +20,16 @@ function familyLabel(type){return NODE_SPECS[type]?.family||'NODE'}
 function title(type){return NODE_SPECS[type]?.title||type}
 function nodeValue(n){const f=familyLabel(n.type);if(f==='IMPULSE')return `W${n.p?.weight||1}`;if(n.type==='repeat')return `×${n.p?.count||1}`;if(f==='STATE')return `+${n.p?.delta??1}`;return ''}
 function nodeSubtitle(n){const map={criticism:'что произошло',resentment:'что накопилось',beright:'чего он хочет',explain:'что он делает',repeat:'сколько раз'};return map[n.type]||familyLabel(n.type)}
+function readBrainConfig(){const g=actors.A.brainGraph;return {impulseWeight:g.nodes.find(n=>n.type==='beright')?.p?.weight??3,repeatCount:g.nodes.find(n=>n.type==='repeat')?.p?.count??4}}
+function applyBrainConfig(config){if(!config)return;const g=actors.A.brainGraph,imp=g.nodes.find(n=>n.type==='beright'),rep=g.nodes.find(n=>n.type==='repeat');if(imp)imp.p.weight=config.impulseWeight;if(rep)rep.p.count=config.repeatCount}
 
 function renderBrain(){
   const graph=actors.A.brainGraph;
-  $('#brain-graph').innerHTML=graph.nodes.map(n=>`<div class="brain-node" data-node="${n.id}"><span class="family">${familyLabel(n.type)}</span><span class="copy"><strong>${title(n.type)}</strong><small>${nodeSubtitle(n)}</small></span><span class="value">${nodeValue(n)}</span></div>`).join('');
+  $('#brain-graph').innerHTML=graph.nodes.map(n=>`<div class="brain-node ${replayMode&&replayTargetType&&n.type===replayTargetType?'replay-target':''}" data-node="${n.id}"><span class="family">${familyLabel(n.type)}</span><span class="copy"><strong>${title(n.type)}</strong><small>${nodeSubtitle(n)}</small></span><span class="value">${nodeValue(n)}</span></div>`).join('');
   const impulse=graph.nodes.find(n=>n.type==='beright'),repeat=graph.nodes.find(n=>n.type==='repeat');
-  $('#brain-editor').innerHTML=`<label>БЫТЬ ПРАВЫМ <span>WEIGHT ${impulse.p.weight}</span><input id="impulse-range" type="range" min="1" max="5" value="${impulse.p.weight}"></label><label>ПОВТОРИТЬ <span>×${repeat.p.count}</span><input id="repeat-range" type="range" min="1" max="5" value="${repeat.p.count}"></label>`;
+  const lockImpulse=replayMode&&replayTargetType&&replayTargetType!=='beright';
+  const lockRepeat=replayMode&&replayTargetType&&replayTargetType!=='repeat';
+  $('#brain-editor').innerHTML=`<label class="${lockImpulse?'locked':''}">БЫТЬ ПРАВЫМ <span>WEIGHT ${impulse.p.weight}</span><input id="impulse-range" type="range" min="1" max="5" value="${impulse.p.weight}" ${lockImpulse?'disabled':''}></label><label class="${lockRepeat?'locked':''}">ПОВТОРИТЬ <span>×${repeat.p.count}</span><input id="repeat-range" type="range" min="1" max="5" value="${repeat.p.count}" ${lockRepeat?'disabled':''}></label>`;
   $('#impulse-range').oninput=e=>{impulse.p.weight=+e.target.value;renderBrain()};
   $('#repeat-range').oninput=e=>{repeat.p.count=+e.target.value;renderBrain()};
 }
@@ -63,15 +67,21 @@ function hideOverlay(){overlay.hidden=true;overlay.innerHTML=''}
 function comparisonHtml(c){const fmt=v=>`${v>0?'+':''}${v}`;return `<small>БЫЛО / СТАЛО</small><strong>${c.sameScenario?'ТОТ ЖЕ СЦЕНАРИЙ':'СЦЕНАРИЙ ИЗМЕНИЛСЯ'}</strong><div class="compare-grid"><span>BRAIN ${fmt(c.metrics.brain)}</span><span>TENSION ${fmt(c.metrics.tension)}</span><span>CONTACT ${fmt(c.metrics.contact)}</span><span>ENERGY ${fmt(c.metrics.energy)}</span></div>`}
 function showResult(result){
   show('result');$('#result-title').textContent=result.punchline;$('#result-cause').textContent=result.stageB.cause;$('#result-node').textContent=result.stageC.nodeType?title(result.stageC.nodeType):'—';
-  if(!baselineEncounter){baselineEncounter=structuredClone(controller.encounter);$('#comparison').hidden=true;$('#rerun').textContent='ИЗМЕНИТЬ ОДНУ ВЕЩЬ →'}
+  if(!baselineEncounter){baselineEncounter=structuredClone(controller.encounter);replayTargetType=result.stageC.nodeType||'repeat';$('#comparison').hidden=true;$('#rerun').textContent='ИЗМЕНИТЬ ОДНУ ВЕЩЬ →'}
   else if(replayMode){const c=compareRuns(baselineEncounter,controller.encounter);$('#comparison').innerHTML=comparisonHtml(c);$('#comparison').hidden=false;$('#rerun').textContent='ЕЩЁ ОДИН ЭКСПЕРИМЕНТ →'}
+}
+function prepareReplay(){
+  replayMode=true;resetActors();applyBrainConfig(firstRunConfig);controller=null;
+  $('#replay-note').textContent=`КОНТРФАКТ: МЕНЯЕМ ТОЛЬКО «${title(replayTargetType)}». ОСТАЛЬНОЕ ЗАФИКСИРОВАНО.`;
+  show('brain');
 }
 
 $$('[data-look]').forEach(b=>b.addEventListener('click',()=>{look=b.dataset.look;$('#person-preview').dataset.look=look;$$('[data-look]').forEach(x=>x.classList.toggle('active',x===b))}));
 $$('[data-mode]').forEach(b=>b.addEventListener('click',()=>{mode=b.dataset.mode;$$('[data-mode]').forEach(x=>x.classList.toggle('active',x===b))}));
 $$('.bottom-nav button').forEach(b=>b.addEventListener('click',()=>{if(b.dataset.nav==='talk'&&!controller?.encounter)return;show(b.dataset.nav)}));
 $('#to-brain').onclick=()=>{resetActors();show('brain')};$('#to-setup').onclick=()=>show('setup');
-$('#play').onclick=()=>{makeController();controller.start({mode});show('talk');if(mode==='auto')startAuto()};
+$('#play').onclick=()=>{if(!replayMode&&!firstRunConfig)firstRunConfig={...readBrainConfig(),look,mode};makeController();controller.start({mode});show('talk');if(mode==='auto')startAuto()};
 $('#next-turn').onclick=()=>{if(mode==='auto'){autoTimer?stopAuto():startAuto()}else doNext()};$('#trace-btn').onclick=showTrace;
-$('#rerun').onclick=()=>{replayMode=true;resetActors();controller=null;show('brain')};overlay.addEventListener('click',e=>{if(e.target===overlay)hideOverlay()});
+$('#rerun').onclick=()=>{if(!baselineEncounter)return;if(replayMode){baselineEncounter=null;firstRunConfig=null;replayTargetType=null;replayMode=false;resetActors();controller=null;show('brain')}else prepareReplay()};
+overlay.addEventListener('click',e=>{if(e.target===overlay)hideOverlay()});
 show('person');
