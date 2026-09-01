@@ -18,8 +18,8 @@ export const APPEARANCE_VARIANTS=Object.freeze({
   glasses:{key:'glassesVariant',prefix:'glasses',legacy:'glasses'},
   facialHair:{key:'facialHairVariant',prefix:'facial-hair',legacy:'beard'},
   accessory:{key:'accessoryVariant',prefix:'accessory',legacy:'accessory'},
-  outfit:{key:'outfitVariant',prefix:'outfit',legacy:'outfit'},
-  shoes:{key:'shoesVariant',prefix:'shoes',legacy:'shoes'}
+  outfit:{key:'outfitVariant',prefix:'outfit',legacy:'outfit',baseWhenNull:true},
+  shoes:{key:'shoesVariant',prefix:'shoes',legacy:'shoes',baseWhenNull:true}
 });
 const COLOR_KEYS=Object.freeze({outfitPrimary:'outfit-primary',outfitSecondary:'outfit-secondary',shoesPrimary:'shoes-primary'});
 const DEFAULT_RIG=Object.freeze({head:[352,270],shoulderLeft:[275,345],shoulderRight:[425,345],hipLeft:[311,590],hipRight:[393,591]});
@@ -57,10 +57,11 @@ export class CharacterRenderer{
   appearance(visual={}){
     const state=visual.appearance||{};
     if(state.variantContract){
-      Object.values(APPEARANCE_VARIANTS).forEach(({key,prefix,legacy})=>{
+      Object.values(APPEARANCE_VARIANTS).forEach(({key,prefix,legacy,baseWhenNull=false})=>{
         const selected=state[key]??null;
         const hasVariants=this.setVariant(prefix,selected);
-        const legacyEl=this.el(legacy);if(legacyEl)legacyEl.style.display=hasVariants?'none':selected?'':'none';
+        const legacyEl=this.el(legacy);
+        if(legacyEl)legacyEl.style.display=hasVariants?'none':baseWhenNull?'':selected?'':'none';
       });
       const colors=state.colors||{};Object.entries(COLOR_KEYS).forEach(([key,id])=>this.setColorTarget(id,colors[key]));
       return;
