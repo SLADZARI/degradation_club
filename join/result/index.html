@@ -27,41 +27,30 @@
   </section>
 
   <section class="dc-map" aria-labelledby="mapTitle">
-    <div class="dc-result-section-head">
-      <p>01 / КАРТА</p>
-      <div><h2 id="mapTitle">ДЕВЯТЬ СФЕР.<br>ОДНА КАРТА.</h2></div>
-    </div>
+    <div class="dc-result-section-head"><p>01 / КАРТА</p><div><h2 id="mapTitle">ДЕВЯТЬ СФЕР.<br>ОДНА КАРТА.</h2></div></div>
     <div class="dc-radar-stage" id="radarStage" aria-live="polite"><div class="dc-state">СОБИРАЕМ ГЕОМЕТРИЮ…</div></div>
-    <div class="dc-contrast-head"><strong>02 / ТРИ ТОЧКИ КОНТРАСТА</strong><span>Выделены для чтения формы. Это не рейтинг и не «лучшие» результаты.</span></div>
+    <p class="dc-radar-approved-note">ЦЕНТР — 0 · КРАЙ — 5 · КАЖДАЯ ОСЬ СЧИТАЕТСЯ ОТДЕЛЬНО<br>ПЛОЩАДЬ УЛУЧШАТЬ НЕ ТРЕБУЕТСЯ.</p>
+    <div class="dc-contrast-head"><strong>02 / ТРИ ЗАМЕТНЫЕ ТОЧКИ</strong><span>Они выделены для контраста.<br>Мест не присуждаем.</span></div>
     <div class="dc-highlight-grid" id="highlightGrid" aria-live="polite"></div>
   </section>
 
   <section class="dc-result-register" aria-labelledby="registerTitle">
-    <div class="dc-result-section-head compact"><p>03 / ОСТАЛЬНЫЕ</p><div><h2 id="registerTitle">ЕЩЁ ШЕСТЬ.</h2></div></div>
+    <div class="dc-result-section-head compact"><p>03 / ОСТАЛЬНАЯ КАРТА</p><div><h2 id="registerTitle">ОСТАЛЬНЫЕ СФЕРЫ.</h2></div></div>
     <div id="sphereRegister" class="dc-sphere-register" aria-live="polite"><div class="dc-state">ЗАГРУЖАЕМ РЕЗУЛЬТАТЫ…</div></div>
   </section>
 
   <section class="dc-dossier" id="dossierSection" hidden aria-labelledby="dossierTitle">
-    <div class="dc-result-section-head compact"><p>04 / КАРТА С СОБОЙ</p><div><h2 id="dossierTitle">СОХРАНИТЬ КАРТУ.</h2></div></div>
-    <div class="dc-dossier-card" id="dossierCard">
-      <div class="dc-dossier-top">DEMENTOR CLUB / DC-9 / ЛИЧНАЯ КАРТА</div>
-      <div class="dc-dossier-title"><span>МОЯ КАРТА.</span></div>
-      <div class="dc-dossier-content"><div class="dc-dossier-radar" id="dossierRadar"></div><div class="dc-dossier-rows" id="dossierRows"></div></div>
-      <div class="dc-dossier-foot"><span>9 СФЕР / БЕЗ ОБЩЕГО БАЛЛА</span><span>DEMENTOR.CLUB</span></div>
-    </div>
+    <div class="dc-result-section-head compact"><p>04 / КАРТА С СОБОЙ</p><div><h2 id="dossierTitle">ЗАБРАТЬ С СОБОЙ.</h2></div></div>
+    <div class="dc-dossier-card" id="dossierCard"><div class="dc-dossier-top">DEMENTOR CLUB / DC-9 / ЛИЧНАЯ КАРТА</div><div class="dc-dossier-title"><span>МОЯ КАРТА.</span></div><div class="dc-dossier-content"><div class="dc-dossier-radar" id="dossierRadar"></div><div class="dc-dossier-rows" id="dossierRows"></div></div><div class="dc-dossier-foot"><span>9 СФЕР / БЕЗ ОБЩЕГО БАЛЛА</span><span>DEMENTOR.CLUB</span></div></div>
     <div class="dc-dossier-actions"><button class="dc-result-action primary" type="button" id="downloadDossier">СКАЧАТЬ КАРТУ</button><button class="dc-result-action" type="button" id="shareDossier">ПОДЕЛИТЬСЯ</button></div>
     <p class="dc-share-note" id="shareNote" aria-live="polite"></p>
   </section>
 
   <section class="dc-result-next" id="nextBlock" aria-live="polite">
-    <div class="dc-community-cta">
-      <div class="dc-result-meta"><span>05 / ДАЛЬШЕ</span><span id="communityState">ПРОВЕРЯЕМ ДОПУСК</span></div>
-      <h2 id="nextTitle">КАРТА ГОТОВА.<br>ДАЛЬШЕ — ПО ЖЕЛАНИЮ.</h2>
-      <p id="nextCopy">Карта ничего не назначает и никуда не зачисляет. Если хочется продолжить — можно оформить участие и зайти в клуб.</p>
-      <div id="nextActions"></div>
-    </div>
+    <div class="dc-community-cta"><div class="dc-result-meta"><span>05 / ДАЛЬШЕ</span><span id="communityState">ПРОВЕРЯЕМ ДОПУСК</span></div><h2 id="nextTitle">КАРТА ГОТОВА.<br>ДАЛЬШЕ — ПО ЖЕЛАНИЮ.</h2><p id="nextCopy">Можно оставить всё как есть. Можно продолжить деградацию среди своих.</p><div id="nextActions"></div></div>
   </section>
 </main>
 <script type="module" src="/join/result/result-v6.js"></script>
+<script type="module" src="/join/result/result-copy-v7.js"></script>
 </body>
 </html>
