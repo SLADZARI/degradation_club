@@ -1,0 +1,11 @@
+{
+  "name": "dementor-lab-vertical-slice",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node tests/encounter-runtime-selftest.mjs && node tests/result-replay-selftest.mjs && node tests/ui-contract-selftest.mjs",
+    "test:runtime": "node tests/encounter-runtime-selftest.mjs",
+    "test:replay": "node tests/result-replay-selftest.mjs",
+    "test:ui": "node tests/ui-contract-selftest.mjs"
+  }
+}
