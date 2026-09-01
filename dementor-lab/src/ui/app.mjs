@@ -2,11 +2,27 @@ import { VerticalSliceController } from '../app/vertical-slice-controller.mjs';
 import { CRITICISM_IDEA_SCENARIO, createCriticismActors } from '../scenarios/criticism-idea.mjs';
 import { compareRuns } from '../encounter/result.mjs';
 import { NODE_SPECS } from '../core/model.mjs';
+import { CharacterRenderer, APPEARANCE_LAYERS } from '../render/character-renderer.mjs';
 
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const app=$('#app'),overlay=$('#overlay'),topStatus=$('#top-status');
-let look='plain',mode='auto',actors=createCriticismActors(),controller=null,autoTimer=null;
+const CHARACTER_ASSET='./assets/characters/character-01/character-01-layered.svg';
+const DEFAULT_APPEARANCE={hat:true,glasses:true,beard:true,accessory:true,outfit:true,shoes:true};
+const MARTA_APPEARANCE={hat:false,glasses:false,beard:false,accessory:false,outfit:true,shoes:true};
+let playerAppearance={...DEFAULT_APPEARANCE};
+let mode='auto',actors=createCriticismActors(),controller=null,autoTimer=null;
 let baselineEncounter=null,replayMode=false,firstRunConfig=null,replayTargetType=null;
+let previewRenderer=null;
+
+async function mountCharacterAssets(){
+  const svg=await fetch(CHARACTER_ASSET).then(r=>{if(!r.ok)throw new Error(`Character asset ${r.status}`);return r.text()});
+  for(const id of ['person-preview','actor-a','actor-b']){
+    const root=$(`#${id}`);root.innerHTML=svg;
+    const node=root.querySelector('svg');node?.setAttribute('aria-hidden','true');
+  }
+  previewRenderer=new CharacterRenderer({side:'A',root:$('#person-preview')});
+  syncAppearancePanel();renderPreview();
+}
 
 function show(screen){
   app.dataset.screen=screen;topStatus.textContent=screen.toUpperCase();
@@ -15,7 +31,27 @@ function show(screen){
   if(screen==='brain'){renderBrain();$('#replay-note').hidden=!replayMode}
   if(screen==='talk')renderTalk();
 }
-function resetActors(){actors=createCriticismActors();actors.A.visual.look=look}
+function resetActors(){
+  actors=createCriticismActors();
+  actors.A.visual={...(actors.A.visual||{}),appearance:{...playerAppearance}};
+  actors.B.visual={...(actors.B.visual||{}),appearance:{...MARTA_APPEARANCE}};
+}
+function renderPreview(){
+  previewRenderer?.render({state:actors.A.state,face:{},visual:{appearance:playerAppearance}});
+}
+function syncAppearancePanel(){
+  $$('[data-part]').forEach(b=>{const on=playerAppearance[b.dataset.part]!==false;b.classList.toggle('active',on);b.setAttribute('aria-pressed',String(on))});
+}
+function toggleAppearance(part){
+  if(!APPEARANCE_LAYERS.includes(part))return;
+  playerAppearance={...playerAppearance,[part]:!playerAppearance[part]};
+  syncAppearancePanel();renderPreview();
+}
+function resetAppearance(){
+  playerAppearance={hat:false,glasses:false,beard:false,accessory:false,outfit:true,shoes:true};
+  syncAppearancePanel();renderPreview();
+}
+
 function familyLabel(type){return NODE_SPECS[type]?.family||'NODE'}
 function title(type){return NODE_SPECS[type]?.title||type}
 function nodeValue(n){const f=familyLabel(n.type);if(f==='IMPULSE')return `W${n.p?.weight||1}`;if(n.type==='repeat')return `×${n.p?.count||1}`;if(f==='STATE')return `+${n.p?.delta??1}`;return ''}
@@ -27,8 +63,7 @@ function renderBrain(){
   const graph=actors.A.brainGraph;
   $('#brain-graph').innerHTML=graph.nodes.map(n=>`<div class="brain-node ${replayMode&&replayTargetType&&n.type===replayTargetType?'replay-target':''}" data-node="${n.id}"><span class="family">${familyLabel(n.type)}</span><span class="copy"><strong>${title(n.type)}</strong><small>${nodeSubtitle(n)}</small></span><span class="value">${nodeValue(n)}</span></div>`).join('');
   const impulse=graph.nodes.find(n=>n.type==='beright'),repeat=graph.nodes.find(n=>n.type==='repeat');
-  const lockImpulse=replayMode&&replayTargetType&&replayTargetType!=='beright';
-  const lockRepeat=replayMode&&replayTargetType&&replayTargetType!=='repeat';
+  const lockImpulse=replayMode&&replayTargetType&&replayTargetType!=='beright',lockRepeat=replayMode&&replayTargetType&&replayTargetType!=='repeat';
   $('#brain-editor').innerHTML=`<label class="${lockImpulse?'locked':''}">БЫТЬ ПРАВЫМ <span>WEIGHT ${impulse.p.weight}</span><input id="impulse-range" type="range" min="1" max="5" value="${impulse.p.weight}" ${lockImpulse?'disabled':''}></label><label class="${lockRepeat?'locked':''}">ПОВТОРИТЬ <span>×${repeat.p.count}</span><input id="repeat-range" type="range" min="1" max="5" value="${repeat.p.count}" ${lockRepeat?'disabled':''}></label>`;
   $('#impulse-range').oninput=e=>{impulse.p.weight=+e.target.value;renderBrain()};
   $('#repeat-range').oninput=e=>{repeat.p.count=+e.target.value;renderBrain()};
@@ -49,16 +84,18 @@ function renderDelta(trace){
   const parts=Object.entries(d).filter(([,v])=>v).map(([k,v])=>`${k.toUpperCase()} ${v>0?'+':''}${Number(v.toFixed?.(1)??v)}`);if(m)parts.unshift(`${String(m.key).toUpperCase()} ${m.before}→${m.after}`);
   const line=parts.join(' · ');$('#delta').textContent=line;setTimeout(()=>{if($('#delta').textContent===line)$('#delta').textContent=''},1100)
 }
-function portraitRenderer(side,selector){return {render(character){const root=$(selector),s=character.state;root.dataset.look=side==='A'?look:'plain';root.classList.toggle('lost',s.brain>=100||s.energy<=0||s.contact<=0);root.classList.toggle('brain',s.brain>=85);root.classList.toggle('energy',s.energy<=25);root.classList.toggle('contact',s.contact<=20)},breakdown(character,reason){this.render(character);$(selector).classList.add('lost',String(reason||'').toLowerCase())}}}
-function makeController(){controller=new VerticalSliceController({scenario:CRITICISM_IDEA_SCENARIO,actors,renderers:{A:portraitRenderer('A','#actor-a'),B:portraitRenderer('B','#actor-b')},onEvent:handleEvent})}
+function makeController(){
+  const rendererA=new CharacterRenderer({side:'A',root:$('#actor-a')}),rendererB=new CharacterRenderer({side:'B',root:$('#actor-b')});
+  controller=new VerticalSliceController({scenario:CRITICISM_IDEA_SCENARIO,actors,renderers:{A:rendererA,B:rendererB},onEvent:handleEvent});
+}
 function handleEvent(evt){if(evt.type==='TURN'){renderDelta(evt.trace);renderTalk()}if(evt.type==='HOT_PATCH'){stopAuto();showHotPatch(evt.breakpoint)}if(evt.type==='RESULT'){stopAuto();showResult(evt.result)}if(evt.type==='PATCH'){hideOverlay();renderTalk();if(mode==='auto')startAuto()}}
 function doNext(){if(!controller?.encounter||controller.encounter.result)return;const out=controller.next();renderTalk();if(out?.result)showResult(controller.result())}
 function startAuto(){stopAuto();autoTimer=setInterval(()=>{if(controller?.encounter?.status==='HOT_PATCH'||controller?.encounter?.result)return stopAuto();doNext()},850);renderTalk()}
-function stopAuto(){if(autoTimer){clearInterval(autoTimer);autoTimer=null}renderTalk()}
+function stopAuto(){if(autoTimer){clearInterval(autoTimer);autoTimer=null}if(controller?.encounter)renderTalk()}
 
 function showHotPatch(bp){
-  const actor=controller.encounter.actors[bp.actorId],ids=bp.nodeIds||[];const chain=ids.map(id=>title(actor.brainGraph.nodes.find(n=>n.id===id)?.type)).join(' → ');
-  const repeat=ids.map(id=>actor.brainGraph.nodes.find(n=>n.id===id)).find(n=>n?.type==='repeat');const impulse=ids.map(id=>actor.brainGraph.nodes.find(n=>n.id===id)).find(n=>familyLabel(n?.type)==='IMPULSE');
+  const actor=controller.encounter.actors[bp.actorId],ids=bp.nodeIds||[],chain=ids.map(id=>title(actor.brainGraph.nodes.find(n=>n.id===id)?.type)).join(' → ');
+  const repeat=ids.map(id=>actor.brainGraph.nodes.find(n=>n.id===id)).find(n=>n?.type==='repeat'),impulse=ids.map(id=>actor.brainGraph.nodes.find(n=>n.id===id)).find(n=>familyLabel(n?.type)==='IMPULSE');
   overlay.innerHTML=`<div class="overlay-card"><p class="kicker">HOT PATCH</p><h3>МОЗГ НАГРЕВАЕТСЯ.</h3><p>Сейчас эта цепочка собирается сделать хуже.</p><div class="chain">${chain}</div><div class="patch-grid">${repeat?`<button data-patch="repeat">REPEAT ×${repeat.p.count} → ×${Math.max(1,repeat.p.count-1)}</button>`:''}${impulse?`<button data-patch="impulse">${title(impulse.type)} ${impulse.p.weight} → ${Math.max(1,impulse.p.weight-1)}</button>`:''}<button data-patch="skip">НИЧЕГО НЕ ТРОГАТЬ</button></div></div>`;overlay.hidden=false;
   $('[data-patch=repeat]')?.addEventListener('click',()=>controller.patch({kind:'reduce-repeat',actorId:bp.actorId,nodeId:repeat.id}));$('[data-patch=impulse]')?.addEventListener('click',()=>controller.patch({kind:'reduce-impulse',actorId:bp.actorId,nodeId:impulse.id}));$('[data-patch=skip]').addEventListener('click',()=>{controller.declinePatch();hideOverlay();if(mode==='auto')startAuto()});
 }
@@ -71,17 +108,20 @@ function showResult(result){
   else if(replayMode){const c=compareRuns(baselineEncounter,controller.encounter);$('#comparison').innerHTML=comparisonHtml(c);$('#comparison').hidden=false;$('#rerun').textContent='ЕЩЁ ОДИН ЭКСПЕРИМЕНТ →'}
 }
 function prepareReplay(){
-  replayMode=true;resetActors();applyBrainConfig(firstRunConfig);controller=null;
-  $('#replay-note').textContent=`КОНТРФАКТ: МЕНЯЕМ ТОЛЬКО «${title(replayTargetType)}». ОСТАЛЬНОЕ ЗАФИКСИРОВАНО.`;
-  show('brain');
+  replayMode=true;playerAppearance={...(firstRunConfig?.appearance||playerAppearance)};resetActors();applyBrainConfig(firstRunConfig);controller=null;
+  $('#replay-note').textContent=`КОНТРФАКТ: МЕНЯЕМ ТОЛЬКО «${title(replayTargetType)}». ОСТАЛЬНОЕ ЗАФИКСИРОВАНО.`;show('brain');
 }
 
-$$('[data-look]').forEach(b=>b.addEventListener('click',()=>{look=b.dataset.look;$('#person-preview').dataset.look=look;$$('[data-look]').forEach(x=>x.classList.toggle('active',x===b))}));
+$$('[data-part]').forEach(b=>b.addEventListener('click',()=>toggleAppearance(b.dataset.part)));
+$('#appearance-reset').onclick=resetAppearance;
 $$('[data-mode]').forEach(b=>b.addEventListener('click',()=>{mode=b.dataset.mode;$$('[data-mode]').forEach(x=>x.classList.toggle('active',x===b))}));
 $$('.bottom-nav button').forEach(b=>b.addEventListener('click',()=>{if(b.dataset.nav==='talk'&&!controller?.encounter)return;show(b.dataset.nav)}));
 $('#to-brain').onclick=()=>{resetActors();show('brain')};$('#to-setup').onclick=()=>show('setup');
-$('#play').onclick=()=>{if(!replayMode&&!firstRunConfig)firstRunConfig={...readBrainConfig(),look,mode};makeController();controller.start({mode});show('talk');if(mode==='auto')startAuto()};
+$('#play').onclick=()=>{if(!replayMode&&!firstRunConfig)firstRunConfig={...readBrainConfig(),appearance:{...playerAppearance},mode};makeController();controller.start({mode});show('talk');if(mode==='auto')startAuto()};
 $('#next-turn').onclick=()=>{if(mode==='auto'){autoTimer?stopAuto():startAuto()}else doNext()};$('#trace-btn').onclick=showTrace;
 $('#rerun').onclick=()=>{if(!baselineEncounter)return;if(replayMode){baselineEncounter=null;firstRunConfig=null;replayTargetType=null;replayMode=false;resetActors();controller=null;show('brain')}else prepareReplay()};
 overlay.addEventListener('click',e=>{if(e.target===overlay)hideOverlay()});
+
+resetActors();
+await mountCharacterAssets();
 show('person');
