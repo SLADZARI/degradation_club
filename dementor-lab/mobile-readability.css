@@ -1,0 +1,46 @@
+/* Mobile readability/density contract carried forward from approved v2.8 direction. */
+@media (max-width:430px){
+  .topbar span{font-size:10px}
+  .hero-copy p:not(.kicker),.lead{font-size:16px;line-height:1.35}
+  .choices button,.segmented button,.bottom-nav button{font-size:11px}
+  .brain-node .family{font-size:10px}
+  .brain-node .copy strong{font-size:15px}
+  .brain-node .copy small{display:none}
+  .brain-node .value{font-size:15px}
+  .editor label{font-size:13px;line-height:1.25}
+
+  /* TALK keeps consequence, characters, metrics and dialogue; duplicated microcopy disappears. */
+  .talk-record{padding:8px 10px}
+  .talk-record b{font-size:13px}
+  .talk-record span{display:none}
+  .turn span{display:none}
+  .turn b{font-size:40px}
+  .actor strong{font-size:13px}
+  .metric{grid-template-columns:54px 1fr 30px 30px 1fr;gap:5px;margin:6px 0}
+  .metric label{font-size:11px;letter-spacing:.01em}
+  .metric .n{font-size:11px}
+  .bar{height:10px}
+  .bubble{font-size:16px;line-height:1.3;padding:11px 12px}
+  .bubble small{display:none}
+  .delta{font-size:10px;line-height:1.25;min-height:24px;padding:5px 8px}
+  .talk-actions{grid-template-columns:1fr 76px}
+  .talk-actions button{font-size:11px;min-height:50px}
+
+  /* Sheets/overlays: readable labels, no technical wall. */
+  .sheet-card dt,.result-block small,.overlay-card .kicker{font-size:10px}
+  .sheet-card dd{font-size:14px;line-height:1.2}
+  .overlay-card h3{font-size:30px}
+  .overlay-card p{font-size:15px;line-height:1.35}
+  .chain{font-size:11px;line-height:1.35}
+  .patch-grid button{font-size:12px;line-height:1.2}
+  .trace-list{font-size:11px;line-height:1.5}
+  .result-block strong{font-size:18px;line-height:1.2}
+  .comparison{font-size:12px;line-height:1.35}
+}
+
+@media (max-width:360px){
+  .screen{padding-left:8px;padding-right:8px}
+  .hero-copy h1,.section-head h2,.sheet-card h2,.result-card h2{font-size:29px}
+  .metric{grid-template-columns:50px 1fr 28px 28px 1fr}
+  .talk-actions{grid-template-columns:1fr 70px}
+}
