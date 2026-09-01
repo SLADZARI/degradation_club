@@ -1,7 +1,8 @@
 # DEMENTOR LAB — Vertical Slice Implementation Status v0.3
 
 **Branch:** `agent/dementor-lab-vertical-slice-v0.3`  
-**Product contract:** `dementor-club/projects/dementor-lab/DEMENTOR_LAB_PRODUCT_FLOW_INTERACTION_SPEC_v0.3.md`
+**Product contract:** `dementor-club/projects/dementor-lab/DEMENTOR_LAB_PRODUCT_FLOW_INTERACTION_SPEC_v0.3.md`  
+**Character contract:** `dementor-club/projects/dementor-lab/DEMENTOR_LAB_CHARACTER_SYSTEM_V0.1.md`
 
 ## Implemented in modular runtime
 
@@ -24,9 +25,37 @@
 - VerticalSliceController separates UI orchestration from engine semantics.
 - CharacterRenderer remains a separate visual boundary.
 
+## Base character system
+
+The vertical slice now has a fixed production roster of exactly two base visual characters:
+
+- `character-01` — base character 01;
+- `character-02` — base character 02 / female visual archetype.
+
+Runtime character assets are intentionally limited to:
+
+```text
+assets/characters/character-01/character-01-layered.svg
+assets/characters/character-02/character-02-layered.svg
+```
+
+Character ownership rules:
+
+- body/rig is character-specific;
+- `outfit` is character-specific;
+- `shoes` are character-specific;
+- `hat`, `glasses`, `beard`/facial-hair category and `accessory` are shared appearance categories;
+- shared appearance state can persist while switching base body;
+- outfit/shoes state belongs to the selected base character;
+- visual identity never changes BehaviorGraph automatically.
+
+The renderer reads rig metadata from the active SVG rather than assuming one universal skeleton. The implementation uses `src/render/character-registry.mjs` as the runtime roster boundary.
+
+Prototype/reference character SVGs must not accumulate in the production character asset folder. Adding a third base body requires an explicit product/registry decision.
+
 ## Wired vertical-slice UI
 
-The implementation branch now has a real modular entry page at `dementor-lab/index.html`.
+The implementation branch has a real modular entry page at `dementor-lab/index.html`.
 
 Current connected flow:
 
@@ -34,7 +63,7 @@ Current connected flow:
 
 UI responsibilities:
 
-- PERSON changes visual identity only.
+- PERSON chooses one of the two base visual bodies and edits appearance only.
 - BRAIN edits actual player graph params (`BE RIGHT weight`, `REPEAT count`).
 - SETUP exposes one authored Scenario and objective contract.
 - TALK reads live Encounter state from `VerticalSliceController`.
@@ -54,27 +83,15 @@ The BRAIN loop breakpoint is aligned with the architecture baseline at predicted
 
 ## Test coverage present in branch
 
-- `tests/encounter-runtime-selftest.mjs`
-  - deterministic first turn;
-  - persistent memory;
-  - authored HOT PATCH gate;
-  - patch preserves turn/memory/transcript;
-  - same Encounter resumes after patch.
+The deterministic suite covers Encounter/HOT PATCH, replay/result, renderer behavior, mobile readability, UI contracts and character-asset contracts.
 
-- `tests/result-replay-selftest.mjs`
-  - Encounter reaches terminal result;
-  - Result derives causal data from trace;
-  - suspicious node is identified;
-  - same-scenario BEFORE/AFTER comparison is produced;
-  - changing one graph parameter changes outcome state.
+Browser smoke additionally verifies the phone-sized end-to-end flow and base-character/appearance switching contract.
 
-## Next gate
+## Current gate
 
-The architecture and UI are now connected enough to stop adding implementation breadth.
+Implementation breadth remains frozen. Continue with QA and visual accuracy rather than adding new game systems.
 
-Next work is **deterministic QA + browser/device QA of the modular page**, with defects fixed in this branch before PR/deploy.
-
-Required checks:
+Required checks before integration PR:
 
 1. AUTO and STEP produce the same deterministic turn semantics.
 2. HOT PATCH appears before dangerous traversal is committed.
@@ -83,6 +100,8 @@ Required checks:
 5. TRACE matches actual graph path.
 6. Result explains actual final trace.
 7. Replay uses the same Scenario and shows a real BEFORE/AFTER delta.
-8. Mobile Safari and Android Chrome remain readable and operable.
+8. Both base characters render correctly with their own rigs/outfit/shoes.
+9. Shared appearance state behaves consistently between both base characters.
+10. Mobile Safari and Android Chrome remain readable and operable.
 
 No deploy yet. No new game systems until this gate passes.
