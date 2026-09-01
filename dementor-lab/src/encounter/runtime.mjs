@@ -51,7 +51,7 @@ export function predictTurn(encounter,{trigger=null}={}){
   return {side,targetSide,actor,target,emittedTrigger,chosen,selfDelta,targetDelta,predictedSelf,predictedTarget};
 }
 export function detectBreakpoint(encounter,prediction){
-  if(prediction.predictedSelf.brain>=85&&prediction.chosen.repeat>1)return {type:'BRAIN_LOOP',actorId:prediction.side,nodeIds:prediction.chosen.path.map(n=>n.id),predictedBrain:prediction.predictedSelf.brain};
+  if(prediction.predictedSelf.brain>=88&&prediction.chosen.repeat>1)return {type:'BRAIN_LOOP',actorId:prediction.side,nodeIds:prediction.chosen.path.map(n=>n.id),predictedBrain:prediction.predictedSelf.brain};
   if(prediction.predictedSelf.contact<=8)return {type:'CONTACT_RISK',actorId:prediction.side,nodeIds:prediction.chosen.path.map(n=>n.id),predictedContact:prediction.predictedSelf.contact};
   return null;
 }
@@ -59,7 +59,6 @@ export function executeActorTurn(encounter,{trigger=null}={}){
   if(encounter.result)return {terminal:true,result:encounter.result};
   const p=predictTurn(encounter,{trigger});
   const breakpoint=!encounter.hotPatchUsed?detectBreakpoint(encounter,p):null;
-  // HOT PATCH intercepts the dangerous traversal before it becomes terminal. No state/turn/transcript mutation yet.
   if(breakpoint){encounter.status='HOT_PATCH';encounter.pendingTurn={trigger:p.emittedTrigger,breakpoint};return {breakpoint,terminal:false,pending:true}}
   const {side,targetSide,actor,target,emittedTrigger,chosen,selfDelta,targetDelta}=p;
   const beforeSelf=cloneState(actor.state),beforeTarget=cloneState(target.state),memoryChanges=[];
@@ -71,7 +70,7 @@ export function executeActorTurn(encounter,{trigger=null}={}){
   encounter.activeActor=targetSide;encounter.status='NEXT_TURN';return {trace,terminal:false};
 }
 export function checkTerminal(encounter){
-  for(const [side,a] of Object.entries(encounter.actors)){if(a.state.brain>=100)return {type:'BREAKDOWN',reason:'BRAIN',loser:side,turn:encounter.turn};if(a.state.energy<=0)return {type:'BREAKDOWN',reason:'ENERGY',loser:side,turn:encounter.turn};if(a.state.tension>=100)return {type:'BREAKDOWN',reason:'TENSION',loser:side,turn:encounter.turn};if(a.state.contact<=0&&encounter.scenario.objective==='contact')return {type:'BREAKDOWN',reason:'CONTACT',loser:side,turn:encounter.turn}}
+  for(const [side,a] of Object.entries(encounter.actors)){if(a.state.brain>=100)return {type:'BREAKDOWN',reason:'BRAIN',loser:side,turn:encounter.turn};if(a.state.energy<=0)return {type:'BREAKDOWN',reason:'ENERGY',loser:side,turn:encounter.turn};if(a.state.contact<=0&&encounter.scenario.objective==='contact')return {type:'BREAKDOWN',reason:'CONTACT',loser:side,turn:encounter.turn}}
   const limit=encounter.scenario.turnLimit||20;if(encounter.turn>=limit)return {type:'TURN_LIMIT',reason:'LIMIT',turn:encounter.turn};return null;
 }
 export function applyHotPatch(encounter,patch){
