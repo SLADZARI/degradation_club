@@ -5,13 +5,13 @@ export const PHRASE_BANK=Object.freeze({
     'Я попробую ещё раз, только короче.'
   ],
   agree:[
-    'Хорошо. Допустим, ты права.',
-    'Ладно, это можно принять.',
-    'Да. Здесь спорить не обязательно.'
+    'Хорошо.',
+    'Ладно.',
+    'Да. Этого достаточно.'
   ],
   joke:[
-    'Отлично. Значит, план уже начал объединять людей.',
-    'Хорошо, хотя бы катастрофа получается последовательная.'
+    'Да. Пока всё идёт по плану.',
+    'Хорошо. Запишем это как рабочий вариант.'
   ],
   silent:['…','Понятно.'],
   pressure:[
@@ -20,7 +20,21 @@ export const PHRASE_BANK=Object.freeze({
   ]
 });
 
-export function resolvePhrase({reaction,turn=0}){
-  const list=PHRASE_BANK[reaction]||['…'];
+const LISTENER_PHRASES=Object.freeze({
+  understand:[
+    'Я понял.',
+    'Да, я это понял.',
+    'Я понял и первый раз.'
+  ],
+  beliked:[
+    'Хорошо.',
+    'Ладно.',
+    'Пусть будет так.'
+  ]
+});
+
+export function resolvePhrase({reaction,impulse=null,actorId=null,turn=0}){
+  const listener=actorId==='B'&&impulse?LISTENER_PHRASES[impulse]:null;
+  const list=listener||PHRASE_BANK[reaction]||['…'];
   return list[Math.abs(turn)%list.length];
 }
