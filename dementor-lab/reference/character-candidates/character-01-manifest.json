@@ -1,0 +1,91 @@
+{
+  "characterId": "character-01",
+  "viewBox": "0 0 703 1024",
+  "baseLayers": {
+    "body": true,
+    "headRig": true
+  },
+  "faceStates": {
+    "eyes": [
+      "eyes-neutral",
+      "eyes-tense",
+      "eyes-sleepy",
+      "eyes-overheat"
+    ],
+    "brows": [
+      "brows-neutral",
+      "brows-tense",
+      "brows-angry"
+    ],
+    "mouth": [
+      "mouth-neutral",
+      "mouth-soft",
+      "mouth-tense",
+      "mouth-open"
+    ]
+  },
+  "variants": {
+    "hat": [
+      "hat-01",
+      "hat-02",
+      "hat-03",
+      "hat-04",
+      "hat-05",
+      "hat-06",
+      "hat-07"
+    ],
+    "glasses": [
+      "glasses-01",
+      "glasses-02",
+      "glasses-03",
+      "glasses-04"
+    ],
+    "facialHair": [
+      "facial-hair-01",
+      "facial-hair-02",
+      "facial-hair-03",
+      "facial-hair-04"
+    ],
+    "accessory": [
+      "accessory-01",
+      "accessory-02",
+      "accessory-03"
+    ],
+    "outfit": [
+      "outfit-01",
+      "outfit-02",
+      "outfit-03"
+    ],
+    "shoes": [
+      "shoes-01"
+    ]
+  },
+  "colorTargets": [
+    "shorts-primary",
+    "shirt-primary",
+    "outfit-primary",
+    "body-underwear",
+    "shoes-primary"
+  ],
+  "rig": {
+    "head": [352, 270],
+    "shoulderLeft": [275, 345],
+    "shoulderRight": [425, 345],
+    "hipLeft": [311, 590],
+    "hipRight": [393, 591]
+  },
+  "missingOrMerged": [
+    {
+      "id": "outfit-02",
+      "reason": "Alternative outfit preserved from source as a single merged geometry block; internal recolor zones were not safely separable without redrawing."
+    },
+    {
+      "id": "outfit-03",
+      "reason": "Alternative outfit preserved from source as a single merged geometry block; internal recolor zones were not safely separable without redrawing."
+    },
+    {
+      "id": "accessories",
+      "reason": "Source accessory sheet has no explicit active/base variant; all variants are preserved as hidden switchable groups."
+    }
+  ]
+}
