@@ -1,8 +1,8 @@
 export const OPPONENT_PRESETS=Object.freeze({
   CONTACT_SKEPTIC:Object.freeze({
     id:'CONTACT_SKEPTIC',
-    label:'СНАЧАЛА РАЗБЕРУСЬ',
-    description:'Сначала пытается понять, что произошло. Перед ответом делает паузу и только потом объясняет.',
+    label:'СНАЧАЛА ДОСЛУШАЕТ',
+    description:'Сначала пытается понять, что именно произошло. Перед ответом делает паузу.',
     graph:Object.freeze({
       id:'opponent-contact-skeptic',
       nodes:[
@@ -23,8 +23,8 @@ export const OPPONENT_PRESETS=Object.freeze({
   }),
   RIGHT_BACK:Object.freeze({
     id:'RIGHT_BACK',
-    label:'НЕТ, ЭТО Я СЕЙЧАС ОБЪЯСНЮ',
-    description:'На критику быстро собирает обиду, хочет остаться правым и повторяет объяснение ещё раз.',
+    label:'ТОЖЕ ЕСТЬ ЧТО ОБЪЯСНИТЬ',
+    description:'На критику быстро отвечает своим объяснением. Если не помогло, повторяет ещё раз.',
     graph:Object.freeze({
       id:'opponent-right-back',
       nodes:[
@@ -45,8 +45,8 @@ export const OPPONENT_PRESETS=Object.freeze({
   }),
   KEEP_PEACE:Object.freeze({
     id:'KEEP_PEACE',
-    label:'ЛИШЬ БЫ НЕ РУГАЛИСЬ',
-    description:'Пытается сохранить контакт, делает паузу и скорее соглашается, чем продолжает спор.',
+    label:'ХОРОШО, ПУСТЬ БУДЕТ ТАК',
+    description:'Скорее согласится и остановит спор, чем станет открывать ещё один раунд.',
     graph:Object.freeze({
       id:'opponent-keep-peace',
       nodes:[
