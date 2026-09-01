@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="./styles.css">
   <link rel="stylesheet" href="./replay.css">
   <link rel="stylesheet" href="./mobile-readability.css">
+  <link rel="stylesheet" href="./character.css">
 </head>
 <body>
   <main id="app" class="app" data-screen="person">
@@ -15,8 +16,16 @@
 
     <section class="screen" data-view="person">
       <div class="hero-copy"><p class="kicker">PERSON</p><h1>СОБЕРИ ХАРАКТЕР.</h1><p>Внешность ничего не обещает. Мозг соберём отдельно.</p></div>
-      <div class="person-stage"><div class="paper-portrait big" id="person-preview" data-look="plain"><div class="hat"></div><div class="head"><i></i><i></i><b></b></div><div class="body"></div></div></div>
-      <div class="choices" aria-label="Внешность"><button data-look="plain" class="active">БАЗА</button><button data-look="hat">ШАПКА</button><button data-look="glasses">ОЧКИ</button><button data-look="full">ВСЁ СРАЗУ</button></div>
+      <div class="person-stage"><div class="character-slot big" id="person-preview" aria-label="Собранный Дементор"></div></div>
+      <div class="appearance-panel" aria-label="Элементы персонажа">
+        <button data-part="hat" class="active">ГОЛОВА</button>
+        <button data-part="glasses" class="active">ОЧКИ</button>
+        <button data-part="beard" class="active">УСЫ</button>
+        <button data-part="accessory" class="active">АКСЕССУАР</button>
+        <button data-part="outfit" class="active">ОДЕЖДА</button>
+        <button data-part="shoes" class="active">ОБУВЬ</button>
+      </div>
+      <button class="secondary-reset" id="appearance-reset">СБРОСИТЬ ОБВЕС</button>
       <button class="primary" id="to-brain">СОБРАТЬ ЕМУ МОЗГ →</button>
     </section>
 
@@ -33,7 +42,11 @@
 
     <section class="screen talk" data-view="talk" hidden>
       <div class="talk-record"><b>КРИТИКА ИДЕИ</b><span>ЦЕЛЬ: СОХРАНИТЬ КОНТАКТ</span></div>
-      <div class="arena"><div class="actor actor-a"><div class="paper-portrait small" id="actor-a"><div class="head"><i></i><i></i><b></b></div><div class="body"></div></div><strong>ГЕНА</strong></div><div class="turn"><span>TURN</span><b id="turn">0</b></div><div class="actor actor-b"><div class="paper-portrait small" id="actor-b"><div class="head"><i></i><i></i><b></b></div><div class="body"></div></div><strong>МАРТА</strong></div></div>
+      <div class="arena">
+        <div class="actor actor-a"><div class="character-slot small" id="actor-a" aria-label="Гена"></div><strong>ГЕНА</strong></div>
+        <div class="turn"><span>TURN</span><b id="turn">0</b></div>
+        <div class="actor actor-b"><div class="character-slot small" id="actor-b" aria-label="Марта"></div><strong>МАРТА</strong></div>
+      </div>
       <div id="metrics" class="metrics"></div><div id="dialogue" class="dialogue"><p class="empty">Никто ещё ничего не сказал.</p></div><div id="delta" class="delta" aria-live="polite"></div>
       <div class="talk-actions"><button id="next-turn" class="primary">NEXT TURN →</button><button id="trace-btn">TRACE</button></div>
     </section>
