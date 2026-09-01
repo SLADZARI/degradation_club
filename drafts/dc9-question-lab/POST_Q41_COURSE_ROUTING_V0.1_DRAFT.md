@@ -1,4 +1,4 @@
-# DC-9 — Post-Q41 Course Routing v0.3
+# DC-9 — Post-Q41 Course Routing v0.4
 
 Status: **DRAFT BEHAVIOR ROUTING / BLIND PLAYTEST REQUIRED / NOT PRODUCTION**  
 Date: 2026-09-01  
@@ -18,7 +18,7 @@ The v0.1 prototype heuristic based on average `(3 - answer score)` over broad sp
 
 Course routing after Q41 must be based on **named behavioral signals from concrete DC-9 scenes**, not on a sphere deficit, overall level, psychotype or inferred personality.
 
-Flow remains:
+Flow remains internally:
 
 `Q41 answer stored → behavioral routing → one course OR no-ad → Q42`
 
@@ -40,21 +40,55 @@ Q41 is an anti-exploitation gate. It may only make the router more conservative.
 
 ## Public presentation rule
 
-The public advertising card is deliberately simple.
+The public advertising sequence is deliberately simple and must not expose routing mechanics.
 
 Do **not** show:
 - MATCH percentage;
 - routing score;
-- question numbers;
+- question numbers, including `41`;
+- internal sphere/question indexing;
 - “recommended for you” language;
 - explanation that the card was assembled from answers;
-- diagnostic reason copy.
+- diagnostic reason copy;
+- `COMMERCIAL ROUTING` semantics as user-facing explanation.
 
-Public card may show only the approved product presentation, Dementor badge/name, course status and CTA.
+Routing rationale remains available only in QA/debug data.
 
-Routing rationale is available only in QA/debug data.
+### Approved playtest choreography v0.4
 
-Secondary action: `ПРОСТО НЕ НАДО` → continue to Q42.
+When a course is selected:
+
+`routing beat → standalone promo copy for 6 seconds → course card`
+
+The **promo copy is not part of the course card**.
+
+Promo screen:
+- shows only the short Dementor/product proposition associated with the selected course;
+- is visually dominant;
+- remains on screen for **6 seconds**;
+- then automatically transitions to the course card;
+- does not show the internal question number or routing score.
+
+Course card then shows:
+- course title;
+- course subtitle / format line;
+- `ДЕМЕНТОР КУРСА` + Dementor name;
+- primary CTA: `ЗАПИСАТЬСЯ НА КУРС →` for routes where that wording is compatible with the approved public product status;
+- secondary action: `НЕ НАДО`.
+
+The course proposition shown during the six-second promo must not be repeated as a large explanatory paragraph inside the course card.
+
+### `НЕ НАДО` secondary path
+
+Current playtest behavior:
+
+`НЕ НАДО → Dementor Club product "НЕ НАДО" → ДАЛЕЕ → Q42`
+
+The `НЕ НАДО` product transition is part of the interaction, not a dismiss/close button.
+
+Until a canonical production URL for the `НЕ НАДО` product is fixed in the club source-of-truth, the playtest may use an internal product screen. Do not invent a production URL.
+
+Clicking any ad/product action must never change DC-9 evidence or result scoring.
 
 ---
 
@@ -173,7 +207,7 @@ Minimum normal evidence: **2 independent signals / strength ≥ 3**.
 
 Hard contradiction: Q26, Q27, Q28 and Q29 are all `2/3`.
 
-Because the product is `planned`, the advertising card must preserve planned status and must not imply open registration, confirmed date, confirmed aeroclub or approved price.
+Because the product is `planned`, the advertising card must preserve planned status and must not imply open registration, confirmed date, confirmed aeroclub or approved price. If `ЗАПИСАТЬСЯ НА КУРС` would imply an already-open registration flow, use the approved interest/status action instead until registration is actually opened.
 
 ---
 
@@ -272,4 +306,7 @@ Do not render this object in the public card.
 7. Confirm Evgeniy requires repeated action-delay/control behavior, not ordinary caution.
 8. Verify Q41 `0/1` reduces ad frequency.
 9. For cross-course profiles, verify the selected product has the highest behavioral proximity.
-10. Only after blind-playtest approval promote the router to `dementor-club-site` production runtime.
+10. Verify selected-course promo copy remains visible for six seconds and is not repeated inside the course card.
+11. Verify no public question number or routing score appears in the ad sequence.
+12. Verify `НЕ НАДО` enters the product path and `ДАЛЕЕ` returns to Q42 without changing evidence.
+13. Only after blind-playtest approval promote the router to `dementor-club-site` production runtime.
