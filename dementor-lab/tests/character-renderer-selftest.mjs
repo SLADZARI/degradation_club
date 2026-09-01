@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { visualStateFromMetrics, resolveVisualState } from '../src/render/character-renderer.mjs';
+import { visualStateFromMetrics, resolveVisualState, isNumberedVariantId } from '../src/render/character-renderer.mjs';
 
 const normal=visualStateFromMetrics({energy:72,brain:15,tension:10,contact:60});
 assert.equal(normal.eyes,'neutral');
@@ -27,5 +27,11 @@ assert.equal(override.eyes,'overheat','partial face override preserves derived e
 assert.equal(override.mouth,'soft','explicit face override wins');
 assert.equal(override.motion.orientToPartner,0.9,'explicit motion override wins');
 assert.ok(override.motion.headInstability>0,'other derived motion survives partial override');
+
+assert.equal(isNumberedVariantId('outfit-01','outfit'),true,'numbered outfit is a variant');
+assert.equal(isNumberedVariantId('A-outfit-03','outfit','A'),true,'side-prefixed numbered outfit is a variant');
+assert.equal(isNumberedVariantId('outfit-primary','outfit'),false,'paint target must not be treated as an outfit variant');
+assert.equal(isNumberedVariantId('outfit-02-primary','outfit'),false,'variant paint subgroup must not be treated as a variant');
+assert.equal(isNumberedVariantId('shoes-primary','shoes'),false,'shoe paint target must not be treated as a shoe variant');
 
 console.log('DEMENTOR LAB character renderer selftest: PASS');
