@@ -1,4 +1,4 @@
-# DC-9 — Post-Q41 Course Routing v0.2
+# DC-9 — Post-Q41 Course Routing v0.3
 
 Status: **DRAFT BEHAVIOR ROUTING / BLIND PLAYTEST REQUIRED / NOT PRODUCTION**  
 Date: 2026-09-01  
@@ -40,7 +40,7 @@ Q41 is an anti-exploitation gate. It may only make the router more conservative.
 
 ## Public presentation rule
 
-Latest playtest decision: the public advertising card is deliberately simple.
+The public advertising card is deliberately simple.
 
 Do **not** show:
 - MATCH percentage;
@@ -79,7 +79,7 @@ Product territory:
 
 | Signal | DC-9 scene | Match state | Strength |
 |---|---|---:|---:|
-| `confirmation_lock` | Q31 confirming headline | `0` | 2 |
+| `confirmation_lock` | Q31 confirming headline | `0/1` | 2 |
 | `source_distance` | Q33 “scientists proved” repost chain | `0/1` | 2 |
 | `position_defense` | Q34 old public position vs new data | `0/1` | 2 |
 | `verification_avoidance` | Q35 source check costs an hour | `0/1` | 1 |
@@ -89,8 +89,6 @@ Product territory:
 Minimum normal evidence: **3 independent signals / strength ≥ 5**.
 
 Hard contradiction: Q33, Q34, Q35 and Q36 are all `2/3`.
-
-Reason: this course should appear for a repeated evidence/risk pattern, not simply because one uncertain decision was uncomfortable.
 
 ---
 
@@ -183,35 +181,58 @@ Because the product is `planned`, the advertising card must preserve planned sta
 
 For each course:
 
-1. evaluate its named signals against stored canonical answers;
+1. evaluate named signals against stored canonical answers;
 2. count independent hits;
-3. sum routing strength only as an internal tie-breaker;
-4. apply hard contradiction;
-5. apply the course-specific minimum evidence;
-6. if Q41 is `0/1`, add `+1` required hit and `+1` required strength;
-7. rank eligible candidates by strength, then hit count;
-8. show a course only if the winner is clearly separated from the second candidate;
-9. otherwise return `no-ad`.
+3. sum internal routing strength;
+4. calculate **behavioral proximity** only over questions mapped to this course;
+5. apply hard contradiction;
+6. apply the course-specific minimum evidence;
+7. if Q41 is `0/1`, add `+1` required hit and `+1` required strength;
+8. discard ineligible courses;
+9. if one or more courses remain eligible, **always show the closest eligible course**.
 
-Clear winner rule:
-- strength lead ≥ 2; **or**
-- hit-count lead ≥ 1 **and** strength lead ≥ 1.
+## Behavioral proximity
 
-If two eligible courses remain closer than this, show no course.
+Proximity is a routing-only value in `0..1`.
 
-This score is **routing infrastructure only**. It is not a diagnostic score and must never be shown publicly or stored as part of DC-9 results.
+For ordinary `0/1` need-signals:
+- answer `0` = `1.00 × signal strength`;
+- answer `1` = `0.68 × signal strength`;
+- answer `2` = `0.18 × signal strength` as a weak near-miss;
+- answer `3` = `0`.
+
+For exact-state signals such as Nikita `utility_cover = 1` or `value_gate = 2`, proximity is awarded only for the exact matching state.
+
+Normalize the weighted sum by the maximum possible signal strength for that course.
+
+Eligible candidates are ranked:
+
+`proximity → routing strength → independent hits → strong/core hits → stable registry order`
+
+The registry-order fallback is only a deterministic last resort for mathematically identical QA profiles; it is not a product priority.
+
+### Changed from v0.2
+
+**Do not cancel advertising merely because two eligible courses are close.**
+
+If two or more products pass their evidence gates, show the one whose mapped behavioral signals are closest to the actual answer pattern.
+
+`no-ad` remains valid only when **no course is eligible after evidence, contradiction and Q41 conservative gates**.
+
+This infrastructure is not a diagnostic score and must never be shown publicly or stored as part of DC-9 results.
 
 ---
 
 # No-ad behavior
 
-No-ad is expected and desirable.
+No-ad remains expected, but only when no product legitimately passes its evidence gate.
 
 Use it when:
 - no course reaches minimum evidence;
-- contradictory evidence blocks the course;
-- top candidates are ambiguous;
-- Q41 conservative gate removes an otherwise weak match.
+- contradictory evidence blocks all candidate courses;
+- Q41 conservative gate removes otherwise weak matches.
+
+Do **not** use no-ad merely to avoid choosing between two eligible products.
 
 Public state:
 
@@ -230,9 +251,11 @@ The playtest implementation may expose a non-public debug object containing:
 - Q41 conservative state;
 - candidate hit counts;
 - candidate strengths;
+- candidate proximity values;
+- strong/core hit counts;
 - matched signal IDs;
 - contradiction flags;
-- ambiguity/no-match reason.
+- no-match reason.
 
 Do not render this object in the public card.
 
@@ -248,5 +271,5 @@ Do not render this object in the public card.
 6. Confirm Valentin requires an evidence/risk cluster, not generic uncertainty.
 7. Confirm Evgeniy requires repeated action-delay/control behavior, not ordinary caution.
 8. Verify Q41 `0/1` reduces ad frequency.
-9. Verify ambiguous cross-course profiles produce no-ad.
+9. For cross-course profiles, verify the selected product has the highest behavioral proximity.
 10. Only after blind-playtest approval promote the router to `dementor-club-site` production runtime.
