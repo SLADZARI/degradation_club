@@ -5,11 +5,11 @@ const browser=await chromium.launch({headless:true});const context=await browser
 await page.goto(baseURL,{waitUntil:'networkidle'});
 assert.equal(await page.locator('#top-status').textContent(),'PERSON');
 assert.equal(await page.locator('#person-preview svg').count(),1,'semantic character asset is mounted');
-assert.equal(await page.locator('[data-character]').count(),2,'PERSON exposes two body rigs');
+assert.equal(await page.locator('.character-switch [data-character]').count(),2,'PERSON exposes exactly two body-rig controls');
 assert.equal(await page.locator('[data-part]').count(),6,'appearance panel exposes six semantic parts');
 assert.equal(await page.locator('#person-preview #hat').isVisible(),true,'shared hat starts visible');
 await page.locator('[data-part="hat"]').click();assert.equal(await page.locator('#person-preview #hat').isVisible(),false,'shared accessory can be hidden');
-await page.locator('[data-character="character-02"]').click();await page.waitForTimeout(80);
+await page.locator('.character-switch [data-character="character-02"]').click();await page.waitForTimeout(80);
 assert.equal(await page.locator('#person-preview').getAttribute('data-character'),'character-02','female body rig mounts');
 assert.equal(await page.locator('#person-preview #hat').isVisible(),false,'shared accessory state survives body switch');
 assert.equal(await page.locator('#person-preview #outfit').isVisible(),true,'female character keeps own outfit');
