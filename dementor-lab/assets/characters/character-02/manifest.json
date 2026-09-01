@@ -1,0 +1,13 @@
+{
+  "id":"character-02",
+  "version":"semantic-v1",
+  "source":"user-supplied character-02-rig-template.svg + rig-pivots-reference 02.svg",
+  "viewBox":"0 0 703 1024",
+  "ownership":{
+    "own":["body","underwear","outfit","shoes","rig"],
+    "shared":["hat","glasses","beard","accessory"]
+  },
+  "rig":{"head":[352,286],"shoulderLeft":[292,354],"shoulderRight":[412,354],"hipLeft":[326,592],"hipRight":[378,592]},
+  "faceLayers":{"eyes":["eyes-neutral","eyes-tense","eyes-sleepy","eyes-overheat"],"brows":["brows-neutral","brows-tense","brows-angry"],"mouth":["mouth-neutral","mouth-soft","mouth-tense","mouth-open"]},
+  "note":"The runtime contract is ready for character-specific pivots, outfit and shoes while shared head/accessory categories remain compatible between characters. The current SVG geometry is a semantic integration reconstruction because the uploaded source vector was not readable from the execution sandbox in this turn; replace only the geometry when the exact source becomes readable, not the IDs or runtime contract."
+}
