@@ -1,14 +1,74 @@
 {
-  "id": "character-01",
-  "version": "reference-rebuild-v1",
-  "source": "user-supplied flattened reference character-01-rig-template(3).jpeg",
+  "characterId": "character-01",
+  "version": "cleaned-svg-v1",
+  "source": "user-supplied character-01-cleaned(4).svg; normalized for runtime semantics without geometry changes on 2026-09-02",
   "viewBox": "0 0 703 1024",
-  "appearanceLayers": ["hat", "glasses", "beard", "accessory", "outfit", "shoes"],
-  "faceLayers": {
-    "eyes": ["eyes-neutral", "eyes-tense", "eyes-sleepy", "eyes-overheat"],
-    "brows": ["brows-neutral", "brows-tense", "brows-angry"],
-    "mouth": ["mouth-neutral", "mouth-soft", "mouth-tense", "mouth-open"]
+  "baseLayers": {
+    "body": true,
+    "headRig": true
   },
+  "faceStates": {
+    "eyes": [
+      "eyes-neutral",
+      "eyes-tense",
+      "eyes-sleepy",
+      "eyes-overheat"
+    ],
+    "brows": [
+      "brows-neutral",
+      "brows-tense",
+      "brows-angry"
+    ],
+    "mouth": [
+      "mouth-neutral",
+      "mouth-soft",
+      "mouth-tense",
+      "mouth-open"
+    ]
+  },
+  "variants": {
+    "hat": [
+      "hat-01",
+      "hat-02",
+      "hat-03",
+      "hat-04",
+      "hat-05",
+      "hat-06",
+      "hat-07"
+    ],
+    "glasses": [
+      "glasses-01",
+      "glasses-02",
+      "glasses-03",
+      "glasses-04"
+    ],
+    "facialHair": [
+      "facial-hair-01",
+      "facial-hair-02",
+      "facial-hair-03",
+      "facial-hair-04"
+    ],
+    "accessory": [
+      "accessory-01",
+      "accessory-02",
+      "accessory-03"
+    ],
+    "outfit": [
+      "outfit-01",
+      "outfit-02",
+      "outfit-03"
+    ],
+    "shoes": [
+      "shoes-01"
+    ]
+  },
+  "colorTargets": [
+    "shorts-primary",
+    "shirt-primary",
+    "outfit-primary",
+    "body-underwear",
+    "shoes-primary"
+  ],
   "rig": {
     "head": [352, 270],
     "shoulderLeft": [275, 345],
@@ -16,5 +76,27 @@
     "hipLeft": [311, 590],
     "hipRight": [393, 591]
   },
-  "note": "The uploaded source is a flattened JPEG. The visible high-confidence components were rebuilt as semantic SVG layers so they can be toggled and animated independently. Ghosted/25%-opacity alternatives in the JPEG are treated as visual guides, not losslessly recoverable source layers."
+  "normalization": {
+    "geometryChanged": false,
+    "changes": [
+      "Preserved all path geometry, transforms, masks, clips, fills, strokes and authored visibility.",
+      "Removed duplicate outfit-primary DOM ids by keeping the canonical id on outfit-01 and assigning unique ids to the corresponding paint groups in outfit-02 and outfit-03.",
+      "Added data-color-target metadata so one manifest color target can address equivalent paint groups across outfit variants.",
+      "Added root data-rig-pivots metadata matching the verified authored pivot coordinates."
+    ]
+  },
+  "missingOrMerged": [
+    {
+      "id": "outfit-02",
+      "reason": "Alternative outfit is authored as a single compatible outfit variant; no additional semantic sub-zones are invented beyond source geometry."
+    },
+    {
+      "id": "outfit-03",
+      "reason": "Alternative outfit is authored as a single compatible outfit variant; no additional semantic sub-zones are invented beyond source geometry."
+    },
+    {
+      "id": "accessories",
+      "reason": "Accessory sheet has no explicit active/base variant; all three authored variants remain independently switchable."
+    }
+  ]
 }
