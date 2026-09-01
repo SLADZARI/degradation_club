@@ -1,0 +1,56 @@
+name: Dementor Lab Character 01 Asset Staging
+
+on:
+  push:
+    branches:
+      - agent/dementor-lab-character01-asset-staging
+    paths:
+      - dementor-lab/.asset-staging/character-01/READY
+
+permissions:
+  contents: write
+
+jobs:
+  assemble-exact-svg:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/dementor-lab-character01-asset-staging
+
+      - name: Assemble and verify exact normalized SVG
+        shell: bash
+        run: |
+          set -euo pipefail
+          parts='dementor-lab/.asset-staging/character-01'
+          target='dementor-lab/assets/characters/character-01/character-01-layered.svg'
+          cat "$parts"/chunk-*.b64 > /tmp/character-01.svg.gz.b64
+          base64 --decode /tmp/character-01.svg.gz.b64 | gzip --decompress > "$target"
+          actual="$(sha256sum "$target" | awk '{print $1}')"
+          expected='d7103109a3be9d6da9e0c66c20e26a4e61efd57c128f9c9a0fb8adf4505ff0db'
+          test "$actual" = "$expected"
+          python - <<'PY'
+          import xml.etree.ElementTree as ET
+          from collections import Counter
+          path='dementor-lab/assets/characters/character-01/character-01-layered.svg'
+          root=ET.parse(path).getroot()
+          assert root.attrib.get('viewBox') == '0 0 703 1024'
+          ids=[el.attrib['id'] for el in root.iter() if 'id' in el.attrib]
+          dup=[key for key,count in Counter(ids).items() if count > 1]
+          assert not dup, f'duplicate ids: {dup}'
+          required={'character-root','body','head-rig','eyes-neutral','eyes-tense','eyes-sleepy','eyes-overheat','brows-neutral','brows-tense','brows-angry','mouth-neutral','mouth-soft','mouth-tense','mouth-open','outfit-01','outfit-02','outfit-03','shoes-01','outfit-primary','shoes-primary'}
+          missing=sorted(required-set(ids))
+          assert not missing, f'missing ids: {missing}'
+          print('exact character-01 SVG staging verification: PASS')
+          PY
+
+      - name: Commit assembled asset
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add dementor-lab/assets/characters/character-01/character-01-layered.svg
+          git diff --cached --quiet && exit 0
+          git commit -m 'feat(lab): assemble exact character-01 SVG asset'
+          git push origin HEAD:agent/dementor-lab-character01-asset-staging
