@@ -4,7 +4,10 @@ import { compareRuns } from '../encounter/result.mjs';
 import { NODE_SPECS } from '../core/model.mjs';
 import { CharacterRenderer, APPEARANCE_LAYERS } from '../render/character-renderer.mjs';
 import {
+  CHARACTER_REGISTRY,
   characterSpec,
+  characterAssetText,
+  loadCharacterContract,
   SHARED_APPEARANCE_LAYERS,
   CHARACTER_OWNED_LAYERS,
   SHARED_APPEARANCE_CATEGORIES,
@@ -23,6 +26,8 @@ const EMPTY_SHARED_VARIANTS=()=>({hatVariant:null,glassesVariant:null,facialHair
 const EMPTY_OWNED_VARIANTS=()=>({outfitVariant:null,shoesVariant:null});
 const EMPTY_COLORS=()=>({outfitPrimary:null,outfitSecondary:null,shoesPrimary:null});
 
+await Promise.allSettled(Object.keys(CHARACTER_REGISTRY).map(id=>loadCharacterContract(id)));
+
 let currentCharacterId='character-01';
 let sharedAppearance={hat:true,glasses:true,beard:true,accessory:true,...EMPTY_SHARED_VARIANTS()};
 let ownedAppearance={
@@ -39,7 +44,7 @@ let baselineEncounter=null,replayMode=false,firstRunConfig=null,replayTargetType
 
 function playerAppearance(){return appearanceForCharacter(currentCharacterId,sharedAppearance,ownedAppearance[currentCharacterId],appearanceColors[currentCharacterId])}
 function opponentAppearance(){return appearanceForCharacter(opponentProfile.baseCharacterId,opponentProfile.sharedAppearance,opponentProfile.ownedAppearance,opponentProfile.colors)}
-async function fetchAsset(id){const spec=characterSpec(id);return fetch(spec.asset).then(r=>{if(!r.ok)throw new Error(`Character asset ${id} ${r.status}`);return r.text()})}
+async function fetchAsset(id){const cached=characterAssetText(id);if(cached)return cached;const spec=characterSpec(id);return fetch(spec.asset).then(r=>{if(!r.ok)throw new Error(`Character asset ${id} ${r.status}`);return r.text()})}
 async function mountAsset(rootId,id){const root=$(`#${rootId}`),spec=characterSpec(id);root.innerHTML=await fetchAsset(id);root.dataset.character=id;root.querySelector('svg')?.setAttribute('aria-hidden','true');return new CharacterRenderer({side:rootId==='actor-b'?'B':'A',root,rigFallback:spec.rigFallback})}
 async function mountCharacterAssets(){previewRenderer=await mountAsset('person-preview',currentCharacterId);await mountAsset('actor-a',currentCharacterId);await mountAsset('actor-b',opponentProfile.baseCharacterId);syncAppearancePanel();renderPreview();renderOpponentCard()}
 async function remountPlayerCharacter(){previewRenderer=await mountAsset('person-preview',currentCharacterId);await mountAsset('actor-a',currentCharacterId);syncCharacterSwitch();syncAppearancePanel();resetActors();renderPreview()}
