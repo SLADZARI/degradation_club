@@ -1,1 +1,38 @@
-PLACEHOLDER
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 703 1024" role="img" aria-labelledby="title desc" data-asset-version="character-01-reference-rebuild-v1">
+<title id="title">Dementor character 01</title><desc id="desc">Layered mobile game character rebuilt from the supplied reference.</desc>
+<g id="character-01-rig-template" stroke="#111" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
+  <g id="body">
+    <g id="body-leg-left"><path d="M277 675 L342 675 L330 902 L268 902 Z" fill="#f1dcc0"/></g>
+    <g id="body-leg-right"><path d="M361 675 L426 675 L437 902 L375 902 Z" fill="#f1dcc0"/></g>
+    <g id="body-torso"><path d="M297 321 Q352 299 406 321 L432 575 L271 575 Z" fill="#f1dcc0"/></g>
+    <g id="body-arm-left"><path d="M281 340 Q245 352 229 408 L214 587 Q211 619 230 638 Q249 651 259 626 L276 432 Z" fill="#f1dcc0"/><path d="M229 590 q-16 24 1 48 q12 15 21-3 q9-20 0-41" fill="#f1dcc0"/></g>
+    <g id="body-arm-right"><path d="M421 340 Q457 352 474 408 L490 587 Q492 619 473 638 Q454 651 444 626 L427 432 Z" fill="#f1dcc0"/><path d="M475 590 q16 24-1 48 q-12 15-21-3 q-9-20 0-41" fill="#f1dcc0"/></g>
+  </g>
+  <g id="underwear"><path d="M304 505 L399 505 L399 579 L304 579 Z" fill="#f5f5ef"/></g>
+  <g id="shoes">
+    <path d="M258 887 Q279 875 312 892 L329 937 Q324 951 303 953 L217 953 Q208 946 214 932 Z" fill="#111"/><path d="M218 930 Q253 928 318 936 L319 954 L216 954 Z" fill="#f5f5ef"/><path d="M259 900 l37 19 M272 895 l35 19 M243 905 l39 20" stroke="#f5f5ef" stroke-width="6"/>
+    <path d="M386 892 Q419 875 441 887 L490 932 Q495 947 484 953 L395 953 Q378 951 375 938 Z" fill="#111"/><path d="M383 936 Q447 927 487 931 L487 954 L383 954 Z" fill="#f5f5ef"/><path d="M408 900 l37 19 M421 895 l35 19 M394 905 l39 20" stroke="#f5f5ef" stroke-width="6"/>
+  </g>
+  <g id="outfit">
+    <path d="M285 319 L320 296 L350 313 L383 296 L418 319 L456 419 L424 435 L431 567 L370 576 L353 549 L335 576 L273 567 L279 435 L247 419 Z" fill="#ead5b8"/>
+    <path d="M319 318 L347 341 L347 505 L306 505 L299 392 Z" fill="#f6f5ef"/><path d="M386 318 L357 341 L357 505 L400 505 L405 392 Z" fill="#f6f5ef"/>
+    <path d="M286 323 L318 297 L347 319 L330 348 L295 340 Z" fill="#ead5b8"/><path d="M416 323 L385 297 L357 319 L374 348 L407 340 Z" fill="#ead5b8"/>
+    <path d="M249 419 L278 430 L264 596 L228 585 L235 438 Z" fill="#f6f1e5"/><path d="M455 419 L426 430 L440 596 L476 585 L469 438 Z" fill="#f6f1e5"/>
+    <g stroke="#b8a892" stroke-width="5"><path d="M239 462 L273 468"/><path d="M237 493 L271 499"/><path d="M234 525 L268 531"/><path d="M231 557 L265 563"/><path d="M431 468 L465 462"/><path d="M433 499 L467 493"/><path d="M436 531 L470 525"/><path d="M439 563 L473 557"/><path d="M258 382 L447 382"/><path d="M253 411 L452 411"/></g>
+    <path d="M274 567 L431 567 L445 704 Q399 716 356 705 Q310 717 260 704 Z" fill="#4a453e"/><path d="M352 572 L352 704" fill="none"/><path d="M304 573 Q321 588 342 583 M401 573 Q384 588 363 583" fill="none" stroke="#111" stroke-width="5"/><path d="M337 568 L369 568 L369 587 L337 587 Z" fill="#3a3732" stroke-width="5"/>
+  </g>
+  <g id="head-rig">
+    <g id="head">
+      <g id="head-base"><path d="M281 150 Q352 118 421 150 L417 255 Q399 305 352 314 Q304 305 286 255 Z" fill="#f1dcc0"/></g>
+      <g id="hair"><path d="M289 155 Q310 132 345 136 Q389 130 414 157 L411 178 Q373 162 289 178 Z" fill="#111"/></g>
+      <g id="eyes"><g id="eyes-neutral"><circle cx="322" cy="208" r="6" fill="#111" stroke="none"/><circle cx="383" cy="208" r="6" fill="#111" stroke="none"/></g><g id="eyes-tense" opacity="0"><path d="M309 210 L332 205 M371 205 L394 210" fill="none"/></g><g id="eyes-sleepy" opacity="0"><path d="M310 210 Q322 217 334 210 M370 210 Q382 217 394 210" fill="none"/></g><g id="eyes-overheat" opacity="0"><path d="M312 199 L332 219 M332 199 L312 219 M372 199 L392 219 M392 199 L372 219" fill="none"/></g></g>
+      <g id="brows"><g id="brows-neutral"><path d="M308 190 Q322 184 336 190 M368 190 Q382 184 396 190" fill="none"/></g><g id="brows-tense" opacity="0"><path d="M308 191 L336 184 M368 184 L396 191" fill="none"/></g><g id="brows-angry" opacity="0"><path d="M308 187 L336 196 M368 196 L396 187" fill="none"/></g></g>
+      <g id="mouth"><g id="mouth-neutral"><path d="M333 264 Q352 271 372 264" fill="none"/></g><g id="mouth-soft" opacity="0"><path d="M333 260 Q352 278 372 260" fill="none"/></g><g id="mouth-tense" opacity="0"><path d="M331 269 L374 269" fill="none"/></g><g id="mouth-open" opacity="0"><ellipse cx="352" cy="267" rx="19" ry="13" fill="#111"/></g></g>
+    </g>
+    <g id="beard"><path d="M296 232 Q314 215 334 232 Q352 213 371 232 Q390 215 408 232 Q404 260 379 261 Q365 260 352 246 Q339 260 325 261 Q300 260 296 232 Z" fill="#111"/><path d="M333 265 Q352 245 371 265 L367 298 Q352 314 337 298 Z" fill="#111"/></g>
+    <g id="accessory"><path d="M302 262 L345 236 L356 246 L315 277 Z" fill="#f6f5ef"/><path d="M352 249 L365 239 L410 273 L401 284 Z" fill="#f6f5ef"/><path d="M289 276 q-16-11-20 3 q-3 10-13 5" fill="none" stroke-width="5"/><path d="M407 294 q13-12 20 0 q5 9 15 3" fill="none" stroke-width="5"/></g>
+    <g id="glasses"><path d="M285 183 Q318 176 350 186 Q383 176 418 183 L414 223 Q397 239 377 232 Q360 226 352 211 Q345 226 328 232 Q307 239 290 223 Z" fill="#111"/><path d="M291 191 L340 191 M290 202 L339 202 M292 213 L336 213 M365 191 L412 191 M366 202 L413 202 M369 213 L410 213" stroke="#f1dcc0" stroke-width="5"/><path d="M347 196 L357 196" stroke="#111" stroke-width="8"/></g>
+    <g id="hat"><path d="M258 89 L355 4 L459 91 L441 176 Q352 163 270 176 Z" fill="#111"/><path d="M270 92 L355 20 L447 94" fill="none" stroke="#f4ded3" stroke-width="8"/><path d="M355 78 L355 137 M332 102 L379 102" fill="none" stroke="#f4ded3" stroke-width="10"/><path d="M269 176 Q352 163 441 176" fill="none" stroke="#111" stroke-width="9"/></g>
+  </g>
+</g>
+</svg>
