@@ -32,34 +32,48 @@ function readRig(svg,fallback=null){
   if(meta?.textContent){try{return {...DEFAULT_RIG,...JSON.parse(meta.textContent)}}catch{}}
   return fallback||DEFAULT_RIG;
 }
+function unprefixedId(id='',side=''){return String(id).replace(new RegExp(`^${side}-`),'')}
+export function isNumberedVariantId(id,prefix,side=''){
+  const normalized=unprefixedId(id,side);
+  return normalized.startsWith(`${prefix}-`)&&/^\d+$/.test(normalized.slice(prefix.length+1));
+}
+function authoredVisible(el){return el?.getAttribute?.('display')!=='none'&&el?.style?.display!=='none'}
 
 export class CharacterRenderer{
-  constructor({side,root,rigFallback=null}){this.side=side;this.root=root;this.rigFallback=rigFallback;this.svg=root?.querySelector('svg')||null;this.rig=readRig(this.svg,rigFallback)}
-  refresh(){this.svg=this.root?.querySelector('svg')||null;this.rig=readRig(this.svg,this.rigFallback);return this}
+  constructor({side,root,rigFallback=null}){this.side=side;this.root=root;this.rigFallback=rigFallback;this.svg=root?.querySelector('svg')||null;this.rig=readRig(this.svg,rigFallback);this.variantDefaults=new Map()}
+  refresh(){this.svg=this.root?.querySelector('svg')||null;this.rig=readRig(this.svg,this.rigFallback);this.variantDefaults.clear();return this}
   el(name){if(!this.svg)return null;const escaped=CSS.escape(name),prefixed=CSS.escape(`${this.side}-${name}`);return this.svg.querySelector(`#${prefixed}`)||this.svg.querySelector(`#${escaped}`)}
   variants(group,active){const groups={eyes:['neutral','tense','sleepy','overheat'],brows:['neutral','tense','angry'],mouth:['neutral','soft','tense','open']};(groups[group]||[]).forEach(v=>{const el=this.el(`${group}-${v}`);if(el)el.style.opacity=v===active?'1':'0'})}
   variantElements(prefix){
     if(!this.svg)return [];
     const selectors=[`[id^="${CSS.escape(prefix)}-"]`,`[id^="${CSS.escape(`${this.side}-${prefix}`)}-"]`];
-    return [...new Set(selectors.flatMap(selector=>[...this.svg.querySelectorAll(selector)]))];
+    return [...new Set(selectors.flatMap(selector=>[...this.svg.querySelectorAll(selector)]))].filter(el=>isNumberedVariantId(el.id,prefix,this.side));
   }
-  setVariant(prefix,active){
+  setVariant(prefix,active,{baseWhenNull=false}={}){
     const variants=this.variantElements(prefix);
-    variants.forEach(el=>{const id=el.id.replace(new RegExp(`^${this.side}-`),'');el.style.display=id===active?'':'none'});
+    if(!this.variantDefaults.has(prefix))this.variantDefaults.set(prefix,new Set(variants.filter(authoredVisible).map(el=>unprefixedId(el.id,this.side))));
+    const defaults=this.variantDefaults.get(prefix)||new Set();
+    variants.forEach(el=>{const id=unprefixedId(el.id,this.side),show=active?id===active:baseWhenNull&&defaults.has(id);el.style.display=show?'inline':'none'});
     return variants.length>0;
   }
   setColorTarget(id,value){
-    if(!value)return;
-    const root=this.el(id);if(!root)return;
+    if(!value||!this.svg)return;
+    const escaped=CSS.escape(id),prefixed=CSS.escape(`${this.side}-${id}`);
+    const roots=[...new Set([
+      ...this.svg.querySelectorAll(`[data-color-target="${escaped}"]`),
+      ...this.svg.querySelectorAll(`[id="${escaped}"]`),
+      ...this.svg.querySelectorAll(`[id="${prefixed}"]`)
+    ])];
+    if(!roots.length)return;
     const paint=el=>{const fill=el.getAttribute?.('fill');if(fill!=='none')el.style.fill=value};
-    paint(root);root.querySelectorAll?.('[fill]').forEach(paint);
+    roots.forEach(root=>{paint(root);root.querySelectorAll?.('[fill]').forEach(paint)});
   }
   appearance(visual={}){
     const state=visual.appearance||{};
     if(state.variantContract){
       Object.values(APPEARANCE_VARIANTS).forEach(({key,prefix,legacy,baseWhenNull=false})=>{
         const selected=state[key]??null;
-        const hasVariants=this.setVariant(prefix,selected);
+        const hasVariants=this.setVariant(prefix,selected,{baseWhenNull});
         const legacyEl=this.el(legacy);
         if(legacyEl)legacyEl.style.display=hasVariants?'none':baseWhenNull?'':selected?'':'none';
       });
