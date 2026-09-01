@@ -3,22 +3,42 @@ import { CRITICISM_IDEA_SCENARIO, createCriticismActors } from '../scenarios/cri
 import { compareRuns } from '../encounter/result.mjs';
 import { NODE_SPECS } from '../core/model.mjs';
 import { CharacterRenderer, APPEARANCE_LAYERS } from '../render/character-renderer.mjs';
-import { characterSpec, SHARED_APPEARANCE_LAYERS, CHARACTER_OWNED_LAYERS, appearanceForCharacter } from '../render/character-registry.mjs';
+import {
+  characterSpec,
+  SHARED_APPEARANCE_LAYERS,
+  CHARACTER_OWNED_LAYERS,
+  SHARED_APPEARANCE_CATEGORIES,
+  CHARACTER_OWNED_CATEGORIES,
+  appearanceForCharacter,
+  variantOptions,
+  variantKey,
+  hasVariantContract
+} from '../render/character-registry.mjs';
 import { createOpponentProfile, freshOpponentSeed } from '../opponent/generator.mjs';
 
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const app=$('#app'),overlay=$('#overlay'),topStatus=$('#top-status');
+const VARIANT_PART_CATEGORY=Object.freeze({hat:'hat',glasses:'glasses',beard:'facialHair',accessory:'accessory',outfit:'outfit',shoes:'shoes'});
+const EMPTY_SHARED_VARIANTS=()=>({hatVariant:null,glassesVariant:null,facialHairVariant:null,accessoryVariant:null});
+const EMPTY_OWNED_VARIANTS=()=>({outfitVariant:null,shoesVariant:null});
+const EMPTY_COLORS=()=>({outfitPrimary:null,outfitSecondary:null,shoesPrimary:null});
+
 let currentCharacterId='character-01';
-let sharedAppearance={hat:true,glasses:true,beard:true,accessory:true};
-let ownedAppearance={'character-01':{outfit:true,shoes:true},'character-02':{outfit:true,shoes:true}};
+let sharedAppearance={hat:true,glasses:true,beard:true,accessory:true,...EMPTY_SHARED_VARIANTS()};
+let ownedAppearance={
+  'character-01':{outfit:true,shoes:true,...EMPTY_OWNED_VARIANTS()},
+  'character-02':{outfit:true,shoes:true,...EMPTY_OWNED_VARIANTS()}
+};
+let appearanceColors={'character-01':EMPTY_COLORS(),'character-02':EMPTY_COLORS()};
+let activeAppearanceCategory='hat';
 const explicitSeed=new URLSearchParams(location.search).get('seed');
 let opponentSeed=explicitSeed||freshOpponentSeed();
 let opponentProfile=createOpponentProfile(opponentSeed);
 let mode='auto',actors=createCriticismActors({opponentProfile}),controller=null,autoTimer=null;
 let baselineEncounter=null,replayMode=false,firstRunConfig=null,replayTargetType=null,previewRenderer=null;
 
-function playerAppearance(){return appearanceForCharacter(currentCharacterId,sharedAppearance,ownedAppearance[currentCharacterId])}
-function opponentAppearance(){return appearanceForCharacter(opponentProfile.baseCharacterId,opponentProfile.sharedAppearance,opponentProfile.ownedAppearance)}
+function playerAppearance(){return appearanceForCharacter(currentCharacterId,sharedAppearance,ownedAppearance[currentCharacterId],appearanceColors[currentCharacterId])}
+function opponentAppearance(){return appearanceForCharacter(opponentProfile.baseCharacterId,opponentProfile.sharedAppearance,opponentProfile.ownedAppearance,opponentProfile.colors)}
 async function fetchAsset(id){const spec=characterSpec(id);return fetch(spec.asset).then(r=>{if(!r.ok)throw new Error(`Character asset ${id} ${r.status}`);return r.text()})}
 async function mountAsset(rootId,id){const root=$(`#${rootId}`),spec=characterSpec(id);root.innerHTML=await fetchAsset(id);root.dataset.character=id;root.querySelector('svg')?.setAttribute('aria-hidden','true');return new CharacterRenderer({side:rootId==='actor-b'?'B':'A',root,rigFallback:spec.rigFallback})}
 async function mountCharacterAssets(){previewRenderer=await mountAsset('person-preview',currentCharacterId);await mountAsset('actor-a',currentCharacterId);await mountAsset('actor-b',opponentProfile.baseCharacterId);syncAppearancePanel();renderPreview();renderOpponentCard()}
@@ -31,10 +51,66 @@ function renderPreview(){previewRenderer?.render({state:actors.A.state,face:{},v
 function renderOpponentCard(){const card=$('#opponent-card');if(!card)return;card.dataset.preset=opponentProfile.presetId;card.dataset.character=opponentProfile.baseCharacterId;$('#opponent-name').textContent=opponentProfile.name.toUpperCase();$('#opponent-preset').textContent=opponentProfile.presetLabel;$('#opponent-description').textContent=opponentProfile.description;$('#opponent-seed').textContent=`ОПЫТ ${String(opponentSeed).slice(0,12)}`}
 async function rerollOpponent(){if(replayMode||baselineEncounter)return;opponentSeed=freshOpponentSeed();opponentProfile=createOpponentProfile(opponentSeed);await remountOpponent()}
 function syncCharacterSwitch(){$$('.character-switch [data-character]').forEach(b=>{const on=b.dataset.character===currentCharacterId;b.classList.toggle('active',on);b.setAttribute('aria-pressed',String(on))})}
-function syncAppearancePanel(){$$('[data-part]').forEach(b=>{const part=b.dataset.part,on=playerAppearance()[part]!==false;b.classList.toggle('active',on);b.setAttribute('aria-pressed',String(on));b.dataset.scope=SHARED_APPEARANCE_LAYERS.includes(part)?'shared':'owned'})}
-function toggleAppearance(part){if(!APPEARANCE_LAYERS.includes(part))return;if(SHARED_APPEARANCE_LAYERS.includes(part))sharedAppearance={...sharedAppearance,[part]:!sharedAppearance[part]};else if(CHARACTER_OWNED_LAYERS.includes(part))ownedAppearance={...ownedAppearance,[currentCharacterId]:{...ownedAppearance[currentCharacterId],[part]:!ownedAppearance[currentCharacterId][part]}};syncAppearancePanel();resetActors();renderPreview()}
-function resetAppearance(){sharedAppearance={hat:false,glasses:false,beard:false,accessory:false};ownedAppearance={...ownedAppearance,[currentCharacterId]:{outfit:true,shoes:true}};syncAppearancePanel();resetActors();renderPreview()}
-async function chooseCharacter(id){if(id===currentCharacterId)return;currentCharacterId=id;await remountPlayerCharacter()}
+
+function categoryForPart(part){return VARIANT_PART_CATEGORY[part]||part}
+function selectionBucket(category){return SHARED_APPEARANCE_CATEGORIES.includes(category)?sharedAppearance:ownedAppearance[currentCharacterId]}
+function selectedVariant(category){const key=variantKey(category);return key?selectionBucket(category)?.[key]??null:null}
+function sanitizeVariantSelections(){
+  if(!hasVariantContract(currentCharacterId))return;
+  const normalized=playerAppearance();
+  for(const category of SHARED_APPEARANCE_CATEGORIES){const key=variantKey(category);if(key)sharedAppearance[key]=normalized[key]??null}
+  for(const category of CHARACTER_OWNED_CATEGORIES){const key=variantKey(category);if(key)ownedAppearance[currentCharacterId][key]=normalized[key]??null}
+  appearanceColors[currentCharacterId]={...appearanceColors[currentCharacterId],...(normalized.colors||{})};
+}
+function renderVariantOptions(){
+  const rack=$('#variant-options');if(!rack)return;
+  const options=variantOptions(currentCharacterId,activeAppearanceCategory);
+  if(!options.length){rack.hidden=true;rack.innerHTML='';return}
+  const active=selectedVariant(activeAppearanceCategory);
+  const baseLabel=CHARACTER_OWNED_CATEGORIES.includes(activeAppearanceCategory)?'БАЗА':'НЕТ';
+  rack.hidden=false;
+  rack.dataset.category=activeAppearanceCategory;
+  rack.innerHTML=`<button data-variant="" class="${active==null?'active':''}">${baseLabel}</button>${options.map((id,i)=>`<button data-variant="${id}" class="${id===active?'active':''}">${String(i+1).padStart(2,'0')}</button>`).join('')}`;
+  rack.querySelectorAll('[data-variant]').forEach(button=>button.addEventListener('click',()=>selectAppearanceVariant(activeAppearanceCategory,button.dataset.variant||null)));
+}
+function syncAppearancePanel(){
+  const appearance=playerAppearance();
+  $$('[data-part]').forEach(b=>{
+    const part=b.dataset.part,category=categoryForPart(part),options=variantOptions(currentCharacterId,category);
+    const usesVariants=options.length>0;
+    const on=usesVariants?selectedVariant(category)!=null:appearance[part]!==false;
+    b.classList.toggle('active',on);
+    b.classList.toggle('has-variants',usesVariants);
+    b.setAttribute('aria-pressed',String(on));
+    b.dataset.scope=SHARED_APPEARANCE_CATEGORIES.includes(category)?'shared':'owned';
+    b.dataset.variantCount=String(options.length);
+    if(usesVariants)b.setAttribute('aria-expanded',String(activeAppearanceCategory===category&&!$('#variant-options')?.hidden));else b.removeAttribute('aria-expanded');
+  });
+  renderVariantOptions();
+}
+function commitAppearanceChange(){sanitizeVariantSelections();syncAppearancePanel();resetActors();renderPreview()}
+function toggleAppearance(part){
+  const category=categoryForPart(part),options=variantOptions(currentCharacterId,category);
+  if(options.length){activeAppearanceCategory=category;syncAppearancePanel();return}
+  if(!APPEARANCE_LAYERS.includes(part))return;
+  if(SHARED_APPEARANCE_LAYERS.includes(part))sharedAppearance={...sharedAppearance,[part]:!sharedAppearance[part]};
+  else if(CHARACTER_OWNED_LAYERS.includes(part))ownedAppearance={...ownedAppearance,[currentCharacterId]:{...ownedAppearance[currentCharacterId],[part]:!ownedAppearance[currentCharacterId][part]}};
+  commitAppearanceChange();
+}
+function selectAppearanceVariant(category,value){
+  const key=variantKey(category),options=variantOptions(currentCharacterId,category);if(!key||!options.length)return;
+  const next=value&&options.includes(value)?value:null;
+  if(SHARED_APPEARANCE_CATEGORIES.includes(category))sharedAppearance={...sharedAppearance,[key]:next};
+  else ownedAppearance={...ownedAppearance,[currentCharacterId]:{...ownedAppearance[currentCharacterId],[key]:next}};
+  commitAppearanceChange();
+}
+function resetAppearance(){
+  sharedAppearance={hat:false,glasses:false,beard:false,accessory:false,...EMPTY_SHARED_VARIANTS()};
+  ownedAppearance={...ownedAppearance,[currentCharacterId]:{outfit:true,shoes:true,...EMPTY_OWNED_VARIANTS()}};
+  appearanceColors={...appearanceColors,[currentCharacterId]:EMPTY_COLORS()};
+  commitAppearanceChange();
+}
+async function chooseCharacter(id){if(id===currentCharacterId)return;currentCharacterId=id;sanitizeVariantSelections();await remountPlayerCharacter()}
 
 function familyLabel(type){return NODE_SPECS[type]?.family||'NODE'}
 function title(type){return NODE_SPECS[type]?.title||type}
@@ -56,7 +132,7 @@ function showTrace(){const trace=controller?.encounter?.traces.at(-1);if(!trace)
 function hideOverlay(){overlay.hidden=true;overlay.innerHTML=''}
 function comparisonHtml(c){const fmt=v=>`${v>0?'+':''}${v}`;return `<small>БЫЛО / СТАЛО</small><strong>${c.sameScenario?'ТОТ ЖЕ СЦЕНАРИЙ':'СЦЕНАРИЙ ИЗМЕНИЛСЯ'}</strong><div class="compare-grid"><span>BRAIN ${fmt(c.metrics.brain)}</span><span>TENSION ${fmt(c.metrics.tension)}</span><span>CONTACT ${fmt(c.metrics.contact)}</span><span>ENERGY ${fmt(c.metrics.energy)}</span></div>`}
 function showResult(result){show('result');$('#result-title').textContent=result.punchline;$('#result-cause').textContent=result.stageB.cause;$('#result-node').textContent=result.stageC.nodeType?title(result.stageC.nodeType):'—';if(!baselineEncounter){baselineEncounter=structuredClone(controller.encounter);replayTargetType=result.stageC.nodeType||'repeat';$('#comparison').hidden=true;$('#rerun').textContent='ИЗМЕНИТЬ ОДНУ ВЕЩЬ →'}else if(replayMode){const c=compareRuns(baselineEncounter,controller.encounter);$('#comparison').innerHTML=comparisonHtml(c);$('#comparison').hidden=false;$('#rerun').textContent='ЕЩЁ ОДИН ЭКСПЕРИМЕНТ →'}}
-function prepareReplay(){replayMode=true;currentCharacterId=firstRunConfig?.characterId||currentCharacterId;sharedAppearance={...(firstRunConfig?.sharedAppearance||sharedAppearance)};ownedAppearance=structuredClone(firstRunConfig?.ownedAppearance||ownedAppearance);opponentSeed=firstRunConfig.opponentSeed;opponentProfile=structuredClone(firstRunConfig.opponentProfile);resetActors();applyBrainConfig(firstRunConfig);controller=null;$('#replay-note').textContent=`КОНТРФАКТ: МЕНЯЕМ ТОЛЬКО «${title(replayTargetType)}». СОПЕРНИК ТОТ ЖЕ.`;show('brain')}
+function prepareReplay(){replayMode=true;currentCharacterId=firstRunConfig?.characterId||currentCharacterId;sharedAppearance={...(firstRunConfig?.sharedAppearance||sharedAppearance)};ownedAppearance=structuredClone(firstRunConfig?.ownedAppearance||ownedAppearance);appearanceColors=structuredClone(firstRunConfig?.appearanceColors||appearanceColors);opponentSeed=firstRunConfig.opponentSeed;opponentProfile=structuredClone(firstRunConfig.opponentProfile);resetActors();applyBrainConfig(firstRunConfig);controller=null;$('#replay-note').textContent=`КОНТРФАКТ: МЕНЯЕМ ТОЛЬКО «${title(replayTargetType)}». СОПЕРНИК ТОТ ЖЕ.`;show('brain')}
 
 $$('.character-switch [data-character]').forEach(b=>b.addEventListener('click',()=>chooseCharacter(b.dataset.character)));
 $$('[data-part]').forEach(b=>b.addEventListener('click',()=>toggleAppearance(b.dataset.part)));$('#appearance-reset').onclick=resetAppearance;
@@ -64,7 +140,7 @@ $$('[data-mode]').forEach(b=>b.addEventListener('click',()=>{mode=b.dataset.mode
 $$('.bottom-nav button').forEach(b=>b.addEventListener('click',()=>{if(b.dataset.nav==='talk'&&!controller?.encounter)return;show(b.dataset.nav)}));
 $('#to-brain').onclick=()=>{resetActors();show('brain')};$('#to-setup').onclick=()=>show('setup');
 $('#reroll-opponent').onclick=rerollOpponent;
-$('#play').onclick=()=>{if(!replayMode&&!firstRunConfig)firstRunConfig={...readBrainConfig(),characterId:currentCharacterId,sharedAppearance:{...sharedAppearance},ownedAppearance:structuredClone(ownedAppearance),mode,opponentSeed,opponentProfile:structuredClone(opponentProfile)};resetActors();makeController();controller.start({mode});show('talk');if(mode==='auto')startAuto()};
+$('#play').onclick=()=>{if(!replayMode&&!firstRunConfig)firstRunConfig={...readBrainConfig(),characterId:currentCharacterId,sharedAppearance:{...sharedAppearance},ownedAppearance:structuredClone(ownedAppearance),appearanceColors:structuredClone(appearanceColors),mode,opponentSeed,opponentProfile:structuredClone(opponentProfile)};resetActors();makeController();controller.start({mode});show('talk');if(mode==='auto')startAuto()};
 $('#next-turn').onclick=()=>{if(mode==='auto'){autoTimer?stopAuto():startAuto()}else doNext()};$('#trace-btn').onclick=showTrace;
 $('#rerun').onclick=async()=>{if(!baselineEncounter)return;if(replayMode){baselineEncounter=null;firstRunConfig=null;replayTargetType=null;replayMode=false;opponentSeed=explicitSeed||freshOpponentSeed();opponentProfile=createOpponentProfile(opponentSeed);await remountOpponent();resetActors();controller=null;show('brain')}else prepareReplay()};overlay.addEventListener('click',e=>{if(e.target===overlay)hideOverlay()});
 
