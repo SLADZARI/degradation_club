@@ -3,11 +3,13 @@ import { opponentPreset } from '../opponent/presets.mjs';
 
 export const CRITICISM_IDEA_SCENARIO=Object.freeze({
   id:'criticism-idea',
-  title:'КРИТИКА ИДЕИ',
-  premise:'Собеседник считает идею Гены плохой.',
-  topic:'Собеседник считает идею Гены плохой.',
+  title:'ТРЕТЬЕ ОБЪЯСНЕНИЕ',
+  premise:'Вы третий раз объясняете идею на кухне.',
+  detail:'Собеседник уже сказал «я понял» и убрал телефон.',
+  hiddenRule:'Почему-то это пока не считается достаточным доказательством того, что он действительно понял.',
+  topic:'Идею уже поняли. Объяснение пока продолжается.',
   objective:'contact',
-  objectiveLabel:'СОХРАНИТЬ КОНТАКТ',
+  objectiveLabel:'ОБЪЯСНИТЬ И ОСТАНОВИТЬСЯ ВОВРЕМЯ',
   openingTrigger:'criticism',
   turnLimit:20
 });
