@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>DEMENTOR LAB — Editorial v0.4</title>
+  <meta name="theme-color" content="#e7ff18">
+  <link rel="stylesheet" href="./styles.css"><link rel="stylesheet" href="./replay.css"><link rel="stylesheet" href="./mobile-readability.css"><link rel="stylesheet" href="./character.css"><link rel="stylesheet" href="./opponent.css">
+</head>
+<body>
+<main id="app" class="app" data-screen="person" data-version="editorial-v0.4">
+<header class="topbar"><strong>DEMENTOR LAB · EDITORIAL v0.4</strong><span id="top-status">PERSON</span></header>
+<section class="screen" data-view="person">
+  <div class="hero-copy"><p class="kicker">PERSON</p><h1>СОБЕРИ ЧЕЛОВЕКА.</h1><p>Внешность пока ни в чём не виновата. Посмотрим, что мы положим ему в голову.</p></div>
+  <div class="segmented character-switch" aria-label="Выбор тела персонажа"><button data-character="character-01" class="active">ПЕРСОНАЖ 01</button><button data-character="character-02">ПЕРСОНАЖ 02</button></div>
+  <div class="person-stage"><div class="character-slot big" id="person-preview" aria-label="Собранный Дементор"></div></div>
+  <div class="appearance-panel" aria-label="Категории внешности">
+    <button data-part="hat" class="active">ГОЛОВА</button><button data-part="glasses" class="active">ОЧКИ</button><button data-part="beard" class="active">УСЫ</button><button data-part="accessory" class="active">АКСЕССУАР</button><button data-part="outfit" class="active">ОДЕЖДА</button><button data-part="shoes" class="active">ОБУВЬ</button>
+  </div>
+  <div id="variant-options" class="variant-options" hidden aria-label="Варианты выбранной категории"></div>
+  <div class="appearance-ownership"><span>ОБЩИЕ: ГОЛОВА · ОЧКИ · УСЫ · АКСЕССУАР</span><span>СВОИ: ОДЕЖДА · ОБУВЬ · СКЕЛЕТ</span></div>
+  <button class="secondary-reset" id="appearance-reset">СБРОСИТЬ ОБВЕС</button><button class="primary" id="to-brain">ПОСМОТРЕТЬ, ЧТО ОН БУДЕТ ДЕЛАТЬ →</button>
+</section>
+<section class="screen" data-view="brain" hidden><div class="section-head"><p class="kicker">BRAIN</p><h2 id="brain-title">ЧТО ПРОИСХОДИТ ПОСЛЕ «Я ПОНЯЛ»?</h2></div><div id="replay-note" class="replay-note" hidden>ТОТ ЖЕ РАЗГОВОР. МЕНЯЕМ ТОЛЬКО ОДНУ ПРИЧИНУ.</div><div id="brain-graph" class="brain-graph"></div><div id="brain-editor" class="editor"></div><button class="primary" id="to-setup">ПРОВЕРИТЬ НА ЛЮДЯХ →</button></section>
+<section class="screen" data-view="setup" hidden><div class="sheet-card"><p class="kicker">СИТУАЦИЯ</p><h2>ТРЕТЬЕ ОБЪЯСНЕНИЕ</h2><p class="lead">Вы третий раз объясняете идею на кухне.</p><p>Собеседник уже сказал «я понял» и убрал телефон.</p><p>Почему-то это пока не считается достаточным доказательством.</p><dl><div><dt>ЗАДАЧА</dt><dd>ОБЪЯСНИТЬ И ОСТАНОВИТЬСЯ ВОВРЕМЯ</dd></div><div><dt>КОНЕЦ</dt><dd>20 РАУНДОВ ИЛИ КОГДА РАЗГОВОР ПЕРЕСТАНЕТ БЫТЬ РАЗГОВОРОМ</dd></div></dl><div id="opponent-card" class="opponent-card"><div class="opponent-head"><span class="kicker">СОБЕСЕДНИК</span><small id="opponent-seed"></small></div><strong id="opponent-name">—</strong><b id="opponent-preset">—</b><p id="opponent-description">—</p><button id="reroll-opponent" class="secondary-reset">ДРУГОГО →</button></div><div class="segmented"><button data-mode="auto" class="active">AUTO</button><button data-mode="step">STEP</button></div><button class="primary" id="play">НАЧАТЬ РАЗГОВОР →</button></div></section>
+<section class="screen talk" data-view="talk" hidden><div class="talk-record"><b>ТРЕТЬЕ ОБЪЯСНЕНИЕ</b><span>ЗАДАЧА: ОСТАНОВИТЬСЯ ВОВРЕМЯ</span></div><div class="arena"><div class="actor actor-a"><div class="character-slot small" id="actor-a" aria-label="Игрок"></div><strong id="actor-a-name">ГЕНА</strong></div><div class="turn"><span>TURN</span><b id="turn">0</b></div><div class="actor actor-b"><div class="character-slot small" id="actor-b" aria-label="Собеседник"></div><strong id="actor-b-name">СОБЕСЕДНИК</strong></div></div><div id="metrics" class="metrics"></div><div id="dialogue" class="dialogue"><p class="empty">Пока всё спокойно.</p></div><div id="delta" class="delta" aria-live="polite"></div><div class="talk-actions"><button id="next-turn" class="primary">NEXT TURN →</button><button id="trace-btn">КАК МЫ СЮДА ДОШЛИ?</button></div></section>
+<section class="screen" data-view="result" hidden><div class="result-card"><p class="kicker">RESULT</p><h2 id="result-title">ЭКСПЕРИМЕНТ ЗАКОНЧИЛСЯ.</h2><div class="result-block"><small>ЧТО ПРОИЗОШЛО</small><strong id="result-cause"></strong></div><div class="result-block"><small>ПОДОЗРИТЕЛЬНОЕ МЕСТО</small><strong id="result-node"></strong></div><div id="comparison" class="comparison" hidden></div><button class="primary" id="rerun">ИЗМЕНИТЬ ОДНУ ВЕЩЬ →</button></div></section>
+<nav class="bottom-nav"><button data-nav="person" class="active">PERSON</button><button data-nav="brain">BRAIN</button><button data-nav="talk">TALK</button></nav><div id="overlay" class="overlay" hidden></div>
+</main>
+<script type="module" src="./src/ui/app.mjs"></script>
+<script type="module" src="./src/ui/editorial-copy.mjs"></script>
+</body></html>
