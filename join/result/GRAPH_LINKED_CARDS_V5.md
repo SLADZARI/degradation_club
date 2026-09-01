@@ -1,34 +1,9 @@
 # DC-9 Result — Graph Linked Cards v5
 
-Status: **CURRENT WORKING REFERENCE**  
-Approved for further design and implementation work: **2026-08-31**  
-Public-index revision: **2026-09-01**
+Status: **SUPERSEDED**  
+Superseded on: **2026-09-01**
 
-Source-of-truth presentation contract:
-`dementor-club/operations/DC9_RESULT_SYSTEM_V0.1.md`
+Current working reference:
+`GRAPH_LINKED_CARDS_V6.md`
 
-Reference artifact name:
-`dementor-dc9-graph-linked-cards-v5.html`
-
-## Baseline
-
-All further work on `/join/result/` should begin from Graph Linked Cards v5 until an explicitly approved later version replaces it.
-
-Graph Linked Cards v5 defines:
-
-- canonical sphere order remains internal to storage/calculation/QA;
-- public radar does **not** show `01–09` sphere numbers;
-- each axis exposes its final `/5` value;
-- strongest visible results may use simple black radar dots;
-- legend maps `sphere pictogram → sphere name → score`;
-- highlighted legend states may use the acid field;
-- no A/B/C markers;
-- no redundant sphere numbers inside result cards;
-- sphere pictograms replace decorative empty circles and public numeric indexing;
-- card hierarchy: icon → sphere → final level → level name → short editorial line;
-- public cards do not expose internal `tagLevels / intent / responsibility / base` by default;
-- page order: hero → linked graph → highlighted results → remaining results → dossier → Community;
-- mobile must preserve graph meaning, not reduce the radar to an unexplained shape;
-- mobile legend must keep pictograms readable and must not reintroduce internal numeric indices to save space.
-
-This file is an implementation pointer. Diagnostic semantics remain governed by the `dementor-club` source-of-truth documents.
+v5 remains in the repository as implementation history. Do not use it as the starting point for new `/join/result/` work.
