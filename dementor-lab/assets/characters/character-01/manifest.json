@@ -1,0 +1,20 @@
+{
+  "id": "character-01",
+  "version": "reference-rebuild-v1",
+  "source": "user-supplied flattened reference character-01-rig-template(3).jpeg",
+  "viewBox": "0 0 703 1024",
+  "appearanceLayers": ["hat", "glasses", "beard", "accessory", "outfit", "shoes"],
+  "faceLayers": {
+    "eyes": ["eyes-neutral", "eyes-tense", "eyes-sleepy", "eyes-overheat"],
+    "brows": ["brows-neutral", "brows-tense", "brows-angry"],
+    "mouth": ["mouth-neutral", "mouth-soft", "mouth-tense", "mouth-open"]
+  },
+  "rig": {
+    "head": [352, 270],
+    "shoulderLeft": [275, 345],
+    "shoulderRight": [425, 345],
+    "hipLeft": [311, 590],
+    "hipRight": [393, 591]
+  },
+  "note": "The uploaded source is a flattened JPEG. The visible high-confidence components were rebuilt as semantic SVG layers so they can be toggled and animated independently. Ghosted/25%-opacity alternatives in the JPEG are treated as visual guides, not losslessly recoverable source layers."
+}
