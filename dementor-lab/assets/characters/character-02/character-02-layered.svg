@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 703 1024" role="img" aria-labelledby="title desc" data-asset-version="character-02-semantic-v1" data-rig-pivots='{"head":[352,286],"shoulderLeft":[292,354],"shoulderRight":[412,354],"hipLeft":[326,592],"hipRight":[378,592]}'>
+<title id="title">Dementor character 02</title><desc id="desc">Female Dementor character with own rig, own outfit and shoes, compatible with shared head and accessory layers.</desc>
+<metadata id="dementor-rig-meta">{"head":[352,286],"shoulderLeft":[292,354],"shoulderRight":[412,354],"hipLeft":[326,592],"hipRight":[378,592]}</metadata>
+<g id="character-02-rig-template" stroke="#111" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
+ <g id="body">
+  <g id="body-leg-left"><path d="M302 651 Q321 643 344 651 L337 897 Q321 910 294 899 Z" fill="#f1dcc0"/></g>
+  <g id="body-leg-right"><path d="M359 651 Q382 643 401 651 L410 899 Q382 910 366 897 Z" fill="#f1dcc0"/></g>
+  <g id="body-torso"><path d="M302 337 Q352 311 402 337 Q421 405 408 520 Q393 582 352 604 Q310 582 296 520 Q283 405 302 337Z" fill="#f1dcc0"/></g>
+  <g id="body-arm-left"><path d="M300 352 Q267 361 250 416 L232 606 Q229 630 246 642 Q265 648 272 622 L289 430Z" fill="#f1dcc0"/></g>
+  <g id="body-arm-right"><path d="M404 352 Q437 361 454 416 L472 606 Q475 630 458 642 Q439 648 432 622 L415 430Z" fill="#f1dcc0"/></g>
+ </g>
+ <g id="underwear"><path d="M313 526 Q352 545 391 526 L391 600 Q352 614 313 600Z" fill="#f6f5ef"/></g>
+ <g id="shoes"><path d="M287 879 Q319 869 343 891 L341 943 Q317 956 273 951 Q262 943 268 930Z" fill="#111"/><path d="M361 891 Q385 869 417 879 L436 930 Q442 943 431 951 Q387 956 363 943Z" fill="#111"/><path d="M275 932 L339 936 M366 936 L429 932" stroke="#f5f5ef" stroke-width="6"/></g>
+ <g id="outfit">
+  <path d="M293 346 Q352 314 411 346 L432 437 L407 451 L420 633 Q352 658 284 633 L297 451 L272 437Z" fill="#111"/>
+  <path d="M285 632 Q352 653 419 632 L444 760 Q352 796 260 760Z" fill="#111"/>
+  <path d="M272 438 L296 446 L282 612 L247 604 L255 460Z" fill="#111"/><path d="M432 438 L408 446 L422 612 L457 604 L449 460Z" fill="#111"/>
+  <g fill="#f1dcc0" stroke="none"><circle cx="318" cy="405" r="8"/><circle cx="353" cy="430" r="7"/><circle cx="389" cy="398" r="9"/><circle cx="330" cy="486" r="7"/><circle cx="379" cy="512" r="8"/><circle cx="304" cy="561" r="6"/><circle cx="396" cy="574" r="7"/><circle cx="332" cy="702" r="8"/><circle cx="387" cy="728" r="7"/></g>
+ </g>
+ <g id="head-rig">
+  <g id="head">
+   <g id="head-base"><path d="M287 151 Q352 119 417 151 L414 260 Q395 311 352 320 Q309 311 290 260Z" fill="#f1dcc0"/></g>
+   <g id="hair"><path d="M290 158 Q306 116 352 121 Q401 116 415 159 L413 206 Q388 174 352 174 Q316 174 291 206Z" fill="#111"/></g>
+   <g id="eyes"><g id="eyes-neutral"><circle cx="324" cy="213" r="6" fill="#111" stroke="none"/><circle cx="380" cy="213" r="6" fill="#111" stroke="none"/></g><g id="eyes-tense" opacity="0"><path d="M311 214 L334 207 M370 207 L393 214" fill="none"/></g><g id="eyes-sleepy" opacity="0"><path d="M312 214 Q324 220 336 214 M368 214 Q380 220 392 214" fill="none"/></g><g id="eyes-overheat" opacity="0"><path d="M314 203 L334 223 M334 203 L314 223 M370 203 L390 223 M390 203 L370 223" fill="none"/></g></g>
+   <g id="brows"><g id="brows-neutral"><path d="M310 193 Q324 187 338 193 M366 193 Q380 187 394 193" fill="none"/></g><g id="brows-tense" opacity="0"><path d="M310 194 L338 187 M366 187 L394 194" fill="none"/></g><g id="brows-angry" opacity="0"><path d="M310 190 L338 199 M366 199 L394 190" fill="none"/></g></g>
+   <g id="mouth"><g id="mouth-neutral"><path d="M334 270 Q352 276 370 270" fill="none"/></g><g id="mouth-soft" opacity="0"><path d="M334 267 Q352 283 370 267" fill="none"/></g><g id="mouth-tense" opacity="0"><path d="M333 274 L371 274" fill="none"/></g><g id="mouth-open" opacity="0"><ellipse cx="352" cy="273" rx="18" ry="12" fill="#111"/></g></g>
+  </g>
+  <g id="beard"><path d="M310 247 Q330 237 345 251 Q352 244 359 251 Q374 237 394 247" fill="none" opacity="0"/></g>
+  <g id="accessory"><path d="M302 268 L344 243 L355 253 L316 282Z" fill="#f6f5ef"/><path d="M353 255 L366 244 L409 278 L400 289Z" fill="#f6f5ef"/></g>
+  <g id="glasses"><path d="M287 188 Q319 181 350 191 Q382 181 416 188 L412 225 Q395 240 377 234 Q360 228 352 214 Q344 228 327 234 Q308 240 292 225Z" fill="#111"/><path d="M293 196 L339 196 M365 196 L410 196" stroke="#f1dcc0" stroke-width="5"/></g>
+  <g id="hat"><path d="M258 92 L355 7 L459 94 L441 177 Q352 164 270 177Z" fill="#111"/><path d="M270 95 L355 23 L447 97" fill="none" stroke="#f4ded3" stroke-width="8"/></g>
+ </g>
+</g>
+</svg>
