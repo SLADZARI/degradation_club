@@ -1,0 +1,51 @@
+import {NODE_SPECS} from './model.mjs';
+
+export function familyOf(node){return NODE_SPECS[node?.type]?.family||'UNKNOWN'}
+
+export const NEXT_FAMILY_COMPAT=Object.freeze({
+  TRIGGER:new Set(['STATE','IMPULSE','REACTION','CONTROL','ABILITY']),
+  STATE:new Set(['STATE','IMPULSE','REACTION','CONTROL','ABILITY']),
+  IMPULSE:new Set(['STATE','REACTION','CONTROL','ABILITY']),
+  REACTION:new Set(['STATE','CONTROL','ABILITY']),
+  CONTROL:new Set(['STATE','REACTION','CONTROL','ABILITY']),
+  ABILITY:new Set(['STATE','REACTION','CONTROL'])
+});
+
+export function canConnectNodes(graph,fromNode,toNode){
+  if(!fromNode||!toNode||fromNode.id===toNode.id)return false;
+  if((graph.edges||[]).some(e=>e.from===fromNode.id&&e.to===toNode.id))return false;
+  const fromFam=familyOf(fromNode),toFam=familyOf(toNode);
+  if(toFam==='TRIGGER')return false;
+  return !!NEXT_FAMILY_COMPAT[fromFam]?.has(toFam);
+}
+
+export function outgoing(graph,id){return (graph.edges||[]).filter(e=>e.from===id)}
+export function reachableFrom(graph,startId){
+  const seen=new Set(),stack=[startId];
+  while(stack.length){
+    const id=stack.pop();if(seen.has(id))continue;seen.add(id);
+    outgoing(graph,id).forEach(e=>stack.push(e.to));
+  }
+  return seen;
+}
+
+export function validateGraph(graph){
+  const triggers=graph.nodes.filter(n=>familyOf(n)==='TRIGGER');
+  const reactions=graph.nodes.filter(n=>familyOf(n)==='REACTION');
+  if(!triggers.length)return {runnable:false,code:'NO_TRIGGER',detail:'СХЕМА ПОКА НЕ ЗНАЕТ, С ЧЕГО НАЧИНАТЬ.'};
+  if(!reactions.length)return {runnable:false,code:'NO_REACTION',detail:'ОН ПОКА НЕ ЗНАЕТ, ЧТО ВООБЩЕ ДЕЛАТЬ.'};
+
+  const reachable=new Set();
+  triggers.forEach(t=>reachableFrom(graph,t.id).forEach(id=>reachable.add(id)));
+
+  const deadTrigger=triggers.find(t=>!outgoing(graph,t.id).length);
+  if(deadTrigger)return {runnable:false,code:'DEAD_TRIGGER',nodeId:deadTrigger.id,detail:`ОН ПОКА НЕ ЗНАЕТ, ЧТО ДЕЛАТЬ ПОСЛЕ «${NODE_SPECS[deadTrigger.type]?.title||deadTrigger.type}».`};
+
+  if(!reactions.some(r=>reachable.has(r.id)))
+    return {runnable:false,code:'REACTION_UNREACHABLE',detail:'РЕАКЦИЯ ЕСТЬ, НО СИГНАЛ ДО НЕЁ НЕ ДОХОДИТ.'};
+
+  const isolated=graph.nodes.find(n=>familyOf(n)!=='TRIGGER'&&!reachable.has(n.id));
+  if(isolated)return {runnable:false,code:'ISLAND',nodeId:isolated.id,detail:`БЛОК «${NODE_SPECS[isolated.type]?.title||isolated.type}» НЕ УЧАСТВУЕТ В СХЕМЕ.`};
+
+  return {runnable:true,code:'READY',detail:'СХЕМА ДОХОДИТ ОТ ТРИГГЕРА ДО РЕАКЦИИ.'};
+}
