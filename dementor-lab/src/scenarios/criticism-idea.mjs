@@ -1,10 +1,11 @@
 import { createCharacter } from '../encounter/runtime.mjs';
+import { opponentPreset } from '../opponent/presets.mjs';
 
 export const CRITICISM_IDEA_SCENARIO=Object.freeze({
   id:'criticism-idea',
   title:'КРИТИКА ИДЕИ',
-  premise:'Марта считает идею Гены плохой.',
-  topic:'Марта считает идею Гены плохой.',
+  premise:'Собеседник считает идею Гены плохой.',
+  topic:'Собеседник считает идею Гены плохой.',
   objective:'contact',
   objectiveLabel:'СОХРАНИТЬ КОНТАКТ',
   openingTrigger:'criticism',
@@ -28,26 +29,31 @@ export const PLAYER_GRAPH=Object.freeze({
   ]
 });
 
-export const MARTA_GRAPH=Object.freeze({
-  id:'marta-contact-skeptic',
-  nodes:[
-    {id:'b-trigger',type:'criticism',p:{}},
-    {id:'b-state',type:'trust',p:{key:'trust',delta:1,cap:5}},
-    {id:'b-impulse',type:'understand',p:{weight:3}},
-    {id:'b-reaction',type:'explain',p:{}},
-    {id:'b-pause',type:'pause',p:{}}
-  ],
-  edges:[
-    {id:'b-e1',from:'b-trigger',to:'b-state'},
-    {id:'b-e2',from:'b-state',to:'b-impulse'},
-    {id:'b-e3',from:'b-impulse',to:'b-pause'},
-    {id:'b-e4',from:'b-pause',to:'b-reaction'}
-  ]
-});
+const DEFAULT_OPPONENT=opponentPreset('CONTACT_SKEPTIC');
+export const MARTA_GRAPH=DEFAULT_OPPONENT.graph;
 
-export function createCriticismActors(){
+export function createCriticismActors({opponentProfile=null}={}){
+  const profile=opponentProfile||{
+    name:'Марта',
+    baseCharacterId:'character-02',
+    presetId:'CONTACT_SKEPTIC',
+    sharedAppearance:{hat:false,glasses:false,beard:false,accessory:false},
+    ownedAppearance:{outfit:true,shoes:true},
+    graph:DEFAULT_OPPONENT.graph,
+    initialState:{...DEFAULT_OPPONENT.initialState,memory:{}}
+  };
   return {
     A:createCharacter({id:'A',name:'Геннадий Львович',graph:PLAYER_GRAPH,state:{energy:72,brain:15,tension:10,contact:60,memory:{}}}),
-    B:createCharacter({id:'B',name:'Марта',graph:MARTA_GRAPH,state:{energy:78,brain:12,tension:12,contact:62,memory:{}}})
+    B:createCharacter({
+      id:'B',
+      name:profile.name,
+      graph:profile.graph,
+      state:profile.initialState,
+      visual:{
+        characterId:profile.baseCharacterId,
+        appearance:{...(profile.sharedAppearance||{}),...(profile.ownedAppearance||{})},
+        opponentPresetId:profile.presetId
+      }
+    })
   };
 }
