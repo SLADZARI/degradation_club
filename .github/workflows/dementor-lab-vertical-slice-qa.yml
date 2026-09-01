@@ -1,0 +1,29 @@
+name: Dementor Lab Vertical Slice QA
+
+on:
+  push:
+    branches:
+      - agent/dementor-lab-vertical-slice-v0.3
+    paths:
+      - 'dementor-lab/**'
+      - '.github/workflows/dementor-lab-vertical-slice-qa.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deterministic-qa:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: dementor-lab
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run zero-dependency QA suite
+        run: npm test
