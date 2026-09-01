@@ -6,11 +6,11 @@
   <meta name="robots" content="noindex,nofollow">
   <meta name="theme-color" content="#f2f0e8">
   <title>Ваша карта DC-9 — Dementor Club</title>
-  <meta name="description" content="Итоговая карта девяти сфер Dementor Club и переход в Community.">
+  <meta name="description" content="Итоговая карта девяти сфер Dementor Club. Девять независимых результатов без общего балла.">
   <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="/join/result/result.css">
-  <link rel="stylesheet" href="/join/result/result-mobile-legend-v1.css">
   <link rel="stylesheet" href="/join/result/result-mobile-final-v4.css">
+  <link rel="stylesheet" href="/join/result/result-graph-v6.css">
   <script src="/site-config.js"></script>
 </head>
 <body class="dc-result-page">
@@ -18,11 +18,11 @@
 
 <main class="dc-result-shell">
   <section class="dc-result-hero">
-    <div class="dc-result-meta"><span>DC-9 / RESULT</span><span id="resultCount">— / 9</span></div>
+    <div class="dc-result-meta"><span>DC-9 / РЕЗУЛЬТАТ</span><span id="resultCount">— / 9</span></div>
     <div class="dc-result-hero__copy">
-      <span class="dc-result-stamp" id="heroStamp">СОБИРАЕМ ПРОТОКОЛ.</span>
-      <h1>ВОТ ВАША<br><span class="dc-acid-word">КАРТА.</span></h1>
-      <p class="dc-result-lead" id="heroLead">Девять сфер. Девять отдельных результатов. Никакого общего балла.</p>
+      <span class="dc-result-stamp" id="heroStamp">СОБИРАЕМ КАРТУ.</span>
+      <h1 id="heroTitle">ВОТ ВАША<br><span class="dc-acid-word">КАРТА.</span></h1>
+      <p class="dc-result-lead" id="heroLead">Девять сфер.<br>Девять отдельных результатов.<br>Общего балла нет.</p>
     </div>
   </section>
 
@@ -32,36 +32,36 @@
       <div><h2 id="mapTitle">ДЕВЯТЬ СФЕР.<br>ОДНА КАРТА.</h2></div>
     </div>
     <div class="dc-radar-stage" id="radarStage" aria-live="polite"><div class="dc-state">СОБИРАЕМ ГЕОМЕТРИЮ…</div></div>
+    <div class="dc-contrast-head"><strong>02 / ТРИ ТОЧКИ КОНТРАСТА</strong><span>Выделены для чтения формы. Это не рейтинг и не «лучшие» результаты.</span></div>
     <div class="dc-highlight-grid" id="highlightGrid" aria-live="polite"></div>
   </section>
 
   <section class="dc-result-register" aria-labelledby="registerTitle">
-    <div class="dc-result-section-head compact"><p>02 / ОСТАЛЬНЫЕ</p><div><h2 id="registerTitle">ЕЩЁ ШЕСТЬ.</h2></div></div>
+    <div class="dc-result-section-head compact"><p>03 / ОСТАЛЬНЫЕ</p><div><h2 id="registerTitle">ЕЩЁ ШЕСТЬ.</h2></div></div>
     <div id="sphereRegister" class="dc-sphere-register" aria-live="polite"><div class="dc-state">ЗАГРУЖАЕМ РЕЗУЛЬТАТЫ…</div></div>
   </section>
 
   <section class="dc-dossier" id="dossierSection" hidden aria-labelledby="dossierTitle">
-    <div class="dc-result-section-head compact"><p>03 / ЛИЧНОЕ ДОСЬЕ</p><div><h2 id="dossierTitle">ЗАБРАТЬ С СОБОЙ.</h2></div></div>
+    <div class="dc-result-section-head compact"><p>04 / КАРТА С СОБОЙ</p><div><h2 id="dossierTitle">СОХРАНИТЬ КАРТУ.</h2></div></div>
     <div class="dc-dossier-card" id="dossierCard">
-      <div class="dc-dossier-top">DEMENTOR CLUB / DC-9</div>
+      <div class="dc-dossier-top">DEMENTOR CLUB / DC-9 / ЛИЧНАЯ КАРТА</div>
       <div class="dc-dossier-title"><span>МОЯ КАРТА.</span></div>
       <div class="dc-dossier-content"><div class="dc-dossier-radar" id="dossierRadar"></div><div class="dc-dossier-rows" id="dossierRows"></div></div>
       <div class="dc-dossier-foot"><span>9 СФЕР / БЕЗ ОБЩЕГО БАЛЛА</span><span>DEMENTOR.CLUB</span></div>
     </div>
-    <div class="dc-dossier-actions"><button class="dc-result-action primary" type="button" id="downloadDossier">СКАЧАТЬ ДОСЬЕ</button><button class="dc-result-action" type="button" id="shareDossier">ПОДЕЛИТЬСЯ</button></div>
+    <div class="dc-dossier-actions"><button class="dc-result-action primary" type="button" id="downloadDossier">СКАЧАТЬ КАРТУ</button><button class="dc-result-action" type="button" id="shareDossier">ПОДЕЛИТЬСЯ</button></div>
     <p class="dc-share-note" id="shareNote" aria-live="polite"></p>
   </section>
 
   <section class="dc-result-next" id="nextBlock" aria-live="polite">
     <div class="dc-community-cta">
-      <div class="dc-result-meta"><span>04 / COMMUNITY</span><span id="communityState">ПРОВЕРЯЕМ ДОПУСК</span></div>
-      <h2 id="nextTitle">КАРТА ГОТОВА.<br>МОЖНО ВНУТРЬ.</h2>
-      <p id="nextCopy">Следующий шаг — оформить участие и перейти к Community.</p>
+      <div class="dc-result-meta"><span>05 / ДАЛЬШЕ</span><span id="communityState">ПРОВЕРЯЕМ ДОПУСК</span></div>
+      <h2 id="nextTitle">КАРТА ГОТОВА.<br>ДАЛЬШЕ — ПО ЖЕЛАНИЮ.</h2>
+      <p id="nextCopy">Карта ничего не назначает и никуда не зачисляет. Если хочется продолжить — можно оформить участие и зайти в клуб.</p>
       <div id="nextActions"></div>
     </div>
   </section>
 </main>
-<script type="module" src="/join/result/result.js"></script>
-<script src="/join/result/result-mobile-legend-v1.js" defer></script>
+<script type="module" src="/join/result/result-v6.js"></script>
 </body>
 </html>
