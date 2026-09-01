@@ -41,8 +41,9 @@ for(const characterId of roster){
     assert.match(svg,/data-rig-pivots=/,'character-01 carries authored rig metadata on the SVG root');
     assert.match(svg,/data-color-target=["']outfit-primary["']/,'character-01 exposes normalized shared outfit paint metadata');
   }else{
-    assert.ok(Array.isArray(manifest.appearanceLayers),'character-02 remains on the legacy appearance-layer manifest');
-    assert.ok(manifest.appearanceLayers.includes('outfit')&&manifest.appearanceLayers.includes('shoes'),'character-02 keeps its owned legacy outfit/shoes layers');
+    assert.equal(manifest.version,'semantic-v1','character-02 remains on the semantic legacy reconstruction');
+    assert.deepEqual(manifest.ownership.shared,['hat','glasses','beard','accessory'],'character-02 keeps the shared legacy accessory contract');
+    assert.ok(manifest.ownership.own.includes('outfit')&&manifest.ownership.own.includes('shoes'),'character-02 keeps its owned legacy outfit/shoes contract');
   }
 }
 
