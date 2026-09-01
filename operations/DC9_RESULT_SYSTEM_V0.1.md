@@ -1,7 +1,8 @@
 # DC-9 Result System v0.1
 
 Status: **APPROVED PRESENTATION CONTRACT / IMPLEMENTATION QA REQUIRED**  
-Date: 2026-08-31
+Date: 2026-08-31  
+Presentation revision: **2026-09-01 — public sphere numbering removed**
 
 ## Current visual reference
 
@@ -17,10 +18,10 @@ All further DC-9 result design, responsive work, dossier work and site implement
 Graph Linked Cards v5 fixes the following presentation principles:
 
 - the radar itself is readable and connected to the result list;
-- radar axes use the canonical `01–09` sphere numbering;
-- each radar axis also shows the final `/5` value;
+- canonical sphere numbering remains internal to the model and implementation but is **not shown to the public user**;
+- each radar axis shows the final `/5` value;
 - the strongest visible sphere results may be marked by simple black dots on the radar;
-- the legend below the radar resolves `01–09 → sphere name → score`;
+- the legend resolves `sphere icon → sphere name → score`;
 - highlighted legend cells may use the acid field to connect them visually to radar peaks;
 - public A/B/C markers are not used;
 - result cards do not repeat sphere numbers;
@@ -50,7 +51,7 @@ Implementation branch:
 
 ## Canonical spheres
 
-Exactly nine permanent spheres, in canonical order:
+Exactly nine permanent spheres, in canonical internal order:
 
 1. `personality` — Личность
 2. `work` — Работа
@@ -61,6 +62,8 @@ Exactly nine permanent spheres, in canonical order:
 7. `self_development` — Саморазвитие
 8. `meaning` — Смысл
 9. `technology` — Технологии
+
+This order remains canonical for storage, calculation, QA and deterministic tie-breaking. It is not a required public numbering system.
 
 Alternative top-level sphere lists are not allowed in the production DC-9 result experience.
 
@@ -121,12 +124,14 @@ The stored `tagLevels`, `intent`, `responsibility` and `base` remain part of the
 The public result page shows:
 
 - full Sphere Map / radar;
-- canonical `01–09` axis numbers and final `/5` values on the graph;
-- readable `01–09 → sphere → score` legend;
+- final `/5` values on the graph;
+- readable `sphere pictogram → sphere name → score` legend;
 - three visually highlighted sphere results;
 - remaining six sphere results in compact form;
 - shareable personal dossier;
 - Community CTA after 9/9.
+
+The public result page does **not** show canonical `01–09` sphere numbers. Those numbers are internal navigation/model indices only.
 
 ### Highlighted three
 
@@ -136,24 +141,24 @@ Approved deterministic contrast rule for v0.1:
 
 1. highest completed sphere level;
 2. lowest completed sphere level;
-3. most pronounced remaining result by absolute distance from midpoint `2.5`; tie-break by higher final level, then canonical sphere order.
+3. most pronounced remaining result by absolute distance from midpoint `2.5`; tie-break by higher final level, then canonical internal sphere order.
 
-No public A/B/C labels are used. Highlighted points on the radar are simple black dots. Sphere numbers `01–09` remain the only visible indexing system.
+No public A/B/C labels are used. Highlighted points on the radar are simple black dots. Public sphere identification uses pictogram + sphere name, not internal numeric indexes.
 
-If fewer than three spheres are complete, available results are ordered by distance from midpoint, then higher level, then canonical sphere order.
+If fewer than three spheres are complete, available results are ordered by distance from midpoint, then higher level, then canonical internal sphere order.
 
 This is `presentation prominence` only. It does not create importance, quality, membership relevance or aggregate interpretation.
 
 ## Approved public UX order after 9/9
 
-1. Completion state `9 / 9` and `ВОТ ВАША КАРТА.`
-2. Graph Linked Sphere Map with `01–09`, `/5` values and linked legend.
+1. Completion state `9 / 9` and result hero.
+2. Graph Linked Sphere Map with `/5` values and icon-linked legend.
 3. Three highlighted results: sphere icon, sphere name, final level, level name and one short editorial line.
 4. Remaining six results: sphere icon, sphere name, final level, level name where useful, and one short editorial line.
 5. Compact personal dossier preview + `СКАЧАТЬ ДОСЬЕ` / `ПОДЕЛИТЬСЯ`.
 6. Strong Community CTA.
 
-Do not repeat sphere numbers inside result cards. Numbers are navigation/indexing for the graph and legend only.
+Do not show internal sphere numbers in the public graph, legend or result cards.
 
 Do not use decorative empty circles in result cards. Use the canonical sphere pictogram instead.
 
@@ -177,7 +182,7 @@ Recommended contents:
 - `9 СФЕР / БЕЗ ОБЩЕГО БАЛЛА`;
 - `DEMENTOR.CLUB`.
 
-Highlighted radar points are black dots without A/B/C labels. Do not place developer explanations inside the dossier.
+Highlighted radar points are black dots without A/B/C labels. Public sphere numbers are not required in the dossier; use icons/names when labels are needed. Do not place developer explanations inside the dossier.
 
 ## Community boundary
 
@@ -195,8 +200,10 @@ Required:
 
 - no horizontal overflow;
 - no clipped public copy;
-- graph axis numbers and `/5` values remain readable on mobile;
+- graph `/5` values remain readable on mobile;
 - legend remains the textual resolution layer for the graph;
+- sphere pictograms remain legible at mobile sizes;
+- no public `01–09` sphere numbering;
 - no public A/B/C marker system;
 - result cards contain no redundant sphere numbering;
 - all nine results remain visible without mandatory interaction;
@@ -209,6 +216,8 @@ Required:
 
 ## Current staging QA snapshot
 
-Graph Linked Cards v5 becomes the baseline for all further responsive QA. Earlier page-height and copy-volume measurements from v4 remain historical evidence only and must not be treated as the current design target.
+Graph Linked Cards v5 remains the baseline for all further responsive QA, with the 2026-09-01 public-index revision: icons/names identify spheres; canonical numeric indexes stay under the hood.
+
+Earlier page-height and copy-volume measurements from v4 remain historical evidence only and must not be treated as the current design target.
 
 Production publication still requires real staging/browser/provider QA and explicit release approval.
