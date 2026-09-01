@@ -3,10 +3,11 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node tests/encounter-runtime-selftest.mjs && node tests/result-replay-selftest.mjs && node tests/character-renderer-selftest.mjs && node tests/ui-contract-selftest.mjs",
+    "test": "node tests/encounter-runtime-selftest.mjs && node tests/result-replay-selftest.mjs && node tests/character-renderer-selftest.mjs && node tests/ui-contract-selftest.mjs && node tests/mobile-readability-selftest.mjs",
     "test:runtime": "node tests/encounter-runtime-selftest.mjs",
     "test:replay": "node tests/result-replay-selftest.mjs",
     "test:renderer": "node tests/character-renderer-selftest.mjs",
-    "test:ui": "node tests/ui-contract-selftest.mjs"
+    "test:ui": "node tests/ui-contract-selftest.mjs",
+    "test:mobile": "node tests/mobile-readability-selftest.mjs"
   }
 }
