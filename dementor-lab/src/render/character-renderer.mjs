@@ -38,6 +38,10 @@ export function isNumberedVariantId(id,prefix,side=''){
   return normalized.startsWith(`${prefix}-`)&&/^\d+$/.test(normalized.slice(prefix.length+1));
 }
 function authoredVisible(el){return el?.getAttribute?.('display')!=='none'&&el?.style?.display!=='none'}
+export function legacyVariantLayerDisplay({hasVariants=false,wrapsVariants=false,baseWhenNull=false,selected=null}={}){
+  if(hasVariants)return wrapsVariants?'inline':'none';
+  return baseWhenNull?'':selected?'':'none';
+}
 
 export class CharacterRenderer{
   constructor({side,root,rigFallback=null}){this.side=side;this.root=root;this.rigFallback=rigFallback;this.svg=root?.querySelector('svg')||null;this.rig=readRig(this.svg,rigFallback);this.variantDefaults=new Map()}
@@ -73,9 +77,13 @@ export class CharacterRenderer{
     if(state.variantContract){
       Object.values(APPEARANCE_VARIANTS).forEach(({key,prefix,legacy,baseWhenNull=false})=>{
         const selected=state[key]??null;
+        const variantEls=this.variantElements(prefix);
         const hasVariants=this.setVariant(prefix,selected,{baseWhenNull});
         const legacyEl=this.el(legacy);
-        if(legacyEl)legacyEl.style.display=hasVariants?'none':baseWhenNull?'':selected?'':'none';
+        if(legacyEl){
+          const wrapsVariants=hasVariants&&variantEls.some(el=>el!==legacyEl&&legacyEl.contains(el));
+          legacyEl.style.display=legacyVariantLayerDisplay({hasVariants,wrapsVariants,baseWhenNull,selected});
+        }
       });
       const colors=state.colors||{};Object.entries(COLOR_KEYS).forEach(([key,id])=>this.setColorTarget(id,colors[key]));
       return;
