@@ -4,7 +4,7 @@ const host=document.getElementById('applyHost');
 const cfg=window.DEMENTOR_SITE_CONFIG?.supabase;
 const SPHERES=[['personality','Личность'],['work','Работа'],['consumption','Потребление'],['relationships','Отношения'],['control','Контроль'],['information','Информация'],['self_development','Саморазвитие'],['meaning','Смысл'],['technology','Технологии']];
 const base=location.pathname.startsWith('/degradation_club/')?'/degradation_club':'';
-const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot',"'":'&#39;'}[c]));
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const date=v=>{try{return new Intl.DateTimeFormat('ru-RU',{day:'2-digit',month:'long',year:'numeric'}).format(new Date(v))}catch{return String(v||'—')}};
 const errorCopy=message=>{
   const m=String(message||'');
