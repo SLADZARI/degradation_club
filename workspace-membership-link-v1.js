@@ -1,19 +1,19 @@
-// Dementor Club — workspace → canonical Community v1 entry compatibility.
+// Dementor Club — Workspace → Membership v2 compatibility link.
 (()=>{
   if(!location.pathname.includes('/workspace'))return;
   const base=location.pathname.startsWith('/degradation_club/')?'/degradation_club':'';
-  const destination=base+'/join/result/';
+  const destination=base+'/join/apply/';
   const root=document.getElementById('appView');
   if(!root)return;
 
   const decorate=()=>{
     const btn=root.querySelector('[data-membership-info]');
-    if(!btn||btn.dataset.dcCommunityV1==='1')return;
-    btn.dataset.dcCommunityV1='1';
-    btn.textContent='ПРОДОЛЖИТЬ ВСТУПЛЕНИЕ →';
+    if(!btn||btn.dataset.dcMembershipV2==='1')return;
+    btn.dataset.dcMembershipV2='1';
+    btn.textContent='ПОДАТЬ ЗАЯВКУ →';
     const block=btn.closest('.dcw-panel,.dcw-card,.dcw-access-card')||btn.parentElement?.parentElement;
     const note=block?.querySelector('.dcw-note');
-    if(note){note.hidden=false;note.textContent='Community v1: сначала проверяем карту DC-9. После 9/9 система попросит минимальную идентификацию и активирует membership автоматически.';}
+    if(note){note.hidden=false;note.textContent='После DC-9 9/9 открывается Membership Application. Членство появляется только после двух независимых подтверждений Dementor.';}
   };
 
   document.addEventListener('click',event=>{
