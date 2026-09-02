@@ -22,13 +22,14 @@ for(const characterId of roster){
   const validation=validateCharacterManifest(characterId,manifest,svg);
   assert.equal(validation.ok,true,`${characterId} manifest matches its production SVG: ${validation.errors.join('; ')}`);
   assert.equal(manifest.viewBox,'0 0 703 1024');
+  assert.equal(manifest.version,'cleaned-svg-v1',`${characterId} is the promoted exact cleaned asset`);
+  assert.match(svg,/data-rig-pivots=/,`${characterId} carries verified rig metadata on the SVG root`);
 
   const ids=[...svg.matchAll(/\bid\s*=\s*["']([^"']+)["']/g)].map(match=>match[1]);
   const duplicates=[...new Set(ids.filter((id,index)=>ids.indexOf(id)!==index))];
   assert.deepEqual(duplicates,[],`${characterId} production SVG contains no duplicate DOM ids`);
 
   if(characterId==='character-01'){
-    assert.equal(manifest.version,'cleaned-svg-v1','character-01 is the promoted exact cleaned asset');
     assert.deepEqual(manifest.rig,{head:[352,270],shoulderLeft:[275,345],shoulderRight:[425,345],hipLeft:[311,590],hipRight:[393,591]},'character-01 exact rig pivots are fixed by the promoted source');
     assert.equal(manifest.variants.hat.length,7);
     assert.equal(manifest.variants.glasses.length,4);
@@ -38,14 +39,21 @@ for(const characterId of roster){
     assert.deepEqual(manifest.variants.shoes,['shoes-01']);
     assert.ok(manifest.colorTargets.includes('outfit-primary'));
     assert.ok(manifest.colorTargets.includes('shoes-primary'));
-    assert.match(svg,/data-rig-pivots=/,'character-01 carries authored rig metadata on the SVG root');
     assert.match(svg,/data-color-target=["']outfit-primary["']/,'character-01 exposes normalized shared outfit paint metadata');
   }else{
-    assert.equal(manifest.version,'semantic-v1','character-02 remains on the semantic legacy reconstruction');
-    assert.deepEqual(manifest.ownership.shared,['hat','glasses','beard','accessory'],'character-02 keeps the shared legacy accessory contract');
-    assert.ok(manifest.ownership.own.includes('outfit')&&manifest.ownership.own.includes('shoes'),'character-02 keeps its owned legacy outfit/shoes contract');
+    assert.equal(ids.length,58,'character-02 exact source keeps its verified 58 unique semantic ids');
+    assert.deepEqual(manifest.rig,{head:[352,270],shoulderLeft:[287,345],shoulderRight:[412,345],hipLeft:[310,540],hipRight:[392,541]},'character-02 exact rig pivots are fixed by the promoted source');
+    assert.equal(manifest.variants.hat.length,7);
+    assert.equal(manifest.variants.glasses.length,4);
+    assert.deepEqual(manifest.variants.facialHair,[],'character-02 exact source intentionally has no facial-hair variants');
+    assert.equal(manifest.variants.accessory.length,3);
+    assert.deepEqual(manifest.variants.outfit,[],'character-02 torso clothing is baked into source geometry');
+    assert.deepEqual(manifest.variants.shoes,['shoes-01']);
+    assert.deepEqual(manifest.colorTargets,['shoes-primary']);
+    assert.equal(ids.some(id=>id.startsWith('facial-hair-')),false,'character-02 SVG does not invent facial-hair ids');
+    assert.equal(ids.some(id=>id.startsWith('outfit-')),false,'character-02 SVG does not invent outfit variant ids');
   }
 }
 
 assert.deepEqual(runtimeSvgs,['character-01/character-01-layered.svg','character-02/character-02-layered.svg']);
-console.log('DEMENTOR LAB character asset selftest: PASS — exact male + legacy female production assets validate');
+console.log('DEMENTOR LAB character asset selftest: PASS — both exact production assets validate');
