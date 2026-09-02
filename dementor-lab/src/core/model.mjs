@@ -1,21 +1,21 @@
 export const NODE_SPECS = Object.freeze({
-  criticism:{family:'TRIGGER',title:'КРИТИКА',defaults:{}},
-  ignore:{family:'TRIGGER',title:'ИГНОР',defaults:{}},
-  beright:{family:'IMPULSE',title:'БЫТЬ ПРАВЫМ',defaults:{weight:3}},
-  beliked:{family:'IMPULSE',title:'НРАВИТЬСЯ',defaults:{weight:2}},
-  understand:{family:'IMPULSE',title:'ПОНЯТЬ',defaults:{weight:2}},
-  resentment:{family:'STATE',title:'ОБИДА',defaults:{key:'resentment',delta:1,cap:5}},
-  trust:{family:'STATE',title:'ДОВЕРИЕ',defaults:{key:'trust',delta:1,cap:5}},
-  explain:{family:'REACTION',title:'ОБЪЯСНИТЬ',defaults:{}},
-  agree:{family:'REACTION',title:'СОГЛАСИТЬСЯ',defaults:{}},
-  joke:{family:'REACTION',title:'ПОШУТИТЬ',defaults:{}},
-  silent:{family:'REACTION',title:'ПРОМОЛЧАТЬ',defaults:{}},
-  pressure:{family:'REACTION',title:'ДАВИТЬ',defaults:{}},
-  repeat:{family:'CONTROL',title:'REPEAT',defaults:{count:2}},
-  stop:{family:'CONTROL',title:'STOP',defaults:{}},
-  ifbrain:{family:'CONTROL',title:'BRAIN >',defaults:{threshold:70}},
-  pause:{family:'ABILITY',title:'ПАУЗА',defaults:{}},
-  interrupt:{family:'ABILITY',title:'ПЕРЕХВАТ',defaults:{}}
+  criticism:{family:'TRIGGER',title:'КРИТИКА',description:'срабатывает, когда идею критикуют',defaults:{}},
+  ignore:{family:'TRIGGER',title:'ИГНОР',description:'срабатывает, когда персонажа игнорируют',defaults:{}},
+  beright:{family:'IMPULSE',title:'БЫТЬ ПРАВЫМ',description:'усиливает эту ветку; добавляет BRAIN и TENSION',defaults:{weight:3}},
+  beliked:{family:'IMPULSE',title:'НРАВИТЬСЯ',description:'усиливает эту ветку; поддерживает CONTACT',defaults:{weight:2}},
+  understand:{family:'IMPULSE',title:'ПОНЯТЬ',description:'усиливает эту ветку; поддерживает CONTACT и немного нагружает BRAIN',defaults:{weight:2}},
+  resentment:{family:'STATE',title:'ОБИДА',description:'записывает обиду в память; повышает TENSION и BRAIN',defaults:{key:'resentment',delta:1,cap:5}},
+  trust:{family:'STATE',title:'ДОВЕРИЕ',description:'записывает доверие в память; поддерживает CONTACT и снижает BRAIN',defaults:{key:'trust',delta:1,cap:5}},
+  explain:{family:'REACTION',title:'ОБЪЯСНИТЬ',description:'объясняет; тратит ENERGY, повышает BRAIN/TENSION и снижает CONTACT',defaults:{}},
+  agree:{family:'REACTION',title:'СОГЛАСИТЬСЯ',description:'соглашается; снижает TENSION и повышает CONTACT',defaults:{}},
+  joke:{family:'REACTION',title:'ПОШУТИТЬ',description:'шутит; снижает TENSION и поддерживает CONTACT',defaults:{}},
+  silent:{family:'REACTION',title:'ПРОМОЛЧАТЬ',description:'молчит; немного повышает TENSION и снижает CONTACT',defaults:{}},
+  pressure:{family:'REACTION',title:'ДАВИТЬ',description:'давит; сильно повышает TENSION и снижает CONTACT',defaults:{}},
+  repeat:{family:'CONTROL',title:'REPEAT',description:'усиливает последствия реакции и цену повторения',defaults:{count:2}},
+  stop:{family:'CONTROL',title:'STOP',description:'останавливает дальнейший проход по этой ветке',defaults:{}},
+  ifbrain:{family:'CONTROL',title:'BRAIN >',description:'пропускает ветку только когда BRAIN выше порога',defaults:{threshold:70}},
+  pause:{family:'ABILITY',title:'ПАУЗА',description:'снижает BRAIN и TENSION, поддерживает CONTACT',defaults:{}},
+  interrupt:{family:'ABILITY',title:'ПЕРЕХВАТ',description:'семантика для vertical slice ещё не утверждена',defaults:{},availableInSlice:false}
 });
 
 export const DEFAULT_STATE = Object.freeze({
