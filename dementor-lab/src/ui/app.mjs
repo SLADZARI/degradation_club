@@ -4,19 +4,9 @@ import { compareRuns } from '../encounter/result.mjs';
 import { NODE_SPECS } from '../core/model.mjs';
 import { familyOf } from '../core/graph.mjs';
 import { CharacterRenderer, APPEARANCE_LAYERS } from '../render/character-renderer.mjs';
-import {
-  BRAIN_PRESETS, BLANK_BRAIN, cloneBrainGraph, brainPreset
-} from './brain-presets.mjs';
-import {
-  BRAIN_FAMILY_ORDER, ensureBrainPositions, addBrainNode, removeBrainNode,
-  moveBrainNode, connectBrainNodes, compatibleBrainTargets, brainValidation, familyNodes
-} from './brain-constructor.mjs';
-import {
-  CHARACTER_REGISTRY, characterSpec, characterAssetText, loadCharacterContract,
-  SHARED_APPEARANCE_LAYERS, CHARACTER_OWNED_LAYERS,
-  SHARED_APPEARANCE_CATEGORIES, CHARACTER_OWNED_CATEGORIES,
-  appearanceForCharacter, variantOptions, variantKey, hasVariantContract
-} from '../render/character-registry.mjs';
+import { BRAIN_PRESETS, BLANK_BRAIN, cloneBrainGraph, brainPreset } from './brain-presets.mjs';
+import { BRAIN_FAMILY_ORDER, ensureBrainPositions, addBrainNode, removeBrainNode, moveBrainNode, connectBrainNodes, compatibleBrainTargets, brainValidation, familyNodes } from './brain-constructor.mjs';
+import { CHARACTER_REGISTRY, characterSpec, characterAssetText, loadCharacterContract, SHARED_APPEARANCE_LAYERS, CHARACTER_OWNED_LAYERS, SHARED_APPEARANCE_CATEGORIES, CHARACTER_OWNED_CATEGORIES, appearanceForCharacter, variantOptions, variantKey, hasVariantContract } from '../render/character-registry.mjs';
 import { createOpponentProfile, freshOpponentSeed } from '../opponent/generator.mjs';
 
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
@@ -25,15 +15,11 @@ const VARIANT_PART_CATEGORY=Object.freeze({hat:'hat',glasses:'glasses',beard:'fa
 const EMPTY_SHARED_VARIANTS=()=>({hatVariant:null,glassesVariant:null,facialHairVariant:null,accessoryVariant:null});
 const EMPTY_OWNED_VARIANTS=()=>({outfitVariant:null,shoesVariant:null});
 const EMPTY_COLORS=()=>({outfitPrimary:null,outfitSecondary:null,shoesPrimary:null});
-
 await Promise.allSettled(Object.keys(CHARACTER_REGISTRY).map(id=>loadCharacterContract(id)));
 
 let currentCharacterId='character-01';
 let sharedAppearance={hat:true,glasses:true,beard:true,accessory:true,...EMPTY_SHARED_VARIANTS()};
-let ownedAppearance={
-  'character-01':{outfit:true,shoes:true,...EMPTY_OWNED_VARIANTS()},
-  'character-02':{outfit:true,shoes:true,...EMPTY_OWNED_VARIANTS()}
-};
+let ownedAppearance={'character-01':{outfit:true,shoes:true,...EMPTY_OWNED_VARIANTS()},'character-02':{outfit:true,shoes:true,...EMPTY_OWNED_VARIANTS()}};
 let appearanceColors={'character-01':EMPTY_COLORS(),'character-02':EMPTY_COLORS()};
 let activeAppearanceCategory='hat';
 const explicitSeed=new URLSearchParams(location.search).get('seed');
@@ -51,48 +37,18 @@ async function mountAsset(rootId,id){const root=$(`#${rootId}`),spec=characterSp
 async function mountCharacterAssets(){previewRenderer=await mountAsset('person-preview',currentCharacterId);await mountAsset('actor-a',currentCharacterId);await mountAsset('actor-b',opponentProfile.baseCharacterId);syncAppearancePanel();renderPreview();renderOpponentCard()}
 async function remountPlayerCharacter(){previewRenderer=await mountAsset('person-preview',currentCharacterId);await mountAsset('actor-a',currentCharacterId);syncCharacterSwitch();syncAppearancePanel();resetActors();renderPreview()}
 async function remountOpponent(){await mountAsset('actor-b',opponentProfile.baseCharacterId);resetActors();renderOpponentCard()}
-
-function show(screen){
-  app.dataset.screen=screen;topStatus.textContent=screen.toUpperCase();
-  $$('.screen').forEach(el=>el.hidden=el.dataset.view!==screen);
-  $$('.bottom-nav button').forEach(b=>b.classList.toggle('active',b.dataset.nav===screen));
-  if(screen==='brain'){renderBrain();$('#replay-note').hidden=!replayMode}
-  if(screen==='setup')renderOpponentCard();if(screen==='talk')renderTalk();
-}
-function resetActors(){
-  actors=createCriticismActors({opponentProfile});
-  actors.A.brainGraph=cloneBrainGraph(currentBrainGraph);
-  actors.A.visual={...(actors.A.visual||{}),characterId:currentCharacterId,appearance:playerAppearance()};
-  actors.B.visual={...(actors.B.visual||{}),characterId:opponentProfile.baseCharacterId,appearance:opponentAppearance(),opponentPresetId:opponentProfile.presetId};
-}
+function show(screen){app.dataset.screen=screen;topStatus.textContent=screen.toUpperCase();$$('.screen').forEach(el=>el.hidden=el.dataset.view!==screen);$$('.bottom-nav button').forEach(b=>b.classList.toggle('active',b.dataset.nav===screen));if(screen==='brain'){renderBrain();$('#replay-note').hidden=!replayMode}if(screen==='setup')renderOpponentCard();if(screen==='talk')renderTalk()}
+function resetActors(){actors=createCriticismActors({opponentProfile});actors.A.brainGraph=cloneBrainGraph(currentBrainGraph);actors.A.visual={...(actors.A.visual||{}),characterId:currentCharacterId,appearance:playerAppearance()};actors.B.visual={...(actors.B.visual||{}),characterId:opponentProfile.baseCharacterId,appearance:opponentAppearance(),opponentPresetId:opponentProfile.presetId}}
 function renderPreview(){previewRenderer?.render({state:actors.A.state,face:{},visual:{characterId:currentCharacterId,appearance:playerAppearance()}})}
 function renderOpponentCard(){const card=$('#opponent-card');if(!card)return;card.dataset.preset=opponentProfile.presetId;card.dataset.character=opponentProfile.baseCharacterId;$('#opponent-name').textContent=opponentProfile.name.toUpperCase();$('#opponent-preset').textContent=opponentProfile.presetLabel;$('#opponent-description').textContent=opponentProfile.description;$('#opponent-seed').textContent=`ОПЫТ ${String(opponentSeed).slice(0,12)}`}
 async function rerollOpponent(){if(replayMode||baselineEncounter)return;opponentSeed=freshOpponentSeed();opponentProfile=createOpponentProfile(opponentSeed);await remountOpponent()}
 function syncCharacterSwitch(){$$('.character-switch [data-character]').forEach(b=>{const on=b.dataset.character===currentCharacterId;b.classList.toggle('active',on);b.setAttribute('aria-pressed',String(on))})}
-
 function categoryForPart(part){return VARIANT_PART_CATEGORY[part]||part}
 function selectionBucket(category){return SHARED_APPEARANCE_CATEGORIES.includes(category)?sharedAppearance:ownedAppearance[currentCharacterId]}
 function selectedVariant(category){const key=variantKey(category);return key?selectionBucket(category)?.[key]??null:null}
-function sanitizeVariantSelections(){
-  if(!hasVariantContract(currentCharacterId))return;
-  const normalized=playerAppearance();
-  for(const category of SHARED_APPEARANCE_CATEGORIES){const key=variantKey(category);if(key)sharedAppearance[key]=normalized[key]??null}
-  for(const category of CHARACTER_OWNED_CATEGORIES){const key=variantKey(category);if(key)ownedAppearance[currentCharacterId][key]=normalized[key]??null}
-  appearanceColors[currentCharacterId]={...appearanceColors[currentCharacterId],...(normalized.colors||{})};
-}
-function renderVariantOptions(){
-  const rack=$('#variant-options');if(!rack)return;const options=variantOptions(currentCharacterId,activeAppearanceCategory);
-  if(!options.length){rack.hidden=true;rack.innerHTML='';return}
-  const active=selectedVariant(activeAppearanceCategory),baseLabel=CHARACTER_OWNED_CATEGORIES.includes(activeAppearanceCategory)?'БАЗА':'НЕТ';
-  rack.hidden=false;rack.dataset.category=activeAppearanceCategory;
-  rack.innerHTML=`<button data-variant="" class="${active==null?'active':''}">${baseLabel}</button>${options.map((id,i)=>`<button data-variant="${id}" class="${id===active?'active':''}">${String(i+1).padStart(2,'0')}</button>`).join('')}`;
-  rack.querySelectorAll('[data-variant]').forEach(button=>button.addEventListener('click',()=>selectAppearanceVariant(activeAppearanceCategory,button.dataset.variant||null)));
-}
-function syncAppearancePanel(){
-  const appearance=playerAppearance();
-  $$('[data-part]').forEach(b=>{const part=b.dataset.part,category=categoryForPart(part),options=variantOptions(currentCharacterId,category),usesVariants=options.length>0,on=usesVariants?selectedVariant(category)!=null:appearance[part]!==false;b.classList.toggle('active',on);b.classList.toggle('has-variants',usesVariants);b.setAttribute('aria-pressed',String(on));b.dataset.scope=SHARED_APPEARANCE_CATEGORIES.includes(category)?'shared':'owned';b.dataset.variantCount=String(options.length);if(usesVariants)b.setAttribute('aria-expanded',String(activeAppearanceCategory===category&&!$('#variant-options')?.hidden));else b.removeAttribute('aria-expanded')});
-  renderVariantOptions();
-}
+function sanitizeVariantSelections(){if(!hasVariantContract(currentCharacterId))return;const normalized=playerAppearance();for(const category of SHARED_APPEARANCE_CATEGORIES){const key=variantKey(category);if(key)sharedAppearance[key]=normalized[key]??null}for(const category of CHARACTER_OWNED_CATEGORIES){const key=variantKey(category);if(key)ownedAppearance[currentCharacterId][key]=normalized[key]??null}appearanceColors[currentCharacterId]={...appearanceColors[currentCharacterId],...(normalized.colors||{})}}
+function renderVariantOptions(){const rack=$('#variant-options');if(!rack)return;const options=variantOptions(currentCharacterId,activeAppearanceCategory);if(!options.length){rack.hidden=true;rack.innerHTML='';return}const active=selectedVariant(activeAppearanceCategory),baseLabel=CHARACTER_OWNED_CATEGORIES.includes(activeAppearanceCategory)?'БАЗА':'НЕТ';rack.hidden=false;rack.dataset.category=activeAppearanceCategory;rack.innerHTML=`<button data-variant="" class="${active==null?'active':''}">${baseLabel}</button>${options.map((id,i)=>`<button data-variant="${id}" class="${id===active?'active':''}">${String(i+1).padStart(2,'0')}</button>`).join('')}`;rack.querySelectorAll('[data-variant]').forEach(button=>button.addEventListener('click',()=>selectAppearanceVariant(activeAppearanceCategory,button.dataset.variant||null)))}
+function syncAppearancePanel(){const appearance=playerAppearance();$$('[data-part]').forEach(b=>{const part=b.dataset.part,category=categoryForPart(part),options=variantOptions(currentCharacterId,category),usesVariants=options.length>0,on=usesVariants?selectedVariant(category)!=null:appearance[part]!==false;b.classList.toggle('active',on);b.classList.toggle('has-variants',usesVariants);b.setAttribute('aria-pressed',String(on));b.dataset.scope=SHARED_APPEARANCE_CATEGORIES.includes(category)?'shared':'owned';b.dataset.variantCount=String(options.length);if(usesVariants)b.setAttribute('aria-expanded',String(activeAppearanceCategory===category&&!$('#variant-options')?.hidden));else b.removeAttribute('aria-expanded')});renderVariantOptions()}
 function commitAppearanceChange(){sanitizeVariantSelections();syncAppearancePanel();resetActors();renderPreview()}
 function toggleAppearance(part){const category=categoryForPart(part),options=variantOptions(currentCharacterId,category);if(options.length){activeAppearanceCategory=category;syncAppearancePanel();return}if(!APPEARANCE_LAYERS.includes(part))return;if(SHARED_APPEARANCE_LAYERS.includes(part))sharedAppearance={...sharedAppearance,[part]:!sharedAppearance[part]};else if(CHARACTER_OWNED_LAYERS.includes(part))ownedAppearance={...ownedAppearance,[currentCharacterId]:{...ownedAppearance[currentCharacterId],[part]:!ownedAppearance[currentCharacterId][part]}};commitAppearanceChange()}
 function selectAppearanceVariant(category,value){const key=variantKey(category),options=variantOptions(currentCharacterId,category);if(!key||!options.length)return;const next=value&&options.includes(value)?value:null;if(SHARED_APPEARANCE_CATEGORIES.includes(category))sharedAppearance={...sharedAppearance,[key]:next};else ownedAppearance={...ownedAppearance,[currentCharacterId]:{...ownedAppearance[currentCharacterId],[key]:next}};commitAppearanceChange()}
@@ -106,63 +62,19 @@ function nodeSubtitle(n){const map={criticism:'что произошло',ignore
 function brainControl(n){const f=familyLabel(n?.type);if(f==='IMPULSE')return {key:'weight',min:1,max:5,label:'СИЛА ИМПУЛЬСА',format:v=>`W${v}`};if(n?.type==='repeat')return {key:'count',min:1,max:5,label:'КОЛИЧЕСТВО ПОВТОРОВ',format:v=>`×${v}`};if(f==='STATE')return {key:'delta',min:1,max:5,label:'ИЗМЕНЕНИЕ ПАМЯТИ',format:v=>`+${v}`};if(n?.type==='ifbrain')return {key:'threshold',min:20,max:100,step:10,label:'ПОРОГ BRAIN',format:v=>`>${v}`};return null}
 function brainNodeLocked(n){return Boolean(replayMode&&replayTargetType&&n.type!==replayTargetType)}
 function currentValidation(){return brainValidation(currentBrainGraph)}
-function renderBrainPresets(){
-  const host=$('#brain-presets');if(!host)return;
-  host.hidden=replayMode;
-  host.innerHTML=BRAIN_PRESETS.map(p=>`<button type="button" data-brain-preset="${p.id}" class="${activeBrainPresetId===p.id?'active':''}">${p.label}</button>`).join('')+`<button type="button" data-brain-preset="custom" class="${activeBrainPresetId==='custom'?'active':''}">СОБРАТЬ СВОЮ КАТАСТРОФУ</button>`;
-  host.querySelectorAll('[data-brain-preset]').forEach(b=>b.addEventListener('click',()=>applyBrainPreset(b.dataset.brainPreset)));
-}
+function renderBrainPresets(){const host=$('#brain-presets');if(!host)return;host.hidden=replayMode;host.innerHTML=BRAIN_PRESETS.map(p=>`<button type="button" data-brain-preset="${p.id}" class="${activeBrainPresetId===p.id?'active':''}">${p.label}</button>`).join('')+`<button type="button" data-brain-preset="custom" class="${activeBrainPresetId==='custom'?'active':''}">СОБРАТЬ СВОЮ КАТАСТРОФУ</button>`;host.querySelectorAll('[data-brain-preset]').forEach(b=>b.addEventListener('click',()=>applyBrainPreset(b.dataset.brainPreset)))}
 function applyBrainPreset(id){if(replayMode)return;const p=brainPreset(id);currentBrainGraph=cloneBrainGraph(p?.graph||BLANK_BRAIN);ensureBrainPositions(currentBrainGraph);activeBrainPresetId=p?.id||'custom';activeBrainNodeId=null;brainConnectFromId=null;renderBrain()}
-function brainNodeHtml(n){
-  const selected=n.id===activeBrainNodeId,source=n.id===brainConnectFromId,locked=brainNodeLocked(n),validTargets=brainConnectFromId?compatibleBrainTargets(currentBrainGraph,brainConnectFromId):[],compatible=validTargets.includes(n.id);
-  return `<article class="brain-canvas-node ${selected?'selected':''} ${source?'connection-source':''} ${compatible?'connection-target':''} ${locked?'locked':''}" data-brain-node-wrap="${n.id}" style="left:${Number(n.ui?.x)||20}px;top:${Number(n.ui?.y)||20}px">
-    <button type="button" class="brain-port brain-port-in" data-brain-in="${n.id}" aria-label="Вход ${title(n.type)}" ${familyOf(n)==='TRIGGER'?'disabled':''}></button>
-    <button type="button" class="brain-node-main" data-brain-node="${n.id}" ${locked?'aria-disabled="true"':''}>
-      <span class="family">${familyLabel(n.type)}</span><span class="copy"><strong>${title(n.type)}</strong><small>${nodeSubtitle(n)}</small></span><span class="value">${nodeValue(n)}</span>
-    </button>
-    <button type="button" class="brain-port brain-port-out" data-brain-out="${n.id}" aria-label="Выход ${title(n.type)}"></button>
-  </article>`;
-}
-function drawBrainEdges(){
-  const canvas=$('#brain-graph .brain-free-canvas'),svg=$('#brain-graph .brain-links');if(!canvas||!svg)return;
-  const width=Math.max(canvas.scrollWidth,canvas.clientWidth),height=Math.max(canvas.scrollHeight,canvas.clientHeight);svg.setAttribute('viewBox',`0 0 ${width} ${height}`);svg.setAttribute('width',width);svg.setAttribute('height',height);
-  const box=canvas.getBoundingClientRect();
-  svg.innerHTML=currentBrainGraph.edges.map(e=>{const from=canvas.querySelector(`[data-brain-node-wrap="${CSS.escape(e.from)}"]`),to=canvas.querySelector(`[data-brain-node-wrap="${CSS.escape(e.to)}"]`);if(!from||!to)return '';const a=from.getBoundingClientRect(),b=to.getBoundingClientRect(),x1=a.left+a.width/2-box.left,y1=a.bottom-box.top,x2=b.left+b.width/2-box.left,y2=b.top-box.top,dy=Math.max(34,Math.abs(y2-y1)*.45);return `<path class="brain-link" data-edge="${e.id}" d="M ${x1} ${y1} C ${x1} ${y1+dy}, ${x2} ${y2-dy}, ${x2} ${y2}"></path>`}).join('');
-}
-function bindBrainDrag(){
-  $$('#brain-graph [data-brain-node]').forEach(el=>{
-    let start=null,moved=false;
-    el.addEventListener('pointerdown',e=>{if(replayMode||brainNodeLocked(currentBrainGraph.nodes.find(n=>n.id===el.dataset.brainNode)))return;const wrap=el.closest('.brain-canvas-node');start={px:e.clientX,py:e.clientY,x:parseFloat(wrap.style.left)||0,y:parseFloat(wrap.style.top)||0,id:el.dataset.brainNode};moved=false;el.setPointerCapture?.(e.pointerId)});
-    el.addEventListener('pointermove',e=>{if(!start)return;const dx=e.clientX-start.px,dy=e.clientY-start.py;if(!moved&&Math.hypot(dx,dy)<8)return;moved=true;const node=moveBrainNode(currentBrainGraph,start.id,start.x+dx,start.y+dy,{maxX:520,maxY:2200});const wrap=el.closest('.brain-canvas-node');wrap.style.left=`${node.ui.x}px`;wrap.style.top=`${node.ui.y}px`;requestAnimationFrame(drawBrainEdges)});
-    el.addEventListener('pointerup',()=>{if(start&&!moved)selectBrainNode(start.id);start=null});
-    el.addEventListener('pointercancel',()=>{start=null});
-    el.addEventListener('click',e=>e.preventDefault());
-  });
-}
+function brainNodeHtml(n){const selected=n.id===activeBrainNodeId,source=n.id===brainConnectFromId,locked=brainNodeLocked(n),validTargets=brainConnectFromId?compatibleBrainTargets(currentBrainGraph,brainConnectFromId):[],compatible=validTargets.includes(n.id);return `<article class="brain-canvas-node ${selected?'selected':''} ${source?'connection-source':''} ${compatible?'connection-target':''} ${locked?'locked':''}" data-brain-node-wrap="${n.id}" style="left:${Number(n.ui?.x)||20}px;top:${Number(n.ui?.y)||20}px"><button type="button" class="brain-port brain-port-in" data-brain-in="${n.id}" aria-label="Вход ${title(n.type)}" ${familyOf(n)==='TRIGGER'?'disabled':''}></button><button type="button" class="brain-node-main" data-brain-node="${n.id}" ${locked?'aria-disabled="true"':''}><span class="family">${familyLabel(n.type)}</span><span class="copy"><strong>${title(n.type)}</strong><small>${nodeSubtitle(n)}</small></span><span class="value">${nodeValue(n)}</span></button><button type="button" class="brain-port brain-port-out" data-brain-out="${n.id}" aria-label="Выход ${title(n.type)}"></button></article>`}
+function drawBrainEdges(){const canvas=$('#brain-graph .brain-free-canvas'),svg=$('#brain-graph .brain-links');if(!canvas||!svg)return;const width=Math.max(canvas.scrollWidth,canvas.clientWidth),height=Math.max(canvas.scrollHeight,canvas.clientHeight);svg.setAttribute('viewBox',`0 0 ${width} ${height}`);svg.setAttribute('width',width);svg.setAttribute('height',height);const box=canvas.getBoundingClientRect();svg.innerHTML=currentBrainGraph.edges.map(e=>{const from=canvas.querySelector(`[data-brain-node-wrap="${CSS.escape(e.from)}"]`),to=canvas.querySelector(`[data-brain-node-wrap="${CSS.escape(e.to)}"]`);if(!from||!to)return '';const a=from.getBoundingClientRect(),b=to.getBoundingClientRect(),x1=a.left+a.width/2-box.left,y1=a.bottom-box.top,x2=b.left+b.width/2-box.left,y2=b.top-box.top,dy=Math.max(34,Math.abs(y2-y1)*.45);return `<path class="brain-link" data-edge="${e.id}" d="M ${x1} ${y1} C ${x1} ${y1+dy}, ${x2} ${y2-dy}, ${x2} ${y2}"></path>`}).join('')}
+function bindBrainDrag(){$$('#brain-graph [data-brain-node]').forEach(el=>{let start=null,moved=false;el.addEventListener('pointerdown',e=>{if(replayMode||brainNodeLocked(currentBrainGraph.nodes.find(n=>n.id===el.dataset.brainNode)))return;const wrap=el.closest('.brain-canvas-node');start={px:e.clientX,py:e.clientY,x:parseFloat(wrap.style.left)||0,y:parseFloat(wrap.style.top)||0,id:el.dataset.brainNode};moved=false;el.setPointerCapture?.(e.pointerId)});el.addEventListener('pointermove',e=>{if(!start)return;const dx=e.clientX-start.px,dy=e.clientY-start.py;if(!moved&&Math.hypot(dx,dy)<8)return;moved=true;const node=moveBrainNode(currentBrainGraph,start.id,start.x+dx,start.y+dy,{maxX:520,maxY:2200});const wrap=el.closest('.brain-canvas-node');wrap.style.left=`${node.ui.x}px`;wrap.style.top=`${node.ui.y}px`;requestAnimationFrame(drawBrainEdges)});el.addEventListener('pointerup',()=>{if(start&&!moved)selectBrainNode(start.id);start=null});el.addEventListener('pointercancel',()=>{start=null});el.addEventListener('click',e=>e.preventDefault())})}
 function selectBrainNode(id){const node=currentBrainGraph.nodes.find(n=>n.id===id);if(!node||brainNodeLocked(node))return;activeBrainNodeId=activeBrainNodeId===id?null:id;renderBrainInspector();renderBrainCanvas()}
 function beginBrainConnection(id){if(replayMode)return;brainConnectFromId=brainConnectFromId===id?null:id;renderBrainCanvas();renderBrainStatus()}
 function finishBrainConnection(id){if(replayMode||!brainConnectFromId)return;const made=connectBrainNodes(currentBrainGraph,brainConnectFromId,id);if(made){brainConnectFromId=null;activeBrainPresetId='custom'}renderBrainCanvas();renderBrainStatus()}
 function nudgeBrainNode(id,delta){const node=currentBrainGraph.nodes.find(n=>n.id===id),control=brainControl(node);if(!node||!control||brainNodeLocked(node))return;const step=control.step||1,current=Number(node.p?.[control.key]??control.min),next=Math.max(control.min,Math.min(control.max,current+delta*step));node.p[control.key]=next;activeBrainPresetId='custom';renderBrainCanvas();renderBrainInspector();renderBrainStatus()}
 function deleteSelectedBrainNode(){if(replayMode||!activeBrainNodeId)return;removeBrainNode(currentBrainGraph,activeBrainNodeId);activeBrainNodeId=null;brainConnectFromId=null;activeBrainPresetId='custom';renderBrain()}
-function renderBrainInspector(){
-  const host=$('#brain-inspector');if(!host)return;const n=currentBrainGraph.nodes.find(x=>x.id===activeBrainNodeId);
-  if(!n){host.hidden=true;host.innerHTML='';return}
-  const control=brainControl(n),locked=brainNodeLocked(n);host.hidden=false;
-  host.innerHTML=`<div class="brain-inspector-head"><div><small>${familyLabel(n.type)}</small><strong>${title(n.type)}</strong></div>${!replayMode?'<button type="button" data-brain-delete>УДАЛИТЬ</button>':''}</div>${control?`<div class="brain-stepper"><button type="button" data-brain-dec="${n.id}" ${locked?'disabled':''}>−</button><output>${control.format(Number(n.p?.[control.key]??control.min))}</output><button type="button" data-brain-inc="${n.id}" ${locked?'disabled':''}>+</button></div>`:'<p>У ЭТОГО УЗЛА НЕТ ЧИСЛОВОГО ПАРАМЕТРА.</p>'}`;
-  host.querySelector('[data-brain-dec]')?.addEventListener('click',()=>nudgeBrainNode(n.id,-1));host.querySelector('[data-brain-inc]')?.addEventListener('click',()=>nudgeBrainNode(n.id,1));host.querySelector('[data-brain-delete]')?.addEventListener('click',deleteSelectedBrainNode);
-}
-function renderBrainStatus(){
-  const host=$('#brain-validation');if(!host)return;const v=currentValidation();host.dataset.code=v.code;host.classList.toggle('ready',v.runnable);
-  host.textContent=brainConnectFromId?`СВЯЗЬ: «${title(currentBrainGraph.nodes.find(n=>n.id===brainConnectFromId)?.type)}» → ВЫБЕРИ ПОДСВЕЧЕННЫЙ ВХОД.`:(v.runnable?'ГОТОВ. ГРАФ ДОХОДИТ ДО РЕАКЦИИ.':v.detail);
-  $('#to-setup').disabled=!v.runnable;
-}
-function renderBrainCanvas(){
-  const host=$('#brain-graph');if(!host)return;ensureBrainPositions(currentBrainGraph);
-  const maxY=Math.max(520,...currentBrainGraph.nodes.map(n=>(Number(n.ui?.y)||0)+150));
-  host.innerHTML=`<div class="brain-free-canvas" style="height:${maxY}px"><svg class="brain-links" aria-hidden="true"></svg>${currentBrainGraph.nodes.map(brainNodeHtml).join('')}</div>`;
-  host.querySelectorAll('[data-brain-out]').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();beginBrainConnection(b.dataset.brainOut)}));
-  host.querySelectorAll('[data-brain-in]').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();finishBrainConnection(b.dataset.brainIn)}));bindBrainDrag();requestAnimationFrame(drawBrainEdges);
-}
+function renderBrainInspector(){const host=$('#brain-inspector');if(!host)return;const n=currentBrainGraph.nodes.find(x=>x.id===activeBrainNodeId);if(!n){host.hidden=true;host.innerHTML='';return}const control=brainControl(n),locked=brainNodeLocked(n);host.hidden=false;host.innerHTML=`<div class="brain-inspector-head"><div><small>${familyLabel(n.type)}</small><strong>${title(n.type)}</strong></div>${!replayMode?'<button type="button" data-brain-delete>УДАЛИТЬ</button>':''}</div>${control?`<div class="brain-stepper"><button type="button" data-brain-dec="${n.id}" ${locked?'disabled':''}>−</button><output>${control.format(Number(n.p?.[control.key]??control.min))}</output><button type="button" data-brain-inc="${n.id}" ${locked?'disabled':''}>+</button></div>`:'<p>У ЭТОГО УЗЛА НЕТ ЧИСЛОВОГО ПАРАМЕТРА.</p>'}`;host.querySelector('[data-brain-dec]')?.addEventListener('click',()=>nudgeBrainNode(n.id,-1));host.querySelector('[data-brain-inc]')?.addEventListener('click',()=>nudgeBrainNode(n.id,1));host.querySelector('[data-brain-delete]')?.addEventListener('click',deleteSelectedBrainNode)}
+function renderBrainStatus(){const host=$('#brain-validation');if(!host)return;const v=currentValidation();host.dataset.code=v.code;host.classList.toggle('ready',v.runnable);host.textContent=brainConnectFromId?`СВЯЗЬ: «${title(currentBrainGraph.nodes.find(n=>n.id===brainConnectFromId)?.type)}» → ВЫБЕРИ ПОДСВЕЧЕННЫЙ ВХОД.`:(v.runnable?'ГОТОВ. ГРАФ ДОХОДИТ ДО РЕАКЦИИ.':v.detail);$('#to-setup').disabled=!v.runnable}
+function renderBrainCanvas(){const host=$('#brain-graph');if(!host)return;ensureBrainPositions(currentBrainGraph);host.dataset.edgeCount=String(currentBrainGraph.edges.length);host.dataset.connectFrom=brainConnectFromId||'';const maxY=Math.max(520,...currentBrainGraph.nodes.map(n=>(Number(n.ui?.y)||0)+150));host.innerHTML=`<div class="brain-free-canvas" style="height:${maxY}px"><svg class="brain-links" aria-hidden="true"></svg>${currentBrainGraph.nodes.map(brainNodeHtml).join('')}</div>`;host.querySelectorAll('[data-brain-out]').forEach(b=>b.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();beginBrainConnection(b.dataset.brainOut)}));host.querySelectorAll('[data-brain-in]').forEach(b=>b.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();finishBrainConnection(b.dataset.brainIn)}));bindBrainDrag();requestAnimationFrame(drawBrainEdges)}
 function showNodeLibrary(){if(replayMode)return;overlay.innerHTML=`<div class="overlay-card brain-library"><p class="kicker">БИБЛИОТЕКА</p><h3>ДОБАВИТЬ В МОЗГ</h3>${BRAIN_FAMILY_ORDER.map(f=>`<section><strong>${f}</strong><div>${familyNodes(f).map(n=>`<button type="button" data-add-brain-node="${n.type}">${n.title}</button>`).join('')}</div></section>`).join('')}<button class="secondary-reset" id="close-overlay">ЗАКРЫТЬ</button></div>`;overlay.hidden=false;overlay.querySelectorAll('[data-add-brain-node]').forEach(b=>b.addEventListener('click',()=>{const node=addBrainNode(currentBrainGraph,b.dataset.addBrainNode);activeBrainNodeId=node.id;activeBrainPresetId='custom';hideOverlay();renderBrain()}));$('#close-overlay').onclick=hideOverlay}
 function renderBrain(){renderBrainPresets();renderBrainCanvas();renderBrainInspector();renderBrainStatus();const add=$('#brain-add-node');if(add)add.hidden=replayMode;const hint=$('#brain-editor');if(hint)hint.textContent=replayMode?'КОНТРФАКТ: МЕНЯЕТСЯ ТОЛЬКО ОДНА ПРИЧИНА.':'ПЕРЕТАЩИ УЗЕЛ. ТАПНИ ВЫХОД → ВХОД, ЧТОБЫ СОЗДАТЬ СВЯЗЬ. ОДИН ВЫХОД МОЖЕТ ИМЕТЬ НЕСКОЛЬКО ВЕТОК.'}
 function brainSnapshot(){return cloneBrainGraph(currentBrainGraph)}
@@ -182,16 +94,5 @@ function hideOverlay(){overlay.hidden=true;overlay.innerHTML=''}
 function comparisonHtml(c){const fmt=v=>`${v>0?'+':''}${v}`;return `<small>БЫЛО / СТАЛО</small><strong>${c.sameScenario?'ТОТ ЖЕ СЦЕНАРИЙ':'СЦЕНАРИЙ ИЗМЕНИЛСЯ'}</strong><div class="compare-grid"><span>BRAIN ${fmt(c.metrics.brain)}</span><span>TENSION ${fmt(c.metrics.tension)}</span><span>CONTACT ${fmt(c.metrics.contact)}</span><span>ENERGY ${fmt(c.metrics.energy)}</span></div>`}
 function showResult(result){show('result');$('#result-title').textContent=result.punchline;$('#result-cause').textContent=result.stageB.cause;$('#result-node').textContent=result.stageC.nodeType?title(result.stageC.nodeType):'—';if(!baselineEncounter){baselineEncounter=structuredClone(controller.encounter);replayTargetType=result.stageC.nodeType||'repeat';$('#comparison').hidden=true;$('#rerun').textContent='ИЗМЕНИТЬ ОДНУ ВЕЩЬ →'}else if(replayMode){const c=compareRuns(baselineEncounter,controller.encounter);$('#comparison').innerHTML=comparisonHtml(c);$('#comparison').hidden=false;$('#rerun').textContent='ЕЩЁ ОДИН ЭКСПЕРИМЕНТ →'}}
 function prepareReplay(){replayMode=true;currentCharacterId=firstRunConfig?.characterId||currentCharacterId;sharedAppearance={...(firstRunConfig?.sharedAppearance||sharedAppearance)};ownedAppearance=structuredClone(firstRunConfig?.ownedAppearance||ownedAppearance);appearanceColors=structuredClone(firstRunConfig?.appearanceColors||appearanceColors);opponentSeed=firstRunConfig.opponentSeed;opponentProfile=structuredClone(firstRunConfig.opponentProfile);restoreBrainSnapshot(firstRunConfig.brainGraph);controller=null;$('#replay-note').textContent=`КОНТРФАКТ: МЕНЯЕМ ТОЛЬКО «${title(replayTargetType)}». СОПЕРНИК ТОТ ЖЕ.`;show('brain')}
-
-$$('.character-switch [data-character]').forEach(b=>b.addEventListener('click',()=>chooseCharacter(b.dataset.character)));
-$$('[data-part]').forEach(b=>b.addEventListener('click',()=>toggleAppearance(b.dataset.part)));$('#appearance-reset').onclick=resetAppearance;
-$$('[data-mode]').forEach(b=>b.addEventListener('click',()=>{mode=b.dataset.mode;$$('[data-mode]').forEach(x=>x.classList.toggle('active',x===b))}));
-$$('.bottom-nav button').forEach(b=>b.addEventListener('click',()=>{if(b.dataset.nav==='talk'&&!controller?.encounter)return;show(b.dataset.nav)}));
-$('#to-brain').onclick=()=>{resetActors();show('brain')};$('#to-setup').onclick=()=>show('setup');$('#brain-add-node').onclick=showNodeLibrary;
-$('#reroll-opponent').onclick=rerollOpponent;
-$('#play').onclick=()=>{if(!replayMode&&!firstRunConfig)firstRunConfig={brainGraph:brainSnapshot(),characterId:currentCharacterId,sharedAppearance:{...sharedAppearance},ownedAppearance:structuredClone(ownedAppearance),appearanceColors:structuredClone(appearanceColors),mode,opponentSeed,opponentProfile:structuredClone(opponentProfile)};resetActors();makeController();controller.start({mode});show('talk');if(mode==='auto')startAuto()};
-$('#next-turn').onclick=()=>{if(mode==='auto'){autoTimer?stopAuto():startAuto()}else doNext()};$('#trace-btn').onclick=showTrace;
-$('#rerun').onclick=async()=>{if(!baselineEncounter)return;if(replayMode){baselineEncounter=null;firstRunConfig=null;replayTargetType=null;replayMode=false;opponentSeed=explicitSeed||freshOpponentSeed();opponentProfile=createOpponentProfile(opponentSeed);await remountOpponent();controller=null;show('brain')}else prepareReplay()};
-overlay.addEventListener('click',e=>{if(e.target===overlay)hideOverlay()});window.addEventListener('resize',()=>{if(app.dataset.screen==='brain')requestAnimationFrame(drawBrainEdges)});
-
+$$('.character-switch [data-character]').forEach(b=>b.addEventListener('click',()=>chooseCharacter(b.dataset.character)));$$('[data-part]').forEach(b=>b.addEventListener('click',()=>toggleAppearance(b.dataset.part)));$('#appearance-reset').onclick=resetAppearance;$$('[data-mode]').forEach(b=>b.addEventListener('click',()=>{mode=b.dataset.mode;$$('[data-mode]').forEach(x=>x.classList.toggle('active',x===b))}));$$('.bottom-nav button').forEach(b=>b.addEventListener('click',()=>{if(b.dataset.nav==='talk'&&!controller?.encounter)return;show(b.dataset.nav)}));$('#to-brain').onclick=()=>{resetActors();show('brain')};$('#to-setup').onclick=()=>show('setup');$('#brain-add-node').onclick=showNodeLibrary;$('#reroll-opponent').onclick=rerollOpponent;$('#play').onclick=()=>{if(!replayMode&&!firstRunConfig)firstRunConfig={brainGraph:brainSnapshot(),characterId:currentCharacterId,sharedAppearance:{...sharedAppearance},ownedAppearance:structuredClone(ownedAppearance),appearanceColors:structuredClone(appearanceColors),mode,opponentSeed,opponentProfile:structuredClone(opponentProfile)};resetActors();makeController();controller.start({mode});show('talk');if(mode==='auto')startAuto()};$('#next-turn').onclick=()=>{if(mode==='auto'){autoTimer?stopAuto():startAuto()}else doNext()};$('#trace-btn').onclick=showTrace;$('#rerun').onclick=async()=>{if(!baselineEncounter)return;if(replayMode){baselineEncounter=null;firstRunConfig=null;replayTargetType=null;replayMode=false;opponentSeed=explicitSeed||freshOpponentSeed();opponentProfile=createOpponentProfile(opponentSeed);await remountOpponent();controller=null;show('brain')}else prepareReplay()};overlay.addEventListener('click',e=>{if(e.target===overlay)hideOverlay()});window.addEventListener('resize',()=>{if(app.dataset.screen==='brain')requestAnimationFrame(drawBrainEdges)});
 resetActors();syncCharacterSwitch();await mountCharacterAssets();show('person');
