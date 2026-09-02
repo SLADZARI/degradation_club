@@ -1,32 +1,33 @@
 # Dementor Club — Membership v2 Production Flow QA
 
-Status: **ACTIVE LIVE QA LEDGER**  
+Status: **DISCOVERY PASS COMPLETE / FIX BATCH 01 STAGED / PRODUCTION RETEST PENDING**  
 Date opened: **2026-09-02**  
-Environment: **PRODUCTION / https://dementor.club**  
+Environment tested: **PRODUCTION / https://dementor.club**  
 Source of truth: `dementor-club`  
 Implementation branch: `dementor-club-site`  
 Production branch: `dementor-club-production`
 
 ## 0. Purpose
 
-This document is the single live QA ledger for the Membership v2 production journey and the immediately connected account/workspace surfaces encountered while testing it.
+This is the single live QA ledger for Membership v2 and the immediately connected authenticated surfaces encountered during the production pass.
 
-For every observation record:
+For every finding we distinguish:
 
-- route / state;
-- expected behavior;
-- actual production behavior;
+- observed production behavior;
+- authoritative data behavior;
 - severity;
-- required fix or clarification;
-- retest status.
+- staged implementation fix;
+- production retest status.
 
-Admission authority remains `community/MEMBERSHIP_AND_DEMENTOR_REVIEW_V2.md`. DC-9 authority remains `operations/ONBOARDING_SYSTEM.md`. Site implementation belongs in `dementor-club-site`. Production deployment remains manual and requires explicit human approval.
+Admission authority remains `community/MEMBERSHIP_AND_DEMENTOR_REVIEW_V2.md`. DC-9 authority remains `operations/ONBOARDING_SYSTEM.md`.
 
-## 1. Canonical flow
+Production deployment remains manual and requires explicit human approval.
+
+## 1. Canonical flow verified
 
 `AUTHENTICATED → DC9 9/9 → APPLICATION_AVAILABLE → APPLICATION_SUBMITTED → UNDER_REVIEW → 2 independent APPROVE → MEMBER_ACTIVE → COMMUNITY / POST-ADMISSION`
 
-Important boundary:
+Boundary:
 
 `AUTHENTICATION ≠ DC9 COMPLETE ≠ APPLICATION ≠ MEMBERSHIP`
 
@@ -35,7 +36,7 @@ Controlled QA account:
 - `sharecraftwideo@gmail.com`
 - display identity observed: `Sled ZARI`
 - DC-9: `9/9`
-- legacy artifacts / grants intentionally preserved during Membership v2 reset.
+- historical artifacts / grants preserved.
 
 Production reviewers:
 
@@ -51,497 +52,476 @@ Threshold: **2 independent APPROVE decisions**.
 - **P2 / MINOR** — usability/state-model ambiguity that does not corrupt authoritative state.
 - **P3 / POLISH** — refinement only.
 
-## 3. Open production findings
+## 3. Findings
 
 ### QA-MEM-001 — Legacy `/join/member/` remains in Membership v2 journey
 
-Status: **OPEN**  
-Severity: **P0 / BLOCKER**  
-Route: `https://dementor.club/join/member/`
+Status: **FIX STAGED / RETEST PENDING**  
+Severity: **P0 / BLOCKER**
 
 Observed:
 
-- legacy screen repeats Community display name, nickname, contact and legal confirmations;
-- exposes `ВОЙТИ В COMMUNITY →`;
-- primary action is non-functional after v2 cutover;
-- duplicates the real Membership v2 application surface.
+- legacy screen duplicated identity/contact/legal;
+- exposed `ВОЙТИ В COMMUNITY →`;
+- still depended on disabled `dc_activate_membership_v1`.
 
-Technical cause:
+Staged fix:
 
-- legacy runtime still calls `dc_activate_membership_v1`;
-- v2 cutover revoked this automatic activation path.
+- `/join/member/` becomes a compatibility redirect to `/join/apply/`;
+- no legacy auto-activation runtime is used;
+- `/join/apply/` restored as the actual Membership v2 application entry in `dementor-club-site`.
 
-Required fix:
+Important branch-drift correction:
 
-1. remove `/join/member/` from primary Membership v2 routing;
-2. completed 9/9 + non-member must resolve to `/join/apply/` or application status;
-3. keep `/join/member/` only as compatibility redirect/state resolver if needed;
-4. never call `dc_activate_membership_v1` from public runtime;
-5. do not recollect identity/contact/legal already captured by Membership v2 unless explicitly required by a future profile-edit flow.
+During implementation it was discovered that `dementor-club-site/join/apply/index.html` was still an old redirect to `/join/member/`, while production already had the newer v2 entry. That stale branch state was corrected before release preparation to avoid a redirect loop.
 
-Retest: **NOT RUN**.
+Retest: **PENDING AFTER DEPLOY**.
 
 ---
 
 ### QA-MEM-002 — Reviewer decision is not visually final
 
-Status: **OPEN**  
-Severity: **P1 / MAJOR**  
-Route: `https://dementor.club/workspace/review/`
+Status: **FIX STAGED / RETEST PENDING**  
+Severity: **P1 / MAJOR**
 
 Observed:
 
-- Евгений submitted `APPROVE`;
-- application correctly remained `reviewing` after first approval;
-- UI showed `Вы / APPROVE`, but all decision buttons remained active;
-- same reviewer could repeatedly press `ПОДТВЕРДИТЬ` or switch decision without an explicit edit mode.
+- one Dementor could repeatedly click decision controls;
+- database correctly stored only one current decision per `(application, reviewer)`;
+- UI did not communicate that the reviewer's decision was already recorded.
 
-Server behavior is correct:
+Server behavior: **PASS**.
 
-- one current review record per `(application, reviewer)`;
-- repeated click does not create extra independent approvals;
-- one reviewer cannot satisfy the 2-approval threshold alone.
+Staged UX fix:
 
-Required UX:
+- after own decision, decision controls are hidden;
+- note becomes read-only;
+- reviewer sees `ВАШЕ РЕШЕНИЕ: ... ✓`;
+- approval progress is shown as `N / 2 DEMENTORS`.
 
-- after decision show `ВАШЕ РЕШЕНИЕ: ПОДТВЕРЖДЕНО ✓`;
-- show threshold progress, e.g. `1 / 2 DEMENTORS`;
-- show `ЖДЁМ ЕЩЁ ОДНО РЕШЕНИЕ` while open;
-- hide/disable fresh decision controls after own decision;
-- if changing is allowed, use a separate explicit `ИЗМЕНИТЬ РЕШЕНИЕ` action;
-- after second approval show final `ПРИНЯТ В COMMUNITY · 2/2` state or remove from active queue.
-
-Retest: **NOT RUN**.
+Retest: **PENDING AFTER DEPLOY**.
 
 ---
 
 ### QA-MEM-003 — `ACCOUNT → CART` routes to production 404
 
-Status: **OPEN**  
-Severity: **P1 / MAJOR NAVIGATION**  
-Route: `ACCOUNT → CART → https://dementor.club/cart/`
+Status: **FIX STAGED / RETEST PENDING**  
+Severity: **P1 / MAJOR NAVIGATION**
 
 Observed:
 
-- ACCOUNT dropdown exposes `PROFILE` and `CART`;
-- `PROFILE` correctly opens the profile/workspace surface — **PASS**;
-- `CART` opens the branded 404 page (`СТРАНИЦА УШЛА`).
+- ACCOUNT menu exposed `CART`;
+- `/cart/` returned branded 404.
 
-Expected:
+Root cause verified:
 
-An exposed production navigation action must resolve to a working approved cart/order surface, or it must not be exposed until such a surface exists.
+- `cart/index.html` does exist in repository;
+- production builder intentionally excludes top-level `cart`;
+- production hardening forces `cartEnabled:false` and `checkoutEnabled:false`.
 
-Required fix:
+Therefore the correct fix is **not** to publish Cart now.
 
-- either restore/implement the canonical `/cart/` route;
-- or remove/hide `CART` from account navigation until the route is real;
-- do not leave a knowingly dead primary account action.
+Staged fix:
 
-Retest: **NOT RUN**.
+- global header reads `DEMENTOR_SITE_CONFIG.merch.cartEnabled`;
+- `CART` is not rendered when production disables commerce;
+- cart runtime is not loaded when disabled.
+
+Retest: **PENDING AFTER DEPLOY**.
 
 ---
 
 ### QA-MEM-004 — Historical completed course is not distinguished from a new repeat pass
 
 Status: **OPEN / NEEDS PRODUCT-STATE CLARIFICATION**  
-Severity: **P2 / STATE AMBIGUITY**  
-Surfaces: course runtime + `Workspace → My Activity`
+Severity: **P2 / STATE AMBIGUITY**
 
-Initial observation:
+Observed:
 
-- course `Думай с опасностью` was shown in Workspace as `completed`;
-- the live course screen was simultaneously on Day 2 and allowed `ОТКРЫТЬ СЛЕДУЮЩИЙ ДЕНЬ`;
-- Workspace also displayed a completion certificate.
+- Workspace showed `Думай с опасностью` as `completed`;
+- course runtime simultaneously allowed a new Day 2 continuation;
+- completion certificate remained visible.
 
-Database verification changed the diagnosis:
+Database verification:
 
-- the Sharecraft enrollment was already `completed` on **2026-08-28**;
-- the completion certificate was also issued on **2026-08-28**;
-- certificate result contains its own historical `completed_at` from that earlier pass;
-- therefore current Day 2 activity did **not** newly mark the course complete during this QA session.
+- historical enrollment completion = **2026-08-28**;
+- certificate completion = **2026-08-28**;
+- current Day 2 did not newly complete the course.
 
-Current interpretation:
+Current diagnosis:
 
-This is most likely a historical completed run from earlier development/testing plus a new repeat/restart being opened now. The bug is therefore **not currently proven to be premature completion**.
-
-Remaining product/UX question:
-
-Workspace currently shows only the historical enrollment state `completed` and does not distinguish:
-
-`previous completed attempt` vs `current repeat attempt in progress`.
-
-The database already permits an `active` enrollment status, so no new generic status enum is required just to represent an in-progress enrollment. What still needs verification is how repeat attempts are modeled: new enrollment row, run/attempt entity, reset of one enrollment, or course-local progress only.
+This is a historical completed pass plus a current repeat/restart whose attempt state is not separately represented in Workspace.
 
 Required follow-up:
 
-1. continue current repeat pass without resetting test history;
-2. determine where current Day progress is stored;
-3. verify whether a repeat pass creates a new authoritative attempt/enrollment;
-4. ensure Workspace can present historical completion and current active repeat without contradiction;
-5. never overwrite or remove the legitimate 2026-08-28 certificate merely because a repeat pass starts.
+1. identify where current repeat progress is stored;
+2. determine canonical attempt model;
+3. show previous completion and current repeat without contradiction;
+4. preserve historical certificate.
 
-Retest/diagnosis status: **RECLASSIFIED — not a premature-completion bug based on current evidence**.
+Retest/diagnosis: **OPEN, not included in Fix Batch 01**.
 
 ---
 
 ### QA-MEM-005 — No discoverable sign-out / logout action
 
-Status: **OPEN**  
-Severity: **P1 / ACCOUNT UX + SESSION CONTROL**  
-Surfaces: global authenticated navigation, ACCOUNT menu, Workspace/Profile
+Status: **FIX STAGED / RETEST PENDING**  
+Severity: **P1 / ACCOUNT UX + SESSION CONTROL**
 
-Observed during live production QA:
+Observed:
 
-- authenticated user can discover `ACCOUNT → PROFILE` and `ACCOUNT → CART`;
-- tester could not find any visible action to sign out / log out from the current account;
-- repository search for visible `signOut`, `logout` or `ВЫЙТИ` control did not surface an obvious global account action during this QA check.
+- tester could not discover a usable logout control;
+- an implementation-level logout existed in Workspace session box but was not sufficiently discoverable.
 
-Why this matters:
+Staged fix:
 
-- a user must be able to terminate their own authenticated session without clearing browser storage or relying on developer tools;
-- it is especially important for shared devices and for QA that switches between Candidate / Member / Dementor accounts;
-- sign-out belongs to account/session control, not to hidden implementation behavior.
+- explicit `LOG OUT` added directly to Workspace left navigation;
+- action performs canonical Supabase `signOut()`;
+- user is returned to public site after session termination.
 
-Expected:
+Retest must verify:
 
-A clearly discoverable `ВЫЙТИ` / `SIGN OUT` action should exist in the authenticated account surface, preferably in the same `ACCOUNT` menu that exposes Profile and other account-level actions. It must call the canonical auth sign-out path, clear the current application session, and resolve the user to an appropriate public/signed-out state.
+- protected surfaces no longer expose authenticated data;
+- relogin under another account does not inherit stale role/member UI.
 
-Required fix / verification:
-
-1. inspect current auth runtime for an existing hidden or route-specific sign-out implementation before adding a duplicate;
-2. if one exists, expose it consistently in the global authenticated ACCOUNT menu;
-3. if none exists, implement one canonical Supabase sign-out action and reuse it across authenticated surfaces;
-4. after sign-out, protected/reviewer surfaces must no longer expose authenticated data;
-5. verify relogin under another account works without stale role/member state.
-
-Retest: **NOT RUN**.
+Retest: **PENDING AFTER DEPLOY**.
 
 ---
 
 ### QA-MEM-006 — Active Member route still speaks as a pre-admission application page
 
-Status: **OPEN**  
-Severity: **P2 / COPY + STATE PRESENTATION**  
-Route: `https://dementor.club/join/apply/`
+Status: **FIX STAGED / RETEST PENDING**  
+Severity: **P2 / COPY + STATE PRESENTATION**
 
 Observed:
 
-- active Member state is technically recognized correctly;
-- panel correctly says `ВЫ УЖЕ В КЛУБЕ` and blocks repeat application;
-- CTA `ОТКРЫТЬ ЛИЧНЫЙ КАБИНЕТ →` works;
-- however the dominant page hero still says `ПОДАТЬ ЗАЯВКУ В КЛУБ` and explains how membership differs from an account.
+- lower state correctly said `ВЫ УЖЕ В КЛУБЕ`;
+- dominant hero still said `ПОДАТЬ ЗАЯВКУ В КЛУБ`.
 
-Problem:
+Staged fix:
 
-The route is state-aware only inside the lower card, while the most visually dominant copy still describes a state the current user has already passed. This creates unnecessary cognitive noise after acceptance.
+For `MEMBERSHIP / ACTIVE`, hero becomes state-aware:
 
-Expected / recommended behavior:
+`ЧЛЕНСТВО АКТИВНО.`
 
-- active Member should receive a state-aware hero, e.g. `ВЫ В КЛУБЕ` / `ЧЛЕНСТВО АКТИВНО`;
-- application explanation should disappear for an already accepted Member;
-- the main next action should lead into the personal Workspace / member surfaces;
-- alternatively, `/join/apply/` may resolve directly to the appropriate Member status surface after a short explicit state message.
+and the copy sends the Member into Workspace rather than explaining application mechanics again.
 
-Retest: **NOT RUN**.
+Retest: **PENDING AFTER DEPLOY**.
 
 ---
 
-### QA-MEM-007 — Global public navigation becomes hard to read on dark membership surface
+### QA-MEM-007 — Global public navigation low contrast on membership application
 
-Status: **OPEN**  
-Severity: **P1 / NAVIGATION + ACCESSIBILITY**  
-Observed route: `https://dementor.club/join/apply/`
+Status: **FIX STAGED / RETEST PENDING**  
+Severity: **P1 / NAVIGATION + ACCESSIBILITY**
 
-Observed:
+Observed on `/join/apply/`:
 
-- top navigation remains present but most navigation labels have very low visual contrast against the light/dark transitional header state;
-- tester needed substantial time to locate `COMMUNITY` despite already knowing the site;
-- a first-time visitor is likely to lose orientation faster.
+- public top navigation became hard to read;
+- experienced tester needed substantial time to locate `COMMUNITY`.
 
-Clarification from later QA:
+Clarification:
 
-- this issue is **not** treated as a separate reason to keep Membership Review standalone;
-- if Review is integrated into the normal Workspace shell, its standalone dark-page navigation problem disappears as part of `QA-MEM-009`;
-- `QA-MEM-007` remains open only for public/special pages where low contrast is independently reproducible, especially `/join/apply/`.
+This issue does not justify keeping Membership Review standalone. Review-specific navigation disappears through `QA-MEM-009`.
 
-Expected:
+Staged fix:
 
-- global public navigation must remain immediately legible on every supported page theme;
-- active, inactive and hover states need explicit dark/light surface tokens rather than inheriting a low-contrast value;
-- `COMMUNITY`, `JOIN`, `ACCOUNT` and other primary destinations must be discoverable without scanning effort.
+- `/join/apply/` explicitly uses a readable light topbar/dark text state;
+- mobile layout also receives a compact header/layout treatment.
 
-Required fix:
-
-1. audit topbar/nav contrast on special dark/onboarding pages where the issue actually reproduces;
-2. use theme-aware navigation tokens or an explicit dark-header variant;
-3. retest desktop and mobile after correction.
-
-Retest: **NOT RUN**.
+Retest: **PENDING AFTER DEPLOY**.
 
 ---
 
-### QA-MEM-008 — Private Community Board exists but is orphaned from Member Workspace navigation
+### QA-MEM-008 — Private Community Board is orphaned from Member Workspace navigation
 
-Status: **OPEN**  
-Severity: **P1 / INFORMATION ARCHITECTURE + DISCOVERABILITY**  
-Relevant production route: `/community/board/`
+Status: **FIX STAGED / RETEST PENDING**  
+Severity: **P1 / INFORMATION ARCHITECTURE + DISCOVERABILITY**
 
-Verified in production code and live QA:
+Production access result:
 
-- the private board exists as a dedicated Member surface;
-- production labels it `COMMUNITY / PRIVATE BOARD` and `ОБЩАЯ ДОСКА`;
-- accepted Membership v2 Member can open it directly — **ACCESS PASS**;
-- current Workspace sidebar exposes `HOME`, `MY CLUB`, `MY ACTIVITY`, optional `MY WORK`, `MY PROFILE`, plus Dementor-only Membership Review;
-- no Board or Artifact destination is present in the left Workspace navigation.
-
-Observed user effect:
-
-- Member opened public `COMMUNITY` and correctly found the public landing/people page;
-- tester could not discover the private Board from the cabinet and interpreted it as having disappeared.
+- accepted Membership v2 Member can open `/community/board/` directly — **ACCESS PASS**;
+- Member could not discover it naturally from Workspace.
 
 Architecture conclusion:
 
-Public `COMMUNITY` and private Member Board are different surfaces and should stay different:
+**PUBLIC TOP NAV** = public club/site architecture.  
+**WORKSPACE LEFT PANEL** = authenticated member/work architecture.
 
-- top navigation = public club/site architecture;
-- Workspace left navigation = authenticated personal/member/work architecture.
+Staged fix:
 
-Recommended placement:
+Workspace left navigation now exposes:
 
-- keep `/community/` as the public landing page;
-- expose private Board from Workspace, preferably under `MY CLUB` or as a clear `COMMUNITY BOARD` / `BOARD` entry in the left panel;
-- expose the member's own Artifacts near the same internal Club surface;
-- do not require an authenticated Member to infer that a private operational Board hides behind the public Community landing.
+- `MY CLUB`
+- `COMMUNITY BOARD`
+- `MY ARTIFACTS`
+- `MY ACTIVITY`
+- `MY WORK` when applicable
+- `MY PROFILE`
+- role-specific tools.
 
-Retest: **ACCESS PASS / DISCOVERABILITY NOT FIXED**.
-
----
-
-### QA-MEM-009 — Membership Review breaks the Workspace shell and role workflow context
-
-Status: **OPEN**  
-Severity: **P1 / INFORMATION ARCHITECTURE + ROLE WORKFLOW**  
-Route: `Workspace → MEMBERSHIP REVIEW → /workspace/review/`
-
-Verified in production code:
-
-- Dementor-only nav button is injected into the Workspace left panel;
-- clicking it performs a full navigation to `./review/`;
-- `/workspace/review/` is a separate standalone page with its own header and no Workspace sidebar.
-
-Observed effect:
-
-- reviewer feels ejected from the personal/role workspace into a different product surface;
-- returning to `MY CLUB`, `MY ACTIVITY`, `MY WORK` or profile requires leaving that context rather than switching inside the same cabinet.
-
-Expected / recommended architecture:
-
-- role-specific working tools should remain inside the Workspace shell;
-- `MEMBERSHIP REVIEW` should behave like another internal Workspace route/view, not like a separate mini-site;
-- Member status belongs in `MY CLUB`;
-- private Board/Artifacts belong in the authenticated Club area;
-- Dementor-only review tooling is layered on top of the same left-panel workspace according to role.
-
-Retest: **NOT RUN**.
+Retest: **ACCESS PASS / DISCOVERABILITY RETEST PENDING**.
 
 ---
 
-### QA-MEM-010 — Archived member Artifacts exist in data but are not discoverable in the UI
+### QA-MEM-009 — Membership Review breaks the Workspace shell
 
-Status: **OPEN**  
-Severity: **P1 / MEMBER HISTORY + DISCOVERABILITY**  
-Surface: `https://dementor.club/community/board/`
+Status: **FIX STAGED / RETEST PENDING**  
+Severity: **P1 / INFORMATION ARCHITECTURE + ROLE WORKFLOW**
 
-Observed during live QA:
+Observed:
 
-- accepted Member can open the private Board;
-- `МОЁ` shows one current Artifact: `Куда двигаемся - народ?`;
-- tester could not find an Archive/history view and could not reach the older Artifact from the UI.
+- reviewer clicked Membership Review inside Workspace;
+- full navigation opened a standalone dark mini-site without the Workspace sidebar.
 
-Database verification:
+Staged fix:
 
-The Sharecraft account has two Community Artifact records:
+- `/workspace/review/` now renders inside the same Workspace shell;
+- Workspace sidebar stays visible;
+- Board and My Artifacts remain reachable;
+- Dementor-only role boundary remains explicit.
 
-1. `Куда двигаемся - народ?` — `status = active`;
-2. `гусь` — `status = archived`, closed on 2026-08-30.
+Negative-role production test:
 
-Therefore `МОЁ` showing one item is not a data-loss bug if it intentionally filters to active items. The defect is that the archived item remains in authoritative data but has no discoverable member-facing history/archive surface.
+- ordinary Member could open direct URL but saw `ACCESS DENIED / НЕ ВАША ОЧЕРЕДЬ`;
+- no application or reviewer data leaked — **SECURITY PASS**.
 
-Expected:
+Staged negative-role UX change:
 
-- current Board can continue to default to active/current Artifacts;
-- Member must have a clear way to inspect their historical/archived Artifacts;
-- archived items should be visibly distinguished from active ones and should not silently disappear from the member's own history;
-- archive access should live in the authenticated Workspace/Club IA, not be hidden behind undocumented filters.
+- direct non-Dementor access redirects back to Workspace instead of rendering a full reviewer surface.
 
-Recommended fix:
+Retest: **PENDING AFTER DEPLOY**.
 
-1. add `ARCHIVE` / `HISTORY` for member Artifacts, or expose archived items in `MY ARTIFACTS` inside Workspace;
-2. preserve existing status semantics (`active` vs `archived`) rather than mixing them in one undifferentiated current Board;
-3. make the archived `гусь` record reachable in the retest without changing its authoritative status;
-4. confirm that archiving an Artifact removes it from the live Board but not from the member's personal history.
+---
 
-Retest: **NOT RUN**.
+### QA-MEM-010 — Archived member Artifacts exist in data but are not discoverable
 
-## 4. Confirmed Membership v2 pass
+Status: **FIX STAGED / RETEST PENDING**  
+Severity: **P1 / MEMBER HISTORY + DISCOVERABILITY**
 
-The core admission sequence is now verified in production.
+Production data verification:
 
-Observed and database-confirmed:
+Sharecraft has two Community Artifact records:
 
-- Sled ZARI application submitted successfully;
-- Евгений submitted independent `APPROVE`;
+1. `Куда двигаемся - народ?` — `active`;
+2. `гусь` — `archived`, closed 2026-08-30.
+
+Production UI result:
+
+- `МОЁ` correctly shows the one current active Artifact;
+- archived `гусь` cannot be reached from UI.
+
+Staged fix:
+
+New internal Workspace surface:
+
+`/workspace/artifacts/`
+
+with filters:
+
+- `ВСЕ`
+- `АКТИВНЫЕ`
+- `АРХИВ`
+
+It reads the current user's own `dc_artifacts` under RLS and keeps archived records out of the live Board while preserving personal history.
+
+Retest requirement:
+
+- active artifact visible;
+- `гусь` visible in Archive;
+- archive item remains `archived` and does not return to live Board.
+
+Retest: **PENDING AFTER DEPLOY**.
+
+---
+
+### QA-MEM-011 — Membership application mobile composition is oversized
+
+Status: **FIX STAGED / RETEST PENDING**  
+Severity: **P1 / RESPONSIVE UX**
+
+Observed during mobile QA:
+
+- `/join/apply/` was functionally usable;
+- buttons remained accessible;
+- composition was strongly desktop-shaped on mobile;
+- oversized hero/media/blocks consumed excessive viewport space;
+- content that could fit into a compact mobile flow required unnecessary scrolling.
+
+Other checked authenticated links opened correctly and their controls remained available.
+
+Staged fix:
+
+- compact mobile hero;
+- reduced page padding and section spacing;
+- smaller state headings;
+- reduced field/textarea footprint;
+- tighter Interest Map rows;
+- full-width submit action;
+- compact phone breakpoint.
+
+Retest: **PENDING AFTER DEPLOY**.
+
+## 4. Confirmed production PASS
+
+The core Membership v2 admission contract is verified:
+
+- Sled ZARI submitted application;
+- Евгений independently APPROVE;
 - first approval did not activate membership;
-- Nikita opened the same application and independently approved it;
-- authoritative application state = `accepted`;
-- authoritative membership state = `active`;
-- membership provenance = `membership-review-v2`;
-- authoritative approve count = `2`;
-- after acceptance the candidate account renders `MEMBER ✓` / active club membership.
+- Nikita independently APPROVE;
+- exactly 2 approvals reached threshold;
+- application → `accepted`;
+- membership → `active`;
+- provenance → `membership-review-v2`;
+- accepted Member could not submit a repeat application;
+- accepted request disappeared from active Dementor queue;
+- accepted Member gained private Board access;
+- ordinary Member could not read reviewer queue/data;
+- Membership v2 did not duplicate initial Artifact grant.
 
-Therefore the core contract:
+Artifact grant verification:
 
-`APPLICATION → APPROVE #1 → still waiting → APPROVE #2 → MEMBER_ACTIVE`
+- Sharecraft has exactly one grant;
+- `grant_key = initial-membership-v1`;
+- created 2026-08-30;
+- no v2 duplicate was created.
+
+Therefore:
+
+`APPLICATION → APPROVE #1 → WAIT → APPROVE #2 → MEMBER_ACTIVE`
 
 is **PASS**.
 
-## 5. Flow checklist — live pass
-
-Legend: `[ ]` not tested, `[~]` issue/incomplete, `[x]` passed.
+## 5. Discovery checklist
 
 ### A. Entry / DC-9
 
-- [x] controlled QA account authenticates in production.
-- [x] server recognizes existing DC-9 9/9.
+- [x] authentication works.
+- [x] server recognizes 9/9.
 - [x] assessment history survives Membership v2 reset.
-- [ ] all returning 9/9 non-member Join entry points resolve to Membership v2 correctly.
-- [~] legacy `/join/member/` remains — `QA-MEM-001`.
+- [~] legacy member surface found — `QA-MEM-001`, fix staged.
 
 ### B. Membership Application
 
-- [x] 9/9 user can open v2 application.
-- [x] application submits in production.
-- [x] one open request is created.
-- [x] Candidate Snapshot reaches authorized review with 9/9.
-- [x] candidate context / Why Club / contact / Interest Map are visible to Dementor.
-- [x] accepted Member is blocked from repeat application.
-- [~] accepted Member page retains pre-admission hero/copy — `QA-MEM-006`.
-- [ ] candidate-facing submitted state after refresh/relogin before acceptance.
-- [ ] duplicate application blocked while application remains open.
-- [ ] non-9/9 application server-blocked.
+- [x] application opens after 9/9.
+- [x] application submits.
+- [x] Candidate Snapshot contains 9/9.
+- [x] candidate context / Why Club / contact / Interest Map reach Dementor.
+- [x] active Member blocked from repeat application.
+- [~] active Member hero stale — `QA-MEM-006`, fix staged.
+- [~] mobile composition oversized — `QA-MEM-011`, fix staged.
 
 ### C. Dementor Review
 
-- [x] authorized Dementor opens review workspace.
-- [x] application appears.
-- [x] Candidate Snapshot/context visible.
-- [x] first APPROVE stored.
+- [x] authorized Dementor opens queue.
+- [x] first APPROVE stored once authoritatively.
 - [x] first APPROVE does not activate membership.
-- [~] own decision lacks visually final state — `QA-MEM-002`.
-- [~] Membership Review leaves Workspace shell — `QA-MEM-009`.
-- [ ] non-Dementor denied review access.
-- [ ] reviewer cannot act as another reviewer.
-- [ ] MORE_CONTEXT tested.
-- [ ] NOT_NOW tested.
+- [~] own decision not visually final — `QA-MEM-002`, fix staged.
+- [~] standalone Review broke Workspace context — `QA-MEM-009`, fix staged.
+- [x] non-Dementor direct access exposes no reviewer data.
 
-### D. Second Review / Admission
+### D. Admission closure
 
-- [x] Nikita opened same application under own account.
-- [x] second independent APPROVE submitted.
-- [x] threshold reached exactly 2 approvals.
-- [x] application authoritative state = `accepted`.
-- [x] membership authoritative state = `active`.
-- [x] membership provenance = `membership-review-v2`.
-- [ ] final review-card UX clearly shows accepted/closed state after refresh.
-- [ ] accepted application absent from active queue.
-- [ ] initial Artifact slot non-duplication rechecked after admission.
+- [x] second independent APPROVE.
+- [x] threshold exactly 2.
+- [x] application accepted.
+- [x] membership active.
+- [x] accepted application disappears from active queue.
+- [x] initial Artifact grant not duplicated.
 
-### E. Candidate after acceptance
+### E. Post-admission Member
 
-- [x] candidate refresh/login resolves to Member state.
-- [x] candidate cannot submit a new application while already active Member.
-- [x] public Community landing remains accessible and behaves as public Community/people surface.
-- [x] private Board direct access works for accepted Member.
-- [~] private Board is not discoverable from Workspace — `QA-MEM-008`.
-- [x] `МОЁ` correctly shows current active Artifact rather than archived history.
-- [~] archived Artifact history is not discoverable — `QA-MEM-010`.
-- [ ] post-admission Artifact creation flow checked.
-- [ ] previous Artifact grant preserved / no duplicate grant.
+- [x] Member state survives refresh/login.
+- [x] public Community remains public landing.
+- [x] private Board direct access works.
+- [~] Board not discoverable from Workspace — `QA-MEM-008`, fix staged.
+- [x] `МОЁ` correctly shows active artifact only.
+- [~] archived artifact not reachable — `QA-MEM-010`, fix staged.
 
-### F. Account / adjacent surfaces encountered during pass
+### F. Account / adjacent
 
 - [x] ACCOUNT → PROFILE works.
-- [~] ACCOUNT → CART → 404 — `QA-MEM-003`.
-- [~] historical course completion vs current repeat pass ambiguous — `QA-MEM-004`.
-- [~] no discoverable sign-out/logout action — `QA-MEM-005`.
-- [~] public top navigation low contrast on `/join/apply/` — `QA-MEM-007`.
+- [~] CART exposed while disabled — `QA-MEM-003`, fix staged.
+- [~] course repeat/history ambiguity — `QA-MEM-004`, remains open.
+- [~] logout not discoverable — `QA-MEM-005`, fix staged.
+- [~] `/join/apply/` topbar contrast — `QA-MEM-007`, fix staged.
 
-### G. Privacy / security / resilience
+### G. Security / resilience
 
-- [ ] normal Member cannot read another candidate application.
-- [ ] normal Member cannot read Dementor internal notes.
-- [ ] candidate cannot read private reviewer notes.
-- [ ] user cannot self-assign Dementor.
+- [x] normal Member cannot enter reviewer data surface.
 - [x] legacy direct `dc_activate_membership_v1` disabled.
 - [x] direct authenticated INSERT to `join_applications` disabled.
-- [ ] Telegram failure does not affect canonical admission state.
+- [ ] MORE_CONTEXT branch not yet end-to-end tested.
+- [ ] NOT_NOW / continue_outside branch not yet end-to-end tested.
+- [ ] Telegram delivery failure independence not yet tested.
 
-### H. Responsive / UX
+## 6. Fix Batch 01 — staged implementation map
 
-- [ ] Membership application mobile pass.
-- [ ] Dementor review mobile pass.
-- [ ] long Candidate Snapshot overflow pass.
-- [ ] decision controls narrow viewport pass.
-- [ ] public topbar theme/contrast pass across light and dark authenticated/onboarding surfaces.
-- [ ] Workspace IA pass: public site nav vs private left-panel navigation remains understandable to a new Member.
+Staged in `dementor-club-site`, not deployed:
 
-## 6. QA operating rule
+- legacy Membership redirect → v2;
+- corrected stale `/join/apply/` branch entry;
+- active-Member hero state;
+- mobile Membership Application layout;
+- application topbar contrast;
+- explicit Workspace logout;
+- Workspace `COMMUNITY BOARD` link;
+- Workspace `MY ARTIFACTS` history/archive surface;
+- Membership Review inside Workspace shell;
+- non-Dementor Review redirect;
+- visually final own Dementor decision;
+- production-disabled CART hidden from global Account menu;
+- stale Workspace guest Membership copy aligned to v2.
 
-`OPEN SCREEN → OBSERVE → RECORD → CLASSIFY → CONTINUE WHEN SAFE`
+## 7. Architecture fixed by this pass
 
-Do not batch-fix while collecting this production pass. P0/P1 items stay open until a fix is prepared in `dementor-club-site`, promoted through release gates, deployed only on explicit human instruction, and retested in production.
+### Public top navigation
 
-## 7. Current IA conclusion from live QA
-
-Current evidence supports a clean boundary:
-
-**PUBLIC TOP NAV**  
 `Club / Events / Projects / Community / Merch / Blog / Join / Account`
 
-This remains the public website/landing architecture.
+This remains public site architecture.
 
-**AUTHENTICATED WORKSPACE LEFT PANEL**  
-`Home / My Club / Community Board / My Artifacts / My Activity / My Work / My Profile / role-specific tools`
+### Authenticated Workspace
 
-Role-specific tools such as Membership Review should remain in this Workspace shell rather than opening a visually separate mini-site.
+`Home / My Club / Community Board / My Artifacts / My Activity / My Work / My Profile / role-specific tools / Log out`
 
-Member Artifact history should be reachable from `My Artifacts` or an explicit internal Archive/History state.
+Membership Review is a role-specific Dementor tool inside this Workspace context.
 
-This is a QA-derived implementation recommendation, not a new change to Membership admission semantics.
+## 8. Remaining before production deploy of Fix Batch 01
 
-## 8. Current next QA actions
+1. prepare a clean release branch from `dementor-club-production`;
+2. selectively promote only Fix Batch 01 runtime files — do **not** merge all of `dementor-club-site`;
+3. add new Workspace Artifact route to production readiness registry if required by gate;
+4. run Production Candidate Integrity;
+5. inspect release diff for unrelated files;
+6. only after explicit deploy instruction: run `Deploy Dementor Production`.
 
-Continue from the now-active Member account without resetting historical test data:
+## 9. Production retest after deploy
 
-1. revisit `/workspace/review/` under a Dementor and confirm the accepted request is closed/removed from active queue;
-2. verify the initial Artifact grant was not duplicated by Membership v2 acceptance;
-3. test the post-admission Artifact creation path if an available slot/action is exposed;
-4. continue current repeat of `Думай с опасностью` only far enough to understand repeat-attempt storage;
-5. later run negative-role access and logout/relogin checks after current positive flow is fully mapped.
+Required retest:
 
-## 9. Exit criteria
+- `/join/member/` resolves safely to v2;
+- active Member `/join/apply/` shows active-state hero;
+- mobile `/join/apply/` fits compactly and controls remain accessible;
+- Account menu no longer exposes disabled CART;
+- Workspace shows Board / My Artifacts / Log out;
+- My Artifacts shows active + archived `гусь` correctly;
+- Membership Review stays inside Workspace shell;
+- ordinary Member direct Review URL resolves back to Workspace;
+- first Dementor decision becomes visually final;
+- second decision still closes queue and activates membership;
+- logout removes protected access and relogin does not retain stale role UI.
 
-The pass is green only when:
+## 10. Exit criteria
 
-- P0 findings are fixed and retested;
-- P1 decision/navigation/session-control/IA/history defects are fixed and retested;
-- core two-Dementor admission remains stable after relogin;
-- candidate/reviewer/membership states remain synchronized;
-- public Community and private Member Board have clear, discoverable boundaries;
-- active and archived member Artifacts are both reachable in the appropriate surfaces;
-- Community/Artifact post-admission path works;
-- user can explicitly terminate an authenticated session and relogin without stale role state;
-- privacy/RLS negative-role tests pass;
-- mobile review/application surfaces are usable;
-- historical course runs and repeat attempts are presented without contradictory state;
-- all remaining warnings are recorded here.
+This QA cycle is green only when:
+
+- Fix Batch 01 passes production retest;
+- P0 is closed;
+- P1 navigation/session/IA/history/responsive findings are closed or explicitly deferred;
+- core two-Dementor admission remains stable;
+- Member can reach current and archived Artifact history;
+- privacy/RLS negative-role behavior remains correct;
+- course repeat-attempt ambiguity is resolved or explicitly moved to its own product-state task;
+- all remaining warnings stay recorded here.
