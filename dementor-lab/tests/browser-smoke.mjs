@@ -42,7 +42,16 @@ await page.locator('[data-part="hat"]').click();
 await page.locator('#variant-options [data-variant=""]').click();
 assert.equal(await page.locator('#person-preview #hat-01').isVisible(),false,'shared exact hat can be cleared on female rig');
 
+// BRAIN is a graph editor, not a static stack: authored edges render and touch controls mutate the selected node.
 await page.locator('#to-brain').click();assert.equal(await page.locator('#top-status').textContent(),'BRAIN');assert.ok(await page.locator('#brain-graph .brain-node').count()>=5);
+await page.waitForTimeout(50);
+assert.equal(await page.locator('#brain-graph .brain-link').count(),4,'current authored graph renders four real edges');
+assert.equal(await page.locator('[data-editor-for="a-impulse"]').isVisible(),true,'first editable causal node is opened by default');
+assert.equal((await page.locator('[data-editor-for="a-impulse"] output').textContent()).trim(),'W3','impulse starts at authored W3');
+await page.locator('[data-brain-inc="a-impulse"]').click();assert.equal((await page.locator('[data-editor-for="a-impulse"] output').textContent()).trim(),'W4','touch plus changes selected graph node');
+await page.locator('[data-brain-dec="a-impulse"]').click();assert.equal((await page.locator('[data-editor-for="a-impulse"] output').textContent()).trim(),'W3','touch minus restores selected graph node');
+await page.locator('[data-brain-node="a-repeat"]').click();assert.equal(await page.locator('[data-editor-for="a-repeat"]').isVisible(),true,'tapping another editable node moves its editor into the graph');
+
 await page.locator('#to-setup').click();assert.equal(await page.locator('#top-status').textContent(),'SETUP');
 assert.ok((await page.locator('#opponent-name').textContent()).trim().length>0,'SETUP names the opponent');
 assert.ok((await page.locator('#opponent-preset').textContent()).trim().length>0,'SETUP exposes authored opponent brain preset');
@@ -54,6 +63,6 @@ let hotPatchSeen=false;for(let i=0;i<16;i++){if(await page.locator('#overlay:not
 assert.equal(hotPatchSeen,true,'predictive HOT PATCH should appear in authored scenario');const turnBeforePatch=Number(await page.locator('#turn').textContent());await page.locator('[data-patch="repeat"]').click();assert.equal(Number(await page.locator('#turn').textContent()),turnBeforePatch,'HOT PATCH must not consume a turn');
 let resultSeen=false;for(let i=0;i<28;i++){if((await page.locator('#top-status').textContent())==='RESULT'){resultSeen=true;break}await page.locator('#next-turn').click();await page.waitForTimeout(30)}
 assert.equal(resultSeen,true,'authored scenario should reach RESULT');assert.ok((await page.locator('#result-cause').textContent()).trim().length>0);assert.ok((await page.locator('#result-node').textContent()).trim().length>0);
-await page.locator('#rerun').click();assert.equal(await page.locator('#top-status').textContent(),'BRAIN');assert.equal(await page.locator('#replay-note').isVisible(),true);assert.match(await page.locator('#replay-note').textContent(),/СОПЕРНИК ТОТ ЖЕ/);assert.equal(await page.locator('#actor-b').getAttribute('data-character'),opponentCharacter,'counterfactual replay keeps same opponent body');assert.equal(await page.locator('#brain-editor input:disabled').count(),1,'counterfactual replay locks the non-target control');
+await page.locator('#rerun').click();assert.equal(await page.locator('#top-status').textContent(),'BRAIN');assert.equal(await page.locator('#replay-note').isVisible(),true);assert.match(await page.locator('#replay-note').textContent(),/СОПЕРНИК ТОТ ЖЕ/);assert.equal(await page.locator('#actor-b').getAttribute('data-character'),opponentCharacter,'counterfactual replay keeps same opponent body');assert.ok(await page.locator('#brain-graph .brain-node.is-locked').count()>=1,'counterfactual replay visibly locks non-target editable causal nodes');
 const viewport=page.viewportSize(),layout=await page.evaluate(()=>({scrollWidth:document.documentElement.scrollWidth,clientWidth:document.documentElement.clientWidth}));assert.ok(layout.scrollWidth<=layout.clientWidth+1,`no horizontal overflow: ${layout.scrollWidth}/${layout.clientWidth}`);assert.ok(viewport?.width<=430,'smoke test runs in small-phone viewport');
-await browser.close();console.log('DEMENTOR LAB browser smoke: PASS — both exact character contracts work in phone-sized flow');
+await browser.close();console.log('DEMENTOR LAB browser smoke: PASS — exact characters and touch-first BRAIN graph work in phone-sized flow');
