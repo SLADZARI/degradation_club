@@ -1,0 +1,28 @@
+{
+  "characterId": "character-02",
+  "version": "cleaned-svg-v1",
+  "source": "user-supplied character-02-cleaned(5).svg; normalized for runtime semantics without geometry changes on 2026-09-02",
+  "viewBox": "0 0 703 1024",
+  "baseLayers": {"body": true, "headRig": true},
+  "faceStates": {
+    "eyes": ["eyes-neutral", "eyes-tense", "eyes-sleepy", "eyes-overheat"],
+    "brows": ["brows-neutral", "brows-tense", "brows-angry"],
+    "mouth": ["mouth-neutral", "mouth-soft", "mouth-tense", "mouth-open"]
+  },
+  "variants": {
+    "hat": ["hat-01", "hat-02", "hat-03", "hat-04", "hat-05", "hat-06", "hat-07"],
+    "glasses": ["glasses-01", "glasses-02", "glasses-03", "glasses-04"],
+    "facialHair": [],
+    "accessory": ["accessory-01", "accessory-02", "accessory-03"],
+    "outfit": [],
+    "shoes": ["shoes-01"]
+  },
+  "colorTargets": ["shoes-primary"],
+  "rig": {"head": [352,270], "shoulderLeft": [287,345], "shoulderRight": [412,345], "hipLeft": [310,540], "hipRight": [392,541]},
+  "normalization": {"geometryChanged": false, "changes": ["Preserved all path geometry, transforms, masks, clips, fills, strokes and authored visibility.", "Added root data-asset-version metadata.", "Added root data-rig-pivots metadata matching the verified authored pivot coordinates."]},
+  "missingOrMerged": [
+    {"id":"body-torso","reason":"Torso clothing is baked into the source body geometry; no separate outfit variants existed in the original SVG."},
+    {"id":"accessories","reason":"Source accessory sheet has no explicit active/base variant; all variants are preserved as hidden switchable groups."},
+    {"id":"hair-overlay","reason":"Additional head hair geometry is preserved as part of the head rig and was not converted into a separate appearance variant."}
+  ]
+}
