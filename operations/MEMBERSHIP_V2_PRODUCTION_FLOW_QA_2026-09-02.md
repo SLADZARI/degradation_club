@@ -182,6 +182,40 @@ Required follow-up:
 
 Retest/diagnosis status: **RECLASSIFIED — not a premature-completion bug based on current evidence**.
 
+---
+
+### QA-MEM-005 — No discoverable sign-out / logout action
+
+Status: **OPEN**  
+Severity: **P1 / ACCOUNT UX + SESSION CONTROL**  
+Surfaces: global authenticated navigation, ACCOUNT menu, Workspace/Profile
+
+Observed during live production QA:
+
+- authenticated user can discover `ACCOUNT → PROFILE` and `ACCOUNT → CART`;
+- tester could not find any visible action to sign out / log out from the current account;
+- repository search for visible `signOut`, `logout` or `ВЫЙТИ` control did not surface an obvious global account action during this QA check.
+
+Why this matters:
+
+- a user must be able to terminate their own authenticated session without clearing browser storage or relying on developer tools;
+- it is especially important for shared devices and for QA that switches between Candidate / Member / Dementor accounts;
+- sign-out belongs to account/session control, not to hidden implementation behavior.
+
+Expected:
+
+A clearly discoverable `ВЫЙТИ` / `SIGN OUT` action should exist in the authenticated account surface, preferably in the same `ACCOUNT` menu that exposes Profile and other account-level actions. It must call the canonical auth sign-out path, clear the current application session, and resolve the user to an appropriate public/signed-out state.
+
+Required fix / verification:
+
+1. inspect current auth runtime for an existing hidden or route-specific sign-out implementation before adding a duplicate;
+2. if one exists, expose it consistently in the global authenticated ACCOUNT menu;
+3. if none exists, implement one canonical Supabase sign-out action and reuse it across authenticated surfaces;
+4. after sign-out, protected/reviewer surfaces must no longer expose authenticated data;
+5. verify relogin under another account works without stale role/member state.
+
+Retest: **NOT RUN**.
+
 ## 4. Confirmed Membership v2 pass
 
 The core admission sequence is now verified in production.
@@ -266,6 +300,7 @@ Legend: `[ ]` not tested, `[~]` issue/incomplete, `[x]` passed.
 - [x] ACCOUNT → PROFILE works.
 - [~] ACCOUNT → CART → 404 — `QA-MEM-003`.
 - [~] historical course completion vs current repeat pass ambiguous — `QA-MEM-004`.
+- [~] no discoverable sign-out/logout action — `QA-MEM-005`.
 
 ### G. Privacy / security / resilience
 
@@ -298,17 +333,19 @@ Continue from the now-active Member account without resetting historical test da
 2. verify Community entry and post-admission access;
 3. verify old artifacts and Artifact grant remain intact;
 4. revisit `/workspace/review/` under a Dementor and confirm the accepted request is closed/removed from active queue;
-5. continue the current repeat of `Думай с опасностью` only far enough to understand how the repeat attempt is stored, without deleting the historical 2026-08-28 completion/certificate.
+5. continue the current repeat of `Думай с опасностью` only far enough to understand how the repeat attempt is stored, without deleting the historical 2026-08-28 completion/certificate;
+6. verify a discoverable sign-out path once `QA-MEM-005` is fixed, including role/session cleanup after relogin.
 
 ## 8. Exit criteria
 
 The pass is green only when:
 
 - P0 findings are fixed and retested;
-- P1 decision/navigation defects are fixed and retested;
+- P1 decision/navigation/session-control defects are fixed and retested;
 - core two-Dementor admission remains stable after relogin;
 - candidate/reviewer/membership states remain synchronized;
 - Community/Artifact post-admission path works;
+- user can explicitly terminate an authenticated session and relogin without stale role state;
 - privacy/RLS negative-role tests pass;
 - mobile review/application surfaces are usable;
 - historical course runs and repeat attempts are presented without contradictory state;
