@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { visualStateFromMetrics, resolveVisualState, isNumberedVariantId } from '../src/render/character-renderer.mjs';
+import { visualStateFromMetrics, resolveVisualState, isNumberedVariantId, legacyVariantLayerDisplay } from '../src/render/character-renderer.mjs';
 
 const normal=visualStateFromMetrics({energy:72,brain:15,tension:10,contact:60});
 assert.equal(normal.eyes,'neutral');
@@ -33,5 +33,10 @@ assert.equal(isNumberedVariantId('A-outfit-03','outfit','A'),true,'side-prefixed
 assert.equal(isNumberedVariantId('outfit-primary','outfit'),false,'paint target must not be treated as an outfit variant');
 assert.equal(isNumberedVariantId('outfit-02-primary','outfit'),false,'variant paint subgroup must not be treated as a variant');
 assert.equal(isNumberedVariantId('shoes-primary','shoes'),false,'shoe paint target must not be treated as a shoe variant');
+
+assert.equal(legacyVariantLayerDisplay({hasVariants:true,wrapsVariants:true,baseWhenNull:true,selected:null}),'inline','exact wrapper containing numbered variants must remain visible');
+assert.equal(legacyVariantLayerDisplay({hasVariants:true,wrapsVariants:false,baseWhenNull:true,selected:null}),'none','separate legacy layer stays hidden when exact variants exist');
+assert.equal(legacyVariantLayerDisplay({hasVariants:false,wrapsVariants:false,baseWhenNull:true,selected:null}),'','legacy owned base remains available when no variants exist');
+assert.equal(legacyVariantLayerDisplay({hasVariants:false,wrapsVariants:false,baseWhenNull:false,selected:null}),'none','optional legacy layer stays hidden when unselected');
 
 console.log('DEMENTOR LAB character renderer selftest: PASS');
