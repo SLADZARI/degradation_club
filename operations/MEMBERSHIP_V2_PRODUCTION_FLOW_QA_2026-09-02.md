@@ -216,6 +216,127 @@ Required fix / verification:
 
 Retest: **NOT RUN**.
 
+---
+
+### QA-MEM-006 — Active Member route still speaks as a pre-admission application page
+
+Status: **OPEN**  
+Severity: **P2 / COPY + STATE PRESENTATION**  
+Route: `https://dementor.club/join/apply/`
+
+Observed:
+
+- active Member state is technically recognized correctly;
+- panel correctly says `ВЫ УЖЕ В КЛУБЕ` and blocks repeat application;
+- CTA `ОТКРЫТЬ ЛИЧНЫЙ КАБИНЕТ →` works;
+- however the dominant page hero still says `ПОДАТЬ ЗАЯВКУ В КЛУБ` and explains how membership differs from an account.
+
+Problem:
+
+The route is state-aware only inside the lower card, while the most visually dominant copy still describes a state the current user has already passed. This creates unnecessary cognitive noise after acceptance.
+
+Expected / recommended behavior:
+
+- active Member should receive a state-aware hero, e.g. `ВЫ В КЛУБЕ` / `ЧЛЕНСТВО АКТИВНО`;
+- application explanation should disappear for an already accepted Member;
+- the main next action should lead into the personal Workspace / member surfaces;
+- alternatively, `/join/apply/` may resolve directly to the appropriate Member status surface after a short explicit state message.
+
+Retest: **NOT RUN**.
+
+---
+
+### QA-MEM-007 — Global public navigation becomes hard to read on dark membership surface
+
+Status: **OPEN**  
+Severity: **P1 / NAVIGATION + ACCESSIBILITY**  
+Observed route: `https://dementor.club/join/apply/`
+
+Observed:
+
+- top navigation remains present but most navigation labels have very low visual contrast against the light/dark transitional header state;
+- tester needed substantial time to locate `COMMUNITY` despite already knowing the site;
+- a first-time visitor is likely to lose orientation faster.
+
+Expected:
+
+- global public navigation must remain immediately legible on every supported page theme;
+- active, inactive and hover states need explicit dark/light surface tokens rather than inheriting a low-contrast value;
+- `COMMUNITY`, `JOIN`, `ACCOUNT` and other primary destinations must be discoverable without scanning effort.
+
+Required fix:
+
+1. audit topbar/nav contrast on all dark pages, not just `/join/apply/`;
+2. use theme-aware navigation tokens or an explicit dark-header variant;
+3. retest desktop and mobile after correction.
+
+Retest: **NOT RUN**.
+
+---
+
+### QA-MEM-008 — Private Community Board exists but is orphaned from Member Workspace navigation
+
+Status: **OPEN**  
+Severity: **P1 / INFORMATION ARCHITECTURE + DISCOVERABILITY**  
+Relevant production route: `/community/board/`
+
+Verified in production code:
+
+- the private board exists as a dedicated Member surface;
+- production labels it `COMMUNITY / PRIVATE BOARD` and `ОБЩАЯ ДОСКА`;
+- current Workspace sidebar exposes `HOME`, `MY CLUB`, `MY ACTIVITY`, optional `MY WORK`, `MY PROFILE`, plus Dementor-only Membership Review;
+- no Board or Artifact destination is present in the left Workspace navigation.
+
+Observed user effect:
+
+- Member opened public `COMMUNITY` and correctly found the public landing/people page;
+- tester could not discover the private Board from the cabinet and interpreted it as having disappeared.
+
+Architecture conclusion:
+
+Public `COMMUNITY` and private Member Board are different surfaces and should stay different:
+
+- top navigation = public club/site architecture;
+- Workspace left navigation = authenticated personal/member/work architecture.
+
+Recommended placement:
+
+- keep `/community/` as the public landing page;
+- expose private Board from Workspace, preferably under `MY CLUB` or as a clear `COMMUNITY BOARD` / `BOARD` entry in the left panel;
+- expose the member's own Artifacts near the same internal Club surface;
+- do not require an authenticated Member to infer that a private operational Board hides behind the public Community landing.
+
+Retest: **NOT RUN**.
+
+---
+
+### QA-MEM-009 — Membership Review breaks the Workspace shell and role workflow context
+
+Status: **OPEN**  
+Severity: **P1 / INFORMATION ARCHITECTURE + ROLE WORKFLOW**  
+Route: `Workspace → MEMBERSHIP REVIEW → /workspace/review/`
+
+Verified in production code:
+
+- Dementor-only nav button is injected into the Workspace left panel;
+- clicking it performs a full navigation to `./review/`;
+- `/workspace/review/` is a separate standalone page with its own header and no Workspace sidebar.
+
+Observed effect:
+
+- reviewer feels ejected from the personal/role workspace into a different product surface;
+- returning to `MY CLUB`, `MY ACTIVITY`, `MY WORK` or profile requires leaving that context rather than switching inside the same cabinet.
+
+Expected / recommended architecture:
+
+- role-specific working tools should remain inside the Workspace shell;
+- `MEMBERSHIP REVIEW` should behave like another internal Workspace route/view, not like a separate mini-site;
+- Member status belongs in `MY CLUB`;
+- private Board/Artifacts belong in the authenticated Club area;
+- Dementor-only review tooling is layered on top of the same left-panel workspace according to role.
+
+Retest: **NOT RUN**.
+
 ## 4. Confirmed Membership v2 pass
 
 The core admission sequence is now verified in production.
@@ -257,8 +378,10 @@ Legend: `[ ]` not tested, `[~]` issue/incomplete, `[x]` passed.
 - [x] one open request is created.
 - [x] Candidate Snapshot reaches authorized review with 9/9.
 - [x] candidate context / Why Club / contact / Interest Map are visible to Dementor.
-- [ ] candidate-facing submitted state after refresh/relogin.
-- [ ] duplicate application blocked while open.
+- [x] accepted Member is blocked from repeat application.
+- [~] accepted Member page retains pre-admission hero/copy — `QA-MEM-006`.
+- [ ] candidate-facing submitted state after refresh/relogin before acceptance.
+- [ ] duplicate application blocked while application remains open.
 - [ ] non-9/9 application server-blocked.
 
 ### C. Dementor Review
@@ -269,6 +392,7 @@ Legend: `[ ]` not tested, `[~]` issue/incomplete, `[x]` passed.
 - [x] first APPROVE stored.
 - [x] first APPROVE does not activate membership.
 - [~] own decision lacks visually final state — `QA-MEM-002`.
+- [~] Membership Review leaves Workspace shell — `QA-MEM-009`.
 - [ ] non-Dementor denied review access.
 - [ ] reviewer cannot act as another reviewer.
 - [ ] MORE_CONTEXT tested.
@@ -289,8 +413,10 @@ Legend: `[ ]` not tested, `[~]` issue/incomplete, `[x]` passed.
 ### E. Candidate after acceptance
 
 - [x] candidate refresh/login resolves to Member state.
-- [ ] candidate cannot submit a new application while already active Member.
-- [ ] Community route/access checked end to end.
+- [x] candidate cannot submit a new application while already active Member.
+- [x] public Community landing remains accessible and behaves as public Community/people surface.
+- [~] private Board is not discoverable from Workspace — `QA-MEM-008`.
+- [ ] private Board access itself checked under accepted Member.
 - [ ] post-admission Artifact flow checked.
 - [ ] previous artifacts preserved visually.
 - [ ] previous Artifact grant preserved / no duplicate grant.
@@ -301,6 +427,7 @@ Legend: `[ ]` not tested, `[~]` issue/incomplete, `[x]` passed.
 - [~] ACCOUNT → CART → 404 — `QA-MEM-003`.
 - [~] historical course completion vs current repeat pass ambiguous — `QA-MEM-004`.
 - [~] no discoverable sign-out/logout action — `QA-MEM-005`.
+- [~] public top navigation low contrast on dark membership page — `QA-MEM-007`.
 
 ### G. Privacy / security / resilience
 
@@ -318,6 +445,8 @@ Legend: `[ ]` not tested, `[~]` issue/incomplete, `[x]` passed.
 - [ ] Dementor review mobile pass.
 - [ ] long Candidate Snapshot overflow pass.
 - [ ] decision controls narrow viewport pass.
+- [ ] public topbar theme/contrast pass across light and dark authenticated/onboarding surfaces.
+- [ ] Workspace IA pass: public site nav vs private left-panel navigation remains understandable to a new Member.
 
 ## 6. QA operating rule
 
@@ -325,25 +454,41 @@ Legend: `[ ]` not tested, `[~]` issue/incomplete, `[x]` passed.
 
 Do not batch-fix while collecting this production pass. P0/P1 items stay open until a fix is prepared in `dementor-club-site`, promoted through release gates, deployed only on explicit human instruction, and retested in production.
 
-## 7. Current next QA actions
+## 7. Current IA conclusion from live QA
+
+Current evidence supports a clean boundary:
+
+**PUBLIC TOP NAV**  
+`Club / Events / Projects / Community / Merch / Blog / Join / Account`
+
+This remains the public website/landing architecture.
+
+**AUTHENTICATED WORKSPACE LEFT PANEL**  
+`Home / My Club / My Activity / [private Board + Artifacts] / My Work / My Profile / role-specific tools`
+
+Role-specific tools such as Membership Review should remain in this Workspace shell rather than opening a visually separate mini-site.
+
+This is a QA-derived implementation recommendation, not a new change to Membership admission semantics.
+
+## 8. Current next QA actions
 
 Continue from the now-active Member account without resetting historical test data:
 
-1. verify accepted application behavior on `/join/apply/` after refresh/relogin;
-2. verify Community entry and post-admission access;
-3. verify old artifacts and Artifact grant remain intact;
-4. revisit `/workspace/review/` under a Dementor and confirm the accepted request is closed/removed from active queue;
-5. continue the current repeat of `Думай с опасностью` only far enough to understand how the repeat attempt is stored, without deleting the historical 2026-08-28 completion/certificate;
-6. verify a discoverable sign-out path once `QA-MEM-005` is fixed, including role/session cleanup after relogin.
+1. open the private Board directly at `/community/board/` and verify Member access, old artifacts and current board behavior;
+2. inspect whether existing 2 Sharecraft artifacts are visible and whether a new initial Artifact slot was incorrectly duplicated;
+3. revisit `/workspace/review/` under a Dementor and confirm the accepted request is closed/removed from active queue;
+4. continue current repeat of `Думай с опасностью` only far enough to understand repeat-attempt storage;
+5. later run negative-role access and logout/relogin checks after current positive flow is fully mapped.
 
-## 8. Exit criteria
+## 9. Exit criteria
 
 The pass is green only when:
 
 - P0 findings are fixed and retested;
-- P1 decision/navigation/session-control defects are fixed and retested;
+- P1 decision/navigation/session-control/IA defects are fixed and retested;
 - core two-Dementor admission remains stable after relogin;
 - candidate/reviewer/membership states remain synchronized;
+- public Community and private Member Board have clear, discoverable boundaries;
 - Community/Artifact post-admission path works;
 - user can explicitly terminate an authenticated session and relogin without stale role state;
 - privacy/RLS negative-role tests pass;
