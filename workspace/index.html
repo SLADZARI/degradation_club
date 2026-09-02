@@ -18,6 +18,7 @@
         <button type="button" data-route="home" class="is-active">HOME</button>
         <button type="button" data-route="club">MY CLUB</button>
         <a class="dcw-nav-link" href="../community/board/">COMMUNITY BOARD</a>
+        <a class="dcw-nav-link" href="./artifacts/">MY ARTIFACTS</a>
         <button type="button" data-route="activity">MY ACTIVITY</button>
         <button type="button" data-route="work" data-work-nav hidden>MY WORK</button>
         <button type="button" data-route="profile">MY PROFILE</button>
@@ -39,14 +40,7 @@
     import {createClient} from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.4/+esm';
     const button=document.querySelector('[data-global-logout]');
     const cfg=window.DEMENTOR_SITE_CONFIG?.supabase;
-    if(button&&cfg?.enabled){
-      button.addEventListener('click',async()=>{
-        button.disabled=true;
-        const client=window.DEMENTOR_SUPABASE_CLIENT||createClient(cfg.url,cfg.publishableKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false,flowType:'pkce'}});
-        await client.auth.signOut();
-        location.href='../';
-      });
-    }
+    if(button&&cfg?.enabled){button.addEventListener('click',async()=>{button.disabled=true;const client=window.DEMENTOR_SUPABASE_CLIENT||createClient(cfg.url,cfg.publishableKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false,flowType:'pkce'}});await client.auth.signOut();location.href='../';});}
   </script>
 </body>
 </html>
