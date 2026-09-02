@@ -11,18 +11,38 @@ The mobile UI is wired to `VerticalSliceController`; encounter semantics remain 
 
 ## Automated gate status
 
+Both approved production bodies now use validated exact cleaned SVG + manifest pairs.
+
 - Modular runtime boundary: **PASS**.
 - UI/runtime separation: **PASS**.
 - Deterministic zero-dependency QA: **PASS**.
 - Seeded opponent generation: **PASS**.
-- Two-base-character production asset contract: **PASS**.
+- Two-base-character exact production asset contract: **PASS**.
+- Manifest/SVG validation gate: **PASS**.
+- Exact numbered variant selection: **PASS**.
+- Intentional female asymmetry (no fabricated facial hair/outfits): **PASS**.
+- Exact wrapper handling for female `shoes-01` and `glasses-01`: **PASS**.
 - Chromium browser smoke with iPhone 13 viewport: **PASS**.
 - Full browser flow through HOT PATCH → RESULT → replay: **PASS**.
 - Generated opponent description/brain preset/rig persistence: **PASS**.
 - Same-opponent counterfactual replay: **PASS**.
 - Horizontal phone overflow smoke: **PASS**.
 
-Verified CI run: `33559927323`.
+Verified CI run: `33605375379`.
+
+## Exact character QA contract
+
+### character-01
+
+Production manifest exposes the exact authored male variants: 7 hats, 4 glasses, 4 facial-hair variants, 3 accessories, 3 outfits and 1 shoes variant.
+
+### character-02
+
+Production manifest exposes the exact authored female variants: 7 hats, 4 glasses, 3 accessories and 1 shoes variant. It intentionally exposes 0 facial-hair and 0 separable outfit variants because those do not exist in the source geometry.
+
+QA must reject any implementation that invents missing variants for visual symmetry.
+
+The renderer must also distinguish numbered variant IDs from paint targets and must not hide a wrapper group that contains active exact variants.
 
 ## Opponent QA contract
 
@@ -42,8 +62,9 @@ Still requires human verification on at least:
 
 ### iPhone Safari
 
-- PERSON switching and appearance controls are thumb-usable;
-- no character clipping around safe areas;
+- PERSON body switching and numbered variant controls are thumb-usable;
+- exact male/female characters are not clipped around safe areas;
+- glasses, hats and shoes render correctly during real touch interaction;
 - SETUP opponent card is readable without tiny support copy;
 - AUTO pause/resume is obvious;
 - STEP progression is obvious;
@@ -55,6 +76,8 @@ Still requires human verification on at least:
 ### Android Chrome
 
 Repeat the same flow and additionally verify browser-specific viewport resize / bottom-bar behavior.
+
+Physical-device QA is **not** considered passed by CI.
 
 ## Remaining Gate D — FUN PASS
 
@@ -86,6 +109,10 @@ Failure signals:
 
 ## Integration decision
 
+Exact character asset integration is complete and automated Gate A coverage is green.
+
 PR to `dementor-club-site` remains **NOT READY** until physical-device Gate A has no blocking defects and at least one short FUN PASS is completed.
 
-No deploy implied.
+Asset expansion remains frozen during this gate. No `character-03` and no fabricated female variants.
+
+No Vercel deploy implied.
