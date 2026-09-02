@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <title>DEMENTOR LAB — Vertical Slice</title>
   <meta name="theme-color" content="#e7ff18">
-  <link rel="stylesheet" href="./styles.css"><link rel="stylesheet" href="./replay.css"><link rel="stylesheet" href="./mobile-readability.css"><link rel="stylesheet" href="./character.css"><link rel="stylesheet" href="./opponent.css"><link rel="stylesheet" href="./brain.css"><link rel="stylesheet" href="./add-node-picker.css">
+  <link rel="stylesheet" href="./styles.css"><link rel="stylesheet" href="./replay.css"><link rel="stylesheet" href="./mobile-readability.css"><link rel="stylesheet" href="./character.css"><link rel="stylesheet" href="./opponent.css"><link rel="stylesheet" href="./brain.css"><link rel="stylesheet" href="./add-node-picker.css"><link rel="stylesheet" href="./brain-stack.css">
 </head>
 <body>
 <main id="app" class="app" data-screen="person">
@@ -23,9 +23,9 @@
   <div class="section-head"><p class="kicker">BRAIN</p><h2 id="brain-title">СОБЕРИ ЕМУ ПРИЧИНУ.</h2><p class="brain-intro">НАЧНИ С ГОТОВОЙ КАТАСТРОФЫ ИЛИ СОБЕРИ СВОЮ.</p></div>
   <div id="replay-note" class="replay-note" hidden>ТОТ ЖЕ ЭКСПЕРИМЕНТ. ИЗМЕНИ ОДНУ ПРИЧИНУ.</div>
   <div id="brain-presets" class="brain-presets" aria-label="Поведенческие пресеты"></div>
-  <div class="brain-toolbar"><button type="button" id="brain-add-node">+ УЗЕЛ</button><span>ПЕРЕТАСКИВАЙ · СОЕДИНЯЙ · ВЕТВИ</span></div>
   <div id="brain-validation" class="brain-validation" aria-live="polite"></div>
   <div id="brain-graph" class="brain-graph brain-constructor" aria-label="Конструктор графа поведения"></div>
+  <button type="button" id="brain-add-node" class="brain-add-node-bottom">+ ДОБАВИТЬ УЗЕЛ</button>
   <div id="brain-inspector" class="brain-inspector" hidden></div>
   <div id="brain-editor" class="brain-editor-note" aria-live="polite"></div>
   <button class="primary" id="to-setup">ОБ ЛЮДЕЙ ПРОВЕРИМ →</button>
