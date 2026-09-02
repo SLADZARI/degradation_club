@@ -29,50 +29,44 @@ for(const characterId of Object.keys(CHARACTER_REGISTRY)){
 
 resetCharacterContracts();
 
-// Production character-01 is now the exact cleaned asset and must expose its authored contract.
-{
-  const characterId='character-01';
+// Both production characters are now exact cleaned SVG + manifest pairs.
+for(const characterId of Object.keys(CHARACTER_REGISTRY)){
   const dir=new URL(`assets/characters/${characterId}/`,root);
   const svg=await readFile(new URL(`${characterId}-layered.svg`,dir),'utf8');
   const manifest=JSON.parse(await readFile(new URL('manifest.json',dir),'utf8'));
   const validation=registerCharacterManifest(characterId,manifest,svg);
-  assert.equal(validation.ok,true,'character-01 exact production manifest matches exact production SVG');
-  assert.equal(hasVariantContract(characterId),true,'character-01 exact production asset enables variants');
-  assert.deepEqual(variantOptions(characterId,'hat'),['hat-01','hat-02','hat-03','hat-04','hat-05','hat-06','hat-07']);
-  assert.deepEqual(variantOptions(characterId,'outfit'),['outfit-01','outfit-02','outfit-03']);
-  assert.deepEqual(variantOptions(characterId,'shoes'),['shoes-01']);
-
-  const selected=normalizeVariantAppearance(characterId,{hatVariant:'hat-03',facialHairVariant:'facial-hair-02'},{outfitVariant:'outfit-02',shoesVariant:'shoes-01'},{outfitPrimary:'#dfff00',shoesPrimary:'#111111'});
-  assert.equal(selected.hatVariant,'hat-03');
-  assert.equal(selected.facialHairVariant,'facial-hair-02');
-  assert.equal(selected.outfitVariant,'outfit-02');
-  assert.equal(selected.shoesVariant,'shoes-01');
-  assert.equal(selected.colors.outfitPrimary,'#dfff00');
-  assert.equal(selected.colors.shoesPrimary,'#111111');
-
-  const sanitized=normalizeVariantAppearance(characterId,{hatVariant:'not-a-real-hat'},{outfitVariant:'not-a-real-outfit'},{outfitPrimary:'#fff'});
-  assert.equal(sanitized.hatVariant,null,'registry rejects undeclared shared variants');
-  assert.equal(sanitized.outfitVariant,null,'registry rejects undeclared owned variants');
-  assert.equal(sanitized.colors.outfitPrimary,'#fff','declared character-01 paint target remains available independent of variant selection');
+  assert.equal(validation.ok,true,`${characterId} exact production manifest matches exact production SVG: ${validation.errors.join('; ')}`);
+  assert.equal(hasVariantContract(characterId),true,`${characterId} exact production asset enables its authored variant contract`);
+  assert.equal(manifest.version,'cleaned-svg-v1',`${characterId} is an exact cleaned production asset`);
 }
 
-// Production character-02 remains the legacy asset until its exact source is promoted.
-{
-  const characterId='character-02';
-  const dir=new URL(`assets/characters/${characterId}/`,root);
-  const svg=await readFile(new URL(`${characterId}-layered.svg`,dir),'utf8');
-  const manifest=JSON.parse(await readFile(new URL('manifest.json',dir),'utf8'));
-  const validation=registerCharacterManifest(characterId,manifest,svg);
-  assert.equal(validation.ok,true,'character-02 current legacy production manifest matches its production SVG');
-  assert.equal(hasVariantContract(characterId),false,'character-02 legacy production asset does not expose candidate variants');
-  for(const category of [...SHARED_APPEARANCE_CATEGORIES,...CHARACTER_OWNED_CATEGORIES])assert.deepEqual(variantOptions(characterId,category),[],`character-02 exposes no numbered ${category} variants yet`);
+assert.deepEqual(variantOptions('character-01','hat'),['hat-01','hat-02','hat-03','hat-04','hat-05','hat-06','hat-07']);
+assert.deepEqual(variantOptions('character-01','facialHair'),['facial-hair-01','facial-hair-02','facial-hair-03','facial-hair-04']);
+assert.deepEqual(variantOptions('character-01','outfit'),['outfit-01','outfit-02','outfit-03']);
+assert.deepEqual(variantOptions('character-01','shoes'),['shoes-01']);
 
-  const candidate=JSON.parse(await readFile(new URL(`reference/character-candidates/${characterId}-manifest.json`,root),'utf8'));
-  const candidateValidation=registerCharacterManifest(characterId,candidate,svg);
-  assert.equal(candidateValidation.ok,false,'character-02 candidate manifest must not be promoted onto unmatched legacy geometry');
-  assert.ok(candidateValidation.missingIds.length>0,'character-02 candidate gate reports missing authored SVG ids');
-  assert.equal(hasVariantContract(characterId),false,'failed character-02 candidate validation cannot enable variants');
-}
+assert.deepEqual(variantOptions('character-02','hat'),['hat-01','hat-02','hat-03','hat-04','hat-05','hat-06','hat-07']);
+assert.deepEqual(variantOptions('character-02','glasses'),['glasses-01','glasses-02','glasses-03','glasses-04']);
+assert.deepEqual(variantOptions('character-02','accessory'),['accessory-01','accessory-02','accessory-03']);
+assert.deepEqual(variantOptions('character-02','facialHair'),[],'female exact source intentionally has no facial-hair variants');
+assert.deepEqual(variantOptions('character-02','outfit'),[],'female exact source intentionally has no separable outfit variants');
+assert.deepEqual(variantOptions('character-02','shoes'),['shoes-01']);
+
+const maleSelected=normalizeVariantAppearance('character-01',{hatVariant:'hat-03',facialHairVariant:'facial-hair-02'},{outfitVariant:'outfit-02',shoesVariant:'shoes-01'},{outfitPrimary:'#dfff00',shoesPrimary:'#111111'});
+assert.equal(maleSelected.hatVariant,'hat-03');
+assert.equal(maleSelected.facialHairVariant,'facial-hair-02');
+assert.equal(maleSelected.outfitVariant,'outfit-02');
+assert.equal(maleSelected.shoesVariant,'shoes-01');
+assert.equal(maleSelected.colors.outfitPrimary,'#dfff00');
+assert.equal(maleSelected.colors.shoesPrimary,'#111111');
+
+const femaleSelected=normalizeVariantAppearance('character-02',{hatVariant:'hat-03',facialHairVariant:'facial-hair-02'},{outfitVariant:'outfit-02',shoesVariant:'shoes-01'},{outfitPrimary:'#dfff00',shoesPrimary:'#111111'});
+assert.equal(femaleSelected.hatVariant,'hat-03','compatible shared exact variant survives on character-02');
+assert.equal(femaleSelected.facialHairVariant,null,'character-02 does not fabricate facial-hair geometry');
+assert.equal(femaleSelected.outfitVariant,null,'character-02 does not fabricate outfit geometry');
+assert.equal(femaleSelected.shoesVariant,'shoes-01');
+assert.equal(femaleSelected.colors.outfitPrimary,null,'character-02 rejects undeclared outfit paint target');
+assert.equal(femaleSelected.colors.shoesPrimary,'#111111');
 
 // Prove the gate still opens for a minimal exact pair and blocks undeclared values.
 resetCharacterContracts();
@@ -87,6 +81,10 @@ const syntheticValidation=registerCharacterManifest('character-01',syntheticMani
 assert.equal(syntheticValidation.ok,true,'matching manifest/SVG pair passes the asset gate');
 assert.equal(hasVariantContract('character-01'),true,'matching manifest/SVG pair enables the variant contract');
 assert.deepEqual(variantOptions('character-01','hat'),['hat-01']);
+const rejected=normalizeVariantAppearance('character-01',{hatVariant:'hat-99'},{outfitVariant:'outfit-99'},{outfitPrimary:'#fff'});
+assert.equal(rejected.hatVariant,null);
+assert.equal(rejected.outfitVariant,null);
+assert.equal(rejected.colors.outfitPrimary,'#fff','declared paint target remains independent of variant selection');
 
 resetCharacterContracts();
-console.log('DEMENTOR LAB character registry selftest: PASS — character-01 exact, character-02 legacy, manifest/SVG gate enforced');
+console.log('DEMENTOR LAB character registry selftest: PASS — both exact assets validate; intentional female asymmetry preserved');
