@@ -35,6 +35,9 @@ assert.equal(await page.locator('#person-preview #hat-01').isVisible(),true,'com
 assert.equal(await page.locator('#person-preview [id^="facial-hair-"]').count(),0,'female SVG contains no fabricated facial-hair geometry');
 assert.equal(await page.locator('#person-preview [id^="outfit-"]').count(),0,'female SVG contains no fabricated outfit variant geometry');
 assert.equal(await page.locator('#person-preview #shoes-01').isVisible(),true,'female authored base shoes remain visible when no explicit shoes variant is selected');
+await page.locator('[data-part="glasses"]').click();
+await page.locator('#variant-options [data-variant="glasses-01"]').click();
+assert.equal(await page.locator('#person-preview #glasses-01').isVisible(),true,'female exact glasses variant renders inside authored wrapper');
 await page.locator('[data-part="hat"]').click();
 await page.locator('#variant-options [data-variant=""]').click();
 assert.equal(await page.locator('#person-preview #hat-01').isVisible(),false,'shared exact hat can be cleared on female rig');
