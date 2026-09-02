@@ -1,99 +1,99 @@
 # Fermentation
 
-Статус: **INTERNAL R&D / PROTOTYPE**  
-Публичный статус: **не анонсирован**  
+Статус: **INTERNAL R&D / DEMAND-VALIDATION PROTOTYPE**  
+Публичный статус: **не запущен**  
 Тип сущности: `project`
+
+## Канонический вход
+
+**Fermentation** — утверждённое каноническое имя продукта и проекта внутри Dementor Club.
+
+Protected PRODUCT authority:
+- `projects/fermentation/product/fermentation-product.v1.0.md`
+- artifactId: `fermentation.product.core`
+- status: `APPROVED v1.0`
+
+Decision record:
+- `projects/fermentation/decisions/product-direction.v1.0.md`
+- artifactId: `fermentation.decision.product-direction`
+- status: `APPROVED v1.0`
+
+Этот README — навигационная точка проекта. Он не дублирует полный продуктовый контракт.
 
 ## Кратко
 
-Внутренний проект Dementor Club по исследованию управляемой ферментации капусты как наблюдаемого цифрового процесса.
+Fermentation — проект Dementor Club, который проверяет спрос на персонализированную ферментацию как сочетание готового ферментированного продукта, кастомизации и live-наблюдения за собственным процессом.
 
-Текущий продуктовый замысел: локальное мелкосерийное производство с контролируемыми параметрами ферментации, выбором рецепта/нарезки и live-доступом к процессу с последующей доставкой готового продукта.
-
-В исследовательских материалах и UI-прототипе одновременно встречаются рабочие названия **CULTURA**, **Kvas** и **Kvas.Tech**. Ни одно из них этим документом не фиксируется как окончательно утверждённый бренд. До отдельного решения каноническое имя сущности внутри клуба — **Fermentation**.
+Основная гипотеза: люди могут платить не только за ферментированную капусту, а за experience — сделать ферментацию своей, наблюдать живой процесс и получить готовый продукт.
 
 ## Текущая база
 
-### Google Drive
+### Product authority
+
+`projects/fermentation/product/fermentation-product.v1.0.md` — единственная текущая PRODUCT authority проекта. Исследования, UI-прототип и implementation docs не должны переопределять её молча.
+
+### Google Drive — RESEARCH / REFERENCE
 
 - Папка проекта: https://drive.google.com/drive/folders/1qvVzl-hb9Sf2PY7qTFELAauIf-eGwQTP
 - Основной исследовательский документ: https://docs.google.com/document/d/1kUMKJDErN2lMX1oWL7X4Okyc18KYNLvKJzbTkBUauCg/edit
 
-В Drive уже собраны продуктовая гипотеза, аудитория, value proposition, исследования процесса ферментации, оборудования, live-стриминга, экономики, рынка и правовых ограничений.
+В Drive находятся продуктовые исследования, аудитория, процесс ферментации, оборудование, live-стриминг, экономика, рынок и правовые материалы. Исследовательские цифры и утверждения не становятся APPROVED автоматически.
 
-### Код / прототип
+### Implementation
 
-Implementation repository: https://github.com/SLADZARI/dementor-fermentation
+Repository: https://github.com/SLADZARI/dementor-fermentation
 
-В отдельный приватный репозиторий перенесён baseline frontend-прототипа на Vite + React + TypeScript, первоначально собранного из Figma Make. В нём уже присутствуют поверхности продукта, включая landing, live fermentation, pricing, onboarding, live access, lab mode, supplier protocol и связанные интерфейсные компоненты.
+Он хранит приложение, техническую архитектуру, тесты, implementation docs, Result/evidence и release history. Его MP_DSL kernel должен указывать обратно на этот PRODUCT authority.
 
-В implementation repo зафиксированы собственные README, `.gitignore` и `docs/BASELINE_STATUS.md`. Первый baseline сохранён без продуктового переосмысления и без деплоя.
+Baseline frontend: Vite + React + TypeScript, импортирован из Figma Make и сохранён без production deployment.
 
-Deployment status: **не настроен / не выполнялся**.
+Deployment status: **не выполнялся**. Deploy остаётся отдельным явным решением.
 
-Этот файл остаётся клубной точкой связи и не должен превращаться в репозиторий реализации.
+## Подтверждено
 
-## Рабочая классификация в Dementor Club
+- каноническое имя: **Fermentation**;
+- продукт сочетает food + controlled process + live experience;
+- Fermentation package включает live-доступ;
+- live-only и ready-product являются отдельными допустимыми входами;
+- Starter / Personal / Experience — рабочая package architecture, но не утверждённая экономика;
+- кастомизация является core proposition;
+- клиент должен иметь возможность видеть собственную ферментацию;
+- bubbles / gas activity / macro-visible process являются частью intended experience;
+- pH, temperature, salt, curve/history входят в intended transparency при наличии реальных данных;
+- запись процесса является частью направления;
+- первый физический pilot может быть одной ферментацией с одной камерой;
+- ~5 L cell — рабочее предположение для проектирования, не финальная спецификация;
+- 360 / multi-cell — более поздний эксперимент;
+- manual degassing не утверждён как обязательный или полезный технологический шаг;
+- текущий сайт предназначен прежде всего для проверки спроса, а не для production commerce.
 
-Основная сфера: **Потребление**  
-Дополнительная связь: **Технологии**
+## Не утверждено
 
-Рабочие теги:
-
-- `#ферментация`
-- `#прозрачность`
-- `#foodtech`
-- `#контролькачества`
-- `#локальноепроизводство`
-
-Классификация рабочая и может быть уточнена редакционно до публичного запуска.
-
-## Что сейчас считаем подтверждённым
-
-- предмет исследования — ферментация капусты;
-- проект рассматривает live-наблюдение за процессом как часть продукта;
-- предполагается контролируемый производственный процесс;
-- рассматривается локальная модель запуска в Варшаве;
-- в продуктовой модели присутствует путь от выбора параметров до получения готового продукта;
-- существует React/Vite UI-прототип и отдельный implementation repository;
-- проект пока внутренний и не должен подаваться как запущенный сервис;
-- публичный deployment отсутствует.
-
-## Что НЕ фиксируем как утверждённый факт
-
-Следующие пункты встречаются в исследованиях, но пока остаются гипотезами или требуют сверки:
-
-- цены и тарифы;
-- точная длительность ферментационного цикла;
-- количество ячеек/стоек и производственная экономика;
-- финальная камера и streaming-архитектура;
-- окончательное продуктовое/брендовое название (`CULTURA`, `Kvas`, `Kvas.Tech` или другое);
-- формулировка «ферментация как сервис» в юридическом смысле;
-- конкретные food-safety и legal claims без отдельной проверки первоисточников и применимости к фактической модели производства.
-
-В исследовательских материалах есть разные допущения по длительности цикла и экономике. Они не должны переноситься на сайт или в коммерческие материалы без отдельного решения.
-
-Inherited prototype docs также могут содержать оценки, метрики и формулировки уровня `production ready`. Они являются частью полученного прототипа, а не автоматически утверждёнными фактами Dementor Club.
+- цены, скидки и unit economics;
+- точные веса пакетов;
+- длительность цикла и release criteria;
+- финальная ёмкость/ячейка;
+- число ячеек/стоек;
+- camera/streaming/sensor architecture;
+- storage model записи;
+- payment/auth/fulfillment architecture;
+- food-safety, probiotic, medical или regulatory claims без отдельной проверки и approval;
+- причинные claims о влиянии фаз Луны;
+- обязательная ручная дегазация.
 
 ## Boundary
 
-`dementor-club` хранит смысл проекта, статус, связи с клубом и утверждённые решения.
+`degradation_club@dementor-club/projects/fermentation` = PRODUCT / semantic authority проекта и его связь с Dementor Club.
 
-`SLADZARI/dementor-fermentation` хранит:
+`SLADZARI/dementor-fermentation` = implementation authority.
 
-- приложение и frontend;
-- техническую архитектуру;
-- конфигурацию;
-- тесты;
-- implementation docs;
-- release history.
+WeeklyOS = operating projection: Project / current Result / Gate / branch / evidence. WeeklyOS не копирует PRODUCT.
 
-Официальный сайт Dementor Club может ссылаться на проект только после появления утверждённого публичного описания.
+Google Drive = RESEARCH / REFERENCE / source material, если конкретный артефакт не промотирован отдельно.
 
-## Следующий gate
+## Gate state
 
-1. Прогнать локальный install/build/smoke-test implementation repository и зафиксировать найденные технические проблемы.
-2. Сверить и разрешить противоречивые исследовательские параметры: длительность цикла, экономика, оборудование и streaming-архитектура.
-3. Отдельно утвердить публичное продуктовое/брендовое название.
-4. До production-use перенести внешние Cloudinary/Unsplash assets под контролируемое проектом владение или зафиксировать допустимую asset policy.
-5. После утверждённой публичной продуктовой спецификации подготовить связь с официальным сайтом клуба. Deploy — отдельное явное решение.
+- `G1_PRODUCT_LOCK`: **PASSED** через `fermentation.product.core v1.0`.
+- `G2_DOMAIN_LOCK`: **OPEN / next semantic gate**.
+- ARCHITECTURE и DESIGN не считаются APPROVED по факту существования Figma/React-прототипа.
+- ближайший implementation Result: demand-validation landing cleanup.
