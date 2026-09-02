@@ -17,15 +17,22 @@ const accountSync=read('dementor-account-sync-v9.js');
 const sphereCompat=read('join/dc9-sphere-compat-v1.js');
 const resultIndex=read('join/result/index.html');
 const memberIndex=read('join/member/index.html');
-const memberRuntime=read('join/member/member.js');
+const applyIndex=read('join/apply/index.html');
 const workspaceMembership=read('workspace-membership-link-v1.js');
+const workspaceIndex=read('workspace/index.html');
+const reviewIndex=read('workspace/review/index.html');
+const artifactsIndex=read('workspace/artifacts/index.html');
 const boardRuntime=read('community/board/board.js');
 const boardIndex=read('community/board/index.html');
 const boardQaCss=read('community/board/board-qa-fix-v1.css');
 const artifactHardening=read('supabase/migrations/20260830095500_community_artifact_qa_hardening.sql');
 
 requireSyntax('community/board/board.js');
-requireSyntax('join/member/member.js');
+requireSyntax('join/apply/apply-member-state-v2.js');
+requireSyntax('workspace-membership-link-v1.js');
+requireSyntax('workspace/review/review-access-router-v2.js');
+requireSyntax('workspace/review/review-decision-lock-v2.js');
+requireSyntax('workspace/artifacts/artifacts.js');
 
 forbid(join,/observe\(grid,\{[^}]*subtree\s*:\s*true/i,'Join grid observer');
 forbid(join,/observe\(host,\{[^}]*subtree\s*:\s*true/i,'Join question observer');
@@ -46,24 +53,31 @@ requireText(accountSync,"sphere_id:canonical",'Canonical assessment run write');
 requireText(accountSync,"state_json:canonical",'Canonical assessment snapshot write');
 requireText(sphereCompat,"const CANONICAL='self_development'",'Community sphere compatibility');
 requireText(resultIndex,'/join/dc9-sphere-compat-v1.js','Result compatibility preboot');
-requireText(memberIndex,'/join/dc9-sphere-compat-v1.js','Membership compatibility preboot');
 
-forbid(workspaceMembership,/\/join\/apply\//,'Deprecated workspace membership route');
+requireText(memberIndex,"location.replace('/join/apply/')",'Retired Membership v1 compatibility redirect');
+forbid(memberIndex,/dc_activate_membership_v1|member\.js\?v=/,'Retired Membership v1 runtime');
+requireText(applyIndex,'/join/apply/apply.js','Membership v2 application runtime');
+requireText(applyIndex,'/join/apply/apply-member-state-v2.js','Active Member application state');
+requireText(siteConfig,"membershipProvider:'membership-review-v2'",'Membership v2 provider');
+requireText(siteConfig,"membershipUrl:'/join/apply/'",'Membership v2 URL');
+
+requireText(workspaceMembership,"destination=base+'/join/apply/'",'Workspace Membership v2 route');
+forbid(workspaceMembership,/активирует membership автоматически|\/join\/result\//,'Legacy Workspace Membership v1 semantics');
 forbid(workspaceMembership,/observe\(document\.body,\{[^}]*subtree\s*:\s*true/i,'Workspace membership body observer');
-requireText(workspaceMembership,"destination=base+'/join/result/'",'Workspace canonical membership route');
 requireText(workspaceMembership,"observe(root,{childList:true})",'Workspace direct-child observer');
-requireText(siteConfig,'workspace-membership-link-v1.js?v=20260830-02','Workspace membership cache bust');
+requireText(siteConfig,'workspace-membership-link-v1.js?v=20260902-01','Workspace Membership v2 cache bust');
+requireText(workspaceIndex,'COMMUNITY BOARD','Workspace Board navigation');
+requireText(workspaceIndex,'MY ARTIFACTS','Workspace Artifact history navigation');
+requireText(workspaceIndex,'data-global-logout','Workspace explicit logout');
+requireText(reviewIndex,'review-access-router-v2.js','Review role access router');
+requireText(reviewIndex,'review-decision-lock-v2.js','Review final decision state');
+requireText(artifactsIndex,'MY ARTIFACTS','Member Artifact history route');
 
 requireText(auth,'window.DEMENTOR_AUTH_USER','Required auth identity');
 requireText(auth,"'dc-auth-ready'",'Required auth ready event');
 requireText(valentinIndex,'/course-account-identity-v1.js','Valentin account identity bridge');
 requireText(accountIdentity,'input.readOnly=true','Valentin account email readonly');
 requireText(accountIdentity,'DEMENTOR_AUTH_USER','Valentin Google account source');
-
-requireText(memberRuntime,'function inferProvider(contact)','Community provider inference');
-requireText(memberRuntime,'function normalizeContactUrl(value)','Community contact URL normalization');
-requireText(memberRuntime,'providerSelect.value=inferred','Community provider auto-selection');
-requireText(memberIndex,'member.js?v=20260830-02','Community member cache bust');
 
 requireText(boardRuntime,"const maxFileSize=4*1024*1024",'Community 4 MiB media limit');
 requireText(boardRuntime,"new Set(['image/jpeg','image/png','image/webp'])",'Community image-only media surface');

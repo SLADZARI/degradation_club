@@ -14,7 +14,8 @@ if(cfg?.enabled&&nav){
       button.dataset.reviewNav='1';
       button.textContent='MEMBERSHIP REVIEW';
       button.addEventListener('click',()=>{location.href='./review/'});
-      nav.appendChild(button);
+      const logout=nav.querySelector('[data-global-logout]');
+      if(logout)nav.insertBefore(button,logout);else nav.appendChild(button);
     }
   }
 }
