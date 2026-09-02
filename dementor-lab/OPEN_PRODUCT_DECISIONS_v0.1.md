@@ -1,11 +1,32 @@
 # DEMENTOR LAB — Open Product Decisions v0.1
 
-**Status:** OPEN / do not invent in implementation  
+**Status:** OPEN / reduced after 2026-09-02 decisions  
 **Date:** 2026-09-02  
 **Implementation branch:** `agent/dementor-lab-vertical-slice-v0.3`  
-**Purpose:** isolate questions that cannot be safely resolved as engineering bugs. After approval, update the `dementor-club` source-of-truth first, then implementation.
+**Purpose:** isolate questions that cannot be safely resolved as engineering bugs. Approved decisions live first in `dementor-club`.
 
-## P0 — decisions blocking semantic closure
+Canonical follow-up:
+- `projects/dementor-lab/DEMENTOR_LAB_RUNTIME_SEMANTIC_DECISIONS_V0.1.md` on `dementor-club`.
+- `projects/dementor-lab/DEMENTOR_LAB_REACTION_EVENT_TRIGGER_MATRIX_V0.1.md` on `dementor-club` (proposal until approved).
+
+## CLOSED / approved direction
+
+### BRAIN interaction — CLOSED
+Production mobile BRAIN is the new vertical stack / metro-style editor. Free-canvas pan/pinch contract is superseded for the slice.
+
+### SETUP interaction — CLOSED
+SETUP remains a separate mobile-first screen between BRAIN and TALK.
+
+### HOT PATCH ownership — CLOSED
+Player may patch only own Character A. Generated opponent B is not editable in the first slice.
+
+### REPEAT direction — CLOSED DIRECTION / matrix details pending
+REPEAT becomes a real conditional mechanic. It must use deterministic acceptance/rejection events and may not remain only a metric multiplier. Exact event table is part of the Reaction → Event → Trigger proposal.
+
+### Dialogue depth — CLOSED
+Use 5–8 authored base phrases per active Reaction plus a small number of contextual replacements at meaningful/extreme states. Phrase selection is deterministic; no random choice and no LLM requirement. Dialogue reads gameplay context but never changes gameplay state.
+
+## P0 — decisions still blocking semantic closure
 
 ### 1. What is a CONTACT objective win?
 
@@ -15,130 +36,84 @@ Current facts:
 - Turn limit is 20.
 - Product architecture contains `OBJECTIVE_COMPLETE`, but implementation has no CONTACT success rule.
 
-Decision needed:
-- Does the player win simply by reaching turn 20 with CONTACT > 0?
-- Is there a minimum success threshold, e.g. CONTACT >= N?
-- Whose CONTACT matters: player A, opponent B, minimum of both, or a future shared relationship metric?
+Current game-design proposal:
+- derive `RELATIONSHIP_CONTACT = min(A.contact, B.contact)`;
+- objective completes at turn limit if neither Character broke down and relationship contact is `>=25`;
+- `1..24` means contact technically exists but objective failed;
+- `0` remains CONTACT breakdown.
 
-Do not tune CONTACT balance until this is defined.
+The value 25 is proposed because the renderer already treats `CONTACT <=25` as a visibly closed/tense state. Needs approval/playtest tuning, not silent implementation.
 
-### 2. How does one graph emit the next graph's Trigger?
+### 2. Reaction → Event → next Trigger matrix
 
-Current facts:
-- Both actors have real BehaviorGraphs.
-- Architecture says each turn receives a Trigger from the scenario **or previous reaction**.
-- Current implementation sends `CRITICISM` again every turn.
+Current implementation still sends `CRITICISM` again every turn.
 
-Decision needed:
-- Define first-slice reaction/event → next-trigger mapping.
-- Example questions, not decisions: can `PRESSURE` emit `CRITICISM` or `INTERRUPTION`; can `SILENT` emit `IGNORE`; does `AGREE` end/de-escalate the exchange?
+Current proposal introduces:
 
-Without this, two graphs take turns but do not yet fully collide causally.
+`REACTION → WORLD EVENT → RECEIVER TRIGGER`
 
-### 3. What does REPEAT actually wait for?
+Proposed first rows:
+- EXPLAIN → COUNTERPOINT → PUSHBACK;
+- AGREE → ACCEPTANCE → ACCEPTANCE;
+- JOKE → DEFLECTION → DEFLECTION;
+- SILENT → NO_RESPONSE → IGNORE;
+- PRESSURE → PRESSURE → PRESSURE.
 
-Current facts:
-- `count` changes metric cost and loop count.
-- UI copy says the reaction repeats if the answer is not accepted.
-- Runtime has no `accepted / rejected` event.
+Only `AGREE → ACCEPTANCE` cancels pending REPEAT in v0.1 proposal.
 
-Decision needed:
-- Keep REPEAT as unconditional repeat count and make copy literal; or
-- add a deterministic acceptance signal and make REPEAT conditional.
+Needs approval before runtime migration because it adds first-slice Trigger semantics and changes both actor graphs.
 
-### 4. What happens when all conditional paths are closed?
+### 3. Exact REPEAT execution contract
 
-Example: the only reaction is behind `BRAIN > 70`, but current BRAIN is 30.
+Direction is approved; exact execution still needs approval with the matrix.
 
-Current implementation correctly refuses the path, but then has no executable reaction.
+Proposal:
+- `×N` means maximum total attempts including the first;
+- runtime stores pending repeat after the first Reaction;
+- the other Character takes a normal graph turn;
+- ACCEPTANCE cancels pending repeat;
+- otherwise the original Character repeats the stored Reaction on its next activation before normal Trigger traversal;
+- incoming event is still recorded even when REPEAT takes precedence.
 
-Decision needed:
-- lost turn / no action;
-- implicit SILENT;
-- implicit STOP;
-- dedicated `NO_ACTION` outcome;
-- or graph validation rule requiring an unconditional fallback path.
+### 4. Closed condition (`BRAIN >`) fallback
 
-This must be a game rule, not an exception handler disguised as gameplay.
+Proposal uses two layers:
 
-### 5. Whose brain may HOT PATCH edit?
+1. Authoring validation requires an unconditional fallback reaction route for any reachable conditional split.
+2. Runtime safety for malformed/legacy content records `NO_ACTION / CONDITION_BLOCKED`, consumes the turn with no hidden metric effects and emits `NO_RESPONSE`; it does not secretly insert SILENT.
 
-Current breakpoint belongs to the causal chain that predicts failure. That chain can belong to A or B.
+Needs approval because this is a visible game rule.
 
-Decision needed:
-- player may patch only own Character A;
-- player may patch whichever actor caused the breakpoint;
-- opponent breakpoints are visible but not editable;
-- another explicit rule.
+## P1 — objective/content decision
 
-Do not silently let the player rewrite the opponent unless that is intended gameplay.
-
-## P1 — source-of-truth conflicts / scope decisions
-
-### 6. BRAIN interaction contract: free canvas or vertical stack?
-
-Approved v0.3 still specifies free canvas, pan, pinch zoom and ports.
-Current implementation and physical-phone design work have moved to a vertical stack with drag/reorder plus bracket-like extra connections.
-
-Decision needed:
-- confirm vertical stack as the new production contract and supersede free-canvas interaction in `dementor-club`; or
-- explicitly retain free canvas and treat stack as temporary prototype.
-
-Implementation should not oscillate between the two.
-
-### 7. SETUP: separate screen or overlay over TALK?
-
-Approved v0.3 says Setup is a transient overlay/bottom sheet over TALK.
-Current implementation uses a separate SETUP screen.
-
-Decision needed:
-- accept separate SETUP as new contract; or
-- return to overlay after BRAIN.
-
-### 8. Which second objective is required for the vertical slice?
-
-Approved v0.3 requires at least two objective contracts and lists:
-- SURVIVE / ВЫДЕРЖАТЬ 20 РАУНДОВ
-- BURNOUT / СЖЕЧЬ МОЗГ
-- CONTACT / СОХРАНИТЬ КОНТАКТ
+### 5. Which second objective is required for the vertical slice?
 
 Current implementation only uses CONTACT.
 
-Decision needed: choose the second first-slice objective. Prefer the one that best tests the same runtime without adding a new influence system.
+Existing architecture mentions:
+- SURVIVE / ВЫДЕРЖАТЬ 20 РАУНДОВ;
+- BURNOUT / СЖЕЧЬ МОЗГ;
+- CONTACT / СОХРАНИТЬ КОНТАКТ.
 
-### 9. How deep should deterministic dialogue react to state in this slice?
-
-Architecture says phrase rendering can use reaction, impulse, scenario, BRAIN, TENSION, CONTACT, memory and recent transcript.
-Current phrase bank effectively uses reaction + turn.
-
-Decision needed:
-- minimum slice: contextual variants only at meaningful thresholds;
-- or richer deterministic phrase rules now.
-
-Graph causality must remain independent of dialogue text.
+Do not implement a second objective until the common collision/event system is stable. New objective concepts may reuse the same metrics/runtime with different terminal/success rules; avoid adding a new combat system just to create variety.
 
 ## P2 — intentionally deferred unless exposed
 
 These are model capabilities, not current UI promises:
 - discoveries/history;
 - negative/decreasing memory controls;
-- broader triggers such as QUESTION / INTERRUPTION;
 - broader reactions such as LEAVE / ASK / ARGUE;
 - broader abilities such as ADMIT ERROR / CHANGE MIND / REFRAME;
-- appearance color controls.
+- appearance color controls;
+- user-created opponent B.
 
 They should remain dormant until the first loop is semantically closed.
 
-## Suggested decision order
+## Next decision order
 
-1. Confirm **vertical stack BRAIN** or restore free canvas.
-2. Define **CONTACT success**.
-3. Define **reaction → next Trigger**.
-4. Define **REPEAT acceptance semantics**.
-5. Define **closed-condition fallback**.
-6. Define **HOT PATCH ownership**.
-7. Choose **second objective**.
-8. Resolve **SETUP screen vs overlay**.
-9. Choose dialogue-context depth.
-
-Once 1–6 are decided, runtime balance can be meaningfully tuned instead of adjusted against an incomplete game contract.
+1. Approve/modify Reaction → Event → Trigger matrix.
+2. Approve REPEAT acceptance/execution details derived from that matrix.
+3. Approve CONTACT relationship rule/threshold.
+4. Approve conditional fallback rule.
+5. Implement collision runtime + rebalance.
+6. Only then choose/design second objective.
