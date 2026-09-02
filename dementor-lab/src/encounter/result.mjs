@@ -1,30 +1,51 @@
+import { NODE_SPECS } from '../core/model.mjs';
+import { familyOf } from '../core/graph.mjs';
+
 function lastTraceFor(encounter,side){return [...encounter.traces].reverse().find(t=>t.actorId===side)||null}
-function nodeType(actor,id){return actor.brainGraph.nodes.find(n=>n.id===id)?.type||id}
-function repeatCount(actor,trace){const id=trace?.visitedNodes.find(n=>nodeType(actor,n)==='repeat');return id?actor.brainGraph.nodes.find(n=>n.id===id)?.p?.count||1:1}
+function nodeFor(actor,id){return actor.brainGraph.nodes.find(n=>n.id===id)||null}
+function nodeType(actor,id){return nodeFor(actor,id)?.type||id}
+function nodeLabel(actor,id){
+  const node=nodeFor(actor,id);if(!node)return String(id).toUpperCase();
+  const base=NODE_SPECS[node.type]?.title||node.type;
+  if(familyOf(node)==='IMPULSE')return `${base} W${node.p?.weight||1}`;
+  if(node.type==='repeat')return `${base} ×${node.p?.count||1}`;
+  if(familyOf(node)==='STATE')return `${base} +${node.p?.delta??1}`;
+  if(node.type==='ifbrain')return `${base} >${node.p?.threshold??70}`;
+  return base;
+}
+function suspiciousNode(actor,trace){
+  if(!trace)return null;
+  return trace.visitedNodes.find(id=>nodeType(actor,id)==='repeat')
+    ||trace.visitedNodes.find(id=>familyOf(nodeFor(actor,id))==='IMPULSE')
+    ||trace.visitedNodes.at(-1)
+    ||null;
+}
 
 export function buildResult(encounter){
   const terminal=encounter.result||{type:'IN_PROGRESS',reason:null,turn:encounter.turn};
   const loser=terminal.loser||null;
-  const actor=loser?encounter.actors[loser]:encounter.actors.A;
-  const trace=lastTraceFor(encounter,loser||'A');
-  const reaction=trace?.selectedReaction||'reaction';
-  const impulse=trace?.selectedImpulse||'impulse';
-  const repeat=repeatCount(actor,trace);
+  const loserActor=loser?encounter.actors[loser]:null;
+  // RESULT may describe either actor's collapse, but the editable diagnosis must always
+  // point to the player's graph because counterfactual replay edits actor A only.
+  const actor=encounter.actors.A;
+  const trace=lastTraceFor(encounter,'A');
   const patch=encounter.patches.at(-1)||null;
 
   let punchline='ЭКСПЕРИМЕНТ ЗАКОНЧИЛСЯ.';
-  if(terminal.type==='BREAKDOWN')punchline=`${actor.name.toUpperCase()} НЕ ВЫВЕЗ.`;
+  if(terminal.type==='BREAKDOWN')punchline=`${(loserActor?.name||actor.name).toUpperCase()} НЕ ВЫВЕЗ.`;
   if(terminal.type==='TURN_LIMIT')punchline='ДВАДЦАТЬ РАУНДОВ. НИКТО НЕ УШЁЛ.';
 
-  const cause=trace?`${reaction.toUpperCase()} → ${impulse.toUpperCase()}${repeat>1?` → REPEAT ×${repeat}`:''}`:'ПРИЧИНА НЕ ЗАФИКСИРОВАНА';
+  const cause=trace?.visitedNodes?.length
+    ?trace.visitedNodes.map(id=>nodeLabel(actor,id).toUpperCase()).join(' → ')
+    :'ПРИЧИНА НЕ ЗАФИКСИРОВАНА';
   const memory=(trace?.memoryChanges||[]).map(m=>`${String(m.key).toUpperCase()} ${m.before}→${m.after}`);
-  const suspicious=trace?.visitedNodes.find(id=>nodeType(actor,id)==='repeat')||trace?.visitedNodes.find(id=>nodeType(actor,id)===impulse)||null;
+  const suspicious=suspiciousNode(actor,trace);
 
   return {
     terminal,
     punchline,
-    stageB:{title:'ЧТО ПРОИЗОШЛО',cause,memory,turn:trace?.turn||encounter.turn},
-    stageC:{title:'ПОДОЗРИТЕЛЬНОЕ МЕСТО',nodeId:suspicious,nodeType:suspicious?nodeType(actor,suspicious):null,patch,nextAction:'ИЗМЕНИТЬ ОДНУ ВЕЩЬ'},
+    stageB:{title:'ЧТО ПРОИЗОШЛО',cause,memory,turn:trace?.turn||encounter.turn,actorId:'A'},
+    stageC:{title:'ПОДОЗРИТЕЛЬНОЕ МЕСТО',actorId:'A',nodeId:suspicious,nodeType:suspicious?nodeType(actor,suspicious):null,patch,nextAction:'ИЗМЕНИТЬ ОДНУ ВЕЩЬ'},
     trace
   };
 }
