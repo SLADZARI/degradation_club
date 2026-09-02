@@ -1,5 +1,5 @@
 window.DEMENTOR_SITE_CONFIG=Object.freeze({
-  version:'2026-08-30.06',
+  version:'2026-09-02.01',
   canonicalOrigin:'https://dementor.club',
   supabase:{
     enabled:true,
@@ -12,7 +12,7 @@ window.DEMENTOR_SITE_CONFIG=Object.freeze({
   donate:{enabled:false,provider:null,checkoutUrl:null,currency:null,recurring:false},
   merch:{catalogEnabled:true,cartEnabled:false,cartStorageKey:'dementorClubCartV1',checkoutEnabled:false,checkoutProvider:null,checkoutUrl:null,preorderPaymentMethod:null,runtimeSource:'supabase'},
   events:{registrationEnabled:false,registrationProvider:null,registrationUrl:null},
-  community:{membershipEnabled:true,membershipProvider:'dc_member_entry_v1',membershipUrl:'/join/member/',boardUrl:'/community/board/',artifactMediaBucket:'dc-community-artifacts'},
+  community:{membershipEnabled:true,membershipProvider:'membership-review-v2',membershipUrl:'/join/apply/',boardUrl:'/community/board/',artifactMediaBucket:'dc-community-artifacts'},
   onboarding:{storageKey:'dementorClubOnboardingV3',storage:'localStorage',accountSync:true,authRequired:false,progressMap:true},
   internalTools:{enabled:false,holdMs:1200,path:'/design-system/admin/'}
 });
@@ -34,7 +34,7 @@ if(typeof document!=='undefined'){
     if(interactiveAuthRequired)addScript('/required-auth-v1.js',{module:true});
     if(path.includes('/courses/dumai-s-opasnostyu/')||path.includes('/courses/dengi-na-veter/'))addScript('/program-account-sync-v1.js',{module:true});
     if(path.includes('/merch/')||path.includes('/objects/'))addScript('/merch-runtime-v1.js',{module:true});
-    if(path.includes('/workspace')){addScript('/workspace-membership-link-v1.js?v=20260830-02');addScript('/workspace-owner-admin-tools-v1.js',{module:true});}
+    if(path.includes('/workspace')){addScript('/workspace-membership-link-v1.js?v=20260902-01');addScript('/workspace-owner-admin-tools-v1.js',{module:true});}
     if(isJoinAssessment){
       addScript('/dementor-account-sync-v9.js?v=20260830-01');
       addScript('/join-data-copy-v1.js?v=20260828-18');
