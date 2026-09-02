@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { createEncounter, predictTurn, executeActorTurn, applyHotPatch } from '../src/encounter/runtime.mjs';
+import { createEncounter, predictTurn, executeActorTurn, applyHotPatch, detectBreakpoint } from '../src/encounter/runtime.mjs';
 import { buildResult } from '../src/encounter/result.mjs';
 import { CRITICISM_IDEA_SCENARIO, createCriticismActors } from '../src/scenarios/criticism-idea.mjs';
 
@@ -36,6 +36,18 @@ const conditionGraph={id:'condition-semantics',nodes:[
 ],edges:[edge('a','t','direct'),edge('b','t','if'),edge('c','if','state'),edge('d','state','pressure')]};
 assert.equal(predictTurn(encounterWithGraph(conditionGraph,{brain:20,memory:{resentment:5}})).chosen.reaction,'explain','closed condition path must be unavailable');
 assert.equal(predictTurn(encounterWithGraph(conditionGraph,{brain:90,memory:{resentment:5}})).chosen.reaction,'pressure','open condition path may win normally');
+
+// CONTACT_RISK belongs to the causal chain that creates the risk, even when the target loses contact.
+const contactRiskEncounter=encounterWithGraph({id:'contact-risk',nodes:[
+  {id:'t',type:'criticism',p:{}},{id:'i',type:'beright',p:{weight:5}},{id:'r',type:'pressure',p:{}},{id:'x',type:'repeat',p:{count:4}}
+],edges:[edge('c1','t','i'),edge('c2','i','r'),edge('c3','r','x')]});
+contactRiskEncounter.actors.B.state.contact=18;
+const contactPrediction=predictTurn(contactRiskEncounter);
+const contactBreakpoint=detectBreakpoint(contactRiskEncounter,contactPrediction);
+assert.equal(contactBreakpoint?.type,'CONTACT_RISK');
+assert.equal(contactBreakpoint?.actorId,'A','the active causal chain remains the patch owner candidate');
+assert.equal(contactBreakpoint?.riskSide,'B','breakpoint records which side is actually at contact risk');
+assert.ok(contactBreakpoint.predictedContact<=8);
 
 // Insert PAUSE is a real hot patch and preserves encounter state.
 const patchEncounter=encounterWithGraph({id:'patch',nodes:[
