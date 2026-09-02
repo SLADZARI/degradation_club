@@ -4,8 +4,8 @@ import { opponentPreset } from '../opponent/presets.mjs';
 export const CRITICISM_IDEA_SCENARIO=Object.freeze({
   id:'criticism-idea',
   title:'КРИТИКА ИДЕИ',
-  premise:'Собеседник считает идею Гены плохой.',
-  topic:'Собеседник считает идею Гены плохой.',
+  premise:'Собеседник считает вашу идею плохой.',
+  topic:'Собеседник считает вашу идею плохой.',
   objective:'contact',
   objectiveLabel:'СОХРАНИТЬ КОНТАКТ',
   openingTrigger:'criticism',
@@ -32,7 +32,8 @@ export const PLAYER_GRAPH=Object.freeze({
 const DEFAULT_OPPONENT=opponentPreset('CONTACT_SKEPTIC');
 export const MARTA_GRAPH=DEFAULT_OPPONENT.graph;
 
-export function createCriticismActors({opponentProfile=null}={}){
+export function createCriticismActors({opponentProfile=null,playerName='Гена'}={}){
+  const safePlayerName=String(playerName||'').trim()||'Гена';
   const profile=opponentProfile||{
     name:'Марта',
     baseCharacterId:'character-02',
@@ -43,7 +44,7 @@ export function createCriticismActors({opponentProfile=null}={}){
     initialState:{...DEFAULT_OPPONENT.initialState,memory:{}}
   };
   return {
-    A:createCharacter({id:'A',name:'Геннадий Львович',graph:PLAYER_GRAPH,state:{energy:72,brain:15,tension:10,contact:60,memory:{}}}),
+    A:createCharacter({id:'A',name:safePlayerName,graph:PLAYER_GRAPH,state:{energy:72,brain:15,tension:10,contact:60,memory:{}}}),
     B:createCharacter({
       id:'B',
       name:profile.name,
