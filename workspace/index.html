@@ -34,12 +34,12 @@
   </div>
   <script src="./workspace-listener-guard-v1.js"></script>
   <script type="module" src="./workspace.js"></script>
+  <script type="module" src="./workspace-membership-v2-fix.js"></script>
   <script type="module" src="./workspace-enhancements-v1.js"></script>
   <script type="module" src="./workspace-review-nav-v2.js"></script>
   <script type="module">
     import {createClient} from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.4/+esm';
-    const button=document.querySelector('[data-global-logout]');
-    const cfg=window.DEMENTOR_SITE_CONFIG?.supabase;
+    const button=document.querySelector('[data-global-logout]');const cfg=window.DEMENTOR_SITE_CONFIG?.supabase;
     if(button&&cfg?.enabled){button.addEventListener('click',async()=>{button.disabled=true;const client=window.DEMENTOR_SUPABASE_CLIENT||createClient(cfg.url,cfg.publishableKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false,flowType:'pkce'}});await client.auth.signOut();location.href='../';});}
   </script>
 </body>
