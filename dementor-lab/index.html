@@ -14,18 +14,20 @@
   <div class="hero-copy"><p class="kicker">PERSON</p><h1>СОБЕРИ ХАРАКТЕР.</h1><p>Внешность ничего не обещает. Мозг соберём отдельно.</p></div>
   <div class="segmented character-switch" aria-label="Выбор тела персонажа"><button data-character="character-01" class="active">ПЕРСОНАЖ 01</button><button data-character="character-02">ПЕРСОНАЖ 02</button></div>
   <div class="person-stage"><div class="character-slot big" id="person-preview" aria-label="Собранный Дементор"></div></div>
-  <div class="appearance-panel" aria-label="Категории внешности">
-    <button data-part="hat" class="active">ГОЛОВА</button><button data-part="glasses" class="active">ОЧКИ</button><button data-part="beard" class="active">УСЫ</button><button data-part="accessory" class="active">АКСЕССУАР</button><button data-part="outfit" class="active">ОДЕЖДА</button><button data-part="shoes" class="active">ОБУВЬ</button>
-  </div>
+  <div class="appearance-panel" aria-label="Категории внешности"><button data-part="hat" class="active">ГОЛОВА</button><button data-part="glasses" class="active">ОЧКИ</button><button data-part="beard" class="active">УСЫ</button><button data-part="accessory" class="active">АКСЕССУАР</button><button data-part="outfit" class="active">ОДЕЖДА</button><button data-part="shoes" class="active">ОБУВЬ</button></div>
   <div id="variant-options" class="variant-options" hidden aria-label="Варианты выбранной категории"></div>
   <div class="appearance-ownership"><span>ОБЩИЕ: ГОЛОВА · ОЧКИ · УСЫ · АКСЕССУАР</span><span>СВОИ: ОДЕЖДА · ОБУВЬ · СКЕЛЕТ</span></div>
   <button class="secondary-reset" id="appearance-reset">СБРОСИТЬ ОБВЕС</button><button class="primary" id="to-brain">СОБРАТЬ ЕМУ МОЗГ →</button>
 </section>
 <section class="screen brain-screen" data-view="brain" hidden>
-  <div class="section-head"><p class="kicker">BRAIN</p><h2 id="brain-title">КАК ОН ДО ЭТОГО ДОХОДИТ?</h2><p class="brain-intro">СВЯЗИ — РЕАЛЬНЫЕ ПЕРЕХОДЫ. ЖЁЛТЫЕ УЗЛЫ МОЖНО МЕНЯТЬ.</p></div>
+  <div class="section-head"><p class="kicker">BRAIN</p><h2 id="brain-title">СОБЕРИ ЕМУ ПРИЧИНУ.</h2><p class="brain-intro">НАЧНИ С ГОТОВОЙ КАТАСТРОФЫ ИЛИ СОБЕРИ СВОЮ.</p></div>
   <div id="replay-note" class="replay-note" hidden>ТОТ ЖЕ ЭКСПЕРИМЕНТ. ИЗМЕНИ ОДНУ ПРИЧИНУ.</div>
-  <div id="brain-graph" class="brain-graph" aria-label="Граф поведения"></div>
-  <div id="brain-editor" class="brain-editor-note" aria-live="polite">НАЖМИ НА ЖЁЛТЫЙ УЗЕЛ, ЧТОБЫ ИЗМЕНИТЬ ЕГО.</div>
+  <div id="brain-presets" class="brain-presets" aria-label="Поведенческие пресеты"></div>
+  <div class="brain-toolbar"><button type="button" id="brain-add-node">+ УЗЕЛ</button><span>ПЕРЕТАСКИВАЙ · СОЕДИНЯЙ · ВЕТВИ</span></div>
+  <div id="brain-validation" class="brain-validation" aria-live="polite"></div>
+  <div id="brain-graph" class="brain-graph brain-constructor" aria-label="Конструктор графа поведения"></div>
+  <div id="brain-inspector" class="brain-inspector" hidden></div>
+  <div id="brain-editor" class="brain-editor-note" aria-live="polite"></div>
   <button class="primary" id="to-setup">ОБ ЛЮДЕЙ ПРОВЕРИМ →</button>
 </section>
 <section class="screen" data-view="setup" hidden><div class="sheet-card"><p class="kicker">СИТУАЦИЯ</p><h2>КРИТИКА ИДЕИ</h2><p class="lead">Собеседник считает идею Гены плохой.</p><dl><div><dt>ЦЕЛЬ</dt><dd>СОХРАНИТЬ КОНТАКТ</dd></div><div><dt>КОНЕЦ</dt><dd>20 РАУНДОВ ИЛИ РАЗВАЛ</dd></div></dl><div id="opponent-card" class="opponent-card"><div class="opponent-head"><span class="kicker">СОПЕРНИК</span><small id="opponent-seed"></small></div><strong id="opponent-name">—</strong><b id="opponent-preset">—</b><p id="opponent-description">—</p><button id="reroll-opponent" class="secondary-reset">ДРУГОГО →</button></div><div class="segmented"><button data-mode="auto" class="active">AUTO</button><button data-mode="step">STEP</button></div><button class="primary" id="play">PLAY →</button></div></section>
