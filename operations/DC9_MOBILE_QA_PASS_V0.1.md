@@ -1,12 +1,12 @@
 # DC-9 Mobile QA Pass v0.1
 
-Status: **QA EVIDENCE / CHILD RECORD OF `DC9_ENTRY_STATE_ROUTING_AND_QA_V0.1.md`**  
+Status: **QA EVIDENCE / MOBILE QUESTION BASELINE HUMAN-ACCEPTED / RESULT QA NEXT**  
 Date: 2026-09-02  
 Production authorization: **NO**
 
 ## Purpose
 
-This file records the mobile-specific QA findings discovered after human review of the DC-9 entry-state QA screens. The canonical decision master remains:
+This file records the mobile-specific QA findings and human decisions after review of the DC-9 entry-state and mobile-only prototypes. The canonical decision master remains:
 
 `operations/DC9_ENTRY_STATE_ROUTING_AND_QA_V0.1.md`
 
@@ -14,34 +14,24 @@ This is evidence and implementation guidance, not a competing source-of-truth.
 
 ## Human review status
 
-The desktop entry-state/copy direction was reviewed and accepted as the working direction.
+Desktop entry-state/copy direction: **accepted as working direction**.
 
-Mobile remains **NOT READY FOR PRODUCTION**.
+Mobile entry/question direction: **human-reviewed and accepted as the working baseline** on 2026-09-02.
 
-Observed human-review issue:
+This acceptance means the next implementation pass should use the mobile v2 principles below. It does **not** authorize production deployment; real viewport/browser QA and implementation QA are still required.
 
-- some mobile headlines/text blocks can leave the intended viewport or produce unstable line breaks;
-- the current mobile composition still behaves too much like a reduced desktop page;
-- large map/community blocks can push the primary action too far down;
-- long question scenes and four answers need a clearer decision-zone composition.
+## Accepted mobile baseline
 
-## Current assessment
-
-Desktop direction: approximately **8.5/10 / implementation-ready direction**.
-
-Mobile direction before this pass: approximately **6/10 / separate design pass required**.
-
-The problem is not the DC-9 diagnostic mechanic itself. Keep:
+Keep the DC-9 diagnostic mechanic itself:
 
 - 4 answer choices;
 - one scene at a time;
 - explicit `ДАЛЬШЕ`;
 - `К СФЕРАМ` in upper navigation;
-- LONG typography direction as the visual baseline.
+- LONG typography direction;
+- selected answer remains editable until progression.
 
-The change is in **mobile presentation mechanics**.
-
-## Mobile v2 principles
+The accepted change is in **mobile presentation mechanics**.
 
 ### 1. Mobile is not scaled desktop
 
@@ -67,7 +57,7 @@ Use a compact map teaser:
 
 `МОЯ КАРТА DC-9 / 9 из 9 / ОТКРЫТЬ →`
 
-The full radar/result belongs on the result route after opening the map.
+The full radar/result belongs on the canonical result route after opening the map.
 
 ### 4. Active member screen is minimal
 
@@ -122,7 +112,7 @@ After tap:
 
 Do not collapse the other choices after selection.
 
-## QA artifact
+## Accepted QA artifact
 
 Implementation branch:
 
@@ -132,19 +122,47 @@ Internal noindex route/file:
 
 `design-system/dc9-mobile-qa/index.html`
 
-The prototype contains five mobile states:
+The reviewed prototype contains five mobile states:
 
 1. short/ordinary question;
 2. long question;
 3. partial guest;
-4. completed authenticated map state;
+4. completed authenticated map-entry state;
 5. active member state.
 
-It is simulation-only and must not write auth, membership or assessment data.
+Human review outcome: **direction accepted**.
+
+## Next mobile QA layer: result/map
+
+The next QA target is the canonical `/join/result/` experience on mobile.
+
+Do not invent a new chart. Preserve Graph Linked Cards v6 semantics:
+
+- 9 independent radar axes;
+- center = 0;
+- outside = 5;
+- one node per sphere;
+- three presentation-selected points may be highlighted for contrast only;
+- no aggregate score;
+- no polygon-area score;
+- mobile legend explicitly maps sphere → level;
+- all nine results remain accessible;
+- `ТРИ ЗАМЕТНЫЕ ТОЧКИ` is not a ranking;
+- dossier/share uses the same nine factual results.
+
+Mobile result QA should test a staged reading flow rather than one very long undifferentiated page:
+
+1. `ВОТ ВАША КАРТА` + radar + mobile legend;
+2. `ТРИ ЗАМЕТНЫЕ ТОЧКИ`;
+3. `ОСТАЛЬНАЯ КАРТА`;
+4. `ЗАБРАТЬ С СОБОЙ` / dossier + share;
+5. final club route, resolved from account/membership state.
+
+QA artifact target:
+
+`dementor-club-site/design-system/dc9-mobile-result-qa/index.html`
 
 ## Required real viewport QA
-
-Do not treat a CSS-sized mock-device inside a desktop viewport as final responsive evidence. CSS media queries follow the browser viewport unless the test uses a proper iframe/container strategy.
 
 Before production, verify with true viewport rendering at minimum:
 
@@ -153,9 +171,19 @@ Before production, verify with true viewport rendering at minimum:
 - 375×812 where practical;
 - 320 narrow fallback.
 
-For question screens also test short and longest real DC-9 scenes.
+For question screens test both a short and one of the longest real DC-9 scenes.
 
-## Mobile release blockers
+For result screens test:
+
+- complete 9/9 map;
+- long sphere names in legend (`САМОРАЗВИТИЕ`, `ПОТРЕБЛЕНИЕ`, `ОТНОШЕНИЯ`);
+- three highlighted points;
+- six remaining cards;
+- dossier preview/export actions;
+- authenticated non-member continuation;
+- active-member continuation.
+
+## Remaining mobile release blockers
 
 The next production candidate remains blocked if any of the following remains true:
 
@@ -167,10 +195,16 @@ The next production candidate remains blocked if any of the following remains tr
 - safe-area/home-indicator overlaps progression controls;
 - 320px fallback has horizontal overflow;
 - member state still presents the test as the primary entry;
-- completed-map state forces the user through a full radar before the next action.
+- completed-map entry state forces the user through a full radar before the next action;
+- result radar loses the meaning of nine independent axes on mobile;
+- mobile legend clips long sphere names or hides levels;
+- highlighted points read as a rank/podium;
+- result CTA order contradicts resolved account/membership state.
 
-## Next QA decision
+## Current QA conclusion
 
-Human review should compare the mobile-only prototype against the current live/QA mobile behavior and decide whether the two-zone question layout and CTA-first entry composition become the implementation baseline.
+The mobile entry/question redesign is no longer an open design question. It is the **accepted implementation direction**, subject to real browser QA.
+
+The active design question now moves to **mobile result/map composition with the canonical Graph Linked Cards v6 radar**.
 
 No production deploy is authorized by this file.
