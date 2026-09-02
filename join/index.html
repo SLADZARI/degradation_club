@@ -11,10 +11,13 @@
   <meta property="og:type" content="website">
   <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="/join/dc9-immersive-v1.css">
+  <link rel="stylesheet" href="/join/dc9-responsive-v2.css">
 </head>
 <body class="dc9-page">
 <header class="topbar"><a class="brand" href="/" aria-label="Dementor Club">DEMENTOR<span>CLUB</span></a><button class="menu-toggle" aria-label="Открыть меню" aria-expanded="false">MENU</button><nav class="nav"><a href="/about/">О клубе</a><a href="/#projects">Проекты</a><a href="/#community">Комьюнити</a><a href="/#events">События</a><a class="active" href="/join/">Вступить</a></nav></header>
 <main class="dc9-shell">
+  <section id="dc9MemberReturn" class="dc9-member-return" hidden aria-live="polite"></section>
+
   <section id="dc9Intro" class="dc9-view dc9-hero">
     <div class="dc9-kicker">DC-9 / ВХОДНОЕ ОБСЛЕДОВАНИЕ</div>
     <div class="dc9-lead">Вашу личность пока оставим в покое.<br>Хочется понять, как вы дошли до этого места.</div>
@@ -33,15 +36,16 @@
   </section>
 
   <section id="dc9Play" class="dc9-view dc9-play" hidden aria-live="polite">
-    <div class="dc9-play-head"><div class="dc9-play-meta" id="dc9PlaySphere"></div><div class="dc9-play-meta" id="dc9PlayCount"></div></div>
+    <div class="dc9-play-head"><button class="dc9-play-back" id="dc9Back" type="button">← К СФЕРАМ</button><div class="dc9-play-meta" id="dc9PlaySphere"></div><div class="dc9-play-meta" id="dc9PlayCount"></div></div>
     <div class="dc9-progress"><i id="dc9ProgressBar"></i></div>
-    <div class="dc9-scene"><div class="dc9-scene-text" id="dc9SceneText"></div><div class="dc9-answers" id="dc9Answers"></div><div class="dc9-reaction" id="dc9Reaction" hidden><div class="dc9-reaction-text" id="dc9ReactionText"></div><div class="dc9-actions"><button class="dc9-button primary" id="dc9Next" type="button">ДАЛЬШЕ →</button><button class="dc9-button" id="dc9Back" type="button">К СФЕРАМ</button></div></div></div>
+    <div class="dc9-scene"><div class="dc9-scene-text" id="dc9SceneText"></div><div class="dc9-answers" id="dc9Answers"></div><div class="dc9-reaction" id="dc9Reaction" hidden><div class="dc9-reaction-text" id="dc9ReactionText"></div><div class="dc9-actions"><button class="dc9-button primary" id="dc9Next" type="button">ДАЛЬШЕ →</button></div></div></div>
   </section>
 
   <section id="dc9Finalizing" class="dc9-view dc9-finalizing" hidden aria-live="polite">
     <div class="dc9-kicker">DC-9 / 9 ИЗ 9</div><div class="dc9-finalizing-box"><div class="dc9-finalizing-mark">✓</div><h2>DC-9<br><span>ЗАВЕРШЁН.</span></h2><div class="dc9-finalizing-status" id="dc9FinalizingStatus">Собираем последствия.</div><div class="dc9-finalizing-line"><i id="dc9FinalizingBar"></i></div></div>
   </section>
 </main>
+<script src="/site-config.js"></script>
 <script src="/script.js"></script>
 <script src="/join/dc9-data/core.js"></script>
 <script src="/join/dc9-data/sphere-01.js"></script>
@@ -54,5 +58,6 @@
 <script src="/join/dc9-data/sphere-08.js"></script>
 <script src="/join/dc9-data/sphere-09.js"></script>
 <script src="/join/dc9-immersive-v1.js"></script>
+<script type="module" src="/join/dc9-entry-state-v1.js"></script>
 </body>
 </html>
