@@ -231,6 +231,13 @@
       "note": "Closed Dementor-only Membership v2 review surface is approved; route is noindex/nofollow/noarchive and access is protected by authentication, active Dementor role and RLS."
     },
     {
+      "route": "/workspace/artifacts/",
+      "state": "FINAL",
+      "source": ["dementor-club/community/MEMBER_ENTRY_AND_ARTIFACT_FLOW_V1.md", "dementor-club/community/MEMBERSHIP_AND_DEMENTOR_REVIEW_V2.md"],
+      "blockingFields": [],
+      "note": "Private Member Artifact history surface is approved for current and archived own Artifacts; route is noindex/nofollow/noarchive and protected by authentication/RLS."
+    },
+    {
       "route": "/donate/",
       "state": "REQUIRES_APPROVAL",
       "productionAllowed": true,
