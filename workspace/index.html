@@ -11,16 +11,19 @@
   <script src="../site-config.js"></script>
 </head>
 <body class="dc-system-page dcw-body">
-  <div class="dcw-live-banner">DEMENTOR CLUB · PERSONAL WORKSPACE · LIVE v0.3.1</div>
+  <div class="dcw-live-banner">DEMENTOR CLUB · PERSONAL WORKSPACE · LIVE v0.3.2</div>
   <div class="dcw-app">
     <aside class="dcw-sidebar">
       <a class="dcw-brand" href="./"><span>DEMENTOR</span><strong>CLUB</strong></a>
       <nav class="dcw-nav" aria-label="Личный кабинет">
         <button type="button" data-route="home" class="is-active">HOME</button>
         <button type="button" data-route="club">MY CLUB</button>
+        <a class="dcw-nav-link" href="../community/board/">COMMUNITY BOARD</a>
+        <a class="dcw-nav-link" href="./artifacts/">MY ARTIFACTS</a>
         <button type="button" data-route="activity">MY ACTIVITY</button>
         <button type="button" data-route="work" data-work-nav hidden>MY WORK</button>
         <button type="button" data-route="profile">MY PROFILE</button>
+        <button type="button" class="dcw-nav-logout" data-global-logout>LOG OUT</button>
       </nav>
       <div class="dcw-boundary"><span>SYSTEM</span><strong>DEMENTOR CLUB</strong><small>Один аккаунт. Статус и рабочие возможности добавляются поверх базового личного кабинета.</small></div>
       <div class="dcw-session" id="sessionBox"><span>SESSION</span><strong>ПРОВЕРКА…</strong></div>
@@ -32,8 +35,14 @@
   </div>
   <script src="./workspace-listener-guard-v1.js"></script>
   <script type="module" src="./workspace.js"></script>
+  <script type="module" src="./workspace-membership-v2-fix.js"></script>
   <script type="module" src="./workspace-enhancements-v1.js"></script>
   <script type="module" src="./workspace-review-nav-v2.js"></script>
   <script src="./workspace-analytics-hook-v1.js" defer></script>
+  <script type="module">
+    import {createClient} from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.4/+esm';
+    const button=document.querySelector('[data-global-logout]');const cfg=window.DEMENTOR_SITE_CONFIG?.supabase;
+    if(button&&cfg?.enabled){button.addEventListener('click',async()=>{button.disabled=true;const client=window.DEMENTOR_SUPABASE_CLIENT||createClient(cfg.url,cfg.publishableKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false,flowType:'pkce'}});await client.auth.signOut();location.href='../';});}
+  </script>
 </body>
 </html>
