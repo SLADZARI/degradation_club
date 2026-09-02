@@ -3,7 +3,7 @@
 Статус: **CANON / source-of-truth**
 
 Дата: 2026-08-23  
-Updated: 2026-08-30
+Updated: 2026-09-02
 
 Этот документ определяет, кого и как ищет онбординг Dementor Club.
 
@@ -229,21 +229,29 @@ Dementor Club не ищет «подходящих людей вообще» и 
 
 ## 11. Переход в Community после 9/9
 
-Для Community membership v1 завершение всех девяти сфер является обязательным входным условием.
+Для Community Membership v2 завершение всех девяти сфер является **обязательным условием подачи заявки**, но не создаёт membership автоматически.
 
 Это правило относится к **вступлению в закрытую Community**, а не меняет смысл отдельных профильных результатов.
 
 После `9/9` пользователь получает доступ к следующему переходу:
 
-`SPHERES COMPLETE → IDENTITY → MEMBERSHIP → COMMUNITY BOARD → FIRST ARTIFACT`
+`SPHERES COMPLETE → APPLICATION AVAILABLE → APPLICATION SUBMITTED → DEMENTOR REVIEW → MEMBER ACTIVE → COMMUNITY BOARD → FIRST ARTIFACT`
 
-Membership v1 не требует общего психологического балла и не зависит от AI-generated summary.
+`9/9 ≠ membership`.
 
-Полная утверждённая механика входа, identity, membership state и первого Community Artifact определена в:
+Membership v2 не требует общего психологического балла и не зависит от AI-generated summary.
+
+Полная утверждённая механика admission, Candidate Snapshot, Dementor review и порога принятия определена в:
+
+`community/MEMBERSHIP_AND_DEMENTOR_REVIEW_V2.md`
+
+После принятия механика первого входа в Community, Board и первого Artifact продолжает использовать:
 
 `community/MEMBER_ENTRY_AND_ARTIFACT_FLOW_V1.md`
 
-Правило при конфликте: этот документ остаётся authority для диагностической модели сфер; `MEMBER_ENTRY_AND_ARTIFACT_FLOW_V1.md` является authority для перехода из завершённой карты 9/9 в Community membership и first-entry activation.
+в той части, которая не противоречит v2 admission.
+
+Правило при конфликте: этот документ остаётся authority для диагностической модели сфер; `MEMBERSHIP_AND_DEMENTOR_REVIEW_V2.md` является authority для admission после 9/9; `MEMBER_ENTRY_AND_ARTIFACT_FLOW_V1.md` остаётся authority для post-admission first-entry / Artifact flow.
 
 ## 12. Правило развития
 
