@@ -1,5 +1,5 @@
 import { cloneState, applyMetricDelta, applyMemoryNode, NODE_SPECS } from '../core/model.mjs';
-import { familyOf, outgoing, validateGraph } from '../core/graph.mjs';
+import { familyOf, outgoing, validateGraph, canConnectNodes } from '../core/graph.mjs';
 
 const REACTION_EFFECTS = Object.freeze({
   explain:{self:{energy:-4,brain:8,tension:5},target:{tension:4,contact:-5}},
@@ -15,7 +15,7 @@ const IMPULSE_EFFECTS = Object.freeze({
 });
 function addDelta(dst,src={}){for(const [k,v] of Object.entries(src))dst[k]=(dst[k]||0)+v}
 function nodeById(graph,id){return graph.nodes.find(n=>n.id===id)}
-function cloneGraph(graph){return {id:graph.id,nodes:graph.nodes.map(n=>({...n,p:{...(n.p||{})}})),edges:graph.edges.map(e=>({...e}))}}
+function cloneGraph(graph){return {id:graph.id,nodes:graph.nodes.map(n=>({...n,p:{...(n.p||{})},ui:n.ui?{...n.ui}:undefined})),edges:graph.edges.map(e=>({...e}))}}
 export function createCharacter({id,name,graph,state,visual={}}){return {id,name,visual,brainGraph:cloneGraph(graph),state:cloneState(state),face:{},discoveries:[],history:[]}}
 export function createEncounter({id='encounter-1',scenario,actorA,actorB,mode='auto'}){return {id,scenario:{...scenario},mode,actors:{A:actorA,B:actorB},activeActor:'A',turn:0,status:'INTRO',transcript:[],traces:[],patches:[],result:null,hotPatchUsed:false}}
 
@@ -24,25 +24,32 @@ function enumeratePaths(graph,startId,maxDepth=18){
   function walk(id,path,visits){
     if(path.length>=maxDepth){out.push(path);return}
     const n=nodeById(graph,id);if(!n){out.push(path);return}
+    // STOP is executable control: nothing downstream may run in this path.
+    if(n.type==='stop'){out.push([...path,n]);return}
     const next=outgoing(graph,id);if(!next.length){out.push([...path,n]);return}
     const count=visits.get(id)||0;if(count>=3){out.push([...path,n]);return}
     const v=new Map(visits);v.set(id,count+1);next.forEach(e=>walk(e.to,[...path,n],v));
   }
   walk(startId,[],new Map());return out;
 }
+function conditionAllows(character,path){
+  return path.every(n=>n.type!=='ifbrain'||Number(character.state.brain)>Number(n.p?.threshold??70));
+}
 function selectPath(character,trigger){
   const graph=character.brainGraph,validation=validateGraph(graph);if(!validation.runnable)throw new Error(validation.detail);
-  const starts=graph.nodes.filter(n=>familyOf(n)==='TRIGGER'&&n.type===trigger),roots=starts.length?starts:graph.nodes.filter(n=>familyOf(n)==='TRIGGER');
-  const scored=roots.flatMap(n=>enumeratePaths(graph,n.id)).map(path=>{
+  // A situation fires a concrete trigger. Another trigger must never silently substitute for it.
+  const roots=graph.nodes.filter(n=>familyOf(n)==='TRIGGER'&&n.type===trigger);
+  if(!roots.length)return null;
+  const scored=roots.flatMap(n=>enumeratePaths(graph,n.id)).filter(path=>conditionAllows(character,path)).map(path=>{
     let score=0,reaction=null,impulse=null,repeat=1;
-    for(const n of path){const fam=familyOf(n);if(fam==='STATE')score+=Number(character.state.memory?.[n.p?.key||n.type]||0)*1.35;if(fam==='IMPULSE'){const w=n.p?.weight||1;score+=w*6;if(!impulse)impulse=n.type}if(fam==='REACTION'&&!reaction){reaction=n.type;score+=8}if(n.type==='repeat')repeat=Math.max(repeat,n.p?.count||1);if(n.type==='pause')score+=character.state.tension>=55?6:1;if(n.type==='ifbrain'&&character.state.brain<(n.p?.threshold||70))score-=5}score+=repeat>1?repeat*2:0;return {path,score,reaction,impulse,repeat};
+    for(const n of path){const fam=familyOf(n);if(fam==='STATE')score+=Number(character.state.memory?.[n.p?.key||n.type]||0)*1.35;if(fam==='IMPULSE'){const w=n.p?.weight||1;score+=w*6;if(!impulse)impulse=n.type}if(fam==='REACTION'&&!reaction){reaction=n.type;score+=8}if(n.type==='repeat')repeat=Math.max(repeat,n.p?.count||1);if(n.type==='pause')score+=character.state.tension>=55?6:1}score+=repeat>1?repeat*2:0;return {path,score,reaction,impulse,repeat};
   }).filter(x=>x.reaction);
   scored.sort((a,b)=>b.score-a.score||a.path.map(n=>n.id).join('|').localeCompare(b.path.map(n=>n.id).join('|')));return scored[0]||null;
 }
 
 export function predictTurn(encounter,{trigger=null}={}){
   const side=encounter.activeActor,targetSide=side==='A'?'B':'A',actor=encounter.actors[side],target=encounter.actors[targetSide];
-  const emittedTrigger=trigger||encounter.scenario.openingTrigger||'criticism',chosen=selectPath(actor,emittedTrigger);if(!chosen)throw new Error(`No executable reaction for ${side}`);
+  const emittedTrigger=trigger||encounter.scenario.openingTrigger||'criticism',chosen=selectPath(actor,emittedTrigger);if(!chosen)throw new Error(`No executable reaction for ${side} on trigger ${emittedTrigger}`);
   const selfDelta={},targetDelta={};addDelta(selfDelta,REACTION_EFFECTS[chosen.reaction]?.self);addDelta(targetDelta,REACTION_EFFECTS[chosen.reaction]?.target);addDelta(selfDelta,IMPULSE_EFFECTS[chosen.impulse]?.self);addDelta(targetDelta,IMPULSE_EFFECTS[chosen.impulse]?.target);
   for(const n of chosen.path.filter(n=>familyOf(n)==='STATE')){const sem=n.type==='resentment'?{self:{tension:.8,brain:.25},target:{contact:-.4}}:n.type==='trust'?{self:{contact:.8,brain:-.2},target:{contact:.5}}:null;if(sem){addDelta(selfDelta,sem.self);addDelta(targetDelta,sem.target)}}
   if(chosen.repeat>1){addDelta(selfDelta,{energy:-(chosen.repeat-1)*2,brain:(chosen.repeat-1)*5,tension:(chosen.repeat-1)*2});addDelta(targetDelta,{contact:-(chosen.repeat-1)*2,tension:(chosen.repeat-1)*2})}
@@ -78,8 +85,19 @@ export function applyHotPatch(encounter,patch){
   const side=patch.actorId||encounter.activeActor,graph=encounter.actors[side].brainGraph;let before=null,after=null;
   if(patch.kind==='reduce-repeat'){const n=nodeById(graph,patch.nodeId);if(!n||n.type!=='repeat')throw new Error('repeat node required');before=n.p.count||1;n.p.count=Math.max(1,before-(patch.amount||1));after=n.p.count}
   else if(patch.kind==='reduce-impulse'){const n=nodeById(graph,patch.nodeId);if(!n||familyOf(n)!=='IMPULSE')throw new Error('impulse node required');before=n.p.weight||1;n.p.weight=Math.max(1,before-(patch.amount||1));after=n.p.weight}
-  else if(patch.kind==='insert-pause'){const edge=graph.edges.find(e=>e.id===patch.edgeId);if(!edge)throw new Error('edge required');const id=patch.nodeId||`pause-${encounter.turn}`;graph.nodes.push({id,type:'pause',p:{...NODE_SPECS.pause.defaults}});graph.edges=graph.edges.filter(e=>e!==edge);graph.edges.push({id:`${edge.id}-a`,from:edge.from,to:id},{id:`${edge.id}-b`,from:id,to:edge.to});before=edge.id;after=id}
-  else if(patch.kind==='rewire'){const edge=graph.edges.find(e=>e.id===patch.edgeId);if(!edge)throw new Error('edge required');before=edge.to;edge.to=patch.toNodeId;after=edge.to}
+  else if(patch.kind==='insert-pause'){
+    const edge=graph.edges.find(e=>e.id===patch.edgeId);if(!edge)throw new Error('edge required');
+    const id=patch.nodeId||`pause-${encounter.turn}`;if(nodeById(graph,id))throw new Error('pause node id already exists');
+    graph.nodes.push({id,type:'pause',p:{...NODE_SPECS.pause.defaults}});graph.edges=graph.edges.filter(e=>e!==edge);graph.edges.push({id:`${edge.id}-a`,from:edge.from,to:id},{id:`${edge.id}-b`,from:id,to:edge.to});
+    const valid=validateGraph(graph);if(!valid.runnable){graph.nodes=graph.nodes.filter(n=>n.id!==id);graph.edges=graph.edges.filter(e=>e.id!==`${edge.id}-a`&&e.id!==`${edge.id}-b`);graph.edges.push(edge);throw new Error(`pause patch invalid: ${valid.code}`)}
+    before=edge.id;after=id
+  }
+  else if(patch.kind==='rewire'){
+    const edge=graph.edges.find(e=>e.id===patch.edgeId);if(!edge)throw new Error('edge required');
+    const from=nodeById(graph,edge.from),to=nodeById(graph,patch.toNodeId);if(!from||!to)throw new Error('rewire target required');
+    const graphWithoutEdge={...graph,edges:graph.edges.filter(e=>e!==edge)};if(!canConnectNodes(graphWithoutEdge,from,to))throw new Error('incompatible rewire target');
+    before=edge.to;edge.to=to.id;const valid=validateGraph(graph);if(!valid.runnable){edge.to=before;throw new Error(`rewire would break graph: ${valid.code}`)}after=edge.to
+  }
   else throw new Error('Unsupported patch');
   encounter.hotPatchUsed=true;encounter.patches.push({turn:encounter.turn,actorId:side,kind:patch.kind,nodeId:patch.nodeId||null,before,after});encounter.status='NEXT_TURN';encounter.pendingTurn=null;return {before,after};
 }
