@@ -15,7 +15,17 @@ export class VerticalSliceController{
     if(this.encounter.status==='HOT_PATCH')return {breakpoint:this.encounter.pendingTurn?.breakpoint,pending:true};
     const out=executeActorTurn(this.encounter);
     if(out.trace){
-      const phrase=resolvePhrase({reaction:out.trace.selectedReaction,turn:out.trace.turn});
+      const actor=this.encounter.actors[out.trace.actorId];
+      const recentTranscript=this.encounter.transcript.slice(0,-1).slice(-3);
+      const phrase=resolvePhrase({
+        reaction:out.trace.selectedReaction,
+        impulse:out.trace.selectedImpulse,
+        scenario:this.encounter.scenario,
+        state:actor.state,
+        memory:actor.state.memory,
+        recentTranscript,
+        turn:out.trace.turn
+      });
       this.encounter.transcript[this.encounter.transcript.length-1].phrase=phrase;
       this.onEvent({type:'TURN',trace:out.trace,phrase,encounter:this.encounter});
     }
