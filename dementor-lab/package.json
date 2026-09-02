@@ -11,6 +11,7 @@
     "test:asset": "node tests/character-asset-selftest.mjs",
     "test:opponent": "node tests/opponent-generator-selftest.mjs",
     "test:ui": "node tests/ui-contract-selftest.mjs",
-    "test:mobile": "node tests/mobile-readability-selftest.mjs"
+    "test:mobile": "node tests/mobile-readability-selftest.mjs",
+    "qa:phone": "node scripts/physical-qa-server.mjs"
   }
 }
