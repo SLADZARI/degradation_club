@@ -9,11 +9,11 @@
   const activeFor=href=>href==='/'?path==='/':path.startsWith(href);
   const link=(href,label,extra='')=>`<a href="${href}"${activeFor(href)?' aria-current="page"':''}${extra}>${label}</a>`;
   const communityActive=path.startsWith('/community/')||path.startsWith('/courses/');
-  const accountActive=path.startsWith('/profile/')||(cartEnabled&&path.startsWith('/cart/'))||path.startsWith('/workspace/');
+  const accountActive=path.startsWith('/profile/')||path.startsWith('/workspace/')||(cartEnabled&&path.startsWith('/cart/'));
   const accountItems=link('/profile/','Profile')+(cartEnabled?link('/cart/','Cart'):'');
   const navHtml=[
     link('/about/','Club'),link('/events/','Events'),link('/projects/','Projects'),
-    `<a href="/community/"${communityActive?' aria-current="page"':''}>Community</a>`,
+    `<div class="dc-global-group${communityActive?' is-active':''}" data-nav-group="community"><button class="dc-global-group__trigger" type="button" aria-expanded="false">Community</button><div class="dc-global-subnav">${link('/community/','People')}${link('/courses/dumai-s-opasnostyu/','Courses')}</div></div>`,
     link('/merch/','Merch'),link('/archive/','Blog'),link('/join/','Join'),
     `<div class="dc-global-group${accountActive?' is-active':''}" data-nav-group="account"><button class="dc-global-group__trigger" type="button" aria-expanded="false">Account</button><div class="dc-global-subnav">${accountItems}</div></div>`
   ].join('');
