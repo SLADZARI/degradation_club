@@ -56,7 +56,7 @@ export const BRAIN_PRESETS=Object.freeze([
     id:'dont-care',
     label:'МНЕ ВСЁ РАВНО',
     graph:graph('preset-dont-care',[
-      node('p5-trigger','ignore',{},160,30),node('p5-silent','silent',{},160,190),node('p5-stop','stop',{},160,350)
+      node('p5-trigger','criticism',{},160,30),node('p5-silent','silent',{},160,190),node('p5-stop','stop',{},160,350)
     ],[edge('p5-e1','p5-trigger','p5-silent'),edge('p5-e2','p5-silent','p5-stop')])
   },
   {
