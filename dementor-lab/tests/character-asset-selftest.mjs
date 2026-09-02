@@ -25,7 +25,8 @@ for(const characterId of roster){
   assert.equal(manifest.version,'cleaned-svg-v1',`${characterId} is the promoted exact cleaned asset`);
   assert.match(svg,/data-rig-pivots=/,`${characterId} carries verified rig metadata on the SVG root`);
 
-  const ids=[...svg.matchAll(/\bid\s*=\s*["']([^"']+)["']/g)].map(match=>match[1]);
+  // Count only id attributes inside XML tags; metadata text may itself contain id="..." examples.
+  const ids=[...svg.matchAll(/<[^>]*\bid\s*=\s*["']([^"']+)["'][^>]*>/g)].map(match=>match[1]);
   const duplicates=[...new Set(ids.filter((id,index)=>ids.indexOf(id)!==index))];
   assert.deepEqual(duplicates,[],`${characterId} production SVG contains no duplicate DOM ids`);
 
