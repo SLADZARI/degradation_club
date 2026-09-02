@@ -14,6 +14,7 @@ It consolidates:
 - DC-9 progress states;
 - result/map access;
 - membership/community routing;
+- public entry-state copy;
 - responsive question-layout QA;
 - browser/auth/sync test cases;
 - acceptance criteria before the next production release.
@@ -32,8 +33,11 @@ Read together with:
 4. `operations/AUTH_SYNC_AND_ACCESS_BASELINE_2026-08-28.md`
 5. `operations/IDENTITY_MEMBERSHIP_AND_ENTITY_BOUNDARY_V0.2.md`
 6. `operations/MEMBERSHIP_APPLICATION_AND_DC9_PUBLIC_FLOW_V0.1.md`
-7. site QA contract: `dementor-club-site/docs/QA_RELEASE_CONTRACT_v1.md`
-8. typography/mobile supplement: `dementor-club-site/docs/TYPOGRAPHY_MOBILE_ACCESSIBILITY_SPEC.md`
+7. `operations/QUESTION_PRESENTATION_HUMOR_STANDARD.md`
+8. `concept/ABOUT_PAGE_APPROVED_V10.md`
+9. `concept/COMMUNITY_PAGE_APPROVED_V1.md`
+10. site QA contract: `dementor-club-site/docs/QA_RELEASE_CONTRACT_v1.md`
+11. typography/mobile supplement: `dementor-club-site/docs/TYPOGRAPHY_MOBILE_ACCESSIBILITY_SPEC.md`
 
 If these sources disagree, do not silently choose a convenient implementation. Record the conflict here and resolve it in `dementor-club` before changing production semantics.
 
@@ -148,33 +152,196 @@ These are presentation/routing states only. They must never grant permissions wi
 | State | Primary surface | Primary action | Secondary action | Must not happen |
 |---|---|---|---|---|
 | Guest + DC-9 NONE | DC-9 intro | `НАЧАТЬ DC-9 →` | `ВОЙТИ ЧЕРЕЗ GOOGLE` | imply membership |
-| Guest + DC-9 PARTIAL | Resume | `ПРОДОЛЖИТЬ DC-9 →` | `ВОЙТИ И СОХРАНИТЬ ПРОГРЕСС` | discard local draft |
-| Guest + DC-9 COMPLETE | Map/result | `ПОСМОТРЕТЬ КАРТУ →` | `ВОЙТИ И СОХРАНИТЬ КАРТУ` | force repeat test |
+| Guest + DC-9 PARTIAL | Resume | `ПРОДОЛЖИТЬ DC-9 →` | `ВОЙТИ И СОХРАНИТЬ` | discard local draft |
+| Guest + DC-9 COMPLETE | Map/result | `ПОСМОТРЕТЬ КАРТУ →` | `СОХРАНИТЬ В АККАУНТ` | force repeat test |
 | Auth + DC-9 NONE | Account-aware DC-9 intro | `НАЧАТЬ DC-9 →` | account/profile | show guest login CTA as primary |
-| Auth + DC-9 PARTIAL | Resume | `ПРОДОЛЖИТЬ DC-9 →` | map/progress/account | restart silently |
-| Auth + DC-9 COMPLETE + NOT_MEMBER | Map/result | membership entry/application CTA | `МОЯ КАРТА DC-9` | infer membership from test |
+| Auth + DC-9 PARTIAL | Resume | `ПРОДОЛЖИТЬ DC-9 →` | account | restart silently |
+| Auth + DC-9 COMPLETE + NOT_MEMBER | Map/result | neutral club-entry CTA | `МОЯ КАРТА DC-9` | infer membership from test |
 | Auth + MEMBER_ACTIVE + FIRST_ARTIFACT_REQUIRED | Club return state | `ОТКРЫТЬ COMMUNITY BOARD →` | `МОЯ КАРТА DC-9` | show quiz as primary |
 | Auth + MEMBER_ACTIVE + MEMBER_ACTIVATED | Club home/Community | `ВОЙТИ В COMMUNITY →` | `МОЯ КАРТА DC-9`, account | force `/join/` test intro |
 
-### Returning-member copy direction
+## 6.1 Editorial copy baseline — QA v0.2
 
-Preferred hierarchy for an authenticated active member:
+Status: **REWRITE APPLIED / HUMAN QA REQUIRED / NOT YET PRODUCTION COPY**
 
-**ДОБРО ПОЖАЛОВАТЬ В КЛУБ.**
+### Editorial rule
 
-Primary:
+The first QA draft sounded too much like a generic product state machine and, after the first rewrite, too much like one continuous bureaucratic sketch.
 
-`ВОЙТИ В COMMUNITY →`
+The corrected direction is:
 
-Secondary:
+- function first;
+- one dry Dementor turn per screen is enough;
+- bureaucratic register is available but not mandatory;
+- returning users should feel recognised, not re-onboarded;
+- Community states use affirmative language rather than a chain of negations;
+- technical facts stay literal: local storage, account save, membership and Community access are never mutated for a joke.
 
-`МОЯ КАРТА DC-9`
+This follows the club voice: calm, dry, observant, concrete. The UI must still be understandable without decoding the joke.
 
-Tertiary if offered:
+### Guest / DC-9 NONE
 
-`ПРОЙТИ DC-9 ЗАНОВО`
+Headline:
 
-The exact wording remains subject to normal editorial approval, but the action priority is part of this QA proposal.
+**ДЕВЯТЬ СФЕР.**
+
+Lead:
+
+**Вашу личность пока оставим в покое. Хочется понять, как вы дошли до этого места.**
+
+Support:
+
+`Девять сфер. По шесть сцен в каждой. Начать можно с любой. Общего балла не будет. Девять отдельных результатов — уже достаточно.`
+
+Primary: `НАЧАТЬ DC-9 →`
+
+Secondary: `ВОЙТИ ЧЕРЕЗ GOOGLE`
+
+### Guest / DC-9 PARTIAL
+
+Headline:
+
+**ВЫ УЖЕ НАЧАЛИ.**
+
+Lead:
+
+`Три сферы из девяти уже готовы.`
+
+Support:
+
+`Можно продолжить с этого места. Пока вы не вошли, прогресс хранится только в этом браузере. Храбро, но не обязательно.`
+
+Primary: `ПРОДОЛЖИТЬ DC-9 →`
+
+Secondary: `ВОЙТИ И СОХРАНИТЬ`
+
+### Guest / DC-9 COMPLETE
+
+Headline:
+
+**КАРТА ГОТОВА.**
+
+Lead:
+
+`Девять сфер закончились. Аккаунт для этого не понадобился.`
+
+Support:
+
+`Карту можно посмотреть сразу. Вход через Google нужен только если вы хотите сохранить её в аккаунте и потом найти на другом устройстве.`
+
+Primary: `ПОСМОТРЕТЬ КАРТУ →`
+
+Secondary: `СОХРАНИТЬ В АККАУНТ`
+
+### Auth / DC-9 NONE
+
+Headline:
+
+**АККАУНТ ЕСТЬ. КАРТЫ НЕТ.**
+
+Lead:
+
+`Профиль уже создан. Выводы пока решили не торопить.`
+
+Support:
+
+`Начать можно с любой сферы. Завершённые результаты сохранятся в аккаунте автоматически.`
+
+Primary: `НАЧАТЬ DC-9 →`
+
+Secondary: `МОЙ АККАУНТ`
+
+### Auth / DC-9 PARTIAL
+
+Headline:
+
+**ТРИ ИЗ ДЕВЯТИ.**
+
+Lead:
+
+`Вы остановились. Результаты — нет.`
+
+Support:
+
+`Продолжим с сохранённого места. Завершённые сферы уже в аккаунте и останутся там на другом устройстве.`
+
+Primary: `ПРОДОЛЖИТЬ DC-9 →`
+
+Secondary: `МОЙ АККАУНТ`
+
+### Auth / DC-9 COMPLETE / NOT MEMBER
+
+Headline:
+
+**КАРТА НА МЕСТЕ.**
+
+Lead:
+
+`Повторно проходить DC-9 для доступа к карте не нужно.`
+
+Support:
+
+`Девять результатов сохранены в аккаунте. Дальше начинается отдельный клубный маршрут. Сама карта никуда вас не назначает.`
+
+Primary for QA: `ПРОДОЛЖИТЬ В КЛУБ →`
+
+Secondary: `МОЯ КАРТА DC-9`
+
+Tertiary: `ПРОЙТИ ЕЩЁ РАЗ`
+
+**Important:** the primary CTA label is provisional until the membership-mechanism conflict in section 3 is resolved.
+
+### Member / FIRST ARTIFACT REQUIRED
+
+Headline:
+
+**ВЫ УЖЕ В КЛУБЕ.**
+
+Lead:
+
+`Теперь можно перестать проходить вход и что-нибудь сделать внутри.`
+
+Support:
+
+`Начните с Community Board. Карта DC-9 остаётся рядом, но больше не работает турникетом.`
+
+Primary: `ОТКРЫТЬ COMMUNITY BOARD →`
+
+Secondary: `МОЯ КАРТА DC-9`
+
+### Member / ACTIVE
+
+Headline:
+
+**ЛЮДИ ЕСТЬ. ВЫ ТОЖЕ.**
+
+This intentionally echoes the approved Community language `ЛЮДИ ЕСТЬ.` without turning the entire Join surface into a duplicate Community page.
+
+Lead:
+
+`Клуб уже происходит. Вы в нём уже есть.`
+
+Support:
+
+`Основной маршрут — Community. Карта DC-9 остаётся в аккаунте как отдельный артефакт, а не как повторный вступительный экзамен.`
+
+Primary: `ВОЙТИ В COMMUNITY →`
+
+Secondary: `МОЯ КАРТА DC-9`
+
+Tertiary: `МОЙ АККАУНТ`
+
+### Persistent map block
+
+Headline:
+
+**ДЕВЯТЬ СФЕР. КАЖДАЯ САМА ЗА СЕБЯ.**
+
+Support:
+
+`Карта хранит девять отдельных результатов. Общего балла нет. Повторно проходить DC-9 ради доступа к карте не нужно.`
+
+CTA: `ОТКРЫТЬ КАРТУ →`
 
 ## 7. State-resolution precedence
 
@@ -331,13 +498,14 @@ This work may move toward production only after:
 
 1. membership-mechanism conflict in section 3 is explicitly resolved in `dementor-club`;
 2. state matrix is human-approved;
-3. design-system QA screen is human-approved on desktop and mobile;
-4. browser/provider auth round-trip is tested;
-5. Supabase sync/access checks pass;
-6. existing `DC9_RESULT_QA_V0.1.md` remains green or is updated with truthful deltas;
-7. site QA/release contract is passed;
-8. dedicated production candidate PR is green;
-9. explicit human deploy approval is given.
+3. public copy in section 6.1 is human-approved;
+4. design-system QA screen is human-approved on desktop and mobile;
+5. browser/provider auth round-trip is tested;
+6. Supabase sync/access checks pass;
+7. existing `DC9_RESULT_QA_V0.1.md` remains green or is updated with truthful deltas;
+8. site QA/release contract is passed;
+9. dedicated production candidate PR is green;
+10. explicit human deploy approval is given.
 
 No deploy is authorized by this document.
 
@@ -345,8 +513,9 @@ No deploy is authorized by this document.
 
 - DC-9 54-scene production instrument: **approved and live baseline**.
 - LONG question-layout direction: **human-approved direction / implementation pending**.
+- entry-state public copy v0.2: **editorially rewritten / human QA pending**.
 - state-aware `/join/` resolver: **proposed / QA design pending**.
 - persistent account-map priority: **supported by existing auth/sync baseline; entry UX pending**.
 - active-member direct Community entry: **proposed UX using existing authoritative membership state**.
 - non-member → member transition semantics: **BLOCKED pending resolution of conflicting source/implementation behavior**.
-- next artifact: `design-system/dc9-entry-state-test/index.html`.
+- QA artifact: `design-system/dc9-entry-state-test/index.html`.
