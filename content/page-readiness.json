@@ -1,5 +1,5 @@
 {
-  "version": "2026-08-29",
+  "version": "2026-09-02",
   "role": "site content readiness registry",
   "statusDefinitions": {
     "FINAL": "Current public copy can ship without additional factual approval; later editorial refinement is optional.",
@@ -168,9 +168,9 @@
     {
       "route": "/join/apply/",
       "state": "FINAL",
-      "source": ["dementor-club/operations/MEMBERSHIP_APPLICATION_AND_DC9_PUBLIC_FLOW_V0.1.md"],
+      "source": ["dementor-club/operations/MEMBERSHIP_APPLICATION_AND_DC9_PUBLIC_FLOW_V0.1.md", "dementor-club/community/MEMBERSHIP_AND_DEMENTOR_REVIEW_V2.md"],
       "blockingFields": [],
-      "note": "Authenticated membership application flow is approved and implemented; submission never creates club membership automatically."
+      "note": "Authenticated Membership v2 application is server-gated by DC-9 completion and never activates club membership without Dementor review."
     },
     {
       "route": "/courses/dumai-s-opasnostyu/",
@@ -222,6 +222,13 @@
       "source": ["dementor-club/operations/DC_WORKSPACE_READONLY_ACCESS_V0.1.md", "dementor-club/operations/PERSONAL_WORKSPACE_PROGRESSIVE_ACCESS_V0.2.md"],
       "blockingFields": [],
       "note": "Production read-only personal workspace is approved; route remains private-product UI with noindex/nofollow/noarchive and server/RLS authorization boundaries."
+    },
+    {
+      "route": "/workspace/review/",
+      "state": "FINAL",
+      "source": ["dementor-club/community/MEMBERSHIP_AND_DEMENTOR_REVIEW_V2.md"],
+      "blockingFields": [],
+      "note": "Closed Dementor-only Membership v2 review surface is approved; route is noindex/nofollow/noarchive and access is protected by authentication, active Dementor role and RLS."
     },
     {
       "route": "/donate/",
