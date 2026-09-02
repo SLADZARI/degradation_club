@@ -17,41 +17,28 @@ await page.locator('.character-switch [data-character="character-02"]').click();
 assert.equal(await page.locator('[data-part="beard"]').getAttribute('data-variant-count'),'0','female keeps authored asymmetry');
 assert.equal(await page.locator('#person-preview #shoes-01').isVisible(),true,'female shoes wrapper remains visible');
 
-// BRAIN: presets are entry points, but custom mode edits the real graph.
 await page.locator('#to-brain').click();assert.equal(await page.locator('#top-status').textContent(),'BRAIN');
 assert.ok(await page.locator('#brain-presets [data-brain-preset]').count()>=7,'behavioral preset rail is restored');
 await page.locator('[data-brain-preset="custom"]').click();
 assert.equal(await page.locator('#to-setup').isDisabled(),true,'blank custom brain is not runnable');
-assert.match(await page.locator('#brain-validation').textContent(),/ТРИГГЕР/);
+assert.equal(await page.locator('#brain-validation').getAttribute('data-code'),'NO_TRIGGER','blank brain reports the engine validation code while copy stays human');
 
 async function addNode(type){await page.locator('#brain-add-node').click();await page.locator(`[data-add-brain-node="${type}"]`).click();await page.waitForTimeout(20)}
 await addNode('criticism');await addNode('explain');
 const triggerWrap=page.locator('#brain-graph .brain-canvas-node').filter({hasText:'КРИТИКА'}).first();
 const reactionWrap=page.locator('#brain-graph .brain-canvas-node').filter({hasText:'ОБЪЯСНИТЬ'}).first();
 const triggerId=await triggerWrap.getAttribute('data-brain-node-wrap'),reactionId=await reactionWrap.getAttribute('data-brain-node-wrap');
-await page.locator(`[data-brain-out="${triggerId}"]`).click();
-assert.ok(await page.locator('#brain-graph .connection-target').count()>=1,'compatible targets highlight during connection');
-await page.locator(`[data-brain-in="${reactionId}"]`).click();
-assert.equal(await page.locator('#brain-graph .brain-link').count(),1,'port-to-port tap creates a real edge');
-assert.equal(await page.locator('#to-setup').isDisabled(),false,'connected trigger to reaction makes graph runnable');
+await page.locator(`[data-brain-out="${triggerId}"]`).click();assert.ok(await page.locator('#brain-graph .connection-target').count()>=1,'compatible targets highlight during connection');await page.locator(`[data-brain-in="${reactionId}"]`).click();
+assert.equal(await page.locator('#brain-graph .brain-link').count(),1,'port-to-port tap creates a real edge');assert.equal(await page.locator('#to-setup').isDisabled(),false,'connected trigger to reaction makes graph runnable');
 
-// Add a real branch: trigger -> reaction AND trigger -> impulse -> reaction.
-await addNode('beright');
-const impulseWrap=page.locator('#brain-graph .brain-canvas-node').filter({hasText:'БЫТЬ ПРАВЫМ'}).first();const impulseId=await impulseWrap.getAttribute('data-brain-node-wrap');
-await page.locator(`[data-brain-out="${triggerId}"]`).click();await page.locator(`[data-brain-in="${impulseId}"]`).click();
-await page.locator(`[data-brain-out="${impulseId}"]`).click();await page.locator(`[data-brain-in="${reactionId}"]`).click();
+await addNode('beright');const impulseWrap=page.locator('#brain-graph .brain-canvas-node').filter({hasText:'БЫТЬ ПРАВЫМ'}).first();const impulseId=await impulseWrap.getAttribute('data-brain-node-wrap');
+await page.locator(`[data-brain-out="${triggerId}"]`).click();await page.locator(`[data-brain-in="${impulseId}"]`).click();await page.locator(`[data-brain-out="${impulseId}"]`).click();await page.locator(`[data-brain-in="${reactionId}"]`).click();
 assert.equal(await page.locator('#brain-graph .brain-link').count(),3,'one source can create a second real branch and rejoin');
-await page.locator(`[data-brain-node="${impulseId}"]`).click();assert.equal(await page.locator('#brain-inspector').isVisible(),true,'node tap opens inspector');
-const before=await page.locator('#brain-inspector output').textContent();await page.locator('#brain-inspector [data-brain-inc]').click();assert.notEqual(await page.locator('#brain-inspector output').textContent(),before,'inspector mutates selected node parameter');
+await page.locator(`[data-brain-node="${impulseId}"]`).click();assert.equal(await page.locator('#brain-inspector').isVisible(),true,'node tap opens inspector');const before=await page.locator('#brain-inspector output').textContent();await page.locator('#brain-inspector [data-brain-inc]').click();assert.notEqual(await page.locator('#brain-inspector output').textContent(),before,'inspector mutates selected node parameter');
 
-// Continue the deterministic scenario from an authored preset that produces HOT PATCH.
-await page.locator('[data-brain-preset="always-right"]').click();
-assert.equal(await page.locator('#to-setup').isDisabled(),false,'authored preset is a runnable real graph');
-await page.locator('#to-setup').click();assert.equal(await page.locator('#top-status').textContent(),'SETUP');
-assert.ok((await page.locator('#opponent-name').textContent()).trim().length>0);
-const opponentCharacter=await page.locator('#opponent-card').getAttribute('data-character');
-await page.locator('[data-mode="step"]').click();await page.locator('#play').click();assert.equal(await page.locator('#top-status').textContent(),'TALK');
-assert.equal(await page.locator('#actor-a').getAttribute('data-character'),'character-02');assert.equal(await page.locator('#actor-b').getAttribute('data-character'),opponentCharacter);
+await page.locator('[data-brain-preset="always-right"]').click();assert.equal(await page.locator('#to-setup').isDisabled(),false,'authored preset is a runnable real graph');
+await page.locator('#to-setup').click();assert.equal(await page.locator('#top-status').textContent(),'SETUP');assert.ok((await page.locator('#opponent-name').textContent()).trim().length>0);const opponentCharacter=await page.locator('#opponent-card').getAttribute('data-character');
+await page.locator('[data-mode="step"]').click();await page.locator('#play').click();assert.equal(await page.locator('#top-status').textContent(),'TALK');assert.equal(await page.locator('#actor-a').getAttribute('data-character'),'character-02');assert.equal(await page.locator('#actor-b').getAttribute('data-character'),opponentCharacter);
 let hotPatchSeen=false;for(let i=0;i<18;i++){if(await page.locator('#overlay:not([hidden]) [data-patch="repeat"]').count()){hotPatchSeen=true;break}await page.locator('#next-turn').click();await page.waitForTimeout(30)}
 assert.equal(hotPatchSeen,true,'predictive HOT PATCH appears from the selected preset graph');const turnBeforePatch=Number(await page.locator('#turn').textContent());await page.locator('[data-patch="repeat"]').click();assert.equal(Number(await page.locator('#turn').textContent()),turnBeforePatch);
 let resultSeen=false;for(let i=0;i<30;i++){if((await page.locator('#top-status').textContent())==='RESULT'){resultSeen=true;break}await page.locator('#next-turn').click();await page.waitForTimeout(30)}
