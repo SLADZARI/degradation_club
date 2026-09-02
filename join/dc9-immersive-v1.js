@@ -21,7 +21,7 @@ function normalizeDb(raw){
  return next;
 }
 function saveDb(){db.quizVersion=QUIZ_VERSION;localStorage.setItem(STORAGE,JSON.stringify(db))}
-function esc(value){return String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot',"'":'&#39;'}[c]))}
+function esc(value){return String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function inline(value){return esc(value).replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/`([^`]+)`/g,'<code>$1</code>')}
 function sceneHtml(text){let out='',quote=[];const flush=()=>{if(quote.length){out+='<blockquote>'+quote.map(x=>inline(x.replace(/^>\s?/,''))).join('<br>')+'</blockquote>';quote=[]}};for(const raw of String(text).split('\n')){const line=raw.trimEnd();if(line.startsWith('>')){quote.push(line);continue}flush();if(!line.trim())continue;out+='<p>'+inline(line)+'</p>'}flush();return out}
 function shuffle(input){const a=[...input];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
