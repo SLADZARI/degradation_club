@@ -1,5 +1,5 @@
 import { NODE_SPECS } from '../core/model.mjs';
-import { canConnectNodes, validateGraph } from '../core/graph.mjs';
+import { canConnectNodes, validateGraph, familyOf } from '../core/graph.mjs';
 import { graphLayers } from './brain-layout.mjs';
 
 let serial=0;
@@ -45,5 +45,10 @@ export function connectBrainNodes(graph,fromId,toId){
 
 export function disconnectBrainEdge(graph,edgeId){graph.edges=graph.edges.filter(e=>e.id!==edgeId)}
 export function compatibleBrainTargets(graph,fromId){const from=graph.nodes.find(n=>n.id===fromId);return graph.nodes.filter(n=>canConnectNodes(graph,from,n)).map(n=>n.id)}
-export function brainValidation(graph){return validateGraph(graph)}
+export function brainValidation(graph,triggerType=null){
+  const base=validateGraph(graph);if(!base.runnable||!triggerType)return base;
+  const trigger=graph.nodes.find(n=>familyOf(n)==='TRIGGER'&&n.type===triggerType);
+  if(!trigger)return {runnable:false,code:'TRIGGER_MISMATCH',detail:`В ЭТОЙ СИТУАЦИИ НЕТ ТРИГГЕРА «${NODE_SPECS[triggerType]?.title||triggerType}».`};
+  return base;
+}
 export function familyNodes(family){return Object.entries(NODE_SPECS).filter(([,spec])=>spec.family===family).map(([type,spec])=>({type,...spec}))}
