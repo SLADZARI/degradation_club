@@ -258,6 +258,12 @@ Observed:
 - tester needed substantial time to locate `COMMUNITY` despite already knowing the site;
 - a first-time visitor is likely to lose orientation faster.
 
+Clarification from later QA:
+
+- this issue is **not** treated as a separate reason to keep Membership Review standalone;
+- if Review is integrated into the normal Workspace shell, its standalone dark-page navigation problem disappears as part of `QA-MEM-009`;
+- `QA-MEM-007` remains open only for public/special pages where low contrast is independently reproducible, especially `/join/apply/`.
+
 Expected:
 
 - global public navigation must remain immediately legible on every supported page theme;
@@ -266,7 +272,7 @@ Expected:
 
 Required fix:
 
-1. audit topbar/nav contrast on all dark pages, not just `/join/apply/`;
+1. audit topbar/nav contrast on special dark/onboarding pages where the issue actually reproduces;
 2. use theme-aware navigation tokens or an explicit dark-header variant;
 3. retest desktop and mobile after correction.
 
@@ -280,10 +286,11 @@ Status: **OPEN**
 Severity: **P1 / INFORMATION ARCHITECTURE + DISCOVERABILITY**  
 Relevant production route: `/community/board/`
 
-Verified in production code:
+Verified in production code and live QA:
 
 - the private board exists as a dedicated Member surface;
 - production labels it `COMMUNITY / PRIVATE BOARD` and `ОБЩАЯ ДОСКА`;
+- accepted Membership v2 Member can open it directly — **ACCESS PASS**;
 - current Workspace sidebar exposes `HOME`, `MY CLUB`, `MY ACTIVITY`, optional `MY WORK`, `MY PROFILE`, plus Dementor-only Membership Review;
 - no Board or Artifact destination is present in the left Workspace navigation.
 
@@ -306,7 +313,7 @@ Recommended placement:
 - expose the member's own Artifacts near the same internal Club surface;
 - do not require an authenticated Member to infer that a private operational Board hides behind the public Community landing.
 
-Retest: **NOT RUN**.
+Retest: **ACCESS PASS / DISCOVERABILITY NOT FIXED**.
 
 ---
 
@@ -334,6 +341,45 @@ Expected / recommended architecture:
 - Member status belongs in `MY CLUB`;
 - private Board/Artifacts belong in the authenticated Club area;
 - Dementor-only review tooling is layered on top of the same left-panel workspace according to role.
+
+Retest: **NOT RUN**.
+
+---
+
+### QA-MEM-010 — Archived member Artifacts exist in data but are not discoverable in the UI
+
+Status: **OPEN**  
+Severity: **P1 / MEMBER HISTORY + DISCOVERABILITY**  
+Surface: `https://dementor.club/community/board/`
+
+Observed during live QA:
+
+- accepted Member can open the private Board;
+- `МОЁ` shows one current Artifact: `Куда двигаемся - народ?`;
+- tester could not find an Archive/history view and could not reach the older Artifact from the UI.
+
+Database verification:
+
+The Sharecraft account has two Community Artifact records:
+
+1. `Куда двигаемся - народ?` — `status = active`;
+2. `гусь` — `status = archived`, closed on 2026-08-30.
+
+Therefore `МОЁ` showing one item is not a data-loss bug if it intentionally filters to active items. The defect is that the archived item remains in authoritative data but has no discoverable member-facing history/archive surface.
+
+Expected:
+
+- current Board can continue to default to active/current Artifacts;
+- Member must have a clear way to inspect their historical/archived Artifacts;
+- archived items should be visibly distinguished from active ones and should not silently disappear from the member's own history;
+- archive access should live in the authenticated Workspace/Club IA, not be hidden behind undocumented filters.
+
+Recommended fix:
+
+1. add `ARCHIVE` / `HISTORY` for member Artifacts, or expose archived items in `MY ARTIFACTS` inside Workspace;
+2. preserve existing status semantics (`active` vs `archived`) rather than mixing them in one undifferentiated current Board;
+3. make the archived `гусь` record reachable in the retest without changing its authoritative status;
+4. confirm that archiving an Artifact removes it from the live Board but not from the member's personal history.
 
 Retest: **NOT RUN**.
 
@@ -415,10 +461,11 @@ Legend: `[ ]` not tested, `[~]` issue/incomplete, `[x]` passed.
 - [x] candidate refresh/login resolves to Member state.
 - [x] candidate cannot submit a new application while already active Member.
 - [x] public Community landing remains accessible and behaves as public Community/people surface.
+- [x] private Board direct access works for accepted Member.
 - [~] private Board is not discoverable from Workspace — `QA-MEM-008`.
-- [ ] private Board access itself checked under accepted Member.
-- [ ] post-admission Artifact flow checked.
-- [ ] previous artifacts preserved visually.
+- [x] `МОЁ` correctly shows current active Artifact rather than archived history.
+- [~] archived Artifact history is not discoverable — `QA-MEM-010`.
+- [ ] post-admission Artifact creation flow checked.
 - [ ] previous Artifact grant preserved / no duplicate grant.
 
 ### F. Account / adjacent surfaces encountered during pass
@@ -427,7 +474,7 @@ Legend: `[ ]` not tested, `[~]` issue/incomplete, `[x]` passed.
 - [~] ACCOUNT → CART → 404 — `QA-MEM-003`.
 - [~] historical course completion vs current repeat pass ambiguous — `QA-MEM-004`.
 - [~] no discoverable sign-out/logout action — `QA-MEM-005`.
-- [~] public top navigation low contrast on dark membership page — `QA-MEM-007`.
+- [~] public top navigation low contrast on `/join/apply/` — `QA-MEM-007`.
 
 ### G. Privacy / security / resilience
 
@@ -464,9 +511,11 @@ Current evidence supports a clean boundary:
 This remains the public website/landing architecture.
 
 **AUTHENTICATED WORKSPACE LEFT PANEL**  
-`Home / My Club / My Activity / [private Board + Artifacts] / My Work / My Profile / role-specific tools`
+`Home / My Club / Community Board / My Artifacts / My Activity / My Work / My Profile / role-specific tools`
 
 Role-specific tools such as Membership Review should remain in this Workspace shell rather than opening a visually separate mini-site.
+
+Member Artifact history should be reachable from `My Artifacts` or an explicit internal Archive/History state.
 
 This is a QA-derived implementation recommendation, not a new change to Membership admission semantics.
 
@@ -474,9 +523,9 @@ This is a QA-derived implementation recommendation, not a new change to Membersh
 
 Continue from the now-active Member account without resetting historical test data:
 
-1. open the private Board directly at `/community/board/` and verify Member access, old artifacts and current board behavior;
-2. inspect whether existing 2 Sharecraft artifacts are visible and whether a new initial Artifact slot was incorrectly duplicated;
-3. revisit `/workspace/review/` under a Dementor and confirm the accepted request is closed/removed from active queue;
+1. revisit `/workspace/review/` under a Dementor and confirm the accepted request is closed/removed from active queue;
+2. verify the initial Artifact grant was not duplicated by Membership v2 acceptance;
+3. test the post-admission Artifact creation path if an available slot/action is exposed;
 4. continue current repeat of `Думай с опасностью` only far enough to understand repeat-attempt storage;
 5. later run negative-role access and logout/relogin checks after current positive flow is fully mapped.
 
@@ -485,10 +534,11 @@ Continue from the now-active Member account without resetting historical test da
 The pass is green only when:
 
 - P0 findings are fixed and retested;
-- P1 decision/navigation/session-control/IA defects are fixed and retested;
+- P1 decision/navigation/session-control/IA/history defects are fixed and retested;
 - core two-Dementor admission remains stable after relogin;
 - candidate/reviewer/membership states remain synchronized;
 - public Community and private Member Board have clear, discoverable boundaries;
+- active and archived member Artifacts are both reachable in the appropriate surfaces;
 - Community/Artifact post-admission path works;
 - user can explicitly terminate an authenticated session and relogin without stale role state;
 - privacy/RLS negative-role tests pass;
