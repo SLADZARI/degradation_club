@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <title>My Artifacts — Dementor Club</title>
+  <link rel="stylesheet" href="../../design-system/design-system.css">
+  <link rel="stylesheet" href="../../design-system/dementor-workspace/workspace.css">
+  <link rel="stylesheet" href="../workspace.css">
+  <link rel="stylesheet" href="./artifacts.css">
+  <script src="../../site-config.js"></script>
+</head>
+<body class="dc-system-page dcw-body">
+  <div class="dcw-live-banner">DEMENTOR CLUB · PERSONAL WORKSPACE · MY ARTIFACTS</div>
+  <div class="dcw-app">
+    <aside class="dcw-sidebar">
+      <a class="dcw-brand" href="../"><span>DEMENTOR</span><strong>CLUB</strong></a>
+      <nav class="dcw-nav" aria-label="Личный кабинет">
+        <a class="dcw-nav-link" href="../">HOME</a>
+        <a class="dcw-nav-link" href="../">MY CLUB</a>
+        <a class="dcw-nav-link" href="../../community/board/">COMMUNITY BOARD</a>
+        <a class="dcw-nav-link is-active" href="./">MY ARTIFACTS</a>
+        <a class="dcw-nav-link" href="../">MY ACTIVITY</a>
+        <a class="dcw-nav-link" href="../">MY PROFILE</a>
+      </nav>
+      <div class="dcw-boundary"><span>MEMBER HISTORY</span><strong>ACTIVE + ARCHIVED</strong><small>Архив не возвращается на live Board, но остаётся доступным владельцу.</small></div>
+    </aside>
+    <main class="dcw-main">
+      <header class="dcw-topbar"><div><span class="dcw-kicker">DEMENTOR CLUB / PERSONAL WORKSPACE</span><strong>MY ARTIFACTS</strong></div><div class="dcw-top-meta"><span>MEMBER DATA</span><span class="dcw-dot"></span><span>RLS</span></div></header>
+      <div class="dcw-view">
+        <div class="dcw-page-head"><div><div class="dcw-kicker">COMMUNITY / PERSONAL HISTORY</div><h1>МОИ<br>АРТЕФАКТЫ.</h1></div><p>Текущие публикации и архив. Live Board показывает происходящее сейчас; здесь ничего не пропадает после закрытия.</p></div>
+        <div class="dca-filters"><button type="button" data-filter="all" class="is-active">ВСЕ</button><button type="button" data-filter="active">АКТИВНЫЕ</button><button type="button" data-filter="archived">АРХИВ</button></div>
+        <div id="artifactHost" class="dca-list" aria-live="polite"><div class="dcw-empty-live">ЗАГРУЖАЕМ ИСТОРИЮ…</div></div>
+      </div>
+    </main>
+  </div>
+  <script type="module" src="./artifacts.js"></script>
+</body>
+</html>
