@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node tests/encounter-runtime-selftest.mjs && node tests/result-replay-selftest.mjs && node tests/character-renderer-selftest.mjs && node tests/character-registry-selftest.mjs && node tests/character-asset-selftest.mjs && node tests/opponent-generator-selftest.mjs && node tests/ui-contract-selftest.mjs && node tests/mobile-readability-selftest.mjs",
+    "test": "node --check scripts/physical-qa-server.mjs && node tests/encounter-runtime-selftest.mjs && node tests/result-replay-selftest.mjs && node tests/character-renderer-selftest.mjs && node tests/character-registry-selftest.mjs && node tests/character-asset-selftest.mjs && node tests/opponent-generator-selftest.mjs && node tests/ui-contract-selftest.mjs && node tests/mobile-readability-selftest.mjs",
     "test:runtime": "node tests/encounter-runtime-selftest.mjs",
     "test:replay": "node tests/result-replay-selftest.mjs",
     "test:renderer": "node tests/character-renderer-selftest.mjs",
@@ -12,6 +12,7 @@
     "test:opponent": "node tests/opponent-generator-selftest.mjs",
     "test:ui": "node tests/ui-contract-selftest.mjs",
     "test:mobile": "node tests/mobile-readability-selftest.mjs",
+    "test:qa-server": "node --check scripts/physical-qa-server.mjs",
     "qa:phone": "node scripts/physical-qa-server.mjs"
   }
 }
