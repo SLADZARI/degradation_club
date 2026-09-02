@@ -6,86 +6,101 @@
 
 ## STATUS
 
-Variant-capable runtime plumbing is integrated. Exact cleaned character geometry is **not yet promoted to production**.
+Exact cleaned geometry for **both** approved production characters is now promoted and active.
 
-This distinction is deliberate: the current production SVGs are still the previously reconstructed semantic assets, while newly supplied candidate manifests describe a richer cleaned-asset contract.
+Production roster remains exactly:
 
-## COMPLETED
+- `character-01` — exact cleaned male base;
+- `character-02` — exact cleaned female base.
 
-- product source-of-truth extended from boolean appearance state to variant appearance state;
-- roster remains exactly `character-01` + `character-02`;
-- `CharacterRegistry` now exposes the variant-capable data contract and rejects undeclared variants/color targets;
-- `CharacterRenderer` supports numbered semantic groups such as `hat-01`, `glasses-01`, `facial-hair-01`, `outfit-01`, `shoes-01`;
-- renderer keeps legacy single-layer SVG compatibility until the geometry swap;
-- PERSON keeps shared vs body-owned appearance responsibilities separate;
-- PERSON has a compact mobile variant rail which activates only when the production registry declares real variants;
-- seeded opponent generation is variant-ready while keeping appearance independent from BehaviorGraph preset;
-- replay snapshot preserves player appearance state and the exact frozen opponent profile;
-- candidate manifests are staged outside the production runtime asset directory;
-- migration selftest prevents candidate variants from being advertised before the production SVG contract is updated.
+The runtime no longer depends on reconstructed character geometry for either production body. Both SVGs are paired with validated `cleaned-svg-v1` manifests and are enabled through the manifest/SVG gate.
 
-## CANDIDATE MANIFEST FACTS
+## VERIFIED EXACT ASSETS
 
 ### character-01
 
-Candidate manifest declares:
+Validated production contract:
 
+- viewBox: `0 0 703 1024`;
 - hats: 7;
 - glasses: 4;
 - facial hair: 4;
 - accessories: 3;
 - outfits: 3;
 - shoes: 1;
-- color targets: `shorts-primary`, `shirt-primary`, `outfit-primary`, `body-underwear`, `shoes-primary`.
-
-It also records that `outfit-02` and `outfit-03` contain merged geometry that must not be split/recolored by invention.
+- exact rig pivots:
+  - head `[352,270]`;
+  - shoulderLeft `[275,345]`;
+  - shoulderRight `[425,345]`;
+  - hipLeft `[311,590]`;
+  - hipRight `[393,591]`.
 
 ### character-02
 
-Candidate manifest declares:
+Validated production contract:
 
+- viewBox: `0 0 703 1024`;
+- 58 unique authored semantic DOM ids;
 - hats: 7;
 - glasses: 4;
 - facial hair: 0;
 - accessories: 3;
 - outfits: 0;
 - shoes: 1;
-- color targets: `shoes-primary` only.
+- color targets: `shoes-primary` only;
+- exact rig pivots:
+  - head `[352,270]`;
+  - shoulderLeft `[287,345]`;
+  - shoulderRight `[412,345]`;
+  - hipLeft `[310,540]`;
+  - hipRight `[392,541]`.
 
-The missing outfit variants are not an error to fill artificially: torso clothing is recorded as baked into source body geometry.
+The female asymmetry is **source truth**, not a missing implementation task. Torso clothing is baked into source body geometry; no facial-hair or separable outfit variants are to be invented for UI symmetry.
 
-## CURRENT ASSET GATE
+## NORMALIZATION RULE
 
-Do **not** copy the candidate manifests over production `manifest.json` yet.
+Both promoted assets preserve authored geometry. Normalization is semantic/runtime-only:
 
-Before promotion, both cleaned SVG files must be directly readable and checked against their manifests for:
+- exact path geometry is not redrawn;
+- verified rig metadata is exposed on the SVG root;
+- semantic IDs are preserved;
+- color targets and variant groups are treated independently;
+- optional appearance remains manifest-driven rather than inferred from visual stereotypes.
 
-- `viewBox`;
-- groups and ids;
-- transforms;
-- masks / clips;
-- opacity / display defaults;
-- fills / strokes;
-- face-state groups;
-- numbered appearance groups;
-- color-target ids;
-- pivot metadata or manifest fallback coordinates.
+## RUNTIME FIXES DISCOVERED BY EXACT-ASSET QA
 
-Only after that comparison should production geometry + production manifests + registry variant catalogs be updated together.
+Exact assets exposed two renderer bugs that were hidden by the reconstructed SVGs:
 
-## INPUT NOTE
+1. `outfit-primary` / `shoes-primary` and similar paint IDs could be mistaken for numbered variants by prefix matching. Variant discovery now accepts only exact `prefix-NN` IDs.
+2. Exact SVGs may use legacy-named wrapper groups such as `#shoes` around numbered variants such as `#shoes-01`. The renderer now preserves such wrapper groups instead of hiding the entire exact variant subtree.
 
-The archive inspected in this integration pass contains four Dementor Club web-ready WEBP editorial/site assets (`about-service-03`, `event-fuengirola-03`, `logic-awareness-03`, `home-interruption-03`). They are not DEMENTOR LAB character geometry and were therefore not added to the LAB character registry.
+Both behaviors are covered by automated tests.
 
-Two pivot-reference SVG attachments were announced for this pass, but their byte paths were not readable in the execution sandbox. Their geometry/pivots therefore remain **unverified input**, not a basis for silently changing production rig coordinates.
+## QA RESULT
+
+Automated QA after both exact promotions:
+
+- deterministic runtime suite: **PASS**;
+- manifest/SVG registry gate: **PASS**;
+- exact character asset checks: **PASS**;
+- renderer exact-variant checks: **PASS**;
+- opponent/replay/UI/mobile-readability checks: **PASS**;
+- iPhone-sized Chromium end-to-end browser smoke: **PASS**.
+
+Browser smoke verifies exact numbered variant selection, compatible shared appearance across body switch, intentional female asymmetry, TALK persistence, predictive HOT PATCH, RESULT and same-opponent counterfactual replay.
 
 ## NEXT GATE
 
-1. Read the exact cleaned male/female SVG XML when accessible.
-2. Compare real ids/geometry with staged candidate manifests.
-3. Promote only validated SVG + manifest pairs into the two production character directories.
-4. Populate production registry variant catalogs from validated manifests.
-5. Run asset/runtime/opponent/UI/browser QA.
-6. Return to physical iPhone Safari + Android Chrome Gate A and FUN PASS.
+Asset expansion is frozen. Do not add `character-03` or fabricate missing female variants.
+
+Next work:
+
+1. physical iPhone Safari QA;
+2. physical Android Chrome QA;
+3. fix only reproducible device/browser defects;
+4. Gate D FUN PASS with a new adult player;
+5. then decide whether the vertical slice is ready for integration/release work.
+
+Physical-device QA is **not** considered passed by CI.
 
 No Vercel deploy is part of this change.
