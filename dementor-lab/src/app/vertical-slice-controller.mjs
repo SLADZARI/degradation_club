@@ -25,6 +25,14 @@ export class VerticalSliceController{
   }
   patch(patch){const change=applyHotPatch(this.encounter,patch);this.onEvent({type:'PATCH',patch,change,encounter:this.encounter});this.render();return change}
   declinePatch(){declineHotPatch(this.encounter);this.onEvent({type:'PATCH_DECLINED',encounter:this.encounter});this.render()}
-  render(){if(!this.encounter)return;this.renderers.A?.render(this.encounter.actors.A);this.renderers.B?.render(this.encounter.actors.B)}
+  render(){
+    if(!this.encounter)return;
+    const terminal=this.encounter.result;
+    for(const side of ['A','B']){
+      const renderer=this.renderers[side],actor=this.encounter.actors[side];
+      if(terminal?.type==='BREAKDOWN'&&terminal.loser===side)renderer?.breakdown?.(actor,terminal.reason);
+      else renderer?.render?.(actor);
+    }
+  }
   result(){return buildResult(this.encounter)}
 }
