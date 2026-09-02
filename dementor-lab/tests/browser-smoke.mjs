@@ -5,17 +5,39 @@ const baseURL=`${root}?seed=browser-smoke-opponent`;
 const browser=await chromium.launch({headless:true});const context=await browser.newContext({...devices['iPhone 13']});const page=await context.newPage();
 await page.goto(baseURL,{waitUntil:'networkidle'});
 assert.equal(await page.locator('#top-status').textContent(),'PERSON');
-assert.equal(await page.locator('#person-preview svg').count(),1,'semantic character asset is mounted');
+assert.equal(await page.locator('#person-preview svg').count(),1,'exact character asset is mounted');
 assert.equal(await page.locator('.character-switch [data-character]').count(),2,'PERSON exposes exactly two body-rig controls');
 assert.equal(await page.locator('[data-part]').count(),6,'appearance panel exposes six semantic parts');
-assert.equal(await page.locator('#person-preview #hat').isVisible(),true,'shared hat starts visible');
-await page.locator('[data-part="hat"]').click();assert.equal(await page.locator('#person-preview #hat').isVisible(),false,'shared accessory can be hidden');
+
+// character-01 exact contract: optional variants start at null, authored owned base remains visible.
+assert.equal(await page.locator('[data-part="hat"]').getAttribute('data-variant-count'),'7','male exposes seven authored hats');
+assert.equal(await page.locator('[data-part="glasses"]').getAttribute('data-variant-count'),'4','male exposes four authored glasses');
+assert.equal(await page.locator('[data-part="beard"]').getAttribute('data-variant-count'),'4','male exposes four authored facial-hair variants');
+assert.equal(await page.locator('[data-part="outfit"]').getAttribute('data-variant-count'),'3','male exposes three authored outfits');
+assert.equal(await page.locator('[data-part="shoes"]').getAttribute('data-variant-count'),'1','male exposes one authored shoes variant');
+assert.equal(await page.locator('#person-preview #hat-01').isVisible(),false,'optional hat starts unselected on exact male');
+await page.locator('[data-part="hat"]').click();
+await page.locator('#variant-options [data-variant="hat-01"]').click();
+assert.equal(await page.locator('#person-preview #hat-01').isVisible(),true,'exact male hat variant can be selected');
+await page.locator('[data-part="beard"]').click();
+await page.locator('#variant-options [data-variant="facial-hair-01"]').click();
+assert.equal(await page.locator('#person-preview #facial-hair-01').isVisible(),true,'exact male facial-hair variant can be selected');
+
+// character-02 exact contract: compatible shared hat survives; unsupported facial hair/outfit are not fabricated.
 await page.locator('.character-switch [data-character="character-02"]').click();await page.waitForTimeout(80);
-assert.equal(await page.locator('#person-preview').getAttribute('data-character'),'character-02','female body rig mounts');
-assert.equal(await page.locator('#person-preview #hat').isVisible(),false,'shared accessory state survives body switch');
-assert.equal(await page.locator('#person-preview #outfit').isVisible(),true,'female character keeps own outfit');
-assert.equal(await page.locator('#person-preview #shoes').isVisible(),true,'female character keeps own shoes');
-await page.locator('[data-part="hat"]').click();assert.equal(await page.locator('#person-preview #hat').isVisible(),true,'shared hat restores on female rig');
+assert.equal(await page.locator('#person-preview').getAttribute('data-character'),'character-02','female exact body rig mounts');
+assert.equal(await page.locator('[data-part="hat"]').getAttribute('data-variant-count'),'7','female exposes seven authored hats');
+assert.equal(await page.locator('[data-part="glasses"]').getAttribute('data-variant-count'),'4','female exposes four authored glasses');
+assert.equal(await page.locator('[data-part="beard"]').getAttribute('data-variant-count'),'0','female exact source intentionally exposes no facial-hair variants');
+assert.equal(await page.locator('[data-part="outfit"]').getAttribute('data-variant-count'),'0','female exact source intentionally exposes no outfit variants');
+assert.equal(await page.locator('[data-part="shoes"]').getAttribute('data-variant-count'),'1','female exposes authored shoes variant');
+assert.equal(await page.locator('#person-preview #hat-01').isVisible(),true,'compatible shared exact hat survives body switch');
+assert.equal(await page.locator('#person-preview [id^="facial-hair-"]').count(),0,'female SVG contains no fabricated facial-hair geometry');
+assert.equal(await page.locator('#person-preview [id^="outfit-"]').count(),0,'female SVG contains no fabricated outfit variant geometry');
+assert.equal(await page.locator('#person-preview #shoes-01').isVisible(),true,'female authored base shoes remain visible when no explicit shoes variant is selected');
+await page.locator('[data-part="hat"]').click();
+await page.locator('#variant-options [data-variant=""]').click();
+assert.equal(await page.locator('#person-preview #hat-01').isVisible(),false,'shared exact hat can be cleared on female rig');
 
 await page.locator('#to-brain').click();assert.equal(await page.locator('#top-status').textContent(),'BRAIN');assert.ok(await page.locator('#brain-graph .brain-node').count()>=5);
 await page.locator('#to-setup').click();assert.equal(await page.locator('#top-status').textContent(),'SETUP');
@@ -31,4 +53,4 @@ let resultSeen=false;for(let i=0;i<28;i++){if((await page.locator('#top-status')
 assert.equal(resultSeen,true,'authored scenario should reach RESULT');assert.ok((await page.locator('#result-cause').textContent()).trim().length>0);assert.ok((await page.locator('#result-node').textContent()).trim().length>0);
 await page.locator('#rerun').click();assert.equal(await page.locator('#top-status').textContent(),'BRAIN');assert.equal(await page.locator('#replay-note').isVisible(),true);assert.match(await page.locator('#replay-note').textContent(),/СОПЕРНИК ТОТ ЖЕ/);assert.equal(await page.locator('#actor-b').getAttribute('data-character'),opponentCharacter,'counterfactual replay keeps same opponent body');assert.equal(await page.locator('#brain-editor input:disabled').count(),1,'counterfactual replay locks the non-target control');
 const viewport=page.viewportSize(),layout=await page.evaluate(()=>({scrollWidth:document.documentElement.scrollWidth,clientWidth:document.documentElement.clientWidth}));assert.ok(layout.scrollWidth<=layout.clientWidth+1,`no horizontal overflow: ${layout.scrollWidth}/${layout.clientWidth}`);assert.ok(viewport?.width<=430,'smoke test runs in small-phone viewport');
-await browser.close();console.log('DEMENTOR LAB browser smoke: PASS');
+await browser.close();console.log('DEMENTOR LAB browser smoke: PASS — both exact character contracts work in phone-sized flow');
