@@ -10,53 +10,50 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  gameplay-ui-repair:
-    if: "github.event.head_commit.message == 'chore(lab): apply hot patch gameplay repair'"
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - run: python3 dementor-lab/scripts/patch-gameplay-ui-2.py
-      - run: |
-          rm dementor-lab/scripts/patch-gameplay-ui-2.py
-          git config user.name SLEDZARI
-          git config user.email sharecraftwideo@gmail.com
-          git add dementor-lab/src/ui/app.mjs dementor-lab/tests/browser-smoke.mjs dementor-lab/scripts/patch-gameplay-ui-2.py
-          git commit -m 'fix(lab): restore full hot patch and brain UI semantics'
-          git push origin HEAD:agent/dementor-lab-vertical-slice-v0.3
-
   deterministic-qa:
-    if: "github.event.head_commit.message != 'chore(lab): apply hot patch gameplay repair'"
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: dementor-lab
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - run: npm test
+      - name: Run zero-dependency QA suite
+        run: npm test
 
   browser-smoke:
-    if: "github.event.head_commit.message != 'chore(lab): apply hot patch gameplay repair'"
     runs-on: ubuntu-latest
     needs: deterministic-qa
     defaults:
       run:
         working-directory: dementor-lab
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - run: npm install --no-save playwright@1.55.0
-      - run: npx playwright install --with-deps chromium
-      - run: python3 -m http.server 4173 --bind 127.0.0.1 > /tmp/dementor-lab-http.log 2>&1 &
-      - run: |
-          for i in {1..20}; do curl -fsS http://127.0.0.1:4173/ >/dev/null && exit 0; sleep 1; done
+      - name: Install Playwright for QA only
+        run: npm install --no-save playwright@1.55.0
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Start static server
+        run: python3 -m http.server 4173 --bind 127.0.0.1 > /tmp/dementor-lab-http.log 2>&1 &
+      - name: Wait for static server
+        run: |
+          for i in {1..20}; do
+            curl -fsS http://127.0.0.1:4173/ >/dev/null && exit 0
+            sleep 1
+          done
           cat /tmp/dementor-lab-http.log
           exit 1
-      - run: DEMENTOR_LAB_URL=http://127.0.0.1:4173 node tests/browser-smoke.mjs
+      - name: Run iPhone-sized browser smoke
+        run: DEMENTOR_LAB_URL=http://127.0.0.1:4173 node tests/browser-smoke.mjs
