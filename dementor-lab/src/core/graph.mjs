@@ -11,14 +11,6 @@ export const NEXT_FAMILY_COMPAT=Object.freeze({
   ABILITY:new Set(['STATE','REACTION','CONTROL'])
 });
 
-export function canConnectNodes(graph,fromNode,toNode){
-  if(!fromNode||!toNode||fromNode.id===toNode.id)return false;
-  if((graph.edges||[]).some(e=>e.from===fromNode.id&&e.to===toNode.id))return false;
-  const fromFam=familyOf(fromNode),toFam=familyOf(toNode);
-  if(toFam==='TRIGGER')return false;
-  return !!NEXT_FAMILY_COMPAT[fromFam]?.has(toFam);
-}
-
 export function outgoing(graph,id){return (graph.edges||[]).filter(e=>e.from===id)}
 export function reachableFrom(graph,startId){
   const seen=new Set(),stack=[startId];
@@ -29,7 +21,21 @@ export function reachableFrom(graph,startId){
   return seen;
 }
 
+export function canConnectNodes(graph,fromNode,toNode){
+  if(!fromNode||!toNode||fromNode.id===toNode.id)return false;
+  if((graph.edges||[]).some(e=>e.from===fromNode.id&&e.to===toNode.id))return false;
+  const fromFam=familyOf(fromNode),toFam=familyOf(toNode);
+  if(toFam==='TRIGGER')return false;
+  if(!NEXT_FAMILY_COMPAT[fromFam]?.has(toFam))return false;
+  // Explicit graph cycles are not the repeat mechanic. REPEAT owns looping semantics.
+  if(reachableFrom(graph,toNode.id).has(fromNode.id))return false;
+  return true;
+}
+
 export function validateGraph(graph){
+  const ids=new Set(graph.nodes.map(n=>n.id));
+  const dangling=(graph.edges||[]).find(e=>!ids.has(e.from)||!ids.has(e.to));
+  if(dangling)return {runnable:false,code:'DANGLING_EDGE',edgeId:dangling.id,detail:'ОДНА ИЗ СВЯЗЕЙ ВЕДЁТ В НЕСУЩЕСТВУЮЩИЙ УЗЕЛ.'};
   const triggers=graph.nodes.filter(n=>familyOf(n)==='TRIGGER');
   const reactions=graph.nodes.filter(n=>familyOf(n)==='REACTION');
   if(!triggers.length)return {runnable:false,code:'NO_TRIGGER',detail:'СХЕМА ПОКА НЕ ЗНАЕТ, С ЧЕГО НАЧИНАТЬ.'};
