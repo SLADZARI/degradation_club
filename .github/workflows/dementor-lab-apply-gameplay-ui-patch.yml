@@ -1,0 +1,23 @@
+name: Apply Dementor Lab Gameplay UI Patch
+on:
+  push:
+    branches:
+      - agent/dementor-lab-vertical-slice-v0.3
+permissions:
+  contents: write
+jobs:
+  patch:
+    if: github.event.head_commit.message == 'chore(lab): apply staged gameplay UI patch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/dementor-lab-vertical-slice-v0.3
+      - run: python3 dementor-lab/scripts/patch-gameplay-ui.py
+      - run: rm dementor-lab/scripts/patch-gameplay-ui.py .github/workflows/dementor-lab-apply-gameplay-ui-patch.yml
+      - run: |
+          git config user.name SLEDZARI
+          git config user.email sharecraftwideo@gmail.com
+          git add -A
+          git commit -m 'fix(lab): restore brain graph and replay invariants'
+          git push origin HEAD:agent/dementor-lab-vertical-slice-v0.3
