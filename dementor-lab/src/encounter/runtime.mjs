@@ -24,7 +24,6 @@ function enumeratePaths(graph,startId,maxDepth=18){
   function walk(id,path,visits){
     if(path.length>=maxDepth){out.push(path);return}
     const n=nodeById(graph,id);if(!n){out.push(path);return}
-    // STOP is executable control: nothing downstream may run in this path.
     if(n.type==='stop'){out.push([...path,n]);return}
     const next=outgoing(graph,id);if(!next.length){out.push([...path,n]);return}
     const count=visits.get(id)||0;if(count>=3){out.push([...path,n]);return}
@@ -37,7 +36,6 @@ function conditionAllows(character,path){
 }
 function selectPath(character,trigger){
   const graph=character.brainGraph,validation=validateGraph(graph);if(!validation.runnable)throw new Error(validation.detail);
-  // A situation fires a concrete trigger. Another trigger must never silently substitute for it.
   const roots=graph.nodes.filter(n=>familyOf(n)==='TRIGGER'&&n.type===trigger);
   if(!roots.length)return null;
   const scored=roots.flatMap(n=>enumeratePaths(graph,n.id)).filter(path=>conditionAllows(character,path)).map(path=>{
@@ -59,7 +57,10 @@ export function predictTurn(encounter,{trigger=null}={}){
 }
 export function detectBreakpoint(encounter,prediction){
   if(prediction.predictedSelf.brain>=88&&prediction.chosen.repeat>1)return {type:'BRAIN_LOOP',actorId:prediction.side,nodeIds:prediction.chosen.path.map(n=>n.id),predictedBrain:prediction.predictedSelf.brain};
-  if(prediction.predictedSelf.contact<=8)return {type:'CONTACT_RISK',actorId:prediction.side,nodeIds:prediction.chosen.path.map(n=>n.id),predictedContact:prediction.predictedSelf.contact};
+  if(encounter.scenario.objective==='contact'){
+    const selfRisk=prediction.predictedSelf.contact<=8,targetRisk=prediction.predictedTarget.contact<=8;
+    if(selfRisk||targetRisk)return {type:'CONTACT_RISK',actorId:prediction.side,nodeIds:prediction.chosen.path.map(n=>n.id),riskSide:selfRisk?prediction.side:prediction.targetSide,predictedContact:selfRisk?prediction.predictedSelf.contact:prediction.predictedTarget.contact};
+  }
   return null;
 }
 export function executeActorTurn(encounter,{trigger=null}={}){
