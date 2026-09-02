@@ -5,7 +5,7 @@ on:
     branches:
       - agent/dementor-lab-character02-asset-staging
     paths:
-      - dementor-lab/reference/character02-upload/**
+      - dementor-lab/reference/character02-upload-v2/**
       - .github/workflows/dementor-lab-character02-asset-staging.yml
 
 permissions:
@@ -23,10 +23,10 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          parts='dementor-lab/reference/character02-upload'
+          parts='dementor-lab/reference/character02-upload-v2'
           target='dementor-lab/assets/characters/character-02/character-02-layered.svg'
-          cat "$parts"/part-*.b64 > /tmp/character-02.svg.gz.b64
-          base64 --decode /tmp/character-02.svg.gz.b64 | gzip --decompress > "$target"
+          cat "$parts"/part-*.b64 > /tmp/character-02.svg.xz.b64
+          base64 --decode /tmp/character-02.svg.xz.b64 | xz --decompress > "$target"
           actual="$(sha256sum "$target" | awk '{print $1}')"
           expected='afaecaa38e2c3eb9901899b1e48036bfc1e1194f8e03a377a7850857d5e76eab'
           test "$actual" = "$expected"
