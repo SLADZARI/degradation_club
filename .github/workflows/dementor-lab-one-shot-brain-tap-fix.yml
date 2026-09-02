@@ -1,0 +1,38 @@
+name: Dementor Lab One-shot Brain Tap Fix
+on:
+  push:
+    branches:
+      - agent/dementor-lab-vertical-slice-v0.3
+permissions:
+  contents: write
+jobs:
+  patch:
+    if: github.event.head_commit.message == 'chore(lab): stage one-shot brain tap fix'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/dementor-lab-vertical-slice-v0.3
+      - name: Patch tap vs drag behavior
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          p=Path('dementor-lab/src/ui/app.mjs')
+          s=p.read_text()
+          pattern=r"function bindBrainDrag\(\)\{.*?\nfunction selectBrainNode"
+          replacement="""function bindBrainDrag(){$$('#brain-graph [data-brain-node]').forEach(el=>{let start=null,moved=false,suppressClick=false;el.addEventListener('pointerdown',e=>{if(replayMode||brainNodeLocked(currentBrainGraph.nodes.find(n=>n.id===el.dataset.brainNode)))return;const wrap=el.closest('.brain-canvas-node');start={px:e.clientX,py:e.clientY,x:parseFloat(wrap.style.left)||0,y:parseFloat(wrap.style.top)||0,id:el.dataset.brainNode};moved=false;suppressClick=false;el.setPointerCapture?.(e.pointerId)});el.addEventListener('pointermove',e=>{if(!start)return;const dx=e.clientX-start.px,dy=e.clientY-start.py;if(!moved&&Math.hypot(dx,dy)<8)return;moved=true;suppressClick=true;const node=moveBrainNode(currentBrainGraph,start.id,start.x+dx,start.y+dy,{maxX:520,maxY:2200});const wrap=el.closest('.brain-canvas-node');wrap.style.left=`${node.ui.x}px`;wrap.style.top=`${node.ui.y}px`;requestAnimationFrame(drawBrainEdges)});el.addEventListener('pointerup',()=>{start=null});el.addEventListener('pointercancel',()=>{start=null;suppressClick=true});el.addEventListener('click',e=>{e.preventDefault();if(suppressClick){suppressClick=false;return}selectBrainNode(el.dataset.brainNode)})})}
+function selectBrainNode"""
+          out,n=re.subn(pattern,replacement,s,count=1,flags=re.S)
+          if n!=1:
+              raise SystemExit(f'patch target count={n}')
+          p.write_text(out)
+          PY
+          rm .github/workflows/dementor-lab-one-shot-brain-tap-fix.yml
+      - name: Commit fix
+        run: |
+          git config user.name "SLEDZARI"
+          git config user.email "sharecraftwideo@gmail.com"
+          git add dementor-lab/src/ui/app.mjs .github/workflows/dementor-lab-one-shot-brain-tap-fix.yml
+          git commit -m "fix(lab): separate brain node tap from drag"
+          git push origin HEAD:agent/dementor-lab-vertical-slice-v0.3
