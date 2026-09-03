@@ -1,0 +1,42 @@
+/* SETUP: three-second brief before PLAY. */
+.setup-card{margin-top:0;padding:12px;background:transparent}
+.setup-card>.kicker{margin-bottom:8px}
+.setup-card .scenario-switch{margin:0 0 12px}
+.setup-situation{border-top:2px solid var(--ink);padding:12px 0 10px}
+.setup-situation>small,.setup-stakes small,.setup-launch small{display:block;font:900 8px/1 monospace;letter-spacing:.06em;opacity:.62;margin-bottom:6px}
+.setup-situation h2{font-size:30px;line-height:.95;margin:0}
+.setup-situation .lead{margin:8px 0 0;font-size:15px;line-height:1.28}
+.setup-stakes{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 0 10px}
+.setup-stakes>div{border:2px solid var(--ink);padding:10px;min-height:92px}
+.setup-goal{background:var(--acid)}
+.setup-stakes strong{display:block;font-size:14px;line-height:1.16}
+.setup-loss strong{font-size:12px;line-height:1.25}
+.setup-card .opponent-card{margin:10px 0 12px;background:#ead2a8}
+.setup-card .opponent-head small{display:none}
+.setup-card .opponent-preview{width:118px;height:166px}
+.setup-card .opponent-card{grid-template-columns:126px minmax(0,1fr);padding:10px}
+.setup-card .opponent-card>strong{font-size:26px}
+.setup-card .opponent-card>p{font-size:13px;line-height:1.25}
+.setup-launch{display:grid;grid-template-columns:132px minmax(0,1fr);gap:8px;align-items:end;border-top:2px solid var(--ink);padding-top:10px}
+.setup-launch .segmented{margin:0}.setup-launch .segmented button{min-width:0;padding:0 8px}
+.setup-launch .primary{min-height:52px}
+@media(max-width:430px){
+ .setup-screen{padding:8px 10px 10px}
+ .setup-card{border:0;padding:0;background:transparent}
+ .setup-card .scenario-switch button{min-height:42px;font-size:10px;padding:0 8px}
+ .setup-situation{padding:10px 0 9px}
+ .setup-situation h2{font-size:27px}
+ .setup-situation .lead{font-size:14px}
+ .setup-stakes{gap:6px}.setup-stakes>div{min-height:82px;padding:8px}
+ .setup-stakes strong{font-size:13px}.setup-loss strong{font-size:11px}
+ .setup-card .opponent-card{grid-template-columns:112px minmax(0,1fr);gap:5px 9px;padding:8px;margin:8px 0 10px}
+ .setup-card .opponent-preview{width:106px;height:150px}
+ .setup-card .opponent-card>strong{font-size:22px}
+ .setup-card .opponent-card>b{font-size:12px}
+ .setup-card .opponent-card>p{font-size:12px;line-height:1.2}
+ .setup-card .opponent-card .secondary-reset{min-height:38px;font-size:10px;padding:0 10px}
+ .setup-launch{grid-template-columns:112px minmax(0,1fr);gap:6px;padding-top:8px}
+ .setup-launch small{font-size:7px;margin-bottom:4px}
+ .setup-launch .segmented button{min-height:44px;font-size:9px}
+ .setup-launch .primary{font-size:12px;min-height:48px}
+}
