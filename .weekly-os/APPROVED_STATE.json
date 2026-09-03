@@ -5,14 +5,14 @@
     "project": "dementor-club",
     "documentType": "STANDARD",
     "projectStage": "CLARITY",
-    "gate": "G1_PRODUCT_LOCK",
-    "status": "DRAFT",
-    "version": "0.1",
+    "gate": "G6_VALIDATION",
+    "status": "APPROVED",
+    "version": "1.0",
     "updated": "2026-09-03",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": null
+    "supersedes": "0.1"
   },
   "protected": {
     "PRODUCT": {"applicable":true,"artifactId":null,"version":null,"status":null,"location":null,"note":"No project-wide APPROVED PRODUCT authority established by this migration."},
