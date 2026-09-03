@@ -1,0 +1,24 @@
+name: Dementor Lab Hot Patch Copy Once
+on:
+  push:
+    paths:
+      - '.github/workflows/dementor-lab-hot-patch-copy-once.yml'
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/dementor-lab-vertical-slice-v0.3
+      - name: Fix hot patch copy
+        run: python3 dementor-lab/scripts/patch-hot-patch-copy.py
+      - name: Commit patch
+        run: |
+          rm dementor-lab/scripts/patch-hot-patch-copy.py
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add dementor-lab/src/ui/app.mjs dementor-lab/scripts/patch-hot-patch-copy.py
+          git commit -m 'fix(lab): clarify repeat loop-break copy'
+          git push origin HEAD:agent/dementor-lab-vertical-slice-v0.3
