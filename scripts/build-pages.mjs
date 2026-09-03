@@ -33,11 +33,25 @@ const productionDependencies = [
   'design-system/dementor-workspace/workspace.css',
 ];
 
+// Selected internal tools are projected into authenticated/noindex Workspace
+// routes. The source design-system tree itself remains excluded from production.
+const productionProjections = [
+  { from:'design-system/index.html', to:'workspace/admin/design/index.html', ownerGate:true },
+  { from:'design-system/ui-lab-v2.css', to:'design-system/ui-lab-v2.css' },
+  { from:'design-system/ui-lab-v2.js', to:'design-system/ui-lab-v2.js' },
+  { from:'design-system/admin/tests/index.html', to:'workspace/admin/tests/index.html' },
+  { from:'design-system/auth-test/index.html', to:'workspace/admin/auth-test/index.html', ownerGate:true },
+  { from:'design-system/sync-test/index.html', to:'workspace/admin/sync-test/index.html', ownerGate:true },
+];
+
 const skipRootFiles = new Set([
   '.deploy-trigger',
   'DEPLOY_TRIGGER.txt',
   'DRIVE.md',
   'README.md',
+  'production-route-manifest.json',
+  'dementor-cart-v1.js',
+  'merch-cart-bridge-v1.js',
 ]);
 
 const textExt = new Set(['.html', '.css', '.js', '.json', '.xml', '.txt', '.webmanifest']);
@@ -91,6 +105,24 @@ function copyProductionDependency(rel) {
   else fs.copyFileSync(from, to);
 }
 
+function copyProductionProjection(spec) {
+  const from = path.join(root, spec.from);
+  const to = path.join(out, spec.to);
+  if (!fs.existsSync(from) || !fs.statSync(from).isFile()) throw new Error(`Approved production projection is missing: ${spec.from}`);
+  fs.mkdirSync(path.dirname(to), { recursive: true });
+  const ext = path.extname(spec.from).toLowerCase();
+  if (!textExt.has(ext)) { fs.copyFileSync(from, to); return; }
+  let text = normalizeProductionText(fs.readFileSync(from, 'utf8'));
+  if (spec.to.startsWith('workspace/admin/')) {
+    text = text.replaceAll('href="../admin/"', 'href="/workspace/admin/"');
+    text = text.replaceAll("href='../admin/'", "href='/workspace/admin/'");
+  }
+  if (spec.ownerGate && ext === '.html' && !text.includes('/workspace/owner-admin-gate-v1.js')) {
+    text = text.replace('</body>', '<script type="module" src="/workspace/owner-admin-gate-v1.js"></script>\n</body>');
+  }
+  fs.writeFileSync(to, text);
+}
+
 function walk(dir, fn) {
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
     const full = path.join(dir, entry.name);
@@ -108,9 +140,12 @@ function injectProductionPublicModules() {
     if (!full.endsWith('.html')) return;
     const rel = path.relative(out, full).replaceAll('\\', '/');
     let html = fs.readFileSync(full, 'utf8');
+    const isPrivateTool = rel.startsWith('workspace/admin/');
 
-    html = injectOnce(html, '/entity-recommendations-v1.css', '<link rel="stylesheet" href="/entity-recommendations-v1.css">', '</head>');
-    html = injectOnce(html, '/entity-recommendations-v1.js', '<script src="/entity-recommendations-v1.js" defer></script>', '</body>');
+    if (!isPrivateTool) {
+      html = injectOnce(html, '/entity-recommendations-v1.css', '<link rel="stylesheet" href="/entity-recommendations-v1.css">', '</head>');
+      html = injectOnce(html, '/entity-recommendations-v1.js', '<script src="/entity-recommendations-v1.js" defer></script>', '</body>');
+    }
 
     // About v10 owns its complete page layout in /about-v1.css. The previous
     // about-definition-v1.css production override is intentionally not injected:
@@ -129,17 +164,33 @@ function injectProductionPublicModules() {
 
 function hardenProductionRuntime() {
   const configPath = path.join(out, 'site-config.js');
-  if (!fs.existsSync(configPath)) return;
-  let source = fs.readFileSync(configPath, 'utf8');
-  source = source.replace(/internalTools:\{enabled:true,holdMs:\d+,path:'[^']*'\}/, "internalTools:{enabled:false,holdMs:0,path:null}");
-  source = source.replace(/cartEnabled:true/g, 'cartEnabled:false');
-  source = source.replace(/checkoutEnabled:true/g, 'checkoutEnabled:false');
-  source = source.replace(/registrationEnabled:true/g, 'registrationEnabled:false');
-  fs.writeFileSync(configPath, source);
+  if (fs.existsSync(configPath)) {
+    let source = fs.readFileSync(configPath, 'utf8');
+    source = source.replace(/internalTools:\{enabled:true,holdMs:\d+,path:'[^']*'\}/, "internalTools:{enabled:false,holdMs:0,path:null}");
+    source = source.replace(/cartEnabled:true/g, 'cartEnabled:false');
+    source = source.replace(/checkoutEnabled:true/g, 'checkoutEnabled:false');
+    source = source.replace(/registrationEnabled:true/g, 'registrationEnabled:false');
+    fs.writeFileSync(configPath, source);
+  }
+  const globalHeaderPath = path.join(out, 'global-header.js');
+  if (fs.existsSync(globalHeaderPath)) {
+    let source = fs.readFileSync(globalHeaderPath, 'utf8');
+    const disabledCommerceLoader = "if(cartEnabled&&(path.startsWith('/merch/')||path.startsWith('/objects/')||path.startsWith('/cart/'))){load('/site-config.js');load('/dementor-cart-v1.js');if(path.startsWith('/merch/drop-001/')||path.startsWith('/objects/'))load('/merch-cart-bridge-v1.js')}";
+    source = source.replace(disabledCommerceLoader, '');
+    fs.writeFileSync(globalHeaderPath, source);
+  }
+  const motionPath = path.join(out, 'motion-v1.js');
+  if (fs.existsSync(motionPath)) {
+    let source = fs.readFileSync(motionPath, 'utf8');
+    source = source.replace("location.assign('/design-system/');", 'unlocked=false;');
+    source = source.replace("window.DEMENTOR_SITE_CONFIG?.internalTools?.enabled&&location.assign('/design-system/')", 'unlocked=false');
+    fs.writeFileSync(motionPath, source);
+  }
 }
 
 copyDir(root, out);
 for (const rel of productionDependencies) copyProductionDependency(rel);
+for (const spec of productionProjections) copyProductionProjection(spec);
 injectProductionPublicModules();
 hardenProductionRuntime();
 
@@ -148,4 +199,5 @@ fs.writeFileSync(path.join(out, 'CNAME'), 'dementor.club\n');
 
 console.log(`GitHub Pages production candidate ready for ${productionOrigin} at ${out}`);
 console.log(`Approved runtime dependencies shipped: ${productionDependencies.length}`);
+console.log(`Approved internal tool projections shipped: ${productionProjections.length}`);
 console.log('Production-only modules injected: recommendations, project visual overrides, consent-gated analytics.');

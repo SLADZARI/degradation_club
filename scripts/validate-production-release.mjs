@@ -36,10 +36,17 @@ const allowedInternalRuntimeAssets = new Set([
   'components/course-cover-v1.css',
   'design-system/design-system.css',
   'design-system/dementor-workspace/workspace.css',
+  'design-system/ui-lab-v2.css',
+  'design-system/ui-lab-v2.js',
 ]);
 const technicalRouteAllowlist = new Set([
   '/auth/callback/',
   '/profile/',
+  '/workspace/admin/',
+  '/workspace/admin/design/',
+  '/workspace/admin/tests/',
+  '/workspace/admin/auth-test/',
+  '/workspace/admin/sync-test/',
 ]);
 const publicTextExtensions = new Set(['.html', '.xml', '.txt', '.webmanifest', '.json', '.js', '.css']);
 const errors = [];
@@ -130,12 +137,37 @@ function validateRef(sourceRel, rawRef, kind) {
   }
 }
 
+function isNoindexHtml(text) {
+  return /<meta[^>]+name=["']robots["'][^>]+content=["'][^"']*noindex/i.test(text)
+    || /<meta[^>]+content=["'][^"']*noindex[^"']*["'][^>]+name=["']robots["']/i.test(text);
+}
+
+function validateNavigationTargets(sourceRel, text) {
+  const seen = new Set();
+  const check = raw => { if (!raw || seen.has(raw)) return; seen.add(raw); validateRef(sourceRel, raw, 'JS navigation'); };
+  const direct = [
+    /\b(?:location\.(?:assign|replace))\(\s*["'](\/[^"']+)["']/g,
+    /\blocation\.href\s*=\s*["'](\/[^"']+)["']/g,
+    /\.href\s*=\s*["'](\/[^"']+)["']/g,
+  ];
+  for (const pattern of direct) for (const match of text.matchAll(pattern)) check(match[1]);
+
+  const vars = new Map();
+  for (const match of text.matchAll(/\b(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*(?:[^;\n]*?\+\s*)?["'](\/[^"']+\/)["']/g)) vars.set(match[1], match[2]);
+  for (const [name, route] of vars) {
+    const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const used = new RegExp(`(?:\\.href\\s*=\\s*${escaped}\\b|location\\.(?:assign|replace)\\(\\s*${escaped}\\s*\\)|location\\.href\\s*=\\s*${escaped}\\b)`);
+    if (used.test(text)) check(route);
+  }
+}
+
 function validatePublicReferences(rel, text, ext) {
   if (ext === '.html') {
     for (const match of text.matchAll(/\b(?:href|src|poster)\s*=\s*["']([^"']+)["']/gi)) validateRef(rel, match[1], 'HTML');
     for (const match of text.matchAll(/\bsrcset\s*=\s*["']([^"']+)["']/gi)) {
       for (const part of match[1].split(',')) validateRef(rel, part.trim().split(/\s+/)[0], 'srcset');
     }
+    validateNavigationTargets(rel, text);
   }
   if (ext === '.css') {
     for (const match of text.matchAll(/@import\s+(?:url\()?\s*["']?([^"')\s;]+)["']?/gi)) validateRef(rel, match[1], 'CSS import');
@@ -144,6 +176,7 @@ function validatePublicReferences(rel, text, ext) {
   if (ext === '.js') {
     const jsAssetPattern = /["']((?:\/|\.\.?\/)[^"'\s$]+?\.(?:css|js|mjs|json|xml|txt|webmanifest|png|jpe?g|webp|gif|svg|ico|avif|woff2?|ttf|otf|mp4|webm|mp3|wav))["']/gi;
     for (const match of text.matchAll(jsAssetPattern)) validateRef(rel, match[1], 'JS asset');
+    validateNavigationTargets(rel, text);
   }
 }
 
@@ -167,9 +200,12 @@ function walk(dir) {
       if (text.includes(legacy)) errors.push(`${rel}: legacy origin remains (${legacy})`);
     }
 
-    const upper = ` ${text.toUpperCase()} `;
-    for (const marker of blockedMarkers) {
-      if (upper.includes(marker)) errors.push(`${rel}: blocked pre-production marker found: ${marker.trim()}`);
+    const privateNoindex = ext === '.html' && isNoindexHtml(text);
+    if (!privateNoindex) {
+      const upper = ` ${text.toUpperCase()} `;
+      for (const marker of blockedMarkers) {
+        if (upper.includes(marker)) errors.push(`${rel}: blocked pre-production marker found: ${marker.trim()}`);
+      }
     }
 
     validatePublicReferences(rel, text, ext);
@@ -254,6 +290,17 @@ if (!fs.existsSync(sitemapPath)) {
 } else {
   const sitemap = fs.readFileSync(sitemapPath, 'utf8');
   if (!sitemap.includes(`<loc>${productionOrigin}/</loc>`)) errors.push(`sitemap.xml: production origin ${productionOrigin} is missing`);
+  for (const loc of [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map(match => match[1])) {
+    try {
+      const url = new URL(loc);
+      const route = url.pathname;
+      const target = route === '/' ? artifactPath('index.html') : artifactPath(path.posix.join(route.replace(/^\//, ''), 'index.html'));
+      if (!fs.existsSync(target)) errors.push(`sitemap.xml: URL has no production page ${route}`);
+      else if (isNoindexHtml(fs.readFileSync(target, 'utf8'))) errors.push(`sitemap.xml: noindex/private route must not be indexed ${route}`);
+    } catch {
+      errors.push(`sitemap.xml: invalid URL ${loc}`);
+    }
+  }
 }
 
 if (errors.length) {
