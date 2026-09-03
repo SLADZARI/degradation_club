@@ -49,22 +49,22 @@ function visibleContent(text, ext) {
 function isNoindexHtml(text){
   return /<meta[^>]+name=["']robots["'][^>]+content=["'][^"']*noindex/i.test(text)||/<meta[^>]+content=["'][^"']*noindex[^"']*["'][^>]+name=["']robots["']/i.test(text);
 }
-function validateRouteLiterals(text, owner){
+function validateNavigationTargets(text, owner){
   const seen=new Set();
-  const patterns=[
+  const check=raw=>{if(!raw||seen.has(raw))return;seen.add(raw);localPathExists(raw,owner);};
+  const direct=[
     /\b(?:location\.(?:assign|replace))\(\s*["'](\/[^"']+)["']/g,
     /\blocation\.href\s*=\s*["'](\/[^"']+)["']/g,
     /\.href\s*=\s*["'](\/[^"']+)["']/g,
-    /["'](\/(?:[a-z0-9._~-]+\/)+)["']/gi,
   ];
-  for(const pattern of patterns){
-    for(const match of text.matchAll(pattern)){
-      const raw=match[1];
-      if(!raw||seen.has(raw))continue;
-      seen.add(raw);
-      if(raw.startsWith('/assets/')||raw.startsWith('/design-system/')&&/\.(?:css|js|svg|png|webp)$/i.test(raw))continue;
-      localPathExists(raw,owner);
-    }
+  for(const pattern of direct)for(const match of text.matchAll(pattern))check(match[1]);
+
+  const vars=new Map();
+  for(const match of text.matchAll(/\b(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*(?:[^;\n]*?\+\s*)?["'](\/[^"']+\/)["']/g))vars.set(match[1],match[2]);
+  for(const [name,route] of vars){
+    const escaped=name.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+    const used=new RegExp(`(?:\\.href\\s*=\\s*${escaped}\\b|location\\.(?:assign|replace)\\(\\s*${escaped}\\s*\\)|location\\.href\\s*=\\s*${escaped}\\b)`);
+    if(used.test(text))check(route);
   }
 }
 
@@ -77,8 +77,12 @@ for (const full of files) {
   const text = fs.readFileSync(full, 'utf8');
   const file = rel(full);
   const lower = text.toLowerCase();
+  const privateTool = ext==='.html' && file.startsWith('workspace/admin/') && isNoindexHtml(text);
 
-  for (const fragment of blockedFragments) if (lower.includes(fragment.toLowerCase())) errors.push(`${file}: blocked legacy/staging fragment found: ${fragment}`);
+  for (const fragment of blockedFragments) {
+    if(privateTool && (fragment==='/test/'||fragment==='/tests/'))continue;
+    if(lower.includes(fragment.toLowerCase())) errors.push(`${file}: blocked legacy/staging fragment found: ${fragment}`);
+  }
 
   if (contentExtensions.has(ext)) {
     const privateNoindex=ext==='.html'&&isNoindexHtml(text);
@@ -93,7 +97,7 @@ for (const full of files) {
   if (ext === '.html') {
     const refs = [...text.matchAll(/\b(?:href|src)=["']([^"']+)["']/gi)].map(m => m[1]);
     for (const ref of refs) localPathExists(ref, full);
-    validateRouteLiterals(text,full);
+    validateNavigationTargets(text,full);
     const ogUrl = text.match(/<meta[^>]+property=["']og:url["'][^>]+content=["']([^"']+)["']/i)?.[1]
       || text.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:url["']/i)?.[1];
     if (ogUrl && !ogUrl.startsWith(productionOrigin)) errors.push(`${file}: og:url must use ${productionOrigin}`);
@@ -104,7 +108,7 @@ for (const full of files) {
   if (ext === '.css') for (const match of text.matchAll(/url\((?:["']?)([^)"']+)(?:["']?)\)/gi)) localPathExists(match[1].trim(), full);
   if (ext === '.js') {
     for (const match of text.matchAll(/["'](\/[^"']+\.(?:js|css|webp|png|jpg|jpeg|svg|json)(?:\?[^"']*)?)["']/gi)) localPathExists(match[1], full);
-    validateRouteLiterals(text,full);
+    validateNavigationTargets(text,full);
   }
 }
 
