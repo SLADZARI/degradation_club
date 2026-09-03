@@ -1,7 +1,6 @@
 import {createClient} from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.4/+esm';
 const cfg=window.DEMENTOR_SITE_CONFIG?.supabase;
-const base=location.pathname.startsWith('/degradation_club/')?'/degradation_club':'';
-const fallback=base+'/workspace/';
+const fallback='/workspace/';
 if(!cfg?.enabled){location.replace(fallback);}
 else{
   const client=window.DEMENTOR_SUPABASE_CLIENT||createClient(cfg.url,cfg.publishableKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false,flowType:'pkce'}});
