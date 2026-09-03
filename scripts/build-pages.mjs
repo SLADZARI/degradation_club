@@ -34,6 +34,9 @@ const skipRootFiles = new Set([
   'dementor-cart-v1.js', 'merch-cart-bridge-v1.js',
 ]);
 const textExt = new Set(['.html', '.css', '.js', '.json', '.xml', '.txt', '.webmanifest']);
+const privateFooterPrefixes = [
+  'workspace/', 'community/board/', 'community/artifact/', 'join/apply/', 'join/result/', 'auth/callback/', 'profile/'
+];
 
 fs.rmSync(out, { recursive: true, force: true });
 fs.mkdirSync(out, { recursive: true });
@@ -107,11 +110,34 @@ function walk(dir, fn) {
   }
 }
 
+function isPrivateFooter(rel) {
+  return privateFooterPrefixes.some(prefix => rel.startsWith(prefix));
+}
+
+function normalizeShellMarkup(html, rel) {
+  if (rel === 'auth/callback/index.html') return html;
+
+  // Production HTML must not retain a page-owned primary header. The runtime owns it.
+  html = html.replace(/<header[^>]*class=["']topbar(?:\s[^"']*)?["'][^>]*>[\s\S]*?<\/header>/gi, '');
+
+  if (!html.includes('/global-header.css')) html = html.replace('</head>', '<link rel="stylesheet" href="/global-header.css">\n</head>');
+  if (!html.includes('/global-header.js')) html = html.replace('</body>', '<script src="/global-header.js" defer></script>\n</body>');
+
+  if (!isPrivateFooter(rel)) {
+    // Local footer markup is source history only. It must not survive into production.
+    html = html.replace(/<footer\b[^>]*>[\s\S]*?<\/footer>/gi, '');
+    if (!html.includes('/global-footer.css')) html = html.replace('</head>', '<link rel="stylesheet" href="/global-footer.css">\n</head>');
+    if (!html.includes('/global-footer.js')) html = html.replace('</body>', '<script src="/global-footer.js" defer></script>\n</body>');
+  }
+  return html;
+}
+
 function injectProductionModules() {
   walk(out, full => {
     if (!full.endsWith('.html')) return;
     const rel = path.relative(out, full).replaceAll('\\','/');
     let html = fs.readFileSync(full, 'utf8');
+    html = normalizeShellMarkup(html, rel);
     const isPrivateTool = rel.startsWith('workspace/admin/');
     if (!isPrivateTool) {
       if (!html.includes('/entity-recommendations-v1.css')) html = html.replace('</head>', '<link rel="stylesheet" href="/entity-recommendations-v1.css">\n</head>');
@@ -130,13 +156,6 @@ function hardenProductionRuntime() {
     source = source.replace(/const legacyOrigins=\[[^\]]*\];/, 'const legacyOrigins=[];');
     source = source.replace("link.href=canonical+path.replace(/^\\/degradation_club/,'')", 'link.href=canonical+path');
     fs.writeFileSync(configPath, source);
-  }
-  const globalHeaderPath = path.join(out, 'global-header.js');
-  if (fs.existsSync(globalHeaderPath)) {
-    let source = fs.readFileSync(globalHeaderPath, 'utf8');
-    const disabledCommerceLoader = "if(cartEnabled&&(path.startsWith('/merch/')||path.startsWith('/objects/')||path.startsWith('/cart/'))){load('/site-config.js');load('/dementor-cart-v1.js');if(path.startsWith('/merch/drop-001/')||path.startsWith('/objects/'))load('/merch-cart-bridge-v1.js')}";
-    source = source.replace(disabledCommerceLoader, '');
-    fs.writeFileSync(globalHeaderPath, source);
   }
   const motionPath = path.join(out, 'motion-v1.js');
   if (fs.existsSync(motionPath)) {
