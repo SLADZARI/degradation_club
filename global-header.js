@@ -1,7 +1,6 @@
 (()=>{
   if(typeof document==='undefined')return;
   const runtimePath=location.pathname.replace(/^\/degradation_club/,'');
-  if(runtimePath.startsWith('/workspace/'))return;
 
   const boot=()=>{
     if(document.documentElement.dataset.dcGlobalHeader==='1')return;
@@ -30,8 +29,8 @@
         ${link('/workspace/','Account')}
       </nav>`;
 
-    // A public page never owns multiple primary headers. Remove legacy/page-specific
-    // copies and create one canonical shell that matches the Home navigation language.
+    // The public club header is canonical across both public pages and Workspace.
+    // Workspace adds its own internal sidebar below it; it does not replace the site header.
     document.querySelectorAll('header.topbar,header.dc-global-header').forEach(node=>node.remove());
     const header=document.createElement('header');
     header.className='dc-global-header';
