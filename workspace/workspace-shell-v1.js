@@ -4,15 +4,15 @@
   if(!host||host.dataset.dcWorkspaceShell==='1')return;
   host.dataset.dcWorkspaceShell='1';
 
-  const path=location.pathname;
+  const path=location.pathname.replace(/^\/degradation_club/,'');
   const root='/workspace/';
-  const board='/community/board/';
+  const board='/workspace/board/';
   const artifacts='/workspace/artifacts/';
   const review='/workspace/review/';
   const admin='/workspace/admin/';
   const current=path;
   const active=(route)=>current===route||current===route+'index.html';
-  const link=(href,label,{key='',hidden=false,roleTool=false}={})=>`<a class="dcw-nav-link${active(href.split('#')[0])?' is-active':''}" href="${href}"${key?` data-route="${key}"`:''}${hidden?' hidden':''}${roleTool?' data-role-tool="1"':''}>${label}</a>`;
+  const link=(href,label,{key='',hidden=false,roleTool=false,workNav=false}={})=>`<a class="dcw-nav-link${active(href.split('#')[0])?' is-active':''}" href="${href}"${key?` data-route="${key}"`:''}${hidden?' hidden':''}${roleTool?' data-role-tool="1"':''}${workNav?' data-work-nav':''}>${label}</a>`;
 
   host.innerHTML=`
     <a class="dcw-brand" href="${root}"><span>DEMENTOR</span><strong>CLUB</strong></a>
@@ -22,14 +22,14 @@
       ${link(board,'COMMUNITY BOARD')}
       ${link(artifacts,'MY ARTIFACTS')}
       ${link(root+'#activity','MY ACTIVITY',{key:'activity'})}
-      ${link(root+'#work','MY WORK',{key:'work',hidden:true})}
+      ${link(root+'#work','MY WORK',{key:'work',hidden:true,workNav:true})}
       ${link(root+'#profile','MY PROFILE',{key:'profile'})}
       ${link(review,'MEMBERSHIP REVIEW',{hidden:true,roleTool:true})}
       ${link(admin,'SYSTEM TOOLS',{hidden:true,roleTool:true})}
       <button type="button" class="dcw-nav-logout" data-global-logout>LOG OUT</button>
     </nav>
     <div class="dcw-boundary"><span>SYSTEM</span><strong>DEMENTOR CLUB</strong><small>Один аккаунт. Членство, рабочие возможности и role-tools добавляются поверх базового кабинета.</small></div>
-    <div class="dcw-session" data-shell-session><span>SESSION</span><strong>ПРОВЕРКА…</strong></div>`;
+    <div class="dcw-session" id="sessionBox" data-shell-session><span>SESSION</span><strong>ПРОВЕРКА…</strong></div>`;
 
   const setCurrentRootRoute=()=>{
     if(current!=='/workspace/'&&current!=='/workspace/index.html')return;
