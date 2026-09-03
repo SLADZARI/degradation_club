@@ -40,7 +40,9 @@ const shell=read('workspace/workspace-shell-v1.js');
 expect(shell.includes("const board='/workspace/board/'"),'workspace shell: Board must stay inside Workspace');
 expect(shell.includes('id="sessionBox"'),'workspace shell: controller sessionBox contract missing');
 expect(shell.includes('data-work-nav'),'workspace shell: controller workNav contract missing');
-expect(shell.includes('const viewButton='),'workspace shell: root views must be controller-owned buttons');
+expect(shell.includes('const viewLink='),'workspace shell: root views must be addressable links');
+for(const route of ['home','club','activity','work','profile'])expect(shell.includes(`viewLink('${route}'`),`workspace shell: addressable root view missing ${route}`);
+expect(shell.includes('href="${root}#${key}"'),'workspace shell: child surfaces cannot return to root hash views');
 expect(shell.includes("dataset.dcWorkspaceAuth='guest'"),'workspace shell: explicit guest boundary state missing');
 expect(shell.includes('host.hidden=true'),'workspace shell: guest/private navigation must begin hidden');
 expect(shell.includes('data-member-tool'),'workspace shell: membership-gated private routes missing');
@@ -85,4 +87,4 @@ if(fail.length){
   for(const item of fail)console.error(`- ${item}`);
   process.exit(1);
 }
-console.log(`Shell contract validation PASS (${publicRoutes.length} public route families + public-header Workspace + auth/Board/Join contracts)`);
+console.log(`Shell contract validation PASS (${publicRoutes.length} public route families + addressable Workspace navigation + auth/Board/Join contracts)`);

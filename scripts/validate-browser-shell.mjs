@@ -96,6 +96,35 @@ for(const route of ['/','/about/','/projects/','/community/','/merch/','/archive
   expect(!pageErrors.length,`/workspace/ member errors: ${pageErrors.join(' | ')}`);await c.close();
 }
 
+// Child surfaces must never strand root Workspace navigation. One session crosses
+// Board -> Home -> Review -> Activity -> Board -> Club without logout/login recovery.
+{
+  const c=await context('owner'),p=await c.newPage(),pageErrors=[];p.on('pageerror',e=>pageErrors.push(e.message));
+  await p.goto(base+'/workspace/',{waitUntil:'domcontentloaded'});await header(p,'workspace navigation sequence');
+  try{
+    await p.locator('[data-workspace-sidebar]').waitFor({state:'visible',timeout:4000});
+    await p.getByRole('link',{name:'COMMUNITY BOARD'}).waitFor({state:'visible',timeout:4000});
+    await p.getByRole('link',{name:'COMMUNITY BOARD'}).click();
+    await p.waitForURL(u=>new URL(u).pathname==='/workspace/board/');
+    await p.getByRole('link',{name:'HOME'}).click();
+    await p.waitForURL(u=>new URL(u).pathname==='/workspace/'&&new URL(u).hash==='#home');
+    await p.waitForFunction(()=>document.querySelector('#topTitle')?.textContent?.trim()==='HOME');
+    await p.getByRole('link',{name:'MEMBERSHIP REVIEW'}).waitFor({state:'visible',timeout:4000});
+    await p.getByRole('link',{name:'MEMBERSHIP REVIEW'}).click();
+    await p.waitForURL(u=>new URL(u).pathname==='/workspace/review/');
+    await p.getByRole('link',{name:'MY ACTIVITY'}).click();
+    await p.waitForURL(u=>new URL(u).pathname==='/workspace/'&&new URL(u).hash==='#activity');
+    await p.waitForFunction(()=>document.querySelector('#topTitle')?.textContent?.trim()==='MY ACTIVITY');
+    await p.getByRole('link',{name:'COMMUNITY BOARD'}).click();
+    await p.waitForURL(u=>new URL(u).pathname==='/workspace/board/');
+    await p.getByRole('link',{name:'MY CLUB'}).click();
+    await p.waitForURL(u=>new URL(u).pathname==='/workspace/'&&new URL(u).hash==='#club');
+    await p.waitForFunction(()=>document.querySelector('#topTitle')?.textContent?.trim()==='MY CLUB');
+    expect((await p.locator('#appView').innerText()).includes('Мой клуб'),'Workspace sequence: My Club did not recover after child surfaces');
+  }catch(e){errors.push(`Workspace child/root navigation sequence failed: ${e.message}; actual=${p.url()}`)}
+  expect(!pageErrors.length,`Workspace navigation sequence errors: ${pageErrors.join(' | ')}`);await c.close();
+}
+
 // Board migration must preserve filters, pan/zoom and own-card positioning.
 {
   const c=await context('member'),p=await c.newPage(),pageErrors=[];p.on('pageerror',e=>pageErrors.push(e.message));
@@ -125,4 +154,4 @@ for(const route of ['/','/about/','/projects/','/community/','/merch/','/archive
 
 await browser.close();await new Promise(resolve=>server.close(resolve));
 if(errors.length){console.error('BROWSER SHELL SMOKE BLOCKED');for(const e of errors)console.error(`- ${e}`);process.exit(1)}
-console.log('Browser shell smoke PASS: public shell + OAuth + guest boundary + Workspace + spatial Board + Join + Admin');
+console.log('Browser shell smoke PASS: public shell + OAuth + guest boundary + addressable Workspace navigation + spatial Board + Join + Admin');
