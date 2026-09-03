@@ -33,7 +33,8 @@ if(typeof document!=='undefined'){
     // The canonical public header remains visible in Workspace so members always
     // retain a clear route back to the public club. Footer stays public-only.
     addScript('/global-header.js');addStyle('/global-header.css');
-    if(!isWorkspaceShell){addScript('/global-footer.js');addStyle('/global-footer.css');}
+    if(isWorkspaceShell)addStyle('/workspace/workspace-public-header-v1.css');
+    else{addScript('/global-footer.js');addStyle('/global-footer.css');}
     addScript('/dementor-relations-v1.js');
     const isJoinAssessment=/\/join\/?(?:index\.html)?$/.test(path);
     const isCommunityRoot=/\/community\/?(?:index\.html)?$/.test(path);
