@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <title>System Tools — Dementor Club</title>
+  <link rel="stylesheet" href="../../design-system/design-system.css">
+  <link rel="stylesheet" href="../workspace.css">
+  <script src="../../site-config.js"></script>
+  <style>
+    .dca-tools{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));border-top:1px solid #111;border-left:1px solid #111}.dca-tool{min-height:220px;padding:24px;border-right:1px solid #111;border-bottom:1px solid #111;color:inherit;text-decoration:none;display:flex;flex-direction:column}.dca-tool:hover{background:#d8ff3e}.dca-tool span{font:800 10px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.1em}.dca-tool strong{margin-top:auto;font-size:clamp(30px,4vw,54px);line-height:.9;letter-spacing:-.05em}.dca-tool p{margin:12px 0 0;max-width:42em}.dca-tool--disabled{opacity:.48;pointer-events:none}@media(max-width:760px){.dca-tools{grid-template-columns:1fr}.dca-tool{min-height:180px}}
+  </style>
+</head>
+<body class="dc-system-page dcw-body">
+  <div class="dcw-live-banner">DEMENTOR CLUB · PERSONAL WORKSPACE · OWNER ADMIN</div>
+  <div class="dcw-app">
+    <aside class="dcw-sidebar" data-workspace-sidebar></aside>
+    <main class="dcw-main">
+      <header class="dcw-topbar"><div><span class="dcw-kicker">DEMENTOR CLUB / PERSONAL WORKSPACE</span><strong>SYSTEM TOOLS</strong></div><div class="dcw-top-meta"><span>OWNER_ADMIN</span><span class="dcw-dot"></span><span>NOINDEX</span></div></header>
+      <div class="dcw-view">
+        <div class="dcw-page-head"><div><div class="dcw-kicker">INTERNAL / OWNER_ADMIN</div><h1>СИСТЕМНЫЕ<br>ИНСТРУМЕНТЫ.</h1></div><p>Визуальный стандарт, диагностика и read-only smoke-тесты. Публичной частью сайта этот раздел не является.</p></div>
+        <section class="dca-tools">
+          <a class="dca-tool" href="/design-system/"><span>01 / DESIGN CODE</span><strong>UI LAB →</strong><p>Рабочий визуальный словарь и presentation roles.</p></a>
+          <a class="dca-tool" href="/design-system/admin/tests/"><span>02 / SYSTEM HEALTH</span><strong>RUN TESTS →</strong><p>Auth, RLS, membership, runtime и production routes.</p></a>
+          <a class="dca-tool" href="/design-system/auth-test/"><span>03 / AUTH</span><strong>AUTH TEST →</strong><p>Google OAuth → Supabase → persistence.</p></a>
+          <a class="dca-tool" href="/design-system/sync-test/"><span>04 / DATA</span><strong>SYNC TEST →</strong><p>Browser state и production persistence.</p></a>
+        </section>
+      </div>
+    </main>
+  </div>
+  <script src="../workspace-shell-v1.js"></script>
+  <script type="module" src="./owner-admin-access-v1.js"></script>
+</body>
+</html>
