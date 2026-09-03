@@ -1,5 +1,5 @@
 import { NODE_SPECS } from '../core/model.mjs';
-import { canConnectNodes, validateGraph, familyOf } from '../core/graph.mjs';
+import { canConnectNodes, validateGraph, familyOf, outgoing } from '../core/graph.mjs';
 import { graphLayers } from './brain-layout.mjs';
 
 let serial=0;
@@ -40,9 +40,7 @@ export function moveBrainNode(graph,nodeId,x,y,{minX=8,minY=8,maxX=430,maxY=2000
 export function connectBrainNodes(graph,fromId,toId){
   const from=graph.nodes.find(n=>n.id===fromId),to=graph.nodes.find(n=>n.id===toId);
   if(!canConnectNodes(graph,from,to))return null;
-  const edge={id:`brain-edge-${Date.now().toString(36)}-${++serial}`,from:fromId,to:toId};graph.edges.push(edge);
-  if(familyOf(from)==='TRIGGER'){from.p=from.p||{};from.p.enabled=true}
-  return edge;
+  const edge={id:`brain-edge-${Date.now().toString(36)}-${++serial}`,from:fromId,to:toId};graph.edges.push(edge);return edge;
 }
 
 export function disconnectBrainEdge(graph,edgeId){graph.edges=graph.edges.filter(e=>e.id!==edgeId)}
@@ -51,7 +49,7 @@ export function brainValidation(graph,triggerType=null){
   const base=validateGraph(graph);if(!base.runnable||!triggerType)return base;
   const trigger=graph.nodes.find(n=>familyOf(n)==='TRIGGER'&&n.type===triggerType);
   if(!trigger)return {runnable:false,code:'TRIGGER_MISMATCH',detail:`В ЭТОЙ СИТУАЦИИ НЕТ ТРИГГЕРА «${NODE_SPECS[triggerType]?.title||triggerType}».`};
-  if(trigger.p?.enabled===false)return {runnable:false,code:'TRIGGER_DISABLED',nodeId:trigger.id,detail:`ВХОД «${NODE_SPECS[triggerType]?.title||triggerType}» ПОКА НЕ ПОДКЛЮЧЕН.`};
+  if(!outgoing(graph,trigger.id).length)return {runnable:false,code:'TRIGGER_DISABLED',nodeId:trigger.id,detail:`ВХОД «${NODE_SPECS[triggerType]?.title||triggerType}» ПОКА НЕ ПОДКЛЮЧЕН.`};
   return base;
 }
 export function familyNodes(family){return Object.entries(NODE_SPECS).filter(([,spec])=>spec.family===family).map(([type,spec])=>({type,...spec}))}
