@@ -10,6 +10,10 @@
   <link rel="stylesheet" href="../../design-system/dementor-workspace/workspace.css">
   <link rel="stylesheet" href="../workspace.css">
   <link rel="stylesheet" href="../../community/board/board.css">
+  <link rel="stylesheet" href="../../community/board/board-qa-fix-v1.css">
+  <link rel="stylesheet" href="../../community-v1-responsive-fix.css">
+  <link rel="stylesheet" href="../../community/board/board-integrations-v1.css">
+  <link rel="stylesheet" href="../../community/board/board-spatial-v1.css">
   <script src="../../site-config.js"></script>
   <style>
     .dcw-board-view{padding:0!important;overflow:hidden}.dcw-board-view .dc-board-shell{max-width:none}.dcw-board-view .dc-board-hero .dc-board-shell{min-height:58vh;padding-top:64px}.dcw-board-view .dc-board-hero h1{font-size:clamp(64px,10vw,150px)}
@@ -31,11 +35,15 @@
           </div>
         </section>
         <section class="dc-board-entry" id="entrySection"><div class="dc-board-shell"><div id="entryHost" aria-live="polite"><div class="dc-board-state">ПРОВЕРЯЕМ, ЕСТЬ ЛИ У ВАС МЕСТО НА ДОСКЕ…</div></div></div></section>
-        <section class="dc-board-wall"><div class="dc-board-shell"><div class="dc-board-wall-head"><div><p>ARTIFACTS / ACTIVE</p><h2>ЧТО УЖЕ<br>ПРИКОЛОТИЛИ.</h2></div><div class="dc-board-count" id="artifactCount">—</div></div><div id="boardHost" class="dc-board-grid" aria-live="polite"><div class="dc-board-state">ЗАГРУЖАЕМ ДОСКУ…</div></div></div></section>
+        <section class="dc-board-wall"><div class="dc-board-shell"><div class="dc-board-wall-head"><div><p>ARTIFACTS / ACTIVE</p><h2>ЧТО УЖЕ<br>ПРИКОЛОТИЛИ.</h2></div><div class="dc-board-count" id="artifactCount">—</div></div><nav class="dc-board-filters" id="boardFilters" aria-label="Фильтры доски"></nav><div id="boardHost" class="dc-board-grid" aria-live="polite"><div class="dc-board-state">ЗАГРУЖАЕМ ДОСКУ…</div></div></div></section>
       </div>
     </main>
   </div>
   <script src="../workspace-shell-v1.js"></script>
   <script type="module" src="../../community/board/board.js"></script>
+  <script src="../../community/board/telegram-worker-trigger-v3.js"></script>
+  <script type="module" src="../../community/board/board-integrations-v1.js"></script>
+  <script type="module" src="../../community/board/board-activation-gate-v1.js"></script>
+  <script type="module" src="../../community/board/board-spatial-v1.js"></script>
 </body>
 </html>
