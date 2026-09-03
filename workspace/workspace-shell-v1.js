@@ -15,18 +15,18 @@
   const current=path;
   const active=(route)=>current===route||current===route+'index.html';
   const link=(href,label,{hidden=false,roleTool=false,memberTool=false}={})=>`<a class="dcw-nav-link${active(href)?' is-active':''}" href="${href}"${hidden?' hidden':''}${roleTool?' data-role-tool="1"':''}${memberTool?' data-member-tool="1"':''}>${label}</a>`;
-  const viewButton=(key,label,{hidden=false,workNav=false}={})=>`<button type="button" class="dcw-nav-link" data-route="${key}"${hidden?' hidden':''}${workNav?' data-work-nav':''}>${label}</button>`;
+  const viewLink=(key,label,{hidden=false,workNav=false}={})=>`<a class="dcw-nav-link" href="${root}#${key}" data-route="${key}"${hidden?' hidden':''}${workNav?' data-work-nav':''}>${label}</a>`;
 
   host.innerHTML=`
     <a class="dcw-brand" href="${root}"><span>DEMENTOR</span><strong>CLUB</strong></a>
     <nav class="dcw-nav" aria-label="Личный кабинет">
-      ${viewButton('home','HOME')}
-      ${viewButton('club','MY CLUB')}
+      ${viewLink('home','HOME')}
+      ${viewLink('club','MY CLUB')}
       ${link(board,'COMMUNITY BOARD',{hidden:true,memberTool:true})}
       ${link(artifacts,'MY ARTIFACTS',{hidden:true,memberTool:true})}
-      ${viewButton('activity','MY ACTIVITY')}
-      ${viewButton('work','MY WORK',{hidden:true,workNav:true})}
-      ${viewButton('profile','MY PROFILE')}
+      ${viewLink('activity','MY ACTIVITY')}
+      ${viewLink('work','MY WORK',{hidden:true,workNav:true})}
+      ${viewLink('profile','MY PROFILE')}
       ${link(review,'MEMBERSHIP REVIEW',{hidden:true,roleTool:true})}
       ${link(admin,'SYSTEM TOOLS',{hidden:true,roleTool:true})}
       <button type="button" class="dcw-nav-logout" data-global-logout>LOG OUT</button>
@@ -41,12 +41,6 @@
   };
   setCurrentRootRoute();
   addEventListener('hashchange',setCurrentRootRoute);
-  host.addEventListener('click',event=>{
-    const control=event.target.closest?.('button[data-route]');
-    if(!control||current!=='/workspace/'&&current!=='/workspace/index.html')return;
-    const route=control.dataset.route;
-    if(route)history.replaceState(null,'',`${location.pathname}#${route}`);
-  });
 
   const cfg=window.DEMENTOR_SITE_CONFIG?.supabase;
   if(!cfg?.enabled||!cfg.url||!cfg.publishableKey){document.documentElement.dataset.dcWorkspaceAuth='error';return;}
