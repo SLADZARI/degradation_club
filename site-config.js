@@ -1,5 +1,5 @@
 window.DEMENTOR_SITE_CONFIG=Object.freeze({
-  version:'2026-09-03.02',
+  version:'2026-09-03.04',
   canonicalOrigin:'https://dementor.club',
   supabase:{
     enabled:true,
@@ -12,7 +12,7 @@ window.DEMENTOR_SITE_CONFIG=Object.freeze({
   donate:{enabled:false,provider:null,checkoutUrl:null,currency:null,recurring:false},
   merch:{catalogEnabled:true,cartEnabled:true,cartStorageKey:'dementorClubCartV1',checkoutEnabled:false,checkoutProvider:null,checkoutUrl:null,preorderPaymentMethod:null,runtimeSource:'supabase'},
   events:{registrationEnabled:false,registrationProvider:null,registrationUrl:null},
-  community:{membershipEnabled:true,membershipProvider:'membership-review-v2',membershipUrl:'/join/apply/',boardUrl:'/community/board/',artifactMediaBucket:'dc-community-artifacts'},
+  community:{membershipEnabled:true,membershipProvider:'membership-review-v2',membershipUrl:'/join/apply/',boardUrl:'/workspace/board/',artifactMediaBucket:'dc-community-artifacts'},
   onboarding:{storageKey:'dementorClubOnboardingV3',storage:'localStorage',accountSync:true,authRequired:false,progressMap:true},
   internalTools:{enabled:true,holdMs:1200,path:'/workspace/admin/'}
 });
