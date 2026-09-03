@@ -41,9 +41,20 @@ const privateFooterPrefixes = [
 fs.rmSync(out, { recursive: true, force: true });
 fs.mkdirSync(out, { recursive: true });
 
-function normalizeProductionText(text) {
+function normalizeProductionText(text, ext='') {
   let result = text;
   for (const legacy of legacyOrigins) result = result.replaceAll(legacy, productionOrigin);
+
+  // Source supports the historical GitHub Pages sub-path. Production does not.
+  // Never run a blind `/degradation_club/ -> /` replacement across JS: it also
+  // matches the slash inside regex literals such as /^\/degradation_club/ and
+  // turns them into syntactically invalid /^\/. Keep compatibility checks as
+  // harmless never-match sentinels, then normalize actual path literals/markup.
+  if (ext === '.js') {
+    result = result.replaceAll('\\/degradation_club/', '\\/__dc_source_path_disabled__/');
+    result = result.replaceAll("'/degradation_club/'", "'/__dc_source_path_disabled__/'");
+    result = result.replaceAll('"/degradation_club/"', '"/__dc_source_path_disabled__/"');
+  }
   result = result.replaceAll('/degradation_club/', '/');
   result = result.replaceAll('/assets/ink/home-interruption-03.webp', '/assets/ink/home_01.webp');
   return result;
@@ -70,7 +81,7 @@ function copyDir(src, dst) {
     }
     if (shouldSkipFile(from, entry.name)) continue;
     const ext = path.extname(entry.name).toLowerCase();
-    if (textExt.has(ext)) fs.writeFileSync(to, normalizeProductionText(fs.readFileSync(from, 'utf8')));
+    if (textExt.has(ext)) fs.writeFileSync(to, normalizeProductionText(fs.readFileSync(from, 'utf8'), ext));
     else fs.copyFileSync(from, to);
   }
 }
@@ -81,7 +92,7 @@ function copyProductionDependency(rel) {
   if (!fs.existsSync(from) || !fs.statSync(from).isFile()) throw new Error(`Approved production dependency is missing: ${rel}`);
   fs.mkdirSync(path.dirname(to), { recursive: true });
   const ext = path.extname(rel).toLowerCase();
-  if (textExt.has(ext)) fs.writeFileSync(to, normalizeProductionText(fs.readFileSync(from, 'utf8')));
+  if (textExt.has(ext)) fs.writeFileSync(to, normalizeProductionText(fs.readFileSync(from, 'utf8'), ext));
   else fs.copyFileSync(from, to);
 }
 
@@ -92,7 +103,7 @@ function copyProductionProjection(spec) {
   fs.mkdirSync(path.dirname(to), { recursive: true });
   const ext = path.extname(spec.from).toLowerCase();
   if (!textExt.has(ext)) { fs.copyFileSync(from, to); return; }
-  let text = normalizeProductionText(fs.readFileSync(from, 'utf8'));
+  let text = normalizeProductionText(fs.readFileSync(from, 'utf8'), ext);
   if (spec.to.startsWith('workspace/admin/')) {
     text = text.replaceAll('href="../admin/"', 'href="/workspace/admin/"');
     text = text.replaceAll("href='../admin/'", "href='/workspace/admin/'");
