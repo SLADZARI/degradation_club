@@ -1,181 +1,186 @@
 # DEMENTOR LAB — Semantic Wiring Audit v0.1
 
 **Status:** ACTIVE QA / implementation registry  
-**Date:** 2026-09-02  
+**Updated:** 2026-09-03  
 **Implementation branch:** `agent/dementor-lab-vertical-slice-v0.3`  
-**Product source:** `dementor-club` (`PRODUCT_FLOW_INTERACTION_SPEC_v0.3` + `GAME_ARCHITECTURE_V0.1`)
+**Product source:** `dementor-club`
 
 ## Audit invariant
 
-Every visible control, label, value and gameplay attribute must have a complete chain:
+Every visible control, label, value and gameplay attribute must complete:
 
 `UI → semantic field → storage/owner → runtime meaning → observable output/result`
 
-Statuses: `WIRED`, `PARTIAL`, `UNWIRED`, `DORMANT`, `DECISION_GAP`, `SOT_CONFLICT`.
+Statuses: `WIRED`, `PARTIAL`, `DORMANT`, `DECISION_GAP`, `PHYSICAL_QA_PENDING`.
 
-## P0 cross-check
+## Current semantic closure
 
-| Area | Current state | Status | Next rule/action |
-| --- | --- | --- | --- |
-| Player identity | PERSON now has required `player-name`; value is stored locally, reaches `Character.name`, TALK and replay. | WIRED | Keep browser regression. |
-| Scenario copy | title/premise/objective/turnLimit now render from `CRITICISM_IDEA_SCENARIO`; hardcoded “Гена” removed. | WIRED | Result wording must later use same objective contract. |
-| Objective CONTACT | `objective='contact'` currently makes CONTACT=0 terminal, but there is no `OBJECTIVE_COMPLETE` or explicit success threshold. | DECISION_GAP / P0 | SOT says KEEP CONTACT = complete encounter with Contact above threshold. Threshold/result wording must be approved before coding. |
-| Objective scope | Approved flow v0.3 requires at least two objective contracts; implementation has only CONTACT. | SOT_CONFLICT / P0 | Add second approved objective only after current semantic hardening. |
-| Two-graph collision | Both actors have real graphs, but every turn still receives `openingTrigger='criticism'`. Previous reaction does not emit next Trigger. | PARTIAL / P0 | Define deterministic reaction/event → next-trigger mapping in SOT. |
-| Dialogue | Phrase resolver still receives only `reaction + turn`; architecture requires impulse/scenario/metrics/memory/recent transcript context. | PARTIAL / P0 | Wire full deterministic dialogue context; graph remains cause. |
-| REPEAT | `count` increases repeat cost/effects, but runtime has no “answer accepted/not accepted” signal. | PARTIAL / P0 | Either define acceptance event or keep copy strictly as multiplier/cost semantics. |
-| BRAIN > | Real gate now works; if every path is closed, runtime throws no-executable-reaction. | PARTIAL / P0 | Define deterministic no-path outcome/fallback. |
-| Breakpoint CONTACT | Current detector checks predicted **self** CONTACT while many hostile actions damage **target** CONTACT. | PARTIAL / P0 | Test/decide whether contact-risk breakpoint tracks actor, target, or shared scenario contact. |
-| HOT PATCH ownership | Patch is applied to `bp.actorId`; a breakpoint caused by opponent B can therefore expose edits to the opponent graph. | DECISION_GAP / P0 | Decide whether first-slice player may patch opponent or only player A. |
-| Breakdown acting | cause-specific renderer existed but controller did not invoke it. Controller now calls `renderer.breakdown()` for the losing actor. | WIRED | Add regression proving cause-specific terminal render. |
-| Speaking animation | Renderer reacts to metrics, but not current speaking/reaction intent. | PARTIAL | SOT requires speaking/state-driven animation. |
-| BRAIN interaction model | Approved v0.3 says free canvas + pan/pinch/ports + bottom-sheet inspector. Current implementation is vertical stack/reorder/bracket edges. | SOT_CONFLICT / P0 | Do not silently revert. Product SOT must be updated if stack BRAIN is now the approved mechanism. |
-| SETUP interaction model | Approved v0.3 says transient overlay/bottom sheet over TALK; implementation is separate SETUP workspace. | SOT_CONFLICT | Confirm/update SOT after UX decision. |
-
-## UI field registry
-
-### PERSON
-
-| UI | Semantic owner | Storage/runtime | Status |
-| --- | --- | --- | --- |
-| Player name | `Character.name` | localStorage → actors A → transcript/TALK/replay | WIRED |
-| Character 01/02 | `visual.characterId` | current run + replay config → renderer/body rig | WIRED |
-| Headgear | `hatVariant` | appearance state → renderer | WIRED |
-| Glasses | `glassesVariant` | appearance state → renderer | WIRED |
-| Moustache/beard | `facialHairVariant` | appearance state → renderer; character-02 authored asymmetry | WIRED |
-| Accessory | `accessoryVariant` | appearance state → renderer | WIRED |
-| Outfit | `outfitVariant` | body-owned appearance → renderer | WIRED where manifest supports |
-| Shoes | `shoesVariant` | body-owned appearance → renderer | WIRED |
-| Appearance colors | `colors.*` | model + renderer support, no user controls | DORMANT |
-| Reset appearance | appearance buckets | resets real appearance state | WIRED |
-| Fake “СКЕЛЕТ” editor copy | no field | removed | FIXED |
-
-### BRAIN
-
-`NODE_SPECS` is now the single owner of node `family`, `title`, `description`, defaults and slice availability. The old duplicate subtitle map is removed.
-
-| Type | Family | Parameter | Real runtime meaning | Status |
-| --- | --- | --- | --- | --- |
-| criticism | TRIGGER | — | exact entry trigger for current scenario | WIRED |
-| ignore | TRIGGER | — | valid global trigger but current scenario never emits it; hidden from current picker | DORMANT here |
-| resentment | STATE | delta/cap | persistent memory; TENSION/BRAIN↑, target CONTACT↓ | WIRED |
-| trust | STATE | delta/cap | persistent memory; CONTACT↑, BRAIN↓ | WIRED |
-| beright | IMPULSE | weight 1–5 | path score + BRAIN/TENSION↑ + target CONTACT↓ | WIRED |
-| beliked | IMPULSE | weight 1–5 | path score + CONTACT support | WIRED |
-| understand | IMPULSE | weight 1–5 | path score + CONTACT support + small BRAIN cost | WIRED |
-| explain | REACTION | — | ENERGY↓, BRAIN/TENSION↑, target CONTACT↓ | WIRED |
-| agree | REACTION | — | TENSION↓, CONTACT↑ | WIRED |
-| joke | REACTION | — | TENSION↓, CONTACT↑, ENERGY cost | WIRED |
-| silent | REACTION | — | small ENERGY/BRAIN/TENSION cost, target CONTACT↓ | WIRED |
-| pressure | REACTION | — | strong TENSION↑ and target CONTACT↓ | WIRED |
-| repeat | CONTROL | count 1–5 | additional repeat cost/effects | PARTIAL semantic contract |
-| stop | CONTROL | — | terminates downstream traversal | WIRED |
-| ifbrain | CONTROL | threshold | branch allowed only when BRAIN > threshold | WIRED; no-path gap |
-| pause | ABILITY | — | BRAIN/TENSION↓, target CONTACT↑ | WIRED |
-| interrupt | ABILITY | — | no approved special runtime semantics; explicitly unavailable in slice | DORMANT |
-
-BRAIN editor controls:
-- add/delete/connect/reorder mutate the real `currentBrainGraph`;
-- user-created edges are tagged `uiManual` and survive reorder;
-- invalid family links, duplicates, self-links and explicit cycles are rejected;
-- current-scenario picker does not offer triggers that cannot fire;
-- empty `brain-inspector` / `brain-editor` placeholders were removed;
-- replay locks every node except one exact `replayTargetNodeId`.
-
-### SETUP
-
-| UI | Owner | Status |
+| Area | Current state | Status |
 | --- | --- | --- |
-| Scenario title | `Scenario.title` | WIRED |
-| Premise | `Scenario.premise` | WIRED |
-| Objective label | `Scenario.objectiveLabel` | WIRED display / PARTIAL rules |
-| End text | `Scenario.turnLimit` + breakdown | WIRED display |
-| Opponent name | seeded `opponentProfile.name` | WIRED |
-| Opponent behavior label/description | opponent preset metadata | WIRED |
-| Opponent seed | deterministic internal seed, currently displayed as `SEED` | WIRED technically; questionable player value |
-| Reroll | new seed/profile | WIRED; frozen after baseline |
-| AUTO / STEP | Encounter mode | WIRED |
+| Player identity | Required PERSON name → local state → `Character.name` → TALK/replay | WIRED |
+| Visual character | exact body + appearance state → CharacterRenderer | WIRED |
+| BRAIN interaction | approved vertical stack/metro editor, real nodes/edges, manual branches survive reorder | WIRED |
+| Scenario copy | title/premise/objective/turn limit all come from Scenario | WIRED |
+| SETUP | approved separate mobile screen | WIRED |
+| Reaction collision | Reaction → World Event → next actor Trigger | WIRED |
+| REPEAT | pending cross-turn repeat, cancelled only by ACCEPTANCE, count includes first attempt | WIRED |
+| CONTACT objective | relationship contact = `min(A,B)`; Scenario owns threshold 25; objective complete/fail at limit | WIRED / balance-tunable |
+| BRAIN > | real condition + required unconditional fallback; malformed runtime becomes NO_ACTION/NO_RESPONSE | WIRED |
+| HOT PATCH ownership | only Character A editable; generated opponent B never patchable | WIRED |
+| Dialogue | deterministic phrase renderer, 5–8-budget contract, contextual state/impulse/memory/recent transcript, no random | WIRED |
+| Cause-specific breakdown | terminal reason → renderer.breakdown | WIRED |
+| Result/replay | actual trace → exact A node → one-node counterfactual → before/after | WIRED |
+| TRACE presentation | causal data exists; remaining UI should use human labels everywhere | PARTIAL |
+| Speaking/reaction animation | metric-driven acting exists, explicit current-speaking/reaction gesture layer incomplete | PARTIAL |
+| Second objective | not selected yet; defer until core collision loop physical QA | DECISION_GAP |
+| Physical devices | browser-sized automation is not physical Safari/Chrome evidence | PHYSICAL_QA_PENDING |
 
-### TALK
+## Approved first-slice causal alphabet
 
-| UI/data | Owner/effect | Status |
-| --- | --- | --- |
-| Actor names | `Character.name` | WIRED |
-| Turn | `Encounter.turn` | WIRED |
-| ENERGY | Character state; reaction/repeat/pause; terminal at 0 | WIRED |
-| BRAIN | Character state; gates, breakpoint, breakdown | WIRED |
-| TENSION | Character state + renderer mapping | WIRED |
-| CONTACT | Character state + contact breakdown | WIRED / objective success unresolved |
-| Dialogue | `transcript.phrase` | PARTIAL: context underwired |
-| Delta | trace metric deltas + memory | PARTIAL: UI currently shows only first memory change |
-| TRACE | `ExecutionTrace` | PARTIAL: current overlay exposes raw internal IDs/types |
-| Character acting | metric→face/body | PARTIAL: speaking/reaction animation missing |
-| Cause-specific collapse | terminal reason → renderer.breakdown | WIRED after audit fix |
+### Triggers
+- `criticism` — КРИТИКА
+- `pushback` — ВОЗРАЖЕНИЕ
+- `acceptance` — ПРИНЯТО
+- `deflection` — УШЛИ В СТОРОНУ
+- `ignore` — ИГНОР / НЕТ ОТВЕТА
+- `underpressure` — ДАВЛЕНИЕ
 
-### HOT PATCH
+`underpressure` is the implementation node id for semantic Trigger PRESSURE because Reaction `pressure` already owns that machine key.
 
-Approved four classes are implemented:
+### Reaction → Event → Trigger
+
+| Reaction | Event | Receiver Trigger | Accepts pending REPEAT |
+| --- | --- | --- | --- |
+| EXPLAIN | COUNTERPOINT | PUSHBACK | no |
+| AGREE | ACCEPTANCE | ACCEPTANCE | yes |
+| JOKE | DEFLECTION | DEFLECTION | no |
+| SILENT | NO_RESPONSE | IGNORE | no |
+| PRESSURE | PRESSURE | PRESSURE (`underpressure`) | no |
+
+Dialogue renders this causal result; dialogue never changes it.
+
+## BRAIN node registry
+
+`NODE_SPECS` is the single semantic owner of title, family, description, defaults and slice availability.
+
+| Type | Family | Runtime meaning | Status |
+| --- | --- | --- | --- |
+| criticism | TRIGGER | scenario opening criticism | WIRED |
+| pushback | TRIGGER | previous actor counter-position | WIRED |
+| acceptance | TRIGGER | explicit agreement/acceptance | WIRED |
+| deflection | TRIGGER | joke/deflection response | WIRED |
+| ignore | TRIGGER | no substantive response | WIRED |
+| underpressure | TRIGGER | receiver is being pressured | WIRED |
+| resentment | STATE | persistent resentment memory + state effects | WIRED |
+| trust | STATE | persistent trust memory + state effects | WIRED |
+| beright | IMPULSE | weighted BE RIGHT branch + metric effects | WIRED |
+| beliked | IMPULSE | weighted BE LIKED branch + contact support | WIRED |
+| understand | IMPULSE | weighted UNDERSTAND branch + contact support | WIRED |
+| explain | REACTION | EXPLAIN effects + COUNTERPOINT event | WIRED |
+| agree | REACTION | AGREE effects + ACCEPTANCE event | WIRED |
+| joke | REACTION | JOKE effects + DEFLECTION event | WIRED |
+| silent | REACTION | SILENT effects + NO_RESPONSE event | WIRED |
+| pressure | REACTION | PRESSURE effects + PRESSURE event | WIRED |
+| repeat | CONTROL | repeat same Reaction on later own activations until accepted/exhausted | WIRED |
+| stop | CONTROL | stop downstream branch traversal | WIRED |
+| ifbrain | CONTROL | route only when BRAIN exceeds threshold | WIRED |
+| pause | ABILITY | BRAIN/TENSION relief + CONTACT support | WIRED |
+| interrupt | ABILITY | no approved first-slice semantics | DORMANT / hidden |
+
+## Objective CONTACT
+
+Source: `Scenario.objectiveRules.minRelationshipContact`.
+
+Derived objective value:
+
+`RELATIONSHIP_CONTACT = min(A.contact, B.contact)`
+
+First tuning contract:
+- 50–100: contact present;
+- 25–49: strained but maintained;
+- 1–24: conversation technically continues but objective failed;
+- 0: CONTACT breakdown.
+
+At turn limit:
+- relationship contact >= configured threshold → `OBJECTIVE_COMPLETE`;
+- relationship contact below threshold but >0 → `OBJECTIVE_FAILED`;
+- breakdown conditions remain terminal earlier.
+
+Threshold is a Scenario field, not a UI/runtime magic number.
+
+## REPEAT
+
+`REPEAT ×N` means maximum total attempts including the first Reaction.
+
+Runtime owns `pendingRepeats.A/B`.
+- first execution schedules `N-1` remaining attempts;
+- other Character receives emitted Event/Trigger and takes a real graph turn;
+- ACCEPTANCE cancels the original Character's pending repeat;
+- otherwise the original Character repeats the stored Reaction on its next activation before normal trigger traversal;
+- incoming trigger remains visible in trace even when repeat takes precedence;
+- repeated attempt does not silently re-run memory/impulse path as though a new cause had been traversed.
+
+## Conditional safety
+
+Authoring:
+- conditional route requires an unconditional fallback route from the same trigger;
+- otherwise validation: `NO_CONDITION_FALLBACK`;
+- message: `ЕСЛИ УСЛОВИЕ НЕ СРАБОТАЕТ, ОН ЗАВИСНЕТ. ДОБАВЬ ЗАПАСНУЮ РЕАКЦИЮ.`
+
+Runtime safety for malformed/legacy content:
+- no uncaught error;
+- `NO_ACTION` trace;
+- no hidden metric effects;
+- emits `NO_RESPONSE` → receiver Trigger `IGNORE`;
+- never inserts a fake SILENT node.
+
+## HOT PATCH
+
+Allowed classes remain:
 - reduce impulse weight;
 - reduce repeat count;
 - insert PAUSE;
-- change one compatible connection.
+- rewire one compatible edge.
 
-Patch preserves turn, metrics, memory and transcript. `hotPatchUsed` is Encounter-global, so only one patch opportunity exists for both actors combined. This matches the “one patch opportunity” wording, but actor ownership still needs a product decision.
+Ownership:
+- only Character A may be mutated;
+- opponent B breakpoint/risk may be informative but never grants graph editing;
+- patch preserves turn, metrics, memory and transcript.
 
-### RESULT / REPLAY
+## Dialogue contract
 
-- Result cause uses actual player A trace in causal order — WIRED.
-- suspicious node is exact A `nodeId` — WIRED.
-- same scenario/opponent/appearance/graph baseline is frozen — WIRED.
-- one-node counterfactual lock — WIRED.
-- BEFORE/AFTER compares A metrics — WIRED.
-- objective-specific success language — UNWIRED / decision gap.
-- discovery output — DORMANT.
+Active Reactions: EXPLAIN / AGREE / JOKE / SILENT / PRESSURE.
 
-## Balance / “combat” snapshot
+- roughly 5–8 authored base phrases per Reaction;
+- small contextual replacement set for meaningful extremes;
+- resolver may use reaction, impulse, scenario, BRAIN, TENSION, CONTACT, memory, recent transcript and deterministic turn/run context;
+- no `Math.random()` phrase choice;
+- same meaningful input context reproduces the same phrase;
+- text never changes metrics, memory, events, triggers or objectives.
 
-Current deterministic reaction deltas:
-- EXPLAIN: self `ENERGY -4, BRAIN +8, TENSION +5`; target `TENSION +4, CONTACT -5`.
-- AGREE: self `ENERGY -2, BRAIN -2, TENSION -4, CONTACT +4`; target `TENSION -3, CONTACT +5`.
-- JOKE: self `ENERGY -3, BRAIN -1, TENSION -5, CONTACT +5`; target `TENSION -4, CONTACT +4`.
-- SILENT: self `ENERGY -1, BRAIN +2, TENSION +2`; target `CONTACT -3`.
-- PRESSURE: self `ENERGY -5, BRAIN +6, TENSION +8`; target `TENSION +9, CONTACT -8`.
+## Remaining real gaps
 
-Impulses:
-- BE RIGHT: self `BRAIN +2, TENSION +2`; target `CONTACT -1`.
-- BE LIKED: self `CONTACT +2, TENSION -1`; target `CONTACT +1`.
-- UNDERSTAND: self `BRAIN +1, CONTACT +3`; target `TENSION -1, CONTACT +2`.
+1. **TRACE UI polish** — eliminate remaining raw IDs/types in player-facing explanation.
+2. **Speaking/reaction animation** — distinguish active speaker/reaction intent from metric-only acting without creating hidden gameplay logic.
+3. **Mobile density of collision inputs** — presets now contain six real Trigger entries. Mechanics are correct; physical-phone QA must decide whether entry triggers need a collapsed/grouped visual presentation while remaining real nodes.
+4. **Second objective** — choose only after the CONTACT collision loop proves fun/readable; avoid adding a new gameplay subsystem just to satisfy a count.
+5. **Physical QA** — iPhone Safari and Android Chrome remain separate from automated phone-sized Chromium.
 
-Extra REPEAT: self `ENERGY -2, BRAIN +5, TENSION +2`; target `CONTACT -2, TENSION +2` per extra repeat.  
-PAUSE: self `BRAIN -5, TENSION -7, ENERGY -1`; target `TENSION -3, CONTACT +3`.
+## Automated acceptance gate
 
-Balance is **not final** while objective success, repeat acceptance and graph-to-graph event propagation are unresolved. Current numbers make AGREE/JOKE structurally safer for CONTACT than EXPLAIN/PRESSURE; that is a valid consequence system but needs FUN/playtest evidence before tuning.
+Required green checks:
+- deterministic collision events;
+- next actor consumes prior Event-derived Trigger;
+- pending REPEAT persists across turns;
+- ACCEPTANCE cancels REPEAT;
+- BRAIN conditional fallback validation;
+- malformed no-path → transparent NO_ACTION;
+- target-side CONTACT risk detection;
+- Scenario-owned CONTACT threshold and objective complete/fail;
+- generated opponent cannot be HOT PATCHed;
+- deterministic dialogue;
+- exact replay node identity;
+- manual BRAIN edges survive reorder;
+- phone-sized browser flow has no page-level horizontal overflow.
 
-## Declared model fields not operational in current slice
-
-- `Character.discoveries[]` — never written/read.
-- `Character.history[]` — never written/read.
-- authored `Character.face` persistence — renderer derives face from state.
-- `BehaviorGraph.entryRules[]` — not first-class runtime data.
-- `BehaviorGraph.runtimeState` — not first-class runtime data.
-- `Scenario.resultRules` — absent; likely required for objective completion.
-- broader triggers/reactions/abilities from architecture — intentionally not all implemented.
-
-These are not bugs unless exposed as working UI.
-
-## Acceptance gate
-
-Semantic layer is not “clean” until:
-1. every visible value has a real owner;
-2. objective rules and result wording agree;
-3. at least the required objective contracts exist;
-4. previous reaction/event propagation is resolved or SOT explicitly narrows “two graphs collide”;
-5. dialogue receives the deterministic context promised by architecture;
-6. REPEAT copy and engine mean the same thing;
-7. BRAIN > cannot crash on no-path;
-8. HOT PATCH actor ownership is explicit;
-9. TRACE is human-readable, not internal IDs;
-10. speaking/reaction and terminal acting are wired;
-11. stack-vs-free-canvas and SETUP-screen-vs-overlay conflicts are resolved in `dementor-club` SOT;
-12. deterministic QA + phone-sized browser smoke are green;
-13. physical iPhone Safari + Android Chrome remain a separate gate.
+Physical device QA remains a separate gate even when automation is green.
