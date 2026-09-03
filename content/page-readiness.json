@@ -1,5 +1,5 @@
 {
-  "version": "2026-09-02",
+  "version": "2026-09-03",
   "role": "site content readiness registry",
   "statusDefinitions": {
     "FINAL": "Current public copy can ship without additional factual approval; later editorial refinement is optional.",
@@ -222,6 +222,13 @@
       "source": ["dementor-club/operations/DC_WORKSPACE_READONLY_ACCESS_V0.1.md", "dementor-club/operations/PERSONAL_WORKSPACE_PROGRESSIVE_ACCESS_V0.2.md"],
       "blockingFields": [],
       "note": "Production read-only personal workspace is approved; route remains private-product UI with noindex/nofollow/noarchive and server/RLS authorization boundaries."
+    },
+    {
+      "route": "/workspace/board/",
+      "state": "FINAL",
+      "source": ["dementor-club/operations/PERSONAL_WORKSPACE_PROGRESSIVE_ACCESS_V0.2.md", "dementor-club/community/MEMBER_ENTRY_AND_ARTIFACT_FLOW_V1.md", "dementor-club/community/MEMBERSHIP_AND_DEMENTOR_REVIEW_V2.md"],
+      "blockingFields": [],
+      "note": "Closed Community Board is an authenticated Member surface composed inside the Personal Workspace shell; route is noindex/nofollow/noarchive and existing membership/RLS gates remain authoritative."
     },
     {
       "route": "/workspace/review/",
