@@ -1,5 +1,5 @@
 window.DEMENTOR_SITE_CONFIG=Object.freeze({
-  version:'2026-09-03.05',
+  version:'2026-09-03.06',
   canonicalOrigin:'https://dementor.club',
   supabase:{
     enabled:true,
@@ -30,10 +30,10 @@ if(typeof document!=='undefined'){
       if(!document.querySelector('link[rel="canonical"]')){const link=document.createElement('link');link.rel='canonical';link.href=canonical+runtimePath;document.head.appendChild(link)}
     };
     normalizeCanonicalMetadata();
-    if(!isWorkspaceShell){
-      addScript('/global-header.js');addStyle('/global-header.css');
-      addScript('/global-footer.js');addStyle('/global-footer.css');
-    }
+    // The canonical public header remains visible in Workspace so members always
+    // retain a clear route back to the public club. Footer stays public-only.
+    addScript('/global-header.js');addStyle('/global-header.css');
+    if(!isWorkspaceShell){addScript('/global-footer.js');addStyle('/global-footer.css');}
     addScript('/dementor-relations-v1.js');
     const isJoinAssessment=/\/join\/?(?:index\.html)?$/.test(path);
     const isCommunityRoot=/\/community\/?(?:index\.html)?$/.test(path);
