@@ -63,7 +63,8 @@ const supabaseStub=(mode='guest')=>{
       from:query,
       rpc:async(name)=>({data:name==='dc_member_entry_status_v1'?{membership_active:${member},community_activation_state:${member?"'MEMBER_ACTIVATED'":"null"},artifact_slots_available:0,published_artifact_count:${member?1:0}}:null,error:null}),
       storage:{from:()=>storageBucket},
-      functions:{invoke:async()=>({data:{},error:null})}
+      functions:{invoke:async()=>({data:{},error:null})
+      }
     }}
   `;
 };
@@ -106,14 +107,13 @@ async function checkPublicShell(route){
 
 for(const route of ['/','/about/','/projects/','/community/','/merch/','/archive/','/join/'])await checkPublicShell(route);
 
-// Guest Workspace: public header remains available, but the private sidebar does not exist visually yet.
+// Guest Workspace: public header remains available, but private navigation stays hidden until auth succeeds.
 {
   const context=await newContext('guest');const page=await context.newPage();const pageErrors=[];page.on('pageerror',e=>pageErrors.push(e.message));
   await page.goto(base+'/workspace/',{waitUntil:'domcontentloaded'});
   await waitHeader(page,'/workspace/ guest');
   try{await page.getByRole('button',{name:'ВОЙТИ ЧЕРЕЗ GOOGLE'}).waitFor({state:'visible',timeout:4000});}catch{errors.push(`/workspace/: guest login gate did not render; errors=${pageErrors.join(' | ')||'none'}`)}
   expect(await page.locator('[data-workspace-sidebar]:visible').count()===0,'/workspace/: guest can see private Workspace sidebar');
-  expect(await page.getByText('LOG OUT',{exact:true}).filter({visible:true}).count?.===undefined||true,'');
   expect(await page.locator('[data-global-logout]:visible').count()===0,'/workspace/: guest can see LOG OUT');
   expect(await page.locator('[data-member-tool]:visible').count()===0,'/workspace/: guest can see member-only navigation');
   expect((await page.locator('.dc-global-brand').getAttribute('href'))==='/', '/workspace/: public brand does not return to club home');
@@ -189,7 +189,7 @@ for(const route of ['/','/about/','/projects/','/community/','/merch/','/archive
   expect(buttons.length>=2&&buttons.every(x=>x.display==='inline-flex'&&x.height>=48),`/join/: member CTA geometry drifted ${JSON.stringify(buttons)}`);
   const darkBlocks=await page.evaluate(()=>{
     const header=document.querySelector('.dc-global-header');if(!header)return[];const bottom=header.getBoundingClientRect().bottom;
-    return [...document.querySelectorAll('body *')].map(el=>{const r=el.getBoundingClientRect();const bg=getComputedStyle(el).backgroundColor;return{tag:el.tagName,cls:el.className||'',top:r.top,height:r.height,width:r.width,bg}}).filter(x=>x.width>innerWidth*.8&&x.height>30&&x.top>=bottom-2&&x.top<bottom+220&&(x.bg==='rgb(17, 17, 17)'||x.bg==='rgb(0, 0, 0)'));
+    return [...document.querySelectorAll('body *')].map(el=>{const r=el.getBoundingClientRect();const bg=getComputedStyle(el).backgroundColor;return{tag:el.tagName,cls:String(el.className||''),top:r.top,height:r.height,width:r.width,bg}}).filter(x=>x.width>innerWidth*.8&&x.height>30&&x.top>=bottom-2&&x.top<bottom+220&&(x.bg==='rgb(17, 17, 17)'||x.bg==='rgb(0, 0, 0)'));
   });
   expect(darkBlocks.length===0,`/join/: unexplained dark slab below header: ${JSON.stringify(darkBlocks.slice(0,3))}`);
   expect(!pageErrors.length,`/join/ member-return produced page errors: ${pageErrors.join(' | ')}`);
