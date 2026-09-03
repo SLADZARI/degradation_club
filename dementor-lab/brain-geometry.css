@@ -1,0 +1,94 @@
+/* DEMENTOR LAB — BRAIN stack geometry pass v0.1
+   Mobile-first: preserve card width, reserve a readable rail, and keep branches legible. */
+
+.brain-screen .brain-graph.brain-constructor{
+  --brain-rail:88px;
+  padding-left:var(--brain-rail);
+  padding-right:10px;
+}
+
+.brain-stack-list{position:relative}
+.brain-stack-node{margin-bottom:14px}
+.brain-stack-card{min-height:74px}
+
+/* A visible port gives the metro/causal line a stable landing point. */
+.brain-stack-node::before{
+  content:"";
+  position:absolute;
+  left:-7px;
+  top:50%;
+  width:10px;
+  height:10px;
+  transform:translate(-50%,-50%);
+  border:2px solid var(--ink);
+  background:var(--paper);
+  z-index:4;
+  pointer-events:none;
+}
+.brain-stack-node.connection-focus::before,
+.brain-stack-node.route-active::before,
+.brain-stack-node.connection-related::before{background:var(--acid)}
+
+/* Causality is allowed two lines: 2–3 outgoing branches must remain readable. */
+.brain-stack-route{
+  white-space:normal;
+  overflow:visible;
+  text-overflow:clip;
+  display:-webkit-box;
+  -webkit-line-clamp:2;
+  -webkit-box-orient:vertical;
+  line-height:1.15;
+  max-height:2.3em;
+  padding-right:4px;
+}
+
+/* Drag remains a dedicated touch target but no longer steals 50px of reading width. */
+.brain-stack-drag{
+  width:44px;
+  border-left:1px solid var(--ink);
+}
+.brain-stack-main{padding-right:52px}
+.brain-stack-value{right:50px}
+
+/* Add-node aligns to the same card/rail geometry. */
+.brain-add-node-bottom{
+  width:calc(100% - var(--brain-rail) - 10px);
+  margin-left:var(--brain-rail);
+  margin-right:10px;
+}
+
+/* Hub belongs to the same causal plane but gets a little more horizontal room. */
+.brain-trigger-hub{margin-left:-10px;margin-right:0}
+
+@media(max-width:430px){
+  .brain-screen .brain-graph.brain-constructor{--brain-rail:84px;padding-left:var(--brain-rail);padding-right:8px}
+  .brain-add-node-bottom{width:calc(100% - var(--brain-rail) - 8px);margin-left:var(--brain-rail);margin-right:8px}
+  .brain-stack-node{margin-bottom:12px}
+  .brain-stack-title{font-size:17px}
+  .brain-stack-main{padding:9px 50px 9px 10px}
+
+  /* Mobile open-state: actions occupy their own internal row instead of pushing copy 184px sideways. */
+  .brain-stack-node.open .brain-stack-main{
+    margin-left:0;
+    padding-top:66px;
+  }
+  .brain-stack-actions{
+    left:0;
+    right:44px;
+    top:0;
+    bottom:auto;
+    width:auto;
+    height:58px;
+    transform:translateY(-60px);
+    padding:5px 8px;
+    gap:6px;
+  }
+  .brain-stack-node.open .brain-stack-actions{transform:translateY(0)}
+  .brain-stack-action{width:46px;min-width:46px;height:46px;min-height:46px}
+  .brain-stack-node.open .brain-stack-value{opacity:0}
+  .brain-stack-node.open .brain-stack-drag{border-left:1px solid var(--ink)}
+
+  /* Connect targets remain tappable without crushing the source title. */
+  .brain-stack-node.connection-target .brain-stack-card{grid-template-columns:minmax(0,1fr) 104px}
+  .brain-stack-connect-target{min-width:92px;margin-left:4px;margin-right:4px;padding:0 6px;font-size:10px}
+}
