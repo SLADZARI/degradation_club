@@ -1,12 +1,12 @@
 # DEMENTOR LAB — Runtime Semantic Decisions v0.1
 
-**STATUS:** PARTIALLY APPROVED / matrix proposal in design  
-**DATE:** 2026-09-02  
+**STATUS:** APPROVED FOR VERTICAL SLICE  
+**DATE:** 2026-09-03  
 **OWNER:** Dementor Club  
 **SOURCE-OF-TRUTH BRANCH:** `dementor-club`  
 **RELATES TO:** `DEMENTOR_LAB_GAME_ARCHITECTURE_V0.1.md`, `DEMENTOR_LAB_PRODUCT_FLOW_INTERACTION_SPEC_v0.3.md`
 
-This document records semantic decisions made after physical/mobile BRAIN QA. Approved items below supersede conflicting interaction details in v0.3. Proposed items remain non-production until explicitly approved.
+This document records semantic decisions made after physical/mobile BRAIN QA. Approved items below supersede conflicting interaction details in v0.3.
 
 ---
 
@@ -68,19 +68,18 @@ Rules:
 
 ---
 
-## 4. APPROVED — REPEAT becomes a real conditional mechanic
+## 4. APPROVED — REPEAT is a real conditional mechanic
 
-`REPEAT ×N` must not remain only a metric multiplier.
+`REPEAT ×N` is not a metric multiplier.
 
-Approved direction:
+Approved behavior:
 
 - REPEAT schedules another attempt of the relevant Reaction;
+- `×N` means maximum total attempts including the first execution;
 - repetition continues only while the previous attempt has **not been accepted**;
-- an explicit deterministic acceptance signal must exist in runtime;
-- acceptance must be derived from game events/reactions, never from dialogue wording or random text;
-- the exact acceptance table is defined together with the Reaction → Event → Trigger matrix.
-
-Until that matrix is approved, do not finalize REPEAT balance numbers.
+- acceptance is derived from deterministic game events, never from dialogue wording;
+- for the first slice, `AGREE → ACCEPTANCE` cancels a pending REPEAT;
+- other active reactions do not count as acceptance.
 
 ---
 
@@ -123,7 +122,7 @@ Dialogue **must not modify gameplay state**. Metrics, memory, objectives and gra
 
 No random phrase selection.
 
-For the same meaningful input context, phrase selection must be reproducible. A replay that changes one causal node may produce a different phrase because its trace/state changed; an unchanged causal state must not change just because text was randomly rerolled.
+For the same meaningful input context, phrase selection must be reproducible. A replay that changes one causal node may produce a different phrase because its trace/state changed; an unchanged causal state must not change because text was rerolled.
 
 Purpose:
 
@@ -131,34 +130,155 @@ Purpose:
 
 ---
 
-## 6. DESIGN RULE — Reaction → Event → Trigger
+## 6. APPROVED — Reaction → Event → Trigger collision
 
-The next semantic layer is explicitly three-stage:
+The semantic layer is explicitly three-stage:
 
 `REACTION → WORLD EVENT → RECEIVER TRIGGER`
 
 Do **not** equate Reaction directly with Trigger.
 
-Reason:
+First-slice mapping:
 
-- a Reaction is what the acting Character does;
-- an Event is what happened in the interaction;
-- a Trigger is how the receiving BehaviorGraph can enter in response to that event.
+| Reaction | World Event | Receiver Trigger | Accepted for REPEAT |
+| --- | --- | --- | --- |
+| EXPLAIN | COUNTERPOINT | PUSHBACK | no |
+| AGREE | ACCEPTANCE | ACCEPTANCE | yes |
+| JOKE | DEFLECTION | DEFLECTION | no |
+| SILENT | NO_RESPONSE | IGNORE | no |
+| PRESSURE | PRESSURE | PRESSURE | no |
 
-This layer is required to make “two graphs collide” real and to define REPEAT acceptance without using dialogue text.
+Scenario opening remains `CRITICISM → CRITICISM`.
 
-The first matrix is designed in a separate proposal and remains non-production until approved.
+This makes **two graphs collide** without making dialogue text causal.
 
 ---
 
-## 7. STILL OPEN
+## 7. APPROVED — CONTACT objective
 
-The following are deliberately not invented here:
+For `CONTACT / СОХРАНИТЬ КОНТАКТ` the relevant relationship value is derived as:
 
-1. CONTACT objective success rule and threshold.
-2. Exact Reaction → Event → Trigger matrix.
-3. Exact acceptance/rejection table used by REPEAT.
-4. Closed-condition (`BRAIN >`) fallback behavior.
-5. Second objective for the vertical slice.
+`RELATIONSHIP_CONTACT = min(A.contact, B.contact)`
 
-These should be solved as one game system, because changing the event matrix changes contact flow, repeat behavior and branch semantics.
+This is not a new persistent stat.
+
+Vertical-slice rule:
+
+- reach the Scenario turn limit;
+- neither actor has broken down;
+- `RELATIONSHIP_CONTACT >= 25` → `OBJECTIVE_COMPLETE`;
+- `RELATIONSHIP_CONTACT 1–24` → `OBJECTIVE_FAILED` without forced breakdown;
+- `CONTACT = 0` for either participant → CONTACT breakdown.
+
+The numeric threshold remains balance-tunable, but the semantic contract is fixed.
+
+---
+
+## 8. APPROVED — closed BRAIN condition safety
+
+A conditional route must have a fallback path for the same reachable interaction context.
+
+Editor diagnosis:
+
+> **ЕСЛИ УСЛОВИЕ НЕ СРАБОТАЕТ, ОН ЗАВИСНЕТ. ДОБАВЬ ЗАПАСНУЮ РЕАКЦИЮ.**
+
+START is disabled until the graph is safe.
+
+Runtime safety for malformed/legacy graphs:
+
+- record `NO_ACTION / CONDITION_BLOCKED`;
+- consume the turn with no hidden metric effects;
+- emit `NO_RESPONSE` to the other actor;
+- receiver gets `IGNORE`;
+- never silently inject a fake SILENT node.
+
+---
+
+## 9. APPROVED — mobile Trigger Hub
+
+The runtime keeps all Trigger nodes as real graph entry points, but the mobile editor must **not render all Trigger nodes as six full-height peer cards in the main vertical stack**.
+
+### 9.1 Player mental model
+
+The user thinks in two layers:
+
+1. **НА ЧТО Я РЕАГИРУЮ** — incoming situations/signals;
+2. **ЧТО СО МНОЙ ПРОИСХОДИТ ДАЛЬШЕ** — state, impulse, reaction, control and ability chain.
+
+Therefore all Trigger nodes are represented in the default BRAIN view by one compact **Trigger Hub** at the top of the graph.
+
+Default label:
+
+> **НА ЧТО Я РЕАГИРУЮ**
+
+The hub displays compact active trigger chips/rows using human labels, for example:
+
+- КРИТИКА
+- ВОЗРАЖЕНИЕ
+- ПРИНЯТО
+- ИГНОР
+- ДАВЛЕНИЕ
+- УШЛИ В СТОРОНУ
+
+### 9.2 Default collapsed state
+
+On normal mobile entry the Trigger Hub is collapsed.
+
+It must show at a glance:
+
+- how many trigger entries are configured;
+- which human trigger names are active;
+- whether one or more entries are incomplete/invalid.
+
+The user then sees the meaningful causal body of the brain immediately instead of scrolling through infrastructure before reaching behavior.
+
+### 9.3 Expanded editing state
+
+Tap on the hub expands it inline or in a mobile bottom sheet.
+
+Expanded mode exposes each real Trigger node and its outgoing connection(s). The user can:
+
+- inspect a trigger description;
+- add/remove an available trigger;
+- connect it to a compatible downstream node;
+- change its outgoing route;
+- see validation for an unconnected trigger.
+
+The runtime graph remains unchanged. The hub is a **UI projection**, not a replacement data structure.
+
+### 9.4 Trigger nodes in the main stack
+
+Trigger cards are not duplicated in the normal causal stack when the hub is collapsed.
+
+When the user expands/selects a trigger, its downstream route should be highlighted in the metro graph so the user can answer:
+
+> **«Если случится вот это — куда пойдёт мой мозг?»**
+
+### 9.5 Progressive disclosure rule
+
+Do not show six equal visual branches by default merely because the engine has six entry points.
+
+Complexity remains real, but the UI reveals it when the player asks for it.
+
+This is a core mobile-first principle for DEMENTOR LAB:
+
+> **Hide infrastructure, never hide causality.**
+
+### 9.6 Presets
+
+Preset cards should open with the Trigger Hub collapsed. A preset may have all first-slice trigger entries internally, but its visible first impression should remain the authored behavioral chain, not six repeated input cards.
+
+Custom BRAIN starts with the Trigger Hub visible as an empty/partial setup affordance and prompts the player to add at least one incoming situation.
+
+---
+
+## 10. STILL OPEN
+
+The following remain deliberate product/design work, not hidden engineering decisions:
+
+1. Second objective for the vertical slice.
+2. Final FUN/balance tuning after physical playtest.
+3. Speaking/reaction animation depth.
+4. Human-readable TRACE presentation details.
+
+These no longer block the collision architecture itself.
