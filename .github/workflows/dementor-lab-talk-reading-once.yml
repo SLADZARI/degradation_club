@@ -1,0 +1,24 @@
+name: Dementor Lab Talk Reading Once
+on:
+  push:
+    paths:
+      - '.github/workflows/dementor-lab-talk-reading-once.yml'
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/dementor-lab-vertical-slice-v0.3
+      - name: Apply talk reading pass
+        run: python3 dementor-lab/scripts/patch-talk-reading-pass.py
+      - name: Commit patch
+        run: |
+          rm dementor-lab/scripts/patch-talk-reading-pass.py
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add dementor-lab .github/workflows/dementor-lab-talk-reading-once.yml
+          git commit -m 'fix(lab): make conversation the primary talk surface'
+          git push origin HEAD:agent/dementor-lab-vertical-slice-v0.3
