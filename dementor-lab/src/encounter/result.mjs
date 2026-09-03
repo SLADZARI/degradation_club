@@ -15,43 +15,21 @@ function nodeLabel(actor,id){
 }
 function suspiciousNode(actor,trace){
   if(!trace)return null;
-  return trace.visitedNodes.find(id=>nodeType(actor,id)==='repeat')
-    ||trace.visitedNodes.find(id=>familyOf(nodeFor(actor,id))==='IMPULSE')
-    ||trace.visitedNodes.at(-1)
-    ||null;
+  return trace.visitedNodes.find(id=>nodeType(actor,id)==='repeat')||trace.visitedNodes.find(id=>familyOf(nodeFor(actor,id))==='IMPULSE')||trace.visitedNodes.at(-1)||null;
 }
-
 export function buildResult(encounter){
   const terminal=encounter.result||{type:'IN_PROGRESS',reason:null,turn:encounter.turn};
-  const loser=terminal.loser||null;
-  const loserActor=loser?encounter.actors[loser]:null;
-  // RESULT may describe either actor's collapse, but the editable diagnosis must always
-  // point to the player's graph because counterfactual replay edits actor A only.
-  const actor=encounter.actors.A;
-  const trace=lastTraceFor(encounter,'A');
-  const patch=encounter.patches.at(-1)||null;
-
+  const loser=terminal.loser||null,loserActor=loser?encounter.actors[loser]:null,actor=encounter.actors.A,trace=lastTraceFor(encounter,'A'),patch=encounter.patches.at(-1)||null;
   let punchline='ЭКСПЕРИМЕНТ ЗАКОНЧИЛСЯ.';
   if(terminal.type==='BREAKDOWN')punchline=`${(loserActor?.name||actor.name).toUpperCase()} НЕ ВЫВЕЗ.`;
   if(terminal.type==='TURN_LIMIT')punchline='ДВАДЦАТЬ РАУНДОВ. НИКТО НЕ УШЁЛ.';
-
-  const cause=trace?.visitedNodes?.length
-    ?trace.visitedNodes.map(id=>nodeLabel(actor,id).toUpperCase()).join(' → ')
-    :'ПРИЧИНА НЕ ЗАФИКСИРОВАНА';
-  const memory=(trace?.memoryChanges||[]).map(m=>`${String(m.key).toUpperCase()} ${m.before}→${m.after}`);
-  const suspicious=suspiciousNode(actor,trace);
-
-  return {
-    terminal,
-    punchline,
-    stageB:{title:'ЧТО ПРОИЗОШЛО',cause,memory,turn:trace?.turn||encounter.turn,actorId:'A'},
-    stageC:{title:'ПОДОЗРИТЕЛЬНОЕ МЕСТО',actorId:'A',nodeId:suspicious,nodeType:suspicious?nodeType(actor,suspicious):null,patch,nextAction:'ИЗМЕНИТЬ ОДНУ ВЕЩЬ'},
-    trace
-  };
+  if(terminal.type==='OBJECTIVE_COMPLETE')punchline=`КОНТАКТ СОХРАНЁН. ${Math.round(terminal.relationshipContact)}.`;
+  if(terminal.type==='OBJECTIVE_FAILED')punchline=`ФОРМАЛЬНО ДОГОВОРИЛИ. КОНТАКТ — ${Math.round(terminal.relationshipContact)}.`;
+  const cause=trace?.noActionReason?`НЕТ ДЕЙСТВИЯ: ${trace.noActionReason}`:trace?.visitedNodes?.length?trace.visitedNodes.map(id=>nodeLabel(actor,id).toUpperCase()).join(' → '):'ПРИЧИНА НЕ ЗАФИКСИРОВАНА';
+  const memory=(trace?.memoryChanges||[]).map(m=>`${String(m.key).toUpperCase()} ${m.before}→${m.after}`),suspicious=suspiciousNode(actor,trace);
+  return {terminal,punchline,stageB:{title:'ЧТО ПРОИЗОШЛО',cause,memory,turn:trace?.turn||encounter.turn,actorId:'A'},stageC:{title:'ПОДОЗРИТЕЛЬНОЕ МЕСТО',actorId:'A',nodeId:suspicious,nodeType:suspicious?nodeType(actor,suspicious):null,patch,nextAction:'ИЗМЕНИТЬ ОДНУ ВЕЩЬ'},trace};
 }
-
 export function compareRuns(beforeEncounter,afterEncounter){
-  const a=beforeEncounter.actors.A.state,b=afterEncounter.actors.A.state;
-  const delta=k=>Number((b[k]-a[k]).toFixed(2));
+  const a=beforeEncounter.actors.A.state,b=afterEncounter.actors.A.state,delta=k=>Number((b[k]-a[k]).toFixed(2));
   return {sameScenario:beforeEncounter.scenario.id===afterEncounter.scenario.id,metrics:{energy:delta('energy'),brain:delta('brain'),tension:delta('tension'),contact:delta('contact')},beforeResult:beforeEncounter.result,afterResult:afterEncounter.result};
 }
