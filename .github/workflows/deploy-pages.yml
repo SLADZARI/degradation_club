@@ -43,6 +43,9 @@ jobs:
       - name: Build production Pages artifact
         run: node scripts/build-pages.mjs
 
+      - name: Validate canonical shell integration
+        run: node scripts/validate-shell-contract.mjs
+
       - name: Validate production route manifest
         run: node scripts/validate-route-manifest.mjs
 
