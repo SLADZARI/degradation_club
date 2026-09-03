@@ -10,7 +10,7 @@
 .brain-behavior-head strong{display:block;margin-top:4px;font-size:15px;line-height:1.05}
 .brain-behavior-head p{margin:6px 0 0;font:800 10px/1.25 monospace;max-width:42ch;opacity:.68}
 
-/* One causal scene: input → readable behavior → editable mechanism. */
+/* One causal scene: input → editable mechanism → readable behavior result. */
 .brain-screen .brain-graph.brain-constructor{
   background:linear-gradient(var(--ink),var(--ink)) calc(var(--brain-rail) - 24px) 0/3px 100% no-repeat;
 }
@@ -21,19 +21,16 @@
   box-sizing:border-box;pointer-events:none;
 }
 .brain-trigger-hub::before{content:'01';left:-18px;top:13px}
-.brain-readable-route::before{content:'02';left:-39px;top:12px;background:var(--acid)}
-.brain-behavior-head::before{content:'03';left:-39px;top:10px}
+.brain-behavior-head::before{content:'02';left:-39px;top:10px;background:var(--paper)}
+.brain-readable-route::before{content:'03';left:-39px;top:12px;background:var(--acid)}
 .brain-trigger-hub:has(.brain-trigger-chip.wired)::before{background:var(--acid)}
 .brain-readable-route.empty::before{background:var(--paper)}
-.brain-behavior-block::after{
-  content:'СМЫСЛ  →  МЕХАНИКА';position:absolute;left:-69px;top:58px;z-index:2;
-  writing-mode:vertical-rl;transform:rotate(180deg);font:900 8px/1 monospace;
-  letter-spacing:.08em;opacity:.38;pointer-events:none;
-}
+.brain-behavior-block::after{content:none}
 
 /* Human-readable projection of the actual graph route. */
-.brain-readable-route{position:relative;z-index:3;margin:0 0 10px;border:2px solid var(--ink);background:#fff;padding:9px 10px}
+.brain-readable-route{position:relative;z-index:3;margin:12px 0 0;border:2px solid var(--ink);background:#fff;padding:9px 10px}
 .brain-readable-route>small{display:block;margin-bottom:7px;font:900 9px/1 monospace;letter-spacing:.08em;opacity:.55}
+.brain-readable-route>small::after{content:' · РЕЗУЛЬТАТ СБОРКИ'}
 .brain-readable-route__flow{display:flex;align-items:flex-start;gap:5px;overflow-x:auto;padding:1px 1px 4px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
 .brain-readable-route__flow::-webkit-scrollbar{display:none}
 .brain-readable-route__flow>.brain-readable-arrow{flex:0 0 auto;display:grid;place-items:center;min-height:58px;font:900 16px/1 monospace;opacity:.38}
@@ -70,7 +67,7 @@
   .brain-behavior-head{margin-bottom:7px;padding:8px 10px}
   .brain-behavior-head strong{font-size:14px}
   .brain-behavior-head p{font-size:9px;line-height:1.2}
-  .brain-readable-route{margin-bottom:8px;padding:8px}
+  .brain-readable-route{margin-top:10px;padding:8px}
   .brain-readable-route>small{margin-bottom:6px;font-size:8px}
   .brain-readable-cluster{min-width:124px;max-width:158px}
   .brain-readable-step{min-width:124px;max-width:158px;min-height:54px;padding:7px 8px}
@@ -87,5 +84,4 @@
   .brain-stack-subtitle{font-size:10px;max-width:28ch}
   .brain-trigger-hub::before{left:-17px;top:13px;width:26px;height:26px}
   .brain-readable-route::before,.brain-behavior-head::before{left:-37px;width:26px;height:26px}
-  .brain-behavior-block::after{left:-64px;top:54px;font-size:7px}
 }
