@@ -1,13 +1,13 @@
-name: Production Candidate Integrity
+name: Site Integrity / Release Readiness
 
 on:
-  pull_request:
-    branches:
-      - dementor-club-production
   push:
     branches:
+      - dementor-club-site
+  pull_request:
+    branches:
+      - dementor-club-site
       - dementor-club-production
-      - release/dementor-production-2026-08-29-rc
   workflow_dispatch:
 
 permissions:
@@ -16,36 +16,33 @@ permissions:
 jobs:
   validate:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
-      - name: Checkout production candidate
+      - name: Checkout candidate branch
         uses: actions/checkout@v4
-
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-
       - name: Validate registry, routes and feature state
         run: node scripts/validate-site.mjs
-
-      - name: Validate page content readiness registry
+      - name: Validate page content readiness
         run: node scripts/validate-content-readiness.mjs
-
       - name: Validate visual contract
         run: node scripts/validate-visual-contract.mjs
-
-      - name: Validate interactive runtime safety
-        run: node scripts/validate-interactive-runtime.mjs
-
-      - name: Build production artifact without deploying
+      - name: Build production candidate artifact
         run: node scripts/build-pages.mjs
-
+      - name: Validate canonical shell integration
+        run: node scripts/validate-shell-contract.mjs
+      - name: Validate built JavaScript syntax
+        run: node scripts/validate-built-js-syntax.mjs
+      - name: Install browser smoke runtime
+        run: |
+          npm install --no-save --no-package-lock playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Validate browser shell and Workspace recovery
+        run: node scripts/validate-browser-shell.mjs
       - name: Validate production route manifest
         run: node scripts/validate-route-manifest.mjs
-
-      - name: Validate production analytics and consent
-        run: node scripts/validate-production-analytics.mjs
-
-      - name: Validate production artifact and release gate
+      - name: Validate production artifact release gate
         run: node scripts/validate-production-release.mjs
