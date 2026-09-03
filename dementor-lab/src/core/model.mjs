@@ -5,9 +5,9 @@ export const NODE_SPECS = Object.freeze({
   acceptance:{family:'TRIGGER',title:'ПРИНЯТО',description:'срабатывает, когда собеседник явно согласился',defaults:{}},
   deflection:{family:'TRIGGER',title:'УШЛИ В СТОРОНУ',description:'срабатывает, когда ответ уводит разговор в шутку или сторону',defaults:{}},
   underpressure:{family:'TRIGGER',title:'ДАВЛЕНИЕ',description:'срабатывает, когда собеседник требует ответа или давит',defaults:{}},
-  beright:{family:'IMPULSE',title:'БЫТЬ ПРАВЫМ',description:'сильнее тянет к этой ветке; добавляет BRAIN и TENSION',defaults:{weight:3}},
-  beliked:{family:'IMPULSE',title:'НРАВИТЬСЯ',description:'сильнее тянет к этой ветке; поддерживает CONTACT',defaults:{weight:2}},
-  understand:{family:'IMPULSE',title:'ПОНЯТЬ',description:'сильнее тянет к этой ветке; поддерживает CONTACT и немного нагружает BRAIN',defaults:{weight:2}},
+  beright:{family:'IMPULSE',title:'БЫТЬ ПРАВЫМ',description:'сильнее тянет к этой ветке; разгоняет BRAIN/TENSION и ухудшает CONTACT',defaults:{weight:3}},
+  beliked:{family:'IMPULSE',title:'НРАВИТЬСЯ',description:'сильнее тянет к этой ветке; успокаивает себя и мягко поддерживает CONTACT без BRAIN-цены',defaults:{weight:2}},
+  understand:{family:'IMPULSE',title:'ПОНЯТЬ',description:'сильнее тянет к этой ветке; лучше поддерживает контакт с другим, но заметнее нагружает BRAIN',defaults:{weight:2}},
   resentment:{family:'STATE',title:'ОБИДА',description:'запоминает обиду; накопленная обида сильнее тянет к этой ветке и повышает TENSION/BRAIN',defaults:{key:'resentment',delta:1,cap:5}},
   trust:{family:'STATE',title:'ДОВЕРИЕ',description:'запоминает доверие; накопленное доверие сильнее тянет к этой ветке и поддерживает CONTACT',defaults:{key:'trust',delta:1,cap:5}},
   explain:{family:'REACTION',title:'ОБЪЯСНИТЬ',description:'нагружает аргументами обоих; повышает BRAIN и немного портит CONTACT',defaults:{}},
@@ -18,7 +18,7 @@ export const NODE_SPECS = Object.freeze({
   repeat:{family:'CONTROL',title:'REPEAT',description:'повторяет ту же реакцию до лимита; явное согласие собеседника отменяет оставшиеся повторы',defaults:{count:2}},
   stop:{family:'CONTROL',title:'STOP',description:'явно завершает эту ветку; дальше по ней ничего не происходит',defaults:{}},
   ifbrain:{family:'CONTROL',title:'BRAIN >',description:'пропускает ветку только когда BRAIN выше порога; иначе нужна запасная ветка',defaults:{threshold:70}},
-  pause:{family:'ABILITY',title:'ПАУЗА',description:'встраивается в путь перед реакцией: снижает BRAIN/TENSION и поддерживает CONTACT',defaults:{}},
+  pause:{family:'ABILITY',title:'ПАУЗА',description:'тратит заметную ENERGY, чтобы снизить BRAIN/TENSION и поддержать CONTACT перед реакцией',defaults:{}},
   interrupt:{family:'ABILITY',title:'ПЕРЕХВАТ',description:'семантика для vertical slice ещё не утверждена',defaults:{},availableInSlice:false}
 });
 

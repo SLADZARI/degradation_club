@@ -8,11 +8,12 @@ export const REACTION_EFFECTS=Object.freeze({
   silent:{self:{energy:-1,brain:1,tension:1},target:{contact:-4}},
   pressure:{self:{energy:-5,brain:7,tension:9},target:{energy:-6,brain:4,tension:10,contact:-9}}
 });
-const IMPULSE_EFFECTS=Object.freeze({
-  beright:{self:{brain:2,tension:2},target:{contact:-1}},
-  beliked:{self:{contact:2,tension:-1},target:{contact:1}},
-  understand:{self:{brain:1,contact:3},target:{tension:-1,contact:2}}
+export const IMPULSE_EFFECTS=Object.freeze({
+  beright:{self:{brain:3,tension:3},target:{contact:-2}},
+  beliked:{self:{contact:2,tension:-3},target:{contact:1}},
+  understand:{self:{brain:2,contact:2},target:{tension:-2,contact:3}}
 });
+export const PAUSE_EFFECTS=Object.freeze({self:{brain:-5,tension:-7,energy:-4},target:{tension:-3,contact:2}});
 export const REACTION_EVENT_MATRIX=Object.freeze({
   explain:{event:'COUNTERPOINT',trigger:'pushback',accepted:false},
   agree:{event:'ACCEPTANCE',trigger:'acceptance',accepted:true},
@@ -69,7 +70,7 @@ export function predictTurn(encounter,{trigger=null}={}){
   if(!chosen){const predictedSelf=cloneState(actor.state),predictedTarget=cloneState(target.state);return {side,targetSide,actor,target,emittedTrigger,chosen:{path:[],score:0,reaction:null,impulse:null,repeat:1},selfDelta:{},targetDelta:{},predictedSelf,predictedTarget,isRepeat:false,noActionReason:selected.reason||'NO_ACTION'}}
   const selfDelta={},targetDelta={};addDelta(selfDelta,REACTION_EFFECTS[chosen.reaction]?.self);addDelta(targetDelta,REACTION_EFFECTS[chosen.reaction]?.target);addDelta(selfDelta,IMPULSE_EFFECTS[chosen.impulse]?.self);addDelta(targetDelta,IMPULSE_EFFECTS[chosen.impulse]?.target);
   for(const n of chosen.path.filter(n=>familyOf(n)==='STATE')){const sem=n.type==='resentment'?{self:{tension:.8,brain:.25},target:{contact:-.4}}:n.type==='trust'?{self:{contact:.8,brain:-.2},target:{contact:.5}}:null;if(sem){addDelta(selfDelta,sem.self);addDelta(targetDelta,sem.target)}}
-  if(chosen.path.some(n=>n.type==='pause')){addDelta(selfDelta,{brain:-5,tension:-7,energy:-1});addDelta(targetDelta,{tension:-3,contact:3})}
+  if(chosen.path.some(n=>n.type==='pause')){addDelta(selfDelta,PAUSE_EFFECTS.self);addDelta(targetDelta,PAUSE_EFFECTS.target)}
   const predictedSelf=applyMetricDelta(cloneState(actor.state),selfDelta),predictedTarget=applyMetricDelta(cloneState(target.state),targetDelta);
   return {side,targetSide,actor,target,emittedTrigger,chosen,selfDelta,targetDelta,predictedSelf,predictedTarget,isRepeat:false,noActionReason:null};
 }

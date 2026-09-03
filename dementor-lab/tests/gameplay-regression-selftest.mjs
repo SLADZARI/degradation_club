@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { createEncounter, predictTurn, executeActorTurn, applyHotPatch, detectBreakpoint, checkTerminal, REACTION_EFFECTS } from '../src/encounter/runtime.mjs';
+import { createEncounter, predictTurn, executeActorTurn, applyHotPatch, detectBreakpoint, checkTerminal, REACTION_EFFECTS, IMPULSE_EFFECTS, PAUSE_EFFECTS } from '../src/encounter/runtime.mjs';
 import { buildResult } from '../src/encounter/result.mjs';
 import { CRITICISM_IDEA_SCENARIO, createCriticismActors } from '../src/scenarios/criticism-idea.mjs';
 import { validateGraph } from '../src/core/graph.mjs';
@@ -15,6 +15,13 @@ assert.ok(Math.abs(REACTION_EFFECTS.silent.self.energy)<Math.abs(REACTION_EFFECT
 assert.ok(REACTION_EFFECTS.explain.target.brain>0,'EXPLAIN creates cognitive load on the listener');
 assert.ok(REACTION_EFFECTS.pressure.target.energy<0&&REACTION_EFFECTS.pressure.target.brain>0,'PRESSURE trades relationship safety for direct opponent depletion');
 assert.ok(REACTION_EFFECTS.pressure.target.contact<REACTION_EFFECTS.explain.target.contact,'PRESSURE is relationally more destructive than EXPLAIN');
+
+assert.ok(IMPULSE_EFFECTS.beright.self.brain>0&&IMPULSE_EFFECTS.beright.target.contact<0,'BE RIGHT trades contact for internal drive');
+assert.ok(IMPULSE_EFFECTS.beliked.self.tension<0&&!IMPULSE_EFFECTS.beliked.self.brain,'BE LIKED regulates self without a brain surcharge');
+assert.ok(IMPULSE_EFFECTS.understand.target.contact>IMPULSE_EFFECTS.beliked.target.contact,'UNDERSTAND invests more strongly in the other side of contact');
+assert.ok(IMPULSE_EFFECTS.understand.self.brain>0,'UNDERSTAND has a cognitive cost');
+assert.ok(PAUSE_EFFECTS.self.energy<=-4,'PAUSE pays a meaningful energy cost for regulation');
+assert.ok(PAUSE_EFFECTS.self.brain<0&&PAUSE_EFFECTS.self.tension<0&&PAUSE_EFFECTS.target.contact>0,'PAUSE remains a strong regulation trade rather than a dead node');
 
 // Missing current Trigger is transparent NO_ACTION, never silent trigger substitution.
 const wrongTrigger={id:'wrong-trigger',nodes:[{id:'t',type:'ignore',p:{}},{id:'r',type:'silent',p:{}}],edges:[edge('e','t','r')]};
