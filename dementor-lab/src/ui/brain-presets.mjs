@@ -35,7 +35,7 @@ export const BRAIN_PRESETS=Object.freeze([
 
 export const BLANK_BRAIN=Object.freeze({
   id:'custom-catastrophe',
-  nodes:SYSTEM_TRIGGER_TYPES.map((type,i)=>node(`custom-${type}`,type,{},160,-30-(i*70))),
+  nodes:SYSTEM_TRIGGER_TYPES.map((type,i)=>node(`custom-${type}`,type,{enabled:false},160,-30-(i*70))),
   edges:[]
 });
 export function cloneBrainGraph(source){return {id:source.id,nodes:source.nodes.map(n=>({...n,p:{...(n.p||{})},ui:{...(n.ui||{})}})),edges:source.edges.map(e=>({...e}))}}
