@@ -33,8 +33,8 @@ const volatileA=playerReactions(volatile),firstPressure=volatileA.indexOf('press
 assert.ok(lastJoke>=0&&firstPressure>lastJoke,'the same authored graph can pivot from JOKE to PRESSURE after accumulated BRAIN');
 const volatileResult=buildResult(volatile);
 assert.ok(volatileResult.stageB.arc?.pivot,'RESULT records the first real behavior pivot');
-assert.match(volatileResult.stageB.arc.summary,/ШУТИЛ/);
-assert.match(volatileResult.stageB.arc.summary,/ДАВИЛ/);
+assert.match(volatileResult.stageB.arc.summary,/ШУТКА/);
+assert.match(volatileResult.stageB.arc.summary,/ДАВЛЕНИЕ/);
 
 const appeaser=run('keep-peace','KEEP_PEACE');
 const appeaserA=playerReactions(appeaser),firstSilent=appeaserA.indexOf('silent'),lastAgree=appeaserA.lastIndexOf('agree');
