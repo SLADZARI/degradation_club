@@ -125,14 +125,24 @@ function isPrivateFooter(rel) {
   return privateFooterPrefixes.some(prefix => rel.startsWith(prefix));
 }
 
+function isWorkspaceShell(rel) {
+  return rel.startsWith('workspace/');
+}
+
 function normalizeShellMarkup(html, rel) {
   if (rel === 'auth/callback/index.html') return html;
+  const workspaceShell=isWorkspaceShell(rel);
 
-  // Production HTML must not retain a page-owned primary header. The runtime owns it.
-  html = html.replace(/<header[^>]*class=["']topbar(?:\s[^"']*)?["'][^>]*>[\s\S]*?<\/header>/gi, '');
-
-  if (!html.includes('/global-header.css')) html = html.replace('</head>', '<link rel="stylesheet" href="/global-header.css">\n</head>');
-  if (!html.includes('/global-header.js')) html = html.replace('</body>', '<script src="/global-header.js" defer></script>\n</body>');
+  // A public page never owns the primary club header. Workspace is a separate
+  // authenticated shell and must not receive the public header at all.
+  if(!workspaceShell){
+    html = html.replace(/<header[^>]*class=["']topbar(?:\s[^"']*)?["'][^>]*>[\s\S]*?<\/header>/gi, '');
+    if (!html.includes('/global-header.css')) html = html.replace('</head>', '<link rel="stylesheet" href="/global-header.css">\n</head>');
+    if (!html.includes('/global-header.js')) html = html.replace('</body>', '<script src="/global-header.js" defer></script>\n</body>');
+  }else{
+    html = html.replace(/<link[^>]+href=["']\/global-header\.css["'][^>]*>/gi,'');
+    html = html.replace(/<script[^>]+src=["']\/global-header\.js["'][^>]*><\/script>/gi,'');
+  }
 
   if (!isPrivateFooter(rel)) {
     // Local footer markup is source history only. It must not survive into production.
