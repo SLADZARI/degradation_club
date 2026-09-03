@@ -1,0 +1,24 @@
+name: Dementor Lab Memory Feedback Once
+on:
+  push:
+    paths:
+      - '.github/workflows/dementor-lab-memory-feedback-once.yml'
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/dementor-lab-vertical-slice-v0.3
+      - name: Apply memory feedback patch
+        run: python3 dementor-lab/scripts/patch-memory-feedback.py
+      - name: Commit patch
+        run: |
+          rm dementor-lab/scripts/patch-memory-feedback.py
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add dementor-lab/src/ui/app.mjs dementor-lab/scripts/patch-memory-feedback.py
+          git commit -m 'feat(lab): expose opposing memory changes in talk'
+          git push origin HEAD:agent/dementor-lab-vertical-slice-v0.3
