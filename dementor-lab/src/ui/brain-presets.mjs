@@ -3,6 +3,7 @@ import { NODE_SPECS } from '../core/model.mjs';
 const node=(id,type,p={},x=160,y=0)=>({id,type,p:{...(NODE_SPECS[type]?.defaults||{}),...p},ui:{x,y}});
 const edge=(id,from,to)=>({id,from,to});
 const RESPONSE_TRIGGERS=Object.freeze(['ignore','pushback','acceptance','deflection','underpressure']);
+const SYSTEM_TRIGGER_TYPES=Object.freeze(['criticism',...RESPONSE_TRIGGERS]);
 function graph(id,nodes,edges){
   const opening=nodes.find(n=>n.type==='criticism');if(!opening)return {id,nodes,edges};
   const targets=edges.filter(e=>e.from===opening.id).map(e=>e.to);
@@ -32,6 +33,10 @@ export const BRAIN_PRESETS=Object.freeze([
   ],[edge('p6-e1','p6-trigger','p6-joke'),edge('p6-e2','p6-trigger','p6-pressure'),edge('p6-e3','p6-pressure','p6-repeat'),edge('p6-e4','p6-joke','p6-stop'),edge('p6-e5','p6-repeat','p6-stop')])}
 ]);
 
-export const BLANK_BRAIN=Object.freeze({id:'custom-catastrophe',nodes:[],edges:[]});
+export const BLANK_BRAIN=Object.freeze({
+  id:'custom-catastrophe',
+  nodes:SYSTEM_TRIGGER_TYPES.map((type,i)=>node(`custom-${type}`,type,{},160,-30-(i*70))),
+  edges:[]
+});
 export function cloneBrainGraph(source){return {id:source.id,nodes:source.nodes.map(n=>({...n,p:{...(n.p||{})},ui:{...(n.ui||{})}})),edges:source.edges.map(e=>({...e}))}}
 export function brainPreset(id){return BRAIN_PRESETS.find(p=>p.id===id)||null}
