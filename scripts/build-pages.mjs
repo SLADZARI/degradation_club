@@ -31,6 +31,7 @@ const productionProjections = [
 
 const skipRootFiles = new Set([
   '.deploy-trigger', 'DEPLOY_TRIGGER.txt', 'DRIVE.md', 'README.md', 'production-route-manifest.json',
+  'dementor-cart-v1.js', 'merch-cart-bridge-v1.js',
 ]);
 const textExt = new Set(['.html', '.css', '.js', '.json', '.xml', '.txt', '.webmanifest']);
 
