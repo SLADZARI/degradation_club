@@ -37,7 +37,7 @@ export function buildResult(encounter){
   const terminal=encounter.result||{type:'IN_PROGRESS',reason:null,turn:encounter.turn};
   const loser=terminal.loser||null,loserActor=loser?encounter.actors[loser]:null,actor=encounter.actors.A,trace=lastTraceFor(encounter,'A'),patch=encounter.patches.at(-1)||null,arc=buildConversationArc(encounter,'A');
   let punchline='ЭКСПЕРИМЕНТ ЗАКОНЧИЛСЯ.';
-  if(terminal.type==='BREAKDOWN')punchline=`${(loserActor?.name||actor.name).toUpperCase()} НЕ ВЫВЕЗ.`;
+  if(terminal.type==='BREAKDOWN')punchline=`${(loserActor?.name||actor.name).toUpperCase()} НЕ ВЫВЕЗ — ${String(terminal.reason||'РАЗВАЛ').toUpperCase()} ${terminal.reason&&loserActor?.state?.[String(terminal.reason).toLowerCase()]!=null?Math.round(loserActor.state[String(terminal.reason).toLowerCase()]):''}.`.replace('  .','.');
   if(terminal.type==='TURN_LIMIT')punchline='ЛИМИТ ХОДОВ. ЭКСПЕРИМЕНТ ЗАКОНЧЕН.';
   if(terminal.type==='OBJECTIVE_COMPLETE'&&terminal.objective==='contact')punchline=`КОНТАКТ СОХРАНЁН. ${Math.round(terminal.relationshipContact)}.`;
   if(terminal.type==='OBJECTIVE_FAILED'&&terminal.objective==='contact')punchline=`ФОРМАЛЬНО ДОГОВОРИЛИ. КОНТАКТ — ${Math.round(terminal.relationshipContact)}.`;
