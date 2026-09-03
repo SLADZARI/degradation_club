@@ -1,5 +1,5 @@
 window.DEMENTOR_SITE_CONFIG=Object.freeze({
-  version:'2026-09-02.01',
+  version:'2026-09-03.03',
   canonicalOrigin:'https://dementor.club',
   supabase:{
     enabled:true,
@@ -14,20 +14,22 @@ window.DEMENTOR_SITE_CONFIG=Object.freeze({
   events:{registrationEnabled:false,registrationProvider:null,registrationUrl:null},
   community:{membershipEnabled:true,membershipProvider:'membership-review-v2',membershipUrl:'/join/apply/',boardUrl:'/community/board/',artifactMediaBucket:'dc-community-artifacts'},
   onboarding:{storageKey:'dementorClubOnboardingV3',storage:'localStorage',accountSync:true,authRequired:false,progressMap:true},
-  internalTools:{enabled:false,holdMs:1200,path:'/design-system/admin/'}
+  internalTools:{enabled:false,holdMs:1200,path:'/workspace/admin/'}
 });
 if(typeof document!=='undefined'){
   (()=>{
     const cfg=window.DEMENTOR_SITE_CONFIG;
     const path=location.pathname;
     const addScript=(src,{module=false,key=null}={})=>{if(document.querySelector(`script[src="${src}"]`)||(key&&document.querySelector(`script[data-${key}]`)))return;const s=document.createElement('script');s.src=src;if(module)s.type='module';else s.defer=true;if(key)s.dataset[key.replace(/-([a-z])/g,(_,c)=>c.toUpperCase())]='1';document.head.appendChild(s)};
+    const addStyle=href=>{if(document.querySelector(`link[href="${href}"]`))return;const l=document.createElement('link');l.rel='stylesheet';l.href=href;document.head.appendChild(l)};
     const normalizeCanonicalMetadata=()=>{
       const canonical=cfg.canonicalOrigin.replace(/\/$/,'');const legacyOrigins=['https://degradation-club.vercel.app','https://sladzari.github.io/degradation_club'];
       document.querySelectorAll('meta[property="og:url"],meta[property="og:image"],meta[name="twitter:image"]').forEach(meta=>{const value=meta.getAttribute('content')||'';for(const legacy of legacyOrigins){if(value.startsWith(legacy)){meta.setAttribute('content',canonical+value.slice(legacy.length));break;}}});
       if(!document.querySelector('link[rel="canonical"]')){const link=document.createElement('link');link.rel='canonical';link.href=canonical+path.replace(/^\/degradation_club/,'');document.head.appendChild(link)}
     };
     normalizeCanonicalMetadata();
-    addScript('/global-header.js');if(!document.querySelector('link[href="/global-header.css"]')){const l=document.createElement('link');l.rel='stylesheet';l.href='/global-header.css';document.head.appendChild(l)}
+    addScript('/global-header.js');addStyle('/global-header.css');
+    addScript('/global-footer.js');addStyle('/global-footer.css');
     addScript('/dementor-relations-v1.js');
     const isJoinAssessment=/\/join\/?(?:index\.html)?$/.test(path);
     const interactiveAuthRequired=path.includes('/courses/dumai-s-opasnostyu/')||path.includes('/courses/dengi-na-veter/');
