@@ -40,7 +40,9 @@ export function moveBrainNode(graph,nodeId,x,y,{minX=8,minY=8,maxX=430,maxY=2000
 export function connectBrainNodes(graph,fromId,toId){
   const from=graph.nodes.find(n=>n.id===fromId),to=graph.nodes.find(n=>n.id===toId);
   if(!canConnectNodes(graph,from,to))return null;
-  const edge={id:`brain-edge-${Date.now().toString(36)}-${++serial}`,from:fromId,to:toId};graph.edges.push(edge);return edge;
+  const edge={id:`brain-edge-${Date.now().toString(36)}-${++serial}`,from:fromId,to:toId};graph.edges.push(edge);
+  if(familyOf(from)==='TRIGGER'){from.p=from.p||{};from.p.enabled=true}
+  return edge;
 }
 
 export function disconnectBrainEdge(graph,edgeId){graph.edges=graph.edges.filter(e=>e.id!==edgeId)}
