@@ -1,0 +1,24 @@
+name: Dementor Lab Mechanics Copy Once
+on:
+  push:
+    paths:
+      - '.github/workflows/dementor-lab-mechanics-copy-once.yml'
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/dementor-lab-vertical-slice-v0.3
+      - name: Apply mechanics copy patch
+        run: python3 dementor-lab/scripts/patch-mechanics-copy.py
+      - name: Commit patch
+        run: |
+          rm dementor-lab/scripts/patch-mechanics-copy.py
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add dementor-lab/src/ui/app.mjs dementor-lab/tests/browser-smoke.mjs dementor-lab/scripts/patch-mechanics-copy.py
+          git commit -m 'fix(lab): clarify brain node mechanics copy'
+          git push origin HEAD:agent/dementor-lab-vertical-slice-v0.3
