@@ -5,14 +5,14 @@
     "project": "dementor-club",
     "documentType": "STANDARD",
     "projectStage": "CLARITY",
-    "gate": "G6_VALIDATION",
+    "gate": "G8_CLEANUP",
     "status": "APPROVED",
-    "version": "1.0",
+    "version": "1.1",
     "updated": "2026-09-03",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "legacy-weekly-os-router@2026-08-29"
+    "supersedes": "1.0"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -68,14 +68,18 @@
     "ARCHITECTURE": null,
     "DESIGN": null
   },
-  "currentResult": {
-    "artifactId": "dementor-club.result.mp-dsl-kernel-migration",
-    "version": "1.0",
-    "status": "APPROVED",
-    "path": ".weekly-os/results/mp-dsl-kernel-migration.v1.0.md"
-  },
-  "activeIntegrationBranch": "result/mp-dsl-kernel-migration",
+  "currentResult": null,
+  "activeIntegrationBranch": null,
   "reportPath": null,
+  "completedResults": [
+    {
+      "artifactId": "dementor-club.result.mp-dsl-kernel-migration",
+      "version": "1.0",
+      "status": "APPROVED",
+      "integrationPullRequest": 84,
+      "integrationCommit": "4648024f7b7adc52e66dab56da686934d89b95c5"
+    }
+  ],
   "legacyWeeklyOs": {
     "reportDirectory": "/.weekly-os/reports",
     "latestReport": "/.weekly-os/reports/latest.json",
