@@ -1,6 +1,6 @@
 # DEMENTOR LAB — Trigger Hub implementation v0.1
 
-**Status:** IMPLEMENTED / FINAL QA RERUN REQUESTED  
+**Status:** IMPLEMENTED / FINAL AUTOMATED GATE RUNNING  
 **Date:** 2026-09-03  
 **Branch:** `agent/dementor-lab-vertical-slice-v0.3`
 
@@ -34,6 +34,10 @@ If one Trigger has multiple outgoing edges, the expanded Hub lists all immediate
 
 A Trigger → body connection belongs to the Trigger Hub projection and is not duplicated as a second metro line inside the behavioral body stack. Body-stack edge counts therefore describe only visible body-to-body causality.
 
+## Related mobile control repair
+
+The BRAIN parameter bottom sheet now initializes its slider state synchronously. A first immediate keyboard/touch change cannot be overwritten by a delayed initialization frame.
+
 ## QA expectations
 
 - Trigger Hub is one mobile block.
@@ -44,5 +48,6 @@ A Trigger → body connection belongs to the Trigger Hub projection and is not d
 - Multiple Trigger destinations remain visible in the expanded Hub.
 - Selecting/connecting a Trigger highlights its downstream route.
 - Body drag/reorder does not destroy Trigger ownership.
+- Parameter bottom sheet keeps the first user change.
 - No page-level horizontal overflow on iPhone-sized viewport.
 - Runtime deterministic regression suite remains unchanged/green.
