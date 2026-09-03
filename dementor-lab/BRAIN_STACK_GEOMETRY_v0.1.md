@@ -25,12 +25,25 @@ The editor distinguishes two visual roles without changing runtime semantics:
 
 Primary/side is a UI reading hierarchy only. It must never alter execution order or silently create/remove graph edges.
 
+## Screen density
+The BRAIN screen is one instrument, not a stack of separate admin panels.
+On phone:
+- title/intro spacing is reduced but hierarchy remains readable;
+- preset rail uses 38px compact controls;
+- validation is a compact status strip rather than a large card;
+- collapsed Trigger Hub is 54px high plus compact chips;
+- body node gaps are reduced to 9px;
+- `ADD NODE` sits close to the causal stack;
+- primary action follows the graph without a large dead zone.
+
+The Hub may grow when explicitly opened for editing. Density optimizations must never hide route destinations, connect actions, or validation errors.
+
 ## Connection target
 CONNECT MODE must preserve enough width for both target title and the `СОЕДИНИТЬ` touch target.
 No connection action may require horizontal scrolling.
 
 ## QA note
-Browser smoke must not toggle off an already-selected source before asserting focus. The test now preserves the selected state after a connection and verifies the real focused edges directly.
+SVG edge focus is painted on `requestAnimationFrame`; browser smoke waits for the visual frame before asserting edge focus. This is a test timing contract, not a gameplay delay.
 
 ## Principle
 `One main line to read; side lanes for alternatives. Visual hierarchy never changes causality.`
