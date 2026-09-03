@@ -17,10 +17,4 @@ needle="assert.match(await impulseWrap.locator('.brain-stack-route').textContent
 insert=needle+"assert.ok(await page.locator('[data-brain-readable-route] .brain-readable-alt').filter({hasText:/STOP/}).count()>=1,'readable route exposes real side branch as ИЛИ');"
 if needle not in t: raise SystemExit('branch assertion marker not found')
 t=t.replace(needle,insert,1)
-old="const replayRepeats=page.locator('#brain-graph .brain-stack-node').filter({hasText:'REPEAT'});assert.equal(await replayRepeats.count(),2,'replay fixture contains two same-type nodes');assert.equal(await page.locator('#brain-graph .brain-stack-node.locked').filter({hasText:'REPEAT'}).count(),1,'only the exact suspicious repeat node is unlocked');"
-new="const replayRepeats=page.locator('#brain-graph .brain-stack-node').filter({has:page.locator('.brain-stack-title',{hasText:/^REPEAT$/})});assert.equal(await replayRepeats.count(),2,'replay fixture contains two same-type nodes');assert.equal(await replayRepeats.filter({has:page.locator('.brain-stack-title',{hasText:/^REPEAT$/})}).locator('..').count()>=0,true);assert.equal(await page.locator('#brain-graph .brain-stack-node.locked').filter({has:page.locator('.brain-stack-title',{hasText:/^REPEAT$/})}).count(),1,'only the exact suspicious repeat node is unlocked');"
-if old not in t: raise SystemExit('repeat selector marker not found')
-t=t.replace(old,new,1)
-# Remove the deliberately redundant middle assertion; keep exact-title selectors only.
-t=t.replace("assert.equal(await replayRepeats.filter({has:page.locator('.brain-stack-title',{hasText:/^REPEAT$/})}).locator('..').count()>=0,true);","")
 test.write_text(t)
