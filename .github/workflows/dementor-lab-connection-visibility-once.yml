@@ -1,0 +1,60 @@
+name: Dementor Lab Connection Visibility Once
+on:
+  push:
+    branches: [agent/dementor-lab-vertical-slice-v0.3]
+    paths: ['.github/workflows/dementor-lab-connection-visibility-once.yml']
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/dementor-lab-vertical-slice-v0.3
+      - name: Apply connection visibility contract
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('dementor-lab/src/ui/app.mjs')
+          s=p.read_text()
+          old="function nodeSubtitle(n){return NODE_SPECS[n.type]?.description||familyLabel(n.type)}"
+          new="function nodeSubtitle(n){return NODE_SPECS[n.type]?.description||familyLabel(n.type)}\nfunction nodeOutgoingLabels(id){return outgoing(currentBrainGraph,id).map(edge=>currentBrainGraph.nodes.find(n=>n.id===edge.to)).filter(Boolean).map(n=>title(n.type))}\nfunction nodeRouteLabel(n){const labels=[...new Set(nodeOutgoingLabels(n.id))];return labels.length?`→ ${labels.join(' · ')}`:''}"
+          if old not in s: raise SystemExit('nodeSubtitle anchor missing')
+          s=s.replace(old,new,1)
+          old="function brainNodeHtml(n){const selected=n.id===activeBrainNodeId,source=n.id===brainConnectFromId,locked=brainNodeLocked(n),validTargets=brainConnectFromId?compatibleBrainTargets(currentBrainGraph,brainConnectFromId):[],compatible=validTargets.includes(n.id),control=brainControl(n);return `<article class=\"brain-stack-node ${selected?'open':''} ${source?'connection-source':''} ${compatible?'connection-target':''} ${locked?'locked':''}\""
+          new="function brainNodeHtml(n){const selected=n.id===activeBrainNodeId,source=n.id===brainConnectFromId,locked=brainNodeLocked(n),validTargets=brainConnectFromId?compatibleBrainTargets(currentBrainGraph,brainConnectFromId):[],compatible=validTargets.includes(n.id),control=brainControl(n),related=Boolean(activeBrainNodeId&&activeBrainNodeId!==n.id&&currentBrainGraph.edges.some(e=>(e.from===activeBrainNodeId&&e.to===n.id)||(e.to===activeBrainNodeId&&e.from===n.id)));return `<article class=\"brain-stack-node ${selected?'open connection-focus':''} ${related?'connection-related':''} ${source?'connection-source':''} ${compatible?'connection-target':''} ${locked?'locked':''}\""
+          if old not in s: raise SystemExit('brainNodeHtml anchor missing')
+          s=s.replace(old,new,1)
+          old="<span class=\"brain-stack-subtitle\">${nodeSubtitle(n)}</span></button>"
+          new="<span class=\"brain-stack-subtitle\">${nodeSubtitle(n)}</span>${nodeRouteLabel(n)?`<span class=\"brain-stack-route\">${nodeRouteLabel(n)}</span>`:''}</button>"
+          if old not in s: raise SystemExit('brain node subtitle anchor missing')
+          s=s.replace(old,new,1)
+          old="return `<path class=\"brain-stack-edge ${edge.kind==='extra'?'extra':''}\" data-edge=\"${edge.id}\""
+          new="const focus=Boolean(activeBrainNodeId&&(edge.from===activeBrainNodeId||edge.to===activeBrainNodeId));return `<path class=\"brain-stack-edge ${edge.kind==='extra'?'extra':''} ${focus?'focus':''}\" data-edge=\"${edge.id}\""
+          if old not in s: raise SystemExit('edge render anchor missing')
+          s=s.replace(old,new,1)
+          p.write_text(s)
+
+          css=Path('dementor-lab/brain-stack.css')
+          c=css.read_text()
+          patch='''\n/* Connection visibility: same causal relation is readable as line + label + focus. */\n.brain-stack-route{display:block;margin-top:5px;font:900 10px/1.05 monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:.72}\n.brain-stack-edge.focus{stroke:var(--acid);stroke-width:5}\n.brain-stack-node.connection-focus .brain-stack-card{outline:3px solid var(--acid);outline-offset:-3px}\n.brain-stack-node.connection-related .brain-stack-card{outline:2px solid var(--acid);outline-offset:-2px}\n.brain-stack-node.connection-target .brain-stack-route{color:#fff;opacity:.8}\n'''
+          if '/* Connection visibility: same causal relation' not in c: c+=patch
+          css.write_text(c)
+
+          t=Path('dementor-lab/tests/browser-smoke.mjs')
+          x=t.read_text()
+          old="await page.locator(`[data-brain-connect=\"${impulseId}\"]`).click();assert.equal(await page.locator('#brain-graph').getAttribute('data-connect-from'),impulseId,'ordinary node enters the same global CONNECT MODE');assert.ok(await page.locator('#brain-graph .connection-target').count()>=1,'ordinary node uses the same compatible target state');await page.locator(`[data-brain-target=\"${reactionId}\"]`).click();"
+          new="await addNode('stop');const stopWrap=page.locator('#brain-graph .brain-stack-node').filter({hasText:'STOP'}).first(),stopId=await stopWrap.getAttribute('data-brain-node-wrap');await page.locator(`[data-brain-node=\"${impulseId}\"]`).click();await page.locator(`[data-brain-connect=\"${impulseId}\"]`).click();assert.equal(await page.locator('#brain-graph').getAttribute('data-connect-from'),impulseId,'ordinary node enters the same global CONNECT MODE');assert.ok(await page.locator('#brain-graph .connection-target').count()>=1,'ordinary node uses the same compatible target state when a free target exists');await page.locator(`[data-brain-target=\"${stopId}\"]`).click();assert.match(await impulseWrap.locator('.brain-stack-route').textContent(),/ОБЪЯСНИТЬ|STOP/,'ordinary node exposes authored outgoing causality in-card');await page.locator(`[data-brain-node=\"${impulseId}\"]`).click();assert.ok(await page.locator('#brain-graph .brain-stack-edge.focus').count()>=1,'selected node highlights its real edges');assert.ok(await page.locator('#brain-graph .connection-related').count()>=1,'selected node highlights directly connected cards');"
+          if old not in x: raise SystemExit('browser smoke anchor missing')
+          x=x.replace(old,new,1)
+          t.write_text(x)
+          PY
+      - name: Commit patch and remove one-shot workflow
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git rm .github/workflows/dementor-lab-connection-visibility-once.yml
+          git add dementor-lab/src/ui/app.mjs dementor-lab/brain-stack.css dementor-lab/tests/browser-smoke.mjs
+          git commit -m "feat(lab): make authored brain connections readable"
+          git push origin HEAD:agent/dementor-lab-vertical-slice-v0.3
