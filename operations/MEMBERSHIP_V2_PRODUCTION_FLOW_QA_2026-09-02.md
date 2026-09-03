@@ -1,6 +1,6 @@
 # Dementor Club — Production Flow QA Ledger
 
-Status: **ACTIVE / MEMBERSHIP V2 CORE PASS / BATCH 04 IMPLEMENTATION MERGED / PRODUCTION RELEASE NOT DEPLOYED**  
+Status: **ACTIVE / MEMBERSHIP V2 CORE PASS / BATCH 04 MERGED TO PRODUCTION / NOT DEPLOYED / LIVE RETEST PENDING**  
 Date opened: **2026-09-02**  
 Last live regression pass: **2026-09-03**  
 Environment: **PRODUCTION / https://dementor.club**  
@@ -52,7 +52,7 @@ Status: **OPEN / PRODUCT-STATE CLARIFICATION REQUIRED** · P2
 Historical `Думай с опасностью` completion/certificate is from 2026-08-28. A later repeat pass must not overwrite or masquerade as that historical completion. Repeat-attempt storage/model still needs clarification.
 
 ### QA-MEM-005 — Logout discoverability
-Status: **LIVE PASS FOR LOGOUT ACTION / LOGIN RECOVERY IMPLEMENTED IN BATCH 04 / LIVE RETEST PENDING** · P1  
+Status: **LIVE PASS FOR LOGOUT ACTION / LOGIN RECOVERY IN BATCH 04 PRODUCTION CODE / LIVE RETEST PENDING** · P1  
 User can log out. Reliable Google return is covered by Batch 04 and must be verified on production after manual deployment.
 
 ### QA-MEM-006 — Active Member `/join/apply/` copy
@@ -62,7 +62,7 @@ Status: **FIX RELEASED / REGRESSION RETEST REQUIRED** · P2
 Status: **FIX RELEASED / REGRESSION RETEST REQUIRED** · P1
 
 ### QA-MEM-008 — Private Board discoverability
-Status: **WORKSPACE SHELL PASS / BOARD RESTORATION IMPLEMENTED IN BATCH 04 / LIVE RETEST PENDING** · P1  
+Status: **WORKSPACE SHELL PASS / BOARD RESTORATION IN BATCH 04 PRODUCTION CODE / LIVE RETEST PENDING** · P1  
 Board remains discoverable inside Workspace; Batch 04 restores the previously approved spatial/integration behavior.
 
 ### QA-MEM-009 — Membership Review outside Workspace shell
@@ -164,7 +164,7 @@ Status: **BATCH 04 BROWSER PASS / LIVE RETEST PENDING** · P1
 Admin grid/layout is now part of the browser release gate.
 
 ### QA-MEM-023 — Logout has no reliable recovery to login
-Status: **BATCH 04 IMPLEMENTATION + BROWSER PASS / LIVE RETEST PENDING** · **P0 ACCESS**
+Status: **BATCH 04 IN PRODUCTION BRANCH + BROWSER PASS / LIVE RETEST PENDING** · **P0 ACCESS**
 
 Guest Workspace shows a stable Google-login gate and successful callback is asserted to finish at `/workspace/` with no `/degradation_club/` prefix.
 
@@ -267,7 +267,7 @@ QA is green only when:
 Observed by the user on production after successful GitHub Pages deployment on **2026-09-03**.
 
 ### QA-MEM-025 — Google auth succeeds but post-login redirect lands on legacy 404
-Status: **BATCH 04 IMPLEMENTATION + BROWSER PASS / LIVE RETEST PENDING** · **P0**
+Status: **BATCH 04 IN PRODUCTION BRANCH + BROWSER PASS / LIVE RETEST PENDING** · **P0**
 
 Live Batch 03 defect: successful Google/Supabase auth landed on a legacy `/degradation_club/...` 404, although the session itself persisted.
 
@@ -278,12 +278,12 @@ Batch 04 correction:
 - Chromium simulates successful PKCE exchange and asserts final pathname exactly `/workspace/`.
 
 ### QA-MEM-026 — Guest Workspace exposes member navigation and logout before authentication
-Status: **BATCH 04 IMPLEMENTATION + BROWSER PASS / LIVE RETEST PENDING** · P1
+Status: **BATCH 04 IN PRODUCTION BRANCH + BROWSER PASS / LIVE RETEST PENDING** · P1
 
 Batch 04 hides the Workspace private sidebar until authenticated identity is resolved. Chromium asserts the guest cannot see private sidebar, member tools or logout while the public header remains available.
 
 ### QA-MEM-027 — Workspace has no route back to public Club Home
-Status: **PRODUCT DECISION APPROVED / BATCH 04 IMPLEMENTATION PASS / LIVE RETEST PENDING** · P1
+Status: **PRODUCT DECISION APPROVED / BATCH 04 IN PRODUCTION BRANCH / LIVE RETEST PENDING** · P1
 
 Approved decision from user on **2026-09-03**:
 - do **not** remove the canonical public header from Workspace;
@@ -293,7 +293,7 @@ Approved decision from user on **2026-09-03**:
 No duplicate sidebar `BACK TO CLUB` control is required under this contract.
 
 ### QA-MEM-028 — Board move to Workspace dropped spatial/integration behavior
-Status: **BATCH 04 IMPLEMENTATION + BROWSER PASS / LIVE RETEST PENDING** · P1
+Status: **BATCH 04 IN PRODUCTION BRANCH + BROWSER PASS / LIVE RETEST PENDING** · P1
 
 Batch 04 restores the existing production Board modules inside `/workspace/board/` rather than recreating them:
 - Board QA/responsive CSS;
@@ -306,7 +306,7 @@ Batch 04 restores the existing production Board modules inside `/workspace/board
 Chromium asserts spatial viewport, filters, controls and movable positioned member Artifact behavior.
 
 ### QA-MEM-029 — Join member-return uses stale production destinations
-Status: **BATCH 04 IMPLEMENTATION + BROWSER PASS / LIVE RETEST PENDING** · P1
+Status: **BATCH 04 IN PRODUCTION BRANCH + BROWSER PASS / LIVE RETEST PENDING** · P1
 
 Member-return destinations are now canonical:
 - Community → `/workspace/board/`;
@@ -316,21 +316,21 @@ Member-return destinations are now canonical:
 The dead `/account/` destination is blocked by browser assertions.
 
 ### QA-MEM-030 — Join leaves a black visual strip under canonical header
-Status: **ROOT CAUSE FIXED IN BATCH 04 / BROWSER PASS / LIVE RETEST PENDING** · P2
+Status: **ROOT CAUSE FIXED IN BATCH 04 PRODUCTION CODE / BROWSER PASS / LIVE RETEST PENDING** · P2
 
 Root cause was the authenticated `.dc-account-panel` created by `dementor-account-sync-v8.js`: a second sticky account UI directly under the canonical header.
 
 Batch 04 keeps DC-9 account synchronization active but does not render that duplicate sticky account panel for an already authenticated user. Guest save/login behavior remains available. Chromium now finds no unexplained dark full-width block under the header.
 
 ### QA-MEM-031 — Join member-return CTA typography/layout is broken
-Status: **BATCH 04 IMPLEMENTATION + BROWSER PASS / LIVE RETEST PENDING** · P2
+Status: **BATCH 04 IN PRODUCTION BRANCH + BROWSER PASS / LIVE RETEST PENDING** · P2
 
 Join member-return anchor/button geometry is normalized and the browser gate verifies stable flex layout and minimum target height.
 
 ### QA-MEM-032 — Browser smoke still misses critical auth/state/integration paths
 Status: **BATCH 04 RELEASE-GATE PASS / KEEP AS PERMANENT COVERAGE** · P1 RELEASE INTEGRITY
 
-Run #704 PASS now exercises:
+Current Chromium coverage exercises:
 - OAuth callback final redirect;
 - guest member-navigation boundary;
 - canonical public header above Workspace;
@@ -341,32 +341,57 @@ Run #704 PASS now exercises:
 - production route manifest;
 - final production artifact release guard.
 
-## 12. Corrective Batch 04 implementation state
+## 12. Corrective Batch 04 release state
 
 Implementation PR:
 **#91 — QA Batch 04: auth boundary, Workspace header, Board restoration, Join routes**.
 
-Final candidate head:
+Final implementation candidate head:
 `f52bde7a978df8fe97a002257bc7a0dfb4ea8f33`
 
-Release Readiness run:
+Implementation Release Readiness:
 **#704 / run `33773784154` — PASS**.
 
-The run passed all current gates:
+PR #91 merged to `dementor-club-site` as:
+`6afb2fa4e81ec0a8b65aa01d6146f70194a518b9`.
+
+Because `dementor-club-site` and `dementor-club-production` are heavily diverged, Batch 04 was **not** released through a direct branch-to-branch merge. A production-only branch was created from the current production commit and populated only with the exact Batch 04 file state.
+
+Production release branch:
+`release/qa-batch-04-production`
+
+Release candidate commit:
+`c3a7eae88e5368ec59e1ad84ed7a7af824739a2f`
+
+Comparison against production before merge:
+- exactly **1 commit ahead**;
+- **0 behind**;
+- actual production diff: **14 files**;
+- remaining PR #91 files were already byte-identical to current production and produced no diff.
+
+Production PR:
+**#92 — Release QA Batch 04: auth boundary, Workspace header, Board restoration, Join routes**.
+
+Production Release Readiness:
+**#706 / run `33775142183` — PASS**.
+
+The production candidate passed:
 - registry/routes/feature state;
 - content readiness;
 - visual contract;
 - production build;
 - production analytics + consent;
 - canonical shell contract;
-- built-JS syntax (`85 files`);
+- built-JS syntax;
 - Chromium browser shell/recovery suite;
-- route manifest (`31 indexable · 16 private/compat · 1 disabled`);
-- production artifact release guard.
+- route manifest;
+- final production artifact release guard.
 
-One final static blocker discovered by the release guard was also removed before the green run: `design-system/admin/tests/index.html` still contained legacy `/degradation_club/` base-path logic. System Tests now use root production routes only.
+PR #92 merged to `dementor-club-production` as:
+`6782521d8145f0e3327d6595f17c633ab43c91b6`.
 
-PR #91 merged to `dementor-club-site` as:
-`6afb2fa4e81ec0a8b65aa01d6146f70194a518b9`.
+The deployment workflow is confirmed manual-only: `.github/workflows/deploy-pages.yml` uses `workflow_dispatch` and requires `release_confirmation = APPROVED` on `dementor-club-production`.
 
-**Production state:** Batch 04 is **not deployed** and none of QA-MEM-025…031 is closed yet. Next release step is to prepare and validate a production PR, then wait for explicit manual deployment authorization before any deploy.
+**Current production-code state:** Batch 04 is merged and ready for manual deployment.  
+**Current live-site state:** Batch 04 is **NOT DEPLOYED**. No deployment workflow was triggered.  
+**QA state:** QA-MEM-025…031 remain **LIVE RETEST PENDING** and must not be closed until the user explicitly deploys and retests the production site.
