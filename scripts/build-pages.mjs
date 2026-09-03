@@ -26,11 +26,10 @@ const productionProjections = [
   { from:'design-system/admin/tests/index.html', to:'workspace/admin/tests/index.html' },
   { from:'design-system/auth-test/index.html', to:'workspace/admin/auth-test/index.html', ownerGate:true },
   { from:'design-system/sync-test/index.html', to:'workspace/admin/sync-test/index.html', ownerGate:true },
-  { from:'design-system/owner-admin-gate-v1.js', to:'workspace/owner-admin-gate-v1.js' },
 ];
 
 const skipRootFiles = new Set([
-  '.deploy-trigger', 'DEPLOY_TRIGGER.txt', 'DRIVE.md', 'README.md',
+  '.deploy-trigger', 'DEPLOY_TRIGGER.txt', 'DRIVE.md', 'README.md', 'production-route-manifest.json',
 ]);
 const textExt = new Set(['.html', '.css', '.js', '.json', '.xml', '.txt', '.webmanifest']);
 
