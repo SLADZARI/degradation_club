@@ -1,6 +1,6 @@
 # Dementor Club — Production Flow QA Ledger
 
-Status: **ACTIVE / MEMBERSHIP V2 CORE PASS / QA BATCH 02 RELEASE CANDIDATE GREEN / PRODUCTION MERGE + RETEST PENDING**  
+Status: **ACTIVE / MEMBERSHIP V2 CORE PASS / QA BATCH 02 MERGED TO PRODUCTION / DEPLOY + RETEST PENDING**  
 Date opened: **2026-09-02**  
 Environment: **PRODUCTION / https://dementor.club**  
 Source of truth: `dementor-club`  
@@ -235,16 +235,17 @@ Implementation/release state:
 - implementation Site Integrity / Release Readiness run **#671**: **PASS**;
 - clean production release branch: `release/qa-batch-02-site-shell-route-integrity`, created from production head `1ed25952cc5a05174a8c1e78cd722b5c5921f7b6`;
 - production release PR: **#87 — Release QA Batch 02: site shell and route integrity**;
-- current release head: `555f612449df6e9320830e2e5d73000aac7b27f9`;
+- release head: `555f612449df6e9320830e2e5d73000aac7b27f9`;
 - Production Candidate Integrity run **#675**: **PASS**;
+- PR #87 merged to `dementor-club-production` as `52091b5c6e21c818a7e32d306f964f1c5242bee8`;
+- post-merge Production Candidate Integrity run **#676**: **PASS**;
 - release gates PASS: registry, readiness, visual contract, interactive runtime safety, production build, route manifest, analytics/consent and final production artifact release gate;
 - route manifest: **31 indexable / 15 private+compat / 1 disabled** — PASS;
-- final diff is a clean descendant of the current production head; no staging branch merge is required;
-- `dementor-club-production` has **not** been merged or deployed with Batch 02 yet.
+- Batch 02 is present in the production branch but has **not been explicitly deployed to the live site yet**.
 
 ### QA-MEM-012 — Global Header can render twice on pages that load `site-config.js` in `<head>`
 
-Status: **FIX IN GREEN RELEASE CANDIDATE / PRODUCTION MERGE + RETEST PENDING**  
+Status: **FIX MERGED TO PRODUCTION / DEPLOY + RETEST PENDING**  
 Severity: **P1 / GLOBAL NAVIGATION + SHELL**
 
 Observed live on `/community/board/`: two public-looking headers appeared one below another.
@@ -265,7 +266,7 @@ Required production regression matrix: `/`, `/about/`, `/events/`, `/projects/`,
 
 ### QA-MEM-013 — Footer is page-owned and visually/content-wise drifts across the site
 
-Status: **FIX IN GREEN RELEASE CANDIDATE / PRODUCTION MERGE + RETEST PENDING**  
+Status: **FIX MERGED TO PRODUCTION / DEPLOY + RETEST PENDING**  
 Severity: **P2 / GLOBAL SHELL CONSISTENCY**
 
 Verified examples: Home and About owned different footer structures/status markers.
@@ -283,7 +284,7 @@ Required production retest: compare Home / About / Events / Projects / Community
 
 ### QA-MEM-014 — Workspace sidebar is copied per page and drifts between routes
 
-Status: **FIX IN GREEN RELEASE CANDIDATE / PRODUCTION MERGE + RETEST PENDING**  
+Status: **FIX MERGED TO PRODUCTION / DEPLOY + RETEST PENDING**  
 Severity: **P1 / AUTHENTICATED INFORMATION ARCHITECTURE**
 
 Root cause: Workspace Home, Artifacts and Review owned separate HTML copies of `.dcw-sidebar/.dcw-nav`.
@@ -307,7 +308,7 @@ Canonical target:
 
 ### QA-MEM-015 — OWNER_ADMIN `SYSTEM TOOLS` links to a route stripped from production
 
-Status: **FIX IN GREEN RELEASE CANDIDATE / PRODUCTION MERGE + RETEST PENDING**  
+Status: **FIX MERGED TO PRODUCTION / DEPLOY + RETEST PENDING**  
 Severity: **P1 / ADMIN TOOLING + BROKEN INTERNAL ROUTE**
 
 Root cause: old runtime linked to `/design-system/admin/`, while production deliberately strips the full source `design-system` tree.
@@ -328,7 +329,7 @@ SEO note: this is a private/noindex route; primary purpose is internal owner too
 
 ### QA-MEM-016 — Production release validator misses JS-generated internal routes
 
-Status: **FIX IN GREEN RELEASE CANDIDATE / PRODUCTION MERGE + RETEST PENDING**  
+Status: **FIX MERGED TO PRODUCTION / DEPLOY + RETEST PENDING**  
 Severity: **P1 / ROUTE INTEGRITY + SEO SAFETY**
 
 Old validator checked static HTML/CSS/file-like references but did not reliably validate route navigation created in JavaScript.
@@ -353,11 +354,13 @@ Production-candidate gate evidence from PR #87 / run #675:
 - analytics/consent PASS;
 - final production release validator PASS.
 
+Post-merge production-branch evidence: run #676 PASS on `52091b5c6e21c818a7e32d306f964f1c5242bee8`.
+
 ---
 
 ### QA-MEM-017 — Sitemap contained a disabled 404 route and a noindex compatibility route
 
-Status: **FIX IN GREEN RELEASE CANDIDATE / PRODUCTION MERGE + RETEST PENDING**  
+Status: **FIX MERGED TO PRODUCTION / DEPLOY + RETEST PENDING**  
 Severity: **P1 / SEO + ROUTE INTEGRITY**
 
 Confirmed audit finding:
@@ -400,13 +403,13 @@ The sitemap remains public/indexable only; private Workspace/admin routes are de
 
 ## 7. Current route integrity facts
 
-Batch 02 now has a green production release candidate, not only implementation-branch evidence.
+Batch 02 is merged into the production branch and has a green post-merge integrity run.
 
-Production candidate evidence:
+Production-branch evidence:
 
-- PR **#87** → `dementor-club-production`;
-- head `555f612449df6e9320830e2e5d73000aac7b27f9`;
-- Production Candidate Integrity run **#675** → **PASS**;
+- release PR **#87** merged into `dementor-club-production`;
+- production head `52091b5c6e21c818a7e32d306f964f1c5242bee8`;
+- post-merge Production Candidate Integrity run **#676** → **PASS**;
 - sitemap/indexable contract: **31 routes**;
 - private + compatibility routes: **15**;
 - disabled routes: **1 (`/cart/`)**;
@@ -416,7 +419,7 @@ Production candidate evidence:
 - analytics/consent gate PASS;
 - final artifact release gate PASS.
 
-This remains **release-candidate evidence**, not live production evidence. Production merge, explicit deploy and live HTTP/UI regression are still required before closing QA-MEM-012..017.
+This is **production-branch evidence, not live deployment evidence**. Explicit deploy and live HTTP/UI regression are still required before closing QA-MEM-012..017.
 
 ## 8. Batch 01 release state
 
@@ -439,16 +442,18 @@ Completed:
 9. CI/release workflows enforce the route manifest.
 10. Production-only analytics, Membership v2 v9/hotfix state and interactive-runtime safety were preserved in the selective release candidate.
 11. Production Candidate Integrity run #675 is fully green.
+12. PR #87 merged to `dementor-club-production` as `52091b5c6e21c818a7e32d306f964f1c5242bee8`.
+13. Post-merge Production Candidate Integrity run #676 is fully green.
 
 Implementation merge: `c4ed4a6a1f7a197e31d6a7563d9e27318fb82006`.  
-Release PR: **#87**.  
-Release head: `555f612449df6e9320830e2e5d73000aac7b27f9`.
+Release PR: **#87 — MERGED**.  
+Release head before merge: `555f612449df6e9320830e2e5d73000aac7b27f9`.  
+Production head after merge: `52091b5c6e21c818a7e32d306f964f1c5242bee8`.
 
 Next release boundary:
 
-- do **not** merge PR #87 into `dementor-club-production` without explicit human instruction;
-- after explicit merge approval, run the production integrity gate on the production head;
 - do **not** deploy until the user explicitly requests deployment;
+- deployment must use the manual production workflow and explicit `APPROVED` confirmation;
 - after deploy, execute live desktop/mobile/header/footer/Workspace/admin/sitemap regression and only then close findings.
 
 ## 10. Exit criteria before advertising
