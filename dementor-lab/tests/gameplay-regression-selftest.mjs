@@ -1,11 +1,20 @@
 import assert from 'node:assert/strict';
-import { createEncounter, predictTurn, executeActorTurn, applyHotPatch, detectBreakpoint, checkTerminal } from '../src/encounter/runtime.mjs';
+import { createEncounter, predictTurn, executeActorTurn, applyHotPatch, detectBreakpoint, checkTerminal, REACTION_EFFECTS } from '../src/encounter/runtime.mjs';
 import { buildResult } from '../src/encounter/result.mjs';
 import { CRITICISM_IDEA_SCENARIO, createCriticismActors } from '../src/scenarios/criticism-idea.mjs';
 import { validateGraph } from '../src/core/graph.mjs';
 
 function encounterWithGraph(graph,{brain=12,memory={}}={}){const actors=createCriticismActors();actors.A.brainGraph=structuredClone(graph);actors.A.state.brain=brain;actors.A.state.memory={...memory};return createEncounter({scenario:CRITICISM_IDEA_SCENARIO,actorA:actors.A,actorB:actors.B,mode:'step'})}
 const edge=(id,from,to)=>({id,from,to});
+
+
+// Reaction strategy identities remain mechanically distinct rather than cosmetic variants.
+assert.ok(REACTION_EFFECTS.agree.target.contact>REACTION_EFFECTS.joke.target.contact,'AGREE is the strongest relationship repair');
+assert.ok(Math.abs(REACTION_EFFECTS.joke.target.tension)>Math.abs(REACTION_EFFECTS.agree.target.tension),'JOKE is the stronger tension release');
+assert.ok(Math.abs(REACTION_EFFECTS.silent.self.energy)<Math.abs(REACTION_EFFECTS.explain.self.energy),'SILENT is the cheapest energy survival response');
+assert.ok(REACTION_EFFECTS.explain.target.brain>0,'EXPLAIN creates cognitive load on the listener');
+assert.ok(REACTION_EFFECTS.pressure.target.energy<0&&REACTION_EFFECTS.pressure.target.brain>0,'PRESSURE trades relationship safety for direct opponent depletion');
+assert.ok(REACTION_EFFECTS.pressure.target.contact<REACTION_EFFECTS.explain.target.contact,'PRESSURE is relationally more destructive than EXPLAIN');
 
 // Missing current Trigger is transparent NO_ACTION, never silent trigger substitution.
 const wrongTrigger={id:'wrong-trigger',nodes:[{id:'t',type:'ignore',p:{}},{id:'r',type:'silent',p:{}}],edges:[edge('e','t','r')]};

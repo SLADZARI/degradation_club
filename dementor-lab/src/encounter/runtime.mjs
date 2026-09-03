@@ -1,12 +1,12 @@
 import { cloneState, applyMetricDelta, applyMemoryNode, NODE_SPECS } from '../core/model.mjs';
 import { familyOf, outgoing, validateGraph, canConnectNodes } from '../core/graph.mjs';
 
-const REACTION_EFFECTS=Object.freeze({
-  explain:{self:{energy:-4,brain:8,tension:5},target:{tension:4,contact:-5}},
-  agree:{self:{energy:-2,brain:-2,tension:-4,contact:4},target:{tension:-3,contact:5}},
-  joke:{self:{energy:-3,brain:-1,tension:-5,contact:5},target:{tension:-4,contact:4}},
-  silent:{self:{energy:-1,brain:2,tension:2},target:{contact:-3}},
-  pressure:{self:{energy:-5,brain:6,tension:8},target:{tension:9,contact:-8}}
+export const REACTION_EFFECTS=Object.freeze({
+  explain:{self:{energy:-4,brain:6,tension:3},target:{brain:3,tension:2,contact:-2}},
+  agree:{self:{energy:-2,brain:-3,tension:-5,contact:3},target:{tension:-4,contact:6}},
+  joke:{self:{energy:-3,brain:-1,tension:-7,contact:1},target:{tension:-6,contact:1}},
+  silent:{self:{energy:-1,brain:1,tension:1},target:{contact:-4}},
+  pressure:{self:{energy:-5,brain:7,tension:9},target:{energy:-6,brain:4,tension:10,contact:-9}}
 });
 const IMPULSE_EFFECTS=Object.freeze({
   beright:{self:{brain:2,tension:2},target:{contact:-1}},
