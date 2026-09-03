@@ -1,4 +1,4 @@
-/* DEMENTOR LAB — BRAIN stack geometry pass v0.1
+/* DEMENTOR LAB — BRAIN stack geometry pass v0.2
    Mobile-first: preserve card width, reserve a readable rail, and keep branches legible. */
 
 .brain-screen .brain-graph.brain-constructor{
@@ -28,6 +28,20 @@
 .brain-stack-node.connection-focus::before,
 .brain-stack-node.route-active::before,
 .brain-stack-node.connection-related::before{background:var(--acid)}
+
+/* Primary route owns the inner metro lane; authored side branches live farther left. */
+.brain-stack-edge:not(.extra){
+  stroke-width:3.25;
+}
+.brain-stack-edge.extra{
+  stroke-width:2;
+  stroke-dasharray:6 4;
+  opacity:.72;
+}
+.brain-stack-edge.extra.focus{
+  opacity:1;
+  stroke-dasharray:none;
+}
 
 /* Causality is allowed two lines: 2–3 outgoing branches must remain readable. */
 .brain-stack-route{
@@ -67,7 +81,7 @@
   .brain-stack-title{font-size:17px}
   .brain-stack-main{padding:9px 50px 9px 10px}
 
-  /* Mobile open-state: actions occupy their own internal row instead of pushing copy 184px sideways. */
+  /* Mobile open-state: actions occupy their own internal row instead of pushing copy sideways. */
   .brain-stack-node.open .brain-stack-main{
     margin-left:0;
     padding-top:66px;
@@ -87,6 +101,10 @@
   .brain-stack-action{width:46px;min-width:46px;height:46px;min-height:46px}
   .brain-stack-node.open .brain-stack-value{opacity:0}
   .brain-stack-node.open .brain-stack-drag{border-left:1px solid var(--ink)}
+
+  /* Side branches stay subordinate on phone, but remain visually distinct. */
+  .brain-stack-edge:not(.extra){stroke-width:3}
+  .brain-stack-edge.extra{stroke-width:1.75;stroke-dasharray:5 4}
 
   /* Connect targets remain tappable without crushing the source title. */
   .brain-stack-node.connection-target .brain-stack-card{grid-template-columns:minmax(0,1fr) 104px}
