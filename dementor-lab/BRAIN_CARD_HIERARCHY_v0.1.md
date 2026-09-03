@@ -24,3 +24,5 @@ A real authored connection must be readable in three equivalent ways:
 `Hide explanation until requested; never hide causality.`
 
 This hierarchy applies consistently to STATE, IMPULSE, REACTION, CONTROL and ABILITY nodes. Trigger infrastructure remains projected through Trigger Hub under its separate approved contract.
+
+QA note: browser smoke resolves nodes by exact card title so route labels such as `→ STOP` cannot masquerade as the destination node itself.
