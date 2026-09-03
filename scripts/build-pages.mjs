@@ -165,6 +165,10 @@ function injectProductionModules() {
       if (!html.includes('/entity-recommendations-v1.js')) html = html.replace('</body>', '<script src="/entity-recommendations-v1.js" defer></script>\n</body>');
     }
     if (rel === 'projects/logic-awareness/index.html' && !html.includes('/logic-awareness-covers-v1.js')) html = html.replace('</body>', '<script src="/logic-awareness-covers-v1.js" defer></script>\n</body>');
+    if (!html.includes('/production-analytics-v1.js')) {
+      if (!html.includes('</body>')) throw new Error(`Cannot inject production analytics runtime into ${rel}: </body> missing`);
+      html = html.replace('</body>', '<script src="/production-analytics-v1.js" defer></script>\n</body>');
+    }
     fs.writeFileSync(full, html);
   });
 }
