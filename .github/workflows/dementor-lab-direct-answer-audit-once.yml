@@ -15,6 +15,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Run direct-answer matrix after graph cleanup
+      - name: Run stricter direct-answer matrix
         working-directory: dementor-lab
         run: node scripts/direct-answer-matrix.mjs
