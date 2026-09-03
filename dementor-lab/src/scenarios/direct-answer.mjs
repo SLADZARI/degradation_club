@@ -7,9 +7,9 @@ export const DIRECT_ANSWER_SCENARIO=Object.freeze({
   topic:'Собеседник уходит от прямого ответа.',
   objective:'direct-answer',
   objectiveLabel:'ПОЛУЧИТЬ ПРЯМОЙ ОТВЕТ',
-  objectiveRules:Object.freeze({requiredOpponentCounterpoints:2,minRelationshipContact:25}),
+  objectiveRules:Object.freeze({requiredOpponentCounterpoints:4,minRelationshipContact:50}),
   openingTrigger:'criticism',
-  turnLimit:12
+  turnLimit:16
 });
 
 const nodes=[
