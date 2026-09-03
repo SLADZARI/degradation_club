@@ -1,6 +1,6 @@
 # DEMENTOR LAB — BRAIN CARD HIERARCHY v0.1
 
-Status: IMPLEMENTED / QA GATE
+Status: IMPLEMENTED / FINAL QA
 
 ## Closed card
 A closed behavioral node shows only information required to read the causal chain:
