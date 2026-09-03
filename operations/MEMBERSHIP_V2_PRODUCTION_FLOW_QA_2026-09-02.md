@@ -1,6 +1,6 @@
 # Dementor Club — Production Flow QA Ledger
 
-Status: **ACTIVE / MEMBERSHIP V2 CORE PASS / BATCH 04 MERGED TO PRODUCTION / NOT DEPLOYED / LIVE RETEST PENDING**  
+Status: **ACTIVE / MEMBERSHIP V2 CORE PASS / BATCH 04 DEPLOYED / LIVE RETEST ACTIVE / QA-MEM-033 OPEN**  
 Date opened: **2026-09-02**  
 Last live regression pass: **2026-09-03**  
 Environment: **PRODUCTION / https://dementor.club**  
@@ -52,8 +52,8 @@ Status: **OPEN / PRODUCT-STATE CLARIFICATION REQUIRED** · P2
 Historical `Думай с опасностью` completion/certificate is from 2026-08-28. A later repeat pass must not overwrite or masquerade as that historical completion. Repeat-attempt storage/model still needs clarification.
 
 ### QA-MEM-005 — Logout discoverability
-Status: **LIVE PASS FOR LOGOUT ACTION / LOGIN RECOVERY IN BATCH 04 PRODUCTION CODE / LIVE RETEST PENDING** · P1  
-User can log out. Reliable Google return is covered by Batch 04 and must be verified on production after manual deployment.
+Status: **LIVE PASS FOR LOGOUT + LOGIN RECOVERY 2026-09-03** · P1  
+User can log out and log back in through Google. Batch 04 production retest confirms the session returns to Workspace rather than the legacy 404. Remaining post-navigation Workspace failure is separate QA-MEM-033.
 
 ### QA-MEM-006 — Active Member `/join/apply/` copy
 Status: **FIX RELEASED / REGRESSION RETEST REQUIRED** · P2
@@ -62,12 +62,12 @@ Status: **FIX RELEASED / REGRESSION RETEST REQUIRED** · P2
 Status: **FIX RELEASED / REGRESSION RETEST REQUIRED** · P1
 
 ### QA-MEM-008 — Private Board discoverability
-Status: **WORKSPACE SHELL PASS / BOARD RESTORATION IN BATCH 04 PRODUCTION CODE / LIVE RETEST PENDING** · P1  
-Board remains discoverable inside Workspace; Batch 04 restores the previously approved spatial/integration behavior.
+Status: **WORKSPACE SHELL PASS / BOARD RESTORATION DEPLOYED / LIVE FUNCTIONAL RETEST PARTIAL** · P1  
+Board remains discoverable inside Workspace; Batch 04 restores the previously approved spatial/integration behavior. Child-surface navigation regression is tracked separately as QA-MEM-033.
 
 ### QA-MEM-009 — Membership Review outside Workspace shell
-Status: **FIX RELEASED / REGRESSION RETEST REQUIRED** · P1  
-Ordinary Member negative access test previously PASS.
+Status: **WORKSPACE CHILD SURFACE PASS / NAVIGATION DESCENDANT QA-MEM-033 OPEN** · P1  
+Review is inside Workspace, but entering the child route exposes a shared-shell navigation defect tracked in QA-MEM-033. Ordinary Member negative access test previously PASS.
 
 ### QA-MEM-010 — Archived Artifact history unavailable
 Status: **FIX RELEASED / PARTIAL LIVE RETEST** · P1  
@@ -117,9 +117,9 @@ Status: **BROWSER PASS / LIVE CROSS-PAGE RETEST PARTIAL** · P1
 Batch 03 browser gate confirms one canonical footer and no surviving `.dc-utility-strip` on tested public routes including `/join/`. Live screenshot of 404 also shows the canonical footer. Full cross-page visual pass is still pending before closure.
 
 ### QA-MEM-014 — Shared Workspace shell incompatible with existing controller
-Status: **CORRECTIVE FIX RELEASED / BATCH 04 BROWSER PASS / LIVE RETEST PENDING** · P0
+Status: **ROOT WORKSPACE PASS / CHILD-SURFACE NAVIGATION REGRESSION QA-MEM-033** · P0
 
-Batch 04 Chromium gate explicitly validates authenticated `MY ACTIVITY` and `MY CLUB` transitions under the shared Workspace controller.
+Root `/workspace/` internal views work after authentication. Live Batch 04 retest found a distinct shared-shell child-route navigation defect after entering Board/Review, tracked as QA-MEM-033.
 
 ### QA-MEM-015 — OWNER_ADMIN route exists but layout is broken
 Status: **BATCH 04 BROWSER PASS / LIVE RETEST PENDING** · P1
@@ -149,12 +149,12 @@ Status: **FIX RELEASED / BROWSER PASS / LIVE VISUAL RETEST PARTIAL** · P1
 Global footer runtime removes legacy `<footer>` and `.dc-utility-strip`; production browser smoke asserts the duplicate utility strip is absent on `/join/`. Keep open until a short live visual pass across Home / Join / one entity page.
 
 ### QA-MEM-020 — Workspace null-DOM crash
-Status: **BATCH 04 BROWSER PASS / LIVE RETEST PENDING** · **P0**
+Status: **ROOT WORKSPACE LIVE PASS / CHILD NAVIGATION DESCENDANT QA-MEM-033** · **P0**
 
-Guest and authenticated Workspace are both exercised by Chromium without the previous `sessionBox.innerHTML` crash.
+Guest and authenticated root Workspace no longer show the previous `sessionBox.innerHTML` crash. The new failure after entering Board/Review is navigation ownership, not a return of the null-DOM crash.
 
 ### QA-MEM-021 — Community Board still escapes Workspace
-Status: **CLOSED FOR ROUTE/SHELL / FUNCTIONAL DESCENDANT QA-MEM-028** · P1
+Status: **CLOSED FOR ROUTE/SHELL / FUNCTIONAL DESCENDANTS QA-MEM-028 + QA-MEM-033** · P1
 
 Canonical member route is `/workspace/board/` and the Board remains a Workspace child surface.
 
@@ -164,14 +164,14 @@ Status: **BATCH 04 BROWSER PASS / LIVE RETEST PENDING** · P1
 Admin grid/layout is now part of the browser release gate.
 
 ### QA-MEM-023 — Logout has no reliable recovery to login
-Status: **BATCH 04 IN PRODUCTION BRANCH + BROWSER PASS / LIVE RETEST PENDING** · **P0 ACCESS**
+Status: **LIVE PASS 2026-09-03** · **P0 ACCESS**
 
-Guest Workspace shows a stable Google-login gate and successful callback is asserted to finish at `/workspace/` with no `/degradation_club/` prefix.
+Live Batch 04 retest: user can log out, use Google login again, and regain an authenticated Workspace session. The subsequent failure after Board/Review navigation is QA-MEM-033 and does not indicate auth-session loss.
 
 ### QA-MEM-024 — Static CI passed while real browser integration was broken
-Status: **BATCH 04 COVERAGE EXPANDED / RELEASE GATE PASS** · P1 RELEASE INTEGRITY
+Status: **BATCH 04 COVERAGE EXPANDED / CHILD-ROUTE GAP QA-MEM-033** · P1 RELEASE INTEGRITY
 
-Chromium now covers OAuth callback, guest/private boundary, Workspace internal view transitions, spatial Board integrations, Join member-return destinations/geometry and Admin layout.
+Chromium covers OAuth callback, guest/private boundary, root Workspace internal view transitions, spatial Board integrations, Join member-return destinations/geometry and Admin layout. Live QA revealed that the suite did not test root-view controls after entering Workspace child routes.
 
 ## 7. Corrective Batch 03 release state
 
@@ -252,11 +252,11 @@ QA is green only when:
 - Workspace retains the canonical public header for public-site escape;
 - Workspace guest state exposes login but not member navigation/logout;
 - Google login returns to `/workspace/` without legacy `/degradation_club/` or 404;
-- Workspace My Club / My Activity / My Profile work without runtime errors;
+- Workspace My Club / My Activity / My Profile work without runtime errors from both root and Workspace child surfaces;
 - Board stays inside Workspace shell **and** retains its approved spatial/integration behavior;
 - OWNER_ADMIN tools resolve and render with normal Workspace geometry;
 - Join member-return CTAs use canonical production routes and stable typography;
-- browser-level CI passes on the production candidate and covers OAuth callback + guest boundary + Board integrations + Join;
+- browser-level CI passes on the production candidate and covers OAuth callback + guest boundary + Board integrations + Join + return navigation from child Workspace routes;
 - 31 indexable sitemap routes resolve live and canonical/OG URLs remain on `https://dementor.club`;
 - Membership v2 regression set remains green;
 - mobile baseline is checked at 360 / 390 / 768 / 1024 / 1440 where applicable;
@@ -267,33 +267,27 @@ QA is green only when:
 Observed by the user on production after successful GitHub Pages deployment on **2026-09-03**.
 
 ### QA-MEM-025 — Google auth succeeds but post-login redirect lands on legacy 404
-Status: **BATCH 04 IN PRODUCTION BRANCH + BROWSER PASS / LIVE RETEST PENDING** · **P0**
+Status: **LIVE PASS AFTER BATCH 04 DEPLOY 2026-09-03** · **P0**
 
-Live Batch 03 defect: successful Google/Supabase auth landed on a legacy `/degradation_club/...` 404, although the session itself persisted.
-
-Batch 04 correction:
-- `/auth/callback/` accepts root-canonical `next` routes and defaults to root production routes;
-- auth entry points stop emitting legacy `/degradation_club/` callback destinations;
-- production HTML normalization no longer rewrites JavaScript inside inline callback code;
-- Chromium simulates successful PKCE exchange and asserts final pathname exactly `/workspace/`.
+Batch 04 correction is now live. User confirms logout followed by Google login restores the authenticated Workspace instead of the previous legacy 404. No evidence of auth-session loss in the current regression.
 
 ### QA-MEM-026 — Guest Workspace exposes member navigation and logout before authentication
-Status: **BATCH 04 IN PRODUCTION BRANCH + BROWSER PASS / LIVE RETEST PENDING** · P1
+Status: **BATCH 04 DEPLOYED + BROWSER PASS / EXPLICIT LIVE GUEST RETEST STILL PENDING** · P1
 
-Batch 04 hides the Workspace private sidebar until authenticated identity is resolved. Chromium asserts the guest cannot see private sidebar, member tools or logout while the public header remains available.
+Batch 04 hides the Workspace private sidebar until authenticated identity is resolved. Chromium asserts the guest cannot see private sidebar, member tools or logout while the public header remains available. A dedicated human guest-boundary screenshot/check is still pending.
 
 ### QA-MEM-027 — Workspace has no route back to public Club Home
-Status: **PRODUCT DECISION APPROVED / BATCH 04 IN PRODUCTION BRANCH / LIVE RETEST PENDING** · P1
+Status: **LIVE PASS / PRODUCT DECISION CONFIRMED 2026-09-03** · P1
 
 Approved decision from user on **2026-09-03**:
 - do **not** remove the canonical public header from Workspace;
 - `HOME` remains the internal Workspace Home;
 - the public header provides the public-site escape, with brand → `/` and the normal public navigation.
 
-No duplicate sidebar `BACK TO CLUB` control is required under this contract.
+Current live screenshot confirms the public header remains above Workspace.
 
 ### QA-MEM-028 — Board move to Workspace dropped spatial/integration behavior
-Status: **BATCH 04 IN PRODUCTION BRANCH + BROWSER PASS / LIVE RETEST PENDING** · P1
+Status: **BATCH 04 DEPLOYED / LIVE FUNCTIONAL RETEST PARTIAL** · P1
 
 Batch 04 restores the existing production Board modules inside `/workspace/board/` rather than recreating them:
 - Board QA/responsive CSS;
@@ -303,10 +297,10 @@ Batch 04 restores the existing production Board modules inside `/workspace/board
 - spatial CSS/JS with pan/zoom and member-card positioning;
 - Telegram worker trigger.
 
-Chromium asserts spatial viewport, filters, controls and movable positioned member Artifact behavior.
+Current live screenshot confirms Board renders inside Workspace with active member state and restored shell. Drag/reposition and scattered test/activity cards still require explicit live functional confirmation. The new inability to leave Board through root Workspace controls is tracked separately as QA-MEM-033.
 
 ### QA-MEM-029 — Join member-return uses stale production destinations
-Status: **BATCH 04 IN PRODUCTION BRANCH + BROWSER PASS / LIVE RETEST PENDING** · P1
+Status: **BATCH 04 DEPLOYED + BROWSER PASS / LIVE RETEST PENDING** · P1
 
 Member-return destinations are now canonical:
 - Community → `/workspace/board/`;
@@ -316,30 +310,21 @@ Member-return destinations are now canonical:
 The dead `/account/` destination is blocked by browser assertions.
 
 ### QA-MEM-030 — Join leaves a black visual strip under canonical header
-Status: **ROOT CAUSE FIXED IN BATCH 04 PRODUCTION CODE / BROWSER PASS / LIVE RETEST PENDING** · P2
+Status: **BATCH 04 DEPLOYED + BROWSER PASS / LIVE RETEST PENDING** · P2
 
 Root cause was the authenticated `.dc-account-panel` created by `dementor-account-sync-v8.js`: a second sticky account UI directly under the canonical header.
 
 Batch 04 keeps DC-9 account synchronization active but does not render that duplicate sticky account panel for an already authenticated user. Guest save/login behavior remains available. Chromium now finds no unexplained dark full-width block under the header.
 
 ### QA-MEM-031 — Join member-return CTA typography/layout is broken
-Status: **BATCH 04 IN PRODUCTION BRANCH + BROWSER PASS / LIVE RETEST PENDING** · P2
+Status: **BATCH 04 DEPLOYED + BROWSER PASS / LIVE RETEST PENDING** · P2
 
 Join member-return anchor/button geometry is normalized and the browser gate verifies stable flex layout and minimum target height.
 
 ### QA-MEM-032 — Browser smoke still misses critical auth/state/integration paths
-Status: **BATCH 04 RELEASE-GATE PASS / KEEP AS PERMANENT COVERAGE** · P1 RELEASE INTEGRITY
+Status: **CHILD-ROUTE COVERAGE GAP OPEN THROUGH QA-MEM-033** · P1 RELEASE INTEGRITY
 
-Current Chromium coverage exercises:
-- OAuth callback final redirect;
-- guest member-navigation boundary;
-- canonical public header above Workspace;
-- authenticated Workspace `MY ACTIVITY` / `MY CLUB` transitions;
-- spatial Board integrations and movable own Artifact;
-- Join canonical member-return routes, CTA geometry and dark-strip regression;
-- Owner Admin Workspace geometry;
-- production route manifest;
-- final production artifact release guard.
+Batch 04 Chromium coverage successfully exercises OAuth callback, guest boundary, root Workspace views, spatial Board integrations, Join and Admin. Live QA found one missing path: after navigating from root Workspace into a child surface (`/workspace/board/` or `/workspace/review/`), root-view controls were never exercised. That gap is now explicit and must be added to the permanent browser suite.
 
 ## 12. Corrective Batch 04 release state
 
@@ -390,8 +375,39 @@ The production candidate passed:
 PR #92 merged to `dementor-club-production` as:
 `6782521d8145f0e3327d6595f17c633ab43c91b6`.
 
-The deployment workflow is confirmed manual-only: `.github/workflows/deploy-pages.yml` uses `workflow_dispatch` and requires `release_confirmation = APPROVED` on `dementor-club-production`.
+Manual Deploy Dementor Production run **#30 / `33776664149` — SUCCESS** on 2026-09-03:
+- canonical production branch checkout PASS;
+- registry/readiness/visual/build PASS;
+- production analytics + consent PASS;
+- final production artifact/release gate PASS;
+- Pages artifact upload PASS;
+- GitHub Pages deployment PASS.
 
-**Current production-code state:** Batch 04 is merged and ready for manual deployment.  
-**Current live-site state:** Batch 04 is **NOT DEPLOYED**. No deployment workflow was triggered.  
-**QA state:** QA-MEM-025…031 remain **LIVE RETEST PENDING** and must not be closed until the user explicitly deploys and retests the production site.
+**Current production-code state:** Batch 04 is merged.  
+**Current live-site state:** Batch 04 is **DEPLOYED**.  
+**QA state:** live retest is active; QA-MEM-033 is open and blocks Workspace navigation closure.
+
+## 13. Live production retest — Batch 04
+
+### QA-MEM-033 — Workspace root-view controls become inert on child surfaces
+Status: **OPEN / LIVE P1 NAVIGATION / SOURCE-CONFIRMED** · P1
+
+Live evidence after Batch 04 deployment:
+- authenticated root Workspace initially works;
+- `HOME`, `MY CLUB`, `MY ACTIVITY`, `MY WORK`, `MY PROFILE` work while the browser remains on `/workspace/`;
+- entering `COMMUNITY BOARD` (`/workspace/board/`) or `MEMBERSHIP REVIEW` (`/workspace/review/`) leaves the same sidebar visible, but the root-view controls stop responding;
+- logout/login or leaving through the public header and returning through `Account` restores `/workspace/` and the controls work again until another child surface is entered;
+- session persists throughout; this is not an auth failure.
+
+Root cause confirmed in `workspace/workspace-shell-v1.js`:
+- root Workspace views are rendered as `<button data-route>` rather than routable links;
+- the click handler explicitly returns unless `current` is `/workspace/` or `/workspace/index.html`;
+- Board and Review are separate child documents that load the shared shell but do not load the root `workspace.js` controller;
+- therefore the buttons are intentionally inert on every child surface.
+
+Required correction:
+- one shared navigation contract must work from every Workspace surface;
+- root views should be addressable from child routes, preferably as canonical links such as `/workspace/#home`, `/workspace/#club`, `/workspace/#activity`, `/workspace/#work`, `/workspace/#profile`;
+- on root Workspace the controller may intercept these links for in-place view changes, but child surfaces must always be able to navigate back to the root route;
+- Board / Artifacts / Review / Admin remain true child routes;
+- add Chromium sequence coverage: `/workspace/` → Board → Home/My Club → Review → Home/My Activity, asserting every transition works without logout/relogin.
