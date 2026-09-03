@@ -5,15 +5,14 @@
   host.dataset.dcWorkspaceShell='1';
 
   const path=location.pathname;
-  const base=path.startsWith('/degradation_club/')?'/degradation_club':'';
-  const root=base+'/workspace/';
-  const board=base+'/community/board/';
-  const artifacts=root+'artifacts/';
-  const review=root+'review/';
-  const admin=root+'admin/';
-  const current=path.replace(base,'');
+  const root='/workspace/';
+  const board='/community/board/';
+  const artifacts='/workspace/artifacts/';
+  const review='/workspace/review/';
+  const admin='/workspace/admin/';
+  const current=path;
   const active=(route)=>current===route||current===route+'index.html';
-  const link=(href,label,{key='',hidden=false,roleTool=false}={})=>`<a class="dcw-nav-link${active(href.replace(base,''))?' is-active':''}" href="${href}"${key?` data-route="${key}"`:''}${hidden?' hidden':''}${roleTool?' data-role-tool="1"':''}>${label}</a>`;
+  const link=(href,label,{key='',hidden=false,roleTool=false}={})=>`<a class="dcw-nav-link${active(href.split('#')[0])?' is-active':''}" href="${href}"${key?` data-route="${key}"`:''}${hidden?' hidden':''}${roleTool?' data-role-tool="1"':''}>${label}</a>`;
 
   host.innerHTML=`
     <a class="dcw-brand" href="${root}"><span>DEMENTOR</span><strong>CLUB</strong></a>
@@ -33,7 +32,7 @@
     <div class="dcw-session" data-shell-session><span>SESSION</span><strong>ПРОВЕРКА…</strong></div>`;
 
   const setCurrentRootRoute=()=>{
-    if(!current.startsWith('/workspace/')||current!=='/workspace/')return;
+    if(current!=='/workspace/'&&current!=='/workspace/index.html')return;
     const route=(location.hash||'#home').slice(1);
     host.querySelectorAll('[data-route]').forEach(a=>a.classList.toggle('is-active',a.dataset.route===route));
   };
@@ -76,6 +75,6 @@
         const client=window.DEMENTOR_SUPABASE_CLIENT||createClient(cfg.url,cfg.publishableKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false,flowType:'pkce'}});
         await client.auth.signOut();
       }
-    }finally{location.href=base+'/';}
+    }finally{location.href='/';}
   });
 })();
