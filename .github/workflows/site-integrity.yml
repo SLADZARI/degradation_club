@@ -34,6 +34,8 @@ jobs:
         run: node scripts/build-pages.mjs
       - name: Validate canonical shell integration
         run: node scripts/validate-shell-contract.mjs
+      - name: Validate built JavaScript syntax
+        run: node scripts/validate-built-js-syntax.mjs
       - name: Install browser smoke runtime
         run: |
           npm install --no-save --no-package-lock playwright@1.55.0
