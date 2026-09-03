@@ -26,6 +26,7 @@ const header=read('global-header.js');
 for(const route of ['/about/','/events/','/projects/','/community/','/merch/','/archive/','/join/','/workspace/'])expect(header.includes(`'${route}'`),`global-header.js: canonical route missing ${route}`);
 expect(!header.includes('dc-global-group'), 'global-header.js: dropdown/group navigation must not return');
 expect(header.includes("document.querySelectorAll('header.topbar,header.dc-global-header')"),'global-header.js: legacy/duplicate header cleanup missing');
+expect(header.includes("startsWith('/workspace/')"),'global-header.js: public header must refuse Workspace routes');
 
 const footer=read('global-footer.js');
 expect(footer.includes("document.querySelectorAll('footer,.dc-utility-strip')"),'global-footer.js: legacy footer/utility cleanup missing');
@@ -35,24 +36,30 @@ const shell=read('workspace/workspace-shell-v1.js');
 expect(shell.includes("const board='/workspace/board/'"),'workspace shell: Board must stay inside Workspace');
 expect(shell.includes('id="sessionBox"'),'workspace shell: legacy controller sessionBox contract missing');
 expect(shell.includes('data-work-nav'),'workspace shell: legacy controller workNav contract missing');
+expect(shell.includes('const viewButton='),'workspace shell: root views must be controller-owned buttons');
+expect(!shell.includes("root+'#activity'"),'workspace shell: hash anchors must not own root Workspace view transitions');
 
 const workspace=read('workspace/index.html');
 expect(workspace.includes('data-workspace-sidebar'),'workspace/index.html: shell host missing');
 expect(workspace.includes('/workspace-shell-v1.js')||workspace.includes('./workspace-shell-v1.js'),'workspace/index.html: shared shell runtime missing');
+expect(!workspace.includes('/global-header.js'),'workspace/index.html: public header runtime leaked into Workspace artifact');
+expect(!workspace.includes('/global-header.css'),'workspace/index.html: public header CSS leaked into Workspace artifact');
 
 const board=read('workspace/board/index.html');
 for(const id of ['boardStatus','memberBadge','entryHost','artifactCount','boardHost'])expect(board.includes(`id="${id}"`),`workspace/board/index.html: board runtime host missing #${id}`);
 expect(board.includes('../workspace-shell-v1.js'),'workspace/board/index.html: shared Workspace shell missing');
+expect(!board.includes('/global-header.js'),'workspace/board/: public header runtime leaked into Workspace Board');
 
 const legacyBoard=read('community/board/index.html');
 expect(legacyBoard.includes('/workspace/board/'),'community/board/: compatibility route must resolve into Workspace Board');
 
 const admin=read('workspace/admin/index.html');
 expect(admin.includes('../../design-system/dementor-workspace/workspace.css'),'workspace/admin/: complete Workspace layout CSS missing');
+expect(!admin.includes('/global-header.js'),'workspace/admin/: public header runtime leaked into Admin shell');
 
 if(fail.length){
   console.error('Shell contract validation failed:');
   for(const item of fail)console.error(`- ${item}`);
   process.exit(1);
 }
-console.log(`Shell contract validation PASS (${publicRoutes.length} public route families + Workspace/Admin contracts)`);
+console.log(`Shell contract validation PASS (${publicRoutes.length} public route families + isolated Workspace/Admin contracts)`);
