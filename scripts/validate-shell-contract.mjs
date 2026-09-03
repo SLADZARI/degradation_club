@@ -26,40 +26,63 @@ const header=read('global-header.js');
 for(const route of ['/about/','/events/','/projects/','/community/','/merch/','/archive/','/join/','/workspace/'])expect(header.includes(`'${route}'`),`global-header.js: canonical route missing ${route}`);
 expect(!header.includes('dc-global-group'), 'global-header.js: dropdown/group navigation must not return');
 expect(header.includes("document.querySelectorAll('header.topbar,header.dc-global-header')"),'global-header.js: legacy/duplicate header cleanup missing');
-expect(header.includes("startsWith('/workspace/')"),'global-header.js: public header must refuse Workspace routes');
+expect(!header.includes("if(runtimePath.startsWith('/workspace/'))return"),'global-header.js: canonical public header must remain visible in Workspace');
 
 const footer=read('global-footer.js');
 expect(footer.includes("document.querySelectorAll('footer,.dc-utility-strip')"),'global-footer.js: legacy footer/utility cleanup missing');
 expect(footer.includes('href="/archive/"')&&footer.includes('>Archive<'),'global-footer.js: Archive route missing');
 
+const config=read('site-config.js');
+expect(config.includes("addScript('/global-header.js');addStyle('/global-header.css')"),'site-config.js: canonical header bootstrap missing');
+expect(config.includes("addStyle('/workspace/workspace-public-header-v1.css')"),'site-config.js: Workspace header offset layer missing');
+
 const shell=read('workspace/workspace-shell-v1.js');
 expect(shell.includes("const board='/workspace/board/'"),'workspace shell: Board must stay inside Workspace');
-expect(shell.includes('id="sessionBox"'),'workspace shell: legacy controller sessionBox contract missing');
-expect(shell.includes('data-work-nav'),'workspace shell: legacy controller workNav contract missing');
+expect(shell.includes('id="sessionBox"'),'workspace shell: controller sessionBox contract missing');
+expect(shell.includes('data-work-nav'),'workspace shell: controller workNav contract missing');
 expect(shell.includes('const viewButton='),'workspace shell: root views must be controller-owned buttons');
-expect(!shell.includes("root+'#activity'"),'workspace shell: hash anchors must not own root Workspace view transitions');
+expect(shell.includes("dataset.dcWorkspaceAuth='guest'"),'workspace shell: explicit guest boundary state missing');
+expect(shell.includes('host.hidden=true'),'workspace shell: guest/private navigation must begin hidden');
+expect(shell.includes('data-member-tool'),'workspace shell: membership-gated private routes missing');
+
+for(const rel of ['workspace/index.html','workspace/board/index.html','workspace/artifacts/index.html','workspace/review/index.html','workspace/admin/index.html']){
+  const html=read(rel);
+  expect(html.includes('/global-header.js'),`${rel}: canonical public header runtime missing above Workspace`);
+  expect(html.includes('/global-header.css'),`${rel}: canonical public header CSS missing above Workspace`);
+  expect(!html.includes('/global-footer.js'),`${rel}: public footer must not leak into private Workspace`);
+}
 
 const workspace=read('workspace/index.html');
 expect(workspace.includes('data-workspace-sidebar'),'workspace/index.html: shell host missing');
 expect(workspace.includes('/workspace-shell-v1.js')||workspace.includes('./workspace-shell-v1.js'),'workspace/index.html: shared shell runtime missing');
-expect(!workspace.includes('/global-header.js'),'workspace/index.html: public header runtime leaked into Workspace artifact');
-expect(!workspace.includes('/global-header.css'),'workspace/index.html: public header CSS leaked into Workspace artifact');
 
 const board=read('workspace/board/index.html');
-for(const id of ['boardStatus','memberBadge','entryHost','artifactCount','boardHost'])expect(board.includes(`id="${id}"`),`workspace/board/index.html: board runtime host missing #${id}`);
+for(const id of ['boardStatus','memberBadge','entryHost','artifactCount','boardFilters','boardHost'])expect(board.includes(`id="${id}"`),`workspace/board/index.html: board runtime host missing #${id}`);
 expect(board.includes('../workspace-shell-v1.js'),'workspace/board/index.html: shared Workspace shell missing');
-expect(!board.includes('/global-header.js'),'workspace/board/: public header runtime leaked into Workspace Board');
+for(const asset of ['board-qa-fix-v1.css','board-integrations-v1.css','board-spatial-v1.css','telegram-worker-trigger-v3.js','board-integrations-v1.js','board-activation-gate-v1.js','board-spatial-v1.js'])expect(board.includes(asset),`workspace/board/index.html: restored Board module missing ${asset}`);
 
 const legacyBoard=read('community/board/index.html');
 expect(legacyBoard.includes('/workspace/board/'),'community/board/: compatibility route must resolve into Workspace Board');
 
 const admin=read('workspace/admin/index.html');
 expect(admin.includes('../../design-system/dementor-workspace/workspace.css'),'workspace/admin/: complete Workspace layout CSS missing');
-expect(!admin.includes('/global-header.js'),'workspace/admin/: public header runtime leaked into Admin shell');
+
+const callback=read('auth/callback/index.html');
+expect(callback.includes("params.get('next')||'/workspace/'"),'auth callback: Workspace must be the canonical default target');
+expect(callback.includes('stripLegacyPrefix'),'auth callback: legacy next-path cleanup missing');
+expect(!callback.includes("const defaultTarget=base+'/join/'"),'auth callback: legacy Join fallback survived');
+expect(!callback.includes("startsWith('/')?'/degradation_club'"),'auth callback: production build corrupted inline path test');
+
+const joinState=read('join/dc9-entry-state-v1.js');
+expect(joinState.includes("route('/workspace/board/')"),'Join member return: Community must route to Workspace Board');
+expect(joinState.includes("route('/workspace/')"),'Join member return: Account must route to Workspace');
+expect(!joinState.includes("route('/account/')"),'Join member return: dead /account/ route survived');
+expect(!joinState.includes("route('/community/board/')"),'Join member return: compatibility Board route must not be primary CTA');
+expect(read('join/index.html').includes('/join/dc9-member-return-fix-v1.css'),'Join member return: CTA geometry correction layer missing');
 
 if(fail.length){
   console.error('Shell contract validation failed:');
   for(const item of fail)console.error(`- ${item}`);
   process.exit(1);
 }
-console.log(`Shell contract validation PASS (${publicRoutes.length} public route families + isolated Workspace/Admin contracts)`);
+console.log(`Shell contract validation PASS (${publicRoutes.length} public route families + public-header Workspace + auth/Board/Join contracts)`);
