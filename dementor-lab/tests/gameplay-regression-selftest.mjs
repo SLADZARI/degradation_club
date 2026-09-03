@@ -54,6 +54,18 @@ const patchEncounter=encounterWithGraph({id:'patch',nodes:[{id:'t',type:'critici
 // Rewire must remain compatible and runnable.
 const rewireGraph={id:'rewire',nodes:[{id:'t',type:'criticism',p:{}},{id:'i',type:'beright',p:{weight:3}},{id:'a',type:'explain',p:{}},{id:'b',type:'joke',p:{}}],edges:[edge('e1','t','i'),edge('e2','i','a'),edge('e3','t','a'),edge('e4','t','b')]};const rewireEncounter=encounterWithGraph(rewireGraph);rewireEncounter.status='HOT_PATCH';const changed=applyHotPatch(rewireEncounter,{kind:'rewire',actorId:'A',edgeId:'e2',toNodeId:'b'});assert.deepEqual(changed,{before:'a',after:'b'});const badRewire=encounterWithGraph(rewireGraph);badRewire.status='HOT_PATCH';assert.throws(()=>applyHotPatch(badRewire,{kind:'rewire',actorId:'A',edgeId:'e2',toNodeId:'t'}),/incompatible rewire target/);
 
+
+
+// Relationship memory is history, not two independent counters: trust and resentment compete and bias future routes.
+const memoryChoiceGraph={id:'memory-choice',nodes:[
+  {id:'t',type:'criticism',p:{}},
+  {id:'resent',type:'resentment',p:{key:'resentment',delta:1,cap:5}},{id:'right',type:'beright',p:{weight:3}},{id:'press',type:'pressure',p:{}},
+  {id:'trust',type:'trust',p:{key:'trust',delta:1,cap:5}},{id:'understand',type:'understand',p:{weight:3}},{id:'agree',type:'agree',p:{}}
+],edges:[edge('m1','t','resent'),edge('m2','resent','right'),edge('m3','right','press'),edge('m4','t','trust'),edge('m5','trust','understand'),edge('m6','understand','agree')]};
+assert.equal(predictTurn(encounterWithGraph(memoryChoiceGraph,{memory:{resentment:4,trust:0}})).chosen.reaction,'pressure','stored resentment pulls future criticism toward escalation');
+assert.equal(predictTurn(encounterWithGraph(memoryChoiceGraph,{memory:{resentment:0,trust:4}})).chosen.reaction,'agree','stored trust pulls the same criticism toward contact repair');
+const memoryActors=createCriticismActors();memoryActors.A.brainGraph={id:'memory-counter',nodes:[{id:'mt',type:'criticism',p:{}},{id:'ms',type:'trust',p:{key:'trust',delta:1,cap:5}},{id:'mr',type:'agree',p:{}}],edges:[edge('mc1','mt','ms'),edge('mc2','ms','mr')]};memoryActors.A.state.memory={resentment:3,trust:1};const memoryEncounter=createEncounter({scenario:CRITICISM_IDEA_SCENARIO,actorA:memoryActors.A,actorB:memoryActors.B,mode:'step'});const memoryOut=executeActorTurn(memoryEncounter);assert.equal(memoryActors.A.state.memory.trust,2);assert.equal(memoryActors.A.state.memory.resentment,2,'new trust erodes stored resentment');assert.deepEqual(memoryOut.trace.memoryChanges[0].counter,{key:'resentment',before:3,after:2});
+
 // CONTACT objective evaluates the weaker side at turn limit.
 const winActors=createCriticismActors();const win=createEncounter({scenario:CRITICISM_IDEA_SCENARIO,actorA:winActors.A,actorB:winActors.B});win.turn=20;win.actors.A.state.contact=40;win.actors.B.state.contact=27;assert.equal(checkTerminal(win).type,'OBJECTIVE_COMPLETE');assert.equal(checkTerminal(win).relationshipContact,27);
 const loseActors=createCriticismActors();const lose=createEncounter({scenario:CRITICISM_IDEA_SCENARIO,actorA:loseActors.A,actorB:loseActors.B});lose.turn=20;lose.actors.A.state.contact=70;lose.actors.B.state.contact=24;assert.equal(checkTerminal(lose).type,'OBJECTIVE_FAILED');

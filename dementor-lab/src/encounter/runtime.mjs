@@ -49,7 +49,7 @@ function selectPath(character,trigger){
   const allowed=allPaths.filter(path=>conditionAllows(character,path));
   const scored=allowed.map(path=>{
     let score=0,reaction=null,impulse=null,repeat=1;
-    for(const n of path){const fam=familyOf(n);if(fam==='STATE')score+=Number(character.state.memory?.[n.p?.key||n.type]||0)*1.35;if(fam==='IMPULSE'){const w=n.p?.weight||1;score+=w*6;if(!impulse)impulse=n.type}if(fam==='REACTION'&&!reaction){reaction=n.type;score+=8}if(n.type==='repeat')repeat=Math.max(repeat,n.p?.count||1);if(n.type==='pause')score+=character.state.tension>=55?6:1}
+    for(const n of path){const fam=familyOf(n);if(fam==='STATE'){const key=n.p?.key||n.type,own=Number(character.state.memory?.[key]||0),opposing=key==='resentment'?'trust':key==='trust'?'resentment':null,other=opposing?Number(character.state.memory?.[opposing]||0):0;score+=(own-other)*1.8;}if(fam==='IMPULSE'){const w=n.p?.weight||1;score+=w*6;if(!impulse)impulse=n.type}if(fam==='REACTION'&&!reaction){reaction=n.type;score+=8}if(n.type==='repeat')repeat=Math.max(repeat,n.p?.count||1);if(n.type==='pause')score+=character.state.tension>=55?6:1}
     return {path,score,reaction,impulse,repeat};
   }).filter(x=>x.reaction);
   scored.sort((a,b)=>b.score-a.score||a.path.map(n=>n.id).join('|').localeCompare(b.path.map(n=>n.id).join('|')));

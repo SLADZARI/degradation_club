@@ -8,8 +8,8 @@ export const NODE_SPECS = Object.freeze({
   beright:{family:'IMPULSE',title:'БЫТЬ ПРАВЫМ',description:'сильнее тянет к этой ветке; разгоняет BRAIN/TENSION и ухудшает CONTACT',defaults:{weight:3}},
   beliked:{family:'IMPULSE',title:'НРАВИТЬСЯ',description:'сильнее тянет к этой ветке; успокаивает себя и мягко поддерживает CONTACT без BRAIN-цены',defaults:{weight:2}},
   understand:{family:'IMPULSE',title:'ПОНЯТЬ',description:'сильнее тянет к этой ветке; лучше поддерживает контакт с другим, но заметнее нагружает BRAIN',defaults:{weight:2}},
-  resentment:{family:'STATE',title:'ОБИДА',description:'запоминает обиду; накопленная обида сильнее тянет к этой ветке и повышает TENSION/BRAIN',defaults:{key:'resentment',delta:1,cap:5}},
-  trust:{family:'STATE',title:'ДОВЕРИЕ',description:'запоминает доверие; накопленное доверие сильнее тянет к этой ветке и поддерживает CONTACT',defaults:{key:'trust',delta:1,cap:5}},
+  resentment:{family:'STATE',title:'ОБИДА',description:'запоминает обиду; она тянет к этой ветке и постепенно вытесняет доверие',defaults:{key:'resentment',delta:1,cap:5}},
+  trust:{family:'STATE',title:'ДОВЕРИЕ',description:'запоминает доверие; оно тянет к этой ветке и постепенно размывает обиду',defaults:{key:'trust',delta:1,cap:5}},
   explain:{family:'REACTION',title:'ОБЪЯСНИТЬ',description:'нагружает аргументами обоих; повышает BRAIN и немного портит CONTACT',defaults:{}},
   agree:{family:'REACTION',title:'СОГЛАСИТЬСЯ',description:'лучше всего восстанавливает CONTACT, снижает TENSION и может остановить чужой REPEAT',defaults:{}},
   joke:{family:'REACTION',title:'ПОШУТИТЬ',description:'лучше всего сбрасывает TENSION, но почти не чинит CONTACT и не считается согласием',defaults:{}},
@@ -58,5 +58,13 @@ export function applyMemoryNode(node,state){
   const before=Number(state.memory[key]||0);
   const after=Math.max(0,Math.min(cap,before+delta));
   state.memory[key]=after;
-  return {key,before,after,semantics:MEMORY_SEMANTICS[node.type]||null};
+  let counter=null;
+  const opposing=key==='resentment'?'trust':key==='trust'?'resentment':null;
+  if(opposing&&delta>0){
+    const counterBefore=Number(state.memory[opposing]||0);
+    const counterAfter=Math.max(0,counterBefore-Math.abs(delta));
+    state.memory[opposing]=counterAfter;
+    if(counterAfter!==counterBefore)counter={key:opposing,before:counterBefore,after:counterAfter};
+  }
+  return {key,before,after,counter,semantics:MEMORY_SEMANTICS[node.type]||null};
 }
