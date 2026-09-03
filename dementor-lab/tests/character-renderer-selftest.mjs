@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { visualStateFromMetrics, resolveVisualState, isNumberedVariantId, legacyVariantLayerDisplay } from '../src/render/character-renderer.mjs';
+import { visualStateFromMetrics, resolveVisualState, reactionCueFromDelta, faceOverrideFromReactionCue, isNumberedVariantId, legacyVariantLayerDisplay } from '../src/render/character-renderer.mjs';
 
 const normal=visualStateFromMetrics({energy:72,brain:15,tension:10,contact:60});
 assert.equal(normal.eyes,'neutral');
@@ -27,6 +27,16 @@ assert.equal(override.eyes,'overheat','partial face override preserves derived e
 assert.equal(override.mouth,'soft','explicit face override wins');
 assert.equal(override.motion.orientToPartner,0.9,'explicit motion override wins');
 assert.ok(override.motion.headInstability>0,'other derived motion survives partial override');
+
+const cueOverheat=reactionCueFromDelta({brain:12,tension:3});
+assert.equal(cueOverheat.kind,'overheat','brain delta projects to an immediate overheat cue');
+assert.ok(cueOverheat.strength>0);
+const cueWithdraw=reactionCueFromDelta({contact:-8});
+assert.equal(cueWithdraw.kind,'withdraw','contact loss projects to visible withdrawal');
+assert.ok(faceOverrideFromReactionCue(cueWithdraw).motion.orientToPartner<0);
+const cueConnect=reactionCueFromDelta({contact:7,tension:-2});
+assert.equal(cueConnect.kind,'connect','contact gain projects to visible approach');
+assert.equal(faceOverrideFromReactionCue(cueConnect).mouth,'soft');
 
 assert.equal(isNumberedVariantId('outfit-01','outfit'),true,'numbered outfit is a variant');
 assert.equal(isNumberedVariantId('A-outfit-03','outfit','A'),true,'side-prefixed numbered outfit is a variant');

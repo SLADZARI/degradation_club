@@ -12,6 +12,30 @@ export function visualStateFromMetrics(s){
   return {eyes,brows,mouth,motion:{amplitude:energy<=25?.45:energy<=60?.72:1,headDrop:energy<=25?1:0,headInstability:brain>=85?Math.min(1,(brain-84)/16):0,gestureSharpness:tension>=55?Math.min(1,(tension-54)/46):0,orientToPartner:contact>=75?.5:contact<=25?-.35:0}};
 }
 export function resolveVisualState(character={}){const derived=visualStateFromMetrics(character.state||{}),override=character.face||{};return {...derived,...override,motion:{...derived.motion,...(override.motion||{})}}}
+export function reactionCueFromDelta(delta={}){
+  const brain=Number(delta.brain||0),tension=Number(delta.tension||0),contact=Number(delta.contact||0),energy=Number(delta.energy||0);
+  let kind='steady',strength=0;
+  const candidates=[
+    ['overheat',Math.max(0,brain)/18],
+    ['tension',Math.max(0,tension)/14],
+    ['withdraw',Math.max(0,-contact)/12],
+    ['connect',Math.max(0,contact)/12],
+    ['relief',Math.max(0,-tension)/12],
+    ['fatigue',Math.max(0,-energy)/16]
+  ];
+  for(const [next,value] of candidates)if(value>strength){kind=next;strength=value}
+  return {kind,strength:Math.max(0,Math.min(1,strength))};
+}
+export function faceOverrideFromReactionCue(cue={}){
+  const strength=Number(cue.strength||0);if(strength<=0)return {};
+  if(cue.kind==='overheat')return {eyes:strength>.55?'overheat':'tense',brows:'tense',motion:{headInstability:.35+.65*strength,gestureSharpness:.25+.5*strength}};
+  if(cue.kind==='tension')return {brows:strength>.55?'angry':'tense',mouth:'tense',motion:{gestureSharpness:.3+.7*strength}};
+  if(cue.kind==='withdraw')return {eyes:'tense',mouth:'tense',motion:{orientToPartner:-.25-.5*strength}};
+  if(cue.kind==='connect')return {mouth:'soft',motion:{orientToPartner:.25+.5*strength}};
+  if(cue.kind==='relief')return {brows:'neutral',mouth:'soft',motion:{orientToPartner:.15+.25*strength}};
+  if(cue.kind==='fatigue')return {eyes:'sleepy',motion:{amplitude:Math.max(.45,1-.45*strength),headDrop:.25+.75*strength}};
+  return {};
+}
 export const APPEARANCE_LAYERS=Object.freeze(['hat','glasses','beard','accessory','outfit','shoes']);
 export const APPEARANCE_VARIANTS=Object.freeze({
   hat:{key:'hatVariant',prefix:'hat',legacy:'hat'},
