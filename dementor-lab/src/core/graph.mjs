@@ -55,15 +55,17 @@ export function validateGraph(graph){
   const reactions=graph.nodes.filter(n=>familyOf(n)==='REACTION');
   if(!triggers.length)return {runnable:false,code:'NO_TRIGGER',detail:'СХЕМА ПОКА НЕ ЗНАЕТ, С ЧЕГО НАЧИНАТЬ.'};
   if(!reactions.length)return {runnable:false,code:'NO_REACTION',detail:'ОН ПОКА НЕ ЗНАЕТ, ЧТО ВООБЩЕ ДЕЛАТЬ.'};
+  const activeTriggers=triggers.filter(t=>t.p?.enabled!==false);
+  if(!activeTriggers.length)return {runnable:false,code:'NO_ACTIVE_TRIGGER',detail:'НИ ОДИН ВХОД ПОКА НЕ ПОДКЛЮЧЕН.'};
 
-  const reachable=new Set();triggers.forEach(t=>reachableFrom(graph,t.id).forEach(id=>reachable.add(id)));
-  const deadTrigger=triggers.find(t=>!outgoing(graph,t.id).length);
+  const reachable=new Set();activeTriggers.forEach(t=>reachableFrom(graph,t.id).forEach(id=>reachable.add(id)));
+  const deadTrigger=activeTriggers.find(t=>!outgoing(graph,t.id).length);
   if(deadTrigger)return {runnable:false,code:'DEAD_TRIGGER',nodeId:deadTrigger.id,detail:`ОН ПОКА НЕ ЗНАЕТ, ЧТО ДЕЛАТЬ ПОСЛЕ «${NODE_SPECS[deadTrigger.type]?.title||deadTrigger.type}».`};
   if(!reactions.some(r=>reachable.has(r.id)))return {runnable:false,code:'REACTION_UNREACHABLE',detail:'РЕАКЦИЯ ЕСТЬ, НО СИГНАЛ ДО НЕЁ НЕ ДОХОДИТ.'};
   const isolated=graph.nodes.find(n=>familyOf(n)!=='TRIGGER'&&!reachable.has(n.id));
   if(isolated)return {runnable:false,code:'ISLAND',nodeId:isolated.id,detail:`БЛОК «${NODE_SPECS[isolated.type]?.title||isolated.type}» НЕ УЧАСТВУЕТ В СХЕМЕ.`};
 
-  for(const trigger of triggers){
+  for(const trigger of activeTriggers){
     const paths=pathsToFirstReaction(graph,trigger.id);
     const hasConditional=paths.some(path=>path.some(n=>n.type==='ifbrain'));
     const hasFallback=paths.some(path=>!path.some(n=>n.type==='ifbrain'));
