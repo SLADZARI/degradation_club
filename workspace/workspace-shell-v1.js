@@ -12,18 +12,19 @@
   const admin='/workspace/admin/';
   const current=path;
   const active=(route)=>current===route||current===route+'index.html';
-  const link=(href,label,{key='',hidden=false,roleTool=false,workNav=false}={})=>`<a class="dcw-nav-link${active(href.split('#')[0])?' is-active':''}" href="${href}"${key?` data-route="${key}"`:''}${hidden?' hidden':''}${roleTool?' data-role-tool="1"':''}${workNav?' data-work-nav':''}>${label}</a>`;
+  const link=(href,label,{hidden=false,roleTool=false}={})=>`<a class="dcw-nav-link${active(href)?' is-active':''}" href="${href}"${hidden?' hidden':''}${roleTool?' data-role-tool="1"':''}>${label}</a>`;
+  const viewButton=(key,label,{hidden=false,workNav=false}={})=>`<button type="button" class="dcw-nav-link" data-route="${key}"${hidden?' hidden':''}${workNav?' data-work-nav':''}>${label}</button>`;
 
   host.innerHTML=`
     <a class="dcw-brand" href="${root}"><span>DEMENTOR</span><strong>CLUB</strong></a>
     <nav class="dcw-nav" aria-label="Личный кабинет">
-      ${link(root+'#home','HOME',{key:'home'})}
-      ${link(root+'#club','MY CLUB',{key:'club'})}
+      ${viewButton('home','HOME')}
+      ${viewButton('club','MY CLUB')}
       ${link(board,'COMMUNITY BOARD')}
       ${link(artifacts,'MY ARTIFACTS')}
-      ${link(root+'#activity','MY ACTIVITY',{key:'activity'})}
-      ${link(root+'#work','MY WORK',{key:'work',hidden:true,workNav:true})}
-      ${link(root+'#profile','MY PROFILE',{key:'profile'})}
+      ${viewButton('activity','MY ACTIVITY')}
+      ${viewButton('work','MY WORK',{hidden:true,workNav:true})}
+      ${viewButton('profile','MY PROFILE')}
       ${link(review,'MEMBERSHIP REVIEW',{hidden:true,roleTool:true})}
       ${link(admin,'SYSTEM TOOLS',{hidden:true,roleTool:true})}
       <button type="button" class="dcw-nav-logout" data-global-logout>LOG OUT</button>
@@ -34,10 +35,16 @@
   const setCurrentRootRoute=()=>{
     if(current!=='/workspace/'&&current!=='/workspace/index.html')return;
     const route=(location.hash||'#home').slice(1);
-    host.querySelectorAll('[data-route]').forEach(a=>a.classList.toggle('is-active',a.dataset.route===route));
+    host.querySelectorAll('[data-route]').forEach(control=>control.classList.toggle('is-active',control.dataset.route===route));
   };
   setCurrentRootRoute();
   addEventListener('hashchange',setCurrentRootRoute);
+  host.addEventListener('click',event=>{
+    const control=event.target.closest?.('button[data-route]');
+    if(!control||current!=='/workspace/'&&current!=='/workspace/index.html')return;
+    const route=control.dataset.route;
+    if(route)history.replaceState(null,'',`${location.pathname}#${route}`);
+  });
 
   const cfg=window.DEMENTOR_SITE_CONFIG?.supabase;
   if(!cfg?.enabled||!cfg.url||!cfg.publishableKey)return;
@@ -61,7 +68,7 @@
     const dementor=activeRoles.includes('dementor')||activeRoles.includes('owner_admin');
     const owner=activeRoles.includes('owner_admin');
     const hasWork=dementor||(assignments||[]).some(isActive);
-    const workLink=host.querySelector('[data-route="work"]');if(workLink)workLink.hidden=!hasWork;
+    const workControl=host.querySelector('[data-route="work"]');if(workControl)workControl.hidden=!hasWork;
     const reviewLink=[...host.querySelectorAll('a')].find(a=>a.href.endsWith('/workspace/review/'));if(reviewLink)reviewLink.hidden=!dementor;
     const adminLink=[...host.querySelectorAll('a')].find(a=>a.href.endsWith('/workspace/admin/'));if(adminLink)adminLink.hidden=!owner;
   }).catch(error=>console.warn('[DC Workspace shell]',error));
