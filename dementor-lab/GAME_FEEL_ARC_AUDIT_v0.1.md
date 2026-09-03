@@ -51,7 +51,7 @@ Repeating oneself is therefore a distinct escalating behavior rather than a free
 
 ### Decisive loop-break HOT PATCH
 
-The emergency REPEAT patch now changes `×N → ×1` and clears an active pending repeat. It preserves the original reaction while stopping additional forced repetition.
+The emergency REPEAT patch now changes `×N → ×1` and clears an active pending repeat. It preserves the original reaction while stopping additional forced repetition. The UI names this action `ОБОРВАТЬ REPEAT ×N → ×1` so the intervention reads as breaking a loop rather than shaving a number.
 
 ## Observed arcs after correction
 
@@ -70,9 +70,26 @@ The matrix now contains state-driven pivots inside one authored BRAIN:
 1. a peaceful player against CONTACT_SKEPTIC can survive the full conversation and preserve CONTACT;
 2. repeated PAUSE does not mechanically exhaust that calm opponent;
 3. `ПОСМОТРИМ, ЧТО БУДЕТ` can pivot JOKE → PRESSURE under reachable accumulated BRAIN;
-4. `ЛИШЬ БЫ НЕ РУГАЛИСЬ` can pivot AGREE → SILENT under reachable resource depletion.
+4. `ЛИШЬ БЫ НЕ РУГАЛИСЬ` can pivot AGREE → SILENT under reachable resource depletion;
+5. RESULT derives the real pivot from traces and exposes the observed JOKE → PRESSURE arc.
 
-Decisive REPEAT HOT PATCH behavior is additionally protected by the runtime selftest.
+Decisive REPEAT HOT PATCH behavior is additionally protected by the runtime selftest. Replay counterfactual tests intentionally disable HOT PATCH so an intervention cannot erase the one-node difference being measured.
+
+## RESULT arc projection
+
+RESULT now separates the last causal route from the whole-conversation behavior arc.
+
+For Character A, traces are compressed into consecutive reaction segments. If behavior changes, RESULT exposes the actual reaction sequence and the first pivot turn with a real state value from that trace. If no behavior changes, RESULT explicitly reports that the pattern did not change.
+
+Examples of the projection shape:
+
+`ШУТИЛ → ДАВИЛ. ПЕРВЫЙ ПЕРЕЛОМ: ХОД 15, BRAIN 43.`
+
+or
+
+`ОБЪЯСНЯЛ ВСЮ ПАРТИЮ — ПАТТЕРН НЕ СМЕНИЛСЯ.`
+
+The projection is derived from `encounter.traces`; it does not introduce a narrative source of truth.
 
 ## Design consequence
 
@@ -82,10 +99,6 @@ DEMENTOR LAB should not optimize for every character to survive. It should optim
 
 A good failure is acceptable when the player can understand why it happened and can imagine a materially different graph that would have changed it.
 
-## Next audit target
+## Next product target
 
-RESULT should expose this arc, not only the final suspicious node. The player should be able to read a compact story such as:
-
-`ШУТИЛ → BRAIN НАКОПИЛСЯ → НАЧАЛ ДАВИТЬ → CONTACT ПРОСЕЛ`
-
-That projection must be derived from actual traces and detected pivots, never authored as a separate narrative truth.
+The current CONTACT objective is now strong enough to expose meaningful behavior arcs. The next major product decision should be a second objective with a genuinely different win condition while preserving the same interaction grammar, so we can test whether the BRAIN system supports more than one kind of social strategy without duplicating the game.
