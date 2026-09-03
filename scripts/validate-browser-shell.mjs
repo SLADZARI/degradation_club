@@ -92,12 +92,32 @@ for(const route of ['/','/about/','/projects/','/community/','/merch/','/archive
 }
 
 {
-  const context=await newContext('member');const page=await context.newPage();const pageErrors=[];page.on('pageerror',e=>pageErrors.push(e.message));
-  await page.goto(base+'/workspace/',{waitUntil:'domcontentloaded'});await page.locator('#topTitle').waitFor({state:'visible',timeout:4000});
-  await page.locator('[data-route="activity"]').first().click();await page.waitForFunction(()=>document.querySelector('#topTitle')?.textContent?.trim()==='MY ACTIVITY');
-  expect((await page.locator('#appView').innerText()).includes('Моя активность'),'Workspace Activity did not render');
-  await page.locator('[data-route="club"]').first().click();await page.waitForFunction(()=>document.querySelector('#topTitle')?.textContent?.trim()==='MY CLUB');
-  expect((await page.locator('#appView').innerText()).includes('Мой клуб'),'Workspace My Club did not render');
+  const context=await newContext('member');const page=await context.newPage();
+  const pageErrors=[];const badResponses=[];const failedRequests=[];
+  page.on('pageerror',e=>pageErrors.push(e.message));
+  page.on('response',response=>{if(response.status()>=400&&response.url().startsWith(base))badResponses.push(`${response.status()} ${new URL(response.url()).pathname}`)});
+  page.on('requestfailed',request=>failedRequests.push(`${request.url()} :: ${request.failure()?.errorText||'failed'}`));
+  await page.goto(base+'/workspace/',{waitUntil:'domcontentloaded'});
+  await page.waitForTimeout(1200);
+  const activityCount=await page.locator('[data-route="activity"]').count();
+  if(activityCount===0){
+    const diag=await page.evaluate(()=>({
+      shellDataset:document.querySelector('[data-workspace-sidebar]')?.dataset.dcWorkspaceShell||'',
+      sidebar:document.querySelector('[data-workspace-sidebar]')?.innerHTML||'',
+      appText:document.querySelector('#appView')?.innerText||'',
+      scripts:[...document.scripts].map(x=>x.getAttribute('src')).filter(Boolean),
+      config:Boolean(window.DEMENTOR_SITE_CONFIG),
+      ready:document.readyState
+    }));
+    errors.push(`/workspace/: authenticated shell/controller did not expose MY ACTIVITY; shellDataset=${diag.shellDataset||'unset'}; config=${diag.config}; ready=${diag.ready}; appText=${diag.appText.slice(0,240).replace(/\s+/g,' ')}; sidebar=${diag.sidebar.slice(0,240).replace(/\s+/g,' ')}; pageErrors=${pageErrors.join(' | ')||'none'}; badResponses=${badResponses.join(' | ')||'none'}; failedRequests=${failedRequests.join(' | ')||'none'}; scripts=${diag.scripts.join(',')}`);
+  }else{
+    await page.locator('[data-route="activity"]').first().click();
+    await page.waitForFunction(()=>document.querySelector('#topTitle')?.textContent?.trim()==='MY ACTIVITY');
+    expect((await page.locator('#appView').innerText()).includes('Моя активность'),'Workspace Activity did not render');
+    await page.locator('[data-route="club"]').first().click();
+    await page.waitForFunction(()=>document.querySelector('#topTitle')?.textContent?.trim()==='MY CLUB');
+    expect((await page.locator('#appView').innerText()).includes('Мой клуб'),'Workspace My Club did not render');
+  }
   expect(!pageErrors.length,`/workspace/ authenticated navigation produced page errors: ${pageErrors.join(' | ')}`);
   await context.close();
 }
