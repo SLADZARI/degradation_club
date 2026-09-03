@@ -38,9 +38,12 @@ export function buildResult(encounter){
   const loser=terminal.loser||null,loserActor=loser?encounter.actors[loser]:null,actor=encounter.actors.A,trace=lastTraceFor(encounter,'A'),patch=encounter.patches.at(-1)||null,arc=buildConversationArc(encounter,'A');
   let punchline='ЭКСПЕРИМЕНТ ЗАКОНЧИЛСЯ.';
   if(terminal.type==='BREAKDOWN')punchline=`${(loserActor?.name||actor.name).toUpperCase()} НЕ ВЫВЕЗ.`;
-  if(terminal.type==='TURN_LIMIT')punchline='ДВАДЦАТЬ РАУНДОВ. НИКТО НЕ УШЁЛ.';
-  if(terminal.type==='OBJECTIVE_COMPLETE')punchline=`КОНТАКТ СОХРАНЁН. ${Math.round(terminal.relationshipContact)}.`;
-  if(terminal.type==='OBJECTIVE_FAILED')punchline=`ФОРМАЛЬНО ДОГОВОРИЛИ. КОНТАКТ — ${Math.round(terminal.relationshipContact)}.`;
+  if(terminal.type==='TURN_LIMIT')punchline='ЛИМИТ ХОДОВ. ЭКСПЕРИМЕНТ ЗАКОНЧЕН.';
+  if(terminal.type==='OBJECTIVE_COMPLETE'&&terminal.objective==='contact')punchline=`КОНТАКТ СОХРАНЁН. ${Math.round(terminal.relationshipContact)}.`;
+  if(terminal.type==='OBJECTIVE_FAILED'&&terminal.objective==='contact')punchline=`ФОРМАЛЬНО ДОГОВОРИЛИ. КОНТАКТ — ${Math.round(terminal.relationshipContact)}.`;
+  if(terminal.type==='OBJECTIVE_COMPLETE'&&terminal.objective==='direct-answer')punchline=`ПРЯМЫЕ ОТВЕТЫ ДОБЫТЫ. ${terminal.answers}/${terminal.required}. CONTACT ${Math.round(terminal.relationshipContact)}.`;
+  if(terminal.type==='OBJECTIVE_FAILED'&&terminal.objective==='direct-answer'&&terminal.reason==='NO_DIRECT_ANSWER')punchline=`ОТВЕТА ТАК И НЕ ДОБИЛИСЬ. ${terminal.answers}/${terminal.required}.`;
+  if(terminal.type==='OBJECTIVE_FAILED'&&terminal.objective==='direct-answer'&&terminal.reason==='CONTACT_LOW')punchline=`ОТВЕТЫ ЕСТЬ. CONTACT НЕ ВЫДЕРЖАЛ — ${Math.round(terminal.relationshipContact)}.`;
   const cause=trace?.noActionReason?`НЕТ ДЕЙСТВИЯ: ${trace.noActionReason}`:trace?.visitedNodes?.length?trace.visitedNodes.map(id=>nodeLabel(actor,id).toUpperCase()).join(' → '):'ПРИЧИНА НЕ ЗАФИКСИРОВАНА';
   const memory=(trace?.memoryChanges||[]).map(m=>`${String(m.key).toUpperCase()} ${m.before}→${m.after}`),suspicious=suspiciousNode(actor,trace);
   return {terminal,punchline,stageB:{title:'ЧТО ПРОИЗОШЛО',cause,memory,arc,turn:trace?.turn||encounter.turn,actorId:'A'},stageC:{title:'ПОДОЗРИТЕЛЬНОЕ МЕСТО',actorId:'A',nodeId:suspicious,nodeType:suspicious?nodeType(actor,suspicious):null,patch,nextAction:'ИЗМЕНИТЬ ОДНУ ВЕЩЬ'},trace};
