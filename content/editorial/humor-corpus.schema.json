@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dementor-humor-corpus.schema.v0.1",
+  "title": "Dementor Club Humor Corpus Entry",
+  "type": "object",
+  "required": ["id", "status", "surface", "sphere", "observation", "comicAngle", "mechanism", "voicePosition", "text", "editorialDecision"],
+  "properties": {
+    "id": {"type": "string"},
+    "status": {"enum": ["candidate", "approved", "rejected", "retired"]},
+    "sourceType": {"enum": ["original", "published", "test", "community", "archive"]},
+    "surface": {"type": "string"},
+    "sphere": {"enum": ["Личность", "Работа", "Потребление", "Отношения", "Контроль", "Информация", "Саморазвитие", "Смысл", "Технологии"]},
+    "observation": {"type": "string"},
+    "socialScript": {"type": ["string", "null"]},
+    "strangeness": {"type": ["string", "null"]},
+    "comicAngle": {"type": "string"},
+    "mechanism": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "voicePosition": {"type": "string"},
+    "contextCost": {"enum": ["LOW", "MEDIUM", "HIGH"]},
+    "form": {"type": "string"},
+    "endingMode": {"type": "string"},
+    "text": {"type": "string"},
+    "factRefs": {"type": "array", "items": {"type": "string"}},
+    "editorialDecision": {"enum": ["KEEP", "REWRITE", "APPROVE", "REJECT", "TEST"]},
+    "decisionReason": {"type": ["string", "null"]},
+    "humanScore": {"type": ["number", "null"], "minimum": 0, "maximum": 10},
+    "audienceReaction": {"type": ["string", "null"]},
+    "reuseTags": {"type": "array", "items": {"type": "string"}},
+    "createdAt": {"type": ["string", "null"]},
+    "approvedAt": {"type": ["string", "null"]}
+  },
+  "additionalProperties": false
+}
