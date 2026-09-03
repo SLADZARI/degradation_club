@@ -1,7 +1,8 @@
 import { NODE_SPECS } from '../core/model.mjs';
 import { familyOf } from '../core/graph.mjs';
 
-const REACTION_ARC_LABEL=Object.freeze({explain:'ОБЪЯСНЯЛ',agree:'СОГЛАШАЛСЯ',joke:'ШУТИЛ',silent:'МОЛЧАЛ',pressure:'ДАВИЛ'});
+const REACTION_ARC_LABEL=Object.freeze({explain:'ОБЪЯСНЕНИЕ',agree:'СОГЛАСИЕ',joke:'ШУТКА',silent:'МОЛЧАНИЕ',pressure:'ДАВЛЕНИЕ'});
+const REACTION_ARC_ACTION=Object.freeze({explain:'объяснять',agree:'соглашаться',joke:'шутить',silent:'молчать',pressure:'давить'});
 function lastTraceFor(encounter,side){return [...encounter.traces].reverse().find(t=>t.actorId===side)||null}
 function nodeFor(actor,id){return actor.brainGraph.nodes.find(n=>n.id===id)||null}
 function nodeType(actor,id){return nodeFor(actor,id)?.type||id}
@@ -43,10 +44,10 @@ function humanCause(encounter,trace,terminal){
   else if(event==='ACCEPTANCE')bits.push('С тобой уже почти согласились.');
   else if(event==='DEFLECTION')bits.push('Разговор попытался сбежать в сторону.');
   else if(event==='PRESSURE')bits.push('На тебя надавили.');
-  if(types.includes('grudge'))bits.push('Ты сохранил обиду как важный документ.');
-  if(types.includes('beright'))bits.push('Потом решил, что быть правым важнее, чем закончить разговор живым.');
-  if(types.includes('explain'))bits.push('И снова начал объяснять.');
-  if(types.includes('repeat'))bits.push('А потом объяснил ещё раз. Потому что вдруг с первого раза было недостаточно.');
+  if(types.includes('resentment'))bits.push('Обида осталась в памяти как важный документ.');
+  if(types.includes('beright'))bits.push('Дальше сработало «быть правым» — важнее, чем закончить разговор живым.');
+  if(types.includes('explain'))bits.push('Следом — ещё одно объяснение.');
+  if(types.includes('repeat'))bits.push('Потом то же объяснение пошло на повтор. Видимо, с первого раза реальность недостаточно внимательно слушала.');
   if(terminal.type==='BREAKDOWN'&&terminal.reason==='BRAIN')bits.push(`В итоге BRAIN дошёл до ${Math.round(terminal.value??encounter.actors[terminal.loser||'A'].state.brain)}. Мозг первым вышел из чата.`);
   if(terminal.type==='BREAKDOWN'&&terminal.reason==='ENERGY')bits.push('В итоге закончились силы. Аргументы остались, человека — почти нет.');
   if(terminal.type==='BREAKDOWN'&&terminal.reason==='CONTACT')bits.push('В итоге закончился контакт. Формально вы ещё разговаривали, фактически уже нет.');
@@ -55,14 +56,14 @@ function humanCause(encounter,trace,terminal){
 function humanArc(arc,traces){
   const count=traces.filter(t=>t.actorId==='A'&&t.selectedReaction).length;
   if(!arc?.segments?.length)return 'Особого плана не возникло.';
-  if(arc.segments.length===1)return `${count} ходов подряд ты выбирал одно и то же: ${arc.segments[0].label}. Мозг решил, что новый план — это старый план ещё раз.`;
-  const labels=arc.segments.slice(0,3).map(x=>x.label.toLowerCase()).join(' → ');
-  return `По ходу разговора ты всё-таки менял тактику: ${labels}. Первый поворот случился примерно на ${arc.pivot?.turn||arc.segments[1].startTurn}-м ходу.`;
+  if(arc.segments.length===1)return `${count} ходов подряд — одна тактика: ${REACTION_ARC_ACTION[arc.segments[0].reaction]||arc.segments[0].label.toLowerCase()}. Мозг решил, что новый план — это старый план ещё раз.`;
+  const labels=arc.segments.slice(0,3).map(x=>REACTION_ARC_ACTION[x.reaction]||x.label.toLowerCase()).join(' → ');
+  return `Тактика по ходу разговора менялась: ${labels}. Первый поворот — примерно на ${arc.pivot?.turn||arc.segments[1].startTurn}-м ходу.`;
 }
 function humanSuspicion(actor,nodeId){
   const node=nodeId?nodeFor(actor,nodeId):null;if(!node)return 'Явного виновника нет. Придётся думать.';
   if(node.type==='repeat')return `ЗАЦИКЛИЛСЯ: REPEAT ×${node.p?.count||1}.`;
-  if(node.type==='beright')return `СЛИШКОМ ХОТЕЛ БЫТЬ ПРАВЫМ: W${node.p?.weight||1}.`;
+  if(node.type==='beright')return `ИМПУЛЬС «БЫТЬ ПРАВЫМ» СЛИШКОМ СИЛЬНЫЙ: W${node.p?.weight||1}.`;
   if(familyOf(node)==='STATE')return `${(NODE_SPECS[node.type]?.title||node.type).toUpperCase()} ПОЕХАЛА С ТОБОЙ ДАЛЬШЕ.`;
   return `ПРОВЕРЬ УЗЕЛ «${(NODE_SPECS[node.type]?.title||node.type).toUpperCase()}».`;
 }

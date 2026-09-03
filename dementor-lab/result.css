@@ -1,0 +1,16 @@
+/* RESULT: diagnosis first, engine notation second. */
+.result-card{background:transparent;padding:16px;margin-top:12px}
+.result-card h2{max-width:18ch}
+.result-block{padding:14px 0;margin-top:14px}
+.result-block small{font-size:9px;letter-spacing:.04em;opacity:.7}
+.result-block strong{display:block;font-size:18px;line-height:1.28;font-weight:800;text-transform:none}
+.result-repair{background:rgba(231,255,24,.16);margin-left:-10px;margin-right:-10px;padding:12px 10px;border-top:2px solid var(--ink);border-bottom:2px solid var(--ink)}
+.result-repair strong{font-family:monospace;font-size:15px;line-height:1.25}
+.result-card .primary{margin-top:14px}
+@media(max-width:430px){
+ .result-card{padding:14px 12px;margin-top:8px}
+ .result-card h2{font-size:30px;line-height:.95}
+ .result-block{padding:12px 0;margin-top:10px}
+ .result-block strong{font-size:17px;line-height:1.27}
+ .result-repair strong{font-size:14px}
+}
