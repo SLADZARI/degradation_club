@@ -63,3 +63,6 @@
   .talk .arena{height:142px}
   .talk .dialogue{height:286px;min-height:286px;max-height:286px}
 }
+
+/* BRAIN first-run explanation exists once, outside the permanent editor chrome. */
+.brain-first-run__steps{display:grid;gap:7px;margin:14px 0}.brain-first-run__steps div{display:grid;grid-template-columns:92px 1fr;gap:10px;align-items:center;border-top:1px solid var(--ink);padding:9px 0}.brain-first-run__steps b{font:900 11px/1 monospace}.brain-first-run__steps span{font-size:15px;line-height:1.2}.brain-first-run__rule{margin:14px 0;font:900 10px/1.4 monospace;border:2px solid var(--ink);padding:10px;background:var(--acid)}

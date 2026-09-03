@@ -24,6 +24,7 @@ let ownedAppearance={'character-01':{outfit:true,shoes:true,...EMPTY_OWNED_VARIA
 let appearanceColors={'character-01':EMPTY_COLORS(),'character-02':EMPTY_COLORS()};
 let activeAppearanceCategory='hat';
 const PLAYER_NAME_KEY='dementor-lab.playerName';
+const BRAIN_HELP_KEY='dementor-lab.brainHelpSeen.v1';
 let playerName=(localStorage.getItem(PLAYER_NAME_KEY)||'').trim().slice(0,24);
 const explicitSeed=new URLSearchParams(location.search).get('seed');
 let opponentSeed=explicitSeed||freshOpponentSeed();
@@ -41,7 +42,13 @@ async function mountAsset(rootId,id){const root=$(`#${rootId}`),spec=characterSp
 async function mountCharacterAssets(){previewRenderer=await mountAsset('person-preview',currentCharacterId);opponentPreviewRenderer=await mountAsset('opponent-preview',opponentProfile.baseCharacterId);await mountAsset('actor-a',currentCharacterId);await mountAsset('actor-b',opponentProfile.baseCharacterId);syncAppearancePanel();renderPreview();renderOpponentCard()}
 async function remountPlayerCharacter(){previewRenderer=await mountAsset('person-preview',currentCharacterId);await mountAsset('actor-a',currentCharacterId);syncCharacterSwitch();syncAppearancePanel();resetActors();renderPreview()}
 async function remountOpponent(){opponentPreviewRenderer=await mountAsset('opponent-preview',opponentProfile.baseCharacterId);await mountAsset('actor-b',opponentProfile.baseCharacterId);resetActors();renderOpponentCard()}
-function show(screen){app.dataset.screen=screen;topStatus.textContent=screen.toUpperCase();$$('.screen').forEach(el=>el.hidden=el.dataset.view!==screen);$$('.bottom-nav button').forEach(b=>b.classList.toggle('active',b.dataset.nav===screen));if(screen==='brain'){renderBrain();$('#replay-note').hidden=!replayMode}if(screen==='setup'){renderScenarioSelector();renderScenarioCopy();renderOpponentCard()}if(screen==='talk'){renderScenarioCopy();renderTalk()}}
+function show(screen){app.dataset.screen=screen;topStatus.textContent=screen.toUpperCase();$$('.screen').forEach(el=>el.hidden=el.dataset.view!==screen);$$('.bottom-nav button').forEach(b=>b.classList.toggle('active',b.dataset.nav===screen));if(screen==='brain'){renderBrain();$('#replay-note').hidden=!replayMode;if(!replayMode&&!localStorage.getItem(BRAIN_HELP_KEY))requestAnimationFrame(showBrainIntro)}if(screen==='setup'){renderScenarioSelector();renderScenarioCopy();renderOpponentCard()}if(screen==='talk'){renderScenarioCopy();renderTalk()}}
+function showBrainIntro(){
+  if(!overlay?.hidden||localStorage.getItem(BRAIN_HELP_KEY))return;
+  overlay.innerHTML=`<div class="overlay-card brain-first-run"><p class="kicker">BRAIN</p><h3>ТРИ ВЕЩИ.</h3><div class="brain-first-run__steps"><div><b>ВХОДЫ</b><span>что тебя задевает</span></div><div><b>ЦЕПОЧКА</b><span>что происходит внутри</span></div><div><b>РЕЗУЛЬТАТ</b><span>как ты в итоге ведёшь себя</span></div></div><p class="brain-first-run__rule">ЛИНИИ ЗАДАЮТ ПРИЧИННОСТЬ. ПЕРЕТАСКИВАНИЕ МЕНЯЕТ ТОЛЬКО ПОРЯДОК КАРТОЧЕК.</p><button type="button" class="primary" id="brain-help-ok">ПОНЯЛ</button></div>`;
+  overlay.hidden=false;
+  $('#brain-help-ok').onclick=()=>{localStorage.setItem(BRAIN_HELP_KEY,'1');hideOverlay()};
+}
 function playerDisplayName(){return playerName.trim()||'Гена'}
 function resetActors(){actors=currentScenario.id==='direct-answer'?createDirectAnswerActors({playerGraph:currentBrainGraph,playerName:playerDisplayName(),opponentName:opponentProfile.name}):createCriticismActors({opponentProfile,playerName:playerDisplayName()});actors.A.brainGraph=cloneBrainGraph(currentBrainGraph);actors.A.visual={...(actors.A.visual||{}),characterId:currentCharacterId,gender:currentCharacterId==='character-02'?'female':'male',appearance:playerAppearance()};actors.B.visual={...(actors.B.visual||{}),characterId:opponentProfile.baseCharacterId,gender:opponentProfile.gender|| (opponentProfile.baseCharacterId==='character-02'?'female':'male'),appearance:opponentAppearance(),opponentPresetId:currentScenario.id==='direct-answer'?'DIRECT_ANSWER':opponentProfile.presetId}}
 function renderPreview(){previewRenderer?.render({state:actors.A.state,face:{},visual:{characterId:currentCharacterId,appearance:playerAppearance()}})}
