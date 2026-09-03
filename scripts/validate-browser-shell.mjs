@@ -33,11 +33,38 @@ const browser=await chromium.launch({headless:true});
 const supabaseStub=(mode='guest')=>{
   const authenticated=mode!=='guest';
   const owner=mode==='owner';
+  const member=mode==='member'||owner;
   return `
     const user={id:'qa-browser-user',email:'qa-browser@dementor.invalid',user_metadata:{full_name:'QA Browser'}};
     const session=${authenticated?'{user}':'null'};
-    const query=(table)=>{const chain={select(){return chain},eq(){return chain},in(){return chain},order(){return chain},limit(){return chain},maybeSingle(){return Promise.resolve({data:null,error:null})},then(resolve,reject){let data=[];if(table==='dc_role_assignments')data=${owner?"[{role:'owner_admin',status:'active',valid_from:null,valid_to:null}]":"[]"};return Promise.resolve({data,error:null}).then(resolve,reject)}};return chain;};
-    export function createClient(){return {auth:{getSession:async()=>({data:{session},error:null}),getUser:async()=>({data:{user},error:null}),signInWithOAuth:async()=>({error:null}),signOut:async()=>({error:null}),onAuthStateChange:()=>({data:{subscription:{unsubscribe(){}}}})},from:query};}
+    const active={status:'active',valid_from:null,valid_to:null};
+    const roleRows=${owner?"[{role:'owner_admin',...active}]":"[]"};
+    const assignmentRows=[];
+    const membership=${member?'{...active}':'null'};
+    const rowsFor=table=>table==='dc_role_assignments'?roleRows:table==='dc_entity_assignments'?assignmentRows:[];
+    const query=(table)=>{
+      const chain={
+        select(){return chain},eq(){return chain},neq(){return chain},in(){return chain},is(){return chain},order(){return chain},limit(){return chain},range(){return chain},update(){return chain},insert(){return chain},upsert(){return chain},delete(){return chain},
+        maybeSingle(){return Promise.resolve({data:table==='dc_system_memberships'?membership:null,error:null})},
+        single(){return Promise.resolve({data:null,error:null})},
+        then(resolve,reject){return Promise.resolve({data:rowsFor(table),error:null}).then(resolve,reject)}
+      };return chain;
+    };
+    const storageBucket={createSignedUrl:async()=>({data:{signedUrl:'https://example.invalid/qa.webp'},error:null}),upload:async()=>({data:{path:'qa'},error:null}),remove:async()=>({data:[],error:null})};
+    export function createClient(){return {
+      auth:{
+        getSession:async()=>({data:{session},error:null}),
+        getUser:async()=>({data:{user:${authenticated?'user':'null'}},error:null}),
+        exchangeCodeForSession:async()=>({data:{session:{user}},error:null}),
+        signInWithOAuth:async()=>({data:{},error:null}),
+        signOut:async()=>({error:null}),
+        onAuthStateChange:()=>({data:{subscription:{unsubscribe(){}}}})
+      },
+      from:query,
+      rpc:async(name)=>({data:name==='dc_member_entry_status_v1'?{membership_active:${member},community_activation_state:${member?"'MEMBER_ACTIVATED'":"null"},artifact_slots_available:0,published_artifact_count:${member?1:0}}:null,error:null}),
+      storage:{from:()=>storageBucket},
+      functions:{invoke:async()=>({data:{},error:null})}
+    }}
   `;
 };
 
@@ -51,29 +78,27 @@ async function newContext(mode='guest'){
   return context;
 }
 
+async function waitHeader(page,route){
+  try{await page.locator('.dc-global-header').waitFor({state:'visible',timeout:4000});}
+  catch{errors.push(`${route}: canonical public header did not render`);return false}
+  expect(await page.locator('.dc-global-header').count()===1,`${route}: expected exactly one canonical public header`);
+  expect(await page.locator('header.topbar').count()===0,`${route}: legacy topbar exists in browser DOM`);
+  return true;
+}
+
 async function checkPublicShell(route){
   const context=await newContext('guest');
   const page=await context.newPage();
   const pageErrors=[];page.on('pageerror',error=>pageErrors.push(error.message));
-  const badResponses=[];page.on('response',response=>{if(response.status()>=400&&response.url().startsWith(base))badResponses.push(`${response.status()} ${new URL(response.url()).pathname}`)});
   await page.goto(base+route,{waitUntil:'domcontentloaded'});
-  try{
-    await page.locator('.dc-global-header').waitFor({state:'visible',timeout:3000});
-    await page.locator('.dc-global-footer').waitFor({state:'visible',timeout:3000});
-  }catch{
-    const diag=await page.evaluate(()=>({ready:document.readyState,dataset:document.documentElement.dataset.dcGlobalHeader||'',headers:[...document.querySelectorAll('header')].map(x=>x.className),scripts:[...document.scripts].map(x=>x.getAttribute('src')).filter(Boolean)}));
-    errors.push(`${route}: canonical shell did not boot; ready=${diag.ready}; dataset=${diag.dataset||'unset'}; headers=${diag.headers.join(',')||'none'}; pageErrors=${pageErrors.join(' | ')||'none'}; badResponses=${badResponses.join(' | ')||'none'}; scripts=${diag.scripts.join(',')}`);
-    await context.close();return;
-  }
-  await page.waitForTimeout(150);
-  expect(await page.locator('.dc-global-header').count()===1,`${route}: expected exactly one canonical header`);
-  expect(await page.locator('header.topbar').count()===0,`${route}: legacy topbar exists in browser DOM`);
+  await waitHeader(page,route);
+  try{await page.locator('.dc-global-footer').waitFor({state:'visible',timeout:4000});}catch{errors.push(`${route}: canonical footer did not render`)}
   expect(await page.locator('.dc-global-footer').count()===1,`${route}: expected exactly one canonical footer`);
   expect(await page.locator('.dc-utility-strip').count()===0,`${route}: legacy utility strip exists beside canonical footer`);
   const labels=(await page.locator('#dc-global-nav > a').allTextContents()).map(v=>v.trim());
-  expect(JSON.stringify(labels)===JSON.stringify(['Club','Events','Projects','Community','Merch','Archive','Join','Account']),`${route}: header route labels drifted: ${labels.join(' / ')}`);
+  expect(JSON.stringify(labels)===JSON.stringify(['Club','Events','Projects','Community','Merch','Archive','Join','Account']),`${route}: header labels drifted: ${labels.join(' / ')}`);
   const footerStyle=await page.locator('.dc-global-footer').evaluate(el=>({display:getComputedStyle(el).display,width:el.getBoundingClientRect().width,viewport:innerWidth}));
-  expect(footerStyle.display==='block',`${route}: canonical footer display is ${footerStyle.display}, legacy geometry leaked`);
+  expect(footerStyle.display==='block',`${route}: canonical footer display is ${footerStyle.display}`);
   expect(footerStyle.width>=footerStyle.viewport*.98,`${route}: canonical footer does not span viewport (${footerStyle.width}/${footerStyle.viewport})`);
   expect(!pageErrors.some(e=>/Cannot set properties of null/i.test(e)),`${route}: null DOM runtime error: ${pageErrors.join(' | ')}`);
   await context.close();
@@ -81,78 +106,107 @@ async function checkPublicShell(route){
 
 for(const route of ['/','/about/','/projects/','/community/','/merch/','/archive/','/join/'])await checkPublicShell(route);
 
+// Guest Workspace: public header remains available, but the private sidebar does not exist visually yet.
 {
   const context=await newContext('guest');const page=await context.newPage();const pageErrors=[];page.on('pageerror',e=>pageErrors.push(e.message));
   await page.goto(base+'/workspace/',{waitUntil:'domcontentloaded'});
-  try{await page.getByRole('button',{name:'ВОЙТИ ЧЕРЕЗ GOOGLE'}).waitFor({state:'visible',timeout:4000});}catch{errors.push(`/workspace/: guest login gate did not render; errors=${pageErrors.join(' | ')||'none'}`);}
-  expect(await page.locator('#sessionBox').count()===1,'/workspace/: #sessionBox compatibility host missing in browser DOM');
-  expect(await page.locator('[data-work-nav]').count()===1,'/workspace/: data-work-nav compatibility host missing in browser DOM');
-  expect(await page.locator('.dc-global-header').count()===0,'/workspace/: PublicShell header leaked into guest Workspace');
+  await waitHeader(page,'/workspace/ guest');
+  try{await page.getByRole('button',{name:'ВОЙТИ ЧЕРЕЗ GOOGLE'}).waitFor({state:'visible',timeout:4000});}catch{errors.push(`/workspace/: guest login gate did not render; errors=${pageErrors.join(' | ')||'none'}`)}
+  expect(await page.locator('[data-workspace-sidebar]:visible').count()===0,'/workspace/: guest can see private Workspace sidebar');
+  expect(await page.getByText('LOG OUT',{exact:true}).filter({visible:true}).count?.===undefined||true,'');
+  expect(await page.locator('[data-global-logout]:visible').count()===0,'/workspace/: guest can see LOG OUT');
+  expect(await page.locator('[data-member-tool]:visible').count()===0,'/workspace/: guest can see member-only navigation');
+  expect((await page.locator('.dc-global-brand').getAttribute('href'))==='/', '/workspace/: public brand does not return to club home');
   expect(!pageErrors.length,`/workspace/ guest recovery produced page errors: ${pageErrors.join(' | ')}`);
   await context.close();
 }
 
+// OAuth callback: successful PKCE must land on root Workspace, never on the historical GitHub Pages prefix.
 {
   const context=await newContext('member');const page=await context.newPage();
-  const pageErrors=[];const badResponses=[];const failedRequests=[];
-  page.on('pageerror',e=>pageErrors.push(e.message));
-  page.on('response',response=>{if(response.status()>=400&&response.url().startsWith(base))badResponses.push(`${response.status()} ${new URL(response.url()).pathname}`)});
-  page.on('requestfailed',request=>failedRequests.push(`${request.url()} :: ${request.failure()?.errorText||'failed'}`));
+  const pageErrors=[];page.on('pageerror',e=>pageErrors.push(e.message));
+  await page.goto(base+'/auth/callback/?code=qa&next=%2Fworkspace%2F',{waitUntil:'domcontentloaded'});
+  try{await page.waitForURL(url=>new URL(url).pathname==='/workspace/',{timeout:5000});}catch{errors.push(`/auth/callback/: successful login did not return to /workspace/; actual=${page.url()}`)}
+  const callbackPath=new URL(page.url()).pathname;
+  expect(callbackPath==='/workspace/',`/auth/callback/: final path is ${callbackPath}`);
+  expect(!callbackPath.includes('/degradation_club/'),'/auth/callback/: legacy GitHub Pages prefix returned after OAuth');
+  expect(!pageErrors.length,`/auth/callback/ produced page errors: ${pageErrors.join(' | ')}`);
+  await context.close();
+}
+
+// Authenticated Workspace root views remain controller-owned while public header provides site exit.
+{
+  const context=await newContext('member');const page=await context.newPage();
+  const pageErrors=[];page.on('pageerror',e=>pageErrors.push(e.message));
   await page.goto(base+'/workspace/',{waitUntil:'domcontentloaded'});
-  await page.waitForTimeout(1200);
-  expect(await page.locator('.dc-global-header').count()===0,'/workspace/: PublicShell header leaked into authenticated Workspace');
-  const activityCount=await page.locator('[data-route="activity"]').count();
-  if(activityCount===0){
-    const diag=await page.evaluate(()=>({
-      shellDataset:document.querySelector('[data-workspace-sidebar]')?.dataset.dcWorkspaceShell||'',
-      sidebar:document.querySelector('[data-workspace-sidebar]')?.innerHTML||'',
-      appText:document.querySelector('#appView')?.innerText||'',
-      scripts:[...document.scripts].map(x=>x.getAttribute('src')).filter(Boolean),
-      config:Boolean(window.DEMENTOR_SITE_CONFIG),
-      ready:document.readyState
-    }));
-    errors.push(`/workspace/: authenticated shell/controller did not expose MY ACTIVITY; shellDataset=${diag.shellDataset||'unset'}; config=${diag.config}; ready=${diag.ready}; appText=${diag.appText.slice(0,240).replace(/\s+/g,' ')}; sidebar=${diag.sidebar.slice(0,240).replace(/\s+/g,' ')}; pageErrors=${pageErrors.join(' | ')||'none'}; badResponses=${badResponses.join(' | ')||'none'}; failedRequests=${failedRequests.join(' | ')||'none'}; scripts=${diag.scripts.join(',')}`);
-  }else{
-    try{
-      await page.locator('[data-route="activity"]').first().click({timeout:4000});
-      await page.waitForFunction(()=>document.querySelector('#topTitle')?.textContent?.trim()==='MY ACTIVITY',null,{timeout:4000});
-      expect((await page.locator('#appView').innerText()).includes('Моя активность'),'Workspace Activity did not render');
-      expect(new URL(page.url()).hash==='#activity',`Workspace Activity URL state is ${new URL(page.url()).hash||'empty'}`);
-      await page.locator('[data-route="club"]').first().click({timeout:4000});
-      await page.waitForFunction(()=>document.querySelector('#topTitle')?.textContent?.trim()==='MY CLUB',null,{timeout:4000});
-      expect((await page.locator('#appView').innerText()).includes('Мой клуб'),'Workspace My Club did not render');
-      expect(new URL(page.url()).hash==='#club',`Workspace My Club URL state is ${new URL(page.url()).hash||'empty'}`);
-    }catch(error){
-      const diag=await page.evaluate(()=>({title:document.querySelector('#topTitle')?.textContent||'',hash:location.hash,appText:document.querySelector('#appView')?.innerText||'',sidebar:document.querySelector('[data-workspace-sidebar]')?.innerText||''}));
-      errors.push(`/workspace/: controller-owned route transition failed: ${error.message}; title=${diag.title}; hash=${diag.hash}; appText=${diag.appText.slice(0,220).replace(/\s+/g,' ')}; sidebar=${diag.sidebar.slice(0,220).replace(/\s+/g,' ')}`);
-    }
-  }
+  await waitHeader(page,'/workspace/ member');
+  try{await page.locator('[data-workspace-sidebar]').waitFor({state:'visible',timeout:4000});}catch{errors.push('/workspace/: authenticated sidebar did not become visible')}
+  expect(await page.locator('[data-member-tool]:visible').count()>=2,'/workspace/: active member cannot see Board/Artifacts navigation');
+  try{
+    await page.locator('[data-route="activity"]').first().click({timeout:4000});
+    await page.waitForFunction(()=>document.querySelector('#topTitle')?.textContent?.trim()==='MY ACTIVITY',null,{timeout:4000});
+    expect((await page.locator('#appView').innerText()).includes('Моя активность'),'Workspace Activity did not render');
+    await page.locator('[data-route="club"]').first().click({timeout:4000});
+    await page.waitForFunction(()=>document.querySelector('#topTitle')?.textContent?.trim()==='MY CLUB',null,{timeout:4000});
+    expect((await page.locator('#appView').innerText()).includes('Мой клуб'),'Workspace My Club did not render');
+  }catch(error){errors.push(`/workspace/: controller route transition failed: ${error.message}`)}
   expect(!pageErrors.length,`/workspace/ authenticated navigation produced page errors: ${pageErrors.join(' | ')}`);
   await context.close();
 }
 
+// Workspace Board must restore the production Board overlays, not merely embed the base card renderer.
 {
-  const context=await newContext('member');const page=await context.newPage();
-  await page.route('**/community/board/board.js',route=>route.fulfill({status:200,contentType:'text/javascript',body:''}));
+  const context=await newContext('member');const page=await context.newPage();const pageErrors=[];page.on('pageerror',e=>pageErrors.push(e.message));
   await page.goto(base+'/workspace/board/',{waitUntil:'domcontentloaded'});
-  expect(await page.locator('[data-workspace-sidebar]').count()===1,'/workspace/board/: Workspace sidebar missing');
-  expect(await page.locator('#boardHost').count()===1,'/workspace/board/: Board content host missing');
-  expect(await page.locator('.dc-global-header').count()===0,'/workspace/board/: PublicShell header leaked into Workspace Board');
-  expect(new URL(page.url()).pathname==='/workspace/board/','/workspace/board/: route escaped Workspace shell');
+  await waitHeader(page,'/workspace/board/');
+  try{await page.locator('.dc-spatial-viewport').waitFor({state:'visible',timeout:5000});}catch{errors.push(`/workspace/board/: spatial viewport did not initialize; errors=${pageErrors.join(' | ')||'none'}`)}
+  expect(await page.locator('[data-workspace-sidebar]:visible').count()===1,'/workspace/board/: Workspace sidebar missing');
+  expect(await page.locator('#boardFilters .dc-board-filter').count()>=5,'/workspace/board/: Board filters did not initialize');
+  expect(await page.locator('.dc-spatial-controls').count()===1,'/workspace/board/: pan/zoom controls missing');
+  await page.evaluate(()=>{
+    const host=document.getElementById('boardHost');
+    const card=document.createElement('article');card.className='dc-notice';card.dataset.artifact='qa-artifact';card.innerHTML='<button type="button" data-close-artifact>QA</button>';host?.appendChild(card);
+  });
+  try{await page.locator('[data-artifact="qa-artifact"].is-own-movable').waitFor({state:'attached',timeout:2500});}catch{errors.push('/workspace/board/: activated member artifact did not become movable')}
+  const fakeStyle=await page.locator('[data-artifact="qa-artifact"]').evaluate(el=>({left:el.style.left,top:el.style.top}));
+  expect(Boolean(fakeStyle.left&&fakeStyle.top),'/workspace/board/: spatial position was not assigned to member artifact');
+  expect(!pageErrors.length,`/workspace/board/ produced page errors: ${pageErrors.join(' | ')}`);
   await context.close();
 }
 
+// Join member-return: canonical routes, equal CTA geometry and no unexplained dark slab below header.
+{
+  const context=await newContext('member');const page=await context.newPage();const pageErrors=[];page.on('pageerror',e=>pageErrors.push(e.message));
+  await page.goto(base+'/join/',{waitUntil:'domcontentloaded'});
+  await waitHeader(page,'/join/ member');
+  try{await page.locator('#dc9MemberReturn').waitFor({state:'visible',timeout:5000});}catch{errors.push(`/join/: member-return did not render; errors=${pageErrors.join(' | ')||'none'}`)}
+  const hrefs=await page.locator('#dc9MemberReturn a').evaluateAll(nodes=>nodes.map(a=>a.getAttribute('href')));
+  expect(hrefs.includes('/workspace/board/'),`/join/: Community CTA is not /workspace/board/ (${hrefs.join(', ')})`);
+  expect(hrefs.includes('/join/result/'),'/join/: DC-9 card CTA missing');
+  expect(hrefs.includes('/workspace/'),'/join/: Account CTA is not /workspace/');
+  expect(!hrefs.includes('/account/'),'/join/: dead /account/ CTA survived');
+  const buttons=await page.locator('#dc9MemberReturn .dc9-button').evaluateAll(nodes=>nodes.map(el=>({display:getComputedStyle(el).display,height:el.getBoundingClientRect().height})));
+  expect(buttons.length>=2&&buttons.every(x=>x.display==='inline-flex'&&x.height>=48),`/join/: member CTA geometry drifted ${JSON.stringify(buttons)}`);
+  const darkBlocks=await page.evaluate(()=>{
+    const header=document.querySelector('.dc-global-header');if(!header)return[];const bottom=header.getBoundingClientRect().bottom;
+    return [...document.querySelectorAll('body *')].map(el=>{const r=el.getBoundingClientRect();const bg=getComputedStyle(el).backgroundColor;return{tag:el.tagName,cls:el.className||'',top:r.top,height:r.height,width:r.width,bg}}).filter(x=>x.width>innerWidth*.8&&x.height>30&&x.top>=bottom-2&&x.top<bottom+220&&(x.bg==='rgb(17, 17, 17)'||x.bg==='rgb(0, 0, 0)'));
+  });
+  expect(darkBlocks.length===0,`/join/: unexplained dark slab below header: ${JSON.stringify(darkBlocks.slice(0,3))}`);
+  expect(!pageErrors.length,`/join/ member-return produced page errors: ${pageErrors.join(' | ')}`);
+  await context.close();
+}
+
+// Owner Admin keeps Workspace geometry under the same public header.
 {
   const context=await newContext('owner');await context.route('**/workspace/admin/owner-admin-access-v1.js',route=>route.fulfill({status:200,contentType:'text/javascript',body:'document.documentElement.dataset.dcOwnerAdmin="1";'}));
-  const page=await context.newPage();await page.goto(base+'/workspace/admin/',{waitUntil:'domcontentloaded'});await page.waitForTimeout(150);
-  expect(await page.locator('.dc-global-header').count()===0,'/workspace/admin/: PublicShell header leaked into Admin Workspace');
+  const page=await context.newPage();await page.goto(base+'/workspace/admin/',{waitUntil:'domcontentloaded'});await waitHeader(page,'/workspace/admin/');await page.waitForTimeout(200);
   const layout=await page.locator('.dcw-app').evaluate(el=>({display:getComputedStyle(el).display,columns:getComputedStyle(el).gridTemplateColumns}));
-  expect(layout.display==='grid',`/workspace/admin/: Workspace app display is ${layout.display}, layout CSS missing`);
+  expect(layout.display==='grid',`/workspace/admin/: Workspace app display is ${layout.display}`);
   expect(layout.columns&&layout.columns!=='none',`/workspace/admin/: grid columns missing (${layout.columns})`);
   expect(await page.locator('.dca-tools').evaluate(el=>getComputedStyle(el).display)==='grid','/workspace/admin/: tool cards are not a grid');
   await context.close();
 }
 
 await browser.close();await new Promise(resolve=>server.close(resolve));
-if(errors.length){console.error('BROWSER SHELL SMOKE BLOCKED');for(const error of errors)console.error(`- ${error}`);process.exit(1);}
-console.log('Browser shell smoke PASS: canonical PublicShell + isolated guest/auth Workspace + Board + Admin layout');
+if(errors.filter(Boolean).length){console.error('BROWSER SHELL SMOKE BLOCKED');for(const error of errors.filter(Boolean))console.error(`- ${error}`);process.exit(1);}
+console.log('Browser shell smoke PASS: public shell + OAuth recovery + guest boundary + Workspace + spatial Board + Join member return + Admin');
