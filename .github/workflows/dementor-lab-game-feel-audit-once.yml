@@ -1,0 +1,20 @@
+name: Dementor Lab Game Feel Audit Once
+on:
+  push:
+    paths:
+      - '.github/workflows/dementor-lab-game-feel-audit-once.yml'
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/dementor-lab-vertical-slice-v0.3
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Run game feel matrix
+        working-directory: dementor-lab
+        run: node scripts/game-feel-matrix-audit.mjs
