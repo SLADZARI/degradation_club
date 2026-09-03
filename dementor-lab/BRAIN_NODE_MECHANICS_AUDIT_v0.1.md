@@ -48,7 +48,7 @@ Clarity issue: `+N` changes how much memory is written, while the immediate sema
 
 Verdict: KEEP all three. The strategic identity is primarily **which route wins**, secondarily the fixed state effect.
 
-Clarity issue: W1–W5 is not a multiplier on the metric delta. It is the strength of the internal pull / route preference. UI should say `НАСKОЛЬКО ТЯНЕТ`, not imply numerical damage strength.
+Clarity issue: W1–W5 is not a multiplier on the metric delta. It is the strength of the internal pull / route preference. UI should say `НАСКОЛЬКО ТЯНЕТ`, not imply numerical damage strength.
 
 ## REACTION
 ### ОБЪЯСНИТЬ
@@ -119,11 +119,18 @@ Semantics are not approved and it is unavailable in the vertical slice.
 Verdict: KEEP HIDDEN.
 
 ## Immediate product corrections
-1. Rename impulse parameter copy from technical/generic `СИЛА ИМПУЛЬСА` to human `НАСKОЛЬКО ТЯНЕТ` (engine field stays `weight`).
+1. Rename impulse parameter copy from technical/generic `СИЛА ИМПУЛЬСА` to human `НАСКОЛЬКО ТЯНЕТ` (engine field stays `weight`).
 2. Clarify STATE parameter as memory accumulation, not generic power.
 3. Present STOP as explicit branch ending, not a conversational Reaction.
 4. Keep PAUSE visibly in ABILITY and describe it as an in-path modifier.
 5. TALK must expose Reaction → Event → next Trigger well enough that AGREE/JOKE/EXPLAIN/SILENT/PRESSURE feel mechanically different.
+
+## Implemented clarity pass
+- Impulse control now says `НАСКОЛЬКО ТЯНЕТ`; `weight` remains the runtime field and route-selection mechanic.
+- STATE control now says `КАК СИЛЬНО ЗАПОМНИТСЯ`; the stored memory delta remains the runtime mechanic.
+- STOP readable projection says `НА ЭТОМ ЗАКАНЧИВАЮ`; no fake conversational effect was added.
+- NODE_SPECS descriptions now explain agreement cancelling REPEAT, joke not counting as agreement, silence saving ENERGY, conditional fallback, and PAUSE acting inside a path.
+- No balance numbers or runtime semantics were changed in this pass.
 
 ## Principle
 `A node earns its place when changing it changes the strategy the player expects — not merely the number the engine computes.`
