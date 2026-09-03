@@ -49,6 +49,7 @@ export function brainValidation(graph,triggerType=null){
   const base=validateGraph(graph);if(!base.runnable||!triggerType)return base;
   const trigger=graph.nodes.find(n=>familyOf(n)==='TRIGGER'&&n.type===triggerType);
   if(!trigger)return {runnable:false,code:'TRIGGER_MISMATCH',detail:`В ЭТОЙ СИТУАЦИИ НЕТ ТРИГГЕРА «${NODE_SPECS[triggerType]?.title||triggerType}».`};
+  if(trigger.p?.enabled===false)return {runnable:false,code:'TRIGGER_DISABLED',nodeId:trigger.id,detail:`ВХОД «${NODE_SPECS[triggerType]?.title||triggerType}» ПОКА НЕ ПОДКЛЮЧЕН.`};
   return base;
 }
 export function familyNodes(family){return Object.entries(NODE_SPECS).filter(([,spec])=>spec.family===family).map(([type,spec])=>({type,...spec}))}
