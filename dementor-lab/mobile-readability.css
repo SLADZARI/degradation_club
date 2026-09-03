@@ -9,22 +9,69 @@
   .brain-node .value{font-size:15px}
   .editor label{font-size:13px;line-height:1.25}
 
-  /* TALK keeps consequence, characters, metrics and dialogue; duplicated microcopy disappears. */
-  .talk-record{padding:8px 10px}
-  .talk-record b{font-size:13px}
+  /* PERSON: keep the character dominant without pushing all controls below the fold. */
+  .screen[data-view="person"] .hero-copy h1{font-size:29px}
+  .screen[data-view="person"] .hero-copy p:not(.kicker){font-size:14px;line-height:1.25;margin:8px 0 10px}
+  .screen[data-view="person"] .person-name-field{margin-top:8px}
+  .screen[data-view="person"] .person-stage{height:39dvh;min-height:270px;margin:9px 0}
+  .screen[data-view="person"] .appearance-panel{gap:5px}
+
+  /* BRAIN: mechanism owns the viewport; supporting copy stops competing with nodes. */
+  .brain-screen .section-head{margin-bottom:8px}
+  .brain-screen .section-head h2{font-size:29px}
+  .brain-screen .brain-intro{font-size:10px;line-height:1.2;margin:6px 0 9px}
+  .brain-screen .brain-validation{font-size:9px;line-height:1.15;padding-top:7px;padding-bottom:7px;margin-bottom:8px}
+  .brain-screen .brain-trigger-hub{margin-bottom:9px}
+  .brain-screen .brain-trigger-hub__head{min-height:56px;padding-top:7px;padding-bottom:7px}
+  .brain-screen .brain-trigger-chips{padding:6px;gap:4px}
+  .brain-screen .brain-trigger-chip{min-height:30px;padding:5px 7px;font-size:9px}
+  .brain-screen .brain-behavior-head{padding:7px 9px;margin-bottom:6px}
+  .brain-screen .brain-behavior-head p{display:none}
+  .brain-screen .brain-stack-node{margin-bottom:7px}
+  .brain-screen .brain-stack-card{min-height:58px}
+  .brain-screen .brain-stack-main{min-height:56px;padding-top:7px;padding-bottom:7px}
+  .brain-screen .brain-stack-title{font-size:17px}
+  .brain-screen .brain-stack-route{font-size:8px;line-height:1.1;margin-top:4px}
+  .brain-screen .brain-add-node-bottom{min-height:52px;margin-top:11px;font-size:15px}
+  .brain-screen .brain-readable-route{margin-top:9px}
+
+  /* TALK: the conversation is primary; arena and instrumentation support it. */
+  .talk-record{padding:7px 9px}
+  .talk-record b{font-size:12px}
   .talk-record span{display:none}
+  .talk .arena{height:148px}
+  .talk .character-slot.small{transform:scale(.88);transform-origin:50% 100%}
+  .talk .turn{min-height:58px!important}
   .turn span{display:none}
-  .turn b{font-size:40px}
-  .actor strong{font-size:13px}
-  .metric{grid-template-columns:54px 1fr 30px 30px 1fr;gap:5px;margin:6px 0}
-  .metric label{font-size:11px;letter-spacing:.01em}
-  .metric .n{font-size:11px}
-  .bar{height:10px}
-  .bubble{font-size:16px;line-height:1.3;padding:11px 12px}
-  .bubble small{display:none}
-  .delta{font-size:10px;line-height:1.25;min-height:24px;padding:5px 8px}
-  .talk-actions{grid-template-columns:1fr 76px}
-  .talk-actions button{font-size:11px;min-height:50px}
+  .turn b{font-size:34px}
+  .talk .arena[data-flow] .turn::after{margin-top:2px;font-size:14px;padding:2px 4px;border-width:1px}
+  .actor strong{font-size:9px}
+
+  .metrics{padding:5px 6px!important}
+  .metrics-head{margin-bottom:3px!important;font-size:7px!important}
+  .metric{grid-template-columns:47px minmax(0,1fr) minmax(0,1fr)!important;gap:5px!important;margin:3px 0!important}
+  .metric label{font-size:9px;letter-spacing:.01em}
+  .metric .n{font-size:9px}
+  .bar{height:8px}
+
+  .dialogue{height:300px!important;min-height:300px!important;max-height:300px!important;padding:8px!important;gap:8px!important}
+  .dialogue::before{font-size:7px!important}
+  .bubble{max-width:92%;font-size:16px;line-height:1.28;padding:10px 11px}
+  .bubble small{display:block;font-size:7px;margin-bottom:3px;opacity:.55}
+
+  .talk-cause{padding:5px!important;gap:3px!important}
+  .talk-cause__step{padding:6px!important;min-height:44px!important}
+  .talk-cause__step small{display:none!important}
+  .talk-cause__step strong{font-size:9px!important;line-height:1.05!important}
+  .talk-cause__arrow{font-size:10px!important}
+
+  .delta{font-size:10px;line-height:1.25;min-height:0;padding:0}
+  .delta-feedback{padding:5px 6px!important;gap:2px!important}
+  .delta-feedback strong{font-size:9px!important;line-height:1.08!important}
+  .delta-feedback small{display:none!important}
+  .delta-feedback__memory{font-size:7px!important;line-height:1.1!important}
+  .talk-actions{grid-template-columns:1fr 70px}
+  .talk-actions button{font-size:10px;min-height:48px}
 
   /* Sheets/overlays: readable labels, no technical wall. */
   .sheet-card dt,.result-block small,.overlay-card .kicker{font-size:10px}
@@ -34,13 +81,20 @@
   .chain{font-size:11px;line-height:1.35}
   .patch-grid button{font-size:12px;line-height:1.2}
   .trace-list{font-size:11px;line-height:1.5}
-  .result-block strong{font-size:18px;line-height:1.2}
+
+  /* RESULT is already comparatively clean; tighten only its vertical rhythm. */
+  .screen[data-view="result"] .result-card{padding:14px}
+  .screen[data-view="result"] .result-card h2{font-size:30px}
+  .screen[data-view="result"] .result-block{padding:10px 0;margin-top:10px}
+  .screen[data-view="result"] .result-block strong{font-size:17px;line-height:1.18}
   .comparison{font-size:12px;line-height:1.35}
 }
 
 @media (max-width:360px){
   .screen{padding-left:8px;padding-right:8px}
-  .hero-copy h1,.section-head h2,.sheet-card h2,.result-card h2{font-size:29px}
-  .metric{grid-template-columns:50px 1fr 28px 28px 1fr}
-  .talk-actions{grid-template-columns:1fr 70px}
+  .hero-copy h1,.section-head h2,.sheet-card h2,.result-card h2{font-size:28px}
+  .screen[data-view="person"] .person-stage{height:37dvh;min-height:250px}
+  .talk .arena{height:140px}
+  .dialogue{height:280px!important;min-height:280px!important;max-height:280px!important}
+  .talk-actions{grid-template-columns:1fr 66px}
 }
