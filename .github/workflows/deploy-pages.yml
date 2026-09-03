@@ -21,7 +21,7 @@ jobs:
   build:
     if: github.ref == 'refs/heads/dementor-club-production' && inputs.release_confirmation == 'APPROVED'
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - name: Checkout production branch
         uses: actions/checkout@v4
@@ -45,6 +45,14 @@ jobs:
 
       - name: Validate canonical shell integration
         run: node scripts/validate-shell-contract.mjs
+
+      - name: Install browser smoke runtime
+        run: |
+          npm install --no-save --no-package-lock playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Validate browser shell and Workspace recovery
+        run: node scripts/validate-browser-shell.mjs
 
       - name: Validate production route manifest
         run: node scripts/validate-route-manifest.mjs
