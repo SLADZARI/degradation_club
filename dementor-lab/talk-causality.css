@@ -6,8 +6,6 @@
 .talk-cause__step strong{font-size:11px;line-height:1.08;overflow-wrap:anywhere}
 .talk-cause__step.trigger{background:var(--acid)}
 .talk-cause__arrow{display:grid;place-items:center;font:900 13px/1 monospace;opacity:.45}
-.talk-cause[data-actor="B"] .talk-cause__step.action{background:var(--acid)}
-.talk-cause[data-actor="B"] .talk-cause__step.trigger{background:#fff}
 @media(max-width:430px){
   .talk-cause{padding:6px;grid-template-columns:minmax(0,1fr) 14px minmax(0,1fr) 14px minmax(0,1fr);gap:3px}
   .talk-cause__step{padding:6px 5px;min-height:48px}
