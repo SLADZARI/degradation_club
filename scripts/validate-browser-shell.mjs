@@ -87,6 +87,7 @@ for(const route of ['/','/about/','/projects/','/community/','/merch/','/archive
   try{await page.getByRole('button',{name:'ВОЙТИ ЧЕРЕЗ GOOGLE'}).waitFor({state:'visible',timeout:4000});}catch{errors.push(`/workspace/: guest login gate did not render; errors=${pageErrors.join(' | ')||'none'}`);}
   expect(await page.locator('#sessionBox').count()===1,'/workspace/: #sessionBox compatibility host missing in browser DOM');
   expect(await page.locator('[data-work-nav]').count()===1,'/workspace/: data-work-nav compatibility host missing in browser DOM');
+  expect(await page.locator('.dc-global-header').count()===0,'/workspace/: PublicShell header leaked into guest Workspace');
   expect(!pageErrors.length,`/workspace/ guest recovery produced page errors: ${pageErrors.join(' | ')}`);
   await context.close();
 }
@@ -99,6 +100,7 @@ for(const route of ['/','/about/','/projects/','/community/','/merch/','/archive
   page.on('requestfailed',request=>failedRequests.push(`${request.url()} :: ${request.failure()?.errorText||'failed'}`));
   await page.goto(base+'/workspace/',{waitUntil:'domcontentloaded'});
   await page.waitForTimeout(1200);
+  expect(await page.locator('.dc-global-header').count()===0,'/workspace/: PublicShell header leaked into authenticated Workspace');
   const activityCount=await page.locator('[data-route="activity"]').count();
   if(activityCount===0){
     const diag=await page.evaluate(()=>({
@@ -111,12 +113,19 @@ for(const route of ['/','/about/','/projects/','/community/','/merch/','/archive
     }));
     errors.push(`/workspace/: authenticated shell/controller did not expose MY ACTIVITY; shellDataset=${diag.shellDataset||'unset'}; config=${diag.config}; ready=${diag.ready}; appText=${diag.appText.slice(0,240).replace(/\s+/g,' ')}; sidebar=${diag.sidebar.slice(0,240).replace(/\s+/g,' ')}; pageErrors=${pageErrors.join(' | ')||'none'}; badResponses=${badResponses.join(' | ')||'none'}; failedRequests=${failedRequests.join(' | ')||'none'}; scripts=${diag.scripts.join(',')}`);
   }else{
-    await page.locator('[data-route="activity"]').first().click();
-    await page.waitForFunction(()=>document.querySelector('#topTitle')?.textContent?.trim()==='MY ACTIVITY');
-    expect((await page.locator('#appView').innerText()).includes('Моя активность'),'Workspace Activity did not render');
-    await page.locator('[data-route="club"]').first().click();
-    await page.waitForFunction(()=>document.querySelector('#topTitle')?.textContent?.trim()==='MY CLUB');
-    expect((await page.locator('#appView').innerText()).includes('Мой клуб'),'Workspace My Club did not render');
+    try{
+      await page.locator('[data-route="activity"]').first().click({timeout:4000});
+      await page.waitForFunction(()=>document.querySelector('#topTitle')?.textContent?.trim()==='MY ACTIVITY',null,{timeout:4000});
+      expect((await page.locator('#appView').innerText()).includes('Моя активность'),'Workspace Activity did not render');
+      expect(new URL(page.url()).hash==='#activity',`Workspace Activity URL state is ${new URL(page.url()).hash||'empty'}`);
+      await page.locator('[data-route="club"]').first().click({timeout:4000});
+      await page.waitForFunction(()=>document.querySelector('#topTitle')?.textContent?.trim()==='MY CLUB',null,{timeout:4000});
+      expect((await page.locator('#appView').innerText()).includes('Мой клуб'),'Workspace My Club did not render');
+      expect(new URL(page.url()).hash==='#club',`Workspace My Club URL state is ${new URL(page.url()).hash||'empty'}`);
+    }catch(error){
+      const diag=await page.evaluate(()=>({title:document.querySelector('#topTitle')?.textContent||'',hash:location.hash,appText:document.querySelector('#appView')?.innerText||'',sidebar:document.querySelector('[data-workspace-sidebar]')?.innerText||''}));
+      errors.push(`/workspace/: controller-owned route transition failed: ${error.message}; title=${diag.title}; hash=${diag.hash}; appText=${diag.appText.slice(0,220).replace(/\s+/g,' ')}; sidebar=${diag.sidebar.slice(0,220).replace(/\s+/g,' ')}`);
+    }
   }
   expect(!pageErrors.length,`/workspace/ authenticated navigation produced page errors: ${pageErrors.join(' | ')}`);
   await context.close();
@@ -128,6 +137,7 @@ for(const route of ['/','/about/','/projects/','/community/','/merch/','/archive
   await page.goto(base+'/workspace/board/',{waitUntil:'domcontentloaded'});
   expect(await page.locator('[data-workspace-sidebar]').count()===1,'/workspace/board/: Workspace sidebar missing');
   expect(await page.locator('#boardHost').count()===1,'/workspace/board/: Board content host missing');
+  expect(await page.locator('.dc-global-header').count()===0,'/workspace/board/: PublicShell header leaked into Workspace Board');
   expect(new URL(page.url()).pathname==='/workspace/board/','/workspace/board/: route escaped Workspace shell');
   await context.close();
 }
@@ -135,6 +145,7 @@ for(const route of ['/','/about/','/projects/','/community/','/merch/','/archive
 {
   const context=await newContext('owner');await context.route('**/workspace/admin/owner-admin-access-v1.js',route=>route.fulfill({status:200,contentType:'text/javascript',body:'document.documentElement.dataset.dcOwnerAdmin="1";'}));
   const page=await context.newPage();await page.goto(base+'/workspace/admin/',{waitUntil:'domcontentloaded'});await page.waitForTimeout(150);
+  expect(await page.locator('.dc-global-header').count()===0,'/workspace/admin/: PublicShell header leaked into Admin Workspace');
   const layout=await page.locator('.dcw-app').evaluate(el=>({display:getComputedStyle(el).display,columns:getComputedStyle(el).gridTemplateColumns}));
   expect(layout.display==='grid',`/workspace/admin/: Workspace app display is ${layout.display}, layout CSS missing`);
   expect(layout.columns&&layout.columns!=='none',`/workspace/admin/: grid columns missing (${layout.columns})`);
@@ -144,4 +155,4 @@ for(const route of ['/','/about/','/projects/','/community/','/merch/','/archive
 
 await browser.close();await new Promise(resolve=>server.close(resolve));
 if(errors.length){console.error('BROWSER SHELL SMOKE BLOCKED');for(const error of errors)console.error(`- ${error}`);process.exit(1);}
-console.log('Browser shell smoke PASS: canonical public shell + guest/auth Workspace + Board + Admin layout');
+console.log('Browser shell smoke PASS: canonical PublicShell + isolated guest/auth Workspace + Board + Admin layout');
