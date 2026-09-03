@@ -13,3 +13,28 @@
 .talk .arena[data-flow='A-B'] .actor-b,.talk .arena[data-flow='B-A'] .actor-a{opacity:.9}
 @media(max-width:430px){.talk .actor.is-speaking::before,.talk .actor.is-target::after{top:2px;font-size:7px;padding:3px 4px}.talk .arena[data-flow] .turn::after{font-size:9px}}
 @media(prefers-reduced-motion:reduce){.talk .actor{transition:none}}
+
+/* Physical-phone cleanup: names and causality stay readable without redundant stage labels. */
+.talk .actor{height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;min-width:0}
+.talk .actor>strong{position:absolute;left:50%;bottom:5px;transform:translateX(-50%);z-index:8;margin:0;padding:3px 6px;border:1.5px solid var(--ink);background:var(--paper);font-size:10px;line-height:1;white-space:nowrap;max-width:92%;overflow:hidden;text-overflow:ellipsis}
+.talk .actor.is-speaking>strong{margin:0;padding:3px 6px;background:var(--acid);border:1.5px solid var(--ink)}
+.talk .actor.is-speaking::before,.talk .actor.is-target::after{content:none!important;display:none!important}
+.talk .arena[data-flow] .turn::after{content:'→';min-width:28px;text-align:center;padding:3px 4px;font-size:16px}
+.metrics{display:block!important}
+.metrics-head{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:6px;padding:0 58px 0 58px;font:900 8px/1 monospace;letter-spacing:.04em}
+.metrics-head span:first-child{text-align:left}.metrics-head span:last-child{text-align:right}
+.metric{grid-template-columns:54px minmax(0,1fr) minmax(0,1fr);gap:8px}
+.metric-side{display:grid;align-items:center;gap:5px;min-width:0}.metric-side.a{grid-template-columns:minmax(0,1fr) 28px}.metric-side.b{grid-template-columns:28px minmax(0,1fr)}
+.bar.danger i{background:var(--danger)!important}.metric .bar:not(.danger) i{background:var(--ink)!important}
+.dialogue{height:220px;min-height:220px;max-height:220px;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
+.dialogue::before{content:'ДИАЛОГ · ЛИСТАЙ ВВЕРХ';position:sticky;top:-9px;z-index:5;align-self:center;margin:-9px 0 2px;padding:4px 7px;background:var(--paper);border-bottom:1px solid var(--ink);font:900 7px/1 monospace;opacity:.65}
+@media(max-width:430px){
+  .arena{height:170px}
+  .talk .actor>strong{font-size:9px;bottom:4px}
+  .metrics{padding:6px}
+  .metrics-head{padding:0 52px 0 52px;font-size:7px}
+  .metric{grid-template-columns:50px minmax(0,1fr) minmax(0,1fr);gap:6px;margin:4px 0}
+  .metric-side{gap:4px}.metric-side.a{grid-template-columns:minmax(0,1fr) 26px}.metric-side.b{grid-template-columns:26px minmax(0,1fr)}
+  .dialogue{height:230px;min-height:230px;max-height:230px}
+  .bubble{max-width:90%;font-size:15px;padding:9px 10px}
+}
