@@ -22,6 +22,8 @@ Primary task: make the character recognizably yours.
 Primary task: author causality.
 - first visit explains `ВХОДЫ → ЦЕПОЧКА → РЕЗУЛЬТАТ` once
 - lines are causal truth
+- adding nodes never invents causal edges
+- the player explicitly connects new custom nodes
 - drag changes presentation order only
 - custom graph runs when its real opening route is valid
 - technical validation does not compete with authoring
