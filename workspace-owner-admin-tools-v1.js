@@ -8,7 +8,7 @@ if(cfg?.enabled&&location.pathname.includes('/workspace')){
     const active=r=>r?.status==='active'&&(!r.valid_from||Date.parse(r.valid_from)<=Date.now())&&(!r.valid_to||Date.parse(r.valid_to)>Date.now());
     if(!error&&(roles||[]).some(active)){
       const base=location.pathname.startsWith('/degradation_club/')?'/degradation_club':'';
-      const href=base+'/design-system/admin/';
+      const href=base+'/workspace/admin/';
       const style=document.createElement('style');style.textContent='.dcw-admin-tools-card{background:#d8ff3e!important;color:#111!important;text-decoration:none!important}.dcw-admin-tools-card small{color:#111!important;opacity:.65!important}';document.head.appendChild(style);
       const install=()=>{
         if((document.getElementById('topTitle')?.textContent||'').trim()!=='HOME')return;
