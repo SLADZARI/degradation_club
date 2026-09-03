@@ -13,7 +13,8 @@ export const IMPULSE_EFFECTS=Object.freeze({
   beliked:{self:{contact:2,tension:-3},target:{contact:1}},
   understand:{self:{brain:2,contact:2},target:{tension:-2,contact:3}}
 });
-export const PAUSE_EFFECTS=Object.freeze({self:{brain:-5,tension:-7,energy:-4},target:{tension:-3,contact:2}});
+export const PAUSE_EFFECTS=Object.freeze({self:{brain:-5,tension:-7,energy:-2},target:{tension:-3,contact:2}});
+export const REPEAT_FRICTION=Object.freeze({self:{energy:-1,brain:4,tension:4},target:{contact:-2}});
 export const REACTION_EVENT_MATRIX=Object.freeze({
   explain:{event:'COUNTERPOINT',trigger:'pushback',accepted:false},
   agree:{event:'ACCEPTANCE',trigger:'acceptance',accepted:true},
@@ -41,6 +42,15 @@ function enumeratePaths(graph,startId,maxDepth=18){
   walk(startId,[],new Map());return out;
 }
 function conditionAllows(character,path){return path.every(n=>n.type!=='ifbrain'||Number(character.state.brain)>Number(n.p?.threshold??70))}
+function reactionContextScore(character,reaction){
+  const s=character.state||{},energy=Number(s.energy||0),brain=Number(s.brain||0),tension=Number(s.tension||0),contact=Number(s.contact||0);
+  if(reaction==='agree')return Math.max(0,60-contact)*.08+Math.max(0,tension-30)*.05;
+  if(reaction==='joke')return Math.max(0,tension-45)*.08;
+  if(reaction==='silent')return Math.max(0,60-energy)*.12+Math.max(0,brain-75)*.05;
+  if(reaction==='pressure')return Math.max(0,brain-28)*.35+Math.max(0,tension-45)*.1;
+  if(reaction==='explain')return Math.max(0,35-brain)*.01;
+  return 0;
+}
 function selectPath(character,trigger){
   const graph=character.brainGraph,validation=validateGraph(graph);if(!validation.runnable)throw new Error(validation.detail);
   const roots=graph.nodes.filter(n=>familyOf(n)==='TRIGGER'&&n.type===trigger);
@@ -49,7 +59,7 @@ function selectPath(character,trigger){
   const allowed=allPaths.filter(path=>conditionAllows(character,path));
   const scored=allowed.map(path=>{
     let score=0,reaction=null,impulse=null,repeat=1;
-    for(const n of path){const fam=familyOf(n);if(fam==='STATE'){const key=n.p?.key||n.type,own=Number(character.state.memory?.[key]||0),opposing=key==='resentment'?'trust':key==='trust'?'resentment':null,other=opposing?Number(character.state.memory?.[opposing]||0):0;score+=(own-other)*1.8;}if(fam==='IMPULSE'){const w=n.p?.weight||1;score+=w*6;if(!impulse)impulse=n.type}if(fam==='REACTION'&&!reaction){reaction=n.type;score+=8}if(n.type==='repeat')repeat=Math.max(repeat,n.p?.count||1);if(n.type==='pause')score+=character.state.tension>=55?6:1}
+    for(const n of path){const fam=familyOf(n);if(fam==='STATE'){const key=n.p?.key||n.type,own=Number(character.state.memory?.[key]||0),opposing=key==='resentment'?'trust':key==='trust'?'resentment':null,other=opposing?Number(character.state.memory?.[opposing]||0):0;score+=(own-other)*1.8;}if(fam==='IMPULSE'){const w=n.p?.weight||1;score+=w*6;if(!impulse)impulse=n.type}if(fam==='REACTION'&&!reaction){reaction=n.type;score+=8+reactionContextScore(character,n.type)}if(n.type==='repeat')repeat=Math.max(repeat,n.p?.count||1);if(n.type==='pause')score+=character.state.tension>=55?6:1}
     return {path,score,reaction,impulse,repeat};
   }).filter(x=>x.reaction);
   scored.sort((a,b)=>b.score-a.score||a.path.map(n=>n.id).join('|').localeCompare(b.path.map(n=>n.id).join('|')));
@@ -58,7 +68,7 @@ function selectPath(character,trigger){
 function repeatPrediction(encounter,side,targetSide,actor,target,pending,receivedTrigger){
   const reactionNode=nodeById(actor.brainGraph,pending.reactionNodeId),repeatNode=nodeById(actor.brainGraph,pending.repeatNodeId);
   const chosen={path:[reactionNode,repeatNode].filter(Boolean),score:0,reaction:pending.reaction,impulse:pending.impulse||null,repeat:1};
-  const selfDelta={},targetDelta={};addDelta(selfDelta,REACTION_EFFECTS[chosen.reaction]?.self);addDelta(targetDelta,REACTION_EFFECTS[chosen.reaction]?.target);
+  const selfDelta={},targetDelta={};addDelta(selfDelta,REACTION_EFFECTS[chosen.reaction]?.self);addDelta(targetDelta,REACTION_EFFECTS[chosen.reaction]?.target);addDelta(selfDelta,REPEAT_FRICTION.self);addDelta(targetDelta,REPEAT_FRICTION.target);
   const predictedSelf=applyMetricDelta(cloneState(actor.state),selfDelta),predictedTarget=applyMetricDelta(cloneState(target.state),targetDelta);
   return {side,targetSide,actor,target,emittedTrigger:receivedTrigger,chosen,selfDelta,targetDelta,predictedSelf,predictedTarget,isRepeat:true,pendingRepeat:pending,noActionReason:null};
 }

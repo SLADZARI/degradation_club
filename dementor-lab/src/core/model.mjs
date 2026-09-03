@@ -15,7 +15,7 @@ export const NODE_SPECS = Object.freeze({
   joke:{family:'REACTION',title:'ПОШУТИТЬ',description:'лучше всего сбрасывает TENSION, но почти не чинит CONTACT и не считается согласием',defaults:{}},
   silent:{family:'REACTION',title:'ПРОМОЛЧАТЬ',description:'самая дешёвая реакция по ENERGY; пережидает ход, но снижает CONTACT',defaults:{}},
   pressure:{family:'REACTION',title:'ДАВИТЬ',description:'выжигает ENERGY и нагружает BRAIN собеседника, но резко повышает TENSION и рушит CONTACT',defaults:{}},
-  repeat:{family:'CONTROL',title:'REPEAT',description:'повторяет ту же реакцию до лимита и завершает ветку; явное согласие собеседника отменяет оставшиеся повторы',defaults:{count:2}},
+  repeat:{family:'CONTROL',title:'REPEAT',description:'повторяет ту же реакцию до лимита и завершает ветку; каждый навязчивый повтор дополнительно разгоняет BRAIN/TENSION, а явное согласие отменяет остаток',defaults:{count:2}},
   stop:{family:'CONTROL',title:'STOP',description:'явно завершает эту ветку; дальше по ней ничего не происходит',defaults:{}},
   ifbrain:{family:'CONTROL',title:'BRAIN >',description:'пропускает ветку только когда BRAIN выше порога; иначе нужна запасная ветка',defaults:{threshold:70}},
   pause:{family:'ABILITY',title:'ПАУЗА',description:'тратит заметную ENERGY, чтобы снизить BRAIN/TENSION и поддержать CONTACT перед реакцией',defaults:{}},
