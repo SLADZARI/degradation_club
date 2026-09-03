@@ -32,6 +32,8 @@ jobs:
         run: node scripts/validate-visual-contract.mjs
       - name: Build production candidate artifact
         run: node scripts/build-pages.mjs
+      - name: Validate production analytics and consent
+        run: node scripts/validate-production-analytics.mjs
       - name: Validate canonical shell integration
         run: node scripts/validate-shell-contract.mjs
       - name: Validate built JavaScript syntax
