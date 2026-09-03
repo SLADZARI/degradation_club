@@ -1,6 +1,6 @@
 # DEMENTOR LAB — Trigger Hub implementation v0.1
 
-**Status:** IMPLEMENTED / FINAL QA RUN REQUESTED  
+**Status:** IMPLEMENTED / FINAL QA RERUN REQUESTED  
 **Date:** 2026-09-03  
 **Branch:** `agent/dementor-lab-vertical-slice-v0.3`
 
@@ -17,6 +17,8 @@ Mobile BRAIN projects Trigger infrastructure into one compact block:
 - selecting a Trigger highlights its downstream route;
 - `СВЯЗАТЬ` edits the real Trigger edge;
 - custom BRAIN with no Trigger asks `НА ЧТО ТЫ РЕАГИРУЕШЬ?`;
+- custom BRAIN keeps the Trigger Hub open while authoring;
+- authored presets default to a compact/collapsed Hub;
 - trigger nodes remain available through `+ УЗЕЛ`;
 - generated/opponent runtime semantics are not changed.
 
@@ -34,6 +36,7 @@ A Trigger → body connection belongs to the Trigger Hub projection and is not d
 
 - Trigger Hub is one mobile block.
 - Collision-ready preset exposes six Trigger chips while the main stack contains only behavioral body cards.
+- Custom authoring keeps the Hub open by default.
 - Expanding the hub reveals real Trigger rows.
 - Trigger → body connection uses the real graph node.
 - Selecting/connecting a Trigger highlights its downstream route.
