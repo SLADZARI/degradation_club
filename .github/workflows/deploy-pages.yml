@@ -43,6 +43,9 @@ jobs:
       - name: Build production Pages artifact
         run: node scripts/build-pages.mjs
 
+      - name: Validate production route manifest
+        run: node scripts/validate-route-manifest.mjs
+
       - name: Validate production artifact and release gate
         run: node scripts/validate-production-release.mjs
 
