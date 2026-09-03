@@ -29,7 +29,7 @@ expect(header.includes("document.querySelectorAll('header.topbar,header.dc-globa
 
 const footer=read('global-footer.js');
 expect(footer.includes("document.querySelectorAll('footer,.dc-utility-strip')"),'global-footer.js: legacy footer/utility cleanup missing');
-expect(footer.includes("'/archive/'"),'global-footer.js: Archive route missing');
+expect(footer.includes('href="/archive/"')&&footer.includes('>Archive<'),'global-footer.js: Archive route missing');
 
 const shell=read('workspace/workspace-shell-v1.js');
 expect(shell.includes("const board='/workspace/board/'"),'workspace shell: Board must stay inside Workspace');
