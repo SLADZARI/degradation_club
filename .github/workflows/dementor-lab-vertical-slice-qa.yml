@@ -25,3 +25,4 @@ jobs:
           git add dementor-lab/src/ui/app.mjs dementor-lab/tests/browser-smoke.mjs dementor-lab/src/encounter/runtime.mjs dementor-lab/scripts/collision-ui-patch.py .github/workflows/dementor-lab-vertical-slice-qa.yml
           git commit -m 'fix(lab): expose collision triggers and scenario-owned contact threshold'
           git push origin HEAD:agent/dementor-lab-vertical-slice-v0.3
+# retry-pattern-v2
