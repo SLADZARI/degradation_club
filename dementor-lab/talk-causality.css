@@ -7,14 +7,46 @@
 .talk-cause__step.trigger{background:var(--acid)}
 .talk-cause__arrow{display:grid;place-items:center;font:900 13px/1 monospace;opacity:.45}
 @media(max-width:430px){
-  .talk-cause{padding:6px;grid-template-columns:minmax(0,1fr) 14px minmax(0,1fr) 14px minmax(0,1fr);gap:3px}
-  .talk-cause__step{padding:6px 5px;min-height:48px}
-  .talk-cause__step small{font-size:7px}
-  .talk-cause__step strong{font-size:9px;line-height:1.08}
-  .talk-cause__arrow{font-size:11px}
+  .talk-cause{padding:4px;grid-template-columns:minmax(0,1fr) 10px minmax(0,1fr) 10px minmax(0,1fr);gap:2px}
+  .talk-cause__step{padding:4px 4px;min-height:39px;gap:2px}
+  .talk-cause__step small{font-size:6px;letter-spacing:.02em}
+  .talk-cause__step strong{font-size:8px;line-height:1.05}
+  .talk-cause__arrow{font-size:9px}
+
+  /* Mobile TALK density: keep one turn readable as one scene. */
+  .talk{padding-top:7px}
+  .talk .talk-record{padding:6px 7px;font-size:10px;line-height:1.1}
+  .talk .talk-record span{margin-top:2px;font-size:7px}
+  .talk .arena{height:154px;grid-template-columns:1fr 50px 1fr}
+  .talk .character-slot.small{width:116px;height:145px}
+  .talk .actor strong{font-size:10px;padding-bottom:4px}
+  .talk .actor.is-speaking>strong{padding:3px 5px;margin-top:-8px}
+  .talk .turn b{font-size:29px;line-height:.9}
+  .talk .turn span{font-size:7px}
+  .talk .arena[data-flow] .turn{min-height:62px}
+  .talk .arena[data-flow] .turn::after{margin-top:3px;padding:4px 3px;font-size:8px}
+
+  .talk .metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:3px 6px;padding:5px 6px}
+  .talk .metric{grid-template-columns:42px minmax(15px,1fr) 20px 20px minmax(15px,1fr);gap:2px;margin:1px 0;font-size:8px;min-width:0}
+  .talk .metric label{font-size:7px;overflow:hidden;text-overflow:ellipsis}
+  .talk .metric .n{font-size:8px}
+  .talk .bar{height:7px}
+
+  .talk .dialogue{min-height:0;height:auto;max-height:112px;padding:6px;gap:4px;overflow:hidden}
+  .talk .dialogue .bubble{display:none}
+  .talk .dialogue .bubble:nth-last-child(-n+2){display:block}
+  .talk .bubble{max-width:92%;padding:7px 8px;font-size:13px;line-height:1.15}
+  .talk .bubble small{font-size:7px;margin-bottom:3px}
+  .talk .bubble:last-child{border-width:2.5px}
+
+  .talk .talk-actions{gap:4px;grid-template-columns:1fr 72px}
+  .talk .talk-actions button{min-height:46px;font-size:10px}
 }
 @media(max-width:360px){
-  .talk-cause{grid-template-columns:minmax(0,1fr) 10px minmax(0,1fr) 10px minmax(0,1fr)}
-  .talk-cause__step{padding:5px 4px}
-  .talk-cause__step strong{font-size:8px}
+  .talk-cause{grid-template-columns:minmax(0,1fr) 8px minmax(0,1fr) 8px minmax(0,1fr)}
+  .talk-cause__step{padding:4px 3px}
+  .talk-cause__step strong{font-size:7px}
+  .talk .arena{height:146px;grid-template-columns:1fr 46px 1fr}
+  .talk .character-slot.small{width:108px;height:136px}
+  .talk .metric{grid-template-columns:38px minmax(12px,1fr) 18px 18px minmax(12px,1fr)}
 }
