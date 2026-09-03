@@ -30,7 +30,7 @@ export const BRAIN_PRESETS=Object.freeze([
   ],[edge('p5-e1','p5-trigger','p5-silent'),edge('p5-e2','p5-silent','p5-stop')])},
   {id:'see-what-happens',label:'ПОСМОТРИМ, ЧТО БУДЕТ',graph:graph('preset-see-what-happens',[
     node('p6-trigger','criticism',{},160,30),node('p6-joke','joke',{},70,190),node('p6-pressure','pressure',{},250,190),node('p6-repeat','repeat',{count:2},250,350),node('p6-stop','stop',{},100,500)
-  ],[edge('p6-e1','p6-trigger','p6-joke'),edge('p6-e2','p6-trigger','p6-pressure'),edge('p6-e3','p6-pressure','p6-repeat'),edge('p6-e4','p6-joke','p6-stop'),edge('p6-e5','p6-repeat','p6-stop')])}
+  ],[edge('p6-e1','p6-trigger','p6-joke'),edge('p6-e2','p6-trigger','p6-pressure'),edge('p6-e3','p6-pressure','p6-repeat'),edge('p6-e4','p6-joke','p6-stop')])}
 ]);
 
 export const BLANK_BRAIN=Object.freeze({
