@@ -12,6 +12,21 @@ Status: IMPLEMENTED / FINAL QA
 On mobile, opening a card must not shift its semantic content sideways into a narrow column.
 Actions reveal as an internal horizontal row while the card body keeps full usable width.
 
+## Human-readable behavior projection
+The BRAIN screen exposes the same BehaviorGraph at two levels:
+1. `КАК ЭТО СРАБОТАЕТ` — readable behavioral sentence for comprehension.
+2. The card stack and metro edges — editor for changing the same graph.
+
+Readable roles are human-facing projections of node families:
+- TRIGGER → `КОГДА`
+- STATE → `Я ЧУВСТВУ`
+- IMPULSE → `Я ХОЧУ`
+- REACTION → `Я ДЕЛАЮ`
+- CONTROL → `ДАЛЬШЕ`
+- ABILITY → `Я МОГУ`
+
+A readable step is clickable and focuses the exact real Trigger/node in the editor. The readable layer never stores its own route state.
+
 ## Branches
 A source with 2–3 outgoing routes must remain legible without opening an inspector.
 The source card may show the direct route label on up to two lines.
@@ -22,6 +37,12 @@ The editor distinguishes two visual roles without changing runtime semantics:
 - `SIDE BRANCH` — authored/manual additional routes; they occupy outer left lanes, use a lighter broken line, and never compete visually with the primary route.
 - When a source has several outgoing edges, port slots are separated vertically so lines leave the source independently rather than overlap.
 - Selecting a node temporarily promotes every real connected edge to full acid focus, including side branches.
+
+The readable projection mirrors the same distinction:
+- primary continuation stays in the main behavioral sentence;
+- every additional real outgoing edge is rendered under its source step as `ИЛИ → <TARGET>`;
+- tapping an alternative opens the exact target node;
+- the `ИЛИ` surface never creates, deletes, or reorders edges.
 
 Primary/side is a UI reading hierarchy only. It must never alter execution order or silently create/remove graph edges.
 
@@ -44,6 +65,7 @@ No connection action may require horizontal scrolling.
 
 ## QA note
 SVG edge focus is painted on `requestAnimationFrame`; browser smoke waits for the visual frame before asserting edge focus. This is a test timing contract, not a gameplay delay.
+Browser smoke also verifies that an authored side branch appears in the readable layer as `ИЛИ`, so readable causality cannot silently diverge from the BehaviorGraph.
 
 ## Principle
-`One main line to read; side lanes for alternatives. Visual hierarchy never changes causality.`
+`One main line to read; side lanes and ИЛИ for alternatives. Visual hierarchy never changes causality.`
