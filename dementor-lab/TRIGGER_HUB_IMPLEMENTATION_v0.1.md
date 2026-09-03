@@ -13,7 +13,7 @@ Mobile BRAIN projects Trigger infrastructure into one compact block:
 **НА ЧТО Я РЕАГИРУЮ**
 
 - collapsed presets show trigger chips instead of six full stack cards;
-- expanded hub shows every real Trigger, description, and current first destination;
+- expanded hub shows every real Trigger, description, and **all immediate destinations**;
 - selecting a Trigger highlights its downstream route;
 - `СВЯЗАТЬ` edits the real Trigger edge;
 - custom BRAIN with no Trigger asks `НА ЧТО ТЫ РЕАГИРУЕШЬ?`;
@@ -28,6 +28,8 @@ Mobile BRAIN projects Trigger infrastructure into one compact block:
 
 With multiple Trigger entry nodes the vertical body auto-sequence must not invent a hidden entry edge because two nodes happen to be adjacent in the UI array. Trigger edges are authored/explicit. The normal non-trigger body remains fast to reorder as a vertical sequence.
 
+If one Trigger has multiple outgoing edges, the expanded Hub lists all immediate destinations (for example `→ БЫТЬ ПРАВЫМ · ОБЪЯСНИТЬ`) rather than silently showing only the first branch.
+
 ## UI projection invariant
 
 A Trigger → body connection belongs to the Trigger Hub projection and is not duplicated as a second metro line inside the behavioral body stack. Body-stack edge counts therefore describe only visible body-to-body causality.
@@ -39,6 +41,7 @@ A Trigger → body connection belongs to the Trigger Hub projection and is not d
 - Custom authoring keeps the Hub open by default.
 - Expanding the hub reveals real Trigger rows.
 - Trigger → body connection uses the real graph node.
+- Multiple Trigger destinations remain visible in the expanded Hub.
 - Selecting/connecting a Trigger highlights its downstream route.
 - Body drag/reorder does not destroy Trigger ownership.
 - No page-level horizontal overflow on iPhone-sized viewport.
