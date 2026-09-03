@@ -56,5 +56,7 @@ Player-facing default surfaces use human language. Engine notation (`W3`, raw no
 ## QA invariant
 A passing mobile smoke must use the same visible controls a real player uses. Tests must not resurrect hidden legacy CTAs or bypass first-run/opt-in surfaces.
 
+The first-run guide is rendered on the next animation frame, so browser QA waits for the visible guide rather than assuming synchronous overlay timing.
+
 ## Product invariant
 **One screen, one primary question. Causality stays deep, but explanation does not compete with play.**
