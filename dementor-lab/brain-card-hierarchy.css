@@ -1,7 +1,7 @@
 /* BRAIN card information hierarchy — mobile-first.
    Closed card = human role / title / value / route.
    Full semantic description appears only after tap. */
-.brain-behavior-block{position:relative;margin-top:10px;padding-top:0}
+.brain-behavior-block{position:static;margin-top:10px;padding-top:0}
 .brain-behavior-head{position:relative;z-index:3;margin:0 0 10px 0;border:2px solid var(--ink);background:var(--paper);padding:10px 12px}
 .brain-behavior-head small{display:block;font:900 9px/1 monospace;letter-spacing:.08em;opacity:.55}
 .brain-behavior-head strong{display:block;margin-top:4px;font-size:15px;line-height:1.05}
