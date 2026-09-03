@@ -1,0 +1,24 @@
+name: Dementor Lab Readable Brain Once
+on:
+  push:
+    paths:
+      - '.github/workflows/dementor-lab-readable-brain-once.yml'
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/dementor-lab-vertical-slice-v0.3
+      - name: Apply readable brain patch
+        run: python3 dementor-lab/scripts/patch-readable-brain-route.py
+      - name: Commit patch
+        run: |
+          rm dementor-lab/scripts/patch-readable-brain-route.py
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add dementor-lab/src/ui/app.mjs dementor-lab/tests/browser-smoke.mjs dementor-lab/scripts/patch-readable-brain-route.py
+          git commit -m 'feat(lab): project brain graph as readable behavior'
+          git push origin HEAD:agent/dementor-lab-vertical-slice-v0.3
