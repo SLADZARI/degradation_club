@@ -25,4 +25,4 @@ A real authored connection must be readable in three equivalent ways:
 
 This hierarchy applies consistently to STATE, IMPULSE, REACTION, CONTROL and ABILITY nodes. Trigger infrastructure remains projected through Trigger Hub under its separate approved contract.
 
-QA note: browser smoke resolves nodes by exact card title so route labels such as `→ STOP` cannot masquerade as the destination node itself.
+QA note: browser smoke resolves nodes by exact card title so route labels such as `→ STOP` cannot masquerade as the destination node itself. Current gate is intentionally re-run only after that selector contract is present on branch head.
