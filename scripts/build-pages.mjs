@@ -179,6 +179,13 @@ function hardenProductionRuntime() {
     source = source.replace(disabledCommerceLoader, '');
     fs.writeFileSync(globalHeaderPath, source);
   }
+  const motionPath = path.join(out, 'motion-v1.js');
+  if (fs.existsSync(motionPath)) {
+    let source = fs.readFileSync(motionPath, 'utf8');
+    source = source.replace("location.assign('/design-system/');", 'unlocked=false;');
+    source = source.replace("window.DEMENTOR_SITE_CONFIG?.internalTools?.enabled&&location.assign('/design-system/')", 'unlocked=false');
+    fs.writeFileSync(motionPath, source);
+  }
 }
 
 copyDir(root, out);
