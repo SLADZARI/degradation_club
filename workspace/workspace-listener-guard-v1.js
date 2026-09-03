@@ -1,11 +1,11 @@
 /*
- * Dementor Club workspace navigation listener guard.
+ * Dementor Club Workspace navigation listener guard.
  *
- * The workspace shell is persistent while #appView is re-rendered. The legacy
- * bind() pass scans document-level [data-route] nodes after every render, which
- * can otherwise stack click handlers on the persistent sidebar navigation.
- * Dynamic route buttons inside #appView are replaced on render and are not
- * affected by this guard.
+ * The Workspace shell is persistent while #appView is re-rendered. The legacy
+ * controller bind() pass scans document-level [data-route] nodes after every
+ * render, which can otherwise stack click handlers on persistent sidebar
+ * controls. Root route URL state is owned by workspace-shell-v1.js; this guard
+ * only prevents duplicate controller listeners.
  */
 (() => {
   const nativeAdd = EventTarget.prototype.addEventListener;

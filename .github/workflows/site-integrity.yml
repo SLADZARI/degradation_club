@@ -16,7 +16,7 @@ permissions:
 jobs:
   validate:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - name: Checkout candidate branch
         uses: actions/checkout@v4
@@ -32,6 +32,16 @@ jobs:
         run: node scripts/validate-visual-contract.mjs
       - name: Build production candidate artifact
         run: node scripts/build-pages.mjs
+      - name: Validate canonical shell integration
+        run: node scripts/validate-shell-contract.mjs
+      - name: Validate built JavaScript syntax
+        run: node scripts/validate-built-js-syntax.mjs
+      - name: Install browser smoke runtime
+        run: |
+          npm install --no-save --no-package-lock playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Validate browser shell and Workspace recovery
+        run: node scripts/validate-browser-shell.mjs
       - name: Validate production route manifest
         run: node scripts/validate-route-manifest.mjs
       - name: Validate production artifact release gate

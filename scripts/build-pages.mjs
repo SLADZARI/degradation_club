@@ -34,13 +34,27 @@ const skipRootFiles = new Set([
   'dementor-cart-v1.js', 'merch-cart-bridge-v1.js',
 ]);
 const textExt = new Set(['.html', '.css', '.js', '.json', '.xml', '.txt', '.webmanifest']);
+const privateFooterPrefixes = [
+  'workspace/', 'community/board/', 'community/artifact/', 'join/apply/', 'join/result/', 'auth/callback/', 'profile/'
+];
 
 fs.rmSync(out, { recursive: true, force: true });
 fs.mkdirSync(out, { recursive: true });
 
-function normalizeProductionText(text) {
+function normalizeProductionText(text, ext='') {
   let result = text;
   for (const legacy of legacyOrigins) result = result.replaceAll(legacy, productionOrigin);
+
+  // Source supports the historical GitHub Pages sub-path. Production does not.
+  // Never run a blind `/degradation_club/ -> /` replacement across JS: it also
+  // matches the slash inside regex literals such as /^\/degradation_club/ and
+  // turns them into syntactically invalid /^\/. Keep compatibility checks as
+  // harmless never-match sentinels, then normalize actual path literals/markup.
+  if (ext === '.js') {
+    result = result.replaceAll('\\/degradation_club/', '\\/__dc_source_path_disabled__/');
+    result = result.replaceAll("'/degradation_club/'", "'/__dc_source_path_disabled__/'");
+    result = result.replaceAll('"/degradation_club/"', '"/__dc_source_path_disabled__/"');
+  }
   result = result.replaceAll('/degradation_club/', '/');
   result = result.replaceAll('/assets/ink/home-interruption-03.webp', '/assets/ink/home_01.webp');
   return result;
@@ -67,7 +81,7 @@ function copyDir(src, dst) {
     }
     if (shouldSkipFile(from, entry.name)) continue;
     const ext = path.extname(entry.name).toLowerCase();
-    if (textExt.has(ext)) fs.writeFileSync(to, normalizeProductionText(fs.readFileSync(from, 'utf8')));
+    if (textExt.has(ext)) fs.writeFileSync(to, normalizeProductionText(fs.readFileSync(from, 'utf8'), ext));
     else fs.copyFileSync(from, to);
   }
 }
@@ -78,7 +92,7 @@ function copyProductionDependency(rel) {
   if (!fs.existsSync(from) || !fs.statSync(from).isFile()) throw new Error(`Approved production dependency is missing: ${rel}`);
   fs.mkdirSync(path.dirname(to), { recursive: true });
   const ext = path.extname(rel).toLowerCase();
-  if (textExt.has(ext)) fs.writeFileSync(to, normalizeProductionText(fs.readFileSync(from, 'utf8')));
+  if (textExt.has(ext)) fs.writeFileSync(to, normalizeProductionText(fs.readFileSync(from, 'utf8'), ext));
   else fs.copyFileSync(from, to);
 }
 
@@ -89,7 +103,7 @@ function copyProductionProjection(spec) {
   fs.mkdirSync(path.dirname(to), { recursive: true });
   const ext = path.extname(spec.from).toLowerCase();
   if (!textExt.has(ext)) { fs.copyFileSync(from, to); return; }
-  let text = normalizeProductionText(fs.readFileSync(from, 'utf8'));
+  let text = normalizeProductionText(fs.readFileSync(from, 'utf8'), ext);
   if (spec.to.startsWith('workspace/admin/')) {
     text = text.replaceAll('href="../admin/"', 'href="/workspace/admin/"');
     text = text.replaceAll("href='../admin/'", "href='/workspace/admin/'");
@@ -107,11 +121,44 @@ function walk(dir, fn) {
   }
 }
 
+function isPrivateFooter(rel) {
+  return privateFooterPrefixes.some(prefix => rel.startsWith(prefix));
+}
+
+function isWorkspaceShell(rel) {
+  return rel.startsWith('workspace/');
+}
+
+function normalizeShellMarkup(html, rel) {
+  if (rel === 'auth/callback/index.html') return html;
+  const workspaceShell=isWorkspaceShell(rel);
+
+  // A public page never owns the primary club header. Workspace is a separate
+  // authenticated shell and must not receive the public header at all.
+  if(!workspaceShell){
+    html = html.replace(/<header[^>]*class=["']topbar(?:\s[^"']*)?["'][^>]*>[\s\S]*?<\/header>/gi, '');
+    if (!html.includes('/global-header.css')) html = html.replace('</head>', '<link rel="stylesheet" href="/global-header.css">\n</head>');
+    if (!html.includes('/global-header.js')) html = html.replace('</body>', '<script src="/global-header.js" defer></script>\n</body>');
+  }else{
+    html = html.replace(/<link[^>]+href=["']\/global-header\.css["'][^>]*>/gi,'');
+    html = html.replace(/<script[^>]+src=["']\/global-header\.js["'][^>]*><\/script>/gi,'');
+  }
+
+  if (!isPrivateFooter(rel)) {
+    // Local footer markup is source history only. It must not survive into production.
+    html = html.replace(/<footer\b[^>]*>[\s\S]*?<\/footer>/gi, '');
+    if (!html.includes('/global-footer.css')) html = html.replace('</head>', '<link rel="stylesheet" href="/global-footer.css">\n</head>');
+    if (!html.includes('/global-footer.js')) html = html.replace('</body>', '<script src="/global-footer.js" defer></script>\n</body>');
+  }
+  return html;
+}
+
 function injectProductionModules() {
   walk(out, full => {
     if (!full.endsWith('.html')) return;
     const rel = path.relative(out, full).replaceAll('\\','/');
     let html = fs.readFileSync(full, 'utf8');
+    html = normalizeShellMarkup(html, rel);
     const isPrivateTool = rel.startsWith('workspace/admin/');
     if (!isPrivateTool) {
       if (!html.includes('/entity-recommendations-v1.css')) html = html.replace('</head>', '<link rel="stylesheet" href="/entity-recommendations-v1.css">\n</head>');
@@ -130,13 +177,6 @@ function hardenProductionRuntime() {
     source = source.replace(/const legacyOrigins=\[[^\]]*\];/, 'const legacyOrigins=[];');
     source = source.replace("link.href=canonical+path.replace(/^\\/degradation_club/,'')", 'link.href=canonical+path');
     fs.writeFileSync(configPath, source);
-  }
-  const globalHeaderPath = path.join(out, 'global-header.js');
-  if (fs.existsSync(globalHeaderPath)) {
-    let source = fs.readFileSync(globalHeaderPath, 'utf8');
-    const disabledCommerceLoader = "if(cartEnabled&&(path.startsWith('/merch/')||path.startsWith('/objects/')||path.startsWith('/cart/'))){load('/site-config.js');load('/dementor-cart-v1.js');if(path.startsWith('/merch/drop-001/')||path.startsWith('/objects/'))load('/merch-cart-bridge-v1.js')}";
-    source = source.replace(disabledCommerceLoader, '');
-    fs.writeFileSync(globalHeaderPath, source);
   }
   const motionPath = path.join(out, 'motion-v1.js');
   if (fs.existsSync(motionPath)) {
