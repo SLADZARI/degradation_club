@@ -110,7 +110,7 @@ export function executeActorTurn(encounter,{trigger=null}={}){
 }
 export function checkTerminal(encounter){
   for(const [side,a] of Object.entries(encounter.actors)){if(a.state.brain>=100)return {type:'BREAKDOWN',reason:'BRAIN',loser:side,turn:encounter.turn};if(a.state.energy<=0)return {type:'BREAKDOWN',reason:'ENERGY',loser:side,turn:encounter.turn};if(a.state.contact<=0&&encounter.scenario.objective==='contact')return {type:'BREAKDOWN',reason:'CONTACT',loser:side,turn:encounter.turn}}
-  const limit=encounter.scenario.turnLimit||20;if(encounter.turn>=limit){if(encounter.scenario.objective==='contact'){const relationshipContact=Math.min(encounter.actors.A.state.contact,encounter.actors.B.state.contact);return relationshipContact>=25?{type:'OBJECTIVE_COMPLETE',reason:'CONTACT',objective:'contact',relationshipContact,turn:encounter.turn}:{type:'OBJECTIVE_FAILED',reason:'CONTACT_LOW',objective:'contact',relationshipContact,turn:encounter.turn}}return {type:'TURN_LIMIT',reason:'LIMIT',turn:encounter.turn}}
+  const limit=encounter.scenario.turnLimit||20;if(encounter.turn>=limit){if(encounter.scenario.objective==='contact'){const relationshipContact=Math.min(encounter.actors.A.state.contact,encounter.actors.B.state.contact);const minContact=Number(encounter.scenario.objectiveRules?.minRelationshipContact??25);return relationshipContact>=minContact?{type:'OBJECTIVE_COMPLETE',reason:'CONTACT',objective:'contact',relationshipContact,turn:encounter.turn}:{type:'OBJECTIVE_FAILED',reason:'CONTACT_LOW',objective:'contact',relationshipContact,turn:encounter.turn}}return {type:'TURN_LIMIT',reason:'LIMIT',turn:encounter.turn}}
   return null;
 }
 export function applyHotPatch(encounter,patch){
