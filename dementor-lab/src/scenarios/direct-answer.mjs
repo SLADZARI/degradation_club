@@ -20,7 +20,6 @@ const nodes=[
   {id:'d-ignore',type:'ignore',p:{}},
   {id:'d-underpressure',type:'underpressure',p:{}},
   {id:'d-explain',type:'explain',p:{}},
-  {id:'d-agree',type:'agree',p:{}},
   {id:'d-joke',type:'joke',p:{}},
   {id:'d-silent',type:'silent',p:{}},
   {id:'d-pressure',type:'pressure',p:{}}
