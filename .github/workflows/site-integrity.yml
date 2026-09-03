@@ -32,5 +32,7 @@ jobs:
         run: node scripts/validate-visual-contract.mjs
       - name: Build production candidate artifact
         run: node scripts/build-pages.mjs
+      - name: Validate production route manifest
+        run: node scripts/validate-route-manifest.mjs
       - name: Validate production artifact release gate
         run: node scripts/validate-production-release.mjs
