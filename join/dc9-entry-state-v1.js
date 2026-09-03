@@ -13,9 +13,9 @@ function showMemberReturn(status){
     <div class="dc9-member-return__lead">Клуб уже происходит. Вы в нём уже есть.</div>
     <p class="dc9-member-return__copy">Основной маршрут — Community. Карта DC-9 остаётся в аккаунте как отдельный артефакт, а не как повторный вступительный экзамен.</p>
     <div class="dc9-actions">
-      <a class="dc9-button primary" href="${route('/community/board/')}">ВОЙТИ В COMMUNITY →</a>
+      <a class="dc9-button primary" href="${route('/workspace/board/')}">ВОЙТИ В COMMUNITY →</a>
       <a class="dc9-button" href="${route('/join/result/')}">МОЯ КАРТА DC-9</a>
-      <a class="dc9-text-button" href="${route('/account/')}">МОЙ АККАУНТ</a>
+      <a class="dc9-text-button" href="${route('/workspace/')}">МОЙ АККАУНТ</a>
     </div>
     <div class="dc9-member-return__state">MEMBER ACTIVE · ${activated?'COMMUNITY ДОСТУПНА':'ПЕРВЫЙ АРТЕФАКТ ЕЩЁ НЕ ОСТАВЛЕН'}</div>`;
   host.hidden=false;
