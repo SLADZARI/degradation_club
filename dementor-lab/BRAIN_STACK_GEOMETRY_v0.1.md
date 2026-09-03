@@ -17,9 +17,17 @@ A source with 2–3 outgoing routes must remain legible without opening an inspe
 The source card may show the direct route label on up to two lines.
 The graph rail/edge layer remains the authoritative visual connection.
 
+The editor distinguishes two visual roles without changing runtime semantics:
+- `PRIMARY ROUTE` — the inner metro lane and strongest continuous line; it represents the main readable stack progression.
+- `SIDE BRANCH` — authored/manual additional routes; they occupy outer left lanes, use a lighter broken line, and never compete visually with the primary route.
+- When a source has several outgoing edges, port slots are separated vertically so lines leave the source independently rather than overlap.
+- Selecting a node temporarily promotes every real connected edge to full acid focus, including side branches.
+
+Primary/side is a UI reading hierarchy only. It must never alter execution order or silently create/remove graph edges.
+
 ## Connection target
 CONNECT MODE must preserve enough width for both target title and the `СОЕДИНИТЬ` touch target.
 No connection action may require horizontal scrolling.
 
 ## Principle
-`Reserve space for causality; do not sacrifice the readable character card to editor chrome.`
+`One main line to read; side lanes for alternatives. Visual hierarchy never changes causality.`
