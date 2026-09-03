@@ -9,9 +9,10 @@ The visible game explains behavior to a person first. Technical causality stays 
 - Appearance controls fit into one compact mobile row.
 - Shoes are not user-configurable in this slice.
 - Glasses and small accessories are one visible category.
+- The selected appearance category is the only strongly highlighted tab; equipped state is secondary.
 - Outfit randomization and full appearance reset live on the character stage.
 - Ownership/debug copy is not shown to players.
-- Bottom navigation remains the persistent route between PERSON / BRAIN / TALK.
+- The large duplicate `СОБРАТЬ ЕМУ МОЗГ` CTA is removed from the visible layer; bottom navigation remains the persistent route between PERSON / BRAIN / TALK.
 
 ## BRAIN
 - Trigger inputs remain real runtime nodes.
@@ -33,11 +34,12 @@ The visible game explains behavior to a person first. Technical causality stays 
 - Opening technical detail pauses AUTO.
 - Character names and per-side metric danger remain explicit.
 
-## RESULT
+## RESULT / REPAIR
 - Result headline states the actual breakdown reason where applicable.
 - Main explanation uses human language with light Dementor humor instead of raw node arithmetic.
 - Behavioral arc is phrased as a recognizable habit, not internal engine terminology.
-- A suspicious node is described as a behavior problem first; node identity remains available for repair/replay.
+- A suspicious node is described as a behavior problem first and highlighted as a recommendation.
+- `ПОЧИНИТЬ МОЗГ` returns to BRAIN without locking every other node. The player may repair any part of their own graph.
 
 ## Invariant
-`graph truth → visible behavior → readable conversation → human explanation → optional technical evidence`
+`graph truth → visible behavior → readable conversation → human explanation → optional technical evidence → editable repair`
