@@ -2,9 +2,13 @@ from pathlib import Path
 
 app=Path('dementor-lab/src/ui/app.mjs')
 s=app.read_text()
-old="if(family==='TRIGGER'&&node.type!==CRITICISM_IDEA_SCENARIO.openingTrigger)continue;if(node.availableInSlice===false)continue;"
-new="if(node.availableInSlice===false)continue;"
-if old not in s: raise SystemExit('app trigger filter pattern not found')
+old="familyNodes(f).filter(n=>n.availableInSlice!==false).filter(n=>n.family!=='TRIGGER'||n.type===CRITICISM_IDEA_SCENARIO.openingTrigger).map"
+new="familyNodes(f).filter(n=>n.availableInSlice!==false).map"
+if old not in s: raise SystemExit('app trigger library pattern not found')
+s=s.replace(old,new)
+old="const d=trace.metricDeltas.self,m=trace.memoryChanges?.[0];const parts=Object.entries(d).filter(([,v])=>v).map(([k,v])=>`${k.toUpperCase()} ${v>0?'+':''}${Number(v.toFixed?.(1)??v)}`);if(m)parts.unshift(`${String(m.key).toUpperCase()} ${m.before}→${m.after}`);"
+new="const d=trace.metricDeltas.self,memory=trace.memoryChanges||[];const parts=Object.entries(d).filter(([,v])=>v).map(([k,v])=>`${k.toUpperCase()} ${v>0?'+':''}${Number(v.toFixed?.(1)??v)}`);for(const m of [...memory].reverse())parts.unshift(`${String(m.key).toUpperCase()} ${m.before}→${m.after}`);"
+if old not in s: raise SystemExit('app memory delta pattern not found')
 app.write_text(s.replace(old,new))
 
 browser=Path('dementor-lab/tests/browser-smoke.mjs')
