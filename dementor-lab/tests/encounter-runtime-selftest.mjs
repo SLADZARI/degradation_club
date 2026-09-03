@@ -6,24 +6,20 @@ function fresh(){const actors=createCriticismActors();return createEncounter({sc
 
 const a=fresh(),b=fresh();
 const ta=executeActorTurn(a).trace,tb=executeActorTurn(b).trace;
-assert.deepEqual({reaction:ta.selectedReaction,impulse:ta.selectedImpulse,nodes:ta.visitedNodes,deltas:ta.metricDeltas,memory:ta.memoryChanges},{reaction:tb.selectedReaction,impulse:tb.selectedImpulse,nodes:tb.visitedNodes,deltas:tb.metricDeltas,memory:tb.memoryChanges});
-assert.equal(ta.selectedReaction,'explain');assert.equal(ta.selectedImpulse,'beright');assert.equal(a.actors.A.state.memory.resentment,1);
+assert.deepEqual({reaction:ta.selectedReaction,impulse:ta.selectedImpulse,nodes:ta.visitedNodes,deltas:ta.metricDeltas,memory:ta.memoryChanges,event:ta.event},{reaction:tb.selectedReaction,impulse:tb.selectedImpulse,nodes:tb.visitedNodes,deltas:tb.metricDeltas,memory:tb.memoryChanges,event:tb.event});
+assert.equal(ta.selectedReaction,'explain');assert.equal(ta.selectedImpulse,'beright');assert.equal(ta.event.type,'COUNTERPOINT');assert.equal(a.nextTrigger,'pushback');assert.equal(a.actors.A.state.memory.resentment,1);
+assert.equal(a.pendingRepeats.A?.remaining,3,'REPEAT ×4 stores three future attempts after first reaction');
 
-const h=fresh();let guard=0;
-while(h.status!=='HOT_PATCH'&&!h.result&&guard++<12)executeActorTurn(h);
-assert.equal(h.status,'HOT_PATCH','authored scenario must expose HOT PATCH before terminal result');
-assert.ok(h.pendingTurn?.breakpoint,'HOT PATCH keeps a pending causal turn');
-const repeatId=h.pendingTurn.breakpoint.nodeIds.find(id=>h.actors[h.activeActor].brainGraph.nodes.find(n=>n.id===id)?.type==='repeat');
-assert.ok(repeatId,'pending causal chain contains repeat node');
+// Next actor consumes the previous reaction-derived trigger through a real graph.
+const second=executeActorTurn(a).trace;assert.equal(second.actorId,'B');assert.equal(second.trigger,'pushback');assert.equal(second.event.type,'COUNTERPOINT');
+// A has not been accepted, so its pending repeat overrides the incoming pushback on its next activation.
+const third=executeActorTurn(a).trace;assert.equal(third.actorId,'A');assert.equal(third.repeatOverride,true);assert.equal(third.selectedReaction,'explain');assert.equal(a.pendingRepeats.A?.remaining,2);
+
+// Predictive HOT PATCH is owned only by Character A.
+const h=fresh();h.actors.A.state.brain=85;
+const pending=executeActorTurn(h);assert.equal(h.status,'HOT_PATCH','high-brain repeating player exposes HOT PATCH before committing the turn');
+assert.ok(pending.breakpoint);const repeatId=pending.breakpoint.nodeIds.find(id=>h.actors.A.brainGraph.nodes.find(n=>n.id===id)?.type==='repeat');assert.ok(repeatId);
 const beforeTurn=h.turn,beforeMemory=JSON.stringify(h.actors.A.state.memory),beforeTranscript=h.transcript.length;
-const changed=applyHotPatch(h,{kind:'reduce-repeat',actorId:h.activeActor,nodeId:repeatId});
-assert.equal(changed.before,4);assert.equal(changed.after,3);
-assert.equal(h.turn,beforeTurn,'patch must not reset or consume turn');
-assert.equal(JSON.stringify(h.actors.A.state.memory),beforeMemory,'patch must not reset memory');
-assert.equal(h.transcript.length,beforeTranscript,'patch must not reset transcript');
-assert.equal(h.status,'NEXT_TURN');
-
-const resumed=executeActorTurn(h);
-assert.ok(resumed.trace||resumed.result);assert.ok(h.turn>beforeTurn);assert.equal(h.patches.length,1);
-assert.equal(h.actors.A.brainGraph.nodes.find(n=>n.id===repeatId).p.count,3);
+const changed=applyHotPatch(h,{kind:'reduce-repeat',actorId:'A',nodeId:repeatId});assert.equal(changed.before,4);assert.equal(changed.after,3);assert.equal(h.turn,beforeTurn);assert.equal(JSON.stringify(h.actors.A.state.memory),beforeMemory);assert.equal(h.transcript.length,beforeTranscript);assert.equal(h.status,'NEXT_TURN');
+assert.throws(()=>{const x=fresh();x.status='HOT_PATCH';applyHotPatch(x,{kind:'reduce-repeat',actorId:'B',nodeId:'b-repeat'})},/only player Character A/,'generated opponent can never be hot-patched');
 console.log('DEMENTOR LAB encounter runtime selftest: PASS');
