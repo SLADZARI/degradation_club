@@ -1,473 +1,307 @@
 # Dementor Club — Production Flow QA Ledger
 
-Status: **ACTIVE / MEMBERSHIP V2 CORE PASS / QA BATCH 02 MERGED TO PRODUCTION / DEPLOY + RETEST PENDING**  
+Status: **ACTIVE / MEMBERSHIP V2 CORE PASS / QA BATCH 02 LIVE REGRESSIONS / CORRECTIVE BATCH 03 IN CI**  
 Date opened: **2026-09-02**  
+Last live regression pass: **2026-09-03**  
 Environment: **PRODUCTION / https://dementor.club**  
 Source of truth: `dementor-club`  
 Implementation branch: `dementor-club-site`  
 Production branch: `dementor-club-production`
 
-## 0. Purpose
+## 0. Purpose and release rule
 
-This is the **single live QA ledger** for Membership v2 and adjacent production surfaces encountered during the pre-advertising QA pass.
+This is the **single live QA ledger** for Membership v2 and adjacent production/site-shell surfaces discovered during pre-advertising QA.
 
-All findings stay here. A finding is closed only after:
+A finding is closed only after root cause → implementation → release gates → explicit human deploy → live retest.
 
-1. root cause is identified;
-2. implementation is staged in `dementor-club-site`;
-3. the release passes production gates;
-4. the fix is merged/deployed only after explicit human approval;
-5. the behavior is retested on `https://dementor.club`.
-
-Deployment remains manual. QA work must not deploy by itself.
+**Deployment is always manual. QA work must not deploy by itself.**
 
 ## 1. Canonical Membership v2 flow
 
 `AUTHENTICATED → DC9 9/9 → APPLICATION_AVAILABLE → APPLICATION_SUBMITTED → UNDER_REVIEW → 2 independent APPROVE → MEMBER_ACTIVE → COMMUNITY / POST-ADMISSION`
 
-Boundary:
+Boundary: `AUTHENTICATION ≠ DC9 COMPLETE ≠ APPLICATION ≠ MEMBERSHIP`.
 
-`AUTHENTICATION ≠ DC9 COMPLETE ≠ APPLICATION ≠ MEMBERSHIP`
+Controlled QA account: `sharecraftwideo@gmail.com` / Sled ZARI / DC-9 9/9. Historical records and grants are preserved.
 
-Controlled QA account:
+Production reviewers: Евгений Казаков + Nikita Lobushkin. Threshold: **2 independent APPROVE**.
 
-- `sharecraftwideo@gmail.com`;
-- display identity observed: `Sled ZARI`;
-- DC-9: `9/9`;
-- historical artifacts / grants preserved.
+## 2. Severity
 
-Production reviewers:
-
-- Евгений Казаков — active `dementor` + `owner_admin`;
-- Nikita Lobushkin — active `dementor` + `owner_admin`.
-
-Threshold: **2 independent APPROVE decisions**.
-
-## 2. Severity model
-
-- **P0 / BLOCKER** — breaks canonical flow, access, security or authoritative state.
-- **P1 / MAJOR** — flow works technically but navigation, state, shell, privacy or release integrity can materially fail.
-- **P2 / MINOR** — ambiguity/usability issue without authoritative state corruption.
+- **P0 / BLOCKER** — canonical flow, access, security or authoritative state is broken.
+- **P1 / MAJOR** — material navigation, shell, privacy, UX or release-integrity failure.
+- **P2 / MINOR** — ambiguity/usability issue without state corruption.
 - **P3 / POLISH** — refinement only.
 
 ## 3. Membership / account findings
 
-### QA-MEM-001 — Legacy `/join/member/` remains in Membership v2 journey
+### QA-MEM-001 — Legacy `/join/member/`
+Status: **FIX RELEASED / REGRESSION SET** · P0  
+Legacy v1 activation removed; compatibility route resolves to Membership v2 `/join/apply/`.
 
-Status: **FIX RELEASED / PRODUCTION RETEST TO KEEP IN REGRESSION SET**  
-Severity: **P0 / BLOCKER**
+### QA-MEM-002 — Reviewer decision not visually final
+Status: **FIX RELEASED / REGRESSION RETEST REQUIRED** · P1  
+Expected: own decision visibly final; progress `N / 2 DEMENTORS`; no misleading repeat controls.
 
-Observed legacy surface duplicated identity/contact/legal and depended on disabled `dc_activate_membership_v1`.
+### QA-MEM-003 — `ACCOUNT → CART` 404
+Status: **FIX RELEASED / REGRESSION RETEST REQUIRED** · P1  
+Production commerce remains disabled; Cart must not be exposed or indexed while disabled.
 
-Fix:
+### QA-MEM-004 — Historical completion vs repeat course attempt
+Status: **OPEN / PRODUCT-STATE CLARIFICATION REQUIRED** · P2  
+Historical `Думай с опасностью` completion/certificate is from 2026-08-28. A later repeat pass must not overwrite or masquerade as that historical completion. Repeat-attempt storage/model still needs clarification.
 
-- `/join/member/` becomes compatibility routing to `/join/apply/`;
-- no legacy auto-activation runtime;
-- Membership v2 remains the admission authority.
+### QA-MEM-005 — Logout discoverability
+Status: **FIX RELEASED / REGRESSION LINKED TO QA-MEM-023** · P1
 
----
+### QA-MEM-006 — Active Member `/join/apply/` copy
+Status: **FIX RELEASED / REGRESSION RETEST REQUIRED** · P2
 
-### QA-MEM-002 — Reviewer decision was not visually final
+### QA-MEM-007 — Membership application nav contrast
+Status: **FIX RELEASED / REGRESSION RETEST REQUIRED** · P1
 
-Status: **FIX RELEASED / REGRESSION RETEST REQUIRED**  
-Severity: **P1 / MAJOR**
+### QA-MEM-008 — Private Board discoverability
+Status: **REOPENED THROUGH QA-MEM-021** · P1  
+Direct Board access worked, but live Batch 02 still left Board outside Workspace.
 
-Server behavior was correct: one review row per `(application, reviewer)`.
+### QA-MEM-009 — Membership Review outside Workspace shell
+Status: **FIX RELEASED / REGRESSION RETEST REQUIRED** · P1  
+Ordinary Member negative access test previously PASS.
 
-Fix behavior expected:
+### QA-MEM-010 — Archived Artifact history unavailable
+Status: **FIX RELEASED / REGRESSION RETEST REQUIRED** · P1  
+Known QA records: active `Куда двигаемся - народ?`; archived `гусь`.
 
-- own decision becomes visibly final;
-- normal decision controls stop looking repeatable;
-- approval progress shows `N / 2 DEMENTORS`.
+### QA-MEM-011 — `/join/apply/` mobile oversized
+Status: **FIX RELEASED / MOBILE REGRESSION RETEST REQUIRED** · P1
 
----
+## 4. Membership v2 authoritative PASS evidence
 
-### QA-MEM-003 — `ACCOUNT → CART` exposed a production 404
+Verified on production before shell regression work:
 
-Status: **FIX RELEASED / REGRESSION RETEST REQUIRED**  
-Severity: **P1 / MAJOR NAVIGATION**
-
-Root cause:
-
-- `cart/index.html` exists in source;
-- production builder intentionally excludes top-level `cart`;
-- production hardening sets `cartEnabled:false` and `checkoutEnabled:false`.
-
-Correct behavior: do not publish Cart while commerce is disabled; do not expose the navigation action.
-
----
-
-### QA-MEM-004 — Historical completed course is not distinguished from a repeat pass
-
-Status: **OPEN / PRODUCT-STATE CLARIFICATION REQUIRED**  
-Severity: **P2 / STATE AMBIGUITY**
-
-Observed:
-
-- Workspace shows `Думай с опасностью` as `completed`;
-- course can simultaneously continue a new Day 2 repeat;
-- completion certificate remains visible.
-
-Database fact:
-
-- historical completion and certificate are from **2026-08-28**;
-- current Day 2 did not newly create that completion.
-
-Required:
-
-- identify repeat-attempt storage/model;
-- preserve historical certificate;
-- present previous completion and current repeat as separate states.
-
----
-
-### QA-MEM-005 — Logout was not discoverable
-
-Status: **FIX RELEASED / REGRESSION RETEST REQUIRED**  
-Severity: **P1 / ACCOUNT UX + SESSION CONTROL**
-
-Expected after fix:
-
-- explicit `LOG OUT` in Workspace;
-- Supabase session ends;
-- protected surfaces do not retain authenticated data;
-- switching account does not inherit stale role/member UI.
-
----
-
-### QA-MEM-006 — Active Member application route used pre-admission hero copy
-
-Status: **FIX RELEASED / REGRESSION RETEST REQUIRED**  
-Severity: **P2 / COPY + STATE PRESENTATION**
-
-Expected active state: Membership route reflects active membership and directs the user into Workspace instead of explaining how to apply.
-
----
-
-### QA-MEM-007 — Membership application top navigation had low contrast
-
-Status: **FIX RELEASED / REGRESSION RETEST REQUIRED**  
-Severity: **P1 / NAVIGATION + ACCESSIBILITY**
-
-Expected: readable global navigation on `/join/apply/` on desktop and mobile.
-
----
-
-### QA-MEM-008 — Private Community Board was not discoverable from Workspace
-
-Status: **FIX RELEASED / ACCESS PASS / DISCOVERABILITY REGRESSION RETEST REQUIRED**  
-Severity: **P1 / INFORMATION ARCHITECTURE**
-
-Access fact: accepted Member can open `/community/board/`.
-
-Expected Workspace architecture exposes `COMMUNITY BOARD` inside authenticated navigation.
-
----
-
-### QA-MEM-009 — Membership Review opened outside Workspace shell
-
-Status: **FIX RELEASED / REGRESSION RETEST REQUIRED**  
-Severity: **P1 / ROLE WORKFLOW**
-
-Security test already passed: ordinary Member did not receive reviewer data.
-
-Expected after fix:
-
-- Review stays inside Workspace context;
-- non-Dementor direct access does not expose review surface/data.
-
----
-
-### QA-MEM-010 — Archived Artifacts existed in data but were not discoverable
-
-Status: **FIX RELEASED / REGRESSION RETEST REQUIRED**  
-Severity: **P1 / MEMBER HISTORY**
-
-Known QA account records:
-
-- `Куда двигаемся - народ?` — active;
-- `гусь` — archived, closed 2026-08-30.
-
-Expected:
-
-- `/workspace/artifacts/` exposes own Active + Archive history;
-- archived record never returns to live Board.
-
----
-
-### QA-MEM-011 — Membership application mobile composition was oversized
-
-Status: **FIX RELEASED / MOBILE REGRESSION RETEST REQUIRED**  
-Severity: **P1 / RESPONSIVE UX**
-
-Expected: compact mobile hero, spacing, fields and controls without desktop-scale scrolling overhead.
-
-## 4. Membership v2 confirmed PASS
-
-Core contract verified on production:
-
-- application submitted after server-side 9/9;
-- Евгений approved independently;
-- first approval did not activate membership;
-- Nikita approved independently;
-- threshold reached at exactly 2 approvals;
+- server-side DC-9 9/9 gate;
+- Membership Application submit;
+- first independent Dementor approval does not activate membership;
+- second independent approval reaches exactly 2;
 - application → `accepted`;
 - membership → `active`;
 - source → `membership-review-v2`;
-- accepted Member could not submit repeat application;
-- accepted application disappeared from active review queue;
+- accepted Member blocked from repeat application;
+- accepted application removed from active review queue;
 - accepted Member gained private Board access;
-- ordinary Member could not read reviewer queue/data;
-- Membership v2 did not duplicate initial Artifact grant.
+- ordinary Member denied reviewer queue/data;
+- Membership v2 did not duplicate initial Artifact slot grant.
 
-Initial Artifact grant remains exactly one record with `grant_key = initial-membership-v1`.
+Initial Artifact grant remains exactly one authoritative record with `grant_key = initial-membership-v1`.
 
-## 5. QA Batch 02 — Site Shell & Route Integrity
+## 5. Batch 02 — Site Shell & Route Integrity
 
-Opened after live screenshots on **2026-09-03**.
+Implementation PR #86 merged to `dementor-club-site` as `c4ed4a6a1f7a197e31d6a7563d9e27318fb82006`.
 
-Goal: remove shell drift and broken internal navigation before advertising the club.
+Production PR #87 merged as:
+`52091b5c6e21c818a7e32d306f964f1c5242bee8`
 
-Implementation/release state:
+Production Candidate Integrity #675 and post-merge #676 both passed. The user then **manually deployed Batch 02** and performed live browser QA on 2026-09-03.
 
-- implementation PR: **#86 — QA Batch 02: site shell and route integrity**;
-- merged to `dementor-club-site`: `c4ed4a6a1f7a197e31d6a7563d9e27318fb82006`;
-- implementation Site Integrity / Release Readiness run **#671**: **PASS**;
-- clean production release branch: `release/qa-batch-02-site-shell-route-integrity`, created from production head `1ed25952cc5a05174a8c1e78cd722b5c5921f7b6`;
-- production release PR: **#87 — Release QA Batch 02: site shell and route integrity**;
-- release head: `555f612449df6e9320830e2e5d73000aac7b27f9`;
-- Production Candidate Integrity run **#675**: **PASS**;
-- PR #87 merged to `dementor-club-production` as `52091b5c6e21c818a7e32d306f964f1c5242bee8`;
-- post-merge Production Candidate Integrity run **#676**: **PASS**;
-- release gates PASS: registry, readiness, visual contract, interactive runtime safety, production build, route manifest, analytics/consent and final production artifact release gate;
-- route manifest: **31 indexable / 15 private+compat / 1 disabled** — PASS;
-- Batch 02 is present in the production branch but has **not been explicitly deployed to the live site yet**.
+The live pass proved that static/build gates were insufficient for DOM/CSS/runtime integration. Batch 02 therefore remains **NOT CLOSED**.
 
-### QA-MEM-012 — Global Header can render twice on pages that load `site-config.js` in `<head>`
+### QA-MEM-012 — Global Header ownership drift
+Status: **LIVE REGRESSION / CORRECTIVE BATCH 03** · P1
 
-Status: **FIX MERGED TO PRODUCTION / DEPLOY + RETEST PENDING**  
-Severity: **P1 / GLOBAL NAVIGATION + SHELL**
+Live evidence:
+- `/join/` displayed the Batch 02 runtime header;
+- Projects / Community / Merch / Archive retained visually different page-owned headers;
+- user requires the classic canonical Home header on all public pages.
 
-Observed live on `/community/board/`: two public-looking headers appeared one below another.
+Root cause:
+- page HTML still owned local `.topbar` markup;
+- `global-header.js` attempted runtime normalization;
+- Batch 02 runtime introduced a third navigation contract (dropdowns / Blog / Account) rather than enforcing the Home contract.
 
-Root cause verified: `site-config.js` could load `global-header.js` before the parser reached an existing static `.topbar`, so runtime inserted a second header.
+Corrective target:
+- one canonical public header owner;
+- Home visual/navigation language;
+- direct `Club / Events / Projects / Community / Merch / Archive / Join` plus stable Account entry;
+- no page-owned primary headers or dropdown variants in production artifact;
+- local product bars may exist only as secondary state bars without duplicated club navigation/logo.
 
-Release fix:
+### QA-MEM-013 — Footer ownership / geometry drift
+Status: **LIVE REGRESSION / CORRECTIVE BATCH 03** · P1
 
-- `global-header.js` boots after DOM readiness when needed;
-- it normalizes the existing `.topbar` rather than racing the HTML parser;
-- defensive cleanup removes additional duplicate `header.topbar` nodes.
+Live evidence: `/join/` showed conflicting footer/utility structures.
 
-Initial implementation commit: `b8e72784beda8c62fe3e8be1aacb5020f5de2898`.
+Root cause:
+- Batch 02 reused legacy `<footer>` element;
+- old `footer{...}` CSS continued to impose flex/max-width/padding geometry;
+- `UTILITY / PUBLIC` runtime duplicated Support/Contacts/Privacy/Terms already present in the new footer.
 
-Required production regression matrix: `/`, `/about/`, `/events/`, `/projects/`, `/community/`, `/community/board/`, `/merch/`, `/join/`, courses and profile/workspace entry. Each public surface must expose exactly one global navigation header.
+Corrective target: one fresh canonical footer; old page footer and utility strip do not survive production shell ownership.
 
----
+### QA-MEM-014 — Shared Workspace shell incompatible with existing controller
+Status: **LIVE BLOCKER / CORRECTIVE BATCH 03** · P0
 
-### QA-MEM-013 — Footer is page-owned and visually/content-wise drifts across the site
+Live error on Sharecraft account when opening `MY ACTIVITY` / `MY CLUB`:
 
-Status: **FIX MERGED TO PRODUCTION / DEPLOY + RETEST PENDING**  
-Severity: **P2 / GLOBAL SHELL CONSISTENCY**
+`Cannot set properties of null (setting 'innerHTML')`
 
-Verified examples: Home and About owned different footer structures/status markers.
+Root cause:
+- `workspace.js` still requires `#sessionBox` and `[data-work-nav]`;
+- Batch 02 shared shell removed those controller contract nodes.
 
-Release contract/fix:
+Corrective target:
+- one Workspace shell;
+- controller compatibility restored or controller refactored atomically;
+- My Club / My Activity / Profile / Work render without null-DOM runtime errors.
 
-- one `global-footer.js` + `global-footer.css` owns the public footer shell;
-- public navigation/legal/support structure is consistent;
-- an existing page-local footer note/version may survive as page provenance;
-- private/authenticated product surfaces (`/workspace/*`, Board, Artifact, Membership Application/Result, auth callback/profile redirect) do not receive the public footer.
+### QA-MEM-015 — OWNER_ADMIN route exists but layout is broken
+Status: **PARTIAL PASS / CORRECTIVE BATCH 03** · P1
 
-Required production retest: compare Home / About / Events / Projects / Community / Merch / Join / courses and verify one consistent footer shell without losing intentional page provenance.
+Live evidence: `/workspace/admin/` is no longer 404 and role access works, but layout is largely unstyled.
 
----
+Root cause: admin page omitted canonical `design-system/dementor-workspace/workspace.css` layout layer.
 
-### QA-MEM-014 — Workspace sidebar is copied per page and drifts between routes
+### QA-MEM-016 — JS-generated route validator
+Status: **IMPLEMENTATION PASS / KEEP IN RELEASE GATES** · P1
 
-Status: **FIX MERGED TO PRODUCTION / DEPLOY + RETEST PENDING**  
-Severity: **P1 / AUTHENTICATED INFORMATION ARCHITECTURE**
+The manifest/static/JS route hardening itself remains useful and caught real residual routes during Batch 02 preparation. It does not replace browser integration QA.
 
-Root cause: Workspace Home, Artifacts and Review owned separate HTML copies of `.dcw-sidebar/.dcw-nav`.
+### QA-MEM-017 — Sitemap/indexability reconciliation
+Status: **STATIC PASS / LIVE HTTP RETEST PENDING** · P1
 
-Release fix:
+Contract remains 31 public indexable routes; `/cart/` and `/profile/` are excluded from sitemap. Live HTTP/canonical verification remains required after the corrective release.
 
-- one `workspace/workspace-shell-v1.js` is the navigation owner;
-- root Workspace, My Artifacts and Membership Review use the same sidebar host;
-- current section changes active state only;
-- role visibility comes from authoritative Supabase roles/assignments;
-- `MY WORK`, `MEMBERSHIP REVIEW`, `SYSTEM TOOLS` appear only when applicable;
-- `LOG OUT` is consistent;
-- root Workspace subviews use stable hash routes rather than copied child navigation;
-- production interactive-runtime gate was updated to validate the shared shell as the navigation source instead of looking for duplicated labels in `workspace/index.html`.
+## 6. New live regression findings from Batch 02 deployment
 
-Canonical target:
+### QA-MEM-018 — Public shell has multiple effective header contracts
+Status: **OPEN / FIX STAGED IN PR #88** · P1
 
-`HOME / MY CLUB / COMMUNITY BOARD / MY ARTIFACTS / MY ACTIVITY / MY WORK when applicable / MY PROFILE / role-specific tools / LOG OUT`
+This is the browser-level descendant of QA-MEM-012. A production page must not decide its own primary club header.
 
----
+### QA-MEM-019 — Public footer duplicates utility/navigation ownership
+Status: **OPEN / FIX STAGED IN PR #88** · P1
 
-### QA-MEM-015 — OWNER_ADMIN `SYSTEM TOOLS` links to a route stripped from production
+This is the browser-level descendant of QA-MEM-013. Canonical footer must own both footer navigation and utility/legal links.
 
-Status: **FIX MERGED TO PRODUCTION / DEPLOY + RETEST PENDING**  
-Severity: **P1 / ADMIN TOOLING + BROKEN INTERNAL ROUTE**
+### QA-MEM-020 — Workspace null-DOM crash
+Status: **OPEN / FIX STAGED IN PR #88** · **P0**
 
-Root cause: old runtime linked to `/design-system/admin/`, while production deliberately strips the full source `design-system` tree.
+Sharecraft live browser reproduced the exact `sessionBox.innerHTML` null crash. A second latent failure existed for `workNav.hidden`.
 
-Release architecture:
+Corrective implementation restores `id="sessionBox"` and `data-work-nav` in the shared shell and adds authenticated browser navigation smoke for `MY ACTIVITY` + `MY CLUB`.
 
-- entire `design-system` remains source-only;
-- production admin entry becomes `/workspace/admin/`;
-- route is `OWNER_ADMIN` + `noindex`;
-- only explicitly approved tools are projected during production build into `/workspace/admin/...`;
-- projected tools: UI Lab, system tests, auth diagnostics and sync diagnostics;
-- direct non-owner access is owner-gated;
-- production builder still blocks the hidden `/design-system/` navigation in `motion-v1.js` rather than publishing that source route.
+### QA-MEM-021 — Community Board still escapes Workspace
+Status: **OPEN / FIX STAGED IN PR #88** · P1
 
-SEO note: this is a private/noindex route; primary purpose is internal owner tooling.
+Batch 02 navigation explicitly sent `COMMUNITY BOARD → /community/board/`, so the separate dark page was expected from the code.
 
----
+Corrective target:
+- canonical member route `/workspace/board/`;
+- Board content uses shared Workspace sidebar;
+- legacy `/community/board/` becomes a noindex compatibility resolver into Workspace.
 
-### QA-MEM-016 — Production release validator misses JS-generated internal routes
+### QA-MEM-022 — Admin shell missing layout dependency
+Status: **OPEN / FIX STAGED IN PR #88** · P1
 
-Status: **FIX MERGED TO PRODUCTION / DEPLOY + RETEST PENDING**  
-Severity: **P1 / ROUTE INTEGRITY + SEO SAFETY**
+Corrective implementation adds the missing canonical Workspace layout stylesheet and browser-computed grid check.
 
-Old validator checked static HTML/CSS/file-like references but did not reliably validate route navigation created in JavaScript.
+### QA-MEM-023 — Logout has no reliable recovery to login
+Status: **OPEN / FIX STAGED IN PR #88** · **P0 ACCESS**
 
-Release fix:
+Live sequence: user logged out and could not find/recover a working authorization path.
 
-- production validator checks real JS navigation assignments (`location.assign`, `location.replace`, `location.href`, `.href` and simple variable-to-navigation flows);
-- route namespaces/feature literals are not falsely treated as navigations;
-- `production-route-manifest.json` classifies indexable, private/noindex, compatibility, disabled and source-only surfaces;
-- CI and manual production deploy workflows run `validate-route-manifest.mjs` after production build;
-- disabled cart runtime and its production loader are removed from the built artifact while commerce is off;
-- the final artifact gate successfully caught a residual `/design-system/` motion navigation during release preparation; production hardening was restored instead of weakening the validator.
+Root cause chain:
+- inconsistent public headers did not guarantee an Account entry;
+- `/profile/` is only compatibility redirect to Workspace;
+- Workspace should render `ВОЙТИ ЧЕРЕЗ GOOGLE`, but crashed before that UI because `#sessionBox` was missing.
 
-Production-candidate gate evidence from PR #87 / run #675:
+Corrective target:
+- canonical public header always exposes `Account → /workspace/`;
+- unauthenticated Workspace always reaches Google-login gate without runtime error.
 
-- source validation PASS;
-- readiness PASS;
-- visual contract PASS;
-- interactive runtime safety PASS;
-- production build PASS;
-- route manifest PASS;
-- analytics/consent PASS;
-- final production release validator PASS.
+### QA-MEM-024 — Static CI passed while real browser integration was broken
+Status: **OPEN / BROWSER GATE ADDED IN PR #88** · P1 RELEASE INTEGRITY
 
-Post-merge production-branch evidence: run #676 PASS on `52091b5c6e21c818a7e32d306f964f1c5242bee8`.
+Batch 02 release gates validated routes/build/readiness but did not execute the assembled DOM/CSS/runtime in a browser.
 
----
+Corrective gate:
+- Chromium/Playwright opens built public route families;
+- checks exactly one canonical header/footer and absence of legacy shell;
+- checks computed footer geometry;
+- checks guest Workspace login recovery;
+- checks authenticated `MY ACTIVITY` and `MY CLUB` rendering;
+- checks Board remains in Workspace route;
+- checks Admin computed grid layout.
 
-### QA-MEM-017 — Sitemap contained a disabled 404 route and a noindex compatibility route
+A corrective release cannot be called green until this browser gate passes.
 
-Status: **FIX MERGED TO PRODUCTION / DEPLOY + RETEST PENDING**  
-Severity: **P1 / SEO + ROUTE INTEGRITY**
+## 7. Corrective Batch 03 implementation state
 
-Confirmed audit finding:
+Implementation branch:
+`fix/qa-batch-03-canonical-shell-auth-recovery`
 
-- sitemap contained `/cart/`, while production intentionally does not publish Cart;
-- sitemap contained `/profile/`, a `noindex` compatibility redirect into Workspace;
-- sitemap omitted several current approved/indexable surfaces.
+Implementation PR:
+**#88 — QA Batch 03: canonical shell and auth recovery**
 
-Release fix:
+Staged scope:
+1. canonical public header becomes sole primary-header owner;
+2. production builder strips page-owned legacy `.topbar` markup;
+3. canonical footer replaces page footer + utility-strip ownership;
+4. Workspace shell restores controller DOM contract;
+5. Board moves to `/workspace/board/`;
+6. `/community/board/` becomes compatibility redirect;
+7. Admin loads complete Workspace layout CSS;
+8. route manifest reflects Board move;
+9. static shell contract added;
+10. real Chromium browser integration smoke added to CI and manual deploy gate.
 
-- sitemap reconciled to **31 public indexable routes**;
-- `/cart/` removed;
-- `/profile/` removed;
-- private auth/Workspace routes remain absent;
-- all sitemap URLs must exist in the built artifact and must not be `noindex`;
-- route manifest is the explicit indexing contract;
-- CI blocks missing sitemap pages, private/noindex routes in sitemap, disabled routes being published, or indexable routes missing from sitemap.
+Current state: **PR #88 open / CI in progress**. No production merge. No deploy.
 
-Production retest must include live HTTP checks of sitemap URLs after deployment and Search Console follow-up if historical 404s were already crawled.
+## 8. Canonical shell contract after corrective work
 
-## 6. Route / SEO audit model
+### Public header
+One primary header only. Canonical Home language:
+`Club / Events / Projects / Community / Merch / Archive / Join`
+with a stable `Account → /workspace/` entry for authentication recovery.
 
-Routes are classified before deciding whether absence is a bug:
+### Product/local bars
+Allowed only below the global header for product/session/progress state. They must not duplicate the club brand or global navigation.
 
-- `PUBLIC_INDEXABLE` — public page; must resolve and be represented by the indexable route contract;
-- `PUBLIC_NOINDEX` — utility/auth flow; must resolve but should not be indexed;
-- `PRIVATE_AUTH` — authenticated route; must resolve for authorized user and remain noindex;
-- `INTERNAL_SOURCE_ONLY` — must not be emitted as a public route or linked from production navigation;
-- `DISABLED_RESERVED` — source may exist, but production navigation/runtime/sitemap must not expose it while disabled.
+### Public footer
+One footer owner only. It contains public section navigation plus Join / Account / Contacts / Support / Privacy / Terms. No separate `UTILITY / PUBLIC` strip beside it.
 
-Current examples:
+### Workspace
+One sidebar owner:
+`HOME / MY CLUB / COMMUNITY BOARD / MY ARTIFACTS / MY ACTIVITY / MY WORK when applicable / MY PROFILE / role tools / LOG OUT`.
 
-- `/community/board/` → private/authenticated and noindex;
-- `/workspace/*` → private/authenticated and noindex;
-- `/workspace/admin/*` → selected private OWNER_ADMIN/noindex production projections;
-- `/design-system/*` → source-only route namespace;
-- `/cart/` → disabled/reserved because production commerce is off.
+Board, Artifacts, Review and Admin are Workspace child surfaces, not independent mini-sites.
 
-The sitemap remains public/indexable only; private Workspace/admin routes are deliberately excluded.
+## 9. Route / SEO model
 
-## 7. Current route integrity facts
+- `PUBLIC_INDEXABLE` — must resolve, canonicalize and appear in sitemap.
+- `PUBLIC_NOINDEX` — utility/auth compatibility surface.
+- `PRIVATE_AUTH` — authorized Workspace/member route; always noindex.
+- `INTERNAL_SOURCE_ONLY` — must never be emitted or linked as public production route.
+- `DISABLED_RESERVED` — source may exist, but production must not expose it while disabled.
 
-Batch 02 is merged into the production branch and has a green post-merge integrity run.
-
-Production-branch evidence:
-
-- release PR **#87** merged into `dementor-club-production`;
-- production head `52091b5c6e21c818a7e32d306f964f1c5242bee8`;
-- post-merge Production Candidate Integrity run **#676** → **PASS**;
-- sitemap/indexable contract: **31 routes**;
-- private + compatibility routes: **15**;
-- disabled routes: **1 (`/cart/`)**;
-- source/static/JS navigation checks PASS;
-- production artifact build PASS;
-- sitemap ↔ artifact/noindex cross-check PASS;
-- analytics/consent gate PASS;
-- final artifact release gate PASS.
-
-This is **production-branch evidence, not live deployment evidence**. Explicit deploy and live HTTP/UI regression are still required before closing QA-MEM-012..017.
-
-## 8. Batch 01 release state
-
-Fix Batch 01 was promoted to `dementor-club-production`; Production Candidate Integrity passed for production head `1ed25952cc5a05174a8c1e78cd722b5c5921f7b6` (`Merge PR #83: Membership v2 QA Fix Batch 01`).
-
-Membership v2 core behavior remains PASS. Findings from Batch 01 stay in this ledger until their production regression checks are explicitly completed.
-
-## 9. Batch 02 release state
-
-Completed:
-
-1. Global Header race/duplicate protection.
-2. Shared Workspace shell and stable role-aware sidebar.
-3. Owner Admin moved to `/workspace/admin/` with selective production projections.
-4. Global Footer runtime and styling.
-5. Production route manifest.
-6. JS navigation-aware release validation.
-7. Sitemap/indexability reconciliation.
-8. Disabled cart runtime removed from production artifact while commerce is off.
-9. CI/release workflows enforce the route manifest.
-10. Production-only analytics, Membership v2 v9/hotfix state and interactive-runtime safety were preserved in the selective release candidate.
-11. Production Candidate Integrity run #675 is fully green.
-12. PR #87 merged to `dementor-club-production` as `52091b5c6e21c818a7e32d306f964f1c5242bee8`.
-13. Post-merge Production Candidate Integrity run #676 is fully green.
-
-Implementation merge: `c4ed4a6a1f7a197e31d6a7563d9e27318fb82006`.  
-Release PR: **#87 — MERGED**.  
-Release head before merge: `555f612449df6e9320830e2e5d73000aac7b27f9`.  
-Production head after merge: `52091b5c6e21c818a7e32d306f964f1c5242bee8`.
-
-Next release boundary:
-
-- do **not** deploy until the user explicitly requests deployment;
-- deployment must use the manual production workflow and explicit `APPROVED` confirmation;
-- after deploy, execute live desktop/mobile/header/footer/Workspace/admin/sitemap regression and only then close findings.
+Current intent:
+- `/workspace/*` including `/workspace/board/` → private/noindex;
+- `/community/board/` → compatibility/noindex;
+- `/design-system/*` → source-only;
+- `/cart/` → disabled/reserved.
 
 ## 10. Exit criteria before advertising
 
 QA is green only when:
 
-- one global public header is rendered per page;
-- footer contract is consistent across public page families;
-- Workspace sidebar does not mutate structurally between child pages;
-- no production UI points to an intentionally stripped internal route;
-- every exposed internal route is covered by static or JS route validation;
-- public sitemap routes resolve and match approved page readiness/indexability;
-- disabled/reserved features are not exposed as working links or dormant production runtime;
-- canonical/OG URLs remain on `https://dementor.club`;
+- live public pages show the same canonical header;
+- no page-owned competing primary header remains;
+- one consistent footer exists and no duplicate utility strip remains;
+- Workspace My Club / My Activity / My Profile work without runtime errors;
+- Board stays inside Workspace shell;
+- OWNER_ADMIN tools resolve and render with normal Workspace geometry;
+- logout → Account → Google login recovery works;
+- browser-level CI passes on the production candidate;
+- 31 indexable sitemap routes resolve live and canonical/OG URLs remain on `https://dementor.club`;
 - Membership v2 regression set remains green;
 - mobile baseline is checked at 360 / 390 / 768 / 1024 / 1440 where applicable;
-- no P0 or unresolved P1 navigation/security/release-integrity issue remains.
+- no unresolved P0 or P1 navigation/security/release-integrity issue remains.
