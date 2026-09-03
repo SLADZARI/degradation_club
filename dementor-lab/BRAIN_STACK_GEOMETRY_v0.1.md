@@ -13,19 +13,28 @@ On mobile, opening a card must not shift its semantic content sideways into a na
 Actions reveal as an internal horizontal row while the card body keeps full usable width.
 
 ## Human-readable behavior projection
-The BRAIN screen exposes the same BehaviorGraph at two levels:
-1. `КАК ЭТО СРАБОТАЕТ` — readable behavioral sentence for comprehension.
-2. The card stack and metro edges — editor for changing the same graph.
+The BRAIN screen exposes one BehaviorGraph at two clearly separated levels:
+1. `КАК Я СЕБЯ ВЕДУ` — the human-readable behavior sentence. This is the comprehension layer and appears before editor mechanics.
+2. `ИЗ ЧЕГО ЭТО СОБРАНО` — the real node/edge editor for changing the same graph.
 
-Readable roles are human-facing projections of node families:
-- TRIGGER → `КОГДА`
-- STATE → `Я ЧУВСТВУ`
-- IMPULSE → `Я ХОЧУ`
-- REACTION → `Я ДЕЛАЮ`
-- CONTROL → `ДАЛЬШЕ`
-- ABILITY → `Я МОГУ`
+The readable layer uses natural character language, not engine-family labels. Examples:
+- criticism → `КОГДА МЕНЯ КРИТИКУЮТ`
+- resentment → `ОБИЖАЮСЬ +1`
+- beright → `ХОЧУ БЫТЬ ПРАВЫМ`
+- understand → `ПЫТАЮСЬ ПОНЯТЬ`
+- explain → `НАЧИНАЮ ОБЪЯСНЯТЬ`
+- agree → `СОГЛАШАЮСЬ`
+- joke → `ОТШУЧИВАЮСЬ`
+- silent → `ЗАМОЛКАЮ`
+- pressure → `НАЧИНАЮ ДАВИТЬ`
+- repeat → `ПОВТОРЯЮ ДО ×N`
+- stop → `ОСТАНАВЛИВАЮСЬ`
+- ifbrain → `ЕСЛИ BRAIN ВЫШЕ N`
+- pause → `БЕРУ ПАУЗУ`
 
 A readable step is clickable and focuses the exact real Trigger/node in the editor. The readable layer never stores its own route state.
+
+The editor heading is deliberately secondary. It may explain editing affordances, but it must not repeat the behavioral meaning already communicated by `КАК Я СЕБЯ ВЕДУ`.
 
 ## Branches
 A source with 2–3 outgoing routes must remain legible without opening an inspector.
@@ -40,7 +49,7 @@ The editor distinguishes two visual roles without changing runtime semantics:
 
 The readable projection mirrors the same distinction:
 - primary continuation stays in the main behavioral sentence;
-- every additional real outgoing edge is rendered under its source step as `ИЛИ → <TARGET>`;
+- every additional real outgoing edge is rendered under its source step as `ИЛИ → <NATURAL PHRASE>`;
 - tapping an alternative opens the exact target node;
 - the `ИЛИ` surface never creates, deletes, or reorders edges.
 
@@ -53,6 +62,7 @@ On phone:
 - preset rail uses 38px compact controls;
 - validation is a compact status strip rather than a large card;
 - collapsed Trigger Hub is 54px high plus compact chips;
+- readable behavior appears before editor chrome;
 - body node gaps are reduced to 9px;
 - `ADD NODE` sits close to the causal stack;
 - primary action follows the graph without a large dead zone.
@@ -65,7 +75,11 @@ No connection action may require horizontal scrolling.
 
 ## QA note
 SVG edge focus is painted on `requestAnimationFrame`; browser smoke waits for the visual frame before asserting edge focus. This is a test timing contract, not a gameplay delay.
-Browser smoke also verifies that an authored side branch appears in the readable layer as `ИЛИ`, so readable causality cannot silently diverge from the BehaviorGraph.
+Browser smoke verifies that:
+- the readable route starts from the real configured Trigger using natural-language copy;
+- the readable layer is labelled `КАК Я СЕБЯ ВЕДУ`;
+- the editor is labelled `ИЗ ЧЕГО ЭТО СОБРАНО`;
+- an authored side branch appears in the readable layer as conversational `ИЛИ`.
 
 ## Principle
-`One main line to read; side lanes and ИЛИ for alternatives. Visual hierarchy never changes causality.`
+`Understand the character first; edit the machinery second. One graph, two views, no duplicate truth.`
