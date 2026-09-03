@@ -131,6 +131,13 @@ function hardenProductionRuntime() {
     source = source.replace("link.href=canonical+path.replace(/^\\/degradation_club/,'')", 'link.href=canonical+path');
     fs.writeFileSync(configPath, source);
   }
+  const globalHeaderPath = path.join(out, 'global-header.js');
+  if (fs.existsSync(globalHeaderPath)) {
+    let source = fs.readFileSync(globalHeaderPath, 'utf8');
+    const disabledCommerceLoader = "if(cartEnabled&&(path.startsWith('/merch/')||path.startsWith('/objects/')||path.startsWith('/cart/'))){load('/site-config.js');load('/dementor-cart-v1.js');if(path.startsWith('/merch/drop-001/')||path.startsWith('/objects/'))load('/merch-cart-bridge-v1.js')}";
+    source = source.replace(disabledCommerceLoader, '');
+    fs.writeFileSync(globalHeaderPath, source);
+  }
   const motionPath = path.join(out, 'motion-v1.js');
   if (fs.existsSync(motionPath)) {
     let source = fs.readFileSync(motionPath, 'utf8');
