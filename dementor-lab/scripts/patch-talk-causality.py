@@ -1,0 +1,19 @@
+from pathlib import Path
+
+app=Path('dementor-lab/src/ui/app.mjs')
+s=app.read_text()
+old="function renderTalk(){if(!controller?.encounter)return;const e=controller.encounter;$('#turn').textContent=e.turn;$('#actor-a-name').textContent=e.actors.A.name.toUpperCase();$('#actor-b-name').textContent=e.actors.B.name.toUpperCase();$('#metrics').innerHTML=metricRow('ENERGY','energy')+metricRow('BRAIN','brain')+metricRow('TENSION','tension')+metricRow('CONTACT','contact');const transcript=e.transcript.slice(-5);$('#dialogue').innerHTML=transcript.length?transcript.map(x=>`<div class=\"bubble ${x.actorId==='A'?'a':'b'}\"><small>${e.actors[x.actorId].name.toUpperCase()}</small>${x.phrase||'…'}</div>`).join(''):'<p class=\"empty\">Никто ещё ничего не сказал.</p>';$('#next-turn').textContent=mode==='auto'?(autoTimer?'PAUSE':'RESUME'):'NEXT TURN →'}"
+new="const TALK_EVENT_LABELS=Object.freeze({COUNTERPOINT:'КОНТРАРГУМЕНТ',ACCEPTANCE:'ПРИНЯТО',DEFLECTION:'УШЛИ В СТОРОНУ',NO_RESPONSE:'НЕТ ОТВЕТА',PRESSURE:'ДАВЛЕНИЕ'});\nconst TALK_REACTION_LABELS=Object.freeze({explain:'ОБЪЯСНИЛ',agree:'СОГЛАСИЛСЯ',joke:'ПОШУТИЛ',silent:'ПРОМОЛЧАЛ',pressure:'НАЧАЛ ДАВИТЬ'});\nfunction talkCauseHtml(trace){if(!trace)return '<span>ПОСЛЕ РЕПЛИКИ ЗДЕСЬ БУДЕТ ВИДНО, ЧТО ОНА ЗАПУСТИЛА.</span>';const reaction=TALK_REACTION_LABELS[trace.selectedReaction]||title(trace.selectedReaction),event=TALK_EVENT_LABELS[trace.event?.type]||trace.event?.type||'—',trigger=title(trace.event?.trigger||'')||trace.event?.trigger||'—';return `<div class=\"talk-cause__step action\"><small>ДЕЙСТВИЕ</small><strong>${reaction}</strong></div><b class=\"talk-cause__arrow\">→</b><div class=\"talk-cause__step event\"><small>ЧТО ПРОИЗОШЛО</small><strong>${event}</strong></div><b class=\"talk-cause__arrow\">→</b><div class=\"talk-cause__step trigger\"><small>СЛЕДУЮЩИЙ МОЗГ</small><strong>${trigger}</strong></div>`}\nfunction renderTalk(){if(!controller?.encounter)return;const e=controller.encounter;$('#turn').textContent=e.turn;$('#actor-a-name').textContent=e.actors.A.name.toUpperCase();$('#actor-b-name').textContent=e.actors.B.name.toUpperCase();$('#metrics').innerHTML=metricRow('ENERGY','energy')+metricRow('BRAIN','brain')+metricRow('TENSION','tension')+metricRow('CONTACT','contact');const transcript=e.transcript.slice(-5);$('#dialogue').innerHTML=transcript.length?transcript.map(x=>`<div class=\"bubble ${x.actorId==='A'?'a':'b'}\"><small>${e.actors[x.actorId].name.toUpperCase()}</small>${x.phrase||'…'}</div>`).join(''):'<p class=\"empty\">Никто ещё ничего не сказал.</p>';const cause=$('#talk-cause'),trace=e.traces.at(-1);if(cause){cause.classList.toggle('empty',!trace);cause.dataset.actor=trace?.actorId||'';cause.innerHTML=talkCauseHtml(trace)}$('#next-turn').textContent=mode==='auto'?(autoTimer?'PAUSE':'RESUME'):'NEXT TURN →'}"
+if old not in s:
+    raise SystemExit('renderTalk anchor not found')
+s=s.replace(old,new,1)
+app.write_text(s)
+
+test=Path('dementor-lab/tests/browser-smoke.mjs')
+t=test.read_text()
+old2="await page.locator('[data-mode=\"step\"]').click();await page.locator('#play').click();assert.equal(await page.locator('#top-status').textContent(),'TALK');assert.equal(await page.locator('#actor-a').getAttribute('data-character'),'character-02');assert.equal(await page.locator('#actor-a-name').textContent(),'ЖЕНЯ','player-entered Character.name reaches TALK');assert.equal(await page.locator('#actor-b').getAttribute('data-character'),opponentCharacter);"
+new2=old2+"await page.locator('#next-turn').click();await page.waitForTimeout(30);assert.equal(await page.locator('#talk-cause .talk-cause__step').count(),3,'TALK exposes action event and next trigger from the real trace');assert.ok((await page.locator('#talk-cause').textContent()).includes('СЛЕДУЮЩИЙ МОЗГ'),'TALK makes the next brain input visible');"
+if old2 not in t:
+    raise SystemExit('browser smoke TALK anchor not found')
+t=t.replace(old2,new2,1)
+test.write_text(t)
