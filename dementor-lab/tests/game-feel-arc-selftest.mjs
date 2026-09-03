@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { createEncounter, executeActorTurn } from '../src/encounter/runtime.mjs';
+import { buildResult } from '../src/encounter/result.mjs';
 import { createCriticismActors, CRITICISM_IDEA_SCENARIO } from '../src/scenarios/criticism-idea.mjs';
 import { brainPreset, cloneBrainGraph } from '../src/ui/brain-presets.mjs';
 import { opponentPreset } from '../src/opponent/presets.mjs';
@@ -30,6 +31,10 @@ assert.ok(peaceful.actors.B.state.energy>0,'repeated PAUSE does not mechanically
 const volatile=run('see-what-happens','CONTACT_SKEPTIC');
 const volatileA=playerReactions(volatile),firstPressure=volatileA.indexOf('pressure'),lastJoke=volatileA.lastIndexOf('joke');
 assert.ok(lastJoke>=0&&firstPressure>lastJoke,'the same authored graph can pivot from JOKE to PRESSURE after accumulated BRAIN');
+const volatileResult=buildResult(volatile);
+assert.ok(volatileResult.stageB.arc?.pivot,'RESULT records the first real behavior pivot');
+assert.match(volatileResult.stageB.arc.summary,/ШУТИЛ/);
+assert.match(volatileResult.stageB.arc.summary,/ДАВИЛ/);
 
 const appeaser=run('keep-peace','KEEP_PEACE');
 const appeaserA=playerReactions(appeaser),firstSilent=appeaserA.indexOf('silent'),lastAgree=appeaserA.lastIndexOf('agree');
