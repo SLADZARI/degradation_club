@@ -18,14 +18,14 @@
 import {createClient} from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.4/+esm';
 const SUPABASE_URL='https://mmekfydwbvptbdatwitj.supabase.co';
 const SUPABASE_KEY='sb_publishable_a7e_Ndwwii8lyt_xmezoVw_ijxfh_yg';
+const AUTH_PENDING_KEY='dc_auth_complete_pending_v1';
 const status=document.getElementById('status');
 const detail=document.getElementById('detail');
-const base=location.pathname.startsWith('/degradation_club/')?'/degradation_club':'';
 const params=new URLSearchParams(location.search);
-const requestedNext=params.get('next');
-const defaultTarget=base+'/join/';
-const safeNext=(requestedNext&&requestedNext.startsWith(base+'/')&&!requestedNext.startsWith(base+'//'))?requestedNext:defaultTarget;
-const target=location.origin+safeNext;
+const stripLegacyPrefix=value=>String(value||'').replace(/^\/degradation_club(?=\/|$)/,'')||'/';
+const requestedNext=stripLegacyPrefix(params.get('next')||'/workspace/');
+const safeNext=requestedNext.startsWith('/')&&!requestedNext.startsWith('//')?requestedNext:'/workspace/';
+const target=new URL(safeNext,location.origin).href;
 const code=params.get('code');
 const oauthError=params.get('error_description')||params.get('error');
 const client=createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false,flowType:'pkce'}});
@@ -41,6 +41,8 @@ try{
   if(!data?.session)throw new Error('Сессия не сохранена после входа.');
   const user=await client.auth.getUser();
   if(user.error)throw user.error;
+  if(!user.data?.user)throw new Error('Пользователь не подтверждён после входа.');
+  try{sessionStorage.setItem(AUTH_PENDING_KEY,'1');}catch{}
   status.textContent='ПРОФИЛЬ ПОДКЛЮЧЁН';
   detail.textContent='Возвращаемся в Dementor Club…';
   location.replace(target);
