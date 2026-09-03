@@ -23,6 +23,7 @@ const productionDependencies = [
 const productionProjections = [
   { from:'design-system/index.html', to:'workspace/admin/design/index.html', ownerGate:true },
   { from:'design-system/ui-lab-v2.css', to:'design-system/ui-lab-v2.css' },
+  { from:'design-system/ui-lab-v2.js', to:'design-system/ui-lab-v2.js' },
   { from:'design-system/admin/tests/index.html', to:'workspace/admin/tests/index.html' },
   { from:'design-system/auth-test/index.html', to:'workspace/admin/auth-test/index.html', ownerGate:true },
   { from:'design-system/sync-test/index.html', to:'workspace/admin/sync-test/index.html', ownerGate:true },
