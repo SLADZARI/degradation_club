@@ -10,7 +10,7 @@ const contentExtensions = new Set(['.html', '.xml', '.txt', '.webmanifest', '.js
 const blockedContentMarkers = ['TEST MATERIAL','TEST DATA','DEMO CONTENT','MOCK CONTENT','PLACEHOLDER','INTERNAL ONLY',' WIP '];
 const warningContentMarkers = ['APPROVED DRAFT'];
 const blockedFragments = ['/degradation_club/','sladzari.github.io/degradation_club','degradation-club.vercel.app','/design-system/admin/','/staging/','/test/','/tests/','localhost:','127.0.0.1:'];
-const forbiddenTopLevel = ['staging', 'test', 'tests', 'admin'];
+const forbiddenTopLevel = ['staging', 'test', 'tests', 'admin', 'cart'];
 const errors = [];
 const warnings = [];
 
@@ -46,6 +46,27 @@ function visibleContent(text, ext) {
     .replace(/&nbsp;|&#160;/gi, ' ')
     .replace(/\s+/g, ' ');
 }
+function isNoindexHtml(text){
+  return /<meta[^>]+name=["']robots["'][^>]+content=["'][^"']*noindex/i.test(text)||/<meta[^>]+content=["'][^"']*noindex[^"']*["'][^>]+name=["']robots["']/i.test(text);
+}
+function validateNavigationTargets(text, owner){
+  const seen=new Set();
+  const check=raw=>{if(!raw||seen.has(raw))return;seen.add(raw);localPathExists(raw,owner);};
+  const direct=[
+    /\b(?:location\.(?:assign|replace))\(\s*["'](\/[^"']+)["']/g,
+    /\blocation\.href\s*=\s*["'](\/[^"']+)["']/g,
+    /\.href\s*=\s*["'](\/[^"']+)["']/g,
+  ];
+  for(const pattern of direct)for(const match of text.matchAll(pattern))check(match[1]);
+
+  const vars=new Map();
+  for(const match of text.matchAll(/\b(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*(?:[^;\n]*?\+\s*)?["'](\/[^"']+\/)["']/g))vars.set(match[1],match[2]);
+  for(const [name,route] of vars){
+    const escaped=name.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+    const used=new RegExp(`(?:\\.href\\s*=\\s*${escaped}\\b|location\\.(?:assign|replace)\\(\\s*${escaped}\\s*\\)|location\\.href\\s*=\\s*${escaped}\\b)`);
+    if(used.test(text))check(route);
+  }
+}
 
 for (const name of forbiddenTopLevel) if (fs.existsSync(path.join(artifact, name))) errors.push(`forbidden production route/surface present: /${name}/`);
 
@@ -56,19 +77,27 @@ for (const full of files) {
   const text = fs.readFileSync(full, 'utf8');
   const file = rel(full);
   const lower = text.toLowerCase();
+  const privateTool = ext==='.html' && file.startsWith('workspace/admin/') && isNoindexHtml(text);
 
-  for (const fragment of blockedFragments) if (lower.includes(fragment.toLowerCase())) errors.push(`${file}: blocked legacy/staging fragment found: ${fragment}`);
+  for (const fragment of blockedFragments) {
+    if(privateTool && (fragment==='/test/'||fragment==='/tests/'))continue;
+    if(lower.includes(fragment.toLowerCase())) errors.push(`${file}: blocked legacy/staging fragment found: ${fragment}`);
+  }
 
   if (contentExtensions.has(ext)) {
-    const publicCopy = visibleContent(text, ext);
-    const upper = ` ${publicCopy.toUpperCase()} `;
-    for (const marker of blockedContentMarkers) if (upper.includes(marker)) errors.push(`${file}: blocked visible pre-production marker found: ${marker.trim()}`);
-    for (const marker of warningContentMarkers) if (upper.includes(marker)) warnings.push(`${file}: visible public status requires review before merge: ${marker}`);
+    const privateNoindex=ext==='.html'&&isNoindexHtml(text);
+    if(!privateNoindex){
+      const publicCopy = visibleContent(text, ext);
+      const upper = ` ${publicCopy.toUpperCase()} `;
+      for (const marker of blockedContentMarkers) if (upper.includes(marker)) errors.push(`${file}: blocked visible pre-production marker found: ${marker.trim()}`);
+      for (const marker of warningContentMarkers) if (upper.includes(marker)) warnings.push(`${file}: visible public status requires review before merge: ${marker}`);
+    }
   }
 
   if (ext === '.html') {
     const refs = [...text.matchAll(/\b(?:href|src)=["']([^"']+)["']/gi)].map(m => m[1]);
     for (const ref of refs) localPathExists(ref, full);
+    validateNavigationTargets(text,full);
     const ogUrl = text.match(/<meta[^>]+property=["']og:url["'][^>]+content=["']([^"']+)["']/i)?.[1]
       || text.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:url["']/i)?.[1];
     if (ogUrl && !ogUrl.startsWith(productionOrigin)) errors.push(`${file}: og:url must use ${productionOrigin}`);
@@ -77,7 +106,10 @@ for (const full of files) {
     if (canonical && !canonical.startsWith(productionOrigin)) errors.push(`${file}: canonical must use ${productionOrigin}`);
   }
   if (ext === '.css') for (const match of text.matchAll(/url\((?:["']?)([^)"']+)(?:["']?)\)/gi)) localPathExists(match[1].trim(), full);
-  if (ext === '.js') for (const match of text.matchAll(/["'](\/[^"']+\.(?:js|css|webp|png|jpg|jpeg|svg|json)(?:\?[^"']*)?)["']/gi)) localPathExists(match[1], full);
+  if (ext === '.js') {
+    for (const match of text.matchAll(/["'](\/[^"']+\.(?:js|css|webp|png|jpg|jpeg|svg|json)(?:\?[^"']*)?)["']/gi)) localPathExists(match[1], full);
+    validateNavigationTargets(text,full);
+  }
 }
 
 const cnamePath = path.join(artifact, 'CNAME');
@@ -91,6 +123,14 @@ else {
   const sitemap = fs.readFileSync(sitemapPath, 'utf8');
   if (!sitemap.includes(`<loc>${productionOrigin}/</loc>`)) errors.push(`sitemap.xml: production origin ${productionOrigin} is missing`);
   if (/sladzari\.github\.io|degradation-club\.vercel\.app|\/degradation_club\//i.test(sitemap)) errors.push('sitemap.xml contains legacy origin/path');
+  for(const loc of [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map(m=>m[1])){
+    try{
+      const url=new URL(loc);const route=url.pathname;
+      const target=route==='/'?path.join(artifact,'index.html'):path.join(artifact,route.replace(/^\//,''),'index.html');
+      if(!fs.existsSync(target))errors.push(`sitemap.xml: URL has no production page ${route}`);
+      else if(isNoindexHtml(fs.readFileSync(target,'utf8')))errors.push(`sitemap.xml: noindex/private route must not be indexed ${route}`);
+    }catch{errors.push(`sitemap.xml: invalid URL ${loc}`);}
+  }
 }
 
 const configPath = path.join(artifact, 'site-config.js');
