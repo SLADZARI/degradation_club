@@ -60,5 +60,7 @@ A passing mobile smoke must use the same visible controls a real player uses. Te
 
 The first-run guide is rendered on the next animation frame, so browser QA waits for the visible guide rather than assuming synchronous overlay timing.
 
+A causal edge is asserted from graph state immediately after `СОЕДИНИТЬ`; its SVG projection is asserted after the animation-frame paint. Tests must distinguish model truth from rendering timing.
+
 ## Product invariant
 **One screen, one primary question. Causality stays deep, but explanation does not compete with play.**
