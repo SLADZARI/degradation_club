@@ -1,26 +1,37 @@
 /* BRAIN card information hierarchy — mobile-first.
-   Closed card = family / title / value / route.
+   Closed card = human role / title / value / route.
    Full semantic description appears only after tap. */
+.brain-behavior-block{position:relative;margin-top:10px;padding-top:0}
+.brain-behavior-head{position:relative;z-index:3;margin:0 0 10px 0;border:2px solid var(--ink);background:var(--paper);padding:10px 12px}
+.brain-behavior-head small{display:block;font:900 9px/1 monospace;letter-spacing:.08em;opacity:.55}
+.brain-behavior-head strong{display:block;margin-top:4px;font-size:15px;line-height:1.05}
+.brain-behavior-head p{margin:6px 0 0;font:800 10px/1.25 monospace;max-width:42ch;opacity:.68}
 .brain-stack-card{min-height:66px}
 .brain-stack-main{min-height:62px;padding-top:8px;padding-bottom:8px}
-.brain-stack-family{font:900 10px/1 monospace;letter-spacing:.04em;text-transform:uppercase;opacity:.62}
-.brain-stack-title{font-size:19px;line-height:1;margin-top:4px;letter-spacing:-.02em}
+.brain-stack-family{display:inline-block;width:auto;padding:3px 6px;background:var(--ink);color:var(--paper);font:900 9px/1 monospace;letter-spacing:.02em;text-transform:uppercase;opacity:1}
+.brain-stack-title{font-size:19px;line-height:1;margin-top:5px;letter-spacing:-.02em}
 .brain-stack-subtitle{display:none;margin-top:7px;font-size:11px;line-height:1.2;white-space:normal;overflow:visible;text-overflow:clip;max-width:34ch;opacity:.7}
 .brain-stack-node.open .brain-stack-subtitle,.brain-stack-node.connection-focus .brain-stack-subtitle{display:block}
 .brain-stack-route{margin-top:6px;font:900 10px/1.1 monospace;opacity:1;white-space:normal;overflow:visible;text-overflow:clip}
+.brain-stack-route::before{content:'ДАЛЬШЕ  ';opacity:.48}
 .brain-stack-value{font-size:18px;right:54px}
 .brain-stack-node.open .brain-stack-card{min-height:86px}
 .brain-stack-node.open .brain-stack-main{min-height:82px}
 .brain-stack-node.open .brain-stack-route{color:var(--ink)}
 .brain-stack-node.connection-target .brain-stack-subtitle{display:block;color:#fff;opacity:.68}
 .brain-stack-node.connection-target .brain-stack-route{color:var(--acid);opacity:1}
+.brain-stack-node.connection-target .brain-stack-family{background:var(--acid);color:var(--ink)}
 .brain-stack-node.connection-related .brain-stack-route,.brain-stack-node.connection-focus .brain-stack-route{color:var(--ink)}
 .brain-stack-node.connection-related .brain-stack-card,.brain-stack-node.connection-focus .brain-stack-card{box-shadow:inset 5px 0 0 var(--acid)}
 @media(max-width:430px){
+  .brain-behavior-block{margin-top:8px}
+  .brain-behavior-head{margin-bottom:8px;padding:8px 10px}
+  .brain-behavior-head strong{font-size:14px}
+  .brain-behavior-head p{font-size:9px;line-height:1.2}
   .brain-stack-card{min-height:64px}
   .brain-stack-main{min-height:60px;padding-right:54px}
   .brain-stack-title{font-size:18px}
-  .brain-stack-family{font-size:9px}
+  .brain-stack-family{font-size:8px;padding:3px 5px}
   .brain-stack-route{font-size:9px}
   .brain-stack-node.open .brain-stack-main{min-height:80px}
   .brain-stack-subtitle{font-size:10px;max-width:28ch}
