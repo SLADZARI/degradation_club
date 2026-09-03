@@ -1,11 +1,13 @@
 (()=>{
   if(typeof document==='undefined')return;
+  const runtimePath=location.pathname.replace(/^\/degradation_club/,'');
+  if(runtimePath.startsWith('/workspace/'))return;
 
   const boot=()=>{
     if(document.documentElement.dataset.dcGlobalHeader==='1')return;
     document.documentElement.dataset.dcGlobalHeader='1';
 
-    const path=location.pathname.replace(/^\/degradation_club/,'');
+    const path=runtimePath;
     const activeFor=href=>href==='/'?path==='/':path.startsWith(href);
     const link=(href,label)=>`<a href="${href}"${activeFor(href)?' aria-current="page"':''}>${label}</a>`;
 
@@ -28,8 +30,8 @@
         ${link('/workspace/','Account')}
       </nav>`;
 
-    // A page never owns the primary club header. Remove legacy/page-specific copies
-    // and create one canonical shell that matches the Home navigation language.
+    // A public page never owns multiple primary headers. Remove legacy/page-specific
+    // copies and create one canonical shell that matches the Home navigation language.
     document.querySelectorAll('header.topbar,header.dc-global-header').forEach(node=>node.remove());
     const header=document.createElement('header');
     header.className='dc-global-header';
