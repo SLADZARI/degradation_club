@@ -1,0 +1,22 @@
+/* TALK causality: expose Reaction → Event → next Trigger without turning the conversation into a debug screen. */
+.talk-cause{border:2px solid var(--ink);border-top:0;background:var(--paper);padding:8px;display:grid;grid-template-columns:minmax(0,1fr) 20px minmax(0,1fr) 20px minmax(0,1fr);gap:4px;align-items:stretch}
+.talk-cause.empty{display:block;font:900 9px/1.25 monospace;opacity:.55}
+.talk-cause__step{min-width:0;border:1.5px solid var(--ink);background:#fff;padding:7px 8px;display:grid;align-content:center;gap:4px}
+.talk-cause__step small{font:900 8px/1 monospace;letter-spacing:.05em;opacity:.52}
+.talk-cause__step strong{font-size:11px;line-height:1.08;overflow-wrap:anywhere}
+.talk-cause__step.trigger{background:var(--acid)}
+.talk-cause__arrow{display:grid;place-items:center;font:900 13px/1 monospace;opacity:.45}
+.talk-cause[data-actor="B"] .talk-cause__step.action{background:var(--acid)}
+.talk-cause[data-actor="B"] .talk-cause__step.trigger{background:#fff}
+@media(max-width:430px){
+  .talk-cause{padding:6px;grid-template-columns:minmax(0,1fr) 14px minmax(0,1fr) 14px minmax(0,1fr);gap:3px}
+  .talk-cause__step{padding:6px 5px;min-height:48px}
+  .talk-cause__step small{font-size:7px}
+  .talk-cause__step strong{font-size:9px;line-height:1.08}
+  .talk-cause__arrow{font-size:11px}
+}
+@media(max-width:360px){
+  .talk-cause{grid-template-columns:minmax(0,1fr) 10px minmax(0,1fr) 10px minmax(0,1fr)}
+  .talk-cause__step{padding:5px 4px}
+  .talk-cause__step strong{font-size:8px}
+}
