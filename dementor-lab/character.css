@@ -28,3 +28,7 @@
 .variant-group>div{display:flex;gap:5px;overflow-x:auto;scrollbar-width:none}
 .person-next{margin-top:8px}
 @media(max-width:430px){.appearance-panel{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}.appearance-panel button{font-size:8px;padding:0 3px}.person-stage-tools{right:7px;top:7px}.person-stage-tools button{width:44px;height:44px}.variant-group{grid-template-columns:70px minmax(0,1fr)}}
+
+/* Selected category is the only strong tab; equipped state stays secondary. */
+.appearance-panel button.equipped:not(.active){opacity:.72}
+.person-next{display:none!important}
