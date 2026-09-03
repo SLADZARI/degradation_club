@@ -29,8 +29,10 @@ const wrong=encounterWithGraph(wrongTrigger),wrongOut=executeActorTurn(wrong);
 assert.equal(wrongOut.trace.selectedReaction,null);assert.equal(wrongOut.trace.noActionReason,'NO_TRIGGER');assert.equal(wrongOut.trace.event.type,'NO_RESPONSE');assert.equal(wrong.nextTrigger,'ignore');
 
 // STOP terminates traversed causal chain.
-const stopGraph={id:'stop-semantics',nodes:[{id:'t',type:'criticism',p:{}},{id:'j',type:'joke',p:{}},{id:'s',type:'stop',p:{}},{id:'p',type:'pressure',p:{}}],edges:[edge('e1','t','j'),edge('e2','j','s'),edge('e3','s','p')]};
+const stopGraph={id:'stop-semantics',nodes:[{id:'t',type:'criticism',p:{}},{id:'j',type:'joke',p:{}},{id:'s',type:'stop',p:{}}],edges:[edge('e1','t','j'),edge('e2','j','s')]};
 const stopPrediction=predictTurn(encounterWithGraph(stopGraph));assert.deepEqual(stopPrediction.chosen.path.map(n=>n.id),['t','j','s']);assert.equal(stopPrediction.chosen.reaction,'joke');
+const deadAfterStop={id:'dead-after-stop',nodes:[{id:'t',type:'criticism',p:{}},{id:'j',type:'joke',p:{}},{id:'s',type:'stop',p:{}},{id:'p',type:'pressure',p:{}}],edges:[edge('s1','t','j'),edge('s2','j','s'),edge('s3','s','p')]};assert.equal(validateGraph(deadAfterStop).code,'TERMINAL_CONTROL_OUTGOING','STOP cannot advertise a route runtime will never execute');
+const deadAfterRepeat={id:'dead-after-repeat',nodes:[{id:'t',type:'criticism',p:{}},{id:'j',type:'joke',p:{}},{id:'x',type:'repeat',p:{count:2}},{id:'p',type:'pressure',p:{}}],edges:[edge('r1','t','j'),edge('r2','j','x'),edge('r3','x','p')]};assert.equal(validateGraph(deadAfterRepeat).code,'TERMINAL_CONTROL_OUTGOING','REPEAT ends the authored branch after scheduling repeats');
 
 // BRAIN > is a real gate and requires an unconditional authoring fallback.
 const conditionGraph={id:'condition-semantics',nodes:[{id:'t',type:'criticism',p:{}},{id:'direct',type:'explain',p:{}},{id:'if',type:'ifbrain',p:{threshold:70}},{id:'state',type:'resentment',p:{key:'resentment',delta:1,cap:5}},{id:'pressure',type:'pressure',p:{}}],edges:[edge('a','t','direct'),edge('b','t','if'),edge('c','if','state'),edge('d','state','pressure')]};

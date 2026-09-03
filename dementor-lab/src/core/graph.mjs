@@ -17,7 +17,8 @@ export function reachableFrom(graph,startId){
   while(stack.length){const id=stack.pop();if(seen.has(id))continue;seen.add(id);outgoing(graph,id).forEach(e=>stack.push(e.to))}
   return seen;
 }
-function edgeFamiliesCompatible(fromNode,toNode){const fromFam=familyOf(fromNode),toFam=familyOf(toNode);return toFam!=='TRIGGER'&&Boolean(NEXT_FAMILY_COMPAT[fromFam]?.has(toFam))}
+function terminalControl(node){return node?.type==='stop'||node?.type==='repeat'}
+function edgeFamiliesCompatible(fromNode,toNode){if(terminalControl(fromNode))return false;const fromFam=familyOf(fromNode),toFam=familyOf(toNode);return toFam!=='TRIGGER'&&Boolean(NEXT_FAMILY_COMPAT[fromFam]?.has(toFam))}
 function graphHasCycle(graph){
   const visiting=new Set(),visited=new Set();
   function visit(id){if(visiting.has(id))return true;if(visited.has(id))return false;visiting.add(id);for(const edge of outgoing(graph,id)){if(visit(edge.to))return true}visiting.delete(id);visited.add(id);return false}
@@ -47,6 +48,8 @@ export function validateGraph(graph){
   const ids=new Set(graph.nodes.map(n=>n.id));
   const dangling=(graph.edges||[]).find(e=>!ids.has(e.from)||!ids.has(e.to));
   if(dangling)return {runnable:false,code:'DANGLING_EDGE',edgeId:dangling.id,detail:'ОДНА ИЗ СВЯЗЕЙ ВЕДЁТ В НЕСУЩЕСТВУЮЩИЙ УЗЕЛ.'};
+  const terminalOutgoing=(graph.edges||[]).find(e=>terminalControl(graph.nodes.find(n=>n.id===e.from)));
+  if(terminalOutgoing){const source=graph.nodes.find(n=>n.id===terminalOutgoing.from);return {runnable:false,code:'TERMINAL_CONTROL_OUTGOING',edgeId:terminalOutgoing.id,nodeId:source?.id,detail:`ПОСЛЕ «${NODE_SPECS[source?.type]?.title||source?.type}» ВЕТКА УЖЕ ЗАКОНЧЕНА. УБЕРИ СВЯЗЬ ПОСЛЕ НЕГО.`}};
   const incompatible=(graph.edges||[]).find(e=>!edgeFamiliesCompatible(graph.nodes.find(n=>n.id===e.from),graph.nodes.find(n=>n.id===e.to)));
   if(incompatible)return {runnable:false,code:'INCOMPATIBLE_EDGE',edgeId:incompatible.id,detail:'ОДНА ИЗ СВЯЗЕЙ СОЕДИНЯЕТ НЕСОВМЕСТИМЫЕ БЛОКИ.'};
   if(graphHasCycle(graph))return {runnable:false,code:'EXPLICIT_CYCLE',detail:'ЯВНАЯ ПЕТЛЯ ЗАПРЕЩЕНА. ДЛЯ ПОВТОРА ЕСТЬ УЗЕЛ REPEAT.'};
