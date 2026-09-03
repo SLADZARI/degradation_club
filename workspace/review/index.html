@@ -4,35 +4,32 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="robots" content="noindex,nofollow,noarchive">
+  <meta name="theme-color" content="#f2f0e8">
   <title>Membership Review — Dementor Club</title>
   <link rel="stylesheet" href="../../design-system/design-system.css">
   <link rel="stylesheet" href="../../design-system/dementor-workspace/workspace.css">
   <link rel="stylesheet" href="../workspace.css">
   <link rel="stylesheet" href="./review.css">
   <script src="../../site-config.js"></script>
-  <script src="../../join/dc9-data/sphere-01.js"></script><script src="../../join/dc9-data/sphere-02.js"></script><script src="../../join/dc9-data/sphere-03.js"></script><script src="../../join/dc9-data/sphere-04.js"></script><script src="../../join/dc9-data/sphere-05.js"></script><script src="../../join/dc9-data/sphere-06.js"></script><script src="../../join/dc9-data/sphere-07.js"></script><script src="../../join/dc9-data/sphere-08.js"></script><script src="../../join/dc9-data/sphere-09.js"></script>
 </head>
-<body class="dc-system-page dcw-body dcr-body">
+<body class="dc-system-page dcw-body">
   <div class="dcw-live-banner">DEMENTOR CLUB · PERSONAL WORKSPACE · MEMBERSHIP REVIEW</div>
   <div class="dcw-app">
-    <aside class="dcw-sidebar">
-      <a class="dcw-brand" href="../"><span>DEMENTOR</span><strong>CLUB</strong></a>
-      <nav class="dcw-nav" aria-label="Личный кабинет">
-        <a class="dcw-nav-link" href="../">HOME</a>
-        <a class="dcw-nav-link" href="../">MY CLUB</a>
-        <a class="dcw-nav-link" href="../../community/board/">COMMUNITY BOARD</a>
-        <a class="dcw-nav-link" href="../artifacts/">MY ARTIFACTS</a>
-        <a class="dcw-nav-link" href="../">MY ACTIVITY</a>
-        <a class="dcw-nav-link" href="../">MY PROFILE</a>
-        <a class="dcw-nav-link is-active" href="./">MEMBERSHIP REVIEW</a>
-      </nav>
-      <div class="dcw-boundary"><span>ROLE TOOL</span><strong>DEMENTOR ONLY</strong><small>Заявки — часть рабочего кабинета Dementor, а не отдельный публичный интерфейс.</small></div>
-    </aside>
+    <aside class="dcw-sidebar" data-workspace-sidebar></aside>
     <main class="dcw-main">
-      <header class="dcw-topbar"><div><span class="dcw-kicker">DEMENTOR CLUB / PERSONAL WORKSPACE</span><strong>MEMBERSHIP REVIEW</strong></div><div class="dcw-top-meta"><span>2 DEMENTORS</span><span class="dcw-dot"></span><span>1 DECISION EACH</span></div></header>
-      <div class="dcr-shell"><section class="dcr-hero"><div class="dcr-kicker">CLOSED WORKSPACE / DEMENTOR ONLY</div><h1>КТО<br>СТУЧИТСЯ.</h1><p>DC-9 уже пройден. Здесь не новый тест, а карта человека на момент подачи заявки и два независимых решения.</p></section><div id="reviewHost" class="dcr-host" aria-live="polite"><section class="dcr-state"><strong>ПРОВЕРЯЕМ ДОСТУП…</strong></section></div></div>
+      <header class="dcw-topbar"><div><span class="dcw-kicker">DEMENTOR CLUB / PERSONAL WORKSPACE</span><strong>MEMBERSHIP REVIEW</strong></div><div class="dcw-top-meta"><span>DEMENTOR ROLE</span><span class="dcw-dot"></span><span>RLS</span></div></header>
+      <div class="dcw-view">
+        <section class="dcr-hero">
+          <div><span class="dcr-meta">CLOSED WORKSPACE / DEMENTOR ONLY</span><h1>КТО<br>СТУЧИТСЯ.</h1></div>
+          <p>DC-9 уже пройден. Здесь не новый тест, а карта человека на момент подачи заявки и два независимых решения.</p>
+        </section>
+        <section class="dcr-queue" id="reviewHost" aria-live="polite"><div class="dcr-state">ПРОВЕРЯЕМ ДОСТУП…</div></section>
+      </div>
     </main>
   </div>
-  <script type="module" src="./review-access-router-v2.js"></script><script type="module" src="./review.js"></script><script type="module" src="./review-decision-lock-v2.js"></script>
+  <script src="../workspace-shell-v1.js"></script>
+  <script type="module" src="./review-access-router-v2.js"></script>
+  <script type="module" src="./review.js"></script>
+  <script type="module" src="./review-decision-lock-v2.js"></script>
 </body>
 </html>
