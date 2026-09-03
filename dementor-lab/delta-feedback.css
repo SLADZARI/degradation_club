@@ -1,0 +1,12 @@
+/* TALK metric feedback: human consequence first, exact trace deltas second. */
+.delta{min-height:0;padding:0;border-left:2px solid var(--ink);border-right:2px solid var(--ink)}
+.delta:empty{display:none}
+.delta-feedback{display:grid;gap:4px;padding:8px 9px;background:var(--paper)}
+.delta-feedback strong{font:900 11px/1.15 Arial,Helvetica,sans-serif;letter-spacing:.01em}
+.delta-feedback small{font:900 8px/1.25 monospace;opacity:.58}
+.delta-feedback__memory{display:block;margin-top:1px;font:900 8px/1.2 monospace;background:var(--ink);color:var(--paper);width:max-content;max-width:100%;padding:3px 5px}
+@media(max-width:430px){
+  .delta-feedback{padding:7px 8px;gap:3px}
+  .delta-feedback strong{font-size:10px;line-height:1.15}
+  .delta-feedback small,.delta-feedback__memory{font-size:7px;line-height:1.2}
+}
