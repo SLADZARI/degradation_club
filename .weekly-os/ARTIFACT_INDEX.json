@@ -5,20 +5,20 @@
     "project": "dementor-club",
     "documentType": "STANDARD",
     "projectStage": "CLARITY",
-    "gate": "G1_PRODUCT_LOCK",
-    "status": "DRAFT",
-    "version": "0.1",
+    "gate": "G6_VALIDATION",
+    "status": "APPROVED",
+    "version": "1.0",
     "updated": "2026-09-03",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": null
+    "supersedes": "0.1"
   },
   "currentArtifacts": [
-    {"artifactId":"dementor-club.kernel.project","documentType":"STANDARD","currentVersion":"0.1","status":"DRAFT","location":".weekly-os/PROJECT.json","sourceSystem":"GIT","authorityType":"IMPLEMENTATION_AUTHORITY","updated":"2026-09-03","canonicalProject":"dementor-club","canonicalLocation":".weekly-os/PROJECT.json","relation":"PROJECT_KERNEL","referencedBy":["dementor-club.result.mp-dsl-kernel-migration"]},
-    {"artifactId":"dementor-club.kernel.artifact-index","documentType":"STANDARD","currentVersion":"0.1","status":"DRAFT","location":".weekly-os/ARTIFACT_INDEX.json","sourceSystem":"GIT","authorityType":"IMPLEMENTATION_AUTHORITY","updated":"2026-09-03","canonicalProject":"dementor-club","canonicalLocation":".weekly-os/ARTIFACT_INDEX.json","relation":"PROJECT_KERNEL","referencedBy":["dementor-club.result.mp-dsl-kernel-migration"]},
-    {"artifactId":"dementor-club.kernel.approved-state","documentType":"STANDARD","currentVersion":"0.1","status":"DRAFT","location":".weekly-os/APPROVED_STATE.json","sourceSystem":"GIT","authorityType":"IMPLEMENTATION_AUTHORITY","updated":"2026-09-03","canonicalProject":"dementor-club","canonicalLocation":".weekly-os/APPROVED_STATE.json","relation":"PROTECTED_STATE","referencedBy":["dementor-club.result.mp-dsl-kernel-migration"]},
-    {"artifactId":"dementor-club.result.mp-dsl-kernel-migration","documentType":"RESULT","currentVersion":"0.1","status":"DRAFT","location":".weekly-os/results/mp-dsl-kernel-migration.v0.1.md","sourceSystem":"GIT","authorityType":"IMPLEMENTATION_AUTHORITY","updated":"2026-09-03","canonicalProject":"dementor-club","canonicalLocation":".weekly-os/results/mp-dsl-kernel-migration.v0.1.md","relation":"CURRENT_RESULT","referencedBy":[]}
+    {"artifactId":"dementor-club.kernel.project","documentType":"STANDARD","currentVersion":"1.0","status":"APPROVED","location":".weekly-os/PROJECT.json","sourceSystem":"GIT","authorityType":"IMPLEMENTATION_AUTHORITY","updated":"2026-09-03","canonicalProject":"dementor-club","canonicalLocation":".weekly-os/PROJECT.json","relation":"PROJECT_KERNEL","referencedBy":["dementor-club.result.mp-dsl-kernel-migration"]},
+    {"artifactId":"dementor-club.kernel.artifact-index","documentType":"STANDARD","currentVersion":"1.0","status":"APPROVED","location":".weekly-os/ARTIFACT_INDEX.json","sourceSystem":"GIT","authorityType":"IMPLEMENTATION_AUTHORITY","updated":"2026-09-03","canonicalProject":"dementor-club","canonicalLocation":".weekly-os/ARTIFACT_INDEX.json","relation":"PROJECT_KERNEL","referencedBy":["dementor-club.result.mp-dsl-kernel-migration"]},
+    {"artifactId":"dementor-club.kernel.approved-state","documentType":"STANDARD","currentVersion":"1.0","status":"APPROVED","location":".weekly-os/APPROVED_STATE.json","sourceSystem":"GIT","authorityType":"IMPLEMENTATION_AUTHORITY","updated":"2026-09-03","canonicalProject":"dementor-club","canonicalLocation":".weekly-os/APPROVED_STATE.json","relation":"PROTECTED_STATE","referencedBy":["dementor-club.result.mp-dsl-kernel-migration"]},
+    {"artifactId":"dementor-club.result.mp-dsl-kernel-migration","documentType":"RESULT","currentVersion":"1.0","status":"APPROVED","location":".weekly-os/results/mp-dsl-kernel-migration.v1.0.md","sourceSystem":"GIT","authorityType":"IMPLEMENTATION_AUTHORITY","updated":"2026-09-03","canonicalProject":"dementor-club","canonicalLocation":".weekly-os/results/mp-dsl-kernel-migration.v1.0.md","relation":"CURRENT_RESULT","referencedBy":[]}
   ],
   "referenceArtifacts": [
     {"artifactId":"dementor-club.reference.identity-membership-entity-boundary","documentType":"ARCHITECTURE","status":"DRAFT","location":"operations/IDENTITY_MEMBERSHIP_AND_ENTITY_BOUNDARY_V0.2.md","sourceSystem":"GIT","authorityType":"REFERENCE","note":"Document declares ARCHITECTURAL BOUNDARY / NOT IMPLEMENTED; not project-wide approved architecture."},
