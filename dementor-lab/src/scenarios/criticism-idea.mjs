@@ -34,7 +34,7 @@ export function createCriticismActors({opponentProfile=null,playerName='Гена
   const safePlayerName=String(playerName||'').trim()||'Гена';
   const profile=opponentProfile||{name:'Марта',baseCharacterId:'character-02',presetId:'CONTACT_SKEPTIC',sharedAppearance:{hat:false,glasses:false,beard:false,accessory:false},ownedAppearance:{outfit:true,shoes:true},graph:DEFAULT_OPPONENT.graph,initialState:{...DEFAULT_OPPONENT.initialState,memory:{}}};
   return {
-    A:createCharacter({id:'A',name:safePlayerName,graph:PLAYER_GRAPH,state:{energy:72,brain:15,tension:10,contact:60,memory:{}}}),
-    B:createCharacter({id:'B',name:profile.name,graph:profile.graph,state:profile.initialState,visual:{characterId:profile.baseCharacterId,appearance:{...(profile.sharedAppearance||{}),...(profile.ownedAppearance||{})},opponentPresetId:profile.presetId}})
+    A:createCharacter({id:'A',name:safePlayerName,graph:PLAYER_GRAPH,state:{energy:72,brain:15,tension:10,contact:60,memory:{}},visual:{gender:'male'}}),
+    B:createCharacter({id:'B',name:profile.name,graph:profile.graph,state:profile.initialState,visual:{characterId:profile.baseCharacterId,gender:profile.gender||(profile.baseCharacterId==='character-02'?'female':'male'),appearance:{...(profile.sharedAppearance||{}),...(profile.ownedAppearance||{})},opponentPresetId:profile.presetId}})
   };
 }

@@ -8,10 +8,10 @@ export const PHRASE_BANK=Object.freeze({
     'Хорошо. Тогда объясню, на чём именно держится моя мысль.'
   ]),
   agree:Object.freeze([
-    'Хорошо. Здесь я с тобой согласен.',
+    'Хорошо. Здесь я с тобой {{agree}}.',
     'Да. Это можно принять.',
     'Ладно, здесь спорить действительно не о чем.',
-    'Согласен. В этом месте твоя версия сильнее.',
+    '{{Agree}}. В этом месте твоя версия сильнее.',
     'Да, это замечание по делу.',
     'Хорошо. Тогда этот пункт снимаем.'
   ]),
@@ -43,14 +43,14 @@ export const PHRASE_BANK=Object.freeze({
 
 const EXTREME=Object.freeze({
   explain:Object.freeze({
-    understand:'Подожди. Кажется, я понял, что именно тебе здесь не нравится.',
+    understand:'Подожди. Кажется, я {{understood}}, что именно тебе здесь не нравится.',
     resentment:'Я уже не первый раз пытаюсь объяснить одно и то же.',
     overheat:'Нет. Подожди. Я ещё раз объясню, потому что сейчас мы вообще разъехались.',
     lowContact:'Я вижу, что разговор уже разваливается. Скажу только главное.'
   }),
   agree:Object.freeze({
-    overheat:'Да. Хорошо. Всё. Здесь согласен.',
-    lowContact:'Согласен. Дальше спорить об этом не буду.',
+    overheat:'Да. Хорошо. Всё. Здесь {{agree}}.',
+    lowContact:'{{Agree}}. Дальше спорить об этом не буду.',
     resentment:'Ладно. Этот пункт принимаю, хотя мне это сейчас даётся тяжело.'
   }),
   joke:Object.freeze({
@@ -75,6 +75,14 @@ function stableHash(input=''){
   for(const ch of String(input)){h^=ch.charCodeAt(0);h=Math.imul(h,16777619)}
   return h>>>0;
 }
+function genderForm(gender,key){
+  const female=gender==='female';
+  const forms={agree:female?'согласна':'согласен',Agree:female?'Согласна':'Согласен',understood:female?'поняла':'понял'};
+  return forms[key]||'';
+}
+function inflectPhrase(text,gender='male'){
+  return String(text||'').replace(/\{\{(agree|Agree|understood)\}\}/g,(_,key)=>genderForm(gender,key));
+}
 function memoryValue(memory,key){return Number(memory?.[key]||0)}
 function recentKey(recentTranscript=[]){return recentTranscript.slice(-3).map(x=>`${x.actorId||''}:${x.reaction||''}:${x.impulse||''}`).join('|')}
 function contextKey({reaction,impulse,scenario,state={},memory={},recentTranscript=[],turn=0}){
@@ -97,7 +105,7 @@ function contextualReplacement({reaction,impulse,state={},memory={}}){
 export function resolvePhrase(context={}){
   const reaction=context.reaction||'silent';
   const contextual=contextualReplacement({...context,reaction});
-  if(contextual)return contextual;
+  if(contextual)return inflectPhrase(contextual,context.gender);
   const list=PHRASE_BANK[reaction]||PHRASE_BANK.silent;
-  return list[stableHash(contextKey({...context,reaction}))%list.length];
+  return inflectPhrase(list[stableHash(contextKey({...context,reaction}))%list.length],context.gender);
 }

@@ -11,6 +11,11 @@ assert.equal(first,second,'same DialogueContext must resolve to the same phrase'
 
 const understand=resolvePhrase({...base,impulse:'understand',state:{brain:30,tension:25,contact:70},memory:{}});
 assert.match(understand,/понял, что именно тебе здесь не нравится/i,'UNDERSTAND explanation has a deterministic contextual replacement');
+const femaleUnderstand=resolvePhrase({...base,impulse:'understand',gender:'female',state:{brain:30,tension:25,contact:70},memory:{}});
+assert.match(femaleUnderstand,/поняла, что именно тебе здесь не нравится/i,'female UNDERSTAND uses feminine agreement');
+const femaleAgree=resolvePhrase({reaction:'agree',gender:'female',impulse:'beliked',scenario:{id:'criticism-idea'},state:{brain:30,tension:25,contact:70},memory:{},recentTranscript:[],turn:2});
+assert.doesNotMatch(femaleAgree,/согласен|я понял/i,'female dialogue never leaks known masculine agreement forms');
+assert.match(femaleAgree,/согласна|принять|спорить|замечание|пункт/i,'female AGREE stays grammatical and deterministic');
 
 const overheated=resolvePhrase({...base,state:{brain:91,tension:84,contact:45},memory:{resentment:4}});
 assert.match(overheated,/ещё раз объясню/i,'extreme BRAIN/TENSION uses the overheat replacement before resentment');

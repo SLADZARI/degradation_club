@@ -2,7 +2,7 @@ import { OPPONENT_PRESET_IDS, opponentPreset } from './presets.mjs';
 import { characterSpec, hasVariantContract, variantOptions } from '../render/character-registry.mjs';
 
 const BASE_CHARACTERS=Object.freeze(['character-01','character-02']);
-const OPPONENT_NAMES=Object.freeze(['Марта','Лев','Нина','Антон','Ира','Вадим']);
+const OPPONENT_NAMES=Object.freeze({female:['Марта','Нина','Ира'],male:['Лев','Антон','Вадим']});
 
 function hashSeed(input){
   const s=String(input??'dementor');let h=2166136261;
@@ -50,12 +50,14 @@ function generatedAppearance(rng,baseCharacterId){
 export function createOpponentProfile(seed){
   const rng=mulberry32(hashSeed(seed));
   const baseCharacterId=pick(rng,BASE_CHARACTERS);
+  const gender=baseCharacterId==='character-02'?'female':'male';
   const presetId=pick(rng,OPPONENT_PRESET_IDS);
   const preset=opponentPreset(presetId);
   const appearance=generatedAppearance(rng,baseCharacterId);
   return {
     seed:String(seed),
-    name:pick(rng,OPPONENT_NAMES),
+    name:pick(rng,OPPONENT_NAMES[gender]),
+    gender,
     baseCharacterId,
     presetId,
     presetLabel:preset.label,

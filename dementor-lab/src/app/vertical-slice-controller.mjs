@@ -24,7 +24,8 @@ export class VerticalSliceController{
         state:actor.state,
         memory:actor.state.memory,
         recentTranscript,
-        turn:out.trace.turn
+        turn:out.trace.turn,
+        gender:actor.visual?.gender||'male'
       });
       this.encounter.transcript[this.encounter.transcript.length-1].phrase=phrase;
       this.onEvent({type:'TURN',trace:out.trace,phrase,encounter:this.encounter});
