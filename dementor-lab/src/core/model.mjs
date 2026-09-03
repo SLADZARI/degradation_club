@@ -4,7 +4,7 @@ export const NODE_SPECS = Object.freeze({
   pushback:{family:'TRIGGER',title:'ВОЗРАЖЕНИЕ',description:'срабатывает, когда собеседник отвечает своей версией',defaults:{}},
   acceptance:{family:'TRIGGER',title:'ПРИНЯТО',description:'срабатывает, когда собеседник явно согласился',defaults:{}},
   deflection:{family:'TRIGGER',title:'УШЛИ В СТОРОНУ',description:'срабатывает, когда ответ уводит разговор в шутку или сторону',defaults:{}},
-  pressure:{family:'TRIGGER',title:'ДАВЛЕНИЕ',description:'срабатывает, когда собеседник требует ответа или давит',defaults:{}},
+  underpressure:{family:'TRIGGER',title:'ДАВЛЕНИЕ',description:'срабатывает, когда собеседник требует ответа или давит',defaults:{}},
   beright:{family:'IMPULSE',title:'БЫТЬ ПРАВЫМ',description:'усиливает эту ветку; добавляет BRAIN и TENSION',defaults:{weight:3}},
   beliked:{family:'IMPULSE',title:'НРАВИТЬСЯ',description:'усиливает эту ветку; поддерживает CONTACT',defaults:{weight:2}},
   understand:{family:'IMPULSE',title:'ПОНЯТЬ',description:'усиливает эту ветку; поддерживает CONTACT и немного нагружает BRAIN',defaults:{weight:2}},
