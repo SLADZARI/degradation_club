@@ -1,36 +1,96 @@
 {
   "schemaVersion": "1.0",
+  "_artifact": {
+    "artifactId": "dementor-club.kernel.project",
+    "project": "dementor-club",
+    "documentType": "STANDARD",
+    "projectStage": "CLARITY",
+    "gate": "G6_VALIDATION",
+    "status": "APPROVED",
+    "version": "1.0",
+    "updated": "2026-09-03",
+    "owner": "Modern Pilgrims",
+    "sourceSystem": "GIT",
+    "authorityType": "IMPLEMENTATION_AUTHORITY",
+    "supersedes": "legacy-weekly-os-router@2026-08-29"
+  },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
-  "system": "MODERN_PILGRIMS",
-  "repository": "SLADZARI/degradation_club",
+  "projectType": null,
+  "canonicalRepository": "SLADZARI/degradation_club",
   "defaultBranch": "main",
-  "workingBranch": "dementor-club",
-  "weeklyOs": {
-    "entrypoint": "/.weekly-os/PROJECT.json",
-    "reportDirectory": "/.weekly-os/reports",
-    "latestReport": "/.weekly-os/reports/latest.json"
-  },
+  "semanticSourceBranch": "dementor-club",
+  "projectStage": "CLARITY",
+  "gate": "G1_PRODUCT_LOCK",
+  "readFirst": [
+    ".weekly-os/PROJECT.json",
+    ".weekly-os/ARTIFACT_INDEX.json",
+    ".weekly-os/APPROVED_STATE.json",
+    ".weekly-os/results/mp-dsl-kernel-migration.v1.0.md",
+    "README.md",
+    "operations/IDENTITY_MEMBERSHIP_AND_ENTITY_BOUNDARY_V0.2.md",
+    "operations/DEMENTOR_ENTITY_MAP_AND_WORKSPACE_MODULES_V0.1.md",
+    "operations/UNIVERSAL_WORKSPACE_WIREFRAME_SPEC_V0.1.md"
+  ],
   "authority": {
-    "implementation": ["app", "src", "supabase"],
-    "productDocs": [
-      "operations/DEMENTOR_ENTITY_MAP_AND_WORKSPACE_MODULES_V0.1.md",
-      "operations/IDENTITY_MEMBERSHIP_AND_ENTITY_BOUNDARY_V0.2.md",
-      "operations/UNIVERSAL_WORKSPACE_WIREFRAME_SPEC_V0.1.md"
-    ]
+    "mpDslCore": {
+      "sourceSystem": "DRIVE",
+      "authorityType": "APPROVED_AUTHORITY",
+      "url": "https://docs.google.com/document/d/1fYwfF8IpvXh36qIAJxylT6oebOfaqJ_-L2MslXRHHOg/edit"
+    },
+    "semanticSource": {
+      "repository": "SLADZARI/degradation_club",
+      "ref": "dementor-club",
+      "sourceSystem": "GIT",
+      "authorityType": "IMPLEMENTATION_AUTHORITY",
+      "note": "Repository ARCHITECTURE.md declares this branch the source-of-truth for club concept, positioning, programs, products, membership logic, operating rules and approved club copy. Individual documents retain their own status/authority and are not auto-promoted."
+    },
+    "legacyProductDocumentPointers": {
+      "sourceSystem": "GIT",
+      "authorityType": "REFERENCE",
+      "paths": [
+        "operations/DEMENTOR_ENTITY_MAP_AND_WORKSPACE_MODULES_V0.1.md",
+        "operations/IDENTITY_MEMBERSHIP_AND_ENTITY_BOUNDARY_V0.2.md",
+        "operations/UNIVERSAL_WORKSPACE_WIREFRAME_SPEC_V0.1.md"
+      ],
+      "note": "Preserved from the legacy WeeklyOS router. Current source statuses are DRAFT / NOT IMPLEMENTED; these pointers do not establish project-wide PRODUCT/DOMAIN/ARCHITECTURE/DESIGN approval."
+    },
+    "legacyImplementationPointers": {
+      "sourceSystem": "GIT",
+      "authorityType": "REFERENCE",
+      "paths": ["app", "src", "supabase"],
+      "note": "Preserved as legacy router evidence only. This migration does not assert that these paths are current semantic or implementation authority on the dementor-club branch."
+    }
   },
-  "gptInstructions": {
-    "readFirst": [
-      "/.weekly-os/PROJECT.json",
-      "operations/IDENTITY_MEMBERSHIP_AND_ENTITY_BOUNDARY_V0.2.md",
-      "operations/DEMENTOR_ENTITY_MAP_AND_WORKSPACE_MODULES_V0.1.md"
-    ],
-    "doNotInfer": [
-      "Modern Pilgrims membership from Dementor Club membership",
-      "Modern Pilgrims roles from dc_* runtime state",
-      "person attribution from shared Git identity"
-    ],
-    "writeAutoReportTo": "/.weekly-os/reports/latest.json"
+  "protected": {
+    "PRODUCT": null,
+    "DOMAIN": null,
+    "ARCHITECTURE": null,
+    "DESIGN": null
   },
-  "updatedAt": "2026-08-29"
+  "currentResult": {
+    "artifactId": "dementor-club.result.mp-dsl-kernel-migration",
+    "version": "1.0",
+    "status": "APPROVED",
+    "path": ".weekly-os/results/mp-dsl-kernel-migration.v1.0.md"
+  },
+  "activeIntegrationBranch": "result/mp-dsl-kernel-migration",
+  "reportPath": null,
+  "legacyWeeklyOs": {
+    "reportDirectory": "/.weekly-os/reports",
+    "latestReport": "/.weekly-os/reports/latest.json",
+    "writeAutoReportTo": "/.weekly-os/reports/latest.json",
+    "systemLabel": "MODERN_PILGRIMS"
+  },
+  "doNotInfer": [
+    "Modern Pilgrims membership from Dementor Club membership",
+    "Modern Pilgrims roles from dc_* runtime state",
+    "person attribution from shared Git identity",
+    "Modern Pilgrims semantic ownership from the legacy system label MODERN_PILGRIMS",
+    "project-wide PRODUCT, DOMAIN, ARCHITECTURE or DESIGN approval from legacy product-document pointers",
+    "implementation authority from legacy app/src/supabase path pointers",
+    "site/staging semantics as club source-of-truth",
+    "production deployment from a merge",
+    "WeeklyOS runtime source_ref correction from kernel migration"
+  ]
 }
