@@ -14,3 +14,17 @@
 @keyframes talk-overheat-hit{0%{translate:-1px 0}100%{translate:1px 0}}
 @keyframes talk-tension-hit{0%{scale:1}45%{scale:1.025}100%{scale:1}}
 @media(prefers-reduced-motion:reduce){.talk .character-slot.reaction-overheat,.talk .character-slot.reaction-tension{animation:none}}
+
+/* Stabilization: appearance is one compact mobile control row. */
+.person-stage{position:relative}
+.person-stage-tools{position:absolute;right:10px;top:10px;z-index:8;display:grid;gap:6px}
+.person-stage-tools button{width:46px;height:46px;min-height:46px;padding:0;background:var(--paper);font-size:24px}
+.appearance-panel{grid-template-columns:repeat(4,1fr)}
+.appearance-panel button{min-height:48px}
+.appearance-panel [data-appearance-group="accessories"].active{background:var(--acid);opacity:1}
+.variant-options[data-category="accessories"]{display:grid;gap:5px;overflow:visible}
+.variant-group{display:grid;grid-template-columns:82px minmax(0,1fr);align-items:center;gap:6px}
+.variant-group>b{font:900 8px/1 monospace}
+.variant-group>div{display:flex;gap:5px;overflow-x:auto;scrollbar-width:none}
+.person-next{margin-top:8px}
+@media(max-width:430px){.appearance-panel{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}.appearance-panel button{font-size:8px;padding:0 3px}.person-stage-tools{right:7px;top:7px}.person-stage-tools button{width:44px;height:44px}.variant-group{grid-template-columns:70px minmax(0,1fr)}}

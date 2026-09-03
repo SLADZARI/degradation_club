@@ -85,3 +85,11 @@
   .brain-trigger-hub::before{left:-17px;top:13px;width:26px;height:26px}
   .brain-readable-route::before,.brain-behavior-head::before{left:-37px;width:26px;height:26px}
 }
+
+/* Stabilization: numbered rail removed; real connections carry causality. */
+.brain-trigger-hub::before,.brain-readable-route::before,.brain-behavior-head::before{content:none!important;display:none!important}
+.brain-screen .brain-graph.brain-constructor{background:none!important;padding-left:10px!important;padding-right:10px!important}
+.brain-behavior-head{border-width:1.5px;padding:7px 9px}
+.brain-behavior-head small{display:none}
+.brain-readable-route>small::after{content:' · РЕЗУЛЬТАТ'}
+@media(max-width:430px){.brain-screen .brain-graph.brain-constructor{padding-left:0!important;padding-right:0!important}.brain-behavior-head strong{font-size:13px}.brain-readable-route{margin-top:8px}}

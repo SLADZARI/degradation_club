@@ -33,6 +33,40 @@ export function buildConversationArc(encounter,side='A'){
   const pivot=segments[1],visible=segments.slice(0,3).map(s=>s.label),suffix=segments.length>3?' → …':'';
   return {summary:`${visible.join(' → ')}${suffix}. ПЕРВЫЙ ПЕРЕЛОМ: ХОД ${pivot.startTurn}, ${pivotStateLabel(pivot.firstTrace)}.`,segments:segments.map(({firstTrace,...s})=>s),pivot:{turn:pivot.startTurn,reaction:pivot.reaction,state:{...(pivot.firstTrace?.before?.self||{})}}};
 }
+
+function humanCause(encounter,trace,terminal){
+  if(!trace)return 'Разговор закончился раньше, чем мы успели понять, что ты творишь.';
+  const types=(trace.visitedNodes||[]).map(id=>nodeType(encounter.actors.A,id));
+  const bits=[];
+  const event=trace.event?.type;
+  if(event==='COUNTERPOINT')bits.push('Тебе возразили.');
+  else if(event==='ACCEPTANCE')bits.push('С тобой уже почти согласились.');
+  else if(event==='DEFLECTION')bits.push('Разговор попытался сбежать в сторону.');
+  else if(event==='PRESSURE')bits.push('На тебя надавили.');
+  if(types.includes('grudge'))bits.push('Ты сохранил обиду как важный документ.');
+  if(types.includes('beright'))bits.push('Потом решил, что быть правым важнее, чем закончить разговор живым.');
+  if(types.includes('explain'))bits.push('И снова начал объяснять.');
+  if(types.includes('repeat'))bits.push('А потом объяснил ещё раз. Потому что вдруг с первого раза было недостаточно.');
+  if(terminal.type==='BREAKDOWN'&&terminal.reason==='BRAIN')bits.push(`В итоге BRAIN дошёл до ${Math.round(terminal.value??encounter.actors[terminal.loser||'A'].state.brain)}. Мозг первым вышел из чата.`);
+  if(terminal.type==='BREAKDOWN'&&terminal.reason==='ENERGY')bits.push('В итоге закончились силы. Аргументы остались, человека — почти нет.');
+  if(terminal.type==='BREAKDOWN'&&terminal.reason==='CONTACT')bits.push('В итоге закончился контакт. Формально вы ещё разговаривали, фактически уже нет.');
+  return bits.join(' ');
+}
+function humanArc(arc,traces){
+  const count=traces.filter(t=>t.actorId==='A'&&t.selectedReaction).length;
+  if(!arc?.segments?.length)return 'Особого плана не возникло.';
+  if(arc.segments.length===1)return `${count} ходов подряд ты выбирал одно и то же: ${arc.segments[0].label}. Мозг решил, что новый план — это старый план ещё раз.`;
+  const labels=arc.segments.slice(0,3).map(x=>x.label.toLowerCase()).join(' → ');
+  return `По ходу разговора ты всё-таки менял тактику: ${labels}. Первый поворот случился примерно на ${arc.pivot?.turn||arc.segments[1].startTurn}-м ходу.`;
+}
+function humanSuspicion(actor,nodeId){
+  const node=nodeId?nodeFor(actor,nodeId):null;if(!node)return 'Явного виновника нет. Придётся думать.';
+  if(node.type==='repeat')return `ЗАЦИКЛИЛСЯ: REPEAT ×${node.p?.count||1}.`;
+  if(node.type==='beright')return `СЛИШКОМ ХОТЕЛ БЫТЬ ПРАВЫМ: W${node.p?.weight||1}.`;
+  if(familyOf(node)==='STATE')return `${(NODE_SPECS[node.type]?.title||node.type).toUpperCase()} ПОЕХАЛА С ТОБОЙ ДАЛЬШЕ.`;
+  return `ПРОВЕРЬ УЗЕЛ «${(NODE_SPECS[node.type]?.title||node.type).toUpperCase()}».`;
+}
+
 export function buildResult(encounter){
   const terminal=encounter.result||{type:'IN_PROGRESS',reason:null,turn:encounter.turn};
   const loser=terminal.loser||null,loserActor=loser?encounter.actors[loser]:null,actor=encounter.actors.A,trace=lastTraceFor(encounter,'A'),patch=encounter.patches.at(-1)||null,arc=buildConversationArc(encounter,'A');
@@ -46,7 +80,7 @@ export function buildResult(encounter){
   if(terminal.type==='OBJECTIVE_FAILED'&&terminal.objective==='direct-answer'&&terminal.reason==='CONTACT_LOW')punchline=`ОТВЕТЫ ЕСТЬ. CONTACT НЕ ВЫДЕРЖАЛ — ${Math.round(terminal.relationshipContact)}.`;
   const cause=trace?.noActionReason?`НЕТ ДЕЙСТВИЯ: ${trace.noActionReason}`:trace?.visitedNodes?.length?trace.visitedNodes.map(id=>nodeLabel(actor,id).toUpperCase()).join(' → '):'ПРИЧИНА НЕ ЗАФИКСИРОВАНА';
   const memory=(trace?.memoryChanges||[]).map(m=>`${String(m.key).toUpperCase()} ${m.before}→${m.after}`),suspicious=suspiciousNode(actor,trace);
-  return {terminal,punchline,stageB:{title:'ЧТО ПРОИЗОШЛО',cause,memory,arc,turn:trace?.turn||encounter.turn,actorId:'A'},stageC:{title:'ПОДОЗРИТЕЛЬНОЕ МЕСТО',actorId:'A',nodeId:suspicious,nodeType:suspicious?nodeType(actor,suspicious):null,patch,nextAction:'ИЗМЕНИТЬ ОДНУ ВЕЩЬ'},trace};
+  return {terminal,punchline,stageB:{title:'ЧТО ПРОИЗОШЛО',cause,humanCause:humanCause(encounter,trace,terminal),humanArc:humanArc(arc,encounter.traces),memory,arc,turn:trace?.turn||encounter.turn,actorId:'A'},stageC:{title:'ПОДОЗРИТЕЛЬНОЕ МЕСТО',actorId:'A',nodeId:suspicious,nodeType:suspicious?nodeType(actor,suspicious):null,humanSuspicion:humanSuspicion(actor,suspicious),patch,nextAction:'ПОЧИНИТЬ МОЗГ'},trace};
 }
 export function compareRuns(beforeEncounter,afterEncounter){
   const a=beforeEncounter.actors.A.state,b=afterEncounter.actors.A.state,delta=k=>Number((b[k]-a[k]).toFixed(2));

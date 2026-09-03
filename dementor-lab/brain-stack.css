@@ -15,3 +15,11 @@
 .brain-stack-node.connection-focus .brain-stack-card{outline:3px solid var(--acid);outline-offset:-3px}
 .brain-stack-node.connection-related .brain-stack-card{outline:2px solid var(--acid);outline-offset:-2px}
 .brain-stack-node.connection-target .brain-stack-route{color:#fff;opacity:.8}
+
+/* Edges are the primary causal affordance, not decorative rail fragments. */
+.brain-stack-links{z-index:1;overflow:visible}
+.brain-stack-edge{stroke-width:3.5}
+.brain-stack-edge.extra{stroke-width:4.5}
+.brain-stack-node{z-index:3}
+.brain-add-node-bottom{width:100%;margin-left:0;margin-right:0}
+@media(max-width:430px){.brain-add-node-bottom{width:100%;margin-left:0;margin-right:0}}

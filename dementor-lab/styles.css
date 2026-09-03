@@ -38,3 +38,9 @@
   .dialogue{height:230px;min-height:230px;max-height:230px}
   .bubble{max-width:90%;font-size:15px;padding:9px 10px}
 }
+
+/* TALK technical details are opt-in; reading pauses autoplay. */
+.talk-tech-toggle{width:100%;min-height:42px;border-left:2px solid var(--ink);border-right:2px solid var(--ink);border-top:0;border-bottom:2px solid var(--ink);background:var(--paper);text-align:left;font:900 9px/1 monospace}
+.talk-tech[hidden]{display:none}
+.talk-tech{border-bottom:2px solid var(--ink)}
+@media(max-width:430px){.talk-tech-toggle{min-height:38px;font-size:8px}.talk-tech .talk-cause{border-top:0}.talk-tech .delta-feedback small{display:block!important;font-size:7px!important}}
