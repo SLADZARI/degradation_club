@@ -1,6 +1,6 @@
 # DEMENTOR LAB — Trigger Hub implementation v0.1
 
-**Status:** IMPLEMENTED / QA pending  
+**Status:** IMPLEMENTED / FINAL QA RUN REQUESTED  
 **Date:** 2026-09-03  
 **Branch:** `agent/dementor-lab-vertical-slice-v0.3`
 
@@ -25,6 +25,10 @@ Mobile BRAIN projects Trigger infrastructure into one compact block:
 `Hide infrastructure, never hide causality.`
 
 With multiple Trigger entry nodes the vertical body auto-sequence must not invent a hidden entry edge because two nodes happen to be adjacent in the UI array. Trigger edges are authored/explicit. The normal non-trigger body remains fast to reorder as a vertical sequence.
+
+## UI projection invariant
+
+A Trigger → body connection belongs to the Trigger Hub projection and is not duplicated as a second metro line inside the behavioral body stack. Body-stack edge counts therefore describe only visible body-to-body causality.
 
 ## QA expectations
 
