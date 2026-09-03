@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { createEncounter, executeActorTurn, applyHotPatch } from '../src/encounter/runtime.mjs';
+import { createEncounter, executeActorTurn } from '../src/encounter/runtime.mjs';
 import { buildResult, compareRuns } from '../src/encounter/result.mjs';
 import { CRITICISM_IDEA_SCENARIO, createCriticismActors } from '../src/scenarios/criticism-idea.mjs';
 
@@ -8,16 +8,9 @@ function run({initialRepeat=4}={}){
   actors.A.brainGraph.nodes.find(n=>n.type==='repeat').p.count=initialRepeat;
   const e=createEncounter({scenario:CRITICISM_IDEA_SCENARIO,actorA:actors.A,actorB:actors.B,mode:'auto'});
   e.status='NEXT_TURN';
+  e.hotPatchUsed=true; // Counterfactual compares authored graphs without an intervention erasing their difference.
   let guard=0;
-  while(!e.result&&guard++<60){
-    const out=executeActorTurn(e);
-    if(out.breakpoint){
-      const side=out.breakpoint.actorId,actor=e.actors[side];
-      const repeat=out.breakpoint.nodeIds.map(id=>actor.brainGraph.nodes.find(n=>n.id===id)).find(n=>n?.type==='repeat');
-      if(repeat)applyHotPatch(e,{kind:'reduce-repeat',actorId:side,nodeId:repeat.id});
-      else throw new Error('Expected repeat node at authored breakpoint');
-    }
-  }
+  while(!e.result&&guard++<60)executeActorTurn(e);
   assert.ok(e.result,'encounter reaches result');
   return e;
 }
