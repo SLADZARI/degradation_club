@@ -1,6 +1,6 @@
 # DEMENTOR LAB — BRAIN STACK GEOMETRY v0.1
 
-Status: IMPLEMENTED / QA GATE
+Status: IMPLEMENTED / FINAL QA
 
 ## Mobile-first geometry
 - BRAIN stack reserves a stable left causal rail before card content.
@@ -28,6 +28,9 @@ Primary/side is a UI reading hierarchy only. It must never alter execution order
 ## Connection target
 CONNECT MODE must preserve enough width for both target title and the `СОЕДИНИТЬ` touch target.
 No connection action may require horizontal scrolling.
+
+## QA note
+Browser smoke must not toggle off an already-selected source before asserting focus. The test now preserves the selected state after a connection and verifies the real focused edges directly.
 
 ## Principle
 `One main line to read; side lanes for alternatives. Visual hierarchy never changes causality.`
