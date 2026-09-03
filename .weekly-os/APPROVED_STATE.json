@@ -1,0 +1,24 @@
+{
+  "schemaVersion": "1.0",
+  "_artifact": {
+    "artifactId": "dementor-club.kernel.approved-state",
+    "project": "dementor-club",
+    "documentType": "STANDARD",
+    "projectStage": "CLARITY",
+    "gate": "G1_PRODUCT_LOCK",
+    "status": "DRAFT",
+    "version": "0.1",
+    "updated": "2026-09-03",
+    "owner": "Modern Pilgrims",
+    "sourceSystem": "GIT",
+    "authorityType": "IMPLEMENTATION_AUTHORITY",
+    "supersedes": null
+  },
+  "protected": {
+    "PRODUCT": {"applicable":true,"artifactId":null,"version":null,"status":null,"location":null,"note":"No project-wide APPROVED PRODUCT authority established by this migration."},
+    "DOMAIN": {"applicable":true,"artifactId":null,"version":null,"status":null,"location":null,"note":"No project-wide APPROVED DOMAIN authority established by this migration."},
+    "ARCHITECTURE": {"applicable":true,"artifactId":null,"version":null,"status":null,"location":null,"note":"Existing architectural boundary documents remain REFERENCE/DRAFT unless separately approved."},
+    "DESIGN": {"applicable":true,"artifactId":null,"version":null,"status":null,"location":null,"note":"Existing workspace/design documents remain REFERENCE/DRAFT unless separately approved."}
+  },
+  "rule": "Kernel migration does not promote legacy documents or implementation detail into APPROVED semantic authority."
+}
