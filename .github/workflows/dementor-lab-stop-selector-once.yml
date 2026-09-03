@@ -1,0 +1,24 @@
+name: Dementor Lab Stop Selector Once
+on:
+  push:
+    paths:
+      - '.github/workflows/dementor-lab-stop-selector-once.yml'
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/dementor-lab-vertical-slice-v0.3
+      - name: Patch selector
+        run: python3 dementor-lab/scripts/patch-brain-stop-selector.py
+      - name: Commit patch
+        run: |
+          rm dementor-lab/scripts/patch-brain-stop-selector.py
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add dementor-lab/tests/browser-smoke.mjs dementor-lab/scripts/patch-brain-stop-selector.py
+          git commit -m 'test(lab): select STOP by exact node title'
+          git push origin HEAD:agent/dementor-lab-vertical-slice-v0.3
