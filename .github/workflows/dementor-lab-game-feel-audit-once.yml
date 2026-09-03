@@ -15,6 +15,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Run game feel matrix
+      - name: Run game feel matrix after arc fixes
         working-directory: dementor-lab
         run: node scripts/game-feel-matrix-audit.mjs
