@@ -1,6 +1,6 @@
 # Dementor Club — Production Flow QA Ledger
 
-Status: **ACTIVE / MEMBERSHIP V2 CORE PASS / QA BATCH 02 STAGED / PRODUCTION RETEST PENDING**  
+Status: **ACTIVE / MEMBERSHIP V2 CORE PASS / QA BATCH 02 RELEASE CANDIDATE GREEN / PRODUCTION MERGE + RETEST PENDING**  
 Date opened: **2026-09-02**  
 Environment: **PRODUCTION / https://dementor.club**  
 Source of truth: `dementor-club`  
@@ -16,7 +16,7 @@ All findings stay here. A finding is closed only after:
 1. root cause is identified;
 2. implementation is staged in `dementor-club-site`;
 3. the release passes production gates;
-4. the fix is deployed only after explicit human deploy approval;
+4. the fix is merged/deployed only after explicit human approval;
 5. the behavior is retested on `https://dementor.club`.
 
 Deployment remains manual. QA work must not deploy by itself.
@@ -228,78 +228,53 @@ Opened after live screenshots on **2026-09-03**.
 
 Goal: remove shell drift and broken internal navigation before advertising the club.
 
-Implementation status:
+Implementation/release state:
 
 - implementation PR: **#86 — QA Batch 02: site shell and route integrity**;
 - merged to `dementor-club-site`: `c4ed4a6a1f7a197e31d6a7563d9e27318fb82006`;
-- Site Integrity / Release Readiness run **#671**: **PASS**;
-- route manifest gate: **31 indexable / 15 private+compat / 1 disabled** — PASS;
-- production has **not** been changed or deployed by this batch yet.
+- implementation Site Integrity / Release Readiness run **#671**: **PASS**;
+- clean production release branch: `release/qa-batch-02-site-shell-route-integrity`, created from production head `1ed25952cc5a05174a8c1e78cd722b5c5921f7b6`;
+- production release PR: **#87 — Release QA Batch 02: site shell and route integrity**;
+- current release head: `555f612449df6e9320830e2e5d73000aac7b27f9`;
+- Production Candidate Integrity run **#675**: **PASS**;
+- release gates PASS: registry, readiness, visual contract, interactive runtime safety, production build, route manifest, analytics/consent and final production artifact release gate;
+- route manifest: **31 indexable / 15 private+compat / 1 disabled** — PASS;
+- final diff is a clean descendant of the current production head; no staging branch merge is required;
+- `dementor-club-production` has **not** been merged or deployed with Batch 02 yet.
 
 ### QA-MEM-012 — Global Header can render twice on pages that load `site-config.js` in `<head>`
 
-Status: **FIX STAGED / CI PASS / PRODUCTION RETEST PENDING**  
+Status: **FIX IN GREEN RELEASE CANDIDATE / PRODUCTION MERGE + RETEST PENDING**  
 Severity: **P1 / GLOBAL NAVIGATION + SHELL**
 
-Observed live on `/community/board/`:
+Observed live on `/community/board/`: two public-looking headers appeared one below another.
 
-- two public-looking headers appear one below another;
-- both contain Dementor Club navigation.
+Root cause verified: `site-config.js` could load `global-header.js` before the parser reached an existing static `.topbar`, so runtime inserted a second header.
 
-Canonical conflict:
-
-`docs/GLOBAL_HEADER_v1.md` requires one global header and forbids page-specific duplicated primary navigation.
-
-Root cause verified:
-
-- `/community/board/index.html` loads `/site-config.js` from `<head>` and also contains a static `<header class="topbar">` later in `<body>`;
-- `site-config.js` dynamically loads `/global-header.js` immediately;
-- `global-header.js` can execute before the parser reaches the static body header;
-- when no `.topbar` exists yet, runtime inserts a new header at the start of body;
-- the parser then continues and creates the page's original header, leaving two headers.
-
-Staged fix:
+Release fix:
 
 - `global-header.js` boots after DOM readiness when needed;
 - it normalizes the existing `.topbar` rather than racing the HTML parser;
 - defensive cleanup removes additional duplicate `header.topbar` nodes.
 
-Initial staging commit: `b8e72784beda8c62fe3e8be1aacb5020f5de2898`.
+Initial implementation commit: `b8e72784beda8c62fe3e8be1aacb5020f5de2898`.
 
-Required production regression matrix:
-
-- `/`;
-- `/about/`;
-- `/events/`;
-- `/projects/`;
-- `/community/`;
-- `/community/board/`;
-- `/merch/`;
-- `/join/`;
-- courses;
-- profile/workspace entry.
-
-Each public surface must expose exactly one global navigation header.
+Required production regression matrix: `/`, `/about/`, `/events/`, `/projects/`, `/community/`, `/community/board/`, `/merch/`, `/join/`, courses and profile/workspace entry. Each public surface must expose exactly one global navigation header.
 
 ---
 
 ### QA-MEM-013 — Footer is page-owned and visually/content-wise drifts across the site
 
-Status: **FIX STAGED / CI PASS / PRODUCTION RETEST PENDING**  
+Status: **FIX IN GREEN RELEASE CANDIDATE / PRODUCTION MERGE + RETEST PENDING**  
 Severity: **P2 / GLOBAL SHELL CONSISTENCY**
 
-Verified examples:
+Verified examples: Home and About owned different footer structures/status markers.
 
-- Home footer uses its own slogan and `HOME SYSTEM v2.4` marker;
-- About footer uses a different slogan and `ABOUT SYSTEM v10` marker.
-
-Root cause: public pages own independent footer markup; no shared footer runtime existed.
-
-Staged contract/fix:
+Release contract/fix:
 
 - one `global-footer.js` + `global-footer.css` owns the public footer shell;
 - public navigation/legal/support structure is consistent;
-- an existing page-local footer note/version may survive as page provenance instead of being silently deleted;
+- an existing page-local footer note/version may survive as page provenance;
 - private/authenticated product surfaces (`/workspace/*`, Board, Artifact, Membership Application/Result, auth callback/profile redirect) do not receive the public footer.
 
 Required production retest: compare Home / About / Events / Projects / Community / Merch / Join / courses and verify one consistent footer shell without losing intentional page provenance.
@@ -308,29 +283,21 @@ Required production retest: compare Home / About / Events / Projects / Community
 
 ### QA-MEM-014 — Workspace sidebar is copied per page and drifts between routes
 
-Status: **FIX STAGED / CI PASS / PRODUCTION RETEST PENDING**  
+Status: **FIX IN GREEN RELEASE CANDIDATE / PRODUCTION MERGE + RETEST PENDING**  
 Severity: **P1 / AUTHENTICATED INFORMATION ARCHITECTURE**
 
-Observed:
+Root cause: Workspace Home, Artifacts and Review owned separate HTML copies of `.dcw-sidebar/.dcw-nav`.
 
-- Home sidebar contained the fuller set of Workspace actions and role-aware additions;
-- `/workspace/artifacts/` hardcoded a smaller menu;
-- `/workspace/review/` hardcoded another variant;
-- changing section therefore changed the left navigation itself.
-
-Root cause:
-
-Workspace pages owned separate HTML copies of `.dcw-sidebar/.dcw-nav` instead of a single shell/navigation renderer.
-
-Staged fix:
+Release fix:
 
 - one `workspace/workspace-shell-v1.js` is the navigation owner;
-- root Workspace, My Artifacts, Membership Review and Owner Admin use the same sidebar host;
+- root Workspace, My Artifacts and Membership Review use the same sidebar host;
 - current section changes active state only;
-- role visibility is derived from Supabase roles/assignments;
+- role visibility comes from authoritative Supabase roles/assignments;
 - `MY WORK`, `MEMBERSHIP REVIEW`, `SYSTEM TOOLS` appear only when applicable;
 - `LOG OUT` is consistent;
-- root Workspace subviews use stable hash routes rather than copied child navigation.
+- root Workspace subviews use stable hash routes rather than copied child navigation;
+- production interactive-runtime gate was updated to validate the shared shell as the navigation source instead of looking for duplicated labels in `workspace/index.html`.
 
 Canonical target:
 
@@ -340,26 +307,20 @@ Canonical target:
 
 ### QA-MEM-015 — OWNER_ADMIN `SYSTEM TOOLS` links to a route stripped from production
 
-Status: **FIX STAGED / CI PASS / PRODUCTION RETEST PENDING**  
+Status: **FIX IN GREEN RELEASE CANDIDATE / PRODUCTION MERGE + RETEST PENDING**  
 Severity: **P1 / ADMIN TOOLING + BROKEN INTERNAL ROUTE**
 
-Observed: admin System Tools / design panel returned branded 404.
+Root cause: old runtime linked to `/design-system/admin/`, while production deliberately strips the full source `design-system` tree.
 
-Root cause verified:
-
-- old runtime linked to `/design-system/admin/`;
-- source contained `design-system/admin/index.html` and diagnostics;
-- production builder intentionally stripped the top-level `design-system` tree.
-
-Staged architecture:
+Release architecture:
 
 - entire `design-system` remains source-only;
 - production admin entry becomes `/workspace/admin/`;
 - route is `OWNER_ADMIN` + `noindex`;
 - only explicitly approved tools are projected during production build into `/workspace/admin/...`;
-- current projected tools: UI Lab, system tests, auth diagnostics and sync diagnostics;
-- direct non-owner access returns to Workspace / owner-gated surface;
-- no reason to publish the complete source design-system tree.
+- projected tools: UI Lab, system tests, auth diagnostics and sync diagnostics;
+- direct non-owner access is owner-gated;
+- production builder still blocks the hidden `/design-system/` navigation in `motion-v1.js` rather than publishing that source route.
 
 SEO note: this is a private/noindex route; primary purpose is internal owner tooling.
 
@@ -367,61 +328,59 @@ SEO note: this is a private/noindex route; primary purpose is internal owner too
 
 ### QA-MEM-016 — Production release validator misses JS-generated internal routes
 
-Status: **FIX STAGED / CI PASS / PRODUCTION RETEST PENDING**  
+Status: **FIX IN GREEN RELEASE CANDIDATE / PRODUCTION MERGE + RETEST PENDING**  
 Severity: **P1 / ROUTE INTEGRITY + SEO SAFETY**
 
-Old validator correctly checked static HTML/CSS/file-like references but did not reliably validate route navigation created in JavaScript.
+Old validator checked static HTML/CSS/file-like references but did not reliably validate route navigation created in JavaScript.
 
-This allowed `/design-system/admin/` to be generated dynamically while absent from the production artifact.
+Release fix:
 
-Staged fix:
-
-- production validator now checks real JS navigation assignments (`location.assign`, `location.replace`, `location.href`, `.href` and simple variable-to-navigation flows);
+- production validator checks real JS navigation assignments (`location.assign`, `location.replace`, `location.href`, `.href` and simple variable-to-navigation flows);
 - route namespaces/feature literals are not falsely treated as navigations;
-- a new `production-route-manifest.json` explicitly classifies indexable, private/noindex, compatibility, disabled and source-only surfaces;
-- CI runs `validate-route-manifest.mjs` after production build;
-- manual production deploy workflow runs the same manifest gate before release;
-- disabled cart runtime and its production loader are removed from the built artifact while commerce is off.
+- `production-route-manifest.json` classifies indexable, private/noindex, compatibility, disabled and source-only surfaces;
+- CI and manual production deploy workflows run `validate-route-manifest.mjs` after production build;
+- disabled cart runtime and its production loader are removed from the built artifact while commerce is off;
+- the final artifact gate successfully caught a residual `/design-system/` motion navigation during release preparation; production hardening was restored instead of weakening the validator.
 
-Gate evidence from PR #86:
+Production-candidate gate evidence from PR #87 / run #675:
 
 - source validation PASS;
 - readiness PASS;
 - visual contract PASS;
+- interactive runtime safety PASS;
 - production build PASS;
 - route manifest PASS;
+- analytics/consent PASS;
 - final production release validator PASS.
 
 ---
 
 ### QA-MEM-017 — Sitemap contained a disabled 404 route and a noindex compatibility route
 
-Status: **FIX STAGED / CI PASS / PRODUCTION RETEST PENDING**  
+Status: **FIX IN GREEN RELEASE CANDIDATE / PRODUCTION MERGE + RETEST PENDING**  
 Severity: **P1 / SEO + ROUTE INTEGRITY**
 
 Confirmed audit finding:
 
 - sitemap contained `/cart/`, while production intentionally does not publish Cart;
-- sitemap contained `/profile/`, which is a `noindex` compatibility redirect into Workspace;
-- sitemap simultaneously omitted several current approved/indexable surfaces, including newer Logic & Awareness dossier routes, Object 001 / merch surface and newer course/project routes.
+- sitemap contained `/profile/`, a `noindex` compatibility redirect into Workspace;
+- sitemap omitted several current approved/indexable surfaces.
 
-This proves the previous static link gate was not sufficient as an SEO route registry.
-
-Staged fix:
+Release fix:
 
 - sitemap reconciled to **31 public indexable routes**;
 - `/cart/` removed;
 - `/profile/` removed;
 - private auth/Workspace routes remain absent;
 - all sitemap URLs must exist in the built artifact and must not be `noindex`;
-- route manifest is now the explicit indexing contract;
-- CI blocks sitemap URLs that resolve to no page, private/noindex routes in sitemap, disabled routes being published, or indexable routes missing from sitemap.
+- route manifest is the explicit indexing contract;
+- CI blocks missing sitemap pages, private/noindex routes in sitemap, disabled routes being published, or indexable routes missing from sitemap.
 
-Production retest should include live HTTP checks of sitemap URLs after deployment and Search Console follow-up if historical 404s were already crawled.
+Production retest must include live HTTP checks of sitemap URLs after deployment and Search Console follow-up if historical 404s were already crawled.
 
 ## 6. Route / SEO audit model
 
-Routes are now classified before deciding whether absence is a bug:
+Routes are classified before deciding whether absence is a bug:
 
 - `PUBLIC_INDEXABLE` — public page; must resolve and be represented by the indexable route contract;
 - `PUBLIC_NOINDEX` — utility/auth flow; must resolve but should not be indexed;
@@ -441,17 +400,23 @@ The sitemap remains public/indexable only; private Workspace/admin routes are de
 
 ## 7. Current route integrity facts
 
-Batch 02 introduces a manifest-driven production route gate.
+Batch 02 now has a green production release candidate, not only implementation-branch evidence.
 
-Implementation candidate evidence:
+Production candidate evidence:
 
-- sitemap: **31 indexable URLs**;
+- PR **#87** → `dementor-club-production`;
+- head `555f612449df6e9320830e2e5d73000aac7b27f9`;
+- Production Candidate Integrity run **#675** → **PASS**;
+- sitemap/indexable contract: **31 routes**;
 - private + compatibility routes: **15**;
 - disabled routes: **1 (`/cart/`)**;
-- sitemap and production artifact cross-check: PASS in PR #86 CI;
-- static + JS navigation release gate: PASS in PR #86 CI.
+- source/static/JS navigation checks PASS;
+- production artifact build PASS;
+- sitemap ↔ artifact/noindex cross-check PASS;
+- analytics/consent gate PASS;
+- final artifact release gate PASS.
 
-This is still **staged evidence**, not a live production crawl. Production deployment and live HTTP regression are required before closing QA-MEM-012..017.
+This remains **release-candidate evidence**, not live production evidence. Production merge, explicit deploy and live HTTP/UI regression are still required before closing QA-MEM-012..017.
 
 ## 8. Batch 01 release state
 
@@ -459,9 +424,9 @@ Fix Batch 01 was promoted to `dementor-club-production`; Production Candidate In
 
 Membership v2 core behavior remains PASS. Findings from Batch 01 stay in this ledger until their production regression checks are explicitly completed.
 
-## 9. Batch 02 implementation state
+## 9. Batch 02 release state
 
-Completed in `dementor-club-site`:
+Completed:
 
 1. Global Header race/duplicate protection.
 2. Shared Workspace shell and stable role-aware sidebar.
@@ -472,16 +437,19 @@ Completed in `dementor-club-site`:
 7. Sitemap/indexability reconciliation.
 8. Disabled cart runtime removed from production artifact while commerce is off.
 9. CI/release workflows enforce the route manifest.
+10. Production-only analytics, Membership v2 v9/hotfix state and interactive-runtime safety were preserved in the selective release candidate.
+11. Production Candidate Integrity run #675 is fully green.
 
-Implementation merge: `c4ed4a6a1f7a197e31d6a7563d9e27318fb82006`.
+Implementation merge: `c4ed4a6a1f7a197e31d6a7563d9e27318fb82006`.  
+Release PR: **#87**.  
+Release head: `555f612449df6e9320830e2e5d73000aac7b27f9`.
 
-Next release step:
+Next release boundary:
 
-- create a clean selective release branch from the **current `dementor-club-production`**;
-- promote only Batch 02 files without overwriting current production-only readiness/content changes;
-- run full production candidate gates;
-- inspect diff;
-- do not deploy until explicit human instruction.
+- do **not** merge PR #87 into `dementor-club-production` without explicit human instruction;
+- after explicit merge approval, run the production integrity gate on the production head;
+- do **not** deploy until the user explicitly requests deployment;
+- after deploy, execute live desktop/mobile/header/footer/Workspace/admin/sitemap regression and only then close findings.
 
 ## 10. Exit criteria before advertising
 
