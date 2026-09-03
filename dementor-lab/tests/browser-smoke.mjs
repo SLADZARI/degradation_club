@@ -18,7 +18,7 @@ await page.locator('[data-brain-preset="custom"]').click();assert.equal(await pa
 async function addNode(type){await page.locator('#brain-add-node').click();await page.locator(`[data-add-brain-node="${type}"]`).click();await page.waitForTimeout(30)}
 await addNode('criticism');await addNode('beright');await addNode('explain');
 assert.equal(await page.locator('#brain-graph [data-trigger-hub]').count(),1,'BRAIN projects trigger infrastructure into one hub');assert.equal(await page.locator('#brain-graph .brain-trigger-chip').count(),1,'custom graph exposes one real trigger as a chip');assert.equal(await page.locator('#brain-graph .brain-stack-node').count(),2,'main stack shows behavioral body without duplicating trigger infrastructure');
-assert.equal(await page.locator('#brain-graph .brain-stack-edge').count(),2,'adding nodes extends the primary sequence');
+assert.equal(await page.locator('#brain-graph .brain-stack-edge').count(),1,'body stack renders only the behavioral edge while trigger entry stays in the hub');
 assert.equal(await page.locator('#to-setup').isDisabled(),false,'valid stacked sequence remains runnable');
 const impulseWrap=page.locator('#brain-graph .brain-stack-node').filter({hasText:'БЫТЬ ПРАВЫМ'}).first();const reactionWrap=page.locator('#brain-graph .brain-stack-node').filter({hasText:'ОБЪЯСНИТЬ'}).first();
 const triggerId=await page.locator('#brain-graph .brain-trigger-chip').first().getAttribute('data-trigger-select'),impulseId=await impulseWrap.getAttribute('data-brain-node-wrap'),reactionId=await reactionWrap.getAttribute('data-brain-node-wrap');
