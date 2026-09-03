@@ -1,0 +1,11 @@
+/* Batch 04: the canonical public header remains above Personal Workspace. */
+.dcw-live-banner{top:var(--dc-global-header-h,72px)!important;z-index:230!important}
+.dcw-sidebar{top:calc(var(--dc-global-header-h,72px) + 24px)!important;height:calc(100vh - var(--dc-global-header-h,72px) - 24px)!important}
+.dcw-topbar{top:calc(var(--dc-global-header-h,72px) + 24px)!important}
+html[data-dc-workspace-auth="checking"] .dcw-app,
+html[data-dc-workspace-auth="guest"] .dcw-app,
+html[data-dc-workspace-auth="error"] .dcw-app{grid-template-columns:1fr!important}
+html[data-dc-workspace-auth="checking"] .dcw-sidebar,
+html[data-dc-workspace-auth="guest"] .dcw-sidebar,
+html[data-dc-workspace-auth="error"] .dcw-sidebar{display:none!important}
+@media(max-width:900px){.dcw-sidebar{height:auto!important}}

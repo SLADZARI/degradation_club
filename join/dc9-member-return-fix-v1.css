@@ -1,0 +1,6 @@
+/* Batch 04: normalize member-return CTA geometry across <a> and <button>. */
+.dc9-member-return .dc9-actions{align-items:stretch}
+.dc9-member-return .dc9-button,
+.dc9-member-return .dc9-text-button{display:inline-flex;align-items:center;justify-content:center;min-height:52px;box-sizing:border-box;text-decoration:none;text-align:center;line-height:1.12}
+.dc9-member-return .dc9-text-button{padding:0 10px;border:0;border-bottom:1px solid currentColor}
+@media(max-width:520px){.dc9-member-return .dc9-button,.dc9-member-return .dc9-text-button{width:100%}}

@@ -32,18 +32,19 @@
     const st=document.createElement('style');st.textContent='.dc-account-panel{position:sticky;top:var(--dc-global-header-h,72px);z-index:230;margin:18px 0 6px;padding:14px 16px;border:1px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;font-size:12px;background:#111;box-shadow:0 8px 0 #111}.dc-account-panel__meta{display:grid;gap:3px}.dc-account-panel__meta strong{font-size:12px;letter-spacing:.06em}.dc-account-panel__meta span{opacity:.58}.dc-account-panel__actions{display:flex;gap:8px;flex-wrap:wrap}.dc-account-panel button{appearance:none;border:1px solid currentColor;background:transparent;color:inherit;padding:9px 11px;font:inherit;font-size:11px;font-weight:800;letter-spacing:.06em;cursor:pointer}.dc-account-panel button:hover{background:var(--acid);color:#111;border-color:var(--acid)}';document.head.appendChild(st);
     el=document.createElement('div');el.className='dc-account-panel';el.setAttribute('aria-live','polite');const shell=document.querySelector('.join-shell');shell?shell.prepend(el):document.body.prepend(el);return el;
   }
+  const removePanel=()=>document.querySelector('.dc-account-panel')?.remove();
   const setStatus=t=>{const e=document.querySelector('[data-dc-account-status]');if(e)e.textContent=t};
   const fail=e=>{trace('error',{message:e?.message||String(e),code:e?.code||null});console.error('[Dementor Sync V8.1]',e);setStatus(`ОШИБКА ВХОДА / СИНХРОНИЗАЦИИ${e?.message?' · '+e.message:''}`)};
   function render(){
+    // Authenticated account state is already represented by the canonical site header
+    // and Join member-return. Keep assessment sync running, but do not render a second
+    // sticky account surface that competes with the public shell.
+    if(!client||session){removePanel();return}
     const el=panel();
-    if(!client){el.innerHTML='<div class="dc-account-panel__meta"><strong>ПРОФИЛЬ</strong><span data-dc-account-status>ПОДКЛЮЧЕНИЕ…</span></div>';return}
-    if(!session){el.innerHTML='<div class="dc-account-panel__meta"><strong>ВАША КАРТА ХРАНИТСЯ НА ЭТОМ УСТРОЙСТВЕ</strong><span data-dc-account-status>Войдите через Google, чтобы синхронизировать её между устройствами.</span></div><div class="dc-account-panel__actions"><button type="button" data-dc-login>СОХРАНИТЬ ПРОФИЛЬ / GOOGLE</button></div>';el.querySelector('[data-dc-login]')?.addEventListener('click',login);return}
-    const m=session.user.user_metadata||{};const name=m.full_name||m.name||session.user.email||'Участник';
-    el.innerHTML=`<div class="dc-account-panel__meta"><strong>${esc(name)}</strong><span data-dc-account-status>СИНХРОНИЗИРОВАНО</span></div><div class="dc-account-panel__actions"><button type="button" data-dc-sync>СИНХРОНИЗИРОВАТЬ</button><button type="button" data-dc-logout>ВЫЙТИ</button></div>`;
-    el.querySelector('[data-dc-sync]')?.addEventListener('click',()=>requestSync(true));
-    el.querySelector('[data-dc-logout]')?.addEventListener('click',async()=>{await client.auth.signOut();session=null;render()});
+    el.innerHTML='<div class="dc-account-panel__meta"><strong>ВАША КАРТА ХРАНИТСЯ НА ЭТОМ УСТРОЙСТВЕ</strong><span data-dc-account-status>Войдите через Google, чтобы синхронизировать её между устройствами.</span></div><div class="dc-account-panel__actions"><button type="button" data-dc-login>СОХРАНИТЬ ПРОФИЛЬ / GOOGLE</button></div>';
+    el.querySelector('[data-dc-login]')?.addEventListener('click',login);
   }
-  function callbackUrl(){const base=location.pathname.startsWith('/degradation_club/')?'/degradation_club':'';return location.origin+base+'/auth/callback/'}
+  function callbackUrl(){return location.origin+'/auth/callback/?next='+encodeURIComponent('/join/')}
   async function login(){
     try{const redirectTo=callbackUrl();trace('login-start',{redirectTo});setStatus('ПЕРЕХОД К GOOGLE…');const {data,error}=await client.auth.signInWithOAuth({provider:'google',options:{redirectTo}});trace('provider-response',{hasUrl:Boolean(data?.url),error:error?.message||null});if(error)throw error}catch(e){fail(e)}
   }

@@ -45,17 +45,21 @@ function normalizeProductionText(text, ext='') {
   let result = text;
   for (const legacy of legacyOrigins) result = result.replaceAll(legacy, productionOrigin);
 
-  // Source supports the historical GitHub Pages sub-path. Production does not.
-  // Never run a blind `/degradation_club/ -> /` replacement across JS: it also
-  // matches the slash inside regex literals such as /^\/degradation_club/ and
-  // turns them into syntactically invalid /^\/. Keep compatibility checks as
-  // harmless never-match sentinels, then normalize actual path literals/markup.
+  // Source can still contain historical GitHub Pages sub-path references.
+  // Never run a blind /degradation_club/ replacement through executable code.
+  // In JS we neutralize compatibility tests before normalizing path literals.
+  // In HTML we normalize URL-bearing attributes only, leaving inline scripts intact.
   if (ext === '.js') {
     result = result.replaceAll('\\/degradation_club/', '\\/__dc_source_path_disabled__/');
     result = result.replaceAll("'/degradation_club/'", "'/__dc_source_path_disabled__/'");
     result = result.replaceAll('"/degradation_club/"', '"/__dc_source_path_disabled__/"');
+    result = result.replaceAll('/degradation_club/', '/');
+  } else if (ext === '.html') {
+    result = result.replace(/(\b(?:href|src|action|poster)=["'])\/degradation_club\//gi, '$1/');
+    result = result.replace(/(\bsrcset=["'][^"']*)\/degradation_club\//gi, '$1/');
+  } else {
+    result = result.replaceAll('/degradation_club/', '/');
   }
-  result = result.replaceAll('/degradation_club/', '/');
   result = result.replaceAll('/assets/ink/home-interruption-03.webp', '/assets/ink/home_01.webp');
   return result;
 }
@@ -125,24 +129,14 @@ function isPrivateFooter(rel) {
   return privateFooterPrefixes.some(prefix => rel.startsWith(prefix));
 }
 
-function isWorkspaceShell(rel) {
-  return rel.startsWith('workspace/');
-}
-
 function normalizeShellMarkup(html, rel) {
   if (rel === 'auth/callback/index.html') return html;
-  const workspaceShell=isWorkspaceShell(rel);
 
-  // A public page never owns the primary club header. Workspace is a separate
-  // authenticated shell and must not receive the public header at all.
-  if(!workspaceShell){
-    html = html.replace(/<header[^>]*class=["']topbar(?:\s[^"']*)?["'][^>]*>[\s\S]*?<\/header>/gi, '');
-    if (!html.includes('/global-header.css')) html = html.replace('</head>', '<link rel="stylesheet" href="/global-header.css">\n</head>');
-    if (!html.includes('/global-header.js')) html = html.replace('</body>', '<script src="/global-header.js" defer></script>\n</body>');
-  }else{
-    html = html.replace(/<link[^>]+href=["']\/global-header\.css["'][^>]*>/gi,'');
-    html = html.replace(/<script[^>]+src=["']\/global-header\.js["'][^>]*><\/script>/gi,'');
-  }
+  // The classic public header is the single site-level exit/navigation surface,
+  // including above Workspace. Workspace owns only its secondary/internal shell.
+  html = html.replace(/<header[^>]*class=["']topbar(?:\s[^"']*)?["'][^>]*>[\s\S]*?<\/header>/gi, '');
+  if (!html.includes('/global-header.css')) html = html.replace('</head>', '<link rel="stylesheet" href="/global-header.css">\n</head>');
+  if (!html.includes('/global-header.js')) html = html.replace('</body>', '<script src="/global-header.js" defer></script>\n</body>');
 
   if (!isPrivateFooter(rel)) {
     // Local footer markup is source history only. It must not survive into production.
@@ -165,6 +159,10 @@ function injectProductionModules() {
       if (!html.includes('/entity-recommendations-v1.js')) html = html.replace('</body>', '<script src="/entity-recommendations-v1.js" defer></script>\n</body>');
     }
     if (rel === 'projects/logic-awareness/index.html' && !html.includes('/logic-awareness-covers-v1.js')) html = html.replace('</body>', '<script src="/logic-awareness-covers-v1.js" defer></script>\n</body>');
+    if (!html.includes('/production-analytics-v1.js')) {
+      if (!html.includes('</body>')) throw new Error(`Cannot inject production analytics runtime into ${rel}: </body> missing`);
+      html = html.replace('</body>', '<script src="/production-analytics-v1.js" defer></script>\n</body>');
+    }
     fs.writeFileSync(full, html);
   });
 }
