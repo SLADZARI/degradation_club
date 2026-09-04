@@ -1,6 +1,6 @@
 # Dementor Club — Production Flow QA Ledger
 
-Status: **ACTIVE / MEMBERSHIP V2 CORE PASS / BATCH 04 LIVE / BATCH 05 MERGED NOT DEPLOYED / QA PORTAL HARMONIZATION ACTIVE / DC-9 BASELINE SITE G6 PASS**  
+Status: **ACTIVE / MEMBERSHIP V2 CORE PASS / BATCH 04 LIVE / BATCH 05 MERGED NOT DEPLOYED / QA PORTAL HARMONIZATION ACTIVE / ACTIVITY SITE G6 PASS / DC-9 BASELINE SITE G6 PASS**  
 Date opened: **2026-09-02**  
 Last live regression pass: **2026-09-03**  
 Operating update: **2026-09-04**  
@@ -73,8 +73,8 @@ Status: **WORKSPACE CHILD SURFACE PASS / NAVIGATION DESCENDANT QA-MEM-033** · P
 Review is inside Workspace. Ordinary Member negative access test previously PASS. Child-route navigation recovery is corrected in Batch 05 production code and awaits deployment/live retest.
 
 ### QA-MEM-010 — Archived Artifact history unavailable
-Status: **FIX RELEASED / PARTIAL LIVE RETEST** · P1  
-Known QA records: active `Куда двигаемся - народ?`; archived `гусь`. Live Board shows active Artifact data; archived history still needs explicit live retest from `MY ARTIFACTS`.
+Status: **FIX RELEASED / PARTIAL LIVE RETEST / ACTIVITY PROJECTION SITE G6 PASS** · P1  
+Known QA records: active `Куда двигаемся - народ?`; archived `гусь`. Live Board shows active Artifact data; archived history still needs explicit live retest. Current site Result additionally projects existing own Artifacts, responses and reactions into `МОЯ АКТИВНОСТЬ` without a new Activity entity.
 
 ### QA-MEM-011 — `/join/apply/` mobile oversized
 Status: **FIX RELEASED / MOBILE REGRESSION RETEST REQUIRED** · P1
@@ -139,9 +139,9 @@ Production Candidate Integrity #675 and post-merge #676 both passed. The user th
 The live pass proved that static/build gates were insufficient for DOM/CSS/runtime integration. Batch 02 therefore remained **NOT CLOSED** and led to Corrective Batch 03.
 
 ### QA-MEM-012 — Global Header ownership drift
-Status: **LIVE VISUAL PASS AFTER BATCH 03 / CURRENT HARMONIZATION IMPLEMENTATION MERGED TO SITE** · P1
+Status: **LIVE PUBLIC-SITE VISUAL PASS AFTER BATCH 03 / WORKSPACE RULE SUPERSEDED BY APPROVED PRIVATE SHELL** · P1
 
-Live Batch 03 retest: public navigation appears visually canonical and consistent across tested pages. Current Result extends this single owner; no second primary header/menu owner is allowed.
+Live Batch 03 retest: public navigation appears visually canonical and consistent across tested public pages. Current Result extends this single public owner, while authenticated `/workspace/*` is now governed by the approved private Workspace Shell authority in `operations/WORKSPACE_MEMBER_ACTIVATION_AND_SHELL_V1.md`.
 
 ### QA-MEM-013 — Footer ownership / geometry drift
 Status: **BROWSER PASS / LIVE CROSS-PAGE RETEST PARTIAL** · P1
@@ -149,14 +149,14 @@ Status: **BROWSER PASS / LIVE CROSS-PAGE RETEST PARTIAL** · P1
 Batch 03 browser gate confirms one canonical footer and no surviving `.dc-utility-strip` on tested public routes including `/join/`. Live screenshot of 404 also shows the canonical footer. Full cross-page visual pass is still pending before closure.
 
 ### QA-MEM-014 — Shared Workspace shell incompatible with existing controller
-Status: **ROOT WORKSPACE PASS / CHILD-SURFACE FIX MERGED IN BATCH 05 / NOT DEPLOYED** · P0
+Status: **ROOT WORKSPACE PASS / CHILD-SURFACE FIX MERGED IN BATCH 05 / CURRENT PRIVATE-SHELL SITE G6 PASS / NOT DEPLOYED** · P0
 
-Root `/workspace/` internal views work after authentication. Child-route navigation defect is tracked as QA-MEM-033 and corrected in Batch 05 production code.
+Root `/workspace/` internal views work after authentication. Child-route navigation defect is tracked as QA-MEM-033. The current Result additionally makes the Workspace Shell the canonical identity/navigation owner and removes the duplicate root `sessionBox` renderer.
 
 ### QA-MEM-015 — OWNER_ADMIN route exists but layout is broken
-Status: **BATCH 04 BROWSER PASS / LIVE RETEST PENDING** · P1
+Status: **CURRENT PRIVATE WORKSPACE SHELL BROWSER PASS / LIVE RETEST PENDING** · P1
 
-Chromium verifies `/workspace/admin/` keeps Workspace grid geometry under the canonical public header. Production visual retest still required.
+Chromium verifies `/workspace/admin/` keeps Workspace grid geometry under the canonical private Workspace Shell. Production visual retest still required.
 
 ### QA-MEM-016 — JS-generated route validator
 Status: **IMPLEMENTATION PASS / KEEP IN RELEASE GATES** · P1
@@ -173,7 +173,7 @@ Contract remains 31 public indexable routes; `/cart/` and `/profile/` are exclud
 ### QA-MEM-018 — Public shell has multiple effective header contracts
 Status: **CLOSED / LIVE VISUAL PASS 2026-09-03 / PERMANENT SINGLE-OWNER CHECK REQUIRED** · P1
 
-Batch 03 made canonical PublicShell the sole primary header owner. Future QA must re-check ownership before modifying header/menu/navigation so duplicate primary navigation cannot reappear.
+Batch 03 made canonical PublicShell the sole primary header owner on public surfaces. Future QA must re-check ownership before modifying header/menu/navigation so duplicate primary navigation cannot reappear.
 
 ### QA-MEM-019 — Public footer duplicates utility/navigation ownership
 Status: **FIX RELEASED / BROWSER PASS / LIVE VISUAL RETEST PARTIAL** · P1
@@ -181,9 +181,9 @@ Status: **FIX RELEASED / BROWSER PASS / LIVE VISUAL RETEST PARTIAL** · P1
 Global footer runtime removes legacy `<footer>` and `.dc-utility-strip`; production browser smoke asserts the duplicate utility strip is absent on `/join/`. Keep open until a short live visual pass across Home / Join / one entity page.
 
 ### QA-MEM-020 — Workspace null-DOM crash
-Status: **ROOT WORKSPACE LIVE PASS / CHILD NAVIGATION FIX MERGED IN BATCH 05 / NOT DEPLOYED** · **P0**
+Status: **ROOT WORKSPACE LIVE PASS / CHILD NAVIGATION FIX MERGED IN BATCH 05 / CURRENT OWNER CLEANUP SITE G6 PASS / NOT DEPLOYED** · **P0**
 
-Guest and authenticated root Workspace no longer show the previous `sessionBox.innerHTML` crash. The child failure is navigation ownership, not a return of the null-DOM crash.
+Guest and authenticated root Workspace no longer show the previous `sessionBox.innerHTML` crash. Current Result removes the root controller as a second `sessionBox`/logout rendering owner; canonical identity/session presentation remains in Workspace Shell.
 
 ### QA-MEM-021 — Community Board still escapes Workspace
 Status: **CLOSED FOR ROUTE/SHELL / FUNCTIONAL DESCENDANTS QA-MEM-028 + QA-MEM-033** · P1
@@ -191,9 +191,9 @@ Status: **CLOSED FOR ROUTE/SHELL / FUNCTIONAL DESCENDANTS QA-MEM-028 + QA-MEM-03
 Canonical member route is `/workspace/board/` and the Board remains a Workspace child surface.
 
 ### QA-MEM-022 — Admin shell missing layout dependency
-Status: **BATCH 04 BROWSER PASS / LIVE RETEST PENDING** · P1
+Status: **CURRENT PRIVATE WORKSPACE SHELL BROWSER PASS / LIVE RETEST PENDING** · P1
 
-Admin grid/layout is now part of the browser release gate.
+Admin grid/layout is part of the browser release gate.
 
 ### QA-MEM-023 — Logout has no reliable recovery to login
 Status: **LIVE PASS 2026-09-03** · **P0 ACCESS**
@@ -201,9 +201,9 @@ Status: **LIVE PASS 2026-09-03** · **P0 ACCESS**
 Live Batch 04 retest: user can log out, use Google login again, and regain an authenticated Workspace session. The subsequent failure after Board/Review navigation is QA-MEM-033 and does not indicate auth-session loss.
 
 ### QA-MEM-024 — Static CI passed while real browser integration was broken
-Status: **BATCH 05 CHILD-ROUTE COVERAGE ADDED / PRODUCTION CODE PASS / LIVE RETEST PENDING** · P1 RELEASE INTEGRITY
+Status: **CURRENT RESULT BROWSER COVERAGE EXTENDED / PRODUCTION LIVE RETEST PENDING** · P1 RELEASE INTEGRITY
 
-Browser coverage now includes a one-session sequence crossing Workspace root and child surfaces. Keep this as a permanent release-gate regression.
+Browser coverage includes a one-session sequence crossing Workspace root and child surfaces and now also verifies persisted Board participation → `МОЯ АКТИВНОСТЬ`. Keep this as a permanent release-gate regression.
 
 ## 7. Corrective Batch 03 release state
 
@@ -235,25 +235,31 @@ The same manual deployment was rerun after the hotfix:
 ## 8. Canonical shell contract after corrective work
 
 ### Public header
-One primary header only. Any future public-header change must modify the existing canonical GlobalHeader rather than add another page-owned menu/header.
+One primary header only on public surfaces. Any future public-header change must modify the existing canonical GlobalHeader rather than add another page-owned menu/header.
 
-**Approved 2026-09-03:** the canonical public header remains visible above Workspace. It is the discoverable escape from private Workspace back to the public Club. The brand points to `/`; public navigation remains available.
+Historical decision recorded 2026-09-03: the canonical public header remained visible above Workspace.
 
-Current Result implementation now contains the approved Russian/auth-aware header target in `dementor-club-site`; production remains unchanged until a separate G7 release.
+**SUPERSEDED 2026-09-04:** `operations/WORKSPACE_MEMBER_ACTIVATION_AND_SHELL_V1.md` is the current approved authority for authenticated Workspace. Public GlobalHeader/Footer are public-site owners only and must not render inside authenticated `/workspace/*`.
+
+Current Result implementation contains both the approved Russian/auth-aware public header target and the separated private Workspace Shell in `dementor-club-site`; production remains unchanged until a separate G7 release.
 
 ### Product/local bars
-Allowed only below the global header for product/session/progress state. They must not duplicate the club brand or global navigation.
+Allowed only where they have a distinct product/session/progress responsibility. They must not duplicate the public Club navigation or another canonical shell owner.
 
 ### Public footer
-One footer owner only. No separate utility/public strip may duplicate it.
+One footer owner only on public surfaces. No separate utility/public strip may duplicate it. Public footer does not render inside Workspace.
 
 ### Workspace
-Authenticated/member sidebar target:
-`HOME / MY CLUB / COMMUNITY BOARD / MY ARTIFACTS / MY ACTIVITY / MY WORK when applicable / MY PROFILE / role tools / LOG OUT`.
+Current approved authenticated/member shell target:
+- Workspace brand/logo → public `/` as the clear escape;
+- ordinary Member default surface = `COMMUNITY BOARD`;
+- ordinary Member primary navigation includes `COMMUNITY BOARD / МОЙ КЛУБ / МОИ АРТЕФАКТЫ / МОЯ АКТИВНОСТЬ` plus role-owned tools where applicable;
+- `HOME` is role-only/internal and is not an ordinary Member primary item;
+- name/avatar owns profile entry;
+- logout remains inside Workspace;
+- public GlobalHeader/Footer do not render inside authenticated Workspace.
 
-`HOME` is **Workspace Home**, not the public site Home. No duplicate `BACK TO CLUB` item is required while the canonical public header is present and working.
-
-**Guest boundary:** before Google authentication, member/role navigation and logout must not be exposed. The public header remains available as the route back to the public Club.
+**Guest boundary:** before Google authentication, member/role navigation and logout must not be exposed. The Workspace brand remains the public escape; the login gate owns authentication entry.
 
 Board, Artifacts, Review and Admin are Workspace child surfaces, not independent mini-sites.
 
@@ -280,16 +286,19 @@ QA is green only when:
 
 - live public pages show one canonical header owner and no duplicate primary menu/header implementation;
 - public header language and auth-aware states match the approved §15 decision;
-- one consistent footer exists and no duplicate utility strip remains;
-- Workspace retains the canonical public header for public-site escape;
+- one consistent public footer exists and no duplicate utility strip remains;
+- authenticated Workspace uses the canonical private Workspace Shell and does not duplicate the Public Header/Footer;
+- Workspace brand/logo provides the public-site escape to `/`;
 - Workspace guest state exposes login but not member navigation/logout;
-- Google login returns to `/workspace/` without legacy `/degradation_club/` or 404;
-- Workspace My Club / My Activity / My Profile work without runtime errors from both root and Workspace child surfaces;
+- Google login returns to canonical Workspace/member destinations without legacy `/degradation_club/` or 404;
+- ordinary Member defaults to Community Board; Workspace My Club / My Activity / profile identity entry work without runtime errors from root and child surfaces;
+- `МОЯ АКТИВНОСТЬ` exposes existing own Artifact / response / reaction history without creating a parallel Activity domain entity;
+- persisted Board response/reaction has visible confirmation and a discoverable path to Activity history;
 - Board stays inside Workspace shell and retains its approved spatial/integration behavior;
 - OWNER_ADMIN tools resolve and render with normal Workspace geometry;
 - DC-9/onboarding preserves the canonical Membership v2 boundary;
 - DC-9 first 9/9 baseline is immutable and repeat attempts remain separate history after the baseline migration is released;
-- browser-level CI covers OAuth callback, guest boundary, Workspace child/root transitions, Board integrations, Join/onboarding routes and Admin;
+- browser-level CI covers OAuth callback, guest boundary, Workspace child/root transitions, Board integrations, Member Activity projection, Join/onboarding routes and Admin;
 - 31 indexable sitemap routes resolve live and canonical/OG URLs remain on `https://dementor.club` unless a separately approved route-map change supersedes this count;
 - mobile baseline is checked at 360 / 390 / 768 / 1024 / 1440 where applicable;
 - G6 validation includes semantic, duplicate-owner, route, auth-state, browser and visual checks;
@@ -306,27 +315,30 @@ Status: **LIVE PASS AFTER BATCH 04 DEPLOY 2026-09-03** · **P0**
 Batch 04 correction is now live. User confirms logout followed by Google login restores the authenticated Workspace instead of the previous legacy 404. No evidence of auth-session loss in the current regression.
 
 ### QA-MEM-026 — Guest Workspace exposes member navigation and logout before authentication
-Status: **BATCH 04 DEPLOYED + BROWSER PASS / EXPLICIT LIVE GUEST RETEST STILL PENDING** · P1
+Status: **CURRENT PRIVATE-SHELL BROWSER PASS / EXPLICIT LIVE GUEST RETEST STILL PENDING** · P1
 
-Batch 04 hides the Workspace private sidebar until authenticated identity is resolved. Chromium asserts the guest cannot see private sidebar, member tools or logout while the public header remains available. A dedicated human guest-boundary screenshot/check is still pending.
+Current Result keeps Workspace private navigation hidden until authenticated identity is resolved. Chromium asserts guest cannot see private navigation/member tools. Public escape is the Workspace brand → `/`; authentication entry remains the login gate.
 
 ### QA-MEM-027 — Workspace has no route back to public Club Home
-Status: **LIVE PASS / PRODUCT DECISION CONFIRMED 2026-09-03** · P1
+Status: **LIVE HISTORICAL PASS / IMPLEMENTATION RULE SUPERSEDED 2026-09-04 / CURRENT PRIVATE-SHELL SITE G6 PASS** · P1
 
-Approved decision:
-- do not remove the canonical public header from Workspace;
-- `HOME` remains the internal Workspace Home;
-- the public header provides the public-site escape, with brand → `/` and normal public navigation.
+Historical 2026-09-03 decision used the public header as the escape. That implementation rule is superseded by `operations/WORKSPACE_MEMBER_ACTIVATION_AND_SHELL_V1.md`.
+
+Current canonical decision:
+- authenticated Workspace has one private Workspace Shell;
+- ordinary Member does not carry the public GlobalHeader inside Workspace;
+- Workspace brand/logo → `/` is the clear public-site escape;
+- `HOME` remains internal/role-specific, not public Home.
 
 ### QA-MEM-028 — Board move to Workspace dropped spatial/integration behavior
-Status: **BATCH 04 DEPLOYED / LIVE FUNCTIONAL RETEST PARTIAL** · P1
+Status: **BATCH 04 DEPLOYED / CURRENT RESULT BROWSER PASS / LIVE FUNCTIONAL RETEST PARTIAL** · P1
 
-Batch 04 restores the existing production Board modules inside `/workspace/board/` rather than recreating them. Current live screenshot confirms Board renders inside Workspace with active member state and restored shell. Drag/reposition and scattered test/activity cards still require explicit live functional confirmation.
+Batch 04 restores the existing production Board modules inside `/workspace/board/` rather than recreating them. Current Result preserves filters, spatial viewport, pan/zoom and own-card positioning in Chromium while extending Board participation discoverability. Drag/reposition on live production still requires explicit human confirmation after release.
 
 ### QA-MEM-029 — Join member-return uses stale production destinations
 Status: **BATCH 04 DEPLOYED + BROWSER PASS / CURRENT RESULT REMOVES LEGACY PRIMARY HANDOFFS IN SITE** · P1
 
-The dead `/account/` destination is blocked by browser assertions. Current Result additionally removes `/join/member/` and `/community/board/` from primary result-page continuation paths while preserving compatibility routes only where explicitly required.
+The dead `/account/` destination is blocked by browser assertions. Current Result removes `/join/member/` and `/community/board/` from primary continuation paths; Board guest OAuth returns to `/workspace/board/` and authenticated non-member Board gate returns to canonical `/join/`.
 
 ### QA-MEM-030 — Join leaves a black visual strip under canonical header
 Status: **BATCH 04 DEPLOYED + BROWSER PASS / LIVE RETEST PENDING** · P2
@@ -339,9 +351,9 @@ Status: **BATCH 04 DEPLOYED + BROWSER PASS / LIVE RETEST PENDING** · P2
 Join member-return geometry is normalized. Any replacement CTA must reuse the canonical header/design owner rather than reintroduce page-local CTA ownership.
 
 ### QA-MEM-032 — Browser smoke misses critical auth/state/integration paths
-Status: **BATCH 05 COVERAGE ADDED / PRODUCTION CODE PASS / LIVE RETEST PENDING** · P1 RELEASE INTEGRITY
+Status: **CURRENT RESULT COVERAGE EXTENDED THROUGH PR #102 / LIVE RETEST PENDING** · P1 RELEASE INTEGRITY
 
-Batch 05 permanently adds the missing child/root navigation sequence to browser validation.
+Current browser coverage includes child/root navigation, ordinary Member Board default, first-Artifact focus, role navigation, spatial Board and persisted Board participation → My Activity projection.
 
 ## 12. Corrective Batch 04 release state
 
@@ -356,13 +368,13 @@ Manual Deploy Dementor Production run **#30 / `33776664149` — SUCCESS** on 202
 ## 13. Live production retest — Batch 04 / Corrective Batch 05
 
 ### QA-MEM-033 — Workspace root-view controls become inert on child surfaces
-Status: **FIX MERGED TO PRODUCTION IN BATCH 05 / NOT DEPLOYED / LIVE RETEST PENDING** · P1
+Status: **FIX MERGED TO PRODUCTION IN BATCH 05 / NOT DEPLOYED / CURRENT PRIVATE-SHELL REGRESSION PASS** · P1
 
 Live evidence after Batch 04 deployment:
 - authenticated root Workspace initially works;
 - `HOME`, `MY CLUB`, `MY ACTIVITY`, `MY WORK`, `MY PROFILE` work while the browser remains on `/workspace/`;
 - entering `COMMUNITY BOARD` or `MEMBERSHIP REVIEW` leaves the same sidebar visible, but root-view controls become inert;
-- logout/login or returning through the public header restores `/workspace/`;
+- logout/login or returning through the then-current public header restores `/workspace/`;
 - session persists throughout; this is not an auth failure.
 
 Root cause confirmed in `workspace/workspace-shell-v1.js`: root views were button controls whose handler only worked on `/workspace/`.
@@ -389,7 +401,7 @@ Production release diff was exactly **1 commit ahead / 0 behind / 3 files**:
 
 Status: **PARTIALLY APPROVED / ACTIVE IMPLEMENTATION UNDER §16 HARMONIZATION PROTOCOL**
 
-This section captures product/UX work derived from live QA. Items with explicit decisions are promoted in §15. Implemented site-only items remain unclosed until production release + live retest.
+This section captures product/UX work derived from live QA. Items with explicit decisions are promoted in §15 and in the later approved Workspace authority. Implemented site-only items remain unclosed until production release + live retest.
 
 Backlog scope:
 1. Unify public interface language in Russian. — **IMPLEMENTED IN SITE / PR #95 / NOT DEPLOYED**
@@ -412,6 +424,7 @@ Backlog scope:
 18. Define 9/9 result screen. — **OPEN FOR FINAL CONTENT/VISUAL; ROUTE HANDOFF HARMONIZED IN PR #98**
 19. Review application form/email ownership and local draft → authenticated application transition. — **AUTH/DATA HANDOFF IMPLEMENTED IN SITE / PR #97 + #101 / EMAIL OWNERSHIP STILL OPEN**
 20. Implement one canonical end-to-end onboarding flow only after source/authority/route harmonization. — **IN PROGRESS UNDER CURRENT RESULT**
+21. Project existing Member Artifacts / responses / reactions into `МОЯ АКТИВНОСТЬ` with visible Board confirmation and no new Activity entity. — **IMPLEMENTED IN SITE / PR #102 / G6 #732 PASS / NOT DEPLOYED**
 
 ## 15. Approved Dementor Club product decisions — 2026-09-04
 
@@ -472,6 +485,10 @@ Technical resolution under PR #101:
 ### 15.5 Remaining visual approval
 
 Nikita/user final review is still required for the concrete visual treatment of the persistent CTA and final public copy refinements. That review may tune typography, spacing, accent, underline/plaque treatment and mobile composition, but must not silently change the approved information architecture above.
+
+### 15.6 Workspace shell / Member activation authority
+
+The separately approved project-local authority `operations/WORKSPACE_MEMBER_ACTIVATION_AND_SHELL_V1.md` supersedes the historical 2026-09-03 Workspace-header rule. It governs authenticated Workspace shell ownership, ordinary Member Board default, first-Artifact spotlight and `МОЯ АКТИВНОСТЬ` projection. It does not change the public Header target in §15.1.
 
 ## 16. MP_DSL harmonization protocol for Dementor Club QA
 
@@ -601,7 +618,7 @@ For Dementor Club portal work, G6 validation should include where applicable:
 - real-browser regression;
 - Safari auth check for auth-related changes;
 - mobile/desktop visual check;
-- canonical header/footer ownership;
+- canonical header/footer/Workspace-shell ownership;
 - no stale `/account/` or `/degradation_club/` runtime destinations;
 - existing Membership v2 regression preservation;
 - DC-9 first-baseline/repeat/reset contract for changes touching assessment history or application snapshots.
@@ -640,7 +657,7 @@ This sequence is intended to make each bug-fix pass also improve Dementor Club s
 
 ## 17. Current Result implementation state — 2026-09-04
 
-Status: **ACTIVE / SIX COHERENT PACKAGES G6 PASS + MERGED TO `dementor-club-site` / PRODUCTION RELEASE NOT AUTHORIZED**
+Status: **ACTIVE / SEVEN COHERENT PACKAGES G6 PASS + MERGED TO `dementor-club-site` / PRODUCTION RELEASE NOT AUTHORIZED**
 
 Current Result:
 `dementor-club.result.qa-portal-harmonization`
@@ -652,7 +669,7 @@ Implementation evidence:
 1. **PR #95 — canonical Russian header and auth identity**  
    G6: Site Integrity / Release Readiness **#715 PASS**.  
    Merged to `dementor-club-site` as `47cc670d12b03e600460176916e15a4de7c890b0`.  
-   Effect: one canonical GlobalHeader, Russian primary navigation, persistent `Вступить в клуб`, guest `Войти`, authenticated identity → Workspace, mobile contract, no second header/auth owner.
+   Effect: one canonical GlobalHeader, Russian primary navigation, persistent `Вступить в клуб`, guest `Войти`, authenticated identity → Workspace, mobile contract, no second public header/auth owner.
 
 2. **PR #97 — canonical application auth handoff**  
    G6: Site Integrity / Release Readiness **#718 PASS**.  
@@ -670,29 +687,34 @@ Implementation evidence:
    Effect: standalone `НАЧАТЬ DC-9` screen removed; user lands directly on the nine-sphere picker; existing explanatory copy is reused rather than silently rewritten; completed sphere cards expose existing level/result meaning; reset capability remains.
 
 5. **PR #100 — canonical Workspace shell and Member activation**  
-   G6: validated before merge under Site Integrity run **#727**.  
+   G6: Site Integrity / Release Readiness **#727 PASS**.  
    Merged to `dementor-club-site` as `596aba91b4f158aa8875fb80285825f8f34e09b8`.  
-   Effect: Workspace shell separation, ordinary Member Board default and first-Artifact spotlight are kept inside the same current Result; no production deploy was performed.
+   Effect: public shell is separated from authenticated Workspace; ordinary Member defaults to Community Board; identity/profile remains in Workspace Shell; first-Artifact spotlight extends the existing activation gate without changing membership state.
 
 6. **PR #101 — immutable first-complete DC-9 baseline**  
    G6: Site Integrity / Release Readiness **#729 PASS** including executable baseline contract, build, shell, Chromium, route manifest and release guard.  
    Merged to `dementor-club-site` as `759c93af280af05bae89c3b17a5de809ffcd83cb`.  
    Effect: guest first 9/9 is preserved, repeats are separated, all local history syncs before application, and a server migration derives/locks the first-complete 9/9 application snapshot from existing append-only `assessment_runs` without a parallel baseline table.
 
+7. **PR #102 — Community participation → My Activity projection**  
+   G6: Site Integrity / Release Readiness **#732 PASS** after a first browser run correctly exposed an unrealistic owner-role test fixture; fixture was corrected rather than weakening the regression.  
+   Merged to `dementor-club-site` as `9adef4a6691e88a63030f2925bfbc004ebdc93a6`.  
+   Effect: `МОЯ АКТИВНОСТЬ` projects existing own `dc_artifacts`, `dc_artifact_responses` and `dc_artifact_reactions`; Board persisted response/reaction state has visible confirmation and an Activity path; no new Activity table/entity was introduced; duplicate root session/identity renderer was removed; Board guest/non-member destinations were reconciled to `/workspace/board/` and `/join/`.
+
 Current branch synchronization:
-- `result/qa-portal-harmonization` is synchronized to `759c93af280af05bae89c3b17a5de809ffcd83cb` after PR #101;
+- `result/qa-portal-harmonization` is synchronized to `9adef4a6691e88a63030f2925bfbc004ebdc93a6` after PR #102;
 - no parallel Result/integration branch was created for these related changes.
 
 Production / database status:
-- **none of PR #95/#97/#98/#99/#100/#101 is deployed or merged to `dementor-club-production` yet**;
+- **none of PR #95/#97/#98/#99/#100/#101/#102 is deployed or merged to `dementor-club-production` yet**;
 - migration `20260904171500_dc9_immutable_first_baseline_v1.sql` is committed and G6-validated but **NOT applied to live Supabase**;
 - Batch 05 (`689105fc1c7ec772cecc9b4248bc16c47cd40935`) remains merged to `dementor-club-production` but **not deployed**;
-- live production therefore still reflects the pre-current-Result header/onboarding/baseline state plus Batch 04;
+- live production therefore still reflects the pre-current-Result header/onboarding/baseline/Activity state plus Batch 04;
 - do not mark current-Result findings LIVE PASS before a clean production candidate, explicit database/deploy authorization and live retest.
 
 Next harmonized priorities:
 1. investigate the reported Safari auth regression and determine whether a Safari-specific compatibility fix/test is required;
 2. continue onboarding/result UX cleanup only where existing copy/source supports it; final 9/9 visual/copy and baseline display-ID remain separate approval items;
 3. when the current QA cluster is ready for release, create a clean production candidate **from the current `dementor-club-production` baseline**, transfer only validated current-Result files/migration, run full production readiness, then stop for explicit user authorization before applying the Supabase migration or deploying the site;
-4. live-retest first-baseline → repeat → application snapshot, auth placement, Header/Workspace and QA-MEM-033 after release;
+4. live-retest first-baseline → repeat → application snapshot, auth placement, Header/Workspace, My Activity and QA-MEM-033 after release;
 5. perform G8 cleanup including legacy Join/member compatibility, dead picker-copy/runtime state, stale branches and any superseded shell/auth code.
