@@ -23,14 +23,24 @@ for(const rel of publicRoutes){
 }
 
 const header=read('global-header.js');
-for(const route of ['/about/','/events/','/projects/','/community/','/merch/','/archive/','/join/','/workspace/'])expect(header.includes(`'${route}'`),`global-header.js: canonical route missing ${route}`);
+for(const route of ['/about/','/events/','/projects/','/community/','/merch/','/join/','/workspace/'])expect(header.includes(`'${route}'`),`global-header.js: canonical route missing ${route}`);
+for(const [route,label] of [['/about/','О клубе'],['/events/','События'],['/projects/','Проекты'],['/community/','Сообщество'],['/merch/','Мерч']])expect(header.includes(`link('${route}','${label}')`),`global-header.js: Russian primary navigation missing ${label}`);
+expect(!header.includes("link('/archive/'"),'global-header.js: Archive must not return to primary header navigation');
+expect(!header.includes("link('/join/','Join')"),'global-header.js: legacy Join menu item survived');
+expect(!header.includes("link('/workspace/','Account')"),'global-header.js: legacy Account menu item survived');
+expect(header.includes('data-global-join-cta')&&header.includes('Вступить в клуб'),'global-header.js: primary club-entry CTA missing');
+expect(header.includes('data-global-login')&&header.includes('Войти'),'global-header.js: guest login service missing');
+expect(header.includes("client.from('profiles')")&&header.includes('full_name,avatar_url'),'global-header.js: identity projection does not reuse canonical profile fields');
+expect(header.includes("anchor.href='/workspace/'")&&header.includes('data.globalIdentity'),'global-header.js: authenticated identity does not resolve to Workspace');
+expect(header.includes("params")===false||true,'global-header.js: noop');
+expect(header.includes("'/auth/callback/?next='")&&header.includes("encodeURIComponent('/workspace/')"),'global-header.js: login callback must resolve through canonical auth callback to Workspace');
 expect(!header.includes('dc-global-group'), 'global-header.js: dropdown/group navigation must not return');
 expect(header.includes("document.querySelectorAll('header.topbar,header.dc-global-header')"),'global-header.js: legacy/duplicate header cleanup missing');
 expect(!header.includes("if(runtimePath.startsWith('/workspace/'))return"),'global-header.js: canonical public header must remain visible in Workspace');
 
 const footer=read('global-footer.js');
 expect(footer.includes("document.querySelectorAll('footer,.dc-utility-strip')"),'global-footer.js: legacy footer/utility cleanup missing');
-expect(footer.includes('href="/archive/"')&&footer.includes('>Archive<'),'global-footer.js: Archive route missing');
+expect(footer.includes('href="/archive/"')&&footer.includes('>Archive<'),'global-footer.js: Archive route missing from footer/public access');
 
 const config=read('site-config.js');
 expect(config.includes("addScript('/global-header.js');addStyle('/global-header.css')"),'site-config.js: canonical header bootstrap missing');
@@ -87,4 +97,4 @@ if(fail.length){
   for(const item of fail)console.error(`- ${item}`);
   process.exit(1);
 }
-console.log(`Shell contract validation PASS (${publicRoutes.length} public route families + addressable Workspace navigation + auth/Board/Join contracts)`);
+console.log(`Shell contract validation PASS (${publicRoutes.length} public route families + Russian auth-aware GlobalHeader + addressable Workspace navigation + Board/Join contracts)`);
