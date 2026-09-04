@@ -1,6 +1,6 @@
 # Dementor Club — Production Flow QA Ledger
 
-Status: **ACTIVE / MEMBERSHIP V2 CORE PASS / BATCH 04 LIVE / BATCH 05 MERGED NOT DEPLOYED / QA PORTAL HARMONIZATION ACTIVE**  
+Status: **ACTIVE / MEMBERSHIP V2 CORE PASS / BATCH 04 LIVE / BATCH 05 MERGED NOT DEPLOYED / QA PORTAL HARMONIZATION ACTIVE / DC-9 BASELINE SITE G6 PASS**  
 Date opened: **2026-09-02**  
 Last live regression pass: **2026-09-03**  
 Operating update: **2026-09-04**  
@@ -52,7 +52,7 @@ Production commerce remains disabled; Cart must not be exposed or indexed while 
 
 ### QA-MEM-004 — Historical completion vs repeat course attempt
 Status: **OPEN / PRODUCT-STATE CLARIFICATION REQUIRED** · P2  
-Historical `Думай с опасностью` completion/certificate is from 2026-08-28. A later repeat pass must not overwrite or masquerade as that historical completion. Repeat-attempt storage/model still needs clarification.
+Historical `Думай с опасностью` completion/certificate is from 2026-08-28. A later repeat pass must not overwrite or masquerade as that historical completion. Repeat-attempt storage/model still needs clarification. This remains separate from the DC-9 baseline fix in QA-MEM-034.
 
 ### QA-MEM-005 — Logout discoverability
 Status: **LIVE PASS FOR LOGOUT + LOGIN RECOVERY 2026-09-03** · P1  
@@ -78,6 +78,35 @@ Known QA records: active `Куда двигаемся - народ?`; archived `
 
 ### QA-MEM-011 — `/join/apply/` mobile oversized
 Status: **FIX RELEASED / MOBILE REGRESSION RETEST REQUIRED** · P1
+
+### QA-MEM-034 — DC-9 first-complete baseline can be overwritten by later repeats
+Status: **IMPLEMENTED IN SITE / PR #101 / G6 #729 PASS / SUPABASE MIGRATION NOT APPLIED / NOT DEPLOYED** · P1 DATA SEMANTICS
+
+FACT / root cause:
+- current `assessment_runs` already stores separate runs and is the correct history owner;
+- current Membership v2 submit RPC built `candidate_snapshot` from the latest run per sphere, so a repeat after first 9/9 could change the admission snapshot;
+- guest localStorage stored only the current result per sphere, so a pre-auth repeat could erase evidence of the original 9/9 locally.
+
+Canonical target:
+- no parallel baseline table;
+- first baseline = map visible at the first moment all 9 canonical spheres have completed runs;
+- server derives `baseline_completed_at = max(min(completed_at per canonical sphere))`, then selects the latest run for each sphere at or before that cutoff;
+- later repeats remain separate history and never overwrite that snapshot;
+- legacy `self-development` is canonicalized to `self_development` during derivation.
+
+Implementation evidence:
+- local `firstBaseline` is locked at first 9/9 and survives repeat/reset;
+- later local repeats are stored separately in `repeatRuns`;
+- application entry synchronizes baseline + repeats + current results before application logic runs;
+- migration `20260904171500_dc9_immutable_first_baseline_v1.sql` overrides new application `candidate_snapshot` at insert time while keeping exactly the 9 sphere keys expected by reviewer UI;
+- baseline rule/timestamp are stored in application `answers`, not as a tenth snapshot key;
+- authenticated `assessment_runs` privileges are reduced to explicit `SELECT + INSERT` to make append-only intent explicit;
+- dedicated executable regression contract verifies first 9/9 → repeat → reset without baseline mutation.
+
+Live DB status:
+- read-only Supabase audit confirmed the existing model can derive complete first baselines from current history without a new table;
+- **no DDL/migration was applied to live Supabase during implementation**;
+- do not close until migration is explicitly released, production code is deployed and live baseline/repeat/application retest passes.
 
 ## 4. Membership v2 authoritative PASS evidence
 
@@ -259,6 +288,7 @@ QA is green only when:
 - Board stays inside Workspace shell and retains its approved spatial/integration behavior;
 - OWNER_ADMIN tools resolve and render with normal Workspace geometry;
 - DC-9/onboarding preserves the canonical Membership v2 boundary;
+- DC-9 first 9/9 baseline is immutable and repeat attempts remain separate history after the baseline migration is released;
 - browser-level CI covers OAuth callback, guest boundary, Workspace child/root transitions, Board integrations, Join/onboarding routes and Admin;
 - 31 indexable sitemap routes resolve live and canonical/OG URLs remain on `https://dementor.club` unless a separately approved route-map change supersedes this count;
 - mobile baseline is checked at 360 / 390 / 768 / 1024 / 1440 where applicable;
@@ -377,10 +407,10 @@ Backlog scope:
 13. Remove low-value completion interstitials. — **OPEN**
 14. Make completed sphere cards informative. — **IMPLEMENTED IN SITE USING EXISTING LEVEL NAMES / PR #99 / NOT DEPLOYED**
 15. Restore humorous payoff after each sphere using existing approved/source material first. — **PARTIAL; EXISTING RESULT LEVEL PAYOFF EXPOSED, DEDICATED POST-SPHERE PAYOFF OPEN**
-16. Design immutable first-pass DC-9 baseline ID on top of existing data model where possible. — **OPEN / APPROVED CONCEPT**
-17. Separate initial baseline from repeat attempts; coordinate with QA-MEM-004. — **OPEN**
+16. Design immutable first-pass DC-9 baseline ID on top of existing data model where possible. — **STORAGE/RULE IMPLEMENTED IN SITE / PR #101 / DISPLAY-ID FORMULA STILL OPEN / DB MIGRATION NOT APPLIED**
+17. Separate initial baseline from repeat attempts; coordinate with QA-MEM-004. — **IMPLEMENTED TECHNICALLY FOR DC-9 IN SITE / `firstBaseline` + `repeatRuns` + APPEND-ONLY `assessment_runs`; REPEAT-HISTORY UX OPEN**
 18. Define 9/9 result screen. — **OPEN FOR FINAL CONTENT/VISUAL; ROUTE HANDOFF HARMONIZED IN PR #98**
-19. Review application form/email ownership and local draft → authenticated application transition. — **AUTH/DATA HANDOFF IMPLEMENTED IN SITE / PR #97 / EMAIL OWNERSHIP STILL OPEN**
+19. Review application form/email ownership and local draft → authenticated application transition. — **AUTH/DATA HANDOFF IMPLEMENTED IN SITE / PR #97 + #101 / EMAIL OWNERSHIP STILL OPEN**
 20. Implement one canonical end-to-end onboarding flow only after source/authority/route harmonization. — **IN PROGRESS UNDER CURRENT RESULT**
 
 ## 15. Approved Dementor Club product decisions — 2026-09-04
@@ -432,6 +462,12 @@ Decision:
 - later attempts must not overwrite the first baseline;
 - exact baseline-ID formula/storage implementation is delegated to technical design after inspection of current `assessment_runs` and related existing model;
 - no parallel baseline entity may be introduced if the existing model can be safely extended.
+
+Technical resolution under PR #101:
+- existing `assessment_runs` remains the history authority;
+- no new baseline table is introduced;
+- first-complete baseline is derived from existing runs at the first 9/9 cutoff and projected into new application snapshots;
+- display ID remains a separate unresolved presentation decision.
 
 ### 15.5 Remaining visual approval
 
@@ -567,7 +603,8 @@ For Dementor Club portal work, G6 validation should include where applicable:
 - mobile/desktop visual check;
 - canonical header/footer ownership;
 - no stale `/account/` or `/degradation_club/` runtime destinations;
-- existing Membership v2 regression preservation.
+- existing Membership v2 regression preservation;
+- DC-9 first-baseline/repeat/reset contract for changes touching assessment history or application snapshots.
 
 A green isolated component test is not sufficient when the affected responsibility is shared across routes.
 
@@ -576,6 +613,8 @@ A green isolated component test is not sufficient when the affected responsibili
 `commit ≠ merge ≠ deploy`.
 
 Production deploy remains manual and requires explicit user authorization. QA/harmonization work must not silently deploy.
+
+A database migration is also a release mutation: committing a migration file does **not** authorize applying it to live Supabase.
 
 ### 16.11 G8 cleanup / entropy check
 
@@ -597,12 +636,11 @@ A Result is not fully clean while an old parallel owner remains active without a
 From now on, default portal QA flow is:
 
 `QA observation → Project/Authority check → Existing implementation inventory → Duplicate/semantic/route check → Decision if required → Result → G5 Build → G6 Validation → G7 explicit release → live retest → G8 Cleanup → ledger update`
-
 This sequence is intended to make each bug-fix pass also improve Dementor Club structural coherence.
 
 ## 17. Current Result implementation state — 2026-09-04
 
-Status: **ACTIVE / FOUR COHERENT PACKAGES G6 PASS + MERGED TO `dementor-club-site` / PRODUCTION RELEASE NOT AUTHORIZED**
+Status: **ACTIVE / SIX COHERENT PACKAGES G6 PASS + MERGED TO `dementor-club-site` / PRODUCTION RELEASE NOT AUTHORIZED**
 
 Current Result:
 `dementor-club.result.qa-portal-harmonization`
@@ -631,19 +669,30 @@ Implementation evidence:
    Merged to `dementor-club-site` as `8fab18931baa4e470bf5ed3f2ef15f92cb5bf3ef`.  
    Effect: standalone `НАЧАТЬ DC-9` screen removed; user lands directly on the nine-sphere picker; existing explanatory copy is reused rather than silently rewritten; completed sphere cards expose existing level/result meaning; reset capability remains.
 
+5. **PR #100 — canonical Workspace shell and Member activation**  
+   G6: validated before merge under Site Integrity run **#727**.  
+   Merged to `dementor-club-site` as `596aba91b4f158aa8875fb80285825f8f34e09b8`.  
+   Effect: Workspace shell separation, ordinary Member Board default and first-Artifact spotlight are kept inside the same current Result; no production deploy was performed.
+
+6. **PR #101 — immutable first-complete DC-9 baseline**  
+   G6: Site Integrity / Release Readiness **#729 PASS** including executable baseline contract, build, shell, Chromium, route manifest and release guard.  
+   Merged to `dementor-club-site` as `759c93af280af05bae89c3b17a5de809ffcd83cb`.  
+   Effect: guest first 9/9 is preserved, repeats are separated, all local history syncs before application, and a server migration derives/locks the first-complete 9/9 application snapshot from existing append-only `assessment_runs` without a parallel baseline table.
+
 Current branch synchronization:
-- `result/qa-portal-harmonization` is synchronized to the latest implementation merge after each package;
+- `result/qa-portal-harmonization` is synchronized to `759c93af280af05bae89c3b17a5de809ffcd83cb` after PR #101;
 - no parallel Result/integration branch was created for these related changes.
 
-Production status:
-- **none of PR #95/#97/#98/#99 is deployed or merged to `dementor-club-production` yet**;
+Production / database status:
+- **none of PR #95/#97/#98/#99/#100/#101 is deployed or merged to `dementor-club-production` yet**;
+- migration `20260904171500_dc9_immutable_first_baseline_v1.sql` is committed and G6-validated but **NOT applied to live Supabase**;
 - Batch 05 (`689105fc1c7ec772cecc9b4248bc16c47cd40935`) remains merged to `dementor-club-production` but **not deployed**;
-- live production therefore still reflects the pre-current-Result header/onboarding state plus Batch 04;
-- do not mark the current Result findings LIVE PASS before a clean production candidate, explicit deploy authorization and live retest.
+- live production therefore still reflects the pre-current-Result header/onboarding/baseline state plus Batch 04;
+- do not mark current-Result findings LIVE PASS before a clean production candidate, explicit database/deploy authorization and live retest.
 
 Next harmonized priorities:
-1. inspect and design the immutable first-complete DC-9 baseline on the existing `assessment_runs` model; do not add a parallel baseline entity without evidence;
-2. investigate the reported Safari auth regression and determine whether a Safari-specific compatibility fix/test is required;
-3. continue onboarding/result UX cleanup only where existing copy/source supports it; final 9/9 visual/copy remains a separate approval item;
-4. when the current QA cluster is ready for release, create a clean production candidate **from the current `dementor-club-production` baseline**, transfer only validated current-Result files, run full production G6/G7 readiness, then stop for explicit user deploy authorization;
-5. after live retest, perform G8 cleanup including legacy Join/member compatibility, dead picker-copy/runtime state, stale branches and any superseded shell/auth code.
+1. investigate the reported Safari auth regression and determine whether a Safari-specific compatibility fix/test is required;
+2. continue onboarding/result UX cleanup only where existing copy/source supports it; final 9/9 visual/copy and baseline display-ID remain separate approval items;
+3. when the current QA cluster is ready for release, create a clean production candidate **from the current `dementor-club-production` baseline**, transfer only validated current-Result files/migration, run full production readiness, then stop for explicit user authorization before applying the Supabase migration or deploying the site;
+4. live-retest first-baseline → repeat → application snapshot, auth placement, Header/Workspace and QA-MEM-033 after release;
+5. perform G8 cleanup including legacy Join/member compatibility, dead picker-copy/runtime state, stale branches and any superseded shell/auth code.
