@@ -15,6 +15,10 @@ const warm=selectWorldEvent({reaction:'explain',intent:INTENTS.MAKE_UNDERSTOOD,t
 assert.equal(warm.event.type,'ACCEPTANCE','high contact + trust can make the same explanation land as acceptance');
 assert.equal(warm.event.accepted,true);
 
+const overloaded=selectWorldEvent({reaction:'explain',intent:INTENTS.MAKE_UNDERSTOOD,targetState:{contact:12,tension:17,brain:96,energy:25,memory:{}}});
+assert.equal(overloaded.event.type,'NO_RESPONSE','collapsed contact + extreme overload should shut the target down instead of producing another counterpoint');
+assert.equal(overloaded.event.trigger,'ignore');
+
 const repeatedA=rankWorldEvents({reaction:'pressure',intent:INTENTS.PRESSURE,targetState:{contact:18,tension:82,brain:88,energy:30,memory:{resentment:2}}});
 const repeatedB=rankWorldEvents({reaction:'pressure',intent:INTENTS.PRESSURE,targetState:{contact:18,tension:82,brain:88,energy:30,memory:{resentment:2}}});
 assert.deepEqual(repeatedA,repeatedB,'event ranking is deterministic');
