@@ -37,33 +37,40 @@ expect(header.includes("anchor.href='/workspace/'")&&header.includes('dataset.gl
 expect(header.includes("'/auth/callback/?next='")&&header.includes("encodeURIComponent('/workspace/')"),'global-header.js: login callback must resolve through canonical auth callback to Workspace');
 expect(!header.includes('dc-global-group'), 'global-header.js: dropdown/group navigation must not return');
 expect(header.includes("document.querySelectorAll('header.topbar,header.dc-global-header')"),'global-header.js: legacy/duplicate header cleanup missing');
-expect(!header.includes("if(runtimePath.startsWith('/workspace/'))return"),'global-header.js: canonical public header must remain visible in Workspace');
 
 const footer=read('global-footer.js');
 expect(footer.includes("document.querySelectorAll('footer,.dc-utility-strip')"),'global-footer.js: legacy footer/utility cleanup missing');
 expect(footer.includes('href="/archive/"')&&footer.includes('>Archive<'),'global-footer.js: Archive route missing from footer/public access');
 
 const config=read('site-config.js');
-expect(config.includes("addScript('/global-header.js');addStyle('/global-header.css')"),'site-config.js: canonical header bootstrap missing');
-expect(config.includes("addStyle('/workspace/workspace-public-header-v1.css')"),'site-config.js: Workspace header offset layer missing');
+expect(config.includes('const isWorkspaceShell=runtimePath.startsWith(\'/workspace/\')'),'site-config.js: Workspace shell boundary missing');
+expect(config.includes('if(!isWorkspaceShell)'),'site-config.js: public shell is not explicitly excluded from Workspace');
+expect(config.includes("addScript('/global-header.js');addStyle('/global-header.css')"),'site-config.js: public GlobalHeader bootstrap missing');
+expect(!config.includes("addStyle('/workspace/workspace-public-header-v1.css')"),'site-config.js: superseded Workspace public-header offset layer still bootstrapped');
 
 const shell=read('workspace/workspace-shell-v1.js');
 expect(shell.includes("const board='/workspace/board/'"),'workspace shell: Board must stay inside Workspace');
 expect(shell.includes('id="sessionBox"'),'workspace shell: controller sessionBox contract missing');
 expect(shell.includes('data-work-nav'),'workspace shell: controller workNav contract missing');
-expect(shell.includes('const viewLink='),'workspace shell: root views must be addressable links');
-for(const route of ['home','club','activity','work','profile'])expect(shell.includes(`viewLink('${route}'`),`workspace shell: addressable root view missing ${route}`);
+expect(shell.includes('const viewLink='),'workspace shell: root views must remain addressable links');
+for(const route of ['home','club','activity','work'])expect(shell.includes(`viewLink('${route}'`),`workspace shell: addressable root view missing ${route}`);
 expect(shell.includes('href="${root}#${key}"'),'workspace shell: child surfaces cannot return to root hash views');
+expect(shell.includes('href="/" aria-label="Dementor Club — на публичный сайт"'),'workspace shell: canonical public escape must be the Workspace brand -> /');
+expect(shell.indexOf("link(board,'COMMUNITY BOARD'")<shell.indexOf("viewLink('club','МОЙ КЛУБ')"),'workspace shell: Community Board must be the first ordinary Member navigation item');
+expect(shell.includes("viewLink('home','HOME',{hidden:true,roleHome:true})"),'workspace shell: HOME must not remain an ordinary Member primary item');
+expect(!shell.includes("viewLink('profile','MY PROFILE')"),'workspace shell: profile must move out of ordinary primary navigation');
+expect(shell.includes('href="${root}#profile"'),'workspace shell: name/avatar identity must own profile entry');
 expect(shell.includes("dataset.dcWorkspaceAuth='guest'"),'workspace shell: explicit guest boundary state missing');
-expect(shell.includes('host.hidden=true'),'workspace shell: guest/private navigation must begin hidden');
+expect(shell.includes('data-workspace-nav hidden'),'workspace shell: private navigation must begin hidden before auth');
 expect(shell.includes('data-member-tool'),'workspace shell: membership-gated private routes missing');
+expect(shell.includes("member&&!dementor")&&shell.includes('location.replace(board)'),'workspace shell: ordinary active Member does not default to Community Board');
 
 for(const rel of ['workspace/index.html','workspace/board/index.html','workspace/artifacts/index.html','workspace/review/index.html','workspace/admin/index.html']){
   const html=read(rel);
-  expect(html.includes('/site-config.js'),`${rel}: canonical site config missing above Workspace`);
-  expect(html.includes('/global-header.js'),`${rel}: canonical public header runtime missing above Workspace`);
-  expect(html.includes('/global-header.css'),`${rel}: canonical public header CSS missing above Workspace`);
-  expect(html.indexOf('/site-config.js')<html.indexOf('/global-header.js'),`${rel}: site config must load before Workspace GlobalHeader`);
+  expect(html.includes('/site-config.js'),`${rel}: canonical site config missing in Workspace`);
+  expect(!html.includes('/global-header.js'),`${rel}: public GlobalHeader runtime leaked into private Workspace`);
+  expect(!html.includes('/global-header.css'),`${rel}: public GlobalHeader CSS leaked into private Workspace`);
+  expect(!html.includes('/workspace/workspace-public-header-v1.css'),`${rel}: superseded public-header offset layer leaked into Workspace`);
   expect(!html.includes('/global-footer.js'),`${rel}: public footer must not leak into private Workspace`);
 }
 
@@ -82,6 +89,12 @@ const board=read('workspace/board/index.html');
 for(const id of ['boardStatus','memberBadge','entryHost','artifactCount','boardFilters','boardHost'])expect(board.includes(`id="${id}"`),`workspace/board/index.html: board runtime host missing #${id}`);
 expect(board.includes('../workspace-shell-v1.js'),'workspace/board/index.html: shared Workspace shell missing');
 for(const asset of ['board-qa-fix-v1.css','board-integrations-v1.css','board-spatial-v1.css','telegram-worker-trigger-v3.js','board-integrations-v1.js','board-activation-gate-v1.js','board-spatial-v1.js'])expect(board.includes(asset),`workspace/board/index.html: restored Board module missing ${asset}`);
+
+const activation=read('community/board/board-activation-gate-v1.js');
+expect(activation.includes("FOCUS_DISMISSED_KEY='dc_first_artifact_spotlight_dismissed_v1'"),'Board first-entry: spotlight session key missing');
+expect(activation.includes("activationState==='FIRST_ARTIFACT_REQUIRED'&&!focusDismissed()"),'Board first-entry: spotlight is not bound to canonical activation state');
+expect(activation.includes("skip.textContent='Пропустить сейчас'"),'Board first-entry: low-emphasis skip control missing');
+expect(!activation.includes("activationState='MEMBER_ACTIVATED'"),'Board first-entry: client spotlight must not mutate canonical activation state');
 
 const legacyBoard=read('community/board/index.html');
 expect(legacyBoard.includes('/workspace/board/'),'community/board/: compatibility route must resolve into Workspace Board');
@@ -134,4 +147,4 @@ if(fail.length){
   for(const item of fail)console.error(`- ${item}`);
   process.exit(1);
 }
-console.log(`Shell contract validation PASS (${publicRoutes.length} public route families + site-config ownership + Russian auth-aware GlobalHeader + merged DC-9 entry/picker + canonical Join application auth + direct DC-9 result handoff + addressable Workspace navigation + Board contracts)`);
+console.log(`Shell contract validation PASS (${publicRoutes.length} public route families + separated public/Workspace shell ownership + ordinary Member Board default + first Artifact spotlight + merged DC-9 entry + canonical application/result handoff + Board contracts)`);
