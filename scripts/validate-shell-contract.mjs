@@ -31,8 +31,7 @@ expect(!header.includes("link('/workspace/','Account')"),'global-header.js: lega
 expect(header.includes('data-global-join-cta')&&header.includes('Вступить в клуб'),'global-header.js: primary club-entry CTA missing');
 expect(header.includes('data-global-login')&&header.includes('Войти'),'global-header.js: guest login service missing');
 expect(header.includes("client.from('profiles')")&&header.includes('full_name,avatar_url'),'global-header.js: identity projection does not reuse canonical profile fields');
-expect(header.includes("anchor.href='/workspace/'")&&header.includes('data.globalIdentity'),'global-header.js: authenticated identity does not resolve to Workspace');
-expect(header.includes("params")===false||true,'global-header.js: noop');
+expect(header.includes("anchor.href='/workspace/'")&&header.includes('dataset.globalIdentity'),'global-header.js: authenticated identity does not resolve to Workspace');
 expect(header.includes("'/auth/callback/?next='")&&header.includes("encodeURIComponent('/workspace/')"),'global-header.js: login callback must resolve through canonical auth callback to Workspace');
 expect(!header.includes('dc-global-group'), 'global-header.js: dropdown/group navigation must not return');
 expect(header.includes("document.querySelectorAll('header.topbar,header.dc-global-header')"),'global-header.js: legacy/duplicate header cleanup missing');
