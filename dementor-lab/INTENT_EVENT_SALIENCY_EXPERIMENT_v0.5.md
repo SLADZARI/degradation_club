@@ -1,16 +1,16 @@
 # DEMENTOR LAB — Intent / Event Saliency Experiment v0.5
 
-Status: EXPERIMENTAL / NON-CANON
+Status: PLAYTESTED / INTEGRATED ON EXPERIMENT BRANCH / NOT MERGED TO CANON
 Branch: `experiment/dementor-lab-intent-saliency-v0.5`
 Base: `agent/dementor-lab-vertical-slice-v0.3`
 
-## Why this exists
-The current vertical slice already has real Reaction → World Event → next Trigger routing and real pending REPEAT semantics. This experiment does not replace that work. It tests one additional semantic layer inspired by simulation/dialogue engines: an internal Intent plus deterministic saliency when more than one world event is plausible.
+## Decision
+The isolated HTML lab was manually tested on 2026-09-04 and the causal block was accepted as working well. The tested behavior is now wired into the real vertical-slice controller on this experiment branch. Nikita/current canonical branch remains untouched.
 
-## New semantic pipeline
+## Semantic pipeline
 `TRIGGER → GRAPH → IMPULSE → INTENT → REACTION → WORLD EVENT (saliency) → opponent TRIGGER`
 
-Intent is not a new visible BRAIN node. It is a semantic projection derived from the selected Impulse + Reaction, so existing graphs remain valid.
+Intent is not a visible BRAIN node. It is derived from selected Impulse + Reaction, so existing graphs remain valid.
 
 Initial Intent vocabulary:
 - `MAKE_UNDERSTOOD`
@@ -20,33 +20,41 @@ Initial Intent vocabulary:
 - `WITHDRAW`
 - `PRESSURE`
 
-## Compatibility rule
-Reaction remains the primary causal signal. Intent only biases close event choices. Under the current baseline criticism scenario, EXPLAIN still deterministically produces COUNTERPOINT → PUSHBACK, preserving the current vertical-slice behavior.
-
-Different state can make the same Reaction land differently. Example: EXPLAIN against very high CONTACT + TRUST and very low TENSION may produce ACCEPTANCE instead of COUNTERPOINT.
-
 ## Deterministic saliency
-Each Reaction exposes a small candidate set. Candidates receive scores from observable encounter state (CONTACT, TENSION, BRAIN, ENERGY, trust, resentment) plus a small Intent bias. Highest score wins; ties are broken lexically. No RNG and no LLM are involved.
+Each Reaction exposes a small candidate set. Candidates receive scores from encounter state (CONTACT, TENSION, BRAIN, ENERGY, trust, resentment) plus an Intent bias. Highest score wins; ties are deterministic. No RNG and no LLM.
 
-This keeps counterfactual replay auditable: same graphs + same state = same event decision.
+The same Reaction can therefore land differently in a different relationship state while remaining auditable. Example: EXPLAIN can resolve to COUNTERPOINT in a tense/resentful state and ACCEPTANCE in a high-contact/high-trust state.
 
-## Files
-- `src/encounter/intent-saliency.mjs` — intent derivation + deterministic event ranking.
-- `src/encounter/runtime-v05.mjs` — experimental wrapper over canonical runtime. It leaves metric/memory execution in the canonical engine, then projects Intent and selected event into the trace and next Trigger.
-- `tests/intent-saliency-selftest.mjs` — compatibility, alternate-state and determinism checks.
+## Event state transition
+The manually tested v0.2 lab also proved that WORLD EVENT must change state before the next brain acts. The integration therefore applies deterministic event impacts to the target after normal Reaction/Impulse deltas. Examples:
+- `ACCEPTANCE` raises CONTACT, lowers TENSION/BRAIN, raises trust and reduces resentment.
+- `COUNTERPOINT` lowers CONTACT, raises TENSION/BRAIN and resentment.
+- `NO_RESPONSE` lowers CONTACT and raises disengagement pressure.
 
-## Important boundary
-The canonical `src/encounter/runtime.mjs` is untouched in this branch. This is deliberate: Nikita/current gameplay work keeps using the approved runtime while this semantic idea is tested separately.
+The resulting state becomes the input to the next actor turn.
 
-## What to evaluate in playtest
-1. Does the same Reaction producing different events feel causal rather than random?
-2. Can the player understand why high TRUST/CONTACT changed how EXPLAIN landed?
-3. Does adding Intent make RESULT/TRACE clearer, or does it add another layer of jargon?
-4. Does saliency improve replay value enough to justify the extra complexity?
+## REPEAT contract
+Existing real pending REPEAT remains intact. In the saliency layer, when the current actor's action resolves to `ACCEPTANCE`, that actor's pending repeat chain is cancelled. This is the behavior verified in the isolated lab.
+
+## Integration files
+- `src/encounter/intent-saliency.mjs` — intent derivation, event ranking and deterministic event impacts.
+- `src/encounter/runtime-v05.mjs` — wrapper over canonical runtime; commits Intent, selected event, event impact, next Trigger and terminal reconciliation.
+- `src/app/vertical-slice-controller.mjs` — now imports `runtime-v05.mjs` on this branch, so the actual vertical slice uses the tested semantic layer.
+- `tests/intent-saliency-selftest.mjs` — determinism, alternate-state, state-transition and runtime integration assertions.
+
+## Safety boundary
+Canonical `src/encounter/runtime.mjs` remains untouched. This branch is still isolated and can be discarded without affecting Nikita's work.
+
+## Validation state
+- isolated HTML manual playtest: PASS;
+- causal state change between turns: PASS manually;
+- deterministic saliency behavior: covered by selftest contract;
+- repository CI run for this branch: NOT AVAILABLE / no workflow runs currently exist for this branch;
+- full browser vertical-slice regression after integration: still required before promotion.
 
 ## Promotion gate
-Do not merge into canonical runtime until:
-- the experimental selftest runs green;
-- at least one browser playtest shows a meaningful state-dependent event change;
-- TALK/TRACE can expose the consequence without showing raw saliency scores;
-- BEFORE/AFTER remains deterministic with exactly one graph mutation.
+Merge into canonical runtime only after:
+1. full `npm test` is run green on the integrated branch;
+2. browser vertical-slice playthrough confirms TALK/HOT PATCH/RESULT still work;
+3. TALK/TRACE exposes consequences without raw saliency scores;
+4. BEFORE/AFTER remains deterministic with exactly one graph mutation.
