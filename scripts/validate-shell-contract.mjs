@@ -85,10 +85,27 @@ const workspace=read('workspace/index.html');
 expect(workspace.includes('data-workspace-sidebar'),'workspace/index.html: shell host missing');
 expect(workspace.includes('/workspace-shell-v1.js')||workspace.includes('./workspace-shell-v1.js'),'workspace/index.html: shared shell runtime missing');
 
+const workspaceController=read('workspace/workspace.js');
+expect(workspaceController.includes('window.DEMENTOR_SUPABASE_CLIENT||createClient'),'workspace controller: must reuse canonical Workspace/Supabase client owner');
+expect(!workspaceController.includes("const sessionBox=document.getElementById('sessionBox')"),'workspace controller: duplicate session/identity owner survived');
+expect(!workspaceController.includes('function setSessionBox'),'workspace controller: duplicate session rendering survived');
+for(const table of ['dc_artifacts','dc_artifact_responses','dc_artifact_reactions'])expect(workspaceController.includes(`from('${table}')`),`workspace activity: existing ${table} projection missing`);
+expect(workspaceController.includes('dc_artifact_responses_artifact_id_fkey'),'workspace activity: response target relation missing');
+expect(workspaceController.includes('dc_artifact_reactions_artifact_id_fkey'),'workspace activity: reaction target relation missing');
+expect(workspaceController.includes('data-community-activity'),'workspace activity: Community participation section missing');
+for(const marker of ['data-activity-artifact','data-activity-response','data-activity-reaction'])expect(workspaceController.includes(marker),`workspace activity: projection marker missing ${marker}`);
+
 const board=read('workspace/board/index.html');
 for(const id of ['boardStatus','memberBadge','entryHost','artifactCount','boardFilters','boardHost'])expect(board.includes(`id="${id}"`),`workspace/board/index.html: board runtime host missing #${id}`);
 expect(board.includes('../workspace-shell-v1.js'),'workspace/board/index.html: shared Workspace shell missing');
 for(const asset of ['board-qa-fix-v1.css','board-integrations-v1.css','board-spatial-v1.css','telegram-worker-trigger-v3.js','board-integrations-v1.js','board-activation-gate-v1.js','board-spatial-v1.js'])expect(board.includes(asset),`workspace/board/index.html: restored Board module missing ${asset}`);
+
+const boardRuntime=read('community/board/board.js');
+expect(boardRuntime.includes("route('/workspace/#activity')"),'Board participation: persisted response/reaction has no My Activity path');
+expect(boardRuntime.includes("loginWithGoogle('/workspace/board/'"),'Board auth: guest login does not return to canonical Workspace Board');
+expect(!boardRuntime.includes("loginWithGoogle('/community/board/'"),'Board auth: legacy Community Board login destination survived');
+expect(!boardRuntime.includes("route('/join/member/')"),'Board non-member gate: legacy Join member bridge survived');
+expect(boardRuntime.includes("route('/join/')"),'Board non-member gate: canonical DC-9 entry missing');
 
 const activation=read('community/board/board-activation-gate-v1.js');
 expect(activation.includes("FOCUS_DISMISSED_KEY='dc_first_artifact_spotlight_dismissed_v1'"),'Board first-entry: spotlight session key missing');
@@ -147,4 +164,4 @@ if(fail.length){
   for(const item of fail)console.error(`- ${item}`);
   process.exit(1);
 }
-console.log(`Shell contract validation PASS (${publicRoutes.length} public route families + separated public/Workspace shell ownership + ordinary Member Board default + first Artifact spotlight + merged DC-9 entry + canonical application/result handoff + Board contracts)`);
+console.log(`Shell contract validation PASS (${publicRoutes.length} public route families + separated public/Workspace shell ownership + ordinary Member Board default + first Artifact spotlight + My Activity participation projection + merged DC-9 entry + canonical application/result handoff + Board contracts)`);
