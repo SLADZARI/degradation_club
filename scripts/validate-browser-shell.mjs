@@ -28,22 +28,22 @@ await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
 const base=`http://127.0.0.1:${server.address().port}`;
 const browser=await chromium.launch({headless:true});
 
-const supabaseStub=(mode='guest')=>{
+const supabaseStub=()=>`
+  const mode=globalThis.__QA_AUTH_MODE__||'guest';
   const authenticated=mode!=='guest',owner=mode==='owner',member=mode==='member'||owner;
-  return `
-    const user={id:'qa-browser-user',email:'qa-browser@dementor.invalid',user_metadata:{full_name:'QA Browser'}};
-    const session=${authenticated?'{user}':'null'};const active={status:'active',valid_from:null,valid_to:null};
-    const roleRows=${owner?"[{role:'owner_admin',...active}]":"[]"};const membership=${member?'{...active}':'null'};
-    const rowsFor=t=>t==='dc_role_assignments'?roleRows:[];
-    const query=t=>{const c={select(){return c},eq(){return c},neq(){return c},in(){return c},is(){return c},order(){return c},limit(){return c},range(){return c},update(){return c},insert(){return c},upsert(){return c},delete(){return c},maybeSingle(){return Promise.resolve({data:t==='dc_system_memberships'?membership:null,error:null})},single(){return Promise.resolve({data:null,error:null})},then(resolve,reject){return Promise.resolve({data:rowsFor(t),error:null}).then(resolve,reject)}};return c};
-    const bucket={createSignedUrl:async()=>({data:{signedUrl:'https://example.invalid/qa.webp'},error:null}),upload:async()=>({data:{path:'qa'},error:null}),remove:async()=>({data:[],error:null})};
-    export function createClient(){return {auth:{getSession:async()=>({data:{session},error:null}),getUser:async()=>({data:{user:${authenticated?'user':'null'}},error:null}),exchangeCodeForSession:async()=>({data:{session:{user}},error:null}),signInWithOAuth:async payload=>{window.__QA_OAUTH__=payload;return {data:{},error:null}},signOut:async()=>({error:null}),onAuthStateChange:()=>({data:{subscription:{unsubscribe(){}}}})},from:query,rpc:async n=>({data:n==='dc_member_entry_status_v1'?{membership_active:${member},community_activation_state:${member?"'MEMBER_ACTIVATED'":"null"},artifact_slots_available:0,published_artifact_count:${member?1:0}}:null,error:null}),storage:{from:()=>bucket},functions:{invoke:async()=>({data:{},error:null})}}}
-  `;
-};
+  const user={id:'qa-browser-user',email:'qa-browser@dementor.invalid',user_metadata:{full_name:'QA Browser'}};
+  const session=authenticated?{user}:null;const active={status:'active',valid_from:null,valid_to:null};
+  const roleRows=owner?[{role:'owner_admin',...active}]:[];const membership=member?{...active}:null;
+  const rowsFor=t=>t==='dc_role_assignments'?roleRows:[];
+  const query=t=>{const c={select(){return c},eq(){return c},neq(){return c},in(){return c},is(){return c},order(){return c},limit(){return c},range(){return c},update(){return c},insert(){return c},upsert(){return c},delete(){return c},maybeSingle(){return Promise.resolve({data:t==='dc_system_memberships'?membership:null,error:null})},single(){return Promise.resolve({data:null,error:null})},then(resolve,reject){return Promise.resolve({data:rowsFor(t),error:null}).then(resolve,reject)}};return c};
+  const bucket={createSignedUrl:async()=>({data:{signedUrl:'https://example.invalid/qa.webp'},error:null}),upload:async()=>({data:{path:'qa'},error:null}),remove:async()=>({data:[],error:null})};
+  export function createClient(){return {auth:{getSession:async()=>({data:{session},error:null}),getUser:async()=>({data:{user:authenticated?user:null},error:null}),exchangeCodeForSession:async()=>({data:{session:{user}},error:null}),signInWithOAuth:async payload=>{globalThis.__QA_OAUTH__=payload;return {data:{},error:null}},signOut:async()=>({error:null}),onAuthStateChange:()=>({data:{subscription:{unsubscribe(){}}}})},from:query,rpc:async n=>({data:n==='dc_member_entry_status_v1'?{membership_active:member,community_activation_state:member?'MEMBER_ACTIVATED':null,artifact_slots_available:0,published_artifact_count:member?1:0}:null,error:null}),storage:{from:()=>bucket},functions:{invoke:async()=>({data:{},error:null})}}}
+`;
 
 async function context(mode='guest',viewport={width:1440,height:1000}){
   const c=await browser.newContext({viewport});
-  await c.route('https://cdn.jsdelivr.net/**',r=>r.request().url().includes('@supabase/supabase-js')?r.fulfill({status:200,contentType:'text/javascript; charset=utf-8',body:supabaseStub(mode)}):r.abort());
+  await c.addInitScript(value=>{globalThis.__QA_AUTH_MODE__=value},mode);
+  await c.route('https://cdn.jsdelivr.net/**',r=>r.request().url().includes('@supabase/supabase-js')?r.fulfill({status:200,contentType:'text/javascript; charset=utf-8',body:supabaseStub()}):r.abort());
   return c;
 }
 
@@ -82,13 +82,16 @@ for(const route of ['/','/about/','/projects/','/community/','/merch/','/archive
 
 // Authenticated guest keeps the club-entry CTA but login becomes identity -> Workspace.
 {
-  const c=await context('auth'),p=await c.newPage(),pageErrors=[];p.on('pageerror',e=>pageErrors.push(e.message));
+  const c=await context('auth'),p=await c.newPage(),pageErrors=[],consoleMessages=[];p.on('pageerror',e=>pageErrors.push(e.message));p.on('console',m=>consoleMessages.push(m.text()));
   await p.goto(base+'/about/',{waitUntil:'domcontentloaded'});await header(p,'authenticated guest header');
-  try{await p.locator('[data-global-identity]').waitFor({state:'visible',timeout:4000})}catch{errors.push('authenticated guest: identity state did not render')}
-  expect((await p.locator('[data-global-identity]').getAttribute('href'))==='/workspace/','authenticated guest: identity does not route to Workspace');
-  expect((await p.locator('[data-global-identity]').innerText()).includes('QA Browser'),'authenticated guest: identity name missing');
-  expect(await p.locator('[data-global-join-cta]:visible').count()===1,'authenticated guest: club-entry CTA must remain visible before membership');
-  expect(await p.locator('[data-global-login]:visible').count()===0,'authenticated guest: login service survived after session');
+  let identityReady=true;
+  try{await p.locator('[data-global-identity]').waitFor({state:'visible',timeout:4000})}catch{identityReady=false;const state=await p.locator('.dc-global-header').getAttribute('data-dc-header-auth').catch(()=>null);const loginCount=await p.locator('[data-global-login]').count();const mode=await p.evaluate(()=>window.__QA_AUTH_MODE__).catch(()=>null);errors.push(`authenticated guest: identity state did not render; header=${state}; login=${loginCount}; mode=${mode}; console=${consoleMessages.slice(-5).join(' | ')}`)}
+  if(identityReady){
+    expect((await p.locator('[data-global-identity]').getAttribute('href'))==='/workspace/','authenticated guest: identity does not route to Workspace');
+    expect((await p.locator('[data-global-identity]').innerText()).includes('QA Browser'),'authenticated guest: identity name missing');
+    expect(await p.locator('[data-global-join-cta]:visible').count()===1,'authenticated guest: club-entry CTA must remain visible before membership');
+    expect(await p.locator('[data-global-login]:visible').count()===0,'authenticated guest: login service survived after session');
+  }
   expect(!pageErrors.length,`authenticated guest header errors: ${pageErrors.join(' | ')}`);await c.close();
 }
 
