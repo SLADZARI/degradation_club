@@ -33,10 +33,11 @@ export function rankWorldEvents({reaction,intent,actorState={},targetState={}}={
   const trust=mem(targetState,'trust'),resentment=mem(targetState,'resentment');
   let out=[];
   if(reaction==='explain'){
+    const overloadShutdown=(contact<20&&brain>=90)?18:0;
     out=[
       candidate('COUNTERPOINT',60+tension*.4+resentment*4,'explanation meets resistance'),
       candidate('ACCEPTANCE',30+contact*.35+trust*6-tension*.25,'high contact/trust makes acceptance plausible'),
-      candidate('NO_RESPONSE',8+Math.max(0,32-contact)*1.8+Math.max(0,brain-82)*.8,'low contact or overload makes disengagement plausible')
+      candidate('NO_RESPONSE',8+Math.max(0,35-contact)*1.8+Math.max(0,brain-80)*1.3+overloadShutdown,'collapsed contact plus overload makes disengagement plausible')
     ];
   }else if(reaction==='agree'){
     out=[
