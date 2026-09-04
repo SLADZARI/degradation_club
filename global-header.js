@@ -68,8 +68,31 @@
     addEventListener('keydown',event=>{if(event.key==='Escape'&&menu?.getAttribute('aria-expanded')==='true')closeMenu(true)});
     addEventListener('resize',()=>{if(innerWidth>900&&menu?.getAttribute('aria-expanded')==='true')closeMenu()},{passive:true});
 
-    const escText=value=>String(value??'').trim();
+    const text=value=>String(value??'').trim();
     const active=row=>row?.status==='active'&&(!row.valid_from||Date.parse(row.valid_from)<=Date.now())&&(!row.valid_to||Date.parse(row.valid_to)>Date.now());
+    let clientPromise=null;
+
+    const getClient=async()=>{
+      if(window.DEMENTOR_SUPABASE_CLIENT)return window.DEMENTOR_SUPABASE_CLIENT;
+      if(clientPromise)return clientPromise;
+      clientPromise=(async()=>{
+        const cfg=window.DEMENTOR_SITE_CONFIG?.supabase;
+        if(!cfg?.enabled||!cfg.url||!cfg.publishableKey)throw new Error('Supabase configuration unavailable');
+        const {createClient}=await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.4/+esm');
+        const client=createClient(cfg.url,cfg.publishableKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false,flowType:'pkce'}});
+        window.DEMENTOR_SUPABASE_CLIENT=client;
+        return client;
+      })();
+      return clientPromise;
+    };
+
+    const login=async()=>{
+      const client=await getClient();
+      const callback=location.origin+'/auth/callback/?next='+encodeURIComponent('/workspace/');
+      const {error}=await client.auth.signInWithOAuth({provider:'google',options:{redirectTo:callback}});
+      if(error)throw error;
+    };
+
     const renderGuest=()=>{
       header.dataset.dcHeaderAuth='guest';
       if(joinCta)joinCta.hidden=false;
@@ -80,6 +103,7 @@
       service.appendChild(button);
       button.addEventListener('click',()=>login().catch(error=>console.warn('[DC GlobalHeader login]',error)));
     };
+
     const renderIdentity=({name,avatar,member})=>{
       header.dataset.dcHeaderAuth=member?'member':'authenticated';
       if(joinCta)joinCta.hidden=Boolean(member);
@@ -96,43 +120,24 @@
       service.appendChild(anchor);
     };
 
-    let clientPromise=null;
-    const getClient=async()=>{
-      if(window.DEMENTOR_SUPABASE_CLIENT)return window.DEMENTOR_SUPABASE_CLIENT;
-      if(clientPromise)return clientPromise;
-      clientPromise=(async()=>{
-        const cfg=window.DEMENTOR_SITE_CONFIG?.supabase;
-        if(!cfg?.enabled||!cfg.url||!cfg.publishableKey)throw new Error('Supabase configuration unavailable');
-        const {createClient}=await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.4/+esm');
-        const client=createClient(cfg.url,cfg.publishableKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false,flowType:'pkce'}});
-        window.DEMENTOR_SUPABASE_CLIENT=client;
-        return client;
-      })();
-      return clientPromise;
-    };
-    const login=async()=>{
-      const client=await getClient();
-      const callback=location.origin+'/auth/callback/?next='+encodeURIComponent('/workspace/');
-      const {error}=await client.auth.signInWithOAuth({provider:'google',options:{redirectTo:callback}});
-      if(error)throw error;
-    };
-    const syncIdentity=async(sessionOverride=>{});
+    const safe=promise=>Promise.resolve(promise).catch(error=>({data:null,error}));
     const resolveIdentity=async session=>{
       const user=session?.user;
       if(!user){renderGuest();return;}
       const client=await getClient();
       const [profileResult,membershipResult,roleResult]=await Promise.all([
-        client.from('profiles').select('full_name,avatar_url').eq('id',user.id).maybeSingle().catch?.(()=>({data:null,error:null}))??Promise.resolve({data:null,error:null}),
-        client.from('dc_system_memberships').select('status,valid_from,valid_to').eq('profile_id',user.id).maybeSingle().catch?.(()=>({data:null,error:null}))??Promise.resolve({data:null,error:null}),
-        client.from('dc_role_assignments').select('role,status,valid_from,valid_to').eq('profile_id',user.id).catch?.(()=>({data:[],error:null}))??Promise.resolve({data:[],error:null})
+        safe(client.from('profiles').select('full_name,avatar_url').eq('id',user.id).maybeSingle()),
+        safe(client.from('dc_system_memberships').select('status,valid_from,valid_to').eq('profile_id',user.id).maybeSingle()),
+        safe(client.from('dc_role_assignments').select('role,status,valid_from,valid_to').eq('profile_id',user.id))
       ]);
       const profile=profileResult?.data||{};
-      const roles=(roleResult?.data||[]).filter(active).map(row=>row.role);
+      const roles=Array.isArray(roleResult?.data)?roleResult.data.filter(active).map(row=>row.role):[];
       const member=active(membershipResult?.data)||roles.includes('dementor')||roles.includes('owner_admin');
-      const name=escText(profile.full_name)||escText(user.user_metadata?.full_name)||escText(user.user_metadata?.name)||escText(user.email?.split('@')[0])||'Участник';
-      const avatar=escText(profile.avatar_url)||escText(user.user_metadata?.avatar_url)||escText(user.user_metadata?.picture)||'';
+      const name=text(profile.full_name)||text(user.user_metadata?.full_name)||text(user.user_metadata?.name)||text(user.email?.split('@')[0])||'Участник';
+      const avatar=text(profile.avatar_url)||text(user.user_metadata?.avatar_url)||text(user.user_metadata?.picture)||'';
       renderIdentity({name,avatar,member});
     };
+
     const bootAuth=async()=>{
       try{
         const client=await getClient();
