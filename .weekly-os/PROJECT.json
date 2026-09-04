@@ -4,15 +4,15 @@
     "artifactId": "dementor-club.kernel.project",
     "project": "dementor-club",
     "documentType": "STANDARD",
-    "projectStage": "CLARITY",
-    "gate": "G8_CLEANUP",
+    "projectStage": "BUILD",
+    "gate": "G5_BUILD",
     "status": "APPROVED",
-    "version": "1.1",
-    "updated": "2026-09-03",
+    "version": "1.2",
+    "updated": "2026-09-04",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "1.0"
+    "supersedes": "1.1"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -20,13 +20,14 @@
   "canonicalRepository": "SLADZARI/degradation_club",
   "defaultBranch": "main",
   "semanticSourceBranch": "dementor-club",
-  "projectStage": "CLARITY",
-  "gate": "G1_PRODUCT_LOCK",
+  "projectStage": "BUILD",
+  "gate": "G5_BUILD",
   "readFirst": [
     ".weekly-os/PROJECT.json",
     ".weekly-os/ARTIFACT_INDEX.json",
     ".weekly-os/APPROVED_STATE.json",
-    ".weekly-os/results/mp-dsl-kernel-migration.v1.0.md",
+    ".weekly-os/results/qa-portal-harmonization.v0.1.md",
+    "operations/MEMBERSHIP_V2_PRODUCTION_FLOW_QA_2026-09-02.md",
     "README.md",
     "operations/IDENTITY_MEMBERSHIP_AND_ENTITY_BOUNDARY_V0.2.md",
     "operations/DEMENTOR_ENTITY_MAP_AND_WORKSPACE_MODULES_V0.1.md",
@@ -35,8 +36,9 @@
   "authority": {
     "mpDslCore": {
       "sourceSystem": "DRIVE",
-      "authorityType": "APPROVED_AUTHORITY",
-      "url": "https://docs.google.com/document/d/1fYwfF8IpvXh36qIAJxylT6oebOfaqJ_-L2MslXRHHOg/edit"
+      "authorityType": "REFERENCE",
+      "url": "https://docs.google.com/document/d/1fYwfF8IpvXh36qIAJxylT6oebOfaqJ_-L2MslXRHHOg/edit",
+      "note": "MP_DSL v0.1 source artifacts currently declare DRAFT / REFERENCE. Dementor Club adopts the explicitly approved local QA/harmonization operating rules without promoting the entire MP_DSL package to APPROVED_AUTHORITY."
     },
     "semanticSource": {
       "repository": "SLADZARI/degradation_club",
@@ -68,9 +70,15 @@
     "ARCHITECTURE": null,
     "DESIGN": null
   },
-  "currentResult": null,
-  "activeIntegrationBranch": null,
-  "reportPath": null,
+  "currentResult": {
+    "artifactId": "dementor-club.result.qa-portal-harmonization",
+    "version": "0.1",
+    "status": "DRAFT",
+    "path": ".weekly-os/results/qa-portal-harmonization.v0.1.md",
+    "gate": "G5_BUILD"
+  },
+  "activeIntegrationBranch": "result/qa-portal-harmonization",
+  "reportPath": "operations/MEMBERSHIP_V2_PRODUCTION_FLOW_QA_2026-09-02.md",
   "completedResults": [
     {
       "artifactId": "dementor-club.result.mp-dsl-kernel-migration",
@@ -95,6 +103,7 @@
     "implementation authority from legacy app/src/supabase path pointers",
     "site/staging semantics as club source-of-truth",
     "production deployment from a merge",
-    "WeeklyOS runtime source_ref correction from kernel migration"
+    "WeeklyOS runtime source_ref correction from kernel migration",
+    "global MP_DSL approval from Dementor Club local operating-rule approval"
   ]
 }
