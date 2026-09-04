@@ -124,6 +124,13 @@
     const resolveIdentity=async session=>{
       const user=session?.user;
       if(!user){renderGuest();return;}
+
+      const metadataName=text(user.user_metadata?.full_name)||text(user.user_metadata?.name)||text(user.email?.split('@')[0])||'Участник';
+      const metadataAvatar=text(user.user_metadata?.avatar_url)||text(user.user_metadata?.picture)||'';
+      // Identity is a projection of the authenticated session and must not wait for
+      // optional profile/membership relation reads on every public page.
+      renderIdentity({name:metadataName,avatar:metadataAvatar,member:false});
+
       const client=await getClient();
       const [profileResult,membershipResult,roleResult]=await Promise.all([
         safe(client.from('profiles').select('full_name,avatar_url').eq('id',user.id).maybeSingle()),
@@ -133,8 +140,8 @@
       const profile=profileResult?.data||{};
       const roles=Array.isArray(roleResult?.data)?roleResult.data.filter(active).map(row=>row.role):[];
       const member=active(membershipResult?.data)||roles.includes('dementor')||roles.includes('owner_admin');
-      const name=text(profile.full_name)||text(user.user_metadata?.full_name)||text(user.user_metadata?.name)||text(user.email?.split('@')[0])||'Участник';
-      const avatar=text(profile.avatar_url)||text(user.user_metadata?.avatar_url)||text(user.user_metadata?.picture)||'';
+      const name=text(profile.full_name)||metadataName;
+      const avatar=text(profile.avatar_url)||metadataAvatar;
       renderIdentity({name,avatar,member});
     };
 
