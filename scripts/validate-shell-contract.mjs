@@ -100,7 +100,20 @@ expect(joinState.includes("route('/workspace/board/')"),'Join member return: Com
 expect(joinState.includes("route('/workspace/')"),'Join member return: Account must route to Workspace');
 expect(!joinState.includes("route('/account/')"),'Join member return: dead /account/ route survived');
 expect(!joinState.includes("route('/community/board/')"),'Join member return: compatibility Board route must not be primary CTA');
-expect(read('join/index.html').includes('/join/dc9-member-return-fix-v1.css'),'Join member return: CTA geometry correction layer missing');
+
+const joinHtml=read('join/index.html');
+expect(joinHtml.includes('/join/dc9-member-return-fix-v1.css'),'Join member return: CTA geometry correction layer missing');
+expect(joinHtml.includes('id="dc9Picker"')&&!/id=["']dc9Picker["'][^>]*\shidden\b/i.test(joinHtml),'Join DC-9: sphere picker must be the visible entry surface');
+expect(!joinHtml.includes('id="dc9Intro"'),'Join DC-9: obsolete standalone intro surface survived');
+expect(!joinHtml.includes('id="dc9Start"'),'Join DC-9: redundant Start DC-9 button survived');
+expect(joinHtml.includes('ДЕВЯТЬ<br><span>СФЕР.</span>'),'Join DC-9: merged entry must retain the existing nine-sphere framing');
+
+const dc9Runtime=read('join/dc9-immersive-v1.js');
+expect(!dc9Runtime.includes('renderIntro'),'Join DC-9: runtime still owns a separate intro state');
+expect(!dc9Runtime.includes('dc9Start'),'Join DC-9: runtime still depends on the removed start button');
+expect(dc9Runtime.includes("else renderPicker()"),'Join DC-9: default entry no longer resolves directly to the sphere picker');
+expect(dc9Runtime.includes('DATA.levelNames'),'Join DC-9: completed sphere cards must expose existing result meaning instead of generic rule copy');
+expect(dc9Runtime.includes('dc9ResetPicker'),'Join DC-9: progress reset capability was lost during intro/picker merge');
 
 const applyRuntime=read('join/apply/apply.js');
 expect(applyRuntime.includes("from '/community-runtime-v1.js'"),'Join apply: canonical community/auth runtime is not the owner');
@@ -121,4 +134,4 @@ if(fail.length){
   for(const item of fail)console.error(`- ${item}`);
   process.exit(1);
 }
-console.log(`Shell contract validation PASS (${publicRoutes.length} public route families + site-config ownership + Russian auth-aware GlobalHeader + canonical Join application auth + direct DC-9 result handoff + addressable Workspace navigation + Board contracts)`);
+console.log(`Shell contract validation PASS (${publicRoutes.length} public route families + site-config ownership + Russian auth-aware GlobalHeader + merged DC-9 entry/picker + canonical Join application auth + direct DC-9 result handoff + addressable Workspace navigation + Board contracts)`);
