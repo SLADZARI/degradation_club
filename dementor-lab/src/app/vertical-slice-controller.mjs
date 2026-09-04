@@ -1,4 +1,4 @@
-import { createEncounter, executeActorTurn, applyHotPatch, declineHotPatch } from '../encounter/runtime.mjs';
+import { createEncounter, executeActorTurn, applyHotPatch, declineHotPatch } from '../encounter/runtime-v05.mjs';
 import { resolvePhrase } from '../dialogue/phrase-bank.mjs';
 import { buildResult } from '../encounter/result.mjs';
 
@@ -27,7 +27,11 @@ export class VerticalSliceController{
         turn:out.trace.turn,
         gender:actor.visual?.gender||'male'
       });
-      this.encounter.transcript[this.encounter.transcript.length-1].phrase=phrase;
+      const transcriptEntry=this.encounter.transcript[this.encounter.transcript.length-1];
+      transcriptEntry.phrase=phrase;
+      transcriptEntry.intent=out.trace.intent||null;
+      transcriptEntry.event=out.trace.event?.type||transcriptEntry.event;
+      transcriptEntry.eventImpact=out.trace.eventImpact||null;
       this.onEvent({type:'TURN',trace:out.trace,phrase,encounter:this.encounter});
     }
     if(out.breakpoint)this.onEvent({type:'HOT_PATCH',breakpoint:out.breakpoint,encounter:this.encounter});
