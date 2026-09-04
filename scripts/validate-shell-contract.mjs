@@ -16,7 +16,9 @@ for(const rel of publicRoutes){
   const html=read(rel);
   expect(!/<header[^>]*class=["']topbar(?:\s[^"']*)?["']/i.test(html),`${rel}: legacy page-owned topbar survived production build`);
   expect(html.includes('/global-header.css'),`${rel}: canonical header CSS missing`);
+  expect(html.includes('/site-config.js'),`${rel}: canonical site config missing before auth-aware header`);
   expect(html.includes('/global-header.js'),`${rel}: canonical header runtime missing`);
+  expect(html.indexOf('/site-config.js')<html.indexOf('/global-header.js'),`${rel}: site config must load before GlobalHeader`);
   expect(!/<footer\b/i.test(html),`${rel}: page-owned footer survived production build`);
   expect(html.includes('/global-footer.css'),`${rel}: canonical footer CSS missing`);
   expect(html.includes('/global-footer.js'),`${rel}: canonical footer runtime missing`);
@@ -58,8 +60,10 @@ expect(shell.includes('data-member-tool'),'workspace shell: membership-gated pri
 
 for(const rel of ['workspace/index.html','workspace/board/index.html','workspace/artifacts/index.html','workspace/review/index.html','workspace/admin/index.html']){
   const html=read(rel);
+  expect(html.includes('/site-config.js'),`${rel}: canonical site config missing above Workspace`);
   expect(html.includes('/global-header.js'),`${rel}: canonical public header runtime missing above Workspace`);
   expect(html.includes('/global-header.css'),`${rel}: canonical public header CSS missing above Workspace`);
+  expect(html.indexOf('/site-config.js')<html.indexOf('/global-header.js'),`${rel}: site config must load before Workspace GlobalHeader`);
   expect(!html.includes('/global-footer.js'),`${rel}: public footer must not leak into private Workspace`);
 }
 
@@ -96,4 +100,4 @@ if(fail.length){
   for(const item of fail)console.error(`- ${item}`);
   process.exit(1);
 }
-console.log(`Shell contract validation PASS (${publicRoutes.length} public route families + Russian auth-aware GlobalHeader + addressable Workspace navigation + Board/Join contracts)`);
+console.log(`Shell contract validation PASS (${publicRoutes.length} public route families + site-config ownership + Russian auth-aware GlobalHeader + addressable Workspace navigation + Board/Join contracts)`);
