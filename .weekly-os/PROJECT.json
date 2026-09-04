@@ -7,12 +7,12 @@
     "projectStage": "BUILD",
     "gate": "G5_BUILD",
     "status": "APPROVED",
-    "version": "1.2",
+    "version": "1.3",
     "updated": "2026-09-04",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "1.1"
+    "supersedes": "1.2"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -26,7 +26,8 @@
     ".weekly-os/PROJECT.json",
     ".weekly-os/ARTIFACT_INDEX.json",
     ".weekly-os/APPROVED_STATE.json",
-    ".weekly-os/results/qa-portal-harmonization.v0.1.md",
+    ".weekly-os/results/qa-portal-harmonization.v0.2.md",
+    "operations/WORKSPACE_MEMBER_ACTIVATION_AND_SHELL_V1.md",
     "operations/MEMBERSHIP_V2_PRODUCTION_FLOW_QA_2026-09-02.md",
     "README.md",
     "operations/IDENTITY_MEMBERSHIP_AND_ENTITY_BOUNDARY_V0.2.md",
@@ -46,6 +47,13 @@
       "sourceSystem": "GIT",
       "authorityType": "IMPLEMENTATION_AUTHORITY",
       "note": "Repository ARCHITECTURE.md declares this branch the source-of-truth for club concept, positioning, programs, products, membership logic, operating rules and approved club copy. Individual documents retain their own status/authority and are not auto-promoted."
+    },
+    "workspaceMemberActivationV1": {
+      "sourceSystem": "GIT",
+      "authorityType": "APPROVED_AUTHORITY",
+      "path": "operations/WORKSPACE_MEMBER_ACTIVATION_AND_SHELL_V1.md",
+      "scope": "authenticated Workspace shell ownership, ordinary Member default Board entry, first Artifact spotlight, Board access boundary, My Activity projection",
+      "note": "Project-local approved authority only. Supersedes the prior local rule that Public Header remains visible above authenticated Workspace. Does not establish project-wide ARCHITECTURE or DESIGN approval."
     },
     "legacyProductDocumentPointers": {
       "sourceSystem": "GIT",
@@ -72,9 +80,9 @@
   },
   "currentResult": {
     "artifactId": "dementor-club.result.qa-portal-harmonization",
-    "version": "0.1",
+    "version": "0.2",
     "status": "DRAFT",
-    "path": ".weekly-os/results/qa-portal-harmonization.v0.1.md",
+    "path": ".weekly-os/results/qa-portal-harmonization.v0.2.md",
     "gate": "G5_BUILD"
   },
   "activeIntegrationBranch": "result/qa-portal-harmonization",
@@ -100,6 +108,7 @@
     "person attribution from shared Git identity",
     "Modern Pilgrims semantic ownership from the legacy system label MODERN_PILGRIMS",
     "project-wide PRODUCT, DOMAIN, ARCHITECTURE or DESIGN approval from legacy product-document pointers",
+    "project-wide ARCHITECTURE or DESIGN approval from the project-local Workspace Member Activation v1 decision",
     "implementation authority from legacy app/src/supabase path pointers",
     "site/staging semantics as club source-of-truth",
     "production deployment from a merge",
