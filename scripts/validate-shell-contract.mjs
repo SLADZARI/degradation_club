@@ -67,6 +67,13 @@ for(const rel of ['workspace/index.html','workspace/board/index.html','workspace
   expect(!html.includes('/global-footer.js'),`${rel}: public footer must not leak into private Workspace`);
 }
 
+for(const rel of ['join/apply/index.html','join/result/index.html']){
+  const html=read(rel);
+  expect(!/<header[^>]*class=["']topbar(?:\s[^"']*)?["']/i.test(html),`${rel}: legacy page-owned topbar survived production build`);
+  expect(html.includes('/global-header.js')&&html.includes('/global-header.css'),`${rel}: canonical public header missing`);
+  expect(!html.includes('/global-footer.js'),`${rel}: private Join surface must not receive public footer`);
+}
+
 const workspace=read('workspace/index.html');
 expect(workspace.includes('data-workspace-sidebar'),'workspace/index.html: shell host missing');
 expect(workspace.includes('/workspace-shell-v1.js')||workspace.includes('./workspace-shell-v1.js'),'workspace/index.html: shared shell runtime missing');
@@ -95,9 +102,16 @@ expect(!joinState.includes("route('/account/')"),'Join member return: dead /acco
 expect(!joinState.includes("route('/community/board/')"),'Join member return: compatibility Board route must not be primary CTA');
 expect(read('join/index.html').includes('/join/dc9-member-return-fix-v1.css'),'Join member return: CTA geometry correction layer missing');
 
+const applyRuntime=read('join/apply/apply.js');
+expect(applyRuntime.includes("from '/community-runtime-v1.js'"),'Join apply: canonical community/auth runtime is not the owner');
+expect(applyRuntime.includes("loginWithGoogle('/join/apply/'"),'Join apply: Google auth must return directly to application');
+expect(applyRuntime.includes('await syncLocalAssessmentRuns(client,uid)'),'Join apply: anonymous DC-9 results are not attached before server gate evaluation');
+expect(applyRuntime.indexOf('await syncLocalAssessmentRuns(client,uid)')<applyRuntime.indexOf("client.rpc('dc_member_entry_status_v1')"),'Join apply: server 9/9 gate is evaluated before local assessment sync');
+expect(!applyRuntime.includes('@supabase/supabase-js'),'Join apply: duplicate Supabase client/auth owner survived');
+
 if(fail.length){
   console.error('Shell contract validation failed:');
   for(const item of fail)console.error(`- ${item}`);
   process.exit(1);
 }
-console.log(`Shell contract validation PASS (${publicRoutes.length} public route families + site-config ownership + Russian auth-aware GlobalHeader + addressable Workspace navigation + Board/Join contracts)`);
+console.log(`Shell contract validation PASS (${publicRoutes.length} public route families + site-config ownership + Russian auth-aware GlobalHeader + canonical Join application auth + addressable Workspace navigation + Board contracts)`);
