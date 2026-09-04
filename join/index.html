@@ -19,21 +19,14 @@
 <main class="dc9-shell">
   <section id="dc9MemberReturn" class="dc9-member-return" hidden aria-live="polite"></section>
 
-  <section id="dc9Intro" class="dc9-view dc9-hero">
-    <div class="dc9-kicker">DC-9 / ВХОДНОЕ ОБСЛЕДОВАНИЕ</div>
-    <div class="dc9-lead">Вашу личность пока оставим в покое.<br>Хочется понять, как вы дошли до этого места.</div>
-    <h1>ДЕВЯТЬ<br><span>СФЕР.</span></h1>
-    <p class="dc9-note"><strong>Девять сфер. В каждой — шесть коротких сцен.</strong><br>Начать можно с любой. Общего балла нет — в конце остаются девять отдельных результатов.</p>
-    <div class="dc9-actions"><button class="dc9-button primary" id="dc9Start" type="button">НАЧАТЬ DC-9 →</button><button class="dc9-button primary" id="dc9Resume" type="button" hidden>ПРОДОЛЖИТЬ →</button><button class="dc9-text-button" id="dc9ResetIntro" type="button" hidden>НАЧАТЬ ЗАНОВО</button></div>
-    <div class="dc9-ready">DC-9 ГОТОВ.</div>
-  </section>
-
-  <section id="dc9Picker" class="dc9-view dc9-picker" hidden>
-    <div class="dc9-kicker" id="dc9PickerKicker">DC-9 / ВЫБОР СФЕРЫ</div>
-    <h2 id="dc9PickerTitle">С ЧЕГО<br><span>НАЧАТЬ?</span></h2>
-    <div class="dc9-picker-lead" id="dc9PickerLead">Можно с любой.<br>Пока карта ничего о вас не знает.</div>
+  <section id="dc9Picker" class="dc9-view dc9-picker">
+    <div class="dc9-kicker" id="dc9PickerKicker">DC-9 / ВХОДНОЕ ОБСЛЕДОВАНИЕ</div>
+    <h2>ДЕВЯТЬ<br><span>СФЕР.</span></h2>
+    <div class="dc9-picker-lead">Вашу личность пока оставим в покое.<br>Хочется понять, как вы дошли до этого места.</div>
+    <p class="dc9-note"><strong>В каждой сфере — шесть коротких сцен.</strong><br>Начать можно с любой. Общего балла нет — в конце остаются девять отдельных результатов.</p>
     <div class="dc9-journey"><div class="dc9-journey-track"><i id="dc9JourneyBar"></i></div><div class="dc9-journey-text" id="dc9JourneyText">0 / 9</div></div>
     <div class="dc9-sphere-grid" id="dc9SphereGrid"></div>
+    <div class="dc9-actions"><button class="dc9-text-button" id="dc9ResetPicker" type="button" hidden>НАЧАТЬ ЗАНОВО</button></div>
   </section>
 
   <section id="dc9Play" class="dc9-view dc9-play" hidden aria-live="polite">
