@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>Dementor Club — протокол собрания / 04.09.2026</title>
+<meta name="description" content="Официальный отчёт Dementor Club по итогам собрания Жени, Никиты и Габиля 04 сентября 2026.">
+<style>
+:root{--paper:#f5f0e6;--paper2:#fbf7ed;--ink:#111;--muted:#69645b;--line:#c8c1b4;--acid:#dfff00;--red:#b21f24;--soft:#e8e1d4;--sidebar:286px;--max:1140px}
+*{box-sizing:border-box}html{scroll-behavior:smooth;background:#c9c4b8}body{margin:0;color:var(--ink);font-family:Arial,Helvetica,sans-serif;background:radial-gradient(circle at 12% 8%,rgba(255,255,255,.5),transparent 28%),repeating-linear-gradient(0deg,rgba(0,0,0,.014),rgba(0,0,0,.014) 1px,transparent 1px,transparent 4px),var(--paper)}
+a{color:inherit}button{font:inherit}::selection{background:var(--acid);color:#111}
+.sidebar{position:fixed;inset:0 auto 0 0;width:var(--sidebar);background:#111;color:#eee;padding:28px 20px;overflow:auto;border-right:1px solid #000;z-index:30}
+.side-brand{font-weight:950;letter-spacing:-.055em;font-size:23px;line-height:1;margin-bottom:7px}.side-brand b{background:var(--acid);color:#111;padding:3px 5px;margin-left:3px}
+.side-meta{font:10.5px/1.55 "Courier New",monospace;color:#aaa;text-transform:uppercase;margin-bottom:26px}
+.sidebar nav{display:grid;gap:3px}.sidebar nav a{text-decoration:none;border-top:1px solid #333;padding:10px 2px;font:700 10.5px/1.25 "Courier New",monospace;letter-spacing:.045em;text-transform:uppercase;transition:.15s}.sidebar nav a:hover,.sidebar nav a.active{color:var(--acid);padding-left:5px}
+.side-actions{margin-top:28px;display:grid;gap:8px}.btn{border:1px solid #666;background:transparent;color:#fff;padding:10px 12px;text-align:left;font:700 10.5px "Courier New",monospace;cursor:pointer;text-transform:uppercase}.btn:hover{border-color:var(--acid);color:var(--acid)}
+.side-foot{margin-top:26px;border-top:1px solid #333;padding-top:12px;font:9px/1.55 "Courier New",monospace;color:#777;text-transform:uppercase}
+main{margin-left:var(--sidebar);padding:0 36px 80px}.sheet{width:min(var(--max),100%);margin:28px auto;background:var(--paper2);border:1px solid #aaa79c;box-shadow:0 22px 55px rgba(0,0,0,.2);position:relative;overflow:hidden}
+.paper-grid{background-image:linear-gradient(rgba(0,0,0,.022) 1px,transparent 1px),linear-gradient(90deg,rgba(0,0,0,.017) 1px,transparent 1px);background-size:24px 24px}
+.paper-grid:before{content:"";position:absolute;left:16px;top:920px;width:3px;height:165px;background:#111;opacity:.22;transform:rotate(1.4deg);box-shadow:8px 25px 0 -1px #111,19px 62px 0 -1px #111}
+.cover{min-height:790px;padding:50px 56px 42px;display:grid;grid-template-rows:auto 1fr auto;position:relative;overflow:hidden}
+.cover:after{content:"CLUB SESSION / EVIDENCE SNAPSHOT";position:absolute;right:-122px;top:300px;transform:rotate(90deg);font:900 13px "Courier New",monospace;letter-spacing:.28em;color:rgba(0,0,0,.09)}
+.docline{display:flex;justify-content:space-between;gap:20px;border-top:5px solid var(--ink);border-bottom:1px solid var(--ink);padding:10px 0;font:700 10.5px/1.35 "Courier New",monospace;text-transform:uppercase}
+.title-block{align-self:center;max-width:900px}.kicker{font:700 11.5px/1.3 "Courier New",monospace;letter-spacing:.11em;text-transform:uppercase;margin:0 0 18px}
+h1{font-size:66px;line-height:.91;letter-spacing:-.067em;margin:0 0 25px;text-transform:uppercase;max-width:930px}h1 .acid{background:var(--acid);padding:0 .07em}.cover-lead{font-size:20px;line-height:1.38;max-width:780px;margin:0}
+.cover-bottom{display:grid;grid-template-columns:1fr auto;gap:28px;align-items:end;border-top:1px solid var(--ink);padding-top:19px}.identity-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 22px;font:11.5px/1.45 "Courier New",monospace}.identity-grid div{border-bottom:1px dotted #918c82;padding-bottom:4px}.identity-grid b{display:block;font-size:9.5px;color:#777;text-transform:uppercase;margin-bottom:2px}
+.stamp{width:148px;height:148px;border:5px double var(--red);border-radius:50%;display:grid;place-items:center;text-align:center;color:var(--red);font:900 12px/1.15 "Courier New",monospace;text-transform:uppercase;transform:rotate(-8deg);position:relative;opacity:.92}.stamp:before,.stamp:after{content:"";position:absolute;border:1px solid var(--red);border-radius:50%;inset:11px}.stamp:after{inset:20px}.stamp span{position:relative;z-index:2;max-width:90px}
+.warning-banner{padding:12px 16px;background:#111;color:#fff;font:700 10.5px/1.45 "Courier New",monospace;text-transform:uppercase;letter-spacing:.04em}.warning-banner em{color:var(--acid);font-style:normal}
+.section{padding:43px 56px;border-top:1px solid var(--line);position:relative}.section.major{padding-top:54px;padding-bottom:54px}.section-head{display:grid;grid-template-columns:92px 1fr;gap:20px;align-items:start;margin-bottom:28px}.secno{font:900 38px/1 "Courier New",monospace;color:#aaa49a}h2{font-size:39px;line-height:1;letter-spacing:-.047em;margin:0;text-transform:uppercase}h3{font-size:18px;margin:27px 0 10px;text-transform:uppercase;letter-spacing:-.02em}p{line-height:1.56}.lead{font-size:19px;line-height:1.46;max-width:870px}.note{font:11.5px/1.5 "Courier New",monospace;color:#625e56}.smallcaps{font:700 9.5px "Courier New",monospace;text-transform:uppercase;letter-spacing:.075em;color:#69645d}
+.callout{border:1px solid var(--ink);padding:19px 21px;margin:18px 0;background:rgba(223,255,0,.13)}.callout strong{font-size:14px;text-transform:uppercase}.callout p:last-child{margin-bottom:0}
+.diagnosis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:26px}.diag{border:1px solid var(--ink);min-height:136px;padding:15px;display:flex;flex-direction:column;justify-content:space-between}.diag small{font:700 9.5px "Courier New",monospace;text-transform:uppercase;color:#666}.diag b{font-size:19px;line-height:1.03;text-transform:uppercase}.diag span{font-size:11px;line-height:1.35}.diag.pass{background:var(--acid)}.diag.hold{background:#eee6d4}.diag.dark{background:#111;color:#fff}.diag.dark small{color:#aaa}
+.metric-line{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--ink);margin:22px 0}.metric{padding:14px;border-right:1px solid var(--ink)}.metric:last-child{border-right:0}.metric b{font:900 28px/1 "Courier New",monospace;display:block}.metric span{font:9.5px/1.35 "Courier New",monospace;text-transform:uppercase;color:#666}
+.people{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:22px 0}.person{border-top:4px solid #111;padding:14px 4px 2px;min-height:170px}.person .name{font-size:27px;font-weight:950;letter-spacing:-.04em;text-transform:uppercase}.person .role{display:inline-block;margin:7px 0 12px;background:#111;color:#fff;padding:4px 6px;font:700 9px "Courier New",monospace;text-transform:uppercase}.person p{font-size:13px;margin:0}
+.position-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:22px 0}.position{border:1px solid #9e998f;padding:20px;background:#f2ecdf}.position h3{margin:0 0 12px;font-size:23px}.position .tag{font:700 9px "Courier New",monospace;text-transform:uppercase;color:#777}.position ul{padding-left:18px;margin-bottom:0}.position li{margin:7px 0;line-height:1.42}
+.quote{margin:24px 0;border-left:8px solid var(--acid);padding:8px 0 8px 20px;font-size:28px;line-height:1.18;font-weight:900;letter-spacing:-.035em;max-width:900px}.quote small{display:block;margin-top:10px;font:700 9.5px/1.45 "Courier New",monospace;color:#69645d;text-transform:uppercase;letter-spacing:.04em}.quote.red{border-left-color:var(--red)}
+.collision{display:grid;grid-template-columns:1fr 80px 1fr;gap:14px;align-items:stretch;margin:24px 0}.hyp{border:2px solid #111;padding:18px}.hyp .label{font:900 10px "Courier New",monospace;text-transform:uppercase}.hyp b{display:block;font-size:24px;line-height:1.05;margin:12px 0}.vs{display:grid;place-items:center;font:900 28px "Courier New",monospace;transform:rotate(-6deg)}
+.assess{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:22px 0}.assessment{border-top:4px solid #111;padding:16px 4px}.assessment.good{border-top-color:#111}.assessment.watch{border-top-color:var(--red)}.assessment h3{margin:0 0 12px}ul.clean{list-style:none;padding:0;margin:12px 0}ul.clean li{border-top:1px solid var(--line);padding:10px 0 10px 22px;position:relative}ul.clean li:before{content:"■";position:absolute;left:0;top:12px;font-size:8px}
+.protocol{counter-reset:prot;display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.prot{counter-increment:prot;border-top:3px solid #111;padding:14px 2px}.prot:before{content:"0" counter(prot);font:900 24px "Courier New",monospace;color:#aaa}.prot b{display:block;margin-top:7px;text-transform:uppercase}.prot p{margin:6px 0 0;font-size:13px}
+.table-wrap{overflow:auto}table{width:100%;border-collapse:collapse;font-size:12px}th,td{border-top:1px solid #bbb5a9;padding:10px 8px;vertical-align:top;text-align:left}th{font:700 9.5px "Courier New",monospace;text-transform:uppercase;background:#e8e1d5}td:first-child{font:700 10.5px "Courier New",monospace;white-space:nowrap}.status{font:700 9.5px/1.4 "Courier New",monospace;text-transform:uppercase}.accepted{color:#1b5b17}.open{color:#8a3d12}.notdecided{color:#333}
+.evidence-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.evidence{border:1px solid #99948a;padding:15px;background:#f0eade}.evidence code{display:block;word-break:break-all;font:10.5px/1.45 "Courier New",monospace;margin-top:6px}.source-quote{display:grid;grid-template-columns:100px 1fr;gap:16px;border-top:1px solid var(--line);padding:14px 0}.source-quote time{font:700 10px "Courier New",monospace}.source-quote b{display:block;margin-bottom:4px}.source-quote p{margin:0;font-size:13px}
+.integrity{margin-top:26px;border:2px solid #111;background:#111;color:#fff;padding:16px;display:grid;grid-template-columns:138px 1fr;gap:20px;align-items:center}.integrity img{width:130px;height:130px;background:var(--paper);image-rendering:pixelated}.integrity h3{margin:0 0 8px;color:var(--acid)}.integrity code{display:block;font:9.5px/1.5 "Courier New",monospace;word-break:break-all;color:#ddd}
+.decision-columns{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:22px}.decision-box{border:1px solid #111;padding:16px;min-height:210px}.decision-box.accept{background:rgba(223,255,0,.22)}.decision-box h3{margin-top:0}.decision-box ul{padding-left:17px}.decision-box li{margin:8px 0;line-height:1.4}
+.verdict{border:5px solid #111;padding:28px;margin:25px 0 8px;position:relative}.verdict:before{content:"ЗАКЛЮЧЕНИЕ";position:absolute;top:-12px;left:18px;background:var(--paper2);padding:0 8px;font:900 10px "Courier New",monospace;letter-spacing:.12em}.verdict .big{font-size:35px;font-weight:950;line-height:1.05;letter-spacing:-.045em;text-transform:uppercase;margin-bottom:15px}.verdict .big .acid{background:var(--acid);padding:0 .08em}
+.signoff{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:36px}.signature{border-top:1px solid #111;padding-top:7px;min-height:84px;font:10.5px/1.45 "Courier New",monospace}.signature b{display:block;text-transform:uppercase}.signature .blank{margin-top:28px;color:#777}
+.stamps{display:flex;gap:24px;align-items:center;justify-content:flex-end;margin-top:34px;flex-wrap:wrap}.rect-stamp{border:4px double var(--red);color:var(--red);padding:12px 16px;transform:rotate(2deg);font:900 11.5px/1.2 "Courier New",monospace;text-align:center;text-transform:uppercase}.rect-stamp.dark{border-color:#111;color:#111;transform:rotate(-2deg)}.rect-stamp.acid{border-color:#111;background:var(--acid);color:#111;transform:rotate(1deg)}
+.footer-code{border-top:1px solid var(--line);margin-top:32px;padding-top:12px;display:flex;justify-content:space-between;gap:15px;font:9.5px/1.4 "Courier New",monospace;color:#777}
+.microink{position:absolute;right:34px;bottom:24px;width:90px;height:28px;opacity:.15;transform:rotate(-6deg);background:repeating-linear-gradient(90deg,#111 0 2px,transparent 2px 6px)}
+@media(max-width:1000px){.sidebar{position:relative;width:auto;inset:auto;padding:18px}.sidebar nav{grid-template-columns:repeat(3,1fr)}.side-actions,.side-foot{display:none}main{margin-left:0;padding:0 12px 50px}.sheet{margin:12px auto}.cover,.section{padding-left:28px;padding-right:28px}h1{font-size:50px}.diagnosis,.metric-line{grid-template-columns:repeat(2,1fr)}.people{grid-template-columns:1fr}.position-grid,.assess,.evidence-grid,.protocol{grid-template-columns:1fr}.decision-columns{grid-template-columns:1fr}}
+@media(max-width:650px){.sidebar nav{grid-template-columns:repeat(2,1fr)}.cover{min-height:auto;padding:30px 20px}h1{font-size:39px}h2{font-size:30px}.cover-bottom,.section-head{grid-template-columns:1fr}.stamp{width:118px;height:118px}.diagnosis,.metric-line{grid-template-columns:1fr}.metric{border-right:0;border-bottom:1px solid #111}.collision{grid-template-columns:1fr}.vs{min-height:50px}.integrity{grid-template-columns:1fr}.signoff{grid-template-columns:1fr}.section{padding:30px 20px}.quote{font-size:23px}}
+@media print{@page{size:A4;margin:13mm 11mm 15mm}body{background:white}.sidebar{display:none!important}main{margin:0;padding:0}.sheet{margin:0;width:100%;border:0;box-shadow:none;background:white}.cover{min-height:260mm;page-break-after:always}.section{padding:9mm 7mm;border-top:1px solid #bbb}.section.major{page-break-before:always}h2,h3{break-after:avoid}.position,.evidence,.diag,.callout,.prot,.decision-box,.integrity,.verdict{break-inside:avoid}table{font-size:9px}a{text-decoration:none}.warning-banner{background:#111!important;color:#fff!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}.diag.pass,.acid,.rect-stamp.acid{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="side-brand">DEMENTOR<b>CLUB</b></div>
+  <div class="side-meta">CLUB SESSION / INTERNAL OBSERVATION<br>DOC DC-CS-2026-09-04/3D</div>
+  <nav>
+    <a href="#diagnosis">01 · Диагноз</a>
+    <a href="#participants">02 · Участники</a>
+    <a href="#positions">03 · Позиции</a>
+    <a href="#collision">04 · Разногласие</a>
+    <a href="#gabil">05 · Габиль / Дементор</a>
+    <a href="#method">06 · Метод v0.1</a>
+    <a href="#findings">07 · Результаты</a>
+    <a href="#evidence">08 · Evidence</a>
+    <a href="#decisions">09 · Решения</a>
+    <a href="#verdict">10 · Заключение</a>
+  </nav>
+  <div class="side-actions">
+    <button class="btn" onclick="window.print()">Печатать / PDF</button>
+    <button class="btn" onclick="navigator.clipboard?.writeText('DC-CS-2026-09-04/3D')">Копировать ID</button>
+  </div>
+  <div class="side-foot">paper / black / grey / acid<br>micro-ink residue: controlled<br>semantic chaos: observed</div>
+</aside>
+<main><article class="sheet paper-grid">
+<section class="cover">
+  <div class="docline"><span>DEMENTOR CLUB / CLUB OBSERVATION UNIT</span><span>OFFICIAL CLUB RECORD / CONTROLLED COPY</span></div>
+  <div class="title-block">
+    <p class="kicker">Протокол собрания и диагностическое заключение · 04.09.2026</p>
+    <h1>СОБРАНИЕ<br><span class="acid">КЛУБА</span></h1>
+    <p class="cover-lead">Три Дементора собрались показать Dementor Club. В ходе процедуры пришлось уточнить, зачем он вообще существует. Настоящий документ фиксирует позиции, обнаруженные вопросы, результаты и следы дементорской практики.</p>
+  </div>
+  <div class="cover-bottom">
+    <div class="identity-grid">
+      <div><b>Document ID</b>DC-CS-2026-09-04/3D</div>
+      <div><b>Revision</b>0.1 / CONTROLLED COPY</div>
+      <div><b>Participants</b>Женя · Никита · Габиль</div>
+      <div><b>Quorum</b>3 Dementors / sufficient</div>
+      <div><b>Subject</b>Dementor Club</div>
+      <div><b>Evidence</b>2 SRT · 00:30:39.75 · 494 cues</div>
+    </div>
+    <div class="stamp"><span>СОБРАНИЕ<br>СОСТОЯЛОСЬ<br>04·09·26</span></div>
+  </div>
+</section>
+<div class="warning-banner">Документ фиксирует <em>наблюдения и позиции</em>. Ни одна позиция не получает статус истины автоматически.</div>
+<section class="section major" id="diagnosis">
+  <div class="section-head"><div class="secno">01</div><h2>Диагностическое резюме</h2></div>
+  <p class="lead">Собрание обнаружило разрыв между внутренней связностью Dementor Club и тем, насколько быстро человек снаружи понимает причину оказаться внутри.</p>
+  <div class="diagnosis">
+    <div class="diag pass"><small>Факт</small><b>Жизнь внутри есть</b><span>Люди, проекты, события, материалы и действия существуют одновременно.</span></div>
+    <div class="diag hold"><small>Симптом</small><b>Снаружи — «много всего»</b><span>Связь между элементами не обязана быть очевидной новому человеку.</span></div>
+    <div class="diag"><small>Открытый вопрос</small><b>Почему войти?</b><span>Нужно проверить публичный вход, не сокращая смысл заранее.</span></div>
+    <div class="diag dark"><small>Резолюция</small><b>Хуйня не подтверждена</b><span>Также не доказано обратное. Наблюдение продолжается.</span></div>
+  </div>
+  <div class="metric-line"><div class="metric"><b>3</b><span>Дементора</span></div><div class="metric"><b>2</b><span>основные позиции</span></div><div class="metric"><b>6</b><span>зафиксированных результатов</span></div><div class="metric"><b>1</b><span>неприятный вопрос</span></div></div>
+  <div class="callout"><strong>Контрольный вопрос</strong><p>Что человек должен увидеть снаружи, чтобы захотеть оказаться внутри?</p></div>
+</section>
+<section class="section" id="participants">
+  <div class="section-head"><div class="secno">02</div><h2>Участники и роли в разговоре</h2></div>
+  <div class="people"><div class="person"><div class="name">Женя</div><div class="role">product / inside view</div><p>Защищал право клуба быть средой, а не сервисом одной функции. Объяснял внутреннюю связность и смысл происходящего.</p></div><div class="person"><div class="name">Никита</div><div class="role">product / inside view</div><p>Поддерживал продуктовую сторону и тезис, что разнообразие клуба является частью системы, а не автоматически дефектом.</p></div><div class="person"><div class="name">Габиль</div><div class="role">outside user / dementor test</div><p>Отказался принимать внутренние объяснения как доказательство и требовал показать действие, причину возврата и возможность передать смысл другому.</p></div></div>
+</section>
+<section class="section major" id="positions">
+  <div class="section-head"><div class="secno">03</div><h2>Зафиксированные позиции</h2></div>
+  <div class="position-grid"><div class="position"><span class="tag">POSITION A · ЖЕНЯ / НИКИТА</span><h3>Клуб не обязан быть одной функцией</h3><ul><li>Люди могут приходить из-за людей, проектов, событий, материалов или общего движения.</li><li>Не каждое действие требует KPI.</li><li>Разнообразие происходящего может быть сущностью клуба, а не ошибкой.</li><li>Проблема может находиться в публичной подаче, а не в количестве направлений.</li></ul></div><div class="position"><span class="tag">POSITION B · ГАБИЛЬ</span><h3>Пользователь не обязан собирать смысл сам</h3><ul><li>Нужно понимать, для кого это.</li><li>Нужно видеть, что человек здесь делает.</li><li>Нужно понимать, зачем возвращаться завтра.</li><li>Если систему трудно объяснить, стоит проверить, не пытаемся ли мы делать слишком много сразу.</li></ul></div></div>
+  <div class="quote">«Я зову тебя в Dementor Club, потому что здесь ________.»<small>Принят как рабочий тест публичной подачи</small></div>
+</section>
+<section class="section major" id="collision">
+  <div class="section-head"><div class="secno">04</div><h2>Точка разногласия</h2></div>
+  <p class="lead">Участники согласились с наличием проблемы входа, но разошлись в объяснении причины.</p>
+  <div class="collision"><div class="hyp"><span class="label">Гипотеза А / Габиль</span><b>Слишком много направлений</b><p>Нужно выбрать одно сильное направление и сделать его главным.</p></div><div class="vs">VS</div><div class="hyp"><span class="label">Гипотеза Б / Женя + Никита</span><b>Недостаточно видна связь</b><p>Количество направлений не доказано как дефект; возможно, нужно лучше показать единое происходящее.</p></div></div>
+  <div class="quote red">«Выбрать одно сильное направление и ебашить его».<small>Габиль · формулировка сохранена без корпоративной санитарной обработки</small></div>
+  <p class="note">Решение по спору не принято. Обе гипотезы сохранены для проверки.</p>
+</section>
+<section class="section major" id="gabil">
+  <div class="section-head"><div class="secno">05</div><h2>Габиль / тестовое дементорство</h2></div>
+  <p class="lead">Разговор одновременно стал тестовой практикой Габиля. В ней проявился рабочий способ давления на неопределённость и собственное ограничение этого способа.</p>
+  <div class="assess"><div class="assessment good"><h3>Где дожал</h3><ul class="clean"><li>Не позволил объёму сделанного заменить ответ на вопрос «зачем».</li><li>Перевёл обсуждение из функций в поведение пользователя.</li><li>Сформулировал сильный тест возвращения: «зачем мне завтра сюда?»</li><li>Сформулировал тест передачи: могу ли я объяснить другу, зачем его позвал.</li><li>Подсветил риск бесконечного «причёсывания» вместо проверки смысла.</li></ul></div><div class="assessment watch"><h3>Где не дожал</h3><ul class="clean"><li>После диагностики быстро перешёл к собственному решению.</li><li>Не доказал, что сложность входа вызвана именно количеством направлений.</li><li>Не проверил альтернативу: может ли множество направлений иметь один ясный внешний смысл.</li><li>Собственная потребность в фокусе могла начать подменять исследование объекта.</li></ul></div></div>
+  <div class="callout"><strong>Рабочая граница</strong><p>Дементор доводит человека до места, где старый ответ перестаёт работать. Консультант начинает объяснять, какой новый ответ следует принять. В этой сессии граница была пересечена.</p></div>
+</section>
+<section class="section" id="method">
+  <div class="section-head"><div class="secno">06</div><h2>Метод Габиля v0.1 / наблюдение</h2></div>
+  <p class="note">Статус: OBSERVED / NOT APPROVED AS COURSE METHOD. Одной сессии недостаточно для канонизации.</p>
+  <div class="protocol"><div class="prot"><b>Убери презентацию</b><p>Количество функций, технологий и затраченного труда не является аргументом смысла.</p></div><div class="prot"><b>Назови человека</b><p>Для кого всё это существует?</p></div><div class="prot"><b>Назови действие</b><p>Что этот человек здесь фактически делает?</p></div><div class="prot"><b>Проверь завтра</b><p>Почему он захочет вернуться ещё раз?</p></div><div class="prot"><b>Проверь передачу</b><p>Почему он позовёт сюда другого человека?</p></div><div class="prot"><b>Найди самообман</b><p>Что сейчас «причёсывается» вместо ответа на неприятный вопрос?</p></div><div class="prot"><b>Не лечи раньше времени</b><p>Диагноз объекта и собственная привычная стратегия — не одно и то же.</p></div></div>
+</section>
+<section class="section major" id="findings">
+  <div class="section-head"><div class="secno">07</div><h2>Результаты собрания</h2></div>
+  <div class="table-wrap"><table><thead><tr><th>ID</th><th>Результат</th><th>Статус</th><th>Что с ним делать</th></tr></thead><tbody>
+    <tr><td>CS-01</td><td>Проблема публичного входа существует.</td><td><span class="status accepted">ПРИНЯТО</span></td><td>Проверять на сайте и в коммуникации.</td></tr>
+    <tr><td>CS-02</td><td>«Зачем возвращаться завтра?» — полезный тест.</td><td><span class="status accepted">ПРИНЯТО</span></td><td>Использовать в QA публичного входа.</td></tr>
+    <tr><td>CS-03</td><td>«Я зову тебя сюда, потому что…» — полезный тест.</td><td><span class="status accepted">ПРИНЯТО</span></td><td>Использовать при редактуре Home / Join.</td></tr>
+    <tr><td>CS-04</td><td>Количество направлений само по себе является дефектом.</td><td><span class="status notdecided">НЕ ДОКАЗАНО</span></td><td>Не менять архитектуру на основании разговора.</td></tr>
+    <tr><td>CS-05</td><td>Одно сильное направление должно стать единственным входом.</td><td><span class="status notdecided">НЕ ПРИНЯТО</span></td><td>Сохранено как гипотеза Габиля.</td></tr>
+    <tr><td>CS-06</td><td>У Габиля проявился воспроизводимый дементорский алгоритм.</td><td><span class="status open">НАБЛЮДЕНИЕ</span></td><td>Проверить на следующей независимой сессии.</td></tr>
+  </tbody></table></div>
+</section>
+<section class="section" id="evidence">
+  <div class="section-head"><div class="secno">08</div><h2>Evidence register</h2></div>
+  <p class="lead">Документ основан на двух SRT-расшифровках разговора. Ниже — технические признаки источника и контрольные реплики, позволяющие восстановить ход вывода.</p>
+  <div class="evidence-grid">
+    <div class="evidence"><span class="smallcaps">SOURCE / PART 01</span><code>Габиль дементор 1.srt</code><code>duration 00:20:11.59 · 345 cues · 2,532 words</code><code>sha256 08f34b6a74e66b1a014d939a3013060852ec163738f78b421ef56d3c48fe8b65</code></div>
+    <div class="evidence"><span class="smallcaps">SOURCE / PART 02</span><code>Габиль дементор 2.srt</code><code>duration 00:10:28.16 · 149 cues · 1,404 words</code><code>sha256 5a7f914f082aa27ccab159c6f83720e3859fb57c5a7642379501dc0e3bd98152</code></div>
+  </div>
+  <h3>Контрольные реплики</h3>
+  <div class="source-quote"><time>01 · 06:00</time><div><b>Use case / адресат</b><p>«Каким способом, ну там, какой use case, какую проблему мы решаем, для кого решаем.»</p></div></div>
+  <div class="source-quote"><time>01 · 15:19</time><div><b>Тест возвращения</b><p>«Да, то есть зачем мне возвращаться завтра сюда?»</p></div></div>
+  <div class="source-quote"><time>02 · 05:07</time><div><b>Диагноз сложности</b><p>«Ну, то есть всё во всём.»</p></div></div>
+  <div class="source-quote"><time>02 · 06:22</time><div><b>Предложенное лечение</b><p>«Я сказал, выбрать одно сильное направление и вебашить его.»</p></div></div>
+  <div class="source-quote"><time>02 · 07:55</time><div><b>Тест действия</b><p>«Что мне делать здесь? Что мне тут делать?»</p></div></div>
+  <div class="source-quote"><time>02 · 09:54</time><div><b>Тест самообмана</b><p>«Ну, причёсывать можно бесконечно… И причёсывание, это может быть самообман.»</p></div></div>
+  <div class="source-quote"><time>02 · 10:12</time><div><b>Тест передачи</b><p>«Я вот зову друзей, чтобы я такое знал…»</p></div></div>
+  <div class="callout"><strong>Source integrity</strong><p>Контроль целостности основан на ID документа, SHA-256 обеих расшифровок и суммарных параметрах транскрипции. Юридическую подлинность этот блок не подтверждает; он нужен для воспроизводимой проверки источника.</p></div>
+</section>
+<section class="section major" id="decisions">
+  <div class="section-head"><div class="secno">09</div><h2>Что принято, что не принято, что осталось</h2></div>
+  <div class="decision-columns">
+    <div class="decision-box accept"><h3>Принято</h3><ul><li>Проблема публичного входа существует как отдельный предмет проверки.</li><li>«Зачем возвращаться завтра?» — рабочий тест.</li><li>«Я зову тебя сюда, потому что…» — рабочий тест.</li><li>Сессия Габиля дала материал для дальнейшей проверки его метода.</li></ul></div>
+    <div class="decision-box"><h3>Не принято</h3><ul><li>Dementor Club должен быть сведен к одному направлению.</li><li>Количество направлений само по себе является дефектом.</li><li>Позиция одного участника считается итоговой истиной собрания.</li></ul></div>
+    <div class="decision-box"><h3>Открыто</h3><ul><li>Что человек должен увидеть снаружи, чтобы захотеть оказаться внутри?</li><li>Проблема входа решается редукцией или лучшей связностью?</li><li>Повторится ли метод Габиля на другой теме без привязки к Dementor Club?</li></ul></div>
+  </div>
+  <div class="callout"><strong>Change control</strong><p>Настоящий документ фиксирует выводы собрания. Он не создаёт автоматически новую таблицу, route, membership-state, governance-механику или архитектурную сущность. Если формат «Собрание клуба» будет интегрирован в портал, сначала проверяется существующий Event / Result / Content контур.</p></div>
+</section>
+<section class="section major" id="verdict">
+  <div class="section-head"><div class="secno">10</div><h2>Официальное заключение</h2></div>
+  <p class="lead">За 30 минут 39 секунд Dementor Club успел побыть клубом, продуктом, движением, набором проектов, непонятной хуйнёй и снова клубом. Окончательная классификация для завершения собрания не потребовалась.</p>
+  <div class="verdict"><div class="big">Главный вопрос после разговора стал проще:<br><span class="acid">что человек должен увидеть снаружи, чтобы захотеть оказаться внутри?</span></div><p>Вопрос передан продукту. Гипотеза одного направления сохранена без повышения до решения. Практика Габиля признана содержательной и требует повторной проверки на независимом материале.</p></div>
+  <div class="quote red">Dementor Club не признан хуйнёй.<br>Также не доказано обратное.<small>Резолюция настоящего отчёта</small></div>
+  <div class="signoff">
+    <div class="signature"><b>Женя</b>участник собрания<div class="blank">подпись ____________________</div></div>
+    <div class="signature"><b>Никита</b>участник собрания<div class="blank">подпись ____________________</div></div>
+    <div class="signature"><b>Габиль</b>участник собрания / тестовая практика<div class="blank">подпись ____________________</div></div>
+  </div>
+  <div class="stamps"><div class="rect-stamp dark">EVIDENCE<br>ПРОВЕРЯЕМО</div><div class="rect-stamp acid">КВОРУМ<br>3 / 3</div><div class="stamp"><span>ПРОТОКОЛ<br>ЗАРЕГИСТРИРОВАН<br>04·09·26</span></div><div class="rect-stamp">ХУЙНЯ<br>НЕ ПОДТВЕРЖДЕНА</div></div>
+  <div class="footer-code"><span>DOC: DC-CS-2026-09-04/3D · REV 0.1</span><span>SOURCE SNAPSHOT: 2 SRT · 00:30:39.75 · CLUB OBSERVATION</span></div>
+  <div class="microink" aria-hidden="true"></div>
+</section>
+</article></main>
+<script>
+(()=>{
+ const links=[...document.querySelectorAll('.sidebar nav a')];
+ const sections=links.map(a=>document.querySelector(a.getAttribute('href'))).filter(Boolean);
+ const setActive=id=>links.forEach(a=>a.classList.toggle('active',a.getAttribute('href')==='#'+id));
+ const io=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting)setActive(e.target.id)})},{rootMargin:'-24% 0px -66% 0px',threshold:0});
+ sections.forEach(s=>io.observe(s));
+})();
+</script>
+</body></html>
