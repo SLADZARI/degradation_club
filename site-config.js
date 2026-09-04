@@ -1,5 +1,5 @@
 window.DEMENTOR_SITE_CONFIG=Object.freeze({
-  version:'2026-09-03.06',
+  version:'2026-09-04.01',
   canonicalOrigin:'https://dementor.club',
   supabase:{
     enabled:true,
@@ -30,11 +30,12 @@ if(typeof document!=='undefined'){
       if(!document.querySelector('link[rel="canonical"]')){const link=document.createElement('link');link.rel='canonical';link.href=canonical+runtimePath;document.head.appendChild(link)}
     };
     normalizeCanonicalMetadata();
-    // The canonical public header remains visible in Workspace so members always
-    // retain a clear route back to the public club. Footer stays public-only.
-    addScript('/global-header.js');addStyle('/global-header.css');
-    if(isWorkspaceShell)addStyle('/workspace/workspace-public-header-v1.css');
-    else{addScript('/global-footer.js');addStyle('/global-footer.css');}
+    // Public site and authenticated Workspace have separate canonical primary shells.
+    // Workspace retains one public escape through its own DEMENTOR CLUB brand -> /.
+    if(!isWorkspaceShell){
+      addScript('/global-header.js');addStyle('/global-header.css');
+      addScript('/global-footer.js');addStyle('/global-footer.css');
+    }
     addScript('/dementor-relations-v1.js');
     const isJoinAssessment=/\/join\/?(?:index\.html)?$/.test(path);
     const isCommunityRoot=/\/community\/?(?:index\.html)?$/.test(path);
