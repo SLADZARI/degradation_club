@@ -109,9 +109,16 @@ expect(applyRuntime.includes('await syncLocalAssessmentRuns(client,uid)'),'Join 
 expect(applyRuntime.indexOf('await syncLocalAssessmentRuns(client,uid)')<applyRuntime.indexOf("client.rpc('dc_member_entry_status_v1')"),'Join apply: server 9/9 gate is evaluated before local assessment sync');
 expect(!applyRuntime.includes('@supabase/supabase-js'),'Join apply: duplicate Supabase client/auth owner survived');
 
+const resultRuntime=read('join/result/result-v6.js');
+expect(!resultRuntime.includes('loginWithGoogle'),'Join result: authentication must not happen before the application boundary');
+expect(!resultRuntime.includes("route('/join/member/')"),'Join result: legacy member bridge must not be the primary application path');
+expect(resultRuntime.includes("route('/join/apply/')"),'Join result: completed DC-9 must continue directly to canonical application');
+expect(!resultRuntime.includes("route('/community/board/')"),'Join result: compatibility Board route must not be a member destination');
+expect(resultRuntime.includes("route('/workspace/board/')"),'Join result: active Member must continue to Workspace Board');
+
 if(fail.length){
   console.error('Shell contract validation failed:');
   for(const item of fail)console.error(`- ${item}`);
   process.exit(1);
 }
-console.log(`Shell contract validation PASS (${publicRoutes.length} public route families + site-config ownership + Russian auth-aware GlobalHeader + canonical Join application auth + addressable Workspace navigation + Board contracts)`);
+console.log(`Shell contract validation PASS (${publicRoutes.length} public route families + site-config ownership + Russian auth-aware GlobalHeader + canonical Join application auth + direct DC-9 result handoff + addressable Workspace navigation + Board contracts)`);
