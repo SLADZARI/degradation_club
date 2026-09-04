@@ -136,6 +136,9 @@ function normalizeShellMarkup(html, rel) {
   // including above Workspace. Workspace owns only its secondary/internal shell.
   html = html.replace(/<header[^>]*class=["']topbar(?:\s[^"']*)?["'][^>]*>[\s\S]*?<\/header>/gi, '');
   if (!html.includes('/global-header.css')) html = html.replace('</head>', '<link rel="stylesheet" href="/global-header.css">\n</head>');
+  // Auth-aware GlobalHeader depends on the canonical runtime config. Keep one
+  // configuration owner and guarantee it is parsed before the deferred header.
+  if (!html.includes('/site-config.js')) html = html.replace('</head>', '<script src="/site-config.js" defer></script>\n</head>');
   if (!html.includes('/global-header.js')) html = html.replace('</body>', '<script src="/global-header.js" defer></script>\n</body>');
 
   if (!isPrivateFooter(rel)) {
