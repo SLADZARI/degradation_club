@@ -4,20 +4,21 @@
     "artifactId": "dementor-club.kernel.artifact-index",
     "project": "dementor-club",
     "documentType": "STANDARD",
-    "projectStage": "CLARITY",
-    "gate": "G8_CLEANUP",
+    "projectStage": "BUILD",
+    "gate": "G5_BUILD",
     "status": "APPROVED",
-    "version": "1.1",
-    "updated": "2026-09-03",
+    "version": "1.2",
+    "updated": "2026-09-04",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "1.0"
+    "supersedes": "1.1"
   },
   "currentArtifacts": [
-    {"artifactId":"dementor-club.kernel.project","documentType":"STANDARD","currentVersion":"1.1","status":"APPROVED","location":".weekly-os/PROJECT.json","sourceSystem":"GIT","authorityType":"IMPLEMENTATION_AUTHORITY","updated":"2026-09-03","canonicalProject":"dementor-club","canonicalLocation":".weekly-os/PROJECT.json","relation":"PROJECT_KERNEL","referencedBy":[]},
-    {"artifactId":"dementor-club.kernel.artifact-index","documentType":"STANDARD","currentVersion":"1.1","status":"APPROVED","location":".weekly-os/ARTIFACT_INDEX.json","sourceSystem":"GIT","authorityType":"IMPLEMENTATION_AUTHORITY","updated":"2026-09-03","canonicalProject":"dementor-club","canonicalLocation":".weekly-os/ARTIFACT_INDEX.json","relation":"PROJECT_KERNEL","referencedBy":[]},
-    {"artifactId":"dementor-club.kernel.approved-state","documentType":"STANDARD","currentVersion":"1.0","status":"APPROVED","location":".weekly-os/APPROVED_STATE.json","sourceSystem":"GIT","authorityType":"IMPLEMENTATION_AUTHORITY","updated":"2026-09-03","canonicalProject":"dementor-club","canonicalLocation":".weekly-os/APPROVED_STATE.json","relation":"PROTECTED_STATE","referencedBy":["dementor-club.result.mp-dsl-kernel-migration"]},
+    {"artifactId":"dementor-club.kernel.project","documentType":"STANDARD","currentVersion":"1.2","status":"APPROVED","location":".weekly-os/PROJECT.json","sourceSystem":"GIT","authorityType":"IMPLEMENTATION_AUTHORITY","updated":"2026-09-04","canonicalProject":"dementor-club","canonicalLocation":".weekly-os/PROJECT.json","relation":"PROJECT_KERNEL","referencedBy":["dementor-club.result.qa-portal-harmonization"]},
+    {"artifactId":"dementor-club.kernel.artifact-index","documentType":"STANDARD","currentVersion":"1.2","status":"APPROVED","location":".weekly-os/ARTIFACT_INDEX.json","sourceSystem":"GIT","authorityType":"IMPLEMENTATION_AUTHORITY","updated":"2026-09-04","canonicalProject":"dementor-club","canonicalLocation":".weekly-os/ARTIFACT_INDEX.json","relation":"PROJECT_KERNEL","referencedBy":["dementor-club.result.qa-portal-harmonization"]},
+    {"artifactId":"dementor-club.kernel.approved-state","documentType":"STANDARD","currentVersion":"1.0","status":"APPROVED","location":".weekly-os/APPROVED_STATE.json","sourceSystem":"GIT","authorityType":"IMPLEMENTATION_AUTHORITY","updated":"2026-09-03","canonicalProject":"dementor-club","canonicalLocation":".weekly-os/APPROVED_STATE.json","relation":"PROTECTED_STATE","referencedBy":["dementor-club.result.mp-dsl-kernel-migration","dementor-club.result.qa-portal-harmonization"]},
+    {"artifactId":"dementor-club.result.qa-portal-harmonization","documentType":"RESULT","currentVersion":"0.1","status":"DRAFT","location":".weekly-os/results/qa-portal-harmonization.v0.1.md","sourceSystem":"GIT","authorityType":"IMPLEMENTATION_AUTHORITY","updated":"2026-09-04","canonicalProject":"dementor-club","canonicalLocation":".weekly-os/results/qa-portal-harmonization.v0.1.md","relation":"CURRENT_RESULT","referencedBy":[]},
     {"artifactId":"dementor-club.result.mp-dsl-kernel-migration","documentType":"RESULT","currentVersion":"1.0","status":"APPROVED","location":".weekly-os/results/mp-dsl-kernel-migration.v1.0.md","sourceSystem":"GIT","authorityType":"IMPLEMENTATION_AUTHORITY","updated":"2026-09-03","canonicalProject":"dementor-club","canonicalLocation":".weekly-os/results/mp-dsl-kernel-migration.v1.0.md","relation":"COMPLETED_RESULT","referencedBy":[]}
   ],
   "referenceArtifacts": [
