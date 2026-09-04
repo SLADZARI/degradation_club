@@ -45,10 +45,6 @@ function normalizeProductionText(text, ext='') {
   let result = text;
   for (const legacy of legacyOrigins) result = result.replaceAll(legacy, productionOrigin);
 
-  // Source can still contain historical GitHub Pages sub-path references.
-  // Never run a blind /degradation_club/ replacement through executable code.
-  // In JS we neutralize compatibility tests before normalizing path literals.
-  // In HTML we normalize URL-bearing attributes only, leaving inline scripts intact.
   if (ext === '.js') {
     result = result.replaceAll('\\/degradation_club/', '\\/__dc_source_path_disabled__/');
     result = result.replaceAll("'/degradation_club/'", "'/__dc_source_path_disabled__/'");
@@ -132,17 +128,23 @@ function isPrivateFooter(rel) {
 function normalizeShellMarkup(html, rel) {
   if (rel === 'auth/callback/index.html') return html;
 
-  // The classic public header is the single site-level exit/navigation surface,
-  // including above Workspace. Workspace owns only its secondary/internal shell.
+  const isWorkspace = rel.startsWith('workspace/');
   html = html.replace(/<header[^>]*class=["']topbar(?:\s[^"']*)?["'][^>]*>[\s\S]*?<\/header>/gi, '');
-  if (!html.includes('/global-header.css')) html = html.replace('</head>', '<link rel="stylesheet" href="/global-header.css">\n</head>');
-  // Auth-aware GlobalHeader depends on the canonical runtime config. Keep one
-  // configuration owner and guarantee it is parsed before the deferred header.
+
   if (!html.includes('/site-config.js')) html = html.replace('</head>', '<script src="/site-config.js" defer></script>\n</head>');
-  if (!html.includes('/global-header.js')) html = html.replace('</body>', '<script src="/global-header.js" defer></script>\n</body>');
+
+  if (isWorkspace) {
+    // Authenticated Workspace owns its primary shell. Do not emit the public
+    // GlobalHeader or its offset compatibility layer into private Workspace pages.
+    html = html.replace(/<link[^>]+href=["']\/global-header\.css["'][^>]*>\s*/gi, '');
+    html = html.replace(/<script[^>]+src=["']\/global-header\.js["'][^>]*><\/script>\s*/gi, '');
+    html = html.replace(/<link[^>]+href=["']\/workspace\/workspace-public-header-v1\.css["'][^>]*>\s*/gi, '');
+  } else {
+    if (!html.includes('/global-header.css')) html = html.replace('</head>', '<link rel="stylesheet" href="/global-header.css">\n</head>');
+    if (!html.includes('/global-header.js')) html = html.replace('</body>', '<script src="/global-header.js" defer></script>\n</body>');
+  }
 
   if (!isPrivateFooter(rel)) {
-    // Local footer markup is source history only. It must not survive into production.
     html = html.replace(/<footer\b[^>]*>[\s\S]*?<\/footer>/gi, '');
     if (!html.includes('/global-footer.css')) html = html.replace('</head>', '<link rel="stylesheet" href="/global-footer.css">\n</head>');
     if (!html.includes('/global-footer.js')) html = html.replace('</body>', '<script src="/global-footer.js" defer></script>\n</body>');
