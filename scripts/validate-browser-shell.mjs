@@ -30,12 +30,36 @@ const browser=await chromium.launch({headless:true});
 
 const supabaseStub=()=>`
   const mode=globalThis.__QA_AUTH_MODE__||'guest';
-  const authenticated=mode!=='guest',owner=mode==='owner',firstRequired=mode==='member-first',member=mode==='member'||firstRequired||owner;
+  const activityMode=mode==='member-activity';
+  const authenticated=mode!=='guest',owner=mode==='owner',firstRequired=mode==='member-first',member=mode==='member'||firstRequired||activityMode||owner;
   const user={id:'qa-browser-user',email:'qa-browser@dementor.invalid',user_metadata:{full_name:'QA Browser'}};
   const session=authenticated?{user}:null;const active={status:'active',valid_from:null,valid_to:null};
-  const roleRows=owner?[{role:'owner_admin',...active}]:[];const membership=member?{...active}:null;
-  const rowsFor=t=>t==='dc_role_assignments'?roleRows:[];
-  const query=t=>{const c={select(){return c},eq(){return c},neq(){return c},in(){return c},is(){return c},order(){return c},limit(){return c},range(){return c},update(){return c},insert(){return c},upsert(){return c},delete(){return c},maybeSingle(){return Promise.resolve({data:t==='dc_system_memberships'?membership:null,error:null})},single(){return Promise.resolve({data:null,error:null})},then(resolve,reject){return Promise.resolve({data:rowsFor(t),error:null}).then(resolve,reject)}};return c};
+  const roleRows=owner?[{profile_id:user.id,role:'owner_admin',...active}]:[];const membership=member?{...active}:null;
+  const targetArtifact={id:'qa-target-artifact',author_profile_id:'qa-other-member',title:'Нужен человек на съёмку',body:'Ищем участника на клубную съёмку.',status:'active',visibility:'community',published_at:'2026-09-04T10:00:00Z',closed_at:null,expires_at:null,created_at:'2026-09-04T09:00:00Z',updated_at:'2026-09-04T10:00:00Z'};
+  const ownArtifact={id:'qa-own-artifact',author_profile_id:user.id,title:'Мой тестовый Artifact',body:'Архивная клубная запись.',status:'archived',visibility:'community',published_at:'2026-09-03T10:00:00Z',closed_at:'2026-09-04T08:00:00Z',expires_at:null,created_at:'2026-09-03T09:00:00Z',updated_at:'2026-09-04T08:00:00Z'};
+  const activityRows={
+    dc_artifacts:activityMode?[ownArtifact,targetArtifact]:[],
+    dc_artifact_responses:activityMode?[{id:'qa-response',artifact_id:targetArtifact.id,responder_profile_id:user.id,message:'Я в деле',status:'submitted',created_at:'2026-09-04T11:00:00Z',updated_at:'2026-09-04T11:00:00Z',artifact:targetArtifact}]:[],
+    dc_artifact_reactions:activityMode?[{id:'qa-reaction',artifact_id:targetArtifact.id,profile_id:user.id,reaction_type:'interested',created_at:'2026-09-04T11:05:00Z',artifact:targetArtifact}]:[]
+  };
+  const rowsFor=t=>t==='dc_role_assignments'?roleRows:(activityRows[t]||[]);
+  const query=t=>{
+    let rows=[...rowsFor(t)];
+    const c={
+      select(){return c},
+      eq(k,v){rows=rows.filter(r=>r?.[k]===v);return c},
+      neq(k,v){rows=rows.filter(r=>r?.[k]!==v);return c},
+      in(k,values){rows=rows.filter(r=>values.includes(r?.[k]));return c},
+      is(k,v){rows=rows.filter(r=>r?.[k]===v);return c},
+      order(){return c},
+      limit(n){rows=rows.slice(0,n);return c},
+      range(from,to){rows=rows.slice(from,to+1);return c},
+      update(){return c},insert(){return c},upsert(){return c},delete(){return c},
+      maybeSingle(){return Promise.resolve({data:t==='dc_system_memberships'?membership:(rows[0]||null),error:null})},
+      single(){return Promise.resolve({data:rows[0]||null,error:null})},
+      then(resolve,reject){return Promise.resolve({data:rows,error:null}).then(resolve,reject)}
+    };return c
+  };
   const bucket={createSignedUrl:async()=>({data:{signedUrl:'https://example.invalid/qa.webp'},error:null}),upload:async()=>({data:{path:'qa'},error:null}),remove:async()=>({data:[],error:null})};
   export function createClient(){return {auth:{getSession:async()=>({data:{session},error:null}),getUser:async()=>({data:{user:authenticated?user:null},error:null}),exchangeCodeForSession:async()=>({data:{session:{user}},error:null}),signInWithOAuth:async payload=>{globalThis.__QA_OAUTH__=payload;return {data:{},error:null}},signOut:async()=>({error:null}),onAuthStateChange:()=>({data:{subscription:{unsubscribe(){}}}})},from:query,rpc:async n=>({data:n==='dc_member_entry_status_v1'?{membership_active:member,community_activation_state:firstRequired?'FIRST_ARTIFACT_REQUIRED':member?'MEMBER_ACTIVATED':null,artifact_slots_available:firstRequired?1:0,published_artifact_count:firstRequired?0:member?1:0}:null,error:null}),storage:{from:()=>bucket},functions:{invoke:async()=>({data:{},error:null})}}}
 `;
@@ -139,6 +163,36 @@ for(const route of ['/','/about/','/projects/','/community/','/merch/','/archive
   const dismissed=await p.evaluate(()=>sessionStorage.getItem('dc_first_artifact_spotlight_dismissed_v1'));expect(dismissed==='1','/workspace/board/: skip is not session-local');expect(!pageErrors.length,`/workspace/board/ first-entry errors: ${pageErrors.join(' | ')}`);await c.close();
 }
 
+// Existing Board participation must remain visible and lead to the canonical My Activity projection.
+{
+  const c=await context('member-activity'),p=await c.newPage(),pageErrors=[];p.on('pageerror',e=>pageErrors.push(e.message));
+  await p.goto(base+'/workspace/board/',{waitUntil:'domcontentloaded'});await workspaceShell(p,'/workspace/board/ activity member');
+  const target=p.locator('[data-artifact="qa-target-artifact"]');
+  try{await target.waitFor({state:'visible',timeout:5000})}catch{errors.push(`/workspace/board/: activity fixture card did not render; errors=${pageErrors.join(' | ')||'none'}`)}
+  if(await target.count()){
+    expect(await target.getByRole('button',{name:'ОТКЛИК ОТПРАВЛЕН'}).count()===1,'Board participation: persisted response confirmation missing');
+    expect(await target.getByRole('button',{name:'✓ ИНТЕРЕСНО'}).count()===1,'Board participation: persisted reaction state missing');
+    const activityLink=target.getByRole('link',{name:'МОЯ АКТИВНОСТЬ'});expect(await activityLink.count()===1,'Board participation: My Activity discoverability link missing');
+    if(await activityLink.count())expect((await activityLink.getAttribute('href'))==='/workspace/#activity','Board participation: My Activity destination drifted');
+  }
+  expect(!pageErrors.length,`/workspace/board/ activity errors: ${pageErrors.join(' | ')}`);await c.close();
+}
+
+// My Activity is a projection of existing Artifacts / responses / reactions, not a new Activity entity.
+{
+  const c=await context('member-activity'),p=await c.newPage(),pageErrors=[];p.on('pageerror',e=>pageErrors.push(e.message));
+  await p.goto(base+'/workspace/#activity',{waitUntil:'domcontentloaded'});await workspaceShell(p,'/workspace/#activity');
+  try{await p.waitForFunction(()=>document.querySelector('#topTitle')?.textContent?.trim()==='MY ACTIVITY',{timeout:5000});await p.locator('[data-community-activity]').waitFor({state:'visible',timeout:3000})}catch(e){errors.push(`/workspace/#activity: projection did not render: ${e.message}`)}
+  expect(await p.locator('[data-activity-artifact]').count()===1,'My Activity: own Artifact projection missing or contains чужие Artifacts');
+  expect(await p.locator('[data-activity-response]').count()===1,'My Activity: own response projection missing');
+  expect(await p.locator('[data-activity-reaction]').count()===1,'My Activity: own reaction projection missing');
+  const text=await p.locator('#appView').innerText().catch(()=> '');
+  for(const expected of ['Мой тестовый Artifact','Нужен человек на съёмку','Я в деле','ОТПРАВЛЕН','ИНТЕРЕСНО'])expect(text.includes(expected),`My Activity: expected participation evidence missing: ${expected}`);
+  expect(await p.locator('.dcw-session-profile--link').count()===1,'My Activity: canonical shell identity owner missing');
+  expect((await p.locator('.dcw-session-profile--link').getAttribute('href'))==='/workspace/#profile','My Activity: identity/profile ownership drifted');
+  expect(!pageErrors.length,`/workspace/#activity errors: ${pageErrors.join(' | ')}`);await c.close();
+}
+
 // Owner retains root Workspace navigation and can cross child surfaces without recovery login.
 {
   const c=await context('owner'),p=await c.newPage(),pageErrors=[];p.on('pageerror',e=>pageErrors.push(e.message));
@@ -182,4 +236,4 @@ for(const route of ['/','/about/','/projects/','/community/','/merch/','/archive
 
 await browser.close();await new Promise(resolve=>server.close(resolve));
 if(errors.length){console.error('BROWSER SHELL SMOKE BLOCKED');for(const e of errors)console.error(`- ${e}`);process.exit(1)}
-console.log('Browser shell smoke PASS: Russian auth-aware public shell + separated Workspace shell + ordinary Member Board default + first Artifact focus + role navigation + spatial Board + Join + Admin');
+console.log('Browser shell smoke PASS: Russian auth-aware public shell + separated Workspace shell + ordinary Member Board default + first Artifact focus + persisted Board participation -> My Activity projection + role navigation + spatial Board + Join + Admin');
