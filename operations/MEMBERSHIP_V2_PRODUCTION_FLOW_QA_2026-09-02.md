@@ -411,3 +411,35 @@ Required correction:
 - on root Workspace the controller may intercept these links for in-place view changes, but child surfaces must always be able to navigate back to the root route;
 - Board / Artifacts / Review / Admin remain true child routes;
 - add Chromium sequence coverage: `/workspace/` → Board → Home/My Club → Review → Home/My Activity, asserting every transition works without logout/relogin.
+
+## 14. Product / UX backlog from live QA discussion — 2026-09-04
+
+Status: **DISCUSSION BACKLOG / NO IMPLEMENTATION APPROVED YET**
+
+This section captures product/UX tasks derived from the live QA discussion. Items below are not treated as shipped requirements until separately approved. Existing Membership v2 boundary remains authoritative: `AUTHENTICATION ≠ DC9 COMPLETE ≠ APPLICATION ≠ MEMBERSHIP`.
+
+1. **Unify public interface language.** Translate the public header/navigation into Russian and verify desktop/mobile composition.
+2. **Separate “join the club” from login.** Stop using one `Join` surface for both DC-9/onboarding and authentication.
+3. **Create a persistent primary club-entry CTA in the header.** Place the club-entry action between brand and normal navigation (or equivalent stable header position) on desktop and mobile. Final wording still requires approval: variants include `Присоединиться`, `Стать участником`, `Вступить в клуб`.
+4. **Reassign current Join navigation to login.** After the club-entry CTA is separated, the old `Join` position should become a login action rather than a DC-9/test entry.
+5. **Define auth-aware header states.** Guest: club-entry CTA + `Войти`; authenticated guest: identity/avatar + club-entry CTA while not a member; member: identity/avatar, no repeated join CTA; logout stays inside Workspace.
+6. **Investigate Safari login regression.** Reproduce Google auth in Safari, including stale cache, PKCE/local storage/cookies, alternate Google account and private browsing. Add Safari to auth/browser QA matrix if reproducible.
+7. **Backlog “Запросить обработку”.** Record as a future feature idea only; purpose, recipient and workflow are not yet defined.
+8. **Remove the redundant intermediate “Подать заявку в клуб” screen before DC-9.** Selecting the club-entry CTA should lead directly into the DC-9 experience rather than requiring another confirmation screen.
+9. **Remove redundant `НАЧАТЬ DC-9` step.** Once the user is already on the DC-9 surface, questions/sphere selection should begin immediately.
+10. **Merge DC-9 intro and sphere selection.** First DC-9 screen should show the nine spheres and a clear `С чего начать` block; any sphere may be selected.
+11. **Rewrite DC-9 onboarding copy.** Explain what the nine spheres are, why the user is doing them, what happens after each sphere and what 9/9 unlocks. `DC-9` must not be the only explanation.
+12. **Clarify admission copy after 9/9 without changing Membership v2 semantics.** 9/9 opens application availability; it does not create membership. Application → Dementor review → accepted membership remains the canonical sequence.
+13. **Remove low-value completion message such as `Первое готово, продолжим`.** Completion should resolve directly into a meaningful result.
+14. **Make completed sphere cards informative.** Completed card should visibly change and show a result/state, not only become black.
+15. **Restore the humorous payoff after each sphere.** Each completed sphere should produce a short club-style result/punchline that motivates the next sphere. Reuse existing approved result texts if they already exist in source-of-truth rather than inventing replacements.
+16. **Design a permanent first-pass DC-9 baseline ID.** First complete DC-9 should create an immutable historical baseline identifier derived from the first-pass result state. Verify existing `assessment_runs` model before creating a new entity.
+17. **Separate baseline from repeat attempts.** Initial DC-9 snapshot must remain immutable; later repeats become separate historical attempts. Coordinate with existing QA-MEM-004 repeat-attempt question.
+18. **Define the 9/9 result screen.** Candidate content: nine-sphere result map, baseline ID, application CTA and concise explanation of review process. Do not show application before 9/9.
+19. **Review application form and email ownership.** Determine which fields are actually necessary, whether email should be re-entered after Google auth, what can exist as a local draft before authentication, and when a draft becomes a server-side `APPLICATION_SUBMITTED` record.
+20. **Approve one canonical end-to-end onboarding flow before implementation.** Working sequence for discussion: `Public site → club-entry CTA → 9 spheres → per-sphere results → 9/9 → auth/identity if needed → application → review → membership → Workspace`. Exact placement of login relative to DC-9/application remains a product decision and is not yet approved.
+
+Recommended discussion order before implementation:
+- first: items 1–5 and 8–12 (public IA + onboarding architecture);
+- second: items 13–18 (DC-9 experience/result mechanics);
+- third: items 19–20 (identity/application stitching and final canonical flow).
