@@ -30,6 +30,8 @@ jobs:
         run: node scripts/validate-content-readiness.mjs
       - name: Validate visual contract
         run: node scripts/validate-visual-contract.mjs
+      - name: Validate DC-9 immutable baseline contract
+        run: node scripts/validate-dc9-baseline-contract.mjs
       - name: Build production candidate artifact
         run: node scripts/build-pages.mjs
       - name: Validate production analytics and consent
