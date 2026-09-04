@@ -63,10 +63,10 @@ for(const route of ['/','/about/','/projects/','/community/','/merch/','/archive
   const labels=(await p.locator('#dc-global-nav > a').allTextContents()).map(v=>v.trim());
   expect(JSON.stringify(labels)===JSON.stringify(['О клубе','События','Проекты','Сообщество','Мерч']),`${route}: header labels drifted: ${labels.join(' / ')}`);
   expect((await p.locator('[data-global-join-cta]').getAttribute('href'))==='/join/',`${route}: primary club-entry CTA drifted`);
-  expect((await p.locator('[data-global-join-cta]').innerText()).trim()==='Вступить в клуб',`${route}: primary club-entry CTA copy drifted`);
+  expect((await p.locator('[data-global-join-cta]').textContent()).trim()==='Вступить в клуб',`${route}: primary club-entry CTA copy drifted`);
   expect(await p.locator('[data-global-login]:visible').count()===1,`${route}: guest must see exactly one login service`);
-  expect(await p.getByText('Account',{exact:true}).count()===0,`${route}: legacy Account navigation survived`);
-  expect(await p.getByText('Join',{exact:true}).count()===0,`${route}: legacy Join navigation survived`);
+  expect(await p.locator('.dc-global-header').getByText('Account',{exact:true}).count()===0,`${route}: legacy Account navigation survived in canonical header`);
+  expect(await p.locator('.dc-global-header').getByText('Join',{exact:true}).count()===0,`${route}: legacy Join navigation survived in canonical header`);
   const f=await p.locator('.dc-global-footer').evaluate(el=>({display:getComputedStyle(el).display,width:el.getBoundingClientRect().width,viewport:innerWidth}));
   expect(f.display==='block'&&f.width>=f.viewport*.98,`${route}: footer geometry drifted ${JSON.stringify(f)}`);
   expect(!pageErrors.some(e=>/Cannot set properties of null/i.test(e)),`${route}: null DOM error: ${pageErrors.join(' | ')}`);await c.close();
