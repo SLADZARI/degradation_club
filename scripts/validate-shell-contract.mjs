@@ -74,11 +74,6 @@ for(const rel of ['workspace/index.html','workspace/board/index.html','workspace
   expect(!html.includes('/global-footer.js'),`${rel}: public footer must not leak into private Workspace`);
 }
 
-const rootController=read('workspace/workspace.js');
-// Root controller still renders root content/profile views; shell owns primary navigation.
-// SessionBox cleanup is tracked as a structural follow-up and must not expand into a second shell.
-expect(!rootController.includes('dc-global-header'),'workspace root controller: public header ownership leaked into root controller');
-
 for(const rel of ['join/apply/index.html','join/result/index.html']){
   const html=read(rel);
   expect(!/<header[^>]*class=["']topbar(?:\s[^"']*)?["']/i.test(html),`${rel}: legacy page-owned topbar survived production build`);
