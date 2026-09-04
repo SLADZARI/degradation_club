@@ -5,6 +5,7 @@ const entryHost=document.getElementById('entryHost');
 const client=getClient();
 let activationState=null;
 let refreshTimer=null;
+const FOCUS_DISMISSED_KEY='dc_first_artifact_spotlight_dismissed_v1';
 
 const LOCAL_ERRORS={
   FIRST_ARTIFACT_REQUIRED:'На доске нет зрителей. Чтобы откликнуться на чужое, сначала оставьте своё объявление.'
@@ -24,22 +25,40 @@ function showGateMessage(message='FIRST_ARTIFACT_REQUIRED'){
 }
 
 function isActivated(){return activationState==='MEMBER_ACTIVATED'}
+function focusDismissed(){try{return sessionStorage.getItem(FOCUS_DISMISSED_KEY)==='1'}catch{return false}}
+function dismissFocus(){try{sessionStorage.setItem(FOCUS_DISMISSED_KEY,'1')}catch{}document.body.classList.remove('dc-board-first-entry-focus');entryHost?.querySelector('.dc-first-focus-skip')?.remove()}
+function syncFirstEntryFocus(){
+  const focused=activationState==='FIRST_ARTIFACT_REQUIRED'&&!focusDismissed();
+  document.body.classList.toggle('dc-board-first-entry-focus',focused);
+  if(!entryHost)return;
+  if(!focused){entryHost.querySelector('.dc-first-focus-skip')?.remove();return}
+  if(entryHost.querySelector('.dc-first-focus-skip'))return;
+  const skip=document.createElement('button');
+  skip.type='button';
+  skip.className='dc-first-focus-skip';
+  skip.textContent='Пропустить сейчас';
+  skip.setAttribute('aria-label','Скрыть подсказку до следующего входа');
+  skip.addEventListener('click',dismissFocus);
+  entryHost.appendChild(skip);
+}
 
 function syncControls(){
-  if(!boardHost)return;
-  const locked=activationState==='FIRST_ARTIFACT_REQUIRED';
-  boardHost.querySelectorAll('[data-reaction],[data-response]').forEach(button=>{
-    button.dataset.activationLocked=locked?'1':'0';
-    if(locked){
-      button.setAttribute('aria-disabled','true');
-      button.title='Сначала займите своё место: опубликуйте первый Artifact.';
-      button.classList.add('dc-board-action--activation-locked');
-    }else{
-      button.removeAttribute('aria-disabled');
-      button.removeAttribute('title');
-      button.classList.remove('dc-board-action--activation-locked');
-    }
-  });
+  if(boardHost){
+    const locked=activationState==='FIRST_ARTIFACT_REQUIRED';
+    boardHost.querySelectorAll('[data-reaction],[data-response]').forEach(button=>{
+      button.dataset.activationLocked=locked?'1':'0';
+      if(locked){
+        button.setAttribute('aria-disabled','true');
+        button.title='Сначала займите своё место: опубликуйте первый Artifact.';
+        button.classList.add('dc-board-action--activation-locked');
+      }else{
+        button.removeAttribute('aria-disabled');
+        button.removeAttribute('title');
+        button.classList.remove('dc-board-action--activation-locked');
+      }
+    });
+  }
+  syncFirstEntryFocus();
 }
 
 async function refreshActivation(){
@@ -74,7 +93,7 @@ if(boardHost){
   observer.observe(boardHost,{childList:true,subtree:false});
 }
 if(entryHost){
-  const observer=new MutationObserver(scheduleRefresh);
+  const observer=new MutationObserver(()=>{syncFirstEntryFocus();scheduleRefresh()});
   observer.observe(entryHost,{childList:true,subtree:true});
 }
 

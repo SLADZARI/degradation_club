@@ -3,7 +3,6 @@
   const host=document.querySelector('[data-workspace-sidebar]');
   if(!host||host.dataset.dcWorkspaceShell==='1')return;
   host.dataset.dcWorkspaceShell='1';
-  host.hidden=true;
   document.documentElement.dataset.dcWorkspaceAuth='checking';
 
   const path=location.pathname.replace(/^\/degradation_club/,'');
@@ -14,26 +13,27 @@
   const admin='/workspace/admin/';
   const current=path;
   const active=(route)=>current===route||current===route+'index.html';
-  const link=(href,label,{hidden=false,roleTool=false,memberTool=false}={})=>`<a class="dcw-nav-link${active(href)?' is-active':''}" href="${href}"${hidden?' hidden':''}${roleTool?' data-role-tool="1"':''}${memberTool?' data-member-tool="1"':''}>${label}</a>`;
-  const viewLink=(key,label,{hidden=false,workNav=false}={})=>`<a class="dcw-nav-link" href="${root}#${key}" data-route="${key}"${hidden?' hidden':''}${workNav?' data-work-nav':''}>${label}</a>`;
+  const link=(href,label,{hidden=false,roleTool=false,memberTool=false,key=null}={})=>`<a class="dcw-nav-link${active(href)?' is-active':''}" href="${href}"${hidden?' hidden':''}${roleTool?' data-role-tool="1"':''}${memberTool?' data-member-tool="1"':''}${key?` data-shell-key="${key}"`:''}>${label}</a>`;
+  const viewLink=(key,label,{hidden=false,workNav=false,roleHome=false}={})=>`<a class="dcw-nav-link" href="${root}#${key}" data-route="${key}"${hidden?' hidden':''}${workNav?' data-work-nav':''}${roleHome?' data-role-home="1"':''}>${label}</a>`;
 
   host.innerHTML=`
-    <a class="dcw-brand" href="${root}"><span>DEMENTOR</span><strong>CLUB</strong></a>
-    <nav class="dcw-nav" aria-label="Личный кабинет">
-      ${viewLink('home','HOME')}
-      ${viewLink('club','MY CLUB')}
-      ${link(board,'COMMUNITY BOARD',{hidden:true,memberTool:true})}
-      ${link(artifacts,'MY ARTIFACTS',{hidden:true,memberTool:true})}
-      ${viewLink('activity','MY ACTIVITY')}
-      ${viewLink('work','MY WORK',{hidden:true,workNav:true})}
-      ${viewLink('profile','MY PROFILE')}
+    <a class="dcw-brand" href="/" aria-label="Dementor Club — на публичный сайт"><span>DEMENTOR</span><strong>CLUB</strong></a>
+    <nav class="dcw-nav" aria-label="Личный кабинет" data-workspace-nav hidden>
+      ${link(board,'COMMUNITY BOARD',{hidden:true,memberTool:true,key:'board'})}
+      ${viewLink('club','МОЙ КЛУБ')}
+      ${link(artifacts,'МОИ АРТЕФАКТЫ',{hidden:true,memberTool:true,key:'artifacts'})}
+      ${viewLink('activity','МОЯ АКТИВНОСТЬ')}
+      ${viewLink('work','МОЯ РАБОТА',{hidden:true,workNav:true})}
+      ${viewLink('home','HOME',{hidden:true,roleHome:true})}
       ${link(review,'MEMBERSHIP REVIEW',{hidden:true,roleTool:true})}
       ${link(admin,'SYSTEM TOOLS',{hidden:true,roleTool:true})}
-      <button type="button" class="dcw-nav-logout" data-global-logout>LOG OUT</button>
     </nav>
-    <div class="dcw-boundary"><span>SYSTEM</span><strong>DEMENTOR CLUB</strong><small>Один аккаунт. Членство, рабочие возможности и role-tools добавляются поверх базового кабинета.</small></div>
+    <div class="dcw-boundary"><span>SYSTEM</span><strong>DEMENTOR CLUB</strong><small>Community Board — основная поверхность участника. Роли и рабочие возможности добавляются поверх членства.</small></div>
     <div class="dcw-session" id="sessionBox" data-shell-session><span>SESSION</span><strong>ПРОВЕРКА…</strong></div>`;
+  host.hidden=false;
 
+  const nav=host.querySelector('[data-workspace-nav]');
+  const sessionBox=host.querySelector('[data-shell-session]');
   const setCurrentRootRoute=()=>{
     if(current!=='/workspace/'&&current!=='/workspace/index.html')return;
     const route=(location.hash||'#home').slice(1);
@@ -49,24 +49,24 @@
     window.DEMENTOR_SUPABASE_CLIENT=client;
     const {data:{session}}=await client.auth.getSession();
     const user=session?.user;
-    const sessionBox=host.querySelector('[data-shell-session]');
     if(!user){
       document.documentElement.dataset.dcWorkspaceAuth='guest';
-      host.hidden=true;
+      if(nav)nav.hidden=true;
       if(sessionBox)sessionBox.innerHTML='<span>SESSION</span><strong>НЕ ВЫПОЛНЕН ВХОД</strong>';
       return;
     }
 
     document.documentElement.dataset.dcWorkspaceAuth='authenticated';
-    host.hidden=false;
-    if(sessionBox)sessionBox.innerHTML=`<span>SESSION</span><strong>${String(user.email||'AUTHENTICATED').replace(/[<>&"']/g,'')}</strong>`;
+    if(nav)nav.hidden=false;
     const now=Date.now();
     const isActive=row=>row?.status==='active'&&(!row.valid_from||Date.parse(row.valid_from)<=now)&&(!row.valid_to||Date.parse(row.valid_to)>now);
-    const [{data:roles,error:roleError},{data:assignments,error:assignmentError},{data:membership,error:membershipError}]=await Promise.all([
+    const [{data:profile,error:profileError},{data:roles,error:roleError},{data:assignments,error:assignmentError},{data:membership,error:membershipError}]=await Promise.all([
+      client.from('profiles').select('full_name,avatar_url').eq('id',user.id).maybeSingle(),
       client.from('dc_role_assignments').select('role,status,valid_from,valid_to').eq('profile_id',user.id),
       client.from('dc_entity_assignments').select('id,status,valid_from,valid_to').eq('profile_id',user.id),
       client.from('dc_system_memberships').select('status,valid_from,valid_to').eq('profile_id',user.id).maybeSingle()
     ]);
+    if(profileError)console.warn('[DC Workspace shell profile]',profileError);
     if(roleError)console.warn('[DC Workspace shell roles]',roleError);
     if(assignmentError)console.warn('[DC Workspace shell assignments]',assignmentError);
     if(membershipError)console.warn('[DC Workspace shell membership]',membershipError);
@@ -75,25 +75,32 @@
     const owner=activeRoles.includes('owner_admin');
     const member=isActive(membership)||dementor;
     const hasWork=dementor||(assignments||[]).some(isActive);
+
     host.querySelectorAll('[data-member-tool]').forEach(control=>control.hidden=!member);
     const workControl=host.querySelector('[data-route="work"]');if(workControl)workControl.hidden=!hasWork;
+    const homeControl=host.querySelector('[data-role-home]');if(homeControl)homeControl.hidden=!dementor;
     const reviewLink=[...host.querySelectorAll('a')].find(a=>a.href.endsWith('/workspace/review/'));if(reviewLink)reviewLink.hidden=!dementor;
     const adminLink=[...host.querySelectorAll('a')].find(a=>a.href.endsWith('/workspace/admin/'));if(adminLink)adminLink.hidden=!owner;
+
+    const name=String(profile?.full_name||user.user_metadata?.full_name||user.user_metadata?.name||user.email||'Участник').trim();
+    const avatar=String(profile?.avatar_url||user.user_metadata?.avatar_url||user.user_metadata?.picture||'').trim();
+    if(sessionBox){
+      const avatarMarkup=avatar?`<img class="dcw-session-avatar" src="${avatar.replace(/["<>]/g,'')}" alt="">`:`<span class="dcw-session-avatar dcw-session-avatar--fallback" aria-hidden="true">${(name.match(/[\p{L}\p{N}]/u)?.[0]||'D').toUpperCase()}</span>`;
+      sessionBox.innerHTML=`<a class="dcw-session-profile dcw-session-profile--link" href="${root}#profile">${avatarMarkup}<div><span>PROFILE</span><strong>${name.replace(/[<>&"']/g,'')}</strong><small>${String(user.email||'').replace(/[<>&"']/g,'')}</small></div></a><button type="button" class="dcw-logout" data-shell-logout>ВЫЙТИ</button>`;
+      sessionBox.querySelector('[data-shell-logout]')?.addEventListener('click',async event=>{
+        const button=event.currentTarget;button.disabled=true;
+        try{await client.auth.signOut()}finally{location.href='/'}
+      });
+    }
+
+    // Ordinary active Members enter the Board by default. Role workspaces keep
+    // their root surface available for Dementor/owner operational tools.
+    if(member&&!dementor&&(current==='/workspace/'||current==='/workspace/index.html')&&!location.hash){
+      location.replace(board);
+    }
   }).catch(error=>{
     document.documentElement.dataset.dcWorkspaceAuth='error';
-    host.hidden=true;
+    if(nav)nav.hidden=true;
     console.warn('[DC Workspace shell]',error);
-  });
-
-  host.querySelector('[data-global-logout]')?.addEventListener('click',async event=>{
-    const button=event.currentTarget;button.disabled=true;
-    try{
-      const cfg=window.DEMENTOR_SITE_CONFIG?.supabase;
-      if(cfg?.enabled){
-        const {createClient}=await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.4/+esm');
-        const client=window.DEMENTOR_SUPABASE_CLIENT||createClient(cfg.url,cfg.publishableKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false,flowType:'pkce'}});
-        await client.auth.signOut();
-      }
-    }finally{location.href='/';}
   });
 })();
