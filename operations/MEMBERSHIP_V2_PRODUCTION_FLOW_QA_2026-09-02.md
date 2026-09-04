@@ -1,6 +1,6 @@
 # Dementor Club — Production Flow QA Ledger
 
-Status: **ACTIVE / MEMBERSHIP V2 CORE PASS / BATCH 04 LIVE / BATCH 05 MERGED NOT DEPLOYED / HARMONIZATION PROTOCOL APPROVED**  
+Status: **ACTIVE / MEMBERSHIP V2 CORE PASS / BATCH 04 LIVE / BATCH 05 MERGED NOT DEPLOYED / QA PORTAL HARMONIZATION ACTIVE**  
 Date opened: **2026-09-02**  
 Last live regression pass: **2026-09-03**  
 Operating update: **2026-09-04**  
@@ -110,9 +110,9 @@ Production Candidate Integrity #675 and post-merge #676 both passed. The user th
 The live pass proved that static/build gates were insufficient for DOM/CSS/runtime integration. Batch 02 therefore remained **NOT CLOSED** and led to Corrective Batch 03.
 
 ### QA-MEM-012 — Global Header ownership drift
-Status: **LIVE VISUAL PASS AFTER BATCH 03 / NEW HEADER PRODUCT DECISIONS RECORDED IN §15** · P1
+Status: **LIVE VISUAL PASS AFTER BATCH 03 / CURRENT HARMONIZATION IMPLEMENTATION MERGED TO SITE** · P1
 
-Live Batch 03 retest: public navigation appears visually canonical and consistent across tested pages. Future language/CTA changes must extend this single header owner rather than create a second menu/header implementation.
+Live Batch 03 retest: public navigation appears visually canonical and consistent across tested pages. Current Result extends this single owner; no second primary header/menu owner is allowed.
 
 ### QA-MEM-013 — Footer ownership / geometry drift
 Status: **BROWSER PASS / LIVE CROSS-PAGE RETEST PARTIAL** · P1
@@ -208,9 +208,9 @@ The same manual deployment was rerun after the hotfix:
 ### Public header
 One primary header only. Any future public-header change must modify the existing canonical GlobalHeader rather than add another page-owned menu/header.
 
-Previously deployed language remains historical live state until the §15 approved header redesign is implemented and released.
-
 **Approved 2026-09-03:** the canonical public header remains visible above Workspace. It is the discoverable escape from private Workspace back to the public Club. The brand points to `/`; public navigation remains available.
+
+Current Result implementation now contains the approved Russian/auth-aware header target in `dementor-club-site`; production remains unchanged until a separate G7 release.
 
 ### Product/local bars
 Allowed only below the global header for product/session/progress state. They must not duplicate the club brand or global navigation.
@@ -294,9 +294,9 @@ Status: **BATCH 04 DEPLOYED / LIVE FUNCTIONAL RETEST PARTIAL** · P1
 Batch 04 restores the existing production Board modules inside `/workspace/board/` rather than recreating them. Current live screenshot confirms Board renders inside Workspace with active member state and restored shell. Drag/reposition and scattered test/activity cards still require explicit live functional confirmation.
 
 ### QA-MEM-029 — Join member-return uses stale production destinations
-Status: **BATCH 04 DEPLOYED + BROWSER PASS / LIVE RETEST PENDING** · P1
+Status: **BATCH 04 DEPLOYED + BROWSER PASS / CURRENT RESULT REMOVES LEGACY PRIMARY HANDOFFS IN SITE** · P1
 
-The dead `/account/` destination is blocked by browser assertions. Future Join/header naming is governed by §15 and must preserve route/state ownership rather than create parallel auth routes.
+The dead `/account/` destination is blocked by browser assertions. Current Result additionally removes `/join/member/` and `/community/board/` from primary result-page continuation paths while preserving compatibility routes only where explicitly required.
 
 ### QA-MEM-030 — Join leaves a black visual strip under canonical header
 Status: **BATCH 04 DEPLOYED + BROWSER PASS / LIVE RETEST PENDING** · P2
@@ -357,31 +357,31 @@ Production release diff was exactly **1 commit ahead / 0 behind / 3 files**:
 
 ## 14. Product / UX backlog from live QA discussion — 2026-09-04
 
-Status: **PARTIALLY APPROVED / IMPLEMENTATION MUST FOLLOW §16 HARMONIZATION PROTOCOL**
+Status: **PARTIALLY APPROVED / ACTIVE IMPLEMENTATION UNDER §16 HARMONIZATION PROTOCOL**
 
-This section captures product/UX work derived from live QA. Items with explicit decisions are promoted in §15. Remaining content stays backlog until its own decision or implementation Result exists.
+This section captures product/UX work derived from live QA. Items with explicit decisions are promoted in §15. Implemented site-only items remain unclosed until production release + live retest.
 
 Backlog scope:
-1. Unify public interface language in Russian.
-2. Separate club-entry from authentication.
-3. Persistent primary club-entry CTA in the canonical header.
-4. Replace public `Join` service role with login behavior after club-entry is separated.
-5. Define auth-aware header states.
-6. Investigate Safari login regression and add Safari auth/browser coverage where reproducible.
-7. Keep `Запросить обработку` as a future feature idea only; no implementation yet.
-8. Remove redundant pre-DC-9 application/confirmation screen if current source confirms it is only duplicate intent confirmation.
-9. Remove redundant `НАЧАТЬ DC-9` step if the user is already inside the DC-9 entry experience.
-10. Merge DC-9 intro and sphere selection.
-11. Rewrite DC-9 onboarding copy using canonical club language.
-12. Clarify post-9/9 admission copy without changing Membership v2 semantics.
-13. Remove low-value completion interstitials.
-14. Make completed sphere cards informative.
-15. Restore humorous payoff after each sphere using existing approved/source material first.
-16. Design immutable first-pass DC-9 baseline ID on top of existing data model where possible.
-17. Separate initial baseline from repeat attempts; coordinate with QA-MEM-004.
-18. Define 9/9 result screen.
-19. Review application form/email ownership and local draft → authenticated application transition.
-20. Implement one canonical end-to-end onboarding flow only after source/authority/route harmonization.
+1. Unify public interface language in Russian. — **IMPLEMENTED IN SITE / PR #95 / NOT DEPLOYED**
+2. Separate club-entry from authentication. — **IMPLEMENTED IN SITE / PR #95 + #97 + #98 / NOT DEPLOYED**
+3. Persistent primary club-entry CTA in the canonical header. — **IMPLEMENTED IN SITE / PR #95 / NOT DEPLOYED**
+4. Replace public `Join` service role with login behavior after club-entry is separated. — **IMPLEMENTED IN SITE / PR #95 / NOT DEPLOYED**
+5. Define auth-aware header states. — **IMPLEMENTED IN SITE / PR #95 / NOT DEPLOYED**
+6. Investigate Safari login regression and add Safari auth/browser coverage where reproducible. — **OPEN**
+7. Keep `Запросить обработку` as a future feature idea only; no implementation yet. — **OPEN / IDEA ONLY**
+8. Remove redundant pre-DC-9 application/confirmation screen if current source confirms it is only duplicate intent confirmation. — **OPEN**
+9. Remove redundant `НАЧАТЬ DC-9` step if the user is already inside the DC-9 entry experience. — **IMPLEMENTED IN SITE / PR #99 / NOT DEPLOYED**
+10. Merge DC-9 intro and sphere selection. — **IMPLEMENTED IN SITE / PR #99 / NOT DEPLOYED**
+11. Rewrite DC-9 onboarding copy using canonical club language. — **OPEN; PR #99 REUSES EXISTING COPY ONLY**
+12. Clarify post-9/9 admission copy without changing Membership v2 semantics. — **PARTIAL; ROUTE/AUTH HANDOFF IMPLEMENTED, FINAL COPY OPEN**
+13. Remove low-value completion interstitials. — **OPEN**
+14. Make completed sphere cards informative. — **IMPLEMENTED IN SITE USING EXISTING LEVEL NAMES / PR #99 / NOT DEPLOYED**
+15. Restore humorous payoff after each sphere using existing approved/source material first. — **PARTIAL; EXISTING RESULT LEVEL PAYOFF EXPOSED, DEDICATED POST-SPHERE PAYOFF OPEN**
+16. Design immutable first-pass DC-9 baseline ID on top of existing data model where possible. — **OPEN / APPROVED CONCEPT**
+17. Separate initial baseline from repeat attempts; coordinate with QA-MEM-004. — **OPEN**
+18. Define 9/9 result screen. — **OPEN FOR FINAL CONTENT/VISUAL; ROUTE HANDOFF HARMONIZED IN PR #98**
+19. Review application form/email ownership and local draft → authenticated application transition. — **AUTH/DATA HANDOFF IMPLEMENTED IN SITE / PR #97 / EMAIL OWNERSHIP STILL OPEN**
+20. Implement one canonical end-to-end onboarding flow only after source/authority/route harmonization. — **IN PROGRESS UNDER CURRENT RESULT**
 
 ## 15. Approved Dementor Club product decisions — 2026-09-04
 
@@ -600,16 +600,50 @@ From now on, default portal QA flow is:
 
 This sequence is intended to make each bug-fix pass also improve Dementor Club structural coherence.
 
-## 17. Next work order
+## 17. Current Result implementation state — 2026-09-04
 
-Status: **READY FOR HARMONIZED BUG-FIX PLANNING / NO NEW DEPLOY AUTHORIZED**
+Status: **ACTIVE / FOUR COHERENT PACKAGES G6 PASS + MERGED TO `dementor-club-site` / PRODUCTION RELEASE NOT AUTHORIZED**
 
-Before changing the newly approved header/onboarding architecture, first inspect the current project kernel/authority and the actual existing menu/auth/DC-9 owners. The first implementation Result should be created only after that inventory confirms what is being extended and what must be deprecated.
+Current Result:
+`dementor-club.result.qa-portal-harmonization`
 
-Immediate live/technical priorities remain:
-1. Batch 05 deployment is pending explicit user authorization; QA-MEM-033 cannot close before live retest.
-2. Continue live portal QA and record observations before fixing them ad hoc.
-3. Perform Project Kernel + authority + shared-UI ownership inventory.
-4. Reconcile current GlobalHeader/menu/auth/DC-9 routes against §15 approved decisions.
-5. Group the first coherent bug/harmonization package into a Result with acceptance criteria and evidence plan.
-6. Implement on one integration branch, validate through the extended G6 matrix, then stop before production unless explicitly authorized.
+Active integration branch:
+`result/qa-portal-harmonization`
+
+Implementation evidence:
+1. **PR #95 — canonical Russian header and auth identity**  
+   G6: Site Integrity / Release Readiness **#715 PASS**.  
+   Merged to `dementor-club-site` as `47cc670d12b03e600460176916e15a4de7c890b0`.  
+   Effect: one canonical GlobalHeader, Russian primary navigation, persistent `Вступить в клуб`, guest `Войти`, authenticated identity → Workspace, mobile contract, no second header/auth owner.
+
+2. **PR #97 — canonical application auth handoff**  
+   G6: Site Integrity / Release Readiness **#718 PASS**.  
+   Merged to `dementor-club-site` as `334f1faacb8d170acce9b82634e2ddc11787fee6`.  
+   Effect: `/join/apply/` reuses `community-runtime-v1.js`; duplicate Supabase/auth owner removed; Google returns to application; anonymous/local DC-9 runs sync before server 9/9 gate evaluation.
+
+3. **PR #98 — direct DC-9 result → application**  
+   G6: Site Integrity / Release Readiness **#720 PASS**.  
+   Merged to `dementor-club-site` as `5f1ccf1ecba91ea317b428ea6daf175a85709ec9`.  
+   Effect: `/join/result/` no longer starts Google auth; non-member continuation goes directly to `/join/apply/`; active Member goes to `/workspace/board/`; legacy `/join/member/` and `/community/board/` are no longer primary continuation destinations.
+
+4. **PR #99 — merged DC-9 intro and sphere picker**  
+   G6: Site Integrity / Release Readiness **#722 PASS**.  
+   Merged to `dementor-club-site` as `8fab18931baa4e470bf5ed3f2ef15f92cb5bf3ef`.  
+   Effect: standalone `НАЧАТЬ DC-9` screen removed; user lands directly on the nine-sphere picker; existing explanatory copy is reused rather than silently rewritten; completed sphere cards expose existing level/result meaning; reset capability remains.
+
+Current branch synchronization:
+- `result/qa-portal-harmonization` is synchronized to the latest implementation merge after each package;
+- no parallel Result/integration branch was created for these related changes.
+
+Production status:
+- **none of PR #95/#97/#98/#99 is deployed or merged to `dementor-club-production` yet**;
+- Batch 05 (`689105fc1c7ec772cecc9b4248bc16c47cd40935`) remains merged to `dementor-club-production` but **not deployed**;
+- live production therefore still reflects the pre-current-Result header/onboarding state plus Batch 04;
+- do not mark the current Result findings LIVE PASS before a clean production candidate, explicit deploy authorization and live retest.
+
+Next harmonized priorities:
+1. inspect and design the immutable first-complete DC-9 baseline on the existing `assessment_runs` model; do not add a parallel baseline entity without evidence;
+2. investigate the reported Safari auth regression and determine whether a Safari-specific compatibility fix/test is required;
+3. continue onboarding/result UX cleanup only where existing copy/source supports it; final 9/9 visual/copy remains a separate approval item;
+4. when the current QA cluster is ready for release, create a clean production candidate **from the current `dementor-club-production` baseline**, transfer only validated current-Result files, run full production G6/G7 readiness, then stop for explicit user deploy authorization;
+5. after live retest, perform G8 cleanup including legacy Join/member compatibility, dead picker-copy/runtime state, stale branches and any superseded shell/auth code.
