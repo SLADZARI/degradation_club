@@ -1,15 +1,17 @@
 export function visualStateFromMetrics(s){
   const brain=s.brain??0,tension=s.tension??0,energy=s.energy??100,contact=s.contact??50;
   let eyes='neutral',brows='neutral',mouth='neutral';
-  if(energy<=25)eyes='sleepy';
-  if(brain>=65)eyes='tense';
-  if(brain>=85)eyes='overheat';
-  if(tension>=55)brows='tense';
-  if(tension>=75)brows='angry';
-  if(contact>=75&&brain<85&&tension<55)mouth='soft';
-  if(contact<=25)mouth='tense';
-  if(brain>=92)mouth='open';
-  return {eyes,brows,mouth,motion:{amplitude:energy<=25?.45:energy<=60?.72:1,headDrop:energy<=25?1:0,headInstability:brain>=85?Math.min(1,(brain-84)/16):0,gestureSharpness:tension>=55?Math.min(1,(tension-54)/46):0,orientToPartner:contact>=75?.5:contact<=25?-.35:0}};
+  // Face states must be readable during ordinary turns, not only at terminal values.
+  // The production SVGs were fine; previous thresholds left almost every real run neutral.
+  if(energy<=48)eyes='sleepy';
+  if(brain>=22)eyes='tense';
+  if(brain>=55)eyes='overheat';
+  if(tension>=22)brows='tense';
+  if(tension>=45)brows='angry';
+  if(contact>=66&&brain<55&&tension<45)mouth='soft';
+  if(contact<=52)mouth='tense';
+  if(brain>=62||tension>=68)mouth='open';
+  return {eyes,brows,mouth,motion:{amplitude:energy<=25?.45:energy<=60?.72:1,headDrop:energy<=25?1:0,headInstability:brain>=55?Math.min(1,(brain-54)/46):0,gestureSharpness:tension>=22?Math.min(1,(tension-21)/79):0,orientToPartner:contact>=66?.5:contact<=52?-.35:0}};
 }
 export function resolveVisualState(character={}){const derived=visualStateFromMetrics(character.state||{}),override=character.face||{};return {...derived,...override,motion:{...derived.motion,...(override.motion||{})}}}
 export function reactionCueFromDelta(delta={}){
@@ -36,23 +38,23 @@ const DEFAULT_RIG=Object.freeze({head:[352,270],shoulderLeft:[275,345],shoulderR
 const FACE_LINE='fill="none" stroke="#111" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" opacity="1"';
 const LEGACY_FACE_GEOMETRY=Object.freeze({
   'character-01':Object.freeze({
-    'eyes-tense':`<path d="M309 210 L332 205 M371 205 L394 210" ${FACE_LINE}/>`,
-    'eyes-sleepy':`<path d="M310 210 Q322 217 334 210 M370 210 Q382 217 394 210" ${FACE_LINE}/>`,
-    'eyes-overheat':`<path d="M312 199 L332 219 M332 199 L312 219 M372 199 L392 219 M392 199 L372 219" ${FACE_LINE}/>`,
-    'brows-tense':`<path d="M308 191 L336 184 M368 184 L396 191" ${FACE_LINE}/>`,
-    'brows-angry':`<path d="M308 187 L336 196 M368 196 L396 187" ${FACE_LINE}/>`,
-    'mouth-soft':`<path d="M333 260 Q352 278 372 260" ${FACE_LINE}/>`,
-    'mouth-tense':`<path d="M331 269 L374 269" ${FACE_LINE}/>`,
+    'eyes-tense':`<path d="M309 210 L332 205 M371 205 L394 210" ${FACE_LINE}/>` ,
+    'eyes-sleepy':`<path d="M310 210 Q322 217 334 210 M370 210 Q382 217 394 210" ${FACE_LINE}/>` ,
+    'eyes-overheat':`<path d="M312 199 L332 219 M332 199 L312 219 M372 199 L392 219 M392 199 L372 219" ${FACE_LINE}/>` ,
+    'brows-tense':`<path d="M308 191 L336 184 M368 184 L396 191" ${FACE_LINE}/>` ,
+    'brows-angry':`<path d="M308 187 L336 196 M368 196 L396 187" ${FACE_LINE}/>` ,
+    'mouth-soft':`<path d="M333 260 Q352 278 372 260" ${FACE_LINE}/>` ,
+    'mouth-tense':`<path d="M331 269 L374 269" ${FACE_LINE}/>` ,
     'mouth-open':'<ellipse cx="352" cy="267" rx="19" ry="13" fill="#111" stroke="none" opacity="1"/>'
   }),
   'character-02':Object.freeze({
-    'eyes-tense':`<path d="M311 214 L334 207 M370 207 L393 214" ${FACE_LINE}/>`,
-    'eyes-sleepy':`<path d="M312 214 Q324 220 336 214 M368 214 Q380 220 392 214" ${FACE_LINE}/>`,
-    'eyes-overheat':`<path d="M314 203 L334 223 M334 203 L314 223 M370 203 L390 223 M390 203 L370 223" ${FACE_LINE}/>`,
-    'brows-tense':`<path d="M310 194 L338 187 M366 187 L394 194" ${FACE_LINE}/>`,
-    'brows-angry':`<path d="M310 190 L338 199 M366 199 L394 190" ${FACE_LINE}/>`,
-    'mouth-soft':`<path d="M334 267 Q352 283 370 267" ${FACE_LINE}/>`,
-    'mouth-tense':`<path d="M333 274 L371 274" ${FACE_LINE}/>`,
+    'eyes-tense':`<path d="M311 214 L334 207 M370 207 L393 214" ${FACE_LINE}/>` ,
+    'eyes-sleepy':`<path d="M312 214 Q324 220 336 214 M368 214 Q380 220 392 214" ${FACE_LINE}/>` ,
+    'eyes-overheat':`<path d="M314 203 L334 223 M334 203 L314 223 M370 203 L390 223 M390 203 L370 223" ${FACE_LINE}/>` ,
+    'brows-tense':`<path d="M310 194 L338 187 M366 187 L394 194" ${FACE_LINE}/>` ,
+    'brows-angry':`<path d="M310 190 L338 199 M366 199 L394 190" ${FACE_LINE}/>` ,
+    'mouth-soft':`<path d="M334 267 Q352 283 370 267" ${FACE_LINE}/>` ,
+    'mouth-tense':`<path d="M333 274 L371 274" ${FACE_LINE}/>` ,
     'mouth-open':'<ellipse cx="352" cy="273" rx="18" ry="12" fill="#111" stroke="none" opacity="1"/>'
   })
 });
