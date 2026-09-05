@@ -12,11 +12,20 @@ const apply=read('join/apply/index.html');
 const baseline=read('join/dc9-baseline-v1.js');
 const sync=read('join/apply/dc9-baseline-sync-v1.js');
 const entry=read('join/apply/apply-entry-v1.js');
+const storageGuard=read('join-storage-guard.js');
+const accountSync=read('dementor-account-sync-v8.js');
+const support=read('support-v1.js');
 const migration=read('supabase/migrations/20260905084028_dc9_immutable_first_baseline_v1.sql');
 const migrationFix=read('supabase/migrations/20260905084118_dc9_immutable_first_baseline_v1_fix_jsonb_key_count.sql');
 
 expect(join.includes('/join/dc9-baseline-v1.js'),'Join: baseline preservation runtime missing');
 expect(join.indexOf('/join/dc9-baseline-v1.js')<join.indexOf('/join/dc9-immersive-v1.js'),'Join: baseline runtime must load before DC-9 runtime');
+expect(join.includes('/join-storage-guard.js'),'Join: storage capability guard must load directly on canonical DC-9 entry');
+expect(!join.includes('src="/script.js"'),'Join: obsolete presentation runtime must not own canonical DC-9 entry');
+expect(storageGuard.includes('.dc9-sphere')&&storageGuard.includes('.dc9-answer'),'Join storage guard: current DC-9 controls are not protected when storage is unavailable');
+expect(storageGuard.includes("document.querySelector('.dc9-shell')"),'Join storage guard: warning is not attached to canonical DC-9 shell');
+expect(accountSync.includes('never render another')&&accountSync.includes('removePanel();'),'Join account sync: duplicate guest auth panel may return above canonical Header');
+expect(support.includes('suppressTimedPrompts')&&support.includes("runtimePath.startsWith('/join/')")&&support.includes('if(!suppressTimedPrompts)'),'Join support: timed support prompts are not suppressed across assessment/application/result flow');
 expect(apply.includes('/join/apply/apply-entry-v1.js'),'Application: guarded entry runtime missing');
 expect(!apply.includes('src="/join/apply/apply.js"'),'Application: direct apply runtime bypasses history sync');
 expect(entry.includes('await syncDc9LocalHistory'),'Application: local history sync is not awaited');
@@ -66,4 +75,4 @@ stored=JSON.parse(context.localStorage.getItem('dementorClubOnboardingV3'));
 expect(stored.firstBaseline.results.personality.date===originalDate,'Reset erased immutable baseline');
 
 if(fail.length){console.error('DC-9 immutable baseline validation failed:');for(const item of fail)console.error(`- ${item}`);process.exit(1)}
-console.log('DC-9 immutable baseline contract PASS (local first 9/9 + repeat history + application sync + server first-complete snapshot + corrective PostgreSQL key-count migration)');
+console.log('DC-9 immutable baseline contract PASS (local first 9/9 + repeat history + application sync + Join ownership guards + server first-complete snapshot + corrective PostgreSQL key-count migration)');

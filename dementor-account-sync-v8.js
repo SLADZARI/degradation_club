@@ -36,17 +36,15 @@
   const setStatus=t=>{const e=document.querySelector('[data-dc-account-status]');if(e)e.textContent=t};
   const fail=e=>{trace('error',{message:e?.message||String(e),code:e?.code||null});console.error('[Dementor Sync V8.1]',e);setStatus(`ОШИБКА ВХОДА / СИНХРОНИЗАЦИИ${e?.message?' · '+e.message:''}`)};
   function render(){
-    // Authenticated account state is already represented by the canonical site header
-    // and Join member-return. Keep assessment sync running, but do not render a second
-    // sticky account surface that competes with the public shell.
-    if(!client||session){removePanel();return}
-    const el=panel();
-    el.innerHTML='<div class="dc-account-panel__meta"><strong>ВАША КАРТА ХРАНИТСЯ НА ЭТОМ УСТРОЙСТВЕ</strong><span data-dc-account-status>Войдите через Google, чтобы синхронизировать её между устройствами.</span></div><div class="dc-account-panel__actions"><button type="button" data-dc-login>СОХРАНИТЬ ПРОФИЛЬ / GOOGLE</button></div>';
-    el.querySelector('[data-dc-login]')?.addEventListener('click',login);
+    // DC-9 is intentionally usable without login. Public auth is owned by the
+    // canonical GlobalHeader and Application boundary, not by a second sticky
+    // Join panel. Keep account/assessment sync active, but never render another
+    // auth surface inside /join/*.
+    removePanel();
   }
   function callbackUrl(){return location.origin+'/auth/callback/?next='+encodeURIComponent('/join/')}
   async function login(){
-    try{const redirectTo=callbackUrl();trace('login-start',{redirectTo});setStatus('ПЕРЕХОД К GOOGLE…');const {data,error}=await client.auth.signInWithOAuth({provider:'google',options:{redirectTo}});trace('provider-response',{hasUrl:Boolean(data?.url),error:error?.message||null});if(error)throw error}catch(e){fail(e)}
+    try{const redirectTo=callbackUrl();trace('login-start',{redirectTo});setStatus('ПЕРЕХОД К GOOGLE…');const {data,error}=await client.auth.signInWithOAuth({provider:'google',options:{redirectTo,queryParams:{prompt:'select_account'}}});trace('provider-response',{hasUrl:Boolean(data?.url),error:error?.message||null});if(error)throw error}catch(e){fail(e)}
   }
   async function persistRun(sphere,result,active){
     if(!session||!result?.date)return;
