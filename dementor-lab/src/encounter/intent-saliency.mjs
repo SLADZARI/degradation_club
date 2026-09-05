@@ -8,7 +8,10 @@ export const INTENTS=Object.freeze({
 });
 
 export function deriveIntent({impulse=null,reaction=null}={}){
-  if(reaction==='explain')return impulse==='understand'?INTENTS.DEESCALATE:INTENTS.MAKE_UNDERSTOOD;
+  if(reaction==='explain'){
+    if(impulse==='beunderstood'||impulse==='beright')return INTENTS.MAKE_UNDERSTOOD;
+    return INTENTS.DEESCALATE;
+  }
   if(reaction==='pressure')return INTENTS.PRESSURE;
   if(reaction==='silent')return INTENTS.WITHDRAW;
   if(reaction==='joke')return INTENTS.DEFLECT_TENSION;
@@ -78,6 +81,7 @@ export function rankWorldEvents({reaction,intent,actorState={},targetState={}}={
   for(const c of out){
     if(intent===INTENTS.DEESCALATE&&c.type==='ACCEPTANCE')c.score+=18;
     if(intent===INTENTS.DEESCALATE&&c.type==='COUNTERPOINT')c.score-=8;
+    if(intent===INTENTS.MAKE_UNDERSTOOD&&c.type==='COUNTERPOINT')c.score+=6;
     if(intent===INTENTS.PRESSURE&&(c.type==='PUSHBACK'||c.type==='PRESSURE'))c.score+=12;
   }
   out.sort((a,b)=>b.score-a.score||a.type.localeCompare(b.type));
