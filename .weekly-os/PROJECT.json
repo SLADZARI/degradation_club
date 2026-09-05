@@ -7,12 +7,12 @@
     "projectStage": "RELEASE",
     "gate": "G7_RELEASE",
     "status": "APPROVED",
-    "version": "1.12",
+    "version": "1.13",
     "updated": "2026-09-05",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "1.11"
+    "supersedes": "1.12"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -26,7 +26,7 @@
     ".weekly-os/PROJECT.json",
     ".weekly-os/ARTIFACT_INDEX.json",
     ".weekly-os/APPROVED_STATE.json",
-    ".weekly-os/results/qa-portal-harmonization.v0.4.md",
+    ".weekly-os/results/qa-portal-harmonization.v0.5.md",
     "operations/WORKSPACE_MEMBER_ACTIVATION_AND_SHELL_V1.md",
     "operations/MEMBERSHIP_V2_PRODUCTION_FLOW_QA_2026-09-02.md",
     "README.md",
@@ -80,16 +80,16 @@
   },
   "currentResult": {
     "artifactId": "dementor-club.result.qa-portal-harmonization",
-    "version": "0.4",
+    "version": "0.5",
     "status": "DRAFT",
-    "path": ".weekly-os/results/qa-portal-harmonization.v0.4.md",
+    "path": ".weekly-os/results/qa-portal-harmonization.v0.5.md",
     "gate": "G7_RELEASE",
-    "productionCommit": "6a7c4d617b6519e0e7dcc4aeb1d27c3102eb943c",
-    "productionDeployed": true,
+    "productionCommit": "326e24debf8696b3c12ddbcef45b8e1615efb11d",
+    "productionDeployed": false,
     "liveDatabaseMigrationApplied": true
   },
   "activeIntegrationBranch": "result/qa-portal-harmonization",
-  "activeReleaseBranch": "release/qa-portal-harmonization-v02-batch-final",
+  "activeReleaseBranch": "release/qa-portal-harmonization-v04-corrective1",
   "reportPath": "operations/MEMBERSHIP_V2_PRODUCTION_FLOW_QA_2026-09-02.md",
   "completedResults": [
     {
