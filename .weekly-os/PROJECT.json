@@ -4,15 +4,15 @@
     "artifactId": "dementor-club.kernel.project",
     "project": "dementor-club",
     "documentType": "STANDARD",
-    "projectStage": "BUILD",
-    "gate": "G5_BUILD",
+    "projectStage": "RELEASE",
+    "gate": "G7_RELEASE",
     "status": "APPROVED",
-    "version": "1.14",
+    "version": "1.15",
     "updated": "2026-09-05",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "1.13"
+    "supersedes": "1.14"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -20,13 +20,13 @@
   "canonicalRepository": "SLADZARI/degradation_club",
   "defaultBranch": "main",
   "semanticSourceBranch": "dementor-club",
-  "projectStage": "BUILD",
-  "gate": "G5_BUILD",
+  "projectStage": "RELEASE",
+  "gate": "G7_RELEASE",
   "readFirst": [
     ".weekly-os/PROJECT.json",
     ".weekly-os/ARTIFACT_INDEX.json",
     ".weekly-os/APPROVED_STATE.json",
-    ".weekly-os/results/workspace-top-navigation.v0.1.md",
+    ".weekly-os/results/workspace-top-navigation.v0.2.md",
     "operations/WORKSPACE_MEMBER_ACTIVATION_AND_SHELL_V1.md",
     "operations/MEMBERSHIP_V2_PRODUCTION_FLOW_QA_2026-09-02.md",
     ".weekly-os/results/qa-portal-harmonization.v1.0.md",
@@ -73,47 +73,25 @@
       "note": "Preserved as legacy router evidence only. This migration does not assert that these paths are current semantic or implementation authority on the dementor-club branch."
     }
   },
-  "protected": {
-    "PRODUCT": null,
-    "DOMAIN": null,
-    "ARCHITECTURE": null,
-    "DESIGN": null
-  },
+  "protected": {"PRODUCT": null, "DOMAIN": null, "ARCHITECTURE": null, "DESIGN": null},
   "currentResult": {
     "artifactId": "dementor-club.result.workspace-top-navigation",
-    "version": "0.1",
+    "version": "0.2",
     "status": "DRAFT",
-    "path": ".weekly-os/results/workspace-top-navigation.v0.1.md",
-    "gate": "G5_BUILD",
-    "productionCommit": null,
+    "path": ".weekly-os/results/workspace-top-navigation.v0.2.md",
+    "gate": "G7_RELEASE",
+    "productionCommit": "019f8ac0f79aad2c7cd457022eca3b2c1a532d55",
     "productionDeployed": false,
     "liveDatabaseMigrationApplied": false
   },
   "activeIntegrationBranch": "result/workspace-top-navigation",
-  "activeReleaseBranch": null,
+  "activeReleaseBranch": "release/workspace-top-navigation-v01",
   "reportPath": "operations/MEMBERSHIP_V2_PRODUCTION_FLOW_QA_2026-09-02.md",
   "completedResults": [
-    {
-      "artifactId": "dementor-club.result.mp-dsl-kernel-migration",
-      "version": "1.0",
-      "status": "APPROVED",
-      "integrationPullRequest": 84,
-      "integrationCommit": "4648024f7b7adc52e66dab56da686934d89b95c5"
-    },
-    {
-      "artifactId": "dementor-club.result.qa-portal-harmonization",
-      "version": "1.0",
-      "status": "APPROVED",
-      "productionCommit": "326e24debf8696b3c12ddbcef45b8e1615efb11d",
-      "productionDeployRun": 36
-    }
+    {"artifactId":"dementor-club.result.mp-dsl-kernel-migration","version":"1.0","status":"APPROVED","integrationPullRequest":84,"integrationCommit":"4648024f7b7adc52e66dab56da686934d89b95c5"},
+    {"artifactId":"dementor-club.result.qa-portal-harmonization","version":"1.0","status":"APPROVED","productionCommit":"326e24debf8696b3c12ddbcef45b8e1615efb11d","productionDeployRun":36}
   ],
-  "legacyWeeklyOs": {
-    "reportDirectory": "/.weekly-os/reports",
-    "latestReport": "/.weekly-os/reports/latest.json",
-    "writeAutoReportTo": "/.weekly-os/reports/latest.json",
-    "systemLabel": "MODERN_PILGRIMS"
-  },
+  "legacyWeeklyOs": {"reportDirectory":"/.weekly-os/reports","latestReport":"/.weekly-os/reports/latest.json","writeAutoReportTo":"/.weekly-os/reports/latest.json","systemLabel":"MODERN_PILGRIMS"},
   "doNotInfer": [
     "Modern Pilgrims membership from Dementor Club membership",
     "Modern Pilgrims roles from dc_* runtime state",
