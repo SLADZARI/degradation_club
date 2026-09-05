@@ -11,7 +11,8 @@ export const REACTION_EFFECTS=Object.freeze({
 export const IMPULSE_EFFECTS=Object.freeze({
   beright:{self:{brain:3,tension:3},target:{contact:-2}},
   beliked:{self:{contact:2,tension:-3},target:{contact:1}},
-  understand:{self:{brain:2,contact:2},target:{tension:-2,contact:3}}
+  understand:{self:{brain:2,contact:2},target:{tension:-2,contact:3}},
+  beunderstood:{self:{brain:3,tension:2},target:{brain:2,contact:-1}}
 });
 export const PAUSE_EFFECTS=Object.freeze({self:{brain:-5,tension:-7,energy:-2},target:{tension:-3,contact:2}});
 export const REPEAT_FRICTION=Object.freeze({self:{energy:-1,brain:4,tension:4},target:{contact:-2}});
