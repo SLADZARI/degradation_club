@@ -28,6 +28,26 @@ function run(preset,objective){
 const matrix=new Map();
 for(const preset of PRESETS)for(const objective of OBJECTIVES)matrix.set(`${preset}/${objective}`,run(preset,objective));
 
+const report=[...matrix.entries()].map(([key,{summary,result,session}])=>{
+  const e=session.controller.encounter;
+  const a=e.traces.filter(t=>t.actorId==='A');
+  const b=e.traces.filter(t=>t.actorId==='B');
+  return {
+    key,
+    scenario:e.scenario.id,
+    terminal:e.result?.type||null,
+    reason:e.result?.reason||null,
+    answers:e.result?.answers??b.filter(t=>t.selectedReaction==='explain').length,
+    relationshipContact:e.result?.relationshipContact??Math.min(e.actors.A.state.contact,e.actors.B.state.contact),
+    reactionKinds:new Set(a.map(t=>t.selectedReaction).filter(Boolean)).size,
+    A:a.map(t=>t.selectedReaction||'-').join('>'),
+    B:b.map(t=>t.selectedReaction||'-').join('>'),
+    punchline:result.punchline
+  };
+});
+console.log('MVP six-way diagnostics');
+console.table(report);
+
 for(const objective of OBJECTIVES){
   const signatures=PRESETS.map(preset=>{
     const e=matrix.get(`${preset}/${objective}`).session.controller.encounter;
@@ -55,17 +75,4 @@ for(const objective of OBJECTIVES){
   assert.ok(firstJoke>0,`PRESS_FOR_ANSWER/${objective} should begin direct and pivot later`);
 }
 
-const report=[...matrix.entries()].map(([key,{summary,result,session}])=>({
-  key,
-  scenario:session.controller.encounter.scenario.id,
-  terminal:summary.result?.type||null,
-  reason:summary.result?.reason||null,
-  turns:summary.turns,
-  brain:summary.final.brain,
-  contact:summary.final.contact,
-  reactions:summary.reactions,
-  punchline:result.punchline
-}));
-
 console.log('MVP six-way matrix OK — both objectives viable; adaptive exposed BRAIN has a real pivot');
-console.table(report);
