@@ -7,12 +7,12 @@
     "projectStage": "RELEASE",
     "gate": "G7_RELEASE",
     "status": "APPROVED",
-    "version": "1.7",
+    "version": "1.8",
     "updated": "2026-09-05",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "1.6"
+    "supersedes": "1.7"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -85,7 +85,7 @@
     "path": ".weekly-os/results/qa-portal-harmonization.v0.2.md",
     "gate": "G7_RELEASE",
     "productionCommit": "723c5404d28530ae9805a76c4442daa0b6bedfcb",
-    "productionDeployed": false,
+    "productionDeployed": true,
     "liveDatabaseMigrationApplied": true
   },
   "activeIntegrationBranch": "result/qa-portal-harmonization",
