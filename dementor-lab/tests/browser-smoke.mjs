@@ -6,25 +6,44 @@ const browser=await chromium.launch({headless:true});
 const context=await browser.newContext({...devices['iPhone 13']});
 const page=await context.newPage();
 const errors=[];page.on('pageerror',e=>errors.push(String(e)));
-await page.goto(`${root}?v=10`,{waitUntil:'networkidle'});
+await page.goto(`${root}?v=11`,{waitUntil:'networkidle'});
 
 assert.equal(await page.locator('#status').textContent(),'ПЕРСОНАЖ');
 assert.equal(await page.locator('#person-live svg').count(),1,'PERSON mounts a real production SVG');
 assert.equal(await page.locator('[data-base]').count(),2,'PERSON exposes both approved bases');
-assert.equal(await page.locator('[data-cat]').count(),6,'PERSON exposes six manifest-driven categories');
+assert.equal(await page.locator('[data-cat]').count(),4,'PERSON returns to the compact four-part wardrobe taxonomy');
 assert.match(await page.locator('[data-cat="hat"]').textContent(),/7/,'male base exposes seven authored hats');
-assert.match(await page.locator('[data-cat="glasses"]').textContent(),/4/,'male base exposes four authored glasses variants');
-assert.match(await page.locator('[data-cat="facialHair"]').textContent(),/4/,'male base exposes four facial-hair variants');
+assert.match(await page.locator('[data-cat="accessories"]').textContent(),/7/,'glasses and small accessories are one product-facing category');
+assert.match(await page.locator('[data-cat="facialHair"]').textContent(),/4/,'male moustache/facial-hair category exposes four authored variants');
+assert.equal(await page.locator('[data-cat="outfit"]').count(),1,'clothing remains a top-level category');
+assert.equal(await page.locator('[data-cat="shoes"]').count(),0,'shoes are not exposed as a product-facing category');
+assert.equal(await page.locator('.person-rule').count(),0,'implementation note is removed from PERSON');
+assert.equal(await page.locator('.person-fact').count(),0,'QA evidence block is removed from PERSON');
+assert.equal(await page.locator('[data-reset]').count(),1,'second PERSON tool is reset, not a face-debug control');
+assert.equal(await page.locator('[data-face]').count(),0,'face debug control is absent from player-facing PERSON');
+
 await page.locator('[data-cat="hat"]').click();
 await page.locator('[data-variant="hat-01"]').click();
 assert.equal(await page.locator('#person-live #hat-01').isVisible(),true,'hat-01 really becomes visible inside the SVG');
-await page.locator('[data-face]').click();
-assert.match(await page.locator('[data-face-label]').textContent(),/НАПРЯГСЯ/,'face QA cycles to a non-neutral authored state');
+await page.locator('[data-reset]').click();
+assert.equal(await page.locator('#person-live #hat-01').isVisible(),false,'reset clears authored wardrobe selections');
+
+const faceState=await page.evaluate(async()=>{
+  const {CharacterRenderer}=await import('./src/render/character-renderer.mjs');
+  const root=document.querySelector('#person-live');
+  const renderer=new CharacterRenderer({side:'A',root});
+  renderer.render({state:{energy:72,brain:95,tension:82,contact:20,memory:{}},face:{},visual:{characterId:'character-01',appearance:{variantContract:true}}});
+  const display=id=>getComputedStyle(root.querySelector(`#${id}`)).display;
+  return {open:display('mouth-open'),neutral:display('mouth-neutral'),eyes:display('eyes-overheat')};
+});
+assert.notEqual(faceState.open,'none','authored mouth-open can now be revealed from runtime state');
+assert.equal(faceState.neutral,'none','inactive authored mouth is really hidden');
+assert.notEqual(faceState.eyes,'none','authored overheat eyes can now be revealed from runtime state');
+
 await page.locator('[data-base="character-02"]').click();await page.waitForTimeout(60);
 assert.equal(await page.locator('#person-live svg').count(),1,'female production SVG remounts');
-assert.equal(await page.locator('[data-cat="facialHair"]').isDisabled(),true,'female asymmetry is preserved');
-assert.equal(await page.locator('[data-cat="outfit"]').isDisabled(),true,'female baked torso is not fabricated into outfit variants');
-assert.match(await page.locator('.person-rule').textContent(),/НЕ БАГ/,'the intentional asymmetry is explained to the player');
+assert.equal(await page.locator('[data-cat="facialHair"]').isDisabled(),true,'female authored asymmetry is preserved without explanatory debug copy');
+assert.equal(await page.locator('[data-cat="outfit"]').isDisabled(),true,'female baked torso is not fabricated into clothing variants');
 
 await page.locator('[data-go="situation"]').click();
 assert.equal(await page.locator('#status').textContent(),'СИТУАЦИЯ');
@@ -74,4 +93,4 @@ assert.ok((await page.locator('#after-summary').textContent()).trim().length>0);
 assert.ok((await page.locator('#compare-story').textContent()).trim().length>0);
 assert.deepEqual(errors,[],'no uncaught browser errors during the full mobile flow');
 await browser.close();
-console.log('DEMENTOR LAB v1.0 iPhone browser smoke: PASS — PERSON, worlds, TALK and counterfactual replay complete');
+console.log('DEMENTOR LAB v1.1 iPhone browser smoke: PASS — compact PERSON, face states, worlds, TALK and replay complete');
