@@ -79,8 +79,8 @@ Canonical decision authority for the Workspace-specific change:
 6. Authenticated non-member cannot read/respond/create on closed Community Board.
 7. Workspace logo returns to `/`; public landing navigation is not simultaneously rendered as Workspace primary navigation.
 8. First-entry spotlight reuses existing Artifact slot/gate and `Пропустить` does not mutate semantic state.
-9. Member responses/reactions/Artifacts have visible confirmation/history through My Activity or the existing canonical projection owner.
-10. Relevant browser regression covers first-entry Member, activated Member, authenticated non-member, Dementor and owner-admin on desktop/mobile, with WebKit auth coverage for Safari-sensitive login/callback paths.
+9. Member responses/reactions/Artifacts have visible confirmation/history through My Activity or the existing canonical projection owner; My Artifacts preserves active + archived personal history.
+10. Relevant browser regression covers first-entry Member, activated Member, authenticated non-member, Dementor and owner-admin on desktop/mobile, with WebKit auth coverage for Safari-sensitive login/callback paths and focused personal Artifact-history coverage.
 11. Critical routes remain canonical and no dead legacy destination is reintroduced.
 12. No unresolved P0/P1 issue included in a release candidate remains without explicit deferral/decision.
 13. Production candidate is built from current production authority using the established safe release method while branch divergence remains unresolved.
@@ -94,6 +94,7 @@ Canonical decision authority for the Workspace-specific change:
 - Community Board
 - first Artifact activation gate
 - Artifact slot/publication state
+- Artifact personal history/archive surface
 - reactions/responses presentation
 - My Activity projection
 - Membership v2 presentation and route integrity
@@ -108,6 +109,7 @@ No new canonical domain entity is authorized by this Result.
 - static/build validation;
 - browser regression evidence across Member/non-member/role states;
 - WebKit proxy evidence for Safari-sensitive auth paths plus real Safari live retest after release;
+- focused My Artifacts active/archive browser evidence;
 - production candidate release-readiness evidence;
 - live human retest after explicit deployment;
 - cleanup/lineage record after release.
@@ -117,9 +119,12 @@ No new canonical domain entity is authorized by this Result.
 - PR #103 `WebKit auth regression gate`: first run #734 failed because the mobile-sized test attempted to click the service login while the canonical burger was closed. This was classified as a test interaction defect; no auth runtime mutation was made.
 - PR #103 corrected run #735 PASS across registry/routes, content, visual contract, DC-9 baseline, production build, analytics, canonical shell, built-JS syntax, Chromium browser regression, WebKit auth regression, route manifest and production artifact release gate.
 - PR #103 merged to `dementor-club-site` as `0fa400b6708328e3602b0eb59bed789bd9e60e85`.
-- `result/qa-portal-harmonization` is synchronized to that site merge commit.
+- Source-backed onboarding inventory confirms `/join/` already lands directly on the visible nine-sphere picker and `dc9-immersive-v1.js` defaults to `renderPicker()`; the backlog's redundant pre-DC-9 intro/confirmation state is not present in the current owner, so no new code was introduced for an already-resolved concern.
+- PR #104 `My Artifacts archive history`: G6 run #737 PASS, including focused Chromium `ВСЕ → АРХИВ → АКТИВНЫЕ`, archived `гусь`, active `Куда двигаемся - народ?`, canonical private Workspace shell, canonical `/workspace/board/` continuation, WebKit auth and all existing release guards.
+- PR #104 merged to `dementor-club-site` as `fe46704380997f987a11e4f12301de2fe66eb626`; `workspace/artifacts/` now reuses `community-runtime-v1.js` for client/session/route ownership instead of creating a child-surface auth owner.
+- `result/qa-portal-harmonization` is synchronized to `fe46704380997f987a11e4f12301de2fe66eb626`.
 - WebKit PASS is browser-engine regression evidence, not a claim that the reported live Safari issue is closed. Real Safari production retest remains required after explicit release.
-- No production branch, live Supabase state or deployment was changed by PR #102/#103.
+- No production branch, live Supabase state or deployment was changed by PR #102/#103/#104.
 
 ## Production Impact
 No new production impact until a separately authorized G7 deployment of this v0.2 scope occurs.
