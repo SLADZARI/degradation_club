@@ -125,6 +125,15 @@ expect(!activation.includes("activationState='MEMBER_ACTIVATED'"),'Board first-e
 const legacyBoard=read('community/board/index.html');
 expect(legacyBoard.includes('/workspace/board/'),'community/board/: compatibility route must resolve into Workspace Board');
 
+const artifactDetailHtml=read('community/artifact/index.html');
+expect(artifactDetailHtml.includes('href="/workspace/board/"'),'Artifact detail: top back link must target canonical Workspace Board');
+expect(!artifactDetailHtml.includes('href="/community/board/"'),'Artifact detail: compatibility Board route survived in active detail source');
+const artifactDetailRuntime=read('community/artifact/artifact.js');
+expect(artifactDetailRuntime.includes("route('/workspace/board/')"),'Artifact detail: canonical Workspace Board destination missing');
+expect(!artifactDetailRuntime.includes("route('/community/board/')"),'Artifact detail: compatibility Board destination survived');
+expect(!artifactDetailRuntime.includes("route('/join/member/')"),'Artifact detail: legacy Join member bridge survived');
+expect(artifactDetailRuntime.includes("route('/join/')"),'Artifact detail: canonical non-member Join gate missing');
+
 const admin=read('workspace/admin/index.html');
 expect(admin.includes('../../design-system/dementor-workspace/workspace.css'),'workspace/admin/: complete Workspace layout CSS missing');
 
