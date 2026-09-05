@@ -17,7 +17,7 @@ Unify the freshest deterministic encounter runtime with the portrait-first story
 5. **IMPLEMENTED DATA CONTRACT** — RESULT and BEFORE/AFTER are derived from `buildResult()`, `ExecutionTrace` and `trace-summary.mjs`. No authored metric/count is allowed for the MVP path.
 6. **IMPLEMENTED FIRST PASS** — deterministic phrase recent-use penalty via `phrase-saliency.mjs`; passive BRAIN voice emitted as a non-causal semantic event.
 7. **IMPLEMENTED FIRST PASS** — runs persist to `localStorage`; Archive list and Archive detail are derived from saved run records through `run-detail.mjs`.
-8. **AUTOMATION IMPLEMENTED / EXECUTION PENDING** — `tests/mvp-mass-smoke.mjs` covers 1000 deterministic encounters; integration and portrait-flow contract selftests cover generalized patch, portrait projection and UI wiring. A real outsider playtest remains required.
+8. **AUTOMATION IMPLEMENTED / EXECUTION PENDING** — `tests/mvp-mass-smoke.mjs` covers 1000 deterministic encounters; `tests/mvp-six-way-matrix-selftest.mjs` covers all 3 BRAIN presets × 2 objectives; integration and portrait-flow contract selftests cover generalized patch, portrait projection and UI wiring. A real outsider playtest remains required.
 
 ## MVP invariants
 
@@ -45,7 +45,9 @@ Unify the freshest deterministic encounter runtime with the portrait-first story
 - `prototypes/portrait-flow-v0.8.html` — portrait-first UI over real runtime with identity, generalized HOT PATCH, runtime emotions and Archive detail.
 - `tests/mvp-integration-selftest.mjs` — integrated patch/emotion contract.
 - `tests/portrait-flow-v08-contract-selftest.mjs` — UI integration contract.
+- `tests/mvp-six-way-matrix-selftest.mjs` — all six preset/objective combinations terminate, preserve objective binding and remain behaviorally distinct by preset.
 - `tests/mvp-mass-smoke.mjs` — 1000-run deterministic smoke.
+- `MVP_SIX_WAY_PLAYTEST_v0.8.md` — required browser/mobile six-way causal playtest.
 - `FIRST_TIME_PLAYER_GATE_v0.8.md` — no-coaching MVP UX gate.
 
 ## Integration warning
@@ -54,8 +56,8 @@ The portrait v0.7 branch and intent/saliency v0.5 branch diverged. Do not merge 
 
 ## Remaining before first MVP label
 
-1. Run the complete automated suite including `npm run test:mvp` / `npm test` and fix regressions.
-2. Browser/mobile playthrough: verify every RESULT statement against ExecutionTrace and verify all three presets reach readable outcomes.
+1. Run `npm run test:mvp-matrix`, `npm run test:mvp-smoke`, `npm run test:mvp` and full `npm test`; fix any regression before claiming green.
+2. Run the six real browser/mobile combinations defined in `MVP_SIX_WAY_PLAYTEST_v0.8.md` and compare visible outcomes with ExecutionTrace.
 3. Visual polish of portrait emotions / speaking state after seeing actual SVG behavior in browser.
 4. Run one outsider first-time-player test using `FIRST_TIME_PLAYER_GATE_v0.8.md`.
 
