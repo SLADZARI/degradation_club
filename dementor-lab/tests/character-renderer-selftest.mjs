@@ -20,7 +20,7 @@ assert.ok(tired.motion.amplitude<1);
 
 const emptyFace=resolveVisualState({state:{energy:72,brain:90,tension:70,contact:50},face:{}});
 assert.equal(emptyFace.eyes,'overheat','empty face object must not suppress metric-driven rendering');
-assert.equal(emptyFace.brows,'tense');
+assert.equal(emptyFace.brows,'angry','high BRAIN keeps the stronger authored brow state');
 
 const override=resolveVisualState({state:{energy:72,brain:90,tension:70,contact:50},face:{mouth:'soft',motion:{orientToPartner:0.9}}});
 assert.equal(override.eyes,'overheat','partial face override preserves derived eyes');
