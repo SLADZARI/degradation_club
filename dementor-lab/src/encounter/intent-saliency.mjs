@@ -25,8 +25,6 @@ const EVENT_SPECS=Object.freeze({
   PUSHBACK:{type:'PUSHBACK',trigger:'pushback',accepted:false}
 });
 
-// Event impacts are intentionally small and deterministic. Reaction/Impulse deltas still
-// describe what the actor does; these deltas describe how that action lands on the target.
 export const WORLD_EVENT_EFFECTS=Object.freeze({
   ACCEPTANCE:{contact:8,tension:-18,brain:-5,trust:1,resentment:-1},
   COUNTERPOINT:{contact:-6,tension:12,brain:7,resentment:1},
@@ -46,10 +44,11 @@ export function rankWorldEvents({reaction,intent,actorState={},targetState={}}={
   const trust=mem(targetState,'trust'),resentment=mem(targetState,'resentment');
   let out=[];
   if(reaction==='explain'){
+    const shutdownSynergy=contact<20&&brain>=90?25:0;
     out=[
       candidate('COUNTERPOINT',42+tension*.55+resentment*7-trust*4,'explanation meets resistance'),
       candidate('ACCEPTANCE',18+contact*.55+trust*12-tension*.45-resentment*5,'high contact/trust makes acceptance plausible'),
-      candidate('NO_RESPONSE',8+(100-contact)*.30+brain*.15,'collapsed contact or overload makes disengagement plausible')
+      candidate('NO_RESPONSE',8+(100-contact)*.30+brain*.15+shutdownSynergy,'collapsed contact plus overload makes disengagement plausible')
     ];
   }else if(reaction==='agree'){
     out=[
@@ -76,7 +75,6 @@ export function rankWorldEvents({reaction,intent,actorState={},targetState={}}={
     out=[candidate('NO_RESPONSE',1,'no reaction maps to no response')];
   }
 
-  // Intent biases the same reaction differently without becoming a second graph.
   for(const c of out){
     if(intent===INTENTS.DEESCALATE&&c.type==='ACCEPTANCE')c.score+=18;
     if(intent===INTENTS.DEESCALATE&&c.type==='COUNTERPOINT')c.score-=8;
