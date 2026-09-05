@@ -98,12 +98,12 @@ function scheduleRepeat(encounter,side,chosen){
   if(!repeatNode||chosen.repeat<=1||!reactionNode)return;
   encounter.pendingRepeats[side]={reaction:chosen.reaction,impulse:chosen.impulse||null,remaining:chosen.repeat-1,total:chosen.repeat,repeatNodeId:repeatNode.id,reactionNodeId:reactionNode.id};
 }
-function commitEvent(encounter,side,targetSide,reaction){
-  const event=eventForReaction(reaction);event.actorId=side;event.targetId=targetSide;encounter.lastEvent=event;encounter.nextTrigger=event.trigger;
+function commitEvent(encounter,side,targetSide,reaction,resolvedEvent=null){
+  const event=resolvedEvent?{...resolvedEvent}:eventForReaction(reaction);event.actorId=side;event.targetId=targetSide;encounter.lastEvent=event;encounter.nextTrigger=event.trigger;
   if(event.accepted&&encounter.pendingRepeats[targetSide])encounter.pendingRepeats[targetSide]=null;
   return event;
 }
-export function executeActorTurn(encounter,{trigger=null}={}){
+export function executeActorTurn(encounter,{trigger=null,eventResolver=null}={}){
   if(encounter.result)return {terminal:true,result:encounter.result};
   const p=predictTurn(encounter,{trigger});
   const breakpoint=!encounter.hotPatchUsed?detectBreakpoint(encounter,p):null;
@@ -114,9 +114,11 @@ export function executeActorTurn(encounter,{trigger=null}={}){
   applyMetricDelta(actor.state,selfDelta);applyMetricDelta(target.state,targetDelta);encounter.turn+=1;
   if(p.isRepeat){const pending=encounter.pendingRepeats[side];if(pending){pending.remaining-=1;if(pending.remaining<=0)encounter.pendingRepeats[side]=null}}
   else scheduleRepeat(encounter,side,chosen);
-  const event=commitEvent(encounter,side,targetSide,chosen.reaction);
-  const trace={turn:encounter.turn,actorId:side,trigger:emittedTrigger,visitedNodes:chosen.path.map(n=>n.id),selectedImpulse:chosen.impulse,selectedReaction:chosen.reaction,metricDeltas:{self:selfDelta,target:targetDelta},memoryChanges,loops:p.isRepeat?1:Math.max(0,chosen.repeat-1),repeatOverride:Boolean(p.isRepeat),noActionReason:p.noActionReason||null,event:{...event},breakpoint:null,before:{self:beforeSelf,target:beforeTarget},after:{self:cloneState(actor.state),target:cloneState(target.state)}};
-  encounter.traces.push(trace);encounter.transcript.push({turn:encounter.turn,actorId:side,reaction:chosen.reaction,impulse:chosen.impulse,event:event.type,noActionReason:p.noActionReason||null});encounter.pendingTurn=null;
+  const semantic=typeof eventResolver==='function'?eventResolver({encounter,side,targetSide,actor,target,reaction:chosen.reaction,impulse:chosen.impulse,chosen,prediction:p})||null:null;
+  const event=commitEvent(encounter,side,targetSide,chosen.reaction,semantic?.event||null);
+  const metricDeltas={self:selfDelta,target:targetDelta};if(semantic?.eventImpact?.metrics)metricDeltas.eventTarget={...semantic.eventImpact.metrics};
+  const trace={turn:encounter.turn,actorId:side,trigger:emittedTrigger,visitedNodes:chosen.path.map(n=>n.id),selectedImpulse:chosen.impulse,selectedReaction:chosen.reaction,metricDeltas,memoryChanges,loops:p.isRepeat?1:Math.max(0,chosen.repeat-1),repeatOverride:Boolean(p.isRepeat),noActionReason:p.noActionReason||null,event:{...event},eventImpact:semantic?.eventImpact||null,eventDecision:semantic?.eventDecision||null,intent:semantic?.intent??null,breakpoint:null,before:{self:beforeSelf,target:beforeTarget},after:{self:cloneState(actor.state),target:cloneState(target.state)}};
+  encounter.traces.push(trace);encounter.transcript.push({turn:encounter.turn,actorId:side,reaction:chosen.reaction,impulse:chosen.impulse,intent:trace.intent,event:event.type,eventDecision:semantic?.eventDecision?.winner||null,eventImpact:trace.eventImpact,noActionReason:p.noActionReason||null});encounter.pendingTurn=null;
   const terminal=checkTerminal(encounter);if(terminal){encounter.status='RESULT';encounter.result=terminal;return {trace,terminal:true,result:terminal}}
   encounter.activeActor=targetSide;encounter.status='NEXT_TURN';return {trace,terminal:false};
 }
