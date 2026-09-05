@@ -148,17 +148,47 @@ Observed on `/join/apply/`:
 
 Classification: **LIVE PASS** for observed mobile Application responsive geometry in the logged-out state.
 
-Observed on `/join/`:
+Observed on `/join/` picker:
 - DC-9 sphere picker rendered as a single-column mobile list;
-- progress state `1 / 9` remained visible;
+- progress state remained visible;
 - typography and sphere cards stayed within the viewport;
 - no horizontal clipping was observed;
-- however, a large empty light band followed by a dark band appeared above the canonical Header in the captured mobile state.
+- a large empty light band followed by a dark band appeared above the canonical Header in the captured mobile state.
 
 Classification: **PARTIAL PASS + BUG OBSERVATION / MOBILE JOIN TOP GAP**.
-Do not assume root cause from the screenshot alone. Investigation found that active `/join/` still loaded legacy `/script.js`, which targets superseded `selector / sphereGrid / questionHost` owners while the current route is fully `dc9-*`. Current DC-9 persistence is owned directly by `dc9-immersive-v1.js`, and static SEO/meta already live in `join/index.html`. The legacy runtime has been removed from the integration branch as a safe ownership cleanup; after the corrective deploy, retest whether the top gap disappears. If it remains, treat it as an independent layout defect rather than retroactively claiming the legacy runtime was the cause.
+Do not assume root cause from the screenshot alone. A legacy `/script.js` ownership question was investigated, but removal is not considered a proven safe fix because historical contracts indicate storage-guard/compatibility coupling. Any integration-only removal must be reverted or otherwise excluded until canonical persistence ownership is proven independently. Treat the top gap as its own observed layout defect until retested after an evidence-backed corrective change.
 
-The consent banner itself is not classified as a responsive defect; it intentionally occupies the lower viewport until the user chooses an analytics-consent option.
+Observed inside an actual DC-9 question on mobile:
+- long scene copy wrapped correctly;
+- quote/highlight treatment remained within the viewport;
+- answer choices A–D rendered in one column;
+- chosen answer stayed visibly selected;
+- progression button remained available without horizontal clipping.
+
+Classification: **LIVE PASS** for the observed mobile DC-9 inner question/answer flow.
+
+UX note: skipping without an answer is already blocked by the canonical scene owner. However, fast tapping can create a short moment of uncertainty between answer selection and reaction/continue state. Classify as **UX POLISH / NEXT RESULT**, not as a flow blocker: preserve immediate selected-state feedback and consider a lightweight `выбрано / можно продолжать` cue rather than a new modal system.
+
+A timed `ПОДДЕРЖАТЬ ДЕГРАДАЦИЮ` prompt appeared during active DC-9 completion on mobile. Classification: **BUG CURRENT RESULT / CONTEXTUAL INTRUSION**. Support mechanics may remain elsewhere, but the timed support prompt should not interrupt active `/join/*` assessment flow.
+
+The consent banner itself is not classified as a responsive defect; it intentionally occupies the lower viewport until the user chooses an analytics-consent option. Consent UX must preserve equally simple acceptance and refusal; any future wording polish belongs outside the current membership semantics.
+
+### Guest 9/9 → Result → Application boundary
+The user completed DC-9 as a guest in the live browser session and reached the result page with `9 / 9` and a complete map.
+Observed:
+- all nine spheres completed;
+- `/join/result/` rendered the completed map;
+- the `05 / ДАЛЬШЕ` block offered `ВСТУПИТЬ В КЛУБ`;
+- that action reached canonical `/join/apply/`;
+- Application correctly required Google authentication before submission.
+
+The account available in that browser session was not controlled by the user, so the user intentionally did not complete Google login/application submission from that specific guest run.
+
+Classification:
+- **LIVE PASS** for guest DC-9 completion, 9/9 result, Join CTA and canonical Application auth boundary;
+- **ACCEPTED / LOW RISK — MANUAL POST-LOGIN HANDOFF NOT REPEATED FOR THIS GUEST SESSION** for attaching this exact guest completion to an account and submitting Application.
+
+This is not mislabeled as a manual LIVE PASS. Acceptance is based on the combination of: existing green auth/application contracts, prior real Google auth live evidence, previously verified live DB immutable-baseline functions/trigger, and the user's explicit decision not to repeat the account-specific handoff for this guest session. No additional user action is required for this item in the current QA pass unless new contradictory evidence appears.
 
 ### Owner/Admin System Tests A3
 The read-only owner/admin test page reported `6 PASS / 1 FAIL`; only `A3 MEMBERSHIP APPLICATION` failed because `authenticated_insert_policy_present=false`.
@@ -173,20 +203,28 @@ Investigation against live Supabase shows this is a stale QA assertion, not a Me
 Classification: **QA TOOL DEFECT / STALE ASSERTION**, non-blocking for the product flow. Do not create a direct INSERT policy merely to turn A3 green. Reconcile the test assertion during QA-tool cleanup/G8 or in the smallest safe regression-maintenance change.
 
 ## Required sequential live retest
-Do not close G7 from deploy success alone. Continue in one sequence:
-1. Board root/child navigation including QA-MEM-033;
-2. first Artifact spotlight without false activation;
-3. Safari/public + private Google login entry points as needed to confirm combined auth convergence;
-4. mobile DC-9 inner question/answer flow at phone width;
-5. immutable first-complete DC-9 baseline → repeat → Application snapshot behavior;
-6. live route/canonical/SEO integrity;
-7. regression confirmation for My Activity, My Artifacts and Board drag.
+Do not close G7 from deploy success alone. Remaining sequence after the accepted 9/9 boundary:
+1. live route/canonical/SEO integrity;
+2. targeted regression confirmation where needed for the corrective-batch surfaces;
+3. corrective batch for only evidenced live defects;
+4. QA ledger reconciliation and G8 cleanup.
+
+Already accepted/covered in this pass and not requiring another manual account run unless new contradictory evidence appears:
+- Board slot/geometry;
+- Artifact open/close and canonical destination, with return-context bug separately queued;
+- guest Header/login/logout and Member → Board;
+- owner/admin + Review surfaces;
+- mobile Application geometry;
+- mobile DC-9 inner question flow;
+- guest DC-9 9/9 result → Application auth boundary;
+- historical My Activity / My Artifacts / Board drag persistence evidence.
 
 ## Deferred / decision-required
 Remain outside this technical batch unless explicitly decided:
 - unlimited owner/admin/system-card publication;
 - QA-MEM-004 historical course repeat-state product decision;
 - final DC-9 onboarding/result/application copy and visual polish;
+- answer-selection micro-feedback polish;
 - compatibility-route deletion and old implicit/hash auth-preboot removal — G8 cleanup after live evidence;
 - **post-QA Workspace navigation redesign:** move the current left Workspace sidebar/menu to a top navigation surface after G7/G8, preserving the same canonical Workspace shell ownership, role-aware items, identity ownership and route semantics. This is a NEXT RESULT / design-shell change, not part of the current QA bugfix batch and must not create a second simultaneous menu system.
 
@@ -194,4 +232,4 @@ Remain outside this technical batch unless explicitly decided:
 `deploy #35 → sequential live QA → corrective batch for only evidenced live defects → reconcile canonical QA ledger → close/reclassify remaining P0/P1 → G8 cleanup → only then close this Result and open the separate pre-advertising content/visual Result.`
 
 ## Gate
-Current gate remains **G7_RELEASE**. The production artifact is deployed, but the Result is not yet `DONE`, `VALIDATED`, or closed until sequential live evidence is complete.
+Current gate remains **G7_RELEASE**. The production artifact is deployed, but the Result is not yet `DONE`, `VALIDATED`, or closed until corrective evidence and remaining route/SEO checks are complete.
