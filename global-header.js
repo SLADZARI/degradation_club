@@ -110,7 +110,7 @@
 
     const renderIdentity=({name,avatar,member})=>{
       header.dataset.dcHeaderAuth=member?'member':'authenticated';
-      if(joinCta)joinCta.hidden=false;
+      if(joinCta)joinCta.hidden=Boolean(member);
       if(!service)return;
       service.replaceChildren();
       const anchor=document.createElement('a');
