@@ -60,6 +60,12 @@ jobs:
       - name: Run integrated v0.8 iPhone smoke
         if: github.ref_name == 'experiment/dementor-lab-integrated-v0.8'
         run: DEMENTOR_LAB_URL=http://127.0.0.1:4173 node tests/portrait-v08-browser-smoke.mjs
+      - name: Run integrated v0.8 six-way browser matrix
+        if: github.ref_name == 'experiment/dementor-lab-integrated-v0.8'
+        run: DEMENTOR_LAB_URL=http://127.0.0.1:4173 node tests/portrait-v08-six-way-browser.mjs
+      - name: Run integrated v0.8 quantitative UX gate
+        if: github.ref_name == 'experiment/dementor-lab-integrated-v0.8'
+        run: DEMENTOR_LAB_URL=http://127.0.0.1:4173 node tests/portrait-v08-ux-browser.mjs
       - name: Run legacy iPhone-sized browser smoke
         if: github.ref_name != 'experiment/dementor-lab-integrated-v0.8'
         run: DEMENTOR_LAB_URL=http://127.0.0.1:4173 node tests/browser-smoke.mjs
