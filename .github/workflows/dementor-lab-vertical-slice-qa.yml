@@ -5,6 +5,7 @@ on:
     branches:
       - agent/dementor-lab-vertical-slice-v0.3
       - experiment/dementor-lab-intent-saliency-v0.5
+      - experiment/dementor-lab-integrated-v0.8
     paths:
       - 'dementor-lab/**'
       - '.github/workflows/dementor-lab-vertical-slice-qa.yml'
@@ -56,5 +57,9 @@ jobs:
           done
           cat /tmp/dementor-lab-http.log
           exit 1
-      - name: Run iPhone-sized browser smoke
+      - name: Run integrated v0.8 iPhone smoke
+        if: github.ref_name == 'experiment/dementor-lab-integrated-v0.8'
+        run: DEMENTOR_LAB_URL=http://127.0.0.1:4173 node tests/portrait-v08-browser-smoke.mjs
+      - name: Run legacy iPhone-sized browser smoke
+        if: github.ref_name != 'experiment/dementor-lab-integrated-v0.8'
         run: DEMENTOR_LAB_URL=http://127.0.0.1:4173 node tests/browser-smoke.mjs
