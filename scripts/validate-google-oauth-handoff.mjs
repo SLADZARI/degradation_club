@@ -9,7 +9,7 @@ const errors=[];
 const expect=(ok,message)=>{if(!ok)errors.push(message)};
 
 const artifact=path.join(process.cwd(),'_site');
-for(const [rel,label] of [['global-header.js','GlobalHeader'],['community-runtime-v1.js','Community runtime'],['workspace/workspace.js','Workspace guest gate'],['workspace/owner-admin-gate-v1.js','Owner-admin gate'],['workspace/review/review.js','Membership Review gate']]){
+for(const [rel,label] of [['global-header.js','GlobalHeader'],['community-runtime-v1.js','Community runtime'],['workspace/workspace.js','Workspace guest gate'],['workspace/owner-admin-gate-v1.js','Owner-admin gate'],['workspace/review/review.js','Membership Review gate'],['required-auth-v1.js','Required-auth gate']]){
   const file=path.join(artifact,rel);
   expect(fs.existsSync(file),`${label}: built auth owner missing: ${rel}`);
   if(fs.existsSync(file)){
