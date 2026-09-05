@@ -95,6 +95,36 @@ Observed evidence:
 
 Classification: **LIVE PASS** for the Board slot control / occupied-state discoverability check. Archive/remove mutation was intentionally not used during this observation.
 
+### Artifact detail return behavior
+User opened an Artifact from the live Board and returned successfully.
+Observed:
+- Artifact detail opens and closes normally;
+- canonical Workspace Board destination works;
+- return loses the previous Board viewport/scroll context and lands at the Board's initial/top state.
+
+Classification: **BUG CURRENT RESULT / NAVIGATION-STATE PRESERVATION**.
+Corrective integration work is prepared so Board-origin navigation can use browser history and preserve the previous Board context, with `/workspace/board/` retained as direct-entry fallback. Do not deploy separately; include in the post-live corrective batch.
+
+### Public Header / auth states
+Authenticated Member public Header:
+- identity/avatar → Workspace is visible and works;
+- no duplicate public header observed;
+- Member does not retain the `Вступить в клуб` CTA after auth resolution, consistent with active-Member entry to Workspace/Board.
+
+A separate visual defect was observed when returning from Workspace/Board to the public site: before auth/membership resolution, the guest CTA can flash briefly and then disappear.
+Classification: **BUG CURRENT RESULT / AUTH-STATE FLASH**.
+Corrective integration CSS hides auth-dependent Header controls only while `data-dc-header-auth="checking"`; final guest/authenticated/member semantics are unchanged.
+
+### Guest Header + login flow
+User live-tested the public site without an existing session.
+Observed:
+- guest Header displayed `Вступить в клуб` + `Войти`;
+- Google login completed successfully;
+- after authentication as an active Member, flow returned into the authenticated club surface/Board as expected;
+- logout/exit also worked in the observed flow.
+
+Classification: **LIVE PASS** for guest Header, Google login handoff and ordinary Member post-login routing.
+
 ### Owner/Admin System Tests A3
 The read-only owner/admin test page reported `6 PASS / 1 FAIL`; only `A3 MEMBERSHIP APPLICATION` failed because `authenticated_insert_policy_present=false`.
 
@@ -109,17 +139,14 @@ Classification: **QA TOOL DEFECT / STALE ASSERTION**, non-blocking for the produ
 
 ## Required sequential live retest
 Do not close G7 from deploy success alone. Continue in one sequence:
-1. Artifact detail canonical Board/Join destinations;
-2. public Header guest/authenticated/member identity states;
-3. Workspace guest boundary and ordinary Member default → Board;
-4. Board root/child navigation including QA-MEM-033;
-5. first Artifact spotlight without false activation;
-6. owner-admin geometry and Review access, without unapproved unlimited publication;
-7. Safari/public + private Google login entry points as needed to confirm combined auth convergence;
-8. mobile Join/DC-9 and Application at phone widths;
-9. immutable first-complete DC-9 baseline → repeat → Application snapshot behavior;
-10. live route/canonical/SEO integrity;
-11. regression confirmation for My Activity, My Artifacts and Board drag.
+1. Board root/child navigation including QA-MEM-033;
+2. first Artifact spotlight without false activation;
+3. owner-admin geometry and Review access, without unapproved unlimited publication;
+4. Safari/public + private Google login entry points as needed to confirm combined auth convergence;
+5. mobile Join/DC-9 and Application at phone widths;
+6. immutable first-complete DC-9 baseline → repeat → Application snapshot behavior;
+7. live route/canonical/SEO integrity;
+8. regression confirmation for My Activity, My Artifacts and Board drag.
 
 ## Deferred / decision-required
 Remain outside this technical batch unless explicitly decided:
@@ -129,7 +156,7 @@ Remain outside this technical batch unless explicitly decided:
 - compatibility-route deletion and old implicit/hash auth-preboot removal — G8 cleanup after live evidence.
 
 ## Closure path
-`deploy #35 → sequential live QA → reconcile canonical QA ledger → close/reclassify remaining P0/P1 → G8 cleanup → only then close this Result and open the separate pre-advertising content/visual Result.`
+`deploy #35 → sequential live QA → corrective batch for only evidenced live defects → reconcile canonical QA ledger → close/reclassify remaining P0/P1 → G8 cleanup → only then close this Result and open the separate pre-advertising content/visual Result.`
 
 ## Gate
 Current gate remains **G7_RELEASE**. The production artifact is deployed, but the Result is not yet `DONE`, `VALIDATED`, or closed until sequential live evidence is complete.
