@@ -24,7 +24,7 @@ export const DIRECT_ANSWER_OPPONENT_GRAPH=Object.freeze({id:'direct-answer-oppon
 export function createDirectAnswerActors({playerGraph,playerName='Гена',opponentName='Марта'}={}){
   if(!playerGraph)throw new Error('playerGraph required');
   return {
-    A:createCharacter({id:'A',name:String(playerName||'').trim()||'Гена',graph:playerGraph,state:{energy:72,brain:15,tension:10,contact:60,memory:{}}}),
-    B:createCharacter({id:'B',name:opponentName,graph:DIRECT_ANSWER_OPPONENT_GRAPH,state:{energy:78,brain:12,tension:14,contact:62,memory:{}}})
+    A:createCharacter({id:'A',name:String(playerName||'').trim()||'Гена',graph:playerGraph,state:{energy:72,brain:15,tension:10,contact:70,memory:{}}}),
+    B:createCharacter({id:'B',name:opponentName,graph:DIRECT_ANSWER_OPPONENT_GRAPH,state:{energy:78,brain:12,tension:14,contact:72,memory:{}}})
   };
 }
