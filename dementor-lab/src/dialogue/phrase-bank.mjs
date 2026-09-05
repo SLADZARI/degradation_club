@@ -43,30 +43,52 @@ export const PHRASE_BANK=Object.freeze({
 
 const EXTREME=Object.freeze({
   explain:Object.freeze({
-    understand:'Подожди. Кажется, я {{understood}}, что именно тебе здесь не нравится.',
-    resentment:'Я уже не первый раз пытаюсь объяснить одно и то же.',
-    overheat:'Нет. Подожди. Я ещё раз объясню, потому что сейчас мы вообще разъехались.',
-    lowContact:'Я вижу, что разговор уже разваливается. Скажу только главное.'
+    beunderstood:Object.freeze([
+      'Нет, подожди. Я хочу, чтобы ты понял именно этот кусок.',
+      'Секунду. Я, кажется, ещё не донёс самое главное.',
+      'Я слышу «понял», но подозреваю, что понял ты пока не всё.',
+      'Есть ещё один маленький нюанс размером с половину разговора.'
+    ]),
+    understand:Object.freeze([
+      'Подожди. Кажется, я {{understood}}, что именно тебе здесь не нравится.',
+      'Кажется, я наконец {{understood}}, где мы разъехались.',
+      'Так. Похоже, я {{understood}}, что ты всё это время пытался сказать.'
+    ]),
+    resentment:Object.freeze([
+      'Я уже не первый раз пытаюсь объяснить одно и то же.',
+      'Мы снова здесь. Отлично. Тогда ещё раз.',
+      'Я сейчас повторюсь, потому что прошлые повторы, очевидно, были недостаточно убедительны.'
+    ]),
+    overheat:Object.freeze([
+      'Нет. Подожди. Я ещё раз объясню, потому что сейчас мы вообще разъехались.',
+      'Стоп. Сейчас всё соберу в одну мысль. Возможно, в последнюю.',
+      'Я уже почти киплю, но нюанс всё ещё жив. Значит, продолжаем.'
+    ]),
+    lowContact:Object.freeze([
+      'Я вижу, что разговор уже разваливается. Скажу только главное.',
+      'Кажется, мы почти перестали разговаривать. Ещё одна фраза — и всё.',
+      'Контакт уже на выходе. Поэтому коротко: вот что я пытаюсь сказать.'
+    ])
   }),
   agree:Object.freeze({
-    overheat:'Да. Хорошо. Всё. Здесь {{agree}}.',
-    lowContact:'{{Agree}}. Дальше спорить об этом не буду.',
-    resentment:'Ладно. Этот пункт принимаю, хотя мне это сейчас даётся тяжело.'
+    overheat:Object.freeze(['Да. Хорошо. Всё. Здесь {{agree}}.','Ладно. Этот пункт снимаю, пока мы оба ещё функционируем.']),
+    lowContact:Object.freeze(['{{Agree}}. Дальше спорить об этом не буду.','Хорошо. Здесь остановимся.']),
+    resentment:Object.freeze(['Ладно. Этот пункт принимаю, хотя мне это сейчас даётся тяжело.','Хорошо. Запишем редкий исторический момент: я это принимаю.'])
   }),
   joke:Object.freeze({
-    overheat:'Прекрасно. Мозг уже кипит, зато чувство юмора ещё формально живо.',
-    lowContact:'Ладно. Пока мы окончательно не разошлись — пусть будет хотя бы шутка.',
-    resentment:'Отлично. Теперь ещё и обижаться можно организованно.'
+    overheat:Object.freeze(['Прекрасно. Мозг уже кипит, зато чувство юмора ещё формально живо.','Хорошо. Если мы не договоримся, хотя бы мем получится.']),
+    lowContact:Object.freeze(['Ладно. Пока мы окончательно не разошлись — пусть будет хотя бы шутка.','Контакта почти нет, но сарказм пока держится.']),
+    resentment:Object.freeze(['Отлично. Теперь ещё и обижаться можно организованно.','Прекрасно. Значит, обида у нас уже командная.'])
   }),
   silent:Object.freeze({
-    overheat:'…',
-    lowContact:'…',
-    resentment:'Понятно.'
+    overheat:Object.freeze(['…','Так. Я лучше сейчас промолчу.']),
+    lowContact:Object.freeze(['…','Понятно. Дальше без меня.']),
+    resentment:Object.freeze(['Понятно.','Да-да. Конечно.'])
   }),
   pressure:Object.freeze({
-    overheat:'Нет. Сейчас отвечай прямо. Без ещё одного круга.',
-    lowContact:'Ответь один раз прямо, и на этом закончим.',
-    resentment:'Нет. После всего этого я всё-таки хочу услышать прямой ответ.'
+    overheat:Object.freeze(['Нет. Сейчас отвечай прямо. Без ещё одного круга.','Стоп. Один прямой ответ. Сейчас.']),
+    lowContact:Object.freeze(['Ответь один раз прямо, и на этом закончим.','Контакт уже почти умер. Поэтому просто ответь.']),
+    resentment:Object.freeze(['Нет. После всего этого я всё-таки хочу услышать прямой ответ.','Нет, теперь уже ответь. Мы слишком далеко зашли, чтобы красиво уйти.'])
   })
 });
 
@@ -93,12 +115,19 @@ function contextKey({reaction,impulse,scenario,state={},memory={},recentTranscri
   const trust=Math.min(5,memoryValue(memory,'trust'));
   return [reaction,impulse||'',scenario?.id||'',brainBand,tensionBand,contactBand,resentment,trust,recentKey(recentTranscript),turn].join('~');
 }
-function contextualReplacement({reaction,impulse,state={},memory={}}){
+function pickVariant(value,context){
+  if(!value)return null;
+  if(!Array.isArray(value))return value;
+  return value[stableHash(contextKey(context))%value.length];
+}
+function contextualReplacement({reaction,impulse,state={},memory={},...rest}){
   const set=EXTREME[reaction];if(!set)return null;
-  if(Number(state.brain)>=85||Number(state.tension)>=80)return set.overheat||null;
-  if(Number(state.contact)<=25)return set.lowContact||null;
-  if(memoryValue(memory,'resentment')>=3)return set.resentment||null;
-  if(reaction==='explain'&&impulse==='understand'&&Number(state.contact)>=40)return set.understand||null;
+  const ctx={reaction,impulse,state,memory,...rest};
+  if(Number(state.brain)>=85||Number(state.tension)>=80)return pickVariant(set.overheat,ctx);
+  if(Number(state.contact)<=25)return pickVariant(set.lowContact,ctx);
+  if(memoryValue(memory,'resentment')>=3)return pickVariant(set.resentment,ctx);
+  if(reaction==='explain'&&impulse==='beunderstood'&&Number(state.contact)>=35)return pickVariant(set.beunderstood,ctx);
+  if(reaction==='explain'&&impulse==='understand'&&Number(state.contact)>=40)return pickVariant(set.understand,ctx);
   return null;
 }
 
