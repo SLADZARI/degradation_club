@@ -45,7 +45,7 @@ async function context(mode='guest'){
   return c;
 }
 
-// WebKit proxy for the reported Safari-only public login hang.
+// WebKit proxy for the reported Safari-only public login failure.
 // At the mobile Safari-sized viewport the service login is intentionally inside the closed burger.
 {
   const c=await context('guest'),p=await c.newPage(),pageErrors=[];p.on('pageerror',e=>pageErrors.push(e.message));
@@ -64,6 +64,7 @@ async function context(mode='guest'){
     expect(oauth?.provider==='google','WebKit public login: provider is not Google');
     expect(redirect.pathname==='/auth/callback/','WebKit public login: callback route drifted');
     expect(redirect.searchParams.get('next')==='/workspace/','WebKit public login: callback next is not Workspace');
+    expect(oauth?.options?.queryParams?.prompt==='select_account','WebKit public login: Google account chooser is not explicitly requested');
   }catch(error){errors.push(`WebKit public login did not start cleanly: ${error.message}`)}
   expect(!pageErrors.length,`WebKit public login page errors: ${pageErrors.join(' | ')}`);await c.close();
 }
@@ -86,4 +87,4 @@ async function context(mode='guest'){
 
 await browser.close();await new Promise(resolve=>server.close(resolve));
 if(errors.length){console.error('WEBKIT AUTH REGRESSION BLOCKED');for(const error of errors)console.error(`- ${error}`);process.exit(1)}
-console.log('WebKit auth regression PASS: mobile public Google start + PKCE callback escape + authenticated identity state');
+console.log('WebKit auth regression PASS: mobile Google start + explicit account chooser + PKCE callback escape + authenticated identity state');

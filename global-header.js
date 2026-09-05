@@ -30,8 +30,6 @@
         </div>
       </nav>`;
 
-    // The public club header is canonical across both public pages and Workspace.
-    // Workspace adds its own internal sidebar below it; it does not replace the site header.
     document.querySelectorAll('header.topbar,header.dc-global-header').forEach(node=>node.remove());
     const header=document.createElement('header');
     header.className='dc-global-header';
@@ -89,7 +87,13 @@
     const login=async()=>{
       const client=await getClient();
       const callback=location.origin+'/auth/callback/?next='+encodeURIComponent('/workspace/');
-      const {error}=await client.auth.signInWithOAuth({provider:'google',options:{redirectTo:callback}});
+      const {error}=await client.auth.signInWithOAuth({
+        provider:'google',
+        options:{
+          redirectTo:callback,
+          queryParams:{prompt:'select_account'}
+        }
+      });
       if(error)throw error;
     };
 
@@ -127,8 +131,6 @@
 
       const metadataName=text(user.user_metadata?.full_name)||text(user.user_metadata?.name)||text(user.email?.split('@')[0])||'Участник';
       const metadataAvatar=text(user.user_metadata?.avatar_url)||text(user.user_metadata?.picture)||'';
-      // Identity is a projection of the authenticated session and must not wait for
-      // optional profile/membership relation reads on every public page.
       renderIdentity({name:metadataName,avatar:metadataAvatar,member:false});
 
       const client=await getClient();
