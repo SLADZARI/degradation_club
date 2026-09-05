@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>DEMENTOR LAB — Vertical Slice v0.5 legacy</title>
+  <meta name="theme-color" content="#e7ff18">
+  <link rel="stylesheet" href="./styles.css"><link rel="stylesheet" href="./replay.css"><link rel="stylesheet" href="./mobile-readability.css"><link rel="stylesheet" href="./character.css"><link rel="stylesheet" href="./opponent.css"><link rel="stylesheet" href="./setup.css"><link rel="stylesheet" href="./result.css"><link rel="stylesheet" href="./brain.css"><link rel="stylesheet" href="./add-node-picker.css"><link rel="stylesheet" href="./brain-stack.css"><link rel="stylesheet" href="./brain-card-hierarchy.css"><link rel="stylesheet" href="./brain-geometry.css"><link rel="stylesheet" href="./talk-causality.css"><link rel="stylesheet" href="./delta-feedback.css">
+</head>
+<body>
+<main id="app" class="app" data-screen="person">
+<header class="topbar"><strong>DEMENTOR LAB</strong><span id="top-status">PERSON</span></header>
+<section class="screen" data-view="person">
+  <div class="hero-copy"><p class="kicker">PERSON</p><h1>СОБЕРИ ХАРАКТЕР.</h1><p>Внешность ничего не обещает. Мозг соберём отдельно.</p></div>
+  <label class="person-name-field"><span>ИМЯ ПЕРСОНАЖА</span><input id="player-name" type="text" maxlength="24" autocomplete="name" placeholder="КАК ТЕБЯ ЗОВУТ?" aria-label="Имя персонажа"></label>
+  <div class="segmented character-switch" aria-label="Выбор тела персонажа"><button data-character="character-01" class="active">ПЕРСОНАЖ 01</button><button data-character="character-02">ПЕРСОНАЖ 02</button></div>
+  <div class="person-stage"><div class="character-slot big" id="person-preview" aria-label="Собранный Дементор"></div><div class="person-stage-tools"><button type="button" id="random-outfit" aria-label="Случайная одежда" title="Случайная одежда">↻</button><button type="button" id="appearance-reset" aria-label="Сбросить обвес" title="Сбросить обвес">×</button></div></div>
+  <div class="appearance-panel" aria-label="Категории внешности"><button data-part="hat" class="active">УБОР</button><button data-appearance-group="accessories" class="active">АКСЕССУАРЫ</button><button data-part="beard" class="active">БОРОДА</button><button data-part="outfit" class="active">ОДЕЖДА</button></div>
+  <div id="variant-options" class="variant-options" hidden aria-label="Варианты выбранной категории"></div>
+  <button class="primary person-next" id="to-brain">СОБРАТЬ ЕМУ МОЗГ →</button>
+</section>
+<section class="screen brain-screen" data-view="brain" hidden>
+  <div class="section-head"><p class="kicker">BRAIN</p><h2 id="brain-title">СОБЕРИ ЕМУ ПРИЧИНУ.</h2><p class="brain-intro">НАЧНИ С ГОТОВОЙ КАТАСТРОФЫ ИЛИ СОБЕРИ СВОЮ.</p></div>
+  <div id="replay-note" class="replay-note" hidden>ТОТ ЖЕ ЭКСПЕРИМЕНТ. ИЗМЕНИ ОДНУ ПРИЧИНУ.</div>
+  <div id="brain-presets" class="brain-presets" aria-label="Поведенческие пресеты"></div>
+  <div id="brain-validation" class="brain-validation" aria-live="polite" hidden></div>
+  <div id="brain-graph" class="brain-graph brain-constructor" aria-label="Конструктор графа поведения"></div>
+  <button type="button" id="brain-add-node" class="brain-add-node-bottom">+ ДОБАВИТЬ УЗЕЛ</button>
+  <button class="primary" id="to-setup">ОБ ЛЮДЕЙ ПРОВЕРИМ →</button>
+</section>
+<section class="screen setup-screen" data-view="setup" hidden><div class="sheet-card setup-card">
+  <p class="kicker">ЭКСПЕРИМЕНТ</p>
+  <div class="segmented scenario-switch" aria-label="Выбор эксперимента"><button data-scenario="contact" class="active">СОХРАНИТЬ КОНТАКТ</button><button data-scenario="direct-answer">ДОБИТЬСЯ ОТВЕТА</button></div>
+  <div class="setup-situation"><small>СИТУАЦИЯ</small><h2 id="scenario-title">—</h2><p class="lead" id="scenario-premise">—</p></div>
+  <div class="setup-stakes"><div class="setup-goal"><small>ТВОЯ ЗАДАЧА</small><strong id="scenario-objective">—</strong></div><div class="setup-loss"><small>ПРОИГРАЕШЬ, ЕСЛИ</small><strong id="scenario-end">—</strong></div></div>
+  <div id="opponent-card" class="opponent-card"><div id="opponent-preview" class="character-slot opponent-preview" aria-label="Соперник"></div><div class="opponent-head"><span class="kicker">СОПЕРНИК</span><small id="opponent-seed"></small></div><strong id="opponent-name">—</strong><b id="opponent-preset">—</b><p id="opponent-description">—</p><button id="reroll-opponent" class="secondary-reset">ДРУГОГО →</button></div>
+  <div class="setup-launch"><div><small>ТЕМП</small><div class="segmented setup-mode"><button data-mode="auto" class="active">AUTO</button><button data-mode="step">STEP</button></div></div><button class="primary" id="play">НАЧАТЬ ЭКСПЕРИМЕНТ →</button></div>
+</div></section>
+<section class="screen talk" data-view="talk" hidden><div class="talk-record"><b id="talk-scenario-title">—</b><span id="talk-objective">—</span></div><div class="arena"><div class="actor actor-a"><div class="character-slot small" id="actor-a" aria-label="Игрок"></div><strong id="actor-a-name">—</strong></div><div class="turn"><span>TURN</span><b id="turn">0</b></div><div class="actor actor-b"><div class="character-slot small" id="actor-b" aria-label="Соперник"></div><strong id="actor-b-name">СОПЕРНИК</strong></div></div><div id="metrics" class="metrics"></div><div id="dialogue" class="dialogue"><p class="empty">Никто ещё ничего не сказал.</p></div><button type="button" id="talk-tech-toggle" class="talk-tech-toggle" aria-expanded="false">ПОЧЕМУ ТАК? +</button><div id="talk-tech" class="talk-tech" hidden><div id="talk-cause" class="talk-cause empty" aria-live="polite"><span>ПОСЛЕ РЕПЛИКИ ЗДЕСЬ БУДЕТ ВИДНО, ЧТО ОНА ЗАПУСТИЛА.</span></div><div id="delta" class="delta" aria-live="polite"></div><button id="trace-btn" class="trace-inside">ТЕХНИЧЕСКИЙ TRACE →</button></div><div class="talk-actions"><button id="next-turn" class="primary">NEXT TURN →</button></div></section>
+<section class="screen" data-view="result" hidden><div class="result-card"><p class="kicker">RESULT</p><h2 id="result-title">ЭКСПЕРИМЕНТ ЗАКОНЧИЛСЯ.</h2><div class="result-block"><small>ЧТО ПРОИЗОШЛО</small><strong id="result-cause"></strong></div><div class="result-block"><small>ЧТО ТЫ ДЕЛАЛ</small><strong id="result-arc"></strong></div><div class="result-block result-repair"><small>ЧТО ПОПРОБОВАТЬ ПОЧИНИТЬ</small><strong id="result-node"></strong></div><div id="comparison" class="comparison" hidden></div><button class="primary" id="rerun">ПОЧИНИТЬ МОЗГ →</button></div></section>
+<nav class="bottom-nav"><button data-nav="person" class="active">PERSON</button><button data-nav="brain">BRAIN</button><button data-nav="talk">TALK</button></nav><div id="overlay" class="overlay" hidden></div>
+</main><script type="module" src="./src/ui/app.mjs"></script></body></html>
