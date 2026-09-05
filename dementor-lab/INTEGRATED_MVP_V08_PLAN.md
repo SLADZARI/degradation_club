@@ -8,16 +8,16 @@ Base: `experiment/dementor-lab-intent-saliency-v0.5`
 
 Unify the freshest deterministic encounter runtime with the portrait-first story flow. v0.8 is the first branch where the player-facing choices must be causally honest: selected brain preset, objective, HOT PATCH and rerun must all change the real ExecutionTrace rather than presentation-only state.
 
-## P0 sequence
+## P0 sequence — current status
 
-1. Port portrait/story flow from v0.7 onto this branch without changing encounter balance.
-2. Make the integrated runtime path canonical for v0.8: Graph → Impulse → Intent → Reaction → salient WorldEvent → next Trigger.
-3. Add three real BRAIN presets as real graphs, not labels.
-4. Bind CASE objective and HOT PATCH to the real Encounter; HOT PATCH edits exactly one cause and recomputes the pending turn / rerun.
-5. Build RESULT and BEFORE/AFTER only from ExecutionTrace / Result objects. No authored counts or metrics may contradict the trace.
-6. Add deterministic phrase saliency with recent-use penalty; add passive BRAIN voice as a semantic, non-causal trace event.
-7. Persist completed runs and reruns to localStorage and render Archive from those records.
-8. Add mass deterministic smoke simulation and a first-time-player UX gate.
+1. **IN PROGRESS** — Portrait/story flow is now represented by `prototypes/portrait-flow-v0.8.html` and is connected to the real controller/runtime. It still needs final parity with all v0.7 onboarding/presentation details.
+2. **IMPLEMENTED FOR v0.8 PATH** — `runtime-integrated.mjs` promotes Graph → Impulse → Intent → Reaction → salient WorldEvent → next Trigger into the controller path and emits semantic trace events.
+3. **IMPLEMENTED** — Three real player graphs: `EXPLAIN_LOOP`, `KEEP_PEACE`, `PRESS_FOR_ANSWER`.
+4. **IMPLEMENTED CORE / UI NEEDS POLISH** — CASE objective changes real scenario objective. HOT PATCH uses real `applyHotPatch`; counterfactual rerun recreates the same config and mutates exactly one graph cause. Non-REPEAT patch UX still needs generalized presentation.
+5. **IMPLEMENTED DATA CONTRACT** — `trace-summary.mjs` and existing `buildResult()` derive counts/metrics from real traces; v0.8 portrait result uses these runtime objects. Remove any remaining authored/demo result text before MVP label.
+6. **IMPLEMENTED FIRST PASS** — deterministic phrase recent-use penalty via `phrase-saliency.mjs`; passive BRAIN voice emitted as non-causal semantic trace event.
+7. **IMPLEMENTED FIRST PASS** — completed encounters serialize into `localStorage` via `archive/run-store.mjs`; portrait Archive renders stored runs. Archive detail UI still needs completion.
+8. **AUTOMATION IMPLEMENTED / EXECUTION PENDING** — `tests/mvp-mass-smoke.mjs` runs 1000 deterministic encounters and checks bounds/distinct preset traces. `FIRST_TIME_PLAYER_GATE_v0.8.md` defines the outsider test. A real outsider playtest is still required.
 
 ## MVP invariants
 
@@ -30,22 +30,29 @@ Unify the freshest deterministic encounter runtime with the portrait-first story
 - First successful playthrough must not require opening the advanced BRAIN editor.
 - TALK defaults to portrait + dialogue + BRAIN + CONTACT; technical diagnostics remain secondary.
 
-## Existing pieces already present on the v0.5 base
+## Current v0.8 implementation map
 
-- pure Encounter runtime and ExecutionTrace;
-- deterministic graph path selection;
-- pending REPEAT and cancellation behavior;
-- predictive HOT PATCH breakpoint;
-- objective-aware terminal logic;
-- Intent derivation experiment;
-- deterministic WorldEvent saliency experiment;
-- trust / resentment memory effects;
-- deterministic contextual phrase bank;
-- VerticalSliceController already importing `runtime-v05.mjs`.
+- `src/encounter/runtime-integrated.mjs` — integrated semantic runtime path + passive brain voice.
+- `src/brain/player-presets.mjs` — three real player BehaviorGraphs.
+- `src/scenarios/criticism-idea.mjs` — objective + player preset binding.
+- `src/dialogue/phrase-saliency.mjs` — deterministic recent-use penalty.
+- `src/app/mvp-session.mjs` — real session, terminal run, one-change counterfactual rerun, archive save.
+- `src/encounter/trace-summary.mjs` — trace-derived BEFORE/AFTER summaries.
+- `src/archive/run-store.mjs` — localStorage archive records.
+- `prototypes/portrait-flow-v0.8.html` — portrait-first UI over the real runtime.
+- `tests/mvp-mass-smoke.mjs` — 1000-run deterministic smoke.
+- `FIRST_TIME_PLAYER_GATE_v0.8.md` — no-coaching MVP UX gate.
 
 ## Integration warning
 
-The portrait v0.7 branch and intent/saliency v0.5 branch diverged. Do not merge v0.7 wholesale over the runtime. Port only the UX/story surfaces and then connect them to the v0.8 controller/runtime contracts.
+The portrait v0.7 branch and intent/saliency v0.5 branch diverged. Do not merge v0.7 wholesale over the runtime. Port only missing UX/story surfaces and keep v0.8 connected to the integrated contracts above.
+
+## Remaining before first MVP label
+
+1. Run the complete automated suite including `npm run test:mvp-smoke` and fix any regression.
+2. Finish portrait v0.7 parity: name/identity onboarding, emotion projection polish, archive detail, cleaner HOT PATCH for non-repeat causes.
+3. Verify every RESULT statement against ExecutionTrace in browser playthroughs.
+4. Run one outsider first-time-player test using `FIRST_TIME_PLAYER_GATE_v0.8.md`.
 
 ## Acceptance gate for first MVP
 
