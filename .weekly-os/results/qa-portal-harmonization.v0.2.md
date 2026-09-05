@@ -19,7 +19,7 @@ supersedes: 0.1
 Bring the current Dementor Club portal through pre-advertising QA while progressively harmonizing implementation with the project kernel and approved local operating rules, without duplicate UI/navigation/auth/domain systems or silent semantic mutation.
 
 ## Status
-**ACTIVE / G7_RELEASE / LIVE DB MIGRATED + CORRECTED / CORRECTIVE DEPLOY #34 PASS / REAL SAFARI GOOGLE AUTH PASS / LIVE RETEST CONTINUES**
+**ACTIVE / G7_RELEASE / LIVE DB MIGRATED + CORRECTED / CORRECTIVE DEPLOY #34 PASS / REAL SAFARI GOOGLE AUTH + LOGOUT/RELOGIN PASS / LIVE RETEST CONTINUES**
 
 Implementation branch: `result/qa-portal-harmonization`  
 Current release branch: `release/qa-portal-harmonization-v02-auth1`  
@@ -147,7 +147,20 @@ Real Safari human retest after deploy #34:
 - ordinary Member landed on `COMMUNITY BOARD` inside the canonical private Workspace shell;
 - visible Workspace logout control is present.
 
-Therefore the previously failing real-Safari Google auth criterion is now **LIVE PASS** for deployed production commit `723c5404...`.
+Live Supabase Auth logs independently confirm the successful Safari PKCE sequence:
+- `/authorize` → 302;
+- Google provider `/callback` → 302;
+- PKCE `/token` → 200;
+- `/user` → 200.
+
+The same live log stream then records a full logout/recovery sequence for the same account:
+- `/logout` → 204 at 12:48:25Z;
+- new Google `/authorize` → 302 at 12:48:27Z;
+- provider `/callback` → 302 at 12:48:32Z;
+- PKCE `/token` → 200 at 12:48:32Z;
+- `/user` → 200 at 12:48:33Z.
+
+Therefore both the previously failing real-Safari Google auth criterion and logout → repeated Google login recovery are now **LIVE PASS** for deployed production commit `723c5404...`.
 
 ## Current release boundary
 `commit ≠ merge ≠ deploy ≠ live-validated`.
@@ -157,18 +170,18 @@ Current facts:
 - corrective production commit `723c5404...`: **DEPLOYED** by run #34;
 - corrective deploy build + Pages deployment: **PASS**;
 - real Safari Google login/callback: **LIVE PASS**;
-- Workspace authenticated landing / ordinary Member → Community Board: **LIVE PASS for this observed session**;
+- Safari logout → repeated Google login recovery: **LIVE PASS**;
+- Workspace authenticated landing / ordinary Member → Community Board: **LIVE PASS for observed sessions**;
 - logout control presence: **VISIBLE**;
-- logout → Google login recovery: **PENDING**;
 - broader post-audit live-convergence inventory: **PENDING / IN PROGRESS**.
 
 ## Remaining live acceptance criteria
 Retest sequentially:
 1. ~~real Safari Google login must show account choice and complete PKCE callback~~ — **PASS after deploy #34**;
-2. logout in Workspace → Google login recovery;
+2. ~~logout in Workspace → Google login recovery~~ — **PASS from live Auth logs after deploy #34**;
 3. public Header guest/authenticated/member states;
 4. authenticated private Workspace shell and guest boundary;
-5. ordinary Member default → Community Board — **PASS for current Safari session; keep broader route/state verification**;
+5. ordinary Member default → Community Board — **PASS for observed Safari sessions; keep broader route/state verification**;
 6. Board root/child navigation including QA-MEM-033;
 7. first Artifact spotlight without false activation;
 8. My Activity response/reaction/Artifact projection;
@@ -184,6 +197,6 @@ The broader post-audit live-convergence inventory remains required after the acc
 ## Next gate
 Current gate remains **G7_RELEASE**.
 
-Next action: perform Safari logout → repeated Google login recovery, then continue the full live-convergence audit and reconcile the canonical QA ledger from live evidence.
+Next action: continue the live sequential Workspace/Board pass, then the broader live-convergence audit and canonical QA-ledger reconciliation.
 
 Do not mark this Result `DONE`, `VALIDATED`, `RELEASED` or move to G8 until the remaining live evidence and convergence findings are resolved.
