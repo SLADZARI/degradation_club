@@ -46,6 +46,8 @@ jobs:
           npx playwright install --with-deps chromium webkit
       - name: Validate browser shell and Workspace recovery
         run: node scripts/validate-browser-shell.mjs
+      - name: Validate My Artifacts history
+        run: node scripts/validate-artifact-history.mjs
       - name: Validate WebKit auth regression
         run: node scripts/validate-webkit-auth.mjs
       - name: Validate production route manifest
