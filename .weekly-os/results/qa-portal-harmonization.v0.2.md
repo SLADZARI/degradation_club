@@ -19,10 +19,10 @@ supersedes: 0.1
 Bring the current Dementor Club portal through pre-advertising QA while progressively harmonizing implementation with the project kernel and approved local operating rules, without duplicate UI/navigation/auth/domain systems or silent semantic mutation.
 
 ## Status
-**ACTIVE / G7_RELEASE / PRODUCTION MERGED / NOT DEPLOYED / LIVE DB UNCHANGED**
+**ACTIVE / G7_RELEASE / LIVE DB MIGRATED + CORRECTED / PRODUCTION MERGED / PAGES DEPLOY DISPATCH PENDING**
 
 Implementation branch: `result/qa-portal-harmonization`  
-Release branch: `release/qa-portal-harmonization-v02`  
+Release branch: `release/qa-portal-harmonization-v02-fix1`  
 Production branch: `dementor-club-production`
 
 ## Authority / protected boundaries
@@ -49,61 +49,105 @@ All related implementation stayed inside one active Result/integration branch an
 
 Source-backed no-op: current `/join/` already opens directly on the nine-sphere picker and runtime defaults to `renderPicker()`; no redundant pre-DC-9 confirmation/start owner remains, so no parallel fix was introduced.
 
-## Clean production candidate evidence
-Current production baseline before this release candidate:
+## Original clean production candidate evidence
+Current production baseline before the original release candidate:
 `337f5bc5ad92a1e18ab49dfafc093a23ec4542ac`.
 
 Important baseline fact: production already contained Batch 05 plus the earlier PR #95 transfer via PR #96, both not deployed. The v0.2 release therefore did **not** blind-merge `dementor-club-site` into production and did not duplicate PR #95.
 
-Release candidate:
+Original release candidate:
 - branch: `release/qa-portal-harmonization-v02`;
 - candidate commit: `e42de43fe637225bc4101095b67229bf8328d196`;
-- exactly **1 commit ahead / 0 behind / 24 whitelisted files** from the current production baseline;
+- exactly **1 commit ahead / 0 behind / 24 whitelisted files** from the then-current production baseline;
 - production PR: **#105**;
-- full Production Release Readiness: **run #739 PASS**.
+- full Production Release Readiness: **run #739 PASS**;
+- merged production commit: `1f383f2c2fe020ce8839286ab56ee29436dbf569`.
 
-Run #739 passed:
-- registry/routes/feature state;
-- content readiness;
-- visual contract;
-- DC-9 immutable baseline contract;
-- production build;
-- analytics + consent guard;
-- canonical shell ownership;
-- built-JS syntax;
-- Chromium Workspace/browser regression;
-- My Artifacts active/archive regression;
-- WebKit auth regression;
-- route manifest;
-- production artifact release guard.
+Run #739 passed registry/routes/feature state, content readiness, visual contract, DC-9 immutable baseline contract, production build, analytics + consent guard, canonical shell ownership, built-JS syntax, Chromium Workspace/browser regression, My Artifacts active/archive regression, WebKit auth regression, route manifest and production artifact release guard.
 
-PR #105 merged to `dementor-club-production` as:
-`1f383f2c2fe020ce8839286ab56ee29436dbf569`.
+## G7 live release attempt and database correction — 2026-09-05
 
-## Pre-deploy verification evidence — 2026-09-05
+The user explicitly authorized the G7 live release with `деплой`.
 
-A final non-mutating G7 check confirmed:
-- current `dementor-club-production` HEAD remains `1f383f2c2fe020ce8839286ab56ee29436dbf569`;
-- that production merge commit points to tree `7eba86a036e8fe3ecd588c68accfb6dd9cdefa79`;
-- the validated release candidate `e42de43fe637225bc4101095b67229bf8328d196` points to the **same tree** `7eba86a036e8fe3ecd588c68accfb6dd9cdefa79`, so run #739 validated the exact production content tree now awaiting deployment;
-- live Supabase still has no `dc_first_complete_baseline_v1(uuid)`, no `dc_lock_join_application_baseline_v1()` and no `dc_join_application_first_baseline_v1` trigger; live DB therefore remains unchanged by this Result;
-- the canonical QA ledger §17 still contains stale pre-PR-#105 wording that says the current packages are not merged to production and that the clean production candidate is still pending. Where that wording conflicts with `PROJECT.json`, `ARTIFACT_INDEX.json`, this Result and Git evidence, it is bookkeeping debt rather than current release state. It must be reconciled from live evidence during the mandatory ledger update after release and before Result closure/G8 completion.
+Release sequence began with production SHA/schema preflight and then the validated DC-9 baseline migration was applied to live Supabase. **GitHub Pages deployment had not been started yet.**
 
-No production deployment or database mutation was performed by this verification.
+### Live migration evidence
+The first live migration was recorded by Supabase as:
+- `20260905084028_dc9_immutable_first_baseline_v1`.
+
+Post-DDL verification confirmed the baseline function, lock function and trigger existed; authenticated `assessment_runs` retained `SELECT + INSERT` but not `UPDATE/DELETE`; `anon` and `authenticated` could not execute the baseline function while `service_role` could.
+
+### Runtime defect discovered before Pages deploy
+A real PostgreSQL verification then exposed a defect that static migration validation had missed: the trigger function referenced nonexistent PostgreSQL function `jsonb_object_length(jsonb)`. This could have broken the first new Membership v2 application after release.
+
+Pages deploy was therefore **stopped before execution**. No stale/known-defective site artifact was deployed.
+
+### Corrective live migration
+A semantic-preserving corrective migration was applied immediately and recorded as:
+- `20260905084118_dc9_immutable_first_baseline_v1_fix_jsonb_key_count`.
+
+The corrected trigger counts snapshot keys using `pg_catalog.jsonb_object_keys(...)` and preserves the exact approved 9-key gate, `SPHERE_GATE_INCOMPLETE`, immutable `candidate_snapshot`, and existing answer metadata.
+
+Real live-history verification after correction:
+- 4 profiles with assessment history;
+- 3 profiles with complete first baselines;
+- all 3 complete baselines contain exactly 9 keys;
+- 2 complete baselines already have later runs/repeats after the immutable cutoff;
+- 0 malformed complete baselines.
+
+Supabase Security Advisor produced no new warning for the two new DC-9 functions. Existing unrelated legacy/public-function and archive warnings remain separate security debt.
+
+### Git/live migration-history reconciliation
+Because Supabase recorded the actual migration versions above, keeping the pre-release filename `20260904171500...` in Git would have created future migration-history drift.
+
+The active Result therefore reconciled Git to live history without changing product semantics:
+- canonical first migration renamed/aligned to `20260905084028...`;
+- corrective migration `20260905084118...` added separately, preserving actual migration history;
+- old pre-live migration timestamp removed;
+- `validate-dc9-baseline-contract.mjs` extended to require the corrective migration and reject the invalid key-count call.
+
+Integration PR **#106** merged to `dementor-club-site` as `6856baf23bc8a10e7c72ba31ee32fd05f89d745c` after full G6 **#745 PASS**.
+
+### Corrected clean production candidate
+A new clean release branch was created from the then-current production HEAD:
+`release/qa-portal-harmonization-v02-fix1`.
+
+Production compare was **0 behind** and contained only:
+- `scripts/validate-dc9-baseline-contract.mjs` update;
+- migration timestamp alignment recognized by GitHub as a rename;
+- one corrective migration.
+
+Production PR **#107** passed full Production Release Readiness **#747 PASS**, including DC-9 corrective migration contract, build, analytics, canonical shell, Chromium, My Artifacts, WebKit auth, route manifest and release guard.
+
+PR #107 merged to `dementor-club-production` as:
+`25dc061e292f79c996d2346c6d51fddc5245b642`.
+
+Current production tree:
+`0b5817431f1cfcebc9998802c86a31d20fa4f826`.
 
 ## Current release boundary
 `commit ≠ merge ≠ deploy`.
 
-The production branch now contains the validated v0.2 candidate, but **live production is still unchanged** because no deploy was triggered.
+Current facts:
+- live Supabase baseline migration: **APPLIED**;
+- live Supabase corrective migration: **APPLIED + VERIFIED**;
+- corrected production code: **MERGED** at `25dc061e292f79c996d2346c6d51fddc5245b642`;
+- corrected production readiness: **#747 PASS**;
+- GitHub Pages production deploy: **NOT STARTED**.
 
-The migration `supabase/migrations/20260904171500_dc9_immutable_first_baseline_v1.sql` is present in production code but is **NOT applied to live Supabase**.
+The user has already explicitly authorized this exact release. No additional semantic/product decision is required before Pages deployment.
 
-No live database mutation and no GitHub Pages deployment may occur without explicit user authorization.
+The remaining execution blocker is tooling capability: the connected GitHub toolset exposes repository writes, PR merge, Actions reads and reruns, but does not expose the `workflow_dispatch` action required by `.github/workflows/deploy-pages.yml`. Do not substitute a temporary trigger, old-run rerun, workflow mutation, or alternate hosting path merely to bypass that boundary.
+
+Required manual dispatch parameters for the existing canonical workflow:
+- workflow: `Deploy Dementor Production`;
+- branch: `dementor-club-production`;
+- `release_confirmation = APPROVED`.
 
 ## Acceptance criteria state
-Implementation/G6 criteria are satisfied for the current technical cluster. Result is not complete until post-release live evidence exists for the relevant surfaces.
+Implementation/G6 and live-DB release criteria are satisfied for the current technical cluster. Result is not complete until Pages deployment succeeds and post-release live evidence exists for the relevant surfaces.
 
-Required live retest after an explicitly authorized release:
+Required live retest after Pages deployment:
 - real Safari Google auth/callback;
 - DC-9 first baseline → repeat → application snapshot;
 - public Header/auth-aware states;
@@ -119,13 +163,13 @@ Required live retest after an explicitly authorized release:
 - live route/canonical/SEO integrity.
 
 ## Next gate
-Current gate: **G7_RELEASE**.
+Current gate remains **G7_RELEASE**.
 
-Next action requires explicit user authorization for the live release steps. If authorized, sequence is:
-1. apply the validated Supabase baseline migration;
-2. deploy current `dementor-club-production` through the existing manual production workflow;
+Next execution sequence:
+1. manually dispatch canonical `Deploy Dementor Production` from `dementor-club-production` with `release_confirmation = APPROVED`;
+2. verify the deployment workflow completes successfully and that deployed content corresponds to production commit `25dc061e292f79c996d2346c6d51fddc5245b642`;
 3. perform live sequential retest;
 4. update the canonical QA ledger from evidence, including removal of stale §17 pre-release wording;
 5. move to G8 cleanup only after live results are known.
 
-Until that authorization, stop before live DB mutation and deploy.
+Do not mark this Result `DONE`, `VALIDATED`, `RELEASED` or `PRODUCTION READY` until the required live evidence exists.
