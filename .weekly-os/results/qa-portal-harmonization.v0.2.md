@@ -19,12 +19,13 @@ supersedes: 0.1
 Bring the current Dementor Club portal through pre-advertising QA while progressively harmonizing implementation with the project kernel and approved local operating rules, without duplicate UI/navigation/auth/domain systems or silent semantic mutation.
 
 ## Status
-**ACTIVE / G7_RELEASE / LIVE DB MIGRATED + CORRECTED / CORRECTIVE DEPLOY #34 PASS / REAL SAFARI GOOGLE AUTH + LOGOUT/RELOGIN PASS / MY ACTIVITY + MY ARTIFACTS LIVE PASS / LIVE RETEST CONTINUES**
+**ACTIVE / G7_RELEASE / LIVE DB MIGRATED + CORRECTED / DEPLOY #34 LIVE / SAFARI AUTH + LOGOUT/RELOGIN PASS / MY ACTIVITY + MY ARTIFACTS + BOARD DRAG LIVE PASS / BOARD SLOT DISCOVERABILITY PRODUCTION MERGED / NOT DEPLOYED**
 
 Implementation branch: `result/qa-portal-harmonization`  
-Current release branch: `release/qa-portal-harmonization-v02-auth1`  
+Current release branch: `release/qa-portal-harmonization-v02-board1`  
 Production branch: `dementor-club-production`  
-Current deployed production HEAD: `723c5404d28530ae9805a76c4442daa0b6bedfcb`
+Current production HEAD: `96d16391a60f8e400ff07f90f3d6a864fb861776`  
+Current live deployed HEAD: `723c5404d28530ae9805a76c4442daa0b6bedfcb`
 
 ## Authority / protected boundaries
 - Workspace-specific approved authority: `operations/WORKSPACE_MEMBER_ACTIVATION_AND_SHELL_V1.md`.
@@ -34,6 +35,7 @@ Current deployed production HEAD: `723c5404d28530ae9805a76c4442daa0b6bedfcb`
 - First complete DC-9 baseline is immutable; repeat attempts remain separate history.
 - No new universal Activity entity/table is authorized; My Activity is a projection of existing canonical data.
 - Public login remains owned by canonical `global-header.js`; PKCE callback remains `/auth/callback/`; logout remains owned by Workspace.
+- Artifact creation remains owned by the existing Board slot/composer flow; admin role does not silently imply unlimited publication or a second composer.
 - MP_DSL v0.1 remains global DRAFT/REFERENCE; only explicitly approved Dementor Club local operating rules apply.
 
 ## Implemented coherent packages before first release
@@ -181,18 +183,48 @@ Human live screenshots on 2026-09-05 confirm the two history/projection surfaces
 
 User also reports both surfaces operate normally after the logout/relogin cycle. This closes the live acceptance criteria for **My Activity response/reaction/Artifact projection** and **My Artifacts active + archived history including archived `гусь`**.
 
+## Live Board evidence + Artifact slot discoverability correction
+Human live Board testing on deployed `723c5404...` confirmed:
+- the spatial Board renders and can be panned/zoomed;
+- the user moved the active Artifact card `Куда двигаемся - народ?`;
+- live database evidence after the move shows updated persisted coordinates and `moved_at`, so Board drag/reposition persistence is **LIVE PASS**.
+
+The same test exposed a current-Result discoverability bug: neither the ordinary Member view nor the owner/admin view made the Artifact creation/slot path obvious from the spatial Board controls.
+
+Authority/runtime inventory showed that backend semantics are correct and no new publication owner is needed:
+- the tested profile has **1 Artifact slot granted and 1 slot consuming** because `Куда двигаемся - народ?` is active;
+- therefore a second Artifact must not be created until the current slot is freed by archiving/removing the active Artifact;
+- `community/board/board.js` already owns the canonical `entrySection`, occupied-slot management and existing composer;
+- admin role does not currently grant an unlimited parallel publication path. Adding a separate admin/system-card publisher would change product/role meaning and is **DECISION REQUIRED**, not a bugfix.
+
+The bug was classified **BUG CURRENT RESULT / discoverability** and fixed by extending the existing spatial owner only:
+- `＋ АРТЕФАКТ` when a slot is free;
+- `SLOT ЗАНЯТ` when the slot is consumed;
+- `SLOT НЕТ` otherwise;
+- clicking the slot control routes to the existing canonical `entrySection` / composer-management surface;
+- no second composer, new table, role bypass or membership semantic was introduced.
+
+Implementation PR #110 changed exactly `community/board/board-spatial-v1.js`. G6 run #751 initially hit an isolated WebKit timing failure (`/workspace/` had not completed the second hop to `/workspace/board/` within the test timeout) while Chromium and live Safari remained healthy. The same unchanged candidate was rerun and **#751 PASS** completely, confirming timing flake rather than Board/auth regression. PR #110 then merged to `dementor-club-site` as `804b31884f02d70a0ad093e59a8adc2f11c9c4a4`.
+
+A clean release branch `release/qa-portal-harmonization-v02-board1` was created directly from production `723c5404...` and contains **1 commit ahead / 0 behind / 1 changed file**. Production PR #111 passed full Production Release Readiness **#753 PASS** and merged to `dementor-club-production` as:
+`96d16391a60f8e400ff07f90f3d6a864fb861776`.
+
+This new production HEAD is **NOT DEPLOYED**. Existing live site remains deploy #34 / `723c5404...` until a new explicit user `деплой` authorization.
+
 ## Current release boundary
 `commit ≠ merge ≠ deploy ≠ live-validated`.
 
 Current facts:
 - live DB migrations: **APPLIED + VERIFIED**;
-- corrective production commit `723c5404...`: **DEPLOYED** by run #34;
-- corrective deploy build + Pages deployment: **PASS**;
+- current live deployed commit `723c5404...`: **DEPLOYED** by run #34;
 - real Safari Google login/callback: **LIVE PASS**;
 - Safari logout → repeated Google login recovery: **LIVE PASS**;
 - Workspace authenticated landing / ordinary Member → Community Board: **LIVE PASS for observed sessions**;
 - My Activity participation projection: **LIVE PASS**;
 - My Artifacts active + archive history including `гусь`: **LIVE PASS**;
+- Board spatial drag/reposition persistence: **LIVE PASS**;
+- Board slot discoverability correction: **G6 #751 PASS + production readiness #753 PASS + merged** as `96d16391...`;
+- current production HEAD `96d16391...`: **NOT DEPLOYED**;
 - broader post-audit live-convergence inventory: **PENDING / IN PROGRESS**.
 
 ## Remaining live acceptance criteria
@@ -206,8 +238,8 @@ Retest sequentially:
 7. first Artifact spotlight without false activation;
 8. ~~My Activity response/reaction/Artifact projection~~ — **LIVE PASS from human screenshot**;
 9. ~~My Artifacts active + archived history including archived `гусь`~~ — **LIVE PASS from human screenshot**;
-10. Board spatial behavior / drag-reposition;
-11. owner-admin geometry;
+10. ~~Board spatial behavior / drag-reposition~~ — **LIVE PASS with persisted DB coordinates**;
+11. owner-admin geometry; unlimited admin publication remains a separate **DECISION REQUIRED** if desired;
 12. mobile Join/Application surfaces;
 13. DC-9 first baseline → repeat → Application snapshot;
 14. live route/canonical/SEO integrity.
@@ -217,6 +249,6 @@ The broader post-audit live-convergence inventory remains required after the acc
 ## Next gate
 Current gate remains **G7_RELEASE**.
 
-Next action: continue the live sequential Board pass: root/child navigation including QA-MEM-033, then spatial drag/reposition, followed by remaining shell/mobile/DC-9/route checks and canonical QA-ledger reconciliation.
+Next action: obtain explicit authorization to deploy production commit `96d16391a60f8e400ff07f90f3d6a864fb861776`; after deployment, live-retest the new Board slot control and existing occupied/free composer flow, then continue root/child navigation, shell/mobile/DC-9/route checks and canonical QA-ledger reconciliation.
 
 Do not mark this Result `DONE`, `VALIDATED`, `RELEASED` or move to G8 until the remaining live evidence and convergence findings are resolved.
