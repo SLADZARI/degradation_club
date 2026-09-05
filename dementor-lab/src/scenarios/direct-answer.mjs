@@ -3,13 +3,13 @@ import { createCharacter } from '../encounter/runtime.mjs';
 export const DIRECT_ANSWER_SCENARIO=Object.freeze({
   id:'direct-answer',
   title:'НЕУДОБНЫЙ ВОПРОС',
-  premise:'Собеседник уходит от прямого ответа. Тебе нужна его реальная позиция.',
+  premise:'Марта уже дважды ответила не совсем на тот вопрос. Тебе всё ещё нужна её реальная позиция.',
   topic:'Собеседник уходит от прямого ответа.',
   objective:'direct-answer',
-  objectiveLabel:'ПОЛУЧИТЬ ПРЯМОЙ ОТВЕТ',
-  objectiveRules:Object.freeze({requiredOpponentCounterpoints:4,minRelationshipContact:50}),
+  objectiveLabel:'ДОБИТЬСЯ ОТВЕТА',
+  objectiveRules:Object.freeze({requiredOpponentCounterpoints:3,minRelationshipContact:25}),
   openingTrigger:'criticism',
-  turnLimit:16
+  turnLimit:18
 });
 
 const nodes=[
@@ -19,6 +19,7 @@ const nodes=[
   {id:'d-deflection',type:'deflection',p:{}},
   {id:'d-ignore',type:'ignore',p:{}},
   {id:'d-underpressure',type:'underpressure',p:{}},
+  {id:'d-answer-impulse',type:'beunderstood',p:{weight:4}},
   {id:'d-explain',type:'explain',p:{}},
   {id:'d-joke',type:'joke',p:{}},
   {id:'d-silent',type:'silent',p:{}},
@@ -26,7 +27,8 @@ const nodes=[
 ];
 const edges=[
   {id:'d-e0',from:'d-open',to:'d-joke'},
-  {id:'d-e1',from:'d-pushback',to:'d-explain'},
+  {id:'d-e1',from:'d-pushback',to:'d-answer-impulse'},
+  {id:'d-e1b',from:'d-answer-impulse',to:'d-explain'},
   {id:'d-e2',from:'d-acceptance',to:'d-silent'},
   {id:'d-e3',from:'d-deflection',to:'d-joke'},
   {id:'d-e4',from:'d-ignore',to:'d-silent'},
