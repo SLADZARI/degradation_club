@@ -1,4 +1,4 @@
-import {DC_SPHERES,esc,getClient,currentSession,loginWithGoogle,syncLocalAssessmentRuns,readSphereResults,getEntryStatus,errorMessage,route} from '/community-runtime-v1.js';
+import {DC_SPHERES,esc,getClient,currentSession,syncLocalAssessmentRuns,readSphereResults,getEntryStatus,errorMessage,route} from '/community-runtime-v1.js';
 import {DC9_LEVEL_NAMES,DC9_RESULT_MODEL,presentationProminence} from '/join/result/result-model-v2.js';
 
 const byId=new Map(DC9_RESULT_MODEL.map(x=>[x.id,x]));
@@ -39,7 +39,6 @@ function clampScore(value){if(value===null||value===undefined||value==='')return
 function point(cx,cy,r,index,total){const a=(-Math.PI/2)+(Math.PI*2*index/total);return[cx+Math.cos(a)*r,cy+Math.sin(a)*r]}
 function polygonPoints(cx,cy,r,total,scale=1){return Array.from({length:total},(_,i)=>point(cx,cy,r*scale,i,total).join(',')).join(' ')}
 function action(label,href,{primary=false,id=''}={}){return `<a ${id?`id="${id}"`:''} class="dc-result-action${primary?' primary':''}" href="${esc(href)}">${esc(label)}</a>`}
-function button(label,id,{primary=false}={}){return `<button class="dc-result-action${primary?' primary':''}" type="button" id="${id}">${esc(label)}</button>`}
 
 function levelFromWeightedAverage(avg){
   const t=SCORING_V09.thresholds;
@@ -172,10 +171,11 @@ async function boot(){
   const items=DC_SPHERES.map(([id,title],index)=>itemFromResult(id,title,index,results[id]));
   const state=renderAll(items);
   if(!state.done){communityState.textContent='КАРТА НЕ ЗАВЕРШЕНА';nextTitle.innerHTML='СНАЧАЛА 9 / 9.';nextCopy.textContent=`Сейчас готово ${state.completed.length} из 9 сфер.`;nextActions.innerHTML=action('ПРОДОЛЖИТЬ DC-9',route('/join/'),{primary:true});return}
-  if(!session){communityState.textContent=state.allFive?'9 / 9 · ГОТОВ':'НУЖНА АВТОРИЗАЦИЯ';nextTitle.innerHTML=state.allFive?'К ДЕМЕНТОРСТВУ ГОТОВ.<br>ЗАКРЕПИМ ЭТО.':'КАРТА ГОТОВА.<br>ЗАКРЕПИМ ЕЁ.';nextCopy.textContent=state.allFive?'Девять из девяти. Войдите, чтобы сохранить карту и продолжить в клуб.':'Войдите через Google, чтобы сохранить результаты и продолжить.';nextActions.innerHTML=button(state.allFive?'ВОЙТИ И ВСТУПИТЬ →':'ВОЙТИ И ПРОДОЛЖИТЬ →','resultLogin',{primary:true});document.getElementById('resultLogin').onclick=async event=>{const el=event.currentTarget;el.disabled=true;try{if(!client)client=getClient();await loginWithGoogle('/join/result/',client)}catch(error){el.disabled=false;nextCopy.textContent=errorMessage(error)}};return}
-  const status=await getEntryStatus(client);
-  if(status.membership_active){communityState.textContent=status.community_activation_state==='MEMBER_ACTIVATED'?'MEMBER ACTIVATED':'MEMBER ACTIVE';nextTitle.innerHTML=status.community_activation_state==='MEMBER_ACTIVATED'?'ВЫ УЖЕ ВНУТРИ.':'КАРТА ГОТОВА.<br>МОЖНО ВНУТРЬ.';nextCopy.textContent=status.community_activation_state==='MEMBER_ACTIVATED'?'Возвращайтесь к общей доске клуба.':'Следующий шаг — первый Artifact на общей доске.';nextActions.innerHTML=action('ОТКРЫТЬ COMMUNITY BOARD →',route('/community/board/'),{primary:true})}
-  else if(state.allFive){communityState.textContent='9 / 9 · ПОКАЗАНО ДЕМЕНТОРСТВО';nextTitle.innerHTML='К ДЕМЕНТОРСТВУ ГОТОВ.<br>СРОЧНО В КЛУБ.';nextCopy.textContent='Девять из девяти. Дальнейшая диагностика не требуется.';nextActions.innerHTML=action('ВСТУПИТЬ В КЛУБ →',route('/join/member/'),{primary:true})}
-  else{communityState.textContent='9 / 9';nextTitle.innerHTML='КАРТА ГОТОВА.<br>ДАЛЬШЕ — ПО ЖЕЛАНИЮ.';nextCopy.textContent='Карта ничего не назначает и никуда не зачисляет. Если хочется продолжить — можно оформить участие и зайти в клуб.';nextActions.innerHTML=action('ВСТУПИТЬ В КЛУБ →',route('/join/member/'),{primary:true})}
+  if(session){
+    const status=await getEntryStatus(client);
+    if(status.membership_active){communityState.textContent=status.community_activation_state==='MEMBER_ACTIVATED'?'MEMBER ACTIVATED':'MEMBER ACTIVE';nextTitle.innerHTML=status.community_activation_state==='MEMBER_ACTIVATED'?'ВЫ УЖЕ ВНУТРИ.':'КАРТА ГОТОВА.<br>МОЖНО ВНУТРЬ.';nextCopy.textContent=status.community_activation_state==='MEMBER_ACTIVATED'?'Возвращайтесь к общей доске клуба.':'Следующий шаг — первый Artifact на общей доске.';nextActions.innerHTML=action('ОТКРЫТЬ COMMUNITY BOARD →',route('/workspace/board/'),{primary:true});return}
+  }
+  if(state.allFive){communityState.textContent='9 / 9 · ПОКАЗАНО ДЕМЕНТОРСТВО';nextTitle.innerHTML='К ДЕМЕНТОРСТВУ ГОТОВ.<br>СРОЧНО В КЛУБ.';nextCopy.textContent='Девять из девяти. Дальнейшая диагностика не требуется.';nextActions.innerHTML=action('ВСТУПИТЬ В КЛУБ →',route('/join/apply/'),{primary:true})}
+  else{communityState.textContent='9 / 9';nextTitle.innerHTML='КАРТА ГОТОВА.<br>ДАЛЬШЕ — ПО ЖЕЛАНИЮ.';nextCopy.textContent='Карта ничего не назначает и никуда не зачисляет. Если хочется продолжить — можно оформить участие и зайти в клуб.';nextActions.innerHTML=action('ВСТУПИТЬ В КЛУБ →',route('/join/apply/'),{primary:true})}
 }
 boot().catch(renderError);
