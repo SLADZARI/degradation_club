@@ -1,5 +1,5 @@
 -- Corrective migration for DC-9 immutable baseline v1.
--- PostgreSQL has jsonb_object_keys(jsonb), not jsonb_object_length(jsonb).
+-- Use PostgreSQL JSONB key enumeration for the exact snapshot-key count.
 -- Preserve the approved 9-key snapshot gate without changing semantics.
 
 create or replace function public.dc_lock_join_application_baseline_v1()
