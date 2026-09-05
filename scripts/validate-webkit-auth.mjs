@@ -7,6 +7,8 @@ const artifact=path.join(process.cwd(),'_site');
 const errors=[];
 const expect=(ok,msg)=>{if(!ok)errors.push(msg)};
 const mime={'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.js':'text/javascript; charset=utf-8','.json':'application/json; charset=utf-8','.svg':'image/svg+xml','.webp':'image/webp','.png':'image/png'};
+const headerCss=fs.readFileSync(path.join(artifact,'global-header.css'),'utf8');
+expect(headerCss.includes('[data-dc-header-auth="checking"] .dc-global-join-cta')&&headerCss.includes('[data-dc-header-auth="checking"] .dc-global-service')&&headerCss.includes('visibility:hidden'),'GlobalHeader auth checking state must suppress guest/member CTA flash before auth resolves');
 
 function resolveFile(urlPath){
   let pathname=decodeURIComponent(new URL(urlPath,'http://local').pathname);
@@ -51,6 +53,8 @@ async function context(mode='guest'){
   const c=await context('guest'),p=await c.newPage(),pageErrors=[];p.on('pageerror',e=>pageErrors.push(e.message));
   await p.goto(base+'/about/',{waitUntil:'domcontentloaded'});
   try{
+    await p.waitForFunction(()=>document.querySelector('.dc-global-header')?.dataset.dcHeaderAuth==='guest',{timeout:5000});
+    expect(await p.locator('[data-global-join-cta]').isVisible(),'WebKit guest header: Join CTA must be visible after guest state resolves');
     const menu=p.locator('.dc-global-menu');
     await menu.waitFor({state:'visible',timeout:5000});
     expect(await p.locator('#dc-global-nav:visible').count()===0,'WebKit mobile login: burger panel is open by default');
@@ -82,9 +86,11 @@ async function context(mode='guest'){
   const c=await context('member'),p=await c.newPage(),pageErrors=[];p.on('pageerror',e=>pageErrors.push(e.message));
   await p.goto(base+'/about/',{waitUntil:'domcontentloaded'});
   try{await p.locator('[data-global-identity]').waitFor({state:'attached',timeout:5000})}catch{errors.push('WebKit authenticated public header stayed stuck instead of rendering identity')}
-  expect((await p.locator('.dc-global-header').getAttribute('data-dc-header-auth').catch(()=>null))==='member','WebKit authenticated public header did not resolve member state');expect(!pageErrors.length,`WebKit authenticated header errors: ${pageErrors.join(' | ')}`);await c.close();
+  expect((await p.locator('.dc-global-header').getAttribute('data-dc-header-auth').catch(()=>null))==='member','WebKit authenticated public header did not resolve member state');
+  expect(await p.locator('[data-global-join-cta]').isHidden(),'WebKit member header: Join CTA must stay absent after member state resolves');
+  expect(!pageErrors.length,`WebKit authenticated header errors: ${pageErrors.join(' | ')}`);await c.close();
 }
 
 await browser.close();await new Promise(resolve=>server.close(resolve));
 if(errors.length){console.error('WEBKIT AUTH REGRESSION BLOCKED');for(const error of errors)console.error(`- ${error}`);process.exit(1)}
-console.log('WebKit auth regression PASS: mobile Google start + explicit account chooser + PKCE callback escape + authenticated identity state');
+console.log('WebKit auth regression PASS: hidden checking state + guest CTA/login + explicit account chooser + PKCE callback escape + member identity without Join CTA');

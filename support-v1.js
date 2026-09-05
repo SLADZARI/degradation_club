@@ -3,6 +3,8 @@
   if(document.documentElement.dataset.dcSupport==='1')return;
   document.documentElement.dataset.dcSupport='1';
 
+  const runtimePath=location.pathname.replace(/^\/degradation_club/,'');
+  const suppressTimedPrompts=runtimePath==='/join'||runtimePath.startsWith('/join/');
   const STORAGE='dc_support_session_v1';
   const state=(()=>{try{return JSON.parse(sessionStorage.getItem(STORAGE)||'{}')}catch{return{}}})();
   state.active=Number(state.active||0);state.first=!!state.first;state.second=!!state.second;state.suppressed=!!state.suppressed;
@@ -38,6 +40,10 @@
   document.addEventListener('click',e=>{if(e.target.closest('[data-dc-preorder-open],.dc-merch-cta--primary,.dc-commerce-action--primary,.object-preorder,.dc-order-submit,[data-open-preorder],[data-object-preorder]'))suppress()});
   document.addEventListener('dc:preorder-open',suppress);
 
-  setInterval(()=>{if(state.suppressed)return;if(document.visibilityState==='visible'&&document.hasFocus()){state.active+=1;if(!state.first&&state.active>=60){state.first=true;makeFirst()}if(!state.second&&state.active>=240){state.second=true;makeSecond()}save()}},1000);
+  if(!suppressTimedPrompts){
+    setInterval(()=>{if(state.suppressed)return;if(document.visibilityState==='visible'&&document.hasFocus()){state.active+=1;if(!state.first&&state.active>=60){state.first=true;makeFirst()}if(!state.second&&state.active>=240){state.second=true;makeSecond()}save()}},1000);
+  }else{
+    prompt.setAttribute('aria-hidden','true');
+  }
   syncAmount();
 })();

@@ -127,9 +127,13 @@ expect(legacyBoard.includes('/workspace/board/'),'community/board/: compatibilit
 
 const artifactDetailHtml=read('community/artifact/index.html');
 expect(artifactDetailHtml.includes('href="/workspace/board/"'),'Artifact detail: top back link must target canonical Workspace Board');
+expect(artifactDetailHtml.includes('id="artifactBackTop"'),'Artifact detail: top back link must participate in board-context restoration');
 expect(!artifactDetailHtml.includes('href="/community/board/"'),'Artifact detail: compatibility Board route survived in active detail source');
 const artifactDetailRuntime=read('community/artifact/artifact.js');
 expect(artifactDetailRuntime.includes("route('/workspace/board/')"),'Artifact detail: canonical Workspace Board destination missing');
+expect(artifactDetailRuntime.includes('document.referrer')&&artifactDetailRuntime.includes('history.back()'),'Artifact detail: return from Board must restore previous Board browsing context');
+expect(artifactDetailRuntime.includes('location.assign(BOARD_PATH)'),'Artifact detail: direct-entry fallback to canonical Board missing');
+expect(artifactDetailRuntime.includes('id="detailBack"'),'Artifact detail: runtime back control is not bound to context-preserving return');
 expect(!artifactDetailRuntime.includes("route('/community/board/')"),'Artifact detail: compatibility Board destination survived');
 expect(!artifactDetailRuntime.includes("route('/join/member/')"),'Artifact detail: legacy Join member bridge survived');
 expect(artifactDetailRuntime.includes("route('/join/')"),'Artifact detail: canonical non-member Join gate missing');
