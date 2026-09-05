@@ -19,12 +19,12 @@ supersedes: 0.1
 Bring the current Dementor Club portal through pre-advertising QA while progressively harmonizing implementation with the project kernel and approved local operating rules, without duplicate UI/navigation/auth/domain systems or silent semantic mutation.
 
 ## Status
-**ACTIVE / G7_RELEASE / LIVE DB MIGRATED + CORRECTED / DEPLOY #33 COMPLETED / REAL SAFARI AUTH FAIL / CORRECTIVE PRODUCTION MERGED / CORRECTIVE DEPLOY NOT AUTHORIZED**
+**ACTIVE / G7_RELEASE / LIVE DB MIGRATED + CORRECTED / CORRECTIVE DEPLOY #34 PASS / REAL SAFARI GOOGLE AUTH PASS / LIVE RETEST CONTINUES**
 
 Implementation branch: `result/qa-portal-harmonization`  
 Current release branch: `release/qa-portal-harmonization-v02-auth1`  
 Production branch: `dementor-club-production`  
-Current production HEAD: `723c5404d28530ae9805a76c4442daa0b6bedfcb`
+Current deployed production HEAD: `723c5404d28530ae9805a76c4442daa0b6bedfcb`
 
 ## Authority / protected boundaries
 - Workspace-specific approved authority: `operations/WORKSPACE_MEMBER_ACTIVATION_AND_SHELL_V1.md`.
@@ -96,23 +96,23 @@ This deployed production commit `25dc061e292f79c996d2346c6d51fddc5245b642` and e
 
 ## Real Safari live failure — 2026-09-05
 Real Safari human retest immediately disproved closure of the auth criterion:
-- public Google login reaches `accounts.google.com`;
-- Google responds with HTTP-style **400 malformed request** page;
-- the flow does not return to `/auth/callback/`.
+- public Google login reached `accounts.google.com`;
+- Google responded with HTTP-style **400 malformed request** page;
+- the flow did not return to `/auth/callback/`.
 
 Supabase Auth log evidence around the failed Safari attempt:
-- `/authorize` succeeds with HTTP 302 and logs `Redirecting to external provider`;
-- no corresponding Supabase `/callback` follows the failed attempt;
-- nearby auth traffic contains `refresh_token_not_found`, indicating stale browser auth-session noise;
-- historical/current Google PKCE flows on the same Supabase project have succeeded, so provider configuration is not globally dead.
+- `/authorize` succeeded with HTTP 302 and logged `Redirecting to external provider`;
+- no corresponding Supabase `/callback` followed the failed attempt;
+- nearby auth traffic contained `refresh_token_not_found`, indicating stale browser auth-session noise;
+- historical/current Google PKCE flows on the same Supabase project had succeeded, so provider configuration was not globally dead.
 
-Therefore the failure boundary is after Supabase `/authorize` and before the canonical app callback. Existing WebKit coverage was insufficient because it stubbed `signInWithOAuth` and did not inspect the real provider redirect.
+Therefore the failure boundary was after Supabase `/authorize` and before the canonical app callback. Existing WebKit coverage was insufficient because it stubbed `signInWithOAuth` and did not inspect the real provider redirect.
 
 ## Corrective Safari / Google handoff package
 The correction preserves existing auth architecture and changes no membership/DC-9 meaning.
 
 Implementation PR #108 changed exactly four files:
-- `global-header.js`: Google PKCE login now explicitly requests `queryParams: { prompt: 'select_account' }` so Google presents account selection instead of silently reusing existing Google account state;
+- `global-header.js`: Google PKCE login explicitly requests `queryParams: { prompt: 'select_account' }` so Google presents account selection instead of silently reusing existing Google account state;
 - `scripts/validate-webkit-auth.mjs`: locks the account-chooser contract;
 - `scripts/validate-google-oauth-handoff.mjs`: new release gate calls the real Supabase `/auth/v1/authorize` endpoint and verifies redirect to `accounts.google.com`, canonical Supabase provider callback, client id, code response type and `prompt=select_account`;
 - `.github/workflows/site-integrity.yml`: runs the provider-handoff gate permanently.
@@ -124,26 +124,51 @@ A clean production branch `release/qa-portal-harmonization-v02-auth1` was create
 Production PR #109 passed full Production Release Readiness **#750 PASS** and merged to `dementor-club-production` as:
 `723c5404d28530ae9805a76c4442daa0b6bedfcb`.
 
+## Corrective Pages deploy #34 and Safari live PASS
+The user explicitly authorized the corrective artifact with a new `деплой` command.
+
+Canonical `Deploy Dementor Production` run #34 (`33966550857`) completed successfully on 2026-09-05:
+- workflow definition ran from `main`;
+- checkout explicitly used `ref: dementor-club-production`;
+- `git log -1 --format=%H` inside the build resolved exactly to `723c5404d28530ae9805a76c4442daa0b6bedfcb`;
+- registry/routes/feature validation: PASS;
+- content readiness: PASS;
+- visual contract: PASS;
+- production build: PASS;
+- analytics + consent guard: PASS;
+- production release guard: PASS (`48 HTML routes`);
+- Pages artifact upload: PASS, artifact id `9969603168`, SHA256 `0e9e2694ec284fa189cce8780858a9475af64783167baa415625891569077a4c`;
+- GitHub Pages deploy: PASS.
+
+Real Safari human retest after deploy #34:
+- Google account handoff completed successfully;
+- PKCE callback returned to `dementor.club`;
+- authenticated Workspace loaded successfully;
+- ordinary Member landed on `COMMUNITY BOARD` inside the canonical private Workspace shell;
+- visible Workspace logout control is present.
+
+Therefore the previously failing real-Safari Google auth criterion is now **LIVE PASS** for deployed production commit `723c5404...`.
+
 ## Current release boundary
-`commit ≠ merge ≠ deploy`.
+`commit ≠ merge ≠ deploy ≠ live-validated`.
 
 Current facts:
 - live DB migrations: **APPLIED + VERIFIED**;
-- previous Pages deploy #33: **SUCCESS**, for production commit `25dc061e...`;
-- real Safari auth criterion: **FAIL** on that deployed build;
-- corrective implementation: **G6 #748 PASS + merged to site**;
-- corrective production candidate: **#750 PASS + merged** at `723c5404...`;
-- corrective Pages deployment: **NOT AUTHORIZED / NOT STARTED**.
-
-Do not treat the previous `деплой` authorization as authorization for this new corrective artifact. A new explicit user authorization is required before manual production deploy.
+- corrective production commit `723c5404...`: **DEPLOYED** by run #34;
+- corrective deploy build + Pages deployment: **PASS**;
+- real Safari Google login/callback: **LIVE PASS**;
+- Workspace authenticated landing / ordinary Member → Community Board: **LIVE PASS for this observed session**;
+- logout control presence: **VISIBLE**;
+- logout → Google login recovery: **PENDING**;
+- broader post-audit live-convergence inventory: **PENDING / IN PROGRESS**.
 
 ## Remaining live acceptance criteria
-After corrective deploy, retest sequentially:
-1. real Safari Google login must show account choice and complete PKCE callback;
+Retest sequentially:
+1. ~~real Safari Google login must show account choice and complete PKCE callback~~ — **PASS after deploy #34**;
 2. logout in Workspace → Google login recovery;
 3. public Header guest/authenticated/member states;
 4. authenticated private Workspace shell and guest boundary;
-5. ordinary Member default → Community Board;
+5. ordinary Member default → Community Board — **PASS for current Safari session; keep broader route/state verification**;
 6. Board root/child navigation including QA-MEM-033;
 7. first Artifact spotlight without false activation;
 8. My Activity response/reaction/Artifact projection;
@@ -159,6 +184,6 @@ The broader post-audit live-convergence inventory remains required after the acc
 ## Next gate
 Current gate remains **G7_RELEASE**.
 
-Next action: wait for explicit authorization to deploy production commit `723c5404d28530ae9805a76c4442daa0b6bedfcb`, then perform real Safari retest before continuing the full live-convergence audit.
+Next action: perform Safari logout → repeated Google login recovery, then continue the full live-convergence audit and reconcile the canonical QA ledger from live evidence.
 
-Do not mark this Result `DONE`, `VALIDATED`, `RELEASED` or move to G8 while the Safari criterion is unresolved.
+Do not mark this Result `DONE`, `VALIDATED`, `RELEASED` or move to G8 until the remaining live evidence and convergence findings are resolved.
