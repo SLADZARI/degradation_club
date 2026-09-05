@@ -43,11 +43,16 @@ function humanCause(encounter,trace,terminal){
   if(event==='COUNTERPOINT')bits.push('Тебе возразили.');
   else if(event==='ACCEPTANCE')bits.push('С тобой уже почти согласились.');
   else if(event==='DEFLECTION')bits.push('Разговор попытался сбежать в сторону.');
+  else if(event==='NO_RESPONSE')bits.push('В ответ разговор почти выключился.');
+  else if(event==='PUSHBACK')bits.push('В ответ собеседник упёрся ещё сильнее.');
   else if(event==='PRESSURE')bits.push('На тебя надавили.');
   if(types.includes('resentment'))bits.push('Обида осталась в памяти как важный документ.');
-  if(types.includes('beright'))bits.push('Дальше сработало «быть правым» — важнее, чем закончить разговор живым.');
+  if(types.includes('beright'))bits.push('Дальше желание остаться правым стало важнее, чем спокойно закончить разговор.');
+  if(types.includes('beunderstood'))bits.push('Мозг решил, что главное — любой ценой быть понятым.');
+  if(types.includes('beliked'))bits.push('Мозг выбрал сохранить расположение собеседника.');
   if(types.includes('explain'))bits.push('Следом — ещё одно объяснение.');
   if(types.includes('repeat'))bits.push('Потом то же объяснение пошло на повтор. Видимо, с первого раза реальность недостаточно внимательно слушала.');
+  if(types.includes('pause'))bits.push('В какой-то момент появилась пауза, и давление немного спало.');
   if(terminal.type==='BREAKDOWN'&&terminal.reason==='BRAIN')bits.push(`В итоге BRAIN дошёл до ${Math.round(terminal.value??encounter.actors[terminal.loser||'A'].state.brain)}. Мозг первым вышел из чата.`);
   if(terminal.type==='BREAKDOWN'&&terminal.reason==='ENERGY')bits.push('В итоге закончились силы. Аргументы остались, человека — почти нет.');
   if(terminal.type==='BREAKDOWN'&&terminal.reason==='CONTACT')bits.push('В итоге закончился контакт. Формально вы ещё разговаривали, фактически уже нет.');
@@ -62,10 +67,14 @@ function humanArc(arc,traces){
 }
 function humanSuspicion(actor,nodeId){
   const node=nodeId?nodeFor(actor,nodeId):null;if(!node)return 'Явного виновника нет. Придётся думать.';
-  if(node.type==='repeat')return `ЗАЦИКЛИЛСЯ: REPEAT ×${node.p?.count||1}.`;
-  if(node.type==='beright')return `ИМПУЛЬС «БЫТЬ ПРАВЫМ» СЛИШКОМ СИЛЬНЫЙ: W${node.p?.weight||1}.`;
+  if(node.type==='repeat')return `ПОХОЖЕ, ТЫ ПРОСТО ПОВТОРЯЕШЬ ОДНО И ТО ЖЕ СЛИШКОМ ДОЛГО.`;
+  if(node.type==='beright')return `ПОХОЖЕ, ЖЕЛАНИЕ ОСТАТЬСЯ ПРАВЫМ СТАЛО СЛИШКОМ СИЛЬНЫМ.`;
+  if(node.type==='beunderstood')return `ПОХОЖЕ, ТЕБЕ СЛИШКОМ ВАЖНО ДОБИТЬСЯ, ЧТОБЫ ТЕБЯ ПОНЯЛИ.`;
+  if(node.type==='beliked')return `ПОХОЖЕ, ТЫ СЛИШКОМ СТАРАЕШЬСЯ НЕ ИСПОРТИТЬ ОТНОШЕНИЯ.`;
+  if(node.type==='understand')return `ПОХОЖЕ, ТЫ СЛИШКОМ ДОЛГО ПЫТАЕШЬСЯ РАЗОБРАТЬСЯ, ВМЕСТО ТОГО ЧТОБЫ ДВИГАТЬ РАЗГОВОР.`;
+  if(node.type==='pause')return `ПАУЗА СИЛЬНО ИЗМЕНИЛА ТЕМП РАЗГОВОРА.`;
   if(familyOf(node)==='STATE')return `${(NODE_SPECS[node.type]?.title||node.type).toUpperCase()} ПОЕХАЛА С ТОБОЙ ДАЛЬШЕ.`;
-  return `ПРОВЕРЬ УЗЕЛ «${(NODE_SPECS[node.type]?.title||node.type).toUpperCase()}».`;
+  return `ПОСМОТРИ НА МОМЕНТ «${(NODE_SPECS[node.type]?.title||node.type).toUpperCase()}».`;
 }
 
 export function buildResult(encounter){
