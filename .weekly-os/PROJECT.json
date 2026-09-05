@@ -4,8 +4,8 @@
     "artifactId": "dementor-club.kernel.project",
     "project": "dementor-club",
     "documentType": "STANDARD",
-    "projectStage": "RELEASE",
-    "gate": "G7_RELEASE",
+    "projectStage": "BUILD",
+    "gate": "G5_BUILD",
     "status": "APPROVED",
     "version": "1.14",
     "updated": "2026-09-05",
@@ -20,15 +20,16 @@
   "canonicalRepository": "SLADZARI/degradation_club",
   "defaultBranch": "main",
   "semanticSourceBranch": "dementor-club",
-  "projectStage": "RELEASE",
-  "gate": "G7_RELEASE",
+  "projectStage": "BUILD",
+  "gate": "G5_BUILD",
   "readFirst": [
     ".weekly-os/PROJECT.json",
     ".weekly-os/ARTIFACT_INDEX.json",
     ".weekly-os/APPROVED_STATE.json",
-    ".weekly-os/results/qa-portal-harmonization.v0.6.md",
+    ".weekly-os/results/workspace-top-navigation.v0.1.md",
     "operations/WORKSPACE_MEMBER_ACTIVATION_AND_SHELL_V1.md",
     "operations/MEMBERSHIP_V2_PRODUCTION_FLOW_QA_2026-09-02.md",
+    ".weekly-os/results/qa-portal-harmonization.v1.0.md",
     "README.md",
     "operations/IDENTITY_MEMBERSHIP_AND_ENTITY_BOUNDARY_V0.2.md",
     "operations/DEMENTOR_ENTITY_MAP_AND_WORKSPACE_MODULES_V0.1.md",
@@ -79,17 +80,17 @@
     "DESIGN": null
   },
   "currentResult": {
-    "artifactId": "dementor-club.result.qa-portal-harmonization",
-    "version": "0.6",
+    "artifactId": "dementor-club.result.workspace-top-navigation",
+    "version": "0.1",
     "status": "DRAFT",
-    "path": ".weekly-os/results/qa-portal-harmonization.v0.6.md",
-    "gate": "G7_RELEASE",
-    "productionCommit": "326e24debf8696b3c12ddbcef45b8e1615efb11d",
-    "productionDeployed": true,
-    "liveDatabaseMigrationApplied": true
+    "path": ".weekly-os/results/workspace-top-navigation.v0.1.md",
+    "gate": "G5_BUILD",
+    "productionCommit": null,
+    "productionDeployed": false,
+    "liveDatabaseMigrationApplied": false
   },
-  "activeIntegrationBranch": "result/qa-portal-harmonization",
-  "activeReleaseBranch": "release/qa-portal-harmonization-v04-corrective1",
+  "activeIntegrationBranch": "result/workspace-top-navigation",
+  "activeReleaseBranch": null,
   "reportPath": "operations/MEMBERSHIP_V2_PRODUCTION_FLOW_QA_2026-09-02.md",
   "completedResults": [
     {
@@ -98,6 +99,13 @@
       "status": "APPROVED",
       "integrationPullRequest": 84,
       "integrationCommit": "4648024f7b7adc52e66dab56da686934d89b95c5"
+    },
+    {
+      "artifactId": "dementor-club.result.qa-portal-harmonization",
+      "version": "1.0",
+      "status": "APPROVED",
+      "productionCommit": "326e24debf8696b3c12ddbcef45b8e1615efb11d",
+      "productionDeployRun": 36
     }
   ],
   "legacyWeeklyOs": {
