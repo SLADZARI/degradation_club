@@ -4,8 +4,9 @@ import { recommendOneCausePatch } from '../src/app/hot-patch-strategy.mjs';
 import { portraitEmotion } from '../src/render/portrait-state.mjs';
 
 const explain=createMvpSession({playerPresetId:'EXPLAIN_LOOP',objective:'contact'});
-let out=null,safety=0;while(!explain.controller.encounter.result&&safety++<30){out=explain.controller.next();if(out?.breakpoint)break}
-assert.equal(Boolean(out?.breakpoint),true,'EXPLAIN_LOOP should reach a patchable breakpoint');
+explain.controller.encounter.actors.A.state.brain=85;
+const out=explain.controller.next();
+assert.equal(Boolean(out?.breakpoint),true,'high-brain EXPLAIN_LOOP should expose a patchable breakpoint before commit');
 const repeatPatch=recommendOneCausePatch(explain.controller.encounter,out.breakpoint);
 assert.equal(repeatPatch?.kind,'reduce-repeat');
 assert.equal(repeatPatch?.after,1);
