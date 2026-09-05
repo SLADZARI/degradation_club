@@ -6,7 +6,7 @@ projectStage: BUILD
 gate: G5_BUILD
 status: DRAFT
 version: 0.2
-updated: 2026-09-04
+updated: 2026-09-05
 owner: Modern Pilgrims
 sourceSystem: GIT
 authorityType: IMPLEMENTATION_AUTHORITY
@@ -80,7 +80,7 @@ Canonical decision authority for the Workspace-specific change:
 7. Workspace logo returns to `/`; public landing navigation is not simultaneously rendered as Workspace primary navigation.
 8. First-entry spotlight reuses existing Artifact slot/gate and `Пропустить` does not mutate semantic state.
 9. Member responses/reactions/Artifacts have visible confirmation/history through My Activity or the existing canonical projection owner.
-10. Relevant browser regression covers first-entry Member, activated Member, authenticated non-member, Dementor and owner-admin on desktop/mobile.
+10. Relevant browser regression covers first-entry Member, activated Member, authenticated non-member, Dementor and owner-admin on desktop/mobile, with WebKit auth coverage for Safari-sensitive login/callback paths.
 11. Critical routes remain canonical and no dead legacy destination is reintroduced.
 12. No unresolved P0/P1 issue included in a release candidate remains without explicit deferral/decision.
 13. Production candidate is built from current production authority using the established safe release method while branch divergence remains unresolved.
@@ -107,9 +107,19 @@ No new canonical domain entity is authorized by this Result.
 - compare/diff evidence;
 - static/build validation;
 - browser regression evidence across Member/non-member/role states;
+- WebKit proxy evidence for Safari-sensitive auth paths plus real Safari live retest after release;
 - production candidate release-readiness evidence;
 - live human retest after explicit deployment;
 - cleanup/lineage record after release.
+
+## Current G6 Evidence
+- PR #102 `Community participation → My Activity projection`: G6 run #732 PASS; merged to `dementor-club-site` as `9adef4a6691e88a63030f2925bfbc004ebdc93a6`.
+- PR #103 `WebKit auth regression gate`: first run #734 failed because the mobile-sized test attempted to click the service login while the canonical burger was closed. This was classified as a test interaction defect; no auth runtime mutation was made.
+- PR #103 corrected run #735 PASS across registry/routes, content, visual contract, DC-9 baseline, production build, analytics, canonical shell, built-JS syntax, Chromium browser regression, WebKit auth regression, route manifest and production artifact release gate.
+- PR #103 merged to `dementor-club-site` as `0fa400b6708328e3602b0eb59bed789bd9e60e85`.
+- `result/qa-portal-harmonization` is synchronized to that site merge commit.
+- WebKit PASS is browser-engine regression evidence, not a claim that the reported live Safari issue is closed. Real Safari production retest remains required after explicit release.
+- No production branch, live Supabase state or deployment was changed by PR #102/#103.
 
 ## Production Impact
 No new production impact until a separately authorized G7 deployment of this v0.2 scope occurs.
