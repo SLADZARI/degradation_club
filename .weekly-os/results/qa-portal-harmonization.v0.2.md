@@ -19,7 +19,7 @@ supersedes: 0.1
 Bring the current Dementor Club portal through pre-advertising QA while progressively harmonizing implementation with the project kernel and approved local operating rules, without duplicate UI/navigation/auth/domain systems or silent semantic mutation.
 
 ## Status
-**ACTIVE / G7_RELEASE / LIVE DB MIGRATED + CORRECTED / CORRECTIVE DEPLOY #34 PASS / REAL SAFARI GOOGLE AUTH + LOGOUT/RELOGIN PASS / LIVE RETEST CONTINUES**
+**ACTIVE / G7_RELEASE / LIVE DB MIGRATED + CORRECTED / CORRECTIVE DEPLOY #34 PASS / REAL SAFARI GOOGLE AUTH + LOGOUT/RELOGIN PASS / MY ACTIVITY + MY ARTIFACTS LIVE PASS / LIVE RETEST CONTINUES**
 
 Implementation branch: `result/qa-portal-harmonization`  
 Current release branch: `release/qa-portal-harmonization-v02-auth1`  
@@ -162,6 +162,25 @@ The same live log stream then records a full logout/recovery sequence for the sa
 
 Therefore both the previously failing real-Safari Google auth criterion and logout → repeated Google login recovery are now **LIVE PASS** for deployed production commit `723c5404...`.
 
+## Live Workspace evidence — My Activity / My Artifacts
+Human live screenshots on 2026-09-05 confirm the two history/projection surfaces on deployed production:
+
+`/workspace/#activity` / **МОЯ АКТИВНОСТЬ**:
+- counters render `АРТЕФАКТЫ 2`, `ОТКЛИКИ 2`, `РЕАКЦИИ 3`;
+- artifact projection contains active `Куда двигаемся - народ?` with `НА ДОСКЕ` state;
+- artifact projection contains archived `гусь` with `В АРХИВЕ` state;
+- two response records render under `Мои отклики`;
+- three reaction records render under `Мои реакции`, including a reaction tied to archived `гусь`;
+- completed-test history remains visible below the community participation projection.
+
+`/workspace/artifacts/` / **МОИ АРТЕФАКТЫ**:
+- active + archived filters are present;
+- active `Куда двигаемся - народ?` renders as `ACTIVE / NOTICE`;
+- archived `гусь` remains in history as `ARCHIVED / NOTICE` with closure date `30.08.2026`;
+- archive history is therefore not lost when an artifact leaves the live Board.
+
+User also reports both surfaces operate normally after the logout/relogin cycle. This closes the live acceptance criteria for **My Activity response/reaction/Artifact projection** and **My Artifacts active + archived history including archived `гусь`**.
+
 ## Current release boundary
 `commit ≠ merge ≠ deploy ≠ live-validated`.
 
@@ -172,7 +191,8 @@ Current facts:
 - real Safari Google login/callback: **LIVE PASS**;
 - Safari logout → repeated Google login recovery: **LIVE PASS**;
 - Workspace authenticated landing / ordinary Member → Community Board: **LIVE PASS for observed sessions**;
-- logout control presence: **VISIBLE**;
+- My Activity participation projection: **LIVE PASS**;
+- My Artifacts active + archive history including `гусь`: **LIVE PASS**;
 - broader post-audit live-convergence inventory: **PENDING / IN PROGRESS**.
 
 ## Remaining live acceptance criteria
@@ -184,8 +204,8 @@ Retest sequentially:
 5. ordinary Member default → Community Board — **PASS for observed Safari sessions; keep broader route/state verification**;
 6. Board root/child navigation including QA-MEM-033;
 7. first Artifact spotlight without false activation;
-8. My Activity response/reaction/Artifact projection;
-9. My Artifacts active + archived history including archived `гусь`;
+8. ~~My Activity response/reaction/Artifact projection~~ — **LIVE PASS from human screenshot**;
+9. ~~My Artifacts active + archived history including archived `гусь`~~ — **LIVE PASS from human screenshot**;
 10. Board spatial behavior / drag-reposition;
 11. owner-admin geometry;
 12. mobile Join/Application surfaces;
@@ -197,6 +217,6 @@ The broader post-audit live-convergence inventory remains required after the acc
 ## Next gate
 Current gate remains **G7_RELEASE**.
 
-Next action: continue the live sequential Workspace/Board pass, then the broader live-convergence audit and canonical QA-ledger reconciliation.
+Next action: continue the live sequential Board pass: root/child navigation including QA-MEM-033, then spatial drag/reposition, followed by remaining shell/mobile/DC-9/route checks and canonical QA-ledger reconciliation.
 
 Do not mark this Result `DONE`, `VALIDATED`, `RELEASED` or move to G8 until the remaining live evidence and convergence findings are resolved.
