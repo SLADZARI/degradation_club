@@ -26,11 +26,7 @@ function run(preset,objective){
 }
 
 const matrix=new Map();
-for(const preset of PRESETS){
-  for(const objective of OBJECTIVES){
-    matrix.set(`${preset}/${objective}`,run(preset,objective));
-  }
-}
+for(const preset of PRESETS)for(const objective of OBJECTIVES)matrix.set(`${preset}/${objective}`,run(preset,objective));
 
 for(const objective of OBJECTIVES){
   const signatures=PRESETS.map(preset=>{
@@ -38,17 +34,30 @@ for(const objective of OBJECTIVES){
     return JSON.stringify(e.traces.filter(t=>t.actorId==='A').map(t=>[t.selectedImpulse,t.intent,t.selectedReaction,t.event?.type]));
   });
   assert.equal(new Set(signatures).size,3,`all three presets must remain behaviorally distinct for ${objective}`);
+  const wins=PRESETS.filter(preset=>matrix.get(`${preset}/${objective}`).session.controller.encounter.result?.type==='OBJECTIVE_COMPLETE');
+  assert.ok(wins.length>=1,`${objective} must have at least one viable visible BRAIN; got none`);
 }
 
 for(const preset of PRESETS){
   const contact=matrix.get(`${preset}/contact`).session.controller.encounter;
   const answer=matrix.get(`${preset}/direct-answer`).session.controller.encounter;
-  assert.equal(contact.scenario.id,answer.scenario.id,`${preset} changed scenario across objectives`);
-  assert.notEqual(contact.scenario.objective,answer.scenario.objective,`${preset} objective choice is presentation-only`);
+  assert.notEqual(contact.scenario.id,answer.scenario.id,`${preset}: each visible case must bind its real scenario identity`);
+  assert.equal(contact.scenario.id,'criticism-idea');
+  assert.equal(answer.scenario.id,'direct-answer');
 }
 
-const report=[...matrix.entries()].map(([key,{summary,result}])=>({
+for(const objective of OBJECTIVES){
+  const press=matrix.get(`PRESS_FOR_ANSWER/${objective}`).session.controller.encounter;
+  const reactions=press.traces.filter(t=>t.actorId==='A').map(t=>t.selectedReaction);
+  assert.ok(reactions.includes('explain'),`PRESS_FOR_ANSWER/${objective} must actually ask/explain`);
+  assert.ok(reactions.includes('joke'),`PRESS_FOR_ANSWER/${objective} must visibly regulate when hot`);
+  const firstJoke=reactions.indexOf('joke');
+  assert.ok(firstJoke>0,`PRESS_FOR_ANSWER/${objective} should begin direct and pivot later`);
+}
+
+const report=[...matrix.entries()].map(([key,{summary,result,session}])=>({
   key,
+  scenario:session.controller.encounter.scenario.id,
   terminal:summary.result?.type||null,
   reason:summary.result?.reason||null,
   turns:summary.turns,
@@ -58,5 +67,5 @@ const report=[...matrix.entries()].map(([key,{summary,result}])=>({
   punchline:result.punchline
 }));
 
-console.log('MVP six-way matrix OK');
+console.log('MVP six-way matrix OK — both objectives viable; adaptive exposed BRAIN has a real pivot');
 console.table(report);
