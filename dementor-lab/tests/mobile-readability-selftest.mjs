@@ -3,19 +3,19 @@ import { readFile } from 'node:fs/promises';
 
 const root=new URL('../',import.meta.url);
 const html=await readFile(new URL('index.html',root),'utf8');
-const css=await readFile(new URL('mobile-readability.css',root),'utf8');
 
-assert.match(html,/mobile-readability\.css/,'mobile readability layer is loaded');
-assert.match(css,/max-width:430px/,'small-phone contract exists');
-assert.match(css,/\.bubble\{[^}]*font-size:16px/,'dialogue remains readable at 16px on phones');
-assert.match(css,/\.dialogue\{[^}]*height:300px[^}]*overflow|\.dialogue\{[^}]*height:300px/,'dialogue receives a substantial phone viewport');
-assert.match(css,/\.bubble small\{display:block/,'speaker identity remains available while reading chat history');
-assert.match(css,/\.talk-record span\{display:none\}/,'duplicate TALK objective microcopy is hidden on small phones');
-assert.match(css,/\.turn span\{display:none\}/,'TURN micro-label is removed before shrinking essential content');
-assert.match(css,/\.metric label\{font-size:9px/,'supporting metric labels are compact while bars remain visible');
-assert.match(css,/\.delta-feedback small\{display:none!important\}/,'exact metric deltas leave the primary phone layer');
-assert.match(html,/id="trace-btn"/,'TRACE keeps exact evidence available on demand');
-assert.match(css,/\.patch-grid button\{font-size:12px/,'HOT PATCH controls remain legible');
-assert.match(css,/max-width:360px/,'narrow-phone fallback exists');
+assert.match(html,/width=device-width,initial-scale=1,viewport-fit=cover/,'safe-area mobile viewport contract present');
+assert.match(html,/max-width:560px/,'playtest remains a narrow mobile-first surface on desktop');
+assert.match(html,/@media\(max-width:390px\)/,'small-phone fallback exists');
+assert.match(html,/\.choice button\{[^}]*font-size:17px/,'human choice copy stays readable');
+assert.match(html,/\.bubble\{[^}]*font-size:17px/,'dialogue stays readable');
+assert.match(html,/\.primary[^}]*min-height:54px|\.primary,.secondary[^\n]*min-height:54px/,'primary interaction targets are at least 54px high');
+assert.match(html,/\.person-tools button\{[^}]*width:44px[^}]*height:44px/,'compact PERSON tools keep 44px touch targets');
+assert.match(html,/\.person-cats button\{[^}]*min-height:48px/,'PERSON category targets remain phone-safe');
+assert.match(html,/\.person-variants button\{[^}]*min-height:44px/,'variant targets remain phone-safe');
+assert.match(html,/overflow-x:auto/,'variant rack scrolls horizontally rather than shrinking controls');
+assert.match(html,/\.actor \.character-slot\{width:135px;height:180px/,'TALK reserves meaningful portrait area');
+assert.match(html,/\.actor \.character-slot\{width:115px;height:155px/,'narrow-phone TALK has an explicit portrait fallback');
+assert.match(html,/\.comparebox\{grid-template-columns:1fr\}/,'before/after collapses to one column on narrow phones');
 
-console.log('DEMENTOR LAB mobile readability selftest: PASS — chat owns the phone viewport and evidence remains available on demand');
+console.log('DEMENTOR LAB v1.0 mobile readability selftest: PASS — touch targets and reading sizes remain phone-first');
