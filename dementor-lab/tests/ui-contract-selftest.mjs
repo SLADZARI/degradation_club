@@ -5,6 +5,7 @@ const root=new URL('../',import.meta.url);
 const html=await readFile(new URL('index.html',root),'utf8');
 const person=await readFile(new URL('src/ui/person-editor.mjs',root),'utf8');
 const registry=await readFile(new URL('src/render/character-registry.mjs',root),'utf8');
+const renderer=await readFile(new URL('src/render/character-renderer.mjs',root),'utf8');
 
 assert.match(html,/Playtest v1\.0/,'current experimental UI identifies v1.0');
 assert.match(html,/id=["']person-editor["']/,'PERSON mounts the manifest-driven editor');
@@ -23,11 +24,17 @@ assert.match(person,/class PersonEditor/,'PERSON behavior is isolated in its own
 assert.match(person,/ensureCharacterContracts/,'PERSON loads validated character contracts');
 assert.match(person,/CharacterRenderer/,'PERSON uses the production SVG renderer');
 assert.match(person,/variantOptions/,'PERSON reads real authored variants from manifests');
-assert.match(person,/FACE_PREVIEWS/,'PERSON can QA authored facial states independently of appearance');
+assert.match(person,/id:'hat',label:'ГОЛОВА'/,'PERSON exposes head as a product-facing category');
+assert.match(person,/id:'accessories',label:'АКСЕССУАРЫ'/,'PERSON merges glasses and small accessories');
+assert.match(person,/id:'facialHair',label:'УСЫ'/,'PERSON keeps facial hair under the moustache category');
+assert.match(person,/id:'outfit',label:'ОДЕЖДА'/,'PERSON exposes clothing');
+assert.doesNotMatch(person,/id:'shoes',label:/,'shoes are not a player-facing top-level category');
+assert.match(person,/data-reset/,'PERSON has an explicit reset control');
+assert.doesNotMatch(person,/data-face/,'face QA is not exposed in player-facing PERSON');
 assert.match(person,/data-base="character-01"/,'PERSON exposes character-01');
 assert.match(person,/data-base="character-02"/,'PERSON exposes character-02');
-assert.match(person,/ДЛЯ ЭТОЙ ОСНОВЫ ОТДЕЛЬНЫХ ВАРИАНТОВ НЕТ/,'intentional asset asymmetry is visible instead of fabricated');
 assert.match(registry,/SHARED_APPEARANCE_CATEGORIES/,'shared appearance ownership remains registry-defined');
 assert.match(registry,/CHARACTER_OWNED_CATEGORIES/,'owned appearance remains registry-defined');
+assert.match(renderer,/el\.style\.display=on\?'inline':'none'/,'face-state renderer overrides authored display:none when a face variant becomes active');
 
-console.log('DEMENTOR LAB v1.0 UI contract selftest: PASS — PERSON + distinct worlds + replay flow are wired');
+console.log('DEMENTOR LAB v1.1 UI contract selftest: PASS — compact PERSON + distinct worlds + replay flow are wired');
