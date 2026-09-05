@@ -12,7 +12,8 @@ const apply=read('join/apply/index.html');
 const baseline=read('join/dc9-baseline-v1.js');
 const sync=read('join/apply/dc9-baseline-sync-v1.js');
 const entry=read('join/apply/apply-entry-v1.js');
-const migration=read('supabase/migrations/20260904171500_dc9_immutable_first_baseline_v1.sql');
+const migration=read('supabase/migrations/20260905084028_dc9_immutable_first_baseline_v1.sql');
+const migrationFix=read('supabase/migrations/20260905084118_dc9_immutable_first_baseline_v1_fix_jsonb_key_count.sql');
 
 expect(join.includes('/join/dc9-baseline-v1.js'),'Join: baseline preservation runtime missing');
 expect(join.indexOf('/join/dc9-baseline-v1.js')<join.indexOf('/join/dc9-immersive-v1.js'),'Join: baseline runtime must load before DC-9 runtime');
@@ -31,6 +32,10 @@ for(const token of ["self-development","self_development","min(completed_at)","m
 }
 expect(migration.includes('revoke all on table public.assessment_runs from authenticated'),'assessment_runs: append-only privilege hardening missing');
 expect(migration.includes('grant select, insert on table public.assessment_runs to authenticated'),'assessment_runs: required append-only client privileges missing');
+expect(migrationFix.includes('create or replace function public.dc_lock_join_application_baseline_v1()'),'DB corrective migration: trigger function replacement missing');
+expect(migrationFix.includes('pg_catalog.jsonb_object_keys'),'DB corrective migration: PostgreSQL JSONB key enumeration missing');
+expect(migrationFix.includes('coalesce(v_snapshot_key_count,0) <> 9'),'DB corrective migration: exact 9-key gate missing');
+expect(!migrationFix.includes('jsonb_object_length('),'DB corrective migration: nonexistent jsonb_object_length must not be used');
 
 class MockStorage{
   constructor(){this.map=new Map()}
@@ -61,4 +66,4 @@ stored=JSON.parse(context.localStorage.getItem('dementorClubOnboardingV3'));
 expect(stored.firstBaseline.results.personality.date===originalDate,'Reset erased immutable baseline');
 
 if(fail.length){console.error('DC-9 immutable baseline validation failed:');for(const item of fail)console.error(`- ${item}`);process.exit(1)}
-console.log('DC-9 immutable baseline contract PASS (local first 9/9 + repeat history + application sync + server first-complete snapshot)');
+console.log('DC-9 immutable baseline contract PASS (local first 9/9 + repeat history + application sync + server first-complete snapshot + corrective PostgreSQL key-count migration)');
