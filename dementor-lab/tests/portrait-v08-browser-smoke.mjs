@@ -6,9 +6,9 @@ const browser=await chromium.launch({headless:true});
 const context=await browser.newContext({...devices['iPhone 13']});
 const page=await context.newPage();
 const errors=[];page.on('pageerror',e=>errors.push(String(e)));
-await page.goto(`${root}/prototypes/portrait-flow-v0.8.html?v=1`,{waitUntil:'networkidle'});
+await page.goto(`${root}/prototypes/portrait-flow-v0.8.html?v=2`,{waitUntil:'networkidle'});
 
-assert.equal(await page.locator('#status').textContent(),'INTRO');
+assert.equal(await page.locator('#status').textContent(),'ЛАБОРАТОРИЯ');
 await page.locator('[data-go="name"]').first().click();
 await page.locator('#playerName').fill('Тестер');
 await page.locator('#name [data-go="portrait"]').click();
@@ -16,10 +16,15 @@ assert.equal((await page.locator('#editName').textContent()).trim(),'ТЕСТЕ�
 assert.equal(await page.locator('#portraitEdit svg').count(),1,'portrait SVG mounts');
 await page.locator('#portrait [data-go="setup"]').click();
 await page.locator('[data-objective="contact"]').click();
+assert.equal((await page.locator('#caseTitle').textContent()).trim(),'КРИТИКА ИДЕИ','visible case identity matches runtime case');
+assert.equal(await page.locator('#caseOpponent svg').count(),1,'opponent is introduced before BRAIN choice');
 await page.locator('#setup [data-go="brain"]').click();
 assert.equal(await page.locator('#brains .choice').count(),3,'three real brain presets are visible');
 await page.locator('#brains .choice').first().click();
 await page.locator('#start').click();
+assert.equal(await page.locator('#vs').isVisible(),true,'preflight beat appears before TALK');
+assert.equal((await page.locator('#vsObjective').textContent()).trim(),'СОХРАНИТЬ КОНТАКТ');
+await page.locator('#launch').click();
 assert.equal(await page.locator('#talk').isVisible(),true);
 assert.equal(await page.locator('#pa svg').count(),1,'player portrait persists into TALK');
 assert.equal(await page.locator('#pb svg').count(),1,'opponent portrait mounts in TALK');
@@ -34,9 +39,9 @@ for(let i=0;i<40;i++){
   if(await page.locator('#next').isVisible())await page.locator('#next').click();
   await page.waitForTimeout(15);
 }
-assert.equal(await page.locator('#result').isVisible(),true,'runtime reaches RESULT');
-assert.ok((await page.locator('#punch').textContent()).trim().length>1,'RESULT verdict rendered');
-assert.ok((await page.locator('#cause').textContent()).trim().length>1,'RESULT cause rendered from trace');
+assert.equal(await page.locator('#result').isVisible(),true,'runtime reaches result');
+assert.ok((await page.locator('#punch').textContent()).trim().length>1,'verdict rendered');
+assert.ok((await page.locator('#cause').textContent()).trim().length>1,'human arc rendered from trace');
 assert.ok((await page.locator('#dialogue .bubble').count())>0,'real dialogue transcript rendered');
 assert.equal(errors.length,0,`browser errors: ${errors.join(' | ')}`);
 
@@ -51,5 +56,5 @@ await page.locator('#archiveList .archive-card').first().click();
 assert.equal(await page.locator('#archiveDetail').isVisible(),true,'archive detail opens');
 assert.ok((await page.locator('#detailChain').textContent()).trim().length>1,'archive detail keeps causal chain');
 
-console.log(`portrait v0.8 iPhone smoke: PASS; hot patch encountered=${patched}`);
+console.log(`portrait v0.8 iPhone smoke: PASS; preflight=true; hot patch encountered=${patched}`);
 await browser.close();
