@@ -137,6 +137,29 @@ Observed:
 
 Classification: **LIVE PASS** for owner/admin geometry, role-tool visibility and Review access in the observed session.
 
+### Mobile Join / DC-9 / Application
+User live-tested `/join/` and `/join/apply/` on a phone-width browser after deploy #35.
+
+Observed on `/join/apply/`:
+- canonical mobile Header rendered with brand, `Вступить в клуб` CTA and burger;
+- application/authentication content stayed within the viewport;
+- text and authentication card were readable without observed horizontal clipping;
+- consent controls remained within the viewport.
+
+Classification: **LIVE PASS** for observed mobile Application responsive geometry in the logged-out state.
+
+Observed on `/join/`:
+- DC-9 sphere picker rendered as a single-column mobile list;
+- progress state `1 / 9` remained visible;
+- typography and sphere cards stayed within the viewport;
+- no horizontal clipping was observed;
+- however, a large empty light band followed by a dark band appeared above the canonical Header in the captured mobile state.
+
+Classification: **PARTIAL PASS + BUG OBSERVATION / MOBILE JOIN TOP GAP**.
+Do not assume root cause from the screenshot alone. Investigation found that active `/join/` still loaded legacy `/script.js`, which targets superseded `selector / sphereGrid / questionHost` owners while the current route is fully `dc9-*`. Current DC-9 persistence is owned directly by `dc9-immersive-v1.js`, and static SEO/meta already live in `join/index.html`. The legacy runtime has been removed from the integration branch as a safe ownership cleanup; after the corrective deploy, retest whether the top gap disappears. If it remains, treat it as an independent layout defect rather than retroactively claiming the legacy runtime was the cause.
+
+The consent banner itself is not classified as a responsive defect; it intentionally occupies the lower viewport until the user chooses an analytics-consent option.
+
 ### Owner/Admin System Tests A3
 The read-only owner/admin test page reported `6 PASS / 1 FAIL`; only `A3 MEMBERSHIP APPLICATION` failed because `authenticated_insert_policy_present=false`.
 
@@ -154,7 +177,7 @@ Do not close G7 from deploy success alone. Continue in one sequence:
 1. Board root/child navigation including QA-MEM-033;
 2. first Artifact spotlight without false activation;
 3. Safari/public + private Google login entry points as needed to confirm combined auth convergence;
-4. mobile Join/DC-9 and Application at phone widths;
+4. mobile DC-9 inner question/answer flow at phone width;
 5. immutable first-complete DC-9 baseline → repeat → Application snapshot behavior;
 6. live route/canonical/SEO integrity;
 7. regression confirmation for My Activity, My Artifacts and Board drag.
