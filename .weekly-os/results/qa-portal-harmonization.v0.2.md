@@ -2,8 +2,8 @@
 artifactId: dementor-club.result.qa-portal-harmonization
 project: dementor-club
 documentType: RESULT
-projectStage: BUILD
-gate: G5_BUILD
+projectStage: RELEASE
+gate: G7_RELEASE
 status: DRAFT
 version: 0.2
 updated: 2026-09-05
@@ -13,118 +13,108 @@ authorityType: IMPLEMENTATION_AUTHORITY
 supersedes: 0.1
 ---
 
-# MP | Dementor Club | BUILD | Portal QA Harmonization | v0.2
+# MP | Dementor Club | RELEASE | Portal QA Harmonization | v0.2
 
 ## Goal
 Bring the current Dementor Club portal through pre-advertising QA while progressively harmonizing implementation with the project kernel and approved local operating rules, without duplicate UI/navigation/auth/domain systems or silent semantic mutation.
 
-## Owner
-Modern Pilgrims
-
 ## Status
-ACTIVE / DRAFT v0.2
+**ACTIVE / G7_RELEASE / PRODUCTION MERGED / NOT DEPLOYED / LIVE DB UNCHANGED**
 
-## Branch
-`result/qa-portal-harmonization`
+Implementation branch: `result/qa-portal-harmonization`  
+Release branch: `release/qa-portal-harmonization-v02`  
+Production branch: `dementor-club-production`
 
-## Gate
-Current: `G5_BUILD`
-Next: `G6_VALIDATION`
-Production release requires separate `G7_RELEASE` authorization and explicit user deploy instruction.
+## Authority / protected boundaries
+- Workspace-specific approved authority: `operations/WORKSPACE_MEMBER_ACTIVATION_AND_SHELL_V1.md`.
+- Canonical QA ledger: `operations/MEMBERSHIP_V2_PRODUCTION_FLOW_QA_2026-09-02.md`.
+- Protected admission boundary: `AUTHENTICATION ≠ DC9 COMPLETE ≠ APPLICATION ≠ MEMBERSHIP`.
+- Protected member activation: `MEMBER_ACTIVE → FIRST_ARTIFACT_REQUIRED → MEMBER_ACTIVATED`.
+- First complete DC-9 baseline is immutable; repeat attempts remain separate history.
+- No new universal Activity entity/table is authorized; My Activity is a projection of existing canonical data.
+- MP_DSL v0.1 remains global DRAFT/REFERENCE; only explicitly approved Dementor Club local operating rules apply.
 
-## Scope
-- Existing live QA findings and portal regressions recorded in `operations/MEMBERSHIP_V2_PRODUCTION_FLOW_QA_2026-09-02.md`.
-- Public shell, Workspace shell, auth/login, Join/DC-9 onboarding, member/application surfaces and related route/state integrity.
-- Approved Workspace Member activation and private-shell change defined in `operations/WORKSPACE_MEMBER_ACTIVATION_AND_SHELL_V1.md`.
-- Progressive MP_DSL / Weekly OS harmonization only where needed to safely implement QA fixes.
-- Duplicate-owner detection for header, footer, navigation, auth identity, Workspace shell and local product navigation.
-- Route/state reconciliation across guest / authenticated non-member / member / Dementor / owner-admin states.
+## Implemented coherent packages
+All related implementation stayed inside one active Result/integration branch and was individually G6-validated before site merge:
 
-## Non-goals
-- No speculative redesign outside approved QA/product decisions.
-- No new parallel auth, state, menu, shell or domain systems.
-- No project-wide PRODUCT / DOMAIN / ARCHITECTURE / DESIGN authority promotion without explicit approval.
-- No production deployment as part of implementation or validation.
-- No DC-9 personalization/recommendation engine, generalized fog-of-war progression engine or reward economy in this Result.
-- No broad branch-history reconciliation while active live QA is in progress unless necessary for a concrete fix.
+1. PR #95 — canonical Russian public header/auth identity — G6 #715 PASS.
+2. PR #97 — canonical application auth handoff — G6 #718 PASS.
+3. PR #98 — direct DC-9 result → application — G6 #720 PASS.
+4. PR #99 — merged DC-9 intro/sphere picker — G6 #722 PASS.
+5. PR #100 — canonical private Workspace shell + Member activation spotlight — G6 #727 PASS.
+6. PR #101 — immutable first-complete DC-9 baseline — G6 #729 PASS.
+7. PR #102 — Community participation → My Activity projection — G6 #732 PASS.
+8. PR #103 — WebKit auth regression gate — corrected G6 #735 PASS; first #734 failure was a mobile-burger test interaction defect, not runtime auth evidence.
+9. PR #104 — My Artifacts archive-history harmonization — G6 #737 PASS.
 
-## Approved Local Operating Rules
-Every fix follows:
+Source-backed no-op: current `/join/` already opens directly on the nine-sphere picker and runtime defaults to `renderPicker()`; no redundant pre-DC-9 confirmation/start owner remains, so no parallel fix was introduced.
 
-`QA observation → authority/current-state check → existing implementation inventory → duplicate/semantic/route check → decision if required → implementation → G6 validation → release candidate → explicit deploy authorization → live retest → G8 cleanup`.
+## Clean production candidate evidence
+Current production baseline before this release candidate:
+`337f5bc5ad92a1e18ab49dfafc093a23ec4542ac`.
 
-Approved product decisions currently in force include:
-- public CTA `Вступить в клуб` and guest `Войти` on the public site;
-- authentication mandatory only immediately before application submission, not before DC-9;
-- first complete DC-9 baseline immutable; later attempts do not overwrite it;
-- for authenticated `/workspace/*`, one canonical Workspace Shell replaces public landing navigation;
-- `DEMENTOR CLUB` logo inside Workspace returns to public `/`;
-- active ordinary Member default entry is Community Board;
-- ordinary Member primary navigation begins with Community Board; `HOME` is not a primary Member item;
-- name/avatar remains identity control;
-- `FIRST_ARTIFACT_REQUIRED` Member receives Board spotlight on the existing first Artifact action;
-- `Пропустить` dismisses the spotlight only and never activates membership state;
-- closed Board remains unavailable to authenticated non-members;
-- `МОЯ АКТИВНОСТЬ` exposes existing responses/reactions/Artifacts as a projection, without introducing a new universal Activity entity.
+Important baseline fact: production already contained Batch 05 plus the earlier PR #95 transfer via PR #96, both not deployed. The v0.2 release therefore did **not** blind-merge `dementor-club-site` into production and did not duplicate PR #95.
 
-Canonical decision authority for the Workspace-specific change:
-`operations/WORKSPACE_MEMBER_ACTIVATION_AND_SHELL_V1.md`.
+Release candidate:
+- branch: `release/qa-portal-harmonization-v02`;
+- candidate commit: `e42de43fe637225bc4101095b67229bf8328d196`;
+- exactly **1 commit ahead / 0 behind / 24 whitelisted files** from the current production baseline;
+- production PR: **#105**;
+- full Production Release Readiness: **run #739 PASS**.
 
-## Acceptance Criteria
-1. Every implemented QA finding is linked to verified source/root cause and existing implementation before new code is introduced.
-2. One canonical owner exists for each shared shell responsibility touched by the Result; no duplicate public/private primary headers survive on authenticated Workspace.
-3. Existing Membership v2 boundary remains intact: `AUTHENTICATION ≠ DC9 COMPLETE ≠ APPLICATION ≠ MEMBERSHIP`.
-4. `MEMBER_ACTIVE → FIRST_ARTIFACT_REQUIRED → MEMBER_ACTIVATED` remains intact; first Artifact publication is the only approved activation transition.
-5. Active Member default Workspace entry resolves to Community Board without breaking role-aware Dementor/owner routes.
-6. Authenticated non-member cannot read/respond/create on closed Community Board.
-7. Workspace logo returns to `/`; public landing navigation is not simultaneously rendered as Workspace primary navigation.
-8. First-entry spotlight reuses existing Artifact slot/gate and `Пропустить` does not mutate semantic state.
-9. Member responses/reactions/Artifacts have visible confirmation/history through My Activity or the existing canonical projection owner; My Artifacts preserves active + archived personal history.
-10. Relevant browser regression covers first-entry Member, activated Member, authenticated non-member, Dementor and owner-admin on desktop/mobile, with WebKit auth coverage for Safari-sensitive login/callback paths and focused personal Artifact-history coverage.
-11. Critical routes remain canonical and no dead legacy destination is reintroduced.
-12. No unresolved P0/P1 issue included in a release candidate remains without explicit deferral/decision.
-13. Production candidate is built from current production authority using the established safe release method while branch divergence remains unresolved.
-14. Commit/merge is never treated as deploy; production requires explicit user authorization.
-15. After each released batch, stale compatibility code, duplicate assets/routes and temporary branches are reviewed under G8 cleanup.
+Run #739 passed:
+- registry/routes/feature state;
+- content readiness;
+- visual contract;
+- DC-9 immutable baseline contract;
+- production build;
+- analytics + consent guard;
+- canonical shell ownership;
+- built-JS syntax;
+- Chromium Workspace/browser regression;
+- My Artifacts active/archive regression;
+- WebKit auth regression;
+- route manifest;
+- production artifact release guard.
 
-## Affected Domain / Systems
-- Public shell/navigation boundary
-- Workspace shell/navigation
-- Authentication/session entry
-- Community Board
-- first Artifact activation gate
-- Artifact slot/publication state
-- Artifact personal history/archive surface
-- reactions/responses presentation
-- My Activity projection
-- Membership v2 presentation and route integrity
-- QA/release validation tooling
+PR #105 merged to `dementor-club-production` as:
+`1f383f2c2fe020ce8839286ab56ee29436dbf569`.
 
-No new canonical domain entity is authorized by this Result.
+## Current release boundary
+`commit ≠ merge ≠ deploy`.
 
-## Evidence Plan
-- source/authority references from Project Kernel, approved Workspace decision and QA ledger;
-- exact implementation-owner inventory before edits;
-- compare/diff evidence;
-- static/build validation;
-- browser regression evidence across Member/non-member/role states;
-- WebKit proxy evidence for Safari-sensitive auth paths plus real Safari live retest after release;
-- focused My Artifacts active/archive browser evidence;
-- production candidate release-readiness evidence;
-- live human retest after explicit deployment;
-- cleanup/lineage record after release.
+The production branch now contains the validated v0.2 candidate, but **live production is still unchanged** because no deploy was triggered.
 
-## Current G6 Evidence
-- PR #102 `Community participation → My Activity projection`: G6 run #732 PASS; merged to `dementor-club-site` as `9adef4a6691e88a63030f2925bfbc004ebdc93a6`.
-- PR #103 `WebKit auth regression gate`: first run #734 failed because the mobile-sized test attempted to click the service login while the canonical burger was closed. This was classified as a test interaction defect; no auth runtime mutation was made.
-- PR #103 corrected run #735 PASS across registry/routes, content, visual contract, DC-9 baseline, production build, analytics, canonical shell, built-JS syntax, Chromium browser regression, WebKit auth regression, route manifest and production artifact release gate.
-- PR #103 merged to `dementor-club-site` as `0fa400b6708328e3602b0eb59bed789bd9e60e85`.
-- Source-backed onboarding inventory confirms `/join/` already lands directly on the visible nine-sphere picker and `dc9-immersive-v1.js` defaults to `renderPicker()`; the backlog's redundant pre-DC-9 intro/confirmation state is not present in the current owner, so no new code was introduced for an already-resolved concern.
-- PR #104 `My Artifacts archive history`: G6 run #737 PASS, including focused Chromium `ВСЕ → АРХИВ → АКТИВНЫЕ`, archived `гусь`, active `Куда двигаемся - народ?`, canonical private Workspace shell, canonical `/workspace/board/` continuation, WebKit auth and all existing release guards.
-- PR #104 merged to `dementor-club-site` as `fe46704380997f987a11e4f12301de2fe66eb626`; `workspace/artifacts/` now reuses `community-runtime-v1.js` for client/session/route ownership instead of creating a child-surface auth owner.
-- `result/qa-portal-harmonization` is synchronized to `fe46704380997f987a11e4f12301de2fe66eb626`.
-- WebKit PASS is browser-engine regression evidence, not a claim that the reported live Safari issue is closed. Real Safari production retest remains required after explicit release.
-- No production branch, live Supabase state or deployment was changed by PR #102/#103/#104.
+The migration `supabase/migrations/20260904171500_dc9_immutable_first_baseline_v1.sql` is present in production code but is **NOT applied to live Supabase**.
 
-## Production Impact
-No new production impact until a separately authorized G7 deployment of this v0.2 scope occurs.
+No live database mutation and no GitHub Pages deployment may occur without explicit user authorization.
+
+## Acceptance criteria state
+Implementation/G6 criteria are satisfied for the current technical cluster. Result is not complete until post-release live evidence exists for the relevant surfaces.
+
+Required live retest after an explicitly authorized release:
+- real Safari Google auth/callback;
+- DC-9 first baseline → repeat → application snapshot;
+- public Header/auth-aware states;
+- authenticated private Workspace shell and guest boundary;
+- ordinary Member default → Community Board;
+- Board root/child navigation including QA-MEM-033;
+- first Artifact spotlight without false activation;
+- My Activity response/reaction/Artifact projection;
+- My Artifacts active + archived history including archived `гусь`;
+- Board spatial behavior / drag-reposition;
+- owner-admin geometry;
+- mobile Join/application surfaces;
+- live route/canonical/SEO integrity.
+
+## Next gate
+Current gate: **G7_RELEASE**.
+
+Next action requires explicit user authorization for the live release steps. If authorized, sequence is:
+1. apply the validated Supabase baseline migration;
+2. deploy current `dementor-club-production` through the existing manual production workflow;
+3. perform live sequential retest;
+4. update the canonical QA ledger from evidence;
+5. move to G8 cleanup only after live results are known.
+
+Until that authorization, stop before live DB mutation and deploy.
