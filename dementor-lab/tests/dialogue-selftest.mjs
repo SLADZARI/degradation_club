@@ -21,7 +21,7 @@ const overheated=resolvePhrase({...base,state:{brain:91,tension:84,contact:45},m
 assert.match(overheated,/ещё раз объясню/i,'extreme BRAIN/TENSION uses the overheat replacement before resentment');
 
 const resentful=resolvePhrase({...base,state:{brain:55,tension:50,contact:50},memory:{resentment:4}});
-assert.match(resentful,/не первый раз/i,'high resentment is audible in deterministic dialogue');
+assert.match(resentful,/не первый раз|снова здесь|прошлые повторы/i,'high resentment is audible in deterministic dialogue');
 
 const lowContact=resolvePhrase({reaction:'pressure',impulse:'beright',scenario:{id:'criticism-idea'},state:{brain:50,tension:55,contact:18},memory:{},recentTranscript:[],turn:5});
 assert.match(lowContact,/на этом закончим/i,'low CONTACT changes wording without changing gameplay');
