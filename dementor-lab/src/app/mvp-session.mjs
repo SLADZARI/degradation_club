@@ -1,5 +1,7 @@
 import { VerticalSliceController } from './vertical-slice-controller.mjs';
 import { createCriticismActors, scenarioWithObjective } from '../scenarios/criticism-idea.mjs';
+import { DIRECT_ANSWER_SCENARIO, createDirectAnswerActors } from '../scenarios/direct-answer.mjs';
+import { playerBrainPreset } from '../brain/player-presets.mjs';
 import { compareRuns, buildResult } from '../encounter/result.mjs';
 import { encounterToRunRecord, saveRunRecord } from '../archive/run-store.mjs';
 import { NODE_SPECS } from '../core/model.mjs';
@@ -10,11 +12,19 @@ function clone(value){return JSON.parse(JSON.stringify(value))}
 function runId(){sessionSequence+=1;return `run-${Date.now().toString(36)}-${sessionSequence.toString(36)}`}
 function repeatNode(actor){return actor.brainGraph.nodes.find(n=>n.type==='repeat')||null}
 function impulseNode(actor){return actor.brainGraph.nodes.find(n=>['beright','beliked','understand','beunderstood'].includes(n.type))||null}
+function directAnswerActors({playerName,playerPresetId}){
+  const preset=playerBrainPreset(playerPresetId);
+  const actors=createDirectAnswerActors({playerGraph:preset.graph,playerName,opponentName:'Марта'});
+  actors.A.visual={...(actors.A.visual||{}),gender:'male',characterId:'character-01',brainPresetId:preset.id};
+  actors.B.visual={...(actors.B.visual||{}),gender:'female',characterId:'character-02',opponentPresetId:'DIRECT_ANSWER'};
+  return actors;
+}
 
 export function createMvpSession({playerName='Гена',playerPresetId='EXPLAIN_LOOP',objective='contact',opponentProfile=null,onEvent=()=>{}}={}){
   const config={playerName,playerPresetId,objective,opponentProfile};
-  const scenario=scenarioWithObjective(objective);
-  const actors=createCriticismActors({playerName,playerPresetId,opponentProfile});
+  const isDirectAnswer=objective==='direct-answer';
+  const scenario=isDirectAnswer?DIRECT_ANSWER_SCENARIO:scenarioWithObjective('contact');
+  const actors=isDirectAnswer?directAnswerActors({playerName,playerPresetId}):createCriticismActors({playerName,playerPresetId,opponentProfile});
   const controller=new VerticalSliceController({scenario,actors,onEvent});
   controller.start({mode:'step'});
   controller.encounter.id=runId();
