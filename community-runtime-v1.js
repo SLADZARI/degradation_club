@@ -28,7 +28,7 @@ export const route=path=>{const base=basePath();const normalized=path.startsWith
 export function getConfig(){const cfg=window.DEMENTOR_SITE_CONFIG?.supabase;if(!cfg?.enabled||!cfg.url||!cfg.publishableKey)throw new Error('SUPABASE_CONFIG_UNAVAILABLE');return cfg}
 export function getClient(){if(window.DEMENTOR_SUPABASE_CLIENT)return window.DEMENTOR_SUPABASE_CLIENT;const cfg=getConfig();const client=createClient(cfg.url,cfg.publishableKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false,flowType:'pkce'}});window.DEMENTOR_SUPABASE_CLIENT=client;return client}
 export async function currentSession(client=getClient()){const {data,error}=await client.auth.getSession();if(error)throw error;return data.session||null}
-export async function loginWithGoogle(next='/join/result/',client=getClient()){const callback=new URL(`${basePath()}/auth/callback/`,location.origin);callback.searchParams.set('next',route(next));const {error}=await client.auth.signInWithOAuth({provider:'google',options:{redirectTo:callback.toString()}});if(error)throw error}
+export async function loginWithGoogle(next='/join/result/',client=getClient()){const callback=new URL(`${basePath()}/auth/callback/`,location.origin);callback.searchParams.set('next',route(next));const {error}=await client.auth.signInWithOAuth({provider:'google',options:{redirectTo:callback.toString(),queryParams:{prompt:'select_account'}}});if(error)throw error}
 
 export function readLocalOnboarding(){try{return JSON.parse(localStorage.getItem(DC_LOCAL_STORAGE_KEY)||'null')||{results:{},active:null}}catch{return{results:{},active:null}}}
 function latestResult(a,b){if(!a)return b;if(!b)return a;return (Date.parse(a.date||0)||0)>=(Date.parse(b.date||0)||0)?a:b}
