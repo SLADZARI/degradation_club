@@ -8,6 +8,7 @@ let extrasHost=null;
 let camera={x:0,y:0,scale:1};
 let positions=new Map();
 let activationState=null;
+let entryStatus=null;
 let renderTimer=null;
 let touchPanEnabled=false;
 
@@ -60,15 +61,33 @@ function placeCards(){
   });
 }
 
+function openArtifactSlot(){
+  const entrySection=document.getElementById('entrySection');
+  if(!entrySection)return;
+  entrySection.scrollIntoView({behavior:'smooth',block:'start'});
+  window.setTimeout(()=>document.getElementById('openComposer')?.focus(),360);
+}
+
+function updateSlotControl(){
+  const control=viewport?.querySelector('[data-slot]');
+  if(!control)return;
+  const available=Number(entryStatus?.artifact_slots_available||0);
+  const consuming=Number(entryStatus?.artifact_slots_consuming||0);
+  if(available>0){control.textContent='＋ АРТЕФАКТ';control.setAttribute('aria-label','Открыть свободный Artifact slot');return}
+  if(consuming>0){control.textContent='SLOT ЗАНЯТ';control.setAttribute('aria-label','Показать занятый Artifact slot и управление текущим объявлением');return}
+  control.textContent='SLOT НЕТ';control.setAttribute('aria-label','Показать состояние Artifact slot');
+}
+
 function installShell(){
   if(!boardHost)return;
   if(boardHost.closest('.dc-spatial-viewport')){viewport=boardHost.closest('.dc-spatial-viewport');extrasHost=viewport.previousElementSibling?.classList.contains('dc-spatial-extras')?viewport.previousElementSibling:null;return}
   extrasHost=document.createElement('div');extrasHost.className='dc-spatial-extras';boardHost.parentNode.insertBefore(extrasHost,boardHost);
   viewport=document.createElement('div');viewport.className='dc-spatial-viewport';boardHost.parentNode.insertBefore(viewport,boardHost);viewport.appendChild(boardHost);boardHost.classList.add('dc-spatial-world');
-  const controls=document.createElement('div');controls.className='dc-spatial-controls';controls.innerHTML='<button class="dc-spatial-control" type="button" data-zoom-in aria-label="Увеличить">＋</button><button class="dc-spatial-control" type="button" data-zoom-out aria-label="Уменьшить">−</button><button class="dc-spatial-control" type="button" data-home>К ЖИЗНИ</button><button class="dc-spatial-control" type="button" data-mine>МОЁ</button><button class="dc-spatial-control" type="button" data-touch-pan>ДВИГАТЬ</button>';
+  const controls=document.createElement('div');controls.className='dc-spatial-controls';controls.innerHTML='<button class="dc-spatial-control" type="button" data-slot aria-label="Показать состояние Artifact slot">SLOT</button><button class="dc-spatial-control" type="button" data-zoom-in aria-label="Увеличить">＋</button><button class="dc-spatial-control" type="button" data-zoom-out aria-label="Уменьшить">−</button><button class="dc-spatial-control" type="button" data-home>К ЖИЗНИ</button><button class="dc-spatial-control" type="button" data-mine>МОЁ</button><button class="dc-spatial-control" type="button" data-touch-pan>ДВИГАТЬ</button>';
   viewport.appendChild(controls);
   const status=document.createElement('div');status.className='dc-spatial-status';status.setAttribute('aria-live','polite');viewport.appendChild(status);
-  const help=document.createElement('div');help.className='dc-spatial-help';help.textContent='Пустое поле: drag мышью. Колесо / + −: масштаб. На телефоне включите «Двигать», чтобы панорамировать одним пальцем.';viewport.appendChild(help);
+  const help=document.createElement('div');help.className='dc-spatial-help';help.textContent='Artifact slot — через кнопку в панели. Пустое поле: drag мышью. Колесо / + −: масштаб. На телефоне включите «Двигать», чтобы панорамировать одним пальцем.';viewport.appendChild(help);
+  controls.querySelector('[data-slot]').onclick=openArtifactSlot;
   controls.querySelector('[data-zoom-in]').onclick=()=>zoomAt(1.18,viewport.getBoundingClientRect().left+viewport.clientWidth/2,viewport.getBoundingClientRect().top+viewport.clientHeight/2);
   controls.querySelector('[data-zoom-out]').onclick=()=>zoomAt(.84,viewport.getBoundingClientRect().left+viewport.clientWidth/2,viewport.getBoundingClientRect().top+viewport.clientHeight/2);
   controls.querySelector('[data-home]').onclick=resetCamera;
@@ -126,7 +145,8 @@ function installOwnDrag(){
 }
 
 async function refreshSpatial(){
-  try{const status=await getEntryStatus(client);activationState=status.community_activation_state||null}catch{activationState=null}
+  try{entryStatus=await getEntryStatus(client);activationState=entryStatus.community_activation_state||null}catch{entryStatus=null;activationState=null}
+  updateSlotControl();
   await loadPositions();placeCards();
 }
 
