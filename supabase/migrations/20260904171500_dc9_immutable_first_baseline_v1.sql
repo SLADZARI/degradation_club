@@ -81,15 +81,20 @@ set search_path = ''
 as $function$
 declare
   v_baseline jsonb;
+  v_snapshot_key_count integer;
 begin
   if new.source is distinct from 'dc-membership-application-v2' then
     return new;
   end if;
 
   v_baseline := public.dc_first_complete_baseline_v1(new.profile_id);
+  select count(*)::integer
+    into v_snapshot_key_count
+  from pg_catalog.jsonb_object_keys(coalesce(v_baseline->'snapshot','{}'::jsonb));
+
   if v_baseline is null
      or coalesce((v_baseline->>'sphere_count')::integer,0) <> 9
-     or jsonb_object_length(coalesce(v_baseline->'snapshot','{}'::jsonb)) <> 9 then
+     or coalesce(v_snapshot_key_count,0) <> 9 then
     raise exception 'SPHERE_GATE_INCOMPLETE';
   end if;
 
