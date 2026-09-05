@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>DEMENTOR LAB — Portrait Flow v0.1</title>
+<style>
+:root{--paper:#f0dfbd;--ink:#111;--acid:#e7ff18;--muted:#9f927c;--danger:#d92f22;--white:#fffaf0}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:var(--paper);color:var(--ink);font-family:Arial,Helvetica,sans-serif}body{min-height:100dvh}.app{width:min(100%,520px);min-height:100dvh;margin:0 auto;border-left:1px solid #111;border-right:1px solid #111;background:var(--paper);padding-bottom:calc(74px + env(safe-area-inset-bottom))}button,input{font:900 12px/1 Arial;border-radius:0;color:var(--ink)}button{border:2px solid var(--ink);background:var(--paper);min-height:48px;padding:0 14px}button.primary{background:var(--acid);width:100%;min-height:58px;font-size:14px}.top{height:54px;position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;padding:0 12px;border-bottom:2px solid var(--ink);background:var(--paper)}.top strong{font-size:15px}.top span{font:900 10px monospace}.screen{padding:14px;min-height:calc(100dvh - 128px)}.screen[hidden]{display:none}.kicker{font:900 9px/1 monospace;letter-spacing:.06em;margin:0 0 8px}.screen h1,.screen h2{margin:0;letter-spacing:-.045em;line-height:.92}.screen h1{font-size:42px}.screen h2{font-size:33px}.lead{font-size:17px;line-height:1.32;margin:14px 0 18px}.muted{font:800 10px/1.35 monospace;color:#6e6557}.stack{display:grid;gap:8px}.field{margin:28px 0}.field label{display:block;font:900 9px monospace;margin-bottom:6px}.field input{width:100%;height:58px;border:2px solid var(--ink);background:var(--white);padding:0 12px;font-size:20px}.ghost{background:transparent;border-style:dashed}.intro-mark{height:45dvh;min-height:280px;display:grid;place-items:center;border:2px solid var(--ink);background:#e7cf9f;margin:14px 0}.intro-face{width:190px;height:190px;border:4px solid var(--ink);border-radius:50%;position:relative;background:var(--white)}.intro-face:before,.intro-face:after{content:"";position:absolute;top:72px;width:16px;height:10px;background:var(--ink)}.intro-face:before{left:48px}.intro-face:after{right:48px}.intro-face i{position:absolute;left:58px;right:58px;bottom:47px;height:4px;background:var(--ink);transform:rotate(-4deg)}.portrait-card{position:relative;border:2px solid var(--ink);background:#e7cf9f;overflow:hidden;min-height:290px;display:grid;place-items:center}.portrait-card.large{height:54dvh;min-height:370px}.portrait-card.medium{height:250px}.portrait-card.small{height:180px}.portrait{width:100%;height:100%;display:grid;place-items:center;overflow:hidden}.portrait svg{width:100%;height:100%;display:block;overflow:visible}.portrait-name{position:absolute;left:8px;bottom:8px;z-index:5;background:var(--paper);border:2px solid var(--ink);padding:5px 8px;font:900 11px monospace}.portrait-state{position:absolute;right:8px;top:8px;z-index:5;background:var(--ink);color:var(--paper);padding:5px 7px;font:900 8px monospace}.portrait-card.speaking{outline:5px solid var(--acid);outline-offset:-5px}.portrait-card.defeated{filter:grayscale(1);background:#393630}.portrait-card.defeated .portrait{opacity:.6}.tabs{display:flex;gap:5px;overflow:auto;margin:10px 0}.tabs button{flex:1;white-space:nowrap;min-width:max-content}.tabs button.active,.brain-card.active,.objective button.active{background:var(--acid)}.variant-row{display:flex;gap:6px;overflow:auto;margin-bottom:12px}.variant-row button{min-width:52px;padding:0 10px}.case-card,.brain-card,.panel,.result-card,.archive-card{border:2px solid var(--ink);background:#ead2a8;padding:14px}.case-card{margin-top:14px}.objective{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:10px 0 14px}.objective button{min-height:68px}.opponent{display:grid;grid-template-columns:122px 1fr;gap:12px;align-items:center;border-top:2px solid var(--ink);padding-top:12px}.opponent .portrait-card{height:130px;min-height:130px}.opponent h3{margin:0 0 4px;font-size:22px}.brain-list{display:grid;gap:8px;margin:14px 0}.brain-card{text-align:left;width:100%;min-height:94px}.brain-card strong{display:block;font-size:19px;margin-bottom:5px}.brain-card span{display:block;font-size:13px;line-height:1.25}.brain-card small{display:block;font:900 9px monospace;margin-top:8px}.vs{display:grid;grid-template-columns:1fr 48px 1fr;gap:6px;align-items:center;margin:16px 0}.vs .portrait-card{height:260px}.vs-mark{font:900 25px monospace;text-align:center}.vs-meta{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:8px 0}.vs-meta div{border:2px solid var(--ink);padding:8px}.vs-meta small,.statusline small,.result-section small{display:block;font:900 8px monospace;margin-bottom:4px}.vs-meta b{font-size:13px}.talk-head{display:flex;justify-content:space-between;gap:8px;border:2px solid var(--ink);padding:8px 9px}.talk-head b{font-size:12px}.talk-head span{font:900 9px monospace}.talk-portraits{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:7px}.talk-portraits .portrait-card{height:245px}.statusline{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:7px}.statusline>div{border:2px solid var(--ink);padding:8px}.meter{height:8px;border:1px solid var(--ink);background:#fff;margin-top:5px}.meter i{display:block;height:100%;background:var(--ink)}.dialogue{height:225px;overflow:auto;border:2px solid var(--ink);margin-top:7px;padding:9px;display:flex;flex-direction:column;gap:7px;background:#f6e8cd}.bubble{max-width:88%;border:2px solid var(--ink);background:var(--white);padding:9px 10px;font-size:15px;line-height:1.25}.bubble.b{align-self:flex-end;background:var(--acid)}.bubble small{display:block;font:900 8px monospace;margin-bottom:4px}.why{width:100%;margin-top:7px;text-align:left}.why-panel{border:2px solid var(--ink);border-top:0;padding:10px;background:var(--white)}.why-panel[hidden]{display:none}.cause-grid{display:grid;grid-template-columns:1fr 18px 1fr 18px 1fr;gap:4px;align-items:center}.cause-grid div{border:1px solid var(--ink);padding:7px;font-size:10px;font-weight:900}.cause-grid b{text-align:center}.cause-hint{margin-top:8px;font:900 9px/1.3 monospace;background:var(--acid);padding:7px}.next-turn{margin-top:8px}.hot{border:3px solid var(--ink);background:var(--acid);padding:16px;margin-top:20px}.hot h2{font-size:31px}.chain{font:900 12px/1.3 monospace;border:2px solid var(--ink);padding:10px;background:var(--white);margin:12px 0}.result-card{margin-top:12px}.result-card h2{font-size:37px}.result-section{border-top:2px solid var(--ink);padding-top:11px;margin-top:12px}.result-section strong{font-size:17px;line-height:1.25}.actions{display:grid;gap:6px;margin-top:14px}.compare{display:grid;grid-template-columns:1fr 1fr;gap:7px}.compare>div{border:2px solid var(--ink);padding:10px;background:var(--white)}.compare>div:last-child{background:var(--acid)}.compare b{font-size:22px}.archive-tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:14px 0}.archive-tabs button{min-height:70px}.archive-list{display:grid;gap:8px}.archive-card{text-align:left}.archive-card strong{display:block;font-size:18px}.archive-card span{display:block;margin-top:5px;font-size:12px}.archive-card small{display:block;margin-top:8px;font:900 9px monospace}.detail-dialogue{display:grid;gap:6px;margin-top:10px}.detail-line{border-left:4px solid var(--ink);padding:6px 9px;background:var(--white);font-size:13px}.nav{position:fixed;left:50%;bottom:0;transform:translateX(-50%);width:min(520px,100%);height:calc(66px + env(safe-area-inset-bottom));padding:6px 8px env(safe-area-inset-bottom);display:grid;grid-template-columns:repeat(3,1fr);gap:5px;background:var(--paper);border-top:2px solid var(--ink);z-index:30}.nav button{min-height:48px}.nav button.active{background:var(--acid)}.tiny{font:900 8px/1.3 monospace}.hidden{display:none!important}@media(max-width:390px){.screen{padding:10px}.screen h1{font-size:36px}.screen h2{font-size:30px}.portrait-card.large{height:50dvh}.talk-portraits .portrait-card{height:210px}.dialogue{height:210px}.opponent{grid-template-columns:105px 1fr}.cause-grid{grid-template-columns:1fr}.cause-grid>b{transform:rotate(90deg)}}
+</style>
+</head>
+<body>
+<main class="app" id="app">
+<header class="top"><strong>DEMENTOR LAB</strong><span id="status">INTRO</span></header>
+
+<section class="screen" data-screen="intro">
+  <p class="kicker">ЛАБОРАТОРИЯ ЧЕЛОВЕЧЕСКИХ КАТАСТРОФ</p>
+  <h1>ПРОВЕРИМ ЛЮДЕЙ ОБ ЛЮДЕЙ.</h1>
+  <p class="lead">Собери характер. Отправь его в разговор. Посмотри, что сломается.</p>
+  <div class="intro-mark"><div class="intro-face"><i></i></div></div>
+  <div class="stack"><button class="primary" data-go="name">НАЧАТЬ ЭКСПЕРИМЕНТ →</button><button class="ghost" data-go="archive">АРХИВ</button></div>
+</section>
+
+<section class="screen" data-screen="name" hidden>
+  <p class="kicker">01 · ЧЕЛОВЕК</p><h2>КАК ЕГО ЗОВУТ?</h2>
+  <p class="lead">С остальным разберёмся постепенно.</p>
+  <div class="field"><label>ИМЯ</label><input id="name-input" maxlength="24" value="Мел" placeholder="Например, Мел"></div>
+  <button class="primary" id="name-next">ДАЛЬШЕ →</button>
+</section>
+
+<section class="screen" data-screen="portrait" hidden>
+  <p class="kicker">02 · ПОРТРЕТ</p><h2>ТЕПЕРЬ ОН ВЫГЛЯДИТ УБЕДИТЕЛЬНО.</h2>
+  <div class="portrait-card large"><div class="portrait" id="portrait-player-edit"></div><span class="portrait-name" id="portrait-edit-name">МЕЛ</span><span class="portrait-state">NEUTRAL</span></div>
+  <div class="tabs" id="portrait-tabs"><button class="active" data-cat="head">ГОЛОВА</button><button data-cat="face">ЛИЦО</button><button data-cat="accessory">АКСЕССУАР</button></div>
+  <div class="variant-row" id="portrait-variants"><button class="active">01</button><button>02</button><button>03</button><button>НЕТ</button></div>
+  <button class="primary" data-go="case">ГОТОВО →</button>
+</section>
+
+<section class="screen" data-screen="case" hidden>
+  <p class="kicker">03 · СИТУАЦИЯ</p><h2>НЕУДОБНЫЙ ВОПРОС</h2>
+  <div class="case-card"><p class="lead">Ира уже дважды ответила не совсем на тот вопрос. Тебе всё ещё нужен прямой ответ.</p>
+    <div class="objective"><button class="active" data-objective="contact">СОХРАНИТЬ<br>КОНТАКТ</button><button data-objective="answer">ДОБИТЬСЯ<br>ОТВЕТА</button></div>
+    <div class="opponent"><div class="portrait-card"><div class="portrait" id="portrait-opponent-case"></div></div><div><p class="kicker">СОПЕРНИК</p><h3>ИРА</h3><p>Если на неё давить — закрывается. Если объяснять — отвечает по сути, но может уйти в сторону.</p></div></div>
+  </div>
+  <button class="primary" data-go="brain">ВЫБРАТЬ МОЗГ →</button>
+</section>
+
+<section class="screen" data-screen="brain" hidden>
+  <p class="kicker">04 · МОЗГ</p><h2>С ЧЕМ ТЫ ТУДА ПОЙДЁШЬ?</h2>
+  <p class="lead">Для первого раза графы оставим специалистам.</p>
+  <div class="brain-list">
+    <button class="brain-card active" data-brain="explain"><strong>Я ВСЁ ОБЪЯСНЮ</strong><span>Если не поняли — надо объяснить лучше.</span><small>РИСК · REPEAT ЛЮБИТ</small></button>
+    <button class="brain-card" data-brain="peace"><strong>ЛИШЬ БЫ НЕ РУГАЛИСЬ</strong><span>Лучше сохранить контакт, чем выиграть спор.</span><small>СИЛА · CONTACT</small></button>
+    <button class="brain-card" data-brain="right"><strong>Я ВСЕГДА ПРАВ</strong><span>Если спорят — значит мысль ещё не дожали.</span><small>РИСК · BRAIN</small></button>
+    <button class="brain-card" data-brain="joke"><strong>ПЕРЕВЕДУ В ШУТКУ</strong><span>Если жарко — сделаем вид, что это неважно.</span><small>РИСК · DEFLECTION</small></button>
+  </div>
+  <div class="stack"><button class="primary" data-go="vs">ВЗЯТЬ ЭТОТ МОЗГ →</button><button class="ghost" id="advanced-brain">СОБРАТЬ СВОЙ МОЗГ →</button></div>
+</section>
+
+<section class="screen" data-screen="vs" hidden>
+  <p class="kicker">05 · ПЕРЕД ЭКСПЕРИМЕНТОМ</p><h2>КТО КОГО.</h2>
+  <div class="vs"><div class="portrait-card"><div class="portrait" id="portrait-player-vs"></div><span class="portrait-name" id="vs-player-name">МЕЛ</span></div><div class="vs-mark">VS</div><div class="portrait-card"><div class="portrait" id="portrait-opponent-vs"></div><span class="portrait-name">ИРА</span></div></div>
+  <div class="vs-meta"><div><small>ТВОЙ МОЗГ</small><b id="vs-brain">Я ВСЁ ОБЪЯСНЮ</b></div><div><small>ЗАДАЧА</small><b id="vs-objective">CONTACT ≥50</b></div></div>
+  <div class="tabs"><button class="active" data-mode="step">STEP</button><button data-mode="auto">AUTO</button></div>
+  <button class="primary" id="start-talk">ПОЕХАЛИ →</button>
+</section>
+
+<section class="screen" data-screen="talk" hidden>
+  <div class="talk-head"><b>НЕУДОБНЫЙ ВОПРОС</b><span id="talk-progress">ХОД 0/6</span></div>
+  <div class="talk-portraits"><div class="portrait-card" id="talk-card-a"><div class="portrait" id="portrait-player-talk"></div><span class="portrait-name" id="talk-player-name">МЕЛ</span><span class="portrait-state" id="state-a">NEUTRAL</span></div><div class="portrait-card" id="talk-card-b"><div class="portrait" id="portrait-opponent-talk"></div><span class="portrait-name">ИРА</span><span class="portrait-state" id="state-b">LISTENING</span></div></div>
+  <div class="statusline"><div><small>BRAIN</small><b id="brain-value">18</b><div class="meter"><i id="brain-bar" style="width:18%"></i></div></div><div><small>CONTACT</small><b id="contact-value">72</b><div class="meter"><i id="contact-bar" style="width:72%"></i></div></div></div>
+  <div class="dialogue" id="dialogue"><div class="muted">Разговор ещё не начался.</div></div>
+  <button class="why" id="why-toggle">ПОЧЕМУ ТАК? +</button>
+  <div class="why-panel" id="why-panel" hidden><div class="cause-grid"><div><small>ТЫ СДЕЛАЛ</small><br><b id="why-action">—</b></div><b>→</b><div><small>ОНА ВОСПРИНЯЛА</small><br><b id="why-event">—</b></div><b>→</b><div><small>СРАБОТАЛО</small><br><b id="why-trigger">—</b></div></div><div class="cause-hint" id="why-hint">Состояние разговора пока ничего не объясняет.</div></div>
+  <button class="primary next-turn" id="next-turn">NEXT TURN →</button>
+</section>
+
+<section class="screen" data-screen="hot" hidden>
+  <p class="kicker">HOT PATCH</p><div class="hot"><h2>РАЗГОВОР ПОШЁЛ ПО СТАРОЙ КОЛЕЕ.</h2><p>Мел снова пытается добиться понимания тем же способом.</p><div class="chain">ВОЗРАЖЕНИЕ → БЫТЬ ПРАВЫМ → ОБЪЯСНИТЬ → REPEAT</div><p class="tiny">ПОДОЗРЕНИЕ · REPEAT ПРОДОЛЖИТ РАЗГОНЯТЬ BRAIN</p></div>
+  <div class="stack" style="margin-top:10px"><button class="primary" id="patch-one">ПОЧИНИТЬ ОДНУ ВЕЩЬ →</button><button class="ghost" id="patch-ignore">ОСТАВИТЬ КАК ЕСТЬ</button></div>
+</section>
+
+<section class="screen" data-screen="result" hidden>
+  <p class="kicker">RESULT</p><div class="result-card"><h2>МЕЛ НЕ ВЫВЕЗ.</h2><p class="lead">Он не проиграл аргумент. Он перегрел собственный способ разговаривать.</p><div class="result-section"><small>ЧТО ПРОИЗОШЛО</small><strong>Пять раз пытался объяснить одну и ту же мысль.</strong></div><div class="result-section"><small>ПОЧЕМУ</small><div class="chain">ВОЗРАЖЕНИЕ → БЫТЬ ПРАВЫМ → ОБЪЯСНИТЬ → REPEAT</div></div><div class="result-section"><small>ЧТО ПОПРОБОВАТЬ ПОЧИНИТЬ</small><strong>REPEAT ×4</strong></div><div class="actions"><button class="primary" id="fix-rerun">ИЗМЕНИТЬ ОДНУ ВЕЩЬ →</button><button data-go="archive">В АРХИВ</button></div></div>
+</section>
+
+<section class="screen" data-screen="compare" hidden>
+  <p class="kicker">ТОТ ЖЕ ЭКСПЕРИМЕНТ</p><h2>ОДНА ПРИЧИНА. ДРУГОЙ ИТОГ.</h2><div class="compare" style="margin-top:14px"><div><small>БЫЛО</small><br><b>5×</b><p>объяснил<br>BRAIN 100<br>CONTACT 19</p></div><div><small>СТАЛО</small><br><b>2×</b><p>объяснил<br>BRAIN 61<br>CONTACT 54</p></div></div><p class="lead">В этот раз реальность поняла быстрее.</p><div class="stack"><button class="primary" data-go="archive">СОХРАНИТЬ В АРХИВ →</button><button data-go="case">ЕЩЁ ОДИН ЭКСПЕРИМЕНТ</button></div>
+</section>
+
+<section class="screen" data-screen="archive" hidden>
+  <p class="kicker">АРХИВ</p><h2>ЧТО МЫ УЖЕ СЛОМАЛИ.</h2><div class="archive-tabs"><button class="active">ЭКСПЕРИМЕНТЫ</button><button>ПЕРСОНАЖИ</button><button>ПОЛОМКИ</button><button>ИСПРАВЛЕНИЯ</button></div><div class="archive-list"><button class="archive-card" data-go="archive-detail"><strong>НЕУДОБНЫЙ ВОПРОС</strong><span><b id="archive-name">Мел</b> vs Ира · BRAIN 100</span><small>ВОЗРАЖЕНИЕ → БЫТЬ ПРАВЫМ → REPEAT</small></button><button class="archive-card"><strong>КРИТИКА ИДЕИ</strong><span>Гена vs Марта · CONTACT сохранён</span><small>ОБЪЯСНИТЬ → ACCEPTANCE</small></button></div>
+</section>
+
+<section class="screen" data-screen="archive-detail" hidden>
+  <p class="kicker">АРХИВ · ЭКСПЕРИМЕНТ 01</p><h2>НЕУДОБНЫЙ ВОПРОС</h2><div class="panel" style="margin-top:14px"><p><b id="detail-name">Мел</b> vs Ира</p><p class="muted">ЦЕЛЬ · СОХРАНИТЬ КОНТАКТ<br>ИТОГ · BRAIN 100</p><div class="result-section"><small>КЛЮЧЕВЫЕ МОМЕНТЫ</small><div class="detail-dialogue"><div class="detail-line"><b>Мел:</b> Нет, подожди. Я всё-таки объясню.</div><div class="detail-line"><b>Ира:</b> Я поняла. Я просто не согласна.</div><div class="detail-line"><b>Мел:</b> Тогда я попробую ещё раз, только короче.</div></div></div><div class="result-section"><small>ЦЕПОЧКА</small><div class="chain">ВОЗРАЖЕНИЕ → БЫТЬ ПРАВЫМ → ОБЪЯСНИТЬ → REPEAT</div></div><div class="result-section"><small>ИСПРАВЛЕНИЕ</small><strong>REPEAT ×4 → ×1</strong></div><div class="result-section"><small>БЫЛО / СТАЛО</small><strong>BRAIN 100 / CONTACT 19 → BRAIN 61 / CONTACT 54</strong></div></div><button class="primary" style="margin-top:10px" data-go="archive">← НАЗАД В АРХИВ</button>
+</section>
+
+<nav class="nav"><button data-nav="intro">LAB</button><button data-nav="case">ИГРАТЬ</button><button data-nav="archive">АРХИВ</button></nav>
+</main>
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const state={name:'Мел',brain:'explain',objective:'contact',turn:0,patched:false,mode:'step'};
+const brainLabels={explain:'Я ВСЁ ОБЪЯСНЮ',peace:'ЛИШЬ БЫ НЕ РУГАЛИСЬ',right:'Я ВСЕГДА ПРАВ',joke:'ПЕРЕВЕДУ В ШУТКУ'};
+const screens=$$('.screen');
+function show(id){screens.forEach(s=>s.hidden=s.dataset.screen!==id);$('#status').textContent=id.toUpperCase();$$('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.nav===id));window.scrollTo({top:0,behavior:'instant'});if(id==='vs')syncVs();if(id==='talk')syncTalkPortraits();if(id==='archive'||id==='archive-detail')syncNames();}
+$$('[data-go]').forEach(b=>b.onclick=()=>show(b.dataset.go));$$('[data-nav]').forEach(b=>b.onclick=()=>show(b.dataset.nav));
+$('#name-next').onclick=()=>{state.name=($('#name-input').value||'Мел').trim().slice(0,24)||'Мел';syncNames();show('portrait')};
+function syncNames(){['#portrait-edit-name','#vs-player-name','#talk-player-name'].forEach(s=>{const e=$(s);if(e)e.textContent=state.name.toUpperCase()});['#archive-name','#detail-name'].forEach(s=>{const e=$(s);if(e)e.textContent=state.name})}
+$$('[data-objective]').forEach(b=>b.onclick=()=>{$$('[data-objective]').forEach(x=>x.classList.remove('active'));b.classList.add('active');state.objective=b.dataset.objective});
+$$('.brain-card').forEach(b=>b.onclick=()=>{$$('.brain-card').forEach(x=>x.classList.remove('active'));b.classList.add('active');state.brain=b.dataset.brain});
+$$('[data-mode]').forEach(b=>b.onclick=()=>{$$('[data-mode]').forEach(x=>x.classList.remove('active'));b.classList.add('active');state.mode=b.dataset.mode});
+$$('#portrait-tabs button').forEach(b=>b.onclick=()=>{$$('#portrait-tabs button').forEach(x=>x.classList.remove('active'));b.classList.add('active')});
+$$('#portrait-variants button').forEach(b=>b.onclick=()=>{$$('#portrait-variants button').forEach(x=>x.classList.remove('active'));b.classList.add('active')});
+$('#advanced-brain').onclick=()=>alert('В production этот CTA открывает существующий advanced BRAIN editor. В story prototype он намеренно не встроен.');
+function syncVs(){$('#vs-brain').textContent=brainLabels[state.brain];$('#vs-objective').textContent=state.objective==='answer'?'4 ПРЯМЫХ ОТВЕТА':'CONTACT ≥50';syncNames()}
+async function mountPortrait(id,charId='character-01',emotion='neutral'){
+ const root=$('#'+id);if(!root)return;const path=charId==='character-02'?'../assets/characters/character-02/character-02-layered.svg':'../assets/characters/character-01/character-01-layered.svg';
+ try{const text=await fetch(path).then(r=>{if(!r.ok)throw Error(r.status);return r.text()});root.innerHTML=text;const svg=root.querySelector('svg');if(svg){svg.setAttribute('viewBox',charId==='character-02'?'235 70 240 275':'235 65 240 275');svg.removeAttribute('width');svg.removeAttribute('height');}setEmotion(root,emotion)}catch(e){root.innerHTML='<div class="intro-face"><i></i></div>'}
+}
+function choose(root,prefix,id){root.querySelectorAll(`[id^="${prefix}-"]`).forEach(e=>e.style.opacity=e.id===id?'1':'0')}
+function setEmotion(root,emotion){if(!root)return;const map={neutral:['eyes-neutral','brows-neutral','mouth-neutral'],listening:['eyes-neutral','brows-neutral','mouth-neutral'],confident:['eyes-neutral','brows-neutral','mouth-soft'],annoyed:['eyes-tense','brows-tense','mouth-tense'],heated:['eyes-tense','brows-angry','mouth-open'],meltdown:['eyes-overheat','brows-angry','mouth-open'],defeated:['eyes-sleepy','brows-tense','mouth-tense']};const p=map[emotion]||map.neutral;choose(root,'eyes',p[0]);choose(root,'brows',p[1]);choose(root,'mouth',p[2]);const svg=root.querySelector('svg');if(svg)svg.style.transform=emotion==='defeated'?'translateY(8px) rotate(-2deg)':emotion==='listening'?'rotate(1deg)':'none'}
+const portraitMounts=[['portrait-player-edit','character-01'],['portrait-opponent-case','character-02'],['portrait-player-vs','character-01'],['portrait-opponent-vs','character-02'],['portrait-player-talk','character-01'],['portrait-opponent-talk','character-02']];portraitMounts.forEach(([id,c])=>mountPortrait(id,c));
+function syncTalkPortraits(){setEmotion($('#portrait-player-talk'),state.turn<2?'neutral':state.turn<4?'annoyed':'heated');setEmotion($('#portrait-opponent-talk'),state.turn<2?'listening':state.turn<5?'annoyed':'defeated')}
+const script=[
+ {side:'a',name:'МЕЛ',line:'Нет, подожди. Я всё-таки объясню, почему это должно работать.',action:'ОБЪЯСНИЛ',event:'КОНТРАРГУМЕНТ',trigger:'ВОЗРАЖЕНИЕ',hint:'CONTACT 72 · TENSION низкий → Ира ещё отвечает по сути.',brain:31,contact:68,a:'confident',b:'listening'},
+ {side:'b',name:'ИРА',line:'Я поняла. Я просто не согласна с выводом.',action:'ВОЗРАЗИЛА',event:'PUSHBACK',trigger:'БЫТЬ ПРАВЫМ',hint:'Возражение задело главный мотив Мела.',brain:42,contact:63,a:'annoyed',b:'confident'},
+ {side:'a',name:'МЕЛ',line:'Смотри. Там просто есть один момент, который ты сейчас пропускаешь.',action:'ОБЪЯСНИЛ',event:'КОНТРАРГУМЕНТ',trigger:'ВОЗРАЖЕНИЕ',hint:'CONTACT 63 · BRAIN 42 → объяснение всё ещё воспринимается как продолжение спора.',brain:58,contact:52,a:'annoyed',b:'annoyed'},
+ {side:'b',name:'ИРА',line:'Я не пропускаю момент. Я с ним не согласна.',action:'ВОЗРАЗИЛА',event:'PUSHBACK',trigger:'REPEAT',hint:'Цель MAKE_UNDERSTOOD не достигнута → REPEAT остаётся активным.',brain:69,contact:44,a:'heated',b:'annoyed'},
+ {side:'a',name:'МЕЛ',line:'Хорошо. Я попробую ещё раз, только короче.',action:'ПОВТОРИЛ',event:'COUNTERPOINT',trigger:'REPEAT',hint:'CONTACT 44 + растущий BRAIN → ещё один повтор становится дорогим.',brain:86,contact:31,a:'heated',b:'defeated'},
+ {side:'b',name:'ИРА',line:'Мел. Я уже ответила.',action:'ОТСТРАНИЛАСЬ',event:'NO_RESPONSE',trigger:'IGNORE',hint:'CONTACT 31 → разговор близок к отключению.',brain:94,contact:24,a:'meltdown',b:'defeated'}
+];
+function addBubble(row){const d=document.createElement('div');d.className='bubble '+(row.side==='b'?'b':'a');d.innerHTML=`<small>${row.name}</small>${row.line}`;$('#dialogue').appendChild(d);$('#dialogue').scrollTop=$('#dialogue').scrollHeight}
+$('#start-talk').onclick=()=>{state.turn=0;state.patched=false;$('#dialogue').innerHTML='';$('#brain-value').textContent='18';$('#contact-value').textContent='72';$('#brain-bar').style.width='18%';$('#contact-bar').style.width='72%';show('talk');if(state.mode==='auto')setTimeout(autoAdvance,500)};
+function autoAdvance(){if(state.mode!=='auto'||document.querySelector('[data-screen="talk"]').hidden)return;advance();if(state.turn<script.length)setTimeout(autoAdvance,1200)}
+function advance(){if(state.turn>=script.length){show('result');return}const row=script[state.turn];addBubble(row);state.turn++;$('#talk-progress').textContent=`ХОД ${state.turn}/${script.length}`;$('#brain-value').textContent=row.brain;$('#contact-value').textContent=row.contact;$('#brain-bar').style.width=row.brain+'%';$('#contact-bar').style.width=row.contact+'%';$('#why-action').textContent=row.action;$('#why-event').textContent=row.event;$('#why-trigger').textContent=row.trigger;$('#why-hint').textContent=row.hint;const cardA=$('#talk-card-a'),cardB=$('#talk-card-b');cardA.classList.toggle('speaking',row.side==='a');cardB.classList.toggle('speaking',row.side==='b');setEmotion($('#portrait-player-talk'),row.a);setEmotion($('#portrait-opponent-talk'),row.b);$('#state-a').textContent=row.a.toUpperCase();$('#state-b').textContent=row.b.toUpperCase();if(state.turn===5&&!state.patched&&state.mode==='step'){setTimeout(()=>show('hot'),300);return}if(state.turn>=script.length){$('#next-turn').textContent='ПОКАЗАТЬ РЕЗУЛЬТАТ →'}}
+$('#next-turn').onclick=()=>advance();
+$('#why-toggle').onclick=()=>{const p=$('#why-panel');p.hidden=!p.hidden;$('#why-toggle').textContent=p.hidden?'ПОЧЕМУ ТАК? +':'ПОЧЕМУ ТАК? −'};
+$('#patch-ignore').onclick=()=>{state.patched=true;show('talk')};$('#patch-one').onclick=()=>{state.patched=true;show('compare')};$('#fix-rerun').onclick=()=>show('compare');
+show('intro');syncNames();
+</script>
+</body>
+</html>
