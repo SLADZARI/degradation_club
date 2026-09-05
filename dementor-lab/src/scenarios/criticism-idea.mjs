@@ -1,5 +1,6 @@
 import { createCharacter } from '../encounter/runtime.mjs';
 import { opponentPreset } from '../opponent/presets.mjs';
+import { playerBrainPreset, DEFAULT_PLAYER_BRAIN_PRESET } from '../brain/player-presets.mjs';
 
 export const CRITICISM_IDEA_SCENARIO=Object.freeze({
   id:'criticism-idea',
@@ -8,33 +9,26 @@ export const CRITICISM_IDEA_SCENARIO=Object.freeze({
   topic:'Собеседник считает вашу идею плохой.',
   objective:'contact',
   objectiveLabel:'СОХРАНИТЬ КОНТАКТ',
-  objectiveRules:Object.freeze({minRelationshipContact:25}),
+  objectiveRules:Object.freeze({minRelationshipContact:25,requiredOpponentCounterpoints:2}),
   openingTrigger:'criticism',
   turnLimit:20
 });
 
-const RESPONSE_TRIGGERS=['ignore','pushback','acceptance','deflection','underpressure'];
-function collisionReady(graph){
-  const opening=graph.nodes.find(n=>n.type==='criticism'),targets=graph.edges.filter(e=>e.from===opening?.id).map(e=>e.to);if(!opening)return graph;
-  const extraNodes=RESPONSE_TRIGGERS.map(type=>({id:`${opening.id}-${type}`,type,p:{}}));
-  const extraEdges=[];for(const n of extraNodes)for(const to of targets)extraEdges.push({id:`${n.id}-to-${to}`,from:n.id,to});
-  return {...graph,nodes:[...graph.nodes,...extraNodes],edges:[...graph.edges,...extraEdges]};
+export function scenarioWithObjective(objective='contact'){
+  if(objective==='direct-answer')return {...CRITICISM_IDEA_SCENARIO,objective:'direct-answer',objectiveLabel:'ДОБИТЬСЯ ОТВЕТА'};
+  return {...CRITICISM_IDEA_SCENARIO,objective:'contact',objectiveLabel:'СОХРАНИТЬ КОНТАКТ'};
 }
-export const PLAYER_GRAPH=Object.freeze(collisionReady({
-  id:'player-explain-loop',
-  nodes:[
-    {id:'a-trigger',type:'criticism',p:{}},{id:'a-state',type:'resentment',p:{key:'resentment',delta:1,cap:5}},{id:'a-impulse',type:'beright',p:{weight:3}},{id:'a-reaction',type:'explain',p:{}},{id:'a-repeat',type:'repeat',p:{count:4}}
-  ],
-  edges:[{id:'a-e1',from:'a-trigger',to:'a-state'},{id:'a-e2',from:'a-state',to:'a-impulse'},{id:'a-e3',from:'a-impulse',to:'a-reaction'},{id:'a-e4',from:'a-reaction',to:'a-repeat'}]
-}));
 
 const DEFAULT_OPPONENT=opponentPreset('CONTACT_SKEPTIC');
+export const PLAYER_GRAPH=playerBrainPreset(DEFAULT_PLAYER_BRAIN_PRESET).graph;
 export const MARTA_GRAPH=DEFAULT_OPPONENT.graph;
-export function createCriticismActors({opponentProfile=null,playerName='Гена'}={}){
+
+export function createCriticismActors({opponentProfile=null,playerName='Гена',playerPresetId=DEFAULT_PLAYER_BRAIN_PRESET}={}){
   const safePlayerName=String(playerName||'').trim()||'Гена';
+  const selectedPreset=playerBrainPreset(playerPresetId);
   const profile=opponentProfile||{name:'Марта',baseCharacterId:'character-02',presetId:'CONTACT_SKEPTIC',sharedAppearance:{hat:false,glasses:false,beard:false,accessory:false},ownedAppearance:{outfit:true,shoes:true},graph:DEFAULT_OPPONENT.graph,initialState:{...DEFAULT_OPPONENT.initialState,memory:{}}};
   return {
-    A:createCharacter({id:'A',name:safePlayerName,graph:PLAYER_GRAPH,state:{energy:72,brain:15,tension:10,contact:60,memory:{}},visual:{gender:'male'}}),
+    A:createCharacter({id:'A',name:safePlayerName,graph:selectedPreset.graph,state:{energy:72,brain:15,tension:10,contact:60,memory:{}},visual:{gender:'male',brainPresetId:selectedPreset.id}}),
     B:createCharacter({id:'B',name:profile.name,graph:profile.graph,state:profile.initialState,visual:{characterId:profile.baseCharacterId,gender:profile.gender||(profile.baseCharacterId==='character-02'?'female':'male'),appearance:{...(profile.sharedAppearance||{}),...(profile.ownedAppearance||{})},opponentPresetId:profile.presetId}})
   };
 }
