@@ -1,6 +1,6 @@
 # Dementor Club — Production Flow QA Ledger
 
-Status: **ACTIVE / MEMBERSHIP V2 CORE PASS / BATCH 04 LIVE / BATCH 05 MERGED NOT DEPLOYED / QA PORTAL HARMONIZATION ACTIVE / WEBKIT AUTH SITE G6 PASS / ACTIVITY SITE G6 PASS / DC-9 BASELINE SITE G6 PASS**  
+Status: **ACTIVE / MEMBERSHIP V2 CORE PASS / BATCH 04 LIVE / BATCH 05 MERGED NOT DEPLOYED / QA PORTAL HARMONIZATION ACTIVE / ARTIFACT HISTORY SITE G6 PASS / WEBKIT AUTH SITE G6 PASS / ACTIVITY SITE G6 PASS / DC-9 BASELINE SITE G6 PASS**  
 Date opened: **2026-09-02**  
 Last live regression pass: **2026-09-03**  
 Operating update: **2026-09-05**  
@@ -73,8 +73,8 @@ Status: **WORKSPACE CHILD SURFACE PASS / NAVIGATION DESCENDANT QA-MEM-033** · P
 Review is inside Workspace. Ordinary Member negative access test previously PASS. Child-route navigation recovery is corrected in Batch 05 production code and awaits deployment/live retest.
 
 ### QA-MEM-010 — Archived Artifact history unavailable
-Status: **FIX RELEASED / PARTIAL LIVE RETEST / ACTIVITY PROJECTION SITE G6 PASS** · P1  
-Known QA records: active `Куда двигаемся - народ?`; archived `гусь`. Live Board shows active Artifact data; archived history still needs explicit live retest. Current site Result additionally projects existing own Artifacts, responses and reactions into `МОЯ АКТИВНОСТЬ` without a new Activity entity.
+Status: **CURRENT SITE G6 PASS / PR #104 / LIVE RETEST PENDING** · P1  
+Known QA records: active `Куда двигаемся - народ?`; archived `гусь`. Current `workspace/artifacts/` remains the canonical personal Artifact-history owner and reads existing `dc_artifacts`; no parallel history entity was introduced. PR #104 reuses canonical community auth/session runtime, removes the compatibility Board destination from the active history card and adds an executable Chromium regression for `ВСЕ → АРХИВ → АКТИВНЫЕ`, including preservation of archived `гусь`. Live production still requires explicit retest after release.
 
 ### QA-MEM-011 — `/join/apply/` mobile oversized
 Status: **FIX RELEASED / MOBILE REGRESSION RETEST REQUIRED** · P1
@@ -203,7 +203,7 @@ Live Batch 04 retest: user can log out, use Google login again, and regain an au
 ### QA-MEM-024 — Static CI passed while real browser integration was broken
 Status: **CURRENT RESULT BROWSER COVERAGE EXTENDED / PRODUCTION LIVE RETEST PENDING** · P1 RELEASE INTEGRITY
 
-Browser coverage includes a one-session sequence crossing Workspace root and child surfaces and now also verifies persisted Board participation → `МОЯ АКТИВНОСТЬ`. WebKit is also a permanent auth regression gate for Safari-sensitive login/callback paths. Keep browser evidence mandatory in release readiness.
+Browser coverage includes a one-session sequence crossing Workspace root and child surfaces, persisted Board participation → `МОЯ АКТИВНОСТЬ`, personal Artifact active/archive history and WebKit auth for Safari-sensitive login/callback paths. Keep browser evidence mandatory in release readiness.
 
 ## 7. Corrective Batch 03 release state
 
@@ -293,12 +293,13 @@ QA is green only when:
 - Google login returns to canonical Workspace/member destinations without legacy `/degradation_club/` or 404;
 - ordinary Member defaults to Community Board; Workspace My Club / My Activity / profile identity entry work without runtime errors from root and child surfaces;
 - `МОЯ АКТИВНОСТЬ` exposes existing own Artifact / response / reaction history without creating a parallel Activity domain entity;
+- `МОИ АРТЕФАКТЫ` preserves current + archived personal Artifact history and uses canonical Workspace Board continuation;
 - persisted Board response/reaction has visible confirmation and a discoverable path to Activity history;
 - Board stays inside Workspace shell and retains its approved spatial/integration behavior;
 - OWNER_ADMIN tools resolve and render with normal Workspace geometry;
 - DC-9/onboarding preserves the canonical Membership v2 boundary;
 - DC-9 first 9/9 baseline is immutable and repeat attempts remain separate history after the baseline migration is released;
-- browser-level CI covers OAuth callback, guest boundary, Workspace child/root transitions, Board integrations, Member Activity projection, Join/onboarding routes and Admin;
+- browser-level CI covers OAuth callback, guest boundary, Workspace child/root transitions, Board integrations, Member Activity projection, My Artifacts active/archive history, Join/onboarding routes and Admin;
 - auth-related release readiness includes WebKit coverage as a Safari-engine proxy, while real Safari remains a live human retest requirement;
 - 31 indexable sitemap routes resolve live and canonical/OG URLs remain on `https://dementor.club` unless a separately approved route-map change supersedes this count;
 - mobile baseline is checked at 360 / 390 / 768 / 1024 / 1440 where applicable;
@@ -352,15 +353,20 @@ Status: **BATCH 04 DEPLOYED + BROWSER PASS / LIVE RETEST PENDING** · P2
 Join member-return geometry is normalized. Any replacement CTA must reuse the canonical header/design owner rather than reintroduce page-local CTA ownership.
 
 ### QA-MEM-032 — Browser smoke misses critical auth/state/integration paths
-Status: **CURRENT RESULT COVERAGE EXTENDED THROUGH PR #103 / CHROMIUM + WEBKIT G6 PASS / LIVE RETEST PENDING** · P1 RELEASE INTEGRITY
+Status: **CURRENT RESULT COVERAGE EXTENDED THROUGH PR #104 / CHROMIUM + WEBKIT G6 PASS / LIVE RETEST PENDING** · P1 RELEASE INTEGRITY
 
-Current browser coverage includes child/root navigation, ordinary Member Board default, first-Artifact focus, role navigation, spatial Board and persisted Board participation → My Activity projection. PR #103 adds focused WebKit auth regression to the existing release-readiness job.
+Current browser coverage includes child/root navigation, ordinary Member Board default, first-Artifact focus, role navigation, spatial Board, persisted Board participation → My Activity projection, My Artifacts active/archive history, and focused WebKit auth regression.
 
 WebKit evidence:
 - G6 #734 initially failed because the mobile-sized test tried to click `Войти` while the canonical burger was closed;
 - that was a test interaction defect, not evidence of a product auth failure;
 - the test was corrected to open the mobile burger first; no auth runtime code was changed;
 - G6 #735 PASS, including WebKit auth, Chromium shell, baseline, build, route manifest and final release guard.
+
+My Artifacts evidence:
+- current source already used `dc_artifacts` as history authority;
+- PR #104 removes child-surface Supabase/auth duplication and stale compatibility Board continuation;
+- G6 #737 PASS verifies `ВСЕ → АРХИВ → АКТИВНЫЕ`, archived `гусь`, active `Куда двигаемся - народ?`, canonical `/workspace/board/`, private shell ownership and the complete existing release gates.
 
 ## 12. Corrective Batch 04 release state
 
@@ -418,12 +424,12 @@ Backlog scope:
 5. Define auth-aware header states. — **IMPLEMENTED IN SITE / PR #95 / NOT DEPLOYED**
 6. Investigate Safari login regression and add Safari auth/browser coverage where reproducible. — **WEBKIT PROXY G6 PASS / PR #103 / REAL SAFARI LIVE RETEST PENDING AFTER RELEASE**
 7. Keep `Запросить обработку` as a future feature idea only; no implementation yet. — **OPEN / IDEA ONLY**
-8. Remove redundant pre-DC-9 application/confirmation screen if current source confirms it is only duplicate intent confirmation. — **OPEN**
+8. Remove redundant pre-DC-9 application/confirmation screen if current source confirms it is only duplicate intent confirmation. — **NO CURRENT DEFECT / CURRENT `/join/` ALREADY OPENS DIRECTLY ON THE NINE-SPHERE PICKER / NO CHANGE REQUIRED**
 9. Remove redundant `НАЧАТЬ DC-9` step if the user is already inside the DC-9 entry experience. — **IMPLEMENTED IN SITE / PR #99 / NOT DEPLOYED**
 10. Merge DC-9 intro and sphere selection. — **IMPLEMENTED IN SITE / PR #99 / NOT DEPLOYED**
 11. Rewrite DC-9 onboarding copy using canonical club language. — **OPEN; PR #99 REUSES EXISTING COPY ONLY**
 12. Clarify post-9/9 admission copy without changing Membership v2 semantics. — **PARTIAL; ROUTE/AUTH HANDOFF IMPLEMENTED, FINAL COPY OPEN**
-13. Remove low-value completion interstitials. — **OPEN**
+13. Remove low-value completion interstitials. — **OPEN / REQUIRES EXPLICIT UX DECISION BEFORE REMOVAL**
 14. Make completed sphere cards informative. — **IMPLEMENTED IN SITE USING EXISTING LEVEL NAMES / PR #99 / NOT DEPLOYED**
 15. Restore humorous payoff after each sphere using existing approved/source material first. — **PARTIAL; EXISTING RESULT LEVEL PAYOFF EXPOSED, DEDICATED POST-SPHERE PAYOFF OPEN**
 16. Design immutable first-pass DC-9 baseline ID on top of existing data model where possible. — **STORAGE/RULE IMPLEMENTED IN SITE / PR #101 / DISPLAY-ID FORMULA STILL OPEN / DB MIGRATION NOT APPLIED**
@@ -432,6 +438,7 @@ Backlog scope:
 19. Review application form/email ownership and local draft → authenticated application transition. — **AUTH/DATA HANDOFF IMPLEMENTED IN SITE / PR #97 + #101 / EMAIL OWNERSHIP STILL OPEN**
 20. Implement one canonical end-to-end onboarding flow only after source/authority/route harmonization. — **IN PROGRESS UNDER CURRENT RESULT**
 21. Project existing Member Artifacts / responses / reactions into `МОЯ АКТИВНОСТЬ` with visible Board confirmation and no new Activity entity. — **IMPLEMENTED IN SITE / PR #102 / G6 #732 PASS / NOT DEPLOYED**
+22. Preserve personal Artifact archive in the existing `МОИ АРТЕФАКТЫ` owner and keep active continuation canonical. — **IMPLEMENTED IN SITE / PR #104 / G6 #737 PASS / NOT DEPLOYED**
 
 ## 15. Approved Dementor Club product decisions — 2026-09-04
 
@@ -624,6 +631,7 @@ For Dementor Club portal work, G6 validation should include where applicable:
 - guest/authenticated/member/role state matrix;
 - real-browser regression;
 - Safari auth check for auth-related changes; current automated proxy is Playwright WebKit and does not replace real Safari live retest;
+- personal Artifact active/archive history where Artifact/Workspace behavior is touched;
 - mobile/desktop visual check;
 - canonical header/footer/Workspace-shell ownership;
 - no stale `/account/` or `/degradation_club/` runtime destinations;
@@ -664,7 +672,7 @@ This sequence is intended to make each bug-fix pass also improve Dementor Club s
 
 ## 17. Current Result implementation state — 2026-09-05
 
-Status: **ACTIVE / EIGHT COHERENT PACKAGES G6 PASS + MERGED TO `dementor-club-site` / PRODUCTION RELEASE NOT AUTHORIZED**
+Status: **ACTIVE / NINE COHERENT PACKAGES G6 PASS + MERGED TO `dementor-club-site` / PRODUCTION RELEASE NOT AUTHORIZED**
 
 Current Result:
 `dementor-club.result.qa-portal-harmonization`
@@ -714,20 +722,28 @@ Implementation evidence:
    Merged to `dementor-club-site` as `0fa400b6708328e3602b0eb59bed789bd9e60e85`.  
    Effect: WebKit is now a permanent auth regression proxy for mobile public Google start, PKCE callback escape to Workspace/Board and authenticated identity state. No auth runtime or Supabase configuration was changed; real Safari live retest remains pending.
 
+9. **PR #104 — My Artifacts archive history harmonization**  
+   G6: Site Integrity / Release Readiness **#737 PASS** including focused My Artifacts Chromium regression plus all existing Chromium/WebKit/build/route/release gates.  
+   Merged to `dementor-club-site` as `fe46704380997f987a11e4f12301de2fe66eb626`.  
+   Effect: the existing My Artifacts owner keeps active + archived personal history, archived `гусь` is regression-covered, active continuation uses `/workspace/board/`, and the child surface reuses canonical `community-runtime-v1.js` instead of owning another Supabase/auth client.
+
+Source-backed no-op evidence:
+- `/join/` already opens directly on the visible `dc9Picker` and runtime defaults to `renderPicker()`; no separate pre-DC-9 confirmation/start owner remains, so backlog item 8 required no implementation.
+
 Current branch synchronization:
-- `result/qa-portal-harmonization` is synchronized to `0fa400b6708328e3602b0eb59bed789bd9e60e85` after PR #103;
+- `result/qa-portal-harmonization` is synchronized to `fe46704380997f987a11e4f12301de2fe66eb626` after PR #104;
 - no parallel Result/integration branch was created for these related changes.
 
 Production / database status:
-- **none of PR #95/#97/#98/#99/#100/#101/#102/#103 is deployed or merged to `dementor-club-production` yet**;
+- **none of PR #95/#97/#98/#99/#100/#101/#102/#103/#104 is deployed or merged to `dementor-club-production` yet**;
 - migration `20260904171500_dc9_immutable_first_baseline_v1.sql` is committed and G6-validated but **NOT applied to live Supabase**;
 - Batch 05 (`689105fc1c7ec772cecc9b4248bc16c47cd40935`) remains merged to `dementor-club-production` but **not deployed**;
-- live production therefore still reflects the pre-current-Result header/onboarding/baseline/Activity/WebKit-gate state plus Batch 04;
+- live production therefore still reflects the pre-current-Result header/onboarding/baseline/Activity/My-Artifacts/WebKit-gate state plus Batch 04;
 - do not mark current-Result findings LIVE PASS before a clean production candidate, explicit database/deploy authorization and live retest.
 
 Next harmonized priorities:
-1. continue source-backed onboarding/result cleanup where it preserves approved semantics; final 9/9 visual/copy and baseline display-ID remain separate approval items;
-2. determine whether the remaining source-backed QA cluster is ready to become a clean production candidate;
+1. do not implement backlog items 11/13/15/18 as silent copy/UX changes; they require explicit content/visual approval where they change experience rather than fix ownership;
+2. inspect the remaining technical P0/P1 release surface and determine whether the validated source-backed cluster is ready to become a clean production candidate;
 3. when ready, create that candidate **from the current `dementor-club-production` baseline**, transfer only validated current-Result files/migration, run full production readiness, then stop for explicit user authorization before applying the Supabase migration or deploying the site;
-4. after release, live-retest real Safari auth, first-baseline → repeat → application snapshot, Header/Workspace, My Activity and QA-MEM-033;
+4. after release, live-retest real Safari auth, first-baseline → repeat → application snapshot, Header/Workspace, My Activity, My Artifacts and QA-MEM-033;
 5. perform G8 cleanup including legacy Join/member compatibility, dead picker-copy/runtime state, stale branches and any superseded shell/auth code.
