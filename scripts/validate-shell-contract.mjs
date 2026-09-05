@@ -147,6 +147,11 @@ expect(!joinHtml.includes('id="dc9Intro"'),'Join DC-9: obsolete standalone intro
 expect(!joinHtml.includes('id="dc9Start"'),'Join DC-9: redundant Start DC-9 button survived');
 expect(joinHtml.includes('ДЕВЯТЬ<br><span>СФЕР.</span>'),'Join DC-9: merged entry must retain the existing nine-sphere framing');
 
+const joinResponsive=read('join/dc9-responsive-v2.css');
+expect(joinResponsive.includes('@media(max-width:800px)'),'Join DC-9 mobile: canonical responsive breakpoint missing');
+expect(joinResponsive.includes('.dc9-member-return .dc9-actions{display:grid}'),'Join DC-9 mobile: member-return actions are not stacked');
+expect(joinResponsive.includes('.dc9-member-return .dc9-actions .dc9-button{width:100%}'),'Join DC-9 mobile: member-return actions are not full width');
+
 const dc9Runtime=read('join/dc9-immersive-v1.js');
 expect(!dc9Runtime.includes('renderIntro'),'Join DC-9: runtime still owns a separate intro state');
 expect(!dc9Runtime.includes('dc9Start'),'Join DC-9: runtime still depends on the removed start button');
@@ -160,6 +165,12 @@ expect(applyRuntime.includes("loginWithGoogle('/join/apply/'"),'Join apply: Goog
 expect(applyRuntime.includes('await syncLocalAssessmentRuns(client,uid)'),'Join apply: anonymous DC-9 results are not attached before server gate evaluation');
 expect(applyRuntime.indexOf('await syncLocalAssessmentRuns(client,uid)')<applyRuntime.indexOf("client.rpc('dc_member_entry_status_v1')"),'Join apply: server 9/9 gate is evaluated before local assessment sync');
 expect(!applyRuntime.includes('@supabase/supabase-js'),'Join apply: duplicate Supabase client/auth owner survived');
+
+const applyCss=read('join/apply/apply.css');
+expect(applyCss.includes('@media(max-width:820px)'),'Join Application mobile: responsive breakpoint missing');
+expect(applyCss.includes('.dc-apply-section-head,.dc-apply-grid{grid-template-columns:1fr}'),'Join Application mobile: form grid does not collapse to one column');
+expect(applyCss.includes('.dc-apply-submit{width:100%}'),'Join Application mobile: submit action is not full width');
+expect(applyCss.includes('@media(max-width:520px)'),'Join Application narrow mobile: compact breakpoint missing');
 
 const resultRuntime=read('join/result/result-v6.js');
 expect(!resultRuntime.includes('loginWithGoogle'),'Join result: authentication must not happen before the application boundary');
