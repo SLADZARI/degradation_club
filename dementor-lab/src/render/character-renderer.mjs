@@ -15,14 +15,7 @@ export function resolveVisualState(character={}){const derived=visualStateFromMe
 export function reactionCueFromDelta(delta={}){
   const brain=Number(delta.brain||0),tension=Number(delta.tension||0),contact=Number(delta.contact||0),energy=Number(delta.energy||0);
   let kind='steady',strength=0;
-  const candidates=[
-    ['overheat',Math.max(0,brain)/18],
-    ['tension',Math.max(0,tension)/14],
-    ['withdraw',Math.max(0,-contact)/12],
-    ['connect',Math.max(0,contact)/12],
-    ['relief',Math.max(0,-tension)/12],
-    ['fatigue',Math.max(0,-energy)/16]
-  ];
+  const candidates=[['overheat',Math.max(0,brain)/18],['tension',Math.max(0,tension)/14],['withdraw',Math.max(0,-contact)/12],['connect',Math.max(0,contact)/12],['relief',Math.max(0,-tension)/12],['fatigue',Math.max(0,-energy)/16]];
   for(const [next,value] of candidates)if(value>strength){kind=next;strength=value}
   return {kind,strength:Math.max(0,Math.min(1,strength))};
 }
@@ -37,91 +30,23 @@ export function faceOverrideFromReactionCue(cue={}){
   return {};
 }
 export const APPEARANCE_LAYERS=Object.freeze(['hat','glasses','beard','accessory','outfit','shoes']);
-export const APPEARANCE_VARIANTS=Object.freeze({
-  hat:{key:'hatVariant',prefix:'hat',legacy:'hat'},
-  glasses:{key:'glassesVariant',prefix:'glasses',legacy:'glasses'},
-  facialHair:{key:'facialHairVariant',prefix:'facial-hair',legacy:'beard'},
-  accessory:{key:'accessoryVariant',prefix:'accessory',legacy:'accessory'},
-  outfit:{key:'outfitVariant',prefix:'outfit',legacy:'outfit',baseWhenNull:true},
-  shoes:{key:'shoesVariant',prefix:'shoes',legacy:'shoes',baseWhenNull:true}
-});
+export const APPEARANCE_VARIANTS=Object.freeze({hat:{key:'hatVariant',prefix:'hat',legacy:'hat'},glasses:{key:'glassesVariant',prefix:'glasses',legacy:'glasses'},facialHair:{key:'facialHairVariant',prefix:'facial-hair',legacy:'beard'},accessory:{key:'accessoryVariant',prefix:'accessory',legacy:'accessory'},outfit:{key:'outfitVariant',prefix:'outfit',legacy:'outfit',baseWhenNull:true},shoes:{key:'shoesVariant',prefix:'shoes',legacy:'shoes',baseWhenNull:true}});
 const COLOR_KEYS=Object.freeze({outfitPrimary:'outfit-primary',outfitSecondary:'outfit-secondary',shoesPrimary:'shoes-primary'});
 const DEFAULT_RIG=Object.freeze({head:[352,270],shoulderLeft:[275,345],shoulderRight:[425,345],hipLeft:[311,590],hipRight:[393,591]});
-
-function readRig(svg,fallback=null){
-  if(!svg)return fallback||DEFAULT_RIG;
-  const raw=svg.getAttribute('data-rig-pivots');
-  if(raw){try{return {...DEFAULT_RIG,...JSON.parse(raw)}}catch{}}
-  const meta=svg.querySelector('metadata#dementor-rig-meta');
-  if(meta?.textContent){try{return {...DEFAULT_RIG,...JSON.parse(meta.textContent)}}catch{}}
-  return fallback||DEFAULT_RIG;
-}
+function readRig(svg,fallback=null){if(!svg)return fallback||DEFAULT_RIG;const raw=svg.getAttribute('data-rig-pivots');if(raw){try{return {...DEFAULT_RIG,...JSON.parse(raw)}}catch{}}const meta=svg.querySelector('metadata#dementor-rig-meta');if(meta?.textContent){try{return {...DEFAULT_RIG,...JSON.parse(meta.textContent)}}catch{}}return fallback||DEFAULT_RIG}
 function unprefixedId(id='',side=''){return String(id).replace(new RegExp(`^${side}-`),'')}
-export function isNumberedVariantId(id,prefix,side=''){
-  const normalized=unprefixedId(id,side);
-  return normalized.startsWith(`${prefix}-`)&&/^\d+$/.test(normalized.slice(prefix.length+1));
-}
+export function isNumberedVariantId(id,prefix,side=''){const normalized=unprefixedId(id,side);return normalized.startsWith(`${prefix}-`)&&/^\d+$/.test(normalized.slice(prefix.length+1))}
 function authoredVisible(el){return el?.getAttribute?.('display')!=='none'&&el?.style?.display!=='none'}
-export function legacyVariantLayerDisplay({hasVariants=false,wrapsVariants=false,baseWhenNull=false,selected=null}={}){
-  if(hasVariants)return wrapsVariants?'inline':'none';
-  return baseWhenNull?'':selected?'':'none';
-}
-
+export function legacyVariantLayerDisplay({hasVariants=false,wrapsVariants=false,baseWhenNull=false,selected=null}={}){if(hasVariants)return wrapsVariants?'inline':'none';return baseWhenNull?'':selected?'':'none'}
 export class CharacterRenderer{
   constructor({side,root,rigFallback=null}){this.side=side;this.root=root;this.rigFallback=rigFallback;this.svg=root?.querySelector('svg')||null;this.rig=readRig(this.svg,rigFallback);this.variantDefaults=new Map()}
   refresh(){this.svg=this.root?.querySelector('svg')||null;this.rig=readRig(this.svg,this.rigFallback);this.variantDefaults.clear();return this}
   el(name){if(!this.svg)return null;const escaped=CSS.escape(name),prefixed=CSS.escape(`${this.side}-${name}`);return this.svg.querySelector(`#${prefixed}`)||this.svg.querySelector(`#${escaped}`)}
-  variants(group,active){const groups={eyes:['neutral','tense','sleepy','overheat'],brows:['neutral','tense','angry'],mouth:['neutral','soft','tense','open']};(groups[group]||[]).forEach(v=>{const el=this.el(`${group}-${v}`);if(el)el.style.opacity=v===active?'1':'0'})}
-  variantElements(prefix){
-    if(!this.svg)return [];
-    const selectors=[`[id^="${CSS.escape(prefix)}-"]`,`[id^="${CSS.escape(`${this.side}-${prefix}`)}-"]`];
-    return [...new Set(selectors.flatMap(selector=>[...this.svg.querySelectorAll(selector)]))].filter(el=>isNumberedVariantId(el.id,prefix,this.side));
-  }
-  setVariant(prefix,active,{baseWhenNull=false}={}){
-    const variants=this.variantElements(prefix);
-    if(!this.variantDefaults.has(prefix))this.variantDefaults.set(prefix,new Set(variants.filter(authoredVisible).map(el=>unprefixedId(el.id,this.side))));
-    const defaults=this.variantDefaults.get(prefix)||new Set();
-    variants.forEach(el=>{const id=unprefixedId(el.id,this.side),show=active?id===active:baseWhenNull&&defaults.has(id);el.style.display=show?'inline':'none'});
-    return variants.length>0;
-  }
-  setColorTarget(id,value){
-    if(!value||!this.svg)return;
-    const escaped=CSS.escape(id),prefixed=CSS.escape(`${this.side}-${id}`);
-    const roots=[...new Set([
-      ...this.svg.querySelectorAll(`[data-color-target="${escaped}"]`),
-      ...this.svg.querySelectorAll(`[id="${escaped}"]`),
-      ...this.svg.querySelectorAll(`[id="${prefixed}"]`)
-    ])];
-    if(!roots.length)return;
-    const paint=el=>{const fill=el.getAttribute?.('fill');if(fill!=='none')el.style.fill=value};
-    roots.forEach(root=>{paint(root);root.querySelectorAll?.('[fill]').forEach(paint)});
-  }
-  appearance(visual={}){
-    const state=visual.appearance||{};
-    if(state.variantContract){
-      Object.values(APPEARANCE_VARIANTS).forEach(({key,prefix,legacy,baseWhenNull=false})=>{
-        const selected=state[key]??null;
-        const variantEls=this.variantElements(prefix);
-        const hasVariants=this.setVariant(prefix,selected,{baseWhenNull});
-        const legacyEl=this.el(legacy);
-        if(legacyEl){
-          const wrapsVariants=hasVariants&&variantEls.some(el=>el!==legacyEl&&legacyEl.contains(el));
-          legacyEl.style.display=legacyVariantLayerDisplay({hasVariants,wrapsVariants,baseWhenNull,selected});
-        }
-      });
-      const colors=state.colors||{};Object.entries(COLOR_KEYS).forEach(([key,id])=>this.setColorTarget(id,colors[key]));
-      return;
-    }
-    APPEARANCE_LAYERS.forEach(name=>{const el=this.el(name);if(el)el.style.display=state[name]===false?'none':''});
-  }
-  render(character){
-    if(!character)return;if(!this.svg)this.refresh();if(!this.svg)return;
-    const face=resolveVisualState(character),m=face.motion||{},rig=this.rig||DEFAULT_RIG;
-    this.appearance(character.visual||{});this.variants('eyes',face.eyes||'neutral');this.variants('brows',face.brows||'neutral');this.variants('mouth',face.mouth||'neutral');
-    const head=this.el('head-rig');if(head){const [cx,cy]=rig.head||DEFAULT_RIG.head;head.style.transformOrigin=`${cx}px ${cy}px`;const sign=this.side==='A'?1:-1;head.style.transform=`translateY(${(m.headDrop||0)*6}px) rotate(${((m.headInstability||0)+(m.orientToPartner||0))*2*sign}deg)`}
-    const left=this.el('body-arm-left'),right=this.el('body-arm-right'),amp=m.amplitude??1,sharp=m.gestureSharpness||0;
-    if(left){const [cx,cy]=rig.shoulderLeft||DEFAULT_RIG.shoulderLeft;left.style.transformOrigin=`${cx}px ${cy}px`;left.style.transform=`rotate(${-sharp*7*amp}deg)`}
-    if(right){const [cx,cy]=rig.shoulderRight||DEFAULT_RIG.shoulderRight;right.style.transformOrigin=`${cx}px ${cy}px`;right.style.transform=`rotate(${sharp*9*amp}deg)`}
-  }
+  variants(group,active){const groups={eyes:['neutral','tense','sleepy','overheat'],brows:['neutral','tense','angry'],mouth:['neutral','soft','tense','open']};(groups[group]||[]).forEach(v=>{const el=this.el(`${group}-${v}`);if(el){const on=v===active;el.style.display=on?'inline':'none';el.style.opacity=on?'1':'0'}})}
+  variantElements(prefix){if(!this.svg)return [];const selectors=[`[id^="${CSS.escape(prefix)}-"]`,`[id^="${CSS.escape(`${this.side}-${prefix}`)}-"]`];return [...new Set(selectors.flatMap(selector=>[...this.svg.querySelectorAll(selector)]))].filter(el=>isNumberedVariantId(el.id,prefix,this.side))}
+  setVariant(prefix,active,{baseWhenNull=false}={}){const variants=this.variantElements(prefix);if(!this.variantDefaults.has(prefix))this.variantDefaults.set(prefix,new Set(variants.filter(authoredVisible).map(el=>unprefixedId(el.id,this.side))));const defaults=this.variantDefaults.get(prefix)||new Set();variants.forEach(el=>{const id=unprefixedId(el.id,this.side),show=active?id===active:baseWhenNull&&defaults.has(id);el.style.display=show?'inline':'none'});return variants.length>0}
+  setColorTarget(id,value){if(!value||!this.svg)return;const escaped=CSS.escape(id),prefixed=CSS.escape(`${this.side}-${id}`);const roots=[...new Set([...this.svg.querySelectorAll(`[data-color-target="${escaped}"]`),...this.svg.querySelectorAll(`[id="${escaped}"]`),...this.svg.querySelectorAll(`[id="${prefixed}"]`)])];if(!roots.length)return;const paint=el=>{const fill=el.getAttribute?.('fill');if(fill!=='none')el.style.fill=value};roots.forEach(root=>{paint(root);root.querySelectorAll?.('[fill]').forEach(paint)})}
+  appearance(visual={}){const state=visual.appearance||{};if(state.variantContract){Object.values(APPEARANCE_VARIANTS).forEach(({key,prefix,legacy,baseWhenNull=false})=>{const selected=state[key]??null;const variantEls=this.variantElements(prefix);const hasVariants=this.setVariant(prefix,selected,{baseWhenNull});const legacyEl=this.el(legacy);if(legacyEl){const wrapsVariants=hasVariants&&variantEls.some(el=>el!==legacyEl&&legacyEl.contains(el));legacyEl.style.display=legacyVariantLayerDisplay({hasVariants,wrapsVariants,baseWhenNull,selected})}});const colors=state.colors||{};Object.entries(COLOR_KEYS).forEach(([key,id])=>this.setColorTarget(id,colors[key]));return}APPEARANCE_LAYERS.forEach(name=>{const el=this.el(name);if(el)el.style.display=state[name]===false?'none':''})}
+  render(character){if(!character)return;if(!this.svg)this.refresh();if(!this.svg)return;const face=resolveVisualState(character),m=face.motion||{},rig=this.rig||DEFAULT_RIG;this.appearance(character.visual||{});this.variants('eyes',face.eyes||'neutral');this.variants('brows',face.brows||'neutral');this.variants('mouth',face.mouth||'neutral');const head=this.el('head-rig');if(head){const [cx,cy]=rig.head||DEFAULT_RIG.head;head.style.transformOrigin=`${cx}px ${cy}px`;const sign=this.side==='A'?1:-1;head.style.transform=`translateY(${(m.headDrop||0)*6}px) rotate(${((m.headInstability||0)+(m.orientToPartner||0))*2*sign}deg)`}const left=this.el('body-arm-left'),right=this.el('body-arm-right'),amp=m.amplitude??1,sharp=m.gestureSharpness||0;if(left){const [cx,cy]=rig.shoulderLeft||DEFAULT_RIG.shoulderLeft;left.style.transformOrigin=`${cx}px ${cy}px`;left.style.transform=`rotate(${-sharp*7*amp}deg)`}if(right){const [cx,cy]=rig.shoulderRight||DEFAULT_RIG.shoulderRight;right.style.transformOrigin=`${cx}px ${cy}px`;right.style.transform=`rotate(${sharp*9*amp}deg)`}}
   breakdown(character,reason){this.render(character);this.root?.classList.remove('lost','brain','energy','contact');this.root?.classList.add('lost');const key=String(reason||'').toUpperCase().includes('ENERGY')?'energy':String(reason||'').toUpperCase().includes('CONTACT')?'contact':'brain';this.root?.classList.add(key);if(key==='brain'){this.variants('eyes','overheat');this.variants('brows','angry');this.variants('mouth','open')}if(key==='energy'){this.variants('eyes','sleepy');this.variants('brows','neutral');this.variants('mouth','tense')}if(key==='contact'){this.variants('eyes','tense');this.variants('brows','tense');this.variants('mouth','tense')}}
 }
