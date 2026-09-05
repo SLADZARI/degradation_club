@@ -9,7 +9,7 @@ const errors=[];
 const expect=(ok,message)=>{if(!ok)errors.push(message)};
 
 const artifact=path.join(process.cwd(),'_site');
-for(const [rel,label] of [['global-header.js','GlobalHeader'],['community-runtime-v1.js','Community runtime']]){
+for(const [rel,label] of [['global-header.js','GlobalHeader'],['community-runtime-v1.js','Community runtime'],['workspace/workspace.js','Workspace guest gate']]){
   const file=path.join(artifact,rel);
   expect(fs.existsSync(file),`${label}: built auth owner missing: ${rel}`);
   if(fs.existsSync(file)){
@@ -53,4 +53,4 @@ if(errors.length){
   process.exit(1);
 }
 
-console.log('Google OAuth provider handoff PASS: both built Google login owners request explicit account choice and Supabase redirects to accounts.google.com with canonical callback');
+console.log('Google OAuth provider handoff PASS: all built Google login owners request explicit account choice and Supabase redirects to accounts.google.com with canonical callback');
