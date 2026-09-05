@@ -7,30 +7,17 @@ export const DIRECT_ANSWER_SCENARIO=Object.freeze({
   topic:'Собеседник уходит от прямого ответа.',
   objective:'direct-answer',
   objectiveLabel:'ДОБИТЬСЯ ОТВЕТА',
-  objectiveRules:Object.freeze({requiredOpponentCounterpoints:4,minRelationshipContact:50}),
+  objectiveRules:Object.freeze({requiredOpponentCounterpoints:4,minRelationshipContact:25,requiredPlayerReactionKinds:2}),
   openingTrigger:'criticism',
   turnLimit:16
 });
 
 const nodes=[
-  {id:'d-open',type:'criticism',p:{}},
-  {id:'d-pushback',type:'pushback',p:{}},
-  {id:'d-acceptance',type:'acceptance',p:{}},
-  {id:'d-deflection',type:'deflection',p:{}},
-  {id:'d-ignore',type:'ignore',p:{}},
-  {id:'d-underpressure',type:'underpressure',p:{}},
-  {id:'d-explain',type:'explain',p:{}},
-  {id:'d-joke',type:'joke',p:{}},
-  {id:'d-silent',type:'silent',p:{}},
-  {id:'d-pressure',type:'pressure',p:{}}
+  {id:'d-open',type:'criticism',p:{}},{id:'d-pushback',type:'pushback',p:{}},{id:'d-acceptance',type:'acceptance',p:{}},{id:'d-deflection',type:'deflection',p:{}},{id:'d-ignore',type:'ignore',p:{}},{id:'d-underpressure',type:'underpressure',p:{}},
+  {id:'d-explain',type:'explain',p:{}},{id:'d-joke',type:'joke',p:{}},{id:'d-silent',type:'silent',p:{}},{id:'d-pressure',type:'pressure',p:{}}
 ];
 const edges=[
-  {id:'d-e0',from:'d-open',to:'d-joke'},
-  {id:'d-e1',from:'d-pushback',to:'d-explain'},
-  {id:'d-e2',from:'d-acceptance',to:'d-silent'},
-  {id:'d-e3',from:'d-deflection',to:'d-joke'},
-  {id:'d-e4',from:'d-ignore',to:'d-silent'},
-  {id:'d-e5',from:'d-underpressure',to:'d-pressure'}
+  {id:'d-e0',from:'d-open',to:'d-joke'},{id:'d-e1',from:'d-pushback',to:'d-explain'},{id:'d-e2',from:'d-acceptance',to:'d-silent'},{id:'d-e3',from:'d-deflection',to:'d-joke'},{id:'d-e4',from:'d-ignore',to:'d-silent'},{id:'d-e5',from:'d-underpressure',to:'d-pressure'}
 ];
 export const DIRECT_ANSWER_OPPONENT_GRAPH=Object.freeze({id:'direct-answer-opponent',nodes:Object.freeze(nodes),edges:Object.freeze(edges)});
 
