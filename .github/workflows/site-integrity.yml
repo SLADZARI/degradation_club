@@ -40,6 +40,8 @@ jobs:
         run: node scripts/validate-shell-contract.mjs
       - name: Validate built JavaScript syntax
         run: node scripts/validate-built-js-syntax.mjs
+      - name: Validate live Google OAuth provider handoff
+        run: node scripts/validate-google-oauth-handoff.mjs
       - name: Install browser smoke runtime
         run: |
           npm install --no-save --no-package-lock playwright@1.55.0
