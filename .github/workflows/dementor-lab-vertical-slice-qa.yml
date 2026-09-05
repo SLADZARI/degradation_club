@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - agent/dementor-lab-vertical-slice-v0.3
+      - experiment/dementor-lab-intent-saliency-v0.5
     paths:
       - 'dementor-lab/**'
       - '.github/workflows/dementor-lab-vertical-slice-qa.yml'
