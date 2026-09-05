@@ -42,7 +42,19 @@ export class CharacterRenderer{
   constructor({side,root,rigFallback=null}){this.side=side;this.root=root;this.rigFallback=rigFallback;this.svg=root?.querySelector('svg')||null;this.rig=readRig(this.svg,rigFallback);this.variantDefaults=new Map()}
   refresh(){this.svg=this.root?.querySelector('svg')||null;this.rig=readRig(this.svg,this.rigFallback);this.variantDefaults.clear();return this}
   el(name){if(!this.svg)return null;const escaped=CSS.escape(name),prefixed=CSS.escape(`${this.side}-${name}`);return this.svg.querySelector(`#${prefixed}`)||this.svg.querySelector(`#${escaped}`)}
-  variants(group,active){const groups={eyes:['neutral','tense','sleepy','overheat'],brows:['neutral','tense','angry'],mouth:['neutral','soft','tense','open']};(groups[group]||[]).forEach(v=>{const el=this.el(`${group}-${v}`);if(el){const on=v===active;el.style.display=on?'inline':'none';el.style.opacity=on?'1':'0'}})}
+  forceFaceVisible(el,on){
+    if(!el)return;
+    el.style.display=on?'inline':'none';el.style.visibility=on?'visible':'hidden';el.style.opacity=on?'1':'0';
+    if(on){
+      el.removeAttribute('opacity');el.removeAttribute('fill-opacity');el.removeAttribute('stroke-opacity');
+      el.querySelectorAll('*').forEach(node=>{node.style.visibility='visible';node.style.opacity='1';node.removeAttribute('opacity');if(node.hasAttribute('fill-opacity'))node.setAttribute('fill-opacity','1');if(node.hasAttribute('stroke-opacity'))node.setAttribute('stroke-opacity','1')});
+    }
+  }
+  variants(group,active){
+    const groups={eyes:['neutral','tense','sleepy','overheat'],brows:['neutral','tense','angry'],mouth:['neutral','soft','tense','open']};
+    const wrapper=this.el(group);if(wrapper){wrapper.style.display='inline';wrapper.style.visibility='visible';wrapper.style.opacity='1';wrapper.removeAttribute('opacity')}
+    ;(groups[group]||[]).forEach(v=>this.forceFaceVisible(this.el(`${group}-${v}`),v===active));
+  }
   variantElements(prefix){if(!this.svg)return [];const selectors=[`[id^="${CSS.escape(prefix)}-"]`,`[id^="${CSS.escape(`${this.side}-${prefix}`)}-"]`];return [...new Set(selectors.flatMap(selector=>[...this.svg.querySelectorAll(selector)]))].filter(el=>isNumberedVariantId(el.id,prefix,this.side))}
   setVariant(prefix,active,{baseWhenNull=false}={}){const variants=this.variantElements(prefix);if(!this.variantDefaults.has(prefix))this.variantDefaults.set(prefix,new Set(variants.filter(authoredVisible).map(el=>unprefixedId(el.id,this.side))));const defaults=this.variantDefaults.get(prefix)||new Set();variants.forEach(el=>{const id=unprefixedId(el.id,this.side),show=active?id===active:baseWhenNull&&defaults.has(id);el.style.display=show?'inline':'none'});return variants.length>0}
   setColorTarget(id,value){if(!value||!this.svg)return;const escaped=CSS.escape(id),prefixed=CSS.escape(`${this.side}-${id}`);const roots=[...new Set([...this.svg.querySelectorAll(`[data-color-target="${escaped}"]`),...this.svg.querySelectorAll(`[id="${escaped}"]`),...this.svg.querySelectorAll(`[id="${prefixed}"]`)])];if(!roots.length)return;const paint=el=>{const fill=el.getAttribute?.('fill');if(fill!=='none')el.style.fill=value};roots.forEach(root=>{paint(root);root.querySelectorAll?.('[fill]').forEach(paint)})}
