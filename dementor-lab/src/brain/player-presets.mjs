@@ -65,20 +65,26 @@ export const PLAYER_BRAIN_PRESETS=Object.freeze({
   PRESS_FOR_ANSWER:Object.freeze({
     id:'PRESS_FOR_ANSWER',
     title:'ОТВЕТЬ ПРЯМО',
-    rule:'Если уходят в сторону — возвращаю к вопросу.',
-    note:'Быстро повышает напряжение.',
+    rule:'Спрашиваю прямо. Если разговор перегрелся — сбавляю и возвращаюсь к вопросу.',
+    note:'Умеет менять тактику по ходу разговора.',
     graph:freezeGraph({
       id:'player-press-answer',
       nodes:[
         {id:'pr-trigger',type:'criticism',p:{}},
         {id:'pr-state',type:'resentment',p:{key:'resentment',delta:1,cap:5}},
         {id:'pr-impulse',type:'beright',p:{weight:4}},
-        {id:'pr-reaction',type:'pressure',p:{}}
+        {id:'pr-reaction',type:'explain',p:{}},
+        {id:'pr-if-hot',type:'ifbrain',p:{threshold:35}},
+        {id:'pr-pause',type:'pause',p:{}},
+        {id:'pr-joke',type:'joke',p:{}}
       ],
       edges:[
         {id:'pr-e1',from:'pr-trigger',to:'pr-state'},
         {id:'pr-e2',from:'pr-state',to:'pr-impulse'},
-        {id:'pr-e3',from:'pr-impulse',to:'pr-reaction'}
+        {id:'pr-e3',from:'pr-impulse',to:'pr-reaction'},
+        {id:'pr-e4',from:'pr-impulse',to:'pr-if-hot'},
+        {id:'pr-e5',from:'pr-if-hot',to:'pr-pause'},
+        {id:'pr-e6',from:'pr-pause',to:'pr-joke'}
       ]
     })
   })
