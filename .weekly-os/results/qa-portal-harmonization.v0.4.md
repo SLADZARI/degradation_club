@@ -125,6 +125,18 @@ Observed:
 
 Classification: **LIVE PASS** for guest Header, Google login handoff and ordinary Member post-login routing.
 
+### Owner/Admin + Membership Review
+User live-tested owner/admin surfaces after deploy #35.
+Observed:
+- `/workspace/admin/` opened inside the canonical Workspace shell;
+- `/workspace/review/` opened inside the same shell without duplicate public navigation;
+- role-specific items `MEMBERSHIP REVIEW` and `SYSTEM TOOLS` were visible for the owner/admin session;
+- Membership Review rendered its closed-workspace review surface normally;
+- System Tools rendered the owner/admin tool surface normally;
+- Board remained subject to the existing Artifact-slot model; no unapproved unlimited owner/admin publication path was introduced.
+
+Classification: **LIVE PASS** for owner/admin geometry, role-tool visibility and Review access in the observed session.
+
 ### Owner/Admin System Tests A3
 The read-only owner/admin test page reported `6 PASS / 1 FAIL`; only `A3 MEMBERSHIP APPLICATION` failed because `authenticated_insert_policy_present=false`.
 
@@ -141,19 +153,19 @@ Classification: **QA TOOL DEFECT / STALE ASSERTION**, non-blocking for the produ
 Do not close G7 from deploy success alone. Continue in one sequence:
 1. Board root/child navigation including QA-MEM-033;
 2. first Artifact spotlight without false activation;
-3. owner-admin geometry and Review access, without unapproved unlimited publication;
-4. Safari/public + private Google login entry points as needed to confirm combined auth convergence;
-5. mobile Join/DC-9 and Application at phone widths;
-6. immutable first-complete DC-9 baseline → repeat → Application snapshot behavior;
-7. live route/canonical/SEO integrity;
-8. regression confirmation for My Activity, My Artifacts and Board drag.
+3. Safari/public + private Google login entry points as needed to confirm combined auth convergence;
+4. mobile Join/DC-9 and Application at phone widths;
+5. immutable first-complete DC-9 baseline → repeat → Application snapshot behavior;
+6. live route/canonical/SEO integrity;
+7. regression confirmation for My Activity, My Artifacts and Board drag.
 
 ## Deferred / decision-required
 Remain outside this technical batch unless explicitly decided:
 - unlimited owner/admin/system-card publication;
 - QA-MEM-004 historical course repeat-state product decision;
 - final DC-9 onboarding/result/application copy and visual polish;
-- compatibility-route deletion and old implicit/hash auth-preboot removal — G8 cleanup after live evidence.
+- compatibility-route deletion and old implicit/hash auth-preboot removal — G8 cleanup after live evidence;
+- **post-QA Workspace navigation redesign:** move the current left Workspace sidebar/menu to a top navigation surface after G7/G8, preserving the same canonical Workspace shell ownership, role-aware items, identity ownership and route semantics. This is a NEXT RESULT / design-shell change, not part of the current QA bugfix batch and must not create a second simultaneous menu system.
 
 ## Closure path
 `deploy #35 → sequential live QA → corrective batch for only evidenced live defects → reconcile canonical QA ledger → close/reclassify remaining P0/P1 → G8 cleanup → only then close this Result and open the separate pre-advertising content/visual Result.`
