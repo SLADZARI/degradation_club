@@ -12,7 +12,7 @@ else{
   const {data:{session},error}=await client.auth.getSession();
   if(error||!session?.user){
     message.textContent='Нужен аккаунт OWNER_ADMIN.';actions.innerHTML='<button type="button" data-login>ВОЙТИ ЧЕРЕЗ GOOGLE</button><a class="secondary" href="/workspace/">В КАБИНЕТ</a>';
-    actions.querySelector('[data-login]')?.addEventListener('click',()=>client.auth.signInWithOAuth({provider:'google',options:{redirectTo:callback}}));
+    actions.querySelector('[data-login]')?.addEventListener('click',()=>client.auth.signInWithOAuth({provider:'google',options:{redirectTo:callback,queryParams:{prompt:'select_account'}}}));
   }else{
     const {data:roles,error:roleError}=await client.from('dc_role_assignments').select('role,status,valid_from,valid_to').eq('profile_id',session.user.id).eq('role','owner_admin');
     const now=Date.now();const active=r=>r?.status==='active'&&(!r.valid_from||Date.parse(r.valid_from)<=now)&&(!r.valid_to||Date.parse(r.valid_to)>now);

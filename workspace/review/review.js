@@ -32,7 +32,7 @@ if(!host||!cfg?.enabled){
     host.querySelector('[data-login]').onclick=async()=>{
       const next=base+location.pathname.replace(base,'')+location.search;
       const callback=location.origin+base+'/auth/callback/?next='+encodeURIComponent(next);
-      const {error}=await client.auth.signInWithOAuth({provider:'google',options:{redirectTo:callback}});
+      const {error}=await client.auth.signInWithOAuth({provider:'google',options:{redirectTo:callback,queryParams:{prompt:'select_account'}}});
       if(error)host.innerHTML='<div class="dcr-error">'+esc(error.message)+'</div>';
     };
   }else{

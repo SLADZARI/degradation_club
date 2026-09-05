@@ -38,7 +38,7 @@ function effectiveState(){
 }
 
 function gate(title,text,action=''){view.innerHTML=`<section class="dcw-gate"><div class="dcw-denied"><h2>${esc(title)}</h2><p>${esc(text)}</p>${action}</div></section>`;}
-async function login(){const next=basePath()+'/workspace/';const callback=location.origin+basePath()+'/auth/callback/?next='+encodeURIComponent(next);const {error}=await state.client.auth.signInWithOAuth({provider:'google',options:{redirectTo:callback}});if(error)throw error;}
+async function login(){const next=basePath()+'/workspace/';const callback=location.origin+basePath()+'/auth/callback/?next='+encodeURIComponent(next);const {error}=await state.client.auth.signInWithOAuth({provider:'google',options:{redirectTo:callback,queryParams:{prompt:'select_account'}}});if(error)throw error;}
 
 async function loadIdentity(){
   const {data:{session},error}=await state.client.auth.getSession();if(error)throw error;state.session=session||null;
