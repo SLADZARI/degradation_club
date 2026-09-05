@@ -7,19 +7,19 @@
     "projectStage": "RELEASE",
     "gate": "G7_RELEASE",
     "status": "APPROVED",
-    "version": "1.6",
+    "version": "1.7",
     "updated": "2026-09-05",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "1.5"
+    "supersedes": "1.6"
   },
   "currentArtifacts": [
-    {"artifactId":"dementor-club.kernel.project","documentType":"STANDARD","currentVersion":"1.6","status":"APPROVED","location":".weekly-os/PROJECT.json","sourceSystem":"GIT","authorityType":"IMPLEMENTATION_AUTHORITY","updated":"2026-09-05","canonicalProject":"dementor-club","canonicalLocation":".weekly-os/PROJECT.json","relation":"PROJECT_KERNEL","referencedBy":["dementor-club.result.qa-portal-harmonization"]},
-    {"artifactId":"dementor-club.kernel.artifact-index","documentType":"STANDARD","currentVersion":"1.6","status":"APPROVED","location":".weekly-os/ARTIFACT_INDEX.json","sourceSystem":"GIT","authorityType":"IMPLEMENTATION_AUTHORITY","updated":"2026-09-05","canonicalProject":"dementor-club","canonicalLocation":".weekly-os/ARTIFACT_INDEX.json","relation":"PROJECT_KERNEL","referencedBy":["dementor-club.result.qa-portal-harmonization"]},
+    {"artifactId":"dementor-club.kernel.project","documentType":"STANDARD","currentVersion":"1.7","status":"APPROVED","location":".weekly-os/PROJECT.json","sourceSystem":"GIT","authorityType":"IMPLEMENTATION_AUTHORITY","updated":"2026-09-05","canonicalProject":"dementor-club","canonicalLocation":".weekly-os/PROJECT.json","relation":"PROJECT_KERNEL","referencedBy":["dementor-club.result.qa-portal-harmonization"]},
+    {"artifactId":"dementor-club.kernel.artifact-index","documentType":"STANDARD","currentVersion":"1.7","status":"APPROVED","location":".weekly-os/ARTIFACT_INDEX.json","sourceSystem":"GIT","authorityType":"IMPLEMENTATION_AUTHORITY","updated":"2026-09-05","canonicalProject":"dementor-club","canonicalLocation":".weekly-os/ARTIFACT_INDEX.json","relation":"PROJECT_KERNEL","referencedBy":["dementor-club.result.qa-portal-harmonization"]},
     {"artifactId":"dementor-club.kernel.approved-state","documentType":"STANDARD","currentVersion":"1.0","status":"APPROVED","location":".weekly-os/APPROVED_STATE.json","sourceSystem":"GIT","authorityType":"IMPLEMENTATION_AUTHORITY","updated":"2026-09-03","canonicalProject":"dementor-club","canonicalLocation":".weekly-os/APPROVED_STATE.json","relation":"PROTECTED_STATE","referencedBy":["dementor-club.result.mp-dsl-kernel-migration","dementor-club.result.qa-portal-harmonization"]},
     {"artifactId":"dementor-club.decision.workspace-member-activation-shell","documentType":"ARCHITECTURE_DECISION","currentVersion":"1.0","status":"APPROVED","location":"operations/WORKSPACE_MEMBER_ACTIVATION_AND_SHELL_V1.md","sourceSystem":"GIT","authorityType":"APPROVED_AUTHORITY","updated":"2026-09-04","canonicalProject":"dementor-club","canonicalLocation":"operations/WORKSPACE_MEMBER_ACTIVATION_AND_SHELL_V1.md","relation":"APPROVED_LOCAL_DECISION","referencedBy":["dementor-club.result.qa-portal-harmonization"],"note":"Project-local scope only; does not promote project-wide ARCHITECTURE/DESIGN protected state."},
-    {"artifactId":"dementor-club.result.qa-portal-harmonization","documentType":"RESULT","currentVersion":"0.2","status":"DRAFT","location":".weekly-os/results/qa-portal-harmonization.v0.2.md","sourceSystem":"GIT","authorityType":"IMPLEMENTATION_AUTHORITY","updated":"2026-09-05","canonicalProject":"dementor-club","canonicalLocation":".weekly-os/results/qa-portal-harmonization.v0.2.md","relation":"CURRENT_RESULT","gate":"G7_RELEASE","productionCommit":"25dc061e292f79c996d2346c6d51fddc5245b642","productionDeployed":true,"liveDatabaseMigrationApplied":true,"referencedBy":[]},
+    {"artifactId":"dementor-club.result.qa-portal-harmonization","documentType":"RESULT","currentVersion":"0.2","status":"DRAFT","location":".weekly-os/results/qa-portal-harmonization.v0.2.md","sourceSystem":"GIT","authorityType":"IMPLEMENTATION_AUTHORITY","updated":"2026-09-05","canonicalProject":"dementor-club","canonicalLocation":".weekly-os/results/qa-portal-harmonization.v0.2.md","relation":"CURRENT_RESULT","gate":"G7_RELEASE","productionCommit":"723c5404d28530ae9805a76c4442daa0b6bedfcb","productionDeployed":false,"liveDatabaseMigrationApplied":true,"referencedBy":[]},
     {"artifactId":"dementor-club.result.mp-dsl-kernel-migration","documentType":"RESULT","currentVersion":"1.0","status":"APPROVED","location":".weekly-os/results/mp-dsl-kernel-migration.v1.0.md","sourceSystem":"GIT","authorityType":"IMPLEMENTATION_AUTHORITY","updated":"2026-09-03","canonicalProject":"dementor-club","canonicalLocation":".weekly-os/results/mp-dsl-kernel-migration.v1.0.md","relation":"COMPLETED_RESULT","referencedBy":[]}
   ],
   "referenceArtifacts": [
