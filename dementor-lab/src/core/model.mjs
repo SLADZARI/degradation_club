@@ -8,6 +8,7 @@ export const NODE_SPECS = Object.freeze({
   beright:{family:'IMPULSE',title:'БЫТЬ ПРАВЫМ',description:'сильнее тянет к этой ветке; разгоняет BRAIN/TENSION и ухудшает CONTACT',defaults:{weight:3}},
   beliked:{family:'IMPULSE',title:'НРАВИТЬСЯ',description:'сильнее тянет к этой ветке; успокаивает себя и мягко поддерживает CONTACT без BRAIN-цены',defaults:{weight:2}},
   understand:{family:'IMPULSE',title:'ПОНЯТЬ',description:'сильнее тянет к этой ветке; лучше поддерживает контакт с другим, но заметнее нагружает BRAIN',defaults:{weight:2}},
+  beunderstood:{family:'IMPULSE',title:'БЫТЬ ПОНЯТЫМ',description:'тянет продолжать объяснение, пока собственная мысль не кажется принятой; может поддержать ясность, но легко разгоняет BRAIN при сопротивлении',defaults:{weight:2}},
   resentment:{family:'STATE',title:'ОБИДА',description:'запоминает обиду; она тянет к этой ветке и постепенно вытесняет доверие',defaults:{key:'resentment',delta:1,cap:5}},
   trust:{family:'STATE',title:'ДОВЕРИЕ',description:'запоминает доверие; оно тянет к этой ветке и постепенно размывает обиду',defaults:{key:'trust',delta:1,cap:5}},
   explain:{family:'REACTION',title:'ОБЪЯСНИТЬ',description:'нагружает аргументами обоих; повышает BRAIN и немного портит CONTACT',defaults:{}},
