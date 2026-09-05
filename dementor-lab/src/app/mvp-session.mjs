@@ -2,8 +2,12 @@ import { VerticalSliceController } from './vertical-slice-controller.mjs';
 import { createCriticismActors, scenarioWithObjective } from '../scenarios/criticism-idea.mjs';
 import { compareRuns, buildResult } from '../encounter/result.mjs';
 import { encounterToRunRecord, saveRunRecord } from '../archive/run-store.mjs';
+import { NODE_SPECS } from '../core/model.mjs';
+import { validateGraph } from '../core/graph.mjs';
 
+let sessionSequence=0;
 function clone(value){return JSON.parse(JSON.stringify(value))}
+function runId(){sessionSequence+=1;return `run-${Date.now().toString(36)}-${sessionSequence.toString(36)}`}
 function repeatNode(actor){return actor.brainGraph.nodes.find(n=>n.type==='repeat')||null}
 function impulseNode(actor){return actor.brainGraph.nodes.find(n=>['beright','beliked','understand','beunderstood'].includes(n.type))||null}
 
@@ -13,6 +17,7 @@ export function createMvpSession({playerName='Гена',playerPresetId='EXPLAIN_
   const actors=createCriticismActors({playerName,playerPresetId,opponentProfile});
   const controller=new VerticalSliceController({scenario,actors,onEvent});
   controller.start({mode:'step'});
+  controller.encounter.id=runId();
   return {config,controller,scenario,actors};
 }
 
@@ -42,11 +47,19 @@ function applyMutation(actor,mutation){
     if(!n)throw new Error('impulse node required for counterfactual');
     const before=Number(n.p?.weight||1);n.p.weight=Math.max(1,before-Number(mutation.amount||1));return {kind:mutation.kind,nodeId:n.id,before,after:n.p.weight};
   }
+  if(mutation.kind==='insert-pause'){
+    const graph=actor.brainGraph,edge=graph.edges.find(e=>e.id===mutation.edgeId);if(!edge)throw new Error('edge required for counterfactual pause');
+    const id=mutation.nodeId||`cf-pause-${edge.id}`;if(graph.nodes.some(n=>n.id===id))throw new Error('pause node already exists');
+    const before={...edge};graph.nodes.push({id,type:'pause',p:{...NODE_SPECS.pause.defaults}});graph.edges=graph.edges.filter(e=>e.id!==edge.id);graph.edges.push({id:`${edge.id}-a`,from:edge.from,to:id},{id:`${edge.id}-b`,from:id,to:edge.to});
+    const valid=validateGraph(graph);if(!valid.runnable)throw new Error(`counterfactual pause invalid: ${valid.code}`);
+    return {kind:mutation.kind,nodeId:id,edgeId:edge.id,before:before.id,after:id};
+  }
   throw new Error(`Unsupported counterfactual mutation: ${mutation.kind}`);
 }
 
 export function counterfactualRerun(beforeSession,mutation,{maxTurns=100}={}){
   const rerun=createMvpSession({...beforeSession.config,onEvent:()=>{}});
+  rerun.actors.A.brainGraph=clone(beforeSession.controller.encounter.actors.A.brainGraph);
   const applied=applyMutation(rerun.actors.A,mutation);
   const after=advanceUntilPause(rerun,{maxTurns,declineHotPatch:true});
   if(after.status!=='RESULT')throw new Error('Counterfactual did not reach result');
