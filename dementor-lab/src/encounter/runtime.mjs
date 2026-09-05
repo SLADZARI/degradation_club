@@ -123,7 +123,7 @@ export function executeActorTurn(encounter,{trigger=null,eventResolver=null}={})
   encounter.activeActor=targetSide;encounter.status='NEXT_TURN';return {trace,terminal:false};
 }
 function relationshipContact(encounter){return Math.min(encounter.actors.A.state.contact,encounter.actors.B.state.contact)}
-function directAnswerProgress(encounter){return encounter.traces.filter(t=>t.actorId==='B'&&t.event?.type==='COUNTERPOINT').length}
+function directAnswerProgress(encounter){return encounter.traces.filter(t=>t.actorId==='B'&&t.selectedReaction==='explain').length}
 export function checkTerminal(encounter){
   for(const [side,a] of Object.entries(encounter.actors)){if(a.state.brain>=100)return {type:'BREAKDOWN',reason:'BRAIN',loser:side,turn:encounter.turn};if(a.state.energy<=0)return {type:'BREAKDOWN',reason:'ENERGY',loser:side,turn:encounter.turn};if(a.state.contact<=0&&encounter.scenario.objective==='contact')return {type:'BREAKDOWN',reason:'CONTACT',loser:side,turn:encounter.turn}}
   const objective=encounter.scenario.objective;
