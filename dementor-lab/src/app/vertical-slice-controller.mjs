@@ -1,5 +1,5 @@
 import { createEncounter, executeActorTurn, applyHotPatch, declineHotPatch } from '../encounter/runtime-integrated.mjs';
-import { resolvePhrase } from '../dialogue/phrase-bank.mjs';
+import { resolveSalientPhrase } from '../dialogue/phrase-saliency.mjs';
 import { buildResult } from '../encounter/result.mjs';
 
 export class VerticalSliceController{
@@ -17,7 +17,7 @@ export class VerticalSliceController{
     if(out.trace){
       const actor=this.encounter.actors[out.trace.actorId];
       const recentTranscript=this.encounter.transcript.slice(0,-1).slice(-6);
-      const phrase=resolvePhrase({reaction:out.trace.selectedReaction,impulse:out.trace.selectedImpulse,scenario:this.encounter.scenario,state:actor.state,memory:actor.state.memory,recentTranscript,turn:out.trace.turn,gender:actor.visual?.gender||'male'});
+      const phrase=resolveSalientPhrase({reaction:out.trace.selectedReaction,impulse:out.trace.selectedImpulse,scenario:this.encounter.scenario,state:actor.state,memory:actor.state.memory,recentTranscript,turn:out.trace.turn,gender:actor.visual?.gender||'male'});
       const transcriptEntry=this.encounter.transcript[this.encounter.transcript.length-1];
       transcriptEntry.phrase=phrase;
       transcriptEntry.intent=out.trace.intent||null;
