@@ -33,26 +33,27 @@ export const APPEARANCE_LAYERS=Object.freeze(['hat','glasses','beard','accessory
 export const APPEARANCE_VARIANTS=Object.freeze({hat:{key:'hatVariant',prefix:'hat',legacy:'hat'},glasses:{key:'glassesVariant',prefix:'glasses',legacy:'glasses'},facialHair:{key:'facialHairVariant',prefix:'facial-hair',legacy:'beard'},accessory:{key:'accessoryVariant',prefix:'accessory',legacy:'accessory'},outfit:{key:'outfitVariant',prefix:'outfit',legacy:'outfit',baseWhenNull:true},shoes:{key:'shoesVariant',prefix:'shoes',legacy:'shoes',baseWhenNull:true}});
 const COLOR_KEYS=Object.freeze({outfitPrimary:'outfit-primary',outfitSecondary:'outfit-secondary',shoesPrimary:'shoes-primary'});
 const DEFAULT_RIG=Object.freeze({head:[352,270],shoulderLeft:[275,345],shoulderRight:[425,345],hipLeft:[311,590],hipRight:[393,591]});
+const FACE_LINE='fill="none" stroke="#111" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" opacity="1"';
 const LEGACY_FACE_GEOMETRY=Object.freeze({
   'character-01':Object.freeze({
-    'eyes-tense':'<path d="M309 210 L332 205 M371 205 L394 210"/>',
-    'eyes-sleepy':'<path d="M310 210 Q322 217 334 210 M370 210 Q382 217 394 210"/>',
-    'eyes-overheat':'<path d="M312 199 L332 219 M332 199 L312 219 M372 199 L392 219 M392 199 L372 219"/>',
-    'brows-tense':'<path d="M308 191 L336 184 M368 184 L396 191"/>',
-    'brows-angry':'<path d="M308 187 L336 196 M368 196 L396 187"/>',
-    'mouth-soft':'<path d="M333 260 Q352 278 372 260"/>',
-    'mouth-tense':'<path d="M331 269 L374 269"/>',
-    'mouth-open':'<ellipse cx="352" cy="267" rx="19" ry="13" fill="#111" stroke="none"/>'
+    'eyes-tense':`<path d="M309 210 L332 205 M371 205 L394 210" ${FACE_LINE}/>`,
+    'eyes-sleepy':`<path d="M310 210 Q322 217 334 210 M370 210 Q382 217 394 210" ${FACE_LINE}/>`,
+    'eyes-overheat':`<path d="M312 199 L332 219 M332 199 L312 219 M372 199 L392 219 M392 199 L372 219" ${FACE_LINE}/>`,
+    'brows-tense':`<path d="M308 191 L336 184 M368 184 L396 191" ${FACE_LINE}/>`,
+    'brows-angry':`<path d="M308 187 L336 196 M368 196 L396 187" ${FACE_LINE}/>`,
+    'mouth-soft':`<path d="M333 260 Q352 278 372 260" ${FACE_LINE}/>`,
+    'mouth-tense':`<path d="M331 269 L374 269" ${FACE_LINE}/>`,
+    'mouth-open':'<ellipse cx="352" cy="267" rx="19" ry="13" fill="#111" stroke="none" opacity="1"/>'
   }),
   'character-02':Object.freeze({
-    'eyes-tense':'<path d="M311 214 L334 207 M370 207 L393 214"/>',
-    'eyes-sleepy':'<path d="M312 214 Q324 220 336 214 M368 214 Q380 220 392 214"/>',
-    'eyes-overheat':'<path d="M314 203 L334 223 M334 203 L314 223 M370 203 L390 223 M390 203 L370 223"/>',
-    'brows-tense':'<path d="M310 194 L338 187 M366 187 L394 194"/>',
-    'brows-angry':'<path d="M310 190 L338 199 M366 199 L394 190"/>',
-    'mouth-soft':'<path d="M334 267 Q352 283 370 267"/>',
-    'mouth-tense':'<path d="M333 274 L371 274"/>',
-    'mouth-open':'<ellipse cx="352" cy="273" rx="18" ry="12" fill="#111" stroke="none"/>'
+    'eyes-tense':`<path d="M311 214 L334 207 M370 207 L393 214" ${FACE_LINE}/>`,
+    'eyes-sleepy':`<path d="M312 214 Q324 220 336 214 M368 214 Q380 220 392 214" ${FACE_LINE}/>`,
+    'eyes-overheat':`<path d="M314 203 L334 223 M334 203 L314 223 M370 203 L390 223 M390 203 L370 223" ${FACE_LINE}/>`,
+    'brows-tense':`<path d="M310 194 L338 187 M366 187 L394 194" ${FACE_LINE}/>`,
+    'brows-angry':`<path d="M310 190 L338 199 M366 199 L394 190" ${FACE_LINE}/>`,
+    'mouth-soft':`<path d="M334 267 Q352 283 370 267" ${FACE_LINE}/>`,
+    'mouth-tense':`<path d="M333 274 L371 274" ${FACE_LINE}/>`,
+    'mouth-open':'<ellipse cx="352" cy="273" rx="18" ry="12" fill="#111" stroke="none" opacity="1"/>'
   })
 });
 function readRig(svg,fallback=null){if(!svg)return fallback||DEFAULT_RIG;const raw=svg.getAttribute('data-rig-pivots');if(raw){try{return {...DEFAULT_RIG,...JSON.parse(raw)}}catch{}}const meta=svg.querySelector('metadata#dementor-rig-meta');if(meta?.textContent){try{return {...DEFAULT_RIG,...JSON.parse(meta.textContent)}}catch{}}return fallback||DEFAULT_RIG}
@@ -71,22 +72,28 @@ export class CharacterRenderer{
     for(const [id,markup] of Object.entries(geometry)){
       const el=this.el(id);if(!el)continue;
       el.innerHTML=markup;
-      el.dataset.faceGeometry='legacy-semantic-v1';
-      el.setAttribute('fill','none');el.setAttribute('stroke','#111');el.setAttribute('stroke-width','7');el.setAttribute('stroke-linecap','round');el.setAttribute('stroke-linejoin','round');
-      el.style.display='none';el.style.opacity='0';
+      el.dataset.faceGeometry='legacy-semantic-v2-self-painted';
+      el.style.display='none';el.style.visibility='hidden';el.style.opacity='0';
     }
   }
   forceFaceVisible(el,on){
     if(!el)return;
     el.style.display=on?'inline':'none';el.style.visibility=on?'visible':'hidden';el.style.opacity=on?'1':'0';
     if(on){
-      el.removeAttribute('opacity');el.removeAttribute('fill-opacity');el.removeAttribute('stroke-opacity');
-      el.querySelectorAll('*').forEach(node=>{node.style.visibility='visible';node.style.opacity='1';node.removeAttribute('opacity');if(node.hasAttribute('fill-opacity'))node.setAttribute('fill-opacity','1');if(node.hasAttribute('stroke-opacity'))node.setAttribute('stroke-opacity','1')});
+      el.removeAttribute('display');el.removeAttribute('visibility');el.removeAttribute('opacity');el.removeAttribute('fill-opacity');el.removeAttribute('stroke-opacity');
+      el.querySelectorAll('*').forEach(node=>{
+        node.style.display='inline';node.style.visibility='visible';node.style.opacity='1';
+        node.removeAttribute('display');node.removeAttribute('visibility');node.removeAttribute('opacity');
+        if(node.tagName?.toLowerCase()==='path'&&node.getAttribute('fill')==='none'){
+          node.setAttribute('stroke','#111');node.setAttribute('stroke-width','7');node.setAttribute('stroke-linecap','round');node.setAttribute('stroke-linejoin','round');node.setAttribute('stroke-opacity','1');
+        }
+        if(node.hasAttribute('fill-opacity'))node.setAttribute('fill-opacity','1');
+      });
     }
   }
   variants(group,active){
     const groups={eyes:['neutral','tense','sleepy','overheat'],brows:['neutral','tense','angry'],mouth:['neutral','soft','tense','open']};
-    const wrapper=this.el(group);if(wrapper){wrapper.style.display='inline';wrapper.style.visibility='visible';wrapper.style.opacity='1';wrapper.removeAttribute('opacity')}
+    const wrapper=this.el(group);if(wrapper){wrapper.style.display='inline';wrapper.style.visibility='visible';wrapper.style.opacity='1';wrapper.removeAttribute('display');wrapper.removeAttribute('visibility');wrapper.removeAttribute('opacity')}
     ;(groups[group]||[]).forEach(v=>this.forceFaceVisible(this.el(`${group}-${v}`),v===active));
   }
   variantElements(prefix){if(!this.svg)return [];const selectors=[`[id^="${CSS.escape(prefix)}-"]`,`[id^="${CSS.escape(`${this.side}-${prefix}`)}-"]`];return [...new Set(selectors.flatMap(selector=>[...this.svg.querySelectorAll(selector)]))].filter(el=>isNumberedVariantId(el.id,prefix,this.side))}
