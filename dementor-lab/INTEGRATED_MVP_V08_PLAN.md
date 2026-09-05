@@ -10,14 +10,14 @@ Unify the freshest deterministic encounter runtime with the portrait-first story
 
 ## P0 sequence — current status
 
-1. **IN PROGRESS** — Portrait/story flow is now represented by `prototypes/portrait-flow-v0.8.html` and is connected to the real controller/runtime. It still needs final parity with all v0.7 onboarding/presentation details.
-2. **IMPLEMENTED FOR v0.8 PATH** — `runtime-integrated.mjs` promotes Graph → Impulse → Intent → Reaction → salient WorldEvent → next Trigger into the controller path and emits semantic trace events.
+1. **IN PROGRESS** — `prototypes/portrait-flow-v0.8.html` is connected to the real controller/runtime. Remaining UX parity: name/identity onboarding and final visual polish.
+2. **IMPLEMENTED FOR v0.8 PATH** — `runtime-integrated.mjs` promotes Graph → Impulse → Intent → Reaction → salient WorldEvent → next Trigger and emits semantic trace events.
 3. **IMPLEMENTED** — Three real player graphs: `EXPLAIN_LOOP`, `KEEP_PEACE`, `PRESS_FOR_ANSWER`.
-4. **IMPLEMENTED CORE / UI NEEDS POLISH** — CASE objective changes real scenario objective. HOT PATCH uses real `applyHotPatch`; counterfactual rerun recreates the same config and mutates exactly one graph cause. Non-REPEAT patch UX still needs generalized presentation.
-5. **IMPLEMENTED DATA CONTRACT** — `trace-summary.mjs` and existing `buildResult()` derive counts/metrics from real traces; v0.8 portrait result uses these runtime objects. Remove any remaining authored/demo result text before MVP label.
-6. **IMPLEMENTED FIRST PASS** — deterministic phrase recent-use penalty via `phrase-saliency.mjs`; passive BRAIN voice emitted as non-causal semantic trace event.
-7. **IMPLEMENTED FIRST PASS** — completed encounters serialize into `localStorage` via `archive/run-store.mjs`; portrait Archive renders stored runs. Archive detail UI still needs completion.
-8. **AUTOMATION IMPLEMENTED / EXECUTION PENDING** — `tests/mvp-mass-smoke.mjs` runs 1000 deterministic encounters and checks bounds/distinct preset traces. `FIRST_TIME_PLAYER_GATE_v0.8.md` defines the outsider test. A real outsider playtest is still required.
+4. **CORE IMPLEMENTED / GENERALIZATION IN PROGRESS** — CASE objective changes the real scenario objective. `hot-patch-strategy.mjs` now recommends a one-cause patch for REPEAT or, when no repeat exists, the active impulse. Counterfactual rerun recreates the same config and mutates exactly one graph cause. The portrait UI still needs to consume the generalized recommendation instead of assuming REPEAT.
+5. **IMPLEMENTED DATA CONTRACT** — RESULT and BEFORE/AFTER are derived from `buildResult()`, `ExecutionTrace` and `trace-summary.mjs`. No authored metric/count is allowed for the MVP path.
+6. **IMPLEMENTED FIRST PASS** — deterministic phrase recent-use penalty via `phrase-saliency.mjs`; passive BRAIN voice emitted as a non-causal semantic event.
+7. **IMPLEMENTED DATA / DETAIL MODEL ADDED** — runs persist to `localStorage` via `archive/run-store.mjs`; `archive/run-detail.mjs` derives readable battle detail from the saved record. Archive detail presentation still needs wiring in the portrait UI.
+8. **AUTOMATION IMPLEMENTED / EXECUTION PENDING** — `tests/mvp-mass-smoke.mjs` covers 1000 deterministic encounters. `tests/mvp-integration-selftest.mjs` covers generalized patch recommendation and portrait-state projection. A real outsider playtest remains required.
 
 ## MVP invariants
 
@@ -32,14 +32,18 @@ Unify the freshest deterministic encounter runtime with the portrait-first story
 
 ## Current v0.8 implementation map
 
-- `src/encounter/runtime-integrated.mjs` — integrated semantic runtime path + passive brain voice.
+- `src/encounter/runtime-integrated.mjs` — integrated semantic runtime + passive BRAIN voice.
 - `src/brain/player-presets.mjs` — three real player BehaviorGraphs.
 - `src/scenarios/criticism-idea.mjs` — objective + player preset binding.
 - `src/dialogue/phrase-saliency.mjs` — deterministic recent-use penalty.
-- `src/app/mvp-session.mjs` — real session, terminal run, one-change counterfactual rerun, archive save.
+- `src/app/mvp-session.mjs` — real session, one-change counterfactual rerun, archive save.
+- `src/app/hot-patch-strategy.mjs` — player-facing one-cause patch recommendation for REPEAT or impulse.
+- `src/render/portrait-state.mjs` — runtime state/reaction → portrait emotion projection.
 - `src/encounter/trace-summary.mjs` — trace-derived BEFORE/AFTER summaries.
 - `src/archive/run-store.mjs` — localStorage archive records.
-- `prototypes/portrait-flow-v0.8.html` — portrait-first UI over the real runtime.
+- `src/archive/run-detail.mjs` — readable archive detail derived from a saved run.
+- `prototypes/portrait-flow-v0.8.html` — portrait-first UI over real runtime.
+- `tests/mvp-integration-selftest.mjs` — integrated patch/emotion contract.
 - `tests/mvp-mass-smoke.mjs` — 1000-run deterministic smoke.
 - `FIRST_TIME_PLAYER_GATE_v0.8.md` — no-coaching MVP UX gate.
 
@@ -49,10 +53,12 @@ The portrait v0.7 branch and intent/saliency v0.5 branch diverged. Do not merge 
 
 ## Remaining before first MVP label
 
-1. Run the complete automated suite including `npm run test:mvp-smoke` and fix any regression.
-2. Finish portrait v0.7 parity: name/identity onboarding, emotion projection polish, archive detail, cleaner HOT PATCH for non-repeat causes.
-3. Verify every RESULT statement against ExecutionTrace in browser playthroughs.
-4. Run one outsider first-time-player test using `FIRST_TIME_PLAYER_GATE_v0.8.md`.
+1. Wire `hot-patch-strategy.mjs` into portrait flow so every preset gets a meaningful one-cause patch, not only EXPLAIN_LOOP.
+2. Wire `portrait-state.mjs` into TALK and remove technical emotion labels from the player-facing surface.
+3. Add name/identity onboarding and wire `run-detail.mjs` into an interactive Archive detail screen.
+4. Run the complete automated suite including `npm run test:mvp` / `npm test` and fix regressions.
+5. Verify every RESULT statement against ExecutionTrace in browser playthroughs.
+6. Run one outsider first-time-player test using `FIRST_TIME_PLAYER_GATE_v0.8.md`.
 
 ## Acceptance gate for first MVP
 
