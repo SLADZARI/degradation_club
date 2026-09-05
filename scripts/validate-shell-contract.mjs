@@ -107,6 +107,15 @@ expect(!boardRuntime.includes("loginWithGoogle('/community/board/'"),'Board auth
 expect(!boardRuntime.includes("route('/join/member/')"),'Board non-member gate: legacy Join member bridge survived');
 expect(boardRuntime.includes("route('/join/')"),'Board non-member gate: canonical DC-9 entry missing');
 
+const boardSpatial=read('community/board/board-spatial-v1.js');
+expect(boardSpatial.includes('data-slot'),'Board Artifact slot: spatial toolbar control missing');
+expect(boardSpatial.includes("control.textContent='＋ АРТЕФАКТ'"),'Board Artifact slot: free-slot action missing');
+expect(boardSpatial.includes("control.textContent='SLOT ЗАНЯТ'"),'Board Artifact slot: occupied-slot state missing');
+expect(boardSpatial.includes("control.textContent='SLOT НЕТ'"),'Board Artifact slot: no-slot state missing');
+expect(boardSpatial.includes("document.getElementById('entrySection')"),'Board Artifact slot: control does not route to canonical entrySection');
+expect(boardSpatial.includes("getEntryStatus(client)"),'Board Artifact slot: control is not driven by canonical entry status');
+expect(!boardSpatial.includes('renderComposer('),'Board Artifact slot: spatial owner must not create a second composer');
+
 const activation=read('community/board/board-activation-gate-v1.js');
 expect(activation.includes("FOCUS_DISMISSED_KEY='dc_first_artifact_spotlight_dismissed_v1'"),'Board first-entry: spotlight session key missing');
 expect(activation.includes("activationState==='FIRST_ARTIFACT_REQUIRED'&&!focusDismissed()"),'Board first-entry: spotlight is not bound to canonical activation state');
