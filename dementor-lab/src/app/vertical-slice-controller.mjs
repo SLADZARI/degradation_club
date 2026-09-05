@@ -1,4 +1,4 @@
-import { createEncounter, executeActorTurn, applyHotPatch, declineHotPatch } from '../encounter/runtime-v05.mjs';
+import { createEncounter, executeActorTurn, applyHotPatch, declineHotPatch } from '../encounter/runtime-integrated.mjs';
 import { resolvePhrase } from '../dialogue/phrase-bank.mjs';
 import { buildResult } from '../encounter/result.mjs';
 
@@ -16,23 +16,16 @@ export class VerticalSliceController{
     const out=executeActorTurn(this.encounter);
     if(out.trace){
       const actor=this.encounter.actors[out.trace.actorId];
-      const recentTranscript=this.encounter.transcript.slice(0,-1).slice(-3);
-      const phrase=resolvePhrase({
-        reaction:out.trace.selectedReaction,
-        impulse:out.trace.selectedImpulse,
-        scenario:this.encounter.scenario,
-        state:actor.state,
-        memory:actor.state.memory,
-        recentTranscript,
-        turn:out.trace.turn,
-        gender:actor.visual?.gender||'male'
-      });
+      const recentTranscript=this.encounter.transcript.slice(0,-1).slice(-6);
+      const phrase=resolvePhrase({reaction:out.trace.selectedReaction,impulse:out.trace.selectedImpulse,scenario:this.encounter.scenario,state:actor.state,memory:actor.state.memory,recentTranscript,turn:out.trace.turn,gender:actor.visual?.gender||'male'});
       const transcriptEntry=this.encounter.transcript[this.encounter.transcript.length-1];
       transcriptEntry.phrase=phrase;
       transcriptEntry.intent=out.trace.intent||null;
       transcriptEntry.event=out.trace.event?.type||transcriptEntry.event;
       transcriptEntry.eventImpact=out.trace.eventImpact||null;
-      this.onEvent({type:'TURN',trace:out.trace,phrase,encounter:this.encounter});
+      transcriptEntry.brainVoice=out.trace.brainVoice||null;
+      transcriptEntry.semanticEvents=(out.trace.semanticEvents||[]).map(event=>event.type==='speech'?{...event,text:phrase}:event);
+      this.onEvent({type:'TURN',trace:out.trace,phrase,brainVoice:out.trace.brainVoice||null,encounter:this.encounter});
     }
     if(out.breakpoint)this.onEvent({type:'HOT_PATCH',breakpoint:out.breakpoint,encounter:this.encounter});
     if(out.result)this.onEvent({type:'RESULT',result:buildResult(this.encounter),encounter:this.encounter});
@@ -45,8 +38,7 @@ export class VerticalSliceController{
     const terminal=this.encounter.result;
     for(const side of ['A','B']){
       const renderer=this.renderers[side],actor=this.encounter.actors[side];
-      if(terminal?.type==='BREAKDOWN'&&terminal.loser===side)renderer?.breakdown?.(actor,terminal.reason);
-      else renderer?.render?.(actor);
+      if(terminal?.type==='BREAKDOWN'&&terminal.loser===side)renderer?.breakdown?.(actor,terminal.reason);else renderer?.render?.(actor);
     }
   }
   result(){return buildResult(this.encounter)}
