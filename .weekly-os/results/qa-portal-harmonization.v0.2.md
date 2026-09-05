@@ -80,6 +80,17 @@ Run #739 passed:
 PR #105 merged to `dementor-club-production` as:
 `1f383f2c2fe020ce8839286ab56ee29436dbf569`.
 
+## Pre-deploy verification evidence — 2026-09-05
+
+A final non-mutating G7 check confirmed:
+- current `dementor-club-production` HEAD remains `1f383f2c2fe020ce8839286ab56ee29436dbf569`;
+- that production merge commit points to tree `7eba86a036e8fe3ecd588c68accfb6dd9cdefa79`;
+- the validated release candidate `e42de43fe637225bc4101095b67229bf8328d196` points to the **same tree** `7eba86a036e8fe3ecd588c68accfb6dd9cdefa79`, so run #739 validated the exact production content tree now awaiting deployment;
+- live Supabase still has no `dc_first_complete_baseline_v1(uuid)`, no `dc_lock_join_application_baseline_v1()` and no `dc_join_application_first_baseline_v1` trigger; live DB therefore remains unchanged by this Result;
+- the canonical QA ledger §17 still contains stale pre-PR-#105 wording that says the current packages are not merged to production and that the clean production candidate is still pending. Where that wording conflicts with `PROJECT.json`, `ARTIFACT_INDEX.json`, this Result and Git evidence, it is bookkeeping debt rather than current release state. It must be reconciled from live evidence during the mandatory ledger update after release and before Result closure/G8 completion.
+
+No production deployment or database mutation was performed by this verification.
+
 ## Current release boundary
 `commit ≠ merge ≠ deploy`.
 
@@ -114,7 +125,7 @@ Next action requires explicit user authorization for the live release steps. If 
 1. apply the validated Supabase baseline migration;
 2. deploy current `dementor-club-production` through the existing manual production workflow;
 3. perform live sequential retest;
-4. update the canonical QA ledger from evidence;
+4. update the canonical QA ledger from evidence, including removal of stale §17 pre-release wording;
 5. move to G8 cleanup only after live results are known.
 
 Until that authorization, stop before live DB mutation and deploy.
