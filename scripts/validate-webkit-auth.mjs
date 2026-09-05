@@ -46,10 +46,25 @@ async function context(mode='guest'){
 }
 
 // WebKit proxy for the reported Safari-only public login hang.
+// At the mobile Safari-sized viewport the service login is intentionally inside the closed burger.
 {
   const c=await context('guest'),p=await c.newPage(),pageErrors=[];p.on('pageerror',e=>pageErrors.push(e.message));
   await p.goto(base+'/about/',{waitUntil:'domcontentloaded'});
-  try{await p.locator('[data-global-login]').waitFor({state:'visible',timeout:5000});await p.locator('[data-global-login]').click();await p.waitForFunction(()=>Boolean(window.__QA_OAUTH__),{timeout:4000});const oauth=await p.evaluate(()=>window.__QA_OAUTH__);const redirect=new URL(oauth?.options?.redirectTo);expect(oauth?.provider==='google','WebKit public login: provider is not Google');expect(redirect.pathname==='/auth/callback/','WebKit public login: callback route drifted');expect(redirect.searchParams.get('next')==='/workspace/','WebKit public login: callback next is not Workspace')}catch(error){errors.push(`WebKit public login did not start cleanly: ${error.message}`)}
+  try{
+    const menu=p.locator('.dc-global-menu');
+    await menu.waitFor({state:'visible',timeout:5000});
+    expect(await p.locator('#dc-global-nav:visible').count()===0,'WebKit mobile login: burger panel is open by default');
+    await menu.click();
+    await p.locator('#dc-global-nav').waitFor({state:'visible',timeout:3000});
+    const login=p.locator('#dc-global-nav [data-global-login]');
+    await login.waitFor({state:'visible',timeout:3000});
+    await login.click();
+    await p.waitForFunction(()=>Boolean(window.__QA_OAUTH__),{timeout:4000});
+    const oauth=await p.evaluate(()=>window.__QA_OAUTH__);const redirect=new URL(oauth?.options?.redirectTo);
+    expect(oauth?.provider==='google','WebKit public login: provider is not Google');
+    expect(redirect.pathname==='/auth/callback/','WebKit public login: callback route drifted');
+    expect(redirect.searchParams.get('next')==='/workspace/','WebKit public login: callback next is not Workspace');
+  }catch(error){errors.push(`WebKit public login did not start cleanly: ${error.message}`)}
   expect(!pageErrors.length,`WebKit public login page errors: ${pageErrors.join(' | ')}`);await c.close();
 }
 
@@ -65,10 +80,10 @@ async function context(mode='guest'){
 {
   const c=await context('member'),p=await c.newPage(),pageErrors=[];p.on('pageerror',e=>pageErrors.push(e.message));
   await p.goto(base+'/about/',{waitUntil:'domcontentloaded'});
-  try{await p.locator('[data-global-identity]').waitFor({state:'visible',timeout:5000})}catch{errors.push('WebKit authenticated public header stayed stuck instead of rendering identity')}
+  try{await p.locator('[data-global-identity]').waitFor({state:'attached',timeout:5000})}catch{errors.push('WebKit authenticated public header stayed stuck instead of rendering identity')}
   expect((await p.locator('.dc-global-header').getAttribute('data-dc-header-auth').catch(()=>null))==='member','WebKit authenticated public header did not resolve member state');expect(!pageErrors.length,`WebKit authenticated header errors: ${pageErrors.join(' | ')}`);await c.close();
 }
 
 await browser.close();await new Promise(resolve=>server.close(resolve));
 if(errors.length){console.error('WEBKIT AUTH REGRESSION BLOCKED');for(const error of errors)console.error(`- ${error}`);process.exit(1)}
-console.log('WebKit auth regression PASS: public Google start + PKCE callback escape + authenticated identity state');
+console.log('WebKit auth regression PASS: mobile public Google start + PKCE callback escape + authenticated identity state');
