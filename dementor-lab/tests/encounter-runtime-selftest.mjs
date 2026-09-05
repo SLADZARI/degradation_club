@@ -7,7 +7,7 @@ function fresh(){const actors=createCriticismActors();return createEncounter({sc
 const a=fresh(),b=fresh();
 const ta=executeActorTurn(a).trace,tb=executeActorTurn(b).trace;
 assert.deepEqual({reaction:ta.selectedReaction,impulse:ta.selectedImpulse,nodes:ta.visitedNodes,deltas:ta.metricDeltas,memory:ta.memoryChanges,event:ta.event},{reaction:tb.selectedReaction,impulse:tb.selectedImpulse,nodes:tb.visitedNodes,deltas:tb.metricDeltas,memory:tb.memoryChanges,event:tb.event});
-assert.equal(ta.selectedReaction,'explain');assert.equal(ta.selectedImpulse,'beright');assert.equal(ta.event.type,'COUNTERPOINT');assert.equal(a.nextTrigger,'pushback');assert.equal(a.actors.A.state.memory.resentment,1);
+assert.equal(ta.selectedReaction,'explain');assert.equal(ta.selectedImpulse,'beunderstood');assert.equal(ta.event.type,'COUNTERPOINT');assert.equal(a.nextTrigger,'pushback');assert.equal(a.actors.A.state.memory.resentment,1);
 assert.equal(a.pendingRepeats.A?.remaining,3,'REPEAT ×4 stores three future attempts after first reaction');
 
 // Next actor consumes the previous reaction-derived trigger through a real graph.
