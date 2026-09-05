@@ -107,6 +107,15 @@ expect(!boardRuntime.includes("loginWithGoogle('/community/board/'"),'Board auth
 expect(!boardRuntime.includes("route('/join/member/')"),'Board non-member gate: legacy Join member bridge survived');
 expect(boardRuntime.includes("route('/join/')"),'Board non-member gate: canonical DC-9 entry missing');
 
+const boardSpatial=read('community/board/board-spatial-v1.js');
+expect(boardSpatial.includes('data-slot'),'Board Artifact slot: spatial toolbar control missing');
+expect(boardSpatial.includes("control.textContent='＋ АРТЕФАКТ'"),'Board Artifact slot: free-slot action missing');
+expect(boardSpatial.includes("control.textContent='SLOT ЗАНЯТ'"),'Board Artifact slot: occupied-slot state missing');
+expect(boardSpatial.includes("control.textContent='SLOT НЕТ'"),'Board Artifact slot: no-slot state missing');
+expect(boardSpatial.includes("document.getElementById('entrySection')"),'Board Artifact slot: control does not route to canonical entrySection');
+expect(boardSpatial.includes("getEntryStatus(client)"),'Board Artifact slot: control is not driven by canonical entry status');
+expect(!boardSpatial.includes('renderComposer('),'Board Artifact slot: spatial owner must not create a second composer');
+
 const activation=read('community/board/board-activation-gate-v1.js');
 expect(activation.includes("FOCUS_DISMISSED_KEY='dc_first_artifact_spotlight_dismissed_v1'"),'Board first-entry: spotlight session key missing');
 expect(activation.includes("activationState==='FIRST_ARTIFACT_REQUIRED'&&!focusDismissed()"),'Board first-entry: spotlight is not bound to canonical activation state');
@@ -115,6 +124,15 @@ expect(!activation.includes("activationState='MEMBER_ACTIVATED'"),'Board first-e
 
 const legacyBoard=read('community/board/index.html');
 expect(legacyBoard.includes('/workspace/board/'),'community/board/: compatibility route must resolve into Workspace Board');
+
+const artifactDetailHtml=read('community/artifact/index.html');
+expect(artifactDetailHtml.includes('href="/workspace/board/"'),'Artifact detail: top back link must target canonical Workspace Board');
+expect(!artifactDetailHtml.includes('href="/community/board/"'),'Artifact detail: compatibility Board route survived in active detail source');
+const artifactDetailRuntime=read('community/artifact/artifact.js');
+expect(artifactDetailRuntime.includes("route('/workspace/board/')"),'Artifact detail: canonical Workspace Board destination missing');
+expect(!artifactDetailRuntime.includes("route('/community/board/')"),'Artifact detail: compatibility Board destination survived');
+expect(!artifactDetailRuntime.includes("route('/join/member/')"),'Artifact detail: legacy Join member bridge survived');
+expect(artifactDetailRuntime.includes("route('/join/')"),'Artifact detail: canonical non-member Join gate missing');
 
 const admin=read('workspace/admin/index.html');
 expect(admin.includes('../../design-system/dementor-workspace/workspace.css'),'workspace/admin/: complete Workspace layout CSS missing');
@@ -138,6 +156,11 @@ expect(!joinHtml.includes('id="dc9Intro"'),'Join DC-9: obsolete standalone intro
 expect(!joinHtml.includes('id="dc9Start"'),'Join DC-9: redundant Start DC-9 button survived');
 expect(joinHtml.includes('ДЕВЯТЬ<br><span>СФЕР.</span>'),'Join DC-9: merged entry must retain the existing nine-sphere framing');
 
+const joinResponsive=read('join/dc9-responsive-v2.css');
+expect(joinResponsive.includes('@media(max-width:800px)'),'Join DC-9 mobile: canonical responsive breakpoint missing');
+expect(joinResponsive.includes('.dc9-member-return .dc9-actions{display:grid}'),'Join DC-9 mobile: member-return actions are not stacked');
+expect(joinResponsive.includes('.dc9-member-return .dc9-actions .dc9-button{width:100%}'),'Join DC-9 mobile: member-return actions are not full width');
+
 const dc9Runtime=read('join/dc9-immersive-v1.js');
 expect(!dc9Runtime.includes('renderIntro'),'Join DC-9: runtime still owns a separate intro state');
 expect(!dc9Runtime.includes('dc9Start'),'Join DC-9: runtime still depends on the removed start button');
@@ -151,6 +174,12 @@ expect(applyRuntime.includes("loginWithGoogle('/join/apply/'"),'Join apply: Goog
 expect(applyRuntime.includes('await syncLocalAssessmentRuns(client,uid)'),'Join apply: anonymous DC-9 results are not attached before server gate evaluation');
 expect(applyRuntime.indexOf('await syncLocalAssessmentRuns(client,uid)')<applyRuntime.indexOf("client.rpc('dc_member_entry_status_v1')"),'Join apply: server 9/9 gate is evaluated before local assessment sync');
 expect(!applyRuntime.includes('@supabase/supabase-js'),'Join apply: duplicate Supabase client/auth owner survived');
+
+const applyCss=read('join/apply/apply.css');
+expect(applyCss.includes('@media(max-width:820px)'),'Join Application mobile: responsive breakpoint missing');
+expect(applyCss.includes('.dc-apply-section-head,.dc-apply-grid{grid-template-columns:1fr}'),'Join Application mobile: form grid does not collapse to one column');
+expect(applyCss.includes('.dc-apply-submit{width:100%}'),'Join Application mobile: submit action is not full width');
+expect(applyCss.includes('@media(max-width:520px)'),'Join Application narrow mobile: compact breakpoint missing');
 
 const resultRuntime=read('join/result/result-v6.js');
 expect(!resultRuntime.includes('loginWithGoogle'),'Join result: authentication must not happen before the application boundary');
