@@ -7,12 +7,12 @@
     "projectStage": "RELEASE",
     "gate": "G7_RELEASE",
     "status": "APPROVED",
-    "version": "1.16",
-    "updated": "2026-09-05",
+    "version": "1.17",
+    "updated": "2026-09-06",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "1.15"
+    "supersedes": "1.16"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -26,7 +26,7 @@
     ".weekly-os/PROJECT.json",
     ".weekly-os/ARTIFACT_INDEX.json",
     ".weekly-os/APPROVED_STATE.json",
-    ".weekly-os/results/workspace-top-navigation.v0.3.md",
+    ".weekly-os/results/workspace-top-navigation.v0.4.md",
     "operations/WORKSPACE_MEMBER_ACTIVATION_AND_SHELL_V1.md",
     "operations/MEMBERSHIP_V2_PRODUCTION_FLOW_QA_2026-09-02.md",
     ".weekly-os/results/qa-portal-harmonization.v1.0.md",
@@ -36,52 +36,22 @@
     "operations/UNIVERSAL_WORKSPACE_WIREFRAME_SPEC_V0.1.md"
   ],
   "authority": {
-    "mpDslCore": {
-      "sourceSystem": "DRIVE",
-      "authorityType": "REFERENCE",
-      "url": "https://docs.google.com/document/d/1fYwfF8IpvXh36qIAJxylT6oebOfaqJ_-L2MslXRHHOg/edit",
-      "note": "MP_DSL v0.1 source artifacts currently declare DRAFT / REFERENCE. Dementor Club adopts the explicitly approved local QA/harmonization operating rules without promoting the entire MP_DSL package to APPROVED_AUTHORITY."
-    },
-    "semanticSource": {
-      "repository": "SLADZARI/degradation_club",
-      "ref": "dementor-club",
-      "sourceSystem": "GIT",
-      "authorityType": "IMPLEMENTATION_AUTHORITY",
-      "note": "Repository ARCHITECTURE.md declares this branch the source-of-truth for club concept, positioning, programs, products, membership logic, operating rules and approved club copy. Individual documents retain their own status/authority and are not auto-promoted."
-    },
-    "workspaceMemberActivationV1": {
-      "sourceSystem": "GIT",
-      "authorityType": "APPROVED_AUTHORITY",
-      "path": "operations/WORKSPACE_MEMBER_ACTIVATION_AND_SHELL_V1.md",
-      "scope": "authenticated Workspace shell ownership, ordinary Member default Board entry, first Artifact spotlight, Board access boundary, My Activity projection",
-      "note": "Project-local approved authority only. Supersedes the prior local rule that Public Header remains visible above authenticated Workspace. Does not establish project-wide ARCHITECTURE or DESIGN approval."
-    },
-    "legacyProductDocumentPointers": {
-      "sourceSystem": "GIT",
-      "authorityType": "REFERENCE",
-      "paths": [
-        "operations/DEMENTOR_ENTITY_MAP_AND_WORKSPACE_MODULES_V0.1.md",
-        "operations/IDENTITY_MEMBERSHIP_AND_ENTITY_BOUNDARY_V0.2.md",
-        "operations/UNIVERSAL_WORKSPACE_WIREFRAME_SPEC_V0.1.md"
-      ],
-      "note": "Preserved from the legacy WeeklyOS router. Current source statuses are DRAFT / NOT IMPLEMENTED; these pointers do not establish project-wide PRODUCT/DOMAIN/ARCHITECTURE/DESIGN approval."
-    },
-    "legacyImplementationPointers": {
-      "sourceSystem": "GIT",
-      "authorityType": "REFERENCE",
-      "paths": ["app", "src", "supabase"],
-      "note": "Preserved as legacy router evidence only. This migration does not assert that these paths are current semantic or implementation authority on the dementor-club branch."
-    }
+    "mpDslCore": {"sourceSystem":"DRIVE","authorityType":"REFERENCE","url":"https://docs.google.com/document/d/1fYwfF8IpvXh36qIAJxylT6oebOfaqJ_-L2MslXRHHOg/edit","note":"MP_DSL v0.1 source artifacts currently declare DRAFT / REFERENCE. Dementor Club adopts the explicitly approved local QA/harmonization operating rules without promoting the entire MP_DSL package to APPROVED_AUTHORITY."},
+    "semanticSource": {"repository":"SLADZARI/degradation_club","ref":"dementor-club","sourceSystem":"GIT","authorityType":"IMPLEMENTATION_AUTHORITY","note":"Repository ARCHITECTURE.md declares this branch the source-of-truth for club concept, positioning, programs, products, membership logic, operating rules and approved club copy. Individual documents retain their own status/authority and are not auto-promoted."},
+    "workspaceMemberActivationV1": {"sourceSystem":"GIT","authorityType":"APPROVED_AUTHORITY","path":"operations/WORKSPACE_MEMBER_ACTIVATION_AND_SHELL_V1.md","scope":"authenticated Workspace shell ownership, ordinary Member default Board entry, first Artifact spotlight, Board access boundary, My Activity projection","note":"Project-local approved authority only. Supersedes the prior local rule that Public Header remains visible above authenticated Workspace. Does not establish project-wide ARCHITECTURE or DESIGN approval."},
+    "legacyProductDocumentPointers": {"sourceSystem":"GIT","authorityType":"REFERENCE","paths":["operations/DEMENTOR_ENTITY_MAP_AND_WORKSPACE_MODULES_V0.1.md","operations/IDENTITY_MEMBERSHIP_AND_ENTITY_BOUNDARY_V0.2.md","operations/UNIVERSAL_WORKSPACE_WIREFRAME_SPEC_V0.1.md"],"note":"Preserved from the legacy WeeklyOS router. Current source statuses are DRAFT / NOT IMPLEMENTED; these pointers do not establish project-wide PRODUCT/DOMAIN/ARCHITECTURE/DESIGN approval."},
+    "legacyImplementationPointers": {"sourceSystem":"GIT","authorityType":"REFERENCE","paths":["app","src","supabase"],"note":"Preserved as legacy router evidence only. This migration does not assert that these paths are current semantic or implementation authority on the dementor-club branch."}
   },
   "protected": {"PRODUCT": null, "DOMAIN": null, "ARCHITECTURE": null, "DESIGN": null},
   "currentResult": {
     "artifactId": "dementor-club.result.workspace-top-navigation",
-    "version": "0.3",
+    "version": "0.4",
     "status": "DRAFT",
-    "path": ".weekly-os/results/workspace-top-navigation.v0.3.md",
+    "path": ".weekly-os/results/workspace-top-navigation.v0.4.md",
     "gate": "G7_RELEASE",
     "productionCommit": "64a0de9c6f9c3accc033950b1f757224edde3c19",
-    "productionDeployed": false,
+    "productionDeployed": true,
+    "productionDeployRun": 38,
     "liveDatabaseMigrationApplied": false
   },
   "activeIntegrationBranch": "result/workspace-top-navigation",
