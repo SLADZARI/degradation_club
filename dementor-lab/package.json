@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node --check scripts/physical-qa-server.mjs && node tests/encounter-runtime-selftest.mjs && node tests/intent-saliency-selftest.mjs && node tests/gameplay-regression-selftest.mjs && node tests/game-feel-arc-selftest.mjs && node tests/objective-diversity-selftest.mjs && node tests/dialogue-selftest.mjs && node tests/result-replay-selftest.mjs && node tests/character-renderer-selftest.mjs && node tests/character-registry-selftest.mjs && node tests/character-asset-selftest.mjs && node tests/opponent-generator-selftest.mjs && node tests/brain-layout-selftest.mjs && node tests/brain-constructor-selftest.mjs && node tests/ui-contract-selftest.mjs && node tests/mobile-readability-selftest.mjs && node tests/mvp-integration-selftest.mjs && node tests/portrait-flow-v08-contract-selftest.mjs && node tests/mvp-mass-smoke.mjs",
+    "test": "node --check scripts/physical-qa-server.mjs && node tests/encounter-runtime-selftest.mjs && node tests/intent-saliency-selftest.mjs && node tests/gameplay-regression-selftest.mjs && node tests/game-feel-arc-selftest.mjs && node tests/objective-diversity-selftest.mjs && node tests/dialogue-selftest.mjs && node tests/result-replay-selftest.mjs && node tests/character-renderer-selftest.mjs && node tests/character-registry-selftest.mjs && node tests/character-asset-selftest.mjs && node tests/opponent-generator-selftest.mjs && node tests/brain-layout-selftest.mjs && node tests/brain-constructor-selftest.mjs && node tests/ui-contract-selftest.mjs && node tests/mobile-readability-selftest.mjs && node tests/mvp-integration-selftest.mjs && node tests/portrait-flow-v08-contract-selftest.mjs && node tests/mvp-six-way-matrix-selftest.mjs && node tests/mvp-mass-smoke.mjs",
     "test:runtime": "node tests/encounter-runtime-selftest.mjs && node tests/intent-saliency-selftest.mjs && node tests/gameplay-regression-selftest.mjs",
     "test:intent": "node tests/intent-saliency-selftest.mjs",
     "test:gameplay": "node tests/gameplay-regression-selftest.mjs && node tests/game-feel-arc-selftest.mjs && node tests/objective-diversity-selftest.mjs",
@@ -16,7 +16,8 @@
     "test:brain": "node tests/brain-layout-selftest.mjs && node tests/brain-constructor-selftest.mjs",
     "test:ui": "node tests/ui-contract-selftest.mjs",
     "test:mobile": "node tests/mobile-readability-selftest.mjs",
-    "test:mvp": "node tests/mvp-integration-selftest.mjs && node tests/portrait-flow-v08-contract-selftest.mjs && node tests/mvp-mass-smoke.mjs",
+    "test:mvp": "node tests/mvp-integration-selftest.mjs && node tests/portrait-flow-v08-contract-selftest.mjs && node tests/mvp-six-way-matrix-selftest.mjs && node tests/mvp-mass-smoke.mjs",
+    "test:mvp-matrix": "node tests/mvp-six-way-matrix-selftest.mjs",
     "test:mvp-smoke": "node tests/mvp-mass-smoke.mjs",
     "test:qa-server": "node --check scripts/physical-qa-server.mjs",
     "qa:phone": "node scripts/physical-qa-server.mjs"
