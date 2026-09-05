@@ -6,8 +6,11 @@ function hash(input=''){
   return h>>>0;
 }
 
-function recentPhrases(recentTranscript=[]){
-  return recentTranscript.map(x=>x.phrase).filter(Boolean);
+function recentPhrases(recentTranscript=[]){return recentTranscript.map(x=>x.phrase).filter(Boolean)}
+function inflect(text,gender='male'){
+  const female=gender==='female';
+  const forms={agree:female?'согласна':'согласен',Agree:female?'Согласна':'Согласен',understood:female?'поняла':'понял'};
+  return String(text||'').replace(/\{\{(agree|Agree|understood)\}\}/g,(_,key)=>forms[key]||'');
 }
 
 export function resolveSalientPhrase(context={}){
@@ -19,7 +22,8 @@ export function resolveSalientPhrase(context={}){
   const list=PHRASE_BANK[reaction]||PHRASE_BANK.silent;
   if(list.length<2)return preferred;
 
-  const scores=list.map((text,index)=>{
+  const scores=list.map((raw,index)=>{
+    const text=inflect(raw,context.gender);
     const age=[...recent].reverse().findIndex(x=>x===text);
     const recentPenalty=age<0?0:Math.max(1,6-age)*20;
     const deterministicTie=hash([reaction,context.impulse||'',context.scenario?.id||'',context.turn||0,index].join('|'))%17;
