@@ -2,7 +2,8 @@ import {getClient,currentSession,getEntryStatus} from '/community-runtime-v1.js'
 
 const boardHost=document.getElementById('boardHost');
 const client=getClient();
-const WORLD={w:5000,h:3500};
+const WORLD={w:12000,h:8000};
+const WORLD_CENTER={x:WORLD.w/2,y:WORLD.h/2};
 let viewport=null;
 let extrasHost=null;
 let camera={x:0,y:0,scale:1};
@@ -14,8 +15,8 @@ let cameraIntent='auto';
 
 function clamp(value,min,max){return Math.max(min,Math.min(max,value))}
 function hashString(value){let h=2166136261;for(const ch of String(value||'')){h^=ch.charCodeAt(0);h=Math.imul(h,16777619)}return h>>>0}
-function deterministicPlatformPosition(id,index=0){const h=hashString(id);const angle=((h%360)/180)*Math.PI;const radius=650+(h%1250);return{x:2500+Math.cos(angle)*radius,y:1750+Math.sin(angle)*radius,rotation:((h%15)-7)/10,size_class:index%4===0?'M':'S'}}
-function fallbackMemberPosition(id,index=0){const h=hashString(id);return{x:1450+(h%7)*470,y:760+(index%6)*430,rotation:((h%9)-4)/10,size_class:null,position_version:1}}
+function deterministicPlatformPosition(id,index=0){const h=hashString(id);const angle=((h%360)/180)*Math.PI;const radius=650+(h%1250);return{x:WORLD_CENTER.x+Math.cos(angle)*radius,y:WORLD_CENTER.y+Math.sin(angle)*radius,rotation:((h%15)-7)/10,size_class:index%4===0?'M':'S'}}
+function fallbackMemberPosition(id,index=0){const h=hashString(id);return{x:WORLD_CENTER.x-850+(h%7)*280,y:WORLD_CENTER.y-620+(index%6)*250,rotation:((h%9)-4)/10,size_class:null,position_version:1}}
 function cardSizeClass(card,pos){if(pos?.size_class)return pos.size_class;if(card.querySelector('.dc-notice__media'))return'L';const length=(card.textContent||'').length;if(length>900)return'M';if(length<220)return'XS';return'S'}
 
 function updateStatus(){const el=viewport?.querySelector('.dc-spatial-status');if(el)el.textContent=`ZOOM ${Math.round(camera.scale*100)}% · X ${Math.round(-camera.x/camera.scale)} · Y ${Math.round(-camera.y/camera.scale)}`}
@@ -38,7 +39,7 @@ function fitActiveContent({markManual=false}={}){
   const cards=visibleSpatialCards();
   if(!cards.length){
     const rect=viewport.getBoundingClientRect();const scale=Math.min(.72,rect.width/2200,rect.height/1450);
-    setCamera({scale,x:rect.width/2-2500*scale,y:rect.height/2-1750*scale});
+    setCamera({scale,x:rect.width/2-WORLD_CENTER.x*scale,y:rect.height/2-WORLD_CENTER.y*scale});
     if(markManual)cameraIntent='manual';
     return false;
   }
@@ -142,7 +143,7 @@ function focusMine(){
   if(!viewport)return;
   const mine=boardHost?.querySelector('.dc-notice.is-own-movable')||boardHost?.querySelector('.dc-notice[data-artifact] [data-close-artifact]')?.closest('.dc-notice');
   if(mine){
-    const x=parseFloat(mine.style.left)||2500,y=parseFloat(mine.style.top)||1750;
+    const x=parseFloat(mine.style.left)||WORLD_CENTER.x,y=parseFloat(mine.style.top)||WORLD_CENTER.y;
     const width=Math.max(mine.offsetWidth||320,240),height=Math.max(mine.offsetHeight||220,160);
     const rect=viewport.getBoundingClientRect();const scale=clamp(Math.max(camera.scale,.82),.28,1.08);
     setCamera({scale,x:rect.width/2-(x+width/2)*scale,y:rect.height/2-(y+height/2)*scale});cameraIntent='manual';
