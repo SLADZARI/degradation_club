@@ -6,8 +6,11 @@ export const BOARD_SOURCE_MODES={
 
 export const BOARD_FILTERS=[
   ['all','ВСЁ'],
-  ['member','УЧАСТНИКИ'],
-  ['platform','ПЛАТФОРМА'],
+  ['member','ОТ ЛЮДЕЙ'],
+  ['platform','ОТ КЛУБА']
+];
+
+export const BOARD_DETAIL_FILTERS=[
   ['event','МЕРОПРИЯТИЯ'],
   ['program','ПРОГРАММЫ'],
   ['course','КУРСЫ'],
@@ -50,8 +53,6 @@ export function entityToBoardProjection(entity,event,program){
 
 export function routeForEntity(entity){
   if(entity.entity_type==='event')return `/events/${entity.slug}/`;
-  // Current production exposes program families under /courses/:slug/.
-  // Preserve semantic subtype for filtering while following the implemented route.
   if(entity.entity_type==='program')return `/courses/${entity.slug}/`;
   if(entity.entity_type==='project')return `/projects/${entity.slug}/`;
   return null;
