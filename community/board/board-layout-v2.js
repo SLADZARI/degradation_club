@@ -2,8 +2,8 @@ import {getClient,currentSession} from '/community-runtime-v1.js';
 
 const boardHost=document.getElementById('boardHost');
 const client=getClient();
-const WORLD={w:5000,h:3500};
-const GAP=34;
+const WORLD={w:12000,h:8000};
+const GAP=42;
 let persisted=new Set();
 let timer=null;
 
@@ -15,9 +15,9 @@ function overlaps(a,b,gap=GAP){return !(a.right+gap<=b.x||b.right+gap<=a.x||a.bo
 function clamp(v,min,max){return Math.max(min,Math.min(max,v))}
 function candidatePositions(origin){
   const out=[origin];
-  for(let ring=1;ring<=9;ring++){
-    const radius=ring*150;
-    const steps=Math.max(8,ring*8);
+  for(let ring=1;ring<=30;ring++){
+    const radius=ring*180;
+    const steps=Math.max(10,ring*10);
     for(let i=0;i<steps;i++){
       const angle=(Math.PI*2*i)/steps;
       out.push({x:origin.x+Math.cos(angle)*radius,y:origin.y+Math.sin(angle)*radius});
@@ -26,11 +26,10 @@ function candidatePositions(origin){
   return out;
 }
 function movable(card){
-  if(card.dataset.boardSource==='platform')return true;
   const id=card.dataset.artifact;
   return Boolean(id&&!persisted.has(id));
 }
-function visibleCards(){return [...(boardHost?.querySelectorAll('.dc-notice[data-artifact],[data-board-source="platform"]')||[])].filter(card=>!card.hidden&&getComputedStyle(card).display!=='none')}
+function visibleCards(){return [...(boardHost?.querySelectorAll('.dc-notice[data-artifact]')||[])].filter(card=>!card.hidden&&getComputedStyle(card).display!=='none')}
 function resolveLayout(){
   if(!boardHost)return;
   const cards=visibleCards();
@@ -38,8 +37,8 @@ function resolveLayout(){
   const fixed=cards.filter(card=>!movable(card));
   fixed.forEach(card=>occupied.push(rectFor(card)));
   const moving=cards.filter(movable);
-  moving.forEach(card=>{
-    const origin={x:parseFloat(card.style.left)||2500,y:parseFloat(card.style.top)||1750};
+  moving.forEach((card,index)=>{
+    const origin={x:parseFloat(card.style.left)||2600+(index%8)*380,y:parseFloat(card.style.top)||1400+Math.floor(index/8)*320};
     const w=Math.max(card.offsetWidth||0,220),h=Math.max(card.offsetHeight||0,140);
     const candidates=candidatePositions(origin);
     let chosen=null;
@@ -61,7 +60,6 @@ async function loadPersisted(){
 }
 async function init(){
   await loadPersisted();schedule();
-  window.addEventListener('dc:board-projections-updated',schedule);
   window.addEventListener('dc:board-layout-request',schedule);
   window.addEventListener('dc:board-filter-changed',schedule);
   if(boardHost)new MutationObserver(schedule).observe(boardHost,{childList:true});
