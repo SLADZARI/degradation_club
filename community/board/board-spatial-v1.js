@@ -10,7 +10,6 @@ let positions=new Map();
 let activationState=null;
 let entryStatus=null;
 let renderTimer=null;
-let touchPanEnabled=false;
 
 function clamp(value,min,max){return Math.max(min,Math.min(max,value))}
 function hashString(value){let h=2166136261;for(const ch of String(value||'')){h^=ch.charCodeAt(0);h=Math.imul(h,16777619)}return h>>>0}
@@ -83,16 +82,15 @@ function installShell(){
   if(boardHost.closest('.dc-spatial-viewport')){viewport=boardHost.closest('.dc-spatial-viewport');extrasHost=viewport.previousElementSibling?.classList.contains('dc-spatial-extras')?viewport.previousElementSibling:null;return}
   extrasHost=document.createElement('div');extrasHost.className='dc-spatial-extras';boardHost.parentNode.insertBefore(extrasHost,boardHost);
   viewport=document.createElement('div');viewport.className='dc-spatial-viewport';boardHost.parentNode.insertBefore(viewport,boardHost);viewport.appendChild(boardHost);boardHost.classList.add('dc-spatial-world');
-  const controls=document.createElement('div');controls.className='dc-spatial-controls';controls.innerHTML='<button class="dc-spatial-control" type="button" data-slot aria-label="Показать состояние Artifact slot">SLOT</button><button class="dc-spatial-control" type="button" data-zoom-in aria-label="Увеличить">＋</button><button class="dc-spatial-control" type="button" data-zoom-out aria-label="Уменьшить">−</button><button class="dc-spatial-control" type="button" data-home>К ЖИЗНИ</button><button class="dc-spatial-control" type="button" data-mine>МОЁ</button><button class="dc-spatial-control" type="button" data-touch-pan>ДВИГАТЬ</button>';
+  const controls=document.createElement('div');controls.className='dc-spatial-controls';controls.innerHTML='<button class="dc-spatial-control" type="button" data-slot aria-label="Показать состояние Artifact slot">SLOT</button><button class="dc-spatial-control" type="button" data-zoom-in aria-label="Увеличить">＋</button><button class="dc-spatial-control" type="button" data-zoom-out aria-label="Уменьшить">−</button><button class="dc-spatial-control" type="button" data-home>К ЖИЗНИ</button><button class="dc-spatial-control" type="button" data-mine>МОЁ</button>';
   viewport.appendChild(controls);
   const status=document.createElement('div');status.className='dc-spatial-status';status.setAttribute('aria-live','polite');viewport.appendChild(status);
-  const help=document.createElement('div');help.className='dc-spatial-help';help.textContent='Artifact slot — через кнопку в панели. Пустое поле: drag мышью. Колесо / + −: масштаб. На телефоне включите «Двигать», чтобы панорамировать одним пальцем.';viewport.appendChild(help);
+  const help=document.createElement('div');help.className='dc-spatial-help';help.textContent='Пустое поле: drag мышью или одним пальцем. Два пальца: масштаб + движение. Двойное касание: приблизить. Колесо / + −: масштаб.';viewport.appendChild(help);
   controls.querySelector('[data-slot]').onclick=openArtifactSlot;
   controls.querySelector('[data-zoom-in]').onclick=()=>zoomAt(1.18,viewport.getBoundingClientRect().left+viewport.clientWidth/2,viewport.getBoundingClientRect().top+viewport.clientHeight/2);
   controls.querySelector('[data-zoom-out]').onclick=()=>zoomAt(.84,viewport.getBoundingClientRect().left+viewport.clientWidth/2,viewport.getBoundingClientRect().top+viewport.clientHeight/2);
   controls.querySelector('[data-home]').onclick=resetCamera;
   controls.querySelector('[data-mine]').onclick=focusMine;
-  controls.querySelector('[data-touch-pan]').onclick=event=>{touchPanEnabled=!touchPanEnabled;viewport.classList.toggle('is-touch-pan',touchPanEnabled);event.currentTarget.classList.toggle('active',touchPanEnabled);event.currentTarget.textContent=touchPanEnabled?'ДВИГАЮ':'ДВИГАТЬ'};
   liftLegacyBlocks();
 }
 
@@ -100,17 +98,81 @@ function focusMine(){const mine=boardHost?.querySelector('.dc-notice.is-own-mova
 
 function installPanZoom(){
   if(!viewport)return;
-  let pan=null;
+  const pointers=new Map();
+  let mousePan=null;
+  let touchGesture=null;
+  let lastTap=null;
+  let suppressClickUntil=0;
+  const blockedTarget=target=>target.closest('.dc-spatial-controls,a,button,input,textarea,dialog');
+  const touchPoints=()=>[...pointers.values()].filter(point=>point.type==='touch');
+  const centerOf=(a,b)=>({x:(a.x+b.x)/2,y:(a.y+b.y)/2});
+  const distance=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
+  const startSingleTouch=point=>{touchGesture={mode:'pan',id:point.id,startX:point.x,startY:point.y,cx:camera.x,cy:camera.y,moved:false}};
+  const startPinch=()=>{
+    const pts=touchPoints();if(pts.length<2)return;
+    const [a,b]=pts;const center=centerOf(a,b);const rect=viewport.getBoundingClientRect();const px=center.x-rect.left,py=center.y-rect.top;
+    touchGesture={mode:'pinch',ids:[a.id,b.id],startDistance:Math.max(1,distance(a,b)),startScale:camera.scale,worldX:(px-camera.x)/camera.scale,worldY:(py-camera.y)/camera.scale,moved:false};
+  };
+
   viewport.addEventListener('wheel',event=>{event.preventDefault();zoomAt(event.deltaY<0?1.1:.9,event.clientX,event.clientY)},{passive:false});
   viewport.addEventListener('pointerdown',event=>{
-    if(event.button!==0)return;
-    if(event.pointerType==='touch'&&!touchPanEnabled)return;
-    if(event.target.closest('.dc-notice,.dc-projection,.dc-spatial-controls,a,button,input,textarea,dialog'))return;
-    pan={id:event.pointerId,x:event.clientX,y:event.clientY,cx:camera.x,cy:camera.y};viewport.setPointerCapture(event.pointerId);viewport.classList.add('is-panning');
+    if(event.pointerType==='mouse'){
+      if(event.button!==0||event.target.closest('.dc-notice,.dc-projection,.dc-spatial-controls,a,button,input,textarea,dialog'))return;
+      mousePan={id:event.pointerId,x:event.clientX,y:event.clientY,cx:camera.x,cy:camera.y};viewport.setPointerCapture(event.pointerId);viewport.classList.add('is-panning');return;
+    }
+    if(event.pointerType!=='touch'||blockedTarget(event.target))return;
+    pointers.set(event.pointerId,{id:event.pointerId,type:'touch',x:event.clientX,y:event.clientY,startX:event.clientX,startY:event.clientY,moved:false});
+    viewport.setPointerCapture(event.pointerId);
+    const pts=touchPoints();
+    if(pts.length===1)startSingleTouch(pts[0]);
+    else if(pts.length===2)startPinch();
+    viewport.classList.add('is-panning');
   });
-  viewport.addEventListener('pointermove',event=>{if(!pan||event.pointerId!==pan.id)return;setCamera({x:pan.cx+(event.clientX-pan.x),y:pan.cy+(event.clientY-pan.y)})});
-  const end=event=>{if(pan?.id===event.pointerId){pan=null;viewport.classList.remove('is-panning')}};
+  viewport.addEventListener('pointermove',event=>{
+    if(event.pointerType==='mouse'){
+      if(!mousePan||event.pointerId!==mousePan.id)return;
+      setCamera({x:mousePan.cx+(event.clientX-mousePan.x),y:mousePan.cy+(event.clientY-mousePan.y)});return;
+    }
+    const point=pointers.get(event.pointerId);if(!point)return;
+    point.x=event.clientX;point.y=event.clientY;
+    if(Math.hypot(point.x-point.startX,point.y-point.startY)>6)point.moved=true;
+    const pts=touchPoints();
+    if(pts.length>=2){
+      if(touchGesture?.mode!=='pinch')startPinch();
+      const [a,b]=pts;const center=centerOf(a,b);const rect=viewport.getBoundingClientRect();const px=center.x-rect.left,py=center.y-rect.top;
+      const nextScale=clamp(touchGesture.startScale*(distance(a,b)/touchGesture.startDistance),.28,1.6);
+      touchGesture.moved=touchGesture.moved||Math.abs(nextScale-touchGesture.startScale)>.01||a.moved||b.moved;
+      setCamera({scale:nextScale,x:px-touchGesture.worldX*nextScale,y:py-touchGesture.worldY*nextScale});
+      event.preventDefault();return;
+    }
+    if(pts.length===1){
+      const current=pts[0];if(touchGesture?.mode!=='pan'||touchGesture.id!==current.id)startSingleTouch(current);
+      const dx=current.x-touchGesture.startX,dy=current.y-touchGesture.startY;
+      if(Math.hypot(dx,dy)>4){touchGesture.moved=true;setCamera({x:touchGesture.cx+dx,y:touchGesture.cy+dy});event.preventDefault()}
+    }
+  },{passive:false});
+  const end=event=>{
+    if(event.pointerType==='mouse'){
+      if(mousePan?.id===event.pointerId){mousePan=null;viewport.classList.remove('is-panning')}return;
+    }
+    const point=pointers.get(event.pointerId);if(!point)return;
+    pointers.delete(event.pointerId);
+    const moved=point.moved||touchGesture?.moved;
+    const remaining=touchPoints();
+    if(moved)suppressClickUntil=Date.now()+350;
+    if(remaining.length===1)startSingleTouch(remaining[0]);
+    else if(remaining.length===0){
+      viewport.classList.remove('is-panning');
+      if(!moved){
+        const now=Date.now();
+        if(lastTap&&now-lastTap.time<320&&Math.hypot(event.clientX-lastTap.x,event.clientY-lastTap.y)<36){zoomAt(1.45,event.clientX,event.clientY);lastTap=null;suppressClickUntil=now+350}
+        else lastTap={time:now,x:event.clientX,y:event.clientY};
+      }
+      touchGesture=null;
+    }
+  };
   viewport.addEventListener('pointerup',end);viewport.addEventListener('pointercancel',end);
+  viewport.addEventListener('click',event=>{if(Date.now()<suppressClickUntil){event.preventDefault();event.stopPropagation()}},true);
 }
 
 async function persistOwnPosition(card){
