@@ -1,0 +1,45 @@
+/* Board UX v2.1 — mobile spatial breathing room.
+   The Board is the primary surface; cards must never consume the whole phone viewport. */
+.dc-board-fullscreen-v21 .dc-board-grid .dc-notice__meta,
+.dc-board-fullscreen-v21 .dc-board-grid .dc-notice__author,
+.dc-board-fullscreen-v21 .dc-board-grid .dc-notice__expiry{display:none!important}
+.dc-board-fullscreen-v21 .dc-board-grid .dc-notice,
+.dc-board-fullscreen-v21 .dc-board-grid .dc-projection{max-height:360px!important}
+.dc-board-fullscreen-v21 .dc-board-grid .dc-notice__body{display:-webkit-box!important;-webkit-box-orient:vertical!important;-webkit-line-clamp:5!important;overflow:hidden!important;max-height:6.8em!important}
+
+@media(max-width:900px){
+  .dc-board-fullscreen-v21 .dc-spatial-world>.dc-notice[data-size-class="XS"],
+  .dc-board-fullscreen-v21 .dc-spatial-world>.dc-projection[data-size-class="XS"]{width:200px!important}
+  .dc-board-fullscreen-v21 .dc-spatial-world>.dc-notice[data-size-class="S"],
+  .dc-board-fullscreen-v21 .dc-spatial-world>.dc-projection[data-size-class="S"]{width:230px!important}
+  .dc-board-fullscreen-v21 .dc-spatial-world>.dc-notice[data-size-class="M"],
+  .dc-board-fullscreen-v21 .dc-spatial-world>.dc-projection[data-size-class="M"]{width:260px!important}
+  .dc-board-fullscreen-v21 .dc-spatial-world>.dc-notice[data-size-class="L"],
+  .dc-board-fullscreen-v21 .dc-spatial-world>.dc-projection[data-size-class="L"]{width:290px!important}
+  .dc-board-fullscreen-v21 .dc-board-grid .dc-notice,
+  .dc-board-fullscreen-v21 .dc-board-grid .dc-projection{max-height:320px!important;padding:14px!important}
+  .dc-board-fullscreen-v21 .dc-board-grid .dc-notice h3,
+  .dc-board-fullscreen-v21 .dc-board-grid .dc-projection h3{font-size:24px!important;line-height:.96!important;margin-bottom:10px!important}
+  .dc-board-fullscreen-v21 .dc-board-grid .dc-notice__body{font-size:15px!important;line-height:1.28!important;-webkit-line-clamp:4!important;max-height:5.2em!important;margin-bottom:10px!important}
+  .dc-board-fullscreen-v21 .dc-board-grid .dc-notice__media{margin-bottom:10px!important}
+  .dc-board-fullscreen-v21 .dc-board-grid .dc-notice__media img{max-height:128px!important}
+  .dc-board-fullscreen-v21 .dc-board-open-hint{padding-top:7px!important;font-size:8px!important}
+}
+
+@media(max-width:520px){
+  .dc-board-fullscreen-v21 .dc-spatial-world>.dc-notice[data-size-class="XS"],
+  .dc-board-fullscreen-v21 .dc-spatial-world>.dc-projection[data-size-class="XS"]{width:180px!important}
+  .dc-board-fullscreen-v21 .dc-spatial-world>.dc-notice[data-size-class="S"],
+  .dc-board-fullscreen-v21 .dc-spatial-world>.dc-projection[data-size-class="S"]{width:210px!important}
+  .dc-board-fullscreen-v21 .dc-spatial-world>.dc-notice[data-size-class="M"],
+  .dc-board-fullscreen-v21 .dc-spatial-world>.dc-projection[data-size-class="M"]{width:235px!important}
+  .dc-board-fullscreen-v21 .dc-spatial-world>.dc-notice[data-size-class="L"],
+  .dc-board-fullscreen-v21 .dc-spatial-world>.dc-projection[data-size-class="L"]{width:260px!important}
+  .dc-board-fullscreen-v21 .dc-board-grid .dc-notice,
+  .dc-board-fullscreen-v21 .dc-board-grid .dc-projection{max-height:290px!important;padding:12px!important}
+  .dc-board-fullscreen-v21 .dc-board-grid .dc-notice h3,
+  .dc-board-fullscreen-v21 .dc-board-grid .dc-projection h3{font-size:21px!important}
+  .dc-board-fullscreen-v21 .dc-board-grid .dc-notice__body{font-size:14px!important;-webkit-line-clamp:3!important;max-height:4em!important}
+  .dc-board-fullscreen-v21 .dc-board-grid .dc-notice__media img{max-height:105px!important}
+  .dc-board-fullscreen-v21 .dc-spatial-status{display:none!important}
+}
