@@ -4,6 +4,8 @@
   if(!host||host.dataset.dcWorkspaceShell==='1')return;
   host.dataset.dcWorkspaceShell='1';
   document.documentElement.dataset.dcWorkspaceAuth='checking';
+  document.documentElement.dataset.dcWorkspaceMembership='checking';
+  document.documentElement.dataset.dcWorkspaceRole='checking';
 
   const path=location.pathname.replace(/^\/degradation_club/,'');
   const root='/workspace/';
@@ -19,8 +21,8 @@
   host.innerHTML=`
     <a class="dcw-brand" href="/" aria-label="Dementor Club — на публичный сайт"><span>DEMENTOR</span><strong>CLUB</strong></a>
     <nav class="dcw-nav" aria-label="Личный кабинет" data-workspace-nav hidden>
-      ${link(board,'COMMUNITY BOARD',{hidden:true,memberTool:true,key:'board'})}
-      ${viewLink('club','МОЙ КЛУБ')}
+      ${link(board,'ДОСКА',{hidden:true,memberTool:true,key:'board'})}
+      ${viewLink('club','УЧАСТИЕ')}
       ${link(artifacts,'МОИ АРТЕФАКТЫ',{hidden:true,memberTool:true,key:'artifacts'})}
       ${viewLink('activity','МОЯ АКТИВНОСТЬ')}
       ${viewLink('work','МОЯ РАБОТА',{hidden:true,workNav:true})}
@@ -28,12 +30,13 @@
       ${link(review,'MEMBERSHIP REVIEW',{hidden:true,roleTool:true})}
       ${link(admin,'SYSTEM TOOLS',{hidden:true,roleTool:true})}
     </nav>
-    <div class="dcw-boundary"><span>SYSTEM</span><strong>DEMENTOR CLUB</strong><small>Community Board — основная поверхность участника. Роли и рабочие возможности добавляются поверх членства.</small></div>
+    <div class="dcw-boundary"><span>SYSTEM</span><strong>DEMENTOR CLUB</strong><small>Доска — основная поверхность участника. Authentication, membership, role и Board activation остаются отдельными состояниями.</small></div>
     <div class="dcw-session" id="sessionBox" data-shell-session><span>SESSION</span><strong>ПРОВЕРКА…</strong></div>`;
   host.hidden=false;
 
   const nav=host.querySelector('[data-workspace-nav]');
   const sessionBox=host.querySelector('[data-shell-session]');
+  const emitWorkspaceState=detail=>window.dispatchEvent(new CustomEvent('dc:workspace-state',{detail}));
   const setCurrentRootRoute=()=>{
     if(current!=='/workspace/'&&current!=='/workspace/index.html')return;
     const route=(location.hash||'#home').slice(1);
@@ -43,7 +46,12 @@
   addEventListener('hashchange',setCurrentRootRoute);
 
   const cfg=window.DEMENTOR_SITE_CONFIG?.supabase;
-  if(!cfg?.enabled||!cfg.url||!cfg.publishableKey){document.documentElement.dataset.dcWorkspaceAuth='error';return;}
+  if(!cfg?.enabled||!cfg.url||!cfg.publishableKey){
+    document.documentElement.dataset.dcWorkspaceAuth='error';
+    document.documentElement.dataset.dcWorkspaceMembership='error';
+    document.documentElement.dataset.dcWorkspaceRole='error';
+    return;
+  }
   import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.4/+esm').then(async({createClient})=>{
     const client=window.DEMENTOR_SUPABASE_CLIENT||createClient(cfg.url,cfg.publishableKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false,flowType:'pkce'}});
     window.DEMENTOR_SUPABASE_CLIENT=client;
@@ -51,6 +59,9 @@
     const user=session?.user;
     if(!user){
       document.documentElement.dataset.dcWorkspaceAuth='guest';
+      document.documentElement.dataset.dcWorkspaceMembership='none';
+      document.documentElement.dataset.dcWorkspaceRole='none';
+      emitWorkspaceState({authenticated:false,membership:'none',role:'none'});
       if(nav)nav.hidden=true;
       if(sessionBox)sessionBox.innerHTML='<span>SESSION</span><strong>НЕ ВЫПОЛНЕН ВХОД</strong>';
       return;
@@ -75,7 +86,16 @@
     const owner=activeRoles.includes('owner_admin');
     const member=isActive(membership)||dementor;
     const hasWork=dementor||(assignments||[]).some(isActive);
+    const role=owner?'owner_admin':dementor?'dementor':member?'member':'guest';
 
+    document.documentElement.dataset.dcWorkspaceMembership=member?'active':'none';
+    document.documentElement.dataset.dcWorkspaceRole=role;
+    emitWorkspaceState({authenticated:true,membership:member?'active':'none',role,member,dementor,owner,hasWork});
+
+    // R1 safety boundary: Board read policies are currently membership-gated in
+    // production. Guest Board navigation is intentionally NOT exposed until a
+    // scoped read contract is introduced and verified. Do not fake membership
+    // in the client to make the route visible.
     host.querySelectorAll('[data-member-tool]').forEach(control=>control.hidden=!member);
     const workControl=host.querySelector('[data-route="work"]');if(workControl)workControl.hidden=!hasWork;
     const homeControl=host.querySelector('[data-role-home]');if(homeControl)homeControl.hidden=!dementor;
@@ -100,6 +120,8 @@
     }
   }).catch(error=>{
     document.documentElement.dataset.dcWorkspaceAuth='error';
+    document.documentElement.dataset.dcWorkspaceMembership='error';
+    document.documentElement.dataset.dcWorkspaceRole='error';
     if(nav)nav.hidden=true;
     console.warn('[DC Workspace shell]',error);
   });
