@@ -104,6 +104,7 @@ function openArtifactSlot(){
 function updateSlotControl(){
   const control=viewport?.querySelector('[data-slot]');
   if(!control)return;
+  if(entryStatus?.membership_active!==true){control.remove();return}
   const available=Number(entryStatus?.artifact_slots_available||0);
   const consuming=Number(entryStatus?.artifact_slots_consuming||0);
   if(available>0){control.textContent='＋ АРТЕФАКТ';control.setAttribute('aria-label','Открыть свободный Artifact slot');return}
