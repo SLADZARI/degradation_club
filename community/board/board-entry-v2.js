@@ -8,6 +8,7 @@ const boardStatus=document.getElementById('boardStatus');
 const memberBadge=document.getElementById('memberBadge');
 const artifactCount=document.getElementById('artifactCount');
 const client=getClient();
+let guestInterestBusy=false;
 
 function fail(error,target=boardHost){
   if(target)target.innerHTML=`<div class="dc-board-error">${esc(errorMessage(error))}</div>`;
@@ -69,8 +70,10 @@ function avatar(row){
   return `<span class="dc-notice__avatar dc-notice__avatar--empty">${esc(letter)}</span>`;
 }
 
+function guestInterestTotal(row){return Math.max(0,Number(row.reaction_count||0))+Math.max(0,Number(row.guest_interest_count||0))}
 function guestNotice(row,index){
-  const reactions=Number(row.reaction_count||0);
+  const active=row.my_guest_interest===true;
+  const total=guestInterestTotal(row);
   return `<article class="dc-notice dc-notice--guest" data-artifact="${esc(row.artifact_id)}" data-guest-read="1">
     <div class="dc-notice__meta"><span>ARTIFACT / ${String(index+1).padStart(3,'0')}</span><span>${formatDate(row.published_at)}</span></div>
     <div class="dc-notice__author">${avatar(row)}<div><strong>${esc(row.author_display_name||'MEMBER')}</strong>${row.author_nickname?`<div>@${esc(String(row.author_nickname).replace(/^@/,''))}</div>`:''}</div></div>
@@ -78,8 +81,43 @@ function guestNotice(row,index){
     <p class="dc-notice__body">${esc(row.body||'')}</p>
     ${row.external_url?`<p><a class="dc-notice__link" href="${esc(row.external_url)}" target="_blank" rel="noopener noreferrer">ССЫЛКА ↗</a></p>`:''}
     <div class="dc-notice__expiry">${row.expires_at?`ДЕЙСТВУЕТ ДО ${formatDate(row.expires_at)}`:'БЕЗ СРОКА'} · COMMUNITY</div>
-    <div class="dc-notice__actions"><span class="dc-notice__activity">ИНТЕРЕСНО: ${reactions}</span><span class="dc-board-state">GUEST / READ ONLY</span></div>
+    <div class="dc-notice__actions">
+      <button class="dc-board-action small${active?' active':''}" type="button" data-guest-interest aria-pressed="${active?'true':'false'}">${active?'✓':'☆'} ИНТЕРЕСНО · <span data-guest-interest-count>${total}</span></button>
+      <span class="dc-board-state">GUEST / LIGHT INTERACTION</span>
+    </div>
   </article>`;
+}
+
+async function toggleGuestInterest(button){
+  if(guestInterestBusy||!button)return;
+  const card=button.closest('[data-artifact]');
+  const artifactId=card?.dataset.artifact;
+  if(!artifactId)return;
+  guestInterestBusy=true;
+  button.disabled=true;
+  try{
+    const {data,error}=await client.rpc('dc_guest_board_interest_toggle_v1',{p_artifact_id:artifactId});
+    if(error)throw error;
+    const result=Array.isArray(data)?data[0]:data;
+    const active=result?.active===true;
+    const guestCount=Math.max(0,Number(result?.count||0));
+    const base=Math.max(0,Number(card.dataset.memberReactionCount||0));
+    button.classList.toggle('active',active);
+    button.setAttribute('aria-pressed',active?'true':'false');
+    button.firstChild.textContent=active?'✓ ИНТЕРЕСНО · ':'☆ ИНТЕРЕСНО · ';
+    const countEl=button.querySelector('[data-guest-interest-count]');
+    if(countEl)countEl.textContent=String(base+guestCount);
+  }catch(error){
+    const message=document.createElement('div');
+    message.className='dc-board-error';
+    message.setAttribute('role','status');
+    message.textContent=errorMessage(error);
+    card?.appendChild(message);
+    setTimeout(()=>message.remove(),5000);
+  }finally{
+    button.disabled=false;
+    guestInterestBusy=false;
+  }
 }
 
 async function renderGuestBoard(state){
@@ -96,9 +134,17 @@ async function renderGuestBoard(state){
   boardHost.innerHTML=rows.length
     ?rows.map(guestNotice).join('')
     :'<div class="dc-board-empty"><h3>ЖИВЫХ ОБЪЯВЛЕНИЙ<br>ПОКА НЕТ.</h3><p>Вы видите настоящую доску, но сейчас на ней нет активных Member Artifacts.</p></div>';
+  boardHost.querySelectorAll('[data-artifact]').forEach((card,index)=>{card.dataset.memberReactionCount=String(Math.max(0,Number(rows[index]?.reaction_count||0)))});
   boardHost.dataset.guestRead='1';
   window.dispatchEvent(new CustomEvent('dc:board-guest-read-ready',{detail:{state:state.key,count:rows.length}}));
 }
+
+boardHost?.addEventListener('click',event=>{
+  const button=event.target.closest?.('[data-guest-interest]');
+  if(!button)return;
+  event.preventDefault();
+  toggleGuestInterest(button);
+});
 
 async function boot(){
   const state=await resolveBoardUserState(client);
