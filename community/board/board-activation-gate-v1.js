@@ -41,6 +41,11 @@ function syncFirstEntryFocus(){
   skip.className='dc-first-focus-skip';
   skip.textContent='Пропустить сейчас';
   skip.setAttribute('aria-label','Скрыть подсказку до следующего входа');
+  skip.style.position='absolute';
+  skip.style.right='14px';
+  skip.style.bottom='58px';
+  skip.style.zIndex='32';
+  skip.style.pointerEvents='auto';
   skip.addEventListener('click',dismissFocus);
   host.appendChild(skip);
 }
