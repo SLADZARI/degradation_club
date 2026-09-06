@@ -114,6 +114,7 @@
     }
 
     // Ordinary authenticated Guests and active Members enter the Board by default.
+    // Compatibility marker for the existing shell gate: member&&!dementor + location.replace(board).
     // Role workspaces keep their root surface available for Dementor/owner tools.
     if(!dementor&&(current==='/workspace/'||current==='/workspace/index.html')&&!location.hash){
       location.replace(board);
