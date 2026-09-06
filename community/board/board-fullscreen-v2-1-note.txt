@@ -1,1 +1,0 @@
-Board UX v2.1 fullscreen candidate. No production deploy implied.
