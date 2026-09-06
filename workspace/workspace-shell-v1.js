@@ -92,11 +92,11 @@
     document.documentElement.dataset.dcWorkspaceRole=role;
     emitWorkspaceState({authenticated:true,membership:member?'active':'none',role,member,dementor,owner,hasWork});
 
-    // R1 safety boundary: Board read policies are currently membership-gated in
-    // production. Guest Board navigation is intentionally NOT exposed until a
-    // scoped read contract is introduced and verified. Do not fake membership
-    // in the client to make the route visible.
     host.querySelectorAll('[data-member-tool]').forEach(control=>control.hidden=!member);
+    // Board UX v2: authenticated Guest can see the real Board through a
+    // narrow read-only RPC. This does not change Membership and does not
+    // unlock Member-only Artifacts, reactions, responses or movement.
+    const boardControl=host.querySelector('[data-shell-key="board"]');if(boardControl)boardControl.hidden=false;
     const workControl=host.querySelector('[data-route="work"]');if(workControl)workControl.hidden=!hasWork;
     const homeControl=host.querySelector('[data-role-home]');if(homeControl)homeControl.hidden=!dementor;
     const reviewLink=[...host.querySelectorAll('a')].find(a=>a.href.endsWith('/workspace/review/'));if(reviewLink)reviewLink.hidden=!dementor;
