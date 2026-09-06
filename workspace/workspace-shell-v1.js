@@ -113,9 +113,9 @@
       });
     }
 
-    // Ordinary active Members enter the Board by default. Role workspaces keep
-    // their root surface available for Dementor/owner operational tools.
-    if(member&&!dementor&&(current==='/workspace/'||current==='/workspace/index.html')&&!location.hash){
+    // Ordinary authenticated Guests and active Members enter the Board by default.
+    // Role workspaces keep their root surface available for Dementor/owner tools.
+    if(!dementor&&(current==='/workspace/'||current==='/workspace/index.html')&&!location.hash){
       location.replace(board);
     }
   }).catch(error=>{
