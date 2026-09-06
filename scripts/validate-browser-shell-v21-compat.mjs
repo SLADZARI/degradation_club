@@ -29,10 +29,12 @@ const replacement=`// Board v2.1: the spatial card is discovery-only. Participat
   const target=p.locator('[data-artifact="qa-target-artifact"]');
   try{await target.waitFor({state:'visible',timeout:5000})}catch{errors.push(\`/workspace/board/: activity fixture card did not render; errors=\${pageErrors.join(' | ')||'none'}\`)}
   if(await target.count()){
+    await p.waitForFunction(()=>document.querySelector('[data-artifact="qa-target-artifact"]')?.getAttribute('role')==='button',{timeout:3000}).catch(()=>errors.push('Board v2.1: spatial Artifact did not become the canonical open target'));
     expect(await target.getByRole('button',{name:'ОТКЛИК ОТПРАВЛЕН'}).count()===0,'Board v2.1: response action leaked onto spatial card');
     expect(await target.getByRole('button',{name:'✓ ИНТЕРЕСНО'}).count()===0,'Board v2.1: reaction action leaked onto spatial card');
     expect(await target.getByRole('link',{name:'МОЯ АКТИВНОСТЬ'}).count()===0,'Board v2.1: My Activity link leaked onto spatial card');
     expect((await target.getAttribute('role'))==='button','Board v2.1: spatial Artifact is not one open target');
+    await p.waitForTimeout(120);
     const before=await p.locator('#boardHost').evaluate(el=>el.style.transform);
     await target.click();
     try{await p.locator('.dc-artifact-overlay:not([hidden])').waitFor({state:'visible',timeout:3000})}catch(e){errors.push(\`Board v2.1: Artifact overlay did not open: \${e.message}\`)}
