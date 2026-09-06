@@ -22,7 +22,7 @@
     <a class="dcw-brand" href="/" aria-label="Dementor Club — на публичный сайт"><span>DEMENTOR</span><strong>CLUB</strong></a>
     <nav class="dcw-nav" aria-label="Личный кабинет" data-workspace-nav hidden>
       ${link(board,'COMMUNITY BOARD',{hidden:true,memberTool:true,key:'board'})}
-      ${viewLink('club','УЧАСТИЕ')}
+      ${viewLink('club','МОЙ КЛУБ')}
       ${link(artifacts,'МОИ АРТЕФАКТЫ',{hidden:true,memberTool:true,key:'artifacts'})}
       ${viewLink('activity','МОЯ АКТИВНОСТЬ')}
       ${viewLink('work','МОЯ РАБОТА',{hidden:true,workNav:true})}
