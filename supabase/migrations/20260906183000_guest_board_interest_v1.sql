@@ -60,9 +60,9 @@ begin
      where i.artifact_id = p_artifact_id
        and i.profile_id = v_uid
   ) then
-    delete from public.dc_guest_board_interests
-     where artifact_id = p_artifact_id
-       and profile_id = v_uid;
+    delete from public.dc_guest_board_interests i
+     where i.artifact_id = p_artifact_id
+       and i.profile_id = v_uid;
     v_active := false;
   else
     insert into public.dc_guest_board_interests (artifact_id, profile_id)
@@ -73,8 +73,8 @@ begin
 
   select count(*)::bigint
     into v_count
-    from public.dc_guest_board_interests
-   where artifact_id = p_artifact_id;
+    from public.dc_guest_board_interests i
+   where i.artifact_id = p_artifact_id;
 
   return jsonb_build_object('active', v_active, 'count', v_count);
 end;
