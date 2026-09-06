@@ -48,6 +48,8 @@ jobs:
         run: |
           npm install --no-save --no-package-lock playwright@1.55.0
           npx playwright install --with-deps chromium webkit
+      - name: Validate Board v2 R10 browser state matrix
+        run: node scripts/validate-board-v2-browser.mjs
       - name: Validate browser shell and Workspace recovery
         run: node scripts/validate-browser-shell.mjs
       - name: Validate My Artifacts history
