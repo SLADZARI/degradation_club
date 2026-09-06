@@ -37,7 +37,7 @@ const supabaseStub=()=>`
   const user={id:'qa-board-user',email:'qa-board@dementor.invalid',user_metadata:{full_name:'QA Board'}};
   const session=authenticated?{user}:null;
   const entry={membership_active:member,community_activation_state:activation,sphere_count:sphereCount,sphere_gate_complete:sphereCount===9,artifact_slots_available:mode==='member-first'?1:0,published_artifact_count:member&&mode!=='member-first'?1:0};
-  const application=mode==='applicant'?{id:'qa-app',status:'reviewing',created_at:'2026-09-06T10:00:00Z',reviewed_at:null}:null;
+  const application=mode==='applicant'?{id:'qa-app',profile_id:user.id,status:'reviewing',created_at:'2026-09-06T10:00:00Z',reviewed_at:null}:null;
   const roles=role?[{profile_id:user.id,role,status:'active',valid_from:null,valid_to:null}]:[];
   const guestRows=[{artifact_id:'qa-artifact-1',artifact_type:'offer',title:'Нужен человек на съёмку',body:'Тестовая активная карточка клуба.',external_url:null,starts_at:null,expires_at:null,published_at:'2026-09-05T10:00:00Z',author_display_name:'QA Member',author_nickname:'qamember',author_avatar_url:null,reaction_count:2,guest_interest_count:1,my_guest_interest:false,board_x:1100,board_y:900,board_rotation:0,board_size_class:'M'}];
   const rowsFor=t=>t==='join_applications'?(application?[application]:[]):t==='dc_role_assignments'?roles:t==='profiles'?[{id:user.id,email:user.email,full_name:'QA Board',display_name:'QA Board',nickname:'qaboard',avatar_url:null}]:t==='dc_system_memberships'?(member?[{profile_id:user.id,status:'active',valid_from:null,valid_to:null}]:[]):[];
