@@ -107,7 +107,17 @@ async function loadPlatformProjections(){
 }
 
 async function init(){
-  installFilters();client=getClient();try{await loadPlatformProjections()}catch(error){console.error('[DC Board integrations]',error)}
+  installFilters();
+  client=getClient();
+  // Fullscreen Workspace Board is a notice-only surface. Keep this module as
+  // the canonical filter owner, but do not project courses/projects/events
+  // into the spatial canvas.
+  if(document.body.classList.contains('dc-board-fullscreen-v21')){
+    markMemberCards();
+    if(boardHost)new MutationObserver(()=>markMemberCards()).observe(boardHost,{childList:true});
+    return;
+  }
+  try{await loadPlatformProjections()}catch(error){console.error('[DC Board integrations]',error)}
   if(boardHost){let timer=null;const observer=new MutationObserver(()=>{if(rendering)return;clearTimeout(timer);timer=setTimeout(()=>{markMemberCards();ensureProjections();applyFilter({announce:false});window.dispatchEvent(new CustomEvent('dc:board-layout-request'))},80)});observer.observe(boardHost,{childList:true})}
 }
 init();
