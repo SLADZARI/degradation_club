@@ -10,6 +10,7 @@ let positions=new Map();
 let activationState=null;
 let entryStatus=null;
 let renderTimer=null;
+let cameraIntent='auto';
 
 function clamp(value,min,max){return Math.max(min,Math.min(max,value))}
 function hashString(value){let h=2166136261;for(const ch of String(value||'')){h^=ch.charCodeAt(0);h=Math.imul(h,16777619)}return h>>>0}
@@ -20,8 +21,41 @@ function cardSizeClass(card,pos){if(pos?.size_class)return pos.size_class;if(car
 function updateStatus(){const el=viewport?.querySelector('.dc-spatial-status');if(el)el.textContent=`ZOOM ${Math.round(camera.scale*100)}% · X ${Math.round(-camera.x/camera.scale)} · Y ${Math.round(-camera.y/camera.scale)}`}
 function applyCamera(){if(boardHost)boardHost.style.transform=`translate(${camera.x}px,${camera.y}px) scale(${camera.scale})`;updateStatus()}
 function setCamera(next){camera={...camera,...next};camera.scale=clamp(camera.scale,.28,1.6);applyCamera()}
-function resetCamera(){if(!viewport)return;const rect=viewport.getBoundingClientRect();const scale=Math.min(.72,rect.width/2200,rect.height/1450);setCamera({scale,x:rect.width/2-2500*scale,y:rect.height/2-1750*scale})}
-function zoomAt(factor,cx,cy){if(!viewport)return;const rect=viewport.getBoundingClientRect();const px=cx-rect.left,py=cy-rect.top;const wx=(px-camera.x)/camera.scale,wy=(py-camera.y)/camera.scale;const nextScale=clamp(camera.scale*factor,.28,1.6);setCamera({scale:nextScale,x:px-wx*nextScale,y:py-wy*nextScale})}
+function visibleSpatialCards(){
+  if(!boardHost)return[];
+  return [...boardHost.querySelectorAll('.dc-notice[data-artifact],[data-board-source="platform"]')].filter(card=>{
+    if(card.hidden||card.classList.contains('dc-board-filtered'))return false;
+    const style=getComputedStyle(card);return style.display!=='none'&&style.visibility!=='hidden';
+  });
+}
+function cardWorldBounds(card){
+  const left=parseFloat(card.style.left)||0,top=parseFloat(card.style.top)||0;
+  const width=Math.max(card.offsetWidth||0,220),height=Math.max(card.offsetHeight||0,140);
+  return{left,top,right:left+width,bottom:top+height};
+}
+function fitActiveContent({markManual=false}={}){
+  if(!viewport)return false;
+  const cards=visibleSpatialCards();
+  if(!cards.length){
+    const rect=viewport.getBoundingClientRect();const scale=Math.min(.72,rect.width/2200,rect.height/1450);
+    setCamera({scale,x:rect.width/2-2500*scale,y:rect.height/2-1750*scale});
+    if(markManual)cameraIntent='manual';
+    return false;
+  }
+  const bounds=cards.map(cardWorldBounds);
+  const minX=Math.min(...bounds.map(b=>b.left)),minY=Math.min(...bounds.map(b=>b.top));
+  const maxX=Math.max(...bounds.map(b=>b.right)),maxY=Math.max(...bounds.map(b=>b.bottom));
+  const width=Math.max(260,maxX-minX),height=Math.max(220,maxY-minY);
+  const rect=viewport.getBoundingClientRect();
+  const pad=Math.min(88,Math.max(36,rect.width*.065));
+  const usableW=Math.max(160,rect.width-pad*2),usableH=Math.max(160,rect.height-pad*2);
+  const scale=clamp(Math.min(.96,usableW/width,usableH/height),.28,.96);
+  const centerX=(minX+maxX)/2,centerY=(minY+maxY)/2;
+  setCamera({scale,x:rect.width/2-centerX*scale,y:rect.height/2-centerY*scale});
+  if(markManual)cameraIntent='manual';
+  return true;
+}
+function zoomAt(factor,cx,cy,{manual=true}={}){if(!viewport)return;const rect=viewport.getBoundingClientRect();const px=cx-rect.left,py=cy-rect.top;const wx=(px-camera.x)/camera.scale,wy=(py-camera.y)/camera.scale;const nextScale=clamp(camera.scale*factor,.28,1.6);setCamera({scale:nextScale,x:px-wx*nextScale,y:py-wy*nextScale});if(manual)cameraIntent='manual'}
 
 async function loadPositions(){
   const session=await currentSession(client);
@@ -85,16 +119,36 @@ function installShell(){
   const controls=document.createElement('div');controls.className='dc-spatial-controls';controls.innerHTML='<button class="dc-spatial-control" type="button" data-slot aria-label="Показать состояние Artifact slot">SLOT</button><button class="dc-spatial-control" type="button" data-zoom-in aria-label="Увеличить">＋</button><button class="dc-spatial-control" type="button" data-zoom-out aria-label="Уменьшить">−</button><button class="dc-spatial-control" type="button" data-home>К ЖИЗНИ</button><button class="dc-spatial-control" type="button" data-mine>МОЁ</button>';
   viewport.appendChild(controls);
   const status=document.createElement('div');status.className='dc-spatial-status';status.setAttribute('aria-live','polite');viewport.appendChild(status);
-  const help=document.createElement('div');help.className='dc-spatial-help';help.textContent='Пустое поле: drag мышью или одним пальцем. Два пальца: масштаб + движение. Двойное касание: приблизить. Колесо / + −: масштаб.';viewport.appendChild(help);
+  const help=document.createElement('div');help.className='dc-spatial-help';help.textContent='Пустое поле: drag мышью или одним пальцем. Два пальца: масштаб + движение. «К жизни» показывает все видимые объекты. «Моё» находит ваш объект.';viewport.appendChild(help);
   controls.querySelector('[data-slot]').onclick=openArtifactSlot;
   controls.querySelector('[data-zoom-in]').onclick=()=>zoomAt(1.18,viewport.getBoundingClientRect().left+viewport.clientWidth/2,viewport.getBoundingClientRect().top+viewport.clientHeight/2);
   controls.querySelector('[data-zoom-out]').onclick=()=>zoomAt(.84,viewport.getBoundingClientRect().left+viewport.clientWidth/2,viewport.getBoundingClientRect().top+viewport.clientHeight/2);
-  controls.querySelector('[data-home]').onclick=resetCamera;
+  controls.querySelector('[data-home]').onclick=()=>fitActiveContent({markManual:true});
   controls.querySelector('[data-mine]').onclick=focusMine;
   liftLegacyBlocks();
 }
 
-function focusMine(){const mine=boardHost?.querySelector('.dc-notice.is-own-movable');if(!mine||!viewport)return;const x=parseFloat(mine.style.left)||2500,y=parseFloat(mine.style.top)||1750;const rect=viewport.getBoundingClientRect();const scale=Math.max(camera.scale,.8);setCamera({scale,x:rect.width/2-x*scale-160,y:rect.height/2-y*scale-120})}
+function focusPersonalCard(){
+  const host=viewport?.querySelector('[data-board-personal-host]');
+  if(!host||host.hidden)return false;
+  host.classList.remove('is-camera-focus');void host.offsetWidth;host.classList.add('is-camera-focus');
+  const action=host.querySelector('a,button,[tabindex]:not([tabindex="-1"])');
+  if(action){try{action.focus({preventScroll:true})}catch{action.focus()}}
+  window.setTimeout(()=>host.classList.remove('is-camera-focus'),1200);
+  return true;
+}
+function focusMine(){
+  if(!viewport)return;
+  const mine=boardHost?.querySelector('.dc-notice.is-own-movable')||boardHost?.querySelector('.dc-notice[data-artifact] [data-close-artifact]')?.closest('.dc-notice');
+  if(mine){
+    const x=parseFloat(mine.style.left)||2500,y=parseFloat(mine.style.top)||1750;
+    const width=Math.max(mine.offsetWidth||320,240),height=Math.max(mine.offsetHeight||220,160);
+    const rect=viewport.getBoundingClientRect();const scale=clamp(Math.max(camera.scale,.82),.28,1.08);
+    setCamera({scale,x:rect.width/2-(x+width/2)*scale,y:rect.height/2-(y+height/2)*scale});cameraIntent='manual';
+    mine.classList.add('is-camera-focus');window.setTimeout(()=>mine.classList.remove('is-camera-focus'),1200);return;
+  }
+  focusPersonalCard();
+}
 
 function installPanZoom(){
   if(!viewport)return;
@@ -118,11 +172,11 @@ function installPanZoom(){
   viewport.addEventListener('pointerdown',event=>{
     if(event.pointerType==='mouse'){
       if(event.button!==0||event.target.closest('.dc-notice,.dc-projection,.dc-spatial-controls,a,button,input,textarea,dialog'))return;
-      mousePan={id:event.pointerId,x:event.clientX,y:event.clientY,cx:camera.x,cy:camera.y};viewport.setPointerCapture(event.pointerId);viewport.classList.add('is-panning');return;
+      mousePan={id:event.pointerId,x:event.clientX,y:event.clientY,cx:camera.x,cy:camera.y};cameraIntent='manual';viewport.setPointerCapture(event.pointerId);viewport.classList.add('is-panning');return;
     }
     if(event.pointerType!=='touch'||blockedTarget(event.target))return;
     pointers.set(event.pointerId,{id:event.pointerId,type:'touch',x:event.clientX,y:event.clientY,startX:event.clientX,startY:event.clientY,moved:false});
-    viewport.setPointerCapture(event.pointerId);
+    cameraIntent='manual';viewport.setPointerCapture(event.pointerId);
     const pts=touchPoints();
     if(pts.length===1)startSingleTouch(pts[0]);
     else if(pts.length===2)startPinch();
@@ -196,7 +250,7 @@ function installOwnDrag(){
   boardHost.addEventListener('pointerdown',event=>{
     const card=event.target.closest('.dc-notice.is-own-movable');
     if(!card||event.target.closest('button,a,textarea,input,dialog'))return;
-    event.stopPropagation();
+    event.stopPropagation();cameraIntent='manual';
     const x=parseFloat(card.style.left)||0,y=parseFloat(card.style.top)||0;
     drag={card,id:event.pointerId,startX:event.clientX,startY:event.clientY,x,y};
     card.setPointerCapture(event.pointerId);card.classList.add('is-dragging');
@@ -210,16 +264,19 @@ async function refreshSpatial(){
   try{entryStatus=await getEntryStatus(client);activationState=entryStatus.community_activation_state||null}catch{entryStatus=null;activationState=null}
   updateSlotControl();
   await loadPositions();placeCards();
+  if(cameraIntent==='auto')requestAnimationFrame(()=>fitActiveContent());
 }
 
 function scheduleSpatialRefresh(){clearTimeout(renderTimer);renderTimer=setTimeout(()=>refreshSpatial(),140)}
 
 async function init(){
   installShell();installPanZoom();installOwnDrag();
-  await refreshSpatial();resetCamera();
+  await refreshSpatial();requestAnimationFrame(()=>fitActiveContent());
   if(boardHost){const observer=new MutationObserver(scheduleSpatialRefresh);observer.observe(boardHost,{childList:true})}
-  window.addEventListener('dc:board-projections-updated',()=>placeCards());
-  window.addEventListener('resize',()=>{applyCamera();placeCards()},{passive:true});
+  window.addEventListener('dc:board-projections-updated',()=>{placeCards();if(cameraIntent==='auto')requestAnimationFrame(()=>fitActiveContent())});
+  window.addEventListener('dc:board-filter-changed',()=>{placeCards();if(cameraIntent==='auto')requestAnimationFrame(()=>fitActiveContent())});
+  window.addEventListener('resize',()=>{placeCards();if(cameraIntent==='auto')fitActiveContent();else applyCamera()},{passive:true});
+  window.dispatchEvent(new CustomEvent('dc:board-spatial-ready',{detail:{camera:'fit-active-content-v2'}}));
 }
 
 init().catch(error=>console.error('[DC Spatial]',error));
