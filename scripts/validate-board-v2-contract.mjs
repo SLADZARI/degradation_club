@@ -8,6 +8,7 @@ const expect=(ok,msg)=>{if(!ok)fail.push(msg)};
 
 const entry=read('community/board/board-entry-v2.js');
 const migration=read('supabase/migrations/20260906183000_guest_board_interest_v1.sql');
+const entityModel=read('community/board/board-entity-model-v1.js');
 const integrations=read('community/board/board-integrations-v1.js');
 const spatial=read('community/board/board-spatial-v1.js');
 const activation=read('community/board/board-activation-gate-v1.js');
@@ -31,7 +32,7 @@ expect(migration.includes('grant execute on function public.dc_guest_board_inter
 expect(migration.includes('guest_interest_count bigint')&&migration.includes('my_guest_interest boolean'),'R9: Guest read projection is not extended with safe interest state');
 
 // R8/R5 safety: true filtering + camera/layout contracts remain intact.
-for(const label of ['ВСЁ','ОТ ЛЮДЕЙ','ОТ КЛУБА'])expect(integrations.includes(label),`R8: primary filter missing ${label}`);
+for(const label of ['ВСЁ','ОТ ЛЮДЕЙ','ОТ КЛУБА'])expect(entityModel.includes(label),`R8: primary filter missing ${label}`);
 expect(integrations.includes('card.hidden=hidden'),'R8: filtered cards are not truly hidden');
 expect(integrations.includes("dc:board-layout-request"),'R8: filter/projection layout event missing');
 expect(spatial.includes('fitActiveContent'),'R5: fitActiveContent missing');
