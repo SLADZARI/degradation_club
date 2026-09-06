@@ -2,7 +2,7 @@
 
 Status: **EVIDENCE / OBSERVATION / NON-AUTHORITATIVE**  
 Date: **2026-09-06**  
-Observed period: **2026-08-31 — 2026-09-06**  
+Observed period: **2026-08-29 — 2026-09-06**  
 Environment: **PRODUCTION / https://dementor.club**  
 Project source: `SLADZARI/degradation_club@dementor-club`  
 Primary telemetry source: **GA4 `properties/551957295` / Europe-Warsaw timezone**  
@@ -97,6 +97,35 @@ Contribution interpretation:
 
 ## 4. External / unclassified traffic after cleanup
 
+### Poland — Katowice — 2026-08-29 — HIGH-INTEREST / NO CONVERSION
+User explicitly confirms that this traffic is **not** technical/test activity from Evgeny or Nikita. It is therefore classified as external evidence.
+
+Device/source:
+- desktop
+- Macintosh
+- Safari
+- `(direct) / (none)`
+
+GA4 reports two session rows on the same evening/device sequence:
+- first row: Home, 1 view, ~5 sec;
+- second row: landing `/about/`, 11 views, ~2932 sec session duration, 414 sec active engagement, 1 engaged session.
+
+Because the event sequence is continuous on one device/browser and the two session rows occur in the same evening, keep this as **one external journey with GA session fragmentation**, not two independent people.
+
+Observed route:
+
+`Home → About → Community → Думай с опасностью → Projects → About → Home → Логика и осознанность → About → Events → Join`
+
+Notable events:
+- `course_open` for `Думай с опасностью`;
+- `project_open` for `Логика и осознанность`;
+- reached `/events/`;
+- reached `/join/`;
+- no `auth_complete`;
+- no observed `join_start`.
+
+Interpretation: strong content exploration and club-entry intent, but no conversion. Classification: **EXTERNAL / HIGH-INTEREST / NO CONVERSION**.
+
 ### Belarus — Brest — 2026-09-05 — meaningful external conversion candidate
 
 - sessions: **1**
@@ -105,12 +134,13 @@ Contribution interpretation:
 - `auth_complete`: **1**
 - `course_open`: **7**
 - `event_open`: **2**
+- device: desktop / Windows 11 / Chrome
 
 Observed journey:
 
 `Home → Community → Думай с опасностью → Не команда → Community → Fuengirola → Community → Деньги на ветер → Google Auth → Деньги на ветер → Nikita → Projects`
 
-At **10:29 Europe/Warsaw**, the only non-Warsaw `auth_complete` in the period aligns with the creation timestamp of the newest Supabase profile. This is a **high-confidence journey match**, not a direct GA4 identity join.
+At **10:29 Europe/Warsaw**, the only non-Warsaw `auth_complete` in the 2026-08-31 — 2026-09-06 period aligns with the creation timestamp of the newest Supabase profile. This is a **high-confidence journey match**, not a direct GA4 identity join.
 
 ### Belarus — Minsk — 2026-09-04 — UNCLASSIFIED
 
@@ -139,27 +169,35 @@ Interpretation: external organic arrival, effectively a bounce; do not treat as 
 
 ## 5. Clean comparison
 
-| Bucket | Sessions | Views | Engagement | Join start | Auth complete | Classification |
+| Bucket | GA session rows | Views | Engagement | Join start | Auth complete | Classification |
 |---|---:|---:|---:|---:|---:|---|
 | Warsaw | 88 | 898 | 264.4 min | 51 | 22 | TEAM / TECHNICAL PROXY |
 | Malaga / Gabil | 3 | 17 | 10.7 min | 1 | 0 | TEAM ACTIVITY |
 | Minsk 02 Sep / son | 3 | 13 | 4.7 min | 0 | 0 | KNOWN TEST TRAFFIC |
-| Brest | 1 | 13 | 5.35 min | 0* | 1 | EXTERNAL / meaningful |
+| Katowice 29 Aug | 2* | 12 | 6.9 min active | 0 | 0 | EXTERNAL / HIGH-INTEREST |
+| Brest | 1 | 13 | 5.35 min | 0** | 1 | EXTERNAL / meaningful |
 | Minsk 04 Sep | 1 | 2 | 0.53 min | 0 | 0 | EXTERNAL / unclassified |
 | New York | 1 | 1 | 0.02 min | 0 | 0 | EXTERNAL / bounce |
 
-`*` The Brest auth trigger did not emit `auth_start`/`join_start`; the observable chain is course interaction → Google callback → `auth_complete`.
+`*` Katowice is retained as one external journey despite two GA session rows; the sequence is same evening/device/browser and likely reflects session fragmentation/long inactivity.
+
+`**` The Brest auth trigger did not emit `auth_start`/`join_start`; the observable chain is course interaction → Google callback → `auth_complete`.
 
 External residual after removing Warsaw, Malaga/Gabil and known son traffic:
 
-- sessions: **3**
-- views: **16**
-- engagement: **354 sec = 5.9 min**
+- GA session rows: **5**
+- external journeys: **4** (Katowice, Brest, Minsk 04 Sep, New York)
+- views: **28**
+- active engagement: **768 sec = 12.8 min**
 - `auth_complete`: **1**
 
 Meaningful external residual excluding the 1-second New York bounce:
 
-- Brest + Minsk 04 Sep = **2 sessions / 15 views / 353 sec engagement / 1 auth_complete**.
+- Katowice + Brest + Minsk 04 Sep = **3 journeys / 27 views / 767 sec active engagement / 1 auth_complete**.
+
+High-signal external journeys:
+1. **Katowice → Join / no conversion**
+2. **Brest → Google Auth / continued exploration after auth**
 
 ## 6. Contribution evidence candidates
 
@@ -211,7 +249,7 @@ This is a QA finding only. No runtime implementation or deployment is performed 
 ## 8. Evidence caveats
 
 - GA4 city is derived from network/IP and can be wrong due to VPN, ISP routing or mobile networks.
-- GA4 sessions/users can fragment around redirects/auth callbacks and attribution changes.
+- GA4 sessions/users can fragment around redirects/auth callbacks and long inactivity.
 - consent requirements mean GA4 is not a complete census of all site activity.
 - user-confirmed classification takes precedence for known team/test traffic in this evidence pass.
 - no individual Warsaw session counts are assigned to Evgeny or Nikita.
@@ -221,5 +259,6 @@ This is a QA finding only. No runtime implementation or deployment is performed 
 
 1. Keep a classified traffic evidence snapshot during pre-advertising QA and after launch.
 2. Exclude/label team and known test activity in reporting.
-3. Add safe auth-start telemetry and strip sensitive callback query parameters.
-4. Tie future Contribution/Spores only to a governed Result with evidence; do not award from traffic/tool activity alone.
+3. Track Katowice-like `Join reached / no conversion` journeys separately from auth conversions.
+4. Add safe auth-start telemetry and strip sensitive callback query parameters.
+5. Tie future Contribution/Spores only to a governed Result with evidence; do not award from traffic/tool activity alone.
