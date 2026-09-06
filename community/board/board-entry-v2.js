@@ -2,6 +2,7 @@ import {getClient,esc,formatDate,errorMessage,route} from '/community-runtime-v1
 import {resolveBoardUserState,isBoardMemberState,BOARD_USER_STATES} from './board-user-state-v2.js';
 
 const entryHost=document.getElementById('entryHost');
+const entrySection=document.getElementById('entrySection');
 const boardHost=document.getElementById('boardHost');
 const boardStatus=document.getElementById('boardStatus');
 const memberBadge=document.getElementById('memberBadge');
@@ -12,17 +13,54 @@ function fail(error,target=boardHost){
   if(target)target.innerHTML=`<div class="dc-board-error">${esc(errorMessage(error))}</div>`;
 }
 
-function guestNextStep(state){
+function clampSphereCount(value){return Math.max(0,Math.min(9,Number(value||0)))}
+
+function personalCardMarkup(state){
   const entry=state.entryStatus||{};
+  const count=clampSphereCount(entry.sphere_count);
+  if(state.key===BOARD_USER_STATES.AUTHENTICATED_GUEST_DC9_INCOMPLETE){
+    return `<article class="dc-personal-card" data-personal-state="guest-dc9-incomplete" tabindex="-1">
+      <div class="dc-personal-card__meta"><span>МОЙ СТАТУС / GUEST</span><span>DC-9 ${count} / 9</span></div>
+      <h3>ВСТУПИТЬ<br>В КЛУБ.</h3>
+      <p>Доску можно смотреть уже сейчас. Для заявки нужен первый полный проход DC-9.</p>
+      <a class="dc-personal-card__action" href="${route('/join/')}">ПРОЙТИ / ПРОДОЛЖИТЬ DC-9 →</a>
+    </article>`;
+  }
+  if(state.key===BOARD_USER_STATES.AUTHENTICATED_GUEST_DC9_COMPLETE){
+    return `<article class="dc-personal-card" data-personal-state="guest-dc9-complete" tabindex="-1">
+      <div class="dc-personal-card__meta"><span>МОЙ СТАТУС / READY</span><span>DC-9 9 / 9</span></div>
+      <h3>МОЖНО<br>ПОДАВАТЬ.</h3>
+      <p>Первый полный DC-9 сохранён как membership baseline. Повторный проход его не заменит.</p>
+      <div class="dc-personal-card__actions"><a class="dc-personal-card__action" href="${route('/join/apply/')}">ПОДАТЬ ЗАЯВКУ →</a><a class="dc-personal-card__secondary" href="${route('/join/')}">ПЕРЕПРОЙТИ DC-9</a></div>
+    </article>`;
+  }
   if(state.key===BOARD_USER_STATES.APPLICANT){
-    return `<div class="dc-first-gate"><div class="dc-first-gate__label">MEMBERSHIP / APPLICATION</div><div><h2>ЗАЯВКА<br>НА РАССМОТРЕНИИ.</h2><p>Доску уже можно смотреть. Членство появится только после принятого решения.</p><a class="dc-board-action primary" href="${route('/join/apply/')}">СТАТУС ЗАЯВКИ →</a></div></div>`;
+    const status=String(state.application?.status||'reviewing').toUpperCase();
+    return `<article class="dc-personal-card" data-personal-state="applicant" tabindex="-1">
+      <div class="dc-personal-card__meta"><span>МОЙ СТАТУС / APPLICATION</span><span>${esc(status)}</span></div>
+      <h3>ЗАЯВКА<br>В РАБОТЕ.</h3>
+      <p>Вы уже сделали следующий шаг. Членство появится только после канонического review.</p>
+      <a class="dc-personal-card__action" href="${route('/join/apply/')}">СТАТУС ЗАЯВКИ →</a>
+    </article>`;
   }
-  const complete=state.key===BOARD_USER_STATES.AUTHENTICATED_GUEST_DC9_COMPLETE;
-  if(complete){
-    return `<div class="dc-first-gate"><div class="dc-first-gate__label">MEMBERSHIP / READY</div><div><h2>DC-9<br>9 / 9.</h2><p>Базовый квест уже завершён. Его первый полный результат остаётся каноническим baseline для заявки.</p><a class="dc-board-action primary" href="${route('/join/apply/')}">ПОДАТЬ ЗАЯВКУ →</a><a class="dc-board-action" href="${route('/join/')}">ПЕРЕПРОЙТИ DC-9</a></div></div>`;
+  if(isBoardMemberState(state.key)){
+    const role=state.key===BOARD_USER_STATES.OWNER_ADMIN?'OWNER':state.key===BOARD_USER_STATES.DEMENTOR?'DEMENTOR':'MEMBER';
+    const activation=state.key===BOARD_USER_STATES.MEMBER_NOT_ACTIVATED?'FIRST ARTIFACT':'ACTIVE';
+    return `<article class="dc-personal-card is-member" data-personal-state="member" tabindex="-1">
+      <div class="dc-personal-card__meta"><span>МОЯ КАРТА / ${role}</span><span>${activation}</span></div>
+      <h3>МОЯ<br>КАРТА.</h3>
+      <p>${state.key===BOARD_USER_STATES.MEMBER_NOT_ACTIVATED?'Членство активно. Осмотритесь и приколите первую свою вещь, чтобы открыть полное участие на доске.':'Членство активно. Ваши Board-действия определяются текущей ролью и activation state.'}</p>
+      <a class="dc-personal-card__action" href="${route('/workspace/#club')}">УЧАСТИЕ →</a>
+    </article>`;
   }
-  const count=Number(entry.sphere_count||0);
-  return `<div class="dc-first-gate"><div class="dc-first-gate__label">MEMBERSHIP / GUEST</div><div><h2>ВЫ ЕЩЁ<br>НЕ В КЛУБЕ.</h2><p>Доску можно смотреть уже сейчас. Для заявки нужен первый полный DC-9: сейчас ${Math.max(0,Math.min(9,count))} / 9.</p><a class="dc-board-action primary" href="${route('/join/')}">ПРОЙТИ / ПРОДОЛЖИТЬ DC-9 →</a></div></div>`;
+  return '';
+}
+
+function publishPersonalCard(state){
+  const html=personalCardMarkup(state);
+  const payload={state:state.key,html};
+  window.DEMENTOR_BOARD_PERSONAL_CARD=payload;
+  window.dispatchEvent(new CustomEvent('dc:board-personal-state',{detail:payload}));
 }
 
 function avatar(row){
@@ -47,7 +85,9 @@ function guestNotice(row,index){
 async function renderGuestBoard(state){
   boardStatus.textContent='GUEST / BOARD READ';
   memberBadge.textContent=state.session?.user?.email||'ACCOUNT';
-  entryHost.innerHTML=guestNextStep(state);
+  if(entrySection)entrySection.hidden=true;
+  if(entryHost)entryHost.replaceChildren();
+  publishPersonalCard(state);
 
   const {data,error}=await client.rpc('dc_guest_board_read_v1');
   if(error)throw error;
@@ -67,7 +107,9 @@ async function boot(){
     await import('./board.js');
     return;
   }
+  publishPersonalCard(state);
   if(isBoardMemberState(state.key)){
+    if(entrySection)entrySection.hidden=false;
     await import('./board.js');
     return;
   }
