@@ -71,20 +71,18 @@ function avatar(row){
 }
 
 function guestInterestTotal(row){return Math.max(0,Number(row.reaction_count||0))+Math.max(0,Number(row.guest_interest_count||0))}
+function guestInterestButton(active,total){return `<button class="dc-board-action small${active?' active':''}" type="button" data-guest-interest aria-pressed="${active?'true':'false'}"><span data-guest-interest-label>${active?'✓':'☆'} ИНТЕРЕСНО ·</span> <span data-guest-interest-count>${total}</span></button>`}
 function guestNotice(row,index){
   const active=row.my_guest_interest===true;
   const total=guestInterestTotal(row);
-  return `<article class="dc-notice dc-notice--guest" data-artifact="${esc(row.artifact_id)}" data-guest-read="1">
+  return `<article class="dc-notice dc-notice--guest" data-artifact="${esc(row.artifact_id)}" data-guest-read="1" data-member-reaction-count="${Math.max(0,Number(row.reaction_count||0))}">
     <div class="dc-notice__meta"><span>ARTIFACT / ${String(index+1).padStart(3,'0')}</span><span>${formatDate(row.published_at)}</span></div>
     <div class="dc-notice__author">${avatar(row)}<div><strong>${esc(row.author_display_name||'MEMBER')}</strong>${row.author_nickname?`<div>@${esc(String(row.author_nickname).replace(/^@/,''))}</div>`:''}</div></div>
     ${row.title?`<h3>${esc(row.title)}</h3>`:''}
     <p class="dc-notice__body">${esc(row.body||'')}</p>
     ${row.external_url?`<p><a class="dc-notice__link" href="${esc(row.external_url)}" target="_blank" rel="noopener noreferrer">ССЫЛКА ↗</a></p>`:''}
     <div class="dc-notice__expiry">${row.expires_at?`ДЕЙСТВУЕТ ДО ${formatDate(row.expires_at)}`:'БЕЗ СРОКА'} · COMMUNITY</div>
-    <div class="dc-notice__actions">
-      <button class="dc-board-action small${active?' active':''}" type="button" data-guest-interest aria-pressed="${active?'true':'false'}">${active?'✓':'☆'} ИНТЕРЕСНО · <span data-guest-interest-count>${total}</span></button>
-      <span class="dc-board-state">GUEST / LIGHT INTERACTION</span>
-    </div>
+    <div class="dc-notice__actions">${guestInterestButton(active,total)}<span class="dc-board-state">GUEST / LIGHT INTERACTION</span></div>
   </article>`;
 }
 
@@ -104,7 +102,8 @@ async function toggleGuestInterest(button){
     const base=Math.max(0,Number(card.dataset.memberReactionCount||0));
     button.classList.toggle('active',active);
     button.setAttribute('aria-pressed',active?'true':'false');
-    button.firstChild.textContent=active?'✓ ИНТЕРЕСНО · ':'☆ ИНТЕРЕСНО · ';
+    const label=button.querySelector('[data-guest-interest-label]');
+    if(label)label.textContent=`${active?'✓':'☆'} ИНТЕРЕСНО ·`;
     const countEl=button.querySelector('[data-guest-interest-count]');
     if(countEl)countEl.textContent=String(base+guestCount);
   }catch(error){
@@ -134,7 +133,6 @@ async function renderGuestBoard(state){
   boardHost.innerHTML=rows.length
     ?rows.map(guestNotice).join('')
     :'<div class="dc-board-empty"><h3>ЖИВЫХ ОБЪЯВЛЕНИЙ<br>ПОКА НЕТ.</h3><p>Вы видите настоящую доску, но сейчас на ней нет активных Member Artifacts.</p></div>';
-  boardHost.querySelectorAll('[data-artifact]').forEach((card,index)=>{card.dataset.memberReactionCount=String(Math.max(0,Number(rows[index]?.reaction_count||0)))});
   boardHost.dataset.guestRead='1';
   window.dispatchEvent(new CustomEvent('dc:board-guest-read-ready',{detail:{state:state.key,count:rows.length}}));
 }
