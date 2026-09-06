@@ -1,0 +1,63 @@
+import {getClient,getEntryStatus,route} from '/community-runtime-v1.js';
+
+const boardHost=document.getElementById('boardHost');
+const filterHost=document.getElementById('boardFilters');
+let viewport=null;
+let entryStatus=null;
+let activeIndex=0;
+
+function visibleCards(){return [...(boardHost?.querySelectorAll('.dc-notice[data-artifact],[data-board-source="platform"]')||[])].filter(card=>!card.hidden&&!card.classList.contains('dc-board-filtered'))}
+function stripBoardActions(){
+  boardHost?.querySelectorAll('.dc-notice,.dc-projection').forEach(card=>{
+    card.classList.remove('is-own-movable','is-dragging');
+    card.setAttribute('tabindex','0');
+    card.setAttribute('role','button');
+    card.setAttribute('aria-label',`${(card.querySelector('h3')?.textContent||'Объявление').trim()}. Открыть`);
+    if(!card.querySelector('.dc-board-open-hint')){
+      const hint=document.createElement('div');hint.className='dc-board-open-hint';hint.textContent='ОТКРЫТЬ →';card.appendChild(hint);
+    }
+  });
+}
+function cardHref(card){
+  if(card.dataset.artifact)return route(`/community/artifact/${card.dataset.artifact}/`);
+  return card.querySelector('a[href]')?.getAttribute('href')||null;
+}
+function overlay(){
+  let el=document.querySelector('.dc-artifact-overlay');if(el)return el;
+  el=document.createElement('section');el.className='dc-artifact-overlay';el.hidden=true;el.setAttribute('aria-label','Открытое объявление');
+  el.innerHTML='<div class="dc-artifact-overlay__scrim" data-overlay-close></div><div class="dc-artifact-overlay__panel"><button class="dc-artifact-overlay__close" type="button" data-overlay-close aria-label="Закрыть">×</button><iframe title="Объявление Dementor Club"></iframe></div>';
+  document.body.appendChild(el);
+  el.querySelectorAll('[data-overlay-close]').forEach(node=>node.addEventListener('click',closeOverlay));
+  return el;
+}
+function openCard(card){const href=cardHref(card);if(!href)return;const el=overlay();el.querySelector('iframe').src=href;el.hidden=false;document.documentElement.dataset.boardArtifactOpen='1';el.querySelector('.dc-artifact-overlay__close')?.focus({preventScroll:true})}
+function closeOverlay(){const el=document.querySelector('.dc-artifact-overlay');if(!el)return;el.hidden=true;el.querySelector('iframe').src='about:blank';delete document.documentElement.dataset.boardArtifactOpen}
+function focusCard(card){if(!card||!viewport)return;const x=parseFloat(card.style.left)||0,y=parseFloat(card.style.top)||0,w=Math.max(card.offsetWidth,240),h=Math.max(card.offsetHeight,160);const rect=viewport.getBoundingClientRect();const scale=.92;boardHost.style.transform=`translate(${rect.width/2-(x+w/2)*scale}px,${rect.height/2-(y+h/2)*scale}px) scale(${scale})`;card.classList.remove('dc-board-focus-step');void card.offsetWidth;card.classList.add('dc-board-focus-step');setTimeout(()=>card.classList.remove('dc-board-focus-step'),900)}
+function updateNavigator(){
+  if(!filterHost)return;let nav=filterHost.querySelector('.dc-board-filter-nav');if(!nav){nav=document.createElement('div');nav.className='dc-board-filter-nav';nav.innerHTML='<button type="button" data-prev aria-label="Предыдущее объявление">←</button><span data-pos>0 / 0</span><button type="button" data-next aria-label="Следующее объявление">→</button>';filterHost.appendChild(nav);nav.querySelector('[data-prev]').onclick=()=>step(-1);nav.querySelector('[data-next]').onclick=()=>step(1)}
+  const cards=visibleCards();if(activeIndex>=cards.length)activeIndex=0;nav.querySelector('[data-pos]').textContent=cards.length?`${activeIndex+1} / ${cards.length}`:'0 / 0';nav.hidden=cards.length<2;
+}
+function step(delta){const cards=visibleCards();if(!cards.length)return;activeIndex=(activeIndex+delta+cards.length)%cards.length;updateNavigator();focusCard(cards[activeIndex])}
+async function updatePrimary(){
+  if(!viewport)return;let host=viewport.querySelector('.dc-board-primary');if(!host){host=document.createElement('div');host.className='dc-board-primary';host.innerHTML='<button type="button"></button>';viewport.appendChild(host)}
+  const btn=host.querySelector('button');try{entryStatus=await getEntryStatus(getClient())}catch{entryStatus=null}
+  if(entryStatus?.membership_active!==true){host.classList.remove('is-visible');return}
+  const available=Number(entryStatus.artifact_slots_available||0),consuming=Number(entryStatus.artifact_slots_consuming||0);
+  host.classList.add('is-visible');
+  if(available>0){btn.textContent='+ ПРИКОЛОТЬ';btn.onclick=()=>document.getElementById('openComposer')?.click()}
+  else if(consuming>0){btn.textContent='МОЁ ОБЪЯВЛЕНИЕ';btn.onclick=()=>{const mine=boardHost?.querySelector('.dc-notice[data-artifact] [data-close-artifact]')?.closest('.dc-notice')||boardHost?.querySelector('.dc-notice[data-artifact]');if(mine)openCard(mine)}}
+  else{host.classList.remove('is-visible')}
+}
+function moveFilters(){viewport=document.querySelector('.dc-spatial-viewport');if(!viewport||!filterHost)return false;if(filterHost.parentElement!==viewport)viewport.appendChild(filterHost);updateNavigator();return true}
+function installInteractions(){
+  document.addEventListener('click',event=>{const card=event.target.closest?.('.dc-notice[data-artifact],[data-board-source="platform"]');if(!card||card.hidden||card.classList.contains('dc-board-filtered'))return;event.preventDefault();event.stopPropagation();openCard(card)},true);
+  document.addEventListener('keydown',event=>{if(event.key==='Escape'&&document.documentElement.dataset.boardArtifactOpen==='1'){closeOverlay();return}const card=event.target.closest?.('.dc-notice[data-artifact],[data-board-source="platform"]');if(card&&(event.key==='Enter'||event.key===' ')){event.preventDefault();openCard(card)}});
+  window.addEventListener('dc:board-filter-changed',()=>{activeIndex=0;setTimeout(updateNavigator,0)});
+  window.addEventListener('dc:board-projections-updated',()=>{stripBoardActions();updateNavigator()});
+}
+async function init(){
+  const wait=()=>new Promise(resolve=>{let tries=0;const tick=()=>{if(moveFilters()||tries++>50)return resolve();setTimeout(tick,60)};tick()});
+  await wait();stripBoardActions();installInteractions();await updatePrimary();
+  if(boardHost){let timer;new MutationObserver(()=>{clearTimeout(timer);timer=setTimeout(()=>{stripBoardActions();updateNavigator();updatePrimary()},90)}).observe(boardHost,{childList:true,subtree:true})}
+}
+init().catch(error=>console.error('[DC Board fullscreen]',error));
