@@ -11,6 +11,7 @@ let currentStep=0;
 let currentTarget=null;
 let mode='guest';
 let autoAttempted=false;
+let restoreFocus=null;
 
 const MEMBER_STATES=new Set([
   BOARD_USER_STATES.MEMBER_NOT_ACTIVATED,
@@ -69,16 +70,24 @@ function targetFor(step){
 function steps(){
   if(mode==='guest')return [
     {eyebrow:'01 / ДВИЖЕНИЕ',title:'ЭТО ЖИВАЯ ДОСКА.',text:'Тяните свободное поле одним пальцем или мышью. Двумя пальцами меняйте масштаб. Двойное касание приближает.'},
-    {eyebrow:'02 / СМОТРЕТЬ',title:'ОТКРЫВАЙТЕ КАРТОЧКИ.',text:'Карточки — это реальные предложения и объекты клуба. Нажимайте на них, чтобы посмотреть, что происходит.'},
+    {eyebrow:'02 / СМОТРЕТЬ',title:'СМОТРИТЕ, ЧТО ПРОИСХОДИТ.',text:'Карточки — реальные предложения и объекты клуба. Здесь видно, чем сейчас живут участники и сам клуб.'},
     {eyebrow:'03 / ОРИЕНТАЦИЯ',title:'«МОЁ» ВОЗВРАЩАЕТ К ВАМ.',text:'Если потерялись в пространстве, «МОЁ» находит ваш личный объект или следующий шаг.'},
     {eyebrow:'04 / ВСТУПЛЕНИЕ',title:'ХОТИТЕ ВНУТРЬ — ПУТЬ ЗДЕСЬ.',text:'Личная карточка показывает ваш статус: DC-9, заявка или следующий шаг. Смотреть доску можно и без вступления.'}
   ];
+  const needsActivation=state?.key===BOARD_USER_STATES.MEMBER_NOT_ACTIVATED;
   return [
     {eyebrow:'01 / ДВИЖЕНИЕ',title:'ДОСКА — ЭТО ПРОСТРАНСТВО.',text:'Тяните свободное поле. Двумя пальцами меняйте масштаб. «К ЖИЗНИ» показывает всю текущую активность.'},
-    {eyebrow:'02 / СМОТРЕТЬ',title:'СНАЧАЛА ОСМОТРИТЕСЬ.',text:'Откройте любую реальную карточку и посмотрите, что уже происходит на доске.'},
+    {eyebrow:'02 / СМОТРЕТЬ',title:'СНАЧАЛА ОСМОТРИТЕСЬ.',text:'Карточки на поле — реальные предложения, проекты и другие объекты клуба. Посмотрите, что уже происходит вокруг.'},
     {eyebrow:'03 / ВАШЕ МЕСТО',title:'«МОЁ» НАХОДИТ ВАС.',text:'Если у вас уже есть Artifact — камера вернётся к нему. Если нет — к вашей личной карте.'},
-    {eyebrow:'04 / АКТИВАЦИЯ',title:'НЕ ОСТАВАЙТЕСЬ ЗРИТЕЛЕМ.',text:'Чтобы включиться полностью, приколите одну свою вещь на доску. После первой публикации открывается полное участие.'}
+    needsActivation
+      ?{eyebrow:'04 / АКТИВАЦИЯ',title:'НЕ ОСТАВАЙТЕСЬ ЗРИТЕЛЕМ.',text:'Чтобы включиться полностью, приколите одну свою вещь на доску. После первой публикации открывается полное участие.'}
+      :{eyebrow:'04 / ПУБЛИКАЦИЯ',title:'ПРИКАЛЫВАЙТЕ СВОЁ.',text:'Через действие публикации можно оставить на доске своё предложение. Текущие slot-правила при этом сохраняются.'}
   ];
+}
+
+function focusables(){
+  if(!overlay)return[];
+  return [...overlay.querySelectorAll('button,a[href],[tabindex]:not([tabindex="-1"])')].filter(el=>!el.disabled&&!el.hidden);
 }
 
 function ensureOverlay(){
@@ -96,10 +105,16 @@ function ensureOverlay(){
     else showStep(currentStep+1);
   };
   document.addEventListener('keydown',event=>{
-    if(overlay?.hidden)return;
-    if(event.key==='Escape')closeTutorial('skip');
-    if(event.key==='ArrowRight')overlay.querySelector('[data-tutorial-next]')?.click();
-    if(event.key==='ArrowLeft')overlay.querySelector('[data-tutorial-prev]')?.click();
+    if(!overlay||overlay.hidden)return;
+    if(event.key==='Escape'){event.preventDefault();closeTutorial('skip');return}
+    if(event.key==='ArrowRight'){event.preventDefault();overlay.querySelector('[data-tutorial-next]')?.click();return}
+    if(event.key==='ArrowLeft'){event.preventDefault();overlay.querySelector('[data-tutorial-prev]')?.click();return}
+    if(event.key==='Tab'){
+      const items=focusables();if(!items.length)return;
+      const first=items[0],last=items[items.length-1];
+      if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus()}
+      else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus()}
+    }
   });
   return overlay;
 }
@@ -123,6 +138,7 @@ function openTutorial({replay=false}={}){
   if(!viewport&&!ensureHelpButton())return;
   if(!replay&&isDone())return;
   ensureOverlay();
+  restoreFocus=document.activeElement instanceof HTMLElement?document.activeElement:null;
   overlay.hidden=false;
   document.documentElement.classList.add('dc-tutorial-open');
   showStep(0);
@@ -135,7 +151,10 @@ function closeTutorial(reason){
   overlay.hidden=true;
   document.documentElement.classList.remove('dc-tutorial-open');
   clearHighlight();
-  viewport?.querySelector('[data-tutorial-help]')?.focus({preventScroll:true});
+  const fallback=viewport?.querySelector('[data-tutorial-help]');
+  const target=restoreFocus&&document.contains(restoreFocus)?restoreFocus:fallback;
+  if(target){try{target.focus({preventScroll:true})}catch{target.focus()}}
+  restoreFocus=null;
 }
 
 async function boot(){
