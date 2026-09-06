@@ -53,7 +53,7 @@ jobs:
       - name: Validate Board v2.1 fullscreen browser state matrix
         run: node scripts/validate-board-v21-browser.mjs
       - name: Validate browser shell and Workspace recovery
-        run: node scripts/validate-browser-shell.mjs
+        run: node scripts/validate-browser-shell-v21-compat.mjs
       - name: Validate My Artifacts history
         run: node scripts/validate-artifact-history.mjs
       - name: Validate WebKit auth regression
