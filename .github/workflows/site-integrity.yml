@@ -34,6 +34,8 @@ jobs:
         run: node scripts/validate-dc9-baseline-contract.mjs
       - name: Validate Board v2 security and interaction contract
         run: node scripts/validate-board-v2-contract.mjs
+      - name: Validate Board v2.1 fullscreen composition contract
+        run: node scripts/validate-board-v21-contract.mjs
       - name: Build production candidate artifact
         run: node scripts/build-pages.mjs
       - name: Validate production analytics and consent
@@ -48,10 +50,10 @@ jobs:
         run: |
           npm install --no-save --no-package-lock playwright@1.55.0
           npx playwright install --with-deps chromium webkit
-      - name: Validate Board v2 R10 browser state matrix
-        run: node scripts/validate-board-v2-browser.mjs
+      - name: Validate Board v2.1 fullscreen browser state matrix
+        run: node scripts/validate-board-v21-browser.mjs
       - name: Validate browser shell and Workspace recovery
-        run: node scripts/validate-browser-shell.mjs
+        run: node scripts/validate-browser-shell-v21-compat.mjs
       - name: Validate My Artifacts history
         run: node scripts/validate-artifact-history.mjs
       - name: Validate WebKit auth regression

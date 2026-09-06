@@ -1,0 +1,22 @@
+import fs from 'node:fs';
+const fail=[];const expect=(ok,msg)=>{if(!ok)fail.push(msg)};
+const read=p=>fs.readFileSync(p,'utf8');
+const page=read('workspace/board/index.html');
+const css=read('community/board/board-fullscreen-v2-1.css');
+const js=read('community/board/board-fullscreen-v2-1.js');
+const tutorial=read('community/board/board-tutorial-v2.js');
+expect(page.includes('board-fullscreen-v2-1.css'),'fullscreen stylesheet missing');
+expect(page.includes('board-fullscreen-v2-1.js'),'fullscreen runtime missing');
+expect(!page.includes('dcw-live-banner'),'legacy live banner must not be in Board markup');
+expect(!page.includes('dcw-topbar'),'duplicate Board topbar must not be in Board markup');
+expect(!page.includes('board-personal-card-v2.js'),'personal membership card must not mount on Board');
+expect(css.includes('height:100dvh'),'Board must own full viewport height');
+expect(css.includes('overflow:hidden'),'Board page must suppress page scroll');
+expect(css.includes('.dc-spatial-controls [data-slot],.dc-spatial-controls [data-mine]{display:none!important}'),'legacy slot/mine controls must be hidden');
+expect(js.includes("'+ ПРИКОЛОТЬ'")||js.includes("'+ ПРИКОЛОТЬ"),'primary publish CTA missing');
+expect(js.includes("'МОЁ ОБЪЯВЛЕНИЕ'"),'occupied-slot CTA missing');
+expect(js.includes('dc-board-filter-nav'),'filter previous/next navigation missing');
+expect(js.includes('dc-artifact-overlay'),'Artifact overlay missing');
+expect(tutorial.includes('НА ДОСКЕ — ТОЛЬКО КОРОТКИЙ ПРЕВЬЮ.'),'tutorial still describes obsolete Board interaction');
+if(fail.length){console.error('BOARD V2.1 CONTRACT BLOCKED');fail.forEach(x=>console.error('- '+x));process.exit(1)}
+console.log('Board v2.1 fullscreen composition contract PASS');
