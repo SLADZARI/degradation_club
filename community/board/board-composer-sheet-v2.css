@@ -1,0 +1,16 @@
+.dcw-board-view .dc-board-entry{display:none!important}
+.dcw-board-view .dc-board-entry.is-composer-sheet-open{display:block!important;position:fixed;z-index:90;right:0;top:0;bottom:0;width:min(560px,96vw);padding:0!important;margin:0!important;border:0!important;background:#f8f5ed;box-shadow:-12px 0 0 #111;overflow:auto}
+.dcw-board-view .dc-board-entry.is-composer-sheet-open>.dc-board-shell{padding:22px!important;max-width:none!important;min-height:100%;background:#f8f5ed}
+.dc-composer-sheet-open body{overflow:hidden}
+.dc-board-entry.is-composer-sheet-open .dc-composer{min-height:100%;padding:0}
+.dc-board-entry.is-composer-sheet-open .dc-composer-head{display:block;margin-bottom:18px}
+.dc-board-entry.is-composer-sheet-open .dc-composer-head>span{display:inline-block;margin-bottom:12px}
+.dc-board-entry.is-composer-sheet-open .dc-composer-head h2{font-size:clamp(30px,4vw,54px);line-height:.9;margin:0 0 10px}
+.dc-board-entry.is-composer-sheet-open .dc-composer-form{display:block}
+.dc-board-entry.is-composer-sheet-open .dc-composer-field{margin:0 0 16px}
+.dc-board-entry.is-composer-sheet-open .dc-composer-actions{position:sticky;bottom:0;background:#f8f5ed;border-top:1px solid #111;padding:12px 0 4px;z-index:2}
+.dc-board-toast{position:fixed;z-index:120;left:50%;bottom:24px;transform:translate(-50%,18px);opacity:0;pointer-events:none;background:#111;color:#d8ff3e;border:1px solid #111;padding:12px 18px;font:1000 11px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.06em;text-transform:uppercase;box-shadow:5px 5px 0 #d8ff3e;transition:opacity .16s ease,transform .16s ease}
+.dc-board-toast.is-visible{opacity:1;transform:translate(-50%,0)}
+@media(max-width:768px){.dcw-board-view .dc-board-entry.is-composer-sheet-open{left:0;right:0;top:auto;bottom:0;width:100%;height:min(92dvh,920px);border-top:2px solid #111!important;box-shadow:0 -8px 0 #111;border-radius:18px 18px 0 0}.dcw-board-view .dc-board-entry.is-composer-sheet-open>.dc-board-shell{padding:18px 14px 24px!important}.dc-board-entry.is-composer-sheet-open .dc-composer-head h2{font-size:34px}.dc-board-toast{bottom:18px}}
+@media(max-width:430px){.dcw-board-view .dc-board-entry.is-composer-sheet-open{height:94dvh;border-radius:14px 14px 0 0}.dcw-board-view .dc-board-entry.is-composer-sheet-open>.dc-board-shell{padding:14px 12px 20px!important}.dc-board-entry.is-composer-sheet-open .dc-composer-head h2{font-size:30px}}
+@media(prefers-reduced-motion:reduce){.dc-board-toast{transition:none}}

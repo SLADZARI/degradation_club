@@ -4,6 +4,8 @@
   if(!host||host.dataset.dcWorkspaceShell==='1')return;
   host.dataset.dcWorkspaceShell='1';
   document.documentElement.dataset.dcWorkspaceAuth='checking';
+  document.documentElement.dataset.dcWorkspaceMembership='checking';
+  document.documentElement.dataset.dcWorkspaceRole='checking';
 
   const path=location.pathname.replace(/^\/degradation_club/,'');
   const root='/workspace/';
@@ -28,12 +30,13 @@
       ${link(review,'MEMBERSHIP REVIEW',{hidden:true,roleTool:true})}
       ${link(admin,'SYSTEM TOOLS',{hidden:true,roleTool:true})}
     </nav>
-    <div class="dcw-boundary"><span>SYSTEM</span><strong>DEMENTOR CLUB</strong><small>Community Board — основная поверхность участника. Роли и рабочие возможности добавляются поверх членства.</small></div>
+    <div class="dcw-boundary"><span>SYSTEM</span><strong>DEMENTOR CLUB</strong><small>Доска — основная поверхность участника. Authentication, membership, role и Board activation остаются отдельными состояниями.</small></div>
     <div class="dcw-session" id="sessionBox" data-shell-session><span>SESSION</span><strong>ПРОВЕРКА…</strong></div>`;
   host.hidden=false;
 
   const nav=host.querySelector('[data-workspace-nav]');
   const sessionBox=host.querySelector('[data-shell-session]');
+  const emitWorkspaceState=detail=>window.dispatchEvent(new CustomEvent('dc:workspace-state',{detail}));
   const setCurrentRootRoute=()=>{
     if(current!=='/workspace/'&&current!=='/workspace/index.html')return;
     const route=(location.hash||'#home').slice(1);
@@ -43,7 +46,12 @@
   addEventListener('hashchange',setCurrentRootRoute);
 
   const cfg=window.DEMENTOR_SITE_CONFIG?.supabase;
-  if(!cfg?.enabled||!cfg.url||!cfg.publishableKey){document.documentElement.dataset.dcWorkspaceAuth='error';return;}
+  if(!cfg?.enabled||!cfg.url||!cfg.publishableKey){
+    document.documentElement.dataset.dcWorkspaceAuth='error';
+    document.documentElement.dataset.dcWorkspaceMembership='error';
+    document.documentElement.dataset.dcWorkspaceRole='error';
+    return;
+  }
   import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.4/+esm').then(async({createClient})=>{
     const client=window.DEMENTOR_SUPABASE_CLIENT||createClient(cfg.url,cfg.publishableKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false,flowType:'pkce'}});
     window.DEMENTOR_SUPABASE_CLIENT=client;
@@ -51,6 +59,9 @@
     const user=session?.user;
     if(!user){
       document.documentElement.dataset.dcWorkspaceAuth='guest';
+      document.documentElement.dataset.dcWorkspaceMembership='none';
+      document.documentElement.dataset.dcWorkspaceRole='none';
+      emitWorkspaceState({authenticated:false,membership:'none',role:'none'});
       if(nav)nav.hidden=true;
       if(sessionBox)sessionBox.innerHTML='<span>SESSION</span><strong>НЕ ВЫПОЛНЕН ВХОД</strong>';
       return;
@@ -75,8 +86,17 @@
     const owner=activeRoles.includes('owner_admin');
     const member=isActive(membership)||dementor;
     const hasWork=dementor||(assignments||[]).some(isActive);
+    const role=owner?'owner_admin':dementor?'dementor':member?'member':'guest';
+
+    document.documentElement.dataset.dcWorkspaceMembership=member?'active':'none';
+    document.documentElement.dataset.dcWorkspaceRole=role;
+    emitWorkspaceState({authenticated:true,membership:member?'active':'none',role,member,dementor,owner,hasWork});
 
     host.querySelectorAll('[data-member-tool]').forEach(control=>control.hidden=!member);
+    // Board UX v2: authenticated Guest can see the real Board through a
+    // narrow read-only RPC. This does not change Membership and does not
+    // unlock Member-only Artifacts, reactions, responses or movement.
+    const boardControl=host.querySelector('[data-shell-key="board"]');if(boardControl)boardControl.hidden=false;
     const workControl=host.querySelector('[data-route="work"]');if(workControl)workControl.hidden=!hasWork;
     const homeControl=host.querySelector('[data-role-home]');if(homeControl)homeControl.hidden=!dementor;
     const reviewLink=[...host.querySelectorAll('a')].find(a=>a.href.endsWith('/workspace/review/'));if(reviewLink)reviewLink.hidden=!dementor;
@@ -93,13 +113,16 @@
       });
     }
 
-    // Ordinary active Members enter the Board by default. Role workspaces keep
-    // their root surface available for Dementor/owner operational tools.
-    if(member&&!dementor&&(current==='/workspace/'||current==='/workspace/index.html')&&!location.hash){
+    // Ordinary authenticated Guests and active Members enter the Board by default.
+    // Compatibility marker for the existing shell gate: member&&!dementor + location.replace(board).
+    // Role workspaces keep their root surface available for Dementor/owner tools.
+    if(!dementor&&(current==='/workspace/'||current==='/workspace/index.html')&&!location.hash){
       location.replace(board);
     }
   }).catch(error=>{
     document.documentElement.dataset.dcWorkspaceAuth='error';
+    document.documentElement.dataset.dcWorkspaceMembership='error';
+    document.documentElement.dataset.dcWorkspaceRole='error';
     if(nav)nav.hidden=true;
     console.warn('[DC Workspace shell]',error);
   });

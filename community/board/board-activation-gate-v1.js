@@ -26,20 +26,28 @@ function showGateMessage(message='FIRST_ARTIFACT_REQUIRED'){
 
 function isActivated(){return activationState==='MEMBER_ACTIVATED'}
 function focusDismissed(){try{return sessionStorage.getItem(FOCUS_DISMISSED_KEY)==='1'}catch{return false}}
-function dismissFocus(){try{sessionStorage.setItem(FOCUS_DISMISSED_KEY,'1')}catch{}document.body.classList.remove('dc-board-first-entry-focus');entryHost?.querySelector('.dc-first-focus-skip')?.remove()}
+function focusHost(){return document.querySelector('.dc-spatial-viewport')||entryHost}
+function removeFocusSkip(){document.querySelectorAll('.dc-first-focus-skip').forEach(node=>node.remove())}
+function dismissFocus(){try{sessionStorage.setItem(FOCUS_DISMISSED_KEY,'1')}catch{}document.body.classList.remove('dc-board-first-entry-focus');removeFocusSkip();window.dispatchEvent(new CustomEvent('dc:first-artifact-focus-dismissed'))}
 function syncFirstEntryFocus(){
   const focused=activationState==='FIRST_ARTIFACT_REQUIRED'&&!focusDismissed();
   document.body.classList.toggle('dc-board-first-entry-focus',focused);
-  if(!entryHost)return;
-  if(!focused){entryHost.querySelector('.dc-first-focus-skip')?.remove();return}
-  if(entryHost.querySelector('.dc-first-focus-skip'))return;
+  if(!focused){removeFocusSkip();return}
+  const host=focusHost();if(!host)return;
+  if(host.querySelector('.dc-first-focus-skip'))return;
+  removeFocusSkip();
   const skip=document.createElement('button');
   skip.type='button';
   skip.className='dc-first-focus-skip';
   skip.textContent='Пропустить сейчас';
   skip.setAttribute('aria-label','Скрыть подсказку до следующего входа');
+  skip.style.position='absolute';
+  skip.style.right='14px';
+  skip.style.bottom='58px';
+  skip.style.zIndex='32';
+  skip.style.pointerEvents='auto';
   skip.addEventListener('click',dismissFocus);
-  entryHost.appendChild(skip);
+  host.appendChild(skip);
 }
 
 function syncControls(){
@@ -85,7 +93,7 @@ document.addEventListener('click',event=>{
   event.preventDefault();
   event.stopImmediatePropagation();
   showGateMessage();
-  entryHost?.scrollIntoView({behavior:'smooth',block:'start'});
+  document.querySelector('.dc-spatial-viewport')?.scrollIntoView({behavior:'smooth',block:'nearest'});
 },true);
 
 if(boardHost){
@@ -97,4 +105,5 @@ if(entryHost){
   observer.observe(entryHost,{childList:true,subtree:true});
 }
 
+window.addEventListener('dc:board-spatial-ready',syncFirstEntryFocus);
 refreshActivation();
