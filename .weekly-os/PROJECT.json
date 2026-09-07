@@ -7,12 +7,12 @@
     "projectStage": "RELEASE",
     "gate": "G7_RELEASE",
     "status": "APPROVED",
-    "version": "1.21",
-    "updated": "2026-09-07",
+    "version": "1.22",
+    "updated": "2026-09-08",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "1.20"
+    "supersedes": "1.21"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -26,7 +26,7 @@
     ".weekly-os/PROJECT.json",
     ".weekly-os/ARTIFACT_INDEX.json",
     ".weekly-os/APPROVED_STATE.json",
-    ".weekly-os/results/board-access-control-v2.v0.2.md",
+    ".weekly-os/results/board-access-control-v2.v0.3.md",
     "operations/BOARD_ACCESS_AND_OWNER_ADMIN_V2.md",
     ".weekly-os/results/workspace-top-navigation.v1.0.md",
     "operations/WORKSPACE_MEMBER_ACTIVATION_AND_SHELL_V1.md",
@@ -48,16 +48,21 @@
   "protected": {"PRODUCT": null, "DOMAIN": null, "ARCHITECTURE": null, "DESIGN": null},
   "currentResult": {
     "artifactId": "dementor-club.result.board-access-control-v2",
-    "version": "0.2",
+    "version": "0.3",
     "status": "ACTIVE",
-    "path": ".weekly-os/results/board-access-control-v2.v0.2.md",
+    "path": ".weekly-os/results/board-access-control-v2.v0.3.md",
     "gate": "G7_RELEASE",
     "productionBaseCommit": "8e8983a0ea39e00773211ce0142b6a7c683002ea",
     "productionCommit": "f74eeb7267e664ed61f6bc3ad08ebe3e6191c0a5",
     "integrationPullRequest": 133,
     "validationRun": 869,
-    "productionDeployed": false,
-    "liveDatabaseMigrationApplied": true
+    "productionDeployed": true,
+    "productionDeployRun": 36,
+    "productionDeployRunId": 33990245535,
+    "productionDeployAttempt": 2,
+    "pagesArtifactId": 10034205443,
+    "liveDatabaseMigrationApplied": true,
+    "targetedAuthenticatedLiveRetest": "PENDING"
   },
   "activeIntegrationBranch": null,
   "activeReleaseBranch": null,
@@ -79,6 +84,7 @@
     "site/staging semantics as club source-of-truth",
     "production deployment from a merge",
     "live Supabase migration from a committed migration file",
+    "authenticated live role validation from G6 browser mocks alone",
     "WeeklyOS runtime source_ref correction from kernel migration",
     "global MP_DSL approval from Dementor Club local operating-rule approval"
   ]
