@@ -158,8 +158,8 @@
   .dcw-main{height:calc(100dvh - 136px)!important}
   .dc-board-entry{inset:136px 0 0!important}
   .dc-artifact-overlay{inset:136px 0 0!important}
-  .dc-board-filters{top:12px!important;left:10px!important;right:10px!important;max-width:calc(100% - 20px)!important}
-  .dc-board-primary{top:62px!important;left:10px!important}
+  .dc-board-filters{top:32px!important;left:10px!important;right:10px!important;max-width:calc(100% - 20px)!important}
+  .dc-board-primary{top:82px!important;left:10px!important}
   .dc-spatial-controls{top:auto!important;right:10px!important;bottom:12px!important}
 }
 
@@ -173,9 +173,9 @@
   .dcw-nav{padding-inline:8px!important}
   .dcw-nav .dcw-nav-link{font-size:7.5px!important;padding-inline:9px!important}
   .dcw-session{padding-inline:10px!important}
-  .dc-board-filters{overflow-x:auto!important;overflow-y:visible!important;scrollbar-width:none!important}
+  .dc-board-filters{top:32px!important;overflow-x:auto!important;overflow-y:visible!important;scrollbar-width:none!important}
   .dc-board-filter-nav{display:none!important}
-  .dc-board-primary{top:60px!important}
+  .dc-board-primary{top:82px!important}
   .dc-board-membership-gate{padding:14px}
   .dc-board-membership-gate__card{width:calc(100vw - 28px);padding:28px 22px 24px;box-shadow:7px 7px 0 #111}
   .dc-board-membership-gate h2{font-size:38px}
