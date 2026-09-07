@@ -263,11 +263,11 @@ function installArtifactDrag(){
     if(!card||event.target.closest('button,a,textarea,input,dialog'))return;
     event.stopPropagation();cameraIntent='manual';
     const x=parseFloat(card.style.left)||0,y=parseFloat(card.style.top)||0;
-    drag={card,id:event.pointerId,startX:event.clientX,startY:event.clientY,x,y};
+    drag={card,id:event.pointerId,startX:event.clientX,startY:event.clientY,x,y,moved:false};
     card.setPointerCapture(event.pointerId);card.classList.add('is-dragging');
   });
-  boardHost.addEventListener('pointermove',event=>{if(!drag||drag.id!==event.pointerId)return;const dx=(event.clientX-drag.startX)/camera.scale,dy=(event.clientY-drag.startY)/camera.scale;drag.card.style.left=`${clamp(drag.x+dx,0,WORLD.w-280)}px`;drag.card.style.top=`${clamp(drag.y+dy,0,WORLD.h-220)}px`});
-  const end=async event=>{if(!drag||drag.id!==event.pointerId)return;const current=drag;drag=null;current.card.classList.remove('is-dragging');await persistPosition(current.card)};
+  boardHost.addEventListener('pointermove',event=>{if(!drag||drag.id!==event.pointerId)return;const dx=(event.clientX-drag.startX)/camera.scale,dy=(event.clientY-drag.startY)/camera.scale;if(Math.hypot(dx,dy)>4)drag.moved=true;drag.card.style.left=`${clamp(drag.x+dx,0,WORLD.w-280)}px`;drag.card.style.top=`${clamp(drag.y+dy,0,WORLD.h-220)}px`});
+  const end=async event=>{if(!drag||drag.id!==event.pointerId)return;const current=drag;drag=null;current.card.classList.remove('is-dragging');if(current.moved)current.card.dataset.boardJustDragged=String(Date.now());await persistPosition(current.card)};
   boardHost.addEventListener('pointerup',end);boardHost.addEventListener('pointercancel',end);
 }
 
@@ -278,12 +278,13 @@ async function refreshSpatial(){
   if(cameraIntent==='auto')requestAnimationFrame(()=>fitActiveContent());
 }
 
-function scheduleSpatialRefresh(){clearTimeout(renderTimer);renderTimer=setTimeout(()=>refreshSpatial(),140)}
+function scheduleSpatialRefresh(){clearTimeout(renderTimer);renderTimer=setTimeout(()=>refreshSpatial(),80)}
 
 async function init(){
   installShell();installPanZoom();installArtifactDrag();
   await refreshSpatial();requestAnimationFrame(()=>fitActiveContent());
   if(boardHost){const observer=new MutationObserver(scheduleSpatialRefresh);observer.observe(boardHost,{childList:true})}
+  window.addEventListener('dc:board-personal-state',scheduleSpatialRefresh);
   window.addEventListener('dc:board-projections-updated',()=>{placeCards();if(cameraIntent==='auto')requestAnimationFrame(()=>fitActiveContent())});
   window.addEventListener('dc:board-filter-changed',()=>{placeCards();if(cameraIntent==='auto')requestAnimationFrame(()=>fitActiveContent())});
   window.addEventListener('resize',()=>{placeCards();if(cameraIntent==='auto')fitActiveContent();else applyCamera()},{passive:true});
