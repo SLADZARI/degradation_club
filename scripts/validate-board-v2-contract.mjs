@@ -57,7 +57,9 @@ expect(activation.includes("activationState==='FIRST_ARTIFACT_REQUIRED'"),'R12: 
 expect(activation.includes("FOCUS_DISMISSED_KEY='dc_first_artifact_spotlight_dismissed_v1'"),'R12: session-local first-entry key missing');
 expect(activation.includes("document.querySelector('.dc-spatial-viewport')||entryHost"),'R12: first-entry skip does not prefer visible spatial viewport');
 expect(activation.includes("skip.style.zIndex='32'"),'R12: first-entry skip stacking correction missing');
-expect(!activation.includes('activationLocked'),'R12: first Artifact still writes an interaction lock');
+expect(!activation.includes('dataset.activationLocked='),'R12: first Artifact still writes an interaction lock');
+expect(activation.includes('delete button.dataset.activationLocked'),'R12: legacy interaction lock is not actively cleaned from reused DOM');
+expect(!activation.includes("setAttribute('aria-disabled','true')"),'R12: first Artifact still sets reaction/response aria-disabled');
 expect(!activation.includes('event.stopImmediatePropagation()'),'R12: activation layer still intercepts reaction/response clicks');
 expect(!activation.includes('Сначала займите своё место'),'R12: legacy interaction-lock copy remains');
 
