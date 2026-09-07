@@ -1,0 +1,91 @@
+/* Board v2.2 — use the same canonical Workspace header as every other Workspace route.
+   Board remains fullscreen below the shared header; only Board page chrome stays suppressed. */
+
+.dcw-live-banner{display:flex!important}
+.dcw-app{padding-top:24px!important;height:100dvh!important}
+.dcw-sidebar{
+  position:sticky!important;
+  inset:auto!important;
+  top:24px!important;
+  width:100%!important;
+  min-width:0!important;
+  max-width:none!important;
+  height:68px!important;
+  min-height:68px!important;
+  overflow:visible!important;
+  border-right:0!important;
+  border-bottom:1px solid var(--dcw-line)!important;
+  background:rgba(242,240,232,.98)!important;
+  backdrop-filter:blur(10px)!important;
+  display:grid!important;
+  grid-template-columns:auto minmax(0,1fr) auto!important;
+  align-items:center!important;
+}
+.dcw-brand{
+  width:auto!important;
+  min-height:68px!important;
+  height:68px!important;
+  padding:0 18px!important;
+  display:flex!important;
+  flex-direction:row!important;
+  align-items:baseline!important;
+  justify-content:flex-start!important;
+  gap:4px!important;
+  border-right:1px solid var(--dcw-line)!important;
+  border-bottom:0!important;
+  white-space:nowrap!important;
+}
+.dcw-brand span{display:inline!important;font-size:9px!important}
+.dcw-brand strong{font-size:22px!important;letter-spacing:normal!important}
+.dcw-brand strong:after{content:none!important}
+.dcw-nav{
+  padding:8px 10px!important;
+  gap:4px!important;
+  align-items:center!important;
+  overflow-x:auto!important;
+  overflow-y:hidden!important;
+}
+.dcw-nav .dcw-nav-link{
+  min-height:38px!important;
+  padding:10px 11px!important;
+  font-size:9px!important;
+}
+.dcw-session{
+  width:auto!important;
+  max-width:none!important;
+  padding:0 14px!important;
+  border-left:1px solid var(--dcw-line)!important;
+  display:flex!important;
+  align-items:center!important;
+  gap:9px!important;
+  overflow:visible!important;
+}
+.dcw-session-avatar{width:34px!important;height:34px!important;flex-basis:34px!important}
+.dcw-main{height:calc(100dvh - 92px)!important}
+.dc-board-entry{inset:92px 0 0!important}
+.dc-artifact-overlay{inset:92px 0 0!important}
+
+@media(max-width:900px){
+  .dcw-sidebar{height:62px!important;min-height:62px!important}
+  .dcw-brand{width:auto!important;height:62px!important;min-height:62px!important;padding:0 12px!important}
+  .dcw-brand span{display:inline!important;font-size:8px!important}
+  .dcw-brand strong{font-size:18px!important}
+  .dcw-nav{padding:6px 8px!important}
+  .dcw-nav .dcw-nav-link{min-height:36px!important;padding:9px 10px!important;font-size:8px!important}
+  .dcw-session{width:auto!important;max-width:none!important;padding:0 10px!important}
+  .dcw-session-avatar{width:32px!important;height:32px!important;flex-basis:32px!important}
+  .dcw-main{height:calc(100dvh - 86px)!important}
+  .dc-board-entry{inset:86px 0 0!important}
+  .dc-artifact-overlay{inset:86px 0 0!important}
+}
+
+@media(max-width:520px){
+  .dcw-sidebar{grid-template-columns:auto minmax(0,1fr) auto!important}
+  .dcw-brand{width:auto!important;padding-inline:9px!important}
+  .dcw-brand span{display:inline!important}
+  .dcw-brand strong{font-size:16px!important}
+  .dcw-brand strong:after{content:none!important}
+  .dcw-nav{width:auto!important}
+  .dcw-nav .dcw-nav-link{font-size:8px!important;padding-inline:9px!important}
+  .dcw-session{width:auto!important;max-width:none!important;padding-inline:7px!important}
+}
