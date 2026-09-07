@@ -13,6 +13,8 @@ let entryStatus=null;
 let renderTimer=null;
 let cameraIntent='auto';
 
+function boardUserState(){return String(document.documentElement.dataset.dcBoardUserState||'')}
+function isOwnerAdmin(){return boardUserState()==='OWNER_ADMIN'}
 function clamp(value,min,max){return Math.max(min,Math.min(max,value))}
 function hashString(value){let h=2166136261;for(const ch of String(value||'')){h^=ch.charCodeAt(0);h=Math.imul(h,16777619)}return h>>>0}
 function deterministicPlatformPosition(id,index=0){const h=hashString(id);const angle=((h%360)/180)*Math.PI;const radius=650+(h%1250);return{x:WORLD_CENTER.x+Math.cos(angle)*radius,y:WORLD_CENTER.y+Math.sin(angle)*radius,rotation:((h%15)-7)/10,size_class:index%4===0?'M':'S'}}
@@ -77,6 +79,7 @@ function liftLegacyBlocks(){
 function placeCards(){
   if(!boardHost)return;
   liftLegacyBlocks();
+  const ownerAdmin=isOwnerAdmin();
   const memberCards=[...boardHost.querySelectorAll('.dc-notice[data-artifact]')];
   memberCards.forEach((card,index)=>{
     const id=card.dataset.artifact;
@@ -86,8 +89,9 @@ function placeCards(){
     card.style.setProperty('--dc-card-rotation',`${Number(pos.rotation)||0}deg`);
     card.dataset.sizeClass=cardSizeClass(card,pos);
     card.dataset.positionVersion=String(pos.position_version||1);
-    if(card.querySelector('[data-close-artifact]')&&activationState==='MEMBER_ACTIVATED')card.classList.add('is-own-movable');
-    else card.classList.remove('is-own-movable');
+    const own=card.dataset.artifactOwned==='1'||!!card.querySelector('[data-close-artifact]');
+    card.classList.toggle('is-own-movable',!ownerAdmin&&own&&activationState==='MEMBER_ACTIVATED');
+    card.classList.toggle('is-admin-movable',ownerAdmin);
   });
   [...boardHost.querySelectorAll('[data-board-source="platform"]')].forEach((card,index)=>{
     const pos=deterministicPlatformPosition(card.dataset.sourceId||`${card.dataset.sourceType}-${index}`,index);
@@ -105,6 +109,11 @@ function openArtifactSlot(){
 function updateSlotControl(){
   const control=viewport?.querySelector('[data-slot]');
   if(!control)return;
+  if(isOwnerAdmin()){
+    control.textContent='＋ АРТЕФАКТ';
+    control.setAttribute('aria-label','Owner Admin: создать Artifact через канонический composer');
+    return;
+  }
   if(entryStatus?.membership_active!==true){control.remove();return}
   const available=Number(entryStatus?.artifact_slots_available||0);
   const consuming=Number(entryStatus?.artifact_slots_consuming||0);
@@ -141,7 +150,7 @@ function focusPersonalCard(){
 }
 function focusMine(){
   if(!viewport)return;
-  const mine=boardHost?.querySelector('.dc-notice.is-own-movable')||boardHost?.querySelector('.dc-notice[data-artifact] [data-close-artifact]')?.closest('.dc-notice');
+  const mine=boardHost?.querySelector('.dc-notice[data-artifact-owned="1"]')||boardHost?.querySelector('.dc-notice[data-artifact] [data-close-artifact]')?.closest('.dc-notice');
   if(mine){
     const x=parseFloat(mine.style.left)||WORLD_CENTER.x,y=parseFloat(mine.style.top)||WORLD_CENTER.y;
     const width=Math.max(mine.offsetWidth||320,240),height=Math.max(mine.offsetHeight||220,160);
@@ -231,7 +240,7 @@ function installPanZoom(){
   viewport.addEventListener('click',event=>{if(Date.now()<suppressClickUntil){event.preventDefault();event.stopPropagation()}},true);
 }
 
-async function persistOwnPosition(card){
+async function persistPosition(card){
   const artifactId=card.dataset.artifact;
   const version=Number(card.dataset.positionVersion||1);
   const x=parseFloat(card.style.left),y=parseFloat(card.style.top);
@@ -246,11 +255,11 @@ async function persistOwnPosition(card){
   positions.set(artifactId,data);
 }
 
-function installOwnDrag(){
+function installArtifactDrag(){
   if(!boardHost)return;
   let drag=null;
   boardHost.addEventListener('pointerdown',event=>{
-    const card=event.target.closest('.dc-notice.is-own-movable');
+    const card=event.target.closest('.dc-notice.is-own-movable,.dc-notice.is-admin-movable');
     if(!card||event.target.closest('button,a,textarea,input,dialog'))return;
     event.stopPropagation();cameraIntent='manual';
     const x=parseFloat(card.style.left)||0,y=parseFloat(card.style.top)||0;
@@ -258,7 +267,7 @@ function installOwnDrag(){
     card.setPointerCapture(event.pointerId);card.classList.add('is-dragging');
   });
   boardHost.addEventListener('pointermove',event=>{if(!drag||drag.id!==event.pointerId)return;const dx=(event.clientX-drag.startX)/camera.scale,dy=(event.clientY-drag.startY)/camera.scale;drag.card.style.left=`${clamp(drag.x+dx,0,WORLD.w-280)}px`;drag.card.style.top=`${clamp(drag.y+dy,0,WORLD.h-220)}px`});
-  const end=async event=>{if(!drag||drag.id!==event.pointerId)return;const current=drag;drag=null;current.card.classList.remove('is-dragging');await persistOwnPosition(current.card)};
+  const end=async event=>{if(!drag||drag.id!==event.pointerId)return;const current=drag;drag=null;current.card.classList.remove('is-dragging');await persistPosition(current.card)};
   boardHost.addEventListener('pointerup',end);boardHost.addEventListener('pointercancel',end);
 }
 
@@ -272,7 +281,7 @@ async function refreshSpatial(){
 function scheduleSpatialRefresh(){clearTimeout(renderTimer);renderTimer=setTimeout(()=>refreshSpatial(),140)}
 
 async function init(){
-  installShell();installPanZoom();installOwnDrag();
+  installShell();installPanZoom();installArtifactDrag();
   await refreshSpatial();requestAnimationFrame(()=>fitActiveContent());
   if(boardHost){const observer=new MutationObserver(scheduleSpatialRefresh);observer.observe(boardHost,{childList:true})}
   window.addEventListener('dc:board-projections-updated',()=>{placeCards();if(cameraIntent==='auto')requestAnimationFrame(()=>fitActiveContent())});
