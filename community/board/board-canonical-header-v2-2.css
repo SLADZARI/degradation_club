@@ -1,5 +1,6 @@
-/* Board v2.2 — use the same canonical Workspace header as every other Workspace route.
-   Board remains fullscreen below the shared header; only Board page chrome stays suppressed. */
+/* Board v2.3 — canonical Workspace shell with public-site brand treatment.
+   Desktop stays one calm row; mobile becomes two deliberate rows so Board chrome
+   never collides with account navigation. Board remains fullscreen below shell. */
 
 .dcw-live-banner{display:flex!important}
 .dcw-app{padding-top:24px!important;height:100dvh!important}
@@ -10,82 +11,154 @@
   width:100%!important;
   min-width:0!important;
   max-width:none!important;
-  height:68px!important;
-  min-height:68px!important;
+  height:72px!important;
+  min-height:72px!important;
   overflow:visible!important;
   border-right:0!important;
   border-bottom:1px solid var(--dcw-line)!important;
   background:rgba(242,240,232,.98)!important;
-  backdrop-filter:blur(10px)!important;
+  backdrop-filter:blur(12px)!important;
   display:grid!important;
   grid-template-columns:auto minmax(0,1fr) auto!important;
   align-items:center!important;
 }
+/* Match the public homepage wordmark: DEMENTOR + acid CLUB tile. */
 .dcw-brand{
   width:auto!important;
-  min-height:68px!important;
-  height:68px!important;
-  padding:0 18px!important;
+  min-height:72px!important;
+  height:72px!important;
+  padding:0 22px!important;
   display:flex!important;
   flex-direction:row!important;
-  align-items:baseline!important;
+  align-items:center!important;
   justify-content:flex-start!important;
-  gap:4px!important;
+  gap:0!important;
   border-right:1px solid var(--dcw-line)!important;
   border-bottom:0!important;
   white-space:nowrap!important;
+  font-weight:900!important;
+  letter-spacing:-.05em!important;
 }
-.dcw-brand span{display:inline!important;font-size:9px!important}
-.dcw-brand strong{font-size:22px!important;letter-spacing:normal!important}
+.dcw-brand span{
+  display:inline-block!important;
+  font:900 20px/1 Inter,Arial,sans-serif!important;
+  letter-spacing:-.05em!important;
+}
+.dcw-brand strong{
+  display:inline-block!important;
+  margin-left:3px!important;
+  padding:3px 5px!important;
+  background:var(--dcw-acid,#d8ff3e)!important;
+  color:#111!important;
+  font:900 20px/1 Inter,Arial,sans-serif!important;
+  letter-spacing:-.05em!important;
+}
 .dcw-brand strong:after{content:none!important}
 .dcw-nav{
-  padding:8px 10px!important;
-  gap:4px!important;
+  padding:10px 14px!important;
+  gap:6px!important;
   align-items:center!important;
   overflow-x:auto!important;
   overflow-y:hidden!important;
+  scrollbar-width:none!important;
 }
+.dcw-nav::-webkit-scrollbar{display:none!important}
 .dcw-nav .dcw-nav-link{
-  min-height:38px!important;
-  padding:10px 11px!important;
+  min-height:40px!important;
+  padding:11px 12px!important;
   font-size:9px!important;
 }
 .dcw-session{
   width:auto!important;
   max-width:none!important;
-  padding:0 14px!important;
+  min-height:72px!important;
+  padding:0 18px!important;
   border-left:1px solid var(--dcw-line)!important;
   display:flex!important;
   align-items:center!important;
-  gap:9px!important;
+  gap:10px!important;
   overflow:visible!important;
 }
 .dcw-session-avatar{width:34px!important;height:34px!important;flex-basis:34px!important}
-.dcw-main{height:calc(100dvh - 92px)!important}
-.dc-board-entry{inset:92px 0 0!important}
-.dc-artifact-overlay{inset:92px 0 0!important}
+.dcw-main{height:calc(100dvh - 96px)!important}
+.dc-board-entry{inset:96px 0 0!important}
+.dc-artifact-overlay{inset:96px 0 0!important}
+/* Give Board tools a deliberate air-gap under the shell instead of gluing them to its rule. */
+.dc-board-filters{top:20px!important;left:16px!important}
+.dc-spatial-controls{top:20px!important;right:16px!important}
+.dc-board-primary{top:76px!important;left:16px!important}
 
 @media(max-width:900px){
-  .dcw-sidebar{height:62px!important;min-height:62px!important}
-  .dcw-brand{width:auto!important;height:62px!important;min-height:62px!important;padding:0 12px!important}
-  .dcw-brand span{display:inline!important;font-size:8px!important}
-  .dcw-brand strong{font-size:18px!important}
-  .dcw-nav{padding:6px 8px!important}
-  .dcw-nav .dcw-nav-link{min-height:36px!important;padding:9px 10px!important;font-size:8px!important}
-  .dcw-session{width:auto!important;max-width:none!important;padding:0 10px!important}
-  .dcw-session-avatar{width:32px!important;height:32px!important;flex-basis:32px!important}
-  .dcw-main{height:calc(100dvh - 86px)!important}
-  .dc-board-entry{inset:86px 0 0!important}
-  .dc-artifact-overlay{inset:86px 0 0!important}
+  .dcw-sidebar{
+    height:112px!important;
+    min-height:112px!important;
+    grid-template-columns:auto minmax(0,1fr) auto!important;
+    grid-template-rows:62px 50px!important;
+    grid-template-areas:
+      "brand spacer session"
+      "nav nav nav"!important;
+    align-items:center!important;
+  }
+  .dcw-brand{
+    grid-area:brand!important;
+    width:auto!important;
+    height:62px!important;
+    min-height:62px!important;
+    padding:0 16px!important;
+    border-right:0!important;
+  }
+  .dcw-brand span{display:inline-block!important;font-size:17px!important}
+  .dcw-brand strong{font-size:17px!important;padding:3px 4px!important}
+  .dcw-nav{
+    grid-area:nav!important;
+    width:100%!important;
+    height:50px!important;
+    min-width:0!important;
+    padding:6px 10px!important;
+    gap:5px!important;
+    border-top:1px solid var(--dcw-line)!important;
+    background:rgba(242,240,232,.98)!important;
+    overflow-x:auto!important;
+    overflow-y:hidden!important;
+  }
+  .dcw-nav .dcw-nav-link{
+    min-height:36px!important;
+    padding:9px 10px!important;
+    font-size:8px!important;
+    flex:0 0 auto!important;
+  }
+  .dcw-session{
+    grid-area:session!important;
+    width:auto!important;
+    max-width:none!important;
+    min-height:62px!important;
+    height:62px!important;
+    padding:0 12px!important;
+    border-left:1px solid var(--dcw-line)!important;
+  }
+  .dcw-session-profile--link>div{display:none!important}
+  .dcw-session-avatar{width:34px!important;height:34px!important;flex-basis:34px!important}
+  .dcw-logout{font-size:0!important;border:0!important;padding:8px!important}
+  .dcw-logout::after{content:'↗';font:900 15px/1 ui-monospace,SFMono-Regular,Menlo,monospace!important}
+  .dcw-main{height:calc(100dvh - 136px)!important}
+  .dc-board-entry{inset:136px 0 0!important}
+  .dc-artifact-overlay{inset:136px 0 0!important}
+  .dc-board-filters{top:12px!important;left:10px!important;right:10px!important;max-width:calc(100% - 20px)!important}
+  .dc-board-primary{top:62px!important;left:10px!important}
+  .dc-spatial-controls{top:auto!important;right:10px!important;bottom:12px!important}
 }
 
 @media(max-width:520px){
-  .dcw-sidebar{grid-template-columns:auto minmax(0,1fr) auto!important}
-  .dcw-brand{width:auto!important;padding-inline:9px!important}
-  .dcw-brand span{display:inline!important}
-  .dcw-brand strong{font-size:16px!important}
+  .dcw-live-banner{min-height:24px!important;padding-inline:14px!important;font-size:8px!important;justify-content:flex-start!important}
+  .dcw-sidebar{height:112px!important;min-height:112px!important}
+  .dcw-brand{padding-inline:14px!important}
+  .dcw-brand span{display:inline-block!important;font-size:16px!important}
+  .dcw-brand strong{font-size:16px!important;margin-left:3px!important;padding:3px 4px!important}
   .dcw-brand strong:after{content:none!important}
-  .dcw-nav{width:auto!important}
-  .dcw-nav .dcw-nav-link{font-size:8px!important;padding-inline:9px!important}
-  .dcw-session{width:auto!important;max-width:none!important;padding-inline:7px!important}
+  .dcw-nav{padding-inline:8px!important}
+  .dcw-nav .dcw-nav-link{font-size:7.5px!important;padding-inline:9px!important}
+  .dcw-session{padding-inline:10px!important}
+  .dc-board-filters{overflow-x:auto!important;overflow-y:visible!important;scrollbar-width:none!important}
+  .dc-board-filter-nav{display:none!important}
+  .dc-board-primary{top:60px!important}
 }
