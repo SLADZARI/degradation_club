@@ -13,6 +13,7 @@ const migration=read('supabase/migrations/20260906183000_guest_board_interest_v1
 const responsePolicy=read('supabase/migrations/20260907210040_guest_board_responses_v1.sql');
 const responseRpc=read('supabase/migrations/20260907210333_guest_board_response_rpc_v1.sql');
 const accessV2=read('supabase/migrations/20260907214500_board_access_owner_admin_v2.sql');
+const ownerStorage=read('supabase/migrations/20260907220000_board_owner_admin_storage_v2.sql');
 const entityModel=read('community/board/board-entity-model-v1.js');
 const integrations=read('community/board/board-integrations-v1.js');
 const spatial=read('community/board/board-spatial-v1.js');
@@ -71,6 +72,9 @@ expect(accessV2.includes("raise exception 'MEMBER_USE_CANONICAL_RESPONSE'"),'R13
 expect(accessV2.includes('if not v_owner then')&&accessV2.includes('NO_ARTIFACT_SLOT_AVAILABLE'),'R13: Owner Admin publish does not explicitly bypass slot accounting');
 expect(accessV2.includes("v_owner and a.visibility='community'")&&accessV2.includes("a.status in ('active','expired','archived')"),'R13: Owner Admin close authority is not bounded to Community Board Artifacts');
 expect(!accessV2.includes('create table'),'R13: access patch created a parallel Board table');
+expect(ownerStorage.includes("bucket_id = 'dc-community-artifacts'")&&ownerStorage.includes('(select public.dc_is_owner_admin())'),'R13: Owner Admin storage read/upload does not reuse canonical private Artifact bucket');
+expect(ownerStorage.includes('(storage.foldername(name))[1] = (select auth.uid())::text'),'R13: Owner Admin storage upload is not confined to own auth.uid folder');
+expect(!ownerStorage.includes('create bucket'),'R13: access patch created a parallel storage bucket');
 expect(board.includes("function isOwnerAdmin(){return boardUserState()==='OWNER_ADMIN'}"),'R13: canonical Artifact controller does not resolve Owner Admin state');
 expect(board.includes('data-admin-close-artifact'),'R13: Owner Admin moderation control missing');
 expect(board.includes("!entryStatus.membership_active&&!isOwnerAdmin()"),'R13: Owner Admin without membership is still blocked from canonical Board controller');
@@ -78,6 +82,8 @@ expect(board.includes('OWNER ADMIN / READY'),'R13: Owner Admin does not reuse ca
 expect(spatial.includes('is-admin-movable'),'R13: spatial owner does not mark Owner Admin movable Artifacts');
 expect(spatial.includes(".dc-notice.is-own-movable,.dc-notice.is-admin-movable"),'R13: spatial drag owner does not include Owner Admin cards');
 expect(spatial.includes("data-artifact-owned=\"1\""),'R13: МОЁ focus can collapse into arbitrary admin-movable card');
+expect(spatial.includes('boardJustDragged'),'R13: drag completion does not suppress accidental fullscreen open');
+expect(spatial.includes("window.addEventListener('dc:board-personal-state',scheduleSpatialRefresh)"),'R13: spatial owner is not synchronized to canonical resolved Board state');
 expect(fullscreen.includes("if(isOwnerAdmin())")&&fullscreen.includes("host.dataset.access='owner-admin'"),'R13: fullscreen primary action does not expose Owner Admin composer');
 expect(fullscreen.includes('interactiveTarget(event.target)'),'R13: fullscreen card-open handler still captures admin controls');
 
@@ -89,4 +95,4 @@ expect(spatial.includes('fitActiveContent'),'R5: fitActiveContent missing');
 expect(spatial.includes('data-mine'),'R5: МОЁ camera control missing');
 
 if(fail.length){console.error('BOARD V2 CONTRACT BLOCKED');for(const e of fail)console.error(`- ${e}`);process.exit(1)}
-console.log('Board v2 contract PASS: Guest boundaries + monotonic first-Artifact interactions + Owner Admin canonical moderation/layout + R8/R5 safety');
+console.log('Board v2 contract PASS: Guest boundaries + monotonic first-Artifact interactions + Owner Admin canonical moderation/layout/storage + R8/R5 safety');
