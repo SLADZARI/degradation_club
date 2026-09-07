@@ -14,7 +14,7 @@ export const GENA_BASE_BRAIN=Object.freeze({
 
 export function createBrainFor(characterId){
   const src=characterId==='character-02'?BASE_BRAIN:GENA_BASE_BRAIN;
-  return structuredClone?structuredClone(src):JSON.parse(JSON.stringify(src));
+  return typeof globalThis.structuredClone==='function'?globalThis.structuredClone(src):JSON.parse(JSON.stringify(src));
 }
 
 export function unlockPool(characterId){
