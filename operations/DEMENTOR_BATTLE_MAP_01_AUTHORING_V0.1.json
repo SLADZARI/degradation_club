@@ -1,0 +1,68 @@
+{
+  "schemaVersion": "0.1",
+  "_artifact": {
+    "artifactId": "dementor-club.reference.dementor-battle-map-01-authoring",
+    "project": "dementor-club",
+    "documentType": "DESIGN_REFERENCE",
+    "status": "DRAFT",
+    "version": "0.1",
+    "updated": "2026-09-07",
+    "sourceSystem": "GIT",
+    "authorityType": "REFERENCE",
+    "note": "MAP-01 level-design contract mirrored in Figma. Not approved product/design authority until validated and explicitly promoted."
+  },
+  "mapId": "MAP-01",
+  "name": "Dementor Battle — Object Placement Contract",
+  "grid": {
+    "type": "orthogonal-logical-isometric-render",
+    "size": {"columns": 9, "rows": 9},
+    "labels": "A1-I9",
+    "tileProjection": {"width": 120, "height": 60}
+  },
+  "figma": {
+    "fileName": "DEMENTOR BATTLE — MAP AUTHORING MASTER",
+    "fileUrl": "https://www.figma.com/design/NRl9XrUMzJeds5558ttijA",
+    "frame": "04 MAP-01 OBJECT CONTRACT"
+  },
+  "spawns": {
+    "nikita": "B5",
+    "zhenya": "H5"
+  },
+  "captureCells": {
+    "bar": "A3",
+    "archive": "F2",
+    "printshop": "E8"
+  },
+  "objects": {
+    "bar-counter": {"cells": ["A2", "B2"], "cover": "full", "blocked": true, "coverEdges": {"A2": ["S", "E"], "B2": ["S", "W"]}},
+    "archive-shelves": {"cells": ["E1", "F1"], "cover": "full", "blocked": true, "coverEdges": {"E1": ["S", "W"], "F1": ["S", "W"]}},
+    "concrete-planter": {"cells": ["D4"], "cover": "full", "blocked": true, "coverEdges": {"D4": ["N", "E", "S", "W"]}},
+    "bust-pedestal": {"cells": ["F4"], "cover": "full", "blocked": true, "coverEdges": {"F4": ["N", "E", "S", "W"]}},
+    "storage-cabinet": {"cells": ["C6"], "cover": "full", "blocked": true, "coverEdges": {"C6": ["N", "E", "S", "W"]}},
+    "crate-stack": {"cells": ["G4"], "cover": "full", "blocked": true, "coverEdges": {"G4": ["N", "E", "S", "W"]}},
+    "filing-cabinet-stack": {"cells": ["D7"], "cover": "full", "blocked": true, "coverEdges": {"D7": ["N", "E", "S", "W"]}},
+    "paper-pallet": {"cells": ["F7"], "cover": "full", "blocked": true, "coverEdges": {"F7": ["N", "E", "S", "W"]}},
+    "printing-press": {"cells": ["D9", "E9"], "cover": "full", "blocked": true, "coverEdges": {"D9": ["N", "E"], "E9": ["N", "W"]}},
+    "bar-stools": {"cells": ["A4"], "cover": "half", "blocked": false, "coverEdges": {"A4": ["N"]}},
+    "side-table": {"cells": ["B3"], "cover": "half", "blocked": false, "coverEdges": {"B3": ["S", "W"]}},
+    "coffee-table": {"cells": ["C4"], "cover": "half", "blocked": false, "coverEdges": {"C4": ["S"]}},
+    "lounge-chair": {"cells": ["C5"], "cover": "half", "blocked": false, "coverEdges": {"C5": ["N"]}},
+    "archive-desk": {"cells": ["E3"], "cover": "half", "blocked": false, "coverEdges": {"E3": ["S"]}},
+    "reading-table": {"cells": ["G2"], "cover": "half", "blocked": false, "coverEdges": {"G2": ["S", "W"]}},
+    "side-cabinet": {"cells": ["H3"], "cover": "half", "blocked": false, "coverEdges": {"H3": ["N"]}},
+    "planter-edge": {"cells": ["D5"], "cover": "half", "blocked": false, "coverEdges": {"D5": ["E"]}},
+    "bench": {"cells": ["E5"], "cover": "half", "blocked": false, "coverEdges": {"E5": ["W"]}},
+    "bench-extension": {"cells": ["F5"], "cover": "half", "blocked": false, "coverEdges": {"F5": ["W"]}},
+    "low-crate-barrier": {"cells": ["G5"], "cover": "half", "blocked": false, "coverEdges": {"G5": ["W"]}},
+    "poster-stand": {"cells": ["C7"], "cover": "half", "blocked": false, "coverEdges": {"C7": ["N", "E"]}},
+    "print-worktable": {"cells": ["E7"], "cover": "half", "blocked": false, "coverEdges": {"E7": ["N"]}},
+    "rolling-cart": {"cells": ["F8"], "cover": "half", "blocked": false, "coverEdges": {"F8": ["N", "W"]}}
+  },
+  "rules": [
+    "Capture cells are always walkable.",
+    "Decorative artwork may be nudged visually but gameplay footprints stay on assigned cells.",
+    "Full-cover object cells are blocked; half-cover cells remain walkable.",
+    "Any geometry change must update this artifact, Figma, and implementation map data together.",
+    "This layout remains DRAFT until playtest validation and explicit approval."
+  ]
+}
