@@ -15,6 +15,8 @@ const CLUB_RECORDS=[
   {meta:'COURSE / VALENTIN',title:'ДУМАЙ С ОПАСНОСТЬЮ',copy:'Курс последовательной деградации уверенности.',href:'/courses/dumai-s-opasnostyu/'}
 ];
 
+function boardUserState(){return String(document.documentElement.dataset.dcBoardUserState||'')}
+function isOwnerAdmin(){return boardUserState()==='OWNER_ADMIN'}
 function boardError(error,target=entryHost){target.innerHTML=`<div class="dc-board-error">${esc(errorMessage(error))}</div>`}
 function localDateInput(value){if(!value)return'';const d=new Date(value);if(Number.isNaN(d.getTime()))return'';const pad=n=>String(n).padStart(2,'0');return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`}
 function minLocalDateTime(){return localDateInput(new Date(Date.now()+60*1000).toISOString())}
@@ -60,6 +62,11 @@ async function loadOwnDraft(){
 async function renderEntry(){
   await loadOwnDraft();
   if(ownDraft){renderComposer(ownDraft);return}
+  if(isOwnerAdmin()){
+    entryHost.innerHTML='<div class="dc-first-gate"><div class="dc-first-gate__label">OWNER ADMIN / BOARD</div><div><h2>СОЗДАТЬ<br>АРТЕФАКТ.</h2><p>Административная роль использует тот же канонический composer. Публикация не создаёт membership или Artifact slot.</p><button class="dc-board-action primary" type="button" id="openComposer">СОЗДАТЬ АРТЕФАКТ →</button></div></div>';
+    document.getElementById('openComposer').onclick=()=>renderComposer(null);
+    return;
+  }
   const available=Number(entryStatus?.artifact_slots_available||0);
   if(available>0){
     const first=Number(entryStatus?.published_artifact_count||0)===0;
@@ -75,7 +82,7 @@ async function renderEntry(){
 
 function renderComposer(draft){
   const media=ownDraftMedia[0]||null;
-  entryHost.innerHTML=`<div class="dc-composer"><div class="dc-composer-head"><span>ARTIFACT / NOTICE<br>${draft?'DRAFT / SAVED':'SLOT / READY'}</span><div><h2>ЕСЛИ БЫ ВЫ БЫЛИ ДЕМЕНТОРОМ —<br>ЧТО БЫ ВЫ ПРЕДЛОЖИЛИ ДРУГИМ?</h2><button class="dc-inline-help" type="button" id="openDementorExplainer">ЧТО ЭТО ЗНАЧИТ? →</button></div></div><form class="dc-composer-form" id="artifactForm" novalidate>
+  entryHost.innerHTML=`<div class="dc-composer"><div class="dc-composer-head"><span>ARTIFACT / NOTICE<br>${draft?'DRAFT / SAVED':isOwnerAdmin()?'OWNER ADMIN / READY':'SLOT / READY'}</span><div><h2>ЕСЛИ БЫ ВЫ БЫЛИ ДЕМЕНТОРОМ —<br>ЧТО БЫ ВЫ ПРЕДЛОЖИЛИ ДРУГИМ?</h2><button class="dc-inline-help" type="button" id="openDementorExplainer">ЧТО ЭТО ЗНАЧИТ? →</button></div></div><form class="dc-composer-form" id="artifactForm" novalidate>
     <div class="dc-composer-field"><label for="artifactTitle">Заголовок</label><input id="artifactTitle" name="title" maxlength="160" value="${esc(draft?.title||'')}" placeholder="Можно без него"><small>Опционально. Не превращайте это в рекламный слоган.</small></div>
     <div class="dc-composer-field"><label for="artifactBody">Объявление *</label><textarea id="artifactBody" name="body" maxlength="4000" required placeholder="Что именно вы предлагаете?">${esc(draft?.body||'')}</textarea><small>Текст обязателен. Пока это Artifact, а не автоматически событие, курс или проект.</small></div>
     <div class="dc-composer-field"><label for="artifactUrl">Ссылка</label><input id="artifactUrl" name="external_url" maxlength="1000" inputmode="url" value="${esc(draft?.external_url||'')}" placeholder="https://…"><small>Опциональная внешняя ссылка. Если вставить адрес без протокола, попробуем безопасно добавить https://.</small></div>
@@ -133,8 +140,9 @@ async function removeDraft(){
   }catch(error){if(button){button.disabled=false;button.textContent='УДАЛИТЬ ЧЕРНОВИК'}showComposerError('Не удалось удалить черновик. Попробуйте ещё раз.')}
 }
 
-async function closeArtifact(id){
-  if(!id||!confirm('Убрать объявление с активной доски и перенести в архив?'))return;
+async function closeArtifact(id,{admin=false}={}){
+  const prompt=admin?'OWNER ADMIN: убрать чужой Artifact с активной доски и перенести в архив?':'Убрать объявление с активной доски и перенести в архив?';
+  if(!id||!confirm(prompt))return;
   const {error}=await client.rpc('dc_close_artifact_v1',{p_artifact_id:id});if(error){boardError(error);return}await refreshAll();
 }
 
@@ -158,16 +166,18 @@ async function loadBoard(){
 }
 
 function renderNotice(artifact,index,profile,reactions,media,responses){
-  const mine=artifact.author_profile_id===session.user.id;const myReaction=reactions.some(r=>r.profile_id===session.user.id);const myResponse=responses.find(r=>r.responder_profile_id===session.user.id&&r.status==='submitted');const incoming=mine?responses.filter(r=>r.status==='submitted').length:0;const item=media[0];let mediaHtml='';
+  const mine=artifact.author_profile_id===session.user.id;const ownerAdmin=isOwnerAdmin();const myReaction=reactions.some(r=>r.profile_id===session.user.id);const myResponse=responses.find(r=>r.responder_profile_id===session.user.id&&r.status==='submitted');const incoming=mine?responses.filter(r=>r.status==='submitted').length:0;const item=media[0];let mediaHtml='';
   if(item?.signedUrl){mediaHtml=item.media_type==='image'?`<div class="dc-notice__media"><img src="${esc(item.signedUrl)}" alt="Прикреплённое изображение"></div>`:''}
   const activityLink=myResponse||myReaction?`<a class="dc-board-action small" href="${route('/workspace/#activity')}">МОЯ АКТИВНОСТЬ</a>`:'';
-  return `<article class="dc-notice" data-artifact="${artifact.id}"><div class="dc-notice__meta"><span>ARTIFACT / ${String(index+1).padStart(3,'0')}</span><span>${formatDate(artifact.published_at)}</span></div><div class="dc-notice__author">${avatar(profile)}<div><strong>${esc(profile?.display_name||'MEMBER')}</strong>${profile?.nickname?`<div>@${esc(profile.nickname.replace(/^@/,''))}</div>`:''}</div></div>${artifact.title?`<h3>${esc(artifact.title)}</h3>`:''}<p class="dc-notice__body">${esc(artifact.body)}</p>${mediaHtml}${artifact.external_url?`<p><a class="dc-notice__link" href="${esc(artifact.external_url)}" target="_blank" rel="noopener noreferrer">ССЫЛКА ↗</a></p>`:''}<div class="dc-notice__expiry">${artifact.expires_at?`ДЕЙСТВУЕТ ДО ${formatDate(artifact.expires_at)}`:'БЕЗ СРОКА'} · COMMUNITY</div><div class="dc-notice__actions"><span class="dc-notice__activity">ИНТЕРЕСНО: ${reactions.length}${mine?` · ОТКЛИКОВ: ${incoming}`:''}</span><button class="dc-board-action small${myReaction?' primary':''}" type="button" data-reaction="${artifact.id}" data-active="${myReaction?'1':'0'}">${myReaction?'✓ ИНТЕРЕСНО':'МНЕ ЭТО НАДО'}</button>${mine?`<button class="dc-board-action small" type="button" data-close-artifact="${artifact.id}">УБРАТЬ</button>`:`<button class="dc-board-action small${myResponse?' primary':''}" type="button" data-response="${artifact.id}" ${myResponse?'disabled':''}>${myResponse?'ОТКЛИК ОТПРАВЛЕН':'ОТКЛИКНУТЬСЯ'}</button>`}${activityLink}<a class="dc-board-action small" href="${route(`/community/artifact/${artifact.id}/`)}">ОТКРЫТЬ</a></div></article>`;
+  const adminControl=ownerAdmin&&!mine?`<button class="dc-board-admin-close" type="button" data-admin-close-artifact="${artifact.id}" aria-label="Owner Admin: убрать Artifact с доски">ADMIN ×</button>`:'';
+  return `<article class="dc-notice" data-artifact="${artifact.id}" data-artifact-owned="${mine?'1':'0'}">${adminControl}<div class="dc-notice__meta"><span>ARTIFACT / ${String(index+1).padStart(3,'0')}</span><span>${formatDate(artifact.published_at)}</span></div><div class="dc-notice__author">${avatar(profile)}<div><strong>${esc(profile?.display_name||'MEMBER')}</strong>${profile?.nickname?`<div>@${esc(profile.nickname.replace(/^@/,''))}</div>`:''}</div></div>${artifact.title?`<h3>${esc(artifact.title)}</h3>`:''}<p class="dc-notice__body">${esc(artifact.body)}</p>${mediaHtml}${artifact.external_url?`<p><a class="dc-notice__link" href="${esc(artifact.external_url)}" target="_blank" rel="noopener noreferrer">ССЫЛКА ↗</a></p>`:''}<div class="dc-notice__expiry">${artifact.expires_at?`ДЕЙСТВУЕТ ДО ${formatDate(artifact.expires_at)}`:'БЕЗ СРОКА'} · COMMUNITY</div><div class="dc-notice__actions"><span class="dc-notice__activity">ИНТЕРЕСНО: ${reactions.length}${mine?` · ОТКЛИКОВ: ${incoming}`:''}</span><button class="dc-board-action small${myReaction?' primary':''}" type="button" data-reaction="${artifact.id}" data-active="${myReaction?'1':'0'}">${myReaction?'✓ ИНТЕРЕСНО':'МНЕ ЭТО НАДО'}</button>${mine?`<button class="dc-board-action small" type="button" data-close-artifact="${artifact.id}">УБРАТЬ</button>`:`<button class="dc-board-action small${myResponse?' primary':''}" type="button" data-response="${artifact.id}" ${myResponse?'disabled':''}>${myResponse?'ОТКЛИК ОТПРАВЛЕН':'ОТКЛИКНУТЬСЯ'}</button>`}${activityLink}<a class="dc-board-action small" href="${route(`/community/artifact/${artifact.id}/`)}">ОТКРЫТЬ</a></div></article>`;
 }
 
 function installNoticeActions(){
   boardHost.querySelectorAll('[data-reaction]').forEach(button=>button.addEventListener('click',()=>toggleReaction(button)));
   boardHost.querySelectorAll('[data-response]').forEach(button=>button.addEventListener('click',()=>openResponse(button)));
   boardHost.querySelectorAll('[data-close-artifact]').forEach(button=>button.addEventListener('click',()=>closeArtifact(button.dataset.closeArtifact)));
+  boardHost.querySelectorAll('[data-admin-close-artifact]').forEach(button=>button.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();closeArtifact(button.dataset.adminCloseArtifact,{admin:true})}));
 }
 
 async function toggleReaction(button){
@@ -191,7 +201,7 @@ async function sendResponse(artifactId,box){
   if(result.error){button.disabled=false;button.textContent='ОТПРАВИТЬ';boardError(result.error,box);return}await loadBoard();
 }
 
-async function refreshAll(){entryStatus=await getEntryStatus(client);boardStatus.textContent=`MEMBER / ACTIVE · SLOTS ${entryStatus.artifact_slots_available??0}`;await Promise.all([renderEntry(),loadBoard()])}
+async function refreshAll(){entryStatus=await getEntryStatus(client);boardStatus.textContent=isOwnerAdmin()?'OWNER ADMIN / BOARD':`MEMBER / ACTIVE · SLOTS ${entryStatus.artifact_slots_available??0}`;await Promise.all([renderEntry(),loadBoard()])}
 
 async function boot(){
   client=getClient();session=await currentSession(client);
@@ -199,11 +209,11 @@ async function boot(){
     boardStatus.textContent='AUTH REQUIRED';memberBadge.textContent='НЕ АВТОРИЗОВАН';entryHost.innerHTML='<div class="dc-first-gate"><div class="dc-first-gate__label">AUTH / REQUIRED</div><div><h2>ДОСКА<br>ЗАКРЫТА.</h2><p>Это внутренняя поверхность Community. Войдите аккаунтом участника.</p><button class="dc-board-action primary" id="boardLogin" type="button">ВОЙТИ ЧЕРЕЗ GOOGLE →</button></div></div>';boardHost.innerHTML='<div class="dc-board-state">СОДЕРЖИМОЕ ДОСКИ ДОСТУПНО ТОЛЬКО УЧАСТНИКАМ.</div>';document.getElementById('boardLogin').onclick=()=>loginWithGoogle('/workspace/board/',client).catch(error=>boardError(error));return;
   }
   entryStatus=await getEntryStatus(client);
-  if(!entryStatus.membership_active){
+  if(!entryStatus.membership_active&&!isOwnerAdmin()){
     boardStatus.textContent='MEMBERSHIP REQUIRED';memberBadge.textContent=session.user.email||'ACCOUNT';entryHost.innerHTML=`<div class="dc-first-gate"><div class="dc-first-gate__label">MEMBERSHIP / REQUIRED</div><div><h2>АККАУНТ<br>ЕЩЁ НЕ КЛУБ.</h2><p>Завершите DC-9 и оформите участие.</p><a class="dc-board-action primary" href="${route('/join/')}">ПРОЙТИ DC-9 →</a></div></div>`;boardHost.innerHTML='<div class="dc-board-state">ACCESS DENIED / COMMUNITY MEMBERS ONLY</div>';return;
   }
   const own=await client.from('dc_member_public_profiles').select('display_name,nickname,avatar_url').eq('profile_id',session.user.id).maybeSingle();
-  memberBadge.textContent=own.data?.display_name?`${own.data.display_name}${own.data.nickname?` / @${own.data.nickname.replace(/^@/,'')}`:''}`:(session.user.user_metadata?.full_name||session.user.email||'MEMBER');
+  memberBadge.textContent=own.data?.display_name?`${own.data.display_name}${own.data.nickname?` / @${own.data.nickname.replace(/^@/,'')}`:''}`:(session.user.user_metadata?.full_name||session.user.email||(isOwnerAdmin()?'OWNER ADMIN':'MEMBER'));
   await refreshAll();
 }
 

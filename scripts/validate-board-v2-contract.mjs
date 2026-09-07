@@ -7,13 +7,17 @@ const read=rel=>{const p=path.join(root,rel);if(!fs.existsSync(p)){fail.push(`mi
 const expect=(ok,msg)=>{if(!ok)fail.push(msg)};
 
 const entry=read('community/board/board-entry-v2.js');
+const board=read('community/board/board.js');
 const guestActions=read('community/board/board-guest-actions-v1.js');
 const migration=read('supabase/migrations/20260906183000_guest_board_interest_v1.sql');
 const responsePolicy=read('supabase/migrations/20260907210040_guest_board_responses_v1.sql');
 const responseRpc=read('supabase/migrations/20260907210333_guest_board_response_rpc_v1.sql');
+const accessV2=read('supabase/migrations/20260907215547_board_access_owner_admin_v2.sql');
+const ownerStorage=read('supabase/migrations/20260907215922_board_owner_admin_storage_v2.sql');
 const entityModel=read('community/board/board-entity-model-v1.js');
 const integrations=read('community/board/board-integrations-v1.js');
 const spatial=read('community/board/board-spatial-v1.js');
+const fullscreen=read('community/board/board-fullscreen-v2-1.js');
 const activation=read('community/board/board-activation-gate-v1.js');
 
 // R9: Guest gets narrow pre-membership interactions, never Member write authority.
@@ -49,6 +53,40 @@ expect(responseRpc.includes('auth.uid()'),'R11: Guest response RPC does not bind
 expect(responseRpc.includes('revoke all on function public.dc_guest_board_response_submit_v1(uuid,text) from public, anon'),'R11: Guest response RPC exposed to public/anon');
 expect(responseRpc.includes('grant execute on function public.dc_guest_board_response_submit_v1(uuid,text) to authenticated'),'R11: Guest response RPC authenticated grant missing');
 
+// R12: FIRST_ARTIFACT_REQUIRED is focus-only. Membership cannot remove Guest interaction rights.
+expect(activation.includes("activationState==='FIRST_ARTIFACT_REQUIRED'"),'R12: first Artifact focus state disappeared');
+expect(activation.includes("FOCUS_DISMISSED_KEY='dc_first_artifact_spotlight_dismissed_v1'"),'R12: session-local first-entry key missing');
+expect(activation.includes("document.querySelector('.dc-spatial-viewport')||entryHost"),'R12: first-entry skip does not prefer visible spatial viewport');
+expect(activation.includes("skip.style.zIndex='32'"),'R12: first-entry skip stacking correction missing');
+expect(!activation.includes('dataset.activationLocked='),'R12: first Artifact still writes an interaction lock');
+expect(activation.includes('delete button.dataset.activationLocked'),'R12: legacy interaction lock is not actively cleaned from reused DOM');
+expect(!activation.includes("setAttribute('aria-disabled','true')"),'R12: first Artifact still sets reaction/response aria-disabled');
+expect(!activation.includes('event.stopImmediatePropagation()'),'R12: activation layer still intercepts reaction/response clicks');
+expect(!activation.includes('Сначала займите своё место'),'R12: legacy interaction-lock copy remains');
+
+// R13: Owner Admin extends canonical Board owners rather than creating parallel state/layout/composer systems.
+expect(accessV2.includes('or (select public.dc_is_owner_admin())'),'R13: Owner Admin is missing from canonical RLS paths');
+expect(accessV2.includes('not (select public.dc_is_owner_admin())'),'R13: Guest response path does not exclude Owner Admin');
+expect(accessV2.includes("raise exception 'MEMBER_USE_CANONICAL_REACTION'"),'R13: Owner Admin can still fall into Guest-interest path');
+expect(accessV2.includes("raise exception 'MEMBER_USE_CANONICAL_RESPONSE'"),'R13: Owner Admin can still fall into Guest-response path');
+expect(accessV2.includes('if not v_owner then')&&accessV2.includes('NO_ARTIFACT_SLOT_AVAILABLE'),'R13: Owner Admin publish does not explicitly bypass slot accounting');
+expect(accessV2.includes("v_owner and a.visibility='community'")&&accessV2.includes("a.status in ('active','expired','archived')"),'R13: Owner Admin close authority is not bounded to Community Board Artifacts');
+expect(!accessV2.includes('create table'),'R13: access patch created a parallel Board table');
+expect(ownerStorage.includes("bucket_id = 'dc-community-artifacts'")&&ownerStorage.includes('(select public.dc_is_owner_admin())'),'R13: Owner Admin storage read/upload does not reuse canonical private Artifact bucket');
+expect(ownerStorage.includes('(storage.foldername(name))[1] = (select auth.uid())::text'),'R13: Owner Admin storage upload is not confined to own auth.uid folder');
+expect(!ownerStorage.includes('create bucket'),'R13: access patch created a parallel storage bucket');
+expect(board.includes("function isOwnerAdmin(){return boardUserState()==='OWNER_ADMIN'}"),'R13: canonical Artifact controller does not resolve Owner Admin state');
+expect(board.includes('data-admin-close-artifact'),'R13: Owner Admin moderation control missing');
+expect(board.includes("!entryStatus.membership_active&&!isOwnerAdmin()"),'R13: Owner Admin without membership is still blocked from canonical Board controller');
+expect(board.includes('OWNER ADMIN / READY'),'R13: Owner Admin does not reuse canonical composer');
+expect(spatial.includes('is-admin-movable'),'R13: spatial owner does not mark Owner Admin movable Artifacts');
+expect(spatial.includes(".dc-notice.is-own-movable,.dc-notice.is-admin-movable"),'R13: spatial drag owner does not include Owner Admin cards');
+expect(spatial.includes("data-artifact-owned=\"1\""),'R13: МОЁ focus can collapse into arbitrary admin-movable card');
+expect(spatial.includes('boardJustDragged'),'R13: drag completion does not suppress accidental fullscreen open');
+expect(spatial.includes("window.addEventListener('dc:board-personal-state',scheduleSpatialRefresh)"),'R13: spatial owner is not synchronized to canonical resolved Board state');
+expect(fullscreen.includes("if(isOwnerAdmin())")&&fullscreen.includes("host.dataset.access='owner-admin'"),'R13: fullscreen primary action does not expose Owner Admin composer');
+expect(fullscreen.includes('interactiveTarget(event.target)'),'R13: fullscreen card-open handler still captures admin controls');
+
 // R8/R5 safety: true filtering + camera/layout contracts remain intact.
 for(const label of ['ВСЁ','ОТ ЛЮДЕЙ','ОТ КЛУБА'])expect(entityModel.includes(label),`R8: primary filter missing ${label}`);
 expect(integrations.includes('card.hidden=hidden'),'R8: filtered cards are not truly hidden');
@@ -56,10 +94,5 @@ expect(integrations.includes("dc:board-layout-request"),'R8: filter/projection l
 expect(spatial.includes('fitActiveContent'),'R5: fitActiveContent missing');
 expect(spatial.includes('data-mine'),'R5: МОЁ camera control missing');
 
-// Compatibility correction: first-entry skip remains on visible spatial Board and keeps session-local key.
-expect(activation.includes("FOCUS_DISMISSED_KEY='dc_first_artifact_spotlight_dismissed_v1'"),'R10 preflight: session-local first-entry key missing');
-expect(activation.includes("document.querySelector('.dc-spatial-viewport')||entryHost"),'R10 preflight: first-entry skip does not prefer visible spatial viewport');
-expect(activation.includes("skip.style.zIndex='32'"),'R10 preflight: first-entry skip stacking correction missing');
-
 if(fail.length){console.error('BOARD V2 CONTRACT BLOCKED');for(const e of fail)console.error(`- ${e}`);process.exit(1)}
-console.log('Board v2 contract PASS: Guest reaction/response boundaries + R8 filters/layout + R5 camera + first-entry compatibility');
+console.log('Board v2 contract PASS: Guest boundaries + monotonic first-Artifact interactions + Owner Admin canonical moderation/layout/storage + R8/R5 safety');
