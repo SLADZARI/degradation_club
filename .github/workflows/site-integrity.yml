@@ -32,6 +32,10 @@ jobs:
         run: node scripts/validate-visual-contract.mjs
       - name: Validate DC-9 immutable baseline contract
         run: node scripts/validate-dc9-baseline-contract.mjs
+      - name: Validate DC-9 account sync integrity
+        run: node scripts/validate-dc9-sync-integrity.mjs
+      - name: Validate Membership semantic authority
+        run: node scripts/validate-membership-semantic-authority.mjs
       - name: Validate Board v2 security and interaction contract
         run: node scripts/validate-board-v2-contract.mjs
       - name: Validate Board v2.1 fullscreen composition contract
@@ -50,6 +54,8 @@ jobs:
         run: |
           npm install --no-save --no-package-lock playwright@1.55.0
           npx playwright install --with-deps chromium webkit
+      - name: Validate DC-9 login sync and cross-device recovery
+        run: node scripts/validate-dc9-sync-browser.mjs
       - name: Validate Board v2.1 fullscreen browser state matrix
         run: node scripts/validate-board-v21-browser.mjs
       - name: Validate browser shell and Workspace recovery

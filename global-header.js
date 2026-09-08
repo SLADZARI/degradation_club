@@ -70,17 +70,11 @@
     const active=row=>row?.status==='active'&&(!row.valid_from||Date.parse(row.valid_from)<=Date.now())&&(!row.valid_to||Date.parse(row.valid_to)>Date.now());
     let clientPromise=null;
 
+    // Supabase session/token lifecycle has one owner. Reuse the shared runtime
+    // provider instead of racing another createClient() against Join/account sync.
     const getClient=async()=>{
       if(window.DEMENTOR_SUPABASE_CLIENT)return window.DEMENTOR_SUPABASE_CLIENT;
-      if(clientPromise)return clientPromise;
-      clientPromise=(async()=>{
-        const cfg=window.DEMENTOR_SITE_CONFIG?.supabase;
-        if(!cfg?.enabled||!cfg.url||!cfg.publishableKey)throw new Error('Supabase configuration unavailable');
-        const {createClient}=await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.4/+esm');
-        const client=createClient(cfg.url,cfg.publishableKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false,flowType:'pkce'}});
-        window.DEMENTOR_SUPABASE_CLIENT=client;
-        return client;
-      })();
+      if(!clientPromise)clientPromise=import('/community-runtime-v1.js').then(mod=>mod.getClient());
       return clientPromise;
     };
 

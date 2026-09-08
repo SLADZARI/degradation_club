@@ -1,5 +1,6 @@
 (()=>{
-  if(!location.pathname.startsWith('/join'))return;
+  const runtimePath=location.pathname.replace(/^\/degradation_club(?=\/|$)/,'')||'/';
+  if(!runtimePath.startsWith('/join'))return;
   let available=true;
   try{
     const key='__dc_storage_probe__';

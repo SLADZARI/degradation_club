@@ -11,6 +11,7 @@ const errorCopy=message=>{
   if(m.includes('ALREADY_MEMBER'))return 'Членство уже активно. Повторная заявка не требуется.';
   if(m.includes('LEGAL_CONSENT_REQUIRED'))return 'Нужно подтвердить условия клуба и политику приватности.';
   if(m.includes('SOCIAL_URL_REQUIRED'))return 'Нужна корректная ссылка на социальную сеть или сайт.';
+  if(m.includes('INTEREST_MAP_REQUIRED')||m.includes('INTEREST_MAP_INVALID_KEYS')||m.includes('INTEREST_MAP_INVALID_VALUE')||m.includes('INTEREST_MAP_TOTAL_INVALID'))return 'Карта интереса должна содержать девять направлений и ровно 100%.';
   return m||'Не удалось отправить заявку.';
 };
 
@@ -43,7 +44,7 @@ function renderForm({client,user,profile}){
     </section>
     <section class="dc-apply-foot">
       <label class="dc-field is-wide"><span>Перед отправкой</span><span><input type="checkbox" name="legal_accepted" required> Подтверждаю <a href="${route('/legal/terms/')}" target="_blank" rel="noopener">условия клуба</a> и <a href="${route('/legal/privacy/')}" target="_blank" rel="noopener">политику приватности</a>.</span></label>
-      <p>Отправка создаёт Membership Application v2 и фиксирует текущий снимок ваших 9/9 результатов. Членство появится только после двух независимых подтверждений дементоров.</p>
+      <p>Отправка создаёт Membership Application v2 и фиксирует первую завершённую карту 9/9. Членство появится только после двух независимых подтверждений дементоров.</p>
       <button class="dc-apply-submit" type="submit">ПОДАТЬ ЗАЯВКУ →</button>
     </section>
   </form>`;
@@ -107,30 +108,23 @@ async function boot(){
     return;
   }
 
+  // apply-entry-v1 synchronizes immutable baseline + repeats before importing this
+  // controller. Keep the existing shared current-map attachment as an idempotent
+  // compatibility guard for shell/release contracts; it uses canonical sphere IDs.
   const uid=user.id;
-  try{
-    // DC-9 may be completed anonymously. Attach local runs to the authenticated
-    // person before evaluating the server-side 9/9 application gate.
-    await syncLocalAssessmentRuns(client,uid);
-  }catch(error){
-    host.innerHTML=`<section class="dc-apply-gate"><div class="dc-apply-kicker">DC-9 / SYNC</div><h2>КАРТА ЕСТЬ.<br>СВЯЗЬ НЕ СОБРАЛАСЬ.</h2><p>Не удалось привязать локальные результаты DC-9 к аккаунту. Заявку пока не отправляем.</p><p><a class="dc-apply-submit" href="${route('/join/result/')}">ВЕРНУТЬСЯ К КАРТЕ →</a></p></section>`;
-    console.warn('[DC apply assessment sync]',error);
-    return;
-  }
-
-  const [{data:profile},{data:membership},{data:applications,error:appError},{data:entryStatus,error:statusError}]=await Promise.all([
+  await syncLocalAssessmentRuns(client,uid);
+  const [{data:profile},{data:applications,error:appError},{data:entryStatus,error:statusError}]=await Promise.all([
     client.from('profiles').select('id,email,full_name,display_name').eq('id',uid).maybeSingle(),
-    client.from('dc_system_memberships').select('status,valid_from,valid_to').eq('profile_id',uid).maybeSingle(),
     client.from('join_applications').select('id,status,created_at,reviewed_at,answers,decision_version').eq('profile_id',uid).order('created_at',{ascending:false}).limit(3),
     client.rpc('dc_member_entry_status_v1')
   ]);
-  if(appError)showError(appError.message);
-  if(statusError)showError(statusError.message);
+  if(appError){showError(appError.message);return}
+  if(statusError){showError(statusError.message);return}
 
-  const member=membership?.status==='active';
+  const member=entryStatus?.membership_active===true;
   const current=applications?.[0]||null;
   const sphereCount=Number(entryStatus?.sphere_count||0);
-  const gateComplete=entryStatus?.sphere_gate_complete===true||sphereCount===9;
+  const gateComplete=entryStatus?.sphere_gate_complete===true;
 
   if(member){
     host.innerHTML=`<section class="dc-apply-done"><div class="dc-apply-kicker">MEMBERSHIP / ACTIVE</div><h2>ВЫ УЖЕ<br>В КЛУБЕ.</h2><p>Повторная заявка не требуется.</p><p><a class="dc-apply-submit" href="${route('/workspace/')}">ОТКРЫТЬ ЛИЧНЫЙ КАБИНЕТ →</a></p></section>`;
