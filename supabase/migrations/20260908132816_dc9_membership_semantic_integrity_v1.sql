@@ -1,6 +1,6 @@
 -- Dementor Club — DC-9 / Membership semantic integrity v1
 -- QA-MEM-037, QA-MEM-038, QA-MEM-039
--- Live applied to production Supabase under version 20260908132816 after transactional dry-run and post-migration smoke checks.
+-- Tracked migration only. Do not apply live without explicit release authorization.
 
 create or replace function public.dc_submit_membership_application_v2(
   p_full_name text,
