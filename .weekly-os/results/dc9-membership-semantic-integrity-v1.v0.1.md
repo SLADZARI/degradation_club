@@ -4,7 +4,7 @@ project: dementor-club
 documentType: RESULT
 projectStage: BUILD
 gate: G3_BUILD
-status: ACTIVE
+status: SUPERSEDED
 version: 0.1
 updated: 2026-09-08
 owner: Modern Pilgrims
@@ -15,6 +15,8 @@ supersedes: null
 
 # MP | Dementor Club | BUILD | DC-9 / Membership Semantic Integrity v1 | v0.1
 
+> SUPERSEDED by v0.2. This historical draft contained the noncanonical gate label `G3_BUILD`. No Product / Domain / Architecture / Design semantics were changed by the correction.
+
 ## Goal
 Remove semantic and state-integrity drift between DC-9 local state, account sync, sphere identity, first-complete baseline, application gate, membership validity, Interest Map server invariants and Supabase client ownership without changing the approved Membership lifecycle.
 
@@ -23,7 +25,7 @@ Protected boundary:
 `AUTHENTICATION ≠ DC9 COMPLETE ≠ APPLICATION ≠ MEMBERSHIP`
 
 ## Status
-**ACTIVE / G3 BUILD**
+**SUPERSEDED / historical G3_BUILD label**
 
 Implementation branch: `agent/dc9-membership-semantic-integrity-v1`  
 Production baseline: `dementor-club-production` @ `a9511a271fbb3524c486c2a9ecd0dc8a3ff22380`  
@@ -81,4 +83,4 @@ Implementation may create a migration file in this branch/PR. That does **not** 
 `commit ≠ merge ≠ database release ≠ deploy`.
 
 ## Gate
-Current: **G3_BUILD**.
+Historical v0.1 label: **G3_BUILD**. Corrected current gate is recorded in v0.2 as **G5_BUILD**.
