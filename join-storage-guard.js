@@ -9,27 +9,26 @@
   }catch(e){available=false;}
   document.documentElement.dataset.dcStorage=available?'available':'unavailable';
 
-  // Temporary compatibility bridge for historical Self-development ids.
-  // Current DC-9 uses `self_development`; keep the old alias readable until G8 cleanup.
-  const syncLegacySphereAlias=()=>{
+  // G8 compatibility cleanup: historical `self-development` results are migrated
+  // once to canonical `self_development`. Keep read compatibility at domain
+  // boundaries, but do not maintain a permanent dual local state.
+  const migrateLegacySphereAlias=()=>{
     if(!available)return;
     try{
       const storageKey='dementorClubOnboardingV3';
       const db=JSON.parse(localStorage.getItem(storageKey)||'null');
       if(!db?.results)return;
       const legacy=db.results['self-development'];
+      if(!legacy)return;
       const canonical=db.results.self_development;
-      if(!legacy&&!canonical)return;
       const stamp=x=>Date.parse(x?.date||0)||0;
       const latest=!canonical||stamp(legacy)>stamp(canonical)?legacy:canonical;
-      let changed=false;
-      if(latest&&JSON.stringify(db.results['self-development'])!==JSON.stringify(latest)){db.results['self-development']=latest;changed=true}
-      if(latest&&JSON.stringify(db.results.self_development)!==JSON.stringify(latest)){db.results.self_development=latest;changed=true}
-      if(changed)localStorage.setItem(storageKey,JSON.stringify(db));
-    }catch(e){console.warn('[DC9 legacy sphere alias]',e)}
+      db.results.self_development=latest;
+      delete db.results['self-development'];
+      localStorage.setItem(storageKey,JSON.stringify(db));
+    }catch(e){console.warn('[DC9 legacy sphere migration]',e)}
   };
-  syncLegacySphereAlias();
-  if(available)setInterval(syncLegacySphereAlias,1200);
+  migrateLegacySphereAlias();
 
   if(available)return;
 

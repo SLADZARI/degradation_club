@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import vm from 'node:vm';
 import {pathToFileURL} from 'node:url';
 
 const root=process.cwd();
@@ -12,6 +13,7 @@ const accountSync=read('dementor-account-sync-v10.js');
 const siteConfig=read('site-config.js');
 const storageGuard=read('join-storage-guard.js');
 const historySync=read('join/apply/dc9-baseline-sync-v1.js');
+const boardFullscreen=read('community/board/board-fullscreen-v2-1.css');
 const temp=path.join(root,'scripts','.dc9-sync-state-validation.mjs');
 fs.writeFileSync(temp,syncSource);
 let domain;
@@ -62,12 +64,40 @@ expect(runs.length>=3,'DC9 sync: completed history collection lost attempts');
 expect(runs.every(x=>x.sphere!=='self-development'&&!x.sourceKey.includes('self-development')),'DC9 sync: a new legacy self-development server source key can still be generated');
 expect(new Set(runs.map(x=>x.sourceKey)).size===runs.length,'DC9 sync: completed run source keys are not deduplicated');
 
+// G8: prove the old local alias is migrated once rather than maintained forever.
+function runStorageGuard(seed){
+  const store=new Map([['dementorClubOnboardingV3',JSON.stringify(seed)]]);
+  const localStorage={
+    getItem:key=>store.has(key)?store.get(key):null,
+    setItem:(key,value)=>store.set(key,String(value)),
+    removeItem:key=>store.delete(key)
+  };
+  const context={
+    location:{pathname:'/join/'},
+    localStorage,
+    document:{documentElement:{dataset:{}},readyState:'complete'},
+    console:{warn(){}}
+  };
+  vm.runInNewContext(storageGuard,context);
+  return JSON.parse(store.get('dementorClubOnboardingV3'));
+}
+const migratedLegacy=runStorageGuard({results:{'self-development':result('2026-09-03T10:00:00Z',3),self_development:result('2026-09-01T10:00:00Z',1)}});
+expect(migratedLegacy.results.self_development?.level===3&&!Object.prototype.hasOwnProperty.call(migratedLegacy.results,'self-development'),'DC9 G8: newer legacy result was not migrated once to canonical self_development');
+const migratedCanonical=runStorageGuard({results:{'self-development':result('2026-09-01T10:00:00Z',1),self_development:result('2026-09-03T10:00:00Z',3)}});
+expect(migratedCanonical.results.self_development?.level===3&&!Object.prototype.hasOwnProperty.call(migratedCanonical.results,'self-development'),'DC9 G8: canonical newer result was not preserved while deleting the legacy alias');
+
 expect(accountSync.includes("getClient")&&!accountSync.includes('createClient('),'DC9 sync: account sync is not using the canonical Supabase client owner');
 expect(accountSync.includes("from '/join/dc9-sync-state-v1.js'"),'DC9 sync: account sync bypasses the canonical state merge primitive');
 expect(siteConfig.includes('/dementor-account-sync-v10.js')&&!siteConfig.includes('/dementor-account-sync-v8.js')&&!siteConfig.includes('/dementor-account-sync-v9.js'),'DC9 sync: site config does not select exactly the v10 account sync owner');
+expect(!fs.existsSync(path.join(root,'dementor-account-sync-v8.js'))&&!fs.existsSync(path.join(root,'dementor-account-sync-v9.js')),'DC9 G8: superseded v8/v9 account sync sources still exist');
 expect(siteConfig.includes("test(runtimePath)"),'DC9 sync: Join loader is not using normalized runtime path');
 expect(storageGuard.includes("replace(/^\\/degradation_club(?=\\/|$)/"),'DC9 sync: storage guard does not normalize the legacy base path');
+expect(storageGuard.includes("delete db.results['self-development']")&&storageGuard.includes('db.results.self_development=latest'),'DC9 G8: storage guard does not perform one-shot canonical result migration');
+expect(!storageGuard.includes('setInterval('),'DC9 G8: periodic legacy alias synchronization still exists');
 expect(historySync.includes("collectCompletedRuns")&&historySync.includes("canonicalSphereId(sphere)"),'DC9 sync: application history sync is not sharing canonical completed-run persistence');
+expect(fs.existsSync(path.join(root,'supabase/migrations/20260908132816_dc9_membership_semantic_integrity_v1.sql')),'DC9 G8: canonical production migration filename is missing');
+expect(!fs.existsSync(path.join(root,'supabase/migrations/20260908135500_dc9_membership_semantic_integrity_v1.sql')),'DC9 G8: superseded migration-history filename still exists');
+expect(!boardFullscreen.includes('width:min(260px,75vw)')&&!boardFullscreen.includes('max-width:75vw!important'),'DC9 G8: temporary Board projection-only CSS workaround survived release reconciliation');
 
 if(errors.length){console.error('DC9 SYNC INTEGRITY BLOCKED');for(const error of errors)console.error(`- ${error}`);process.exit(1)}
-console.log('DC9 sync integrity PASS: drafts + remote recovery + unknown fields + immutable baseline diagnostics + canonical source keys + single Supabase client owner');
+console.log('DC9 sync integrity PASS: drafts + remote recovery + immutable baseline + canonical source keys + one-shot legacy migration + single client owner + G8 entropy checks');
