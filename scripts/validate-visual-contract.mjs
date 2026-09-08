@@ -12,6 +12,7 @@ const styles = read('styles.css');
 const bridge = read('course-bridge-v1.css');
 const home = read('index.html');
 const community = read('community/index.html');
+const communityCss = read('community-v2.css');
 const event = read('events/fuengirola/index.html');
 const relations = read('dementor-relations-v1.js');
 
@@ -43,6 +44,17 @@ must(visual.includes(".dc-home section.dc-event:has(a[href=\"/events/fuengirola/
 must(visual.includes("/assets/people/dementors/valentin/dementor_valentin.webp"), 'Valentin portrait binding missing');
 must((home.match(/<a class="dc-course-prototype__mentor"/g) || []).length === 1, 'Home course must contain exactly one Valentin mentor-card');
 must(!home.includes('Дементор: Валентин Лосев.'), 'Home duplicate textual Valentin attribution must stay removed');
+
+// Community hero owns one semantic source across desktop/mobile layouts.
+must((community.match(/<h1\b/g) || []).length === 1, 'Community hero must contain exactly one h1');
+must((community.match(/community-hero-01\.webp/g) || []).length === 1, 'Community hero image source must occur exactly once');
+must((community.match(/class="hero-ref__lead"/g) || []).length === 1, 'Community hero lead source must occur exactly once');
+must((community.match(/class="hero-ref__copy"/g) || []).length === 1, 'Community hero body-copy source must occur exactly once');
+must(!community.includes('hero-ref__desktop'), 'Community duplicate desktop hero tree must stay removed');
+must(!community.includes('hero-ref__mobile'), 'Community duplicate mobile hero tree must stay removed');
+must(community.includes('hero-ref__content'), 'Community canonical hero content root missing');
+must(communityCss.includes('.hero-ref__content'), 'Community canonical hero CSS owner missing');
+
 must(event.includes('/assets/ink/event-fuengirola-03.webp'), 'Fuengirola approved event asset missing');
 must(event.includes('/assets/people/dementors/gabil/dementor_gabil.webp'), 'Fuengirola Gabil relation portrait missing');
 
@@ -81,6 +93,7 @@ console.log('✓ global visual layer active; legacy course import absent');
 console.log('✓ HERO / MICRO / RELATION / FEATURE contracts present');
 console.log('✓ Home course/person FEATURE and Home event FEATURE bound to approved assets');
 console.log('✓ Home course keeps one Valentin mentor identity');
+console.log('✓ Community hero has one semantic content source across breakpoints');
 console.log('✓ Fuengirola media = canonical asset / top-right / height-first');
 console.log('✓ Fuengirola relation owner is static; runtime duplicate + second dominant Gabil feature absent');
 console.log('✓ Community roster + 4 profile heroes use canonical portraits');
