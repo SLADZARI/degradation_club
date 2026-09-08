@@ -7,12 +7,12 @@
     "projectStage": "BUILD",
     "gate": "G7_RELEASE",
     "status": "APPROVED",
-    "version": "1.26",
+    "version": "1.27",
     "updated": "2026-09-08",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "1.25"
+    "supersedes": "1.26"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -26,7 +26,7 @@
     ".weekly-os/PROJECT.json",
     ".weekly-os/ARTIFACT_INDEX.json",
     ".weekly-os/APPROVED_STATE.json",
-    ".weekly-os/results/dc9-membership-semantic-integrity-v1.v0.4.md",
+    ".weekly-os/results/dc9-membership-semantic-integrity-v1.v0.5.md",
     "operations/QA_DC9_MEMBERSHIP_SEMANTIC_INTEGRITY_2026-09-08.md",
     "operations/QA_DC9_MEMBERSHIP_PATH_MAP_2026-09-08.md",
     "operations/MEMBERSHIP_V2_PRODUCTION_FLOW_QA_2026-09-02.md",
@@ -52,9 +52,9 @@
   "protected": {"PRODUCT": null, "DOMAIN": null, "ARCHITECTURE": null, "DESIGN": null},
   "currentResult": {
     "artifactId": "dementor-club.result.dc9-membership-semantic-integrity-v1",
-    "version": "0.4",
+    "version": "0.5",
     "status": "DRAFT",
-    "path": ".weekly-os/results/dc9-membership-semantic-integrity-v1.v0.4.md",
+    "path": ".weekly-os/results/dc9-membership-semantic-integrity-v1.v0.5.md",
     "gate": "G7_RELEASE",
     "productionBaseCommit": "a9511a271fbb3524c486c2a9ecd0dc8a3ff22380",
     "integrationBranch": "agent/dc9-membership-semantic-integrity-v1",
@@ -71,8 +71,12 @@
     "liveDatabaseMutationAuthorized": true,
     "productionMergeAuthorized": true,
     "productionDeployAuthorized": true,
-    "productionMerged": false,
-    "productionDeployed": false
+    "productionMerged": true,
+    "productionCommit": "472882c95ffd1d9fae165edf4dcaf4e1865337a9",
+    "productionDeployed": false,
+    "productionDeployStatus": "PENDING_WORKFLOW_DISPATCH",
+    "productionDeployWorkflow": ".github/workflows/deploy-pages.yml",
+    "productionDeployRequiredInput": "release_confirmation=APPROVED"
   },
   "waitingResults": [
     {
