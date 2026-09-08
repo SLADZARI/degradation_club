@@ -35,9 +35,9 @@ export function deriveBoardUserState({session,entryStatus,application,roles=[]}=
     return BOARD_USER_STATES.APPLICANT;
   }
 
-  const sphereCount=Number(entryStatus?.sphere_count||0);
-  const complete=entryStatus?.sphere_gate_complete===true||sphereCount===9;
-  return complete
+  // sphere_count is informative UI progress only. Permission completion is owned
+  // by the canonical server first-complete baseline exposed as sphere_gate_complete.
+  return entryStatus?.sphere_gate_complete===true
     ?BOARD_USER_STATES.AUTHENTICATED_GUEST_DC9_COMPLETE
     :BOARD_USER_STATES.AUTHENTICATED_GUEST_DC9_INCOMPLETE;
 }
