@@ -208,8 +208,13 @@ declare
   v_baseline jsonb;
   v_snapshot jsonb := '{}'::jsonb;
   v_snapshot_key_count integer := 0;
+  v_completed text[] := array[]::text[];
+  v_missing text[] := array[]::text[];
   v_sphere_count integer := 0;
   v_sphere_gate_complete boolean := false;
+  v_identity_ready boolean := false;
+  v_legal_ready boolean := false;
+  v_membership_status text;
   v_membership_active boolean := false;
   v_published_artifact_count integer := 0;
   v_granted_slots integer := 0;
@@ -219,22 +224,36 @@ declare
 begin
   if v_uid is null then raise exception 'AUTH_REQUIRED'; end if;
 
-  -- Informational progress count is canonicalized and version-scoped, but it does
-  -- not define permission completion. Only the immutable baseline does that.
-  select count(distinct case
-    when ar.sphere_id = 'self-development' then 'self_development'
-    else ar.sphere_id
-  end)::integer
-  into v_sphere_count
-  from public.assessment_runs ar
-  where ar.profile_id = v_uid
-    and ar.completed_at is not null
-    and ar.assessment_version = 'dc9-v1'
-    and ar.sphere_id = any(array[
-      'personality','work','consumption','relationships','control','information',
-      'self_development','self-development','meaning','technology'
-    ]::text[]);
+  -- Preserve the existing informative response contract, but canonicalize legacy
+  -- sphere ids and scope progress to the canonical DC-9 assessment version.
+  select coalesce(array_agg(x.sphere_id order by x.sphere_id),array[]::text[])
+  into v_completed
+  from (
+    select distinct case
+      when ar.sphere_id = 'self-development' then 'self_development'
+      else ar.sphere_id
+    end as sphere_id
+    from public.assessment_runs ar
+    where ar.profile_id = v_uid
+      and ar.completed_at is not null
+      and ar.assessment_version = 'dc9-v1'
+      and ar.sphere_id = any(array[
+        'personality','work','consumption','relationships','control','information',
+        'self_development','self-development','meaning','technology'
+      ]::text[])
+  ) x;
 
+  v_sphere_count := coalesce(array_length(v_completed,1),0);
+
+  select coalesce(array_agg(s order by s),array[]::text[])
+  into v_missing
+  from unnest(array[
+    'personality','work','consumption','relationships','control','information',
+    'self_development','meaning','technology'
+  ]::text[]) s
+  where not (s = any(v_completed));
+
+  -- Permission completion is owned only by the immutable first-complete baseline.
   v_baseline := public.dc_first_complete_baseline_v1(v_uid);
   if v_baseline is not null then
     v_snapshot := coalesce(v_baseline->'snapshot','{}'::jsonb);
@@ -252,6 +271,31 @@ begin
         )
       );
   end if;
+
+  select exists (
+    select 1
+    from public.profiles p
+    where p.id = v_uid
+      and nullif(btrim(p.display_name),'') is not null
+  ) and exists (
+    select 1
+    from public.dc_member_external_identities i
+    where i.profile_id = v_uid and i.is_primary
+  ) into v_identity_ready;
+
+  select exists (
+    select 1
+    from public.dc_member_legal_acknowledgements l
+    where l.profile_id = v_uid
+      and l.terms_version = '0.2'
+      and l.privacy_version = '0.2'
+  ) into v_legal_ready;
+
+  -- Keep raw lifecycle status for backwards-compatible informational consumers,
+  -- while all permission decisions use the validity-window boolean below.
+  select m.status into v_membership_status
+  from public.dc_system_memberships m
+  where m.profile_id = v_uid;
 
   v_membership_active := public.dc_membership_active(v_uid);
 
@@ -272,22 +316,30 @@ begin
     and (a.expires_at is null or a.expires_at > now());
 
   v_artifact_slots_available := greatest(v_granted_slots - v_consuming_slots,0);
-  if v_membership_active then
-    v_community_activation_state := case
-      when v_published_artifact_count > 0 then 'MEMBER_ACTIVATED'
-      else 'FIRST_ARTIFACT_REQUIRED'
-    end;
-  end if;
+
+  v_community_activation_state := case
+    when v_membership_active and v_published_artifact_count > 0 then 'MEMBER_ACTIVATED'
+    when v_membership_active then 'FIRST_ARTIFACT_REQUIRED'
+    when v_sphere_gate_complete then 'IDENTITY_REQUIRED'
+    else 'SPHERES_IN_PROGRESS'
+  end;
 
   return jsonb_build_object(
     'assessment_version','dc9-v1',
     'sphere_count',v_sphere_count,
+    'completed_spheres',v_completed,
+    'missing_spheres',v_missing,
     'sphere_gate_complete',v_sphere_gate_complete,
     'baseline_completed_at',v_baseline->>'completed_at',
+    'identity_ready',v_identity_ready,
+    'legal_ready',v_legal_ready,
+    'membership_status',v_membership_status,
     'membership_active',v_membership_active,
-    'community_activation_state',v_community_activation_state,
+    'artifact_slots_granted',v_granted_slots,
+    'artifact_slots_consuming',v_consuming_slots,
     'artifact_slots_available',v_artifact_slots_available,
-    'published_artifact_count',v_published_artifact_count
+    'published_artifact_count',v_published_artifact_count,
+    'community_activation_state',v_community_activation_state
   );
 end;
 $function$;
@@ -296,4 +348,4 @@ revoke all on function public.dc_member_entry_status_v1() from public, anon;
 grant execute on function public.dc_member_entry_status_v1() to authenticated;
 
 comment on function public.dc_member_entry_status_v1() is
-'DC-9 / Membership semantic authority: first-complete baseline gate + validity-window membership + existing first-Artifact activation projection.';
+'DC-9 / Membership semantic authority: preserves Entry Status response shape while using first-complete baseline gate + validity-window membership + existing first-Artifact activation projection.';
