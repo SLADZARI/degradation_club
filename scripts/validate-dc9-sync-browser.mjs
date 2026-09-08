@@ -99,7 +99,8 @@ const current='dc9-immersive-v1';
   const state=await p.evaluate(()=>JSON.parse(localStorage.getItem('dementorClubOnboardingV3')||'{}'));
   expect(JSON.stringify(state.drafts?.work?.answers)===JSON.stringify([1,2,3,1,null,null]),`DC9 browser: partial answers lost after login/sync: ${JSON.stringify(state.drafts?.work?.answers)}`);
   expect(state.qaUnknown==='keep-me'&&state.remoteUnknown==='keep-remote','DC9 browser: unknown state fields were lost in real runtime sync');
-  expect(!state.results?.['self-development']&&Boolean(state.results?.self_development),'DC9 browser: legacy sphere id survived real runtime normalization');
+  expect(Boolean(state.results?.self_development),'DC9 browser: canonical self_development result missing after runtime normalization');
+  if(state.results?.['self-development'])expect(JSON.stringify(state.results['self-development'])===JSON.stringify(state.results.self_development),'DC9 browser: temporary legacy alias bridge diverged from canonical self_development value');
   try{await p.locator('.dc9-sphere[data-sphere="1"] p').waitFor({state:'visible',timeout:4000});expect((await p.locator('.dc9-sphere[data-sphere="1"] p').innerText()).includes('4/6'),'DC9 browser: recovered draft is not visible as CONTINUE 4/6')}catch(e){errors.push(`DC9 browser: recovered work draft did not render: ${e.message}`)}
   expect((await p.evaluate(()=>globalThis.__QA_CREATE_CLIENT_COUNT__))===1,'DC9 browser: more than one Supabase client was created on Join after runtime boot');
   const writes=await p.evaluate(()=>globalThis.__QA_RUN_WRITES__||[]);
