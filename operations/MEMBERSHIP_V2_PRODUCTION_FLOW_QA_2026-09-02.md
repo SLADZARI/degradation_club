@@ -1,12 +1,12 @@
 # Dementor Club — Production Flow QA Ledger
 
-Status: **ACTIVE / MEMBERSHIP V2 CORE PASS / BATCH 04 LIVE / BATCH 05 MERGED NOT DEPLOYED / QA PORTAL HARMONIZATION ACTIVE / ARTIFACT HISTORY SITE G6 PASS / WEBKIT AUTH SITE G6 PASS / ACTIVITY SITE G6 PASS / DC-9 BASELINE SITE G6 PASS**  
+Status: **ACTIVE / MEMBERSHIP V2 CORE PASS / DC-9 SEMANTIC INTEGRITY QA-MEM-035…042 CLOSED / G8 COMPLETE / BOARD RESULT WAITING**  
 Date opened: **2026-09-02**  
-Last live regression pass: **2026-09-03**  
-Operating update: **2026-09-05**  
+Last live regression pass: **2026-09-08**  
+Operating update: **2026-09-08**  
 Environment: **PRODUCTION / https://dementor.club**  
 Source of truth: `dementor-club`  
-Implementation branch: `dementor-club-site`  
+Implementation branch: **per Result; closed DC-9 Result has no active integration branch**  
 Production branch: `dementor-club-production`
 
 ## 0. Purpose and release rule
@@ -18,6 +18,8 @@ A finding is closed only after root cause → implementation → release gates �
 **Deployment is always manual. QA work must not deploy by itself.**
 
 From 2026-09-04, Dementor Club QA also acts as a controlled project-harmonization loop. A bug is not implemented directly from observation. Before implementation, the project must resolve existing ownership, canonical semantics, duplicate risk, affected routes/surfaces and the current Result/Gate.
+
+**Current-status rule:** dated sections below are preserved as historical evidence. Where an older release-state sentence conflicts with §18, §18 is the current reconciliation for DC-9 / Membership Semantic Integrity and QA-MEM-035…042.
 
 ## 1. Canonical Membership v2 flow
 
@@ -747,3 +749,116 @@ Next harmonized priorities:
 3. when ready, create that candidate **from the current `dementor-club-production` baseline**, transfer only validated current-Result files/migration, run full production readiness, then stop for explicit user authorization before applying the Supabase migration or deploying the site;
 4. after release, live-retest real Safari auth, first-baseline → repeat → application snapshot, Header/Workspace, My Activity, My Artifacts and QA-MEM-033;
 5. perform G8 cleanup including legacy Join/member compatibility, dead picker-copy/runtime state, stale branches and any superseded shell/auth code.
+
+## 18. DC-9 / Membership Semantic Integrity — final reconciliation 2026-09-08
+
+Status: **CLOSED / RELEASED / LIVE VALIDATED / G8 COMPLETE**
+
+Result:
+`dementor-club.result.dc9-membership-semantic-integrity-v1` **v1.0**.
+
+This section supersedes conflicting earlier dated release-state statements for the DC-9 semantic-integrity cluster. Historical sections are retained as evidence of how the defects were discovered and evolved.
+
+### Release evidence
+
+Canonical DB migration:
+`supabase/migrations/20260908132816_dc9_membership_semantic_integrity_v1.sql`  
+Live migration registry version: `20260908132816`.
+
+Primary validated candidate:
+`7a7db50038e14e89c7ac85c28311a61a992eb49a`  
+Site Integrity / Release Readiness **#893** (`34256560528`) — **SUCCESS**.
+
+Primary production merge:
+`472882c95ffd1d9fae165edf4dcaf4e1865337a9` via PR **#136**.  
+Manual deploy **#48** (`34258541128`) — **SUCCESS**.  
+Pages artifact: `10068871371`.
+
+G8 cleanup candidate:
+`ca84a64fdeb8579bb686e9e4e584d5ac4b648399`  
+Site Integrity / Release Readiness **#894** (`34267025765`) — **SUCCESS**.
+
+Cleanup PR **#137** merged to production as:
+`b1ed177564581c820e3739e70404957108157af1`.
+
+Manual cleanup deploy **#49** (`34272073283`) — **SUCCESS**.  
+Pages artifact: `10074208550`.  
+Digest: `sha256:2c442117c6d2e67dac272914fc1e9294ebc3d1662cafb4c2e3e556e85cb9d195`.
+
+The workflow-dispatch run is recorded by GitHub under `main`, but build logs explicitly checkout `dementor-club-production` and report exact content commit `b1ed177564581c820e3739e70404957108157af1`; therefore the workflow-dispatch head SHA is not used as production-content provenance.
+
+### Live evidence
+
+Real user-browser validation on 2026-09-08 confirmed:
+- Guest `/join/` opens without login;
+- partial DC-9 draft survives reload;
+- accepted current reload UX is picker-first: reload returns to sphere picker, displays `ПРОДОЛЖИТЬ · N/6`, then resumes at the first unanswered question;
+- login → Workspace recovery works;
+- session/state persists after logout/login smoke;
+- active Member `/join/apply/` correctly shows membership active and does not offer a duplicate application;
+- Workspace / Board desktop and mobile spot-checks pass;
+- strict cross-device DC-9 sync passes phone → desktop;
+- Board card drag/reposition persists phone → desktop;
+- after cleanup deploy #49, final smoke of Join/DC-9, Workspace/Board and active-Member application guard was reported by the project owner as **“всё работает”**.
+
+### QA-MEM-035 — Account sync can destroy unfinished DC-9 progress
+Status: **CLOSED / RELEASED / LIVE CROSS-DEVICE PASS** · P0 DATA INTEGRITY
+
+Canonical merge preserves drafts, results, active pointer validity, quizVersion, legacyActive, immutable firstBaseline, repeatRuns and unknown top-level keys. Guest partial-progress reload and phone → desktop authenticated recovery both passed live.
+
+### QA-MEM-036 — Legacy sphere alias can create duplicate semantic assessment runs
+Status: **CLOSED / RELEASED / G8 CLEANUP COMPLETE** · P0/P1 DATA SEMANTICS
+
+`self-development` is normalized to canonical `self_development` before persistence/source-key identity. G8 removed account-sync v8/v9 and replaced the permanent alias interval writer with one-shot compatibility migration. Legacy reading remains only where compatibility requires it.
+
+### QA-MEM-037 — Application and Entry Status use a second, stale 9/9 model
+Status: **CLOSED / LIVE DB AUTHORITY PASS** · P0/P1 ADMISSION AUTHORITY
+
+Application permission and Entry Status permission meaning now use the same first-complete baseline primitive. Post-migration smoke confirmed canonical complete/incomplete Entry Status behavior and application guards. No synthetic successful production application was fabricated where no suitable real non-member 9/9 profile existed.
+
+### QA-MEM-038 — Interest Map invariant exists only in UI
+Status: **CLOSED / SERVER AUTHORITY RELEASED** · P1 DOMAIN BOUNDARY
+
+The live application RPC now contains the server-side nine-key/integer/range/total invariant and stable error branches. G6 semantic-authority validation and the released migration protect the contract. No destructive production fixture was fabricated solely to exercise invalid-map writes.
+
+### QA-MEM-039 — Active membership meaning is inconsistent across runtime/RPCs
+Status: **CLOSED / LIVE DB FORMULA PASS / LIVE APPLICATION GUARD PASS** · P0/P1 ACCESS STATE
+
+Server decisions use `public.dc_membership_active(profile_id)`. Production helper output matched the explicit validity-window formula for current rows, and the active-Member `/join/apply/` guard passed live.
+
+### QA-MEM-040 — Legacy `/degradation_club/` path handling is inconsistent in Join storage guard
+Status: **CLOSED / RELEASED / COMPATIBILITY NORMALIZED** · P2
+
+Join storage handling accepts the historical base-path shape at the compatibility boundary without making `/degradation_club/` canonical or adding another router.
+
+### QA-MEM-041 — Supabase client ownership is duplicated by account sync
+Status: **CLOSED / RELEASED / LIVE AUTH+SYNC PASS** · P1 AUTH RUNTIME OWNERSHIP
+
+Canonical owner is `community-runtime-v1.js → getClient()`. Account sync v10 reuses that client; v8/v9 are removed from production. Login/session and cross-device sync smoke passed after release.
+
+### QA-MEM-042 — Existing DC-9 QA contract does not cover semantic-integrity risks
+Status: **CLOSED / PERMANENT G6 COVERAGE ACTIVE** · P1 RELEASE INTEGRITY
+
+Executable coverage now includes DC-9 sync integrity and Membership semantic authority. Full Site Integrity #893 passed the released candidate; G8 cleanup extended the entropy contract and full Site Integrity #894 passed the exact cleanup candidate.
+
+### QA-MEM-034 reconciliation note
+
+Older QA-MEM-034 statements saying the baseline migration was not applied/not deployed are historical and no longer current. The canonical first-complete baseline primitive and the semantic-integrity migration are live. Immutable baseline/repeat/reset behavior remains executable G6 coverage. A fabricated production non-member 9/9 successful application was intentionally not created solely for QA; repeat-history UX remains a separate product-history concern under QA-MEM-004.
+
+### G8 entropy result
+
+Removed from production:
+- `dementor-account-sync-v8.js`;
+- `dementor-account-sync-v9.js`;
+- permanent 1200 ms `self-development ↔ self_development` dual writer.
+
+Intentionally retained:
+- `join/apply/apply.js → syncLocalAssessmentRuns()` as an idempotent current-map compatibility guard because safe removal was not independently proven.
+
+Branch audit was completed. Old merged implementation branches are no longer active integration/runtime owners. Divergent historical handoff/evidence branches were not blindly deleted. The current connector did not expose branch deletion, so physical branch removal is repository hygiene rather than an unresolved runtime owner.
+
+### Result boundary
+
+This closure does **not** close `dementor-club.result.board-access-control-v2`. Board remains **WAITING** for its residual authenticated Guest / State5 / OwnerAdmin role-state retests, even though mobile Board spot-check and phone → desktop card-position persistence are now live-confirmed.
+
+**QA-MEM-035…042 are closed. DC-9 / Membership Semantic Integrity Result is closed at G8_CLEANUP.**
