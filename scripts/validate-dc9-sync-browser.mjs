@@ -40,7 +40,7 @@ const supabaseStub=()=>`
       },
       upsert(payload){
         if(table==='assessment_runs')globalThis.__QA_RUN_WRITES__.push(payload);
-        if(table==='assessment_snapshots')globalThis.__QA_REMOTE_WRITTEN__=payload.state_json;
+        if(table==='assessment_snapshots')globalThis.__QA_REMOTE_STATE__=payload.state_json;
         return Promise.resolve({data:payload,error:null});
       },
       then(resolve,reject){return Promise.resolve({data:rows,error:null}).then(resolve,reject)}
@@ -67,6 +67,21 @@ async function context({localState,remoteState}){
   return c;
 }
 
+async function waitForSyncBoot(page,label,timeout=12000){
+  const deadline=Date.now()+timeout;
+  while(Date.now()<deadline){
+    try{
+      const ready=await page.evaluate(()=>Boolean(globalThis.__DC_AUTH_TRACE__?.some(x=>x.step==='boot-done')));
+      if(ready){await page.waitForTimeout(150);return true}
+    }catch(error){
+      if(!/Execution context was destroyed|Target page, context or browser has been closed/i.test(String(error?.message||error)))throw error;
+    }
+    await page.waitForTimeout(100).catch(()=>{});
+  }
+  errors.push(label);
+  return false;
+}
+
 const current='dc9-immersive-v1';
 // Partial local progress + remote answers: login/sync must preserve both and the reloaded
 // DC-9 picker must expose the recovered 4/6 draft.
@@ -75,7 +90,7 @@ const current='dc9-immersive-v1';
   const remoteState={quizVersion:current,results:{self_development:{date:'2026-09-01T10:00:00Z',level:1}},drafts:{work:{quizVersion:current,sphere:'work',answers:[null,null,3,1,null,null],startedAt:'2026-09-08T09:30:00Z',updatedAt:'2026-09-08T11:00:00Z'}},active:{quizVersion:current,sphere:'work',index:3,updatedAt:'2026-09-08T11:00:00Z'},remoteUnknown:'keep-remote'};
   const c=await context({localState,remoteState}),p=await c.newPage(),pageErrors=[];p.on('pageerror',e=>pageErrors.push(e.message));
   await p.goto(base+'/join/',{waitUntil:'domcontentloaded'});
-  try{await p.waitForFunction(()=>globalThis.__DC_AUTH_TRACE__?.some(x=>x.step==='boot-done'),{timeout:10000})}catch{errors.push('DC9 browser: canonical account sync did not finish after remote recovery')}
+  await waitForSyncBoot(p,'DC9 browser: canonical account sync did not finish after remote recovery');
   const state=await p.evaluate(()=>JSON.parse(localStorage.getItem('dementorClubOnboardingV3')||'{}'));
   expect(JSON.stringify(state.drafts?.work?.answers)===JSON.stringify([1,2,3,1,null,null]),`DC9 browser: partial answers lost after login/sync: ${JSON.stringify(state.drafts?.work?.answers)}`);
   expect(state.qaUnknown==='keep-me'&&state.remoteUnknown==='keep-remote','DC9 browser: unknown state fields were lost in real runtime sync');
@@ -93,7 +108,7 @@ const current='dc9-immersive-v1';
   const remoteState={quizVersion:current,drafts:{control:{quizVersion:current,sphere:'control',answers:[2,1,3,null,null,null],startedAt:'2026-09-08T08:00:00Z',updatedAt:'2026-09-08T12:00:00Z'}},active:{quizVersion:current,sphere:'control',index:3,updatedAt:'2026-09-08T12:00:00Z'},results:{}};
   const c=await context({localState:null,remoteState}),p=await c.newPage(),pageErrors=[];p.on('pageerror',e=>pageErrors.push(e.message));
   await p.goto(base+'/join/',{waitUntil:'domcontentloaded'});
-  try{await p.waitForFunction(()=>globalThis.__DC_AUTH_TRACE__?.some(x=>x.step==='boot-done'),{timeout:10000})}catch{errors.push('DC9 browser: clean-device remote sync did not finish')}
+  await waitForSyncBoot(p,'DC9 browser: clean-device remote sync did not finish');
   const state=await p.evaluate(()=>JSON.parse(localStorage.getItem('dementorClubOnboardingV3')||'{}'));
   expect(JSON.stringify(state.drafts?.control?.answers)===JSON.stringify([2,1,3,null,null,null]),'DC9 browser: remote-only draft was not restored on clean device');
   try{expect((await p.locator('.dc9-sphere[data-sphere="4"] p').innerText()).includes('3/6'),'DC9 browser: clean-device recovered draft is not resumable in picker')}catch(e){errors.push(`DC9 browser: clean-device draft did not render: ${e.message}`)}
