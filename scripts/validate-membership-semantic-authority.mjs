@@ -8,6 +8,8 @@ const read=rel=>fs.readFileSync(path.join(root,rel),'utf8');
 const migration=read('supabase/migrations/20260908135500_dc9_membership_semantic_integrity_v1.sql');
 const apply=read('join/apply/apply.js');
 const board=read('community/board/board-user-state-v2.js');
+const applyEntry=read('join/apply/apply-entry-v1.js');
+const historySync=read('join/apply/dc9-baseline-sync-v1.js');
 
 expect(migration.includes('create or replace function public.dc_submit_membership_application_v2'),'Membership authority: application RPC replacement missing');
 expect(migration.includes('v_baseline := public.dc_first_complete_baseline_v1(v_uid)'),'Membership authority: application eligibility does not use first-complete baseline');
@@ -30,11 +32,12 @@ expect(migration.includes("when v_published_artifact_count > 0 then 'MEMBER_ACTI
 
 expect(apply.includes("const member=entryStatus?.membership_active===true")&&!apply.includes("membership?.status==='active'"),'Membership UI: raw membership status still defines active membership');
 expect(apply.includes("const gateComplete=entryStatus?.sphere_gate_complete===true")&&!apply.includes('sphereCount===9'),'Membership UI: raw progress count can still redefine application permission');
-expect(!apply.includes('syncLocalAssessmentRuns'),'Membership UI: duplicate application assessment-sync owner survived');
+expect(applyEntry.includes('await syncDc9LocalHistory')&&historySync.includes('collectCompletedRuns'),'Membership UI: full baseline/repeat history is not synchronized by the guarded application entry');
+expect(apply.includes('await syncLocalAssessmentRuns(client,uid)'),'Membership UI: canonical current-map compatibility attachment before Entry Status is missing');
 expect(board.includes("entryStatus?.sphere_gate_complete===true")&&!board.includes('sphereCount===9'),'Board state: raw progress count can still redefine DC9-complete permission');
 
 // Local DB execution is deliberately not faked here. This contract protects the tracked
 // migration shape; SQL execution belongs to local Supabase when its harness is available,
 // then to the separately authorized release/live-retest path.
 if(errors.length){console.error('MEMBERSHIP SEMANTIC AUTHORITY BLOCKED');for(const error of errors)console.error(`- ${error}`);process.exit(1)}
-console.log('Membership semantic authority PASS: one DC9 baseline gate + backend Interest Map invariant + validity-window membership + client consumers');
+console.log('Membership semantic authority PASS: one DC9 baseline gate + backend Interest Map invariant + validity-window membership + guarded history sync + client consumers');
