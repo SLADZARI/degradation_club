@@ -13,6 +13,7 @@ const bridge = read('course-bridge-v1.css');
 const home = read('index.html');
 const community = read('community/index.html');
 const event = read('events/fuengirola/index.html');
+const relations = read('dementor-relations-v1.js');
 
 const tokens = {
   valentin: '#EFE5D3',
@@ -43,6 +44,14 @@ must(visual.includes("/assets/people/dementors/valentin/dementor_valentin.webp")
 must(event.includes('/assets/ink/event-fuengirola-03.webp'), 'Fuengirola approved event asset missing');
 must(event.includes('/assets/people/dementors/gabil/dementor_gabil.webp'), 'Fuengirola Gabil relation portrait missing');
 
+// Public-site harmonization: Fuengirola owns one static event→Gabil relation.
+// Guard runtime ownership and editorial identity density as separate invariants.
+must((event.match(/dc-event-hero__relation/g) || []).length === 1, 'Fuengirola must contain exactly one static event→Gabil relation');
+must(!relations.includes("if(path==='/events/fuengirola/')"), 'Fuengirola route-specific relation injection must stay retired');
+must(!event.includes('dc-dementor-feature--gabil'), 'Fuengirola second dominant Gabil feature must stay removed');
+must(!event.includes('participant relation from entity record'), 'Fuengirola internal entity-record copy leaked into public UI');
+must(event.includes('ДЕМЕНТОР СОБЫТИЯ'), 'Fuengirola compact public relation label missing');
+
 const portraitPath = (name) => `/assets/people/dementors/${name}/dementor_${name}.webp`;
 const hasPortrait = (html, name) => html.includes(portraitPath(name));
 
@@ -70,5 +79,6 @@ console.log('✓ global visual layer active; legacy course import absent');
 console.log('✓ HERO / MICRO / RELATION / FEATURE contracts present');
 console.log('✓ Home course/person FEATURE and Home event FEATURE bound to approved assets');
 console.log('✓ Fuengirola media = canonical asset / top-right / height-first');
+console.log('✓ Fuengirola relation owner is static; runtime duplicate + second dominant Gabil feature absent');
 console.log('✓ Community roster + 4 profile heroes use canonical portraits');
 console.log('0 error(s)');
