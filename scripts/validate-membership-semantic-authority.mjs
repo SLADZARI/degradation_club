@@ -5,7 +5,7 @@ const root=process.cwd();
 const errors=[];
 const expect=(ok,message)=>{if(!ok)errors.push(message)};
 const read=rel=>fs.readFileSync(path.join(root,rel),'utf8');
-const migration=read('supabase/migrations/20260908135500_dc9_membership_semantic_integrity_v1.sql');
+const migration=read('supabase/migrations/20260908132816_dc9_membership_semantic_integrity_v1.sql');
 const apply=read('join/apply/apply.js');
 const board=read('community/board/board-user-state-v2.js');
 const applyEntry=read('join/apply/apply-entry-v1.js');
