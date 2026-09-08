@@ -7,12 +7,12 @@
     "projectStage": "BUILD",
     "gate": "G7_RELEASE",
     "status": "APPROVED",
-    "version": "1.27",
+    "version": "1.28",
     "updated": "2026-09-08",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "1.26"
+    "supersedes": "1.27"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -26,7 +26,7 @@
     ".weekly-os/PROJECT.json",
     ".weekly-os/ARTIFACT_INDEX.json",
     ".weekly-os/APPROVED_STATE.json",
-    ".weekly-os/results/dc9-membership-semantic-integrity-v1.v0.5.md",
+    ".weekly-os/results/dc9-membership-semantic-integrity-v1.v0.6.md",
     "operations/QA_DC9_MEMBERSHIP_SEMANTIC_INTEGRITY_2026-09-08.md",
     "operations/QA_DC9_MEMBERSHIP_PATH_MAP_2026-09-08.md",
     "operations/MEMBERSHIP_V2_PRODUCTION_FLOW_QA_2026-09-02.md",
@@ -52,9 +52,9 @@
   "protected": {"PRODUCT": null, "DOMAIN": null, "ARCHITECTURE": null, "DESIGN": null},
   "currentResult": {
     "artifactId": "dementor-club.result.dc9-membership-semantic-integrity-v1",
-    "version": "0.5",
+    "version": "0.6",
     "status": "DRAFT",
-    "path": ".weekly-os/results/dc9-membership-semantic-integrity-v1.v0.5.md",
+    "path": ".weekly-os/results/dc9-membership-semantic-integrity-v1.v0.6.md",
     "gate": "G7_RELEASE",
     "productionBaseCommit": "a9511a271fbb3524c486c2a9ecd0dc8a3ff22380",
     "integrationBranch": "agent/dc9-membership-semantic-integrity-v1",
@@ -73,10 +73,15 @@
     "productionDeployAuthorized": true,
     "productionMerged": true,
     "productionCommit": "472882c95ffd1d9fae165edf4dcaf4e1865337a9",
-    "productionDeployed": false,
-    "productionDeployStatus": "PENDING_WORKFLOW_DISPATCH",
-    "productionDeployWorkflow": ".github/workflows/deploy-pages.yml",
-    "productionDeployRequiredInput": "release_confirmation=APPROVED"
+    "productionDeployed": true,
+    "productionDeployStatus": "SUCCESS",
+    "productionDeployWorkflow": ".github/workflows/deploy-production.yml",
+    "productionDeployRun": 48,
+    "productionDeployRunId": 34258541128,
+    "pagesArtifactId": 10068871371,
+    "productionDeployRequiredInput": "release_confirmation=APPROVED",
+    "productionDeploySourceCheckout": "472882c95ffd1d9fae165edf4dcaf4e1865337a9",
+    "liveFunctionalRetest": "PENDING_RUNTIME_ACCESS"
   },
   "waitingResults": [
     {
@@ -92,7 +97,7 @@
       "note": "Released and partially live-retested. Own-Artifact locator corrective is live-confirmed. Residual authenticated Guest / State5 / OwnerAdmin / mobile / drag-reload retests remain open; Result is not DONE or G8 closed."
     }
   ],
-  "activeIntegrationBranch": "agent/dc9-membership-semantic-integrity-v1",
+  "activeIntegrationBranch": null,
   "activeReleaseBranch": null,
   "reportPath": "operations/MEMBERSHIP_V2_PRODUCTION_FLOW_QA_2026-09-02.md",
   "completedResults": [
@@ -114,6 +119,7 @@
     "live Supabase migration from a committed migration file",
     "SQL runtime validation from static migration-shape contracts alone",
     "authenticated live role validation from G6 browser mocks alone",
+    "live functional success from GitHub Pages deployment success alone",
     "Board Result DONE/G8 closure from WAITING status or partial live retest",
     "authorization to mutate live Supabase, merge production or deploy from activation or G6 validation of the DC-9 integrity Result",
     "WeeklyOS runtime source_ref correction from kernel migration",
