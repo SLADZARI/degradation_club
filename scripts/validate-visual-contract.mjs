@@ -46,7 +46,7 @@ must(event.includes('/assets/people/dementors/gabil/dementor_gabil.webp'), 'Fuen
 
 // Public-site harmonization: Fuengirola owns one static event→Gabil relation.
 // Guard runtime ownership and editorial identity density as separate invariants.
-must((event.match(/dc-event-hero__relation/g) || []).length === 1, 'Fuengirola must contain exactly one static event→Gabil relation');
+must((event.match(/<a class="dc-event-hero__relation\b/g) || []).length === 1, 'Fuengirola must contain exactly one static event→Gabil relation');
 must(!relations.includes("if(path==='/events/fuengirola/')"), 'Fuengirola route-specific relation injection must stay retired');
 must(!event.includes('dc-dementor-feature--gabil'), 'Fuengirola second dominant Gabil feature must stay removed');
 must(!event.includes('participant relation from entity record'), 'Fuengirola internal entity-record copy leaked into public UI');
