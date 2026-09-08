@@ -5,14 +5,14 @@
     "project": "dementor-club",
     "documentType": "STANDARD",
     "projectStage": "BUILD",
-    "gate": "G7_RELEASE",
+    "gate": "G8_CLEANUP",
     "status": "APPROVED",
-    "version": "1.28",
+    "version": "1.29",
     "updated": "2026-09-08",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "1.27"
+    "supersedes": "1.28"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -21,12 +21,12 @@
   "defaultBranch": "main",
   "semanticSourceBranch": "dementor-club",
   "projectStage": "BUILD",
-  "gate": "G7_RELEASE",
+  "gate": "G8_CLEANUP",
   "readFirst": [
     ".weekly-os/PROJECT.json",
     ".weekly-os/ARTIFACT_INDEX.json",
     ".weekly-os/APPROVED_STATE.json",
-    ".weekly-os/results/dc9-membership-semantic-integrity-v1.v0.6.md",
+    ".weekly-os/results/dc9-membership-semantic-integrity-v1.v0.7.md",
     "operations/QA_DC9_MEMBERSHIP_SEMANTIC_INTEGRITY_2026-09-08.md",
     "operations/QA_DC9_MEMBERSHIP_PATH_MAP_2026-09-08.md",
     "operations/MEMBERSHIP_V2_PRODUCTION_FLOW_QA_2026-09-02.md",
@@ -52,10 +52,10 @@
   "protected": {"PRODUCT": null, "DOMAIN": null, "ARCHITECTURE": null, "DESIGN": null},
   "currentResult": {
     "artifactId": "dementor-club.result.dc9-membership-semantic-integrity-v1",
-    "version": "0.6",
+    "version": "0.7",
     "status": "DRAFT",
-    "path": ".weekly-os/results/dc9-membership-semantic-integrity-v1.v0.6.md",
-    "gate": "G7_RELEASE",
+    "path": ".weekly-os/results/dc9-membership-semantic-integrity-v1.v0.7.md",
+    "gate": "G8_CLEANUP",
     "productionBaseCommit": "a9511a271fbb3524c486c2a9ecd0dc8a3ff22380",
     "integrationBranch": "agent/dc9-membership-semantic-integrity-v1",
     "integrationPullRequest": 136,
@@ -81,7 +81,11 @@
     "pagesArtifactId": 10068871371,
     "productionDeployRequiredInput": "release_confirmation=APPROVED",
     "productionDeploySourceCheckout": "472882c95ffd1d9fae165edf4dcaf4e1865337a9",
-    "liveFunctionalRetest": "PENDING_RUNTIME_ACCESS"
+    "liveFunctionalRetest": "PASS_USER_BROWSER_2026-09-08",
+    "liveCrossDeviceDc9Sync": "PASS_PHONE_TO_DESKTOP",
+    "liveApplicationActiveMemberGuard": "PASS",
+    "liveWorkspaceBoardSpotCheck": "PASS",
+    "liveBoardPositionPersistence": "PASS_PHONE_TO_DESKTOP"
   },
   "waitingResults": [
     {
@@ -94,7 +98,7 @@
       "productionDeployRun": 47,
       "productionDeployRunId": 34220090345,
       "pagesArtifactId": 10053362035,
-      "note": "Released and partially live-retested. Own-Artifact locator corrective is live-confirmed. Residual authenticated Guest / State5 / OwnerAdmin / mobile / drag-reload retests remain open; Result is not DONE or G8 closed."
+      "note": "Released and partially live-retested. Own-Artifact locator is live-confirmed fixed; mobile Board spot-check and phone-to-desktop card position persistence are now live-confirmed. Residual authenticated Guest / State5 / OwnerAdmin role-state retests remain open; Result is not DONE or G8 closed."
     }
   ],
   "activeIntegrationBranch": null,
