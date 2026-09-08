@@ -6,6 +6,11 @@
 .dc-programme__body{min-width:0}
 .dc-programme__empty{min-height:112px;padding:24px clamp(18px,2.2vw,34px);display:flex;align-items:center;justify-content:space-between;gap:24px;color:var(--dc-ink);opacity:.46;font-size:12px;text-transform:uppercase;letter-spacing:.08em}
 .dc-programme__empty span:last-child{font-variant-numeric:tabular-nums}
+.dc-programme__empty-states{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));border-bottom:1px solid var(--dc-line);background:rgba(17,17,17,.02)}
+.dc-programme__empty-state{min-width:0;padding:15px clamp(12px,1.6vw,22px);display:flex;align-items:baseline;justify-content:space-between;gap:10px;border-right:1px solid var(--dc-line);font-size:9px;letter-spacing:.09em;text-transform:uppercase;opacity:.56}
+.dc-programme__empty-state:last-child{border-right:0}
+.dc-programme__empty-state strong{min-width:0;font-size:9px;letter-spacing:.07em;overflow-wrap:anywhere}
+.dc-programme__empty-state small{font-size:9px;font-variant-numeric:tabular-nums}
 .dc-programme .dc-entity-row{border:0;min-height:132px}
 .dc-programme__lane--active .dc-programme__label{background:var(--dc-acid);color:var(--dc-ink)}
 .dc-programme__lane--active .dc-programme__label::after{content:'CURRENT STATE';display:block;margin-top:18px;font-size:9px;letter-spacing:.14em}
@@ -42,6 +47,10 @@
   .dc-programme__label{border-right:0;border-bottom:1px solid var(--dc-line);display:flex;justify-content:space-between;align-items:center;gap:20px}
   .dc-programme__label strong{margin-top:0}
   .dc-programme__lane--active .dc-programme__label::after{display:none}
+  .dc-programme__empty-states{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .dc-programme__empty-state{border-bottom:1px solid var(--dc-line)}
+  .dc-programme__empty-state:nth-child(2n){border-right:0}
+  .dc-programme__empty-state:last-child{border-bottom:0}
   .dc-programme-intro,.dc-programme-note,.dc-event-relations{grid-template-columns:1fr;gap:18px}
   .dc-programme-intro .dc-kicker,.dc-programme-intro .dc-lead,.dc-programme-note__label,.dc-programme-note__copy,.dc-event-relations__label,.dc-event-relations__body{grid-column:1}
   .dc-lifecycle{grid-template-columns:1fr 1fr}
@@ -49,6 +58,9 @@
 }
 
 @media(max-width:560px){
+  .dc-programme__empty-states{grid-template-columns:1fr}
+  .dc-programme__empty-state{border-right:0;border-bottom:1px solid var(--dc-line)}
+  .dc-programme__empty-state:last-child{border-bottom:0}
 
 
 
