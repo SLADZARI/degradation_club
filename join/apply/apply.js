@@ -1,8 +1,8 @@
-import {getClient,currentSession,loginWithGoogle,route} from '/community-runtime-v1.js';
+import {getClient,currentSession,loginWithGoogle,syncLocalAssessmentRuns,route} from '/community-runtime-v1.js';
 
 const host=document.getElementById('applyHost');
 const SPHERES=[['personality','Личность'],['work','Работа'],['consumption','Потребление'],['relationships','Отношения'],['control','Контроль'],['information','Информация'],['self_development','Саморазвитие'],['meaning','Смысл'],['technology','Технологии']];
-const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot',"'":'&#39;'}[c]));
 const date=v=>{try{return new Intl.DateTimeFormat('ru-RU',{day:'2-digit',month:'long',year:'numeric'}).format(new Date(v))}catch{return String(v||'—')}};
 const errorCopy=message=>{
   const m=String(message||'');
@@ -108,9 +108,11 @@ async function boot(){
     return;
   }
 
-  // Full baseline + repeat history is synchronized by apply-entry-v1.js before
-  // this controller is imported. Do not introduce a second application sync owner here.
+  // apply-entry-v1 synchronizes immutable baseline + repeats before importing this
+  // controller. Keep the existing shared current-map attachment as an idempotent
+  // compatibility guard for shell/release contracts; it uses canonical sphere IDs.
   const uid=user.id;
+  await syncLocalAssessmentRuns(client,uid);
   const [{data:profile},{data:applications,error:appError},{data:entryStatus,error:statusError}]=await Promise.all([
     client.from('profiles').select('id,email,full_name,display_name').eq('id',uid).maybeSingle(),
     client.from('join_applications').select('id,status,created_at,reviewed_at,answers,decision_version').eq('profile_id',uid).order('created_at',{ascending:false}).limit(3),
