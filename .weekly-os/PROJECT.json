@@ -7,12 +7,12 @@
     "projectStage": "BUILD",
     "gate": "G8_CLEANUP",
     "status": "APPROVED",
-    "version": "1.31",
+    "version": "1.32",
     "updated": "2026-09-08",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "1.30"
+    "supersedes": "1.31"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -26,7 +26,7 @@
     ".weekly-os/PROJECT.json",
     ".weekly-os/ARTIFACT_INDEX.json",
     ".weekly-os/APPROVED_STATE.json",
-    ".weekly-os/results/dc9-membership-semantic-integrity-v1.v0.9.md",
+    ".weekly-os/results/dc9-membership-semantic-integrity-v1.v0.10.md",
     "operations/QA_DC9_MEMBERSHIP_SEMANTIC_INTEGRITY_2026-09-08.md",
     "operations/QA_DC9_MEMBERSHIP_PATH_MAP_2026-09-08.md",
     "operations/MEMBERSHIP_V2_PRODUCTION_FLOW_QA_2026-09-02.md",
@@ -52,9 +52,9 @@
   "protected": {"PRODUCT": null, "DOMAIN": null, "ARCHITECTURE": null, "DESIGN": null},
   "currentResult": {
     "artifactId": "dementor-club.result.dc9-membership-semantic-integrity-v1",
-    "version": "0.9",
+    "version": "0.10",
     "status": "DRAFT",
-    "path": ".weekly-os/results/dc9-membership-semantic-integrity-v1.v0.9.md",
+    "path": ".weekly-os/results/dc9-membership-semantic-integrity-v1.v0.10.md",
     "gate": "G8_CLEANUP",
     "releasedProductionCommit": "472882c95ffd1d9fae165edf4dcaf4e1865337a9",
     "releasedProductionDeployRun": 48,
@@ -79,10 +79,14 @@
     "cleanupValidationRun": 894,
     "cleanupValidationRunId": 34267025765,
     "cleanupCodeBrowserG6": "PASS",
-    "cleanupProductionMergeAuthorized": false,
-    "cleanupProductionDeployAuthorized": false,
-    "cleanupProductionMerged": false,
+    "cleanupProductionMergeAuthorized": true,
+    "cleanupProductionDeployAuthorized": true,
+    "cleanupProductionMerged": true,
+    "cleanupProductionCommit": "b1ed177564581c820e3739e70404957108157af1",
     "cleanupProductionDeployed": false,
+    "cleanupDeployStatus": "AUTHORIZED_WORKFLOW_DISPATCH_PENDING",
+    "cleanupDeployWorkflow": ".github/workflows/deploy-pages.yml",
+    "cleanupDeployRequiredInput": "release_confirmation=APPROVED",
     "qaCluster": ["QA-MEM-035","QA-MEM-036","QA-MEM-037","QA-MEM-038","QA-MEM-039","QA-MEM-040","QA-MEM-041","QA-MEM-042"],
     "cleanupScope": ["remove account sync v8/v9","one-shot self-development alias migration","retain proven idempotent application compatibility guard","migration filename entropy check","temporary Board CSS workaround absence check","stale branch audit"]
   },
@@ -100,7 +104,7 @@
       "note": "Released and partially live-retested. Own-Artifact locator is live-confirmed fixed; mobile Board spot-check and phone-to-desktop card position persistence are now live-confirmed. Residual authenticated Guest / State5 / OwnerAdmin role-state retests remain open; Result is not DONE or G8 closed."
     }
   ],
-  "activeIntegrationBranch": "agent/dc9-membership-semantic-integrity-g8",
+  "activeIntegrationBranch": null,
   "activeReleaseBranch": null,
   "reportPath": "operations/MEMBERSHIP_V2_PRODUCTION_FLOW_QA_2026-09-02.md",
   "completedResults": [
@@ -123,7 +127,7 @@
     "SQL runtime validation from static migration-shape contracts alone",
     "authenticated live role validation from G6 browser mocks alone",
     "Board Result DONE/G8 closure from WAITING status or partial live retest",
-    "cleanup production merge/deploy authorization from the already-completed original DC9 release authorization",
+    "cleanup production deployment from cleanup production merge",
     "authorization to mutate live Supabase from G8 cleanup validation",
     "WeeklyOS runtime source_ref correction from kernel migration",
     "global MP_DSL approval from Dementor Club local operating-rule approval"
