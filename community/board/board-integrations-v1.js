@@ -94,6 +94,13 @@ function installFilters(){
   });
 }
 
+function installOwnLocatorFilterBridge(){
+  document.addEventListener('click',event=>{
+    if(!event.target.closest?.('[data-mine]')||activeFilter==='member')return;
+    activeFilter='member';applyFilter();closeDrawer();
+  },true);
+}
+
 async function loadPlatformProjections(){
   const session=await currentSession();if(!session)return;
   const [entitiesResult,eventsResult,programsResult]=await Promise.all([
@@ -108,6 +115,7 @@ async function loadPlatformProjections(){
 
 async function init(){
   installFilters();
+  installOwnLocatorFilterBridge();
   client=getClient();
   // Fullscreen Workspace Board is a notice-only surface. Keep this module as
   // the canonical filter owner, but do not project courses/projects/events
