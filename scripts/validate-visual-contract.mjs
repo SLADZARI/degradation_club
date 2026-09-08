@@ -41,6 +41,8 @@ must(home.includes('/events/fuengirola/'), 'Home event feature missing');
 must(visual.includes(".dc-home section.dc-event:has(a[href=\"/courses/dumai-s-opasnostyu/\"])::after"), 'Home course FEATURE portrait layer missing');
 must(visual.includes(".dc-home section.dc-event:has(a[href=\"/events/fuengirola/\"])::after"), 'Home Event FEATURE media layer missing');
 must(visual.includes("/assets/people/dementors/valentin/dementor_valentin.webp"), 'Valentin portrait binding missing');
+must((home.match(/<a class="dc-course-prototype__mentor"/g) || []).length === 1, 'Home course must contain exactly one Valentin mentor-card');
+must(!home.includes('Дементор: Валентин Лосев.'), 'Home duplicate textual Valentin attribution must stay removed');
 must(event.includes('/assets/ink/event-fuengirola-03.webp'), 'Fuengirola approved event asset missing');
 must(event.includes('/assets/people/dementors/gabil/dementor_gabil.webp'), 'Fuengirola Gabil relation portrait missing');
 
@@ -78,6 +80,7 @@ console.log('✓ 4 Dementor identity background tokens');
 console.log('✓ global visual layer active; legacy course import absent');
 console.log('✓ HERO / MICRO / RELATION / FEATURE contracts present');
 console.log('✓ Home course/person FEATURE and Home event FEATURE bound to approved assets');
+console.log('✓ Home course keeps one Valentin mentor identity');
 console.log('✓ Fuengirola media = canonical asset / top-right / height-first');
 console.log('✓ Fuengirola relation owner is static; runtime duplicate + second dominant Gabil feature absent');
 console.log('✓ Community roster + 4 profile heroes use canonical portraits');
