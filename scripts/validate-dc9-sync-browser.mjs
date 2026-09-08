@@ -29,18 +29,19 @@ const supabaseStub=()=>`
   globalThis.__QA_RUN_WRITES__=globalThis.__QA_RUN_WRITES__||[];
   const user={id:'qa-dc9-user',email:'qa-dc9@dementor.invalid',user_metadata:{full_name:'QA DC9'}};
   const session={user};
+  const remoteState=()=>{try{return JSON.parse(sessionStorage.getItem('__qa_remote_state__')||'null')}catch{return null}};
   const query=table=>{
     let rows=table==='profiles'?[{id:user.id,email:user.email,full_name:'QA DC9',display_name:'QA DC9',avatar_url:null}]:[];
     const c={
       select(){return c},eq(k,v){rows=rows.filter(r=>r?.[k]===v);return c},in(k,values){rows=rows.filter(r=>values.includes(r?.[k]));return c},order(){return c},limit(n){rows=rows.slice(0,n);return c},
       maybeSingle(){
-        if(table==='assessment_snapshots')return Promise.resolve({data:globalThis.__QA_REMOTE_STATE__?{state_json:globalThis.__QA_REMOTE_STATE__}:null,error:null});
+        if(table==='assessment_snapshots'){const state=remoteState();return Promise.resolve({data:state?{state_json:state}:null,error:null})}
         if(table==='dc_system_memberships')return Promise.resolve({data:null,error:null});
         return Promise.resolve({data:rows[0]||null,error:null});
       },
       upsert(payload){
         if(table==='assessment_runs')globalThis.__QA_RUN_WRITES__.push(payload);
-        if(table==='assessment_snapshots')globalThis.__QA_REMOTE_STATE__=payload.state_json;
+        if(table==='assessment_snapshots')sessionStorage.setItem('__qa_remote_state__',JSON.stringify(payload.state_json));
         return Promise.resolve({data:payload,error:null});
       },
       then(resolve,reject){return Promise.resolve({data:rows,error:null}).then(resolve,reject)}
@@ -60,8 +61,12 @@ const supabaseStub=()=>`
 async function context({localState,remoteState}){
   const c=await browser.newContext({viewport:{width:1280,height:900}});
   await c.addInitScript(({localState,remoteState})=>{
-    globalThis.__QA_REMOTE_STATE__=remoteState;
-    if(localState)localStorage.setItem('dementorClubOnboardingV3',JSON.stringify(localState));
+    if(sessionStorage.getItem('__qa_dc9_seeded__')!=='1'){
+      sessionStorage.setItem('__qa_remote_state__',JSON.stringify(remoteState||null));
+      if(localState)localStorage.setItem('dementorClubOnboardingV3',JSON.stringify(localState));
+      else localStorage.removeItem('dementorClubOnboardingV3');
+      sessionStorage.setItem('__qa_dc9_seeded__','1');
+    }
   },{localState,remoteState});
   await c.route('https://cdn.jsdelivr.net/**',route=>route.request().url().includes('@supabase/supabase-js')?route.fulfill({status:200,contentType:'text/javascript; charset=utf-8',body:supabaseStub()}):route.abort());
   return c;
