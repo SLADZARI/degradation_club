@@ -69,24 +69,28 @@ if(/\/join\/?(?:index\.html)?$/.test(runtimePath)&&!window.__DC_ACCOUNT_SYNC_V10
   }
   async function syncPass(mergeRemote=false){
     trace('sync-pass-start',{mergeRemote});
-    const local=readLocal();let state=local,remote=null;
+    const local=readLocal();let state=local,remote=null,mergedChanged=false;
     if(mergeRemote){
       remote=await readRemoteSnapshot();
       if(remote){
         state=mergeAssessmentStates(local,remote,mergeOptions);
         if(state.syncIntegrityConflicts?.length)trace('integrity-conflict',{types:state.syncIntegrityConflicts.map(x=>x.type)});
         if(stable(state)!==stable(local)){
+          mergedChanged=true;
           applyingRemote=true;
           try{localStorage.setItem(DC_LOCAL_STORAGE_KEY,JSON.stringify(state))}finally{applyingRemote=false}
           lastState=clone(state);
-          window.dispatchEvent(new CustomEvent('dc:assessment-state-merged',{detail:{state:clone(state)}}));
         }
       }
     }
     await persistCompletedRuns(state);
     const canonicalRemote=remote?normalize(remote):null,canonicalState=normalize(state);
     if(canonicalRemote&&stable(canonicalState)===stable(canonicalRemote))trace('snapshot-write-skip',{reason:'unchanged'});else await writeSnapshot(canonicalState);
-    trace('sync-pass-done',{results:Object.keys(canonicalState.results||{}).length,drafts:Object.keys(canonicalState.drafts||{}).length,active:canonicalState.active?.sphere||null});
+    trace('sync-pass-done',{results:Object.keys(canonicalState.results||{}).length,drafts:Object.keys(canonicalState.drafts||{}).length,active:canonicalState.active?.sphere||null,mergedChanged});
+    // The DC-9 engine owns an in-memory state snapshot. A single reload after a
+    // successful remote merge makes restored drafts visible without creating a
+    // second state owner. The just-written remote snapshot prevents reload loops.
+    if(mergedChanged){trace('merged-state-reload');location.reload();}
   }
   async function requestSync(mergeRemote=false){
     if(!session||!client)return;
