@@ -13,7 +13,7 @@
   overflow:hidden!important;
   box-sizing:border-box!important;
   background-color:#FAF4E3!important;
-  background-image:url('/assets/home/events/fuengirola-banner.webp')!important;
+  background-image:url('/assets/ink/event-fuengirola-03.webp')!important;
   background-position:center center!important;
   background-size:cover!important;
   background-repeat:no-repeat!important;
@@ -22,7 +22,7 @@
 }
 
 /* This route-specific file is the sole Home Fuengirola image owner.
-   Suppress the older shared visual-standard overlay so the event image is rendered once. */
+   Reuse the canonical decodable event asset; the retired home banner is not a runtime source. */
 .dc-home .dc-event.dc-section::after{
   content:none!important;
   display:none!important;
@@ -169,7 +169,7 @@
     aspect-ratio:auto!important;
     margin:0!important;
     background-color:#FAF4E3!important;
-    background-image:url('/assets/home/events/fuengirola-banner.webp')!important;
+    background-image:url('/assets/ink/event-fuengirola-03.webp')!important;
     background-position:center bottom!important;
     background-size:100% auto!important;
     background-repeat:no-repeat!important;
