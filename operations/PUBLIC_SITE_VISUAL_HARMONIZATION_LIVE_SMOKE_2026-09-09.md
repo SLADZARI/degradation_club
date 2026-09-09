@@ -1,6 +1,6 @@
 # Public Site Visual Harmonization — Live Smoke Evidence — 2026-09-09
 
-Status: EVIDENCE / SECOND CORRECTIVE PASS OPEN
+Status: EVIDENCE / FINAL CORRECTIVE PASS VALIDATED / LIVE RELEASE RETEST PENDING
 
 Result: `dementor-club.result.public-site-visual-harmonization-v1`
 
@@ -99,18 +99,60 @@ Required separate decision before real sales activation:
 - fulfilment/size/material/shipping facts required before purchase;
 - reconciliation rule between Supabase commercial runtime state and tracked merch records.
 
-## Current second corrective implementation
-The same Result and same integration branch continue with PR `#140` from exact production commit `435c74c1fb8566d47f28c5ceda1006279f5f622c`.
+## Release #52 — live composition retest
+PR `#140` was merged and released as production commit:
 
-Latest validated candidate:
-- `587315105146904fd380eff5661ff955bcce3743`
-- Site Integrity / Release Readiness `#917` / `34398964239` / **SUCCESS**
-- updated public browser matrix includes raster decode validation and passed.
+`6abb7f28d63fe2e0e7025d49255b59ee55b715db`
 
-Scope remains public visual/editorial harmonization only:
-- Home Fuengirola full-bleed desktop composition using a decodable canonical event asset;
-- Events visitor-facing simplification;
-- Merch live-catalog framing without changing sales-state or checkout semantics;
-- regression guards for those exact live findings, including raster integrity.
+Deploy Dementor Production `#52` / `34400419171` completed **SUCCESS**. Pages artifact: `10123205040`, digest `sha256:c146bb0fa744ad025c23d63c8c3a832f23d4db9a2d9bd4c286b851f9efc0d4a3`.
 
-No Workspace, Board, DC-9, Membership, auth, Supabase data/schema, event registration or merch checkout mutation is included.
+User-supplied live screenshot confirmed the technical duplicate and corrupted-asset issues were gone, but revealed one remaining visual defect: the full-bleed Home Fuengirola background plus a still-strong left veil/copy rail visually read as a smaller paper/card composition placed over the same larger poster.
+
+This was classified as **visual duplicate composition**, not a second raster asset.
+
+## PR #141 — final Home visual correction
+Final correction remains inside Result 1 and the same active integration branch. It does not change Header, Gabil relation, CTA semantics, events lifecycle, merch commercial state, Board, Workspace, Membership, DC-9, auth or Supabase.
+
+Implemented:
+- desktop/tablet: one canonical `assets/ink/event-fuengirola-03.webp` section background, `cover`;
+- desktop veil shortened/softened and copy rail narrowed to the accepted composition range;
+- mobile `<=700`: section background intentionally removed and the same canonical asset rendered once as an in-flow poster strip owned by `.dc-shell::before`;
+- legacy runtime Home Fuengirola `<img>` injection removed;
+- one semantic Gabil relation preserved;
+- breakpoint-aware regression contract now requires exactly one active Fuengirola raster owner at every tested width.
+
+### Visual-reference establishment
+Site Integrity / Release Readiness `#924` / `34406568109` intentionally stopped only because accepted visual hashes did not yet exist. Its breakpoint-aware media-owner diagnostics passed, including `390px`, where the sole active Fuengirola raster owner was `.dc-shell::before` with the canonical asset and `cover`.
+
+Reference artifact from #924:
+- artifact: `10125592894` / `home-fuengirola-visual-references`;
+- widths inspected: `1440 / 1024 / 390`;
+- acceptance: one poster/composition, no inner rectangular paper/card panel, one Gabil, readable copy, visible CTA, no overflow;
+- accepted hashes committed in `scripts/visual-baselines/home-fuengirola.json`.
+
+### Final G6
+Validated candidate:
+
+`07a097594dc816c718e6c8d28a49f62ddb88bc69`
+
+Site Integrity / Release Readiness `#925` / `34406937024` completed **SUCCESS** on the exact candidate and production base `6abb7f28d63fe2e0e7025d49255b59ee55b715db`.
+
+All validation steps passed, including:
+- visual/static contracts;
+- raster decode;
+- breakpoint-aware Home Fuengirola ownership and browser matrix;
+- accepted screenshot baselines at `1440 / 1024 / 390`;
+- DC-9/Membership regression contracts;
+- Board browser state matrix;
+- Workspace/browser recovery;
+- My Artifacts;
+- WebKit auth;
+- route manifest;
+- production artifact release gate.
+
+Final visual-reference artifact from #925:
+- artifact: `10125722167`;
+- digest: `sha256:d53fffebcfc2556e6ca1f609c578acc42db6ae5acd85bb7883d5d2b4d650c0af`.
+
+## Current gate
+Final correction is **G6 validated** and ready to return to `G7_RELEASE` once Weekly OS pointers are updated. Production has not been mutated by PR #141 yet. A final production merge/deploy still requires explicit authorization, followed by one short live smoke before Result 1 can close.
