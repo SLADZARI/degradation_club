@@ -37,7 +37,10 @@ const supabaseStub=`
 
 const routes=['/','/events/','/events/fuengirola/','/community/','/community/gabil/','/merch/'];
 const widths=[1440,1024,768,390,360];
-const forbidden=['source-of-truth','canonical source-of-truth','participant relation from entity record','sales_state','production spec','CHECKOUT / DISABLED','PRICE / TBD','MECHANICS PENDING'];
+const forbidden=[
+  'source-of-truth','canonical source-of-truth','participant relation from entity record','sales_state','production spec','CHECKOUT / DISABLED','PRICE / TBD','MECHANICS PENDING',
+  'Пустое состояние — тоже данные','канонической записи события','OBJECT / WEAR / DROP сущности','WORKING ASSETS','MERCH CONTRACT'
+];
 
 async function makeContext(width){
   const c=await browser.newContext({viewport:{width,height:1000}});
@@ -72,6 +75,33 @@ for(const width of widths){
     if(route==='/'){
       expect(await p.locator('.dc-course-prototype__mentor').count()===1,`${label}: Home Valentin mentor-card count drifted`);
       expect(!(await p.locator('body').innerText()).includes('Дементор: Валентин Лосев.'),`${label}: Home duplicate Valentin attribution visible`);
+
+      const homeEvent=p.locator('section.dc-event:has(a[href="/events/fuengirola/"])');
+      expect(await homeEvent.count()===1,`${label}: Home Fuengirola feature missing/duplicated`);
+      if(await homeEvent.count()){
+        expect(await homeEvent.locator('.dc-dementor-link').count()===1,`${label}: Home Fuengirola must expose exactly one semantic Gabil relation after runtime`);
+        const layers=await homeEvent.evaluate(el=>{
+          const after=getComputedStyle(el,'::after');
+          const action=el.querySelector('.dc-event__action');
+          const before=action?getComputedStyle(action,'::before'):null;
+          const actionAfter=action?getComputedStyle(action,'::after'):null;
+          const own=getComputedStyle(el);
+          return {
+            backgroundImage:own.backgroundImage,
+            overlayDisplay:after.display,
+            overlayContent:after.content,
+            overlayBackgroundImage:after.backgroundImage,
+            actionBeforeDisplay:before?.display||null,
+            actionBeforeContent:before?.content||null,
+            actionBeforeBackgroundImage:before?.backgroundImage||null,
+            actionAfterDisplay:actionAfter?.display||null,
+            actionAfterContent:actionAfter?.content||null
+          };
+        });
+        expect(layers.backgroundImage.includes('fuengirola-banner.webp'),`${label}: Home Fuengirola canonical banner is not the active section background`);
+        expect(layers.overlayDisplay==='none'&&layers.overlayBackgroundImage==='none',`${label}: duplicate Fuengirola pseudo-image layer survived ${JSON.stringify(layers)}`);
+        expect(layers.actionBeforeDisplay==='none'&&layers.actionAfterDisplay==='none',`${label}: decorative duplicate Gabil CTA pseudo-treatment survived ${JSON.stringify(layers)}`);
+      }
     }
 
     if(route==='/events/fuengirola/'){
@@ -93,6 +123,12 @@ for(const width of widths){
       expect(await p.locator('.dc-programme__lane').count()===1,`${label}: Events real-lane count drifted`);
       expect(await p.locator('.dc-programme__empty-state').count()===5,`${label}: Events compact empty-state count drifted`);
       expect(await p.locator('.dc-programme__empty').count()===0,`${label}: legacy full empty lanes survived`);
+      expect((await p.locator('.dc-programme-intro').innerText()).includes('В программе — только то, что уже стало событием клуба.'),`${label}: Events public programme copy drifted`);
+    }
+
+    if(route==='/merch/'){
+      const lead=await p.locator('.dc-entity-hero__lead').innerText();
+      expect(lead.includes('вещи и физические артефакты клубной культуры'),`${label}: Merch public hero copy drifted`);
     }
 
     await p.close();
@@ -121,5 +157,6 @@ console.log('Public harmonization browser matrix PASS');
 console.log('✓ routes: /, /events/, /events/fuengirola/, /community/, /community/gabil/, /merch/');
 console.log('✓ widths: 1440 / 1024 / 768 / 390 / 360');
 console.log('✓ no horizontal overflow; canonical Header geometry preserved');
-console.log('✓ Fuengirola relation ownership + Gabil density; Home Valentin; Community one-source hero; Events compact lifecycle');
+console.log('✓ Home Fuengirola one image owner + one semantic Gabil relation; Home Valentin; Community one-source hero');
+console.log('✓ Fuengirola detail relation ownership + Gabil density; Events compact lifecycle; Merch public hero copy');
 console.log('✓ exact public implementation-marker denylist; mobile Events path remains tap-accessible');
