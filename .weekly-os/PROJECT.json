@@ -7,12 +7,12 @@
     "projectStage": "VALIDATION",
     "gate": "G7_RELEASE",
     "status": "APPROVED",
-    "version": "1.41",
+    "version": "1.42",
     "updated": "2026-09-09",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "1.40"
+    "supersedes": "1.41"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -26,7 +26,7 @@
     ".weekly-os/PROJECT.json",
     ".weekly-os/ARTIFACT_INDEX.json",
     ".weekly-os/APPROVED_STATE.json",
-    ".weekly-os/results/public-site-visual-harmonization-v1.v0.7.md",
+    ".weekly-os/results/public-site-visual-harmonization-v1.v0.8.md",
     "operations/PUBLIC_SITE_VISUAL_HARMONIZATION_V1.md",
     "operations/PUBLIC_SITE_VISUAL_HARMONIZATION_INVENTORY_2026-09-08.md",
     "operations/PUBLIC_SITE_VISUAL_HARMONIZATION_LIVE_SMOKE_2026-09-09.md",
@@ -52,9 +52,9 @@
   "protected": {"PRODUCT": null, "DOMAIN": null, "ARCHITECTURE": null, "DESIGN": null},
   "currentResult": {
     "artifactId": "dementor-club.result.public-site-visual-harmonization-v1",
-    "version": "0.7",
+    "version": "0.8",
     "status": "DRAFT",
-    "path": ".weekly-os/results/public-site-visual-harmonization-v1.v0.7.md",
+    "path": ".weekly-os/results/public-site-visual-harmonization-v1.v0.8.md",
     "gate": "G7_RELEASE",
     "specification": "operations/PUBLIC_SITE_VISUAL_HARMONIZATION_V1.md",
     "inventory": "operations/PUBLIC_SITE_VISUAL_HARMONIZATION_INVENTORY_2026-09-08.md",
@@ -87,7 +87,7 @@
     "secondPolishValidationRun": 917,
     "secondPolishValidationRunId": 34398964239,
     "secondPolishG6Validation": "PASS_WITH_RASTER_DECODE_GUARD",
-    "rasterIntegrityBlocker": "FIXED_IN_PR140_PENDING_RELEASE",
+    "rasterIntegrityBlocker": "FIXED_IN_PR140_MERGED_PENDING_DEPLOY",
     "retiredCorruptedAsset": "assets/home/events/fuengirola-banner.webp",
     "homeCanonicalEventAsset": "assets/ink/event-fuengirola-03.webp",
     "commercialActivationConflict": "OPEN_SEPARATE_DECISION_REQUIRED",
@@ -99,8 +99,14 @@
     "previousProductionDeployAuthorized": true,
     "previousProductionMerged": true,
     "previousProductionDeployed": true,
-    "secondPolishProductionMergeAuthorized": false,
-    "secondPolishProductionDeployAuthorized": false,
+    "secondPolishProductionMergeAuthorized": true,
+    "secondPolishProductionDeployAuthorized": true,
+    "secondPolishProductionMerged": true,
+    "secondPolishProductionCommit": "6abb7f28d63fe2e0e7025d49255b59ee55b715db",
+    "secondPolishProductionDeployed": false,
+    "secondPolishDeployStatus": "AUTHORIZED_WORKFLOW_DISPATCH_PENDING",
+    "secondPolishDeployWorkflow": ".github/workflows/deploy-pages.yml",
+    "secondPolishDeployRequiredInput": "release_confirmation=APPROVED",
     "liveDatabaseMutationAuthorized": false
   },
   "waitingResults": [
@@ -117,7 +123,7 @@
       "note": "Released and partially live-retested. Own-Artifact locator is live-confirmed fixed; mobile Board spot-check and phone-to-desktop card position persistence are live-confirmed. Residual authenticated Guest / State5 / OwnerAdmin role-state retests remain open; Result is not DONE or G8 closed."
     }
   ],
-  "activeIntegrationBranch": "agent/public-site-visual-harmonization-v1",
+  "activeIntegrationBranch": null,
   "activeReleaseBranch": null,
   "reportPath": "operations/MEMBERSHIP_V2_PRODUCTION_FLOW_QA_2026-09-02.md",
   "completedResults": [
