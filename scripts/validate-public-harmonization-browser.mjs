@@ -48,6 +48,39 @@ async function makeContext(width){
   return c;
 }
 
+async function rasterHealth(page){
+  return page.evaluate(async()=>{
+    const urls=new Set();
+    const addUrl=value=>{
+      if(!value)return;
+      try{urls.add(new URL(value,location.href).href)}catch{}
+    };
+    document.querySelectorAll('img[src]').forEach(img=>addUrl(img.getAttribute('src')));
+    const addStyleUrls=style=>{
+      const bg=style?.backgroundImage||'';
+      for(const match of bg.matchAll(/url\(["']?([^"')]+)["']?\)/g))addUrl(match[1]);
+    };
+    document.querySelectorAll('*').forEach(el=>{
+      addStyleUrls(getComputedStyle(el));
+      addStyleUrls(getComputedStyle(el,'::before'));
+      addStyleUrls(getComputedStyle(el,'::after'));
+    });
+    const raster=[...urls].filter(url=>/\.(?:webp|png|jpe?g)(?:[?#].*)?$/i.test(url));
+    const out=[];
+    for(const url of raster){
+      const img=new Image();
+      img.src=url;
+      let error=null;
+      try{
+        if(typeof img.decode==='function')await img.decode();
+        else await new Promise((resolve,reject)=>{img.onload=resolve;img.onerror=()=>reject(new Error('load failed'))});
+      }catch(err){error=String(err?.message||err)}
+      out.push({url,ok:!error&&img.naturalWidth>0&&img.naturalHeight>0,width:img.naturalWidth,height:img.naturalHeight,error});
+    }
+    return out;
+  });
+}
+
 for(const width of widths){
   const c=await makeContext(width);
   for(const route of routes){
@@ -72,6 +105,13 @@ for(const width of widths){
     const publicText=(await p.locator('body').innerText()).toLowerCase();
     for(const marker of forbidden)expect(!publicText.includes(marker.toLowerCase()),`${label}: forbidden public marker visible: ${marker}`);
 
+    // Decode every raster referenced by target-route DOM/CSS once at desktop width.
+    // Existence/content-length alone is insufficient: a truncated WebP can still pass static/build checks.
+    if(width===1440){
+      const health=await rasterHealth(p);
+      for(const item of health)expect(item.ok,`${label}: raster failed browser decode ${JSON.stringify(item)}`);
+    }
+
     if(route==='/'){
       expect(await p.locator('.dc-course-prototype__mentor').count()===1,`${label}: Home Valentin mentor-card count drifted`);
       expect(!(await p.locator('body').innerText()).includes('Дементор: Валентин Лосев.'),`${label}: Home duplicate Valentin attribution visible`);
@@ -80,6 +120,11 @@ for(const width of widths){
       expect(await homeEvent.count()===1,`${label}: Home Fuengirola feature missing/duplicated`);
       if(await homeEvent.count()){
         expect(await homeEvent.locator('.dc-dementor-link').count()===1,`${label}: Home Fuengirola must expose exactly one semantic Gabil relation after runtime`);
+        const eventBox=await homeEvent.boundingBox();
+        if(eventBox&&width>700){
+          expect(eventBox.x>=-1&&eventBox.x<=1,`${label}: Home Fuengirola is not full-bleed from viewport left ${JSON.stringify(eventBox)}`);
+          expect(eventBox.width>=width-1&&eventBox.width<=width+1,`${label}: Home Fuengirola is not viewport-wide ${JSON.stringify(eventBox)}`);
+        }
         const layers=await homeEvent.evaluate(el=>{
           const after=getComputedStyle(el,'::after');
           const action=el.querySelector('.dc-event__action');
@@ -88,6 +133,7 @@ for(const width of widths){
           const own=getComputedStyle(el);
           return {
             backgroundImage:own.backgroundImage,
+            backgroundSize:own.backgroundSize,
             overlayDisplay:after.display,
             overlayContent:after.content,
             overlayBackgroundImage:after.backgroundImage,
@@ -98,7 +144,9 @@ for(const width of widths){
             actionAfterContent:actionAfter?.content||null
           };
         });
-        expect(layers.backgroundImage.includes('fuengirola-banner.webp'),`${label}: Home Fuengirola canonical banner is not the active section background`);
+        expect(layers.backgroundImage.includes('event-fuengirola-03.webp'),`${label}: Home Fuengirola canonical decodable event asset is not the active section background`);
+        expect(!layers.backgroundImage.includes('fuengirola-banner.webp'),`${label}: retired/corrupted Fuengirola banner returned to active background`);
+        if(width>700)expect(layers.backgroundSize==='cover',`${label}: Home Fuengirola desktop background must cover full feature; actual=${layers.backgroundSize}`);
         expect(layers.overlayDisplay==='none'&&layers.overlayBackgroundImage==='none',`${label}: duplicate Fuengirola pseudo-image layer survived ${JSON.stringify(layers)}`);
         expect(layers.actionBeforeDisplay==='none'&&layers.actionAfterDisplay==='none',`${label}: decorative duplicate Gabil CTA pseudo-treatment survived ${JSON.stringify(layers)}`);
       }
@@ -121,14 +169,19 @@ for(const width of widths){
 
     if(route==='/events/'){
       expect(await p.locator('.dc-programme__lane').count()===1,`${label}: Events real-lane count drifted`);
-      expect(await p.locator('.dc-programme__empty-state').count()===5,`${label}: Events compact empty-state count drifted`);
-      expect(await p.locator('.dc-programme__empty').count()===0,`${label}: legacy full empty lanes survived`);
-      expect((await p.locator('.dc-programme-intro').innerText()).includes('В программе — только то, что уже стало событием клуба.'),`${label}: Events public programme copy drifted`);
+      expect(await p.locator('.dc-programme__empty-state').count()===0,`${label}: Events lifecycle mechanics returned to public DOM`);
+      expect(await p.locator('.dc-editorial-opening').count()===0,`${label}: Events process editorial block returned`);
+      expect(await p.locator('.dc-programme-note').count()===0,`${label}: Events archive/process note returned`);
+      expect(await p.locator('.dc-footnotes').count()===0,`${label}: Events implementation footnotes returned`);
+      expect((await p.locator('.dc-programme-intro').innerText()).includes('БЛИЖАЙШЕЕ СОБЫТИЕ'),`${label}: Events visitor-facing current-event label drifted`);
     }
 
     if(route==='/merch/'){
       const lead=await p.locator('.dc-entity-hero__lead').innerText();
-      expect(lead.includes('вещи и физические артефакты клубной культуры'),`${label}: Merch public hero copy drifted`);
+      expect(lead.includes('Актуальная цена и доступность указаны на карточках.'),`${label}: Merch live-catalog hero copy drifted`);
+      expect(await p.locator('.dc-boundary').count()===0,`${label}: Merch sales-rule intent block returned`);
+      const merchText=await p.locator('body').innerText();
+      for(const marker of ['SALES NOT OPEN','WEAR / PREVIEW','MERCH / SALES RULE','Визуальные макеты существуют'])expect(!merchText.includes(marker),`${label}: Merch preview/intent framing visible: ${marker}`);
     }
 
     await p.close();
@@ -156,7 +209,8 @@ if(errors.length){console.error('PUBLIC HARMONIZATION BROWSER MATRIX BLOCKED');f
 console.log('Public harmonization browser matrix PASS');
 console.log('✓ routes: /, /events/, /events/fuengirola/, /community/, /community/gabil/, /merch/');
 console.log('✓ widths: 1440 / 1024 / 768 / 390 / 360');
+console.log('✓ target-route raster assets browser-decode successfully at 1440');
 console.log('✓ no horizontal overflow; canonical Header geometry preserved');
-console.log('✓ Home Fuengirola one image owner + one semantic Gabil relation; Home Valentin; Community one-source hero');
-console.log('✓ Fuengirola detail relation ownership + Gabil density; Events compact lifecycle; Merch public hero copy');
+console.log('✓ Home Fuengirola full-bleed one decodable canonical image owner + one semantic Gabil relation; Home Valentin; Community one-source hero');
+console.log('✓ Fuengirola detail relation ownership + Gabil density; Events current-event presentation; Merch live-catalog framing');
 console.log('✓ exact public implementation-marker denylist; mobile Events path remains tap-accessible');
