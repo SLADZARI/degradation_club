@@ -30,9 +30,6 @@
     if(path==='/events/'){
       const row=document.querySelector('a[href="/events/fuengirola/"]');if(row&&!row.parentElement.querySelector('.dc-dementor-link'))row.insertAdjacentElement('afterend',card('gabil','ДЕМЕНТОР СОБЫТИЯ'));
     }
-    if(path==='/events/fuengirola/'){
-      const rel=document.querySelector('.dc-event-relations')||document.querySelector('.dc-event-detail__intro');add(rel,'gabil','ДЕМЕНТОР СОБЫТИЯ');
-    }
     if(path==='/community/gabil/'){
       const main=document.querySelector('main');if(main&&!main.querySelector('a[href="/events/fuengirola/"]')){const s=document.createElement('section');s.className='dc-section';s.innerHTML='<div class="dc-shell dc-profile-grid"><div class="dc-profile-label"><p class="dc-kicker">06 / СОБЫТИЯ</p></div><div class="dc-profile-content"><a class="dc-profile-item" href="/events/fuengirola/" style="text-decoration:none;color:inherit"><span class="dc-profile-item__num">01</span><div><p class="dc-kicker">PLANNED / SPAIN</p><h3>Фуэнхирола</h3><p>Связанное мероприятие Dementor Club.</p><span class="dc-profile-back">Открыть событие →</span></div></a></div></div>';main.appendChild(s)}
     }
