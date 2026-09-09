@@ -92,10 +92,7 @@ async function makeContext(width){
 async function rasterHealth(page){
   return page.evaluate(async()=>{
     const urls=new Set();
-    const addUrl=value=>{
-      if(!value)return;
-      try{urls.add(new URL(value,location.href).href)}catch{}
-    };
+    const addUrl=value=>{if(!value)return;try{urls.add(new URL(value,location.href).href)}catch{}};
     document.querySelectorAll('img[src]').forEach(img=>addUrl(img.getAttribute('src')));
     const addStyleUrls=style=>{
       const bg=style?.backgroundImage||'';
@@ -109,13 +106,8 @@ async function rasterHealth(page){
     const raster=[...urls].filter(url=>/\.(?:webp|png|jpe?g)(?:[?#].*)?$/i.test(url));
     const out=[];
     for(const url of raster){
-      const img=new Image();
-      img.src=url;
-      let error=null;
-      try{
-        if(typeof img.decode==='function')await img.decode();
-        else await new Promise((resolve,reject)=>{img.onload=resolve;img.onerror=()=>reject(new Error('load failed'))});
-      }catch(err){error=String(err?.message||err)}
+      const img=new Image();img.src=url;let error=null;
+      try{if(typeof img.decode==='function')await img.decode();else await new Promise((resolve,reject)=>{img.onload=resolve;img.onerror=()=>reject(new Error('load failed'))})}catch(err){error=String(err?.message||err)}
       out.push({url,ok:!error&&img.naturalWidth>0&&img.naturalHeight>0,width:img.naturalWidth,height:img.naturalHeight,error});
     }
     return out;
@@ -146,8 +138,6 @@ for(const width of widths){
     const publicText=(await p.locator('body').innerText()).toLowerCase();
     for(const marker of forbidden)expect(!publicText.includes(marker.toLowerCase()),`${label}: forbidden public marker visible: ${marker}`);
 
-    // Decode every raster referenced by target-route DOM/CSS once at desktop width.
-    // Existence/content-length alone is insufficient: a truncated WebP can still pass static/build checks.
     if(width===1440){
       const health=await rasterHealth(p);
       for(const item of health)expect(item.ok,`${label}: raster failed browser decode ${JSON.stringify(item)}`);
@@ -166,23 +156,41 @@ for(const width of widths){
           expect(eventBox.x>=-1&&eventBox.x<=1,`${label}: Home Fuengirola is not full-bleed from viewport left ${JSON.stringify(eventBox)}`);
           expect(eventBox.width>=width-1&&eventBox.width<=width+1,`${label}: Home Fuengirola is not viewport-wide ${JSON.stringify(eventBox)}`);
         }
+
         const shell=homeEvent.locator(':scope > .dc-shell');
         const shellBox=await shell.boundingBox();
         const layers=await homeEvent.evaluate(el=>{
+          const own=getComputedStyle(el);
           const after=getComputedStyle(el,'::after');
           const beforeVeil=getComputedStyle(el,'::before');
+          const shellEl=el.querySelector(':scope > .dc-shell');
+          const shellStyle=shellEl?getComputedStyle(shellEl):null;
+          const shellBefore=shellEl?getComputedStyle(shellEl,'::before'):null;
           const action=el.querySelector('.dc-event__action');
           const actionBefore=action?getComputedStyle(action,'::before'):null;
           const actionAfter=action?getComputedStyle(action,'::after'):null;
-          const own=getComputedStyle(el);
-          const shellEl=el.querySelector(':scope > .dc-shell');
-          const shellStyle=shellEl?getComputedStyle(shellEl):null;
+          const runtimeImgs=[...el.querySelectorAll('img')].filter(img=>{
+            const src=img.currentSrc||img.src||'';
+            const r=img.getBoundingClientRect();
+            const s=getComputedStyle(img);
+            return src.includes('event-fuengirola-03.webp')&&s.display!=='none'&&s.visibility!=='hidden'&&r.width>0&&r.height>0;
+          }).length;
+          const activeAssetOwners=[];
+          if(own.display!=='none'&&own.backgroundImage.includes('event-fuengirola-03.webp'))activeAssetOwners.push('section-background');
+          if(shellBefore&&shellBefore.display!=='none'&&shellBefore.content!=='none'&&shellBefore.backgroundImage.includes('event-fuengirola-03.webp'))activeAssetOwners.push('shell::before');
+          if(runtimeImgs)for(let i=0;i<runtimeImgs;i++)activeAssetOwners.push('runtime-img');
           const alphas=[...beforeVeil.backgroundImage.matchAll(/rgba\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*,\s*([0-9.]+)\s*\)/g)].map(m=>Number(m[1]));
           const stops=[...beforeVeil.backgroundImage.matchAll(/([0-9.]+)%/g)].map(m=>Number(m[1]));
           return {
             backgroundImage:own.backgroundImage,
             backgroundSize:own.backgroundSize,
             backgroundPosition:own.backgroundPosition,
+            shellBeforeDisplay:shellBefore?.display||null,
+            shellBeforeContent:shellBefore?.content||null,
+            shellBeforeBackgroundImage:shellBefore?.backgroundImage||null,
+            shellBeforeBackgroundSize:shellBefore?.backgroundSize||null,
+            activeAssetOwners,
+            runtimeImgs,
             veilDisplay:beforeVeil.display,
             veilBackground:beforeVeil.backgroundImage,
             veilMaxAlpha:alphas.length?Math.max(...alphas):0,
@@ -192,18 +200,30 @@ for(const width of widths){
             overlayContent:after.content,
             overlayBackgroundImage:after.backgroundImage,
             actionBeforeDisplay:actionBefore?.display||null,
-            actionBeforeContent:actionBefore?.content||null,
-            actionBeforeBackgroundImage:actionBefore?.backgroundImage||null,
-            actionAfterDisplay:actionAfter?.display||null,
-            actionAfterContent:actionAfter?.content||null
+            actionAfterDisplay:actionAfter?.display||null
           };
         });
-        expect(layers.backgroundImage.includes('event-fuengirola-03.webp'),`${label}: Home Fuengirola canonical decodable event asset is not the active section background`);
+
         expect(!layers.backgroundImage.includes('fuengirola-banner.webp'),`${label}: retired/corrupted Fuengirola banner returned to active background`);
-        if(width>700)expect(layers.backgroundSize==='cover',`${label}: Home Fuengirola desktop background must cover full feature; actual=${layers.backgroundSize}`);
+        expect(layers.runtimeImgs===0,`${label}: legacy/runtime Fuengirola img owner returned ${JSON.stringify(layers)}`);
+        expect(layers.activeAssetOwners.length===1,`${label}: Home Fuengirola must have exactly one active raster owner ${JSON.stringify(layers.activeAssetOwners)}`);
+        if(width>700){
+          expect(layers.backgroundImage.includes('event-fuengirola-03.webp'),`${label}: desktop/tablet canonical Fuengirola asset must be the section background`);
+          expect(layers.backgroundSize==='cover',`${label}: desktop/tablet Fuengirola section background must be cover; actual=${layers.backgroundSize}`);
+          expect(layers.activeAssetOwners[0]==='section-background',`${label}: desktop/tablet canonical owner drifted ${JSON.stringify(layers.activeAssetOwners)}`);
+          expect(!layers.shellBeforeBackgroundImage?.includes('event-fuengirola-03.webp'),`${label}: mobile strip leaked into desktop/tablet`);
+        }else{
+          expect(layers.backgroundImage==='none',`${label}: mobile section background must be absent; actual=${layers.backgroundImage}`);
+          expect(layers.shellBeforeDisplay!=='none'&&layers.shellBeforeBackgroundImage?.includes('event-fuengirola-03.webp'),`${label}: mobile canonical in-flow Fuengirola strip missing ${JSON.stringify(layers)}`);
+          expect(layers.shellBeforeBackgroundSize==='cover',`${label}: mobile canonical strip must use cover; actual=${layers.shellBeforeBackgroundSize}`);
+          expect(layers.activeAssetOwners[0]==='shell::before',`${label}: mobile canonical owner must be the in-flow strip ${JSON.stringify(layers.activeAssetOwners)}`);
+          expect(layers.veilDisplay==='none',`${label}: Home mobile must not use desktop veil`);
+        }
+
         expect(layers.overlayDisplay==='none'&&layers.overlayBackgroundImage==='none',`${label}: duplicate Fuengirola pseudo-image layer survived ${JSON.stringify(layers)}`);
         expect(layers.actionBeforeDisplay==='none'&&layers.actionAfterDisplay==='none',`${label}: decorative duplicate Gabil CTA pseudo-treatment survived ${JSON.stringify(layers)}`);
         expect(layers.shellBackground==='rgba(0, 0, 0, 0)'||layers.shellBackground==='transparent',`${label}: Home Fuengirola copy shell became an opaque panel: ${layers.shellBackground}`);
+
         if(width>1100){
           expect(shellBox&&shellBox.width<=562&&shellBox.width>=500,`${label}: Home Fuengirola copy shell must stay in ~520–560px band ${JSON.stringify(shellBox)}`);
           expect(layers.veilMaxAlpha<=.79&&layers.veilEndPct<=42,`${label}: Home veil too opaque/wide; visual-card regression ${JSON.stringify(layers)}`);
@@ -213,14 +233,9 @@ for(const width of widths){
         }else if(width>700){
           expect(shellBox&&shellBox.width<=502,`${label}: Home Fuengirola tablet copy shell too wide ${JSON.stringify(shellBox)}`);
           expect(layers.veilMaxAlpha<=.85&&layers.veilEndPct<=55,`${label}: Home tablet veil too opaque/wide ${JSON.stringify(layers)}`);
-        }else{
-          expect(layers.veilDisplay==='none',`${label}: Home mobile must not use desktop veil`);
         }
 
         if(visualWidths.has(width)){
-          // Reproduce the settled in-view state before capturing the visual reference.
-          // Without this explicit scroll/wait the Home section can still be at the motion-reveal opacity:0 state,
-          // producing a false baseline that contains only the background image.
           await homeEvent.scrollIntoViewIfNeeded();
           await p.waitForTimeout(850);
           const settled=await shell.evaluate(el=>({opacity:Number(getComputedStyle(el).opacity),visibleClass:el.classList.contains('is-visible')}));
@@ -228,7 +243,6 @@ for(const width of widths){
           expect(await homeEvent.locator('.dc-event__title').count()===1,`${label}: Home Fuengirola title missing before screenshot`);
           expect(await homeEvent.locator('.dc-event__desc').count()===1,`${label}: Home Fuengirola description missing before screenshot`);
           expect(await homeEvent.locator('.dc-event__action').count()===1,`${label}: Home Fuengirola CTA missing before screenshot`);
-          // Header/skip-link geometry is validated separately above. Exclude sticky overlays from the event-only visual reference.
           await p.addStyleTag({content:'.dc-global-header,a[href="#main-content"]{visibility:hidden!important}'});
           const file=path.join(visualDir,`home-fuengirola-${width}.png`);
           const shot=await homeEvent.screenshot({path:file,animations:'disabled'});
@@ -283,7 +297,6 @@ for(const width of widths){
   await c.close();
 }
 
-// Touch/mobile critical path: Events preview is tap-accessible and the second tap opens the event.
 {
   const c=await makeContext(390),p=await c.newPage();
   await p.goto(base+'/events/',{waitUntil:'domcontentloaded'});await p.waitForTimeout(180);
@@ -305,7 +318,8 @@ console.log('✓ routes: /, /events/, /events/fuengirola/, /community/, /communi
 console.log('✓ widths: 1440 / 1024 / 768 / 390 / 360');
 console.log('✓ target-route raster assets browser-decode successfully at 1440');
 console.log('✓ no horizontal overflow; canonical Header geometry preserved');
+console.log('✓ Home Fuengirola breakpoint-aware single raster owner: section background >700, in-flow strip <=700');
 console.log('✓ Home Fuengirola one-poster veil/copy geometry + screenshot visual baselines at 1440/1024/390');
-console.log('✓ Home Fuengirola one decodable canonical image owner + one semantic Gabil relation; Home Valentin; Community one-source hero');
+console.log('✓ Home Fuengirola one semantic Gabil relation; Home Valentin; Community one-source hero');
 console.log('✓ Fuengirola detail relation ownership + Gabil density; Events current-event presentation; Merch live-catalog framing');
 console.log('✓ exact public implementation-marker denylist; mobile Events path remains tap-accessible');
