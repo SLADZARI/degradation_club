@@ -218,6 +218,18 @@ for(const width of widths){
         }
 
         if(visualWidths.has(width)){
+          // Reproduce the settled in-view state before capturing the visual reference.
+          // Without this explicit scroll/wait the Home section can still be at the motion-reveal opacity:0 state,
+          // producing a false baseline that contains only the background image.
+          await homeEvent.scrollIntoViewIfNeeded();
+          await p.waitForTimeout(850);
+          const settled=await shell.evaluate(el=>({opacity:Number(getComputedStyle(el).opacity),visibleClass:el.classList.contains('is-visible')}));
+          expect(settled.opacity>=.99,`${label}: Home Fuengirola visual reference captured before reveal settled ${JSON.stringify(settled)}`);
+          expect(await homeEvent.locator('.dc-event__title').count()===1,`${label}: Home Fuengirola title missing before screenshot`);
+          expect(await homeEvent.locator('.dc-event__desc').count()===1,`${label}: Home Fuengirola description missing before screenshot`);
+          expect(await homeEvent.locator('.dc-event__action').count()===1,`${label}: Home Fuengirola CTA missing before screenshot`);
+          // Header/skip-link geometry is validated separately above. Exclude sticky overlays from the event-only visual reference.
+          await p.addStyleTag({content:'.dc-global-header,a[href="#main-content"]{visibility:hidden!important}'});
           const file=path.join(visualDir,`home-fuengirola-${width}.png`);
           const shot=await homeEvent.screenshot({path:file,animations:'disabled'});
           const hash=visualHash(shot);
