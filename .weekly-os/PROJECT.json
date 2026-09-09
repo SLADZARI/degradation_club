@@ -4,15 +4,15 @@
     "artifactId": "dementor-club.kernel.project",
     "project": "dementor-club",
     "documentType": "STANDARD",
-    "projectStage": "VALIDATION",
+    "projectStage": "BUILD",
     "gate": "G7_RELEASE",
     "status": "APPROVED",
-    "version": "1.44",
+    "version": "1.45",
     "updated": "2026-09-09",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "1.43"
+    "supersedes": "1.44"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -20,7 +20,7 @@
   "canonicalRepository": "SLADZARI/degradation_club",
   "defaultBranch": "main",
   "semanticSourceBranch": "dementor-club",
-  "projectStage": "VALIDATION",
+  "projectStage": "BUILD",
   "gate": "G7_RELEASE",
   "readFirst": [
     ".weekly-os/PROJECT.json",
