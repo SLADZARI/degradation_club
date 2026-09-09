@@ -48,6 +48,39 @@ async function makeContext(width){
   return c;
 }
 
+async function rasterHealth(page){
+  return page.evaluate(async()=>{
+    const urls=new Set();
+    const addUrl=value=>{
+      if(!value)return;
+      try{urls.add(new URL(value,location.href).href)}catch{}
+    };
+    document.querySelectorAll('img[src]').forEach(img=>addUrl(img.getAttribute('src')));
+    const addStyleUrls=style=>{
+      const bg=style?.backgroundImage||'';
+      for(const match of bg.matchAll(/url\(["']?([^"')]+)["']?\)/g))addUrl(match[1]);
+    };
+    document.querySelectorAll('*').forEach(el=>{
+      addStyleUrls(getComputedStyle(el));
+      addStyleUrls(getComputedStyle(el,'::before'));
+      addStyleUrls(getComputedStyle(el,'::after'));
+    });
+    const raster=[...urls].filter(url=>/\.(?:webp|png|jpe?g)(?:[?#].*)?$/i.test(url));
+    const out=[];
+    for(const url of raster){
+      const img=new Image();
+      img.src=url;
+      let error=null;
+      try{
+        if(typeof img.decode==='function')await img.decode();
+        else await new Promise((resolve,reject)=>{img.onload=resolve;img.onerror=()=>reject(new Error('load failed'))});
+      }catch(err){error=String(err?.message||err)}
+      out.push({url,ok:!error&&img.naturalWidth>0&&img.naturalHeight>0,width:img.naturalWidth,height:img.naturalHeight,error});
+    }
+    return out;
+  });
+}
+
 for(const width of widths){
   const c=await makeContext(width);
   for(const route of routes){
@@ -71,6 +104,13 @@ for(const width of widths){
 
     const publicText=(await p.locator('body').innerText()).toLowerCase();
     for(const marker of forbidden)expect(!publicText.includes(marker.toLowerCase()),`${label}: forbidden public marker visible: ${marker}`);
+
+    // Decode every raster referenced by target-route DOM/CSS once at desktop width.
+    // Existence/content-length alone is insufficient: a truncated WebP can still pass static/build checks.
+    if(width===1440){
+      const health=await rasterHealth(p);
+      for(const item of health)expect(item.ok,`${label}: raster failed browser decode ${JSON.stringify(item)}`);
+    }
 
     if(route==='/'){
       expect(await p.locator('.dc-course-prototype__mentor').count()===1,`${label}: Home Valentin mentor-card count drifted`);
@@ -104,7 +144,8 @@ for(const width of widths){
             actionAfterContent:actionAfter?.content||null
           };
         });
-        expect(layers.backgroundImage.includes('fuengirola-banner.webp'),`${label}: Home Fuengirola canonical banner is not the active section background`);
+        expect(layers.backgroundImage.includes('event-fuengirola-03.webp'),`${label}: Home Fuengirola canonical decodable event asset is not the active section background`);
+        expect(!layers.backgroundImage.includes('fuengirola-banner.webp'),`${label}: retired/corrupted Fuengirola banner returned to active background`);
         if(width>700)expect(layers.backgroundSize==='cover',`${label}: Home Fuengirola desktop background must cover full feature; actual=${layers.backgroundSize}`);
         expect(layers.overlayDisplay==='none'&&layers.overlayBackgroundImage==='none',`${label}: duplicate Fuengirola pseudo-image layer survived ${JSON.stringify(layers)}`);
         expect(layers.actionBeforeDisplay==='none'&&layers.actionAfterDisplay==='none',`${label}: decorative duplicate Gabil CTA pseudo-treatment survived ${JSON.stringify(layers)}`);
@@ -168,7 +209,8 @@ if(errors.length){console.error('PUBLIC HARMONIZATION BROWSER MATRIX BLOCKED');f
 console.log('Public harmonization browser matrix PASS');
 console.log('✓ routes: /, /events/, /events/fuengirola/, /community/, /community/gabil/, /merch/');
 console.log('✓ widths: 1440 / 1024 / 768 / 390 / 360');
+console.log('✓ target-route raster assets browser-decode successfully at 1440');
 console.log('✓ no horizontal overflow; canonical Header geometry preserved');
-console.log('✓ Home Fuengirola full-bleed one image owner + one semantic Gabil relation; Home Valentin; Community one-source hero');
+console.log('✓ Home Fuengirola full-bleed one decodable canonical image owner + one semantic Gabil relation; Home Valentin; Community one-source hero');
 console.log('✓ Fuengirola detail relation ownership + Gabil density; Events current-event presentation; Merch live-catalog framing');
 console.log('✓ exact public implementation-marker denylist; mobile Events path remains tap-accessible');
