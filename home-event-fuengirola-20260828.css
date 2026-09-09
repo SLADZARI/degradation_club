@@ -89,6 +89,11 @@
   color:#111!important;
 }
 
+/* Wide desktop title must fit inside the deliberately narrow copy rail. */
+@media(min-width:1101px){
+  .dc-home .dc-event__title{font-size:clamp(76px,6.2vw,92px)!important}
+}
+
 .dc-home .dc-event__status{display:none!important}
 
 .dc-home .dc-event__body{
@@ -189,10 +194,7 @@
     aspect-ratio:auto!important;
     margin:0!important;
     background-color:#FAF4E3!important;
-    background-image:url('/assets/ink/event-fuengirola-03.webp')!important;
-    background-position:center bottom!important;
-    background-size:100% auto!important;
-    background-repeat:no-repeat!important;
+    background-image:none!important;
     overflow:visible!important;
   }
 
@@ -205,14 +207,43 @@
     min-height:0!important;
     max-height:none!important;
     margin:0!important;
-    padding:28px 20px calc(67vw + 34px)!important;
-    display:block!important;
+    padding:28px 20px 34px!important;
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr)!important;
+    grid-template-rows:auto auto auto!important;
     box-sizing:border-box!important;
     background:transparent!important;
   }
 
-  .dc-home .dc-event__top,
+  /* Mobile uses the same canonical asset from the same canonical owner file,
+     but as an in-flow poster strip between title and body. */
+  .dc-home .dc-event>.dc-shell::before{
+    content:""!important;
+    display:block!important;
+    grid-column:1!important;
+    grid-row:2!important;
+    width:100%!important;
+    aspect-ratio:3/2!important;
+    margin:28px 0 0!important;
+    background-color:#FAF4E3!important;
+    background-image:url('/assets/ink/event-fuengirola-03.webp')!important;
+    background-position:center center!important;
+    background-size:cover!important;
+    background-repeat:no-repeat!important;
+    pointer-events:none!important;
+  }
+
+  .dc-home .dc-event__top{
+    grid-column:1!important;
+    grid-row:1!important;
+    width:100%!important;
+    max-width:none!important;
+    height:auto!important;
+  }
+
   .dc-home .dc-event__body{
+    grid-column:1!important;
+    grid-row:3!important;
     width:100%!important;
     max-width:none!important;
     height:auto!important;
@@ -225,9 +256,9 @@
   }
 
   .dc-home .dc-event__title{
-    font-size:clamp(50px,14.5vw,62px)!important;
+    font-size:clamp(48px,13.8vw,56px)!important;
     line-height:.82!important;
-    white-space:normal!important;
+    white-space:nowrap!important;
     letter-spacing:-.07em!important;
   }
 
