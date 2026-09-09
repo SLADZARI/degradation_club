@@ -32,7 +32,8 @@
 
   if(path==='/'){
     mountExisting('.dc-ink-slot--home','.dc-hero','home');
-    mountNew({targetSelector:'.dc-home .dc-event[aria-labelledby="event-title"] .dc-shell',src:'/assets/event-fuengirola-03.webp',alt:'Набережная Фуэнхиролы с пальмами, морем и городом',role:'home-event'});
+    // Home Fuengirola media is owned exclusively by home-event-fuengirola-20260828.css.
+    // Do not inject a second runtime figure into the event shell.
   }
   if(path==='/about/'){
     mountExisting('.dc-ink-slot--about','.dc-about-service__grid','service');
