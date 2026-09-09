@@ -2,8 +2,13 @@ import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';
 import {chromium} from 'playwright';
+import {PNG} from 'pngjs';
 
 const artifact=path.join(process.cwd(),'_site');
+const visualDir=path.join(process.cwd(),'.qa','public-harmonization');
+const visualBaselinePath=path.join(process.cwd(),'scripts','visual-baselines','home-fuengirola.json');
+fs.mkdirSync(visualDir,{recursive:true});
+const visualBaselines=fs.existsSync(visualBaselinePath)?JSON.parse(fs.readFileSync(visualBaselinePath,'utf8')):null;
 const errors=[];
 const expect=(ok,msg)=>{if(!ok)errors.push(msg)};
 const mime={'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.js':'text/javascript; charset=utf-8','.mjs':'text/javascript; charset=utf-8','.json':'application/json; charset=utf-8','.svg':'image/svg+xml','.png':'image/png','.webp':'image/webp','.jpg':'image/jpeg','.jpeg':'image/jpeg','.xml':'application/xml; charset=utf-8','.txt':'text/plain; charset=utf-8'};
@@ -14,6 +19,41 @@ function resolveFile(urlPath){
   const full=path.resolve(artifact,pathname.replace(/^\/+/,''));
   if(!full.startsWith(path.resolve(artifact)+path.sep)&&full!==path.resolve(artifact))return null;
   return full;
+}
+
+function visualHash(buffer,cols=32,rows=18){
+  const png=PNG.sync.read(buffer);
+  const cells=[];
+  for(let gy=0;gy<rows;gy++){
+    const y0=Math.floor(gy*png.height/rows),y1=Math.max(y0+1,Math.floor((gy+1)*png.height/rows));
+    for(let gx=0;gx<cols;gx++){
+      const x0=Math.floor(gx*png.width/cols),x1=Math.max(x0+1,Math.floor((gx+1)*png.width/cols));
+      let sum=0,count=0;
+      const sx=Math.max(1,Math.floor((x1-x0)/6)),sy=Math.max(1,Math.floor((y1-y0)/6));
+      for(let y=y0;y<y1;y+=sy){
+        for(let x=x0;x<x1;x+=sx){
+          const i=(y*png.width+x)*4;
+          const a=png.data[i+3]/255;
+          const r=png.data[i]*a+255*(1-a),g=png.data[i+1]*a+255*(1-a),b=png.data[i+2]*a+255*(1-a);
+          sum+=.2126*r+.7152*g+.0722*b;count++;
+        }
+      }
+      cells.push(sum/Math.max(1,count));
+    }
+  }
+  const avg=cells.reduce((a,b)=>a+b,0)/cells.length;
+  const bits=cells.map(v=>v>=avg?1:0);
+  let hex='';
+  for(let i=0;i<bits.length;i+=4){
+    let n=0;for(let j=0;j<4;j++)n=(n<<1)|(bits[i+j]||0);hex+=n.toString(16);
+  }
+  return hex;
+}
+
+function hammingHex(a,b){
+  if(typeof a!=='string'||typeof b!=='string'||a.length!==b.length)return Infinity;
+  const pop=[0,1,1,2,1,2,2,3,1,2,2,3,2,3,3,4];
+  let d=0;for(let i=0;i<a.length;i++)d+=pop[parseInt(a[i],16)^parseInt(b[i],16)];return d;
 }
 
 const server=http.createServer((req,res)=>{
@@ -37,6 +77,7 @@ const supabaseStub=`
 
 const routes=['/','/events/','/events/fuengirola/','/community/','/community/gabil/','/merch/'];
 const widths=[1440,1024,768,390,360];
+const visualWidths=new Set([1440,1024,390]);
 const forbidden=[
   'source-of-truth','canonical source-of-truth','participant relation from entity record','sales_state','production spec','CHECKOUT / DISABLED','PRICE / TBD','MECHANICS PENDING',
   'Пустое состояние — тоже данные','канонической записи события','OBJECT / WEAR / DROP сущности','WORKING ASSETS','MERCH CONTRACT'
@@ -86,7 +127,7 @@ for(const width of widths){
   for(const route of routes){
     const p=await c.newPage();
     await p.goto(base+route,{waitUntil:'domcontentloaded'});
-    await p.waitForTimeout(180);
+    await p.waitForTimeout(220);
     const label=`${route}@${width}`;
 
     const geometry=await p.evaluate(()=>({scrollWidth:document.documentElement.scrollWidth,clientWidth:document.documentElement.clientWidth}));
@@ -125,21 +166,34 @@ for(const width of widths){
           expect(eventBox.x>=-1&&eventBox.x<=1,`${label}: Home Fuengirola is not full-bleed from viewport left ${JSON.stringify(eventBox)}`);
           expect(eventBox.width>=width-1&&eventBox.width<=width+1,`${label}: Home Fuengirola is not viewport-wide ${JSON.stringify(eventBox)}`);
         }
+        const shell=homeEvent.locator(':scope > .dc-shell');
+        const shellBox=await shell.boundingBox();
         const layers=await homeEvent.evaluate(el=>{
           const after=getComputedStyle(el,'::after');
+          const beforeVeil=getComputedStyle(el,'::before');
           const action=el.querySelector('.dc-event__action');
-          const before=action?getComputedStyle(action,'::before'):null;
+          const actionBefore=action?getComputedStyle(action,'::before'):null;
           const actionAfter=action?getComputedStyle(action,'::after'):null;
           const own=getComputedStyle(el);
+          const shellEl=el.querySelector(':scope > .dc-shell');
+          const shellStyle=shellEl?getComputedStyle(shellEl):null;
+          const alphas=[...beforeVeil.backgroundImage.matchAll(/rgba\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*,\s*([0-9.]+)\s*\)/g)].map(m=>Number(m[1]));
+          const stops=[...beforeVeil.backgroundImage.matchAll(/([0-9.]+)%/g)].map(m=>Number(m[1]));
           return {
             backgroundImage:own.backgroundImage,
             backgroundSize:own.backgroundSize,
+            backgroundPosition:own.backgroundPosition,
+            veilDisplay:beforeVeil.display,
+            veilBackground:beforeVeil.backgroundImage,
+            veilMaxAlpha:alphas.length?Math.max(...alphas):0,
+            veilEndPct:stops.length?Math.max(...stops):0,
+            shellBackground:shellStyle?.backgroundColor||null,
             overlayDisplay:after.display,
             overlayContent:after.content,
             overlayBackgroundImage:after.backgroundImage,
-            actionBeforeDisplay:before?.display||null,
-            actionBeforeContent:before?.content||null,
-            actionBeforeBackgroundImage:before?.backgroundImage||null,
+            actionBeforeDisplay:actionBefore?.display||null,
+            actionBeforeContent:actionBefore?.content||null,
+            actionBeforeBackgroundImage:actionBefore?.backgroundImage||null,
             actionAfterDisplay:actionAfter?.display||null,
             actionAfterContent:actionAfter?.content||null
           };
@@ -149,6 +203,34 @@ for(const width of widths){
         if(width>700)expect(layers.backgroundSize==='cover',`${label}: Home Fuengirola desktop background must cover full feature; actual=${layers.backgroundSize}`);
         expect(layers.overlayDisplay==='none'&&layers.overlayBackgroundImage==='none',`${label}: duplicate Fuengirola pseudo-image layer survived ${JSON.stringify(layers)}`);
         expect(layers.actionBeforeDisplay==='none'&&layers.actionAfterDisplay==='none',`${label}: decorative duplicate Gabil CTA pseudo-treatment survived ${JSON.stringify(layers)}`);
+        expect(layers.shellBackground==='rgba(0, 0, 0, 0)'||layers.shellBackground==='transparent',`${label}: Home Fuengirola copy shell became an opaque panel: ${layers.shellBackground}`);
+        if(width>1100){
+          expect(shellBox&&shellBox.width<=562&&shellBox.width>=500,`${label}: Home Fuengirola copy shell must stay in ~520–560px band ${JSON.stringify(shellBox)}`);
+          expect(layers.veilMaxAlpha<=.79&&layers.veilEndPct<=42,`${label}: Home veil too opaque/wide; visual-card regression ${JSON.stringify(layers)}`);
+        }else if(width>900){
+          expect(shellBox&&shellBox.width<=522,`${label}: Home Fuengirola 1024 copy shell too wide ${JSON.stringify(shellBox)}`);
+          expect(layers.veilMaxAlpha<=.81&&layers.veilEndPct<=49,`${label}: Home 1024 veil too opaque/wide ${JSON.stringify(layers)}`);
+        }else if(width>700){
+          expect(shellBox&&shellBox.width<=502,`${label}: Home Fuengirola tablet copy shell too wide ${JSON.stringify(shellBox)}`);
+          expect(layers.veilMaxAlpha<=.85&&layers.veilEndPct<=55,`${label}: Home tablet veil too opaque/wide ${JSON.stringify(layers)}`);
+        }else{
+          expect(layers.veilDisplay==='none',`${label}: Home mobile must not use desktop veil`);
+        }
+
+        if(visualWidths.has(width)){
+          const file=path.join(visualDir,`home-fuengirola-${width}.png`);
+          const shot=await homeEvent.screenshot({path:file,animations:'disabled'});
+          const hash=visualHash(shot);
+          console.log(`VISUAL_REF home-fuengirola@${width} hash=${hash}`);
+          const baseline=visualBaselines?.widths?.[String(width)];
+          if(!baseline){
+            errors.push(`${label}: visual baseline missing in ${path.relative(process.cwd(),visualBaselinePath)}; candidate hash=${hash}`);
+          }else{
+            const distance=hammingHex(hash,baseline.hash);
+            const maxDistance=Number.isFinite(baseline.maxDistance)?baseline.maxDistance:36;
+            expect(distance<=maxDistance,`${label}: visual screenshot drift ${distance}>${maxDistance}; hash=${hash}; baseline=${baseline.hash}`);
+          }
+        }
       }
     }
 
@@ -211,6 +293,7 @@ console.log('✓ routes: /, /events/, /events/fuengirola/, /community/, /communi
 console.log('✓ widths: 1440 / 1024 / 768 / 390 / 360');
 console.log('✓ target-route raster assets browser-decode successfully at 1440');
 console.log('✓ no horizontal overflow; canonical Header geometry preserved');
-console.log('✓ Home Fuengirola full-bleed one decodable canonical image owner + one semantic Gabil relation; Home Valentin; Community one-source hero');
+console.log('✓ Home Fuengirola one-poster veil/copy geometry + screenshot visual baselines at 1440/1024/390');
+console.log('✓ Home Fuengirola one decodable canonical image owner + one semantic Gabil relation; Home Valentin; Community one-source hero');
 console.log('✓ Fuengirola detail relation ownership + Gabil density; Events current-event presentation; Merch live-catalog framing');
 console.log('✓ exact public implementation-marker denylist; mobile Events path remains tap-accessible');
