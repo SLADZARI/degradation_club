@@ -11,6 +11,7 @@ const illustrationSurfaces = read('illustration-surfaces.css');
 const styles = read('styles.css');
 const bridge = read('course-bridge-v1.css');
 const home = read('index.html');
+const homeEventCss = read('home-event-fuengirola-20260828.css');
 const community = read('community/index.html');
 const communityCss = read('community-v2.css');
 const eventsIndex = read('events/index.html');
@@ -43,7 +44,12 @@ must(illustrationSurfaces.includes('var(--dc-ink-bg-fuengirola)'), 'Fuengirola i
 must(home.includes('/courses/dumai-s-opasnostyu/'), 'Home course feature missing');
 must(home.includes('/events/fuengirola/'), 'Home event feature missing');
 must(visual.includes(".dc-home section.dc-event:has(a[href=\"/courses/dumai-s-opasnostyu/\"])::after"), 'Home course FEATURE portrait layer missing');
-must(visual.includes(".dc-home section.dc-event:has(a[href=\"/events/fuengirola/\"])::after"), 'Home Event FEATURE media layer missing');
+must(visual.includes(".dc-home section.dc-event:has(a[href=\"/events/fuengirola/\"])::after"), 'Legacy Home Event media layer unexpectedly disappeared before tech-debt cleanup');
+must(homeEventCss.includes("background-image:url('/assets/home/events/fuengirola-banner.webp')!important"), 'Home Fuengirola canonical banner owner missing');
+must(homeEventCss.includes('.dc-home .dc-event.dc-section::after'), 'Home Fuengirola shared-overlay suppression missing');
+must(homeEventCss.includes('content:none!important') && homeEventCss.includes('background-image:none!important'), 'Home Fuengirola duplicate image overlay is not neutralized');
+must(!homeEventCss.includes('Габиль Тагиев\\A дементор'), 'Home Fuengirola decorative duplicate Gabil treatment survived');
+must(relations.includes("add(fuengirola?.querySelector('.dc-event__meta'),'gabil','ДЕМЕНТОР СОБЫТИЯ')"), 'Home Fuengirola semantic Gabil relation owner missing');
 must(visual.includes("/assets/people/dementors/valentin/dementor_valentin.webp"), 'Valentin portrait binding missing');
 must((home.match(/<a class="dc-course-prototype__mentor"/g) || []).length === 1, 'Home course must contain exactly one Valentin mentor-card');
 must(!home.includes('Дементор: Валентин Лосев.'), 'Home duplicate textual Valentin attribution must stay removed');
@@ -62,7 +68,9 @@ must(communityCss.includes('minmax(0,.9fr) minmax(0,1.35fr) minmax(0,.9fr)'), 'C
 // Events keeps the real record dominant and represents empty lifecycle states compactly.
 must((eventsIndex.match(/<div class="dc-programme__lane\b/g) || []).length === 1, 'Events must keep exactly one full programme lane for the real event');
 must((eventsIndex.match(/<span class="dc-programme__empty-state"/g) || []).length === 5, 'Events compact lifecycle rail must contain five empty states');
-must((eventsIndex.match(/Пустое состояние/gi) || []).length === 1, 'Events empty-state editorial rule must be stated once');
+must(!eventsIndex.includes('Пустое состояние — тоже данные'), 'Events internal empty-state explanation returned');
+must(eventsIndex.includes('В программе — только то, что уже стало событием клуба.'), 'Events public programme explanation missing');
+must(!eventsIndex.includes('канонической записи события'), 'Events canonical-record implementation wording leaked into public copy');
 for (const state of ['ANNOUNCED','REGISTRATION','SOLD-OUT','COMPLETED','CANCELLED']) must(eventsIndex.includes(`<strong>${state}</strong>`), `Events compact lifecycle missing ${state}`);
 
 must(event.includes('/assets/ink/event-fuengirola-03.webp'), 'Fuengirola approved event asset missing');
@@ -86,7 +94,12 @@ const forbiddenMarkers = [
   'production spec',
   'CHECKOUT / DISABLED',
   'PRICE / TBD',
-  'MECHANICS PENDING'
+  'MECHANICS PENDING',
+  'Пустое состояние — тоже данные',
+  'канонической записи события',
+  'OBJECT / WEAR / DROP сущности',
+  'WORKING ASSETS',
+  'MERCH CONTRACT'
 ];
 for (const [surface, html] of Object.entries(publicSurfaces)) {
   for (const marker of forbiddenMarkers) must(!html.toLowerCase().includes(marker.toLowerCase()), `${surface}: forbidden public implementation marker survived: ${marker}`);
@@ -118,6 +131,7 @@ console.log('✓ 4 Dementor identity background tokens');
 console.log('✓ global visual layer active; legacy course import absent');
 console.log('✓ HERO / MICRO / RELATION / FEATURE contracts present');
 console.log('✓ Home course/person FEATURE and Home event FEATURE bound to approved assets');
+console.log('✓ Home Fuengirola has one image owner and one semantic Gabil treatment');
 console.log('✓ Home course keeps one Valentin mentor identity');
 console.log('✓ Community hero has one semantic content source across breakpoints');
 console.log('✓ Events keeps one real lane + compact five-state lifecycle rail');
