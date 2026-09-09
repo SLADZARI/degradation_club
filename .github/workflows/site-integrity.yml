@@ -52,10 +52,18 @@ jobs:
         run: node scripts/validate-google-oauth-handoff.mjs
       - name: Install browser smoke runtime
         run: |
-          npm install --no-save --no-package-lock playwright@1.55.0
+          npm install --no-save --no-package-lock playwright@1.55.0 pngjs@7.0.0
           npx playwright install --with-deps chromium webkit
       - name: Validate public harmonization browser matrix
         run: node scripts/validate-public-harmonization-browser.mjs
+      - name: Upload Home Fuengirola visual references
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: home-fuengirola-visual-references
+          path: .qa/public-harmonization/home-fuengirola-*.png
+          if-no-files-found: error
+          retention-days: 14
       - name: Validate DC-9 login sync and cross-device recovery
         run: node scripts/validate-dc9-sync-browser.mjs
       - name: Validate Board v2.1 fullscreen browser state matrix
