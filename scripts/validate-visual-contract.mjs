@@ -48,6 +48,9 @@ must(visual.includes(".dc-home section.dc-event:has(a[href=\"/events/fuengirola/
 must(homeEventCss.includes("background-image:url('/assets/home/events/fuengirola-banner.webp')!important"), 'Home Fuengirola canonical banner owner missing');
 must(homeEventCss.includes('.dc-home .dc-event.dc-section::after'), 'Home Fuengirola shared-overlay suppression missing');
 must(homeEventCss.includes('content:none!important') && homeEventCss.includes('background-image:none!important'), 'Home Fuengirola duplicate image overlay is not neutralized');
+must(homeEventCss.includes('width:100vw!important'), 'Home Fuengirola desktop feature is not full-bleed');
+must(homeEventCss.includes('margin:0 0 0 -50vw!important'), 'Home Fuengirola full-bleed viewport anchor missing');
+must(homeEventCss.includes('background-size:cover!important'), 'Home Fuengirola desktop image must cover the full feature');
 must(!homeEventCss.includes('Габиль Тагиев\\A дементор'), 'Home Fuengirola decorative duplicate Gabil treatment survived');
 must(relations.includes("add(fuengirola?.querySelector('.dc-event__meta'),'gabil','ДЕМЕНТОР СОБЫТИЯ')"), 'Home Fuengirola semantic Gabil relation owner missing');
 must(visual.includes("/assets/people/dementors/valentin/dementor_valentin.webp"), 'Valentin portrait binding missing');
@@ -65,24 +68,30 @@ must(community.includes('hero-ref__content'), 'Community canonical hero content 
 must(communityCss.includes('.hero-ref__content'), 'Community canonical hero CSS owner missing');
 must(communityCss.includes('minmax(0,.9fr) minmax(0,1.35fr) minmax(0,.9fr)'), 'Community 1024-safe hero grid contract missing');
 
-// Events keeps the real record dominant and represents empty lifecycle states compactly.
+// Events now presents the real event directly; lifecycle mechanics remain internal data, not public layout.
 must((eventsIndex.match(/<div class="dc-programme__lane\b/g) || []).length === 1, 'Events must keep exactly one full programme lane for the real event');
-must((eventsIndex.match(/<span class="dc-programme__empty-state"/g) || []).length === 5, 'Events compact lifecycle rail must contain five empty states');
-must(!eventsIndex.includes('Пустое состояние — тоже данные'), 'Events internal empty-state explanation returned');
-must(eventsIndex.includes('В программе — только то, что уже стало событием клуба.'), 'Events public programme explanation missing');
-must(!eventsIndex.includes('канонической записи события'), 'Events canonical-record implementation wording leaked into public copy');
-for (const state of ['ANNOUNCED','REGISTRATION','SOLD-OUT','COMPLETED','CANCELLED']) must(eventsIndex.includes(`<strong>${state}</strong>`), `Events compact lifecycle missing ${state}`);
+must((eventsIndex.match(/dc-programme__empty-state/g) || []).length === 0, 'Events empty lifecycle mechanics must stay out of public DOM');
+must(eventsIndex.includes('БЛИЖАЙШЕЕ СОБЫТИЕ'), 'Events visitor-facing current-event label missing');
+for (const marker of ['PROGRAMME / STATUS INDEX','STATE / 01','ARCHIVE RULE','NOTES / EVENTS','Пустое состояние — тоже данные','канонической записи события']) {
+  must(!eventsIndex.includes(marker), `Events public mechanics returned: ${marker}`);
+}
 
 must(event.includes('/assets/ink/event-fuengirola-03.webp'), 'Fuengirola approved event asset missing');
 must(event.includes('/assets/people/dementors/gabil/dementor_gabil.webp'), 'Fuengirola Gabil relation portrait missing');
 
 // Public-site harmonization: Fuengirola owns one static event→Gabil relation.
-// Guard runtime ownership and editorial identity density as separate invariants.
 must((event.match(/<a class="dc-event-hero__relation\b/g) || []).length === 1, 'Fuengirola must contain exactly one static event→Gabil relation');
 must(!relations.includes("if(path==='/events/fuengirola/')"), 'Fuengirola route-specific relation injection must stay retired');
 must(!event.includes('dc-dementor-feature--gabil'), 'Fuengirola second dominant Gabil feature must stay removed');
 must(!event.includes('participant relation from entity record'), 'Fuengirola internal entity-record copy leaked into public UI');
 must(event.includes('ДЕМЕНТОР СОБЫТИЯ'), 'Fuengirola compact public relation label missing');
+
+// Merch must read as a live catalog. Commercial truth still comes from the existing runtime source.
+must(merch.includes('LIVE CATALOG'), 'Merch live-catalog framing missing');
+must(merch.includes('Актуальная цена и доступность указаны на карточках.'), 'Merch visitor-facing price/availability copy missing');
+for (const marker of ['SALES NOT OPEN','WEAR / PREVIEW','MERCH / SALES RULE','Визуальные макеты существуют','Продажи открываются только после утверждения']) {
+  must(!merch.includes(marker), `Merch intent/preview framing returned: ${marker}`);
+}
 
 // Public copy denylist targets implementation/data-model leaks, not generic club status vocabulary.
 const publicSurfaces = {home,events:eventsIndex,fuengirola:event,merch,gabil};
@@ -130,11 +139,12 @@ console.log('✓ canonical visual token runtime + illustration surfaces active')
 console.log('✓ 4 Dementor identity background tokens');
 console.log('✓ global visual layer active; legacy course import absent');
 console.log('✓ HERO / MICRO / RELATION / FEATURE contracts present');
-console.log('✓ Home course/person FEATURE and Home event FEATURE bound to approved assets');
+console.log('✓ Home course/person FEATURE and full-bleed Home Fuengirola FEATURE bound to approved assets');
 console.log('✓ Home Fuengirola has one image owner and one semantic Gabil treatment');
 console.log('✓ Home course keeps one Valentin mentor identity');
 console.log('✓ Community hero has one semantic content source across breakpoints');
-console.log('✓ Events keeps one real lane + compact five-state lifecycle rail');
+console.log('✓ Events exposes the current event without lifecycle/process mechanics');
+console.log('✓ Merch reads as live catalog while runtime remains commercial-state owner');
 console.log('✓ public implementation/data-model markers are blocked on touched surfaces');
 console.log('✓ Fuengirola media = canonical asset / top-right / height-first');
 console.log('✓ Fuengirola relation owner is static; runtime duplicate + second dominant Gabil feature absent');
