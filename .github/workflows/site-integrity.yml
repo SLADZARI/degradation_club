@@ -54,6 +54,8 @@ jobs:
         run: |
           npm install --no-save --no-package-lock playwright@1.55.0
           npx playwright install --with-deps chromium webkit
+      - name: Validate public harmonization browser matrix
+        run: node scripts/validate-public-harmonization-browser.mjs
       - name: Validate DC-9 login sync and cross-device recovery
         run: node scripts/validate-dc9-sync-browser.mjs
       - name: Validate Board v2.1 fullscreen browser state matrix
