@@ -1,5 +1,4 @@
 (()=>{
-  const people={};
   const entities=[
     {id:'SH-DEM-01',type:'wear',name:'OVERTHINKING IS MY CARDIO.',url:'/merch/drop-001/overthinking-is-my-cardio/',asset:'/assets/merch/drop-001/sh-dem-01-light.webp',state:'NOT OPEN',status:'working-assets-present',idea:'Футболка для тех, кто уже превратил мыслительный процесс в кардио.',tags:['thinking','overthinking','course'],slots:['COURSE_RELATED','MERCH_CROSSSELL','FOOTER_ROTATION'],priority:60},
     {id:'SH-DEM-02',type:'wear',name:'PERSONAL GROWTH CANCELLED.',url:'/merch/drop-001/personal-growth-cancelled/',asset:'/assets/merch/drop-001/sh-dem-02-light.webp',state:'NOT OPEN',status:'working-assets-present',idea:'Физическое подтверждение временной приостановки личностного роста.',tags:['personal-growth','self-improvement','home'],slots:['HOME_INLINE','MERCH_CROSSSELL','FOOTER_ROTATION'],priority:55},
