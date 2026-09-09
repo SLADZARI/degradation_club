@@ -57,6 +57,24 @@ User-supplied desktop + mobile screenshots after deploy #51 confirm:
    - page is visually cleaner but still reads as a preview/intention instead of an operating catalog;
    - requested direction: public page should read as a live shop/catalog and let actual price/availability state speak through the cards.
 
+## Artifact-level blocker discovered before PR #140 release
+A tester then inspected the exact Pages artifact from deploy #51 and found that the Home-only asset:
+
+`assets/home/events/fuengirola-banner.webp`
+
+was physically truncated/corrupted. GitHub reports the repository file size as `29 921` bytes, while the WebP RIFF header declares a much larger payload; direct decoders reject the file. This explains why a CSS/layout-only fix could still leave the sole Home event image unreliable.
+
+This finding is valid and is inside Result 1 because the visible harmonization acceptance requires the built Home image to actually render.
+
+Resolution in PR `#140`:
+- do not create another duplicate event image;
+- stop referencing the corrupted Home-only banner in runtime CSS;
+- reuse the existing canonical, decodable event asset `assets/ink/event-fuengirola-03.webp` for Home Fuengirola;
+- keep the single Home image owner and single semantic Gabil relation;
+- add built-route browser raster decoding checks so truncated `.webp/.png/.jpg` references fail G6 instead of passing on file existence/CSS geometry alone.
+
+The corrupted `assets/home/events/fuengirola-banner.webp` file itself is not deleted in Result 1; once unreferenced it becomes tech-debt inventory for Result 2 rather than another visual mutation.
+
 ## Commercial truth conflict discovered during second retest
 Actual sales activation is intentionally **not** folded into the visual harmonization pass because current production sources disagree and checkout is disabled.
 
@@ -84,10 +102,15 @@ Required separate decision before real sales activation:
 ## Current second corrective implementation
 The same Result and same integration branch continue with PR `#140` from exact production commit `435c74c1fb8566d47f28c5ceda1006279f5f622c`.
 
+Latest validated candidate:
+- `587315105146904fd380eff5661ff955bcce3743`
+- Site Integrity / Release Readiness `#917` / `34398964239` / **SUCCESS**
+- updated public browser matrix includes raster decode validation and passed.
+
 Scope remains public visual/editorial harmonization only:
-- Home Fuengirola full-bleed desktop composition;
+- Home Fuengirola full-bleed desktop composition using a decodable canonical event asset;
 - Events visitor-facing simplification;
 - Merch live-catalog framing without changing sales-state or checkout semantics;
-- regression guards for those exact live findings.
+- regression guards for those exact live findings, including raster integrity.
 
 No Workspace, Board, DC-9, Membership, auth, Supabase data/schema, event registration or merch checkout mutation is included.
