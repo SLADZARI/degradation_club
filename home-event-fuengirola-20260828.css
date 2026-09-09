@@ -19,6 +19,14 @@
   isolation:isolate!important;
 }
 
+/* This route-specific file is the sole Home Fuengirola image owner.
+   Suppress the older shared visual-standard overlay so the event image is rendered once. */
+.dc-home .dc-event.dc-section::after{
+  content:none!important;
+  display:none!important;
+  background-image:none!important;
+}
+
 /* Only a soft veil remains over the photo. No opaque paper plate. */
 .dc-home .dc-event::before{
   content:""!important;
@@ -132,32 +140,13 @@
   overflow:visible!important;
 }
 
-.dc-home .dc-event__action::before{
-  content:""!important;
-  position:absolute!important;
-  left:calc(100% + 18px)!important;
-  top:1px!important;
-  width:50px!important;
-  height:58px!important;
-  overflow:hidden!important;
-  border:1px solid rgba(17,17,17,.45)!important;
-  background:url('/assets/people/dementors/gabil/dementor_gabil.webp') center center/cover no-repeat!important;
-}
-
+/* Gabil identity is semantic DOM owned by dementor-relations-v1.js.
+   Retire the old decorative duplicate attached to the CTA. */
+.dc-home .dc-event__action::before,
 .dc-home .dc-event__action::after{
-  content:"Габиль Тагиев\A дементор"!important;
-  white-space:pre!important;
-  position:absolute!important;
-  left:calc(100% + 80px)!important;
-  top:10px!important;
-  width:150px!important;
-  text-align:left!important;
-  color:#111!important;
-  font-size:14px!important;
-  line-height:1.15!important;
-  font-weight:800!important;
-  letter-spacing:0!important;
-  text-transform:none!important;
+  content:none!important;
+  display:none!important;
+  background:none!important;
 }
 
 @media(max-width:900px) and (min-width:701px){
@@ -239,23 +228,9 @@
   .dc-home .dc-event__action{
     width:100%!important;
     min-height:54px!important;
-    margin:96px 0 0!important;
+    margin:28px 0 0!important;
     padding:0 18px!important;
     font-size:12px!important;
-  }
-
-  .dc-home .dc-event__action::before{
-    left:0!important;
-    top:-78px!important;
-    width:48px!important;
-    height:56px!important;
-  }
-
-  .dc-home .dc-event__action::after{
-    left:68px!important;
-    top:-68px!important;
-    width:180px!important;
-    font-size:14px!important;
   }
 
   .dc-home .dc-event>.dc-shell::after{display:none!important}
