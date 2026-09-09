@@ -80,6 +80,11 @@ for(const width of widths){
       expect(await homeEvent.count()===1,`${label}: Home Fuengirola feature missing/duplicated`);
       if(await homeEvent.count()){
         expect(await homeEvent.locator('.dc-dementor-link').count()===1,`${label}: Home Fuengirola must expose exactly one semantic Gabil relation after runtime`);
+        const eventBox=await homeEvent.boundingBox();
+        if(eventBox&&width>700){
+          expect(eventBox.x>=-1&&eventBox.x<=1,`${label}: Home Fuengirola is not full-bleed from viewport left ${JSON.stringify(eventBox)}`);
+          expect(eventBox.width>=width-1&&eventBox.width<=width+1,`${label}: Home Fuengirola is not viewport-wide ${JSON.stringify(eventBox)}`);
+        }
         const layers=await homeEvent.evaluate(el=>{
           const after=getComputedStyle(el,'::after');
           const action=el.querySelector('.dc-event__action');
@@ -88,6 +93,7 @@ for(const width of widths){
           const own=getComputedStyle(el);
           return {
             backgroundImage:own.backgroundImage,
+            backgroundSize:own.backgroundSize,
             overlayDisplay:after.display,
             overlayContent:after.content,
             overlayBackgroundImage:after.backgroundImage,
@@ -99,6 +105,7 @@ for(const width of widths){
           };
         });
         expect(layers.backgroundImage.includes('fuengirola-banner.webp'),`${label}: Home Fuengirola canonical banner is not the active section background`);
+        if(width>700)expect(layers.backgroundSize==='cover',`${label}: Home Fuengirola desktop background must cover full feature; actual=${layers.backgroundSize}`);
         expect(layers.overlayDisplay==='none'&&layers.overlayBackgroundImage==='none',`${label}: duplicate Fuengirola pseudo-image layer survived ${JSON.stringify(layers)}`);
         expect(layers.actionBeforeDisplay==='none'&&layers.actionAfterDisplay==='none',`${label}: decorative duplicate Gabil CTA pseudo-treatment survived ${JSON.stringify(layers)}`);
       }
@@ -121,14 +128,19 @@ for(const width of widths){
 
     if(route==='/events/'){
       expect(await p.locator('.dc-programme__lane').count()===1,`${label}: Events real-lane count drifted`);
-      expect(await p.locator('.dc-programme__empty-state').count()===5,`${label}: Events compact empty-state count drifted`);
-      expect(await p.locator('.dc-programme__empty').count()===0,`${label}: legacy full empty lanes survived`);
-      expect((await p.locator('.dc-programme-intro').innerText()).includes('В программе — только то, что уже стало событием клуба.'),`${label}: Events public programme copy drifted`);
+      expect(await p.locator('.dc-programme__empty-state').count()===0,`${label}: Events lifecycle mechanics returned to public DOM`);
+      expect(await p.locator('.dc-editorial-opening').count()===0,`${label}: Events process editorial block returned`);
+      expect(await p.locator('.dc-programme-note').count()===0,`${label}: Events archive/process note returned`);
+      expect(await p.locator('.dc-footnotes').count()===0,`${label}: Events implementation footnotes returned`);
+      expect((await p.locator('.dc-programme-intro').innerText()).includes('БЛИЖАЙШЕЕ СОБЫТИЕ'),`${label}: Events visitor-facing current-event label drifted`);
     }
 
     if(route==='/merch/'){
       const lead=await p.locator('.dc-entity-hero__lead').innerText();
-      expect(lead.includes('вещи и физические артефакты клубной культуры'),`${label}: Merch public hero copy drifted`);
+      expect(lead.includes('Актуальная цена и доступность указаны на карточках.'),`${label}: Merch live-catalog hero copy drifted`);
+      expect(await p.locator('.dc-boundary').count()===0,`${label}: Merch sales-rule intent block returned`);
+      const merchText=await p.locator('body').innerText();
+      for(const marker of ['SALES NOT OPEN','WEAR / PREVIEW','MERCH / SALES RULE','Визуальные макеты существуют'])expect(!merchText.includes(marker),`${label}: Merch preview/intent framing visible: ${marker}`);
     }
 
     await p.close();
@@ -157,6 +169,6 @@ console.log('Public harmonization browser matrix PASS');
 console.log('✓ routes: /, /events/, /events/fuengirola/, /community/, /community/gabil/, /merch/');
 console.log('✓ widths: 1440 / 1024 / 768 / 390 / 360');
 console.log('✓ no horizontal overflow; canonical Header geometry preserved');
-console.log('✓ Home Fuengirola one image owner + one semantic Gabil relation; Home Valentin; Community one-source hero');
-console.log('✓ Fuengirola detail relation ownership + Gabil density; Events compact lifecycle; Merch public hero copy');
+console.log('✓ Home Fuengirola full-bleed one image owner + one semantic Gabil relation; Home Valentin; Community one-source hero');
+console.log('✓ Fuengirola detail relation ownership + Gabil density; Events current-event presentation; Merch live-catalog framing');
 console.log('✓ exact public implementation-marker denylist; mobile Events path remains tap-accessible');
