@@ -45,7 +45,8 @@ must(home.includes('/courses/dumai-s-opasnostyu/'), 'Home course feature missing
 must(home.includes('/events/fuengirola/'), 'Home event feature missing');
 must(visual.includes(".dc-home section.dc-event:has(a[href=\"/courses/dumai-s-opasnostyu/\"])::after"), 'Home course FEATURE portrait layer missing');
 must(visual.includes(".dc-home section.dc-event:has(a[href=\"/events/fuengirola/\"])::after"), 'Legacy Home Event media layer unexpectedly disappeared before tech-debt cleanup');
-must(homeEventCss.includes("background-image:url('/assets/home/events/fuengirola-banner.webp')!important"), 'Home Fuengirola canonical banner owner missing');
+must(homeEventCss.includes("background-image:url('/assets/ink/event-fuengirola-03.webp')!important"), 'Home Fuengirola canonical decodable event asset owner missing');
+must(!homeEventCss.includes('/assets/home/events/fuengirola-banner.webp'), 'Retired/corrupted Home Fuengirola banner path returned to runtime CSS');
 must(homeEventCss.includes('.dc-home .dc-event.dc-section::after'), 'Home Fuengirola shared-overlay suppression missing');
 must(homeEventCss.includes('content:none!important') && homeEventCss.includes('background-image:none!important'), 'Home Fuengirola duplicate image overlay is not neutralized');
 must(homeEventCss.includes('width:100vw!important'), 'Home Fuengirola desktop feature is not full-bleed');
@@ -140,6 +141,7 @@ console.log('✓ 4 Dementor identity background tokens');
 console.log('✓ global visual layer active; legacy course import absent');
 console.log('✓ HERO / MICRO / RELATION / FEATURE contracts present');
 console.log('✓ Home course/person FEATURE and full-bleed Home Fuengirola FEATURE bound to approved assets');
+console.log('✓ Home Fuengirola reuses canonical decodable event asset; retired corrupted banner is not referenced');
 console.log('✓ Home Fuengirola has one image owner and one semantic Gabil treatment');
 console.log('✓ Home course keeps one Valentin mentor identity');
 console.log('✓ Community hero has one semantic content source across breakpoints');
