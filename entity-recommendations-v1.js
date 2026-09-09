@@ -1,4 +1,5 @@
 (()=>{
+  const people={};
   const entities=[
     {id:'SH-DEM-01',type:'wear',name:'OVERTHINKING IS MY CARDIO.',url:'/merch/drop-001/overthinking-is-my-cardio/',asset:'/assets/merch/drop-001/sh-dem-01-light.webp',state:'NOT OPEN',status:'working-assets-present',idea:'Футболка для тех, кто уже превратил мыслительный процесс в кардио.',tags:['thinking','overthinking','course'],slots:['COURSE_RELATED','MERCH_CROSSSELL','FOOTER_ROTATION'],priority:60},
     {id:'SH-DEM-02',type:'wear',name:'PERSONAL GROWTH CANCELLED.',url:'/merch/drop-001/personal-growth-cancelled/',asset:'/assets/merch/drop-001/sh-dem-02-light.webp',state:'NOT OPEN',status:'working-assets-present',idea:'Физическое подтверждение временной приостановки личностного роста.',tags:['personal-growth','self-improvement','home'],slots:['HOME_INLINE','MERCH_CROSSSELL','FOOTER_ROTATION'],priority:55},
@@ -53,13 +54,17 @@
     return 'ОТКРЫТЬ ОБЪЕКТ';
   }
 
+  function priceLabelFor(entity){
+    return entity.state==='AVAILABLE'?'ЦЕНА / СМОТРИТЕ НА СТРАНИЦЕ':'ЦЕНА / БУДЕТ ОБЪЯВЛЕНА';
+  }
+
   function render(entity,ctx){
     seen.add(entity.id);
     const section=document.createElement('section');
     section.className='dc-recommendation'+(ctx.mode==='minor'?' dc-recommendation--minor':'');
     section.dataset.recommendationSlot=ctx.slot;
     section.dataset.entityId=entity.id;
-    section.innerHTML=`<div class="dc-recommendation__inner"><a class="dc-recommendation__media" href="${entity.url}" aria-label="${entity.name.replace(/"/g,'&quot;')}"><img src="${entity.asset}" alt="${entity.name.replace(/"/g,'&quot;')}" loading="lazy" decoding="async"></a><div class="dc-recommendation__copy"><div class="dc-recommendation__meta"><span>${entity.id} / ${entity.type.toUpperCase()}</span><span>${entity.state}</span></div><p class="dc-recommendation__label">${labelFor(ctx.slot)}</p><h2 class="dc-recommendation__title">${entity.name}</h2><p class="dc-recommendation__idea">${entity.idea}</p><div class="dc-recommendation__foot"><div class="dc-recommendation__state">PRICE / ${entity.state==='AVAILABLE'?'SEE PRODUCT':'TBD'}<br>SALES / ${entity.state}</div><a class="dc-recommendation__action" href="${entity.url}">${actionFor(entity)} →</a></div></div></div>`;
+    section.innerHTML=`<div class="dc-recommendation__inner"><a class="dc-recommendation__media" href="${entity.url}" aria-label="${entity.name.replace(/"/g,'&quot;')}"><img src="${entity.asset}" alt="${entity.name.replace(/"/g,'&quot;')}" loading="lazy" decoding="async"></a><div class="dc-recommendation__copy"><div class="dc-recommendation__meta"><span>${entity.id} / ${entity.type.toUpperCase()}</span><span>${entity.state}</span></div><p class="dc-recommendation__label">${labelFor(ctx.slot)}</p><h2 class="dc-recommendation__title">${entity.name}</h2><p class="dc-recommendation__idea">${entity.idea}</p><div class="dc-recommendation__foot"><div class="dc-recommendation__state">${priceLabelFor(entity)}<br>SALES / ${entity.state}</div><a class="dc-recommendation__action" href="${entity.url}">${actionFor(entity)} →</a></div></div></div>`;
     const before=ctx.before&&document.querySelector(ctx.before);
     if(before) before.parentNode.insertBefore(section,before);
     else if(ctx.after&&ctx.after.parentNode) ctx.after.parentNode.insertBefore(section,ctx.after.nextSibling);
