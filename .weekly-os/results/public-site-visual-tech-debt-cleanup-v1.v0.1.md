@@ -2,8 +2,8 @@
 artifactId: dementor-club.result.public-site-visual-tech-debt-cleanup-v1
 project: dementor-club
 documentType: RESULT
-projectStage: BUILD
-gate: G6_VALIDATION
+projectStage: VALIDATION
+gate: G7_RELEASE
 status: DRAFT
 version: 0.1
 updated: 2026-09-10
@@ -12,7 +12,7 @@ sourceSystem: GIT
 authorityType: IMPLEMENTATION_AUTHORITY
 ---
 
-# MP | Dementor Club | BUILD | Public Site Visual Tech-Debt Cleanup v1 | v0.1
+# MP | Dementor Club | VALIDATION | Public Site Visual Tech-Debt Cleanup v1 | v0.1
 
 ## Goal
 Reduce structural presentation entropy on the public site without changing the accepted Result-1 production appearance or product semantics.
@@ -21,7 +21,7 @@ Source specification boundary: `operations/PUBLIC_SITE_VISUAL_HARMONIZATION_V1.m
 Accepted visual baseline: `operations/PUBLIC_SITE_VISUAL_HARMONIZATION_LIVE_SMOKE_2026-09-10.md`.
 
 ## Status
-**DRAFT / BUILD / G6 VALIDATION PENDING**
+**DRAFT / CLEANUP PASS 01 G6 PASS / G7 RELEASE PENDING**
 
 ## Exact baseline
 - production branch: `dementor-club-production`;
@@ -52,7 +52,7 @@ Confirmed:
 
 Exact duplicate-asset families were also observed, but equality alone is not deletion authority. They remain inventory until full source + built reference closure is proved.
 
-## Cleanup pass 01 — implemented on integration branch
+## Cleanup pass 01 — implemented and validated
 Without creating a new CSS/JS layer:
 - `seo-runtime.js`: legacy `.nav`/`.menu-toggle` compatibility hooks removed; ink-layout loading scoped to its four active routes;
 - `ink-layout-v2.js`: explicit active-route allowlist added; unrelated public routes no longer load the old layout/tuning CSS;
@@ -60,6 +60,14 @@ Without creating a new CSS/JS layer:
 - `docs/GLOBAL_HEADER_v1.md`: aligned with the current Russian/auth-aware Public Header contract;
 - retired corrupted `assets/home/events/fuengirola-banner.webp` removed;
 - unreferenced `ui-redesign-drive-v1.css` removed after exact built-artifact reference check.
+
+PR / candidate:
+- PR: `#143` — `Public visual tech-debt cleanup v1 — owner retirement pass 01`;
+- base: `f3ffdea8cc4ec17a140beeada2b2af3f774dba29`;
+- candidate: `7f8c25dbd7668869565b0721592be0d46a2dbdb3`;
+- Site Integrity / Release Readiness: `#932` / `34465751927` / **SUCCESS**.
+
+G6 passed the full current chain including visual contract, production candidate build, canonical shell, JS syntax, Home Fuengirola ownership diagnostic, public harmonization browser matrix, DC-9, Membership, Board browser state matrix, Workspace/browser recovery, My Artifacts, auth regressions, route manifest and production release gate.
 
 ## Deferred inside this Result until regression evidence
 Do not blindly remove:
@@ -84,7 +92,7 @@ A later cleanup pass may remove dead Fuengirola selectors from legacy ink-layout
 - production deploy authorized: **false**;
 - live database mutation authorized: **false**.
 
-A green commit is not a release. After G6, explicit owner authorization is still required before merge/deploy.
+A green commit is not a release. Explicit owner authorization is still required before merge/deploy.
 
 ## Related state
 - `dementor-club.result.public-site-visual-harmonization-v1` is released and handed off to this cleanup Result;
