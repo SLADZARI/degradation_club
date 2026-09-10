@@ -267,6 +267,15 @@ for(const width of widths){
       expect(await p.locator('.dc-event-hero__media img[src="/assets/ink/event-fuengirola-03.webp"]').count()===1,`${label}: Fuengirola detail canonical hero owner missing/duplicated`);
       expect(await p.locator('img[src="/assets/ink/event-fuengirola-03.webp"]').count()===1,`${label}: Fuengirola detail has multiple canonical event raster owners`);
       expect(await p.locator('.dc-event-hero__relation img[src*="/assets/people/dementors/gabil/"]').count()===1,`${label}: Fuengirola detail must expose exactly one Gabil portrait relation`);
+      const detailTitle=p.locator('#fuengirola-title');
+      expect(await detailTitle.count()===1,`${label}: Fuengirola H1 missing/duplicated`);
+      if(await detailTitle.count()){
+        const detailTitleBox=await detailTitle.boundingBox();
+        const detailHeroBox=await p.locator('.dc-fuengirola-page .dc-entity-hero').boundingBox();
+        const detailTitleState=await detailTitle.evaluate(el=>{const s=getComputedStyle(el);return {display:s.display,visibility:s.visibility,opacity:Number(s.opacity),color:s.color,text:el.textContent?.trim()||''}});
+        expect(detailTitleState.text==='ФУЭНХИРОЛА'&&detailTitleState.display!=='none'&&detailTitleState.visibility!=='hidden'&&detailTitleState.opacity>.01&&detailTitleBox&&detailTitleBox.width>80&&detailTitleBox.height>30,`${label}: Fuengirola H1 is not visibly rendered ${JSON.stringify({detailTitleState,detailTitleBox})}`);
+        if(detailTitleBox&&detailHeroBox)expect(detailTitleBox.y+detailTitleBox.height>detailHeroBox.y&&detailTitleBox.y<detailHeroBox.y+detailHeroBox.height,`${label}: Fuengirola H1 escaped the hero ${JSON.stringify({detailTitleBox,detailHeroBox})}`);
+      }
     }
 
     if(route==='/community/'){
@@ -289,6 +298,27 @@ for(const width of widths){
       expect(await eventRow.count()===1,`${label}: Events Fuengirola row missing/duplicated`);
       if(await eventRow.count())expect(await eventRow.getAttribute('data-preview-src')==='/assets/ink/event-fuengirola-03.webp',`${label}: Events preview source is not canonical`);
       expect(await p.locator('.dc-programme-intro .dc-ink-trace-media').count()===0,`${label}: persistent INK programme media owner survived`);
+      const eventsInkState=await p.evaluate(()=>{
+        const intro=document.querySelector('.dc-programme-intro');
+        const after=intro?getComputedStyle(intro,'::after'):null;
+        return {bodyLevel:document.body.dataset.inkLevel||null,bodyRole:document.body.dataset.inkRole||null,introTrace:intro?.classList.contains('dc-ink-trace')||false,afterDisplay:after?.display||null,afterContent:after?.content||null};
+      });
+      expect(eventsInkState.bodyLevel==='0'&&eventsInkState.bodyRole==='silence',`${label}: Events must not claim an Ink trace presentation role ${JSON.stringify(eventsInkState)}`);
+      expect(!eventsInkState.introTrace,`${label}: orphan PROGRAMME TRACE class survived ${JSON.stringify(eventsInkState)}`);
+      expect(eventsInkState.afterDisplay==='none'||eventsInkState.afterContent==='none'||eventsInkState.afterContent==='normal',`${label}: orphan PROGRAMME TRACE label is visible ${JSON.stringify(eventsInkState)}`);
+      const eventsHero=p.locator('.dc-events-hero');
+      const eventsTitle=p.locator('#events-title');
+      expect(await eventsTitle.count()===1,`${label}: Events page title missing/duplicated`);
+      const eventsHeroBox=await eventsHero.boundingBox();
+      if(await eventsTitle.count()){
+        const eventsTitleBox=await eventsTitle.boundingBox();
+        const eventsTitleState=await eventsTitle.evaluate(el=>{const s=getComputedStyle(el);return {display:s.display,visibility:s.visibility,opacity:Number(s.opacity),text:el.textContent?.trim()||''}});
+        expect(eventsTitleState.text==='СОБЫТИЯ'&&eventsTitleState.display!=='none'&&eventsTitleState.visibility!=='hidden'&&eventsTitleState.opacity>.01&&eventsTitleBox&&eventsTitleBox.width>40&&eventsTitleBox.height>20,`${label}: Events page title is not visibly owned by the compact header ${JSON.stringify({eventsTitleState,eventsTitleBox})}`);
+      }
+      if(eventsHeroBox){
+        expect(eventsHeroBox.height<650,`${label}: Events header regressed to a full-screen/empty hero ${JSON.stringify(eventsHeroBox)}`);
+        if(width<=700)expect(eventsHeroBox.height<500,`${label}: Events mobile header leaves excessive empty space ${JSON.stringify(eventsHeroBox)}`);
+      }
       expect(await p.locator('.dc-programme__body > .dc-dementor-link').count()===0,`${label}: runtime Gabil card survived in Events listing`);
       expect(await p.locator('.dc-programme__body img[src*="/assets/people/dementors/gabil/"]').count()===0,`${label}: Gabil portrait must not be a listing presentation owner`);
       const persistentOwners=await p.evaluate(()=>{
@@ -348,6 +378,6 @@ console.log('✓ no horizontal overflow; canonical Header geometry preserved');
 console.log('✓ Home Fuengirola breakpoint-aware single raster owner: section background >700, in-flow strip <=700');
 console.log('✓ Home Fuengirola one-poster veil/copy geometry + screenshot visual baselines at 1440/1024/390');
 console.log('✓ Home Fuengirola one semantic Gabil relation; Home Valentin; Community one-source hero');
-console.log('✓ Events listing has no persistent Fuengirola/Gabil presentation owners; canonical preview remains interactive');
-console.log('✓ Fuengirola detail owns exactly one canonical hero raster + one Gabil portrait relation; Merch live-catalog framing');
+console.log('✓ Events listing has no persistent Fuengirola/Gabil presentation owners or orphan trace; compact Events header stays visible');
+console.log('✓ Fuengirola detail owns exactly one canonical hero raster + one Gabil portrait relation + visible H1; Merch live-catalog framing');
 console.log('✓ exact public implementation-marker denylist; mobile Events path remains tap-accessible');
