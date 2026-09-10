@@ -87,7 +87,7 @@
     '/about/':{level:2,role:'contamination',target:'.dc-ink-slot--about'},
     '/projects/logic-awareness/':{level:2,role:'leak',target:'.dc-ink-slot--logic'},
     '/events/fuengirola/':{level:2,role:'field-record',target:'.dc-ink-slot--event'},
-    '/events/':{level:1,role:'trace',target:'.dc-programme-intro',label:'INK / L1 / PROGRAMME TRACE',media:true},
+    '/events/':{level:1,role:'trace',target:'.dc-programme-intro',label:'INK / L1 / PROGRAMME TRACE'},
     '/projects/':{level:1,role:'trace',target:'.dc-project-register-section .dc-kicker',label:'INK / L1 / PROJECT TRACE',media:true},
     '/catalog/':{level:1,role:'trace',target:'.dc-entity-index__head',label:'INK / L1 / REGISTER TRACE'},
     '/community/':{level:1,role:'people-flow',target:'.dc-community-hero',label:'INK / L1 / PEOPLE FLOW'},

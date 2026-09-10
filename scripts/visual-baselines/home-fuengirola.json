@@ -1,0 +1,22 @@
+{
+  "schemaVersion": "1.0",
+  "result": "dementor-club.result.public-site-visual-harmonization-v1",
+  "surface": "home-fuengirola",
+  "acceptedFromRun": 924,
+  "acceptedArtifactId": 10125592894,
+  "note": "Accepted only after breakpoint-aware media-owner contract passed and 1440/1024/390 reference screenshots were visually inspected. Desktop/tablet use the canonical section background; mobile uses one canonical in-flow strip.",
+  "widths": {
+    "1440": {
+      "hash": "ffffffffffffffffd7b7ffff8003fffef0ffffe4f1ffc004f0600004f0006004ff707c00ff801c00fff07e00fa63f840ffcff070f1fff000fffff500ffff8008ffff8400fffe4816",
+      "maxDistance": 36
+    },
+    "1024": {
+      "hash": "ffffffffffffffffc602ffffc000fffff83ffffef87fffe0fe7c0000fc000000fff3dc00ff801c80ff807e00fc0ff840fdfff011fc7ff004ffff8000ffdf8200fff88002fff89010",
+      "maxDistance": 36
+    },
+    "390": {
+      "hash": "fffdffffc0000013c9124843fffffffffff88001c0000001c0000001c0000001c7bfffffc01fffff8003ffffc001ffffffffffffc000500f821fffffe3ffffffbffffffdffffffff",
+      "maxDistance": 36
+    }
+  }
+}

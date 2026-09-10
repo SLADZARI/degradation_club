@@ -14,7 +14,7 @@
   box-sizing:border-box!important;
   background-color:#FAF4E3!important;
   background-image:url('/assets/ink/event-fuengirola-03.webp')!important;
-  background-position:center center!important;
+  background-position:58% center!important;
   background-size:cover!important;
   background-repeat:no-repeat!important;
   color:#111!important;
@@ -29,7 +29,8 @@
   background-image:none!important;
 }
 
-/* Only a soft veil remains over the photo. No opaque paper plate. */
+/* One poster, not a paper card over a second picture.
+   The veil only protects copy contrast and must dissolve before it can read as a panel. */
 .dc-home .dc-event::before{
   content:""!important;
   position:absolute!important;
@@ -37,23 +38,23 @@
   z-index:1!important;
   pointer-events:none!important;
   background:linear-gradient(90deg,
-    rgba(250,244,227,.94) 0%,
-    rgba(250,244,227,.84) 14%,
-    rgba(250,244,227,.62) 27%,
-    rgba(250,244,227,.34) 39%,
-    rgba(250,244,227,.12) 48%,
-    rgba(250,244,227,0) 57%)!important;
+    rgba(250,244,227,.78) 0%,
+    rgba(250,244,227,.66) 10%,
+    rgba(250,244,227,.46) 20%,
+    rgba(250,244,227,.25) 29%,
+    rgba(250,244,227,.09) 35%,
+    rgba(250,244,227,0) 41%)!important;
 }
 
 .dc-home .dc-event>.dc-shell{
   position:relative!important;
   z-index:2!important;
-  width:min(48vw,720px)!important;
+  width:min(560px,100vw)!important;
   max-width:none!important;
   height:100%!important;
   min-height:clamp(660px,58vw,860px)!important;
   margin:0!important;
-  padding:clamp(58px,6.2vw,90px) 0 clamp(48px,5.6vw,82px) clamp(40px,5.1vw,78px)!important;
+  padding:clamp(58px,6.2vw,90px) 18px clamp(48px,5.6vw,82px) clamp(40px,4.2vw,64px)!important;
   display:grid!important;
   grid-template-rows:auto auto 1fr!important;
   background:transparent!important;
@@ -86,6 +87,11 @@
   text-transform:uppercase!important;
   white-space:nowrap!important;
   color:#111!important;
+}
+
+/* Wide desktop title must fit inside the deliberately narrow copy rail. */
+@media(min-width:1101px){
+  .dc-home .dc-event__title{font-size:clamp(76px,6.2vw,92px)!important}
 }
 
 .dc-home .dc-event__status{display:none!important}
@@ -151,10 +157,29 @@
   background:none!important;
 }
 
+@media(max-width:1100px) and (min-width:901px){
+  .dc-home .dc-event.dc-section{background-position:60% center!important}
+  .dc-home .dc-event>.dc-shell{width:min(520px,52vw)!important;padding-left:clamp(36px,4.4vw,48px)!important}
+  .dc-home .dc-event::before{background:linear-gradient(90deg,
+    rgba(250,244,227,.80) 0%,
+    rgba(250,244,227,.68) 12%,
+    rgba(250,244,227,.46) 24%,
+    rgba(250,244,227,.24) 34%,
+    rgba(250,244,227,.08) 42%,
+    rgba(250,244,227,0) 48%)!important}
+}
+
 @media(max-width:900px) and (min-width:701px){
+  .dc-home .dc-event.dc-section{background-position:62% center!important}
   .dc-home .dc-event__title{font-size:clamp(62px,7.8vw,82px)!important}
-  .dc-home .dc-event>.dc-shell{width:56vw!important;padding-left:4.5vw!important}
-  .dc-home .dc-event::before{background:linear-gradient(90deg,rgba(250,244,227,.92) 0%,rgba(250,244,227,.72) 25%,rgba(250,244,227,.34) 45%,rgba(250,244,227,0) 64%)!important}
+  .dc-home .dc-event>.dc-shell{width:min(500px,66vw)!important;padding-left:4vw!important}
+  .dc-home .dc-event::before{background:linear-gradient(90deg,
+    rgba(250,244,227,.84) 0%,
+    rgba(250,244,227,.72) 14%,
+    rgba(250,244,227,.50) 28%,
+    rgba(250,244,227,.28) 40%,
+    rgba(250,244,227,.10) 48%,
+    rgba(250,244,227,0) 54%)!important}
 }
 
 @media(max-width:700px){
@@ -169,10 +194,7 @@
     aspect-ratio:auto!important;
     margin:0!important;
     background-color:#FAF4E3!important;
-    background-image:url('/assets/ink/event-fuengirola-03.webp')!important;
-    background-position:center bottom!important;
-    background-size:100% auto!important;
-    background-repeat:no-repeat!important;
+    background-image:none!important;
     overflow:visible!important;
   }
 
@@ -185,14 +207,43 @@
     min-height:0!important;
     max-height:none!important;
     margin:0!important;
-    padding:28px 20px calc(67vw + 34px)!important;
-    display:block!important;
+    padding:28px 20px 34px!important;
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr)!important;
+    grid-template-rows:auto auto auto!important;
     box-sizing:border-box!important;
     background:transparent!important;
   }
 
-  .dc-home .dc-event__top,
+  /* Mobile uses the same canonical asset from the same canonical owner file,
+     but as an in-flow poster strip between title and body. */
+  .dc-home .dc-event>.dc-shell::before{
+    content:""!important;
+    display:block!important;
+    grid-column:1!important;
+    grid-row:2!important;
+    width:100%!important;
+    aspect-ratio:3/2!important;
+    margin:28px 0 0!important;
+    background-color:#FAF4E3!important;
+    background-image:url('/assets/ink/event-fuengirola-03.webp')!important;
+    background-position:center center!important;
+    background-size:cover!important;
+    background-repeat:no-repeat!important;
+    pointer-events:none!important;
+  }
+
+  .dc-home .dc-event__top{
+    grid-column:1!important;
+    grid-row:1!important;
+    width:100%!important;
+    max-width:none!important;
+    height:auto!important;
+  }
+
   .dc-home .dc-event__body{
+    grid-column:1!important;
+    grid-row:3!important;
     width:100%!important;
     max-width:none!important;
     height:auto!important;
@@ -205,9 +256,9 @@
   }
 
   .dc-home .dc-event__title{
-    font-size:clamp(50px,14.5vw,62px)!important;
+    font-size:clamp(48px,13.8vw,56px)!important;
     line-height:.82!important;
-    white-space:normal!important;
+    white-space:nowrap!important;
     letter-spacing:-.07em!important;
   }
 
