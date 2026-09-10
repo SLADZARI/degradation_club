@@ -13,7 +13,7 @@
 .dc-home .dc-hero>.dc-ink-integrated--home{grid-column:7/13!important;grid-row:1/4!important;align-self:stretch;width:100%!important;height:100%!important;z-index:1;position:relative!important;inset:auto!important}
 .dc-home .dc-hero>.dc-ink-integrated--home img{object-fit:cover!important;object-position:68% center}
 
-/* HOME / FUENGIROLA — illustration is the event card's visual half. */
+/* HOME / FUENGIROLA — retained compatibility declarations that still match the accepted Home DOM. */
 .dc-home .dc-event[aria-labelledby="event-title"] .dc-shell.dc-has-integrated-ink--home-event{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:var(--dc-gap);align-items:stretch}
 .dc-home .dc-event[aria-labelledby="event-title"] .dc-event__top{grid-column:1/7;grid-row:1}
 .dc-home .dc-event[aria-labelledby="event-title"] .dc-event__body{grid-column:1/7;grid-row:2}
@@ -44,17 +44,6 @@
 .dc-ministry__grid.dc-has-integrated-ink--logic .dc-ministry__statement{grid-column:7/13;grid-row:2;margin-top:32px}
 .dc-ministry__grid>.dc-ink-integrated--logic{grid-column:1/7;grid-row:1/3;width:100%!important;height:100%!important;min-height:620px;position:relative!important;inset:auto!important}
 .dc-ministry__grid>.dc-ink-integrated--logic img{object-fit:contain!important;object-position:left center}
-
-/* FUENGIROLA ENTITY — event copy left, location image right. */
-.dc-fuengirola-page .dc-entity-hero.dc-has-integrated-ink--fuengirola{grid-template-rows:auto 1fr auto;align-content:stretch;min-height:calc(100svh - 64px)}
-.dc-fuengirola-page .dc-entity-hero.dc-has-integrated-ink--fuengirola .dc-entity-hero__meta{grid-column:1/13;grid-row:1;z-index:3}
-.dc-fuengirola-page .dc-entity-hero.dc-has-integrated-ink--fuengirola .dc-entity-hero__title{grid-column:1/7;grid-row:2;align-self:center;margin-top:0;z-index:3}
-.dc-fuengirola-page .dc-entity-hero.dc-has-integrated-ink--fuengirola .dc-entity-hero__bottom{grid-column:1/7;grid-row:3;grid-template-columns:repeat(6,1fr);margin-top:28px;z-index:3}
-.dc-fuengirola-page .dc-entity-hero.dc-has-integrated-ink--fuengirola .dc-entity-hero__lead{grid-column:1/7}
-.dc-fuengirola-page .dc-entity-hero.dc-has-integrated-ink--fuengirola .dc-entity-hero__facts{grid-column:1/4;margin-top:22px}
-.dc-fuengirola-page .dc-entity-hero.dc-has-integrated-ink--fuengirola .dc-entity-hero__action{grid-column:4/7;align-self:end}
-.dc-fuengirola-page .dc-entity-hero>.dc-ink-integrated--fuengirola{grid-column:7/13!important;grid-row:1/4!important;width:100%!important;height:100%!important;z-index:1;position:relative!important;inset:auto!important}
-.dc-fuengirola-page .dc-entity-hero>.dc-ink-integrated--fuengirola img{object-fit:cover!important;object-position:center center}
 
 /* COMMUNITY — hero copy left, people flow right. */
 .dc-community-hero .dc-shell.dc-has-integrated-ink--community{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:16px;align-items:center}
@@ -95,15 +84,6 @@
   .dc-ministry__grid.dc-has-integrated-ink--logic .dc-ministry__statement{grid-column:1/9;grid-row:2;margin-top:28px}
   .dc-ministry__grid>.dc-ink-integrated--logic{grid-column:1/9;grid-row:3;height:auto!important;min-height:0;aspect-ratio:16/10;margin-top:32px!important}
 
-  .dc-fuengirola-page .dc-entity-hero.dc-has-integrated-ink--fuengirola{grid-template-columns:repeat(8,minmax(0,1fr));grid-template-rows:auto auto auto auto;min-height:auto}
-  .dc-fuengirola-page .dc-entity-hero.dc-has-integrated-ink--fuengirola .dc-entity-hero__meta{grid-column:1/9;grid-row:1}
-  .dc-fuengirola-page .dc-entity-hero.dc-has-integrated-ink--fuengirola .dc-entity-hero__title{grid-column:1/9;grid-row:2;margin-top:54px}
-  .dc-fuengirola-page .dc-entity-hero>.dc-ink-integrated--fuengirola{grid-column:1/9!important;grid-row:3!important;height:auto!important;aspect-ratio:16/9;margin-top:34px!important}
-  .dc-fuengirola-page .dc-entity-hero.dc-has-integrated-ink--fuengirola .dc-entity-hero__bottom{grid-column:1/9;grid-row:4;grid-template-columns:repeat(8,1fr);margin-top:34px}
-  .dc-fuengirola-page .dc-entity-hero.dc-has-integrated-ink--fuengirola .dc-entity-hero__lead{grid-column:1/9}
-  .dc-fuengirola-page .dc-entity-hero.dc-has-integrated-ink--fuengirola .dc-entity-hero__facts{grid-column:1/5}
-  .dc-fuengirola-page .dc-entity-hero.dc-has-integrated-ink--fuengirola .dc-entity-hero__action{grid-column:5/9}
-
   .dc-community-hero .dc-shell.dc-has-integrated-ink--community{grid-template-columns:repeat(8,1fr)}
   .dc-community-hero .dc-shell.dc-has-integrated-ink--community>.dc-kicker{grid-column:1/9;grid-row:1}
   .dc-community-hero .dc-shell.dc-has-integrated-ink--community>h1{grid-column:1/9;grid-row:2}
@@ -124,12 +104,6 @@
   .dc-about-service__grid.dc-has-integrated-ink--service,.dc-about-dementor__grid.dc-has-integrated-ink--authority,.dc-ministry__grid.dc-has-integrated-ink--logic{grid-template-columns:repeat(4,1fr)}
   .dc-about-service__grid.dc-has-integrated-ink--service .dc-about-service__label,.dc-about-service__grid.dc-has-integrated-ink--service .dc-about-service__title,.dc-about-service__grid>.dc-ink-integrated--service,.dc-about-service__grid.dc-has-integrated-ink--service .dc-about-service__copy,.dc-about-service__grid.dc-has-integrated-ink--service .dc-about-service__quote,.dc-about-dementor__grid.dc-has-integrated-ink--authority .dc-about-dementor__label,.dc-about-dementor__grid.dc-has-integrated-ink--authority .dc-about-dementor__title,.dc-about-dementor__grid>.dc-ink-integrated--authority,.dc-about-dementor__grid.dc-has-integrated-ink--authority .dc-about-dementor__copy,.dc-about-dementor__grid.dc-has-integrated-ink--authority .dc-footnotes,.dc-ministry__grid.dc-has-integrated-ink--logic .dc-ministry__label,.dc-ministry__grid.dc-has-integrated-ink--logic .dc-ministry__statement,.dc-ministry__grid>.dc-ink-integrated--logic{grid-column:1/5}
   .dc-about-service__grid>.dc-ink-integrated--service,.dc-about-dementor__grid>.dc-ink-integrated--authority,.dc-ministry__grid>.dc-ink-integrated--logic{aspect-ratio:1.2/1}
-
-  .dc-fuengirola-page .dc-entity-hero.dc-has-integrated-ink--fuengirola{grid-template-columns:repeat(4,minmax(0,1fr))}
-  .dc-fuengirola-page .dc-entity-hero.dc-has-integrated-ink--fuengirola .dc-entity-hero__meta,.dc-fuengirola-page .dc-entity-hero.dc-has-integrated-ink--fuengirola .dc-entity-hero__title,.dc-fuengirola-page .dc-entity-hero>.dc-ink-integrated--fuengirola,.dc-fuengirola-page .dc-entity-hero.dc-has-integrated-ink--fuengirola .dc-entity-hero__bottom{grid-column:1/5!important}
-  .dc-fuengirola-page .dc-entity-hero>.dc-ink-integrated--fuengirola{aspect-ratio:1.35/1}
-  .dc-fuengirola-page .dc-entity-hero.dc-has-integrated-ink--fuengirola .dc-entity-hero__bottom{grid-template-columns:repeat(4,1fr)}
-  .dc-fuengirola-page .dc-entity-hero.dc-has-integrated-ink--fuengirola .dc-entity-hero__lead,.dc-fuengirola-page .dc-entity-hero.dc-has-integrated-ink--fuengirola .dc-entity-hero__facts,.dc-fuengirola-page .dc-entity-hero.dc-has-integrated-ink--fuengirola .dc-entity-hero__action{grid-column:1/5}
 
   .dc-community-hero .dc-shell.dc-has-integrated-ink--community{grid-template-columns:repeat(4,1fr)}
   .dc-community-hero .dc-shell.dc-has-integrated-ink--community>.dc-kicker,.dc-community-hero .dc-shell.dc-has-integrated-ink--community>h1,.dc-community-hero .dc-shell>.dc-ink-integrated--community,.dc-community-hero .dc-shell.dc-has-integrated-ink--community .dc-community-intro{grid-column:1/5}
