@@ -1,9 +1,10 @@
 (()=>{
   const path=location.pathname;
-  if(!document.querySelector('link[href="/ink-layout-v2.css"]')){
+  const legacyLayoutAllowed=path!=='/events/fuengirola/';
+  if(legacyLayoutAllowed&&!document.querySelector('link[href="/ink-layout-v2.css"]')){
     const link=document.createElement('link');link.rel='stylesheet';link.href='/ink-layout-v2.css';document.head.appendChild(link);
   }
-  if(!document.querySelector('link[href="/ink-layout-v2-tuning.css"]')){
+  if(legacyLayoutAllowed&&!document.querySelector('link[href="/ink-layout-v2-tuning.css"]')){
     const tune=document.createElement('link');tune.rel='stylesheet';tune.href='/ink-layout-v2-tuning.css';document.head.appendChild(tune);
   }
 
@@ -40,6 +41,7 @@
     mountNew({targetSelector:'.dc-about-dementor__grid',src:'/assets/ink/authority-chair-01.webp',alt:'Офисное кресло, превращённое в ироничный трон',role:'authority'});
   }
   if(path==='/projects/logic-awareness/')mountExisting('.dc-ink-slot--logic','.dc-ministry__grid','logic');
-  if(path==='/events/fuengirola/')mountExisting('.dc-ink-slot--event','.dc-entity-hero','fuengirola');
+  // Fuengirola detail owns its static canonical hero in visual-standard-v2.css.
+  // Legacy ink-layout CSS/tuning and runtime mounting are intentionally disabled on this route.
   if(path==='/community/')mountNew({targetSelector:'.dc-community-hero .dc-shell',src:'/assets/ink/community-flow-01.webp',alt:'Группа людей движется в одном направлении, рядом отдельно стоит человек с листом',role:'community'});
 })();
