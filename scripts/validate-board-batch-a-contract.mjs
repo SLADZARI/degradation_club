@@ -5,7 +5,9 @@ const expect=(ok,message)=>{if(!ok)failures.push(message)};
 const read=path=>fs.readFileSync(path,'utf8');
 
 const migrationPath='supabase/migrations/20260912131000_board_information_architecture_batch_a.sql';
+const hardeningPath='supabase/migrations/20260912141500_board_information_architecture_batch_a_security_hardening.sql';
 const migration=read(migrationPath);
+const hardening=read(hardeningPath);
 const board=read('community/board/board.js');
 const entry=read('community/board/board-entry-v2.js');
 const detail=read('community/artifact/artifact.js');
@@ -23,6 +25,10 @@ expect(migration.includes('drop function if exists public.dc_guest_board_read_v1
 expect(/a\.status in \('active','expired','archived'\)/.test(migration),'Guest Board history RPC does not include all historical statuses');
 expect(entry.includes("dc_guest_board_read_v1"),'Guest Board entry does not use canonical Guest Board read RPC');
 expect(entry.includes('artifact.status')||entry.includes('artifact_status')||entry.includes('status'),'Guest Board render has no lifecycle status handling');
+
+// Guest Board read must remain authenticated-only after drop/recreate.
+expect(hardening.includes('revoke all on function public.dc_guest_board_read_v1() from public'),'Guest Board read hardening does not revoke PUBLIC execute');
+expect(hardening.includes('grant execute on function public.dc_guest_board_read_v1() to authenticated'),'Guest Board read hardening does not restore authenticated execute');
 
 // Historical interaction policy: reactions allowed, responses frozen.
 expect(migration.includes('dc_guest_board_interest_toggle_v1'),'Guest reaction owner missing from Batch A migration');
