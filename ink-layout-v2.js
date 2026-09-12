@@ -1,6 +1,6 @@
 (()=>{
   const path=location.pathname;
-  const layoutRoutes=new Set(['/','/about/','/projects/logic-awareness/','/community/']);
+  const layoutRoutes=new Set(['/','/about/','/projects/logic-awareness/']);
   if(!layoutRoutes.has(path))return;
   if(!document.querySelector('link[href="/ink-layout-v2.css"]')){
     const link=document.createElement('link');link.rel='stylesheet';link.href='/ink-layout-v2.css';document.head.appendChild(link);
@@ -42,5 +42,4 @@
     mountNew({targetSelector:'.dc-about-dementor__grid',src:'/assets/ink/authority-chair-01.webp',alt:'Офисное кресло, превращённое в ироничный трон',role:'authority'});
   }
   if(path==='/projects/logic-awareness/')mountExisting('.dc-ink-slot--logic','.dc-ministry__grid','logic');
-  if(path==='/community/')mountNew({targetSelector:'.dc-community-hero .dc-shell',src:'/assets/ink/community-flow-01.webp',alt:'Группа людей движется в одном направлении, рядом отдельно стоит человек с листом',role:'community'});
 })();
