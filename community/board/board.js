@@ -1,4 +1,5 @@
 import {getClient,currentSession,loginWithGoogle,getEntryStatus,DC_ARTIFACT_BUCKET,esc,formatDate,safeFileName,mediaType,signedMediaUrl,errorMessage,route} from '/community-runtime-v1.js';
+import {ARTIFACT_SUBTYPES,artifactSubtypeLabel} from '/community/board/board-entity-model-v1.js';
 
 const entryHost=document.getElementById('entryHost');
 const boardHost=document.getElementById('boardHost');
@@ -9,6 +10,7 @@ let client=null,session=null,entryStatus=null,ownDraft=null,ownDraftMedia=[];
 
 const allowedTypes=new Set(['image/jpeg','image/png','image/webp']);
 const maxFileSize=4*1024*1024;
+const artifactSubtypeIds=new Set(ARTIFACT_SUBTYPES.map(([id])=>id));
 
 function boardUserState(){return String(document.documentElement.dataset.dcBoardUserState||'')}
 function isOwnerAdmin(){return boardUserState()==='OWNER_ADMIN'}
@@ -18,6 +20,7 @@ function localDateInput(value){if(!value)return'';const d=new Date(value);if(Num
 function minLocalDateTime(){return localDateInput(new Date(Date.now()+60*1000).toISOString())}
 function iso(value){return value?new Date(value).toISOString():null}
 function avatar(profile){if(profile?.avatar_url)return `<img class="dc-notice__avatar" src="${esc(profile.avatar_url)}" alt="">`;const letter=String(profile?.display_name||'?').trim().charAt(0).toUpperCase()||'?';return `<span class="dc-notice__avatar dc-notice__avatar--empty">${esc(letter)}</span>`}
+function artifactSubtypeOptions(selected='announcement'){const current=artifactSubtypeIds.has(String(selected))?String(selected):'announcement';return ARTIFACT_SUBTYPES.map(([id,label])=>`<option value="${id}" ${id===current?'selected':''}>${label}</option>`).join('')}
 function normalizeExternalUrl(value){
   const raw=String(value||'').trim();if(!raw)return null;
   let candidate=raw;
@@ -40,14 +43,15 @@ function showComposerError(message,fieldId=null){
 }
 function humanArtifactError(error){
   const message=String(error?.message||error||'');
+  if(message.includes('ARTIFACT_TYPE_INVALID'))return 'Выберите один из доступных типов публикации.';
   if(message.includes('dc_artifacts_external_url_check'))return 'Ссылка не прошла проверку. Используйте обычный http:// или https:// адрес.';
   if(/expired|expires|expiry/i.test(message))return 'Срок действия должен быть в будущем.';
-  if(/slot/i.test(message))return 'Свободного места для нового объявления сейчас нет.';
-  return 'Не удалось опубликовать объявление. Данные формы сохранены — проверьте поля и попробуйте ещё раз.';
+  if(/slot/i.test(message))return 'Свободного места для новой публикации сейчас нет.';
+  return 'Не удалось опубликовать. Данные формы сохранены — проверьте поля и попробуйте ещё раз.';
 }
 
 async function loadOwnDraft(){
-  const {data,error}=await client.from('dc_artifacts').select('id,title,body,external_url,status,starts_at,expires_at,created_at').eq('author_profile_id',session.user.id).eq('status','draft').order('created_at',{ascending:false}).limit(1).maybeSingle();
+  const {data,error}=await client.from('dc_artifacts').select('id,artifact_type,title,body,external_url,status,starts_at,expires_at,created_at').eq('author_profile_id',session.user.id).eq('status','draft').order('created_at',{ascending:false}).limit(1).maybeSingle();
   if(error)throw error;ownDraft=data||null;ownDraftMedia=[];
   if(ownDraft){const media=await client.from('dc_artifact_media').select('id,media_type,storage_path,metadata').eq('artifact_id',ownDraft.id);if(media.error)throw media.error;ownDraftMedia=media.data||[]}
 }
@@ -56,30 +60,31 @@ async function renderEntry(){
   await loadOwnDraft();
   if(ownDraft){renderComposer(ownDraft);return}
   if(isOwnerAdmin()){
-    entryHost.innerHTML='<div class="dc-first-gate"><div class="dc-first-gate__label">OWNER ADMIN / BOARD</div><div><h2>СОЗДАТЬ<br>АРТЕФАКТ.</h2><p>Административная роль использует тот же канонический composer. Публикация не создаёт membership или Artifact slot.</p><button class="dc-board-action primary" type="button" id="openComposer">СОЗДАТЬ АРТЕФАКТ →</button></div></div>';
+    entryHost.innerHTML='<div class="dc-first-gate"><div class="dc-first-gate__label">OWNER ADMIN / BOARD</div><div><h2>СОЗДАТЬ<br>ПУБЛИКАЦИЮ.</h2><p>Административная роль использует тот же канонический composer. Публикация не создаёт membership или Artifact slot.</p><button class="dc-board-action primary" type="button" id="openComposer">СОЗДАТЬ ПУБЛИКАЦИЮ →</button></div></div>';
     document.getElementById('openComposer').onclick=()=>renderComposer(null);
     return;
   }
   const available=Number(entryStatus?.artifact_slots_available||0);
   if(available>0){
     const first=Number(entryStatus?.published_artifact_count||0)===0;
-    entryHost.innerHTML=`<div class="dc-first-gate"><div class="dc-first-gate__label">${first?'FIRST ARTIFACT / REQUIRED':'ARTIFACT SLOT / AVAILABLE'}<br>${available} FREE</div><div><h2>${first?'ПРЕЖДЕ ЧЕМ ОСМАТРИВАТЬСЯ,<br>ОСТАВЬТЕ ЧТО-НИБУДЬ.':'НА ДОСКЕ<br>ЕСТЬ МЕСТО.'}</h2><p>${first?'Если бы вы были дементором — что бы вы предложили другим участникам? Встречу, мысль, практику, эксперимент или что-то, чему пока нет названия.':'Ваше текущее место свободно. Можно повесить новое объявление.'}</p><button class="dc-board-action primary" type="button" id="openComposer">ПРИКОЛОТЬ ОБЪЯВЛЕНИЕ →</button></div></div>`;
+    entryHost.innerHTML=`<div class="dc-first-gate"><div class="dc-first-gate__label">${first?'FIRST ARTIFACT / REQUIRED':'ARTIFACT SLOT / AVAILABLE'}<br>${available} FREE</div><div><h2>${first?'ПРЕЖДЕ ЧЕМ ОСМАТРИВАТЬСЯ,<br>ОСТАВЬТЕ ЧТО-НИБУДЬ.':'НА ДОСКЕ<br>ЕСТЬ МЕСТО.'}</h2><p>${first?'Если бы вы были дементором — что бы вы предложили другим участникам? Встречу, мысль, практику, эксперимент или что-то, чему пока нет названия.':'Ваше текущее место свободно. Можно приколоть новую публикацию.'}</p><button class="dc-board-action primary" type="button" id="openComposer">ПРИКОЛОТЬ ПУБЛИКАЦИЮ →</button></div></div>`;
     document.getElementById('openComposer').onclick=()=>renderComposer(null);
     return;
   }
   const {data,error}=await client.from('dc_artifacts').select('id,title,body,published_at,expires_at').eq('author_profile_id',session.user.id).eq('status','active').order('published_at',{ascending:false}).limit(1).maybeSingle();
   if(error)throw error;
-  entryHost.innerHTML=`<div class="dc-first-gate"><div class="dc-first-gate__label">ARTIFACT SLOT / OCCUPIED</div><div><h2>МЕСТО<br>ЗАНЯТО.</h2><p>${data?'Ваше объявление сейчас висит на общей доске. Чтобы использовать этот slot заново, уберите текущее объявление в архив. Дополнительные slots позже смогут появляться за участие в жизни клуба.':'Свободного Artifact slot сейчас нет.'}</p>${data?`<div class="dc-composer-actions"><a class="dc-board-action primary" href="${route(`/community/artifact/${data.id}/`)}">ОТКРЫТЬ МОЁ ОБЪЯВЛЕНИЕ →</a><button class="dc-board-action" type="button" data-entry-close="${data.id}">УБРАТЬ С ДОСКИ</button></div>`:''}</div></div>`;
+  entryHost.innerHTML=`<div class="dc-first-gate"><div class="dc-first-gate__label">ARTIFACT SLOT / OCCUPIED</div><div><h2>МЕСТО<br>ЗАНЯТО.</h2><p>${data?'Ваша публикация сейчас висит на общей доске. Чтобы использовать этот slot заново, уберите текущую публикацию в архив. Дополнительные slots позже смогут появляться за участие в жизни клуба.':'Свободного Artifact slot сейчас нет.'}</p>${data?`<div class="dc-composer-actions"><a class="dc-board-action primary" href="${route(`/community/artifact/${data.id}/`)}">ОТКРЫТЬ МОЮ ПУБЛИКАЦИЮ →</a><button class="dc-board-action" type="button" data-entry-close="${data.id}">УБРАТЬ С ДОСКИ</button></div>`:''}</div></div>`;
   entryHost.querySelector('[data-entry-close]')?.addEventListener('click',event=>closeArtifact(event.currentTarget.dataset.entryClose));
 }
 
 function renderComposer(draft){
   const media=ownDraftMedia[0]||null;
-  entryHost.innerHTML=`<div class="dc-composer"><div class="dc-composer-head"><span>ARTIFACT / NOTICE<br>${draft?'DRAFT / SAVED':isOwnerAdmin()?'OWNER ADMIN / READY':'SLOT / READY'}</span><div><h2>ЕСЛИ БЫ ВЫ БЫЛИ ДЕМЕНТОРОМ —<br>ЧТО БЫ ВЫ ПРЕДЛОЖИЛИ ДРУГИМ?</h2><button class="dc-inline-help" type="button" id="openDementorExplainer">ЧТО ЭТО ЗНАЧИТ? →</button></div></div><form class="dc-composer-form" id="artifactForm" novalidate>
+  entryHost.innerHTML=`<div class="dc-composer"><div class="dc-composer-head"><span>ARTIFACT / PUBLICATION<br>${draft?'DRAFT / SAVED':isOwnerAdmin()?'OWNER ADMIN / READY':'SLOT / READY'}</span><div><h2>ЕСЛИ БЫ ВЫ БЫЛИ ДЕМЕНТОРОМ —<br>ЧТО БЫ ВЫ ПРЕДЛОЖИЛИ ДРУГИМ?</h2><button class="dc-inline-help" type="button" id="openDementorExplainer">ЧТО ЭТО ЗНАЧИТ? →</button></div></div><form class="dc-composer-form" id="artifactForm" novalidate>
+    <div class="dc-composer-field"><label for="artifactType">Тип публикации *</label><select id="artifactType" name="artifact_type" required>${artifactSubtypeOptions(draft?.artifact_type)}</select><small>Тип описывает смысл публикации и не меняет ваши права, slot или роль.</small></div>
     <div class="dc-composer-field"><label for="artifactTitle">Заголовок</label><input id="artifactTitle" name="title" maxlength="160" value="${esc(draft?.title||'')}" placeholder="Можно без него"><small>Опционально. Не превращайте это в рекламный слоган.</small></div>
-    <div class="dc-composer-field"><label for="artifactBody">Объявление *</label><textarea id="artifactBody" name="body" maxlength="4000" required placeholder="Что именно вы предлагаете?">${esc(draft?.body||'')}</textarea><small>Текст обязателен. Пока это Artifact, а не автоматически событие, курс или проект.</small></div>
+    <div class="dc-composer-field"><label for="artifactBody">Текст *</label><textarea id="artifactBody" name="body" maxlength="4000" required placeholder="Что именно вы предлагаете?">${esc(draft?.body||'')}</textarea><small>Текст обязателен. Artifact не становится автоматически событием, курсом или проектом.</small></div>
     <div class="dc-composer-field"><label for="artifactUrl">Ссылка</label><input id="artifactUrl" name="external_url" maxlength="1000" inputmode="url" value="${esc(draft?.external_url||'')}" placeholder="https://…"><small>Опциональная внешняя ссылка. Если вставить адрес без протокола, попробуем безопасно добавить https://.</small></div>
-    <div class="dc-composer-field"><label for="artifactExpires">Срок действия</label><input id="artifactExpires" name="expires_at" type="datetime-local" min="${esc(minLocalDateTime())}" value="${esc(localDateInput(draft?.expires_at))}"><small>Оставьте пустым для постоянного объявления. Прошедшую дату опубликовать нельзя.</small></div>
+    <div class="dc-composer-field"><label for="artifactExpires">Срок действия</label><input id="artifactExpires" name="expires_at" type="datetime-local" min="${esc(minLocalDateTime())}" value="${esc(localDateInput(draft?.expires_at))}"><small>Оставьте пустым для постоянной публикации. Прошедшую дату опубликовать нельзя.</small></div>
     <div class="dc-composer-field"><label for="artifactFile">Изображение</label><div><input id="artifactFile" name="media" type="file" accept="image/jpeg,image/png,image/webp" ${media?'disabled':''}>${media?`<div class="dc-board-state">УЖЕ ПРИКРЕПЛЕНО: ${esc(media.metadata?.name||media.storage_path.split('/').pop())}</div>`:''}</div><small>Один файл, максимум 4 MB. JPG / PNG / WebP. Изображение хранится в закрытом Community bucket и не отправляется в Telegram напрямую.</small></div>
     <div class="dc-composer-actions"><button class="dc-board-action primary" type="submit">ОПУБЛИКОВАТЬ →</button>${draft?'<button class="dc-board-action" type="button" id="removeDraft">УДАЛИТЬ ЧЕРНОВИК</button>':'<button class="dc-board-action" type="button" id="cancelComposer">НЕ СЕЙЧАС</button>'}<span class="dc-board-state" id="composerState" hidden></span></div>
   </form><dialog class="dc-explainer" id="dementorExplainer"><button class="dc-explainer__close" type="button" id="closeDementorExplainer" aria-label="Закрыть">×</button><span>CONTEXT / DEMENTOR</span><h3>ЭТО НЕ ПРИСВОЕНИЕ РОЛИ.</h3><p>Представьте, что у вас есть право предложить клубу одну вещь без долгой защиты идеи. Встречу. Практику. Эксперимент. Полезную провокацию. То, вокруг чего другим может захотеться собраться.</p><p><strong>Member ≠ Dementor.</strong> Ответ на этот вопрос не делает вас Дементором.</p><a href="${route('/community/')}" class="dc-board-action">О COMMUNITY →</a></dialog></div>`;
@@ -94,8 +99,9 @@ function renderComposer(draft){
 
 async function publishFromForm(event){
   event.preventDefault();const form=event.currentTarget;const submit=form.querySelector('button[type=submit]');const state=document.getElementById('composerState');const fd=new FormData(form);clearComposerError();
-  const body=String(fd.get('body')||'').trim();const title=String(fd.get('title')||'').trim()||null;const externalRaw=String(fd.get('external_url')||'').trim();const expiresRaw=String(fd.get('expires_at')||'').trim();const file=form.querySelector('#artifactFile')?.files?.[0]||null;
-  if(!body){showComposerError('Введите текст объявления.','artifactBody');return}
+  const artifactType=String(fd.get('artifact_type')||'').trim().toLowerCase();const body=String(fd.get('body')||'').trim();const title=String(fd.get('title')||'').trim()||null;const externalRaw=String(fd.get('external_url')||'').trim();const expiresRaw=String(fd.get('expires_at')||'').trim();const file=form.querySelector('#artifactFile')?.files?.[0]||null;
+  if(!artifactSubtypeIds.has(artifactType)){showComposerError('Выберите тип публикации.','artifactType');return}
+  if(!body){showComposerError('Введите текст публикации.','artifactBody');return}
   let externalUrl=null;
   if(externalRaw){externalUrl=normalizeExternalUrl(externalRaw);if(!externalUrl){showComposerError('Проверьте ссылку. Нужен обычный веб-адрес — например https://example.com.','artifactUrl');return}document.getElementById('artifactUrl').value=externalUrl}
   let expiresAt=null;
@@ -108,8 +114,10 @@ async function publishFromForm(event){
       ownDraft={...ownDraft,title,body,external_url:externalUrl,expires_at:expiresAt};
     }else{
       const created=await client.rpc('dc_create_artifact_draft_v1',{p_body:body,p_title:title,p_external_url:externalUrl,p_starts_at:null,p_expires_at:expiresAt});if(created.error)throw created.error;artifactId=created.data;
-      ownDraft={id:artifactId,title,body,external_url:externalUrl,expires_at:expiresAt,status:'draft'};
+      ownDraft={id:artifactId,artifact_type:'announcement',title,body,external_url:externalUrl,expires_at:expiresAt,status:'draft'};
     }
+    const subtype=await client.rpc('dc_set_artifact_subtype_v1',{p_artifact_id:artifactId,p_artifact_type:artifactType});if(subtype.error)throw subtype.error;
+    ownDraft={...ownDraft,artifact_type:artifactType};
     if(file&&!ownDraftMedia.length){
       state.textContent='ЗАГРУЖАЕМ ИЗОБРАЖЕНИЕ';const path=`${session.user.id}/${artifactId}/${Date.now()}-${safeFileName(file.name)}`;const uploaded=await client.storage.from(DC_ARTIFACT_BUCKET).upload(path,file,{upsert:false,contentType:file.type});if(uploaded.error)throw uploaded.error;uploadedPath=path;
       const metadata={name:file.name,size:file.size,mime:file.type};const attached=await client.rpc('dc_attach_artifact_media_v1',{p_artifact_id:artifactId,p_storage_path:path,p_media_type:'image',p_metadata:metadata});if(attached.error){await client.storage.from(DC_ARTIFACT_BUCKET).remove([path]).catch(()=>{});throw attached.error}ownDraftMedia=[{storage_path:path,media_type:'image',metadata}];uploadedPath=null;
@@ -134,14 +142,14 @@ async function removeDraft(){
 }
 
 async function closeArtifact(id,{admin=false}={}){
-  const prompt=admin?'OWNER ADMIN: убрать чужой Artifact с активной доски и перенести в архив?':'Убрать объявление с активной доски и перенести в архив?';
+  const prompt=admin?'OWNER ADMIN: убрать чужой Artifact с активной доски и перенести в архив?':'Убрать публикацию с активной доски и перенести в архив?';
   if(!id||!confirm(prompt))return;
   const {error}=await client.rpc('dc_close_artifact_v1',{p_artifact_id:id});if(error){boardError(error);return}await refreshAll();
 }
 
 async function loadBoard(){
   const normalized=await client.rpc('dc_normalize_artifact_lifecycle_v1');if(normalized.error)throw normalized.error;
-  const artifactsResult=await client.from('dc_artifacts').select('id,author_profile_id,title,body,external_url,status,starts_at,expires_at,published_at,closed_at,created_at').eq('visibility','community').in('status',['active','expired','archived']).order('published_at',{ascending:false});
+  const artifactsResult=await client.from('dc_artifacts').select('id,author_profile_id,artifact_type,title,body,external_url,status,starts_at,expires_at,published_at,closed_at,created_at').eq('visibility','community').in('status',['active','expired','archived']).order('published_at',{ascending:false});
   if(artifactsResult.error)throw artifactsResult.error;
   const artifacts=(artifactsResult.data||[]).filter(artifact=>Boolean(artifact.published_at));artifactCount.textContent=String(artifacts.length).padStart(2,'0');
   if(!artifacts.length){boardHost.innerHTML='<div class="dc-board-empty"><h3>НА ДОСКЕ<br>ПОКА НЕТ ИСТОРИИ.</h3><p>Здесь появятся текущие и прошедшие Community Artifacts.</p></div>';return}
@@ -161,12 +169,13 @@ async function loadBoard(){
 
 function renderNotice(artifact,index,profile,reactions,media,responses){
   const mine=artifact.author_profile_id===session.user.id;const ownerAdmin=isOwnerAdmin();const historical=isHistoricalStatus(artifact.status);const myReaction=reactions.some(r=>r.profile_id===session.user.id);const myResponse=responses.find(r=>r.responder_profile_id===session.user.id&&r.status==='submitted');const incoming=mine?responses.filter(r=>r.status==='submitted').length:0;const item=media[0];let mediaHtml='';
+  const subtype=String(artifact.artifact_type||'announcement').toLowerCase();
   if(item?.signedUrl){mediaHtml=item.media_type==='image'?`<div class="dc-notice__media"><img src="${esc(item.signedUrl)}" alt="Прикреплённое изображение"></div>`:''}
   const activityLink=myResponse||myReaction?`<a class="dc-board-action small" href="${route('/workspace/#activity')}">МОЯ АКТИВНОСТЬ</a>`:'';
   const adminControl=ownerAdmin&&!mine&&artifact.status!=='archived'?`<button class="dc-board-admin-close" type="button" data-admin-close-artifact="${artifact.id}" aria-label="Owner Admin: убрать Artifact с доски">ADMIN ×</button>`:'';
   const responseControl=mine?(historical?'':`<button class="dc-board-action small" type="button" data-close-artifact="${artifact.id}">УБРАТЬ</button>`):(historical?'<span class="dc-board-state">ОТКЛИКИ ЗАКРЫТЫ</span>':`<button class="dc-board-action small${myResponse?' primary':''}" type="button" data-response="${artifact.id}" ${myResponse?'disabled':''}>${myResponse?'ОТКЛИК ОТПРАВЛЕН':'ОТКЛИКНУТЬСЯ'}</button>`);
   const statusLine=historical?(artifact.status==='expired'?'ПРОШЛО / EXPIRED':'АРХИВ / CLOSED'):(artifact.expires_at?`ДЕЙСТВУЕТ ДО ${formatDate(artifact.expires_at)}`:'БЕЗ СРОКА');
-  return `<article class="dc-notice${historical?' is-history':''}" data-artifact="${artifact.id}" data-artifact-status="${esc(artifact.status)}" data-artifact-owned="${mine?'1':'0'}">${adminControl}<div class="dc-notice__meta"><span>ARTIFACT / ${String(index+1).padStart(3,'0')}</span><span>${formatDate(artifact.published_at)}</span></div><div class="dc-notice__author">${avatar(profile)}<div><strong>${esc(profile?.display_name||'MEMBER')}</strong>${profile?.nickname?`<div>@${esc(profile.nickname.replace(/^@/,''))}</div>`:''}</div></div>${artifact.title?`<h3>${esc(artifact.title)}</h3>`:''}<p class="dc-notice__body">${esc(artifact.body)}</p>${mediaHtml}${artifact.external_url?`<p><a class="dc-notice__link" href="${esc(artifact.external_url)}" target="_blank" rel="noopener noreferrer">ССЫЛКА ↗</a></p>`:''}<div class="dc-notice__expiry">${statusLine} · COMMUNITY</div><div class="dc-notice__actions"><span class="dc-notice__activity">ИНТЕРЕСНО: ${reactions.length}${mine?` · ОТКЛИКОВ: ${incoming}`:''}</span><button class="dc-board-action small${myReaction?' primary':''}" type="button" data-reaction="${artifact.id}" data-active="${myReaction?'1':'0'}">${myReaction?'✓ ИНТЕРЕСНО':'МНЕ ЭТО НАДО'}</button>${responseControl}${activityLink}<a class="dc-board-action small" href="${route(`/community/artifact/${artifact.id}/`)}">ОТКРЫТЬ</a></div></article>`;
+  return `<article class="dc-notice${historical?' is-history':''}" data-artifact="${artifact.id}" data-artifact-status="${esc(artifact.status)}" data-artifact-subtype="${esc(subtype)}" data-source-type="artifact" data-artifact-owned="${mine?'1':'0'}">${adminControl}<div class="dc-notice__meta"><span>${esc(artifactSubtypeLabel(subtype))} / ${String(index+1).padStart(3,'0')}</span><span>${formatDate(artifact.published_at)}</span></div><div class="dc-notice__author">${avatar(profile)}<div><strong>${esc(profile?.display_name||'MEMBER')}</strong>${profile?.nickname?`<div>@${esc(profile.nickname.replace(/^@/,''))}</div>`:''}</div></div>${artifact.title?`<h3>${esc(artifact.title)}</h3>`:''}<p class="dc-notice__body">${esc(artifact.body)}</p>${mediaHtml}${artifact.external_url?`<p><a class="dc-notice__link" href="${esc(artifact.external_url)}" target="_blank" rel="noopener noreferrer">ССЫЛКА ↗</a></p>`:''}<div class="dc-notice__expiry">${statusLine} · COMMUNITY</div><div class="dc-notice__actions"><span class="dc-notice__activity">ИНТЕРЕСНО: ${reactions.length}${mine?` · ОТКЛИКОВ: ${incoming}`:''}</span><button class="dc-board-action small${myReaction?' primary':''}" type="button" data-reaction="${artifact.id}" data-active="${myReaction?'1':'0'}">${myReaction?'✓ ИНТЕРЕСНО':'МНЕ ЭТО НАДО'}</button>${responseControl}${activityLink}<a class="dc-board-action small" href="${route(`/community/artifact/${artifact.id}/`)}">ОТКРЫТЬ</a></div></article>`;
 }
 
 function installNoticeActions(){
