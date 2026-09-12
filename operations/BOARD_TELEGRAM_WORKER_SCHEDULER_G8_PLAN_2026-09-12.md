@@ -43,16 +43,18 @@ The candidate adds:
 - scheduler token is stored in Vault;
 - validator returns only boolean and is executable only by `service_role`;
 - worker retains internal service-role DB access;
-- worker request still must pass the Supabase Edge gateway using the project publishable key, matching the supported Supabase Cron → Edge Function pattern;
+- automatic scheduler calls use the project publishable key only for Edge gateway routing plus the private `x-dc-worker-token` for worker authorization;
+- worker is deployed with `verify_jwt=false` because this is service-to-service custom authentication, not user-JWT authentication;
+- ordinary requests without the service-role credential or the private scheduler token are rejected by the handler;
 - real Telegram delivery is not manufactured for QA.
 
 ## Planned production sequence after explicit authorization
 
 1. apply scheduler migration;
 2. verify extensions, Vault names, validator grants and canonical cron job without exposing decrypted secret values;
-3. deploy worker candidate with `verify_jwt=true`;
+3. deploy worker candidate with `verify_jwt=false` and the existing explicit trusted-invocation guard;
 4. perform scheduler-auth zero-claim smoke while there are no actionable rows;
-5. verify ordinary user invocation remains rejected;
+5. verify ordinary publishable/browser-style invocation remains rejected;
 6. merge/deploy frontend cleanup removing browser trigger;
 7. retest Board and inspect cron/Edge logs;
 8. only then continue G8 branch/runtime cleanup.
