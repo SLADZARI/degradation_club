@@ -9,14 +9,10 @@ let client=null,session=null,entryStatus=null,ownDraft=null,ownDraftMedia=[];
 
 const allowedTypes=new Set(['image/jpeg','image/png','image/webp']);
 const maxFileSize=4*1024*1024;
-const CLUB_RECORDS=[
-  {meta:'PROJECT / ACTIVE',title:'ЛОГИКА И ОСОЗНАННОСТЬ',copy:'Самостоятельный проект внутри клубной экосистемы.',href:'/projects/logic-awareness/'},
-  {meta:'OBJECT / CLUB ARTIFACT',title:'НЕ НАДО',copy:'Клубный объект 001. Зафиксирован на официальном сайте.',href:'/objects/001-ne-nado/'},
-  {meta:'COURSE / VALENTIN',title:'ДУМАЙ С ОПАСНОСТЬЮ',copy:'Курс последовательной деградации уверенности.',href:'/courses/dumai-s-opasnostyu/'}
-];
 
 function boardUserState(){return String(document.documentElement.dataset.dcBoardUserState||'')}
 function isOwnerAdmin(){return boardUserState()==='OWNER_ADMIN'}
+function isHistoricalStatus(status){return ['expired','archived'].includes(String(status||'').toLowerCase())}
 function boardError(error,target=entryHost){target.innerHTML=`<div class="dc-board-error">${esc(errorMessage(error))}</div>`}
 function localDateInput(value){if(!value)return'';const d=new Date(value);if(Number.isNaN(d.getTime()))return'';const pad=n=>String(n).padStart(2,'0');return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`}
 function minLocalDateTime(){return localDateInput(new Date(Date.now()+60*1000).toISOString())}
@@ -48,9 +44,6 @@ function humanArtifactError(error){
   if(/expired|expires|expiry/i.test(message))return 'Срок действия должен быть в будущем.';
   if(/slot/i.test(message))return 'Свободного места для нового объявления сейчас нет.';
   return 'Не удалось опубликовать объявление. Данные формы сохранены — проверьте поля и попробуйте ещё раз.';
-}
-function renderClubRecords(){
-  return `<section class="dc-club-records" aria-label="Подтверждённые материалы клуба"><div class="dc-club-records__head"><span>CLUB RECORDS / SOURCE-BACKED</span><p>Не выдуманная активность, а уже существующие объекты и форматы клуба.</p></div><div class="dc-club-records__grid">${CLUB_RECORDS.map(record=>`<a class="dc-club-record" href="${route(record.href)}"><span>${esc(record.meta)}</span><strong>${esc(record.title)}</strong><p>${esc(record.copy)}</p><em>ОТКРЫТЬ →</em></a>`).join('')}</div></section>`;
 }
 
 async function loadOwnDraft(){
@@ -147,10 +140,11 @@ async function closeArtifact(id,{admin=false}={}){
 }
 
 async function loadBoard(){
-  const artifactsResult=await client.from('dc_artifacts').select('id,author_profile_id,title,body,external_url,status,starts_at,expires_at,published_at,created_at').eq('visibility','community').eq('status','active').order('published_at',{ascending:false});
+  const normalized=await client.rpc('dc_normalize_artifact_lifecycle_v1');if(normalized.error)throw normalized.error;
+  const artifactsResult=await client.from('dc_artifacts').select('id,author_profile_id,title,body,external_url,status,starts_at,expires_at,published_at,closed_at,created_at').eq('visibility','community').in('status',['active','expired','archived']).not('published_at','is',null).order('published_at',{ascending:false});
   if(artifactsResult.error)throw artifactsResult.error;
-  const now=Date.now();const artifacts=(artifactsResult.data||[]).filter(a=>!a.expires_at||Date.parse(a.expires_at)>now);artifactCount.textContent=String(artifacts.length).padStart(2,'0');
-  if(!artifacts.length){boardHost.innerHTML=`${renderClubRecords()}<div class="dc-board-empty"><h3>ЖИВЫХ ОБЪЯВЛЕНИЙ<br>ПОКА НЕТ.</h3><p>Подтверждённые клубные объекты уже выше. Первый живой Member Artifact может появиться прямо сейчас.</p></div>`;return}
+  const artifacts=artifactsResult.data||[];artifactCount.textContent=String(artifacts.length).padStart(2,'0');
+  if(!artifacts.length){boardHost.innerHTML='<div class="dc-board-empty"><h3>НА ДОСКЕ<br>ПОКА НЕТ ИСТОРИИ.</h3><p>Здесь появятся текущие и прошедшие Community Artifacts.</p></div>';return}
   const ids=artifacts.map(a=>a.id);const authors=[...new Set(artifacts.map(a=>a.author_profile_id))];
   const [profilesResult,reactionsResult,mediaResult,responsesResult]=await Promise.all([
     client.from('dc_member_public_profiles').select('profile_id,display_name,nickname,avatar_url,member_since').in('profile_id',authors),
@@ -161,16 +155,18 @@ async function loadBoard(){
   for(const result of [profilesResult,reactionsResult,mediaResult,responsesResult])if(result.error)throw result.error;
   const profiles=new Map((profilesResult.data||[]).map(p=>[p.profile_id,p]));const reactions=reactionsResult.data||[];const media=mediaResult.data||[];const responses=responsesResult.data||[];
   const mediaUrls=new Map();await Promise.all(media.map(async item=>{try{mediaUrls.set(item.id,await signedMediaUrl(client,item.storage_path))}catch{mediaUrls.set(item.id,null)}}));
-  boardHost.innerHTML=renderClubRecords()+artifacts.map((artifact,index)=>renderNotice(artifact,index,profiles.get(artifact.author_profile_id),reactions.filter(r=>r.artifact_id===artifact.id),media.filter(m=>m.artifact_id===artifact.id).map(m=>({...m,signedUrl:mediaUrls.get(m.id)})),responses.filter(r=>r.artifact_id===artifact.id))).join('');
+  boardHost.innerHTML=artifacts.map((artifact,index)=>renderNotice(artifact,index,profiles.get(artifact.author_profile_id),reactions.filter(r=>r.artifact_id===artifact.id),media.filter(m=>m.artifact_id===artifact.id).map(m=>({...m,signedUrl:mediaUrls.get(m.id)})),responses.filter(r=>r.artifact_id===artifact.id))).join('');
   installNoticeActions();
 }
 
 function renderNotice(artifact,index,profile,reactions,media,responses){
-  const mine=artifact.author_profile_id===session.user.id;const ownerAdmin=isOwnerAdmin();const myReaction=reactions.some(r=>r.profile_id===session.user.id);const myResponse=responses.find(r=>r.responder_profile_id===session.user.id&&r.status==='submitted');const incoming=mine?responses.filter(r=>r.status==='submitted').length:0;const item=media[0];let mediaHtml='';
+  const mine=artifact.author_profile_id===session.user.id;const ownerAdmin=isOwnerAdmin();const historical=isHistoricalStatus(artifact.status);const myReaction=reactions.some(r=>r.profile_id===session.user.id);const myResponse=responses.find(r=>r.responder_profile_id===session.user.id&&r.status==='submitted');const incoming=mine?responses.filter(r=>r.status==='submitted').length:0;const item=media[0];let mediaHtml='';
   if(item?.signedUrl){mediaHtml=item.media_type==='image'?`<div class="dc-notice__media"><img src="${esc(item.signedUrl)}" alt="Прикреплённое изображение"></div>`:''}
   const activityLink=myResponse||myReaction?`<a class="dc-board-action small" href="${route('/workspace/#activity')}">МОЯ АКТИВНОСТЬ</a>`:'';
-  const adminControl=ownerAdmin&&!mine?`<button class="dc-board-admin-close" type="button" data-admin-close-artifact="${artifact.id}" aria-label="Owner Admin: убрать Artifact с доски">ADMIN ×</button>`:'';
-  return `<article class="dc-notice" data-artifact="${artifact.id}" data-artifact-owned="${mine?'1':'0'}">${adminControl}<div class="dc-notice__meta"><span>ARTIFACT / ${String(index+1).padStart(3,'0')}</span><span>${formatDate(artifact.published_at)}</span></div><div class="dc-notice__author">${avatar(profile)}<div><strong>${esc(profile?.display_name||'MEMBER')}</strong>${profile?.nickname?`<div>@${esc(profile.nickname.replace(/^@/,''))}</div>`:''}</div></div>${artifact.title?`<h3>${esc(artifact.title)}</h3>`:''}<p class="dc-notice__body">${esc(artifact.body)}</p>${mediaHtml}${artifact.external_url?`<p><a class="dc-notice__link" href="${esc(artifact.external_url)}" target="_blank" rel="noopener noreferrer">ССЫЛКА ↗</a></p>`:''}<div class="dc-notice__expiry">${artifact.expires_at?`ДЕЙСТВУЕТ ДО ${formatDate(artifact.expires_at)}`:'БЕЗ СРОКА'} · COMMUNITY</div><div class="dc-notice__actions"><span class="dc-notice__activity">ИНТЕРЕСНО: ${reactions.length}${mine?` · ОТКЛИКОВ: ${incoming}`:''}</span><button class="dc-board-action small${myReaction?' primary':''}" type="button" data-reaction="${artifact.id}" data-active="${myReaction?'1':'0'}">${myReaction?'✓ ИНТЕРЕСНО':'МНЕ ЭТО НАДО'}</button>${mine?`<button class="dc-board-action small" type="button" data-close-artifact="${artifact.id}">УБРАТЬ</button>`:`<button class="dc-board-action small${myResponse?' primary':''}" type="button" data-response="${artifact.id}" ${myResponse?'disabled':''}>${myResponse?'ОТКЛИК ОТПРАВЛЕН':'ОТКЛИКНУТЬСЯ'}</button>`}${activityLink}<a class="dc-board-action small" href="${route(`/community/artifact/${artifact.id}/`)}">ОТКРЫТЬ</a></div></article>`;
+  const adminControl=ownerAdmin&&!mine&&artifact.status!=='archived'?`<button class="dc-board-admin-close" type="button" data-admin-close-artifact="${artifact.id}" aria-label="Owner Admin: убрать Artifact с доски">ADMIN ×</button>`:'';
+  const responseControl=mine?(historical?'':`<button class="dc-board-action small" type="button" data-close-artifact="${artifact.id}">УБРАТЬ</button>`):(historical?'<span class="dc-board-state">ОТКЛИКИ ЗАКРЫТЫ</span>':`<button class="dc-board-action small${myResponse?' primary':''}" type="button" data-response="${artifact.id}" ${myResponse?'disabled':''}>${myResponse?'ОТКЛИК ОТПРАВЛЕН':'ОТКЛИКНУТЬСЯ'}</button>`);
+  const statusLine=historical?(artifact.status==='expired'?'ПРОШЛО / EXPIRED':'АРХИВ / CLOSED'):(artifact.expires_at?`ДЕЙСТВУЕТ ДО ${formatDate(artifact.expires_at)}`:'БЕЗ СРОКА');
+  return `<article class="dc-notice${historical?' is-history':''}" data-artifact="${artifact.id}" data-artifact-status="${esc(artifact.status)}" data-artifact-owned="${mine?'1':'0'}">${adminControl}<div class="dc-notice__meta"><span>ARTIFACT / ${String(index+1).padStart(3,'0')}</span><span>${formatDate(artifact.published_at)}</span></div><div class="dc-notice__author">${avatar(profile)}<div><strong>${esc(profile?.display_name||'MEMBER')}</strong>${profile?.nickname?`<div>@${esc(profile.nickname.replace(/^@/,''))}</div>`:''}</div></div>${artifact.title?`<h3>${esc(artifact.title)}</h3>`:''}<p class="dc-notice__body">${esc(artifact.body)}</p>${mediaHtml}${artifact.external_url?`<p><a class="dc-notice__link" href="${esc(artifact.external_url)}" target="_blank" rel="noopener noreferrer">ССЫЛКА ↗</a></p>`:''}<div class="dc-notice__expiry">${statusLine} · COMMUNITY</div><div class="dc-notice__actions"><span class="dc-notice__activity">ИНТЕРЕСНО: ${reactions.length}${mine?` · ОТКЛИКОВ: ${incoming}`:''}</span><button class="dc-board-action small${myReaction?' primary':''}" type="button" data-reaction="${artifact.id}" data-active="${myReaction?'1':'0'}">${myReaction?'✓ ИНТЕРЕСНО':'МНЕ ЭТО НАДО'}</button>${responseControl}${activityLink}<a class="dc-board-action small" href="${route(`/community/artifact/${artifact.id}/`)}">ОТКРЫТЬ</a></div></article>`;
 }
 
 function installNoticeActions(){
@@ -190,7 +186,7 @@ async function toggleReaction(button){
 }
 
 function openResponse(button){
-  const notice=button.closest('.dc-notice');if(!notice||notice.querySelector('.dc-response-box'))return;const id=button.dataset.response;
+  const notice=button.closest('.dc-notice');if(!notice||notice.classList.contains('is-history')||notice.querySelector('.dc-response-box'))return;const id=button.dataset.response;
   const box=document.createElement('div');box.className='dc-response-box';box.innerHTML='<textarea maxlength="2000" placeholder="Можно оставить короткое сообщение. Можно просто откликнуться."></textarea><div class="dc-response-box__actions"><button class="dc-board-action small primary" type="button" data-send>ОТПРАВИТЬ</button><button class="dc-board-action small" type="button" data-cancel>ОТМЕНА</button></div>';
   notice.appendChild(box);box.querySelector('[data-cancel]').onclick=()=>box.remove();box.querySelector('[data-send]').onclick=()=>sendResponse(id,box);
 }
