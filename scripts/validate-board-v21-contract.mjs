@@ -6,6 +6,7 @@ const css=read('community/board/board-fullscreen-v2-1.css');
 const mobileAir=read('community/board/board-mobile-air-v2-1.css');
 const spatialCss=read('community/board/board-spatial-v1.css');
 const filterCss=read('community/board/board-filters-v2.css');
+const qaCss=read('community/board/board-qa-fix-v1.css');
 const canonicalHeader=read('community/board/board-canonical-header-v2-2.css');
 const js=read('community/board/board-fullscreen-v2-1.js');
 const spatial=read('community/board/board-spatial-v1.js');
@@ -29,6 +30,9 @@ expect(mobileAir.includes('.dc-board-fullscreen-v21 .dc-board-filter-drawer{posi
 expect(mobileAir.includes('touch-action:pan-y!important'),'mobile type drawer must preserve vertical touch interaction');
 expect(spatialCss.includes('.dc-spatial-control{display:inline-flex;align-items:center;justify-content:center;text-align:center;box-sizing:border-box;'),'spatial Board controls must keep labels optically centered');
 expect(filterCss.includes('.dc-board-filter{display:inline-flex;align-items:center;justify-content:center;text-align:center;box-sizing:border-box}'),'Board filter buttons must keep labels centered');
+expect(filterCss.includes('.dc-board-filter.active{background:#d8ff3e!important;color:#111!important}'),'active Board filter must remain black-on-lime');
+expect(!/\.dc-board-first-entry-focus \.dc-board-wall\{[^}]*pointer-events\s*:\s*none/i.test(qaCss),'FIRST_ARTIFACT_REQUIRED presentation must not block Board pointer interaction');
+expect(qaCss.includes('.dc-board-first-entry-focus .dc-board-wall{opacity:.72;filter:grayscale(.25);pointer-events:auto;'),'first Artifact focus must preserve a visible, interactive Board');
 expect(spatial.includes('data-mine>МОЁ</button>'),'own-card locator control missing from canonical spatial controls');
 expect(spatial.includes("controls.querySelector('[data-mine]').onclick=focusMine"),'own-card locator is not bound to canonical focusMine()');
 expect(integrations.includes('installOwnLocatorFilterBridge'),'own-card locator filter bridge missing from canonical Board filter owner');
