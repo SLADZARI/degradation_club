@@ -41,9 +41,9 @@ Order is mandatory:
 
 1. apply scheduler migration;
 2. verify extension presence, cron job, grants and Vault secret **names only**;
-3. deploy worker candidate with `verify_jwt=true`;
+3. deploy worker candidate with `verify_jwt=false`: this worker is service-to-service and authenticates the trusted scheduler explicitly with the private `x-dc-worker-token`; ordinary callers remain rejected in the handler;
 4. issue one trusted scheduler-token zero-claim request without creating an Artifact or outbox row;
-5. verify ordinary browser/user-auth call remains unauthorized;
+5. verify an ordinary publishable/browser-style request without the private scheduler token is rejected;
 6. only then release frontend removal of browser trigger;
 7. retest Board desktop/mobile shell and outbox state.
 
