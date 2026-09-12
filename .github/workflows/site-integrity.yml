@@ -80,6 +80,8 @@ jobs:
         run: node scripts/validate-board-v21-browser.mjs
       - name: Validate Board live corrective browser acceptance
         run: node scripts/validate-board-live-corrective-browser.mjs
+      - name: Validate Board navigation and adaptive cards browser acceptance
+        run: node scripts/validate-board-navigation-adaptive-cards-browser.mjs
       - name: Validate browser shell and Workspace recovery
         run: node scripts/validate-browser-shell-v21-compat.mjs
       - name: Validate My Artifacts history
