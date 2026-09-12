@@ -80,7 +80,7 @@ function ensureProjections(){
 }
 
 function closeDrawer(){if(!drawer)return;drawer.hidden=true;filterHost?.querySelector('[data-board-filter-drawer]')?.setAttribute('aria-expanded','false')}
-function openDrawer(){if(!drawer)return;drawer.hidden=false;filterHost?.querySelector('[data-board-filter-drawer]')?.setAttribute('aria-expanded','true');drawer.querySelector('[data-board-detail-filter]')?.focus({preventScroll:true})}
+function openDrawer(){if(!drawer)return;drawer.scrollTop=0;drawer.hidden=false;filterHost?.querySelector('[data-board-filter-drawer]')?.setAttribute('aria-expanded','true');drawer.querySelector('[data-board-detail-filter]')?.focus({preventScroll:true})}
 function ensureDrawer(){
   if(drawer)return drawer;
   drawer=document.createElement('div');drawer.className='dc-board-filter-drawer';drawer.hidden=true;
