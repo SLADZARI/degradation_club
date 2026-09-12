@@ -4,6 +4,8 @@ const read=p=>fs.readFileSync(p,'utf8');
 const page=read('workspace/board/index.html');
 const css=read('community/board/board-fullscreen-v2-1.css');
 const mobileAir=read('community/board/board-mobile-air-v2-1.css');
+const spatialCss=read('community/board/board-spatial-v1.css');
+const filterCss=read('community/board/board-filters-v2.css');
 const canonicalHeader=read('community/board/board-canonical-header-v2-2.css');
 const js=read('community/board/board-fullscreen-v2-1.js');
 const spatial=read('community/board/board-spatial-v1.js');
@@ -25,6 +27,8 @@ expect(css.includes('body:has(.dc-spatial-world .dc-notice[data-artifact-owned="
 expect(mobileAir.includes('.dc-board-fullscreen-v21 .dc-board-filters{overflow:visible!important}'),'mobile filter host must not clip the nested type drawer');
 expect(mobileAir.includes('.dc-board-fullscreen-v21 .dc-board-filter-drawer{position:fixed!important'),'mobile type drawer must escape the spatial filter row as a viewport-owned sheet');
 expect(mobileAir.includes('touch-action:pan-y!important'),'mobile type drawer must preserve vertical touch interaction');
+expect(spatialCss.includes('.dc-spatial-control{display:inline-flex;align-items:center;justify-content:center;text-align:center;box-sizing:border-box;'),'spatial Board controls must keep labels optically centered');
+expect(filterCss.includes('.dc-board-filter{display:inline-flex;align-items:center;justify-content:center;text-align:center;box-sizing:border-box}'),'Board filter buttons must keep labels centered');
 expect(spatial.includes('data-mine>МОЁ</button>'),'own-card locator control missing from canonical spatial controls');
 expect(spatial.includes("controls.querySelector('[data-mine]').onclick=focusMine"),'own-card locator is not bound to canonical focusMine()');
 expect(integrations.includes('installOwnLocatorFilterBridge'),'own-card locator filter bridge missing from canonical Board filter owner');
