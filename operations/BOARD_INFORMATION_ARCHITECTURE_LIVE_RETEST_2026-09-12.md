@@ -2,25 +2,27 @@
 artifactId: dementor-club.evidence.board-information-architecture-live-retest-2026-09-12
 project: dementor-club
 documentType: QA_EVIDENCE
-projectStage: RELEASE
-gate: G7_RELEASE
-status: ACTIVE_EVIDENCE
+projectStage: CLEANUP
+gate: G8_CLEANUP
+status: APPROVED_EVIDENCE
 updated: 2026-09-12
 owner: Modern Pilgrims
 sourceSystem: GIT
 authorityType: EVIDENCE
 result: dementor-club.result.board-information-architecture-v1
 productionReleaseRun: 57
-correctiveReleaseRun: 58
+correctiveReleaseRuns: [58, 59]
 primaryProductionCommit: 75e074a431f18bd65506bf567ae21308057b24fe
-correctiveProductionCommit: fa9a0840b6a97d1718ae47500f89ec621cc76d93
+correctiveProductionCommits:
+  - fa9a0840b6a97d1718ae47500f89ec621cc76d93
+  - 8adee2d8708393d7ba56de0bc53790152fb5c69c
 ---
 
 # Board Information Architecture v1 — authenticated live retest — 2026-09-12
 
 ## Evidence source
 
-Project owner supplied authenticated production-browser screenshots after production release #57 and after corrective release #58.
+Project owner supplied authenticated production-browser screenshots after the primary release and both corrective releases.
 
 The screenshots are conversation evidence; this note records only directly observed facts and does not infer unobserved role states.
 
@@ -58,7 +60,7 @@ Observed before corrective release #58:
 - stored body content loaded;
 - defect `QA-BOARD-LIVE-001`: stored minimal emphasis syntax `**Нам действительно нужен AGI?**` was displayed literally.
 
-Corrective release:
+Corrective release #58:
 
 - PR #147;
 - production commit `fa9a0840b6a97d1718ae47500f89ec621cc76d93`;
@@ -79,7 +81,7 @@ Observed after corrective release #58:
 
 ### `/workspace/artifacts/` authenticated personal history
 
-Owner-provided production screenshot confirms:
+Owner-provided production screenshots confirm:
 
 - authenticated My Artifacts route loads successfully;
 - canonical Workspace navigation remains present and `МОИ АРТЕФАКТЫ` is the active tab;
@@ -91,38 +93,51 @@ Owner-provided production screenshot confirms:
 - `ОТКРЫТЬ` affordances remain available on historical rows;
 - no duplicate history table/surface is visible in the rendered UI.
 
-The same screenshot exposed a semantic copy defect:
+The first screenshot exposed `QA-BOARD-LIVE-002`: copy still said `Live Board показывает происходящее сейчас`, contradicting the approved persistent Board-history model.
 
-`QA-BOARD-LIVE-002` — the page text still said `Live Board показывает происходящее сейчас`, which contradicts approved Board Information Architecture v1 where current and historical activity coexist on Community Board.
+Corrective release #59:
 
-Corrective candidate prepared from the exact current production baseline:
-
-- branch `release/board-ia-live-retest-002`;
 - PR #150;
-- scope limited to `workspace/artifacts/index.html` copy plus a Batch A regression assertion;
-- no DB/RLS/worker/membership/lifecycle/spatial/route/Telegram changes;
-- production merge/deploy not yet performed.
+- production commit `8adee2d8708393d7ba56de0bc53790152fb5c69c`;
+- Deploy Dementor Production run #59;
+- run id `34706259996`;
+- workflow conclusion `success`;
+- build logs confirm checkout of exact canonical branch `dementor-club-production` at `8adee2d8708393d7ba56de0bc53790152fb5c69c`;
+- Pages artifact `10300789454`;
+- artifact digest `sha256:ee235519d76f5030e557ba5c02045bce20fb865873dbcbceffbcce27b5a50aef`;
+- no DB/RLS/worker/membership/lifecycle/spatial/route/Telegram behavior changed.
 
-`/workspace/artifacts/` functional authenticated route = **PASS**.
+Observed after corrective release #59:
 
-`QA-BOARD-LIVE-002` = **OPEN / CORRECTIVE CANDIDATE IN VALIDATION**.
+- `/workspace/artifacts/` still loads successfully;
+- history rows and lifecycle labels remain present;
+- corrected copy now states that Community Board preserves both what is happening now and club history;
+- the obsolete live-only wording is absent.
 
-## Remaining live evidence not currently manufacturable safely
+`QA-BOARD-LIVE-002` = **PASS / CLOSED BY CORRECTIVE RELEASE #59 + OWNER LIVE SCREENSHOT**.
 
-The following are not claimed as live-validated by this note:
+## Authenticated route retest conclusion
 
-- legitimate non-owner Dementor promotion support `0/2 → 1/2 → 2/2 → pending`;
+Target routes from the active Result now have direct authenticated production evidence:
+
+- `/workspace/board/` — PASS desktop + mobile;
+- `/community/artifact/:id/` — PASS after corrective release #58;
+- `/workspace/artifacts/` — PASS after corrective release #59.
+
+## Deferred operational evidence
+
+The following are not claimed as live-validated because a legitimate production actor/event is not currently available:
+
+- non-owner Dementor promotion support `0/2 → 1/2 → 2/2 → pending`;
 - real external Telegram delivery by worker v10 from a legitimate pending row;
 - every one of the eight Board user states in a real production browser session.
 
-No synthetic role mutation is authorized merely to manufacture those states.
+These are deferred operational evidence, not blockers to beginning G8 cleanup. No synthetic role mutation or fake Telegram delivery should be created merely to manufacture evidence.
 
 ## Gate implication
 
-The three target routes required by Result v0.10 now have authenticated owner-browser evidence:
+Authenticated live release validation for the three target routes is complete. Both defects discovered during live retest were corrected, redeployed, and rechecked in production.
 
-- `/workspace/board/` — PASS;
-- `/community/artifact/:id/` — PASS after corrective release #58;
-- `/workspace/artifacts/` — functional PASS, with one semantic copy defect isolated in `QA-BOARD-LIVE-002`.
+The active Result may move from `G7_RELEASE` to `G8_CLEANUP`.
 
-The Result must remain in release validation until `QA-BOARD-LIVE-002` is either released and rechecked or explicitly deferred. After that, it may move to G8 cleanup with the unavailable legitimate-actor Telegram/Dementor evidence recorded as deferred rather than synthesized.
+This evidence does **not** by itself claim final Result closure: G8 must still inventory and address stale branches, temporary/compatibility layers, superseded assets/routes, duplicate owners and stale QA status before `DONE / APPROVED` is asserted.
