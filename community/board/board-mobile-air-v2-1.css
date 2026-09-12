@@ -1,11 +1,26 @@
 /* Board UX v2.1 — mobile spatial breathing room.
-   The Board is the primary surface; cards must never consume the whole phone viewport. */
+   The Board is the primary surface; cards must never consume the whole phone viewport.
+   This file also owns the final responsive card composition layer after fullscreen CSS. */
 .dc-board-fullscreen-v21 .dc-board-grid .dc-notice__meta,
 .dc-board-fullscreen-v21 .dc-board-grid .dc-notice__author,
 .dc-board-fullscreen-v21 .dc-board-grid .dc-notice__expiry{display:none!important}
 .dc-board-fullscreen-v21 .dc-board-grid .dc-notice,
 .dc-board-fullscreen-v21 .dc-board-grid .dc-projection{max-height:360px!important}
+.dc-board-fullscreen-v21 .dc-board-grid .dc-notice:has(.dc-notice__media){max-height:760px!important}
 .dc-board-fullscreen-v21 .dc-board-grid .dc-notice__body{display:-webkit-box!important;-webkit-box-orient:vertical!important;-webkit-line-clamp:5!important;overflow:hidden!important;max-height:6.8em!important}
+
+/* Canonical card rhythm: keep one card component, but let existing size classes
+   produce a visible typographic hierarchy. Media preserves its source proportion
+   instead of being forced into the same cropped strip on every card. */
+.dc-board-fullscreen-v21 .dc-board-grid [data-size-class="XS"] h3{font-size:40px!important;line-height:.92!important}
+.dc-board-fullscreen-v21 .dc-board-grid [data-size-class="S"] h3{font-size:34px!important;line-height:.94!important}
+.dc-board-fullscreen-v21 .dc-board-grid [data-size-class="M"] h3{font-size:30px!important;line-height:.95!important}
+.dc-board-fullscreen-v21 .dc-board-grid [data-size-class="L"] h3{font-size:26px!important;line-height:.97!important}
+.dc-board-fullscreen-v21 .dc-board-grid [data-size-class="XS"] .dc-notice__body{font-size:18px!important;line-height:1.28!important}
+.dc-board-fullscreen-v21 .dc-board-grid [data-size-class="S"] .dc-notice__body{font-size:17px!important;line-height:1.3!important}
+.dc-board-fullscreen-v21 .dc-board-grid [data-size-class="M"] .dc-notice__body{font-size:16px!important;line-height:1.32!important}
+.dc-board-fullscreen-v21 .dc-board-grid [data-size-class="L"] .dc-notice__body{font-size:15px!important;line-height:1.34!important}
+.dc-board-fullscreen-v21 .dc-board-grid .dc-notice__media img{width:100%!important;height:auto!important;max-height:430px!important;object-fit:contain!important;object-position:center!important;margin-inline:auto!important;background:#f2f0e8}
 
 @media(max-width:900px){
   /* The canonical v1 filter set is ВСЁ + ТИПЫ. Keeping this host scrollable clips
@@ -30,11 +45,20 @@
   .dc-board-fullscreen-v21 .dc-spatial-world>.dc-projection[data-size-class="L"]{width:290px!important}
   .dc-board-fullscreen-v21 .dc-board-grid .dc-notice,
   .dc-board-fullscreen-v21 .dc-board-grid .dc-projection{max-height:320px!important;padding:14px!important}
+  .dc-board-fullscreen-v21 .dc-board-grid .dc-notice:has(.dc-notice__media){max-height:560px!important}
   .dc-board-fullscreen-v21 .dc-board-grid .dc-notice h3,
   .dc-board-fullscreen-v21 .dc-board-grid .dc-projection h3{font-size:24px!important;line-height:.96!important;margin-bottom:10px!important}
+  .dc-board-fullscreen-v21 .dc-board-grid [data-size-class="XS"] h3{font-size:30px!important;line-height:.92!important}
+  .dc-board-fullscreen-v21 .dc-board-grid [data-size-class="S"] h3{font-size:27px!important;line-height:.94!important}
+  .dc-board-fullscreen-v21 .dc-board-grid [data-size-class="M"] h3{font-size:24px!important;line-height:.96!important}
+  .dc-board-fullscreen-v21 .dc-board-grid [data-size-class="L"] h3{font-size:22px!important;line-height:.98!important}
   .dc-board-fullscreen-v21 .dc-board-grid .dc-notice__body{font-size:15px!important;line-height:1.28!important;-webkit-line-clamp:4!important;max-height:5.2em!important;margin-bottom:10px!important}
+  .dc-board-fullscreen-v21 .dc-board-grid [data-size-class="XS"] .dc-notice__body{font-size:16px!important}
+  .dc-board-fullscreen-v21 .dc-board-grid [data-size-class="S"] .dc-notice__body{font-size:15px!important}
+  .dc-board-fullscreen-v21 .dc-board-grid [data-size-class="M"] .dc-notice__body{font-size:14.5px!important}
+  .dc-board-fullscreen-v21 .dc-board-grid [data-size-class="L"] .dc-notice__body{font-size:14px!important}
   .dc-board-fullscreen-v21 .dc-board-grid .dc-notice__media{margin-bottom:10px!important}
-  .dc-board-fullscreen-v21 .dc-board-grid .dc-notice__media img{max-height:128px!important}
+  .dc-board-fullscreen-v21 .dc-board-grid .dc-notice__media img{height:auto!important;max-height:260px!important;object-fit:contain!important}
   .dc-board-fullscreen-v21 .dc-board-open-hint{padding-top:7px!important;font-size:8px!important}
 }
 
@@ -49,9 +73,27 @@
   .dc-board-fullscreen-v21 .dc-spatial-world>.dc-projection[data-size-class="L"]{width:260px!important}
   .dc-board-fullscreen-v21 .dc-board-grid .dc-notice,
   .dc-board-fullscreen-v21 .dc-board-grid .dc-projection{max-height:290px!important;padding:12px!important}
+  .dc-board-fullscreen-v21 .dc-board-grid .dc-notice:has(.dc-notice__media){max-height:480px!important}
   .dc-board-fullscreen-v21 .dc-board-grid .dc-notice h3,
   .dc-board-fullscreen-v21 .dc-board-grid .dc-projection h3{font-size:21px!important}
+  .dc-board-fullscreen-v21 .dc-board-grid [data-size-class="XS"] h3{font-size:25px!important;line-height:.92!important}
+  .dc-board-fullscreen-v21 .dc-board-grid [data-size-class="S"] h3{font-size:22px!important;line-height:.94!important}
+  .dc-board-fullscreen-v21 .dc-board-grid [data-size-class="M"] h3{font-size:20px!important;line-height:.96!important}
+  .dc-board-fullscreen-v21 .dc-board-grid [data-size-class="L"] h3{font-size:19px!important;line-height:.98!important}
   .dc-board-fullscreen-v21 .dc-board-grid .dc-notice__body{font-size:14px!important;-webkit-line-clamp:3!important;max-height:4em!important}
-  .dc-board-fullscreen-v21 .dc-board-grid .dc-notice__media img{max-height:105px!important}
+  .dc-board-fullscreen-v21 .dc-board-grid [data-size-class="XS"] .dc-notice__body{font-size:15px!important}
+  .dc-board-fullscreen-v21 .dc-board-grid [data-size-class="S"] .dc-notice__body{font-size:14.5px!important}
+  .dc-board-fullscreen-v21 .dc-board-grid [data-size-class="M"] .dc-notice__body{font-size:14px!important}
+  .dc-board-fullscreen-v21 .dc-board-grid [data-size-class="L"] .dc-notice__body{font-size:13.5px!important}
+  .dc-board-fullscreen-v21 .dc-board-grid .dc-notice__media img{height:auto!important;max-height:230px!important;object-fit:contain!important}
   .dc-board-fullscreen-v21 .dc-spatial-status{display:none!important}
+
+  /* The previous/next owner already exists in board-fullscreen-v2-1.js. Mobile
+     only needs composition: keep the same navigator, place it above the spatial
+     controls, and move the type drawer high enough that the two never overlap. */
+  .dc-board-fullscreen-v21 .dc-board-filter-nav{display:flex!important;position:fixed!important;left:8px!important;right:auto!important;top:auto!important;bottom:calc(68px + env(safe-area-inset-bottom,0px))!important;margin:0!important;padding:5px!important;border:1px solid #111!important;background:#f8f5ed!important;box-shadow:3px 3px 0 #111!important;z-index:175!important}
+  .dc-board-fullscreen-v21 .dc-board-filter-nav[hidden]{display:none!important}
+  .dc-board-fullscreen-v21 .dc-board-filter-nav button{width:36px!important;height:36px!important;min-width:36px!important;min-height:36px!important}
+  .dc-board-fullscreen-v21 .dc-board-filter-nav span{min-width:48px!important;font-size:9px!important}
+  .dc-board-fullscreen-v21 .dc-board-filter-drawer{bottom:calc(126px + env(safe-area-inset-bottom,0px))!important;max-height:min(62dvh,calc(100dvh - 215px))!important}
 }
