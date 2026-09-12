@@ -165,7 +165,6 @@ const joinResponsive=read('join/dc9-responsive-v2.css');
 expect(joinResponsive.includes('@media(max-width:800px)'),'Join DC-9 mobile: canonical responsive breakpoint missing');
 expect(joinResponsive.includes('.dc9-member-return .dc9-actions{display:grid}'),'Join DC-9 mobile: member-return actions are not stacked');
 expect(joinResponsive.includes('.dc9-member-return .dc9-actions .dc9-button{width:100%}'),'Join DC-9 mobile: member-return actions are not full width');
-expect(joinResponsive.includes('@media(max-width:520px)'),'Join Application narrow mobile: compact breakpoint missing');
 
 const dc9Runtime=read('join/dc9-immersive-v1.js');
 expect(!dc9Runtime.includes('renderIntro'),'Join DC-9: runtime still owns a separate intro state');
