@@ -42,6 +42,8 @@ jobs:
         run: node scripts/validate-board-v21-contract.mjs
       - name: Validate Board Information Architecture Batch A contract
         run: node scripts/validate-board-batch-a-contract.mjs
+      - name: Validate Board Information Architecture Batch B contract
+        run: node scripts/validate-board-batch-b-contract.mjs
       - name: Build production candidate artifact
         run: node scripts/build-pages.mjs
       - name: Validate production analytics and consent
