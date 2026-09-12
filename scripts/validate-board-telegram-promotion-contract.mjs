@@ -9,9 +9,11 @@ const read=p=>fs.readFileSync(p,'utf8');
 // a second authority document into the release candidate branch.
 const migration=read('supabase/migrations/20260912153000_board_telegram_promotion_v1.sql');
 const hardening=read('supabase/migrations/20260912153500_board_telegram_promotion_v1_worker_hardening.sql');
+const scheduler=read('supabase/migrations/20260912170000_board_telegram_worker_scheduler_v1.sql');
 const board=read('community/board/board.js');
 const entry=read('community/board/board-entry-v2.js');
 const detail=read('community/artifact/artifact.js');
+const workspaceBoard=read('workspace/board/index.html');
 const worker=read('supabase/functions/telegram-outbox-worker/index.ts');
 
 // Activity datetime must not reuse starts_at.
@@ -60,19 +62,37 @@ expect(migration.includes('a.board_hidden_at is null'),'backend ordinary Board-h
 expect(board.includes(".is('board_hidden_at',null)"),'member Board ordinary-hide exclusion missing');
 expect(migration.includes('dc_admin_board_hidden_read_v1'),'Owner/Admin moderation read for hidden Artifacts missing');
 
-// Worker authority / claim / ambiguity safety.
+// Worker claim / ambiguity safety remains service-owned.
 expect(migration.includes('dc_distribution_claim_pending_v1'),'canonical worker claim RPC missing');
 expect(migration.includes("where o.status='pending'")&&migration.includes('for update skip locked'),'pending-only atomic worker claim missing');
 expect(migration.includes('grant execute on function public.dc_distribution_claim_pending_v1(integer) to service_role'),'worker claim is not service-role only');
 expect(migration.includes('revoke all on function public.dc_distribution_claim_pending_v1(integer) from public, anon, authenticated'),'ordinary authenticated worker claim not revoked');
-expect(worker.includes('SUPABASE_SERVICE_ROLE_KEY'),'worker does not enforce service-role invocation');
-expect(worker.includes('SERVICE_ROLE_REQUIRED'),'trusted worker invocation guard missing');
+expect(worker.includes('SUPABASE_SERVICE_ROLE_KEY'),'worker lost internal service-role owner');
 expect(worker.includes('dc_distribution_claim_pending_v1'),'worker bypasses canonical pending claim RPC');
 expect(worker.includes('dc_distribution_mark_unknown_v1'),'worker cannot persist delivery_unknown');
 expect(worker.includes('AmbiguousDeliveryOutcome'),'worker does not distinguish ambiguous external outcome');
 expect(!worker.includes('.in("status", ["pending", "failed"])'),'worker still directly consumes pending+failed');
 expect(!worker.includes('withSupabase({ auth: "user" })'),'ordinary user-auth worker wrapper remains');
 expect(hardening.includes("a.status='active'")&&hardening.includes('a.board_hidden_at is null'),'failed retry is not revalidated against current Artifact eligibility');
+
+// G8: one trusted scheduler must replace browser-owned worker invocation.
+expect(scheduler.includes('create extension if not exists pg_net'),'trusted scheduler does not enable pg_net');
+expect(scheduler.includes('create extension if not exists pg_cron'),'trusted scheduler does not enable pg_cron');
+expect(scheduler.includes('dc_telegram_worker_scheduler_token_v1'),'scheduler token Vault owner missing');
+expect(scheduler.includes('extensions.gen_random_bytes(32)'),'scheduler token is not generated server-side');
+expect(scheduler.includes('dc_validate_telegram_worker_scheduler_token_v1'),'scheduler token validation RPC missing');
+expect(scheduler.includes('revoke all on function public.dc_validate_telegram_worker_scheduler_token_v1(text) from public, anon, authenticated'),'scheduler token validator exposed to ordinary API roles');
+expect(scheduler.includes('dc_telegram_worker_scheduler_tick_v1'),'canonical scheduler tick owner missing');
+expect(scheduler.includes("'dc-telegram-outbox-worker-v1'"),'canonical pg_cron job missing');
+expect(scheduler.includes("'* * * * *'"),'worker scheduler cadence is not explicit');
+expect(scheduler.includes("'x-dc-worker-token',v_scheduler_token"),'scheduler request does not carry private worker token');
+expect(scheduler.includes("'apikey',v_publishable_key"),'scheduler request lacks Supabase gateway key');
+expect(worker.includes('x-dc-worker-token'),'worker does not accept the private scheduler credential');
+expect(worker.includes('dc_validate_telegram_worker_scheduler_token_v1'),'worker does not validate scheduler credential through backend owner');
+expect(worker.includes('auth === `Bearer ${serviceRoleKey}`'),'controlled direct service-role invocation path missing');
+expect(worker.includes('TRUSTED_WORKER_INVOCATION_REQUIRED'),'worker trusted-invocation failure state missing');
+expect(!workspaceBoard.includes('telegram-worker-trigger'),'canonical Workspace Board still invokes worker from browser');
+for(const v of ['v1','v2','v3'])expect(!fs.existsSync(`community/board/telegram-worker-trigger-${v}.js`),`legacy browser worker trigger ${v} still shipped`);
 
 // UI must not infer sent from threshold alone.
 expect(board.includes("if(status==='sent')return '✓ TELEGRAM'"),'Board sent label is not bound to canonical sent state');
@@ -83,4 +103,4 @@ expect(entry.includes("status==='delivery_unknown'"),'Guest delivery_unknown UI 
 expect(detail.includes("status==='delivery_unknown'"),'Detail delivery_unknown UI missing');
 
 if(fail.length){console.error('BOARD TELEGRAM PROMOTION V1 CONTRACT BLOCKED');fail.forEach(x=>console.error('- '+x));process.exit(1)}
-console.log('Board Telegram Promotion v1 contract PASS: canonical activity datetime + atomic support gate + existing outbox owner + trusted worker + delivery ambiguity safety + admin moderation');
+console.log('Board Telegram Promotion v1 contract PASS: activity datetime + atomic support gate + canonical outbox + trusted DB scheduler + retired browser trigger + delivery ambiguity safety + admin moderation');
