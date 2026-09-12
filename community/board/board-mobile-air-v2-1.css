@@ -8,6 +8,12 @@
 .dc-board-fullscreen-v21 .dc-board-grid .dc-notice__body{display:-webkit-box!important;-webkit-box-orient:vertical!important;-webkit-line-clamp:5!important;overflow:hidden!important;max-height:6.8em!important}
 
 @media(max-width:900px){
+  /* The canonical v1 filter set is ВСЁ + ТИПЫ. Keeping this host scrollable clips
+     the nested drawer on narrow viewports because overflow-x:auto makes the
+     vertical axis a scroll container as well. Keep the host open and render the
+     drawer as a viewport-owned bottom sheet instead. */
+  .dc-board-fullscreen-v21 .dc-board-filters{overflow:visible!important}
+  .dc-board-fullscreen-v21 .dc-board-filter-drawer{position:fixed!important;left:8px!important;right:8px!important;top:auto!important;bottom:calc(8px + env(safe-area-inset-bottom,0px))!important;width:auto!important;max-height:min(70dvh,560px)!important;overflow:auto!important;z-index:180!important;touch-action:pan-y!important;overscroll-behavior:contain}
   .dc-board-fullscreen-v21 .dc-spatial-world>.dc-notice[data-size-class="XS"],
   .dc-board-fullscreen-v21 .dc-spatial-world>.dc-projection[data-size-class="XS"]{width:200px!important}
   .dc-board-fullscreen-v21 .dc-spatial-world>.dc-notice[data-size-class="S"],
