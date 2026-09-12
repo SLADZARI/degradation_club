@@ -68,7 +68,7 @@ async function persist(card){
 
 function start(event){
   const card=event.target.closest?.('.dc-notice.is-own-movable');
-  if(!card||event.button!==0)return;
+  if(!card||event.button!==0||event.target.closest?.('button,a,input,textarea,select,label,dialog,[contenteditable="true"]'))return;
   event.preventDefault();event.stopPropagation();
   ensureCenteredCloud();
   const x=parseFloat(card.style.left)||0,y=parseFloat(card.style.top)||0;
