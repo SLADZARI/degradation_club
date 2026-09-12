@@ -14,9 +14,7 @@ function json(data: unknown, status = 200) {
 
 function requireServiceRequest(req: Request, serviceRoleKey: string) {
   const auth = req.headers.get("authorization") || "";
-  if (auth !== `Bearer ${serviceRoleKey}`) {
-    throw new Error("SERVICE_ROLE_REQUIRED");
-  }
+  if (auth !== `Bearer ${serviceRoleKey}`) throw new Error("SERVICE_ROLE_REQUIRED");
 }
 
 async function telegramCall(url: string, body: Record<string, unknown>) {
@@ -37,14 +35,19 @@ async function telegramCall(url: string, body: Record<string, unknown>) {
   try {
     payload = raw ? JSON.parse(raw) : null;
   } catch {
-    if (response.ok) {
-      throw new AmbiguousDeliveryOutcome(`Telegram returned unreadable success response: ${clip(raw, 300)}`);
+    if (response.ok || response.status >= 500) {
+      throw new AmbiguousDeliveryOutcome(`Telegram response outcome ambiguous: HTTP ${response.status}; ${clip(raw, 300)}`);
     }
-    throw new KnownDeliveryFailure(`Telegram HTTP ${response.status}: ${clip(raw, 300)}`);
+    throw new KnownDeliveryFailure(`Telegram rejected request: HTTP ${response.status}; ${clip(raw, 300)}`);
   }
 
+  // 5xx after request dispatch is not safe to auto-retry: Telegram may have
+  // accepted the message before the upstream failure became visible to us.
+  if (response.status >= 500) {
+    throw new AmbiguousDeliveryOutcome(payload?.description || `Telegram server outcome ambiguous: HTTP ${response.status}`);
+  }
   if (!response.ok || !payload?.ok) {
-    throw new KnownDeliveryFailure(payload?.description || `Telegram HTTP ${response.status}`);
+    throw new KnownDeliveryFailure(payload?.description || `Telegram rejected request: HTTP ${response.status}`);
   }
 
   return payload.result;
@@ -72,11 +75,9 @@ Deno.serve(async (req: Request) => {
   });
 
   try {
-    // Controlled retry policy: only known non-delivery rows may return to pending.
     const requeue = await admin.rpc("dc_distribution_requeue_failed_v1", { p_limit: 5 });
     if (requeue.error) return json({ error: "Failed retry requeue unavailable", stage: "requeue", detail: requeue.error.message }, 532);
 
-    // Canonical DB claim uses FOR UPDATE SKIP LOCKED and only claims pending.
     const claimedResult = await admin.rpc("dc_distribution_claim_pending_v1", { p_limit: 5 });
     if (claimedResult.error) return json({ error: "Outbox claim unavailable", stage: "claim", detail: claimedResult.error.message }, 533);
 
@@ -108,8 +109,8 @@ Deno.serve(async (req: Request) => {
           .select("display_name,nickname")
           .eq("id", artifact.author_profile_id)
           .maybeSingle();
-
         if (profileResult.error) throw new KnownDeliveryFailure(`Author read failed: ${profileResult.error.message}`);
+
         const profile = profileResult.data;
         const author = String(profile?.display_name || profile?.nickname || "Участник клуба").trim();
         const artifactUrl = `https://dementor.club/community/artifact/${artifact.id}/`;
@@ -131,8 +132,8 @@ Deno.serve(async (req: Request) => {
           .order("created_at", { ascending: true })
           .limit(1)
           .maybeSingle();
-
         if (mediaResult.error) throw new KnownDeliveryFailure(`Media read failed: ${mediaResult.error.message}`);
+
         const media = mediaResult.data;
         let telegramResult: any = null;
 
