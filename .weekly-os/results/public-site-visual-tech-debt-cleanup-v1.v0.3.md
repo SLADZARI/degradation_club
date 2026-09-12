@@ -23,13 +23,13 @@ liveDatabaseMutationAuthorized: false
 
 ## Status
 
-**ACTIVE / G7 RELEASE — REBASED ISOLATED CANDIDATE VALIDATED**
+**ACTIVE / G7 RELEASE — MERGED, PAGES DEPLOY PENDING**
 
 The owner explicitly resumed this Result and authorized PR #155 for production with `разрешаю #155 в production` on 2026-09-12.
 
 ## Exact production baseline
 
-Current live production after Board corrective #156:
+Current live production before this release remains Board corrective #156:
 
 `af28404048dfc918ada81298b0d184df407d0595`
 
@@ -37,9 +37,7 @@ Deploy #63 / run `34719474734` — SUCCESS.
 Pages artifact: `10305938397`.
 Artifact digest: `sha256:37e5cf886005fcaecc34757988b34f1aba8a774e944cb06bbbd834c6aa41e988`.
 
-The deploy build explicitly checked out `dementor-club-production` and `git log -1` resolved to `af28404048dfc918ada81298b0d184df407d0595`.
-
-## Release candidate
+## Release candidate and merge
 
 PR: **#155** — `Public visual tech-debt cleanup v1 — refreshed isolated candidate`.
 
@@ -47,11 +45,17 @@ Integration branch:
 
 `agent/public-site-visual-tech-debt-cleanup-v1-refresh`
 
-Exact candidate head:
+Validated candidate head:
 
 `bf8156f0c8934aabfd062b6a2def3910c3921e44`
 
-Candidate shape:
+Production squash merge commit:
+
+`43b6dcaa11292f49564c989add219e0b095fbf8d`
+
+Repository merge is complete. GitHub Pages deployment is still pending manual workflow dispatch; therefore this Result is not yet released/live-validated.
+
+Candidate shape before merge:
 
 - 1 commit;
 - 8 changed files;
@@ -112,8 +116,8 @@ No changes to:
 
 ## Release boundary
 
-Production merge and Pages deployment for PR #155 are explicitly authorized by the project owner. `Commit ≠ merge ≠ deploy`: repository merge must be recorded separately from successful Pages deployment.
+Production merge and Pages deployment for PR #155 are explicitly authorized by the project owner. `Commit ≠ merge ≠ deploy`: repository merge is now complete; successful Pages deployment still requires evidence.
 
 ## Acceptance before G8 closure
 
-After merge/deploy, live smoke must confirm the changed public surfaces, especially Home/Fuengirola ownership and the four Merch detail/catalog states. Board #156 must remain unaffected in the integrated production composition.
+After deploy, live smoke must confirm the changed public surfaces, especially Home/Fuengirola ownership and the four Merch detail/catalog states. Board #156 must remain unaffected in the integrated production composition.
