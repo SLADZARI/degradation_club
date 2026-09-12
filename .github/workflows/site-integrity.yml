@@ -44,6 +44,8 @@ jobs:
         run: node scripts/validate-board-batch-a-contract.mjs
       - name: Validate Board Information Architecture Batch B contract
         run: node scripts/validate-board-batch-b-contract.mjs
+      - name: Validate Board Telegram Promotion v1 contract
+        run: node scripts/validate-board-telegram-promotion-contract.mjs
       - name: Build production candidate artifact
         run: node scripts/build-pages.mjs
       - name: Validate production analytics and consent
