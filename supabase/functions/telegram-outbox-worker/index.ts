@@ -12,9 +12,28 @@ function json(data: unknown, status = 200) {
   });
 }
 
-function requireServiceRequest(req: Request, serviceRoleKey: string) {
+async function requireTrustedRequest(req: Request, admin: any, serviceRoleKey: string) {
   const auth = req.headers.get("authorization") || "";
-  if (auth !== `Bearer ${serviceRoleKey}`) throw new Error("SERVICE_ROLE_REQUIRED");
+
+  // Keep direct service-role invocation available for controlled operations and
+  // emergency/manual smoke. Never accept an ordinary authenticated user token.
+  if (auth === `Bearer ${serviceRoleKey}`) return "service_role";
+
+  // Normal automatic processing is owned by the database scheduler. The opaque
+  // token is generated/stored in Vault and is validated through a service-only
+  // RPC; the plaintext secret is never committed or returned to browser code.
+  const schedulerToken = req.headers.get("x-dc-worker-token") || "";
+  if (!schedulerToken) throw new Error("TRUSTED_WORKER_INVOCATION_REQUIRED");
+
+  const validation = await admin.rpc("dc_validate_telegram_worker_scheduler_token_v1", {
+    p_token: schedulerToken,
+  });
+
+  if (validation.error || validation.data !== true) {
+    throw new Error("TRUSTED_WORKER_INVOCATION_REQUIRED");
+  }
+
+  return "db_scheduler";
 }
 
 async function telegramCall(url: string, body: Record<string, unknown>) {
@@ -64,15 +83,16 @@ Deno.serve(async (req: Request) => {
   if (!supabaseUrl || !serviceRoleKey) return json({ error: "Supabase service configuration missing", stage: "preflight" }, 530);
   if (!botToken || !chatId) return json({ error: "Telegram configuration missing", stage: "preflight" }, 531);
 
-  try {
-    requireServiceRequest(req, serviceRoleKey);
-  } catch {
-    return json({ error: "Trusted worker invocation required", stage: "auth" }, 403);
-  }
-
   const admin = createClient(supabaseUrl, serviceRoleKey, {
     auth: { persistSession: false, autoRefreshToken: false },
   });
+
+  let invoker = "unknown";
+  try {
+    invoker = await requireTrustedRequest(req, admin, serviceRoleKey);
+  } catch {
+    return json({ error: "Trusted worker invocation required", stage: "auth" }, 403);
+  }
 
   try {
     const requeue = await admin.rpc("dc_distribution_requeue_failed_v1", { p_limit: 5 });
@@ -186,7 +206,7 @@ Deno.serve(async (req: Request) => {
       }
     }
 
-    return json({ ok: true, requeued: Number(requeue.data || 0), claimed: claimed.length, sent, failed, delivery_unknown: unknown, stage: "complete" });
+    return json({ ok: true, invoker, requeued: Number(requeue.data || 0), claimed: claimed.length, sent, failed, delivery_unknown: unknown, stage: "complete" });
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     return json({ error: "Worker failed", stage: "unhandled", detail: clip(message, 500) }, 534);
