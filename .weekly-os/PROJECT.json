@@ -7,12 +7,12 @@
     "projectStage": "CLEANUP",
     "gate": "G7_RELEASE",
     "status": "APPROVED",
-    "version": "1.64",
+    "version": "1.65",
     "updated": "2026-09-12",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "1.63"
+    "supersedes": "1.64"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -75,10 +75,10 @@
     "productionMergeAuthorized": true,
     "productionDeployAuthorized": true,
     "productionReleaseAuthorizationBasis": "Explicit project-owner instruction `разрешаю #155 в production` on 2026-09-12.",
-    "productionCommit": null,
-    "productionMergeComplete": false,
+    "productionCommit": "43b6dcaa11292f49564c989add219e0b095fbf8d",
+    "productionMergeComplete": true,
     "lastLiveProductionCommit": "af28404048dfc918ada81298b0d184df407d0595",
-    "productionDeployStatus": "NOT_MERGED",
+    "productionDeployStatus": "PENDING_WORKFLOW_DISPATCH",
     "lastSuccessfulProductionDeployRun": 63,
     "lastSuccessfulProductionDeployRunId": 34719474734,
     "lastLivePagesArtifactId": 10305938397,
@@ -87,7 +87,7 @@
     "evidence": "operations/PUBLIC_SITE_VISUAL_TECH_DEBT_CLEANUP_REFRESH_2026-09-12.md",
     "liveDatabaseMutationAuthorized": false,
     "openValidationGaps": [
-      "PR #155 is validated and production-authorized but not yet merged/deployed; do not claim the public visual cleanup live until Pages deployment and live smoke pass.",
+      "PR #155 is merged into production repository commit 43b6dcaa11292f49564c989add219e0b095fbf8d but Pages deployment is pending workflow_dispatch; do not claim the public visual cleanup live yet.",
       "Board Result v0.17 remains WAITING rather than DONE; deferred real non-owner Dementor promotion/Telegram/all-eight-state evidence is unchanged."
     ],
     "scope": ["public visual runtime ownership cleanup","Home/Fuengirola compatibility boundary","Merch four-SKU runtime mapping","visitor-facing unavailable states","visual release validation"],
