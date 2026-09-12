@@ -103,28 +103,21 @@ function installOwnLocatorFilterBridge(){
 
 async function loadPlatformProjections(){
   const session=await currentSession();if(!session)return;
-  const [entitiesResult,eventsResult,programsResult]=await Promise.all([
-    client.from('dc_entities').select('id,entity_type,slug,title,status,summary,source_system,source_ref,provenance_status,confirmed_at,updated_at').eq('provenance_status','confirmed'),
-    client.from('dc_events').select('entity_id,location,capacity,metadata'),
-    client.from('dc_programs').select('entity_id,program_type,delivery_mode,content_summary,metadata')
-  ]);
-  for(const result of [entitiesResult,eventsResult,programsResult])if(result.error)throw result.error;
-  const events=new Map((eventsResult.data||[]).map(item=>[item.entity_id,item]));const programs=new Map((programsResult.data||[]).map(item=>[item.entity_id,item]));
-  projections=(entitiesResult.data||[]).map(entity=>entityToBoardProjection(entity,events.get(entity.id),programs.get(entity.id))).filter(isProjectionVisible);ensureProjections();
+  const {data,error}=await client.rpc('dc_board_entity_projection_read_v1');
+  if(error)throw error;
+  projections=(data||[]).map(row=>{
+    const entity={id:row.entity_id,entity_type:row.entity_type,slug:row.slug,title:row.title,status:row.status,summary:row.summary,source_system:row.source_system,provenance_status:row.provenance_status};
+    const event=row.entity_type==='event'?{location:row.event_location,capacity:row.event_capacity}:null;
+    const program=row.entity_type==='program'?{program_type:row.program_type,delivery_mode:row.delivery_mode,content_summary:row.content_summary}:null;
+    return entityToBoardProjection(entity,event,program);
+  }).filter(isProjectionVisible);
+  ensureProjections();
 }
 
 async function init(){
   installFilters();
   installOwnLocatorFilterBridge();
   client=getClient();
-  // Fullscreen Workspace Board is a notice-only surface. Keep this module as
-  // the canonical filter owner, but do not project courses/projects/events
-  // into the spatial canvas.
-  if(document.body.classList.contains('dc-board-fullscreen-v21')){
-    markMemberCards();
-    if(boardHost)new MutationObserver(()=>markMemberCards()).observe(boardHost,{childList:true});
-    return;
-  }
   try{await loadPlatformProjections()}catch(error){console.error('[DC Board integrations]',error)}
   if(boardHost){let timer=null;const observer=new MutationObserver(()=>{if(rendering)return;clearTimeout(timer);timer=setTimeout(()=>{markMemberCards();ensureProjections();applyFilter({announce:false});window.dispatchEvent(new CustomEvent('dc:board-layout-request'))},80)});observer.observe(boardHost,{childList:true})}
 }
