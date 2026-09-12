@@ -98,7 +98,6 @@ for(const viewport of [{width:390,height:844,label:'390'},{width:1440,height:900
   expect(before!==after,`member-first-${viewport.label}: Board zoom control did not move camera`);
   await page.locator('.dc-notice[data-artifact] h3').first().click();
   const overlay=page.locator('.dc-artifact-overlay');await overlay.waitFor({state:'visible',timeout:2500});
-  expect(document!==null,`member-first-${viewport.label}: unreachable`);
   await page.locator('.dc-artifact-overlay__close').click();await page.waitForTimeout(80);
   expect(await overlay.isHidden(),`member-first-${viewport.label}: Artifact detail did not close`);
   expect(!errors.length,`member-first-${viewport.label}: ${errors.join(' | ')}`);
