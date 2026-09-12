@@ -1,26 +1,62 @@
-import {getClient,currentSession,BOARD_DETAIL_FILTERS,BOARD_FILTERS,matchesBoardFilter} from './board-runtime-v1.js';
+import {getClient,currentSession,esc} from '/community-runtime-v1.js';
+import {BOARD_FILTERS,BOARD_DETAIL_FILTERS,BOARD_SOURCE_MODES,entityToBoardProjection,isProjectionVisible,matchesBoardFilter} from '/community/board/board-entity-model-v1.js';
 
 const boardHost=document.getElementById('boardHost');
 const filterHost=document.getElementById('boardFilters');
-let client=null;let projections=[];let rendering=false;let activeFilter='all';let drawer=null;
+let client=null;
+let activeFilter='all';
+let projections=[];
+let rendering=false;
+let drawer=null;
 
-function escapeHtml(value){return String(value??'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]))}
-function entityToBoardProjection(entity,event,program){
-  if(entity.entity_type==='event')return{source:'platform',sourceType:'event',sourceId:entity.id,title:entity.title,body:entity.summary||'',status:entity.status||'',meta:[event?.location,event?.capacity?`${event.capacity} мест`:null].filter(Boolean).join(' · '),href:entity.slug?`/events/${entity.slug}/`:null};
-  if(entity.entity_type==='program')return{source:'platform',sourceType:'program',sourceId:entity.id,title:entity.title,body:program?.content_summary||entity.summary||'',status:entity.status||'',meta:[program?.program_type,program?.delivery_mode].filter(Boolean).join(' · '),href:entity.slug?`/projects/${entity.slug}/`:null};
-  if(entity.entity_type==='project')return{source:'platform',sourceType:'project',sourceId:entity.id,title:entity.title,body:entity.summary||'',status:entity.status||'',meta:'ПРОЕКТ',href:entity.slug?`/projects/${entity.slug}/`:null};
-  if(entity.entity_type==='product')return{source:'platform',sourceType:'product',sourceId:entity.id,title:entity.title,body:entity.summary||'',status:entity.status||'',meta:'ПРОДУКТ',href:entity.slug?`/merch/${entity.slug}/`:null};
-  if(entity.entity_type==='content')return{source:'platform',sourceType:'content',sourceId:entity.id,title:entity.title,body:entity.summary||'',status:entity.status||'',meta:'КОНТЕНТ',href:entity.slug?`/content/${entity.slug}/`:null};
-  return null;
+function projectionClass(item){
+  const classes=['dc-projection'];
+  if(item.sourceType==='event')classes.push('dc-projection--event');
+  if(item.sourceType==='course')classes.push('dc-projection--course');
+  if(item.sourceType==='practice')classes.push('dc-projection--practice');
+  if(item.isForming)classes.push('is-forming');
+  return classes.join(' ');
 }
-function isProjectionVisible(item){return item&&item.title&&item.status!=='removed'}
-function renderProjection(item){return`<article class="dc-projection" data-board-source="platform" data-source-type="${escapeHtml(item.sourceType)}" data-source-id="${escapeHtml(item.sourceId)}" data-status="${escapeHtml(item.status)}"><div class="dc-notice__meta"><span>${escapeHtml(item.meta||item.sourceType.toUpperCase())}</span><span>${escapeHtml(item.status||'')}</span></div><h3>${escapeHtml(item.title)}</h3>${item.body?`<p class="dc-notice__body">${escapeHtml(item.body)}</p>`:''}${item.href?`<a class="dc-board-open-hint" href="${escapeHtml(item.href)}">ОТКРЫТЬ →</a>`:''}</article>`}
-function markMemberCards(){boardHost?.querySelectorAll('.dc-notice[data-artifact]').forEach(card=>{card.dataset.boardSource='artifact';card.dataset.sourceType='artifact';card.dataset.sourceId=card.dataset.artifact||''})}
+
+function statusLabel(item){
+  const map={active:'ACTIVE',announced:'ANNOUNCED',registration:'REGISTRATION',planned:'PLANNED','approved-draft':'FORMING / APPROVED','mvp-in-development':'IN DEVELOPMENT'};
+  return map[item.status]||String(item.status||'').toUpperCase();
+}
+
+function renderProjection(item){
+  const route=item.publicRoute;
+  const location=item.location?`<div class="dc-projection__line" dir="auto">${esc(item.location)}</div>`:'';
+  const action=route?`<a class="dc-board-action small" href="${esc(route)}">ОТКРЫТЬ →</a>`:'';
+  return `<article class="${projectionClass(item)}" data-board-source="platform" data-source-mode="${BOARD_SOURCE_MODES.ENTITY_PROJECTION}" data-source-id="${esc(item.sourceId)}" data-source-type="${esc(item.sourceType)}" data-forming="${item.isForming?'1':'0'}">
+    <div class="dc-notice__meta"><span>DEMENTOR CLUB / ${esc(item.sourceType.toUpperCase())}</span><span>${esc(statusLabel(item))}</span></div>
+    <div class="dc-projection__authority">CLUB / OFFICIAL</div>
+    <h3 dir="auto">${esc(item.title)}</h3>
+    ${item.body?`<p class="dc-notice__body" dir="auto">${esc(item.body)}</p>`:''}
+    ${location}
+    <div class="dc-notice__expiry">SOURCE / ${esc(item.sourceSystem||'dementor-club')} · ${esc(item.provenanceStatus||'')}</div>
+    <div class="dc-notice__actions">${action}<span class="dc-notice__activity">${esc(statusLabel(item))}</span></div>
+  </article>`;
+}
+
+function markMemberCards(){
+  boardHost?.querySelectorAll('.dc-notice[data-artifact]:not([data-board-source])').forEach(card=>{
+    card.dataset.boardSource='member';
+    card.dataset.sourceMode=BOARD_SOURCE_MODES.ARTIFACT;
+    card.dataset.sourceType='artifact';
+    card.dataset.forming='0';
+  });
+}
+
 function applyFilter({announce=true}={}){
-  if(!boardHost)return;
   markMemberCards();
-  [...boardHost.querySelectorAll('.dc-notice[data-artifact],.dc-projection[data-board-source="platform"]')].forEach(card=>{
-    const item=card.matches('.dc-notice[data-artifact]')?{source:'artifact',sourceType:'artifact',artifactType:card.dataset.artifactType||'announcement'}:{source:'platform',sourceType:card.dataset.sourceType||''};
+  boardHost?.querySelectorAll('[data-board-source]').forEach(card=>{
+    const item={
+      sourceMode:card.dataset.sourceMode||null,
+      isMember:card.dataset.boardSource==='member',
+      isPlatform:card.dataset.boardSource==='platform',
+      sourceType:card.dataset.sourceType,
+      isForming:card.dataset.forming==='1'
+    };
     const hidden=!matchesBoardFilter(item,activeFilter);
     card.hidden=hidden;
     card.classList.toggle('dc-board-filtered',hidden);
@@ -49,8 +85,6 @@ function ensureDrawer(){
   if(drawer)return drawer;
   drawer=document.createElement('div');drawer.className='dc-board-filter-drawer';drawer.hidden=true;
   drawer.innerHTML=`<div class="dc-board-filter-drawer__head"><strong>ТИП ОБЪЕКТА</strong><button type="button" data-filter-close aria-label="Закрыть фильтры">×</button></div><div class="dc-board-filter-drawer__grid">${BOARD_DETAIL_FILTERS.map(([id,label])=>`<button class="dc-board-filter" type="button" data-board-detail-filter="${id}">${label}</button>`).join('')}</div>`;
-  // Viewport-owned sheet: keep the canonical drawer outside Workspace/Board stacking
-  // contexts so neither the top navigation nor the fixed Board controls can steal taps.
   document.body.appendChild(drawer);
   drawer.querySelector('[data-filter-close]').onclick=closeDrawer;
   drawer.addEventListener('click',event=>{const button=event.target.closest('[data-board-detail-filter]');if(!button)return;activeFilter=button.dataset.boardDetailFilter||'all';applyFilter();closeDrawer()});
@@ -94,5 +128,4 @@ async function init(){
   try{await loadPlatformProjections()}catch(error){console.error('[DC Board integrations]',error)}
   if(boardHost){let timer=null;const observer=new MutationObserver(()=>{if(rendering)return;clearTimeout(timer);timer=setTimeout(()=>{markMemberCards();ensureProjections();applyFilter({announce:false});window.dispatchEvent(new CustomEvent('dc:board-layout-request'))},80)});observer.observe(boardHost,{childList:true})}
 }
-
-init().catch(error=>console.error('[DC Board integrations]',error));
+init();
