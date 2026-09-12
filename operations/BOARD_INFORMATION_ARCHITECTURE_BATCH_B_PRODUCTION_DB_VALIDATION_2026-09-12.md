@@ -4,8 +4,8 @@ project: dementor-club
 documentType: QA_EVIDENCE
 projectStage: BUILD
 gate: G6B_VALIDATION
-status: EVIDENCE
-version: 1.0
+status: APPROVED_EVIDENCE
+version: 1.1
 updated: 2026-09-12
 owner: Modern Pilgrims
 sourceSystem: GIT
@@ -24,7 +24,7 @@ liveDatabaseMutationAuthorized: true
 
 Project owner explicitly authorized production DB mutation for the active Board Result on 2026-09-12 with instruction to minimize risk.
 
-Batch B uses the existing `public.dc_artifacts.artifact_type` column; no publication/content table, membership state or slot owner was added.
+Batch B extends the existing `public.dc_artifacts.artifact_type` owner in place. No publication/content table, membership state or slot owner was added.
 
 Production code merge/deploy remain unauthorized.
 
@@ -36,6 +36,7 @@ Before mutation:
 - all 8 had `artifact_type='notice'`;
 - no draft rows existed;
 - `dc_artifacts_type_check` allowed only `notice`;
+- table-level `artifact_type` default was legacy `'notice'`;
 - no DB dependents were found on the current `dc_create_artifact_draft_v1` or `dc_update_artifact_draft_v1` signatures.
 
 Exact preflight Artifact IDs:
@@ -49,16 +50,18 @@ Exact preflight Artifact IDs:
 - `d0d79a2f-6f14-475f-9af0-f21b4f7e604d`;
 - `42b71eab-aa58-490e-9d7d-ff866c5792f9`.
 
-## CI before DB mutation
+## CI evidence
 
-Site Integrity / Release Readiness run `#953` passed on the Batch B integration head after harmonizing superseded Board v2 filter assertions.
+Site Integrity / Release Readiness run `#953` passed before the production subtype migration.
+
+Site Integrity / Release Readiness run `#954` passed on the subsequent Batch B integration head after the default-hardening file and production evidence were tracked.
 
 Passed checks include:
 
 - legacy Board access/security contracts;
 - Board v2.1 fullscreen contract;
 - Batch A contract;
-- new Batch B contract;
+- Batch B contract;
 - production candidate build;
 - built JavaScript syntax;
 - Board fullscreen browser role-state matrix;
@@ -67,9 +70,11 @@ Passed checks include:
 - WebKit regression;
 - route manifest and production artifact release gate.
 
-## Applied migration
+## Applied production DB migrations
 
-Applied successfully to production Supabase:
+### 1. Canonical subtype migration
+
+Applied successfully:
 
 `board_information_architecture_batch_b_subtypes`
 
@@ -79,17 +84,38 @@ Tracked source:
 
 Effects:
 
-1. legacy `notice` values were updated in-place to `announcement`;
-2. `dc_artifacts_type_check` now allows only:
-   - `announcement`;
-   - `post`;
-   - `idea`;
-   - `request`;
-3. existing create-draft RPC/signature remains canonical and now defaults new drafts to `announcement`;
-4. narrow `dc_set_artifact_subtype_v1(uuid,text)` was added for the existing canonical composer;
+1. legacy `notice` values updated in-place to `announcement`;
+2. `dc_artifacts_type_check` now allows only `announcement`, `post`, `idea`, `request`;
+3. existing create-draft RPC/signature remains canonical and persists new drafts as `announcement`;
+4. narrow `dc_set_artifact_subtype_v1(uuid,text)` added for the existing canonical composer;
 5. publish/slot/membership RPC ownership was not rewritten.
 
 No Artifact ID/history/position/reaction/response row was recreated.
+
+### 2. Table-default hardening
+
+Pre-hardening read-only check showed the table-level default still remained legacy `'notice'` even after the subtype constraint had changed.
+
+Applied successfully:
+
+`board_information_architecture_batch_b_default_hardening`
+
+Tracked source:
+
+`supabase/migrations/20260912144500_board_information_architecture_batch_b_default_hardening.sql`
+
+Effect is limited to:
+
+`dc_artifacts.artifact_type DEFAULT 'announcement'`
+
+No existing row is rewritten by this hardening migration.
+
+Post-hardening verification:
+
+- table default: `'announcement'`;
+- 8 total persisted Artifacts remain `announcement`;
+- 0 non-announcement persisted historical rows;
+- 0 draft rows.
 
 ## Runtime validation
 
@@ -108,7 +134,7 @@ Constraint verified as:
 
 Using an existing active Member profile inside an explicit transaction:
 
-1. `dc_create_artifact_draft_v1(...)` created a test draft with default subtype `announcement`;
+1. `dc_create_artifact_draft_v1(...)` created a test draft with subtype `announcement`;
 2. `dc_set_artifact_subtype_v1(...,'post')` changed the same draft to `post`;
 3. readback returned `artifact_type='post'`, `status='draft'`;
 4. transaction was rolled back;
@@ -121,34 +147,30 @@ For `dc_set_artifact_subtype_v1(uuid,text)`:
 - anonymous EXECUTE: `false`;
 - authenticated EXECUTE: `true`.
 
-An authenticated Guest/non-member was exercised against the subtype command and did not gain draft subtype write authority.
+Authenticated Guest/non-member did not gain draft subtype write authority.
 
-An invalid subtype was exercised in a rollback-safe Member transaction and remained rejected by the RPC/constraint path.
+Invalid subtype remained rejected by the RPC/constraint path in rollback-safe validation.
 
 ## Security advisor
 
-Post-migration security advisor did not introduce a new anonymous SECURITY DEFINER exposure.
+The subtype RPC belongs to the existing class of intentional authenticated SECURITY DEFINER Board commands. Its body enforces authenticated identity, active Membership or Owner Admin, approved subtype vocabulary, caller ownership and `status='draft'` only.
 
-The new subtype RPC appears under the existing class of intentional `authenticated_security_definer_function_executable` warnings because it is an authenticated Board command. Its body explicitly enforces:
-
-- authenticated identity;
-- active Membership or Owner Admin;
-- approved subtype vocabulary;
-- caller ownership;
-- `status='draft'` only.
-
-Pre-existing advisor findings are not silently expanded into this Result.
+No new anonymous subtype authority was introduced.
 
 ## Rollback boundary
 
-A broad `announcement → notice` rollback is unsafe after new production writes begin because new canonical announcements would be indistinguishable from migrated legacy rows.
+A broad `announcement → notice` rollback is unsafe after new canonical writes begin because new announcements become indistinguishable from migrated legacy rows.
 
-If an immediate rollback is ever required, use the exact eight preflight IDs above plus a coordinated restoration of the old create RPC/constraint. Prefer forward correction once new subtype writes exist.
+If immediate rollback were ever required, use the exact eight preflight IDs above plus coordinated restoration of the old create RPC/constraint/default. Prefer forward correction after new subtype writes exist.
 
-## Frontend boundary
+## Batch B factual closure
 
-Batch B frontend code is validated on `agent/board-information-architecture-v1` but is not yet deployed to production.
+Batch B taxonomy/filter implementation is present on `agent/board-information-architecture-v1` and CI-validated.
 
-The current production frontend remains compatible with the migrated DB because the create RPC signature did not change and defaults to `announcement`.
+Production DB subtype semantics and table default are now aligned with the canonical vocabulary.
+
+Production frontend is still not merged/deployed.
+
+This evidence closes the factual Batch B DB state required before the approved Board Telegram Promotion pre-release batch.
 
 `Commit ≠ merge ≠ deploy.`
