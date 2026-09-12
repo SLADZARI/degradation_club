@@ -96,7 +96,11 @@ for(const viewport of [{width:390,height:844,label:'390'},{width:1440,height:900
   await page.locator('[data-zoom-in]').click();await page.waitForTimeout(80);
   const after=await page.locator('.dc-spatial-world').evaluate(el=>el.style.transform);
   expect(before!==after,`member-first-${viewport.label}: Board zoom control did not move camera`);
-  await page.locator('.dc-notice[data-artifact] h3').first().click();
+  await page.locator('[data-home]').click();await page.waitForTimeout(140);
+  const card=page.locator('.dc-notice[data-artifact]').first();
+  const cardBox=await card.boundingBox();const vp=page.viewportSize();
+  expect(!!cardBox&&!!vp&&cardBox.x<vp.width&&cardBox.x+cardBox.width>0&&cardBox.y<vp.height&&cardBox.y+cardBox.height>0,`member-first-${viewport.label}: canonical fit-to-life did not return Artifact to viewport ${JSON.stringify({cardBox,vp})}`);
+  await card.locator('h3').click();
   const overlay=page.locator('.dc-artifact-overlay');await overlay.waitFor({state:'visible',timeout:2500});
   await page.locator('.dc-artifact-overlay__close').click();await page.waitForTimeout(80);
   expect(await overlay.isHidden(),`member-first-${viewport.label}: Artifact detail did not close`);
