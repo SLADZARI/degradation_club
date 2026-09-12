@@ -29,9 +29,10 @@ $function$;
 revoke all on function public.dc_normalize_artifact_lifecycle_v1() from public;
 grant execute on function public.dc_normalize_artifact_lifecycle_v1() to authenticated;
 
--- Evolve the canonical Guest Board read owner. It normalizes stale lifecycle state
--- before returning published Community history. Draft/publishing/removed stay private.
-create or replace function public.dc_guest_board_read_v1()
+-- The return shape changes, so PostgreSQL requires a drop/recreate rather than
+-- CREATE OR REPLACE. This preserves the canonical function name/owner.
+drop function if exists public.dc_guest_board_read_v1();
+create function public.dc_guest_board_read_v1()
 returns table(
   artifact_id uuid,
   artifact_type text,
@@ -246,7 +247,34 @@ $function$;
 revoke all on function public.dc_guest_board_artifact_detail_read_v1(uuid) from public;
 grant execute on function public.dc_guest_board_artifact_detail_read_v1(uuid) to authenticated;
 
--- Narrow Guest storage read: only files already attached to published Board-readable history.
+-- Storage policies cannot depend on guest-visible rows from dc_artifact_media because
+-- its own RLS is Member-only. Resolve that lookup through one narrow SECURITY DEFINER helper.
+create or replace function public.dc_can_read_guest_board_media_v1(p_bucket text,p_object_name text)
+returns boolean
+language sql
+stable
+security definer
+set search_path = 'public', 'pg_temp'
+as $function$
+  select auth.uid() is not null
+    and not public.dc_membership_active()
+    and not public.dc_is_owner_admin()
+    and exists (
+      select 1
+      from public.dc_artifact_media m
+      join public.dc_artifacts a on a.id = m.artifact_id
+      where m.storage_bucket = p_bucket
+        and m.storage_path = p_object_name
+        and a.visibility = 'community'
+        and a.status in ('active','expired','archived')
+        and a.published_at is not null
+        and (a.starts_at is null or a.starts_at <= now())
+    );
+$function$;
+
+revoke all on function public.dc_can_read_guest_board_media_v1(text,text) from public;
+grant execute on function public.dc_can_read_guest_board_media_v1(text,text) to authenticated;
+
 drop policy if exists dc_community_artifacts_storage_select_board_guests on storage.objects;
 create policy dc_community_artifacts_storage_select_board_guests
 on storage.objects
@@ -254,19 +282,7 @@ for select
 to authenticated
 using (
   bucket_id = 'dc-community-artifacts'
-  and not public.dc_membership_active()
-  and not public.dc_is_owner_admin()
-  and exists (
-    select 1
-    from public.dc_artifact_media m
-    join public.dc_artifacts a on a.id = m.artifact_id
-    where m.storage_bucket = storage.objects.bucket_id
-      and m.storage_path = storage.objects.name
-      and a.visibility = 'community'
-      and a.status in ('active','expired','archived')
-      and a.published_at is not null
-      and (a.starts_at is null or a.starts_at <= now())
-  )
+  and public.dc_can_read_guest_board_media_v1(bucket_id,name)
 );
 
 -- Safe Board projection read. Canonical entity deep-access RLS remains untouched.
