@@ -4,19 +4,31 @@ export const BOARD_SOURCE_MODES={
   SYSTEM:'system'
 };
 
+export const ARTIFACT_SUBTYPES=Object.freeze([
+  ['announcement','ОБЪЯВЛЕНИЕ'],
+  ['post','ПОСТ'],
+  ['idea','ИДЕЯ'],
+  ['request','ЗАПРОС']
+]);
+
+export function artifactSubtypeLabel(value){
+  const type=String(value||'announcement').toLowerCase();
+  return ARTIFACT_SUBTYPES.find(([id])=>id===type)?.[1]||'ОБЪЯВЛЕНИЕ';
+}
+
+// Workshop 02 made ВСЁ the only required source-level control in v1.
+// Object type is a separate dimension exposed by the detail filter drawer.
 export const BOARD_FILTERS=[
-  ['all','ВСЁ'],
-  ['member','ОТ ЛЮДЕЙ'],
-  ['platform','ОТ КЛУБА']
+  ['all','ВСЁ']
 ];
 
 export const BOARD_DETAIL_FILTERS=[
-  ['event','МЕРОПРИЯТИЯ'],
-  ['program','ПРОГРАММЫ'],
-  ['course','КУРСЫ'],
+  ['artifact','ОБЪЯВЛЕНИЯ / ПУБЛИКАЦИИ'],
+  ['event','СОБЫТИЯ'],
+  ['program','КУРСЫ / ПРОГРАММЫ'],
   ['practice','ПРАКТИКИ'],
-  ['forming','ФОРМИРУЕТСЯ'],
-  ['project','ПРОЕКТЫ']
+  ['project','ПРОЕКТЫ / ПРОДУКТЫ'],
+  ['content','СТАТЬИ / КОНТЕНТ']
 ];
 
 const ACTIVEISH=new Set(['active','announced','registration','planned','approved-draft','mvp-in-development']);
@@ -64,13 +76,11 @@ export function isProjectionVisible(item){
 
 export function matchesBoardFilter(item,filter){
   if(filter==='all')return true;
-  if(filter==='member')return item.isMember===true;
-  if(filter==='platform')return item.isPlatform===true;
+  if(filter==='artifact')return item.sourceMode===BOARD_SOURCE_MODES.ARTIFACT||item.isMember===true||item.sourceType==='artifact';
   if(filter==='event')return item.sourceType==='event';
-  if(filter==='program')return ['program','course','practice'].includes(item.sourceType);
-  if(filter==='course')return item.sourceType==='course';
+  if(filter==='program')return ['program','course'].includes(item.sourceType);
   if(filter==='practice')return item.sourceType==='practice';
-  if(filter==='forming')return item.isForming===true;
-  if(filter==='project')return item.sourceType==='project';
+  if(filter==='project')return ['project','product'].includes(item.sourceType);
+  if(filter==='content')return ['article','content'].includes(item.sourceType);
   return true;
 }
