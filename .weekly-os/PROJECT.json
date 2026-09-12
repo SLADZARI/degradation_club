@@ -5,14 +5,14 @@
     "project": "dementor-club",
     "documentType": "STANDARD",
     "projectStage": "BUILD",
-    "gate": "G3_BUILD_TELEGRAM_PROMOTION",
+    "gate": "G6_PROMOTION_VALIDATION",
     "status": "APPROVED",
-    "version": "1.54",
+    "version": "1.55",
     "updated": "2026-09-12",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "1.53"
+    "supersedes": "1.54"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -21,14 +21,15 @@
   "defaultBranch": "main",
   "semanticSourceBranch": "dementor-club",
   "projectStage": "BUILD",
-  "gate": "G3_BUILD_TELEGRAM_PROMOTION",
+  "gate": "G6_PROMOTION_VALIDATION",
   "readFirst": [
     ".weekly-os/PROJECT.json",
     ".weekly-os/ARTIFACT_INDEX.json",
     ".weekly-os/APPROVED_STATE.json",
-    ".weekly-os/results/board-information-architecture-v1.v0.6.md",
+    ".weekly-os/results/board-information-architecture-v1.v0.7.md",
     "operations/BOARD_INFORMATION_ARCHITECTURE_V1.md",
     "operations/BOARD_TELEGRAM_PROMOTION_V1.md",
+    "operations/BOARD_TELEGRAM_PROMOTION_PRODUCTION_DB_VALIDATION_2026-09-12.md",
     ".weekly-os/results/board-access-control-v2.v0.4.md",
     "operations/BOARD_ACCESS_AND_OWNER_ADMIN_V2.md",
     ".weekly-os/results/public-site-visual-tech-debt-cleanup-v1.v0.2.md",
@@ -48,7 +49,7 @@
     "mpDslCore": {"sourceSystem":"DRIVE","authorityType":"REFERENCE","url":"https://docs.google.com/document/d/1fYwfF8IpvXh36qIAJxylT6oebOfaqJ_-L2MslXRHHOg/edit","note":"MP_DSL v0.1 source artifacts currently declare DRAFT / REFERENCE. Dementor Club adopts the explicitly approved local QA/harmonization operating rules without promoting the entire MP_DSL package to APPROVED_AUTHORITY."},
     "semanticSource": {"repository":"SLADZARI/degradation_club","ref":"dementor-club","sourceSystem":"GIT","authorityType":"IMPLEMENTATION_AUTHORITY","note":"Repository ARCHITECTURE.md declares this branch the source-of-truth for club concept, positioning, programs, products, membership logic, operating rules and approved club copy. Individual documents retain their own status/authority and are not auto-promoted."},
     "boardInformationArchitectureV1": {"sourceSystem":"GIT","authorityType":"APPROVED_AUTHORITY","path":"operations/BOARD_INFORMATION_ARCHITECTURE_V1.md","scope":"Community Board information architecture, persistent history, canonical entity projections, Artifact subtypes, relation graph, historical interaction, Board hide semantics and filters","note":"Project-local approved authority. Does not by itself authorize production deploy or live DB mutation."},
-    "boardTelegramPromotionV1": {"sourceSystem":"GIT","authorityType":"APPROVED_AUTHORITY","path":"operations/BOARD_TELEGRAM_PROMOTION_V1.md","scope":"Artifact activity datetime, Dementor promotion support, Telegram outbox promotion gate, worker delivery state machine, Owner/Admin Telegram controls and pre-release Board-hide","note":"Project-local approved change Decision extending the active Board Result. Does not create a parallel Result or second delivery owner. Production frontend merge/deploy remain separately unauthorized."},
+    "boardTelegramPromotionV1": {"sourceSystem":"GIT","authorityType":"APPROVED_AUTHORITY","path":"operations/BOARD_TELEGRAM_PROMOTION_V1.md","scope":"Artifact activity datetime, Dementor promotion support, Telegram outbox promotion gate, worker delivery state machine, Owner/Admin Telegram controls and pre-release Board-hide","note":"Project-local approved change Decision extending the active Board Result. Does not create a parallel Result or second delivery owner. Production frontend merge/deploy and Telegram Edge worker deploy remain separately unauthorized."},
     "boardAccessOwnerAdminV2": {"sourceSystem":"GIT","authorityType":"APPROVED_AUTHORITY","path":"operations/BOARD_ACCESS_AND_OWNER_ADMIN_V2.md","scope":"Community Board user-state permissions, Guest Board participation, first-Artifact interaction boundary, Owner Admin Board moderation/layout authority","note":"Board Information Architecture v1 supersedes only conflicting live-only Guest visibility, fullscreen Member-Artifact-only content boundary, and missing historical/relation/board-hide semantics. Membership v2 lifecycle remains unchanged."},
     "workspaceMemberActivationV1": {"sourceSystem":"GIT","authorityType":"APPROVED_AUTHORITY","path":"operations/WORKSPACE_MEMBER_ACTIVATION_AND_SHELL_V1.md","scope":"authenticated Workspace shell ownership, ordinary Member default Board entry, first Artifact spotlight, Board access boundary, My Activity projection","note":"Project-local scope. Prior closed pre-membership Board boundary is superseded by Board Access & Owner Admin v2; shell ownership and first-Artifact activation semantics remain authoritative."},
     "legacyProductDocumentPointers": {"sourceSystem":"GIT","authorityType":"REFERENCE","paths":["operations/DEMENTOR_ENTITY_MAP_AND_WORKSPACE_MODULES_V0.1.md","operations/IDENTITY_MEMBERSHIP_AND_ENTITY_BOUNDARY_V0.2.md","operations/UNIVERSAL_WORKSPACE_WIREFRAME_SPEC_V0.1.md"],"note":"Legacy pointers remain DRAFT/REFERENCE unless separately approved."},
@@ -57,10 +58,10 @@
   "protected": {"PRODUCT": null, "DOMAIN": null, "ARCHITECTURE": null, "DESIGN": null},
   "currentResult": {
     "artifactId": "dementor-club.result.board-information-architecture-v1",
-    "version": "0.6",
+    "version": "0.7",
     "status": "ACTIVE",
-    "path": ".weekly-os/results/board-information-architecture-v1.v0.6.md",
-    "gate": "G3_BUILD_TELEGRAM_PROMOTION",
+    "path": ".weekly-os/results/board-information-architecture-v1.v0.7.md",
+    "gate": "G6_PROMOTION_VALIDATION",
     "specification": "operations/BOARD_INFORMATION_ARCHITECTURE_V1.md",
     "changeDecision": "operations/BOARD_TELEGRAM_PROMOTION_V1.md",
     "productionBaseCommit": "fe7a86a024f1c316c93b800ba66e70933082e927",
@@ -73,11 +74,19 @@
       "board_information_architecture_batch_a",
       "board_information_architecture_batch_a_security_hardening",
       "board_information_architecture_batch_b_subtypes",
-      "board_information_architecture_batch_b_default_hardening"
+      "board_information_architecture_batch_b_default_hardening",
+      "board_telegram_promotion_v1",
+      "board_telegram_promotion_v1_worker_hardening"
     ],
     "productionDbEvidence": [
       "operations/BOARD_INFORMATION_ARCHITECTURE_BATCH_A_PRODUCTION_DB_VALIDATION_2026-09-12.md",
-      "operations/BOARD_INFORMATION_ARCHITECTURE_BATCH_B_PRODUCTION_DB_VALIDATION_2026-09-12.md"
+      "operations/BOARD_INFORMATION_ARCHITECTURE_BATCH_B_PRODUCTION_DB_VALIDATION_2026-09-12.md",
+      "operations/BOARD_TELEGRAM_PROMOTION_PRODUCTION_DB_VALIDATION_2026-09-12.md"
+    ],
+    "integrationValidation": {"commit":"0d3a927a92f5f750733a327a2d1981663b332417","runNumber":970,"runId":34698779364,"conclusion":"success","evidenceOnlyHead":"7ac0a657111a2c504a85fe7a95c7705eaac76794"},
+    "openValidationGaps": [
+      "No active non-owner Dementor identity currently exists in production, so real 0/2→1/2→2/2 live support/concurrency cannot be exercised without prohibited synthetic role mutation",
+      "New Telegram Edge worker runtime is not deployed; trusted live worker/Telegram delivery evidence remains pending separate deployment authorization"
     ],
     "scope": ["Board persistent history","lifecycle normalization","Guest and Applicant historical read","canonical entity projections","Artifact subtypes","Board filter harmonization","Telegram promotion gate","activity datetime","Dementor promotion support","worker delivery safety","typed relation graph","historical interaction semantics","board-hide","continuous visual aging"],
     "targetRoutes": ["/workspace/board/","/community/artifact/:id/","/workspace/artifacts/"],
@@ -114,6 +123,8 @@
     "Telegram sent state from promotion threshold alone",
     "exactly-once external Telegram delivery from outbox uniqueness",
     "authorization to merge/deploy production frontend from production DB mutation authorization",
+    "authorization to deploy the Telegram Edge worker from production DB mutation authorization",
+    "G6 promotion PASS from static/CI Dementor support coverage when no real non-owner Dementor actor exists in production",
     "global MP_DSL approval from Dementor Club local operating-rule approval"
   ]
 }
