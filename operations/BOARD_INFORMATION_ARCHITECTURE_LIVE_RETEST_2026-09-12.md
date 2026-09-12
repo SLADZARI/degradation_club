@@ -77,11 +77,40 @@ Observed after corrective release #58:
 
 `QA-BOARD-LIVE-001` = **PASS / CLOSED BY CORRECTIVE RELEASE #58 + OWNER LIVE SCREENSHOT**.
 
-## Not yet evidenced by owner live screenshot
+### `/workspace/artifacts/` authenticated personal history
+
+Owner-provided production screenshot confirms:
+
+- authenticated My Artifacts route loads successfully;
+- canonical Workspace navigation remains present and `МОИ АРТЕФАКТЫ` is the active tab;
+- personal Artifact history is populated from production data;
+- expired and archived records coexist in the list;
+- lifecycle labels (`EXPIRED`, `ARCHIVED`) are visible;
+- Artifact subtype labels are visible;
+- archived rows retain historical close metadata;
+- `ОТКРЫТЬ` affordances remain available on historical rows;
+- no duplicate history table/surface is visible in the rendered UI.
+
+The same screenshot exposed a semantic copy defect:
+
+`QA-BOARD-LIVE-002` — the page text still said `Live Board показывает происходящее сейчас`, which contradicts approved Board Information Architecture v1 where current and historical activity coexist on Community Board.
+
+Corrective candidate prepared from the exact current production baseline:
+
+- branch `release/board-ia-live-retest-002`;
+- PR #150;
+- scope limited to `workspace/artifacts/index.html` copy plus a Batch A regression assertion;
+- no DB/RLS/worker/membership/lifecycle/spatial/route/Telegram changes;
+- production merge/deploy not yet performed.
+
+`/workspace/artifacts/` functional authenticated route = **PASS**.
+
+`QA-BOARD-LIVE-002` = **OPEN / CORRECTIVE CANDIDATE IN VALIDATION**.
+
+## Remaining live evidence not currently manufacturable safely
 
 The following are not claimed as live-validated by this note:
 
-- `/workspace/artifacts/` authenticated history route;
 - legitimate non-owner Dementor promotion support `0/2 → 1/2 → 2/2 → pending`;
 - real external Telegram delivery by worker v10 from a legitimate pending row;
 - every one of the eight Board user states in a real production browser session.
@@ -90,6 +119,10 @@ No synthetic role mutation is authorized merely to manufacture those states.
 
 ## Gate implication
 
-This evidence closes the production presentation defect discovered during the first authenticated live retest, but does not by itself justify `DONE` or full G8 closure.
+The three target routes required by Result v0.10 now have authenticated owner-browser evidence:
 
-The active Board Result may proceed toward G8 only with remaining live-validation limitations recorded explicitly and without treating unavailable synthetic actors as evidence.
+- `/workspace/board/` — PASS;
+- `/community/artifact/:id/` — PASS after corrective release #58;
+- `/workspace/artifacts/` — functional PASS, with one semantic copy defect isolated in `QA-BOARD-LIVE-002`.
+
+The Result must remain in release validation until `QA-BOARD-LIVE-002` is either released and rechecked or explicitly deferred. After that, it may move to G8 cleanup with the unavailable legitimate-actor Telegram/Dementor evidence recorded as deferred rather than synthesized.
