@@ -8,4 +8,4 @@
 .dc-board-filter-drawer .dc-board-filter{width:100%;min-height:42px}
 .dc-board-filter.active{background:#d8ff3e!important;color:#111!important}
 .dc-board-filter-drawer .dc-board-filter.active{background:#d8ff3e!important;color:#111!important}
-@media(max-width:768px){.dc-board-filter-drawer{position:fixed;left:8px;right:8px;top:auto;bottom:calc(78px + env(safe-area-inset-bottom));width:auto;max-height:min(62dvh,calc(100dvh - 150px));overflow:auto;z-index:80}.dc-board-filter-drawer__grid{grid-template-columns:1fr}.dc-board-filter-drawer .dc-board-filter{min-height:48px}}
+@media(max-width:768px){.dc-board-filter-drawer{position:fixed;left:8px;right:8px;top:auto;bottom:8px;width:auto;max-height:min(70vh,560px);overflow:auto;z-index:80}.dc-board-filter-drawer__grid{grid-template-columns:1fr}.dc-board-filter-drawer .dc-board-filter{min-height:48px}}
