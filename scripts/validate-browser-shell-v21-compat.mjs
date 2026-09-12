@@ -6,6 +6,15 @@ const sourcePath=path.join(process.cwd(),'scripts','validate-browser-shell.mjs')
 const tempPath=path.join(process.cwd(),'scripts','.validate-browser-shell-v21-runtime.mjs');
 let source=fs.readFileSync(sourcePath,'utf8');
 
+// The compatibility runtime must model the current canonical Board row shape.
+// Hidden-state filtering uses `.is('board_hidden_at', null)`, so legacy QA fixtures
+// without the column would be filtered out even though real pre-migration rows receive
+// NULL after the additive schema migration.
+source=source.replaceAll(
+  'closed_at:null,expires_at:null,created_at:',
+  'closed_at:null,activity_at:null,board_hidden_at:null,expires_at:null,created_at:'
+);
+
 const legacy=`// Existing Board participation must remain visible and lead to the canonical My Activity projection.
 {
   const c=await context('member-activity'),p=await c.newPage(),pageErrors=[];p.on('pageerror',e=>pageErrors.push(e.message));
