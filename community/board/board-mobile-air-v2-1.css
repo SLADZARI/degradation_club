@@ -16,7 +16,8 @@
      Workspace top navigation itself owns z-index:70, lift the existing filter
      host stacking context while on mobile so its fixed drawer and sticky close
      control remain tappable instead of sitting under Workspace navigation. */
-  .dc-board-fullscreen-v21 .dc-board-filters{overflow:visible!important;z-index:190!important}
+  .dc-board-fullscreen-v21 .dc-board-filters{overflow:visible!important}
+  .dc-board-fullscreen-v21 .dc-board-filters{z-index:190!important}
   .dc-board-fullscreen-v21 .dc-board-filter-drawer{position:fixed!important;left:8px!important;right:8px!important;top:auto!important;bottom:calc(76px + env(safe-area-inset-bottom,0px))!important;width:auto!important;max-height:min(62dvh,calc(100dvh - 160px))!important;overflow:auto!important;z-index:180!important;touch-action:pan-y!important;overscroll-behavior:contain}
   .dc-board-fullscreen-v21 .dc-board-filter-drawer__head{position:sticky;top:0;z-index:2;background:#f8f5ed}
   .dc-board-fullscreen-v21 .dc-spatial-world>.dc-notice[data-size-class="XS"],
