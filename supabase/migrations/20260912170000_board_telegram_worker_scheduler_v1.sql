@@ -70,8 +70,8 @@ grant execute on function public.dc_validate_telegram_worker_scheduler_token_v1(
 
 -- One scheduler owner. It invokes the worker only when there is actionable work,
 -- so an idle Board does not create a permanent stream of Edge Function calls.
--- Failed rows are included because worker v10+ owns eligibility revalidation and
--- controlled failed -> pending requeue through dc_distribution_requeue_failed_v1.
+-- Failed rows are considered actionable only while they still match the same
+-- eligibility contract used by dc_distribution_requeue_failed_v1.
 create or replace function public.dc_telegram_worker_scheduler_tick_v1()
 returns bigint
 language plpgsql
@@ -87,9 +87,20 @@ begin
   if not exists (
     select 1
     from public.dc_distribution_outbox o
+    left join public.dc_artifacts a on a.id=o.artifact_id
     where
       (o.status='pending' and o.available_at <= now())
-      or (o.status='failed' and o.available_at <= now() and o.attempts < 5)
+      or (
+        o.status='failed'
+        and o.available_at <= now()
+        and o.attempts < 5
+        and a.status='active'
+        and a.visibility='community'
+        and a.board_hidden_at is null
+        and a.published_at is not null
+        and (a.starts_at is null or a.starts_at <= now())
+        and (a.expires_at is null or a.expires_at > now())
+      )
   ) then
     return null;
   end if;
