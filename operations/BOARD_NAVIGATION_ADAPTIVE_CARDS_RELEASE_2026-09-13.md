@@ -4,7 +4,7 @@ project: dementor-club
 documentType: QA_EVIDENCE
 projectStage: RELEASE
 gate: G7_RELEASE
-status: ACTIVE_EVIDENCE
+status: APPROVED_EVIDENCE
 updated: 2026-09-13
 owner: Modern Pilgrims
 sourceSystem: GIT
@@ -20,7 +20,7 @@ Explicit project-owner instruction:
 
 `разрешаю #158 в production`
 
-Authorization applies to exact validated PR head:
+Authorization applied to exact validated PR head:
 
 `faf57aa7a949f27d506ef9a969896e8653c32d2b`
 
@@ -37,7 +37,7 @@ Authorization applies to exact validated PR head:
   - `scripts/validate-board-navigation-adaptive-cards-browser.mjs`
 - full Site Integrity / Release Readiness: `#1031`, run `34722775463`, SUCCESS
 
-No DB/RLS/migration, Membership/DC-9, Telegram, Artifact lifecycle, entity ownership, Workspace shell, or spatial persistence files were part of the release diff.
+No DB/RLS/migration, Membership/DC-9, Telegram, Artifact lifecycle, entity ownership, Workspace shell, auth owner or spatial persistence files were part of the release diff.
 
 ## Merge evidence
 
@@ -49,31 +49,49 @@ Resulting `dementor-club-production` commit:
 
 Production branch was re-read after merge and resolves to the same commit.
 
-## Deploy state
+Candidate and production merge commit resolve to the same released tree:
 
-**PENDING MANUAL WORKFLOW_DISPATCH**
+`9adfa8fa800c221e27b80e767864efa206acc3d9`
 
-Canonical workflow:
+## Deploy evidence
 
-`.github/workflows/deploy-pages.yml` / `Deploy Dementor Production`
+Deploy Dementor Production #65 / workflow run `34723798930` — SUCCESS.
 
-Required input:
+The build job explicitly checked out `dementor-club-production`; `git log -1 --format=%H` returned:
 
-`release_confirmation=APPROVED`
+`d7451d1d7023edf4ff85abb17fa6235ddc53bb35`
 
-The workflow itself guards both build and deploy on:
+before the production validation/build steps.
 
-- `github.ref == refs/heads/dementor-club-production`
-- `inputs.release_confirmation == APPROVED`
+Build/release guards passed, including registry/routes/feature-state validation, content readiness, visual contract, production Pages build, analytics/consent guard and production release guard.
 
-Merge alone is not deployment.
+Pages artifact:
 
-## Remaining release evidence
+`10307500383`
 
-Before claiming RELEASED / PRODUCTION READY / DONE:
+Artifact digest:
 
-1. launch `Deploy Dementor Production` for `dementor-club-production` with `release_confirmation=APPROVED`;
-2. verify workflow success;
-3. verify checkout/build used exact production commit `d7451d1d7023edf4ff85abb17fa6235ddc53bb35`;
-4. record Pages artifact id/digest and deployment success;
-5. live-retest `/workspace/board/` on mobile and desktop, including arrows, `ТИПЫ`, card/media proportions, and existing Board interactions.
+`sha256:cc65101ed21f1f102a1772b328abd9eb48439285efd9731fc1363130a03e5c9b`
+
+GitHub Pages deployment reported SUCCESS and environment URL `http://dementor.club/`.
+
+## Live smoke
+
+Project owner reported live smoke PASS after deployment on `/workspace/board/` for the released Board navigation/adaptive-card behavior.
+
+This is owner-provided live evidence. It does not claim a separate post-deploy automated browser run beyond the already-green pre-release browser matrix.
+
+## Release conclusion
+
+Release evidence is complete for G7:
+
+- exact validated candidate;
+- exact production merge commit;
+- exact production commit used for build;
+- successful Pages artifact and deployment;
+- artifact id/digest recorded;
+- owner live smoke PASS.
+
+G8 cleanup/closure evidence is recorded separately at:
+
+`operations/BOARD_NAVIGATION_ADAPTIVE_CARDS_G8_2026-09-13.md`.
