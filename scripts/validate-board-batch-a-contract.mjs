@@ -12,6 +12,7 @@ const board=read('community/board/board.js');
 const entry=read('community/board/board-entry-v2.js');
 const detail=read('community/artifact/artifact.js');
 const integrations=read('community/board/board-integrations-v1.js');
+const artifactsPage=read('workspace/artifacts/index.html');
 
 // Lifecycle normalization must preserve history instead of hiding stale active rows.
 expect(migration.includes('dc_normalize_artifact_lifecycle_v1'),'Batch A migration missing lifecycle normalizer');
@@ -19,6 +20,10 @@ expect(/status\s*=\s*'expired'/m.test(migration),'Lifecycle normalizer does not 
 expect(/status\s*=\s*'active'[\s\S]*expires_at\s*<=\s*now\(\)/m.test(migration),'Lifecycle normalizer does not target stale active rows');
 expect(board.includes("dc_normalize_artifact_lifecycle_v1"),'Member Board does not invoke lifecycle normalizer');
 expect(board.includes(".in('status',['active','expired','archived'])"),'Member Board does not load current + history');
+
+// Personal Artifact history copy must not contradict the approved persistent Board history model.
+expect(!artifactsPage.includes('Live Board показывает происходящее сейчас'),'My Artifacts still describes Board as live-only');
+expect(artifactsPage.includes('историю клуба'),'My Artifacts does not explain persistent Board history');
 
 // Guest/Applicant Board history must use the canonical Guest RPC and include explicit lifecycle.
 expect(migration.includes('drop function if exists public.dc_guest_board_read_v1()'),'Guest Board RPC shape change is not protected by drop/recreate');
