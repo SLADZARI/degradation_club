@@ -3,36 +3,38 @@ artifactId: dementor-club.change-proposal.board-information-architecture-v1
 project: dementor-club
 documentType: CHANGE_PROPOSAL
 projectStage: CLARITY
-status: DRAFT
+status: APPROVED
 version: 1.0
 updated: 2026-09-12
 owner: Modern Pilgrims
 sourceSystem: GIT
-authorityType: REFERENCE
+authorityType: HISTORY
 basis: operations/BOARD_INFORMATION_ARCHITECTURE_V0.4.md
+resolvedBy: operations/BOARD_INFORMATION_ARCHITECTURE_V1.md
 ---
 
 # Dementor Club — Board Information Architecture Change Proposal v1
 
-**Status:** DRAFT / NOT APPROVED / NOT IMPLEMENTED  
-**Purpose:** request explicit approval for semantic Board changes consolidated in `BOARD_INFORMATION_ARCHITECTURE_V0.4.md`.  
+**Status:** APPROVED / RESOLVED BY `BOARD_INFORMATION_ARCHITECTURE_V1.md` / NOT IMPLEMENTED BY ITSELF  
+**Approval date:** 2026-09-12  
+**Purpose:** historical approval record for the semantic Board changes consolidated from Workshop 01 + Workshop 02.  
 **Existing authority affected:** `operations/BOARD_ACCESS_AND_OWNER_ADMIN_V2.md` only within the Board scopes listed below. Membership v2 lifecycle is not changed.
 
-## 1. Why a Change Proposal is required
+## 1. Why a Change Proposal was required
 
-The proposed work changes product meaning, permissions and architecture boundaries rather than only refactoring code.
+The work changes product meaning, permissions and architecture boundaries rather than only refactoring code.
 
-Current approved Board Access v2 defines a live Member-Artifact notice surface for Guest/Member participation and explicitly keeps official Event/Program/Project projections out of fullscreen Board.
+Previous approved Board Access v2 defined a live Member-Artifact notice surface for Guest/Member participation and explicitly kept official Event/Program/Project projections out of fullscreen Board.
 
-Workshop 01 + 02 now define a broader target: persistent all-time club-memory Board, canonical entity projections, explicit relation graph, historical interaction rules and new moderation semantics.
+Workshop 01 + 02 defined a broader target: persistent all-time club-memory Board, canonical entity projections, explicit relation graph, historical interaction rules and new moderation semantics.
 
-These changes require approval before implementation.
+These changes were explicitly approved by the project owner on 2026-09-12 and are now authoritative through `operations/BOARD_INFORMATION_ARCHITECTURE_V1.md`.
 
-## 2. Proposed semantic changes
+## 2. Approved semantic package
 
 ### CP-1 — Persistent Board memory
 
-Change Board from a live-only visibility model to an all-time spatial club-memory surface.
+Board changes from a live-only visibility model to an all-time spatial club-memory surface.
 
 Expired and archived objects remain visible by default, with continuous visual aging.
 
@@ -78,11 +80,11 @@ Board v1 target uses object-type filters:
 
 No lifecycle filter is required in v1; historical fading carries time state.
 
-Workshop 02 explicitly selected `ВСЁ` for source filtering. Existing `ОТ ЛЮДЕЙ / ОТ КЛУБА` controls are not made canonical by this proposal unless retained during final Decision review.
+Workshop 02 explicitly selected `ВСЁ` for source filtering. Existing `ОТ ЛЮДЕЙ / ОТ КЛУБА` controls are not canonical requirements of this Decision.
 
 ### CP-6 — Relation graph v1
 
-Approve a canonical typed relation layer with the following product meanings:
+Approved canonical typed relation layer meanings:
 
 - СВЯЗАНО С;
 - ПОЯВИЛОСЬ ИЗ / РЕЗУЛЬТАТ;
@@ -124,7 +126,7 @@ Distinguish:
 - user hide/filter = presentation only;
 - Owner/Admin board-hide = remove from general Board presentation while retaining canonical object/history.
 
-Hard deletion is not approved by this proposal.
+Hard deletion is not approved.
 
 ### CP-11 — Visual aging
 
@@ -132,7 +134,7 @@ Historical cards age continuously over time. Exact formula/accessibility floor r
 
 ## 3. Explicit non-changes
 
-This proposal does **not** change:
+This approval does **not** change:
 
 - DC-9 completion semantics;
 - Application lifecycle;
@@ -143,9 +145,9 @@ This proposal does **not** change:
 - global person/role model;
 - production deploy authorization.
 
-## 4. Compatibility / supersession boundary
+## 4. Supersession boundary
 
-If approved, this Decision would supersede only conflicting Board statements in `BOARD_ACCESS_AND_OWNER_ADMIN_V2`, specifically:
+The approved Decision supersedes only conflicting Board statements in `BOARD_ACCESS_AND_OWNER_ADMIN_V2`, specifically:
 
 - live-only Guest visibility;
 - fullscreen Member-Artifact-only content boundary;
@@ -154,7 +156,7 @@ If approved, this Decision would supersede only conflicting Board statements in 
 
 All unaffected Board Access v2 rules remain valid, including Guest no-publish/no-move/no-archive and Owner Admin moderation authority.
 
-## 5. Proposed implementation sequence after approval
+## 5. Approved implementation sequence for planning
 
 ```text
 Batch A — lifecycle/history + canonical entity projections
@@ -163,22 +165,12 @@ Batch C — relation data model + permissions + canvas/detail UI
 Batch D — cleanup, visual aging tuning, regression hardening
 ```
 
-Each batch requires its own acceptance evidence inside one coherent Board Result or clearly separated Results if scope/risk requires it.
+Each batch requires acceptance evidence inside a dedicated Board Result or clearly separated Results if risk requires it.
 
-## 6. Approval gate
+## 6. Resolution
 
-No implementation is authorized by this draft.
+This Change Proposal is resolved by:
 
-To approve, project owners must explicitly confirm that the CP-1…CP-11 semantic package is accepted, or identify exceptions/amendments.
+`operations/BOARD_INFORMATION_ARCHITECTURE_V1.md`
 
-After approval:
-
-1. convert this proposal into an APPROVED local Decision;
-2. update authority pointers/index;
-3. create a dedicated Board Result and one active integration branch;
-4. inventory existing schema/runtime owners before any new table/state;
-5. implement and validate G6;
-6. release from current production baseline using only required diff;
-7. deploy/live DB migration only after separate explicit authorization;
-8. live retest all Board user states;
-9. G8 cleanup.
+Approval of this proposal does **not** itself authorize implementation, production merge, deploy or live database mutation.
