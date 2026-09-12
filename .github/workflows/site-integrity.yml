@@ -78,6 +78,8 @@ jobs:
         run: node scripts/validate-dc9-sync-browser.mjs
       - name: Validate Board v2.1 fullscreen browser state matrix
         run: node scripts/validate-board-v21-browser.mjs
+      - name: Validate Board live corrective browser acceptance
+        run: node scripts/validate-board-live-corrective-browser.mjs
       - name: Validate browser shell and Workspace recovery
         run: node scripts/validate-browser-shell-v21-compat.mjs
       - name: Validate My Artifacts history
