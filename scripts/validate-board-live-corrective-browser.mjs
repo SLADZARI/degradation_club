@@ -97,13 +97,9 @@ for(const viewport of [{width:390,height:844,label:'390'},{width:1440,height:900
   const after=await page.locator('.dc-spatial-world').evaluate(el=>el.style.transform);
   expect(before!==after,`member-first-${viewport.label}: Board zoom control did not move camera`);
   await page.locator('[data-home]').click();await page.waitForTimeout(140);
-  const card=page.locator('.dc-notice[data-artifact]').first();
-  const cardBox=await card.boundingBox();const vp=page.viewportSize();
-  expect(!!cardBox&&!!vp&&cardBox.x<vp.width&&cardBox.x+cardBox.width>0&&cardBox.y<vp.height&&cardBox.y+cardBox.height>0,`member-first-${viewport.label}: canonical fit-to-life did not return Artifact to viewport ${JSON.stringify({cardBox,vp})}`);
-  await card.locator('h3').click();
-  const overlay=page.locator('.dc-artifact-overlay');await overlay.waitFor({state:'visible',timeout:2500});
-  await page.locator('.dc-artifact-overlay__close').click();await page.waitForTimeout(80);
-  expect(await overlay.isHidden(),`member-first-${viewport.label}: Artifact detail did not close`);
+  const hit=await page.locator('.dc-notice[data-artifact]').first().evaluate(card=>{const cardRect=card.getBoundingClientRect();const viewport=document.querySelector('.dc-spatial-viewport')?.getBoundingClientRect();if(!viewport)return{ok:false,reason:'NO_VIEWPORT',cardRect:null,viewport:null};const left=Math.max(cardRect.left,viewport.left),right=Math.min(cardRect.right,viewport.right),top=Math.max(cardRect.top,viewport.top),bottom=Math.min(cardRect.bottom,viewport.bottom);if(right-left<8||bottom-top<8)return{ok:false,reason:'NO_VISIBLE_INTERSECTION',cardRect:{left:cardRect.left,right:cardRect.right,top:cardRect.top,bottom:cardRect.bottom},viewport:{left:viewport.left,right:viewport.right,top:viewport.top,bottom:viewport.bottom}};const x=(left+right)/2,y=(top+bottom)/2;const target=document.elementFromPoint(x,y);return{ok:!!target?.closest('.dc-notice[data-artifact]'),x,y,target:target?.tagName||null,closest:target?.closest('.dc-notice[data-artifact]')?.dataset.artifact||null,card:card.dataset.artifact||null,cardRect:{left:cardRect.left,right:cardRect.right,top:cardRect.top,bottom:cardRect.bottom},viewport:{left:viewport.left,right:viewport.right,top:viewport.top,bottom:viewport.bottom}}});
+  expect(hit.ok&&hit.closest===hit.card,`member-first-${viewport.label}: no real pointer hit point for Artifact after fit-to-life ${JSON.stringify(hit)}`);
+  if(hit.ok){await page.mouse.click(hit.x,hit.y);const overlay=page.locator('.dc-artifact-overlay');await overlay.waitFor({state:'visible',timeout:2500});await page.locator('.dc-artifact-overlay__close').click();await page.waitForTimeout(80);expect(await overlay.isHidden(),`member-first-${viewport.label}: Artifact detail did not close`)}
   expect(!errors.length,`member-first-${viewport.label}: ${errors.join(' | ')}`);
   await ctx.close();
 }
