@@ -85,7 +85,7 @@ function ensureDrawer(){
   if(drawer)return drawer;
   drawer=document.createElement('div');drawer.className='dc-board-filter-drawer';drawer.hidden=true;
   drawer.innerHTML=`<div class="dc-board-filter-drawer__head"><strong>ТИП ОБЪЕКТА</strong><button type="button" data-filter-close aria-label="Закрыть фильтры">×</button></div><div class="dc-board-filter-drawer__grid">${BOARD_DETAIL_FILTERS.map(([id,label])=>`<button class="dc-board-filter" type="button" data-board-detail-filter="${id}">${label}</button>`).join('')}</div>`;
-  document.body.appendChild(drawer);
+  (window.matchMedia('(max-width:900px)').matches?document.body:filterHost)?.appendChild(drawer);
   drawer.querySelector('[data-filter-close]').onclick=closeDrawer;
   drawer.addEventListener('click',event=>{const button=event.target.closest('[data-board-detail-filter]');if(!button)return;activeFilter=button.dataset.boardDetailFilter||'all';applyFilter();closeDrawer()});
   return drawer;
