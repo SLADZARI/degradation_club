@@ -23,9 +23,18 @@ const status=document.getElementById('status');
 const detail=document.getElementById('detail');
 const params=new URLSearchParams(location.search);
 const stripLegacyPrefix=value=>String(value||'').replace(/^\/degradation_club(?=\/|$)/,'')||'/';
-const requestedNext=stripLegacyPrefix(params.get('next')||'/workspace/');
-const safeNext=requestedNext.startsWith('/')&&!requestedNext.startsWith('//')?requestedNext:'/workspace/';
-const target=new URL(safeNext,location.origin).href;
+function safeReturnTarget(raw){
+  const fallback=new URL('/workspace/',location.origin);
+  try{
+    const parsed=new URL(stripLegacyPrefix(raw),location.origin);
+    if(parsed.origin!==location.origin)return fallback;
+    const normalizedPath=parsed.pathname.replace(/\/+$/,'/')||'/';
+    if(normalizedPath==='/auth/callback/'||normalizedPath==='/degradation_club/auth/callback/')return fallback;
+    return parsed;
+  }catch{return fallback}
+}
+const requestedNext=params.get('next')||'/workspace/';
+const target=safeReturnTarget(requestedNext).href;
 const code=params.get('code');
 const oauthError=params.get('error_description')||params.get('error');
 const client=createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false,flowType:'pkce'}});

@@ -1,0 +1,40 @@
+import fs from 'node:fs';
+const read=p=>fs.readFileSync(p,'utf8');
+const fail=[];const must=(ok,msg)=>{if(!ok)fail.push(msg)};
+const html=read('workspace/board/index.html');
+const deep=read('community/board/board-deeplink-auth-return-v1.js');
+const full=read('community/board/board-fullscreen-v2-1.js');
+const callback=read('auth/callback/index.html');
+const g2=read('operations/BOARD_DEEPLINK_AUTH_RETURN_G2_2026-09-12.md');
+
+must(html.includes('board-deeplink-auth-return-v1.css'),'Board deeplink CSS is not loaded');
+must(html.includes('board-deeplink-auth-return-v1.js'),'Board deeplink runtime is not loaded');
+must(deep.includes("FOCUS_RE=/^(artifact|entity):"),'canonical artifact/entity focus grammar missing');
+must(deep.includes("dc:board-guest-read-ready"),'Artifact Guest readiness lifecycle missing');
+must(deep.includes("dc:board-projections-updated"),'Entity projection readiness lifecycle missing');
+must(deep.includes("history.pushState")||deep.includes("history[replace?'replaceState':'pushState']"),'focus history push owner missing');
+must(deep.includes("window.addEventListener('popstate'"),'popstate handling missing');
+must(deep.includes("navigator.clipboard.writeText"),'Clipboard API share path missing');
+must(deep.includes("document.execCommand('copy')"),'Clipboard fallback missing');
+must(deep.includes("data-board-share"),'visible target Share action missing');
+must(deep.includes("loginWithGoogle(`${location.pathname}${location.search}${location.hash}`"),'unauth deep-link does not preserve exact Board path/query/hash');
+must(deep.includes('ЭТОГО ЗДЕСЬ БОЛЬШЕ НЕТ.'),'non-leaking missing-target copy missing');
+must(!deep.includes('.rpc(')&&!deep.includes('.from('),'deeplink orchestrator must not query DB/RPC by focus id');
+must(!/token/i.test(deep),'deeplink/share runtime must not introduce share tokens');
+must(full.includes("dc:board-focus-target"),'fullscreen camera/Artifact owner does not accept focus requests');
+must(full.includes("dc:board-close-artifact"),'fullscreen owner does not accept history close requests');
+must(callback.includes("const requestedNext=params.get('next')||'/workspace/'"),'callback canonical Workspace fallback missing');
+must(callback.includes("new URL(stripLegacyPrefix(raw),location.origin)"),'callback must normalize through WHATWG URL before accepting return target');
+must(callback.includes('parsed.origin!==location.origin'),'callback same-origin URL check missing');
+must(callback.includes("normalizedPath==='/auth/callback/'"),'callback recursion guard missing');
+must(!callback.includes("requestedNext.startsWith('/')"),'legacy raw-string next validation survived');
+must(g2.includes('no direct privileged lookup by focus ID'),'G2 permission boundary evidence missing');
+
+if(fail.length){console.error('Board deep-link auth-return contract failed');for(const item of fail)console.error(`✗ ${item}`);process.exit(1)}
+console.log('Board deep-link auth-return contract');
+console.log('✓ canonical artifact/entity focus URL grammar');
+console.log('✓ safe same-origin auth return after URL normalization');
+console.log('✓ lawful loaded-DOM resolution only; no focus-ID DB lookup/share token');
+console.log('✓ existing fullscreen camera/Artifact overlay remains presentation owner');
+console.log('✓ lifecycle, history, missing-target and clipboard contracts present');
+console.log('0 error(s)');
