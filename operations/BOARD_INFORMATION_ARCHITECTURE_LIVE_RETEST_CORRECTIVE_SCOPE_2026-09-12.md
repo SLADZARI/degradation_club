@@ -1,0 +1,1 @@
+QA-BOARD-LIVE-001 corrective scope: render stored `**bold**` emphasis safely in canonical Artifact detail. Escape stored body first; do not add a general Markdown engine. Validation and production correction remain separate gates.
