@@ -37,6 +37,11 @@ expect(/create policy dc_artifact_reactions_insert_own[\s\S]*a\.status in \('act
 expect(board.includes("isHistoricalStatus")&&board.includes('ОТКЛИКИ ЗАКРЫТЫ'),'Member Board does not freeze historical responses in UI');
 expect(detail.includes("isHistorical()")&&detail.includes('ОТКЛИКИ ЗАКРЫТЫ / HISTORY'),'Artifact detail does not freeze historical responses');
 
+// Artifact body must preserve stored text safely while rendering the minimal supported emphasis syntax.
+expect(detail.includes('function renderArtifactBody'),'Artifact detail missing safe body formatter');
+expect(detail.includes("const safe=esc(String(value||''))"),'Artifact body formatter must escape stored content before adding markup');
+expect(detail.includes('renderArtifactBody(artifact.body)'),'Artifact detail bypasses the safe body formatter');
+
 // Guest detail must be Board-safe and must not disclose response bodies.
 expect(migration.includes('dc_guest_board_artifact_detail_read_v1'),'Guest Board-safe Artifact detail RPC missing');
 const detailFn=migration.match(/create or replace function public\.dc_guest_board_artifact_detail_read_v1[\s\S]*?grant execute on function public\.dc_guest_board_artifact_detail_read_v1\(uuid\) to authenticated;/m)?.[0]||'';
