@@ -1,0 +1,10 @@
+.dc-board-deeplink-gate,.dc-board-focus-missing{position:fixed;inset:0;z-index:260;display:grid;place-items:center;padding:24px;background:rgba(17,17,17,.94);color:#f2f0e8}
+.dc-board-deeplink-gate__card,.dc-board-focus-missing__card{width:min(720px,100%);border:1px solid rgba(242,240,232,.45);background:#111;padding:clamp(22px,4vw,42px);font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+.dc-board-deeplink-gate__card h1,.dc-board-focus-missing__card h2{margin:0 0 12px;font-size:clamp(34px,6vw,72px);line-height:.88;letter-spacing:-.06em}
+.dc-board-deeplink-gate__card h2{margin:0 0 28px;font-size:clamp(20px,3vw,36px);line-height:1}
+.dc-board-deeplink-gate__card p,.dc-board-focus-missing__card p{max-width:58ch;line-height:1.55}
+.dc-board-deeplink-gate__action,.dc-board-focus-missing__action{display:inline-flex;align-items:center;justify-content:center;min-height:48px;margin-top:22px;padding:0 18px;border:1px solid #d8ff3e;background:#d8ff3e;color:#111;font:800 14px/1 ui-monospace,SFMono-Regular,Menlo,monospace;text-decoration:none;cursor:pointer}
+.dc-board-deeplink-gate__note{margin-top:16px!important;opacity:.68;font-size:12px}
+.dc-board-share{margin-left:auto}
+.dc-board-focus-step{outline:3px solid #d8ff3e!important;outline-offset:5px!important}
+@media(max-width:600px){.dc-board-deeplink-gate,.dc-board-focus-missing{padding:12px}.dc-board-deeplink-gate__card,.dc-board-focus-missing__card{padding:22px}}
