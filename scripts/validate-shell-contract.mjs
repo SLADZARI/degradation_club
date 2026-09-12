@@ -98,7 +98,8 @@ for(const marker of ['data-activity-artifact','data-activity-response','data-act
 const board=read('workspace/board/index.html');
 for(const id of ['boardStatus','memberBadge','entryHost','artifactCount','boardFilters','boardHost'])expect(board.includes(`id="${id}"`),`workspace/board/index.html: board runtime host missing #${id}`);
 expect(board.includes('../workspace-shell-v1.js'),'workspace/board/index.html: shared Workspace shell missing');
-for(const asset of ['board-qa-fix-v1.css','board-integrations-v1.css','board-spatial-v1.css','telegram-worker-trigger-v3.js','board-integrations-v1.js','board-activation-gate-v1.js','board-spatial-v1.js'])expect(board.includes(asset),`workspace/board/index.html: restored Board module missing ${asset}`);
+for(const asset of ['board-qa-fix-v1.css','board-integrations-v1.css','board-spatial-v1.css','board-integrations-v1.js','board-activation-gate-v1.js','board-spatial-v1.js'])expect(board.includes(asset),`workspace/board/index.html: restored Board module missing ${asset}`);
+expect(!board.includes('telegram-worker-trigger-'),'workspace/board/index.html: browser-owned Telegram worker trigger must stay retired');
 
 const boardRuntime=read('community/board/board.js');
 expect(boardRuntime.includes("route('/workspace/#activity')"),'Board participation: persisted response/reaction has no My Activity path');
