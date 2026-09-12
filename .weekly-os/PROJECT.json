@@ -5,14 +5,14 @@
     "project": "dementor-club",
     "documentType": "STANDARD",
     "projectStage": "CLEANUP",
-    "gate": "G7_RELEASE",
+    "gate": "G8_CLEANUP",
     "status": "APPROVED",
-    "version": "1.65",
+    "version": "1.66",
     "updated": "2026-09-12",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "1.64"
+    "supersedes": "1.65"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -21,12 +21,12 @@
   "defaultBranch": "main",
   "semanticSourceBranch": "dementor-club",
   "projectStage": "CLEANUP",
-  "gate": "G7_RELEASE",
+  "gate": "G8_CLEANUP",
   "readFirst": [
     ".weekly-os/PROJECT.json",
     ".weekly-os/ARTIFACT_INDEX.json",
     ".weekly-os/APPROVED_STATE.json",
-    ".weekly-os/results/public-site-visual-tech-debt-cleanup-v1.v0.3.md",
+    ".weekly-os/results/public-site-visual-tech-debt-cleanup-v1.v0.4.md",
     "operations/PUBLIC_SITE_VISUAL_TECH_DEBT_CLEANUP_REFRESH_2026-09-12.md",
     "operations/PUBLIC_SITE_VISUAL_HARMONIZATION_V1.md",
     ".weekly-os/results/board-information-architecture-v1.v0.17.md",
@@ -62,10 +62,10 @@
   "protected": {"PRODUCT": null, "DOMAIN": null, "ARCHITECTURE": null, "DESIGN": null},
   "currentResult": {
     "artifactId": "dementor-club.result.public-site-visual-tech-debt-cleanup-v1",
-    "version": "0.3",
+    "version": "0.4",
     "status": "ACTIVE",
-    "path": ".weekly-os/results/public-site-visual-tech-debt-cleanup-v1.v0.3.md",
-    "gate": "G7_RELEASE",
+    "path": ".weekly-os/results/public-site-visual-tech-debt-cleanup-v1.v0.4.md",
+    "gate": "G8_CLEANUP",
     "specification": "operations/PUBLIC_SITE_VISUAL_HARMONIZATION_V1.md",
     "integrationBranch": "agent/public-site-visual-tech-debt-cleanup-v1-refresh",
     "previousIntegrationBranch": "agent/public-site-visual-tech-debt-cleanup-v1",
@@ -77,24 +77,26 @@
     "productionReleaseAuthorizationBasis": "Explicit project-owner instruction `разрешаю #155 в production` on 2026-09-12.",
     "productionCommit": "43b6dcaa11292f49564c989add219e0b095fbf8d",
     "productionMergeComplete": true,
-    "lastLiveProductionCommit": "af28404048dfc918ada81298b0d184df407d0595",
-    "productionDeployStatus": "PENDING_WORKFLOW_DISPATCH",
-    "lastSuccessfulProductionDeployRun": 63,
-    "lastSuccessfulProductionDeployRunId": 34719474734,
-    "lastLivePagesArtifactId": 10305938397,
-    "lastLivePagesArtifactDigest": "sha256:37e5cf886005fcaecc34757988b34f1aba8a774e944cb06bbbd834c6aa41e988",
+    "lastLiveProductionCommit": "43b6dcaa11292f49564c989add219e0b095fbf8d",
+    "productionDeployStatus": "SUCCESS",
+    "lastSuccessfulProductionDeployRun": 64,
+    "lastSuccessfulProductionDeployRunId": 34720912365,
+    "lastLivePagesArtifactId": 10305384132,
+    "lastLivePagesArtifactDigest": "sha256:ce4324fd48037817c7a5c188104611edde913477339106234bc1a890699905b2",
     "validation": {"commit":"bf8156f0c8934aabfd062b6a2def3910c3921e44","runNumber":1026,"runId":34720030176,"conclusion":"success"},
+    "ownerLiveSmoke": {"status":"PASS","reported":"2026-09-12","note":"Project owner explicitly tested the deployed release and reported it works."},
+    "clientPreviewStatus": "READY",
     "evidence": "operations/PUBLIC_SITE_VISUAL_TECH_DEBT_CLEANUP_REFRESH_2026-09-12.md",
     "liveDatabaseMutationAuthorized": false,
     "openValidationGaps": [
-      "PR #155 is merged into production repository commit 43b6dcaa11292f49564c989add219e0b095fbf8d but Pages deployment is pending workflow_dispatch; do not claim the public visual cleanup live yet.",
+      "Current Result is released and owner-smoke validated but remains in G8 cleanup; do not claim final DONE until stale branch/state/compatibility cleanup is reviewed.",
       "Board Result v0.17 remains WAITING rather than DONE; deferred real non-owner Dementor promotion/Telegram/all-eight-state evidence is unchanged."
     ],
     "scope": ["public visual runtime ownership cleanup","Home/Fuengirola compatibility boundary","Merch four-SKU runtime mapping","visitor-facing unavailable states","visual release validation"],
     "targetRoutes": ["/","/community/","/events/fuengirola/","/merch/","/merch/drop-001/overthinking-is-my-cardio/","/merch/drop-001/personal-growth-cancelled/","/merch/drop-001/success-is-boring/","/merch/drop-001/potential-too-long-revealed/"]
   },
   "waitingResults": [
-    {"artifactId":"dementor-club.result.board-information-architecture-v1","version":"0.17","status":"WAITING","path":".weekly-os/results/board-information-architecture-v1.v0.17.md","gate":"G8_CLEANUP","productionCommit":"af28404048dfc918ada81298b0d184df407d0595","productionDeployRun":63,"productionDeployRunId":34719474734,"pagesArtifactId":10305938397,"note":"Corrective #156 is released in deploy #63; Board remains not DONE/G8 closed because deferred legitimate-actor evidence and cleanup work remain."},
+    {"artifactId":"dementor-club.result.board-information-architecture-v1","version":"0.17","status":"WAITING","path":".weekly-os/results/board-information-architecture-v1.v0.17.md","gate":"G8_CLEANUP","productionCommit":"af28404048dfc918ada81298b0d184df407d0595","productionDeployRun":63,"productionDeployRunId":34719474734,"pagesArtifactId":10305938397,"note":"Corrective #156 is released in deploy #63; Board remains not DONE/G8 closed. Owner follow-up UX observations are deferred from the current edition: mobile directional arrows analogous to desktop, media-responsive card composition/typographic hierarchy, and a separate exploration of visual distinction by Board item/event type. These are discussion/backlog inputs, not approved implementation."},
     {"artifactId":"dementor-club.result.board-access-control-v2","version":"0.4","status":"WAITING","path":".weekly-os/results/board-access-control-v2.v0.4.md","gate":"G7_RELEASE","productionCommit":"a9511a271fbb3524c486c2a9ecd0dc8a3ff22380","productionDeployRun":47,"productionDeployRunId":34220090345,"pagesArtifactId":10053362035,"note":"Released and partially live-retested; residual authenticated role-state QA remains open."}
   ],
   "activeIntegrationBranch": "agent/public-site-visual-tech-debt-cleanup-v1-refresh",
@@ -123,6 +125,7 @@
     "exactly-once external Telegram delivery from outbox uniqueness",
     "frontend live deployment from repository merge alone",
     "global MP_DSL approval from Dementor Club local operating-rule approval",
-    "project-wide DESIGN approval from the public visual cleanup Result"
+    "project-wide DESIGN approval from the public visual cleanup Result",
+    "approved Board UX implementation from deferred owner observations"
   ]
 }
