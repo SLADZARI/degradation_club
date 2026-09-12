@@ -20,7 +20,7 @@
 .dc-board-fullscreen-v21 .dc-board-grid [data-size-class="S"] .dc-notice__body{font-size:17px!important;line-height:1.3!important}
 .dc-board-fullscreen-v21 .dc-board-grid [data-size-class="M"] .dc-notice__body{font-size:16px!important;line-height:1.32!important}
 .dc-board-fullscreen-v21 .dc-board-grid [data-size-class="L"] .dc-notice__body{font-size:15px!important;line-height:1.34!important}
-.dc-board-fullscreen-v21 .dc-board-grid .dc-notice__media img{width:100%!important;height:auto!important;max-height:430px!important;object-fit:contain!important;object-position:center!important;margin-inline:auto!important;background:#f2f0e8}
+.dc-board-fullscreen-v21 .dc-board-grid .dc-notice__media img{display:block!important;width:auto!important;max-width:100%!important;height:auto!important;max-height:430px!important;object-fit:contain!important;object-position:center!important;margin-inline:auto!important;background:#f2f0e8}
 
 @media(max-width:900px){
   /* The canonical v1 filter set is ВСЁ + ТИПЫ. Keeping this host scrollable clips
@@ -58,7 +58,7 @@
   .dc-board-fullscreen-v21 .dc-board-grid [data-size-class="M"] .dc-notice__body{font-size:14.5px!important}
   .dc-board-fullscreen-v21 .dc-board-grid [data-size-class="L"] .dc-notice__body{font-size:14px!important}
   .dc-board-fullscreen-v21 .dc-board-grid .dc-notice__media{margin-bottom:10px!important}
-  .dc-board-fullscreen-v21 .dc-board-grid .dc-notice__media img{height:auto!important;max-height:260px!important;object-fit:contain!important}
+  .dc-board-fullscreen-v21 .dc-board-grid .dc-notice__media img{width:auto!important;max-width:100%!important;height:auto!important;max-height:260px!important;object-fit:contain!important}
   .dc-board-fullscreen-v21 .dc-board-open-hint{padding-top:7px!important;font-size:8px!important}
 }
 
@@ -85,7 +85,7 @@
   .dc-board-fullscreen-v21 .dc-board-grid [data-size-class="S"] .dc-notice__body{font-size:14.5px!important}
   .dc-board-fullscreen-v21 .dc-board-grid [data-size-class="M"] .dc-notice__body{font-size:14px!important}
   .dc-board-fullscreen-v21 .dc-board-grid [data-size-class="L"] .dc-notice__body{font-size:13.5px!important}
-  .dc-board-fullscreen-v21 .dc-board-grid .dc-notice__media img{height:auto!important;max-height:230px!important;object-fit:contain!important}
+  .dc-board-fullscreen-v21 .dc-board-grid .dc-notice__media img{width:auto!important;max-width:100%!important;height:auto!important;max-height:230px!important;object-fit:contain!important}
   .dc-board-fullscreen-v21 .dc-spatial-status{display:none!important}
 
   /* The previous/next owner already exists in board-fullscreen-v2-1.js. Mobile
