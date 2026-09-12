@@ -139,16 +139,59 @@ After rollback:
 
 Result: **PASS_ROLLED_BACK**.
 
+## Trusted worker DB state-machine smoke
+
+A second rollback-only production transaction validated the installed DB worker owner without contacting Telegram and without persisting a QA object.
+
+Flow:
+
+`draft → publish(held) → admin promote(pending) → worker claim(processing) → mark unknown(delivery_unknown)`
+
+Assertions passed:
+
+- `dc_distribution_claim_pending_v1(1)` claimed the temporary pending row;
+- claim moved it to `processing` and incremented attempts to `1`;
+- `dc_distribution_mark_unknown_v1` moved it to `delivery_unknown`;
+- `dc_distribution_requeue_failed_v1` did not convert the unknown row;
+- a subsequent pending claim did not reclaim the unknown row;
+- final status inside the transaction remained `delivery_unknown`.
+
+After rollback:
+
+- persisted worker-smoke Artifact rows = `0`;
+- production outbox remained exactly `6 sent + 1 failed`.
+
+Result: **PASS_ROLLED_BACK**.
+
+This reduces the remaining worker gap to the deployed Edge runtime and real Telegram external outcome path; the production DB state machine itself has live transactional evidence.
+
+## Transitional worker risk inventory
+
+Current production Edge Function remains version `9`, `verify_jwt=true`, on the pre-Decision direct-admin flow.
+
+Read-only production inventory found:
+
+- no `pending` outbox rows;
+- the sole `failed` row has `attempts=5` and belongs to an archived/expired historical Artifact;
+- deployed v9 filters failed rows with `attempts < 5`, so that row is not eligible for another v9 retry;
+- production Postgres has neither `pg_cron` nor `pg_net` installed.
+
+New publications now create `held`, which deployed v9 does not select. Therefore the DB-first transition does not let the old worker bypass the promotion gate for new publications. An external scheduler outside Postgres cannot be proven absent from this database inventory.
+
+Exact old-vs-candidate worker delta is recorded in:
+
+`operations/BOARD_TELEGRAM_PROMOTION_WORKER_RELEASE_DELTA_2026-09-12.md`
+
 ## CI evidence
 
-Integration-branch commit:
+Latest integration evidence head:
 
-`0d3a927a92f5f750733a327a2d1981663b332417`
+`ca6046fcdc5ce410dc98ae341252324f0af75127`
 
 Site Integrity / Release Readiness:
 
-- run `#970`;
-- run id `34698779364`;
+- run `#972`;
+- run id `34700403139`;
 - conclusion `success`.
 
 The workflow includes Board v2/v2.1 contracts, Batch A, Batch B, Board Telegram Promotion v1 contract, build, JS syntax, OAuth handoff and browser regression gates.
@@ -160,16 +203,17 @@ This evidence is not a full G6 promotion PASS.
 Two live-path gaps remain:
 
 1. **No current non-owner Dementor actor exists in production.** Read-only role inventory found Owner/Admin identities and ordinary active Members, but no current account that can exercise the canonical Dementor-only support path. Therefore the live `0/2 → 1/2 → 2/2` threshold and real concurrent Dementor support cannot be tested without inventing a synthetic role. That is prohibited by the project rules and was not done.
-2. **The new Telegram worker runtime is not deployed.** DB worker functions and authority boundaries are installed and validated, but the live Edge worker is still the previous implementation. Trusted worker delivery, real Telegram ambiguous-outcome handling and live worker claim behavior remain pending a separately authorized worker deployment.
+2. **The new Telegram worker runtime is not deployed.** DB worker functions, authority boundaries and state-machine transitions are installed and rollback-safe validated, but the live Edge worker is still the previous implementation. Trusted Edge invocation, real Telegram success/non-delivery/ambiguous-outcome classification and external-message persistence remain pending a separately authorized worker deployment.
 
-CI/static contract coverage for Dementor support and worker state semantics is green, but it does not substitute for these two live-path checks.
+CI/static contract coverage and DB transactional coverage do not substitute for these two live-path checks.
 
 ## Release boundary
 
 Current factual state:
 
 - production DB migration — applied and rollback-safe validated;
-- integration CI — green;
+- production DB worker state machine — rollback-safe validated;
+- integration CI — green through run `#972`;
 - production frontend merge — **NOT AUTHORIZED / NOT DONE**;
 - production site deploy — **NOT AUTHORIZED / NOT DONE**;
 - Telegram Edge worker deploy — **NOT AUTHORIZED / NOT DONE**;
