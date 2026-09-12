@@ -61,11 +61,11 @@ async function copyText(text){
 function addShareButtons(){
   if(!session?.user||!boardHost)return;
   boardHost.querySelectorAll('.dc-notice[data-artifact],.dc-projection[data-source-id]').forEach(node=>{
-    if(node.querySelector('[data-board-share]'))return;
+    if(node.querySelector(':scope > [data-board-share]'))return;
+    const stale=node.querySelector('[data-board-share]');if(stale)stale.remove();
     const type=node.matches('.dc-notice[data-artifact]')?'artifact':'entity';const id=type==='artifact'?node.dataset.artifact:node.dataset.sourceId;if(!id)return;
-    const host=node.querySelector('.dc-notice__actions')||node;
-    const button=document.createElement('button');button.type='button';button.className='dc-board-action small dc-board-share';button.dataset.boardShare='1';button.textContent='ПОДЕЛИТЬСЯ';
-    button.addEventListener('click',async event=>{event.preventDefault();event.stopPropagation();const ok=await copyText(boardUrlFor(type,id).href);button.textContent=ok?'ССЫЛКА СКОПИРОВАНА':'НЕ УДАЛОСЬ';setTimeout(()=>button.textContent='ПОДЕЛИТЬСЯ',1600)});host.appendChild(button);
+    const button=document.createElement('button');button.type='button';button.className='dc-board-share';button.dataset.boardShare='1';button.setAttribute('aria-label','Скопировать ссылку на карточку');button.textContent='ПОДЕЛИТЬСЯ ↗';
+    button.addEventListener('click',async event=>{event.preventDefault();event.stopPropagation();const ok=await copyText(boardUrlFor(type,id).href);button.dataset.copyState=ok?'done':'error';button.textContent=ok?'СКОПИРОВАНО ✓':'НЕ УДАЛОСЬ';setTimeout(()=>{button.textContent='ПОДЕЛИТЬСЯ ↗';delete button.dataset.copyState},1600)});node.appendChild(button);
   });
 }
 function renderAuthGate(){
