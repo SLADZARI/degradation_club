@@ -33,7 +33,7 @@ expect(migration.includes('revoke all on table public.dc_guest_board_interests f
 expect(migration.includes('security definer'),'R9: narrow Guest-interest function is not SECURITY DEFINER');
 expect(migration.includes('if public.dc_membership_active() then'),'R9: active Member is not rejected from Guest-interest RPC');
 expect(migration.includes("raise exception 'MEMBER_USE_CANONICAL_REACTION'"),'R9: Member canonical-reaction boundary missing');
-expect(migration.includes("a.visibility = 'community'")&&migration.includes("a.status = 'active'"),'R9: Guest-interest target is not restricted to live community Artifacts');
+expect(migration.includes("a.visibility = 'community'")&&migration.includes("a.status = 'active'"),'R9: baseline Guest-interest target is not restricted to live community Artifacts');
 expect(migration.includes('revoke all on function public.dc_guest_board_interest_toggle_v1(uuid) from public, anon'),'R9: anon/public function execution not revoked');
 expect(migration.includes('grant execute on function public.dc_guest_board_interest_toggle_v1(uuid) to authenticated'),'R9: authenticated execution grant missing');
 expect(migration.includes('guest_interest_count bigint')&&migration.includes('my_guest_interest boolean'),'R9: Guest read projection is not extended with safe interest state');
@@ -87,12 +87,14 @@ expect(spatial.includes("window.addEventListener('dc:board-personal-state',sched
 expect(fullscreen.includes("if(isOwnerAdmin())")&&fullscreen.includes("host.dataset.access='owner-admin'"),'R13: fullscreen primary action does not expose Owner Admin composer');
 expect(fullscreen.includes('interactiveTarget(event.target)'),'R13: fullscreen card-open handler still captures admin controls');
 
-// R8/R5 safety: true filtering + camera/layout contracts remain intact.
-for(const label of ['ВСЁ','ОТ ЛЮДЕЙ','ОТ КЛУБА'])expect(entityModel.includes(label),`R8: primary filter missing ${label}`);
+// R8/R5 safety: Board IA v1 supersedes the old required source-filter trio.
+// ВСЁ remains the single required source view; object taxonomy is validated by Batch B.
+expect(entityModel.includes("['all','ВСЁ']"),'R8: canonical ВСЁ source view missing');
+expect(!entityModel.includes("['member','ОТ ЛЮДЕЙ']")&&!entityModel.includes("['platform','ОТ КЛУБА']"),'R8: superseded source-filter controls still present');
 expect(integrations.includes('card.hidden=hidden'),'R8: filtered cards are not truly hidden');
 expect(integrations.includes("dc:board-layout-request"),'R8: filter/projection layout event missing');
 expect(spatial.includes('fitActiveContent'),'R5: fitActiveContent missing');
 expect(spatial.includes('data-mine'),'R5: МОЁ camera control missing');
 
 if(fail.length){console.error('BOARD V2 CONTRACT BLOCKED');for(const e of fail)console.error(`- ${e}`);process.exit(1)}
-console.log('Board v2 contract PASS: Guest boundaries + monotonic first-Artifact interactions + Owner Admin canonical moderation/layout/storage + R8/R5 safety');
+console.log('Board v2 contract PASS: Guest boundaries + monotonic first-Artifact interactions + Owner Admin canonical moderation/layout/storage + Board IA v1 filter compatibility + R5 safety');
