@@ -141,9 +141,9 @@ async function closeArtifact(id,{admin=false}={}){
 
 async function loadBoard(){
   const normalized=await client.rpc('dc_normalize_artifact_lifecycle_v1');if(normalized.error)throw normalized.error;
-  const artifactsResult=await client.from('dc_artifacts').select('id,author_profile_id,title,body,external_url,status,starts_at,expires_at,published_at,closed_at,created_at').eq('visibility','community').in('status',['active','expired','archived']).not('published_at','is',null).order('published_at',{ascending:false});
+  const artifactsResult=await client.from('dc_artifacts').select('id,author_profile_id,title,body,external_url,status,starts_at,expires_at,published_at,closed_at,created_at').eq('visibility','community').in('status',['active','expired','archived']).order('published_at',{ascending:false});
   if(artifactsResult.error)throw artifactsResult.error;
-  const artifacts=artifactsResult.data||[];artifactCount.textContent=String(artifacts.length).padStart(2,'0');
+  const artifacts=(artifactsResult.data||[]).filter(artifact=>Boolean(artifact.published_at));artifactCount.textContent=String(artifacts.length).padStart(2,'0');
   if(!artifacts.length){boardHost.innerHTML='<div class="dc-board-empty"><h3>НА ДОСКЕ<br>ПОКА НЕТ ИСТОРИИ.</h3><p>Здесь появятся текущие и прошедшие Community Artifacts.</p></div>';return}
   const ids=artifacts.map(a=>a.id);const authors=[...new Set(artifacts.map(a=>a.author_profile_id))];
   const [profilesResult,reactionsResult,mediaResult,responsesResult]=await Promise.all([
