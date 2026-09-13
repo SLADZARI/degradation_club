@@ -4,8 +4,8 @@ const failures=[];
 const expect=(ok,message)=>{if(!ok)failures.push(message)};
 const read=path=>fs.readFileSync(path,'utf8');
 
-const migrationPath='supabase/migrations/20260912131000_board_information_architecture_batch_a.sql';
-const hardeningPath='supabase/migrations/20260912141500_board_information_architecture_batch_a_security_hardening.sql';
+const migrationPath='supabase/migrations/20260912121109_board_information_architecture_batch_a.sql';
+const hardeningPath='supabase/migrations/20260912121255_board_information_architecture_batch_a_security_hardening.sql';
 const migration=read(migrationPath);
 const hardening=read(hardeningPath);
 const board=read('community/board/board.js');
