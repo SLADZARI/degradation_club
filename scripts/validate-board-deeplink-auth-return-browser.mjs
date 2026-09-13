@@ -94,6 +94,8 @@ try{
 
   const social=await browser.newPage();await social.goto(`${base}/share/artifact/?id=${ART}`,{waitUntil:'domcontentloaded'});await social.waitForURL(url=>url.pathname==='/workspace/board/'&&url.searchParams.get('from')==='share');expect(new URL(social.url()).searchParams.get('focus')===`artifact:${ART}`,'social share surface: human redirect lost exact Artifact');await social.close();
 
+  const invalid=await browser.newPage();await invalid.goto(`${base}/share/artifact/?id=not-a-uuid`);await invalid.waitForTimeout(650);expect(new URL(invalid.url()).pathname==='/share/artifact/','invalid transport id: must not redirect to Board');expect(await invalid.getByText('ССЫЛКА НЕ СОБРАЛАСЬ.').count()===1,'invalid transport id: error state missing');expect(await invalid.getByRole('link',{name:'DEMENTOR CLUB →'}).getAttribute('href')==='/' ,'invalid transport id: safe club fallback missing');await invalid.close();
+
   const mobile=await browser.newPage({viewport:{width:390,height:844}});await mobile.goto(`${base}/__deeplink_harness__`);const mobileShare=mobile.locator('.dc-notice > [data-board-share]');await mobileShare.waitFor({state:'visible'});await mobileShare.click();const mobileCard=mobile.locator('.dc-board-share-postcard');await mobileCard.waitFor({state:'visible'});const box=await mobileCard.boundingBox();expect(!!box&&box.x>=0&&box.x+box.width<=390.5,'mobile postcard: horizontal overflow');expect(await mobile.locator('.dc-artifact-overlay').evaluate(el=>el.hidden),'mobile share: clicking Share opened Artifact overlay');await mobile.close();
 }finally{await browser.close();await new Promise(resolve=>server.close(resolve))}
 if(failures.length){console.error('BOARD DEEPLINK AUTH-RETURN BROWSER BLOCKED');for(const item of failures)console.error(`- ${item}`);process.exit(1)}
@@ -102,4 +104,5 @@ console.log('✓ unauth shared entry uses Receive postcard and preserves exact O
 console.log('✓ Sender Share opens postcard first, then explicit copy, without Artifact fullscreen');
 console.log('✓ Guest gets delivered arrival then exact Artifact; Member opens directly');
 console.log('✓ from=share is consumed without losing focus/history semantics');
+console.log('✓ transport surface redirects valid UUID only and keeps invalid links local');
 console.log('✓ Entity share and 390px mobile remain valid');
