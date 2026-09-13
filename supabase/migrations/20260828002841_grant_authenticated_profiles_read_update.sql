@@ -1,0 +1,1 @@
+grant select, update on table public.profiles to authenticated;

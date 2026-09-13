@@ -1,0 +1,2 @@
+alter table public.mp_project_assignments drop constraint if exists mp_project_assignments_access_profile_check;
+alter table public.mp_project_assignments add constraint mp_project_assignments_access_profile_check check (access_profile in ('INTERNAL','OWNER','DECISION','TEAM','OBSERVER','UNASSIGNED'));
