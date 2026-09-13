@@ -87,7 +87,7 @@ for(const [engine,browserType] of [['chromium',chromium],['webkit',webkit]]){
       expect(await receive.getByRole('button',{name:'ПОСМОТРЕТЬ АРТЕФАКТ →'}).count()===1,`${engine}/${viewport.width}: receive accept action missing`);
       expect(await receive.getByRole('button',{name:'ОСТАТЬСЯ НА ДОСКЕ'}).count()===1,`${engine}/${viewport.width}: receive stay action missing`);
       await page.waitForTimeout(760);
-      expect(await page.locator('.dc-artifact-overlay').evaluate(el=>el.hidden),`${engine}/${viewport.width}: shared Artifact auto-opened before explicit accept`);
+      expect(await page.locator('.dc-artifact-overlay:not([hidden])').count()===0,`${engine}/${viewport.width}: shared Artifact auto-opened before explicit accept`);
       expect(new URL(page.url()).searchParams.get('from')==='share',`${engine}/${viewport.width}: from=share consumed before recipient choice`);
       expect(new URL(page.url()).searchParams.get('focus')===`artifact:${ART}`,`${engine}/${viewport.width}: focus changed before recipient choice`);
       const receiveCardBox=await receive.locator('.dc-board-share-postcard').boundingBox();if(mobile)expect(!!receiveCardBox&&receiveCardBox.x>=0&&receiveCardBox.x+receiveCardBox.width<=viewport.width+.5,`${engine}/${viewport.width}: receive postcard overflows viewport`);
@@ -98,10 +98,10 @@ for(const [engine,browserType] of [['chromium',chromium],['webkit',webkit]]){
 
       await page.goto(`${base}/workspace/board/?focus=artifact:${ART}&from=share`);
       const decline=page.locator('.dc-board-share-postcard-layer');await decline.waitFor({state:'visible'});await page.waitForTimeout(760);
-      expect(await page.locator('.dc-artifact-overlay').evaluate(el=>el.hidden),`${engine}/${viewport.width}: second shared arrival auto-opened before stay choice`);
+      expect(await page.locator('.dc-artifact-overlay:not([hidden])').count()===0,`${engine}/${viewport.width}: second shared arrival auto-opened before stay choice`);
       await decline.getByRole('button',{name:'ОСТАТЬСЯ НА ДОСКЕ'}).click();
       await page.waitForFunction(()=>{const u=new URL(location.href);return !u.searchParams.has('focus')&&!u.searchParams.has('from')});
-      expect(await page.locator('.dc-artifact-overlay').evaluate(el=>el.hidden),`${engine}/${viewport.width}: stay action opened/retained Artifact`);
+      expect(await page.locator('.dc-artifact-overlay:not([hidden])').count()===0,`${engine}/${viewport.width}: stay action opened/retained Artifact`);
       expect(await page.locator('.dc-board-share-postcard-layer:visible').count()===0,`${engine}/${viewport.width}: receive postcard remained after stay`);
       await context.close();
     }
