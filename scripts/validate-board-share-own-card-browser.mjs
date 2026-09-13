@@ -13,7 +13,7 @@ const profile={profile_id:USER,display_name:'Member',full_name:'Member',nickname
 const runtimeStub=`
 export const DC_ARTIFACT_BUCKET='dc-artifacts';
 export const route=p=>p;
-export const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot',"'":'&#39;'}[c]));
+export const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export const formatDate=v=>v?new Date(v).toLocaleDateString('ru-RU'):'';
 export const errorMessage=e=>String(e?.message||e||'ERROR');
 export const safeFileName=v=>String(v||'file').replace(/[^a-z0-9._-]+/gi,'-');
