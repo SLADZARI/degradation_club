@@ -25,9 +25,14 @@ must(deep.includes("url.searchParams.delete('from')")&&deep.includes('history.re
 must(deep.includes('ПЕРЕДАТЬ АРТЕФАКТ'),'Sender postcard copy missing');
 must(deep.includes('ВАМ ПЕРЕДАЛИ АРТЕФАКТ'),'Receiver postcard copy missing');
 must(deep.includes('ВХОД ≠ ЧЛЕНСТВО'),'Receiver membership disclaimer missing');
+must(deep.includes('dc-board-share-postcard__brand')&&css.includes('.dc-board-share-postcard__brand'),'Postcard canonical brand missing');
+must(deep.includes("[data-shell-session] .dcw-session-profile")&&deep.includes('user_metadata'),'Sender identity must reuse canonical Workspace identity with auth metadata fallback');
+must(deep.includes('data-postcard-sender-avatar')&&deep.includes('data-postcard-sender-name'),'Sender postcard identity preview missing');
 must(css.includes('.dc-board-share-postcard'),'Postcard visual contract missing');
 must(css.includes('#a13b30'),'Postcard muted red stamp token missing');
-must(deep.includes("data-board-share"),'visible target Share action missing');
+must(deep.includes('data-board-artifact-share')&&deep.includes("doc?.querySelector('.dc-artifact-actions')"),'Artifact Share must live in open Artifact action row');
+must(deep.includes(".dc-notice[data-artifact] > [data-board-share]")&&deep.includes('.forEach(node=>node.remove())'),'legacy closed-card Artifact Share trigger must be removed');
+must(deep.includes(".dc-projection[data-source-id]")&&deep.includes("externalShareUrlFor('entity',id)"),'Entity direct Share behavior must remain');
 must(deep.includes("loginWithGoogle(`${location.pathname}${location.search}${location.hash}`"),'unauth deep-link does not preserve exact Board path/query/hash');
 must(deep.includes('ЭТОГО ЗДЕСЬ БОЛЬШЕ НЕТ.'),'non-leaking missing-target copy missing');
 must(!deep.includes('.rpc(')&&!deep.includes('.from('),'deeplink orchestrator must not query DB/RPC by focus id');
@@ -46,8 +51,8 @@ must(share.includes('<meta property="og:title" content="Вам передали 
 must(share.includes('<meta property="og:description" content="Открыть внутри DEMENTOR CLUB">'),'OG description must stay generic across Artifact UUIDs');
 must(share.includes('<meta property="og:url" content="https://dementor.club/share/artifact/">'),'OG URL must identify generic transport surface, not UUID');
 must(!/og:(?:title|description|url)[^>]+(?:\$\{|id\b|searchParams)/i.test(share),'OG metadata must not become UUID-specific client metadata');
-must(share.includes('/assets/social/dementor-artifact-share-postcard.webp'),'stable branded share image missing from OG surface');
-must(share.includes('og:image:width" content="1200"')&&share.includes('og:image:height" content="630"'),'OG 1200x630 dimensions missing');
+must(share.includes('/assets/ink/community-hero-01.webp'),'stable Community hero share image missing from OG surface');
+must(share.includes('og:image:alt" content="Люди Dementor Club"'),'OG image alt missing');
 must(share.includes("target.searchParams.set('focus',`artifact:${id.toLowerCase()}`)")&&share.includes("target.searchParams.set('from','share')"),'share surface does not route human to exact Board Artifact receive state');
 must(share.includes("if(!UUID.test(id))")&&share.includes('ССЫЛКА НЕ СОБРАЛАСЬ.')&&!share.includes("setTimeout(()=>location.replace('/workspace/board/')"),'invalid share id must stay on transport surface without random Board redirect');
 must(share.includes('<noscript>')&&share.includes('Для доставки нужен JavaScript.'),'share surface noscript fallback missing');
@@ -56,9 +61,10 @@ must(!/dc-community-artifacts|signedMediaUrl|createSignedUrl|dc_artifacts|curren
 if(fail.length){console.error('Board deep-link auth-return contract failed');for(const item of fail)console.error(`✗ ${item}`);process.exit(1)}
 console.log('Board deep-link auth-return contract');
 console.log('✓ canonical focus/history/auth-return preserved');
-console.log('✓ Sender postcard owns native share + explicit copy');
+console.log('✓ Artifact Share lives in open detail action row; Entity Share remains direct');
+console.log('✓ Sender postcard reuses canonical Workspace identity and shows brand');
 console.log('✓ from=share is one-time presentation state only');
-console.log('✓ /share/artifact is transport-only with generic static OG + validated UUID redirect');
+console.log('✓ /share/artifact stays transport-only with generic Community OG image + validated UUID redirect');
 console.log('✓ invalid UUID stays on transport surface and noscript fallback exists');
 console.log('✓ existing fullscreen owner and permission boundaries preserved');
 console.log('0 error(s)');

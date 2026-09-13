@@ -13,6 +13,7 @@ let activeShareTrigger=null;
 let arrivalTimer=null;
 let sharedArrivalMode=null;
 let sharedArrivalStarted=false;
+let artifactFrameObserver=null;
 
 function parseFocus(){
   const raw=new URL(location.href).searchParams.get('focus')||'';
@@ -50,6 +51,7 @@ function setFocus(type,id,{replace=false,pushed=false}={}){
   const url=boardUrlFor(type,String(id).toLowerCase());
   const state={...(history.state||{}),dcBoardFocus:true,dcBoardFocusPushed:pushed};
   history[replace?'replaceState':'pushState'](state,'',url);
+  queueMicrotask(refreshArtifactDetailShare);
 }
 function clearFocus({replace=false}={}){
   const url=baseBoardUrl();
@@ -80,6 +82,7 @@ function showMissing(){
 function openResolvedFocus(node,focus){
   hideMissing();revealPresentationOnly(node);
   window.dispatchEvent(new CustomEvent('dc:board-focus-target',{detail:{node,open:focus.type==='artifact',focus,source:'url'}}));
+  setTimeout(refreshArtifactDetailShare,0);
 }
 function resolveCurrentFocus({allowMissing=false}={}){
   const focus=parseFocus();if(!focus){hideMissing();return false}
@@ -122,9 +125,15 @@ function ensurePostcard(){
   postcard.innerHTML=`<article class="dc-board-share-postcard" role="dialog" aria-modal="true" aria-labelledby="dcBoardPostcardTitle" aria-describedby="dcBoardPostcardCopy">
     <button class="dc-board-share-postcard__close" type="button" data-postcard-close aria-label="Закрыть">×</button>
     <div class="dc-board-share-postcard__stamp"><span data-postcard-stamp>К ПЕРЕДАЧЕ</span></div>
+    <div class="dc-board-share-postcard__brand" aria-label="Dementor Club"><span>DEMENTOR</span><strong>CLUB</strong></div>
     <div class="dc-board-share-postcard__meta"><span data-postcard-meta-left>OUTBOUND / ARTIFACT</span><span data-postcard-meta-right>STATUS / READY</span></div>
     <h2 class="dc-board-share-postcard__title" id="dcBoardPostcardTitle" data-postcard-title>ПЕРЕДАТЬ АРТЕФАКТ</h2>
     <p class="dc-board-share-postcard__copy" id="dcBoardPostcardCopy" data-postcard-copy>Ссылка ведёт прямо сюда.</p>
+    <div class="dc-board-share-postcard__sender" data-postcard-sender hidden>
+      <img data-postcard-sender-avatar alt="" hidden>
+      <span class="dc-board-share-postcard__sender-fallback" data-postcard-sender-fallback aria-hidden="true">D</span>
+      <div><small>ОТПРАВИТЕЛЬ</small><strong data-postcard-sender-name>УЧАСТНИК</strong></div>
+    </div>
     <div class="dc-board-share-postcard__link" data-postcard-sender>
       <input type="text" readonly data-postcard-url aria-label="Ссылка на артефакт">
       <span aria-hidden="true">↗</span>
@@ -150,6 +159,20 @@ function ensurePostcard(){
     else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus()}
   });
   return postcard;
+}
+function senderIdentity(){
+  const profile=document.querySelector('[data-shell-session] .dcw-session-profile');
+  const shellAvatar=profile?.querySelector('img.dcw-session-avatar');
+  const meta=session?.user?.user_metadata||{};
+  const name=String(profile?.querySelector('strong')?.textContent||meta.full_name||meta.name||session?.user?.email||'УЧАСТНИК').trim();
+  const avatar=String(shellAvatar?.currentSrc||shellAvatar?.src||meta.avatar_url||meta.picture||'').trim();
+  return {name:name||'УЧАСТНИК',avatar};
+}
+function renderSenderIdentity(){
+  const layer=ensurePostcard();const identity=senderIdentity();
+  const name=layer.querySelector('[data-postcard-sender-name]');const img=layer.querySelector('[data-postcard-sender-avatar]');const fallback=layer.querySelector('[data-postcard-sender-fallback]');
+  if(name)name.textContent=identity.name;
+  if(identity.avatar){img.src=identity.avatar;img.hidden=false;fallback.hidden=true}else{img.removeAttribute('src');img.hidden=true;fallback.hidden=false;fallback.textContent=(identity.name.match(/[\p{L}\p{N}]/u)?.[0]||'D').toUpperCase()}
 }
 function setPostcardMode({mode,title,copy,stamp,metaLeft,metaRight,legal,closable=false,url=null,login=false}={}){
   const layer=ensurePostcard();const card=layer.querySelector('.dc-board-share-postcard');
@@ -181,6 +204,7 @@ function openSenderPostcard(id,trigger){
   activeShareTrigger=trigger;
   const url=externalShareUrlFor('artifact',id).href;
   const layer=setPostcardMode({mode:'sender',title:'ПЕРЕДАТЬ АРТЕФАКТ',copy:'Ссылка ведёт прямо сюда.',stamp:'К ПЕРЕДАЧЕ',metaLeft:'OUTBOUND / ARTIFACT',metaRight:'STATUS / READY',legal:'ARTIFACT / DIRECT LINK / EXTERNAL TRANSFER',closable:true,url});
+  renderSenderIdentity();
   const copyButton=layer.querySelector('[data-postcard-copy-link]');copyButton.textContent='КОПИРОВАТЬ ССЫЛКУ';
   copyButton.onclick=()=>runSenderCopy(url);
   layer.querySelector('[data-postcard-native]').onclick=async()=>{
@@ -198,17 +222,56 @@ function showReceiveAuthPostcard(){
 function showGuestArrivalPostcard(){
   setPostcardMode({mode:'receiver-arrival',title:'ВАМ ПЕРЕДАЛИ АРТЕФАКТ',copy:'Получено. Открываем.',stamp:'ДОСТАВЛЕНО',metaLeft:'INCOMING / ARTIFACT',metaRight:'STATUS / DELIVERED',legal:'OPENING EXACT ARTIFACT',closable:false,login:false});
 }
-function addShareButtons(){
+function artifactIdFromFrame(frame){
+  try{
+    const raw=frame?.contentWindow?.location?.href||frame?.getAttribute?.('src')||'';const url=new URL(raw,location.origin);const parts=url.pathname.split('/').filter(Boolean);const index=parts.indexOf('artifact');const id=index>=0?String(parts[index+1]||'').toLowerCase():'';
+    if(id&&FOCUS_RE.test(`artifact:${id}`))return id;
+  }catch{}
+  const focus=parseFocus();return focus?.type==='artifact'?focus.id:null;
+}
+function injectArtifactDetailShare(frame){
+  if(!session?.user||!frame)return;
+  try{
+    const doc=frame.contentDocument;const actions=doc?.querySelector('.dc-artifact-actions');if(!actions)return;
+    const id=artifactIdFromFrame(frame);if(!id)return;
+    let button=actions.querySelector('[data-board-artifact-share]');
+    if(!button){
+      button=doc.createElement('button');button.type='button';button.className='dc-artifact-action';button.dataset.boardArtifactShare='1';button.textContent='ПОДЕЛИТЬСЯ ↗';button.setAttribute('aria-label','Передать артефакт');
+      const back=actions.querySelector('#detailBack');if(back)back.before(button);else actions.appendChild(button);
+    }
+    button.dataset.artifactId=id;
+    button.onclick=event=>{event.preventDefault();event.stopPropagation();openSenderPostcard(id,button)};
+  }catch{}
+}
+function bindArtifactFrame(frame){
+  if(!frame||frame.dataset.dcBoardShareDetailBound==='1')return;
+  frame.dataset.dcBoardShareDetailBound='1';let observer=null;
+  const install=()=>{
+    try{
+      observer?.disconnect();injectArtifactDetailShare(frame);const doc=frame.contentDocument;const target=doc?.getElementById('artifactHost')||doc?.body;if(!target)return;
+      observer=new MutationObserver(()=>injectArtifactDetailShare(frame));observer.observe(target,{childList:true,subtree:true});
+    }catch{}
+  };
+  frame.addEventListener('load',install);install();
+}
+function refreshArtifactDetailShare(){
+  document.querySelectorAll('.dc-artifact-overlay iframe').forEach(frame=>{bindArtifactFrame(frame);injectArtifactDetailShare(frame)});
+}
+function installArtifactDetailShareBridge(){
+  refreshArtifactDetailShare();
+  artifactFrameObserver=new MutationObserver(refreshArtifactDetailShare);artifactFrameObserver.observe(document.body,{childList:true,subtree:true});
+}
+function addEntityShareButtons(){
   if(!session?.user||!boardHost)return;
-  boardHost.querySelectorAll('.dc-notice[data-artifact],.dc-projection[data-source-id]').forEach(node=>{
+  boardHost.querySelectorAll('.dc-notice[data-artifact] > [data-board-share]').forEach(node=>node.remove());
+  boardHost.querySelectorAll('.dc-projection[data-source-id]').forEach(node=>{
     if(node.querySelector(':scope > [data-board-share]'))return;
     const stale=node.querySelector('[data-board-share]');if(stale)stale.remove();
-    const type=node.matches('.dc-notice[data-artifact]')?'artifact':'entity';const id=type==='artifact'?node.dataset.artifact:node.dataset.sourceId;if(!id)return;
-    const button=document.createElement('button');button.type='button';button.className='dc-board-share';button.dataset.boardShare='1';button.setAttribute('aria-label',type==='artifact'?'Передать артефакт':'Скопировать ссылку на карточку');button.textContent='ПОДЕЛИТЬСЯ ↗';
+    const id=node.dataset.sourceId;if(!id)return;
+    const button=document.createElement('button');button.type='button';button.className='dc-board-share';button.dataset.boardShare='1';button.setAttribute('aria-label','Скопировать ссылку на карточку');button.textContent='ПОДЕЛИТЬСЯ ↗';
     button.addEventListener('click',async event=>{
       event.preventDefault();event.stopPropagation();
-      if(type==='artifact'){openSenderPostcard(id,button);return}
-      const ok=await copyText(externalShareUrlFor(type,id).href);button.dataset.copyState=ok?'done':'error';button.textContent=ok?'СКОПИРОВАНО ✓':'НЕ УДАЛОСЬ';setTimeout(()=>{button.textContent='ПОДЕЛИТЬСЯ ↗';delete button.dataset.copyState},1600);
+      const ok=await copyText(externalShareUrlFor('entity',id).href);button.dataset.copyState=ok?'done':'error';button.textContent=ok?'СКОПИРОВАНО ✓':'НЕ УДАЛОСЬ';setTimeout(()=>{button.textContent='ПОДЕЛИТЬСЯ ↗';delete button.dataset.copyState},1600);
     });node.appendChild(button);
   });
 }
@@ -256,11 +319,11 @@ async function init(){
   const focus=parseFocus();const shared=isSharedArtifactArrival();
   if(focus&&!session){if(shared)showReceiveAuthPostcard();else renderAuthGate();return}
   if(!session)return;
-  installHistoryBridge();addShareButtons();
-  window.addEventListener('dc:board-guest-read-ready',()=>{addShareButtons();scheduleResolve()});
-  window.addEventListener('dc:board-projections-updated',()=>{addShareButtons();scheduleResolve()});
-  window.addEventListener('dc:board-layout-request',()=>addShareButtons());
-  if(boardHost)new MutationObserver(()=>{addShareButtons();if(parseFocus())scheduleResolve()}).observe(boardHost,{childList:true,subtree:true});
+  installHistoryBridge();installArtifactDetailShareBridge();addEntityShareButtons();
+  window.addEventListener('dc:board-guest-read-ready',()=>{addEntityShareButtons();scheduleResolve()});
+  window.addEventListener('dc:board-projections-updated',()=>{addEntityShareButtons();scheduleResolve()});
+  window.addEventListener('dc:board-layout-request',()=>addEntityShareButtons());
+  if(boardHost)new MutationObserver(()=>{addEntityShareButtons();if(parseFocus())scheduleResolve()}).observe(boardHost,{childList:true,subtree:true});
   if(shared)await prepareSharedArrival();else if(focus)scheduleResolve();
 }
 init().catch(error=>console.error('[DC Board deeplink]',error));
