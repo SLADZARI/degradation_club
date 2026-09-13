@@ -3,6 +3,8 @@ const read=p=>fs.readFileSync(p,'utf8');
 const fail=[];const must=(ok,msg)=>{if(!ok)fail.push(msg)};
 const html=read('workspace/board/index.html');
 const deep=read('community/board/board-deeplink-auth-return-v1.js');
+const css=read('community/board/board-deeplink-auth-return-v1.css');
+const share=read('share/artifact/index.html');
 const full=read('community/board/board-fullscreen-v2-1.js');
 const callback=read('auth/callback/index.html');
 const g2=read('operations/BOARD_DEEPLINK_AUTH_RETURN_G2_2026-09-12.md');
@@ -16,11 +18,20 @@ must(deep.includes("history.pushState")||deep.includes("history[replace?'replace
 must(deep.includes("window.addEventListener('popstate'"),'popstate handling missing');
 must(deep.includes("navigator.clipboard.writeText"),'Clipboard API share path missing');
 must(deep.includes("document.execCommand('copy')"),'Clipboard fallback missing');
+must(deep.includes("typeof navigator.share!=='function'"),'native Web Share path/fallback missing');
+must(deep.includes("url.pathname=route('/share/artifact/')"),'Artifact Share must use dedicated social surface');
+must(deep.includes("url.searchParams.set('id'"),'Artifact Share surface UUID missing');
+must(deep.includes("url.searchParams.delete('from')")&&deep.includes('history.replaceState'),'one-time from=share cleanup missing');
+must(deep.includes('ПЕРЕДАТЬ АРТЕФАКТ'),'Sender postcard copy missing');
+must(deep.includes('ВАМ ПЕРЕДАЛИ АРТЕФАКТ'),'Receiver postcard copy missing');
+must(deep.includes('ВХОД ≠ ЧЛЕНСТВО'),'Receiver membership disclaimer missing');
+must(css.includes('.dc-board-share-postcard'),'Postcard visual contract missing');
+must(css.includes('#a13b30'),'Postcard muted red stamp token missing');
 must(deep.includes("data-board-share"),'visible target Share action missing');
 must(deep.includes("loginWithGoogle(`${location.pathname}${location.search}${location.hash}`"),'unauth deep-link does not preserve exact Board path/query/hash');
 must(deep.includes('ЭТОГО ЗДЕСЬ БОЛЬШЕ НЕТ.'),'non-leaking missing-target copy missing');
 must(!deep.includes('.rpc(')&&!deep.includes('.from('),'deeplink orchestrator must not query DB/RPC by focus id');
-must(!/token/i.test(deep),'deeplink/share runtime must not introduce share tokens');
+must(!/share[_-]?token|token=.*share/i.test(deep),'deeplink/share runtime must not introduce share tokens');
 must(full.includes("dc:board-focus-target"),'fullscreen camera/Artifact owner does not accept focus requests');
 must(full.includes("dc:board-close-artifact"),'fullscreen owner does not accept history close requests');
 must(callback.includes("const requestedNext=params.get('next')||'/workspace/'"),'callback canonical Workspace fallback missing');
@@ -30,11 +41,17 @@ must(callback.includes("normalizedPath==='/auth/callback/'"),'callback recursion
 must(!callback.includes("requestedNext.startsWith('/')"),'legacy raw-string next validation survived');
 must(g2.includes('no direct privileged lookup by focus ID'),'G2 permission boundary evidence missing');
 
+must(share.includes('og:title')&&share.includes('og:description')&&share.includes('og:image'),'social share surface OG metadata missing');
+must(share.includes('/assets/social/dementor-artifact-share-postcard.webp'),'stable branded share image missing from OG surface');
+must(share.includes('og:image:width" content="1200"')&&share.includes('og:image:height" content="630"'),'OG 1200x630 dimensions missing');
+must(share.includes("target.searchParams.set('focus',`artifact:${id.toLowerCase()}`)")&&share.includes("target.searchParams.set('from','share')"),'share surface does not route human to exact Board Artifact receive state');
+must(!/dc-community-artifacts|signedMediaUrl|createSignedUrl/.test(share),'social surface must not expose private Artifact media');
+
 if(fail.length){console.error('Board deep-link auth-return contract failed');for(const item of fail)console.error(`✗ ${item}`);process.exit(1)}
 console.log('Board deep-link auth-return contract');
-console.log('✓ canonical artifact/entity focus URL grammar');
-console.log('✓ safe same-origin auth return after URL normalization');
-console.log('✓ lawful loaded-DOM resolution only; no focus-ID DB lookup/share token');
-console.log('✓ existing fullscreen camera/Artifact overlay remains presentation owner');
-console.log('✓ lifecycle, history, missing-target and clipboard contracts present');
+console.log('✓ canonical focus/history/auth-return preserved');
+console.log('✓ Sender postcard owns native share + explicit copy');
+console.log('✓ from=share is one-time presentation state only');
+console.log('✓ crawler-readable branded social surface exists without private Artifact media');
+console.log('✓ existing fullscreen owner and permission boundaries preserved');
 console.log('0 error(s)');
