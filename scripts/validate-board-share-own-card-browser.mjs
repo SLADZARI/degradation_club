@@ -35,13 +35,28 @@ for(const [engine,browserType] of [['chromium',chromium],['webkit',webkit]]){
   try{
     for(const viewport of [{width:1280,height:800},{width:390,height:844}]){
       const mobile=viewport.width<500;const context=await browser.newContext({viewport,hasTouch:mobile,isMobile:mobile});const page=await context.newPage();
-      await page.addInitScript(()=>{globalThis.__TRACE=[];globalThis.__DC_COPIED='';Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:async value=>{globalThis.__DC_COPIED=value}}});document.execCommand=()=>true;for(const type of ['pointerdown','pointerup','click'])document.addEventListener(type,event=>{globalThis.__TRACE.push({type,target:event.target?.tagName||'',className:String(event.target?.className||''),share:!!event.target?.closest?.('[data-board-share],[data-board-artifact-share]'),x:event.clientX,y:event.clientY})},true)});
+      await page.addInitScript(()=>{
+        globalThis.__TRACE=[];globalThis.__DC_COPIED='';
+        Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:async value=>{globalThis.__DC_COPIED=value}}});document.execCommand=()=>true;
+        for(const type of ['pointerdown','pointerup','click'])document.addEventListener(type,event=>{globalThis.__TRACE.push({type,target:event.target?.tagName||'',className:String(event.target?.className||''),share:!!event.target?.closest?.('[data-board-share],[data-board-artifact-share]'),x:event.clientX,y:event.clientY})},true);
+        const shellSession={user:{id:'guest-1',email:'member@example.test',user_metadata:{full_name:'Member',picture:'/assets/brand/dementor-mark-black.svg'}}};
+        const shellRows={
+          profiles:[{full_name:'Member',avatar_url:'/assets/brand/dementor-mark-black.svg'}],
+          dc_role_assignments:[],
+          dc_entity_assignments:[],
+          dc_system_memberships:[{status:'active',valid_from:'2026-01-01T00:00:00.000Z',valid_to:null}]
+        };
+        const shellQuery=table=>{const rows=shellRows[table]||[];const api={select(){return api},eq(){return api},maybeSingle:async()=>({data:rows[0]||null,error:null}),then(resolve,reject){return Promise.resolve({data:rows,error:null}).then(resolve,reject)}};return api};
+        globalThis.DEMENTOR_SUPABASE_CLIENT={auth:{getSession:async()=>({data:{session:shellSession}}),signOut:async()=>({error:null})},from:table=>shellQuery(table)};
+      });
       await page.goto(`${base}/workspace/board/?debug=must-not-leak`);
       const card=page.locator(`.dc-notice[data-artifact="${ART}"]`);await card.waitFor({state:'visible'});await page.waitForFunction(id=>document.querySelector(`.dc-notice[data-artifact="${id}"]`)?.classList.contains('is-own-movable'),ART);
       expect(await card.locator(':scope > [data-board-share]').count()===0,`${engine}/${viewport.width}: legacy Artifact Share survived on closed Board card`);
       const runtime=await page.evaluate(()=>[...document.scripts].map(s=>s.src).find(src=>src.includes('board-own-drag-livefix'))||'');expect(runtime.endsWith('/community/board/board-own-drag-livefix-v2-2.js'),`${engine}/${viewport.width}: production Board did not load v2-2 runtime: ${runtime}`);
       const scripts=await page.evaluate(()=>[...document.scripts].map(s=>s.src).filter(Boolean));for(const owner of ['board-entry-v2.js','board-spatial-v1.js','board-layout-v2.js','board-fullscreen-v2-1.js','board-deeplink-auth-return-v1.js','board-own-drag-livefix-v2-2.js'])expect(scripts.some(src=>src.endsWith(`/community/board/${owner}`)),`${engine}/${viewport.width}: missing production owner ${owner}`);
-      await page.waitForSelector('[data-shell-session] .dcw-session-profile');
+      await page.waitForSelector('[data-shell-session] .dcw-session-profile',{state:'attached'});
+      const shellIdentity=await page.locator('[data-shell-session] .dcw-session-profile').evaluate(node=>({name:node.querySelector('strong')?.textContent?.trim()||'',avatar:node.querySelector('img.dcw-session-avatar')?.getAttribute('src')||''}));
+      expect(shellIdentity.name==='Member',`${engine}/${viewport.width}: canonical Workspace identity name missing`);expect(shellIdentity.avatar==='/assets/brand/dementor-mark-black.svg',`${engine}/${viewport.width}: canonical Workspace identity avatar missing`);
       await card.locator('.dc-board-open-hint').click();
       const overlay=page.locator('.dc-artifact-overlay');await overlay.waitFor({state:'visible'});expect(new URL(page.url()).searchParams.get('focus')===`artifact:${ART}`,`${engine}/${viewport.width}: opening Artifact did not set canonical focus`);
       const detail=page.frameLocator('.dc-artifact-overlay iframe');const share=detail.locator('[data-board-artifact-share]');await share.waitFor({state:'visible'});
@@ -62,6 +77,7 @@ await new Promise(resolve=>server.close(resolve));
 if(failures.length){console.error('BOARD FULL-STACK SHARE BLOCKED');for(const item of failures)console.error(`- ${item}`);process.exit(1)}
 console.log('BOARD FULL-STACK SHARE PASS');
 console.log('✓ real production Board HTML and runtime owner list loaded');
+console.log('✓ canonical Workspace identity is supplied through the shell owner, not a parallel profile query');
 console.log('✓ closed Artifact card has no Share trigger; open Artifact action row owns Share');
 console.log('✓ sender postcard preserves open detail and shows canonical sender identity + brand');
 console.log('✓ explicit postcard copy emits clean dedicated Artifact share URL across Chromium/WebKit desktop/mobile');
