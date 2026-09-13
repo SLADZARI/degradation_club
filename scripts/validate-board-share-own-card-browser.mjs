@@ -36,9 +36,10 @@ globalThis.__TRACE=[];
 Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:async value=>{globalThis.__DC_COPIED=value}}});document.execCommand=()=>true;
 for(const type of ['pointerdown','pointerup','click'])document.addEventListener(type,event=>{globalThis.__TRACE.push({type,target:event.target?.tagName||'',className:event.target?.className||'',share:!!event.target?.closest?.('[data-board-share]'),x:event.clientX,y:event.clientY})},true);
 </script>
+<script src="/community/board/board-share-hitguard-v1.js"></script>
 <script type="module" src="/community/board/board-fullscreen-v2-1.js"></script>
 <script type="module" src="/community/board/board-deeplink-auth-return-v1.js"></script>
-<script type="module" src="/community/board/board-own-drag-livefix-v2-1.js"></script>
+<script type="module" src="/community/board/board-own-drag-livefix-v2-2.js"></script>
 </body></html>`}
 const mime={'.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8'};
 const server=http.createServer((req,res)=>{const u=new URL(req.url,'http://local');if(u.pathname==='/__share_own_card__'){res.setHeader('content-type','text/html; charset=utf-8');res.end(harness());return}if(u.pathname==='/community-runtime-v1.js'){res.setHeader('content-type','text/javascript; charset=utf-8');res.end(runtimeStub);return}const file=path.resolve(root,u.pathname.replace(/^[/]+/,''));if(!file.startsWith(root)||!fs.existsSync(file)||!fs.statSync(file).isFile()){res.statusCode=404;res.end('not found');return}res.setHeader('content-type',mime[path.extname(file)]||'application/octet-stream');res.end(fs.readFileSync(file))});
@@ -54,20 +55,39 @@ for(const [engine,browserType] of [['chromium',chromium],['webkit',webkit]]){
       await page.goto(`${base}/__share_own_card__`);
       const share=page.locator('.dc-notice > [data-board-share]');
       await share.waitFor({state:'visible'});
-      const box=await share.boundingBox();
+      let box=await share.boundingBox();
       expect(!!box,`${engine}/${viewport.width}: Share has no bounding box`);
       if(!box){await context.close();continue}
-      const point={x:box.x+box.width/2,y:box.y+box.height/2};
+      let point={x:box.x+box.width/2,y:box.y+box.height/2};
       const hit=await page.evaluate(({x,y})=>{const el=document.elementFromPoint(x,y);return {tag:el?.tagName||'',className:el?.className||'',isShare:!!el?.closest?.('[data-board-share]')}},point);
       if(mobile)await page.touchscreen.tap(point.x,point.y);else await page.mouse.click(point.x,point.y);
       await page.waitForTimeout(220);
-      const state=await page.evaluate(()=>({copied:globalThis.__DC_COPIED||'',overlayHidden:document.querySelector('.dc-artifact-overlay')?.hidden??true,dragging:document.documentElement.dataset.boardDragging||'',shareText:document.querySelector('[data-board-share]')?.textContent||'',trace:globalThis.__TRACE||[]}));
+      let state=await page.evaluate(()=>({copied:globalThis.__DC_COPIED||'',overlayHidden:document.querySelector('.dc-artifact-overlay')?.hidden??true,dragging:document.documentElement.dataset.boardDragging||'',shareText:document.querySelector('[data-board-share]')?.textContent||'',trace:globalThis.__TRACE||[]}));
       expect(hit.isShare,`${engine}/${viewport.width}: center hit target is ${hit.tag}.${hit.className}, not Share`);
       expect(Boolean(state.copied),`${engine}/${viewport.width}: Share coordinate click did not copy; trace=${JSON.stringify(state.trace)}`);
       if(state.copied){const copied=new URL(state.copied);expect(copied.pathname==='/workspace/board/'&&copied.searchParams.get('focus')===`artifact:${ART}`,`${engine}/${viewport.width}: canonical URL mismatch ${state.copied}`)}
       expect(state.overlayHidden,`${engine}/${viewport.width}: Share coordinate click opened Artifact; trace=${JSON.stringify(state.trace)}`);
       expect(!state.dragging,`${engine}/${viewport.width}: Share coordinate click started drag; trace=${JSON.stringify(state.trace)}`);
       expect(state.shareText.includes('СКОПИРОВАНО'),`${engine}/${viewport.width}: copy feedback missing`);
+
+      await page.goto(`${base}/__share_own_card__`);
+      await share.waitFor({state:'visible'});
+      box=await share.boundingBox();
+      if(!box){expect(false,`${engine}/${viewport.width}: Share missing before mis-target test`);await context.close();continue}
+      point={x:box.x+box.width/2,y:box.y+box.height/2};
+      await page.evaluate(({x,y})=>{
+        globalThis.__DC_COPIED='';globalThis.__TRACE=[];
+        const card=document.querySelector('.dc-notice[data-artifact]');
+        card.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true,cancelable:true,pointerId:77,pointerType:'mouse',button:0,clientX:x,clientY:y}));
+        card.dispatchEvent(new PointerEvent('pointerup',{bubbles:true,cancelable:true,pointerId:77,pointerType:'mouse',button:0,clientX:x,clientY:y}));
+        card.dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true,button:0,clientX:x,clientY:y}));
+      },point);
+      await page.waitForTimeout(220);
+      state=await page.evaluate(()=>({copied:globalThis.__DC_COPIED||'',overlayHidden:document.querySelector('.dc-artifact-overlay')?.hidden??true,dragging:document.documentElement.dataset.boardDragging||'',shareText:document.querySelector('[data-board-share]')?.textContent||'',trace:globalThis.__TRACE||[]}));
+      expect(Boolean(state.copied),`${engine}/${viewport.width}: mis-targeted Share click did not copy; trace=${JSON.stringify(state.trace)}`);
+      expect(state.overlayHidden,`${engine}/${viewport.width}: mis-targeted Share click opened Artifact; trace=${JSON.stringify(state.trace)}`);
+      expect(!state.dragging,`${engine}/${viewport.width}: mis-targeted Share click started drag; trace=${JSON.stringify(state.trace)}`);
+      expect(state.shareText.includes('СКОПИРОВАНО'),`${engine}/${viewport.width}: mis-targeted Share feedback missing`);
       await context.close();
     }
   }finally{await browser.close()}
@@ -77,3 +97,4 @@ if(failures.length){console.error('BOARD OWN-CARD SHARE BLOCKED');for(const item
 console.log('BOARD OWN-CARD SHARE PASS');
 console.log('✓ production-like fullscreen hit target resolves to Share');
 console.log('✓ coordinate click/tap copies without Artifact open or drag in Chromium + WebKit');
+console.log('✓ geometrically valid Share intent survives a card-retargeted click without opening Artifact');
