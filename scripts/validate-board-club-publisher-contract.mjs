@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 
 const read=path=>fs.readFileSync(path,'utf8');
-const migration=read('supabase/migrations/20260913154500_board_club_publisher_v1.sql');
+const migration=read('supabase/migrations/20260913171431_board_club_publisher_v1.sql');
 const board=read('community/board/board-club-publisher-v1.js');
 const boardCss=read('community/board/board-club-publisher-v1.css');
 const boardHtml=read('workspace/board/index.html');
