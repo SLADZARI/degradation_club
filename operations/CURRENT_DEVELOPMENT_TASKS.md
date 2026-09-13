@@ -1,6 +1,7 @@
 # Dementor Club — current development tasks
 
-Дата фиксации: 2026-08-25
+Дата первоначальной фиксации: 2026-08-25  
+Обновлено: 2026-09-13  
 Статус: current internal working backlog
 Область: внутренняя работа над продуктом Dementor Club
 
@@ -13,13 +14,49 @@
 - `Merch` — физические товары;
 - `Course` — онлайн-продукт / онлайн-процесс;
 - `Event` — офлайн-событие;
+- `Project` — самостоятельный культурный / продуктовый мир внутри экосистемы клуба;
 - `Join` — отдельный onboarding / вход в клуб;
 - `Dementor` — человек/ведущий, связанный с продуктами, событиями и сферами;
 - `Donation` — добровольная поддержка клуба.
 
-Не смешивать `Event` и `Course`: офлайн-обучение всё равно остаётся `Event`; `Course` — только онлайн.
+Не смешивать `Event`, `Course` и `Project`. `Project` может иметь собственные материалы, программы, события, людей, архив и отдельный runtime, но не обязан включать всё перечисленное.
 
-Каноническая классификация по 9 сферам остаётся обязательной.
+Каноническая классификация по 9 сферам остаётся обязательной там, где она применима к конкретной сущности.
+
+### 0.1 Projects / самостоятельные проектные миры — IDEA / BACKLOG
+
+Статус этого блока: **IDEA / NOT APPROVED / NO PUBLIC IMPLEMENTATION**.
+
+Рабочая продуктовая гипотеза для дальнейшей проработки:
+
+- `/projects/` — не единая подробная продуктовая страница и не новый универсальный runtime;
+- `/projects/` должен работать как **реестр / вход / маршрутизатор** в самостоятельные проекты Dementor Club;
+- подробная логика, контент, gameplay/runtime и собственный product lifecycle могут жить внутри отдельного проекта и отдельного repository/source-of-truth;
+- главная Dementor Club и другие публичные поверхности могут вести человека непосредственно в конкретный Project;
+- у разных Projects могут быть разные режимы доступа, но конкретная access matrix пока **не определена и не утверждена**;
+- Project access не должен создавать параллельный auth или параллельную membership-модель: при необходимости он должен опираться на существующую identity/membership boundary Dementor Club и явно утверждённые project-scoped permissions;
+- существование repository, прототипа или документа не означает автоматический public/active status;
+- при подключении внешнего project repository сначала читать его `PROJECT / ARTIFACT_INDEX / APPROVED_STATE` и authority pointers, а не выводить статус по имени, дате или степени готовности кода.
+
+Текущий обнаруженный inventory для дальнейшей проработки реестра:
+
+- `Логика и осознанность` — существующий публичный Project в Dementor Club;
+- `Fermentation` — отдельный Project / internal R&D, public launch не утверждён; implementation repository: `SLADZARI/dementor-fermentation`;
+- `DEMENTOR LAB` — самостоятельный игровой Project в проработке; repository: `SLADZARI/dementor_lab`; текущие клубные product/game specs не считать автоматически public approval;
+- `Dementor Battle` — самостоятельный GAME Project; repository: `SLADZARI/Dementor-Battle`; собственный kernel находится на `G1_PRODUCT_LOCK`, protected Product/Domain/Architecture/Design pointers пока не разрешены;
+- `DEMENTOR Robo Games` — самостоятельный GAME Project; repository: `SLADZARI/dementor_robo_games`; G1–G4 пройдены в собственном kernel, текущая работа находится в G5 Build; интеграция в публичный Projects register отдельно не утверждена;
+- `Хит-парад промптов` — Project idea внутри semantic repo; `IDEA / NOT ANNOUNCED / NO DEPLOY`.
+
+Backlog для этой гипотезы:
+
+1. собрать полный cross-repository Project inventory без автоматического включения посторонних продуктов;
+2. для каждого кандидата зафиксировать canonical name, canonical repository/source, semantic status, public status, current Gate и owner;
+3. разделить `project exists` / `project visible in register` / `project publicly accessible` / `project access restricted`;
+4. определить минимальный контракт Project card / Project entry на `/projects/`;
+5. определить, какие access modes реально нужны, только после проверки существующей auth/membership/permission архитектуры;
+6. определить, какие Projects показываются на Home и по какому правилу;
+7. не создавать `dc_projects`, новый universal project backend или parallel auth до появления реальной operational необходимости;
+8. после решения оформить отдельный Result на Projects registry / entry harmonization и только затем менять публичный `/projects/`.
 
 ---
 
@@ -236,6 +273,7 @@ Events и часть merch на первом этапе могут остава�
 - merch;
 - courses;
 - events;
+- projects;
 - dementors;
 - join;
 - donations.
@@ -263,6 +301,14 @@ Events и часть merch на первом этапе могут остава�
 ### D6. Donations
 
 Страница/механика поддержки после сборки основных продуктовых flows. Платёжная интеграция может быть отдельным техническим этапом.
+
+### D7. Projects entry / router — IDEA
+
+После отдельного решения проверить модель:
+
+`Home / Projects index → конкретный Project → project-owned surface/runtime`.
+
+До approval не менять публичный register и не создавать универсальный Project runtime внутри Dementor Club.
 
 ---
 
@@ -327,6 +373,8 @@ Events и часть merch на первом этапе могут остава�
 
 `Merch preorder → Join/e-mail → Course → Events → Dementors → Donations → Auth/Payments`.
 
+Projects registry / entry hypothesis пока ведётся отдельно как IDEA и не вставляется в эту последовательность до отдельного решения о приоритете.
+
 ---
 
 # 4. Владельцы
@@ -370,6 +418,8 @@ Visual / Merch owner:
 - AI-agent на каждом шаге Course;
 - полноценный Google auth как обязательный блокер MVP;
 - масштабирование на много курсов до проверки одного end-to-end;
+- универсальный Project backend только ради единого списка Projects;
+- параллельный auth/membership внутри Projects без отдельного approved boundary;
 - автоматизацию, которая не нужна для проверки текущего flow.
 
 ---
