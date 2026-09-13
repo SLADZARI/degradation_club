@@ -6,6 +6,7 @@ const CLUB_NAME='DEMENTOR CLUB';
 const CLUB_MARK='/assets/brand/dementor-mark-black.svg';
 const host=document.getElementById('artifactHost');
 let busy=false;
+let refreshQueued=false;
 
 function idFromLocation(){
   const query=new URLSearchParams(location.search).get('id');
@@ -17,15 +18,18 @@ function idFromLocation(){
 
 function renderClubIdentity(){
   const author=host?.querySelector('.dc-artifact-author');
-  if(!author)return;
-  author.dataset.publisherScope=CLUB_SCOPE;
+  if(!author||author.dataset.publisherScope===CLUB_SCOPE)return false;
   author.innerHTML=`<img class="dc-artifact-avatar" src="${CLUB_MARK}" alt=""><div><strong>${CLUB_NAME}</strong><span>CLUB / PUBLICATION</span></div>`;
+  author.dataset.publisherScope=CLUB_SCOPE;
+  return true;
 }
 
 async function refresh(){
   if(busy)return;
   const id=idFromLocation();
   if(!id||!/^[0-9a-f-]{36}$/i.test(id)||!host?.querySelector('.dc-artifact-record'))return;
+  const author=host.querySelector('.dc-artifact-author');
+  if(author?.dataset.publisherScope===CLUB_SCOPE)return;
   busy=true;
   try{
     const result=await client.rpc('dc_artifact_publisher_scopes_v1',{p_artifact_ids:[id]});
@@ -37,6 +41,15 @@ async function refresh(){
   }finally{busy=false}
 }
 
-const observer=new MutationObserver(()=>refresh());
+function queueRefresh(){
+  if(refreshQueued)return;
+  refreshQueued=true;
+  requestAnimationFrame(()=>{
+    refreshQueued=false;
+    refresh();
+  });
+}
+
+const observer=new MutationObserver(queueRefresh);
 if(host)observer.observe(host,{childList:true,subtree:true});
-refresh();
+queueRefresh();

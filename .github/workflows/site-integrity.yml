@@ -66,6 +66,8 @@ jobs:
         run: |
           npm install --no-save --no-package-lock playwright@1.55.0 pngjs@7.0.0
           npx playwright install --with-deps chromium webkit
+      - name: Validate sustained Club publisher stability
+        run: node scripts/validate-club-publisher-stability-browser.mjs
       - name: Diagnose Home Fuengirola mobile media owners
         run: node scripts/diagnose-home-fuengirola-media.mjs
       - name: Validate public harmonization browser matrix
