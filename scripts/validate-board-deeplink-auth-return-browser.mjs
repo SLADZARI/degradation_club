@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import http from 'node:http';
-import {chromium} from 'playwright';
+import {chromium,webkit} from 'playwright';
 
 const root=path.join(process.cwd(),'_site');
 const failures=[];const expect=(ok,msg)=>{if(!ok)failures.push(msg)};
@@ -29,6 +29,45 @@ document.querySelector('[data-overlay-close]').addEventListener('click',()=>{con
 const mime={'.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.html':'text/html; charset=utf-8','.webp':'image/webp','.svg':'image/svg+xml'};
 const server=http.createServer((req,res)=>{const u=new URL(req.url,'http://local');if(u.pathname==='/__deeplink_harness__'){res.setHeader('content-type','text/html; charset=utf-8');res.end(harness());return}if(u.pathname==='/community-runtime-v1.js'){res.setHeader('content-type','text/javascript; charset=utf-8');res.end(runtimeStub);return}const requestPath=u.pathname.endsWith('/')?`${u.pathname}index.html`:u.pathname;const file=path.resolve(root,requestPath.replace(/^\/+/,''));if(!file.startsWith(root)||!fs.existsSync(file)||!fs.statSync(file).isFile()){res.statusCode=404;res.end('not found');return}res.setHeader('content-type',mime[path.extname(file)]||'application/octet-stream');res.end(fs.readFileSync(file))});
 await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));const base=`http://127.0.0.1:${server.address().port}`;
+
+async function expectPersistentReceive(page,label){
+  const arrival=page.locator('.dc-board-share-postcard-layer');await arrival.waitFor({state:'visible'});
+  expect(await arrival.getByText('ВАМ ПЕРЕДАЛИ АРТЕФАКТ').count()===1,`${label}: incoming postcard missing`);
+  expect(await arrival.getByRole('button',{name:'ПОСМОТРЕТЬ АРТЕФАКТ →'}).count()===1,`${label}: accept action missing`);
+  expect(await arrival.getByRole('button',{name:'ОСТАТЬСЯ НА ДОСКЕ'}).count()===1,`${label}: stay action missing`);
+  await page.waitForTimeout(760);
+  expect(await page.locator('.dc-artifact-overlay').evaluate(el=>el.hidden),`${label}: Artifact auto-opened before explicit accept`);
+  const url=new URL(page.url());
+  expect(url.searchParams.get('from')==='share',`${label}: from=share was consumed before explicit choice`);
+  expect(url.searchParams.get('focus')===`artifact:${ART}`,`${label}: focus changed before explicit choice`);
+  return arrival;
+}
+
+async function acceptShared(page,label){
+  const arrival=await expectPersistentReceive(page,label);
+  await arrival.getByRole('button',{name:'ПОСМОТРЕТЬ АРТЕФАКТ →'}).click();
+  await page.waitForFunction(()=>globalThis.__DC_FOCUS?.type==='artifact');
+  const url=new URL(page.url());
+  expect(url.searchParams.get('from')===null,`${label}: accept did not consume from=share`);
+  expect(url.searchParams.get('focus')===`artifact:${ART}`,`${label}: accept lost canonical focus`);
+  expect(!(await page.locator('.dc-artifact-overlay').evaluate(el=>el.hidden)),`${label}: accept did not open exact Artifact`);
+  expect(await page.locator('.dc-board-share-postcard-layer:visible').count()===0,`${label}: receive postcard remained after accept`);
+}
+
+async function stayShared(page,label,action='button'){
+  const arrival=await expectPersistentReceive(page,label);
+  if(action==='button')await arrival.getByRole('button',{name:'ОСТАТЬСЯ НА ДОСКЕ'}).click();
+  else if(action==='close')await arrival.getByRole('button',{name:'Закрыть'}).click();
+  else if(action==='escape')await page.keyboard.press('Escape');
+  else if(action==='backdrop')await arrival.click({position:{x:2,y:2}});
+  await page.waitForFunction(()=>{const u=new URL(location.href);return !u.searchParams.has('from')&&!u.searchParams.has('focus')});
+  await page.waitForTimeout(120);
+  const url=new URL(page.url());
+  expect(url.searchParams.get('from')===null&&url.searchParams.get('focus')===null,`${label}: stay/close did not clear both from and focus`);
+  expect(await page.locator('.dc-artifact-overlay').evaluate(el=>el.hidden),`${label}: stay/close opened or retained Artifact`);
+  expect(await page.locator('.dc-board-share-postcard-layer:visible').count()===0,`${label}: postcard stayed visible after decline`);
+}
+
 const browser=await chromium.launch({headless:true});
 try{
   const unauth=await browser.newPage();
@@ -37,6 +76,7 @@ try{
   expect(await receive.getByText('ВАМ ПЕРЕДАЛИ АРТЕФАКТ').count()===1,'unauth share: receive postcard missing');
   expect(await receive.getByText('ВХОД ≠ ЧЛЕНСТВО').count()===1,'unauth share: membership disclaimer missing');
   expect((await receive.locator('.dc-board-share-postcard__brand').innerText()).replace(/\s+/g,' ').trim()==='DEMENTOR CLUB','unauth share: postcard brand missing');
+  expect(await unauth.locator('.dc-artifact-overlay').evaluate(el=>el.hidden),'unauth share: target existence leaked through opened Artifact');
   await receive.getByRole('button',{name:'ВОЙТИ И ПОСМОТРЕТЬ →'}).click();
   const next=await unauth.evaluate(()=>globalThis.__DC_LOGIN_NEXT);
   expect(next===`/__deeplink_harness__?unauth=1&focus=artifact:${ART}&from=share`,`unauth share: exact path/query not preserved: ${next}`);
@@ -72,26 +112,32 @@ try{
   expect(await artifactShare.evaluate(el=>el.ownerDocument.activeElement===el),'sender: close did not restore focus to detail Share trigger');
   await board.close();
 
-  const guest=await browser.newPage();
-  await guest.goto(`${base}/__deeplink_harness__?state=AUTHENTICATED_GUEST_DC9_COMPLETE&focus=artifact:${ART}&from=share`);
-  const arrival=guest.locator('.dc-board-share-postcard-layer');await arrival.waitFor({state:'visible'});
-  expect(await arrival.getByText('ДОСТАВЛЕНО').count()===1,'guest share: delivered state missing');
-  await guest.waitForFunction(()=>globalThis.__DC_FOCUS?.type==='artifact');
-  expect(new URL(guest.url()).searchParams.get('from')===null,'guest share: from=share not consumed via replaceState');
-  expect(new URL(guest.url()).searchParams.get('focus')===`artifact:${ART}`,'guest share: focus lost after arrival');
-  expect(!(await guest.locator('.dc-artifact-overlay').evaluate(el=>el.hidden)),'guest share: exact Artifact not opened');
-  await guest.close();
+  for(const state of ['AUTHENTICATED_GUEST_DC9_INCOMPLETE','AUTHENTICATED_GUEST_DC9_COMPLETE','APPLICANT','MEMBER_NOT_ACTIVATED','MEMBER_ACTIVATED','DEMENTOR','OWNER_ADMIN']){
+    const page=await browser.newPage();
+    await page.goto(`${base}/__deeplink_harness__?state=${state}&focus=artifact:${ART}&from=share`);
+    await acceptShared(page,`role ${state}`);
+    await page.close();
+  }
 
-  const member=await browser.newPage();
-  await member.goto(`${base}/__deeplink_harness__?state=MEMBER_ACTIVATED&focus=artifact:${ART}&from=share`);
-  await member.waitForFunction(()=>globalThis.__DC_FOCUS?.type==='artifact');
-  expect(new URL(member.url()).searchParams.get('from')===null,'member share: from=share not consumed');
-  expect(!(await member.locator('.dc-artifact-overlay').evaluate(el=>el.hidden)),'member share: direct Artifact open missing');
-  expect(await member.locator('.dc-board-share-postcard-layer:visible').count()===0,'member share: blocking postcard must not appear');
-  await member.close();
+  const stay=await browser.newPage();
+  await stay.goto(`${base}/__deeplink_harness__?state=MEMBER_ACTIVATED&focus=artifact:${ART}&from=share`);
+  await stayShared(stay,'member stay action','button');await stay.close();
+
+  const close=await browser.newPage();
+  await close.goto(`${base}/__deeplink_harness__?state=DEMENTOR&focus=artifact:${ART}&from=share`);
+  await stayShared(close,'dementor close action','close');await close.close();
+
+  const escape=await browser.newPage();
+  await escape.goto(`${base}/__deeplink_harness__?state=OWNER_ADMIN&focus=artifact:${ART}&from=share`);
+  await stayShared(escape,'owner Escape action','escape');await escape.close();
+
+  const backdrop=await browser.newPage();
+  await backdrop.goto(`${base}/__deeplink_harness__?state=MEMBER_ACTIVATED&focus=artifact:${ART}&from=share`);
+  await stayShared(backdrop,'member backdrop action','backdrop');await backdrop.close();
 
   const artifact=await browser.newPage();
   await artifact.goto(`${base}/__deeplink_harness__?focus=artifact:${ART}`);await artifact.waitForFunction(()=>globalThis.__DC_FOCUS?.type==='artifact');
+  expect(await artifact.locator('.dc-board-share-postcard-layer:visible').count()===0,'ordinary deeplink: receive postcard must not appear without from=share');
   await artifact.locator('[data-overlay-close]').click();await artifact.waitForFunction(()=>!new URL(location.href).searchParams.has('focus'));
   await artifact.locator('.dc-notice').click({position:{x:10,y:10}});await artifact.waitForFunction(()=>new URL(location.href).searchParams.has('focus'));
   expect(new URL(artifact.url()).searchParams.get('focus')===`artifact:${ART}`,'normal open: focus was not pushed');
@@ -105,13 +151,32 @@ try{
   const invalid=await browser.newPage();await invalid.goto(`${base}/share/artifact/?id=not-a-uuid`);await invalid.waitForTimeout(650);expect(new URL(invalid.url()).pathname==='/share/artifact/','invalid transport id: must not redirect to Board');expect(await invalid.getByText('ССЫЛКА НЕ СОБРАЛАСЬ.').count()===1,'invalid transport id: error state missing');expect(await invalid.getByRole('link',{name:'DEMENTOR CLUB →'}).getAttribute('href')==='/' ,'invalid transport id: safe club fallback missing');await invalid.close();
 
   const mobile=await browser.newPage({viewport:{width:390,height:844}});await mobile.goto(`${base}/__deeplink_harness__`);expect(await mobile.locator('.dc-notice > [data-board-share]').count()===0,'mobile: legacy closed-card Artifact Share survived');await mobile.locator('.dc-notice').click({position:{x:10,y:10}});await mobile.waitForFunction(()=>new URL(location.href).searchParams.get('focus')?.startsWith('artifact:'));const mobileShare=mobile.frameLocator('.dc-artifact-overlay iframe').locator('[data-board-artifact-share]');await mobileShare.waitFor({state:'visible'});await mobileShare.click();const mobileCard=mobile.locator('.dc-board-share-postcard');await mobileCard.waitFor({state:'visible'});const box=await mobileCard.boundingBox();expect(!!box&&box.x>=0&&box.x+box.width<=390.5,'mobile postcard: horizontal overflow');expect(!(await mobile.locator('.dc-artifact-overlay').evaluate(el=>el.hidden)),'mobile share: postcard must preserve open Artifact detail');await mobile.close();
-}finally{await browser.close();await new Promise(resolve=>server.close(resolve))}
+}finally{await browser.close()}
+
+for(const [engine,browserType] of [['chromium',chromium],['webkit',webkit]]){
+  const matrixBrowser=await browserType.launch({headless:true});
+  try{
+    for(const viewport of [{width:1280,height:800},{width:390,height:844}]){
+      const context=await matrixBrowser.newContext({viewport,hasTouch:viewport.width<500,isMobile:viewport.width<500});
+      const accept=await context.newPage();
+      await accept.goto(`${base}/__deeplink_harness__?state=MEMBER_ACTIVATED&focus=artifact:${ART}&from=share`);
+      await acceptShared(accept,`${engine}/${viewport.width} accept`);
+      await accept.close();
+      const stay=await context.newPage();
+      await stay.goto(`${base}/__deeplink_harness__?state=MEMBER_ACTIVATED&focus=artifact:${ART}&from=share`);
+      await stayShared(stay,`${engine}/${viewport.width} stay`,'button');
+      await stay.close();
+      await context.close();
+    }
+  }finally{await matrixBrowser.close()}
+}
+
+await new Promise(resolve=>server.close(resolve));
 if(failures.length){console.error('BOARD DEEPLINK AUTH-RETURN BROWSER BLOCKED');for(const item of failures)console.error(`- ${item}`);process.exit(1)}
 console.log('BOARD DEEPLINK AUTH-RETURN BROWSER PASS');
-console.log('✓ unauth shared entry uses Receive postcard and preserves exact OAuth return');
-console.log('✓ Artifact Share lives inside open detail actions and opens sender postcard without closing detail');
-console.log('✓ sender postcard shows canonical identity + DEMENTOR CLUB brand');
-console.log('✓ Guest gets delivered arrival then exact Artifact; Member opens directly');
-console.log('✓ from=share is consumed without losing focus/history semantics');
-console.log('✓ transport surface redirects valid UUID only and keeps invalid links local');
-console.log('✓ Entity share and 390px mobile remain valid');
+console.log('✓ unauth shared entry uses generic Receive postcard and preserves exact OAuth return');
+console.log('✓ all authenticated Board states stop at persistent incoming postcard; no timer/direct-open remains');
+console.log('✓ explicit accept consumes from=share, retains focus and opens exact Artifact');
+console.log('✓ stay / close / Escape / backdrop consume both from=share and focus and remain on Board');
+console.log('✓ receive accept/stay matrix passes Chromium + WebKit on desktop and 390px mobile');
+console.log('✓ ordinary non-share focus/history, Sender Share, Entity Share and transport behavior remain valid');
