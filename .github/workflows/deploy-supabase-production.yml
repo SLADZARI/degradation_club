@@ -1,0 +1,136 @@
+name: Deploy Dementor Supabase Production
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_confirmation:
+        description: 'Type APPROVED to release the production Supabase backend'
+        required: true
+        type: string
+      deploy_telegram_worker:
+        description: 'Deploy telegram-outbox-worker from the production branch'
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dementor-club-production-supabase
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+      SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
+    steps:
+      - name: Enforce production release gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "${{ github.ref }}" = "refs/heads/dementor-club-production" || {
+            echo "This workflow must be dispatched from dementor-club-production."
+            exit 1
+          }
+          test "${{ inputs.release_confirmation }}" = "APPROVED" || {
+            echo "release_confirmation must equal APPROVED."
+            exit 1
+          }
+
+      - name: Checkout exact production branch
+        uses: actions/checkout@v4
+        with:
+          ref: dementor-club-production
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Prove checked-out production SHA
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch --no-tags --depth=1 origin dementor-club-production
+          ACTUAL_SHA="$(git rev-parse HEAD)"
+          REMOTE_SHA="$(git rev-parse origin/dementor-club-production)"
+          echo "Checked-out production SHA: ${ACTUAL_SHA}"
+          echo "Remote production SHA:      ${REMOTE_SHA}"
+          test "${ACTUAL_SHA}" = "${REMOTE_SHA}" || {
+            echo "Production branch moved during checkout; aborting before backend mutation."
+            exit 1
+          }
+
+      - name: Validate required Supabase secrets
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${SUPABASE_ACCESS_TOKEN}" || { echo "SUPABASE_ACCESS_TOKEN is missing"; exit 1; }
+          test -n "${SUPABASE_DB_PASSWORD}" || { echo "SUPABASE_DB_PASSWORD is missing"; exit 1; }
+          test -n "${SUPABASE_PROJECT_ID}" || { echo "SUPABASE_PROJECT_ID is missing"; exit 1; }
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@3c2f5e2ae34c34e428e8e206e2c4d21fa2d20fbf
+        with:
+          version: latest
+
+      - name: Log Supabase CLI version
+        run: supabase --version
+
+      - name: Link existing production project
+        shell: bash
+        run: |
+          set -euo pipefail
+          supabase link --project-ref "${SUPABASE_PROJECT_ID}"
+
+      - name: Inspect local and remote migration ledger
+        shell: bash
+        run: |
+          set -euo pipefail
+          supabase migration list --linked 2>&1 | tee /tmp/dementor-migration-status.txt
+
+      - name: Hard-stop on drift or out-of-order history
+        id: migration_preflight
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/validate-supabase-release-contract.mjs --migration-status /tmp/dementor-migration-status.txt
+
+      - name: Show exact pending migration dry-run
+        shell: bash
+        run: |
+          set -euo pipefail
+          supabase db push --linked --dry-run
+
+      - name: No pending migrations
+        if: steps.migration_preflight.outputs.pending_count == '0'
+        run: echo "No pending migrations. Migration release is an explicit no-op PASS."
+
+      - name: Apply tracked pending migrations only
+        if: steps.migration_preflight.outputs.pending_count != '0'
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "Applying pending versions: ${{ steps.migration_preflight.outputs.pending_versions }}"
+          supabase db push --linked
+
+      - name: Verify migration ledger after apply
+        shell: bash
+        run: |
+          set -euo pipefail
+          supabase migration list --linked 2>&1 | tee /tmp/dementor-migration-status-after.txt
+          node scripts/validate-supabase-release-contract.mjs --migration-status /tmp/dementor-migration-status-after.txt --require-clean
+
+      - name: Deploy telegram-outbox-worker with current auth contract
+        if: inputs.deploy_telegram_worker == true
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "Deploying telegram-outbox-worker with verify_jwt=false; internal trusted-request validation remains authoritative."
+          supabase functions deploy telegram-outbox-worker --project-ref "${SUPABASE_PROJECT_ID}" --no-verify-jwt
+
+      - name: Telegram worker deployment skipped
+        if: inputs.deploy_telegram_worker != true
+        run: echo "telegram-outbox-worker deploy not requested; existing function remains untouched."
