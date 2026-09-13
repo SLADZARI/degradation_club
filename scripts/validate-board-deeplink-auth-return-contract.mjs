@@ -42,16 +42,23 @@ must(!callback.includes("requestedNext.startsWith('/')"),'legacy raw-string next
 must(g2.includes('no direct privileged lookup by focus ID'),'G2 permission boundary evidence missing');
 
 must(share.includes('og:title')&&share.includes('og:description')&&share.includes('og:image'),'social share surface OG metadata missing');
+must(share.includes('<meta property="og:title" content="Вам передали артефакт — Dementor Club">'),'OG title must stay generic across Artifact UUIDs');
+must(share.includes('<meta property="og:description" content="Открыть внутри DEMENTOR CLUB">'),'OG description must stay generic across Artifact UUIDs');
+must(share.includes('<meta property="og:url" content="https://dementor.club/share/artifact/">'),'OG URL must identify generic transport surface, not UUID');
+must(!/og:(?:title|description|url)[^>]+(?:\$\{|id\b|searchParams)/i.test(share),'OG metadata must not become UUID-specific client metadata');
 must(share.includes('/assets/social/dementor-artifact-share-postcard.webp'),'stable branded share image missing from OG surface');
 must(share.includes('og:image:width" content="1200"')&&share.includes('og:image:height" content="630"'),'OG 1200x630 dimensions missing');
 must(share.includes("target.searchParams.set('focus',`artifact:${id.toLowerCase()}`)")&&share.includes("target.searchParams.set('from','share')"),'share surface does not route human to exact Board Artifact receive state');
-must(!/dc-community-artifacts|signedMediaUrl|createSignedUrl/.test(share),'social surface must not expose private Artifact media');
+must(share.includes("if(!UUID.test(id))")&&share.includes('ССЫЛКА НЕ СОБРАЛАСЬ.')&&!share.includes("setTimeout(()=>location.replace('/workspace/board/')"),'invalid share id must stay on transport surface without random Board redirect');
+must(share.includes('<noscript>')&&share.includes('Для доставки нужен JavaScript.'),'share surface noscript fallback missing');
+must(!/dc-community-artifacts|signedMediaUrl|createSignedUrl|dc_artifacts|currentSession|getEntryStatus/.test(share),'transport surface must not own Artifact data/access/session logic');
 
 if(fail.length){console.error('Board deep-link auth-return contract failed');for(const item of fail)console.error(`✗ ${item}`);process.exit(1)}
 console.log('Board deep-link auth-return contract');
 console.log('✓ canonical focus/history/auth-return preserved');
 console.log('✓ Sender postcard owns native share + explicit copy');
 console.log('✓ from=share is one-time presentation state only');
-console.log('✓ crawler-readable branded social surface exists without private Artifact media');
+console.log('✓ /share/artifact is transport-only with generic static OG + validated UUID redirect');
+console.log('✓ invalid UUID stays on transport surface and noscript fallback exists');
 console.log('✓ existing fullscreen owner and permission boundaries preserved');
 console.log('0 error(s)');
