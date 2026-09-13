@@ -124,15 +124,25 @@ Deno.serve(async (req: Request) => {
           throw new KnownDeliveryFailure("Artifact is no longer distributable");
         }
 
-        const profileResult = await admin
-          .from("profiles")
-          .select("display_name,nickname")
-          .eq("id", artifact.author_profile_id)
+        const publisherResult = await admin
+          .from("dc_artifact_publisher_overrides")
+          .select("publisher_scope")
+          .eq("artifact_id", artifact.id)
           .maybeSingle();
-        if (profileResult.error) throw new KnownDeliveryFailure(`Author read failed: ${profileResult.error.message}`);
+        if (publisherResult.error) throw new KnownDeliveryFailure(`Publisher read failed: ${publisherResult.error.message}`);
 
-        const profile = profileResult.data;
-        const author = String(profile?.display_name || profile?.nickname || "Участник клуба").trim();
+        let author = "DEMENTOR CLUB";
+        if (publisherResult.data?.publisher_scope !== "club") {
+          const profileResult = await admin
+            .from("profiles")
+            .select("display_name,nickname")
+            .eq("id", artifact.author_profile_id)
+            .maybeSingle();
+          if (profileResult.error) throw new KnownDeliveryFailure(`Author read failed: ${profileResult.error.message}`);
+          const profile = profileResult.data;
+          author = String(profile?.display_name || profile?.nickname || "Участник клуба").trim();
+        }
+
         const artifactUrl = `https://dementor.club/community/artifact/${artifact.id}/`;
         const activity = artifact.activity_at ? `Когда: ${new Date(artifact.activity_at).toLocaleString("ru-RU", { timeZone: "Europe/Warsaw" })}` : "";
         const fullText = [
