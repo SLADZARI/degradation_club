@@ -7,5 +7,13 @@
   "scope": "/",
   "display": "minimal-ui",
   "background_color": "#f2f0e8",
-  "theme_color": "#d8ff3e"
+  "theme_color": "#d8ff3e",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
 }
