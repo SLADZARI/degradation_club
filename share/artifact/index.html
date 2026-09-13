@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <meta name="theme-color" content="#f2f0e8">
+  <title>Вам передали артефакт — Dementor Club</title>
+  <link rel="canonical" href="https://dementor.club/share/artifact/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="DEMENTOR CLUB">
+  <meta property="og:title" content="Вам передали артефакт — Dementor Club">
+  <meta property="og:description" content="Открыть внутри DEMENTOR CLUB">
+  <meta property="og:url" content="https://dementor.club/share/artifact/">
+  <meta property="og:image" content="https://dementor.club/assets/social/dementor-artifact-share-postcard.webp">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/webp">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Вам передали артефакт — Dementor Club">
+  <meta name="twitter:description" content="Открыть внутри DEMENTOR CLUB">
+  <meta name="twitter:image" content="https://dementor.club/assets/social/dementor-artifact-share-postcard.webp">
+  <style>
+    :root{color-scheme:light;--paper:#f2f0e8;--ink:#111;--acid:#d8ff3e;--red:#a13b30;--line:#c9c3b8}*{box-sizing:border-box}body{margin:0;min-height:100svh;display:grid;place-items:center;padding:24px;background:var(--ink);color:var(--ink);font-family:Arial,Helvetica,sans-serif}.card{position:relative;width:min(720px,100%);min-height:410px;padding:44px 46px 38px;border:1px solid var(--ink);background:var(--paper);overflow:hidden}.card:before{content:"";position:absolute;left:72%;top:30px;bottom:30px;width:1px;background:var(--line)}.meta{font:800 10px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.14em;color:#6f6b63;text-transform:uppercase}.title{max-width:8ch;margin:36px 0 18px;font-size:clamp(46px,8vw,76px);line-height:.82;letter-spacing:-.065em;text-transform:uppercase}.copy{max-width:30ch;margin:0;font-size:17px;line-height:1.4}.signal{display:inline-flex;align-items:center;min-height:52px;margin-top:30px;padding:0 18px;border:1px solid var(--ink);background:var(--acid);font:900 11px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.08em;text-transform:uppercase}.stamp{position:absolute;right:64px;top:62px;width:126px;aspect-ratio:1;border:4px double var(--red);border-radius:50%;display:grid;place-items:center;padding:16px;color:var(--red);font:900 11px/1.05 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.08em;text-align:center;text-transform:uppercase;transform:rotate(7deg)}.stamp:before{content:"DEMENTOR CLUB";position:absolute;inset:9px;border:1px dashed currentColor;border-radius:50%;display:grid;place-items:start center;padding-top:13px;font-size:7px}.status{margin-top:18px;font:800 9px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.12em;color:#6f6b63;text-transform:uppercase}@media(max-width:600px){body{padding:12px}.card{min-height:430px;padding:34px 20px 28px}.card:before{left:70%}.stamp{width:92px;right:32px;top:72px;border-width:3px;font-size:9px}.title{max-width:7ch;font-size:clamp(42px,13vw,58px)}.copy{max-width:67%;font-size:15px}}
+  </style>
+</head>
+<body>
+  <main class="card" aria-live="polite">
+    <div class="stamp">ПЕРЕДАНО</div>
+    <div class="meta">INCOMING / ARTIFACT</div>
+    <h1 class="title">ВАМ ПЕРЕДАЛИ АРТЕФАКТ</h1>
+    <p class="copy">Открываем внутри DEMENTOR CLUB.</p>
+    <div class="signal">ДОСТАВКА →</div>
+    <div class="status" id="status">ПРОВЕРЯЕМ АДРЕС…</div>
+  </main>
+<script>
+(()=>{
+  const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  const id=new URL(location.href).searchParams.get('id')||'';
+  const status=document.getElementById('status');
+  if(!UUID.test(id)){status.textContent='АДРЕС НЕ НАЙДЕН · ОТКРЫВАЕМ BOARD';setTimeout(()=>location.replace('/workspace/board/'),500);return}
+  const target=new URL('/workspace/board/',location.origin);
+  target.searchParams.set('focus',`artifact:${id.toLowerCase()}`);
+  target.searchParams.set('from','share');
+  status.textContent='ДОСТАВЛЕНО · ОТКРЫВАЕМ';
+  location.replace(target.href);
+})();
+</script>
+</body>
+</html>
