@@ -25,6 +25,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
+      CANONICAL_SUPABASE_PROJECT_REF: mmekfydwbvptbdatwitj
       SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
       SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
       SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
@@ -33,8 +34,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          test "${{ github.ref }}" = "refs/heads/dementor-club-production" || {
-            echo "This workflow must be dispatched from dementor-club-production."
+          test "${{ github.event_name }}" = "workflow_dispatch" || {
+            echo "Production backend release is manual-only."
             exit 1
           }
           test "${{ inputs.release_confirmation }}" = "APPROVED" || {
@@ -63,18 +64,23 @@ jobs:
             exit 1
           }
 
-      - name: Validate required Supabase secrets
+      - name: Validate required Supabase secrets and production project
         shell: bash
         run: |
           set -euo pipefail
           test -n "${SUPABASE_ACCESS_TOKEN}" || { echo "SUPABASE_ACCESS_TOKEN is missing"; exit 1; }
           test -n "${SUPABASE_DB_PASSWORD}" || { echo "SUPABASE_DB_PASSWORD is missing"; exit 1; }
           test -n "${SUPABASE_PROJECT_ID}" || { echo "SUPABASE_PROJECT_ID is missing"; exit 1; }
+          test "${SUPABASE_PROJECT_ID}" = "${CANONICAL_SUPABASE_PROJECT_REF}" || {
+            echo "Configured project ref is not the canonical Dementor production project; aborting before link."
+            exit 1
+          }
+          echo "Canonical production project ref verified: ${CANONICAL_SUPABASE_PROJECT_REF}"
 
-      - name: Setup Supabase CLI
+      - name: Setup pinned Supabase CLI
         uses: supabase/setup-cli@3c2f5e2ae34c34e428e8e206e2c4d21fa2d20fbf
         with:
-          version: latest
+          version: 2.117.0
 
       - name: Log Supabase CLI version
         run: supabase --version
@@ -83,7 +89,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          supabase link --project-ref "${SUPABASE_PROJECT_ID}"
+          supabase link --project-ref "${CANONICAL_SUPABASE_PROJECT_REF}"
 
       - name: Inspect local and remote migration ledger
         shell: bash
@@ -129,7 +135,7 @@ jobs:
         run: |
           set -euo pipefail
           echo "Deploying telegram-outbox-worker with verify_jwt=false; internal trusted-request validation remains authoritative."
-          supabase functions deploy telegram-outbox-worker --project-ref "${SUPABASE_PROJECT_ID}" --no-verify-jwt
+          supabase functions deploy telegram-outbox-worker --project-ref "${CANONICAL_SUPABASE_PROJECT_REF}" --no-verify-jwt
 
       - name: Telegram worker deployment skipped
         if: inputs.deploy_telegram_worker != true
