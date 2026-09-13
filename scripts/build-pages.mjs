@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import {normalizeCanonicalSocialHead,validateCanonicalSocialArtifact} from './social-head-v1.mjs';
 
 const root = process.cwd();
 const out = path.join(root, '_site');
@@ -134,8 +135,6 @@ function normalizeShellMarkup(html, rel) {
   if (!html.includes('/site-config.js')) html = html.replace('</head>', '<script src="/site-config.js" defer></script>\n</head>');
 
   if (isWorkspace) {
-    // Authenticated Workspace owns its primary shell. Do not emit the public
-    // GlobalHeader or its offset compatibility layer into private Workspace pages.
     html = html.replace(/<link[^>]+href=["']\/global-header\.css["'][^>]*>\s*/gi, '');
     html = html.replace(/<script[^>]+src=["']\/global-header\.js["'][^>]*><\/script>\s*/gi, '');
     html = html.replace(/<link[^>]+href=["']\/workspace\/workspace-public-header-v1\.css["'][^>]*>\s*/gi, '');
@@ -158,6 +157,7 @@ function injectProductionModules() {
     const rel = path.relative(out, full).replaceAll('\\','/');
     let html = fs.readFileSync(full, 'utf8');
     html = normalizeShellMarkup(html, rel);
+    html = normalizeCanonicalSocialHead(html, rel);
     const isPrivateTool = rel.startsWith('workspace/admin/');
     if (!isPrivateTool) {
       if (!html.includes('/entity-recommendations-v1.css')) html = html.replace('</head>', '<link rel="stylesheet" href="/entity-recommendations-v1.css">\n</head>');
@@ -197,6 +197,7 @@ injectProductionModules();
 hardenProductionRuntime();
 fs.writeFileSync(path.join(out, '.nojekyll'), '');
 fs.writeFileSync(path.join(out, 'CNAME'), 'dementor.club\n');
+validateCanonicalSocialArtifact(out);
 
 console.log(`GitHub Pages production candidate ready for ${productionOrigin} at ${out}`);
 console.log(`Approved runtime dependencies shipped: ${productionDependencies.length}`);
