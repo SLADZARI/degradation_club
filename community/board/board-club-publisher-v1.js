@@ -9,6 +9,8 @@ const entryHost=document.getElementById('entryHost');
 const boardHost=document.getElementById('boardHost');
 let choiceBusy=false;
 let boardRefreshQueued=false;
+let boardRefreshRunning=false;
+let boardRefreshRerun=false;
 const scopeCache=new Map();
 
 function isOwnerAdmin(){return String(document.documentElement.dataset.dcBoardUserState||'')==='OWNER_ADMIN'}
@@ -89,30 +91,42 @@ async function bindComposer(){
 }
 
 function clubifyAuthor(card){
+  if(card.dataset.publisherScope===CLUB_SCOPE)return false;
   const author=card.querySelector('.dc-notice__author');
-  if(!author)return;
+  if(!author)return false;
   author.innerHTML=`<img class="dc-notice__avatar dc-notice__avatar--club" src="${CLUB_MARK}" alt=""><div><strong>${CLUB_NAME}</strong><div>CLUB / PUBLICATION</div></div>`;
   card.dataset.publisherScope=CLUB_SCOPE;
+  return true;
 }
 
 async function refreshBoardPublishers(){
   if(!boardHost)return;
-  const cards=[...boardHost.querySelectorAll('[data-artifact]')];
-  const ids=[...new Set(cards.map(card=>card.dataset.artifact).filter(id=>/^[0-9a-f-]{36}$/i.test(id)))];
-  const unknown=ids.filter(id=>!scopeCache.has(id));
-  if(unknown.length){
-    const result=await client.rpc('dc_artifact_publisher_scopes_v1',{p_artifact_ids:unknown});
-    if(result.error){console.warn('[DC Board] publisher projection unavailable',result.error);return}
-    unknown.forEach(id=>scopeCache.set(id,PROFILE_SCOPE));
-    for(const row of result.data||[])scopeCache.set(row.artifact_id,row.publisher_scope===CLUB_SCOPE?CLUB_SCOPE:PROFILE_SCOPE);
+  if(boardRefreshRunning){boardRefreshRerun=true;return}
+  boardRefreshRunning=true;
+  try{
+    const cards=[...boardHost.querySelectorAll('[data-artifact]')];
+    const ids=[...new Set(cards.map(card=>card.dataset.artifact).filter(id=>/^[0-9a-f-]{36}$/i.test(id)))];
+    const unknown=ids.filter(id=>!scopeCache.has(id));
+    if(unknown.length){
+      const result=await client.rpc('dc_artifact_publisher_scopes_v1',{p_artifact_ids:unknown});
+      if(result.error){console.warn('[DC Board] publisher projection unavailable',result.error);return}
+      unknown.forEach(id=>scopeCache.set(id,PROFILE_SCOPE));
+      for(const row of result.data||[])scopeCache.set(row.artifact_id,row.publisher_scope===CLUB_SCOPE?CLUB_SCOPE:PROFILE_SCOPE);
+    }
+    for(const card of cards){if(scopeCache.get(card.dataset.artifact)===CLUB_SCOPE)clubifyAuthor(card)}
+  }finally{
+    boardRefreshRunning=false;
+    if(boardRefreshRerun){boardRefreshRerun=false;queueBoardRefresh()}
   }
-  for(const card of cards){if(scopeCache.get(card.dataset.artifact)===CLUB_SCOPE)clubifyAuthor(card)}
 }
 
 function queueBoardRefresh(){
   if(boardRefreshQueued)return;
   boardRefreshQueued=true;
-  queueMicrotask(()=>{boardRefreshQueued=false;refreshBoardPublishers().catch(error=>console.warn('[DC Board] publisher render failed',error))});
+  requestAnimationFrame(()=>{
+    boardRefreshQueued=false;
+    refreshBoardPublishers().catch(error=>console.warn('[DC Board] publisher render failed',error));
+  });
 }
 
 const observer=new MutationObserver(()=>{bindComposer();queueBoardRefresh()});
