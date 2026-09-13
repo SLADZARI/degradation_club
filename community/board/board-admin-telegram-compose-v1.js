@@ -20,10 +20,10 @@ function installCheckbox(){
 
 function showTelegramWarning(message){
   lastTelegramError=String(message||'TELEGRAM_PROMOTION_FAILED');
-  const host=document.getElementById('entryHost')||document.body;
   let notice=document.getElementById('dcAdminTelegramWarning');
-  if(!notice){notice=document.createElement('div');notice.id='dcAdminTelegramWarning';notice.className='dc-admin-telegram-warning';host.prepend(notice)}
-  notice.innerHTML=`<strong>BOARD ОПУБЛИКОВАН · TELEGRAM НЕ ПОСТАВЛЕН В ОЧЕРЕДЬ</strong><span>${esc(lastTelegramError)}</span>`;
+  if(!notice){notice=document.createElement('div');notice.id='dcAdminTelegramWarning';notice.className='dc-admin-telegram-warning';document.body.appendChild(notice)}
+  notice.innerHTML=`<strong>BOARD ОПУБЛИКОВАН · TELEGRAM НЕ ПОСТАВЛЕН В ОЧЕРЕДЬ</strong><span>${esc(lastTelegramError)}</span><button type="button" aria-label="Закрыть">×</button>`;
+  notice.querySelector('button')?.addEventListener('click',()=>notice.remove(),{once:true});
 }
 
 function wantsTelegram(){return Boolean(document.querySelector('#artifactForm [name="admin_send_telegram"]:checked'))}
