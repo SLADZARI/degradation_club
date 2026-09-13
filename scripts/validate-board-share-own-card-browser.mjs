@@ -13,7 +13,7 @@ const profile={profile_id:USER,display_name:'Member',full_name:'Member',nickname
 const runtimeStub=`
 export const DC_ARTIFACT_BUCKET='dc-artifacts';
 export const route=p=>p;
-export const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+export const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot',"'":'&#39;'}[c]));
 export const formatDate=v=>v?new Date(v).toLocaleDateString('ru-RU'):'';
 export const errorMessage=e=>String(e?.message||e||'ERROR');
 export const safeFileName=v=>String(v||'file').replace(/[^a-z0-9._-]+/gi,'-');
@@ -27,7 +27,19 @@ const client={auth:{getSession:async()=>({data:{session}})},from:table=>query(ta
 export const getClient=()=>client;export async function currentSession(){return session}export async function getEntryStatus(){return {membership_active:true,artifact_slots_available:0,artifact_slots_consuming:1,published_artifact_count:1,sphere_gate_complete:true,sphere_count:9,community_activation_state:'MEMBER_ACTIVATED'}}
 `;
 const mime={'.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.html':'text/html; charset=utf-8','.svg':'image/svg+xml','.webp':'image/webp','.png':'image/png','.jpg':'image/jpeg','.jpeg':'image/jpeg'};
-const server=http.createServer((req,res)=>{const u=new URL(req.url,'http://local');if(u.pathname==='/community-runtime-v1.js'){res.setHeader('content-type','text/javascript; charset=utf-8');res.end(runtimeStub);return}const requestPath=u.pathname==='/'?'/workspace/board/index.html':u.pathname.endsWith('/')?`${u.pathname}index.html`:u.pathname;const file=path.resolve(root,requestPath.replace(/^[/]+/,''));if(!file.startsWith(root)||!fs.existsSync(file)||!fs.statSync(file).isFile()){res.statusCode=404;res.end('not found');return}res.setHeader('content-type',mime[path.extname(file)]||'application/octet-stream');res.end(fs.readFileSync(file))});
+const server=http.createServer((req,res)=>{
+  const u=new URL(req.url,'http://local');
+  if(u.pathname==='/community-runtime-v1.js'){res.setHeader('content-type','text/javascript; charset=utf-8');res.end(runtimeStub);return}
+  const requestPath=u.pathname==='/'?'/workspace/board/index.html':u.pathname.endsWith('/')?`${u.pathname}index.html`:u.pathname;
+  const file=path.resolve(root,requestPath.replace(/^[/]+/,''));
+  if(!file.startsWith(root)||!fs.existsSync(file)||!fs.statSync(file).isFile()){
+    const notFound=path.join(root,'404.html');
+    res.statusCode=404;
+    if(fs.existsSync(notFound)){res.setHeader('content-type','text/html; charset=utf-8');res.end(fs.readFileSync(notFound));return}
+    res.end('not found');return;
+  }
+  res.setHeader('content-type',mime[path.extname(file)]||'application/octet-stream');res.end(fs.readFileSync(file));
+});
 await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));const base=`http://127.0.0.1:${server.address().port}`;
 
 for(const [engine,browserType] of [['chromium',chromium],['webkit',webkit]]){
@@ -40,12 +52,7 @@ for(const [engine,browserType] of [['chromium',chromium],['webkit',webkit]]){
         Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:async value=>{globalThis.__DC_COPIED=value}}});document.execCommand=()=>true;
         for(const type of ['pointerdown','pointerup','click'])document.addEventListener(type,event=>{globalThis.__TRACE.push({type,target:event.target?.tagName||'',className:String(event.target?.className||''),share:!!event.target?.closest?.('[data-board-share],[data-board-artifact-share]'),x:event.clientX,y:event.clientY})},true);
         const shellSession={user:{id:'guest-1',email:'member@example.test',user_metadata:{full_name:'Member',picture:'/assets/brand/dementor-mark-black.svg'}}};
-        const shellRows={
-          profiles:[{full_name:'Member',avatar_url:'/assets/brand/dementor-mark-black.svg'}],
-          dc_role_assignments:[],
-          dc_entity_assignments:[],
-          dc_system_memberships:[{status:'active',valid_from:'2026-01-01T00:00:00.000Z',valid_to:null}]
-        };
+        const shellRows={profiles:[{full_name:'Member',avatar_url:'/assets/brand/dementor-mark-black.svg'}],dc_role_assignments:[],dc_entity_assignments:[],dc_system_memberships:[{status:'active',valid_from:'2026-01-01T00:00:00.000Z',valid_to:null}]};
         const shellQuery=table=>{const rows=shellRows[table]||[];const api={select(){return api},eq(){return api},maybeSingle:async()=>({data:rows[0]||null,error:null}),then(resolve,reject){return Promise.resolve({data:rows,error:null}).then(resolve,reject)}};return api};
         globalThis.DEMENTOR_SUPABASE_CLIENT={auth:{getSession:async()=>({data:{session:shellSession}}),signOut:async()=>({error:null})},from:table=>shellQuery(table)};
       });
@@ -78,6 +85,7 @@ if(failures.length){console.error('BOARD FULL-STACK SHARE BLOCKED');for(const it
 console.log('BOARD FULL-STACK SHARE PASS');
 console.log('✓ real production Board HTML and runtime owner list loaded');
 console.log('✓ canonical Workspace identity is supplied through the shell owner, not a parallel profile query');
+console.log('✓ GitHub Pages 404 bridge resolves canonical /community/artifact/<uuid>/ into the Artifact detail surface');
 console.log('✓ closed Artifact card has no Share trigger; open Artifact action row owns Share');
 console.log('✓ sender postcard preserves open detail and shows canonical sender identity + brand');
 console.log('✓ explicit postcard copy emits clean dedicated Artifact share URL across Chromium/WebKit desktop/mobile');
