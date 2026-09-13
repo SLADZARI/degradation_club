@@ -38,6 +38,121 @@
 - существование repository, прототипа или документа не означает автоматический public/active status;
 - при подключении внешнего project repository сначала читать его `PROJECT / ARTIFACT_INDEX / APPROVED_STATE` и authority pointers, а не выводить статус по имени, дате или степени готовности кода.
 
+#### Форма проекта не является отдельной сущностью
+
+`Project` описывает самостоятельность мира/инициативы, а не формат интерфейса.
+
+Один Project может быть преимущественно:
+
+- информационным / редакционным;
+- игрой / интерактивным runtime;
+- видео / медиапроектом;
+- рейтингом / хит-парадом;
+- экспериментом / live experience;
+- отдельным приложением;
+- смешанным форматом.
+
+Эти формы не должны создавать параллельные типы `InfoProject`, `GameProject`, `VideoProject` и т.п. внутри Dementor Club. Формат может быть presentation/entry metadata проекта, но canonical entity остаётся `PROJECT`.
+
+#### Гармонизация с Community Board — рабочая гипотеза
+
+Эта гипотеза должна развиваться **поверх уже APPROVED `BOARD_INFORMATION_ARCHITECTURE_V1`**, а не заменять её.
+
+Board уже определён как persistent spatial map of club life и умеет показывать Project только как **projection canonical source object**. Board не становится вторым владельцем Project semantics, lifecycle или content.
+
+Предлагаемая связь:
+
+```text
+BOARD
+  = место, где видна жизнь клуба, идеи, публикации, связи и происхождение
+
+PROJECTS INDEX
+  = устойчивый реестр / вход в самостоятельные Project-миры
+
+PROJECT-OWNED SURFACE
+  = подробный контент / игра / видео / рейтинг / runtime конкретного Project
+```
+
+Кандидатный путь зарождения проекта:
+
+```text
+Board Artifact: IDEA / POST / ANNOUNCEMENT
+    ↓ отдельное решение о promotion / создании Project
+CANONICAL PROJECT
+    ↓ projection
+Board Project Card
+    ↓ open
+/projects/ entry или прямой Project entry
+    ↓
+project-owned surface/runtime
+```
+
+Если Project вырос из конкретной Board-публикации, его происхождение не теряется. Для связи использовать существующий approved relation graph, прежде всего:
+
+- `RESULT_OF` — ПОЯВИЛОСЬ ИЗ / РЕЗУЛЬТАТ;
+- `CONTINUES` — ПРОДОЛЖЕНИЕ / ОБНОВЛЕНИЕ;
+- при необходимости `RELATED_TO` — СВЯЗАНО С.
+
+То есть вместо копирования исходной идеи в новую сущность сохраняется lineage:
+
+```text
+Artifact / discussion / experiment
+    └── RESULT_OF → Project
+```
+
+Не каждая `idea` на Board становится Project. Promotion в Project — отдельное осознанное решение, которое создаёт/фиксирует canonical Project owner.
+
+Project может появиться и не из Board, если у него уже есть утверждённый внешний semantic source/repository. В этом случае Board получает projection после явной интеграции; происхождение не выдумывается.
+
+#### Один Project — несколько проекций, один смысл
+
+Нужно различать поверхности, но не создавать дубли сущности:
+
+```text
+CANONICAL PROJECT
+├── Board projection — жизнь / связи / происхождение / текущая активность
+├── /projects/ projection — каталог / вход / discovery
+├── Home projection — выбранный редакционный entry point
+└── Project-owned surface — собственный мир и подробная механика
+```
+
+Название, canonical identity и смысл Project должны приходить из одного authority owner. Board card, Projects card и Home block не создают свои независимые версии Project.
+
+#### Status и access не смешивать
+
+Для дальнейшей модели отдельно проработать минимум три независимых измерения:
+
+```text
+PROJECT MATURITY
+  idea / prototype / build / released / ...
+
+PUBLIC VISIBILITY
+  hidden / listed / featured / ...
+
+ACCESS MODE
+  public / authenticated / member / project-scoped / ...
+```
+
+Точные значения здесь **не утверждены**. Смысл фиксации — не сворачивать development Gate, публичность и право доступа в одно поле `status`.
+
+Board relation, наличие Project card или попадание на Home сами по себе не дают человеку право доступа внутрь Project.
+
+#### Минимальный общий entry contract
+
+Поскольку Project может быть чем угодно по формату, общий клубный контракт должен быть минимальным. Кандидатные поля для дальнейшего решения:
+
+- canonical Project identity / name;
+- короткое объяснение, что это;
+- cover / media preview при наличии;
+- presentation format (`information / game / video / chart / app / mixed`) только как UI metadata;
+- public visibility state;
+- access state / понятный CTA;
+- canonical entry target;
+- relation/origin indicator при необходимости;
+- source/authority pointer только во внутреннем слое, не как публичный implementation-текст.
+
+Projects index не должен пытаться нормализовать внутреннюю структуру игр, видео, статей или приложений в один универсальный шаблон.
+
 Текущий обнаруженный inventory для дальнейшей проработки реестра:
 
 - `Логика и осознанность` — существующий публичный Project в Dementor Club;
@@ -53,10 +168,13 @@ Backlog для этой гипотезы:
 2. для каждого кандидата зафиксировать canonical name, canonical repository/source, semantic status, public status, current Gate и owner;
 3. разделить `project exists` / `project visible in register` / `project publicly accessible` / `project access restricted`;
 4. определить минимальный контракт Project card / Project entry на `/projects/`;
-5. определить, какие access modes реально нужны, только после проверки существующей auth/membership/permission архитектуры;
-6. определить, какие Projects показываются на Home и по какому правилу;
-7. не создавать `dc_projects`, новый universal project backend или parallel auth до появления реальной operational необходимости;
-8. после решения оформить отдельный Result на Projects registry / entry harmonization и только затем менять публичный `/projects/`.
+5. определить Board → Project promotion rule без создания второго lifecycle;
+6. определить lineage: какая исходная Board-сущность породила Project и какая approved relation это выражает;
+7. определить, какие access modes реально нужны, только после проверки существующей auth/membership/permission архитектуры;
+8. определить, какие Projects показываются на Home и по какому правилу;
+9. проверить, как Board показывает Project projection при разных public/access состояниях, не превращая Board visibility в permission;
+10. не создавать `dc_projects`, новый universal project backend или parallel auth до появления реальной operational необходимости;
+11. после решения оформить отдельный Result на Projects registry / entry harmonization и только затем менять публичный `/projects/`.
 
 ---
 
@@ -306,9 +424,19 @@ Events и часть merch на первом этапе могут остава�
 
 После отдельного решения проверить модель:
 
-`Home / Projects index → конкретный Project → project-owned surface/runtime`.
+```text
+Board origin / Project projection
+        ↓
+Home / Projects index
+        ↓
+конкретный Project entry
+        ↓
+project-owned surface/runtime
+```
 
-До approval не менять публичный register и не создавать универсальный Project runtime внутри Dementor Club.
+`/projects/`, Home и Board должны быть разными проекциями одного canonical Project, а не независимыми карточечными реестрами с собственными статусами.
+
+До approval не менять публичный register, не создавать универсальный Project runtime внутри Dementor Club и не менять APPROVED Board IA.
 
 ---
 
@@ -420,6 +548,7 @@ Visual / Merch owner:
 - масштабирование на много курсов до проверки одного end-to-end;
 - универсальный Project backend только ради единого списка Projects;
 - параллельный auth/membership внутри Projects без отдельного approved boundary;
+- отдельный Board-project lifecycle, дублирующий canonical Project status/owner;
 - автоматизацию, которая не нужна для проверки текущего flow.
 
 ---
