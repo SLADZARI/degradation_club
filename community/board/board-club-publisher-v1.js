@@ -1,4 +1,4 @@
-import {getClient,esc} from '/community-runtime-v1.js';
+import {getClient} from '/community-runtime-v1.js';
 
 const client=getClient();
 const CLUB_SCOPE='club';
@@ -33,15 +33,20 @@ async function readOwnerScope(){
 }
 
 async function setOwnerScope(scope,root){
-  if(choiceBusy)return;
+  if(choiceBusy)return false;
   choiceBusy=true;
+  const form=root?.closest('form');
+  const submit=form?.querySelector('button[type="submit"]');
   const state=root?.querySelector('[data-club-publisher-state]');
   const inputs=[...(root?.querySelectorAll('input[name="dc_publisher_scope"]')||[])];
   inputs.forEach(input=>input.disabled=true);
+  if(submit)submit.disabled=true;
   if(state){state.hidden=false;state.textContent='СОХРАНЯЕМ…'}
+  let saved=false;
   try{
     const result=await client.rpc('dc_owner_board_publisher_choice_v1',{p_scope:scope});
     if(result.error)throw result.error;
+    saved=true;
     if(state){state.textContent=scope===CLUB_SCOPE?'ПУБЛИКАЦИЯ ОТ DEMENTOR CLUB':'ПУБЛИКАЦИЯ ОТ ВАШЕГО ПРОФИЛЯ'}
   }catch(error){
     console.warn('[DC Board] publisher choice failed',error);
@@ -51,8 +56,10 @@ async function setOwnerScope(scope,root){
     if(fallback)fallback.checked=true;
   }finally{
     inputs.forEach(input=>input.disabled=false);
+    if(submit)submit.disabled=false;
     choiceBusy=false;
   }
+  return saved;
 }
 
 async function bindComposer(){
@@ -72,6 +79,13 @@ async function bindComposer(){
     if(!input)return;
     setOwnerScope(input.value===CLUB_SCOPE?CLUB_SCOPE:PROFILE_SCOPE,root);
   });
+  form.addEventListener('submit',event=>{
+    if(!choiceBusy)return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    const state=root?.querySelector('[data-club-publisher-state]');
+    if(state){state.hidden=false;state.textContent='ДОЖДИТЕСЬ СОХРАНЕНИЯ ИЗДАТЕЛЯ'}
+  },true);
 }
 
 function clubifyAuthor(card){
@@ -104,6 +118,10 @@ function queueBoardRefresh(){
 const observer=new MutationObserver(()=>{bindComposer();queueBoardRefresh()});
 if(entryHost)observer.observe(entryHost,{childList:true,subtree:true});
 if(boardHost)observer.observe(boardHost,{childList:true,subtree:true});
+entryHost?.addEventListener('click',event=>{
+  if(!isOwnerAdmin()||!event.target.closest?.('#cancelComposer'))return;
+  client.rpc('dc_owner_board_publisher_choice_v1',{p_scope:PROFILE_SCOPE}).catch(()=>{});
+},true);
 window.addEventListener('dc:board-spatial-ready',queueBoardRefresh);
 window.addEventListener('dc:board-guest-read-ready',queueBoardRefresh);
 bindComposer();
