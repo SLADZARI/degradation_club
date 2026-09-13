@@ -7,9 +7,9 @@ const read=p=>fs.readFileSync(p,'utf8');
 // Semantic authority lives on the canonical dementor-club branch. This integration
 // contract validates implementation against that approved Decision without copying
 // a second authority document into the release candidate branch.
-const migration=read('supabase/migrations/20260912153000_board_telegram_promotion_v1.sql');
-const hardening=read('supabase/migrations/20260912153500_board_telegram_promotion_v1_worker_hardening.sql');
-const scheduler=read('supabase/migrations/20260912170000_board_telegram_worker_scheduler_v1.sql');
+const migration=read('supabase/migrations/20260912144034_board_telegram_promotion_v1.sql');
+const hardening=read('supabase/migrations/20260912144055_board_telegram_promotion_v1_worker_hardening.sql');
+const scheduler=read('supabase/migrations/20260912173340_board_telegram_worker_scheduler_v1.sql');
 const board=read('community/board/board.js');
 const entry=read('community/board/board-entry-v2.js');
 const detail=read('community/artifact/artifact.js');
