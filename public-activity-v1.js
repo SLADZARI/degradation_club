@@ -3,6 +3,10 @@ import {getClient,esc,route} from '/community-runtime-v1.js';
 const HOME_LIMIT=10;
 const COMMUNITY_LIMIT=24;
 
+const waitForDom=async()=>{
+  if(document.readyState!=='loading')return;
+  await new Promise(resolve=>document.addEventListener('DOMContentLoaded',resolve,{once:true}));
+};
 const waitForConfig=async()=>{
   if(window.DEMENTOR_SITE_CONFIG?.supabase)return;
   await new Promise(resolve=>{
@@ -53,6 +57,7 @@ function renderCommunityError(error){
 }
 
 async function boot(){
+  await waitForDom();
   const path=location.pathname.replace(/^\/degradation_club(?=\/|$)/,'')||'/';
   const home=path==='/'||path==='/index.html';const community=/^\/community\/?(?:index\.html)?$/.test(path);
   if(!home&&!community)return;
