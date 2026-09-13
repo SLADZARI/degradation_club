@@ -9,7 +9,7 @@
 .dc-board-share:hover,.dc-board-share:focus-visible,.dc-board-share[data-copy-state="done"]{border-color:#111;background:#d8ff3e}
 .dc-board-share:focus-visible{outline:2px solid #111;outline-offset:2px}
 .dc-board-focus-step{outline:3px solid #d8ff3e!important;outline-offset:5px!important}
-.dc-board-share-postcard-layer{position:fixed;inset:0;z-index:285;display:grid;place-items:center;padding:24px;background:rgba(17,17,17,.76);backdrop-filter:blur(2px);color:#111;box-sizing:border-box;overflow:auto}
+.dc-board-share-postcard-layer{position:fixed;inset:0;z-index:320;display:grid;place-items:center;padding:24px;background:rgba(17,17,17,.76);backdrop-filter:blur(2px);color:#111;box-sizing:border-box;overflow:auto}
 .dc-board-share-postcard-layer[hidden]{display:none!important}
 .dc-board-share-postcard,.dc-board-share-postcard *{box-sizing:border-box}
 .dc-board-share-postcard{--dc-postcard-paper:#f2f0e8;--dc-postcard-ink:#111;--dc-postcard-acid:#d8ff3e;--dc-postcard-red:#a13b30;--dc-postcard-line:#c9c3b8;position:relative;width:min(720px,calc(100vw - 48px));min-height:430px;margin:auto;padding:42px 46px 36px;border:1px solid var(--dc-postcard-ink);border-radius:0;background:linear-gradient(to bottom,rgba(255,255,255,.22),rgba(255,255,255,0) 110px),var(--dc-postcard-paper);box-shadow:0 24px 60px rgba(0,0,0,.22);font-family:Arial,Helvetica,sans-serif;overflow:hidden;outline:none}
