@@ -19,7 +19,7 @@ must(deep.includes("window.addEventListener('popstate'"),'popstate handling miss
 must(deep.includes("navigator.clipboard.writeText"),'Clipboard API share path missing');
 must(deep.includes("document.execCommand('copy')"),'Clipboard fallback missing');
 must(deep.includes("typeof navigator.share!=='function'"),'native Web Share path/fallback missing');
-must(deep.includes("url.pathname=route('/share/artifact/')"),'Artifact Share must use dedicated social surface');
+must(deep.includes("new URL(route('/share/artifact/'),origin)"),'Artifact Share must use dedicated social surface');
 must(deep.includes("url.searchParams.set('id'"),'Artifact Share surface UUID missing');
 must(deep.includes("url.searchParams.delete('from')")&&deep.includes('history.replaceState'),'one-time from=share cleanup missing');
 must(deep.includes('ПЕРЕДАТЬ АРТЕФАКТ'),'Sender postcard copy missing');
