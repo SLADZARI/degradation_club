@@ -41,7 +41,7 @@ for(const type of ['pointerdown','pointerup','click'])document.addEventListener(
 <script type="module" src="/community/board/board-own-drag-livefix-v2-1.js"></script>
 </body></html>`}
 const mime={'.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8'};
-const server=http.createServer((req,res)=>{const u=new URL(req.url,'http://local');if(u.pathname==='/__share_own_card__'){res.setHeader('content-type','text/html; charset=utf-8');res.end(harness());return}if(u.pathname==='/community-runtime-v1.js'){res.setHeader('content-type','text/javascript; charset=utf-8');res.end(runtimeStub);return}const file=path.resolve(root,u.pathname.replace(/^\\/+/,''));if(!file.startsWith(root)||!fs.existsSync(file)||!fs.statSync(file).isFile()){res.statusCode=404;res.end('not found');return}res.setHeader('content-type',mime[path.extname(file)]||'application/octet-stream');res.end(fs.readFileSync(file))});
+const server=http.createServer((req,res)=>{const u=new URL(req.url,'http://local');if(u.pathname==='/__share_own_card__'){res.setHeader('content-type','text/html; charset=utf-8');res.end(harness());return}if(u.pathname==='/community-runtime-v1.js'){res.setHeader('content-type','text/javascript; charset=utf-8');res.end(runtimeStub);return}const file=path.resolve(root,u.pathname.replace(/^[/]+/,''));if(!file.startsWith(root)||!fs.existsSync(file)||!fs.statSync(file).isFile()){res.statusCode=404;res.end('not found');return}res.setHeader('content-type',mime[path.extname(file)]||'application/octet-stream');res.end(fs.readFileSync(file))});
 await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
 const base=`http://127.0.0.1:${server.address().port}`;
 for(const [engine,browserType] of [['chromium',chromium],['webkit',webkit]]){
