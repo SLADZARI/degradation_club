@@ -1,0 +1,159 @@
+name: Recover Supabase Migration History Once
+
+on:
+  push:
+    branches:
+      - agent/175-supabase-release-infra
+
+permissions:
+  contents: write
+
+concurrency:
+  group: dementor-supabase-ledger-recovery-once
+  cancel-in-progress: false
+
+jobs:
+  recover:
+    if: contains(github.event.head_commit.message, '[recover-ledger]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      CANONICAL_SUPABASE_PROJECT_REF: mmekfydwbvptbdatwitj
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+      SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
+    steps:
+      - name: Checkout recovery branch
+        uses: actions/checkout@v4
+        with:
+          ref: agent/175-supabase-release-infra
+          fetch-depth: 1
+          persist-credentials: true
+
+      - name: Guard exact recovery source and production project
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "${GITHUB_REF}" = "refs/heads/agent/175-supabase-release-infra" || {
+            echo "Ledger recovery may run only from the #177 branch."
+            exit 1
+          }
+          test -n "${SUPABASE_ACCESS_TOKEN}" || { echo "SUPABASE_ACCESS_TOKEN is missing"; exit 1; }
+          test -n "${SUPABASE_DB_PASSWORD}" || { echo "SUPABASE_DB_PASSWORD is missing"; exit 1; }
+          test -n "${SUPABASE_PROJECT_ID}" || { echo "SUPABASE_PROJECT_ID is missing"; exit 1; }
+          test "${SUPABASE_PROJECT_ID}" = "${CANONICAL_SUPABASE_PROJECT_REF}" || {
+            echo "Configured project ref is not the canonical Dementor production project."
+            exit 1
+          }
+
+      - name: Setup pinned Supabase CLI
+        uses: supabase/setup-cli@3c2f5e2ae34c34e428e8e206e2c4d21fa2d20fbf
+        with:
+          version: 2.117.0
+
+      - name: Link production project read-only for migration-history fetch
+        shell: bash
+        run: |
+          set -euo pipefail
+          supabase link --project-ref "${CANONICAL_SUPABASE_PROJECT_REF}"
+
+      - name: Fetch exact remote migration history
+        shell: bash
+        run: |
+          set -euo pipefail
+          supabase migration fetch --linked --yes
+
+      - name: Verify fetch changed exactly the 22 missing historical files
+        shell: bash
+        run: |
+          set -euo pipefail
+          EXPECTED_PATHS="$(mktemp)"
+          cat > "${EXPECTED_PATHS}" <<'EOF'
+          supabase/migrations/20260827212520_archive_edu_and_create_dementor_core.sql
+          supabase/migrations/20260827212614_secure_legacy_edu_archive.sql
+          supabase/migrations/20260827213550_add_dementor_assessment_sync.sql
+          supabase/migrations/20260827214433_add_dementor_commerce_state.sql
+          supabase/migrations/20260828002841_grant_authenticated_profiles_read_update.sql
+          supabase/migrations/20260828170411_dc_workspace_readonly_v01.sql
+          supabase/migrations/20260828203152_dc_merch_certificates_progress_v01.sql
+          supabase/migrations/20260828204145_course_enrollment_account_progress_v01.sql
+          supabase/migrations/20260828205228_mp_weekly_runtime_v1.sql
+          supabase/migrations/20260828205746_mp_weekly_runtime_rls_v1_1.sql
+          supabase/migrations/20260828205825_mp_weekly_runtime_grants_v1_2.sql
+          supabase/migrations/20260828211140_mp_project_access_profiles_v1.sql
+          supabase/migrations/20260828212349_mp_client_team_artifact_access_v1.sql
+          supabase/migrations/20260828213850_mp_spore_person_credits_v1.sql
+          supabase/migrations/20260828221529_join_application_authenticated_only_v1.sql
+          supabase/migrations/20260828222141_mp_project_access_profile_unassigned_v1.sql
+          supabase/migrations/20260828223528_dc_owner_admin_system_checks_v1.sql
+          supabase/migrations/20260829061020_mp_publishing_runtime_v1.sql
+          supabase/migrations/20260829074301_mp_spore_tool_leverage_v1.sql
+          supabase/migrations/20260829080909_mp_weekly_snapshot_v1.sql
+          supabase/migrations/20260829232745_community_member_artifact_v1.sql
+          supabase/migrations/20260829232924_community_member_artifact_v1_hardening.sql
+          EOF
+          sed -i 's/^          //' "${EXPECTED_PATHS}"
+
+          ACTUAL_PATHS="$(mktemp)"
+          git status --porcelain --untracked-files=all | cut -c4- | sort > "${ACTUAL_PATHS}"
+          sort -o "${EXPECTED_PATHS}" "${EXPECTED_PATHS}"
+          echo "Fetched migration paths:"
+          cat "${ACTUAL_PATHS}"
+          diff -u "${EXPECTED_PATHS}" "${ACTUAL_PATHS}" || {
+            echo "migration fetch changed something outside the exact historical recovery set; refusing to commit."
+            exit 1
+          }
+
+      - name: Verify every fetched file byte-for-byte against production history oracle
+        shell: bash
+        run: |
+          set -euo pipefail
+          while read -r expected path; do
+            actual="$(git hash-object "${path}")"
+            test "${actual}" = "${expected}" || {
+              echo "Blob mismatch for ${path}: expected ${expected}, got ${actual}"
+              exit 1
+            }
+            echo "verified ${path} ${actual}"
+          done <<'EOF'
+          ad1e8762167dc1a01f023b70247abdbff808bde7 supabase/migrations/20260827212520_archive_edu_and_create_dementor_core.sql
+          c69bbdfdb8e5e00f6a3b569e925349e15a5076ce supabase/migrations/20260827212614_secure_legacy_edu_archive.sql
+          141bfa4365172c43376a81022a69d30b5096fdba supabase/migrations/20260827213550_add_dementor_assessment_sync.sql
+          61f0ccf184afa10809d96400f5b1910742bdd855 supabase/migrations/20260827214433_add_dementor_commerce_state.sql
+          93d2d89305ba6be46a327c2333005e51e8212e21 supabase/migrations/20260828002841_grant_authenticated_profiles_read_update.sql
+          6d313eda5d8fa23713e2186dac0f39317d4f28d1 supabase/migrations/20260828170411_dc_workspace_readonly_v01.sql
+          6ecb83c8bb06965dc6fa0c8eed43fee9196a4cf2 supabase/migrations/20260828203152_dc_merch_certificates_progress_v01.sql
+          84fa58fb2ef5deb6b703491aee3d084d1a689982 supabase/migrations/20260828204145_course_enrollment_account_progress_v01.sql
+          034c651412cf56f44ca3e60b67ab3e86a6b24449 supabase/migrations/20260828205228_mp_weekly_runtime_v1.sql
+          0eab060bc4b1ad423e1eb100ae52f8c3e2c72361 supabase/migrations/20260828205746_mp_weekly_runtime_rls_v1_1.sql
+          acfe00723e2caaed049c2833d20634cc6fa8e749 supabase/migrations/20260828205825_mp_weekly_runtime_grants_v1_2.sql
+          d082f134715821622086c42ab846d8422872701f supabase/migrations/20260828211140_mp_project_access_profiles_v1.sql
+          c54c499b30b4cff960e8055f645513b2338faa57 supabase/migrations/20260828212349_mp_client_team_artifact_access_v1.sql
+          433cb51369cf3191124a33255c2038d22388aa23 supabase/migrations/20260828213850_mp_spore_person_credits_v1.sql
+          22a7835d3fd24e8547bc734bb3e9a6eb0168a7dd supabase/migrations/20260828221529_join_application_authenticated_only_v1.sql
+          d8d55ccaf7306460572d8fe1c32d4045c03a1ae3 supabase/migrations/20260828222141_mp_project_access_profile_unassigned_v1.sql
+          2c1cdcb677286392243bf7bcd63f9e408542db1b supabase/migrations/20260828223528_dc_owner_admin_system_checks_v1.sql
+          e6ace0097b8c0c1e9b2b9662553f79e21649e7e4 supabase/migrations/20260829061020_mp_publishing_runtime_v1.sql
+          b46b17cf97ee8ec5557c8ae9a73a6bb2fce92335 supabase/migrations/20260829074301_mp_spore_tool_leverage_v1.sql
+          b2652abc9fe3bd118fc7b41ce07a4d910694925a supabase/migrations/20260829080909_mp_weekly_snapshot_v1.sql
+          6caad18bb722e33679f35011366390c9762821dd supabase/migrations/20260829232745_community_member_artifact_v1.sql
+          54a39c5b71ec00dd3bbab422790040db8e6c3511 supabase/migrations/20260829232924_community_member_artifact_v1_hardening.sql
+          EOF
+
+      - name: Commit recovered history and remove this one-off workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm .github/workflows/recover-supabase-history-once.yml
+          git add supabase/migrations .github/workflows/recover-supabase-history-once.yml
+          echo "Recovery commit contents:"
+          git diff --cached --name-status
+          ADDED_COUNT="$(git diff --cached --name-status | awk '$1=="A" && $2 ~ /^supabase\/migrations\// {n++} END {print n+0}')"
+          DELETED_RECOVERY="$(git diff --cached --name-status | awk '$1=="D" && $2==".github/workflows/recover-supabase-history-once.yml" {n++} END {print n+0}')"
+          test "${ADDED_COUNT}" = "22" || { echo "Expected 22 recovered migration files, got ${ADDED_COUNT}"; exit 1; }
+          test "${DELETED_RECOVERY}" = "1" || { echo "One-off recovery workflow was not removed from final commit."; exit 1; }
+          test "$(git diff --cached --name-only | wc -l | tr -d ' ')" = "23" || { echo "Unexpected staged files in recovery commit."; exit 1; }
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Release infra: recover exact historical Supabase migration ledger"
+          git push origin HEAD:agent/175-supabase-release-infra
