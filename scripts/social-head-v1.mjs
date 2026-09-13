@@ -1,224 +1,100 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-export const SOCIAL_ORIGIN = 'https://dementor.club';
-export const DEFAULT_SOCIAL_IMAGE_PATH = '/assets/ink/home-community-01.webp';
-export const COMMUNITY_SOCIAL_IMAGE_PATH = '/assets/ink/community-hero-01.webp';
-export const FAVICON_PATH = '/favicon.svg';
+const ORIGIN='https://dementor.club';
+const SOCIAL_IMAGE='/assets/social/dementor-social-default.jpg';
+const FAVICON='/favicon.svg';
+const esc=v=>String(v??'').replaceAll('&','&amp;').replaceAll('"','&quot;').replaceAll('<','&lt;').replaceAll('>','&gt;');
+const re=v=>String(v).replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+const posix=v=>String(v).replaceAll('\\','/');
 
-const SOCIAL_IMAGE_OVERRIDES = new Map([
-  ['/community/', COMMUNITY_SOCIAL_IMAGE_PATH],
-  ['/share/artifact/', COMMUNITY_SOCIAL_IMAGE_PATH],
-]);
-
-const escapeRegExp = value => String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-const escapeAttr = value => String(value ?? '').replaceAll('&', '&amp;').replaceAll('"', '&quot;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
-const toPosix = value => String(value).replaceAll('\\', '/');
-
-export function routeFromHtmlRel(rel) {
-  const clean = toPosix(rel);
-  if (clean === 'index.html') return '/';
-  if (clean.endsWith('/index.html')) return `/${clean.slice(0, -'/index.html'.length)}/`;
+export function routeFromHtmlRel(rel){
+  const clean=posix(rel);
+  if(clean==='index.html')return '/';
+  if(clean.endsWith('/index.html'))return `/${clean.slice(0,-'/index.html'.length)}/`;
   return `/${clean}`;
 }
-
-function isNoindexHtml(html) {
-  return /<meta[^>]+name=["']robots["'][^>]+content=["'][^"']*noindex/i.test(html)
-    || /<meta[^>]+content=["'][^"']*noindex[^"']*["'][^>]+name=["']robots["']/i.test(html);
+function noindex(html){return /<meta[^>]+name=["']robots["'][^>]+content=["'][^"']*noindex/i.test(html)||/<meta[^>]+content=["'][^"']*noindex[^"']*["'][^>]+name=["']robots["']/i.test(html)}
+function meta(html,key,value){
+  const x=re(value);
+  return html.match(new RegExp(`<meta\\b[^>]*\\b${key}=["']${x}["'][^>]*\\bcontent=["']([^"']*)["'][^>]*>`,'i'))?.[1]
+    ??html.match(new RegExp(`<meta\\b[^>]*\\bcontent=["']([^"']*)["'][^>]*\\b${key}=["']${x}["'][^>]*>`,'i'))?.[1]??null;
 }
-
-function getMetaContent(html, key, value) {
-  const escaped = escapeRegExp(value);
-  const keyFirst = new RegExp(`<meta\\b[^>]*\\b${key}=["']${escaped}["'][^>]*\\bcontent=["']([^"']*)["'][^>]*>`, 'i');
-  const contentFirst = new RegExp(`<meta\\b[^>]*\\bcontent=["']([^"']*)["'][^>]*\\b${key}=["']${escaped}["'][^>]*>`, 'i');
-  return html.match(keyFirst)?.[1] ?? html.match(contentFirst)?.[1] ?? null;
+function add(html,line){if(!html.includes('</head>'))throw new Error('Cannot inject canonical social head: </head> missing');return html.replace('</head>',`${line}\n</head>`)}
+function ensureMeta(html,key,value,content){return meta(html,key,value)!==null?html:add(html,`<meta ${key}="${esc(value)}" content="${esc(content)}">`)}
+function removeMeta(html,key,value){return html.replace(new RegExp(`<meta\\b(?=[^>]*\\b${key}=["']${re(value)}["'])[^>]*>\\s*`,'gi'),'')}
+function title(html){return html.match(/<title>([\s\S]*?)<\/title>/i)?.[1]?.replace(/<[^>]+>/g,'').trim()||'Dementor Club'}
+function description(html){return meta(html,'name','description')||'Dementor Club — клуб и культурная платформа.'}
+function firstAlt(html){for(const m of html.matchAll(/<img\b([^>]*)>/gi)){const a=m[1].match(/\balt=["']([^"']+)["']/i)?.[1]?.trim();if(a)return a}return null}
+function canonicalHref(html){return html.match(/<link\b(?=[^>]*\brel=["']canonical["'])[^>]*\bhref=["']([^"']+)["'][^>]*>/i)?.[1]??null}
+function canonical(html,url){
+  const current=canonicalHref(html);
+  if(current===url)return html;
+  if(current!==null)html=html.replace(/<link\b(?=[^>]*\brel=["']canonical["'])[^>]*>\s*/gi,'');
+  return add(html,`<link rel="canonical" href="${esc(url)}">`);
 }
-
-function hasLinkRel(html, rel) {
-  return new RegExp(`<link\\b[^>]*\\brel=["'][^"']*\\b${escapeRegExp(rel)}\\b[^"']*["'][^>]*>`, 'i').test(html);
+function favicon(html){
+  if(new RegExp(`<link\\b[^>]*\\brel=["'](?:icon|shortcut icon)["'][^>]*\\bhref=["']${re(FAVICON)}["']`,'i').test(html))return html;
+  html=add(html,`<link rel="icon" type="image/svg+xml" href="${FAVICON}" sizes="any">`);
+  if(!/<link\b[^>]*\brel=["']manifest["']/i.test(html))html=add(html,'<link rel="manifest" href="/site.webmanifest">');
+  return html;
 }
-
-function getTitle(html) {
-  return html.match(/<title>([\s\S]*?)<\/title>/i)?.[1]?.replace(/<[^>]+>/g, '').trim() || 'Dementor Club';
-}
-
-function getDescription(html) {
-  return getMetaContent(html, 'name', 'description') || 'Dementor Club — клуб и культурная платформа.';
-}
-
-function getFirstImageAlt(html) {
-  for (const match of html.matchAll(/<img\b([^>]*)>/gi)) {
-    const alt = match[1].match(/\balt=["']([^"']+)["']/i)?.[1]?.trim();
-    if (alt) return alt;
-  }
-  return null;
-}
-
-function imageType(url) {
-  const clean = String(url).split(/[?#]/, 1)[0].toLowerCase();
-  if (clean.endsWith('.jpg') || clean.endsWith('.jpeg')) return 'image/jpeg';
-  if (clean.endsWith('.png')) return 'image/png';
-  if (clean.endsWith('.webp')) return 'image/webp';
-  if (clean.endsWith('.gif')) return 'image/gif';
-  return null;
-}
-
-function removeMeta(html, key, value) {
-  const escaped = escapeRegExp(value);
-  return html.replace(new RegExp(`<meta\\b(?=[^>]*\\b${key}=["']${escaped}["'])[^>]*>\\s*`, 'gi'), '');
-}
-
-function appendHead(html, lines) {
-  if (!lines.length) return html;
-  if (!html.includes('</head>')) throw new Error('Cannot inject canonical social head: </head> missing');
-  return html.replace('</head>', `${lines.join('\n')}\n</head>`);
-}
-
-function ensureMeta(html, key, value, content) {
-  if (getMetaContent(html, key, value) !== null) return html;
-  return appendHead(html, [`<meta ${key}="${escapeAttr(value)}" content="${escapeAttr(content)}">`]);
-}
-
-function ensureCanonical(html, absoluteUrl) {
-  if (hasLinkRel(html, 'canonical')) return html;
-  return appendHead(html, [`<link rel="canonical" href="${escapeAttr(absoluteUrl)}">`]);
-}
-
-function ensureFavicon(html) {
-  if (new RegExp(`<link\\b[^>]*\\brel=["'](?:icon|shortcut icon)["'][^>]*\\bhref=["']${escapeRegExp(FAVICON_PATH)}["']`, 'i').test(html)) return html;
-  return appendHead(html, [
-    `<link rel="icon" type="image/svg+xml" href="${FAVICON_PATH}" sizes="any">`,
-    '<link rel="manifest" href="/site.webmanifest">',
-  ]);
-}
-
-function replaceSocialImage(html, absoluteImage) {
-  for (const [key, value] of [['property','og:image'], ['property','og:image:secure_url'], ['property','og:image:type'], ['name','twitter:image']]) {
-    html = removeMeta(html, key, value);
-  }
-  const type = imageType(absoluteImage) || 'image/webp';
-  return appendHead(html, [
-    `<meta property="og:image" content="${escapeAttr(absoluteImage)}">`,
-    `<meta property="og:image:secure_url" content="${escapeAttr(absoluteImage)}">`,
-    `<meta property="og:image:type" content="${type}">`,
-    `<meta name="twitter:image" content="${escapeAttr(absoluteImage)}">`,
-  ]);
-}
-
-export function normalizeCanonicalSocialHead(html, rel) {
-  const route = routeFromHtmlRel(rel);
-  const absoluteUrl = new URL(route, SOCIAL_ORIGIN).href;
-  const noindex = isNoindexHtml(html);
-  html = ensureFavicon(html);
-
-  const overridePath = SOCIAL_IMAGE_OVERRIDES.get(route);
-  if (overridePath) html = replaceSocialImage(html, new URL(overridePath, SOCIAL_ORIGIN).href);
-  if (noindex && route !== '/share/artifact/') return html;
-
-  const title = getTitle(html);
-  const description = getDescription(html);
-  html = ensureCanonical(html, absoluteUrl);
-  html = ensureMeta(html, 'property', 'og:site_name', 'DEMENTOR CLUB');
-  html = ensureMeta(html, 'property', 'og:title', title);
-  html = ensureMeta(html, 'property', 'og:description', description);
-  html = ensureMeta(html, 'property', 'og:type', 'website');
-  html = ensureMeta(html, 'property', 'og:locale', 'ru_RU');
-  html = ensureMeta(html, 'property', 'og:url', absoluteUrl);
-
-  let ogImage = getMetaContent(html, 'property', 'og:image');
-  if (!ogImage) {
-    ogImage = new URL(DEFAULT_SOCIAL_IMAGE_PATH, SOCIAL_ORIGIN).href;
-    html = replaceSocialImage(html, ogImage);
-  } else {
-    html = ensureMeta(html, 'property', 'og:image:secure_url', ogImage);
-    const type = imageType(ogImage);
-    if (type) html = ensureMeta(html, 'property', 'og:image:type', type);
-  }
-
-  const defaultAlt = route === '/community/' || route === '/share/artifact/'
-    ? 'Люди Dementor Club'
-    : getFirstImageAlt(html) || title;
-  html = ensureMeta(html, 'property', 'og:image:alt', defaultAlt);
-  html = ensureMeta(html, 'name', 'twitter:card', 'summary_large_image');
-  html = ensureMeta(html, 'name', 'twitter:title', getMetaContent(html, 'property', 'og:title') || title);
-  html = ensureMeta(html, 'name', 'twitter:description', getMetaContent(html, 'property', 'og:description') || description);
-  html = ensureMeta(html, 'name', 'twitter:image', getMetaContent(html, 'property', 'og:image') || ogImage);
-  html = ensureMeta(html, 'name', 'twitter:image:alt', getMetaContent(html, 'property', 'og:image:alt') || defaultAlt);
+function setImage(html,url){
+  for(const [k,v] of [['property','og:image'],['property','og:image:secure_url'],['property','og:image:type'],['property','og:image:width'],['property','og:image:height'],['name','twitter:image']])html=removeMeta(html,k,v);
+  for(const line of [
+    `<meta property="og:image" content="${url}">`,
+    `<meta property="og:image:secure_url" content="${url}">`,
+    '<meta property="og:image:type" content="image/jpeg">',
+    '<meta property="og:image:width" content="1200">',
+    '<meta property="og:image:height" content="630">',
+    `<meta name="twitter:image" content="${url}">`,
+  ])html=add(html,line);
   return html;
 }
 
-function localAssetFromAbsolute(url) {
-  try {
-    const parsed = new URL(url);
-    if (parsed.origin !== SOCIAL_ORIGIN) return null;
-    return decodeURIComponent(parsed.pathname.replace(/^\//, ''));
-  } catch {
-    return null;
+export function normalizeCanonicalSocialHead(html,rel){
+  const route=routeFromHtmlRel(rel),url=new URL(route,ORIGIN).href,social=new URL(SOCIAL_IMAGE,ORIGIN).href,isNoindex=noindex(html);
+  html=favicon(html);
+  if(route==='/community/'||route==='/share/artifact/')html=setImage(html,social);
+  if(isNoindex&&route!=='/share/artifact/')return html;
+  html=canonical(html,url);
+  const t=title(html),d=description(html);
+  for(const [k,v,c] of [
+    ['property','og:site_name','DEMENTOR CLUB'],['property','og:title',t],['property','og:description',d],['property','og:type','website'],['property','og:locale','ru_RU'],['property','og:url',url],
+  ])html=ensureMeta(html,k,v,c);
+  let image=meta(html,'property','og:image');
+  if(!image){html=setImage(html,social);image=social}else{
+    html=ensureMeta(html,'property','og:image:secure_url',image);
+    const type=/\.png(?:$|[?#])/i.test(image)?'image/png':/\.jpe?g(?:$|[?#])/i.test(image)?'image/jpeg':/\.webp(?:$|[?#])/i.test(image)?'image/webp':null;
+    if(type)html=ensureMeta(html,'property','og:image:type',type);
   }
+  const alt=(route==='/community/'||route==='/share/artifact/')?'Люди Dementor Club':firstAlt(html)||t;
+  html=ensureMeta(html,'property','og:image:alt',alt);
+  for(const [v,c] of [['twitter:card','summary_large_image'],['twitter:title',meta(html,'property','og:title')||t],['twitter:description',meta(html,'property','og:description')||d],['twitter:image',meta(html,'property','og:image')||image],['twitter:image:alt',meta(html,'property','og:image:alt')||alt]])html=ensureMeta(html,'name',v,c);
+  return html;
 }
-
-function validateRaster(file, label, errors) {
-  if (!fs.existsSync(file) || !fs.statSync(file).isFile()) { errors.push(`${label}: file missing`); return; }
-  const bytes = fs.readFileSync(file);
-  if (bytes.length < 32) { errors.push(`${label}: file too small`); return; }
-  if (bytes.subarray(0, 2).equals(Buffer.from([0xff,0xd8]))) return;
-  if (bytes.subarray(0, 8).equals(Buffer.from([0x89,0x50,0x4e,0x47,0x0d,0x0a,0x1a,0x0a]))) return;
-  if (bytes.subarray(0,4).toString('ascii') === 'RIFF' && bytes.subarray(8,12).toString('ascii') === 'WEBP') {
-    const declared = bytes.readUInt32LE(4) + 8;
-    if (bytes.length < declared) errors.push(`${label}: truncated WebP (${bytes.length} < ${declared})`);
-    return;
-  }
-  if (bytes.subarray(0,4).toString('ascii').startsWith('GIF8')) return;
+function local(url){try{const u=new URL(url);return u.origin===ORIGIN?decodeURIComponent(u.pathname.replace(/^\//,'')):null}catch{return null}}
+function raster(file,label,errors){
+  if(!fs.existsSync(file)||!fs.statSync(file).isFile()){errors.push(`${label}: file missing`);return}
+  const b=fs.readFileSync(file);if(b.length<32){errors.push(`${label}: file too small`);return}
+  if(b.subarray(0,2).equals(Buffer.from([0xff,0xd8])))return;
+  if(b.subarray(0,8).equals(Buffer.from([0x89,0x50,0x4e,0x47,0x0d,0x0a,0x1a,0x0a])))return;
+  if(b.subarray(0,4).toString('ascii')==='RIFF'&&b.subarray(8,12).toString('ascii')==='WEBP'){const declared=b.readUInt32LE(4)+8;if(b.length<declared)errors.push(`${label}: truncated WebP (${b.length} < ${declared})`);return}
   errors.push(`${label}: unsupported or corrupt raster signature`);
 }
-
-export function validateCanonicalSocialArtifact(artifactRoot) {
-  const errors = [];
-  const htmlFiles = [];
-  const walk = dir => {
-    for (const entry of fs.readdirSync(dir, {withFileTypes:true})) {
-      const full = path.join(dir, entry.name);
-      if (entry.isDirectory()) walk(full);
-      else if (entry.isFile() && entry.name.endsWith('.html')) htmlFiles.push(full);
-    }
-  };
-  walk(artifactRoot);
-  let publicCount = 0;
-  for (const full of htmlFiles) {
-    const rel = toPosix(path.relative(artifactRoot, full));
-    const route = routeFromHtmlRel(rel);
-    const html = fs.readFileSync(full, 'utf8');
-    const noindex = isNoindexHtml(html);
-
-    if (!new RegExp(`<link\\b[^>]*\\brel=["'](?:icon|shortcut icon)["'][^>]*\\bhref=["']${escapeRegExp(FAVICON_PATH)}["']`, 'i').test(html)) {
-      errors.push(`${route}: canonical favicon missing from raw <head>`);
-    }
-
-    if (noindex && route !== '/share/artifact/') continue;
-    if (!noindex) publicCount++;
-    const expectedUrl = new URL(route, SOCIAL_ORIGIN).href;
-    const required = [
-      ['og:title','property'],['og:description','property'],['og:type','property'],['og:locale','property'],['og:url','property'],
-      ['og:image','property'],['og:image:secure_url','property'],['og:image:type','property'],['og:image:alt','property'],
-      ['twitter:card','name'],['twitter:title','name'],['twitter:description','name'],['twitter:image','name'],['twitter:image:alt','name'],
-    ];
-    for (const [value,key] of required) if (getMetaContent(html,key,value) === null) errors.push(`${route}: ${value} missing`);
-    if (!noindex) {
-      if (!hasLinkRel(html,'canonical')) errors.push(`${route}: canonical link missing`);
-      const ogUrl = getMetaContent(html,'property','og:url');
-      if (ogUrl !== expectedUrl) errors.push(`${route}: og:url ${ogUrl || 'missing'} != ${expectedUrl}`);
-    }
-    const image = getMetaContent(html,'property','og:image');
-    if (!/^https:\/\//i.test(image || '')) errors.push(`${route}: og:image must be absolute HTTPS`);
-    const local = localAssetFromAbsolute(image);
-    if (local) validateRaster(path.join(artifactRoot, local), `${route}: ${local}`, errors);
-    if (getMetaContent(html,'name','twitter:image') !== image) errors.push(`${route}: twitter:image must match og:image`);
+export function validateCanonicalSocialArtifact(root){
+  const errors=[],files=[];const walk=d=>{for(const e of fs.readdirSync(d,{withFileTypes:true})){const f=path.join(d,e.name);if(e.isDirectory())walk(f);else if(e.isFile()&&e.name.endsWith('.html'))files.push(f)}};walk(root);
+  let publicCount=0;
+  for(const f of files){
+    const rel=posix(path.relative(root,f)),route=routeFromHtmlRel(rel),html=fs.readFileSync(f,'utf8'),isNoindex=noindex(html),expected=new URL(route,ORIGIN).href;
+    if(!new RegExp(`<link\\b[^>]*\\brel=["'](?:icon|shortcut icon)["'][^>]*\\bhref=["']${re(FAVICON)}["']`,'i').test(html))errors.push(`${route}: canonical favicon missing from raw <head>`);
+    if(isNoindex&&route!=='/share/artifact/')continue;if(!isNoindex)publicCount++;
+    for(const [v,k] of [['og:title','property'],['og:description','property'],['og:type','property'],['og:locale','property'],['og:url','property'],['og:image','property'],['og:image:secure_url','property'],['og:image:type','property'],['og:image:alt','property'],['twitter:card','name'],['twitter:title','name'],['twitter:description','name'],['twitter:image','name'],['twitter:image:alt','name']])if(meta(html,k,v)===null)errors.push(`${route}: ${v} missing`);
+    if(!isNoindex&&canonicalHref(html)!==expected)errors.push(`${route}: canonical ${canonicalHref(html)||'missing'} != ${expected}`);
+    if(!isNoindex&&meta(html,'property','og:url')!==expected)errors.push(`${route}: og:url ${meta(html,'property','og:url')||'missing'} != ${expected}`);
+    const image=meta(html,'property','og:image');if(!/^https:\/\//i.test(image||''))errors.push(`${route}: og:image must be absolute HTTPS`);const l=local(image);if(l)raster(path.join(root,l),`${route}: ${l}`,errors);if(meta(html,'name','twitter:image')!==image)errors.push(`${route}: twitter:image must match og:image`);
   }
-
-  if (!fs.existsSync(path.join(artifactRoot, FAVICON_PATH.slice(1)))) errors.push(`${FAVICON_PATH}: canonical favicon file missing`);
-  validateRaster(path.join(artifactRoot, DEFAULT_SOCIAL_IMAGE_PATH.slice(1)), DEFAULT_SOCIAL_IMAGE_PATH, errors);
-  validateRaster(path.join(artifactRoot, COMMUNITY_SOCIAL_IMAGE_PATH.slice(1)), COMMUNITY_SOCIAL_IMAGE_PATH, errors);
-
-  if (errors.length) throw new Error(`Canonical social metadata validation failed:\n${errors.map(item=>`- ${item}`).join('\n')}`);
+  if(!fs.existsSync(path.join(root,FAVICON.slice(1))))errors.push(`${FAVICON}: file missing`);raster(path.join(root,SOCIAL_IMAGE.slice(1)),SOCIAL_IMAGE,errors);
+  if(errors.length)throw new Error(`Canonical social metadata validation failed:\n${errors.map(x=>`- ${x}`).join('\n')}`);
   console.log(`Canonical social metadata: ${publicCount} indexable HTML routes covered; favicon + OG/Twitter raw-head contract PASS.`);
 }
