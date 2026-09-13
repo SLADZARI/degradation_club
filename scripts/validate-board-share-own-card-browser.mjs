@@ -64,6 +64,10 @@ for(const [engine,browserType] of [['chromium',chromium],['webkit',webkit]]){
       await page.waitForSelector('[data-shell-session] .dcw-session-profile',{state:'attached'});
       const shellIdentity=await page.locator('[data-shell-session] .dcw-session-profile').evaluate(node=>({name:node.querySelector('strong')?.textContent?.trim()||'',avatar:node.querySelector('img.dcw-session-avatar')?.getAttribute('src')||''}));
       expect(shellIdentity.name==='Member',`${engine}/${viewport.width}: canonical Workspace identity name missing`);expect(shellIdentity.avatar==='/assets/brand/dementor-mark-black.svg',`${engine}/${viewport.width}: canonical Workspace identity avatar missing`);
+      const tutorialSkip=page.locator('.dc-board-tutorial [data-tutorial-skip]');
+      await tutorialSkip.waitFor({state:'visible'});
+      await tutorialSkip.click();
+      await page.locator('.dc-board-tutorial').waitFor({state:'hidden'});
       await card.locator('.dc-board-open-hint').click();
       const overlay=page.locator('.dc-artifact-overlay');await overlay.waitFor({state:'visible'});expect(new URL(page.url()).searchParams.get('focus')===`artifact:${ART}`,`${engine}/${viewport.width}: opening Artifact did not set canonical focus`);
       const detail=page.frameLocator('.dc-artifact-overlay iframe');const share=detail.locator('[data-board-artifact-share]');await share.waitFor({state:'visible'});
@@ -85,6 +89,7 @@ if(failures.length){console.error('BOARD FULL-STACK SHARE BLOCKED');for(const it
 console.log('BOARD FULL-STACK SHARE PASS');
 console.log('✓ real production Board HTML and runtime owner list loaded');
 console.log('✓ canonical Workspace identity is supplied through the shell owner, not a parallel profile query');
+console.log('✓ first-run Board tutorial is dismissed through its canonical ПРОПУСТИТЬ UI action before Artifact interaction');
 console.log('✓ GitHub Pages 404 bridge resolves canonical /community/artifact/<uuid>/ into the Artifact detail surface');
 console.log('✓ closed Artifact card has no Share trigger; open Artifact action row owns Share');
 console.log('✓ sender postcard preserves open detail and shows canonical sender identity + brand');
