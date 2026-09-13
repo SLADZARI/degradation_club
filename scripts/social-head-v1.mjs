@@ -2,11 +2,9 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 export const SOCIAL_ORIGIN = 'https://dementor.club';
-export const DEFAULT_SOCIAL_IMAGE_PATH = '/assets/social/dementor-social-default.jpg';
-export const COMMUNITY_SOCIAL_IMAGE_PATH = '/assets/social/community-og.jpg';
-export const FAVICON_ICO_PATH = '/favicon.ico';
-export const FAVICON_SVG_PATH = '/assets/brand/dementor-mark-black.svg';
-export const APPLE_TOUCH_ICON_PATH = '/apple-touch-icon.png';
+export const DEFAULT_SOCIAL_IMAGE_PATH = '/assets/ink/home-community-01.webp';
+export const COMMUNITY_SOCIAL_IMAGE_PATH = '/assets/ink/community-hero-01.webp';
+export const FAVICON_PATH = '/favicon.svg';
 
 const SOCIAL_IMAGE_OVERRIDES = new Map([
   ['/community/', COMMUNITY_SOCIAL_IMAGE_PATH],
@@ -50,8 +48,7 @@ function getDescription(html) {
 
 function getFirstImageAlt(html) {
   for (const match of html.matchAll(/<img\b([^>]*)>/gi)) {
-    const attrs = match[1];
-    const alt = attrs.match(/\balt=["']([^"']+)["']/i)?.[1]?.trim();
+    const alt = match[1].match(/\balt=["']([^"']+)["']/i)?.[1]?.trim();
     if (alt) return alt;
   }
   return null;
@@ -68,8 +65,7 @@ function imageType(url) {
 
 function removeMeta(html, key, value) {
   const escaped = escapeRegExp(value);
-  const pattern = new RegExp(`<meta\\b(?=[^>]*\\b${key}=["']${escaped}["'])[^>]*>\\s*`, 'gi');
-  return html.replace(pattern, '');
+  return html.replace(new RegExp(`<meta\\b(?=[^>]*\\b${key}=["']${escaped}["'])[^>]*>\\s*`, 'gi'), '');
 }
 
 function appendHead(html, lines) {
@@ -88,42 +84,32 @@ function ensureCanonical(html, absoluteUrl) {
   return appendHead(html, [`<link rel="canonical" href="${escapeAttr(absoluteUrl)}">`]);
 }
 
-function ensureFavicons(html) {
-  const additions = [];
-  if (!new RegExp(`<link\\b[^>]*\\brel=["'](?:icon|shortcut icon)["'][^>]*\\bhref=["']${escapeRegExp(FAVICON_ICO_PATH)}["']`, 'i').test(html)) {
-    additions.push(`<link rel="icon" href="${FAVICON_ICO_PATH}" sizes="any">`);
-  }
-  if (!new RegExp(`<link\\b[^>]*\\brel=["']icon["'][^>]*\\bhref=["']${escapeRegExp(FAVICON_SVG_PATH)}["']`, 'i').test(html)) {
-    additions.push(`<link rel="icon" type="image/svg+xml" href="${FAVICON_SVG_PATH}" sizes="any">`);
-  }
-  if (!new RegExp(`<link\\b[^>]*\\brel=["']apple-touch-icon["'][^>]*\\bhref=["']${escapeRegExp(APPLE_TOUCH_ICON_PATH)}["']`, 'i').test(html)) {
-    additions.push(`<link rel="apple-touch-icon" href="${APPLE_TOUCH_ICON_PATH}" sizes="180x180">`);
-  }
-  if (!hasLinkRel(html, 'manifest')) additions.push('<link rel="manifest" href="/site.webmanifest">');
-  return appendHead(html, additions);
+function ensureFavicon(html) {
+  if (new RegExp(`<link\\b[^>]*\\brel=["'](?:icon|shortcut icon)["'][^>]*\\bhref=["']${escapeRegExp(FAVICON_PATH)}["']`, 'i').test(html)) return html;
+  return appendHead(html, [
+    `<link rel="icon" type="image/svg+xml" href="${FAVICON_PATH}" sizes="any">`,
+    '<link rel="manifest" href="/site.webmanifest">',
+  ]);
 }
 
 function replaceSocialImage(html, absoluteImage) {
-  for (const [key, value] of [['property','og:image'], ['property','og:image:secure_url'], ['property','og:image:type'], ['property','og:image:width'], ['property','og:image:height'], ['name','twitter:image']]) {
+  for (const [key, value] of [['property','og:image'], ['property','og:image:secure_url'], ['property','og:image:type'], ['name','twitter:image']]) {
     html = removeMeta(html, key, value);
   }
-  const type = imageType(absoluteImage) || 'image/jpeg';
-  const lines = [
+  const type = imageType(absoluteImage) || 'image/webp';
+  return appendHead(html, [
     `<meta property="og:image" content="${escapeAttr(absoluteImage)}">`,
     `<meta property="og:image:secure_url" content="${escapeAttr(absoluteImage)}">`,
     `<meta property="og:image:type" content="${type}">`,
-    '<meta property="og:image:width" content="1200">',
-    '<meta property="og:image:height" content="630">',
     `<meta name="twitter:image" content="${escapeAttr(absoluteImage)}">`,
-  ];
-  return appendHead(html, lines);
+  ]);
 }
 
 export function normalizeCanonicalSocialHead(html, rel) {
   const route = routeFromHtmlRel(rel);
   const absoluteUrl = new URL(route, SOCIAL_ORIGIN).href;
   const noindex = isNoindexHtml(html);
-  html = ensureFavicons(html);
+  html = ensureFavicon(html);
 
   const overridePath = SOCIAL_IMAGE_OVERRIDES.get(route);
   if (overridePath) html = replaceSocialImage(html, new URL(overridePath, SOCIAL_ORIGIN).href);
@@ -183,7 +169,6 @@ function validateRaster(file, label, errors) {
     return;
   }
   if (bytes.subarray(0,4).toString('ascii').startsWith('GIF8')) return;
-  if (bytes.subarray(0,4).equals(Buffer.from([0x00,0x00,0x01,0x00]))) return;
   errors.push(`${label}: unsupported or corrupt raster signature`);
 }
 
@@ -205,11 +190,9 @@ export function validateCanonicalSocialArtifact(artifactRoot) {
     const html = fs.readFileSync(full, 'utf8');
     const noindex = isNoindexHtml(html);
 
-    for (const [label, pattern] of [
-      ['favicon.ico', /<link\b[^>]*\brel=["'](?:icon|shortcut icon)["'][^>]*\bhref=["']\/favicon\.ico["']/i],
-      ['svg favicon', /<link\b[^>]*\brel=["']icon["'][^>]*\bhref=["']\/assets\/brand\/dementor-mark-black\.svg["']/i],
-      ['apple touch icon', /<link\b[^>]*\brel=["']apple-touch-icon["'][^>]*\bhref=["']\/apple-touch-icon\.png["']/i],
-    ]) if (!pattern.test(html)) errors.push(`${route}: ${label} missing from raw <head>`);
+    if (!new RegExp(`<link\\b[^>]*\\brel=["'](?:icon|shortcut icon)["'][^>]*\\bhref=["']${escapeRegExp(FAVICON_PATH)}["']`, 'i').test(html)) {
+      errors.push(`${route}: canonical favicon missing from raw <head>`);
+    }
 
     if (noindex && route !== '/share/artifact/') continue;
     if (!noindex) publicCount++;
@@ -229,17 +212,13 @@ export function validateCanonicalSocialArtifact(artifactRoot) {
     if (!/^https:\/\//i.test(image || '')) errors.push(`${route}: og:image must be absolute HTTPS`);
     const local = localAssetFromAbsolute(image);
     if (local) validateRaster(path.join(artifactRoot, local), `${route}: ${local}`, errors);
-    const twitterImage = getMetaContent(html,'name','twitter:image');
-    if (twitterImage !== image) errors.push(`${route}: twitter:image must match og:image`);
+    if (getMetaContent(html,'name','twitter:image') !== image) errors.push(`${route}: twitter:image must match og:image`);
   }
 
-  validateRaster(path.join(artifactRoot, 'favicon.ico'), '/favicon.ico', errors);
-  validateRaster(path.join(artifactRoot, 'apple-touch-icon.png'), '/apple-touch-icon.png', errors);
+  if (!fs.existsSync(path.join(artifactRoot, FAVICON_PATH.slice(1)))) errors.push(`${FAVICON_PATH}: canonical favicon file missing`);
   validateRaster(path.join(artifactRoot, DEFAULT_SOCIAL_IMAGE_PATH.slice(1)), DEFAULT_SOCIAL_IMAGE_PATH, errors);
   validateRaster(path.join(artifactRoot, COMMUNITY_SOCIAL_IMAGE_PATH.slice(1)), COMMUNITY_SOCIAL_IMAGE_PATH, errors);
 
-  if (errors.length) {
-    throw new Error(`Canonical social metadata validation failed:\n${errors.map(item=>`- ${item}`).join('\n')}`);
-  }
+  if (errors.length) throw new Error(`Canonical social metadata validation failed:\n${errors.map(item=>`- ${item}`).join('\n')}`);
   console.log(`Canonical social metadata: ${publicCount} indexable HTML routes covered; favicon + OG/Twitter raw-head contract PASS.`);
 }
