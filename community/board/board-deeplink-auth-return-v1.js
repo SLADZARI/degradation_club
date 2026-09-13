@@ -2,15 +2,12 @@ import {getClient,currentSession,loginWithGoogle,route} from '/community-runtime
 
 const boardHost=document.getElementById('boardHost');
 const FOCUS_RE=/^(artifact|entity):([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$/i;
-const MEMBER_STATES=new Set(['MEMBER_NOT_ACTIVATED','MEMBER_ACTIVATED','DEMENTOR','OWNER_ADMIN']);
-const GUEST_STATES=new Set(['AUTHENTICATED_GUEST_DC9_INCOMPLETE','AUTHENTICATED_GUEST_DC9_COMPLETE','APPLICANT']);
 let session=null;
 let resolving=false;
 let popHandling=false;
 let missingTimer=null;
 let postcard=null;
 let activeShareTrigger=null;
-let arrivalTimer=null;
 let sharedArrivalMode=null;
 let sharedArrivalStarted=false;
 let artifactFrameObserver=null;
@@ -77,7 +74,7 @@ function showMissing(){
   if(document.querySelector('.dc-board-focus-missing'))return;
   const gate=document.createElement('section');gate.className='dc-board-focus-missing';gate.setAttribute('role','dialog');gate.setAttribute('aria-modal','true');
   gate.innerHTML='<article class="dc-board-focus-missing__card"><h2>ЭТОГО ЗДЕСЬ БОЛЬШЕ НЕТ.</h2><p>Возможно, всё закончилось хорошо.</p><p>Возможно, наоборот.</p><button class="dc-board-focus-missing__action" type="button">ОТКРЫТЬ BOARD</button></article>';
-  gate.querySelector('button').onclick=()=>{clearFocus({replace:true});gate.remove();window.dispatchEvent(new CustomEvent('dc:board-close-artifact'))};document.body.appendChild(gate);
+  gate.querySelector('button').onclick=()=>{sharedArrivalMode=null;sharedArrivalStarted=false;clearFocus({replace:true});gate.remove();window.dispatchEvent(new CustomEvent('dc:board-close-artifact'))};document.body.appendChild(gate);
 }
 function openResolvedFocus(node,focus){
   hideMissing();revealPresentationOnly(node);
@@ -87,17 +84,12 @@ function openResolvedFocus(node,focus){
 function resolveCurrentFocus({allowMissing=false}={}){
   const focus=parseFocus();if(!focus){hideMissing();return false}
   const node=targetNode(focus);if(!node){if(allowMissing)showMissing();return false}
-  if(sharedArrivalMode==='guest'){
+  if(sharedArrivalMode==='receiver'){
     if(sharedArrivalStarted)return true;
     sharedArrivalStarted=true;
-    showGuestArrivalPostcard();
-    clearTimeout(arrivalTimer);
-    arrivalTimer=setTimeout(()=>{
-      consumeSharePresentation();sharedArrivalMode=null;closePostcard({restoreFocus:false});openResolvedFocus(node,focus);
-    },600);
+    hideMissing();revealPresentationOnly(node);showReceiveArrivalPostcard(node,focus);
     return true;
   }
-  if(sharedArrivalMode==='member'){consumeSharePresentation();sharedArrivalMode=null}
   openResolvedFocus(node,focus);return true;
 }
 function scheduleResolve(){
@@ -114,10 +106,21 @@ function focusablePostcardControls(){
 }
 function closePostcard({restoreFocus=true}={}){
   if(!postcard||postcard.hidden)return;
-  clearTimeout(arrivalTimer);arrivalTimer=null;
   postcard.hidden=true;postcard.setAttribute('aria-hidden','true');postcard.dataset.closable='0';
   if(restoreFocus&&activeShareTrigger?.isConnected)activeShareTrigger.focus();
   activeShareTrigger=null;
+}
+function stayOnBoardFromSharedArrival(){
+  clearTimeout(missingTimer);missingTimer=null;
+  sharedArrivalMode=null;sharedArrivalStarted=false;
+  clearFocus({replace:true});
+  closePostcard({restoreFocus:false});
+  window.dispatchEvent(new CustomEvent('dc:board-close-artifact'));
+}
+function requestPostcardClose(){
+  const mode=postcard?.querySelector('.dc-board-share-postcard')?.dataset.mode||'';
+  if(mode==='receiver-arrival'){stayOnBoardFromSharedArrival();return}
+  closePostcard();
 }
 function ensurePostcard(){
   if(postcard)return postcard;
@@ -144,14 +147,16 @@ function ensurePostcard(){
     </div>
     <div class="dc-board-share-postcard__receive" data-postcard-receiver hidden>
       <button class="dc-board-share-postcard__action is-acid" type="button" data-postcard-login hidden>ВОЙТИ И ПОСМОТРЕТЬ →</button>
+      <button class="dc-board-share-postcard__action is-acid" type="button" data-postcard-accept hidden>ПОСМОТРЕТЬ АРТЕФАКТ →</button>
+      <button class="dc-board-share-postcard__action" type="button" data-postcard-stay hidden>ОСТАТЬСЯ НА ДОСКЕ</button>
     </div>
     <div class="dc-board-share-postcard__legal" data-postcard-legal>ARTIFACT / DIRECT LINK / EXTERNAL TRANSFER</div>
   </article>`;
   document.body.appendChild(postcard);
-  postcard.querySelector('[data-postcard-close]').addEventListener('click',()=>closePostcard());
-  postcard.addEventListener('click',event=>{if(event.target===postcard&&postcard.dataset.closable==='1')closePostcard()});
+  postcard.querySelector('[data-postcard-close]').addEventListener('click',requestPostcardClose);
+  postcard.addEventListener('click',event=>{if(event.target===postcard&&postcard.dataset.closable==='1')requestPostcardClose()});
   postcard.addEventListener('keydown',event=>{
-    if(event.key==='Escape'&&postcard.dataset.closable==='1'){event.preventDefault();closePostcard();return}
+    if(event.key==='Escape'&&postcard.dataset.closable==='1'){event.preventDefault();requestPostcardClose();return}
     if(event.key!=='Tab')return;
     const controls=focusablePostcardControls();if(!controls.length)return;
     const first=controls[0],last=controls.at(-1);
@@ -174,7 +179,7 @@ function renderSenderIdentity(){
   if(name)name.textContent=identity.name;
   if(identity.avatar){img.src=identity.avatar;img.hidden=false;fallback.hidden=true}else{img.removeAttribute('src');img.hidden=true;fallback.hidden=false;fallback.textContent=(identity.name.match(/[\p{L}\p{N}]/u)?.[0]||'D').toUpperCase()}
 }
-function setPostcardMode({mode,title,copy,stamp,metaLeft,metaRight,legal,closable=false,url=null,login=false}={}){
+function setPostcardMode({mode,title,copy,stamp,metaLeft,metaRight,legal,closable=false,url=null,login=false,accept=false,stay=false}={}){
   const layer=ensurePostcard();const card=layer.querySelector('.dc-board-share-postcard');
   card.dataset.mode=mode||'';layer.dataset.closable=closable?'1':'0';
   layer.querySelector('[data-postcard-title]').textContent=title||'';
@@ -187,9 +192,11 @@ function setPostcardMode({mode,title,copy,stamp,metaLeft,metaRight,legal,closabl
   layer.querySelectorAll('[data-postcard-sender]').forEach(el=>el.hidden=mode!=='sender');
   const receiver=layer.querySelector('[data-postcard-receiver]');receiver.hidden=mode==='sender';
   const loginButton=layer.querySelector('[data-postcard-login]');loginButton.hidden=!login;
+  const acceptButton=layer.querySelector('[data-postcard-accept]');acceptButton.hidden=!accept;
+  const stayButton=layer.querySelector('[data-postcard-stay]');stayButton.hidden=!stay;
   const input=layer.querySelector('[data-postcard-url]');if(input&&url!==null)input.value=url;
   layer.hidden=false;layer.setAttribute('aria-hidden','false');
-  requestAnimationFrame(()=>{const target=mode==='sender'?layer.querySelector('[data-postcard-native]'):login?loginButton:card;target?.focus?.()});
+  requestAnimationFrame(()=>{const target=mode==='sender'?layer.querySelector('[data-postcard-native]'):login?loginButton:accept?acceptButton:card;target?.focus?.()});
   return layer;
 }
 function setSenderStatus({stamp,meta,copyLabel}={}){
@@ -219,8 +226,14 @@ function showReceiveAuthPostcard(){
   const layer=setPostcardMode({mode:'receiver-auth',title:'ВАМ ПЕРЕДАЛИ АРТЕФАКТ',copy:'Чтобы посмотреть содержимое, войдите.',stamp:'ТРЕБУЕТ ВХОДА',metaLeft:'INCOMING / ARTIFACT',metaRight:'STATUS / SEALED',legal:'ВХОД ≠ ЧЛЕНСТВО',closable:false,login:true});
   layer.querySelector('[data-postcard-login]').onclick=()=>loginWithGoogle(`${location.pathname}${location.search}${location.hash}`,getClient());
 }
-function showGuestArrivalPostcard(){
-  setPostcardMode({mode:'receiver-arrival',title:'ВАМ ПЕРЕДАЛИ АРТЕФАКТ',copy:'Получено. Открываем.',stamp:'ДОСТАВЛЕНО',metaLeft:'INCOMING / ARTIFACT',metaRight:'STATUS / DELIVERED',legal:'OPENING EXACT ARTIFACT',closable:false,login:false});
+function showReceiveArrivalPostcard(node,focus){
+  const layer=setPostcardMode({mode:'receiver-arrival',title:'ВАМ ПЕРЕДАЛИ АРТЕФАКТ',copy:'Передача готова. Посмотреть артефакт или остаться на доске.',stamp:'ПОЛУЧЕНО',metaLeft:'INCOMING / ARTIFACT',metaRight:'STATUS / RECEIVED',legal:'ARTIFACT / RECEIVED / CHOICE REQUIRED',closable:true,accept:true,stay:true});
+  layer.querySelector('[data-postcard-accept]').onclick=()=>{
+    clearTimeout(missingTimer);missingTimer=null;
+    consumeSharePresentation();sharedArrivalMode=null;sharedArrivalStarted=false;
+    closePostcard({restoreFocus:false});openResolvedFocus(node,focus);
+  };
+  layer.querySelector('[data-postcard-stay]').onclick=stayOnBoardFromSharedArrival;
 }
 function artifactIdFromFrame(frame){
   try{
@@ -308,10 +321,8 @@ function waitForBoardUserState(timeout=2600){
   });
 }
 async function prepareSharedArrival(){
-  const state=await waitForBoardUserState();
-  sharedArrivalStarted=false;
-  sharedArrivalMode=GUEST_STATES.has(state)?'guest':MEMBER_STATES.has(state)?'member':'member';
-  scheduleResolve();
+  await waitForBoardUserState();
+  sharedArrivalStarted=false;sharedArrivalMode='receiver';scheduleResolve();
 }
 
 async function init(){

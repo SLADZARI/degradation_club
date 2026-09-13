@@ -79,7 +79,30 @@ for(const [engine,browserType] of [['chromium',chromium],['webkit',webkit]]){
       expect(await postcard.getByText('Member').count()>=1,`${engine}/${viewport.width}: sender identity name missing`);expect(await postcard.locator('[data-postcard-sender-avatar]:not([hidden])').count()===1,`${engine}/${viewport.width}: sender identity avatar missing`);expect((await postcard.locator('.dc-board-share-postcard__brand').innerText()).replace(/\s+/g,' ').trim()==='DEMENTOR CLUB',`${engine}/${viewport.width}: postcard brand missing`);
       const shown=await postcard.locator('[data-postcard-url]').inputValue();const shownUrl=new URL(shown);expect(shownUrl.origin===base&&shownUrl.pathname==='/share/artifact/'&&shownUrl.searchParams.get('id')===ART&&shownUrl.searchParams.size===1,`${engine}/${viewport.width}: clean Share URL mismatch ${shown}`);
       await postcard.getByRole('button',{name:'КОПИРОВАТЬ ССЫЛКУ'}).click();await page.waitForTimeout(80);state=await page.evaluate(()=>({copied:globalThis.__DC_COPIED||'',overlayHidden:document.querySelector('.dc-artifact-overlay')?.hidden??true,dragging:document.documentElement.dataset.boardDragging||''}));expect(state.copied===shown,`${engine}/${viewport.width}: explicit postcard copy mismatch`);expect(!state.overlayHidden,`${engine}/${viewport.width}: postcard copy closed Artifact detail`);expect(!state.dragging,`${engine}/${viewport.width}: postcard copy started drag`);expect(await postcard.getByText('СКОПИРОВАНО').count()===1,`${engine}/${viewport.width}: postcard copy feedback missing`);
-      const cardBox=await postcard.locator('.dc-board-share-postcard').boundingBox();if(mobile)expect(!!cardBox&&cardBox.x>=0&&cardBox.x+cardBox.width<=viewport.width+.5,`${engine}/${viewport.width}: postcard overflows viewport`);
+      const senderCardBox=await postcard.locator('.dc-board-share-postcard').boundingBox();if(mobile)expect(!!senderCardBox&&senderCardBox.x>=0&&senderCardBox.x+senderCardBox.width<=viewport.width+.5,`${engine}/${viewport.width}: sender postcard overflows viewport`);
+      await postcard.getByRole('button',{name:'Закрыть'}).click();
+
+      await page.goto(`${base}/workspace/board/?focus=artifact:${ART}&from=share`);
+      const receive=page.locator('.dc-board-share-postcard-layer');await receive.waitFor({state:'visible'});
+      expect(await receive.getByRole('button',{name:'ПОСМОТРЕТЬ АРТЕФАКТ →'}).count()===1,`${engine}/${viewport.width}: receive accept action missing`);
+      expect(await receive.getByRole('button',{name:'ОСТАТЬСЯ НА ДОСКЕ'}).count()===1,`${engine}/${viewport.width}: receive stay action missing`);
+      await page.waitForTimeout(760);
+      expect(await page.locator('.dc-artifact-overlay:not([hidden])').count()===0,`${engine}/${viewport.width}: shared Artifact auto-opened before explicit accept`);
+      expect(new URL(page.url()).searchParams.get('from')==='share',`${engine}/${viewport.width}: from=share consumed before recipient choice`);
+      expect(new URL(page.url()).searchParams.get('focus')===`artifact:${ART}`,`${engine}/${viewport.width}: focus changed before recipient choice`);
+      const receiveCardBox=await receive.locator('.dc-board-share-postcard').boundingBox();if(mobile)expect(!!receiveCardBox&&receiveCardBox.x>=0&&receiveCardBox.x+receiveCardBox.width<=viewport.width+.5,`${engine}/${viewport.width}: receive postcard overflows viewport`);
+      await receive.getByRole('button',{name:'ПОСМОТРЕТЬ АРТЕФАКТ →'}).click();
+      await page.locator('.dc-artifact-overlay').waitFor({state:'visible'});
+      expect(new URL(page.url()).searchParams.get('from')===null,`${engine}/${viewport.width}: accept did not consume from=share`);
+      expect(new URL(page.url()).searchParams.get('focus')===`artifact:${ART}`,`${engine}/${viewport.width}: accept lost canonical focus`);
+
+      await page.goto(`${base}/workspace/board/?focus=artifact:${ART}&from=share`);
+      const decline=page.locator('.dc-board-share-postcard-layer');await decline.waitFor({state:'visible'});await page.waitForTimeout(760);
+      expect(await page.locator('.dc-artifact-overlay:not([hidden])').count()===0,`${engine}/${viewport.width}: second shared arrival auto-opened before stay choice`);
+      await decline.getByRole('button',{name:'ОСТАТЬСЯ НА ДОСКЕ'}).click();
+      await page.waitForFunction(()=>{const u=new URL(location.href);return !u.searchParams.has('focus')&&!u.searchParams.has('from')});
+      expect(await page.locator('.dc-artifact-overlay:not([hidden])').count()===0,`${engine}/${viewport.width}: stay action opened/retained Artifact`);
+      expect(await page.locator('.dc-board-share-postcard-layer:visible').count()===0,`${engine}/${viewport.width}: receive postcard remained after stay`);
       await context.close();
     }
   }finally{await browser.close()}
@@ -93,4 +116,6 @@ console.log('✓ first-run Board tutorial is dismissed through its canonical П�
 console.log('✓ GitHub Pages 404 bridge resolves canonical /community/artifact/<uuid>/ into the Artifact detail surface');
 console.log('✓ closed Artifact card has no Share trigger; open Artifact action row owns Share');
 console.log('✓ sender postcard preserves open detail and shows canonical sender identity + brand');
+console.log('✓ authenticated shared arrival stays on persistent receive postcard across Chromium/WebKit desktop/mobile');
+console.log('✓ explicit receive accept retains focus and opens exact Artifact; stay clears focus/from and remains on Board');
 console.log('✓ explicit postcard copy emits clean dedicated Artifact share URL across Chromium/WebKit desktop/mobile');

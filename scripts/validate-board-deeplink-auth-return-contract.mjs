@@ -25,6 +25,18 @@ must(deep.includes("url.searchParams.delete('from')")&&deep.includes('history.re
 must(deep.includes('ПЕРЕДАТЬ АРТЕФАКТ'),'Sender postcard copy missing');
 must(deep.includes('ВАМ ПЕРЕДАЛИ АРТЕФАКТ'),'Receiver postcard copy missing');
 must(deep.includes('ВХОД ≠ ЧЛЕНСТВО'),'Receiver membership disclaimer missing');
+must(deep.includes('ПОСМОТРЕТЬ АРТЕФАКТ →'),'explicit receive accept action missing');
+must(deep.includes('ОСТАТЬСЯ НА ДОСКЕ'),'explicit receive stay action missing');
+must(deep.includes('data-postcard-accept')&&deep.includes('data-postcard-stay'),'receive action controls missing');
+must(deep.includes("sharedArrivalMode='receiver'"),'shared arrivals must use one role-neutral receiver presentation mode');
+must(!deep.includes("sharedArrivalMode==='guest'")&&!deep.includes("sharedArrivalMode==='member'"),'role-specific shared-arrival opening survived');
+must(!deep.includes('arrivalTimer')&&!deep.includes('},600)')&&!deep.includes('}, 600)'),'shared-arrival auto-open timer survived');
+must(deep.includes('showReceiveArrivalPostcard(node,focus)'),'resolved shared target does not stop at persistent receive postcard');
+must(deep.includes("consumeSharePresentation();sharedArrivalMode=null;sharedArrivalStarted=false")&&deep.includes('openResolvedFocus(node,focus)'),'explicit accept must consume only share presentation and then open exact target');
+must(deep.includes('function stayOnBoardFromSharedArrival()')&&deep.includes('clearFocus({replace:true})'),'stay/close must consume focus and from via canonical base Board URL');
+must(deep.includes("if(mode==='receiver-arrival'){stayOnBoardFromSharedArrival();return}"),'receiver close must mean stay on Board');
+must(deep.includes("event.target===postcard&&postcard.dataset.closable==='1'")&&deep.includes('requestPostcardClose()'),'receiver backdrop close path missing');
+must(deep.includes("event.key==='Escape'&&postcard.dataset.closable==='1'")&&deep.includes('requestPostcardClose()'),'receiver Escape close path missing');
 must(deep.includes('dc-board-share-postcard__brand')&&css.includes('.dc-board-share-postcard__brand'),'Postcard canonical brand missing');
 must(deep.includes("[data-shell-session] .dcw-session-profile")&&deep.includes('user_metadata'),'Sender identity must reuse canonical Workspace identity with auth metadata fallback');
 must(deep.includes('data-postcard-sender-avatar')&&deep.includes('data-postcard-sender-name'),'Sender postcard identity preview missing');
@@ -61,9 +73,12 @@ must(!/dc-community-artifacts|signedMediaUrl|createSignedUrl|dc_artifacts|curren
 if(fail.length){console.error('Board deep-link auth-return contract failed');for(const item of fail)console.error(`✗ ${item}`);process.exit(1)}
 console.log('Board deep-link auth-return contract');
 console.log('✓ canonical focus/history/auth-return preserved');
+console.log('✓ shared Artifact arrival stops at one role-neutral persistent receive postcard');
+console.log('✓ explicit accept removes from=share, retains focus and opens exact Artifact');
+console.log('✓ stay/close consumes both from=share and focus without resolver reopen');
 console.log('✓ Artifact Share lives in open detail action row; Entity Share remains direct');
 console.log('✓ Sender postcard reuses canonical Workspace identity and shows brand');
-console.log('✓ from=share is one-time presentation state only');
+console.log('✓ unauth shared entry preserves exact OAuth return without pre-auth target lookup');
 console.log('✓ /share/artifact stays transport-only with generic Community OG image + validated UUID redirect');
 console.log('✓ invalid UUID stays on transport surface and noscript fallback exists');
 console.log('✓ existing fullscreen owner and permission boundaries preserved');
