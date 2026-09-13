@@ -52,6 +52,8 @@ jobs:
         run: node scripts/validate-board-deeplink-auth-return-contract.mjs
       - name: Validate Board institutional publisher contract
         run: node scripts/validate-board-club-publisher-contract.mjs
+      - name: Validate Board public activity contract
+        run: node scripts/validate-board-public-activity-contract.mjs
       - name: Build production candidate artifact
         run: node scripts/build-pages.mjs
       - name: Validate production analytics and consent
