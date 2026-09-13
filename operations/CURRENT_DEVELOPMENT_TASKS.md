@@ -87,6 +87,28 @@ Board Project Card
 project-owned surface/runtime
 ```
 
+#### Кто может превратить инициативу в Project — IDEA
+
+Рабочее правило: **инициатива становится кандидатом в canonical Project через явное принятие ответственности Dementor за этот Project**.
+
+Два равноправных пути:
+
+1. **Dementor — создатель инициативы.** Если автор Board Artifact уже является Dementor, он может отдельно решить, что эта инициатива становится самостоятельным Project.
+2. **Dementor присоединяется к чужой инициативе.** Автором исходной идеи может быть Member или другой участник; если Dementor явно присоединяется к инициативе и принимает ответственность за Project, она может быть promoted в canonical Project.
+
+Важно:
+
+- простая реакция, комментарий, `RELATED_TO` или присутствие Dementor рядом с карточкой не считаются присоединением к Project;
+- присоединение должно выражаться canonical scoped assignment / participation relation к конкретному Project;
+- глобальная роль `DEMENTOR` сама по себе не даёт права произвольно менять чужие Board Artifacts или их lifecycle;
+- решение действует только в рамках Project, который Dementor создал или к которому явно присоединился;
+- если ни один Dementor не принял ответственность, идея может оставаться важной/популярной Board-публикацией, но сама по себе не становится Project;
+- несколько Dementors могут участвовать в одном Project; точная модель owner / co-owner / participant пока не определена;
+- создание Project **не означает** автоматический public listing, Home feature, доступ для всех или release;
+- точное UI-действие, permission path и storage representation не утверждены.
+
+Эта идея затрагивает role/permission и Project lifecycle boundary, поэтому перед implementation должна быть оформлена отдельным approved Decision / Change Proposal, а не внесена молча как рефакторинг.
+
 Если Project вырос из конкретной Board-публикации, его происхождение не теряется. Для связи использовать существующий approved relation graph, прежде всего:
 
 - `RESULT_OF` — ПОЯВИЛОСЬ ИЗ / РЕЗУЛЬТАТ;
@@ -168,13 +190,14 @@ Backlog для этой гипотезы:
 2. для каждого кандидата зафиксировать canonical name, canonical repository/source, semantic status, public status, current Gate и owner;
 3. разделить `project exists` / `project visible in register` / `project publicly accessible` / `project access restricted`;
 4. определить минимальный контракт Project card / Project entry на `/projects/`;
-5. определить Board → Project promotion rule без создания второго lifecycle;
-6. определить lineage: какая исходная Board-сущность породила Project и какая approved relation это выражает;
-7. определить, какие access modes реально нужны, только после проверки существующей auth/membership/permission архитектуры;
-8. определить, какие Projects показываются на Home и по какому правилу;
-9. проверить, как Board показывает Project projection при разных public/access состояниях, не превращая Board visibility в permission;
-10. не создавать `dc_projects`, новый universal project backend или parallel auth до появления реальной operational необходимости;
-11. после решения оформить отдельный Result на Projects registry / entry harmonization и только затем менять публичный `/projects/`.
+5. оформить и утвердить Board → Project promotion rule на основе явного принятия ответственности Dementor;
+6. определить canonical scoped assignment при присоединении Dementor к Project, не создавая глобальную роль или параллельный lifecycle;
+7. определить lineage: какая исходная Board-сущность породила Project и какая approved relation это выражает;
+8. определить, какие access modes реально нужны, только после проверки существующей auth/membership/permission архитектуры;
+9. определить, какие Projects показываются на Home и по какому правилу;
+10. проверить, как Board показывает Project projection при разных public/access состояниях, не превращая Board visibility в permission;
+11. не создавать `dc_projects`, новый universal project backend или parallel auth до появления реальной operational необходимости;
+12. после решения оформить отдельный Result на Projects registry / entry harmonization и только затем менять публичный `/projects/`.
 
 ---
 
