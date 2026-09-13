@@ -4,7 +4,7 @@ const failures=[];
 const expect=(ok,message)=>{if(!ok)failures.push(message)};
 const read=path=>fs.readFileSync(path,'utf8');
 
-const migration=read('supabase/migrations/20260912143000_board_information_architecture_batch_b_subtypes.sql');
+const migration=read('supabase/migrations/20260912123011_board_information_architecture_batch_b_subtypes.sql');
 const model=read('community/board/board-entity-model-v1.js');
 const integrations=read('community/board/board-integrations-v1.js');
 const board=read('community/board/board.js');
