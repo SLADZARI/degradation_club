@@ -137,7 +137,10 @@ function validateRepositoryContract() {
     'name: Deploy Dementor Supabase Production',
     'workflow_dispatch:',
     'release_confirmation:',
-    "ref: dementor-club-production",
+    'ref: dementor-club-production',
+    'CANONICAL_SUPABASE_PROJECT_REF: mmekfydwbvptbdatwitj',
+    'version: 2.117.0',
+    'Configured project ref is not the canonical Dementor production project',
     'supabase migration list --linked',
     'supabase db push --linked --dry-run',
     'supabase db push --linked',
@@ -149,13 +152,14 @@ function validateRepositoryContract() {
   }
 
   const forbiddenWorkflowTokens = [
+    'version: latest',
     'supabase db reset',
     'supabase migration repair',
     '--include-all',
     '--prune',
   ];
   for (const token of forbiddenWorkflowTokens) {
-    if (workflow.includes(token)) fail(`backend workflow contains forbidden operation: ${token}`);
+    if (workflow.includes(token)) fail(`backend workflow contains forbidden operation/config: ${token}`);
   }
 
   if (/\bon\s*:\s*\n(?:.|\n)*?\bpush\s*:/m.test(workflow)) fail('backend workflow must not deploy on push');
