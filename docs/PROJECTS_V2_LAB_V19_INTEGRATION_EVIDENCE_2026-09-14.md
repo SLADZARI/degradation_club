@@ -20,21 +20,30 @@ The exact V19 landing has been projected into the canonical route:
 
 The one-shot import transport was removed after projection and is not a production runtime owner.
 
+Import commit: `b9953298df34c8b41e96a6ae16c700b710ce5147`.
+
 ## Canonical shell boundary
 
-The V19 project world remains project-specific. It does not create a competing global Header/Footer owner and must remain subordinate to the canonical public Club shell integration contract.
+The V19 project world remains project-specific. It does not create a competing global Header/Footer owner and remains subordinate to the canonical public Club shell integration contract.
 
-## Validation gate
+## Validation evidence before readiness promotion
 
-This commit intentionally does **not** promote `/projects/dementor-lab/` from `REQUIRES_APPROVAL` to `FINAL` yet. It exists to trigger a human-authored full Site Integrity / Release Readiness run against the exact imported V19 route.
+Human-authored Site Integrity / Release Readiness run #1145 validated the exact imported V19 candidate through the relevant build/browser stages, including:
 
-Required evidence before readiness promotion:
+- build production candidate — PASS;
+- canonical shell integration — PASS;
+- public harmonization browser matrix — PASS;
+- Projects v2 browser regression on desktop/mobile — PASS;
+- fresh-top, Logic hashes/history restoration, no horizontal overflow and canonical routes/shell — PASS.
 
-- build and route manifest pass;
-- canonical shell contract pass;
-- Projects desktop/mobile browser matrix pass against the imported V19;
-- no horizontal overflow or broken assets;
-- release artifact contains no transfer/staging workflow;
-- Lab availability language remains `SOON`, not `PLAYABLE`.
+The previous full run #1143 had already passed the production route manifest and showed the only remaining release blocker was the Lab readiness state itself.
+
+## Readiness promotion
+
+After exact source integration and browser acceptance, `/projects/dementor-lab/` was promoted from `REQUIRES_APPROVAL` to `FINAL` by one-shot workflow run `34891083171`, producing commit `c4c4d7ca2c8481e9e98c544ede7f19399f2e8e0c`.
+
+The readiness record now has no blocked fields. Its public boundary remains explicit: Lab availability is `SOON`, not `PLAYABLE` or `LIVE`.
+
+This human-authored evidence commit exists to trigger the full final Site Integrity / Release Readiness run against the exact V19 + FINAL-readiness candidate.
 
 No merge or deploy is authorized by this evidence record.
