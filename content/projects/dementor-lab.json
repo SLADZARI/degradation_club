@@ -11,12 +11,14 @@
   "editorialSource": "dementor-lab",
   "publicationStatus": "public-access-soon",
   "provenance": {
+    "branch": "agent/169-projects-hub-v2",
+    "path": "docs/PROJECTS_V2_SOURCE_AUDIT_GATE_2026-09-14.md",
     "sourceSystem": "google-drive",
     "authorityType": "approved-public-landing",
     "artifactName": "dementor_lab_landing_v19_APPROVED.html",
     "artifactId": "1JptEnjRn4ebCUHfGRAGCqxy4ALacVumP",
     "sha256": "b6b592c79c6c798ad140a0937bfa271c3fbf9724f8a2cf28e3456ada2602738e",
-    "role": "canonical-project-public-landing-source"
+    "role": "approved-public-landing-source-pointer"
   },
   "siteRole": "implementation-mirror",
   "updatedAt": "2026-09-14"
