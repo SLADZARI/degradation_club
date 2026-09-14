@@ -10,6 +10,7 @@ const activity=read('public-activity-v1.js');
 const activityCss=read('public-activity-v1.css');
 const media=read('community/board/board-artifact-media-v1.js');
 const mediaCss=read('community/board/board-artifact-media-v1.css');
+const browser=read('scripts/validate-board-public-activity-browser.mjs');
 const boardHtml=read('workspace/board/index.html');
 const siteConfig=read('site-config.js');
 
@@ -44,9 +45,14 @@ assert(media.includes(".dc-notice__link"),'Board YouTube presentation owner miss
 assert(media.includes(".dc-artifact-link"),'Artifact detail YouTube presentation owner missing');
 assert(media.includes('VIDEO · YOUTUBE'),'literal YouTube label missing');
 assert(media.includes('i.ytimg.com/vi/'),'Board/Artifact YouTube thumbnail missing');
+assert(media.includes('new MutationObserver(apply)'),'Board/Artifact presentation must react directly to runtime render mutations');
 assert(mediaCss.includes('.dc-youtube-presentation__play'),'YouTube play marker styles missing');
 assert(siteConfig.includes("addScript('/public-activity-v1.js',{module:true})"),'public activity runtime not wired');
 assert(siteConfig.includes("addScript('/community/board/board-artifact-media-v1.js',{module:true})"),'Board/Artifact media runtime not wired');
+
+for(const token of ['width:390','width:360','PROFILE TEXT','PRIVATE IMAGE','HIDDEN FIXTURE','FUTURE FIXTURE','EXPIRED FIXTURE','assertRuntimeExclusions','Artifact detail presentation diagnostic'])assert(browser.includes(token),`browser evidence missing ${token}`);
+assert(browser.includes('privateStoragePath'),'private-image fixture must carry a private storage path for leak evidence');
+assert(browser.includes("eligibleIds"),'browser fixture must expose runtime eligibility evidence');
 
 assert(!exists('community/board/board-admin-telegram-compose-v1.js'),'#172 must not contain Telegram composer JS');
 assert(!exists('community/board/board-admin-telegram-compose-v1.css'),'#172 must not contain Telegram composer CSS');

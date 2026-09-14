@@ -21,10 +21,14 @@ function ensureBadge(media,id){
 }
 
 function enhance(container,{linkSelector,mediaSelector,mediaClass}){
-  const link=container.querySelector(linkSelector);const id=youtubeVideoId(link?.href);if(!id)return;
+  const link=container.querySelector(linkSelector);const id=youtubeVideoId(link?.href);if(!id)return false;
   let media=container.querySelector(mediaSelector);let image=media?.querySelector('img');
-  if(!media||!image){media=document.createElement('div');media.className=`${mediaClass} dc-youtube-presentation`;image=document.createElement('img');image.src=`https://i.ytimg.com/vi/${id}/hqdefault.jpg`;image.alt='YouTube preview';image.loading='lazy';image.decoding='async';media.appendChild(image);const anchorBlock=link.closest('p')||link;anchorBlock.parentNode?.insertBefore(media,anchorBlock)}
-  ensureBadge(media,id);
+  if(!media||!image){
+    media=document.createElement('div');media.className=`${mediaClass} dc-youtube-presentation`;
+    image=document.createElement('img');image.src=`https://i.ytimg.com/vi/${id}/hqdefault.jpg`;image.alt='YouTube preview';image.loading='lazy';image.decoding='async';
+    media.appendChild(image);const anchorBlock=link.closest('p')||link;anchorBlock.parentNode?.insertBefore(media,anchorBlock);
+  }
+  ensureBadge(media,id);return true;
 }
 
 function apply(){
@@ -32,7 +36,8 @@ function apply(){
   document.querySelectorAll('.dc-artifact-record').forEach(record=>enhance(record,{linkSelector:'.dc-artifact-link',mediaSelector:'.dc-artifact-media',mediaClass:'dc-artifact-media'}));
 }
 
-let scheduled=false;
-function schedule(){if(scheduled)return;scheduled=true;requestAnimationFrame(()=>{scheduled=false;apply()})}
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',schedule,{once:true});else schedule();
-new MutationObserver(schedule).observe(document.documentElement,{childList:true,subtree:true});
+function start(){
+  apply();
+  new MutationObserver(apply).observe(document.documentElement,{childList:true,subtree:true});
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
