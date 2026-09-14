@@ -60,17 +60,36 @@ for(const width of widths){
 
   for(const hash of ['#series-01','#series-03']){
     const page=await context.newPage();
+    const pageErrors=[];
+    page.on('pageerror',error=>pageErrors.push(error.message));
     await page.goto(base+'/projects/logic-awareness/'+hash,{waitUntil:'load'});
     await page.waitForSelector('.dc-global-header');
     await page.waitForTimeout(160);
     const state=await page.evaluate((hash)=>{
       const target=document.querySelector(hash);
-      return {exists:!!target,scrollY:window.scrollY,top:target?.getBoundingClientRect().top??null,hash:location.hash};
+      const top=target?.getBoundingClientRect().top??null;
+      return {
+        exists:!!target,
+        scrollY:window.scrollY,
+        top,
+        absoluteTop:top===null?null:top+window.scrollY,
+        hash:location.hash,
+        path:location.pathname,
+        readyState:document.readyState,
+        seriesRuntime:window.__DC_CONTENT_SERIES_V1__===true,
+        seriesScript:!!document.querySelector('script[src="/content-series-v1.js"]'),
+        seriesStyle:!!document.querySelector('#dc-content-series-v1'),
+        enhancedTracks:document.querySelectorAll('.dc-carousel-grid.dc-content-series').length,
+        navigationType:performance.getEntriesByType?.('navigation')?.[0]?.type??null,
+        scrollRestoration:history.scrollRestoration,
+        documentHeight:document.documentElement.scrollHeight
+      };
     },hash);
     expect(state.exists,`${width}px Logic ${hash}: target missing`);
     expect(state.hash===hash,`${width}px Logic ${hash}: fragment not preserved`);
     expect(state.scrollY>20,`${width}px Logic ${hash}: explicit hash was reset to top`);
-    expect(state.top!==null&&state.top>-80&&state.top<260,`${width}px Logic ${hash}: target not landed near viewport top (${state.top})`);
+    const landed=state.top!==null&&state.top>-80&&state.top<260;
+    expect(landed,`${width}px Logic ${hash}: target not landed near viewport top (${state.top}); diagnostics=${JSON.stringify({...state,pageErrors})}`);
     await page.close();
   }
 
