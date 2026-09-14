@@ -73,7 +73,17 @@ The semantic kernel on `dementor-club` is not mutated by this Result. This branc
 
 ## Current build note
 
-The approved Dementor Lab V19 self-contained landing is available as an external approved source artifact, but is not yet present as a repository file on this branch. Do not create a substitute Lab page. The hub may link to the canonical route while the route integration remains an explicit G5 dependency.
+The exact approved Dementor Lab V19 public landing authority is resolved and pinned:
+
+- source artifact: `dementor_lab_landing_v19_APPROVED.html`;
+- Google Drive artifact id: `1JptEnjRn4ebCUHfGRAGCqxy4ALacVumP`;
+- SHA-256: `b6b592c79c6c798ad140a0937bfa271c3fbf9724f8a2cf28e3456ada2602738e`;
+- availability boundary: `ПУБЛИЧНЫЙ ДОСТУП / СКОРО`;
+- V19 remains the project-owned visual/editorial world while the canonical Club Header/Footer own the public site shell.
+
+The canonical route still contains only the G5 source-binding shell. Exact V19 projection plus its approved visual media must be integrated before the Lab route can move from `REQUIRES_APPROVAL / productionAllowed:false` to visual acceptance. Do not substitute a reconstructed or experiment-branch version.
+
+The #44 navigation regression remains open at G5/G6 boundary until explicit Logic hash deep-links pass the automated desktop/mobile browser matrix without breaking fresh-top or Back restoration.
 
 ## Evidence required for G6
 
@@ -84,4 +94,4 @@ The approved Dementor Lab V19 self-contained landing is available as an external
 - shared header regression;
 - Home hero before/after equivalence check;
 - #44 navigation/hash/history check;
-- Lab source binding evidence before marking Lab route complete.
+- Lab exact V19 projection + visual source binding evidence before marking Lab route complete.
