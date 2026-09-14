@@ -47,15 +47,21 @@ The four stable routes are fixed by #169 and do not encode version numbers:
 
 ## Passport — `/projects/dementor-lab/`
 
-**Audit state: BLOCKED FOR SUBSTANTIVE BUILD — approved source artifact must be resolved.**
+**Audit state: VERIFIED FOR V19 PUBLIC LANDING SOURCE; ROUTE INTEGRATION STILL GATED.**
 
-- Canonical source required by #169: the approved public landing **V19**. A repository artifact/commit/branch that is demonstrably that approved landing must be identified before copying its design/content as authority.
+- Canonical public landing source: Google Drive artifact `dementor_lab_landing_v19_APPROVED.html`, file id `1JptEnjRn4ebCUHfGRAGCqxy4ALacVumP`.
+- Exact audited source SHA-256: `b6b592c79c6c798ad140a0937bfa271c3fbf9724f8a2cf28e3456ada2602738e`.
 - Confirmed public name: `DEMENTOR LAB`.
-- Confirmed issue-level public facts: #169 defines it as a public/approved project and preserves the approved core line `ИГРАЕМ В РЕАЛЬНОСТЬ`.
-- Current public status allowed on hub only after source cross-check: `PUBLIC / APPROVED` is specified by #169, but page-level claims and experience details must come from the resolved V19 source.
-- Allowed CTA before V19 resolution: neutral `ОТКРЫТЬ ПРОЕКТ →` only once the canonical slug has real source-backed content. Board bridge may use the #169-approved Club relationship language.
-- Verified visual assets: **pending V19 source resolution**. Lab experiment/runtime branches and `dementor-lab/` materials exist in repository history, but are not automatically the approved public landing authority.
-- Forbidden without V19/newer source: gameplay/mechanics descriptions, current feature list, progress/completion claims, dates, prices, participant data, launch/release promises, or treating an experiment/runtime branch as the public landing canon.
+- Confirmed V19 core line: `ИГРАЕМ В РЕАЛЬНОСТЬ`.
+- What V19 demonstrably presents: an interactive story in which the same situation is replayed after changing one cause/choice; the approved landing explicitly uses the first episode `S01E01 / МЫ ОПАЗДЫВАЕМ` and the `Hot Patch` framing.
+- Current public status allowed on the Projects hub: `PUBLIC / APPROVED`.
+- Availability boundary from V19: `ПУБЛИЧНЫЙ ДОСТУП / СКОРО`. This does **not** authorize `PLAYABLE`, `LIVE`, or a claim that the experience is currently publicly available.
+- Allowed CTA: `ОТКРЫТЬ ПРОЕКТ →` to the canonical Lab slug once that slug contains the source-backed V19 landing. The hub may describe the approved public concept, but must preserve the V19 availability boundary.
+- Verified visual source: V19 contains 13 unique embedded WebP visuals (16 data-URI occurrences across responsive placements). These visuals belong to the approved public landing source; repository experiment/runtime assets are not interchangeable authority unless matched to the audited V19 source.
+- Shell boundary: V19's local `sitebar` is not canonical public-site ownership. Integration must preserve V19's project-specific visual/content world while removing the page-owned duplicate shell and allowing the canonical public Header/Footer to own navigation. This is integration adaptation, not a redesign.
+- Authority boundary: V19 approves the public landing only. It does not promote experiment/runtime branches to in-game Design authority.
+- Forbidden without newer source: current playable/live claims, completion/progress claims, dates, prices, participant data, launch/release promises, or treating a Lab experiment/runtime branch as a replacement for the approved V19 public landing.
+- Remaining implementation gate: exact V19 content/visual projection must be present at `/projects/dementor-lab/`, canonical shell ownership must be preserved, and desktop/mobile browser/visual QA must pass before page readiness can become `FINAL`.
 
 ## Passport — `/projects/dementor-battle/`
 
@@ -88,7 +94,7 @@ The first Draft PR may establish the `/projects/` information architecture, stab
 In particular:
 
 - no `PLAYABLE` badge for Robo Games until verified;
-- no Lab mechanics or V19-derived visual claims until the actual approved V19 artifact is resolved;
+- Lab hub copy may use the audited V19 facts, but the Lab route remains gated until the exact approved V19 landing is integrated with canonical shell ownership and passes browser/visual QA;
 - no Battle rules beyond the #169 safe envelope until its responsible source is audited;
 - Logic & Awareness keeps its existing project-specific visual/editorial world rather than being rebuilt into a generic template.
 
