@@ -1,0 +1,45 @@
+name: Projects v2 Lab V19 readiness promotion
+
+on:
+  push:
+    branches:
+      - agent/169-projects-hub-v2
+    paths:
+      - .github/workflows/projects-v2-lab-v19-readiness.yml
+
+permissions:
+  contents: write
+
+jobs:
+  promote-readiness:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout integration branch
+        uses: actions/checkout@v4
+        with:
+          ref: agent/169-projects-hub-v2
+          fetch-depth: 1
+
+      - name: Promote exact approved Lab V19 route to FINAL
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs = require('fs');
+          const path = 'content/page-readiness.json';
+          const doc = JSON.parse(fs.readFileSync(path, 'utf8'));
+          const page = doc.pages.find((item) => item.route === '/projects/dementor-lab/');
+          if (!page) throw new Error('Lab readiness record not found');
+          page.state = 'FINAL';
+          delete page.productionAllowed;
+          page.blockingFields = [];
+          page.note = 'Approved Dementor Lab V19 is integrated at the canonical route with 13 verified visual derivatives; public availability remains SOON and does not imply PLAYABLE or LIVE.';
+          fs.writeFileSync(path, JSON.stringify(doc, null, 2) + '\n');
+          NODE
+          git rm .github/workflows/projects-v2-lab-v19-readiness.yml
+          git add content/page-readiness.json
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git diff --cached --check
+          git commit -m 'chore(projects): approve integrated Lab V19 route'
+          git push origin HEAD:agent/169-projects-hub-v2
