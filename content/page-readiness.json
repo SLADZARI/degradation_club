@@ -52,6 +52,22 @@
       "note": "Canonical route exists only as a G5 source-binding shell. Do not mark FINAL or production-allowed until the exact approved V19 artifact is integrated and visually accepted."
     },
     {
+      "route": "/projects/dementor-battle/",
+      "state": "REQUIRES_APPROVAL",
+      "productionAllowed": true,
+      "source": ["docs/PROJECTS_V2_SOURCE_AUDIT_GATE_2026-09-14.md", "docs/PROJECTS_V2_EDITORIAL_DESIGN_HANDOFF_2026-09-14.md"],
+      "blockingFields": ["responsible project source audit", "verified project visual assets", "final mechanics beyond the approved safe envelope"],
+      "note": "Neutral IN DEVELOPMENT route may ship using only the #169 safe envelope. No final rules, release claims or playable status are allowed until the responsible source is verified."
+    },
+    {
+      "route": "/projects/dementor-robo-games/",
+      "state": "REQUIRES_APPROVAL",
+      "productionAllowed": true,
+      "source": ["docs/PROJECTS_V2_SOURCE_AUDIT_GATE_2026-09-14.md", "docs/PROJECTS_V2_EDITORIAL_DESIGN_HANDOFF_2026-09-14.md"],
+      "blockingFields": ["current playable source verification", "verified project visual assets", "disciplines and competition rules"],
+      "note": "Neutral IN DEVELOPMENT route may ship. PLAYABLE, PLAY/ИГРАТЬ, disciplines, scoring, tournaments, dates and prizes remain blocked until a current responsible source verifies them."
+    },
+    {
       "route": "/projects/logic-awareness/",
       "state": "FINAL",
       "source": ["logic-awareness/README.md"],
