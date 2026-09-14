@@ -65,10 +65,10 @@ The semantic kernel on `dementor-club` is not mutated by this Result. This branc
 - [ ] Battle/Robo CTAs point to canonical `/workspace/board/`.
 - [ ] Acid CTAs use INK/black text.
 - [ ] New page styles are scoped to the Projects hub and do not override global Home/About/Community selectors.
-- [ ] No horizontal overflow on mobile layouts.
-- [ ] Existing shared topbar and mobile INDEX behavior remain owned by the shared shell.
+- [x] No horizontal overflow on 1440/390 Projects browser matrix.
+- [x] Canonical public Header is present on hub + all four canonical slugs in the Projects browser matrix.
 - [ ] `/projects/` metadata describes the whole hub, not only Logic & Awareness.
-- [ ] #44 regression remains part of G6: fresh `/projects/` and `/projects/logic-awareness/` open at top; valid hashes and history continue to work.
+- [x] #44 browser regression: fresh hub/slugs open at top; Logic `#series-01` / `#series-03` land correctly; browser Back restoration remains enabled on 1440/390.
 - [ ] Home hero remains visually and structurally unchanged.
 
 ## Current build note
@@ -83,15 +83,30 @@ The exact approved Dementor Lab V19 public landing authority is resolved and pin
 
 The canonical route still contains only the G5 source-binding shell. Exact V19 projection plus its approved visual media must be integrated before the Lab route can move from `REQUIRES_APPROVAL / productionAllowed:false` to visual acceptance. Do not substitute a reconstructed or experiment-branch version.
 
-The #44 navigation regression remains open at G5/G6 boundary until explicit Logic hash deep-links pass the automated desktop/mobile browser matrix without breaking fresh-top or Back restoration.
+## #44 evidence — passed on branch
+
+CI run `#1140` / Actions run `34873362152` passed `Validate Projects v2 navigation` after the corrective fragment owner was fixed.
+
+Root cause: global `html { scroll-behavior:smooth }` converted the explicit Logic fragment correction into a repeatedly restarted smooth animation. The existing `content-series-v1.js` owner now temporarily bypasses that global smooth-scroll rule only while an explicit Logic hash settles, restores the original rule afterwards, and does not alter browser-owned Back/Forward restoration.
+
+Automated evidence on both 1440 and 390 widths:
+
+- fresh `/projects/` starts at top;
+- fresh four canonical project slugs start at top;
+- `#series-01` and `#series-03` remain explicit and land at their targets;
+- Back restoration is not forced to top;
+- no horizontal overflow;
+- canonical public Header remains present.
+
+Issue #44 is not treated as released/production-fixed until the Result is actually released; current evidence is branch acceptance only.
+
+## Current release blocker
+
+CI run `#1140` passes the Projects-specific browser gate and all preceding static/build/browser checks, but the final production release gate correctly remains red because `/projects/dementor-lab/` is still `REQUIRES_APPROVAL` / `productionAllowed:false` pending exact V19 media projection. This is an expected gate, not a reason to weaken readiness.
 
 ## Evidence required for G6
 
 - exact changed-file diff;
-- build success;
-- route checks;
 - desktop + mobile visual evidence for `/projects/`;
-- shared header regression;
 - Home hero before/after equivalence check;
-- #44 navigation/hash/history check;
 - Lab exact V19 projection + visual source binding evidence before marking Lab route complete.
