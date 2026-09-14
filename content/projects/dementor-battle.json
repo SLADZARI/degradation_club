@@ -1,0 +1,20 @@
+{
+  "id": "project-003-dementor-battle",
+  "entityType": "project",
+  "slug": "dementor-battle",
+  "title": "DEMENTOR BATTLE",
+  "type": "tactical-browser-game",
+  "status": "in-development",
+  "publicUrl": "/projects/dementor-battle/",
+  "preview": null,
+  "summary": "Тактическая браузерная игра в разработке: изометрическое поле, персонажи, движение и укрытия.",
+  "editorialSource": "dementor-battle",
+  "publicationStatus": "in-development",
+  "provenance": {
+    "branch": "agent/169-projects-hub-v2",
+    "path": "docs/PROJECTS_V2_SOURCE_AUDIT_GATE_2026-09-14.md",
+    "role": "source-bounded-public-project-record"
+  },
+  "siteRole": "implementation-mirror",
+  "updatedAt": "2026-09-14"
+}
