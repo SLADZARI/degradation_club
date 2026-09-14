@@ -5,7 +5,7 @@
   const style=document.createElement('style');
   style.id='dc-content-series-v1';
   style.textContent=`
-    .dc-carousel-publication{overflow:hidden}
+    .dc-carousel-publication{overflow:hidden;scroll-margin-top:calc(var(--dc-global-header-h,72px) + 16px)}
     .dc-carousel-grid.dc-content-series{display:flex;gap:clamp(12px,2vw,28px);overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scroll-behavior:smooth;overscroll-behavior-inline:contain;scrollbar-width:none;padding:24px max(18px,calc((100vw - min(68vw,620px))/2)) 28px;margin-inline:calc(50% - 50vw);cursor:grab;touch-action:pan-x pan-y}
     .dc-carousel-grid.dc-content-series::-webkit-scrollbar{display:none}
     .dc-carousel-grid.dc-content-series.is-dragging{cursor:grabbing;scroll-snap-type:none;user-select:none}
@@ -115,6 +115,47 @@
     requestAnimationFrame(()=>go(0,{behavior:false}));
   };
 
-  const boot=()=>document.querySelectorAll('.dc-carousel-grid').forEach(enhance);
+  const stabilizeExplicitLogicHash=()=>{
+    const path=location.pathname.replace(/^\/degradation_club/,'');
+    if(path!=='/projects/logic-awareness/'||!location.hash)return;
+    const navigation=performance.getEntriesByType?.('navigation')?.[0];
+    if(navigation?.type==='back_forward')return;
+
+    let target=null;
+    try{target=document.querySelector(location.hash);}catch{}
+    if(!target)return;
+
+    let stopped=false,raf=0,observer=null;
+    const stop=()=>{
+      if(stopped)return;
+      stopped=true;
+      observer?.disconnect();
+    };
+    const userTookControl=()=>stop();
+    addEventListener('pointerdown',userTookControl,{once:true,passive:true,capture:true});
+    addEventListener('wheel',userTookControl,{once:true,passive:true,capture:true});
+    addEventListener('touchstart',userTookControl,{once:true,passive:true,capture:true});
+    addEventListener('keydown',userTookControl,{once:true,capture:true});
+
+    const align=()=>{
+      if(stopped||raf)return;
+      raf=requestAnimationFrame(()=>{
+        raf=0;
+        if(stopped)return;
+        target.scrollIntoView({block:'start',inline:'nearest',behavior:'auto'});
+      });
+    };
+
+    /* Lazy media above the deep-link can change document height after native hash navigation. */
+    if('ResizeObserver' in window){observer=new ResizeObserver(align);observer.observe(document.body);}
+    align();
+    if(document.readyState!=='complete')addEventListener('load',align,{once:true});
+    setTimeout(stop,2500);
+  };
+
+  const boot=()=>{
+    document.querySelectorAll('.dc-carousel-grid').forEach(enhance);
+    stabilizeExplicitLogicHash();
+  };
   document.readyState==='loading'?document.addEventListener('DOMContentLoaded',boot,{once:true}):boot();
 })();
