@@ -11,9 +11,12 @@
   "editorialSource": "dementor-lab",
   "publicationStatus": "public-access-soon",
   "provenance": {
-    "branch": "dementor-club",
-    "path": "projects/dementor-lab/",
-    "role": "canonical-project-product-source"
+    "sourceSystem": "google-drive",
+    "authorityType": "approved-public-landing",
+    "artifactName": "dementor_lab_landing_v19_APPROVED.html",
+    "artifactId": "1JptEnjRn4ebCUHfGRAGCqxy4ALacVumP",
+    "sha256": "b6b592c79c6c798ad140a0937bfa271c3fbf9724f8a2cf28e3456ada2602738e",
+    "role": "canonical-project-public-landing-source"
   },
   "siteRole": "implementation-mirror",
   "updatedAt": "2026-09-14"
