@@ -7,7 +7,8 @@ const artifact=path.join(process.cwd(),'_site');
 const failures=[];
 const expect=(ok,msg)=>{if(!ok)failures.push(msg)};
 const mime={'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.js':'text/javascript; charset=utf-8','.mjs':'text/javascript; charset=utf-8','.json':'application/json; charset=utf-8','.svg':'image/svg+xml','.png':'image/png','.webp':'image/webp','.jpg':'image/jpeg'};
-function resolveFile(urlPath){let pathname=decodeURIComponent(new URL(urlPath,'http://local').pathname);if(/^\/community\/artifact\/[^/]+\/?$/.test(pathname))pathname='/community/artifact/index.html';else if(pathname.endsWith('/'))pathname+='index.html';const full=path.resolve(artifact,pathname.replace(/^\/+/,''));return full.startsWith(path.resolve(artifact))?full:null}
+const ARTIFACT_UUID_PATH=/^\/community\/artifact\/[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\/?$/i;
+function resolveFile(urlPath){let pathname=decodeURIComponent(new URL(urlPath,'http://local').pathname);if(ARTIFACT_UUID_PATH.test(pathname))pathname='/community/artifact/index.html';else if(pathname.endsWith('/'))pathname+='index.html';const full=path.resolve(artifact,pathname.replace(/^\/+/,''));return full.startsWith(path.resolve(artifact))?full:null}
 const server=http.createServer((req,res)=>{const file=resolveFile(req.url||'/');if(!file||!fs.existsSync(file)||!fs.statSync(file).isFile()){res.statusCode=404;res.end('Not found');return}res.statusCode=200;res.setHeader('content-type',mime[path.extname(file)]||'application/octet-stream');res.end(fs.readFileSync(file))});
 await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
 const base=`http://127.0.0.1:${server.address().port}`;
@@ -52,13 +53,27 @@ async function context(browser,options={}){
   return ctx;
 }
 function watchErrors(page){const errors=[];page.on('pageerror',error=>errors.push(error.message));return errors}
-async function waitForArtifactPresentation(page,errors){
+function watchArtifactDiagnostics(page){
+  const consoleErrors=[];const requestFailures=[];const badResponses=[];const artifactRequests=[];
+  page.on('console',message=>{if(['error','warning'].includes(message.type()))consoleErrors.push(`${message.type()}: ${message.text()}`)});
+  page.on('request',request=>{if(new URL(request.url()).pathname==='/community/artifact/artifact.js')artifactRequests.push(request.url())});
+  page.on('requestfailed',request=>requestFailures.push(`${request.method()} ${request.url()} :: ${request.failure()?.errorText||'UNKNOWN'}`));
+  page.on('response',response=>{if(response.status()>=400)badResponses.push(`${response.status()} ${response.url()}`)});
+  return{consoleErrors,requestFailures,badResponses,artifactRequests};
+}
+async function artifactExecutionEvidence(page){
+  const coverage=await page.coverage.stopJSCoverage();
+  const entry=coverage.find(item=>{try{return new URL(item.url).pathname==='/community/artifact/artifact.js'}catch{return false}});
+  return{artifactJsExecuted:Boolean(entry?.ranges?.some(range=>range.end>range.start)),artifactJsCoverageRanges:entry?.ranges?.length||0};
+}
+async function waitForArtifactPresentation(page,errors,network){
   try{
     await page.locator('.dc-artifact-record').waitFor({state:'visible',timeout:4000});
     await page.locator('.dc-artifact-record .dc-youtube-presentation').waitFor({state:'visible',timeout:4000});
   }catch(error){
+    const execution=await artifactExecutionEvidence(page);
     const diagnostic=await page.evaluate(()=>({artifactState:document.getElementById('artifactState')?.textContent||null,artifactHost:document.getElementById('artifactHost')?.innerHTML||null,mediaRuntimeLoaded:Boolean([...document.scripts].find(script=>script.src.includes('board-artifact-media-v1.js')))}));
-    console.error('Artifact detail presentation diagnostic',JSON.stringify({pageErrors:errors,diagnostic},null,2));
+    console.error('Artifact detail presentation diagnostic',JSON.stringify({pageErrors:errors,...network,...execution,diagnostic},null,2));
     throw error;
   }
 }
@@ -115,10 +130,10 @@ try{
     const label=await page.locator(`.dc-notice[data-artifact="${VIDEO_ID}"] [data-youtube-label]`).innerText();expect(label==='VIDEO · YOUTUBE',`board: YouTube label missing (${label})`);const src=await page.locator(`.dc-notice[data-artifact="${VIDEO_ID}"] .dc-youtube-presentation img`).getAttribute('src');expect(String(src).includes('i.ytimg.com/vi/dQw4w9WgXcQ/'),`board: YouTube preview missing (${src})`);expect(!errors.length,`board: ${errors.join(' | ')}`);await ctx.close();
   }
   {
-    const ctx=await context(browser,{viewport:{width:1200,height:900}});const page=await ctx.newPage();const errors=watchErrors(page);
-    await page.goto(base+`/community/artifact/${VIDEO_ID}/`,{waitUntil:'domcontentloaded'});await waitForArtifactPresentation(page,errors);const label=await page.locator('.dc-artifact-record [data-youtube-label]').innerText();expect(label==='VIDEO · YOUTUBE',`artifact: YouTube label missing (${label})`);const src=await page.locator('.dc-artifact-record .dc-youtube-presentation img').getAttribute('src');expect(String(src).includes('i.ytimg.com/vi/dQw4w9WgXcQ/'),`artifact: YouTube preview missing (${src})`);expect(!errors.length,`artifact: ${errors.join(' | ')}`);await ctx.close();
+    const ctx=await context(browser,{viewport:{width:1200,height:900}});const page=await ctx.newPage();const errors=watchErrors(page);const network=watchArtifactDiagnostics(page);await page.coverage.startJSCoverage({resetOnNavigation:false});
+    await page.goto(base+`/community/artifact/${VIDEO_ID}/`,{waitUntil:'domcontentloaded'});await waitForArtifactPresentation(page,errors,network);const execution=await artifactExecutionEvidence(page);expect(network.artifactRequests.length===1,`artifact: expected one artifact.js request, got ${network.artifactRequests.length}`);expect(execution.artifactJsExecuted,`artifact: artifact.js did not execute (${execution.artifactJsCoverageRanges} coverage ranges)`);const label=await page.locator('.dc-artifact-record [data-youtube-label]').innerText();expect(label==='VIDEO · YOUTUBE',`artifact: YouTube label missing (${label})`);const src=await page.locator('.dc-artifact-record .dc-youtube-presentation img').getAttribute('src');expect(String(src).includes('i.ytimg.com/vi/dQw4w9WgXcQ/'),`artifact: YouTube preview missing (${src})`);expect(!network.requestFailures.length,`artifact request failures: ${network.requestFailures.join(' | ')}`);expect(!network.badResponses.length,`artifact bad responses: ${network.badResponses.join(' | ')}`);expect(!errors.length,`artifact: ${errors.join(' | ')}`);await ctx.close();
   }
 }finally{await browser.close();server.close()}
 
 if(failures.length){console.error(`Board public activity browser acceptance failed (${failures.length})`);for(const failure of failures)console.error(`- ${failure}`);process.exit(1)}
-console.log('Board public activity browser acceptance passed: desktop + mobile 390/360 + reduced motion + runtime eligibility + pagination + Board/Artifact YouTube.');
+console.log('Board public activity browser acceptance passed: desktop + mobile 390/360 + reduced motion + runtime eligibility + pagination + canonical Artifact boot + Board/Artifact YouTube.');
