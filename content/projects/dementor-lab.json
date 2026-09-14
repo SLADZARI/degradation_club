@@ -1,0 +1,20 @@
+{
+  "id": "project-002-dementor-lab",
+  "entityType": "project",
+  "slug": "dementor-lab",
+  "title": "DEMENTOR LAB",
+  "type": "interactive-project",
+  "status": "public-approved",
+  "publicUrl": "/projects/dementor-lab/",
+  "preview": null,
+  "summary": "Интерактивная история, где одну ситуацию можно прожить ещё раз — изменив один ход.",
+  "editorialSource": "dementor-lab",
+  "publicationStatus": "public-access-soon",
+  "provenance": {
+    "branch": "dementor-club",
+    "path": "projects/dementor-lab/",
+    "role": "canonical-project-product-source"
+  },
+  "siteRole": "implementation-mirror",
+  "updatedAt": "2026-09-14"
+}
