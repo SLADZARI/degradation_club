@@ -185,7 +185,6 @@ async function supportPromotion(id){
   if(error){boardError(error,boardHost);return}
   await loadBoard();
 }
-async function adminPromote(id){const {error}=await client.rpc('dc_admin_promote_artifact_telegram_v1',{p_artifact_id:id});if(error){boardError(error,boardHost);return}await loadBoard()}
 async function adminSuppress(id){if(!confirm('Отключить Telegram distribution для этой публикации?'))return;const {error}=await client.rpc('dc_admin_suppress_artifact_telegram_v1',{p_artifact_id:id});if(error){boardError(error,boardHost);return}await loadBoard()}
 async function adminHide(id){if(!confirm('Скрыть публикацию с общей доски? История и canonical Artifact сохранятся.'))return;const {error}=await client.rpc('dc_admin_board_hide_artifact_v1',{p_artifact_id:id});if(error){boardError(error,boardHost);return}await refreshAll()}
 async function resolveUnknownDelivery(outboxId,resolution){
@@ -229,7 +228,6 @@ function promotionControls(artifact,row,{ownerAdmin=false,historical=false}={}){
   if(!historical&&row.can_support===true&&row.my_support!==true&&threshold>0&&count<threshold)parts.push(`<button class="dc-board-action small" type="button" data-promotion-support="${artifact.id}">ПОДДЕРЖАТЬ · ${count}/${threshold}</button>`);
   else if(row.my_support===true&&threshold>0)parts.push(`<span class="dc-board-state">✓ ПОДДЕРЖАНО · ${count}/${threshold}</span>`);
   if(ownerAdmin){
-    if(status==='held')parts.push(`<button class="dc-board-action small" type="button" data-admin-promote="${artifact.id}">ОПУБЛИКОВАТЬ В TELEGRAM</button>`);
     if(status==='held'||status==='pending')parts.push(`<button class="dc-board-action small" type="button" data-admin-suppress="${artifact.id}">НЕ ПУБЛИКОВАТЬ В TELEGRAM</button>`);
     if(status==='delivery_unknown'&&row.outbox_id){parts.push(`<button class="dc-board-action small" type="button" data-admin-resolve="sent" data-outbox="${esc(row.outbox_id)}">ПОДТВЕРДИТЬ SENT</button>`);parts.push(`<button class="dc-board-action small" type="button" data-admin-resolve="retry" data-outbox="${esc(row.outbox_id)}">CONTROLLED RETRY</button>`);parts.push(`<button class="dc-board-action small" type="button" data-admin-resolve="cancelled" data-outbox="${esc(row.outbox_id)}">ОТМЕНИТЬ</button>`)}
     parts.push(`<button class="dc-board-action small" type="button" data-admin-hide="${artifact.id}">СКРЫТЬ С ДОСКИ</button>`);
@@ -255,7 +253,6 @@ function installNoticeActions(){
   boardHost.querySelectorAll('[data-close-artifact]').forEach(button=>button.addEventListener('click',()=>closeArtifact(button.dataset.closeArtifact)));
   boardHost.querySelectorAll('[data-admin-close-artifact]').forEach(button=>button.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();closeArtifact(button.dataset.adminCloseArtifact,{admin:true})}));
   boardHost.querySelectorAll('[data-promotion-support]').forEach(button=>button.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();supportPromotion(button.dataset.promotionSupport)}));
-  boardHost.querySelectorAll('[data-admin-promote]').forEach(button=>button.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();adminPromote(button.dataset.adminPromote)}));
   boardHost.querySelectorAll('[data-admin-suppress]').forEach(button=>button.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();adminSuppress(button.dataset.adminSuppress)}));
   boardHost.querySelectorAll('[data-admin-hide]').forEach(button=>button.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();adminHide(button.dataset.adminHide)}));
   boardHost.querySelectorAll('[data-admin-resolve]').forEach(button=>button.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();resolveUnknownDelivery(button.dataset.outbox,button.dataset.adminResolve)}));
