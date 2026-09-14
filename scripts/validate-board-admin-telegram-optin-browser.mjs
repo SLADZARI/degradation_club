@@ -9,20 +9,8 @@ const expect=(ok,msg)=>{if(!ok)failures.push(msg)};
 const mime={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8'};
 
 const runtimeStub=`
-export async function currentSession(){return {user:{id:'owner-1'}}}
 const state=()=>globalThis.__QA_STATE__;
-const query=()=>{
-  const q={
-    select(){return q},eq(){return q},order(){return q},limit(){return q},
-    then(resolve,reject){
-      state().sequence.push('artifact-read');
-      return Promise.resolve({data:[...(state().rows||[])],error:null}).then(resolve,reject)
-    }
-  };
-  return q;
-};
 const client={
-  from(){return query()},
   rpc:async(name,args)=>{
     if(name==='dc_admin_promote_artifact_telegram_v1'){
       state().promoteCalls+=1;
@@ -41,13 +29,13 @@ function pageHtml(role='OWNER_ADMIN'){
     <div id="entryHost"></div>
     <script>
       document.documentElement.dataset.dcBoardUserState=${JSON.stringify(role)};
-      globalThis.__QA_STATE__={rows:[],promoteCalls:0,promotedIds:[],sequence:[],promotionFails:false};
+      globalThis.__QA_STATE__={promoteCalls:0,promotedIds:[],sequence:[],promotionFails:false};
       globalThis.__renderComposer=()=>{
         document.getElementById('entryHost').innerHTML='<form id="artifactForm"><input id="artifactTitle" value="QA TITLE"><textarea id="artifactBody">QA BODY</textarea><div class="dc-composer-actions"><button type="submit">PUBLISH</button></div></form>';
       };
       globalThis.__publishSuccess=id=>{
-        globalThis.__QA_STATE__.rows=[{id,title:'QA TITLE',body:'QA BODY',status:'active',published_at:new Date().toISOString()}];
         globalThis.__QA_STATE__.sequence.push('board-success');
+        window.dispatchEvent(new CustomEvent('dc:board:artifact-published',{detail:{artifactId:id}}));
         document.getElementById('entryHost').innerHTML='<div data-published="1">BOARD PUBLISHED</div>';
       };
       globalThis.__renderComposer();
@@ -76,9 +64,7 @@ async function ownerPage(){
   await page.locator('[data-admin-telegram-optin-input]').waitFor({state:'attached',timeout:3000});
   return {page,errors};
 }
-async function submit(page){
-  await page.locator('#artifactForm').evaluate(form=>form.dispatchEvent(new Event('submit',{bubbles:true,cancelable:true})));
-}
+async function submit(page){await page.locator('#artifactForm').evaluate(form=>form.dispatchEvent(new Event('submit',{bubbles:true,cancelable:true})))}
 async function state(page){return page.evaluate(()=>globalThis.__QA_STATE__)}
 
 try{
@@ -86,90 +72,51 @@ try{
   {
     const {page,errors}=await ownerPage();
     expect(await page.locator('[data-admin-telegram-optin-input]').isChecked()===false,'case 1: opt-in must default OFF');
-    await submit(page);
-    await page.evaluate(()=>globalThis.__publishSuccess('11111111-1111-4111-8111-111111111111'));
-    await page.waitForTimeout(120);
-    const s=await state(page);
-    expect(await page.locator('[data-published="1"]').count()===1,'case 1: canonical Board success marker missing');
-    expect(s.promoteCalls===0,`case 1: OFF unexpectedly promoted ${s.promoteCalls} time(s)`);
-    expect(!errors.length,`case 1 pageerror: ${errors.join(' | ')}`);
-    await page.close();
+    await submit(page);await page.evaluate(()=>globalThis.__publishSuccess('11111111-1111-4111-8111-111111111111'));await page.waitForTimeout(100);
+    const s=await state(page);expect(await page.locator('[data-published="1"]').count()===1,'case 1: canonical Board success marker missing');expect(s.promoteCalls===0,`case 1: OFF unexpectedly promoted ${s.promoteCalls} time(s)`);expect(!errors.length,`case 1 pageerror: ${errors.join(' | ')}`);await page.close();
   }
 
-  // 2. ON + publish fail -> composer remains, zero promotion attempts.
+  // 2. ON + publish fail -> no success event, zero promotion attempts.
   {
-    const {page,errors}=await ownerPage();
-    await page.locator('[data-admin-telegram-optin-input]').check();
-    await submit(page);
-    await page.waitForTimeout(120);
-    const s=await state(page);
-    expect(await page.locator('#artifactForm').count()===1,'case 2: failed canonical publish should leave composer present in fixture');
-    expect(s.promoteCalls===0,`case 2: failed Board publish triggered ${s.promoteCalls} promotion attempt(s)`);
-    expect(!errors.length,`case 2 pageerror: ${errors.join(' | ')}`);
-    await page.close();
+    const {page,errors}=await ownerPage();await page.locator('[data-admin-telegram-optin-input]').check();await submit(page);await page.waitForTimeout(100);
+    const s=await state(page);expect(await page.locator('#artifactForm').count()===1,'case 2: failed canonical publish should leave composer present');expect(s.promoteCalls===0,`case 2: failed Board publish triggered ${s.promoteCalls} promotion attempt(s)`);expect(!errors.length,`case 2 pageerror: ${errors.join(' | ')}`);await page.close();
   }
 
-  // 3. ON + publish success -> exactly one promotion after canonical success.
+  // 3. ON + publish success -> exactly one promotion of the exact success-event Artifact id.
   {
-    const {page,errors}=await ownerPage();
-    await page.locator('[data-admin-telegram-optin-input]').check();
-    await submit(page);
-    await page.evaluate(()=>globalThis.__publishSuccess('22222222-2222-4222-8222-222222222222'));
-    await page.waitForFunction(()=>globalThis.__QA_STATE__.promoteCalls===1,{timeout:2000});
-    const s=await state(page);
-    expect(s.promoteCalls===1,`case 3: expected exactly one promotion, got ${s.promoteCalls}`);
-    expect(s.promotedIds[0]==='22222222-2222-4222-8222-222222222222',`case 3: wrong Artifact promoted (${s.promotedIds[0]})`);
-    expect(s.sequence.indexOf('board-success')>=0&&s.sequence.indexOf('promote')>s.sequence.indexOf('board-success'),`case 3: promotion did not occur after canonical success (${s.sequence.join(' > ')})`);
-    expect(!errors.length,`case 3 pageerror: ${errors.join(' | ')}`);
-    await page.close();
+    const {page,errors}=await ownerPage();await page.locator('[data-admin-telegram-optin-input]').check();await submit(page);await page.evaluate(()=>globalThis.__publishSuccess('22222222-2222-4222-8222-222222222222'));await page.waitForFunction(()=>globalThis.__QA_STATE__.promoteCalls===1,{timeout:2000});
+    const s=await state(page);expect(s.promoteCalls===1,`case 3: expected exactly one promotion, got ${s.promoteCalls}`);expect(s.promotedIds[0]==='22222222-2222-4222-8222-222222222222',`case 3: wrong Artifact promoted (${s.promotedIds[0]})`);expect(s.sequence.indexOf('promote')>s.sequence.indexOf('board-success'),`case 3: promotion did not occur after canonical success (${s.sequence.join(' > ')})`);expect(!errors.length,`case 3 pageerror: ${errors.join(' | ')}`);await page.close();
   }
 
   // 4. Promotion failure -> Board remains published and literal independent warning appears.
   {
-    const {page,errors}=await ownerPage();
-    await page.locator('[data-admin-telegram-optin-input]').check();
-    await page.evaluate(()=>globalThis.__QA_STATE__.promotionFails=true);
-    await submit(page);
-    await page.evaluate(()=>globalThis.__publishSuccess('33333333-3333-4333-8333-333333333333'));
-    await page.waitForFunction(()=>globalThis.__QA_STATE__.promoteCalls===1,{timeout:2000});
-    await page.locator('[data-admin-telegram-warning]').waitFor({state:'attached',timeout:2000});
-    const warning=await page.locator('[data-admin-telegram-warning]').innerText();
-    expect(warning==='BOARD ОПУБЛИКОВАН · TELEGRAM НЕ ПОСТАВЛЕН В ОЧЕРЕДЬ',`case 4: wrong warning (${warning})`);
-    expect(await page.locator('[data-published="1"]').count()===1,'case 4: Telegram failure disturbed canonical Board success');
-    expect(!errors.length,`case 4 pageerror: ${errors.join(' | ')}`);
-    await page.close();
+    const {page,errors}=await ownerPage();await page.locator('[data-admin-telegram-optin-input]').check();await page.evaluate(()=>globalThis.__QA_STATE__.promotionFails=true);await submit(page);await page.evaluate(()=>globalThis.__publishSuccess('33333333-3333-4333-8333-333333333333'));await page.waitForFunction(()=>globalThis.__QA_STATE__.promoteCalls===1,{timeout:2000});await page.locator('[data-admin-telegram-warning]').waitFor({state:'attached',timeout:2000});
+    const warning=await page.locator('[data-admin-telegram-warning]').innerText();expect(warning==='BOARD ОПУБЛИКОВАН · TELEGRAM НЕ ПОСТАВЛЕН В ОЧЕРЕДЬ',`case 4: wrong warning (${warning})`);expect(await page.locator('[data-published="1"]').count()===1,'case 4: Telegram failure disturbed canonical Board success');expect(!errors.length,`case 4 pageerror: ${errors.join(' | ')}`);await page.close();
   }
 
-  // 5. Re-render/reopen composer -> one control, one listener path, one promotion call.
+  // 5. Re-render/reopen composer -> one control and one promotion call.
   {
-    const {page,errors}=await ownerPage();
-    await page.evaluate(()=>{globalThis.__renderComposer();globalThis.__renderComposer()});
-    await page.waitForTimeout(80);
-    expect(await page.locator('[data-admin-telegram-optin]').count()===1,'case 5: composer re-render duplicated opt-in control');
-    await page.locator('[data-admin-telegram-optin-input]').check();
-    await submit(page);
-    await page.evaluate(()=>globalThis.__publishSuccess('44444444-4444-4444-8444-444444444444'));
-    await page.waitForFunction(()=>globalThis.__QA_STATE__.promoteCalls===1,{timeout:2000});
-    await page.waitForTimeout(100);
-    const s=await state(page);
-    expect(s.promoteCalls===1,`case 5: re-render duplicated promotion calls (${s.promoteCalls})`);
-    expect(!errors.length,`case 5 pageerror: ${errors.join(' | ')}`);
-    await page.close();
+    const {page,errors}=await ownerPage();await page.evaluate(()=>{globalThis.__renderComposer();globalThis.__renderComposer()});await page.waitForTimeout(80);expect(await page.locator('[data-admin-telegram-optin]').count()===1,'case 5: composer re-render duplicated opt-in control');await page.locator('[data-admin-telegram-optin-input]').check();await submit(page);await page.evaluate(()=>globalThis.__publishSuccess('44444444-4444-4444-8444-444444444444'));await page.waitForFunction(()=>globalThis.__QA_STATE__.promoteCalls===1,{timeout:2000});
+    await page.evaluate(()=>window.dispatchEvent(new CustomEvent('dc:board:artifact-published',{detail:{artifactId:'44444444-4444-4444-8444-444444444444'}})));await page.waitForTimeout(100);const s=await state(page);expect(s.promoteCalls===1,`case 5: rerender/repeated signal duplicated promotion calls (${s.promoteCalls})`);expect(!errors.length,`case 5 pageerror: ${errors.join(' | ')}`);await page.close();
   }
 
   // 6. #174 sustained stability is executed as its existing dedicated Site Integrity step.
 
-  // 7. Normal member composer has no Telegram opt-in control.
+  // 7. Normal Member has no Telegram opt-in control.
   {
-    const page=await browser.newPage();const errors=[];page.on('pageerror',error=>errors.push(error.message));
-    await page.goto(base+'/qa-member.html',{waitUntil:'domcontentloaded'});await page.waitForTimeout(120);
-    expect(await page.locator('[data-admin-telegram-optin]').count()===0,'case 7: non-owner member received Telegram opt-in control');
-    expect(!errors.length,`case 7 pageerror: ${errors.join(' | ')}`);
-    await page.close();
+    const page=await browser.newPage();const errors=[];page.on('pageerror',error=>errors.push(error.message));await page.goto(base+'/qa-member.html',{waitUntil:'domcontentloaded'});await page.waitForTimeout(100);expect(await page.locator('[data-admin-telegram-optin]').count()===0,'case 7: non-owner member received Telegram opt-in control');expect(!errors.length,`case 7 pageerror: ${errors.join(' | ')}`);await page.close();
   }
-}finally{
-  await browser.close();server.close();
-}
+
+  // 8. Extreme browser clock skew cannot affect exact-id continuation.
+  {
+    const {page,errors}=await ownerPage();await page.addInitScript(()=>{});await page.locator('[data-admin-telegram-optin-input]').check();await page.evaluate(()=>{const RealDate=Date;class SkewDate extends RealDate{static now(){return RealDate.now()+24*60*60*1000}};globalThis.Date=SkewDate});await submit(page);await page.evaluate(()=>globalThis.__publishSuccess('55555555-5555-4555-8555-555555555555'));await page.waitForFunction(()=>globalThis.__QA_STATE__.promoteCalls===1,{timeout:2000});const s=await state(page);expect(s.promotedIds[0]==='55555555-5555-4555-8555-555555555555',`case 8: clock skew changed promoted Artifact (${s.promotedIds[0]})`);expect(!errors.length,`case 8 pageerror: ${errors.join(' | ')}`);await page.close();
+  }
+
+  // 9. Duplicate title/body identity is irrelevant: exact event id wins.
+  {
+    const {page,errors}=await ownerPage();await page.locator('[data-admin-telegram-optin-input]').check();await submit(page);await page.evaluate(()=>{globalThis.__QA_DUPLICATE_ROWS__=[{id:'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',title:'QA TITLE',body:'QA BODY'},{id:'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',title:'QA TITLE',body:'QA BODY'}];globalThis.__publishSuccess('66666666-6666-4666-8666-666666666666')});await page.waitForFunction(()=>globalThis.__QA_STATE__.promoteCalls===1,{timeout:2000});const s=await state(page);expect(s.promotedIds[0]==='66666666-6666-4666-8666-666666666666',`case 9: duplicate title/body confused Artifact identity (${s.promotedIds[0]})`);expect(!errors.length,`case 9 pageerror: ${errors.join(' | ')}`);await page.close();
+  }
+}finally{await browser.close();server.close()}
 
 if(failures.length){console.error(`Board OWNER_ADMIN Telegram opt-in browser acceptance failed (${failures.length})`);for(const failure of failures)console.error(`- ${failure}`);process.exit(1)}
-console.log('Board OWNER_ADMIN Telegram opt-in browser acceptance PASS: OFF/success, ON/fail, ON/success, independent warning, rerender safety, member exclusion.');
+console.log('Board OWNER_ADMIN Telegram opt-in browser acceptance PASS: exact-id post-success signal, OFF/fail/success, independent warning, rerender safety, member exclusion, clock skew, duplicate content.');
