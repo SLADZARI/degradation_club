@@ -1,5 +1,5 @@
 {
-  "version": "2026-09-13",
+  "version": "2026-09-14",
   "role": "site content readiness registry",
   "statusDefinitions": {
     "FINAL": "Current public copy can ship without additional factual approval; later editorial refinement is optional.",
@@ -39,9 +39,32 @@
     {
       "route": "/projects/",
       "state": "FINAL",
-      "source": ["dementor-club/concept/ecosystem.md", "logic-awareness/README.md"],
+      "source": ["dementor-club/concept/ecosystem.md", "logic-awareness/README.md", "docs/PROJECTS_V2_EDITORIAL_DESIGN_HANDOFF_2026-09-14.md"],
       "blockingFields": [],
-      "note": "Projects index exposes only approved public project references."
+      "note": "Projects hub exposes source-bounded public project references and the canonical Board bridge."
+    },
+    {
+      "route": "/projects/dementor-lab/",
+      "state": "FINAL",
+      "source": ["dementor-club/projects/dementor-lab/", "dementor_lab_landing_v19_APPROVED.html", "docs/PROJECTS_V2_EDITORIAL_DESIGN_HANDOFF_2026-09-14.md"],
+      "blockingFields": [],
+      "note": "Approved Dementor Lab V19 is integrated at the canonical route with 13 verified visual derivatives; public availability remains SOON and does not imply PLAYABLE or LIVE."
+    },
+    {
+      "route": "/projects/dementor-battle/",
+      "state": "REQUIRES_APPROVAL",
+      "productionAllowed": true,
+      "source": ["docs/PROJECTS_V2_SOURCE_AUDIT_GATE_2026-09-14.md", "docs/PROJECTS_V2_EDITORIAL_DESIGN_HANDOFF_2026-09-14.md"],
+      "blockingFields": ["responsible project source audit", "verified project visual assets", "final mechanics beyond the approved safe envelope"],
+      "note": "Neutral IN DEVELOPMENT route may ship using only the #169 safe envelope. No final rules, release claims or playable status are allowed until the responsible source is verified."
+    },
+    {
+      "route": "/projects/dementor-robo-games/",
+      "state": "REQUIRES_APPROVAL",
+      "productionAllowed": true,
+      "source": ["docs/PROJECTS_V2_SOURCE_AUDIT_GATE_2026-09-14.md", "docs/PROJECTS_V2_EDITORIAL_DESIGN_HANDOFF_2026-09-14.md"],
+      "blockingFields": ["current playable source verification", "verified project visual assets", "disciplines and competition rules"],
+      "note": "Neutral IN DEVELOPMENT route may ship. PLAYABLE, PLAY/ИГРАТЬ, disciplines, scoring, tournaments, dates and prizes remain blocked until a current responsible source verifies them."
     },
     {
       "route": "/projects/logic-awareness/",

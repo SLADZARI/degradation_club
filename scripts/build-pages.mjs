@@ -163,6 +163,7 @@ function injectProductionModules() {
       if (!html.includes('/entity-recommendations-v1.css')) html = html.replace('</head>', '<link rel="stylesheet" href="/entity-recommendations-v1.css">\n</head>');
       if (!html.includes('/entity-recommendations-v1.js')) html = html.replace('</body>', '<script src="/entity-recommendations-v1.js" defer></script>\n</body>');
     }
+    if (rel === 'projects/logic-awareness/index.html' && !html.includes('/content-series-v1.js')) html = html.replace('</body>', '<script src="/content-series-v1.js" defer></script>\n</body>');
     if (rel === 'projects/logic-awareness/index.html' && !html.includes('/logic-awareness-covers-v1.js')) html = html.replace('</body>', '<script src="/logic-awareness-covers-v1.js" defer></script>\n</body>');
     if (!html.includes('/production-analytics-v1.js')) {
       if (!html.includes('</body>')) throw new Error(`Cannot inject production analytics runtime into ${rel}: </body> missing`);

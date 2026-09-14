@@ -1,0 +1,20 @@
+{
+  "id": "project-004-dementor-robo-games",
+  "entityType": "project",
+  "slug": "dementor-robo-games",
+  "title": "DEMENTOR ROBO GAMES",
+  "type": "robot-competition-project",
+  "status": "in-development",
+  "publicUrl": "/projects/dementor-robo-games/",
+  "preview": null,
+  "summary": "Проект в разработке. Дисциплины, правила и playable-статус не заявляются без подтверждённого текущего source.",
+  "editorialSource": "dementor-robo-games",
+  "publicationStatus": "in-development",
+  "provenance": {
+    "branch": "agent/169-projects-hub-v2",
+    "path": "docs/PROJECTS_V2_SOURCE_AUDIT_GATE_2026-09-14.md",
+    "role": "source-bounded-public-project-record"
+  },
+  "siteRole": "implementation-mirror",
+  "updatedAt": "2026-09-14"
+}

@@ -5,7 +5,7 @@
   const style=document.createElement('style');
   style.id='dc-content-series-v1';
   style.textContent=`
-    .dc-carousel-publication{overflow:hidden}
+    .dc-carousel-publication{overflow:hidden;scroll-margin-top:calc(var(--dc-global-header-h,72px) + 16px)}
     .dc-carousel-grid.dc-content-series{display:flex;gap:clamp(12px,2vw,28px);overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scroll-behavior:smooth;overscroll-behavior-inline:contain;scrollbar-width:none;padding:24px max(18px,calc((100vw - min(68vw,620px))/2)) 28px;margin-inline:calc(50% - 50vw);cursor:grab;touch-action:pan-x pan-y}
     .dc-carousel-grid.dc-content-series::-webkit-scrollbar{display:none}
     .dc-carousel-grid.dc-content-series.is-dragging{cursor:grabbing;scroll-snap-type:none;user-select:none}
@@ -78,11 +78,18 @@
     const onScroll=()=>{if(!raf)raf=requestAnimationFrame(()=>{raf=0;nearest();});};
     track.addEventListener('scroll',onScroll,{passive:true});
 
-    const go=index=>{
+    const targetLeft=index=>{
+      const slide=slides[index];
+      return Math.max(0,slide.offsetLeft-(track.clientWidth-slide.offsetWidth)/2);
+    };
+
+    const go=(index,{behavior=true}={})=>{
       const i=clamp(index,0,slides.length-1);
-      slides[i].scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'nearest',inline:'center'});
+      const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+      track.scrollTo({left:targetLeft(i),top:0,behavior:behavior&&!reduce?'smooth':'auto'});
       paint(i);
     };
+
     prev.addEventListener('click',()=>go(active-1));
     next.addEventListener('click',()=>go(active+1));
     slides.forEach((slide,i)=>slide.addEventListener('click',()=>{if(i!==active)go(i);}));
@@ -104,9 +111,76 @@
     track.addEventListener('pointercancel',endDrag);
 
     paint(0);
-    requestAnimationFrame(()=>go(0));
+    /* Initial centering must never scroll the document vertically. */
+    requestAnimationFrame(()=>go(0,{behavior:false}));
   };
 
-  const boot=()=>document.querySelectorAll('.dc-carousel-grid').forEach(enhance);
+  const stabilizeExplicitLogicHash=()=>{
+    const path=location.pathname.replace(/^\/degradation_club/,'');
+    if(path!=='/projects/logic-awareness/'||!location.hash)return;
+    const navigation=performance.getEntriesByType?.('navigation')?.[0];
+    if(navigation?.type==='back_forward')return;
+
+    let target=null;
+    try{target=document.querySelector(location.hash);}catch{}
+    if(!target)return;
+
+    const root=document.documentElement;
+    const previousScrollBehavior=root.style.getPropertyValue('scroll-behavior');
+    const previousScrollBehaviorPriority=root.style.getPropertyPriority('scroll-behavior');
+    root.style.setProperty('scroll-behavior','auto','important');
+
+    let stopped=false,raf=0,interval=0,stopTimer=0;
+    const cleanup=()=>{
+      if(interval)clearInterval(interval);
+      if(stopTimer)clearTimeout(stopTimer);
+      interval=0;stopTimer=0;
+      if(previousScrollBehavior)root.style.setProperty('scroll-behavior',previousScrollBehavior,previousScrollBehaviorPriority);
+      else root.style.removeProperty('scroll-behavior');
+    };
+    const stop=()=>{
+      if(stopped)return;
+      stopped=true;
+      cleanup();
+    };
+    const userTookControl=()=>stop();
+    addEventListener('pointerdown',userTookControl,{once:true,passive:true,capture:true});
+    addEventListener('wheel',userTookControl,{once:true,passive:true,capture:true});
+    addEventListener('touchstart',userTookControl,{once:true,passive:true,capture:true});
+    addEventListener('keydown',userTookControl,{once:true,capture:true});
+
+    const align=()=>{
+      if(stopped||raf)return;
+      raf=requestAnimationFrame(()=>{
+        raf=0;
+        if(stopped||location.hash!==`#${target.id}`)return;
+        target.scrollIntoView({block:'start',inline:'nearest',behavior:'auto'});
+      });
+    };
+    const settleAfterLoad=()=>{
+      align();
+      if(stopTimer)clearTimeout(stopTimer);
+      stopTimer=setTimeout(stop,1400);
+    };
+
+    /* The site-level html smooth-scroll rule must not turn fragment stabilization into a restarted animation. */
+    const imagesBeforeTarget=[...document.images].filter(img=>Boolean(img.compareDocumentPosition(target)&Node.DOCUMENT_POSITION_FOLLOWING));
+    imagesBeforeTarget.forEach(img=>{
+      if(img.complete)return;
+      img.addEventListener('load',align,{once:true});
+      img.addEventListener('error',align,{once:true});
+    });
+
+    document.fonts?.ready?.then(align).catch?.(()=>{});
+    align();
+    interval=setInterval(align,50);
+    if(document.readyState==='complete')settleAfterLoad();
+    else addEventListener('load',settleAfterLoad,{once:true});
+  };
+
+  const boot=()=>{
+    document.querySelectorAll('.dc-carousel-grid').forEach(enhance);
+    stabilizeExplicitLogicHash();
+  };
   document.readyState==='loading'?document.addEventListener('DOMContentLoaded',boot,{once:true}):boot();
 })();

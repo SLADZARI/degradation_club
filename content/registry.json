@@ -1,9 +1,12 @@
 {
-  "version": "2026-08-26",
+  "version": "2026-09-14",
   "role": "site implementation registry",
   "entities": [
     {"id":"event-001-fuengirola","entityType":"event","title":"Фуэнхирола","status":"planned","publicUrl":"/events/fuengirola/","record":"/content/events/fuengirola.json"},
     {"id":"project-001-logic-awareness","entityType":"project","title":"Логика и осознанность","status":"active","publicUrl":"/projects/logic-awareness/","record":"/content/projects/logic-awareness.json"},
+    {"id":"project-002-dementor-lab","entityType":"project","title":"DEMENTOR LAB","status":"public-approved","publicUrl":"/projects/dementor-lab/","record":"/content/projects/dementor-lab.json"},
+    {"id":"project-003-dementor-battle","entityType":"project","title":"DEMENTOR BATTLE","status":"in-development","publicUrl":"/projects/dementor-battle/","record":"/content/projects/dementor-battle.json"},
+    {"id":"project-004-dementor-robo-games","entityType":"project","title":"DEMENTOR ROBO GAMES","status":"in-development","publicUrl":"/projects/dementor-robo-games/","record":"/content/projects/dementor-robo-games.json"},
     {"id":"DEMENTOR-001","entityType":"dementor","title":"Валентин Лосев","status":"active","publicUrl":"/community/valentin/","record":"/content/dementors/valentin.json"},
     {"id":"DEMENTOR-002","entityType":"dementor","title":"Никита","status":"active-content-pending","publicUrl":"/community/nikita/","record":"/content/dementors/nikita.json"},
     {"id":"DEMENTOR-003","entityType":"dementor","title":"Евгений","status":"active-content-pending","publicUrl":"/community/evgeniy/","record":"/content/dementors/evgeniy.json"},

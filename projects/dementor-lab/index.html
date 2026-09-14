@@ -1,0 +1,497 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f3eddf">
+<title>DEMENTOR LAB — играем в реальность</title>
+<meta name="description" content="DEMENTOR LAB — интерактивная история о том, как одна и та же ситуация меняется из-за одного решения.">
+<link rel="canonical" href="https://dementor.club/projects/dementor-lab/">
+<style>
+:root{
+  --paper:#f2f0e8;
+  --paper-2:#F1E9D8;
+  --paper-3:#f7f3e8;
+  --ink:#111111;
+  --ink-2:#24211d;
+  --acid:#d8ff3e;
+  --muted:rgba(17,17,17,.58);
+  --line:rgba(16,16,16,.14);
+  --shadow:0 18px 48px rgba(0,0,0,.11);
+  --radius:28px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;background:var(--paper)}
+body{margin:0;color:var(--ink);background:var(--paper);font-family:Inter,Arial,Helvetica,sans-serif;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:200;opacity:.1;background-image:radial-gradient(rgba(0,0,0,.12) .55px,transparent .75px);background-size:5px 5px;mix-blend-mode:multiply}
+a{color:inherit;text-decoration:none}
+img{max-width:100%;display:block}
+button{font:inherit}
+.progress{position:fixed;z-index:230;left:0;top:var(--dc-global-header-h,72px);height:4px;width:0;background:var(--acid);border-right:1px solid var(--ink)}
+main{padding-top:0}
+.section{scroll-margin-top:calc(var(--dc-global-header-h,72px) + 12px);padding:clamp(66px,7vw,104px) clamp(16px,4vw,64px);border-bottom:1px solid var(--ink);position:relative;overflow:hidden}
+.section.dark{background:#171613;color:var(--paper)}
+.inner{width:min(1440px,100%);margin:auto;display:grid;gap:clamp(22px,3vw,34px);position:relative;z-index:2}
+.kicker{margin:0 0 2px;font:800 10px/1.1 monospace;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted)}
+h1,h2,h3,p{margin:0}
+h1,h2{font-weight:900;text-transform:uppercase;text-wrap:balance;overflow-wrap:normal}
+h1{font-size:clamp(64px,9vw,150px);line-height:.82;letter-spacing:-.075em}
+h2{font-size:clamp(46px,6vw,94px);line-height:.86;letter-spacing:-.06em}
+h3{font-size:clamp(24px,2.6vw,40px);line-height:.94;letter-spacing:-.045em}
+.lead{font-size:clamp(24px,2.35vw,38px);line-height:1.04;letter-spacing:-.04em;font-weight:800;max-width:25ch;text-wrap:balance}
+.copy{font-size:clamp(17px,1.3vw,20px);line-height:1.44;max-width:680px}
+.small{font-size:14px;line-height:1.45;color:var(--muted)}
+.acid{color:var(--ink);background:var(--acid);padding:.02em .12em;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+.acid-text{color:var(--acid)}
+.dark .kicker,.final .kicker{color:rgba(242,240,232,.58)}
+.hero{scroll-margin-top:calc(var(--dc-global-header-h,72px) + 4px);min-height:calc(92svh - var(--dc-global-header-h,72px));display:grid;align-items:end;background:#171613;color:var(--paper);padding-block:clamp(32px,4vw,52px);overflow:visible}
+.hero .visual{position:absolute;inset:0;z-index:0}
+.hero .visual img{width:100%;height:100%;object-fit:cover;object-position:center}
+.hero::after{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(90deg, rgba(23,22,19,.78) 0%, rgba(23,22,19,.62) 35%, rgba(23,22,19,.35) 62%, rgba(23,22,19,.18) 100%)}
+.hero-grid{grid-template-columns:minmax(0,680px) 1fr;align-items:end;gap:clamp(16px,3vw,36px)}
+.hero-copy,.textblock{display:grid;gap:18px;align-content:start;position:relative;z-index:2;min-width:0}
+.hero-panel{background:rgba(243,237,223,.96);color:var(--ink);border:1.5px solid var(--ink);padding:clamp(22px,2.4vw,34px);box-shadow:var(--shadow);max-width:760px;transform:translateY(42%)}
+.hero-panel .lead{max-width:none;width:100%;text-wrap:pretty}
+.hero h1{font-size:clamp(70px,5.7vw,94px);line-height:.84;letter-spacing:-.07em;max-width:100%}
+.hero-followup{position:relative;z-index:1;background:var(--paper);border-bottom:1px solid var(--ink);min-height:72svh;padding:clamp(170px,16vw,250px) clamp(16px,4vw,64px) clamp(96px,10vw,140px)}
+.hero-followup-inner{grid-template-columns:minmax(0,1.2fr) minmax(280px,.8fr);align-content:start;align-items:start;gap:clamp(24px,4vw,54px)}
+.hero-followup-copy{font-size:clamp(26px,2.35vw,38px);line-height:1.08;letter-spacing:-.035em;font-weight:800;max-width:22ch;text-wrap:balance}
+.hero-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:4px}
+.cta{color:var(--ink);display:inline-flex;align-items:center;justify-content:center;gap:14px;border:1.5px solid var(--ink);background:var(--acid);padding:15px 20px;font-weight:950;text-transform:uppercase;letter-spacing:.02em;transition:.18s transform,.18s box-shadow;box-shadow:0 0 0 0 var(--ink)}
+.cta:hover{transform:translate(-4px,-4px);box-shadow:4px 4px 0 var(--ink)}
+.cta.secondary{background:rgba(243,237,223,.96)}
+.hero-meta{justify-self:end;align-self:start;display:grid;gap:8px;text-align:right;color:var(--paper);position:relative;z-index:2}
+.hero-meta .meta-box{font:900 10px/1.45 monospace;letter-spacing:.14em;text-transform:uppercase}
+.hero-meta .badge{display:inline-block;justify-self:end;background:rgba(230,255,23,.94);color:var(--ink);border:1px solid var(--ink);padding:8px 10px;font:900 10px/1 monospace;letter-spacing:.14em;text-transform:uppercase}
+.feature{display:grid;grid-template-columns:minmax(0,.72fr) minmax(0,1.28fr);gap:clamp(28px,4.5vw,68px);align-items:center}
+.feature.media-left{grid-template-columns:minmax(0,1.28fr) minmax(0,.72fr)}
+.feature .textblock{padding-top:min(2vw,12px)}
+.frame{border:0;background:transparent;overflow:hidden;position:relative;box-shadow:none;z-index:1}
+.frame.round{border-radius:var(--radius)}
+.frame.zoomable{cursor:zoom-in}
+.frame .art-picture{display:block}
+.frame .art-picture img{display:block;width:100%;height:auto;object-fit:contain;background:transparent}
+.frame.padded{padding:0;background:transparent}
+.note{border-left:6px solid currentColor;padding-left:18px;display:grid;gap:6px;max-width:44ch}
+.note small{font:900 9px/1 monospace;letter-spacing:.15em;text-transform:uppercase}
+.note strong{font-size:clamp(18px,1.7vw,26px);line-height:1.16}
+.stat,.mobile-badge,.mini-badge{display:inline-flex;width:max-content;border:1px solid currentColor;background:var(--paper-3);padding:8px 10px;font:900 10px/1 monospace;letter-spacing:.14em;text-transform:uppercase}
+.dark .stat{background:var(--acid);color:var(--ink)}
+.person-logic{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center;max-width:1020px}
+.person-logic .box{border:1px solid currentColor;padding:18px;background:rgba(255,255,255,.96);color:var(--ink)}
+.person-logic strong{font-size:clamp(22px,2.2vw,34px);line-height:1}
+.person-logic p{font-size:15px;line-height:1.4;margin-top:8px}
+.person-logic .arrow{font-size:32px;font-weight:900;text-align:center}
+.mobile-proof{background:var(--paper-2)}
+.mobile-proof-grid{display:grid;grid-template-columns:minmax(0,420px) minmax(0,1fr);gap:clamp(24px,5vw,72px);align-items:center}
+.phone-row{display:flex;gap:18px;align-items:flex-end;justify-content:flex-end;position:relative;z-index:0;padding-top:6px}
+.phone{width:min(205px,20vw);background:#0d0d0d;border:2px solid var(--ink);border-radius:34px;padding:9px;box-shadow:0 20px 42px rgba(0,0,0,.18);transform:rotate(var(--r,0deg))}
+.phone:nth-child(1){--r:-4deg}.phone:nth-child(2){--r:2deg;transform:translateY(-18px) rotate(var(--r))}.phone:nth-child(3){--r:5deg}
+.phone-screen{border-radius:25px;overflow:hidden;background:var(--paper);aspect-ratio:9/16}
+.phone-screen img{width:100%;height:100%;object-fit:contain;background:var(--paper)}
+.phone-home{width:34%;height:4px;background:#575757;border-radius:99px;margin:8px auto 2px}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.card,.sticky-note,.step{border:1px solid var(--ink);background:#fff;color:var(--ink)}
+.card{padding:clamp(18px,2vw,28px);min-height:220px;display:grid;align-content:space-between;gap:24px}
+.card:nth-child(2){background:var(--acid)}
+.card b{font:900 10px/1 monospace;letter-spacing:.14em;text-transform:uppercase}
+.card strong{font-size:clamp(25px,2.6vw,40px);line-height:.97;text-transform:uppercase}
+.card p{font-size:16px;line-height:1.38}
+.sticky-note{padding:18px 20px;box-shadow:10px 10px 0 rgba(16,16,16,.08);transform:rotate(-1.2deg);max-width:350px;background:var(--paper-3)}
+.sticky-note b{font:900 10px/1 monospace;letter-spacing:.14em;text-transform:uppercase;display:block;margin-bottom:8px}
+.sticky-note strong{font-size:clamp(22px,2vw,32px);line-height:1.02}
+.chain{padding:20px;border-radius:20px;display:grid;gap:14px;background:var(--paper-3);border:1px solid var(--ink);color:var(--ink)}
+.chain b{font:900 10px/1 monospace;letter-spacing:.14em;text-transform:uppercase}
+.chain-flow{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.chain-node{padding:12px 14px;border:1px solid var(--ink);background:#fff;font-weight:900;font-size:15px;line-height:1.12;text-transform:uppercase;color:var(--ink)}
+.chain-node.acid{background:var(--acid)}
+.chain-arrow{font-size:24px;font-weight:900;color:var(--paper)}
+.replay-stage{display:grid;gap:clamp(24px,3vw,36px)}
+.replay-hero{position:relative;display:grid;gap:14px}
+.replay-hero .mini-badge{background:var(--acid)}
+.replay-main{background:#141310;min-height:clamp(420px,52vw,760px);padding:0}
+.replay-main img{width:100%;height:100%;object-fit:cover;object-position:center}
+.replay-overlay{position:absolute;right:clamp(18px,3vw,28px);bottom:clamp(18px,2vw,28px);width:min(38vw,440px);background:rgba(243,237,223,.96);border:1px solid var(--ink);border-radius:24px;padding:10px;box-shadow:var(--shadow)}
+.replay-overlay img{border-radius:16px;display:block;width:100%;height:auto}
+.replay-copy{display:grid;gap:18px;max-width:840px}
+.step-row{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.step{padding:16px;display:grid;gap:8px;min-height:112px}
+.step:nth-child(2),.step:nth-child(4){background:var(--acid)}
+.step b{font:900 10px/1 monospace;letter-spacing:.12em;text-transform:uppercase}
+.step strong{font-size:clamp(16px,1.45vw,22px);line-height:1.08;text-transform:uppercase}
+.final{background:#171613;color:var(--paper)}
+.final-grid{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(0,.92fr);gap:clamp(28px,5vw,72px);align-items:start}
+.final-panel{display:grid;gap:18px}
+.final-mark{font-size:clamp(80px,14vw,220px);line-height:.74;font-weight:950;letter-spacing:-.09em;text-transform:uppercase}
+.final-list{display:grid;gap:10px}
+.final-item{border-top:1px solid rgba(243,237,223,.32);padding-top:10px;font-size:clamp(16px,1.45vw,21px);line-height:1.38}
+.quote{padding:clamp(20px,2.2vw,30px);border:1px solid var(--ink);border-left:7px solid var(--ink);font-size:clamp(30px,3.6vw,56px);line-height:.94;font-weight:900;letter-spacing:-.055em;max-width:14ch;background:var(--acid);color:var(--ink)}
+.fine{font:900 10px/1.45 monospace;letter-spacing:.14em;text-transform:uppercase;opacity:.72}
+.modal{position:fixed;inset:0;z-index:5000;background:rgba(10,10,10,.94);display:none;align-items:center;justify-content:center;padding:22px;cursor:zoom-out}
+.modal.open{display:flex}
+.modal img{max-width:96vw;max-height:92vh;object-fit:contain;border:1px solid rgba(255,255,255,.2)}
+.modal button{position:absolute;right:16px;top:16px;width:46px;height:46px;border:1px solid var(--paper);background:var(--paper);font-size:24px;cursor:pointer}
+.reveal{opacity:1;transform:none}
+.reveal.in{opacity:1;transform:none}
+.mobile-hero-panel,.mobile-hero-art{display:none}
+
+@media(min-width:1101px){
+  .hero{min-height:calc(92svh - var(--dc-global-header-h,72px));display:grid;align-items:end;padding-block:clamp(32px,4vw,52px);overflow:visible}
+  .hero .visual{position:absolute;inset:0;z-index:0;display:block}
+  .desktop-hero-art{display:block}
+  .mobile-hero-art,.mobile-hero-panel{display:none}
+  .hero-panel{max-width:760px;transform:translateY(42%)}
+  .hero-followup{min-height:72svh;padding:clamp(170px,16vw,250px) clamp(16px,4vw,64px) clamp(96px,10vw,140px)}
+  .hero-followup-inner{grid-template-columns:minmax(0,1.2fr) minmax(280px,.8fr);gap:clamp(24px,4vw,54px)}
+  .hero-followup-copy{max-width:22ch}
+}
+
+@media(max-width:1200px){
+  .hero-followup-inner{grid-template-columns:1fr}
+  .hero-followup-copy{max-width:30ch}
+}
+@media(max-width:1100px){
+  .hero-grid,.feature,.feature.media-left,.mobile-proof-grid,.final-grid{grid-template-columns:1fr}
+  .hero-panel{transform:translateY(28%)}
+  .hero{min-height:auto}
+  .hero-meta{justify-self:start;text-align:left}
+  .hero-meta .badge{justify-self:start}
+  .phone-row{justify-content:flex-start}
+  .replay-overlay{width:min(44vw,380px)}
+}
+@media(max-width:900px){
+}
+@media(max-width:860px){
+  .cards,.step-row{grid-template-columns:1fr}
+  .person-logic{grid-template-columns:1fr}
+  .person-logic .arrow{transform:rotate(90deg)}
+}
+@media(max-width:760px){
+  .section{padding-block:64px;padding-inline:14px}
+  .feature.media-left .textblock{order:-1}
+  main{padding-top:0}
+
+  /* MOBILE HERO: one full image + one centered sticky plaque. */
+  .hero{display:block;background:#171613;color:var(--ink);padding:0;height:auto;min-height:0;overflow:visible;position:relative}
+  .hero::after{display:none}
+  .hero .visual{
+    position:relative;inset:auto;width:100%;height:auto;z-index:0;
+    background:#171613;overflow:visible;
+    display:grid;grid-template-columns:1fr;grid-template-rows:auto;
+  }
+  .desktop-hero-art{display:none}
+  .mobile-hero-art{
+    display:block;width:100%;margin:0;padding:0;
+    grid-area:1/1;
+  }
+  .mobile-hero-art img{
+    display:block;width:100%;height:auto;max-width:none;
+    object-fit:contain;object-position:center top;background:#171613;
+  }
+  .hero-grid{display:none}
+  .mobile-hero-panel{
+    display:grid;gap:10px;
+    grid-area:1/1;
+    align-self:start;
+    position:sticky;
+    top:50svh;
+    transform:translateY(-50%);
+    z-index:2;
+    width:calc(100% - 24px);
+    margin:0 12px;
+    background:rgba(242,240,232,.96);
+    color:var(--ink);
+    border:1.5px solid var(--ink);
+    padding:18px 16px 20px;
+    box-shadow:none;
+  }
+  .mobile-hero-panel h1{
+    font-size:clamp(38px,10.5vw,50px);line-height:.82;
+    letter-spacing:-.075em;max-width:none;white-space:normal;text-align:center;
+  }
+  .mobile-hero-panel .lead{
+    font-size:clamp(16px,4.7vw,21px);line-height:1.08;
+    letter-spacing:-.025em;font-weight:800;max-width:none;width:100%;
+    text-wrap:pretty;text-align:center;
+  }
+
+  /* Keep header stable; only the plaque is sticky inside the image. */
+
+  .hero-followup{min-height:auto;padding:72px 16px 92px}
+  .hero-followup-copy{font-size:clamp(22px,6vw,30px);line-height:1.08;max-width:none}
+  .hero-followup .hero-actions{display:grid;width:100%}
+  .hero-followup .hero-actions .cta{width:100%}
+  .hero-followup + .section{padding-top:72px}
+
+  .phone-row{width:100%;max-width:100%;overflow-x:auto;overflow-y:hidden;padding:8px 0 24px;scroll-snap-type:x mandatory;justify-content:flex-start}
+  .phone{width:68vw;min-width:220px;scroll-snap-align:center}
+  .phone,.phone:nth-child(1),.phone:nth-child(2),.phone:nth-child(3){transform:none}
+  .quote{max-width:none}
+  h2{font-size:clamp(42px,12vw,64px);line-height:.84;letter-spacing:-.06em}
+  .lead{font-size:clamp(22px,6.2vw,30px);max-width:22ch}
+  .copy{font-size:17px;line-height:1.43}
+  .frame.padded{padding:0}
+  .frame.round{border-radius:18px}
+  .mobile-proof h2{font-size:clamp(42px,11.5vw,58px)}
+  .mobile-proof-grid{gap:34px}
+  .final-mark{font-size:clamp(84px,26vw,132px)}
+  .replay-main{min-height:0}
+  .replay-main img{height:auto;object-fit:contain}
+  .replay-overlay{position:relative;right:auto;bottom:auto;width:100%;margin-top:0}
+}
+@media(min-width:761px) and (max-width:1100px){
+  .section{padding-block:78px}
+
+  /* TABLET HERO: remove overlapping layers and keep media/text in normal flow. */
+  .hero{display:block;min-height:0;padding:0;background:var(--paper);color:var(--ink);overflow:hidden}
+  .hero::after{display:none}
+  .hero .visual{position:relative;inset:auto;width:100%;height:auto;background:#171613}
+  .hero .visual img{display:block;width:100%;height:auto;object-fit:contain;object-position:center}
+  .hero-grid{display:block;width:100%;padding:0;margin:0}
+  .hero-copy{display:block}
+  .hero-panel{transform:none;max-width:none;width:100%;margin:0;border-left:0;border-right:0;box-shadow:none;padding:34px clamp(28px,5vw,56px) 42px}
+  .hero-panel h1{font-size:clamp(60px,8vw,84px);max-width:none;width:100%}
+  .hero-panel .lead{max-width:34ch}
+  .hero-meta{display:none}
+
+  .hero-followup{min-height:auto;padding:86px clamp(28px,5vw,56px) 104px}
+  .hero-followup-inner{grid-template-columns:1fr;gap:34px}
+  .hero-followup-copy{max-width:28ch}
+
+  .mobile-proof-grid{grid-template-columns:1fr;gap:44px}
+  .phone-row{justify-content:flex-start;overflow-x:auto;padding-bottom:20px}
+  .phone{width:min(260px,31vw);min-width:210px}
+
+  .replay-main{min-height:0}
+  .replay-main img{height:auto;object-fit:contain}
+  .replay-overlay{position:relative;right:auto;bottom:auto;width:min(620px,82%);margin-top:0;justify-self:end}
+}
+@media(max-width:620px){
+  :root{--header:58px}
+}
+.dc-lab-v19-page .dc-global-footer{position:relative;z-index:201}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.reveal{opacity:1;transform:none;transition:none}.cta{transition:none}}
+</style>
+</head>
+<body class="dc-lab-v19-page" data-page-id="projects-dementor-lab">
+<div class="progress" id="progress"></div>
+<!-- V19 APPROVED SOURCE: Google Drive file 1JptEnjRn4ebCUHfGRAGCqxy4ALacVumP; source SHA-256 b6b592c79c6c798ad140a0937bfa271c3fbf9724f8a2cf28e3456ada2602738e. Only canonical shell ownership + embedded-media externalization adapted. -->
+<main id="top">
+  <section class="section hero" id="hero" aria-label="Dementor Lab — играем в реальность">
+    <div class="visual">
+      <picture class="art-picture desktop-hero-art"><img src="/assets/projects/dementor-lab/v19/01-hero-desktop.avif" alt="Dementor Lab — играем в реальность"></picture>
+      <picture class="art-picture mobile-hero-art">
+        <img src="/assets/projects/dementor-lab/v19/02-hero-mobile.avif" alt="Гена и Марта: такси, разговор в кафе и вечер дома">
+      </picture>
+      <div class="mobile-hero-panel">
+        <h1>ИГРАЕМ В <span class="acid">РЕАЛЬНОСТЬ</span></h1>
+        <p class="lead">Интерактивная история о том, как одна и та же ситуация меняется из-за одного решения.</p>
+      </div>
+    </div>
+
+    <div class="inner hero-grid">
+      <div class="hero-copy reveal">
+        <div class="hero-panel">
+          <p class="kicker">ПРОЕКТ DEMENTOR CLUB / ЭКСПЕРИМЕНТ 01</p>
+          <h1>ИГРАЕМ<br>В <span class="acid">РЕАЛЬНОСТЬ</span></h1>
+          <p class="lead">Интерактивная история о том, как одна и та же ситуация меняется из-за одного решения.</p>
+        </div>
+      </div>
+      <div class="hero-meta reveal">
+        <div class="badge">наблюдаем / понимаем / играем</div>
+        <div class="meta-box">один мир<br>много тебя</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="hero-followup" id="hero-followup">
+    <div class="inner hero-followup-inner">
+      <p class="hero-followup-copy">Уверены, что проблема в другом человеке? Добро пожаловать в игру. Одну и ту же сцену вы проживёте дважды: сначала как обычно, потом — после одной точечной замены.</p>
+      <div class="textblock" style="gap:18px;justify-items:start">
+        <p class="copy">Сначала вы видите, как вечер идёт не туда. Потом находите момент, где всё изменилось. Дальше — Hot Patch, то есть точечная замена одной причины. Запускаете тот же эпизод снова и проверяете: была ли это действительно причина.</p>
+        <div class="hero-actions">
+          <a class="cta" href="#episode">СМОТРЕТЬ ПЕРВЫЙ ЭПИЗОД →</a>
+          <a class="cta secondary" href="#how">КАК ЭТО РАБОТАЕТ</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="episode">
+    <div class="inner feature">
+      <div class="textblock reveal">
+        <span class="stat">S01E01 / Первый эпизод</span>
+        <h2>МЫ<br><span class="acid">ОПАЗДЫВАЕМ</span></h2>
+        <p class="lead">Друзья уже ждут. Марта ещё собирается. Гена уже нервничает. Вечер ещё не начался, а материал для эксперимента уже готов.</p>
+        <p class="copy">Дверь, телефон и несколько лишних минут. Этого хватает, чтобы двое пришли в один вечер с разными ожиданиями и разным настроением.</p>
+        <div class="note"><small>ПРОТОКОЛ / 01</small><strong>Конфликт начинается раньше, чем кто-то успевает сказать: «Да всё нормально».</strong></div>
+      </div>
+      <figure class="frame round padded zoomable reveal"><picture class="art-picture"><source media="(max-width:760px)" srcset="/assets/projects/dementor-lab/v19/03-episode-mobile.avif"><img src="/assets/projects/dementor-lab/v19/04-episode-desktop.avif" alt="Первый эпизод — Мы опаздываем"></picture></figure>
+    </div>
+  </section>
+
+  <section class="section dark" id="side">
+    <div class="inner feature media-left">
+      <figure class="frame round padded zoomable reveal"><picture class="art-picture"><source media="(max-width:760px)" srcset="/assets/projects/dementor-lab/v19/05-character-choice-mobile.avif"><img src="/assets/projects/dementor-lab/v19/06-character-choice-desktop.avif" alt="Выбор героя — Гена или Марта"></picture></figure>
+      <div class="textblock reveal">
+        <p class="kicker">РАЗДЕЛЕНИЕ ОТВЕТСТВЕННОСТИ / 01</p>
+        <h2>ЗА КОГО<br>ИГРАТЬ?</h2>
+        <p class="lead">Выберите, чью версию событий временно считать единственно разумной.</p>
+        <p class="copy">Сначала вы играете за одного персонажа. Потом — за второго. После двух прохождений назначить виноватого сложнее. Зато становится видно, что каждый приносит в сцену.</p>
+      </div>
+    </div>
+    <div class="inner">
+      <div class="person-logic reveal">
+        <div class="box"><strong>ГЕНА</strong><p>Мы уже опоздали. Осталось понять, кто виноват.</p></div>
+        <div class="arrow">↔</div>
+        <div class="box"><strong>МАРТА</strong><p>Две минуты — не катастрофа. Давление уже ближе.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section mobile-proof" id="mobile-play">
+    <div class="inner mobile-proof-grid">
+      <div class="textblock reveal">
+        <span class="mobile-badge">В ТЕЛЕФОНЕ / В БРАУЗЕРЕ</span>
+        <h2>ЛАБОРАТОРИЯ.<br><span class="acid">ТЕПЕРЬ В КАРМАНЕ.</span></h2>
+        <p class="lead">Вся история работает прямо в телефоне.</p>
+        <p class="copy">Эпизод, выбор стороны, разбор причин и точечная замена — в вертикальном формате. Реплики и ключевые моменты остаются крупными и читаемыми.</p>
+      </div>
+      <div class="phone-row reveal" aria-label="Мобильные экраны Dementor Lab">
+        <div class="phone"><div class="phone-screen"><img src="/assets/projects/dementor-lab/v19/03-episode-mobile.avif" alt="Мобильный первый эпизод"></div><div class="phone-home"></div></div>
+        <div class="phone"><div class="phone-screen"><img src="/assets/projects/dementor-lab/v19/07-causality-mobile.avif" alt="Мобильная причинная система"></div><div class="phone-home"></div></div>
+        <div class="phone"><div class="phone-screen"><img src="/assets/projects/dementor-lab/v19/08-hot-patch-mobile.avif" alt="Мобильный Hot Patch"></div><div class="phone-home"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="how">
+    <div class="inner feature">
+      <div class="textblock reveal">
+        <p class="kicker">ПРОЦЕДУРА / 02</p>
+        <h2>ТЫ НЕ ВЫБИРАЕШЬ<br><span class="acid">РЕПЛИКИ</span></h2>
+        <p class="lead">Готового правильного ответа не будет. Система справится сама.</p>
+        <p class="copy">Ситуация запускает состояние, память и импульс. Из этого рождается реакция. Она становится событием для второго человека — и уже его система отвечает вашей. Разговор здесь только видимая часть.</p>
+        <div class="sticky-note"><b>НАБЛЮДЕНИЕ</b><strong>Диалог — симптом. Причина обычно глубже.</strong></div>
+      </div>
+      <div class="reveal" style="display:grid;gap:12px">
+        <figure class="frame round padded zoomable"><picture class="art-picture"><source media="(max-width:760px)" srcset="/assets/projects/dementor-lab/v19/07-causality-mobile.avif"><img src="/assets/projects/dementor-lab/v19/09-word-action-result-desktop.avif" alt="Слово — действие — результат"></picture></figure>
+        <div class="cards">
+          <article class="card"><b>01 / Триггер</b><strong>Что во мне сработало?</strong><p>Стресс, память, импульс, привычка. Здесь начинается реакция.</p></article>
+          <article class="card"><b>02 / Контакт</b><strong>Что сделал другой?</strong><p>У второго человека своя система. К сожалению, она тоже отвечает.</p></article>
+          <article class="card"><b>03 / Итог</b><strong>К чему это привело?</strong><p>Контакт изменился. Теперь можно смотреть на последствия, а не спорить о намерениях.</p></article>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section dark" id="result">
+    <div class="inner feature media-left">
+      <figure class="frame round padded zoomable reveal"><picture class="art-picture"><source media="(max-width:760px)" srcset="/assets/projects/dementor-lab/v19/10-result-mobile.avif"><img src="/assets/projects/dementor-lab/v19/11-result-desktop.avif" alt="Причинная цепь результата"></picture></figure>
+      <div class="textblock reveal">
+        <p class="kicker">ПРОТОКОЛ ПОСЛЕ СЦЕНЫ / РЕЗУЛЬТАТ</p>
+        <h2>СТАЛО ХУЖЕ.<br><span class="acid">ЗАТО ПОНЯТНО ПОЧЕМУ</span></h2>
+        <p class="lead">После сцены остаётся не мораль, а понятная цепочка событий.</p>
+        <p class="copy">Лаборатория показывает точку поворота: что произошло, как изменилось состояние второго человека и где начал рушиться контакт. Никаких советов жить правильно. Только причинная цепь и повторная проверка.</p>
+      </div>
+    </div>
+    <div class="inner">
+      <div class="chain reveal">
+        <b>ПРОТОКОЛ ПОВРЕЖДЕНИЙ</b>
+        <div class="chain-flow">
+          <div class="chain-node">разговор шёл легко</div>
+          <div class="chain-arrow">→</div>
+          <div class="chain-node acid">предложили ещё бокал</div>
+          <div class="chain-arrow">→</div>
+          <div class="chain-node">она стала менее вовлечённой</div>
+          <div class="chain-arrow">→</div>
+          <div class="chain-node">обнаружилась точка риска</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="replay">
+    <div class="inner replay-stage">
+      <div class="replay-hero reveal">
+        <span class="mini-badge">ТОЧЕЧНАЯ ЗАМЕНА / ПОВТОР</span>
+        <figure class="frame round zoomable replay-main"><picture class="art-picture"><source media="(max-width:760px)" srcset="/assets/projects/dementor-lab/v19/08-hot-patch-mobile.avif"><img src="/assets/projects/dementor-lab/v19/12-hot-patch-desktop.avif" alt="Hot Patch — изменить одну причину"></picture></figure>
+        <div class="replay-overlay zoomable">
+          <img src="/assets/projects/dementor-lab/v19/13-before-after-desktop.avif" alt="До и после — одна сцена, два исхода">
+        </div>
+      </div>
+      <div class="replay-copy reveal">
+        <h2>ЧЕЛОВЕКА НЕ ТРОГАЕМ.<br><span class="acid">МЕНЯЕМ ПРИЧИНУ.</span></h2>
+        <p class="lead">Не понравился исход? Отлично. Теперь хотя бы понятно, что проверять.</p>
+        <p class="copy">Меняем одну причину и запускаем тот же вечер снова. Те же люди, та же сцена. Если исход меняется, значит, вмешательство попало в нужное место.</p>
+      </div>
+      <div class="step-row reveal">
+        <div class="step"><b>01</b><strong>Увидел исход</strong></div>
+        <div class="step"><b>02</b><strong>Нашёл причину</strong></div>
+        <div class="step"><b>03</b><strong>Изменил одну причину</strong></div>
+        <div class="step"><b>04</b><strong>Повторил сцену</strong></div>
+        <div class="step"><b>05</b><strong>Сравнил до / после</strong></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section final" id="start">
+    <div class="inner final-grid">
+      <div class="final-panel reveal">
+        <p class="kicker">DEMENTOR CLUB / PROJECT / DEMENTOR LAB</p>
+        <div class="final-mark">LAB.</div>
+        <p class="lead">Один вечер. Два человека. Несколько способов всё испортить без посторонней помощи.</p>
+        <div class="hero-actions">
+          <a class="cta" href="#episode">ПОСМОТРЕТЬ ЭПИЗОД 01 →</a>
+          <a class="cta secondary" href="#top">К НАЧАЛУ</a>
+        </div>
+        <p class="fine">ПУБЛИЧНЫЙ ДОСТУП / СКОРО</p>
+      </div>
+      <div class="final-side reveal">
+        <div class="quote">Один мир. Много тебя.</div>
+        <div class="final-list">
+          <div class="final-item">Сначала проживите ситуацию как обычно.</div>
+          <div class="final-item">Потом найдите момент, где всё пошло не туда.</div>
+          <div class="final-item">Измените одну причину и повторите ту же сцену.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+<div class="modal" id="modal" aria-hidden="true"><button aria-label="Закрыть">×</button><img alt=""></div>
+<script>
+const progress = document.getElementById('progress');
+const updateProgress = () => {
+  const h = document.documentElement;
+  const max = h.scrollHeight - innerHeight;
+  progress.style.width = (max ? scrollY / max * 100 : 0) + '%';
+};
+addEventListener('scroll', updateProgress, {passive:true});
+updateProgress();
+
+const io = new IntersectionObserver(entries => entries.forEach(e => {
+  if (e.isIntersecting) e.target.classList.add('in');
+}), {threshold:.12});
+document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+const modal = document.getElementById('modal');
+const modalImg = modal.querySelector('img');
+document.querySelectorAll('.zoomable img, .replay-overlay img').forEach(img => img.addEventListener('click', () => {
+  modalImg.src = img.currentSrc || img.src;
+  modalImg.alt = img.alt;
+  modal.classList.add('open');
+  modal.setAttribute('aria-hidden','false');
+}));
+const closeModal = () => {
+  modal.classList.remove('open');
+  modal.setAttribute('aria-hidden','true');
+  modalImg.src = '';
+};
+modal.addEventListener('click', closeModal);
+modal.querySelector('button').addEventListener('click', closeModal);
+addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+
+</script>
+</body>
+</html>
