@@ -1,5 +1,5 @@
 {
-  "version": "2026-09-13",
+  "version": "2026-09-14",
   "role": "site content readiness registry",
   "statusDefinitions": {
     "FINAL": "Current public copy can ship without additional factual approval; later editorial refinement is optional.",
@@ -39,9 +39,17 @@
     {
       "route": "/projects/",
       "state": "FINAL",
-      "source": ["dementor-club/concept/ecosystem.md", "logic-awareness/README.md"],
+      "source": ["dementor-club/concept/ecosystem.md", "logic-awareness/README.md", "docs/PROJECTS_V2_EDITORIAL_DESIGN_HANDOFF_2026-09-14.md"],
       "blockingFields": [],
-      "note": "Projects index exposes only approved public project references."
+      "note": "Projects hub exposes source-bounded public project references and the canonical Board bridge."
+    },
+    {
+      "route": "/projects/dementor-lab/",
+      "state": "REQUIRES_APPROVAL",
+      "productionAllowed": false,
+      "source": ["dementor-club/projects/dementor-lab/", "dementor_lab_landing_v19_APPROVED.html", "docs/PROJECTS_V2_EDITORIAL_DESIGN_HANDOFF_2026-09-14.md"],
+      "blockingFields": ["exact approved V19 landing source binding into canonical route", "final project-route visual acceptance"],
+      "note": "Canonical route exists only as a G5 source-binding shell. Do not mark FINAL or production-allowed until the exact approved V19 artifact is integrated and visually accepted."
     },
     {
       "route": "/projects/logic-awareness/",
