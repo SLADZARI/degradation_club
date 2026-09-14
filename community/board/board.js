@@ -156,6 +156,7 @@ async function publishFromForm(event){
       const metadata={name:file.name,size:file.size,mime:file.type};const attached=await client.rpc('dc_attach_artifact_media_v1',{p_artifact_id:artifactId,p_storage_path:path,p_media_type:'image',p_metadata:metadata});if(attached.error){await client.storage.from(DC_ARTIFACT_BUCKET).remove([path]).catch(()=>{});throw attached.error}ownDraftMedia=[{storage_path:path,media_type:'image',metadata}];uploadedPath=null;
     }
     state.textContent='ПРИКАЛЫВАЕМ К ДОСКЕ';const published=await client.rpc('dc_publish_artifact_v1',{p_artifact_id:artifactId});if(published.error)throw published.error;
+    window.dispatchEvent(new CustomEvent('dc:board:artifact-published',{detail:{artifactId}}));
     ownDraft=null;ownDraftMedia=[];await refreshAll();
   }catch(error){
     submit.disabled=false;submit.textContent='ОПУБЛИКОВАТЬ →';state.textContent='НЕ ОПУБЛИКОВАНО';
