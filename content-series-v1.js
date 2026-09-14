@@ -125,11 +125,16 @@
     try{target=document.querySelector(location.hash);}catch{}
     if(!target)return;
 
-    let stopped=false,raf=0,observer=null;
+    let stopped=false,raf=0,interval=0,stopTimer=0;
+    const cleanup=()=>{
+      if(interval)clearInterval(interval);
+      if(stopTimer)clearTimeout(stopTimer);
+      interval=0;stopTimer=0;
+    };
     const stop=()=>{
       if(stopped)return;
       stopped=true;
-      observer?.disconnect();
+      cleanup();
     };
     const userTookControl=()=>stop();
     addEventListener('pointerdown',userTookControl,{once:true,passive:true,capture:true});
@@ -141,16 +146,26 @@
       if(stopped||raf)return;
       raf=requestAnimationFrame(()=>{
         raf=0;
-        if(stopped)return;
+        if(stopped||location.hash!==`#${target.id}`)return;
         target.scrollIntoView({block:'start',inline:'nearest',behavior:'auto'});
       });
     };
 
-    /* Lazy media above the deep-link can change document height after native hash navigation. */
-    if('ResizeObserver' in window){observer=new ResizeObserver(align);observer.observe(document.body);}
-    align();
+    /* Native hash navigation happens before lazy media above the section has a stable height. */
+    const imagesBeforeTarget=[...document.images].filter(img=>Boolean(img.compareDocumentPosition(target)&Node.DOCUMENT_POSITION_FOLLOWING));
+    imagesBeforeTarget.forEach(img=>{
+      if(img.complete)return;
+      img.addEventListener('load',align,{once:true});
+      img.addEventListener('error',align,{once:true});
+    });
+
+    document.fonts?.ready?.then(align).catch?.(()=>{});
     if(document.readyState!=='complete')addEventListener('load',align,{once:true});
-    setTimeout(stop,2500);
+
+    /* Keep the explicit fragment pinned only during the short initial layout-settle window. */
+    align();
+    interval=setInterval(align,40);
+    stopTimer=setTimeout(stop,900);
   };
 
   const boot=()=>{
