@@ -125,11 +125,18 @@
     try{target=document.querySelector(location.hash);}catch{}
     if(!target)return;
 
+    const root=document.documentElement;
+    const previousScrollBehavior=root.style.getPropertyValue('scroll-behavior');
+    const previousScrollBehaviorPriority=root.style.getPropertyPriority('scroll-behavior');
+    root.style.setProperty('scroll-behavior','auto','important');
+
     let stopped=false,raf=0,interval=0,stopTimer=0;
     const cleanup=()=>{
       if(interval)clearInterval(interval);
       if(stopTimer)clearTimeout(stopTimer);
       interval=0;stopTimer=0;
+      if(previousScrollBehavior)root.style.setProperty('scroll-behavior',previousScrollBehavior,previousScrollBehaviorPriority);
+      else root.style.removeProperty('scroll-behavior');
     };
     const stop=()=>{
       if(stopped)return;
@@ -156,7 +163,7 @@
       stopTimer=setTimeout(stop,1400);
     };
 
-    /* Native hash navigation happens before lazy media above the section has a stable height. */
+    /* The site-level html smooth-scroll rule must not turn fragment stabilization into a restarted animation. */
     const imagesBeforeTarget=[...document.images].filter(img=>Boolean(img.compareDocumentPosition(target)&Node.DOCUMENT_POSITION_FOLLOWING));
     imagesBeforeTarget.forEach(img=>{
       if(img.complete)return;
