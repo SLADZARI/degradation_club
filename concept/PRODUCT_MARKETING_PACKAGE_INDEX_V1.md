@@ -79,22 +79,28 @@ Audience modes are not a maturity ladder. Program Audience is a complete valid s
 
 ## 04 · Value Architecture
 
-**Question:** What value does the person receive at each depth without forcing them deeper?
+**Question:** What independent value does a person receive in each mode without being forced deeper?
 
-**Status:** NEXT
+**Status:** WORKING CANON
 
-Expected layers:
-
-- watched / experienced;
-- returned;
-- brought something;
-- joined;
-- made something;
-- received contextual utility;
-- paid for a useful intervention / product / event.
-
-Target source:
+Source:
 `concept/VALUE_ARCHITECTURE_V1.md`
+
+Core formula:
+
+**THING WORTH ATTENTION → PROGRAM WORTH RETURNING TO → OPTIONAL VALUE WHEN CONTEXT APPEARS**
+
+Optional value may include:
+
+- editorial reaction;
+- participation;
+- making / authorship;
+- contextual utility;
+- paid value.
+
+Core rule:
+
+**Value is not a ladder.** Viewer, Program Audience, Contributor, Participant, Maker and contextual users are valid independent modes, not steps toward one preferred end state.
 
 ---
 
@@ -102,7 +108,7 @@ Target source:
 
 **Question:** What entities exist and how are they related?
 
-**Status:** PARTIALLY DEFINED IN JTBD
+**Status:** NEXT / PARTIALLY DEFINED IN JTBD
 
 Must formalize:
 
@@ -216,7 +222,7 @@ Target source:
 
 **Question:** How are authors, methods, courses, tools and expertise discovered through situations rather than profiles?
 
-**Status:** PARTIALLY DEFINED IN JTBD + CJM
+**Status:** PARTIALLY DEFINED IN JTBD + CJM + VALUE ARCHITECTURE
 
 Core rule:
 
@@ -286,13 +292,15 @@ Target source:
 
 **Question:** Where can money appear naturally without making monetization the reason the club exists?
 
-**Status:** TODO
+**Status:** PARTIALLY DEFINED IN VALUE ARCHITECTURE
 
-Working model:
+Working principle:
 
-**FREE EXPERIENCE → PARTICIPATION → CONTEXTUAL VALUE → PAID VALUE**
+**Paid value is not a higher user level.**
 
-Possible paid layers:
+Payment appears when a concrete Thing / event / intervention has standalone value and literally stated terms.
+
+Possible paid layers may include:
 
 - contextual course;
 - method;
@@ -312,7 +320,7 @@ Target source:
 
 **Question:** How do we know the club is alive without optimizing it into a social network or marketplace?
 
-**Status:** PARTIALLY DEFINED IN JTBD + CJM
+**Status:** PARTIALLY DEFINED IN JTBD + CJM + VALUE ARCHITECTURE
 
 Primary signal groups:
 
@@ -334,7 +342,7 @@ Target source:
 
 **Question:** What must future design, product and marketing decisions not break?
 
-**Status:** PARTIALLY DEFINED IN JTBD
+**Status:** PARTIALLY DEFINED IN JTBD + VALUE ARCHITECTURE
 
 Known principles:
 
@@ -349,7 +357,10 @@ Known principles:
 - Editorial reaction > Infinite publishing;
 - Intervention > Catalog;
 - Participation > Management;
-- Utility is contextual.
+- Utility is contextual;
+- Value is not a ladder;
+- Value before CTA;
+- Paid value is not paid belonging.
 
 Target source:
 `concept/PRODUCT_PRINCIPLES_ANTIPATTERNS_V1.md`
@@ -360,20 +371,19 @@ Target source:
 
 Current recommended sequence:
 
-1. **Value Architecture**
-2. **Product Model**
-3. **Board Product Model**
-4. **Content & Programming Model**
-5. **Return Loops**
-6. **Contribution Model**
-7. **Dementor / Intervention Model**
-8. **Marketing Positioning & Messaging**
-9. **Distribution Model**
-10. **Monetization Map**
-11. **Metrics & Signals**
-12. **Product Principles / Anti-patterns final consolidation**
+1. **Product Model**
+2. **Board Product Model**
+3. **Content & Programming Model**
+4. **Return Loops**
+5. **Contribution Model**
+6. **Dementor / Intervention Model**
+7. **Marketing Positioning & Messaging**
+8. **Distribution Model**
+9. **Monetization Map**
+10. **Metrics & Signals**
+11. **Product Principles / Anti-patterns final consolidation**
 
-Reason: entry doors are now mapped. Next clarify **what value a person receives at each depth**; only then lock entities, surfaces, growth, marketing and monetization.
+Reason: entry doors and independent value modes are now mapped. Next formalize **what exists in the product and how these entities relate**, before locking surfaces, programming, marketing and monetization.
 
 ---
 
@@ -386,8 +396,12 @@ Reason: entry doors are now mapped. Next clarify **what value a person receives 
 - CJM BOARD / PARTICIPATION
 - Audience & Entry Map
 
-**NEXT**
+**WORKING CANON**
 
 - Value Architecture
+
+**NEXT**
+
+- Product Model
 
 Everything else should reference the authorities above and must not redefine them silently.
