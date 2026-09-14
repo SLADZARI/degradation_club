@@ -61,6 +61,18 @@ for(const width of widths){
     expect(Math.abs(state.scrollY)<=2,`${width}px ${route}: fresh non-hash navigation must start at top, scrollY=${state.scrollY}`);
     expect(state.overflow<=1,`${width}px ${route}: horizontal overflow ${state.overflow}px`);
     expect(state.header,`${width}px ${route}: canonical public Header missing`);
+
+    if(route==='/projects/'&&width===390){
+      const headings=await page.evaluate(()=>[...document.querySelectorAll('.dc-projects-v2__territory-main h2,.dc-projects-v2__final-grid h2')].map(el=>({
+        text:(el.textContent||'').trim().replace(/\s+/g,' '),
+        scrollWidth:el.scrollWidth,
+        clientWidth:el.clientWidth
+      })));
+      for(const heading of headings){
+        expect(heading.scrollWidth<=heading.clientWidth+1,`390px Projects hub: heading clips inside its owner: ${heading.text} (${heading.scrollWidth}px > ${heading.clientWidth}px)`);
+      }
+    }
+
     const visualName=visualRoutes.get(route);
     if(visualName){
       await page.screenshot({path:path.join(qaDir,`projects-v2-${visualName}-${width}.png`),fullPage:true});
@@ -137,4 +149,4 @@ if(errors.length){
   for(const e of errors)console.error(`- ${e}`);
   process.exit(1);
 }
-console.log('Projects v2 browser regression PASS: fresh-top + Logic hashes + history restoration + no overflow + canonical shell/routes on 1440/390. Visual evidence captured for Hub + Lab.');
+console.log('Projects v2 browser regression PASS: fresh-top + Logic hashes + history restoration + no overflow + mobile heading fit + canonical shell/routes on 1440/390. Visual evidence captured for Hub + Lab.');
