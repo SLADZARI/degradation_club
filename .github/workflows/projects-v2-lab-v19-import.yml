@@ -40,6 +40,8 @@ jobs:
           mkdir -p assets/projects/dementor-lab/v19
           cp /tmp/dementor-lab-v19-import/projects/dementor-lab/index.html projects/dementor-lab/index.html
           cp /tmp/dementor-lab-v19-import/assets/projects/dementor-lab/v19/*.avif assets/projects/dementor-lab/v19/
+          sed -i '/\.dc-lab-v19-brand-legacy{font-size:12px}/d; /\.dc-lab-v19-nav-legacy \.play{padding:9px 10px;font-size:10px}/d' projects/dementor-lab/index.html
+          sed -i 's/[[:space:]]\+$//' projects/dementor-lab/index.html
 
       - name: Remove one-shot transfer workflow and commit
         shell: bash
