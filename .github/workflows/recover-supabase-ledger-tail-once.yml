@@ -1,0 +1,173 @@
+name: Recover Supabase Ledger Tail Once
+
+on:
+  push:
+    branches:
+      - agent/175-supabase-ledger-tail-recovery
+
+permissions:
+  contents: write
+
+concurrency:
+  group: dementor-supabase-ledger-tail-recovery-once
+  cancel-in-progress: false
+
+jobs:
+  recover:
+    if: contains(github.event.head_commit.message, '[recover-ledger-tail]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      CANONICAL_SUPABASE_PROJECT_REF: mmekfydwbvptbdatwitj
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+      SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
+    steps:
+      - name: Checkout exact recovery branch
+        uses: actions/checkout@v4
+        with:
+          ref: agent/175-supabase-ledger-tail-recovery
+          fetch-depth: 1
+          persist-credentials: true
+
+      - name: Guard exact source and canonical production project
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "${GITHUB_REF}" = "refs/heads/agent/175-supabase-ledger-tail-recovery" || {
+            echo "Ledger-tail recovery may run only from its dedicated branch."
+            exit 1
+          }
+          test -n "${SUPABASE_ACCESS_TOKEN}" || { echo "SUPABASE_ACCESS_TOKEN is missing"; exit 1; }
+          test -n "${SUPABASE_DB_PASSWORD}" || { echo "SUPABASE_DB_PASSWORD is missing"; exit 1; }
+          test -n "${SUPABASE_PROJECT_ID}" || { echo "SUPABASE_PROJECT_ID is missing"; exit 1; }
+          test "${SUPABASE_PROJECT_ID}" = "${CANONICAL_SUPABASE_PROJECT_REF}" || {
+            echo "Configured project ref is not canonical Dementor production."
+            exit 1
+          }
+          echo "Recovery source SHA: $(git rev-parse HEAD)"
+
+      - name: Setup pinned Supabase CLI
+        uses: supabase/setup-cli@3c2f5e2ae34c34e428e8e206e2c4d21fa2d20fbf
+        with:
+          version: 2.117.0
+
+      - name: Link production project read-only for migration-history fetch
+        shell: bash
+        run: |
+          set -euo pipefail
+          supabase link --project-ref "${CANONICAL_SUPABASE_PROJECT_REF}"
+
+      - name: Prove expected pre-fetch ledger tail
+        shell: bash
+        run: |
+          set -euo pipefail
+          supabase migration list --linked 2>&1 | tee /tmp/ledger-before.txt
+          for version in \
+            20260829234107 \
+            20260830203911 \
+            20260831080627 \
+            20260831081426 \
+            20260831130116 \
+            20260902130850 \
+            20260902131415 \
+            20260908202747 \
+            20260909061242 \
+            20260909214529; do
+            grep -Eq "^[[:space:]]*`?[[:space:]]*`?[[:space:]]*\\|[[:space:]]*`?${version}`?[[:space:]]*\\|" /tmp/ledger-before.txt || {
+              echo "Expected remote-only migration ${version} is not remote-only in live ledger."
+              exit 1
+            }
+          done
+          grep -Eq "20260914090000.*\\|[[:space:]]*`?[[:space:]]*`?[[:space:]]*\\|" /tmp/ledger-before.txt || {
+            echo "Expected pending Activity migration 20260914090000 is not local-only."
+            exit 1
+          }
+
+      - name: Fetch exact remote migration history
+        shell: bash
+        run: |
+          set -euo pipefail
+          supabase migration fetch --linked --yes
+
+      - name: Verify fetch changed exactly the ten missing historical files
+        shell: bash
+        run: |
+          set -euo pipefail
+          EXPECTED="$(mktemp)"
+          cat > "${EXPECTED}" <<'EOF'
+          supabase/migrations/20260829234107_community_membership_state_guard_v1.sql
+          supabase/migrations/20260830203911_grant_mp_project_refs_select_to_service_role.sql
+          supabase/migrations/20260831080627_community_distribution_outbox_service_role_permissions.sql
+          supabase/migrations/20260831081426_community_telegram_worker_service_role_reads.sql
+          supabase/migrations/20260831130116_mp_client_project_visibility_v1.sql
+          supabase/migrations/20260902130850_dc_membership_dementor_review_v2.sql
+          supabase/migrations/20260902131415_dc_membership_review_v2_hardening.sql
+          supabase/migrations/20260908202747_mp_project_requests_v1.sql
+          supabase/migrations/20260909061242_mp_project_owner_provisioning_v1.sql
+          supabase/migrations/20260909214529_mp_client_team_access_v1.sql
+          EOF
+          sed -i 's/^          //' "${EXPECTED}"
+          sort -o "${EXPECTED}" "${EXPECTED}"
+
+          ACTUAL="$(mktemp)"
+          git status --porcelain --untracked-files=all | cut -c4- | sort > "${ACTUAL}"
+          echo "Fetched paths:"
+          cat "${ACTUAL}"
+          diff -u "${EXPECTED}" "${ACTUAL}" || {
+            echo "migration fetch changed something outside the exact ten-file recovery set; refusing to commit."
+            exit 1
+          }
+
+      - name: Record byte identities from direct production-history fetch
+        shell: bash
+        run: |
+          set -euo pipefail
+          for path in \
+            supabase/migrations/20260829234107_community_membership_state_guard_v1.sql \
+            supabase/migrations/20260830203911_grant_mp_project_refs_select_to_service_role.sql \
+            supabase/migrations/20260831080627_community_distribution_outbox_service_role_permissions.sql \
+            supabase/migrations/20260831081426_community_telegram_worker_service_role_reads.sql \
+            supabase/migrations/20260831130116_mp_client_project_visibility_v1.sql \
+            supabase/migrations/20260902130850_dc_membership_dementor_review_v2.sql \
+            supabase/migrations/20260902131415_dc_membership_review_v2_hardening.sql \
+            supabase/migrations/20260908202747_mp_project_requests_v1.sql \
+            supabase/migrations/20260909061242_mp_project_owner_provisioning_v1.sql \
+            supabase/migrations/20260909214529_mp_client_team_access_v1.sql; do
+            test -s "${path}" || { echo "Fetched migration is empty: ${path}"; exit 1; }
+            echo "git_blob $(git hash-object "${path}") ${path}"
+            sha256sum "${path}"
+          done
+
+      - name: Verify post-fetch ledger is clean except pending Activity migration
+        shell: bash
+        run: |
+          set -euo pipefail
+          supabase migration list --linked 2>&1 | tee /tmp/ledger-after.txt
+          node scripts/validate-supabase-release-contract.mjs --migration-status /tmp/ledger-after.txt
+          supabase db push --linked --dry-run 2>&1 | tee /tmp/dry-run.txt
+          grep -q "20260914090000" /tmp/dry-run.txt || {
+            echo "Dry-run did not expose the expected pending Activity migration."
+            exit 1
+          }
+
+      - name: Commit exact fetched history and remove one-off recovery workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm .github/workflows/recover-supabase-ledger-tail-once.yml
+          git add supabase/migrations .github/workflows/recover-supabase-ledger-tail-once.yml
+          echo "Recovery commit contents:"
+          git diff --cached --name-status
+          test "$(git diff --cached --name-status | awk '$1=="A" && $2 ~ /^supabase\/migrations\/2026.*\.sql$/ {n++} END {print n+0}')" = "10" || {
+            echo "Expected exactly ten migration additions."
+            exit 1
+          }
+          test "$(git diff --cached --name-status | awk '$1=="D" && $2==".github/workflows/recover-supabase-ledger-tail-once.yml" {n++} END {print n+0}')" = "1" || {
+            echo "One-off recovery workflow was not removed."
+            exit 1
+          }
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Release infra: recover ten historical Supabase ledger migrations"
+          git push origin HEAD:agent/175-supabase-ledger-tail-recovery
