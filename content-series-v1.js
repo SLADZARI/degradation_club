@@ -150,6 +150,11 @@
         target.scrollIntoView({block:'start',inline:'nearest',behavior:'auto'});
       });
     };
+    const settleAfterLoad=()=>{
+      align();
+      if(stopTimer)clearTimeout(stopTimer);
+      stopTimer=setTimeout(stop,1400);
+    };
 
     /* Native hash navigation happens before lazy media above the section has a stable height. */
     const imagesBeforeTarget=[...document.images].filter(img=>Boolean(img.compareDocumentPosition(target)&Node.DOCUMENT_POSITION_FOLLOWING));
@@ -160,12 +165,10 @@
     });
 
     document.fonts?.ready?.then(align).catch?.(()=>{});
-    if(document.readyState!=='complete')addEventListener('load',align,{once:true});
-
-    /* Keep the explicit fragment pinned only during the short initial layout-settle window. */
     align();
-    interval=setInterval(align,40);
-    stopTimer=setTimeout(stop,900);
+    interval=setInterval(align,50);
+    if(document.readyState==='complete')settleAfterLoad();
+    else addEventListener('load',settleAfterLoad,{once:true});
   };
 
   const boot=()=>{
