@@ -1,7 +1,7 @@
 # DEMENTOR CLUB — PRODUCT & MARKETING PACKAGE v1
 
 Status: **WORKING INDEX / source map**  
-Updated: **2026-09-14**
+Updated: **2026-09-15**
 
 ## Purpose
 
@@ -56,25 +56,24 @@ Key separation:
 
 **Question:** Why does a person first encounter Dementor, through which door, and what should they see next?
 
-**Status:** WORKING CANON
+**Status:** CANON
 
 Source:
 `concept/AUDIENCE_ENTRY_MAP_V1.md`
 
-Current entry modes:
+Canonical entry model:
 
-- пришёл поржать;
-- переслали конкретную вещь;
-- увидел игру / инструмент / странный продукт;
-- пришёл через конкретного Dementor;
-- увидел событие;
-- увидел Project;
-- попал в ситуацию, где пригодился инструмент;
-- сам что-то заметил и хочет принести.
+**SOURCE × INTENT × ENTRY OBJECT**
 
-Core entry structure:
+Canonical audience journey:
 
-**trigger → first thing → promise → channel → next thing → return reason**
+**THING → EXPERIENCE → VIEW → PROGRAM → IMPACT → RETURN**
+
+Core rule:
+
+**Thing first.** Do not bring the person into the club first; let them meet a thing that makes them want to see what this place is.
+
+Audience modes are not a maturity ladder. Program Audience is a complete valid state; Contributor, Participant and Maker are optional modes, not higher levels.
 
 ---
 
@@ -385,9 +384,6 @@ Reason: entry doors are now mapped. Next clarify **what value a person receives 
 - Product Thesis / JTBD
 - CJM CLUB
 - CJM BOARD / PARTICIPATION
-
-**WORKING CANON**
-
 - Audience & Entry Map
 
 **NEXT**
