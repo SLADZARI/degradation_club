@@ -106,45 +106,60 @@ Core rule:
 
 ## 05 · Product Model
 
-**Question:** What entities exist and how are they related?
+**Question:** What exists in the product semantically, how are those objects related, and what must implementation preserve without confusing ontology with database tables?
 
-**Status:** NEXT / PARTIALLY DEFINED IN JTBD
+**Status:** WORKING CANON
 
-Must formalize:
-
-- Thing;
-- Observation;
-- Form;
-- Project;
-- Dementor / Author;
-- State;
-- Participation;
-- Release;
-- History / Reaction;
-- Intervention.
-
-Target source:
+Source:
 `concept/PRODUCT_MODEL_V1.md`
+
+Production review:
+`operations/PRODUCT_MODEL_PRODUCTION_ENTITY_REVIEW_2026-09-15.md`
+
+Core semantic loop:
+
+**OBSERVATION → THING → FORM → RELEASE → HISTORY**
+
+When needed:
+
+**THING ↔ PROJECT**
+
+**THING / PROJECT → PARTICIPATION OPPORTUNITY → PARTICIPANT RELATION**
+
+**SITUATION → INTERVENTION → DEMENTOR / METHOD / RESOURCE THING**
+
+Key decisions:
+
+- `THING` is product semantics, not an automatic request for a new `dc_things` table;
+- existing Artifact / Event / Program / entity sources may back a Thing;
+- Artifact remains an implementation term, not the universal public ontology;
+- Form, Release State and Production State are separate dimensions;
+- `ВЫШЛО` and `МУТЯТ` may coexist when a released Thing is producing a new version;
+- Dementor is a public authorial projection of Person + scoped role + body of work, not a duplicate identity entity;
+- Participation Opportunity and Participant Relation are separate concepts;
+- Board / Home / Activity / Profile / Card are projections, not core entities.
 
 ---
 
 ## 06 · Board Product Model
 
-**Question:** How does the stage of the club display living things without becoming a forum or marketplace?
+**Question:** How does the stage of the club display living Things, Projects, Releases, History and Participation without becoming a forum or marketplace?
 
-**Status:** PARTIALLY DEFINED IN JTBD + CJM
+**Status:** NEXT / PARTIALLY DEFINED IN JTBD + CJM + PRODUCT MODEL
 
 Must formalize:
 
-- card anatomy;
-- information priority;
-- Form / State / Participation display rules;
+- Board source adapter around Artifact / entity projection / system;
+- card anatomy and information priority;
+- Thing identity on Board;
+- Form / Release State / Production State / Participation display rules;
+- how `ВЫШЛО + МУТЯТ v2` is represented without badge overload;
 - detail view;
-- transitions;
 - History presentation;
 - Project relation;
 - editorial control;
-- Activity relationship.
+- Activity relationship;
+- compatibility with existing production Board contracts.
 
 Target source:
 `concept/BOARD_PRODUCT_MODEL_V1.md`
@@ -200,15 +215,17 @@ Target source:
 
 **Question:** How does a person move from watching to bringing something without turning Dementor into UGC feed?
 
-**Status:** PARTIALLY DEFINED IN CJM
+**Status:** PARTIALLY DEFINED IN CJM + PRODUCT MODEL
 
 Must define:
 
 - entry prompt;
+- Observation / contribution boundary;
 - editorial reaction;
 - submission states;
+- mapping of existing Artifact to contribution / native Thing;
 - merge with existing Thing;
-- when contribution becomes Form;
+- when contribution becomes a Thing;
 - when Project starts;
 - author credit;
 - rejection / no-action outcomes.
@@ -222,7 +239,7 @@ Target source:
 
 **Question:** How are authors, methods, courses, tools and expertise discovered through situations rather than profiles?
 
-**Status:** PARTIALLY DEFINED IN JTBD + CJM + VALUE ARCHITECTURE
+**Status:** PARTIALLY DEFINED IN JTBD + CJM + VALUE ARCHITECTURE + PRODUCT MODEL
 
 Core rule:
 
@@ -230,8 +247,8 @@ Core rule:
 
 Must define:
 
-- Dementor public role;
-- point of view + practice;
+- Dementor as public authorial projection, not duplicate Person identity;
+- point of view + practice + body of work;
 - intervention triggers;
 - contextual products;
 - free vs paid intervention;
@@ -342,7 +359,7 @@ Target source:
 
 **Question:** What must future design, product and marketing decisions not break?
 
-**Status:** PARTIALLY DEFINED IN JTBD + VALUE ARCHITECTURE
+**Status:** PARTIALLY DEFINED IN JTBD + VALUE ARCHITECTURE + PRODUCT MODEL
 
 Known principles:
 
@@ -352,7 +369,7 @@ Known principles:
 - Objects > Profiles;
 - Situations > Skills;
 - Form ≠ Project;
-- State ≠ Participation ≠ History;
+- Release State ≠ Production State ≠ Participation ≠ History;
 - Release > Completion;
 - Editorial reaction > Infinite publishing;
 - Intervention > Catalog;
@@ -360,7 +377,9 @@ Known principles:
 - Utility is contextual;
 - Value is not a ladder;
 - Value before CTA;
-- Paid value is not paid belonging.
+- Paid value is not paid belonging;
+- Product semantics ≠ database table list;
+- Projection never becomes a second source of semantic truth.
 
 Target source:
 `concept/PRODUCT_PRINCIPLES_ANTIPATTERNS_V1.md`
@@ -371,19 +390,18 @@ Target source:
 
 Current recommended sequence:
 
-1. **Product Model**
-2. **Board Product Model**
-3. **Content & Programming Model**
-4. **Return Loops**
-5. **Contribution Model**
-6. **Dementor / Intervention Model**
-7. **Marketing Positioning & Messaging**
-8. **Distribution Model**
-9. **Monetization Map**
-10. **Metrics & Signals**
-11. **Product Principles / Anti-patterns final consolidation**
+1. **Board Product Model**
+2. **Content & Programming Model**
+3. **Return Loops**
+4. **Contribution Model**
+5. **Dementor / Intervention Model**
+6. **Marketing Positioning & Messaging**
+7. **Distribution Model**
+8. **Monetization Map**
+9. **Metrics & Signals**
+10. **Product Principles / Anti-patterns final consolidation**
 
-Reason: entry doors and independent value modes are now mapped. Next formalize **what exists in the product and how these entities relate**, before locking surfaces, programming, marketing and monetization.
+Reason: product meaning, journeys, entry, value and core ontology are now mapped. Next make the existing Board express that model without forcing a destructive production rewrite.
 
 ---
 
@@ -399,9 +417,10 @@ Reason: entry doors and independent value modes are now mapped. Next formalize *
 **WORKING CANON**
 
 - Value Architecture
+- Product Model
 
 **NEXT**
 
-- Product Model
+- Board Product Model
 
 Everything else should reference the authorities above and must not redefine them silently.
