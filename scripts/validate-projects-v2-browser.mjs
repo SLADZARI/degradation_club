@@ -5,9 +5,11 @@ import {chromium} from 'playwright';
 
 const root=process.cwd();
 const artifact=path.join(root,'_site');
+const qaDir=path.join(root,'.qa','projects-v2');
+fs.mkdirSync(qaDir,{recursive:true});
 const errors=[];
 const expect=(ok,msg)=>{if(!ok)errors.push(msg)};
-const mime={'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.js':'text/javascript; charset=utf-8','.mjs':'text/javascript; charset=utf-8','.json':'application/json; charset=utf-8','.svg':'image/svg+xml','.png':'image/png','.webp':'image/webp','.jpg':'image/jpeg','.jpeg':'image/jpeg'};
+const mime={'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.js':'text/javascript; charset=utf-8','.mjs':'text/javascript; charset=utf-8','.json':'application/json; charset=utf-8','.svg':'image/svg+xml','.png':'image/png','.webp':'image/webp','.jpg':'image/jpeg','.jpeg':'image/jpeg','.avif':'image/avif'};
 
 function resolveFile(urlPath){
   let pathname=decodeURIComponent(new URL(urlPath,'http://local').pathname);
@@ -37,6 +39,10 @@ const routes=[
   '/projects/dementor-robo-games/'
 ];
 const widths=[1440,390];
+const visualRoutes=new Map([
+  ['/projects/','hub'],
+  ['/projects/dementor-lab/','lab']
+]);
 
 for(const width of widths){
   const context=await browser.newContext({viewport:{width,height:1000}});
@@ -44,7 +50,7 @@ for(const width of widths){
     const page=await context.newPage();
     await page.goto(base+route,{waitUntil:'load'});
     await page.waitForSelector('.dc-global-header');
-    await page.waitForTimeout(120);
+    await page.waitForTimeout(160);
     const state=await page.evaluate(()=>({
       scrollY:window.scrollY,
       overflow:document.documentElement.scrollWidth-document.documentElement.clientWidth,
@@ -55,6 +61,10 @@ for(const width of widths){
     expect(Math.abs(state.scrollY)<=2,`${width}px ${route}: fresh non-hash navigation must start at top, scrollY=${state.scrollY}`);
     expect(state.overflow<=1,`${width}px ${route}: horizontal overflow ${state.overflow}px`);
     expect(state.header,`${width}px ${route}: canonical public Header missing`);
+    const visualName=visualRoutes.get(route);
+    if(visualName){
+      await page.screenshot({path:path.join(qaDir,`projects-v2-${visualName}-${width}.png`),fullPage:true});
+    }
     await page.close();
   }
 
@@ -127,4 +137,4 @@ if(errors.length){
   for(const e of errors)console.error(`- ${e}`);
   process.exit(1);
 }
-console.log('Projects v2 browser regression PASS: fresh-top + Logic hashes + history restoration + no overflow + canonical shell/routes on 1440/390.');
+console.log('Projects v2 browser regression PASS: fresh-top + Logic hashes + history restoration + no overflow + canonical shell/routes on 1440/390. Visual evidence captured for Hub + Lab.');
