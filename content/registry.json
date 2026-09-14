@@ -12,7 +12,7 @@
     {"id":"COURSE-001","entityType":"course","title":"Думай с опасностью","status":"active-production-stage-1","publicUrl":"/courses/dumai-s-opasnostyu/","record":"/content/courses/dumai-s-opasnostyu.json","catalogPlacement":"not-approved"},
     {"id":"SH-DEM-01","entityType":"merch","title":"OVERTHINKING IS MY CARDIO.","status":"working-assets-present","publicUrl":"/merch/drop-001/overthinking-is-my-cardio/","record":"/content/merch/sh-dem-01.json"},
     {"id":"SH-DEM-02","entityType":"merch","title":"PERSONAL GROWTH CANCELLED.","status":"working-assets-present","publicUrl":"/merch/drop-001/personal-growth-cancelled/","record":"/content/merch/sh-dem-02.json"},
-    {"id":"SH-DEM-03","entityType":"merch","title":"SUCCESS IS BORING.","status":"working-assets-present","publicUrl":"/merch/drop-001/personal-growth-cancelled/","record":"/content/merch/sh-dem-03.json"}
+    {"id":"SH-DEM-03","entityType":"merch","title":"SUCCESS IS BORING.","status":"working-assets-present","publicUrl":"/merch/drop-001/success-is-boring/","record":"/content/merch/sh-dem-03.json"}
   ],
   "emptyRegisters": {"archive":0}
 }
