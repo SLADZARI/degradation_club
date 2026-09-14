@@ -137,14 +137,13 @@ jobs:
 
           echo "Restoring every pre-existing tracked migration after Supabase fetch."
           git checkout -- supabase/migrations
-          rm -rf supabase/.temp
 
           ACTUAL="$(mktemp)"
-          git status --porcelain --untracked-files=all | cut -c4- | sort > "${ACTUAL}"
-          echo "Net recovery paths after tracked-file restore:"
+          git status --porcelain --untracked-files=all -- supabase/migrations | cut -c4- | sort > "${ACTUAL}"
+          echo "Net recovery migration paths after tracked-file restore:"
           cat "${ACTUAL}"
           diff -u "${EXPECTED}" "${ACTUAL}" || {
-            echo "Net working tree is not exactly the ten historical additions; refusing to continue."
+            echo "Net migration working tree is not exactly the ten historical additions; refusing to continue."
             exit 1
           }
 
@@ -184,6 +183,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          rm -rf supabase/.temp
           rm .github/workflows/recover-supabase-ledger-tail-once.yml
           git add supabase/migrations .github/workflows/recover-supabase-ledger-tail-once.yml
           echo "Recovery commit contents:"
