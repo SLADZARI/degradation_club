@@ -1,8 +1,8 @@
 {
-  "version": "2026-09-13",
+  "version": "2026-09-14",
   "role": "production route and indexing contract",
   "indexable": [
-    "/", "/about/", "/events/", "/events/fuengirola/", "/projects/", "/projects/logic-awareness/", "/projects/logic-awareness/dossiers/", "/projects/logic-awareness/dossiers/logic/", "/projects/logic-awareness/dossiers/awareness/", "/community/", "/community/valentin/", "/community/nikita/", "/community/evgeniy/", "/community/gabil/", "/merch/", "/objects/001-ne-nado/", "/merch/drop-001/overthinking-is-my-cardio/", "/merch/drop-001/personal-growth-cancelled/", "/merch/drop-001/success-is-boring/", "/merch/drop-001/potential-too-long-revealed/", "/join/", "/courses/dumai-s-opasnostyu/", "/courses/dengi-na-veter/", "/courses/ne-komanda/", "/courses/slaboumie-i-otvaga/", "/catalog/", "/archive/", "/donate/", "/contacts/", "/legal/privacy/", "/legal/terms/"
+    "/", "/about/", "/events/", "/events/fuengirola/", "/projects/", "/projects/dementor-lab/", "/projects/dementor-battle/", "/projects/dementor-robo-games/", "/projects/logic-awareness/", "/projects/logic-awareness/dossiers/", "/projects/logic-awareness/dossiers/logic/", "/projects/logic-awareness/dossiers/awareness/", "/community/", "/community/valentin/", "/community/nikita/", "/community/evgeniy/", "/community/gabil/", "/merch/", "/objects/001-ne-nado/", "/merch/drop-001/overthinking-is-my-cardio/", "/merch/drop-001/personal-growth-cancelled/", "/merch/drop-001/success-is-boring/", "/merch/drop-001/potential-too-long-revealed/", "/join/", "/courses/dumai-s-opasnostyu/", "/courses/dengi-na-veter/", "/courses/ne-komanda/", "/courses/slaboumie-i-otvaga/", "/catalog/", "/archive/", "/donate/", "/contacts/", "/legal/privacy/", "/legal/terms/"
   ],
   "privateNoindex": [
     "/join/apply/", "/join/result/", "/community/artifact/", "/share/artifact/", "/workspace/", "/workspace/board/", "/workspace/artifacts/", "/workspace/review/", "/workspace/admin/", "/workspace/admin/design/", "/workspace/admin/tests/", "/workspace/admin/auth-test/", "/workspace/admin/sync-test/"
