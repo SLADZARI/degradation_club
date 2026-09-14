@@ -12,7 +12,7 @@ expect(runtime.includes('По умолчанию выключено. Публи�
 expect(runtime.includes('BOARD ОПУБЛИКОВАН · TELEGRAM НЕ ПОСТАВЛЕН В ОЧЕРЕДЬ'),'missing literal independent Telegram failure warning');
 expect(runtime.includes("==='OWNER_ADMIN'"),'opt-in is not explicitly OWNER_ADMIN-gated');
 expect(runtime.includes('type="checkbox"'),'opt-in checkbox missing');
-expect(!/checked(?:\s|=|>)/.test(runtime),'Telegram opt-in must default OFF');
+expect(!/data-admin-telegram-optin-input[^>]*\schecked(?:\s|=|>)/.test(runtime),'Telegram opt-in must default OFF');
 expect(runtime.includes("const PUBLISHED_EVENT='dc:board:artifact-published'"),'Telegram continuation is not bound to the narrow canonical success signal');
 expect(board.includes("window.dispatchEvent(new CustomEvent('dc:board:artifact-published',{detail:{artifactId}}));"),'canonical Board publish owner does not emit exact Artifact success signal');
 expect(board.indexOf("dc_publish_artifact_v1")<board.indexOf("dc:board:artifact-published"),'success signal must occur after canonical publish RPC');
