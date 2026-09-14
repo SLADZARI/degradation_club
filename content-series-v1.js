@@ -78,11 +78,18 @@
     const onScroll=()=>{if(!raf)raf=requestAnimationFrame(()=>{raf=0;nearest();});};
     track.addEventListener('scroll',onScroll,{passive:true});
 
-    const go=index=>{
+    const targetLeft=index=>{
+      const slide=slides[index];
+      return Math.max(0,slide.offsetLeft-(track.clientWidth-slide.offsetWidth)/2);
+    };
+
+    const go=(index,{behavior=true}={})=>{
       const i=clamp(index,0,slides.length-1);
-      slides[i].scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'nearest',inline:'center'});
+      const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+      track.scrollTo({left:targetLeft(i),top:0,behavior:behavior&&!reduce?'smooth':'auto'});
       paint(i);
     };
+
     prev.addEventListener('click',()=>go(active-1));
     next.addEventListener('click',()=>go(active+1));
     slides.forEach((slide,i)=>slide.addEventListener('click',()=>{if(i!==active)go(i);}));
@@ -104,7 +111,8 @@
     track.addEventListener('pointercancel',endDrag);
 
     paint(0);
-    requestAnimationFrame(()=>go(0));
+    /* Initial centering must never scroll the document vertically. */
+    requestAnimationFrame(()=>go(0,{behavior:false}));
   };
 
   const boot=()=>document.querySelectorAll('.dc-carousel-grid').forEach(enhance);
