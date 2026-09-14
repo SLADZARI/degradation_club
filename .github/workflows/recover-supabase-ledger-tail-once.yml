@@ -1,3 +1,4 @@
+# one-off recovery trigger
 name: Recover Supabase Ledger Tail Once
 
 on:
