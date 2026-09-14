@@ -1,0 +1,6 @@
+project_id = "degradation_club"
+
+# The worker intentionally performs its own trusted-invocation validation.
+# Keep this aligned with the explicit --no-verify-jwt production deploy flag.
+[functions.telegram-outbox-worker]
+verify_jwt = false

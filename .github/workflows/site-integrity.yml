@@ -24,6 +24,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Validate Supabase release contract
+        run: node scripts/validate-supabase-release-contract.mjs
       - name: Validate registry, routes and feature state
         run: node scripts/validate-site.mjs
       - name: Validate page content readiness

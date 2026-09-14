@@ -6,7 +6,7 @@ const read=path=>fs.readFileSync(path,'utf8');
 
 const workspace=read('workspace/board/index.html');
 const worker=read('supabase/functions/telegram-outbox-worker/index.ts');
-const scheduler=read('supabase/migrations/20260912170000_board_telegram_worker_scheduler_v1.sql');
+const scheduler=read('supabase/migrations/20260912173340_board_telegram_worker_scheduler_v1.sql');
 
 expect(!workspace.includes('telegram-worker-trigger-'),'Workspace Board still owns worker invocation');
 for(const version of ['v1','v2','v3']){

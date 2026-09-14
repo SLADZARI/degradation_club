@@ -9,7 +9,7 @@ const expect=(ok,msg)=>{if(!ok)fail.push(msg)};
 const entry=read('community/board/board-entry-v2.js');
 const board=read('community/board/board.js');
 const guestActions=read('community/board/board-guest-actions-v1.js');
-const migration=read('supabase/migrations/20260906183000_guest_board_interest_v1.sql');
+const migration=read('supabase/migrations/20260906173725_guest_board_interest_v1.sql');
 const responsePolicy=read('supabase/migrations/20260907210040_guest_board_responses_v1.sql');
 const responseRpc=read('supabase/migrations/20260907210333_guest_board_response_rpc_v1.sql');
 const accessV2=read('supabase/migrations/20260907215547_board_access_owner_admin_v2.sql');
