@@ -61,19 +61,13 @@ function watchArtifactDiagnostics(page){
   page.on('response',response=>{if(response.status()>=400)badResponses.push(`${response.status()} ${response.url()}`)});
   return{consoleErrors,requestFailures,badResponses,artifactRequests};
 }
-async function artifactExecutionEvidence(page){
-  const coverage=await page.coverage.stopJSCoverage();
-  const entry=coverage.find(item=>{try{return new URL(item.url).pathname==='/community/artifact/artifact.js'}catch{return false}});
-  return{artifactJsExecuted:Boolean(entry?.ranges?.some(range=>range.end>range.start)),artifactJsCoverageRanges:entry?.ranges?.length||0};
-}
 async function waitForArtifactPresentation(page,errors,network){
   try{
     await page.locator('.dc-artifact-record').waitFor({state:'visible',timeout:4000});
     await page.locator('.dc-artifact-record .dc-youtube-presentation').waitFor({state:'visible',timeout:4000});
   }catch(error){
-    const execution=await artifactExecutionEvidence(page);
     const diagnostic=await page.evaluate(()=>({artifactState:document.getElementById('artifactState')?.textContent||null,artifactHost:document.getElementById('artifactHost')?.innerHTML||null,mediaRuntimeLoaded:Boolean([...document.scripts].find(script=>script.src.includes('board-artifact-media-v1.js')))}));
-    console.error('Artifact detail presentation diagnostic',JSON.stringify({pageErrors:errors,...network,...execution,diagnostic},null,2));
+    console.error('Artifact detail presentation diagnostic',JSON.stringify({pageErrors:errors,...network,diagnostic},null,2));
     throw error;
   }
 }
@@ -130,8 +124,8 @@ try{
     const label=await page.locator(`.dc-notice[data-artifact="${VIDEO_ID}"] [data-youtube-label]`).innerText();expect(label==='VIDEO · YOUTUBE',`board: YouTube label missing (${label})`);const src=await page.locator(`.dc-notice[data-artifact="${VIDEO_ID}"] .dc-youtube-presentation img`).getAttribute('src');expect(String(src).includes('i.ytimg.com/vi/dQw4w9WgXcQ/'),`board: YouTube preview missing (${src})`);expect(!errors.length,`board: ${errors.join(' | ')}`);await ctx.close();
   }
   {
-    const ctx=await context(browser,{viewport:{width:1200,height:900}});const page=await ctx.newPage();const errors=watchErrors(page);const network=watchArtifactDiagnostics(page);await page.coverage.startJSCoverage({resetOnNavigation:false});
-    await page.goto(base+`/community/artifact/${VIDEO_ID}/`,{waitUntil:'domcontentloaded'});await waitForArtifactPresentation(page,errors,network);const execution=await artifactExecutionEvidence(page);expect(network.artifactRequests.length===1,`artifact: expected one artifact.js request, got ${network.artifactRequests.length}`);expect(execution.artifactJsExecuted,`artifact: artifact.js did not execute (${execution.artifactJsCoverageRanges} coverage ranges)`);const label=await page.locator('.dc-artifact-record [data-youtube-label]').innerText();expect(label==='VIDEO · YOUTUBE',`artifact: YouTube label missing (${label})`);const src=await page.locator('.dc-artifact-record .dc-youtube-presentation img').getAttribute('src');expect(String(src).includes('i.ytimg.com/vi/dQw4w9WgXcQ/'),`artifact: YouTube preview missing (${src})`);expect(!network.requestFailures.length,`artifact request failures: ${network.requestFailures.join(' | ')}`);expect(!network.badResponses.length,`artifact bad responses: ${network.badResponses.join(' | ')}`);expect(!errors.length,`artifact: ${errors.join(' | ')}`);await ctx.close();
+    const ctx=await context(browser,{viewport:{width:1200,height:900}});const page=await ctx.newPage();const errors=watchErrors(page);const network=watchArtifactDiagnostics(page);
+    await page.goto(base+`/community/artifact/${VIDEO_ID}/`,{waitUntil:'domcontentloaded'});await waitForArtifactPresentation(page,errors,network);expect(network.artifactRequests.length===1,`artifact: expected one artifact.js request, got ${network.artifactRequests.length}`);const state=(await page.locator('#artifactState').innerText()).trim();expect(state!=='LOADING',`artifact: canonical load did not leave LOADING (${state})`);expect(await page.locator('.dc-artifact-record').count()===1,'artifact: canonical Artifact record missing after load');const label=await page.locator('.dc-artifact-record [data-youtube-label]').innerText();expect(label==='VIDEO · YOUTUBE',`artifact: YouTube label missing (${label})`);const src=await page.locator('.dc-artifact-record .dc-youtube-presentation img').getAttribute('src');expect(String(src).includes('i.ytimg.com/vi/dQw4w9WgXcQ/'),`artifact: YouTube preview missing (${src})`);expect(!network.requestFailures.length,`artifact request failures: ${network.requestFailures.join(' | ')}`);expect(!network.badResponses.length,`artifact bad responses: ${network.badResponses.join(' | ')}`);expect(!network.consoleErrors.length,`artifact console errors: ${network.consoleErrors.join(' | ')}`);expect(!errors.length,`artifact: ${errors.join(' | ')}`);await ctx.close();
   }
 }finally{await browser.close();server.close()}
 
