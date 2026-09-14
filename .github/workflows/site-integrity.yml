@@ -84,6 +84,14 @@ jobs:
         run: node scripts/validate-public-harmonization-browser.mjs
       - name: Validate Projects v2 navigation and #44 browser regression
         run: node scripts/validate-projects-v2-browser.mjs
+      - name: Upload Projects v2 visual references
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: projects-v2-visual-references
+          path: .qa/projects-v2/*.png
+          if-no-files-found: error
+          retention-days: 14
       - name: Upload Home Fuengirola visual references
         if: always()
         uses: actions/upload-artifact@v4
