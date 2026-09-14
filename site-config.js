@@ -1,5 +1,5 @@
 window.DEMENTOR_SITE_CONFIG=Object.freeze({
-  version:'2026-09-08.01',
+  version:'2026-09-14.01',
   canonicalOrigin:'https://dementor.club',
   supabase:{
     enabled:true,
@@ -39,6 +39,9 @@ if(typeof document!=='undefined'){
     addScript('/dementor-relations-v1.js');
     const isJoinAssessment=/\/join\/?(?:index\.html)?$/.test(runtimePath);
     const isCommunityRoot=/\/community\/?(?:index\.html)?$/.test(runtimePath);
+    const isHome=runtimePath==='/'||runtimePath==='/index.html';
+    const isBoardRoot=/^\/workspace\/board\/?(?:index\.html)?$/.test(runtimePath);
+    const isArtifactDetail=runtimePath.startsWith('/community/artifact/');
     const interactiveAuthRequired=runtimePath.includes('/courses/dumai-s-opasnostyu/')||runtimePath.includes('/courses/dengi-na-veter/');
     if(interactiveAuthRequired)addScript('/required-auth-v1.js',{module:true});
     if(runtimePath.includes('/courses/dumai-s-opasnostyu/')||runtimePath.includes('/courses/dengi-na-veter/'))addScript('/program-account-sync-v1.js',{module:true});
@@ -51,6 +54,8 @@ if(typeof document!=='undefined'){
       if(cfg.onboarding?.progressMap)addScript('/join/join-progress-map-v2.js?v=20260829-01',{module:true});
     }
     if(isCommunityRoot&&cfg.community?.membershipEnabled)addScript('/community/community-member-entry-link-v1.js?v=20260830-01');
+    if(isHome||isCommunityRoot){addStyle('/public-activity-v1.css');addScript('/public-activity-v1.js',{module:true});}
+    if(isBoardRoot||isArtifactDetail){addStyle('/community/board/board-artifact-media-v1.css');addScript('/community/board/board-artifact-media-v1.js',{module:true});}
     if(runtimePath.endsWith('/projects/logic-awareness/'))addScript('/content-series-v1.js');
 
     const installInternalToolsHold=()=>{
