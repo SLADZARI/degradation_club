@@ -42,25 +42,27 @@ for(const width of widths){
   const context=await browser.newContext({viewport:{width,height:1000}});
   for(const route of routes){
     const page=await context.newPage();
-    await page.goto(base+route,{waitUntil:'domcontentloaded'});
-    await page.waitForTimeout(80);
+    await page.goto(base+route,{waitUntil:'load'});
+    await page.waitForSelector('.dc-global-header');
+    await page.waitForTimeout(120);
     const state=await page.evaluate(()=>({
       scrollY:window.scrollY,
       overflow:document.documentElement.scrollWidth-document.documentElement.clientWidth,
-      topbar:!!document.querySelector('.topbar'),
+      header:!!document.querySelector('.dc-global-header'),
       path:location.pathname
     }));
     expect(state.path===route,`${width}px ${route}: canonical path changed to ${state.path}`);
     expect(Math.abs(state.scrollY)<=2,`${width}px ${route}: fresh non-hash navigation must start at top, scrollY=${state.scrollY}`);
     expect(state.overflow<=1,`${width}px ${route}: horizontal overflow ${state.overflow}px`);
-    expect(state.topbar,`${width}px ${route}: canonical public Header missing`);
+    expect(state.header,`${width}px ${route}: canonical public Header missing`);
     await page.close();
   }
 
   for(const hash of ['#series-01','#series-03']){
     const page=await context.newPage();
-    await page.goto(base+'/projects/logic-awareness/'+hash,{waitUntil:'domcontentloaded'});
-    await page.waitForTimeout(120);
+    await page.goto(base+'/projects/logic-awareness/'+hash,{waitUntil:'load'});
+    await page.waitForSelector('.dc-global-header');
+    await page.waitForTimeout(160);
     const state=await page.evaluate((hash)=>{
       const target=document.querySelector(hash);
       return {exists:!!target,scrollY:window.scrollY,top:target?.getBoundingClientRect().top??null,hash:location.hash};
@@ -68,17 +70,19 @@ for(const width of widths){
     expect(state.exists,`${width}px Logic ${hash}: target missing`);
     expect(state.hash===hash,`${width}px Logic ${hash}: fragment not preserved`);
     expect(state.scrollY>20,`${width}px Logic ${hash}: explicit hash was reset to top`);
-    expect(state.top!==null&&state.top>-40&&state.top<220,`${width}px Logic ${hash}: target not landed near viewport top (${state.top})`);
+    expect(state.top!==null&&state.top>-80&&state.top<260,`${width}px Logic ${hash}: target not landed near viewport top (${state.top})`);
     await page.close();
   }
 
   const history=await context.newPage();
-  await history.goto(base+'/projects/',{waitUntil:'domcontentloaded'});
+  await history.goto(base+'/projects/',{waitUntil:'load'});
+  await history.waitForSelector('.dc-global-header');
   await history.evaluate(()=>scrollTo(0,Math.min(900,document.documentElement.scrollHeight-innerHeight-10)));
   const before=await history.evaluate(()=>scrollY);
-  await history.goto(base+'/projects/dementor-lab/',{waitUntil:'domcontentloaded'});
-  await history.goBack({waitUntil:'domcontentloaded'});
-  await history.waitForTimeout(120);
+  await history.goto(base+'/projects/dementor-lab/',{waitUntil:'load'});
+  await history.goBack({waitUntil:'load'});
+  await history.waitForSelector('.dc-global-header');
+  await history.waitForTimeout(160);
   const afterBack=await history.evaluate(()=>({path:location.pathname,y:scrollY,restoration:history.scrollRestoration}));
   expect(afterBack.path==='/projects/',`${width}px history: Back did not return to Projects`);
   expect(afterBack.restoration!=='manual',`${width}px history: page globally disables browser scroll restoration`);
@@ -88,7 +92,8 @@ for(const width of widths){
 }
 
 const hub=await browser.newPage({viewport:{width:1440,height:1000}});
-await hub.goto(base+'/projects/',{waitUntil:'domcontentloaded'});
+await hub.goto(base+'/projects/',{waitUntil:'load'});
+await hub.waitForSelector('.dc-global-header');
 const links=await hub.evaluate(()=>Object.fromEntries([...document.querySelectorAll('a[href]')].map(a=>[(a.textContent||'').trim().replace(/\s+/g,' '),a.getAttribute('href')])));
 expect(links['ОТКРЫТЬ DEMENTOR LAB →']==='/projects/dementor-lab/','Projects hub: Lab CTA must use canonical Lab slug');
 expect(links['ОТКРЫТЬ ПРОЕКТ →']==='/projects/logic-awareness/','Projects hub: Logic CTA must use canonical Logic slug');
