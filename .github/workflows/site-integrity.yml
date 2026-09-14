@@ -82,6 +82,8 @@ jobs:
         run: node scripts/diagnose-home-fuengirola-media.mjs
       - name: Validate public harmonization browser matrix
         run: node scripts/validate-public-harmonization-browser.mjs
+      - name: Validate Projects v2 navigation and #44 browser regression
+        run: node scripts/validate-projects-v2-browser.mjs
       - name: Upload Home Fuengirola visual references
         if: always()
         uses: actions/upload-artifact@v4
