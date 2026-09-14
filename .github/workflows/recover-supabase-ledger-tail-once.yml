@@ -107,7 +107,7 @@ jobs:
           set -euo pipefail
           supabase migration fetch --linked --yes
 
-      - name: Verify fetch changed exactly the ten missing historical files
+      - name: Isolate exactly the ten missing historical files
         shell: bash
         run: |
           set -euo pipefail
@@ -127,12 +127,24 @@ jobs:
           sed -i 's/^          //' "${EXPECTED}"
           sort -o "${EXPECTED}" "${EXPECTED}"
 
+          while read -r path; do
+            test -s "${path}" || { echo "Expected fetched migration missing/empty: ${path}"; exit 1; }
+            if git ls-files --error-unmatch "${path}" >/dev/null 2>&1; then
+              echo "Expected recovery path is already tracked: ${path}"
+              exit 1
+            fi
+          done < "${EXPECTED}"
+
+          echo "Restoring every pre-existing tracked migration after Supabase fetch."
+          git checkout -- supabase/migrations
+          rm -rf supabase/.temp
+
           ACTUAL="$(mktemp)"
           git status --porcelain --untracked-files=all | cut -c4- | sort > "${ACTUAL}"
-          echo "Fetched paths:"
+          echo "Net recovery paths after tracked-file restore:"
           cat "${ACTUAL}"
           diff -u "${EXPECTED}" "${ACTUAL}" || {
-            echo "migration fetch changed something outside the exact ten-file recovery set; refusing to commit."
+            echo "Net working tree is not exactly the ten historical additions; refusing to continue."
             exit 1
           }
 
