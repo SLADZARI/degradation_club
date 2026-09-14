@@ -50,7 +50,8 @@ assert(mediaCss.includes('.dc-youtube-presentation__play'),'YouTube play marker 
 assert(siteConfig.includes("addScript('/public-activity-v1.js',{module:true})"),'public activity runtime not wired');
 assert(siteConfig.includes("addScript('/community/board/board-artifact-media-v1.js',{module:true})"),'Board/Artifact media runtime not wired');
 
-for(const token of ['width:390','width:360','PROFILE TEXT','PRIVATE IMAGE','HIDDEN FIXTURE','FUTURE FIXTURE','EXPIRED FIXTURE','assertRuntimeExclusions','Artifact detail presentation diagnostic'])assert(browser.includes(token),`browser evidence missing ${token}`);
+assert(browser.includes('for(const width of [390,360])'),'browser evidence must cover both 390px and 360px Home mobile');
+for(const token of ['PROFILE TEXT','PRIVATE IMAGE','HIDDEN FIXTURE','FUTURE FIXTURE','EXPIRED FIXTURE','assertRuntimeExclusions','Artifact detail presentation diagnostic'])assert(browser.includes(token),`browser evidence missing ${token}`);
 assert(browser.includes('privateStoragePath'),'private-image fixture must carry a private storage path for leak evidence');
 assert(browser.includes("eligibleIds"),'browser fixture must expose runtime eligibility evidence');
 
