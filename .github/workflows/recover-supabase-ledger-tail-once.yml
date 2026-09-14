@@ -75,12 +75,28 @@ jobs:
             20260908202747 \
             20260909061242 \
             20260909214529; do
-            grep -Eq "^[[:space:]]*`?[[:space:]]*`?[[:space:]]*\\|[[:space:]]*`?${version}`?[[:space:]]*\\|" /tmp/ledger-before.txt || {
+            awk -F'|' -v v="${version}" '
+              {
+                l=$1; r=$2;
+                gsub(/[[:space:]`]/,"",l);
+                gsub(/[[:space:]`]/,"",r);
+                if (l=="" && r==v) found=1;
+              }
+              END { exit(found ? 0 : 1) }
+            ' /tmp/ledger-before.txt || {
               echo "Expected remote-only migration ${version} is not remote-only in live ledger."
               exit 1
             }
           done
-          grep -Eq "20260914090000.*\\|[[:space:]]*`?[[:space:]]*`?[[:space:]]*\\|" /tmp/ledger-before.txt || {
+          awk -F'|' '
+            {
+              l=$1; r=$2;
+              gsub(/[[:space:]`]/,"",l);
+              gsub(/[[:space:]`]/,"",r);
+              if (l=="20260914090000" && r=="") found=1;
+            }
+            END { exit(found ? 0 : 1) }
+          ' /tmp/ledger-before.txt || {
             echo "Expected pending Activity migration 20260914090000 is not local-only."
             exit 1
           }
