@@ -56,9 +56,12 @@ Key separation:
 
 **Question:** Why does a person first encounter Dementor, through which door, and what should they see next?
 
-**Status:** NEXT
+**Status:** WORKING CANON
 
-Must cover entry intents such as:
+Source:
+`concept/AUDIENCE_ENTRY_MAP_V1.md`
+
+Current entry modes:
 
 - пришёл поржать;
 - переслали конкретную вещь;
@@ -69,12 +72,9 @@ Must cover entry intents such as:
 - попал в ситуацию, где пригодился инструмент;
 - сам что-то заметил и хочет принести.
 
-For each entry:
+Core entry structure:
 
 **trigger → first thing → promise → channel → next thing → return reason**
-
-Target source:
-`concept/AUDIENCE_ENTRY_MAP_V1.md`
 
 ---
 
@@ -82,7 +82,7 @@ Target source:
 
 **Question:** What value does the person receive at each depth without forcing them deeper?
 
-**Status:** TODO
+**Status:** NEXT
 
 Expected layers:
 
@@ -359,25 +359,22 @@ Target source:
 
 # Recommended build order
 
-Do not complete this package by numbering alone.
-
 Current recommended sequence:
 
-1. **Audience & Entry Map**
-2. **Value Architecture**
-3. **Product Model**
-4. **Board Product Model**
-5. **Content & Programming Model**
-6. **Return Loops**
-7. **Contribution Model**
-8. **Dementor / Intervention Model**
-9. **Marketing Positioning & Messaging**
-10. **Distribution Model**
-11. **Monetization Map**
-12. **Metrics & Signals**
-13. **Product Principles / Anti-patterns final consolidation**
+1. **Value Architecture**
+2. **Product Model**
+3. **Board Product Model**
+4. **Content & Programming Model**
+5. **Return Loops**
+6. **Contribution Model**
+7. **Dementor / Intervention Model**
+8. **Marketing Positioning & Messaging**
+9. **Distribution Model**
+10. **Monetization Map**
+11. **Metrics & Signals**
+12. **Product Principles / Anti-patterns final consolidation**
 
-Reason: first clarify **who enters through which door and what value they receive**; only then lock entities, surfaces, growth, marketing and monetization.
+Reason: entry doors are now mapped. Next clarify **what value a person receives at each depth**; only then lock entities, surfaces, growth, marketing and monetization.
 
 ---
 
@@ -389,8 +386,12 @@ Reason: first clarify **who enters through which door and what value they receiv
 - CJM CLUB
 - CJM BOARD / PARTICIPATION
 
-**NEXT**
+**WORKING CANON**
 
 - Audience & Entry Map
+
+**NEXT**
+
+- Value Architecture
 
 Everything else should reference the authorities above and must not redefine them silently.
