@@ -1,0 +1,49 @@
+name: Patch 176 Board Success Event Once
+
+on:
+  push:
+    branches:
+      - agent/176-owner-admin-telegram-optin
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: contains(github.event.head_commit.message, '[patch-176-event]')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/176-owner-admin-telegram-optin
+          fetch-depth: 1
+          persist-credentials: true
+      - name: Patch exact canonical post-publish success signal
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs=require('fs');
+          const path='community/board/board.js';
+          let s=fs.readFileSync(path,'utf8');
+          const old="state.textContent='ПРИКАЛЫВАЕМ К ДОСКЕ';const published=await client.rpc('dc_publish_artifact_v1',{p_artifact_id:artifactId});if(published.error)throw published.error;\n    ownDraft=null;ownDraftMedia=[];await refreshAll();";
+          const next="state.textContent='ПРИКАЛЫВАЕМ К ДОСКЕ';const published=await client.rpc('dc_publish_artifact_v1',{p_artifact_id:artifactId});if(published.error)throw published.error;\n    window.dispatchEvent(new CustomEvent('dc:board:artifact-published',{detail:{artifactId}}));\n    ownDraft=null;ownDraftMedia=[];await refreshAll();";
+          if(!s.includes(old))throw new Error('canonical publish success snippet not found exactly once');
+          if((s.match(/dc:board:artifact-published/g)||[]).length)throw new Error('success event already present before patch');
+          s=s.replace(old,next);
+          fs.writeFileSync(path,s);
+          NODE
+          node --check community/board/board.js
+          grep -F "window.dispatchEvent(new CustomEvent('dc:board:artifact-published',{detail:{artifactId}}));" community/board/board.js
+      - name: Remove one-off patch workflow and commit
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm .github/workflows/patch-176-board-success-event-once.yml
+          git add community/board/board.js .github/workflows/patch-176-board-success-event-once.yml
+          git diff --cached --name-status
+          test "$(git diff --cached --name-only | wc -l)" = "2"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "#176: emit exact canonical Artifact publish success signal"
+          git push origin HEAD:agent/176-owner-admin-telegram-optin
