@@ -11,6 +11,7 @@ const migration=read('supabase/migrations/20260912144034_board_telegram_promotio
 const hardening=read('supabase/migrations/20260912144055_board_telegram_promotion_v1_worker_hardening.sql');
 const scheduler=read('supabase/migrations/20260912173340_board_telegram_worker_scheduler_v1.sql');
 const board=read('community/board/board.js');
+const adminTelegramOptin=read('community/board/board-admin-telegram-optin-v1.js');
 const entry=read('community/board/board-entry-v2.js');
 const detail=read('community/artifact/artifact.js');
 const workspaceBoard=read('workspace/board/index.html');
@@ -48,12 +49,19 @@ expect(migration.includes('on conflict (artifact_id,profile_id) do nothing'),'su
 expect(board.includes('promotion_threshold'),'frontend does not consume backend threshold');
 expect(!board.includes('const promotionThreshold=2')&&!board.includes('PROMOTION_THRESHOLD=2'),'frontend independently hardcodes promotion threshold');
 
-// Owner/Admin moderation paths.
+// Owner/Admin moderation paths. The post-publish override UI has one frontend owner:
+// the explicit composer opt-in continuation. board.js must not retain the legacy
+// per-card promote control/callsite, while suppression and recovery stay available.
 for(const fn of ['dc_admin_promote_artifact_telegram_v1','dc_admin_suppress_artifact_telegram_v1','dc_admin_board_hide_artifact_v1','dc_admin_resolve_delivery_unknown_v1'])expect(migration.includes(fn),`${fn} missing`);
 expect(migration.includes("v_resolution not in ('sent','retry','cancelled')"),'delivery_unknown manual resolution vocabulary missing');
 expect(migration.includes('board_hidden_at'),'minimal Board-hide state missing');
 expect(board.includes('СКРЫТЬ С ДОСКИ'),'Owner/Admin Board-hide UI missing');
-expect(board.includes('ОПУБЛИКОВАТЬ В TELEGRAM'),'Owner/Admin manual promotion UI missing');
+expect(!board.includes('ОПУБЛИКОВАТЬ В TELEGRAM'),'legacy per-card Owner/Admin manual promotion UI must be retired');
+expect(!board.includes('data-admin-promote'),'legacy per-card Owner/Admin promotion binding must be retired');
+expect(!board.includes('dc_admin_promote_artifact_telegram_v1'),'board.js must not own the Owner/Admin promotion RPC');
+expect(adminTelegramOptin.includes('ОТПРАВИТЬ В TELEGRAM ПОСЛЕ ПУБЛИКАЦИИ'),'OWNER_ADMIN composer Telegram opt-in UI missing');
+expect(adminTelegramOptin.includes("client.rpc('dc_admin_promote_artifact_telegram_v1'"),'OWNER_ADMIN composer opt-in does not own the promotion RPC');
+expect((adminTelegramOptin.match(/dc_admin_promote_artifact_telegram_v1/g)||[]).length===1,'OWNER_ADMIN composer opt-in must contain exactly one promotion RPC callsite');
 expect(board.includes('НЕ ПУБЛИКОВАТЬ В TELEGRAM'),'Owner/Admin suppression UI missing');
 expect(board.includes('CONTROLLED RETRY'),'ambiguous-delivery controlled retry UI missing');
 
@@ -103,4 +111,4 @@ expect(entry.includes("status==='delivery_unknown'"),'Guest delivery_unknown UI 
 expect(detail.includes("status==='delivery_unknown'"),'Detail delivery_unknown UI missing');
 
 if(fail.length){console.error('BOARD TELEGRAM PROMOTION V1 CONTRACT BLOCKED');fail.forEach(x=>console.error('- '+x));process.exit(1)}
-console.log('Board Telegram Promotion v1 contract PASS: activity datetime + atomic support gate + canonical outbox + trusted DB scheduler + retired browser trigger + delivery ambiguity safety + admin moderation');
+console.log('Board Telegram Promotion v1 contract PASS: activity datetime + atomic support gate + canonical outbox + single OWNER_ADMIN opt-in promotion owner + trusted DB scheduler + retired browser trigger + delivery ambiguity safety + admin moderation');
