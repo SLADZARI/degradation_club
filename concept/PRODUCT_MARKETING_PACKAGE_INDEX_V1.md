@@ -187,29 +187,46 @@ Key decisions:
 
 **Question:** What makes Dementor feel like an ongoing program rather than a repository, and how does editorial programming decide what returns, repeats, develops anticipation, and becomes a recognizable rhythm over time?
 
-**Status:** NEXT
+**Status:** WORKING CANON
 
-Must define without redefining Board semantics:
+Source:
+`concept/CONTENT_PROGRAMMING_MODEL_V1.md`
 
-- editorial rhythm;
-- release types as programming units, referencing Product Model Release semantics rather than redefining them;
-- series;
-- recurring formats;
-- editorial seasons / cycles if useful;
-- fresh / making / continuing as programming choices, not new lifecycle states;
-- relationship between authored program and contributions;
-- anticipation mechanics;
-- how Things are selected, sequenced, resurfaced and retired editorially;
-- how Board, Home, Activity and external distribution consume the same programming decisions differently;
-- how the program stays alive without requiring constant net-new content.
+Core formula:
+
+**THING + WHY NOW + SEQUENCE + REAL CONTINUATION = PROGRAM**
+
+Canonical programming unit:
+
+**Programming Moment** = editorial decision to make an existing Thing noticeable now for a concrete reason.
+
+Key decisions:
+
+- Programming Moment is not a new Thing/entity/table by default;
+- Thing existence ≠ program relevance;
+- freshness is editorial, not chronology;
+- meaningful delta is required for a new programming moment;
+- programming reasons may include New Release, Continuation, Making Proof, Open Participation, History Event, Resurface, Series Episode, Editorial Pairing and Time Window;
+- `NO DELTA → NO UPDATE`;
+- `SEQUENCE BY ATTENTION, NOT DATABASE CHRONOLOGY`;
+- Series ≠ Project;
+- Editorial Format ≠ Product Form;
+- Project activity requires editorial selection before it becomes program;
+- anticipation is allowed only for a real next move;
+- resurfacing requires changed meaning/context, not a need to fill the feed;
+- editorial retirement is not Product State;
+- Home, Board, Activity, Thing Detail, Project, Dementor Profile and external distribution consume one programming truth differently;
+- Programming Model does not replace the thematic content taxonomy: taxonomy answers `о чём / где в карте клуба`, programming answers `почему сейчас`.
 
 Boundary with `06`:
 
 - `06` owns **how Board presents a Thing now**;
 - `07` owns **why this Thing is in the program now, what comes before/after it, and what recurring editorial structure makes people expect more**.
 
-Target source:
-`concept/CONTENT_PROGRAMMING_MODEL_V1.md`
+Boundary with `08`:
+
+- `07` = **PROGRAM CREATES REASONS TO RETURN**;
+- `08` = **PERSON EXPERIENCES A REASON AND RETURNS**.
 
 ---
 
@@ -217,7 +234,7 @@ Target source:
 
 **Question:** Why does a person come back tomorrow, next week or next month?
 
-**Status:** PARTIALLY DEFINED IN CJM
+**Status:** NEXT / PARTIALLY DEFINED IN CJM + CONTENT PROGRAMMING MODEL
 
 Known loops:
 
@@ -231,6 +248,20 @@ Known loops:
 - Contributor;
 - Participation;
 - contextual Utility.
+
+Must formalize:
+
+- trigger → expectation → return → payoff;
+- passive return vs active follow;
+- direct return vs external re-entry;
+- Thing follower / Dementor follower / Project follower loops;
+- how anticipation closes;
+- contributor return after editorial reaction;
+- participant return after joining action;
+- utility return without turning Dementor into service marketplace;
+- Activity / notification role without notification-driven retention;
+- failed / broken loops and anti-signals;
+- measurement boundaries for each return mode.
 
 Target source:
 `concept/RETURN_LOOPS_V1.md`
@@ -385,7 +416,7 @@ Target source:
 
 **Question:** What must future design, product and marketing decisions not break?
 
-**Status:** PARTIALLY DEFINED IN JTBD + VALUE ARCHITECTURE + PRODUCT MODEL + BOARD PRODUCT MODEL
+**Status:** PARTIALLY DEFINED IN JTBD + VALUE ARCHITECTURE + PRODUCT MODEL + BOARD PRODUCT MODEL + CONTENT PROGRAMMING MODEL
 
 Known principles:
 
@@ -409,7 +440,12 @@ Known principles:
 - Projection never becomes a second source of semantic truth;
 - Rich model → sparse card;
 - Release CTA > internal navigation;
-- Freshness ≠ created_at / published_at.
+- Freshness ≠ created_at / published_at;
+- Thing existence ≠ program relevance;
+- No delta → no update;
+- Sequence by attention, not database chronology;
+- Promise only what actually exists as a next move;
+- Resurface because meaning changed, not because the feed needs filling.
 
 Target source:
 `concept/PRODUCT_PRINCIPLES_ANTIPATTERNS_V1.md`
@@ -420,17 +456,16 @@ Target source:
 
 Current recommended sequence:
 
-1. **Content & Programming Model**
-2. **Return Loops**
-3. **Contribution Model**
-4. **Dementor / Intervention Model**
-5. **Marketing Positioning & Messaging**
-6. **Distribution Model**
-7. **Monetization Map**
-8. **Metrics & Signals**
-9. **Product Principles / Anti-patterns final consolidation**
+1. **Return Loops**
+2. **Contribution Model**
+3. **Dementor / Intervention Model**
+4. **Marketing Positioning & Messaging**
+5. **Distribution Model**
+6. **Monetization Map**
+7. **Metrics & Signals**
+8. **Product Principles / Anti-patterns final consolidation**
 
-Board Product Model is now established as WORKING CANON. The next question is no longer what a Board object means or how it is rendered, but how Dementor creates an ongoing authored program from Things over time.
+Content & Programming Model is now established as WORKING CANON. The next question is audience-side continuity: which triggers and expectations actually cause a person to come back, and how those loops close without making retention depend on notifications or social pressure.
 
 ---
 
@@ -448,9 +483,10 @@ Board Product Model is now established as WORKING CANON. The next question is no
 - Value Architecture
 - Product Model
 - Board Product Model
+- Content & Programming Model
 
 **NEXT**
 
-- Content & Programming Model
+- Return Loops
 
 Everything else should reference the authorities above and must not redefine them silently.
