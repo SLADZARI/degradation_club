@@ -2,8 +2,8 @@
 artifactId: dementor-club.result.current-program-projection-v1
 project: dementor-club
 documentType: RESULT
-projectStage: VALIDATION
-gate: G6_VALIDATION
+projectStage: RELEASE
+gate: G7_RELEASE
 status: ACTIVE
 version: 0.1
 updated: 2026-09-15
@@ -14,27 +14,29 @@ supersedes: null
 branch: result/current-program-projection-v1
 baseline: dementor-club-production@688899e31b82e14c31f5f805b2bce4f00f3741c0
 implementationStartAuthorized: true
-productionMergeAuthorized: false
+productionMergeAuthorized: true
 productionDeployAuthorized: false
 ---
 
-# MP | Dementor Club | VALIDATION | Current Program Projection v1 | Result v0.1
+# MP | Dementor Club | RELEASE | Current Program Projection v1 | Result v0.1
 
 ## Status
 
-**ACTIVE / G6_VALIDATION / IMPLEMENTATION EVIDENCE COMPLETE**
+**ACTIVE / G7_RELEASE / PRODUCTION MERGE AUTHORIZED / DEPLOY NOT AUTHORIZED**
 
-Single implementation owner for the first Current Program runtime slice. Production merge and deploy remain unauthorized.
+Single implementation owner for the first Current Program runtime slice. G6 is complete. Owner explicitly authorized production merge on 2026-09-15; deploy remains a separate unauthorized action.
 
 ## Approval record · 2026-09-15
 
 Owner explicitly accepted semantic stack `#196 → #205 → #207` as the implementation basis and opened G5 for this Result.
 
+After exact-head G6 validation passed, owner explicitly authorized the production merge in chat on 2026-09-15. This authorization applies to the same Result and branch only and does **not** authorize deploy.
+
 Narrow precedence:
 
 > #207 supersedes the older #196 product-status wording for one claim: `Деньги на ветер` is **ready to take**.
 
-This does not approve price, checkout, server/AI backend, Membership requirement, live Supabase mutation, production merge or deploy.
+This does not approve price, checkout, server/AI backend, Membership requirement, live Supabase mutation or production deploy.
 
 ## Baseline decision
 
@@ -94,7 +96,7 @@ Board projects reviewed Things separately from raw Artifacts. Artifact existence
 Reuse existing analytics conventions where possible; prove rendered Program and exact action destinations without building a new analytics platform.
 
 ### AC8 · Validation
-Desktop + mobile, Home render, Board hook, exact routes, blocked-claim sweep, no duplicate semantic/runtime owner, build/route integrity and full browser/release-gate regression must pass before G7 discussion.
+Desktop + mobile, Home render, Board hook, exact routes, blocked-claim sweep, no duplicate semantic/runtime owner, build/route integrity and full browser/release-gate regression must pass before production merge.
 
 ## G6 corrective loop
 
@@ -171,13 +173,29 @@ Implementation evidence also proves:
 - Current Program Board overlay does not alter fullscreen viewport geometry;
 - non-action Program surface does not steal Board filter/pan/drag pointer ownership.
 
-## Evidence-commit boundary
+## Exact-head G6 evidence
 
-This Result update is documentation-only relative to validated implementation head `18769232342574efac649d9e03c80fc385c87261`.
+G6 evidence commit head:
 
-The resulting exact branch head must pass the same full `Site Integrity / Release Readiness` workflow before #208 can be treated as a G7 candidate.
+`312ebae9279e6c5082fca76924e1123ea73a1e4d`
 
-A successful G6 does **not** authorize production merge or deploy.
+Site Integrity / Release Readiness:
+
+- workflow run: `#1179` / Actions run `34999591341`;
+- conclusion: `SUCCESS`;
+- every workflow step through `Validate production artifact release gate`: `SUCCESS`.
+
+This proves the exact G6 evidence head, not only the implementation candidate.
+
+## G7 authorization boundary
+
+Owner authorized production merge on 2026-09-15 after the full G6 PASS.
+
+This Result update records that authorization and is documentation-only relative to the validated runtime. Because it creates a new exact branch head, the same full `Site Integrity / Release Readiness` workflow must pass on this authorization head before merge.
+
+If that exact-head workflow passes, PR #208 may be merged into `dementor-club-production` using the recorded production baseline and without any blind `dementor-club-site → production` merge.
+
+**Production deploy remains unauthorized.**
 
 ## Non-goals
 
@@ -186,8 +204,8 @@ No payment, Merch commerce, Membership/access redesign, Fuengirola registration 
 ## Gate plan
 
 - **G5 BUILD — COMPLETE**
-- **G6 VALIDATION — implementation evidence complete; exact evidence-commit head must pass full CI**
-- G7 RELEASE — requires explicit owner authorization
+- **G6 VALIDATION — COMPLETE**
+- **G7 RELEASE — production merge authorized; exact authorization head must pass full CI; deploy not authorized**
 - G8 CLEANUP — after authorized release/live evidence
 
 `commit ≠ merge ≠ deploy`
