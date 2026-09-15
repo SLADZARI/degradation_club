@@ -20,14 +20,18 @@ Runtime branches inspected:
 
 Статусы:
 
-- **KEEP** — существующий механизм полезен в новой модели без смыслового разворота;
-- **REFRAME** — transport / runtime нужно сохранить, но изменить семантическую причину или роль;
-- **PARTIAL GAP** — фундамент есть, но покрытие / consistency / semantics неполны;
-- **GAP** — требуемый semantic/runtime слой в проверенном production/staging не подтверждён.
+- **KEEP** — механизм полезен без смыслового разворота;
+- **REFRAME** — transport сохраняется, но меняется причина / роль;
+- **PARTIAL GAP** — фундамент есть, semantic coverage неполно;
+- **GAP** — требуемый semantic/runtime layer не подтверждён.
 
 Главный вывод:
 
-> **Текущий Dementor уже имеет значительную часть transport-инфраструктуры. Главный дефицит — не новые каналы, а единый routing decision `CHANNEL × INTENT × ENTRY OBJECT`, Programming Moment–driven delivery и post-click measurement.**
+> **Текущий Dementor уже имеет большую часть transport-инфраструктуры. Главный дефицит — единая semantic routing policy: trigger → intent → precise Entry Object → experience, а не новые каналы.**
+
+Ключевое уточнение authority:
+
+> **Programming Moment нужен для controlled editorial outbound, но не является обязательным gate для Search, person-mediated Share, direct return или contextual QR handoff.**
 
 ---
 
@@ -35,221 +39,176 @@ Runtime branches inspected:
 
 | Surface / capability | Status | Production reading |
 |---|---|---|
-| Sitemap | **KEEP** | `sitemap.xml` существует как discoverability transport |
-| Robots | **KEEP** | `robots.txt` существует как crawler control |
-| Canonical runtime | **KEEP** | `seo-runtime.js` нормализует canonical URL и `og:url` через `canonicalOrigin` |
-| Search intent → precise Entry Object | **GAP** | sitemap/canonical не принимают semantic routing decision |
-| Page OG/Twitter metadata | **KEEP** | Home и Event имеют social metadata |
-| Thing-specific preview coverage | **PARTIAL GAP** | entity-specific preview есть выборочно; formal social raster pipeline всё ещё `ASSETS PENDING` |
-| Canonical host consistency in static metadata | **PARTIAL GAP** | Fuengirola static OG URLs всё ещё используют `degradation-club.vercel.app`, хотя runtime canonical может исправлять `og:url` |
-| Dedicated native Share action | **GAP** | в проверенном коде не подтверждён `navigator.share`; preview transport существует отдельно |
-| Telegram delivery plumbing | **KEEP** | worker/outbox invocation и delivery states уже существуют |
-| Telegram semantic trigger | **REFRAME** | staging worker запускается после Artifact submit; причина доставки слишком близка к публикационному событию |
-| Programming Moment → outbound decision | **GAP** | отдельный semantic gate перед Telegram/social delivery не подтверждён |
-| Event detail surfaces | **KEEP** | конкретный Event имеет самостоятельную public destination и event-specific metadata |
-| Event/QR continuation routing | **GAP** | dedicated QR mechanics в проверенном repo не подтверждены; semantic physical→digital continuation layer отсутствует |
-| Board entity projection routes | **KEEP** | Board projection умеет вести на конкретный `publicRoute` |
-| Board as external acquisition router | **REFRAME** | Board должен оставаться destination только для intent «что сейчас происходит?» |
-| Home public destination | **KEEP** | Home существует как direct/program-cover surface |
-| Home as default acquisition destination | **REFRAME** | текущая структура допускает generic brand/section entry, но `12` запрещает использовать Home как default для precise promises |
-| Route/entity analytics | **KEEP** | analytics знает project/course/event/merch opens и CTA clicks |
-| Placement/context analytics | **KEEP** | `source_page`, placement, contextual recommendation и entity context уже пишутся |
-| Programming Moment / target intent / entry object attribution | **GAP** | semantic Distribution dimensions не представлены в текущих allowed events/payloads |
-| Qualified experience consumption | **PARTIAL GAP** | route opens/CTA clicks есть, но consumption конкретного promised experience системно не подтверждён |
-| Thing → Thing / continuation measurement | **PARTIAL GAP** | `recommendation_click` есть, но универсальный Thing→Thing semantics отсутствует |
-| Return measurement by distribution intent | **GAP** | current analytics не связывает return с Programming Moment / intent / entry object |
+| Sitemap | **KEEP** | discoverability transport существует |
+| Robots | **KEEP** | crawler control существует |
+| Canonical runtime | **KEEP** | canonical URL / `og:url` нормализуются runtime |
+| Search intent → precise Entry Object | **GAP** | discoverability infrastructure не выражает semantic intent routing |
+| OG / Twitter metadata | **KEEP** | primitives существуют |
+| Thing-specific preview coverage | **PARTIAL GAP** | entity-specific coverage неполна |
+| Static canonical-host consistency | **PARTIAL GAP** | отдельные static metadata всё ещё указывают старый Vercel host |
+| Share URL / preview transport | **KEEP / PARTIAL** | обычная ссылка и preview возможны; universal Thing-aware contract неполон |
+| Dedicated native Share action | **OPTIONAL GAP** | `navigator.share` не подтверждён и не требуется для закрытия модели |
+| Telegram worker / outbox | **KEEP** | transport и delivery states существуют |
+| Telegram publication trigger | **REFRAME** | raw Artifact submit слишком близок к причине send |
+| Programming Moment → editorial outbound gate | **GAP** | semantic gate до send не подтверждён |
+| Event detail surfaces | **KEEP** | Event может быть exact Entry Object |
+| Event / physical → digital continuation | **GAP** | general contextual handoff policy не подтверждена |
+| Board public routes | **KEEP** | projection может вести на concrete object |
+| Board as generic acquisition destination | **REFRAME** | допустим только для intent «что сейчас происходит?» |
+| Home | **KEEP** | хороший program-cover / direct destination |
+| Home as default landing | **REFRAME** | precise promise должен вести к precise object |
+| Entity / CTA analytics | **KEEP** | open/click primitives есть |
+| Placement / source-page context | **KEEP** | basic attribution foundation есть |
+| Distribution trigger / intent / Entry Object attribution | **GAP** | semantic dimensions не представлены системно |
+| Qualified experience consumption | **PARTIAL GAP** | route opens есть, experience-consumption покрытие неполно |
+| Thing → Thing continuation | **PARTIAL GAP** | `recommendation_click` даёт primitive, но Product-level semantics неполны |
+| Delivery permission / suppression semantics | **PARTIAL GAP** | Telegram states включают suppression, но общий channel eligibility contract не подтверждён |
+| Return linked to distribution context | **GAP / LATER** | не нужен perfect multi-touch для Phase 0; owner также `08/14` |
 
 ---
 
-# 2. SEO / sitemap / canonical
+# 2. Что уже можно KEEP
 
-## KEEP — `sitemap.xml`
+Не нужно строить заново:
 
-Production имеет `sitemap.xml`.
+- `sitemap.xml`;
+- `robots.txt`;
+- canonical URL runtime;
+- existing OG / Twitter primitives;
+- standalone Event routes;
+- Board `publicRoute` primitive;
+- Telegram worker / outbox;
+- Telegram delivery states;
+- GA4 / Clarity foundation;
+- entity open / CTA tracking;
+- placement / source-page context;
+- contextual recommendation tracking;
+- public Dementor routes.
 
-Сохранить как discoverability infrastructure.
+Это transport / destination foundation.
 
-Каноническая граница:
+`12` добавляет semantic routing поверх него.
+
+---
+
+# 3. SEO / persistent discovery
+
+## KEEP
+
+Production уже имеет sitemap, robots и canonical runtime.
+
+Канонически:
 
 > **SITEMAP MAKES THINGS DISCOVERABLE. IT DOES NOT DECIDE WHAT SHOULD RANK.**
 
-Sitemap не должен становиться:
+## GAP — semantic Search routing
 
-- программным приоритетом;
-- ranking strategy;
-- источником target intent;
-- списком того, что редакция обязана распространять.
-
-## KEEP — `robots.txt`
-
-Production имеет `robots.txt`.
-
-Это crawler control, а не editorial distribution decision.
-
-## KEEP — `seo-runtime.js`
-
-Production `seo-runtime.js`:
-
-- читает `window.DEMENTOR_SITE_CONFIG.canonicalOrigin`;
-- формирует canonical из текущего pathname;
-- создаёт / обновляет `<link rel="canonical">`;
-- создаёт / обновляет `meta[property="og:url"]`.
-
-Это правильный transport-level механизм и должен сохраниться.
-
-## GAP — Search intent routing
-
-В проверенном runtime не подтверждён слой, который выражает:
+Не подтверждён единый contract:
 
 ```text
-QUERY / SITUATION
-→ TARGET INTENT
+QUERY / SITUATION / INTENT
 → PRECISE ENTRY OBJECT
+→ PROMISED EXPERIENCE
 ```
 
-Наличие sitemap и canonical URL не закрывает этот вопрос.
+Это важно отличать от editorial outbound.
 
-### Implementation implication
+Search route **не требует активного Programming Moment**.
 
-Phase 0 не требует SEO schema migration.
+Старая публичная Thing может оставаться правильным destination после выхода из текущей программы.
 
-Нужна policy / adapter, который для выбранных public objects подтверждает:
+### Phase 0 requirement
 
-- какой search intent они реально закрывают;
+Для нескольких public objects вручную подтвердить:
+
+- какой query / intent они реально закрывают;
 - является ли object лучшим destination;
-- совпадает ли title/description с обещанным experience.
+- совпадают ли title / description / preview с реальным experience;
+- не ведёт ли Search unnecessarily на Home.
 
 ---
 
-# 3. Social metadata / preview
+# 4. Social preview / canonical consistency
 
-## KEEP — базовая OG/Twitter инфраструктура
+## KEEP
 
-Production Home уже содержит:
+Home и отдельные Event pages уже имеют OG / Twitter metadata.
 
-- `og:title`;
-- `og:description`;
-- `og:type`;
-- `og:locale`;
-- `og:url`;
-- `og:image`;
-- `og:image:alt`;
-- Twitter card/title/description/image.
+## PARTIAL GAP — Thing-specific coverage
 
-Event `events/fuengirola/` также имеет entity-specific OG/Twitter metadata.
-
-Это подтверждает, что preview infrastructure не нужно строить с нуля.
-
-## PARTIAL GAP — Thing-specific preview coverage
-
-Staging `assets/social/README.md` фиксирует raster pipeline и required 1200×630 social assets, но статус файла:
-
-> **RASTER PIPELINE / ASSETS PENDING**
-
-То есть design/technical contract существует, но coverage не завершён.
-
-Кроме того, текущая metadata система подтверждена для Home и отдельных entity pages, но не как универсальный Thing-aware preview layer для всех будущих Things.
-
-Целевой contract:
+Нужен общий contract:
 
 ```text
 ENTRY OBJECT
 → identity / premise
-→ relevant preview image
+→ relevant preview
 → canonical URL
-→ same promised experience after click
+→ same experience after click
 ```
 
-## PARTIAL GAP — canonical host consistency
+Не требуется новая Product entity.
 
-`events/fuengirola/index.html` содержит static:
+## PARTIAL GAP — static host consistency
 
-- `og:url = https://degradation-club.vercel.app/events/fuengirola/`
-- `og:image = https://degradation-club.vercel.app/...`
+`events/fuengirola/` содержит static OG URL/image на `degradation-club.vercel.app`, хотя runtime canonical уже знает production origin.
 
-при том, что production runtime уже знает canonical `dementor.club` через `seo-runtime.js`.
-
-`og:url` может быть нормализован runtime-скриптом в браузере, но social crawlers не всегда исполняют JS одинаково; image host также остаётся static.
-
-Поэтому static metadata host consistency остаётся **PARTIAL GAP**.
+Так как social crawler может не исполнять runtime JS одинаково, static metadata желательно привести к canonical host.
 
 ---
 
-# 4. Share
+# 5. Share
 
-## PARTIAL GAP — preview transport exists
+Share относится к **person-mediated distribution**.
 
-OG/Twitter metadata уже позволяет обычной ссылке получать preview на supporting platforms.
-
-Это нужно сохранить.
-
-## GAP — dedicated native Share action not confirmed
-
-Поиск по проверенному repo не подтвердил использование `navigator.share`.
-
-Это не означает, что человек не может скопировать / переслать URL.
-
-Это означает только, что отдельный native Share control / contract не подтверждён в inspected runtime.
-
-Не следует строить большой Share subsystem ради `12`.
-
-Минимально достаточно:
-
-- exact Thing URL;
-- correct preview;
-- source context;
-- destination matching the promise.
+Поэтому новый Programming Moment не нужен.
 
 Канонически:
 
-> **SHARE SHOULD PRESERVE THE THING’S CONTEXT AND PREVIEW, NOT TURN INTO A BRAND INVITE.**
+> **SHARE MAY EXTEND THE LIFE OF A THING WITHOUT CREATING A NEW PROGRAMMING MOMENT.**
 
-### Reframe needed
+Existing URL + OG transport уже даёт полезный фундамент.
 
-Если dedicated Share UI будет добавляться, его задача — делиться **текущим Entry Object**, а не отправлять generic Home URL.
+Минимальный product contract:
+
+- exact Thing / Entry Object URL;
+- correct preview;
+- canonical host;
+- destination matching the shared context.
+
+Dedicated native Share UI — optional implementation, а не gap authority-модели.
+
+Если он добавляется, должен делиться текущим Entry Object, не generic Home.
 
 ---
 
-# 5. Telegram
+# 6. Telegram / editorial outbound
 
-## KEEP — worker / delivery plumbing
+## KEEP — transport
 
-Staging `community/board/telegram-worker-trigger-v3.js` уже вызывает:
+Staging worker уже вызывает `telegram-outbox-worker`.
 
-`telegram-outbox-worker`
+Production Board знает delivery states, включая:
 
-через Supabase Functions.
+- sent;
+- pending;
+- processing;
+- suppressed;
+- cancelled;
+- failed;
+- held.
 
-Production `community/board/board.js` уже умеет отображать delivery states:
+Transport переписывать не нужно.
 
-- `sent`;
-- `pending`;
-- `processing`;
-- `suppressed`;
-- `delivery_unknown`;
-- `cancelled`;
-- `failed`;
-- `held`.
+## REFRAME — trigger semantics
 
-Это сильный готовый transport foundation.
+Staging worker привязан к `artifactForm` submit слишком близко к raw publication event.
 
-Не нужно переписывать Telegram transport ради `12`.
-
-## REFRAME — current trigger semantics
-
-Staging worker trigger:
-
-- стартует после load;
-- слушает submit `artifactForm`;
-- после submit планирует worker invocation.
-
-Это связывает delivery pipeline с Artifact composer / publication flow слишком напрямую.
-
-Новая семантическая цепочка:
+Целевая цепочка:
 
 ```text
 PROGRAMMING MOMENT
 → DISTRIBUTION DECISION
+→ DELIVERY ELIGIBILITY
 → TELEGRAM OUTBOX / DELIVERY
 ```
 
@@ -257,227 +216,115 @@ PROGRAMMING MOMENT
 
 ```text
 ARTIFACT SUBMIT
-→ TELEGRAM WORKER
+→ TELEGRAM
 ```
 
-Важно: worker invocation может остаться тем же.
+## GAP — semantic outbound gate
 
-Меняется **причина появления сообщения в outbox / eligibility for delivery**, а не обязательно сама доставка.
-
-## GAP — Programming Moment gate
-
-В проверенном runtime не подтверждён единый semantic gate, который до Telegram send отвечает:
-
-- почему сейчас;
-- target intent;
-- chosen message;
-- exact Entry Object;
-- promised experience;
-- next step.
-
-Это один из главных implementation gaps `12`.
-
----
-
-# 6. Event surfaces / physical continuation
-
-## KEEP — Event as precise Entry Object
-
-`events/fuengirola/` — самостоятельная public destination с:
-
-- Event title;
-- description;
-- event-specific OG metadata;
-- Dementor relation;
-- full experience context.
-
-То есть Event уже может быть точным destination вместо Home / Events index.
-
-## GAP — QR mechanics not confirmed
-
-Поиск в repo не подтвердил отдельный QR/qrcode implementation.
-
-Поэтому `12` не должен притворяться, что QR transport уже существует.
-
-Если физический Event требует QR, v1 может использовать простой canonical Event/Thing URL и generated QR вне Product ontology.
-
-## GAP — physical context continuation policy
-
-Не подтверждён общий слой:
-
-```text
-PHYSICAL CONTEXT
-→ EXACT DIGITAL CONTINUATION
-```
-
-например:
-
-- Event → related Thing;
-- Event → History;
-- Event → Participation action;
-- Event → next relevant object.
-
-Это semantic routing gap, не причина строить новый Event subsystem.
-
----
-
-# 7. Board
-
-## KEEP — concrete public routes from projections
-
-Production `community/board/board-integrations-v1.js` строит platform projections и использует `publicRoute` для `ОТКРЫТЬ →`.
-
-Это правильный primitive:
-
-Board может показать живой объект и вести прямо к нему.
-
-## REFRAME — Board acquisition role
-
-Board должен остаться surface для intent:
-
-> **«Что сейчас происходит?»**
-
-Не нужно удалять Board routes или projection infrastructure.
-
-Нужно перестать использовать Board как возможный default external destination только потому, что там много объектов.
-
-Канонически:
-
-> **BOARD IS NOT THE DEFAULT ACQUISITION SURFACE.**
-
-`12` добавляет semantic guardrail, а не новую Board ontology.
-
----
-
-# 8. Home
-
-## KEEP — Home as direct/program-cover destination
-
-Home существует как самостоятельная public surface и естественно подходит под direct intent:
-
-> **«Что у них сейчас?»**
-
-Это нужно сохранить.
-
-## REFRAME — generic acquisition use
-
-Текущий Home всё ещё содержит сильный brand-level DaaS hero и section/ecosystem navigation.
-
-Для Distribution это не проблема само по себе.
-
-Проблемой будет использовать Home как default destination после promise конкретной Thing / Event / Release.
-
-Канонически:
-
-> **HOME IS NOT THE DEFAULT LANDING PAGE.**
-
-Новая разработка здесь может быть нулевой, если routing policy просто перестанет отправлять precise invitations на `/`.
-
----
-
-# 9. Analytics / attribution
-
-Production `production-analytics-v1.js` уже является полезным semantic-ish transport foundation.
-
-## KEEP — current route/entity analytics
-
-Allowed events уже включают:
-
-- `project_open`;
-- `course_open`;
-- `course_cta_click`;
-- `event_open`;
-- `event_cta_click`;
-- `merch_open`;
-- `merch_cta_click`;
-- `recommendation_click`;
-- `external_community_click`;
-- join/workspace signals.
-
-Runtime распознаёт project/course/event/merch routes и сохраняет:
-
-- `entity_type`;
-- `entity_id`;
-- `placement`;
-- `source_page`.
-
-Это нужно сохранить.
-
-## KEEP — contextual recommendation signal
-
-`linkPlacement()` отдельно распознаёт contextual recommendations, а internal navigation к supported entities может дать `recommendation_click`.
-
-Это уже полезный primitive для future Thing → Thing measurement.
-
-## GAP — semantic Distribution attribution
-
-Текущая analytics schema не выражает системно:
-
-- `programming_moment`;
-- `channel` как Distribution decision;
-- `target_intent`;
-- `entry_object` как promise destination;
-- `message_variant`;
-- `promised_experience`.
-
-`source_page` / placement не заменяют intent.
-
-UTM / referrer также не заменяют intent.
-
-Целевой payload может быть добавлен инкрементально и не требует отдельной Distribution database.
-
-## PARTIAL GAP — qualified consumption
-
-Current analytics хорошо видит route opens и отдельные CTA clicks.
-
-Но:
-
-> **route open ≠ promised experience consumed**
-
-Например открытие страницы игры ещё не обязательно означает `game started`.
-
-Для каждого Form / experience потребуется минимальный success event там, где это имеет смысл.
-
-Не нужен универсальный fake `consumed=true`.
-
-## PARTIAL GAP — Thing → Thing
-
-`recommendation_click` уже даёт primitive для contextual continuation.
-
-Но текущая route model ограничена operational entity types и не выражает universal Product Thing semantics.
-
-Поэтому:
-
-- infrastructure exists;
-- Product-level Thing → Thing measurement ещё неполно.
-
-## GAP — Return by Distribution context
-
-Current analytics не связывает последующий direct/re-entry return с исходным:
+До send нужно уметь выразить:
 
 - Programming Moment;
 - target intent;
-- Entry Object.
+- message / promise;
+- exact Entry Object;
+- promised experience;
+- delivery eligibility;
+- next step.
 
-Полная Return attribution может быть сложнее и относится также к `08` / Metrics.
+Это semantic adapter/policy problem, не новый Telegram subsystem.
 
-Для `12` достаточно сначала сохранять semantic dimensions на entry и не требовать perfect multi-touch attribution.
+---
+
+# 7. Delivery eligibility / permission
+
+Authority `12` добавляет слой, которого ранний mapping не выделял отдельно.
+
+Даже хороший outbound reason не означает право доставлять его любым способом.
+
+## PARTIAL GAP
+
+Telegram уже знает suppression / held-like delivery states, что является полезным primitive.
+
+Но общий semantic contract для future individualized / owned channels не подтверждён:
+
+```text
+DISTRIBUTION DECISION
+→ CAN / SHOULD THIS CHANNEL DELIVER?
+```
+
+Potential dimensions там, где применимо:
+
+- explicit follow / subscription / consent;
+- suppression / unsubscribe;
+- audience eligibility;
+- duplicate / frequency pressure;
+- geographic / Event eligibility.
+
+Не нужно строить universal permission engine до появления конкретных channels.
+
+---
+
+# 8. Event / physical continuation
+
+## KEEP
+
+`events/fuengirola/` подтверждает, что Event уже может быть precise public Entry Object.
+
+## GAP — contextual handoff policy
+
+Не подтверждён общий semantic layer:
+
+```text
+PHYSICAL / EVENT CONTEXT
+→ EXACT DIGITAL CONTINUATION
+```
+
+Например:
+
+- Event → related Thing;
+- Event → Participation;
+- Event → History;
+- Event → exact instruction.
+
+QR — transport и добавляется только под реальный use case.
+
+Отдельная QR Product entity не нужна.
+
+---
+
+# 9. Home / Board
+
+## Home — KEEP + REFRAME
+
+Home полезен для:
+
+- direct traffic;
+- program-cover intent;
+- «что у них сейчас?».
+
+Но precise external invitation не должен вести на `/` по умолчанию.
+
+## Board — KEEP + REFRAME
+
+Board projections уже умеют открывать concrete `publicRoute`.
+
+Board должен оставаться destination только при intent:
+
+> **«Что сейчас происходит?»**
+
+Board — destination surface, не distribution channel.
 
 ---
 
 # 10. Dementor / author path
 
-Существующие public Dementor routes присутствуют в runtime (например Event связывает Габиля с `/community/gabil/`).
+## KEEP
 
-## KEEP — public author destination
+Public Dementor routes уже существуют.
 
-Profile route уже может быть destination при прямом author intent.
+## PARTIAL GAP
 
-## PARTIAL GAP — authored Thing → body of work continuation
-
-Проверенный Event показывает relation к Dementor, но единый body-of-work routing contract для всех Things не подтверждён.
-
-Целевой путь:
+Нужен общий authored-work continuation contract:
 
 ```text
 AUTHORED THING
@@ -485,185 +332,239 @@ AUTHORED THING
 → ANOTHER AUTHORED THING
 ```
 
-Не требуется новый Person/Dementor model — это presentation/distribution continuation.
+При direct author intent profile/body of work может быть первым Entry Object.
+
+При незнакомом авторе сильнее:
+
+**WORK BEFORE BIOGRAPHY.**
+
+Новая Person / Dementor ontology не требуется.
 
 ---
 
-# 11. Social / external community / partner
+# 11. Partner / social / manual outbound
 
-## KEEP — manual outbound remains valid
+Ручная distribution остаётся валидным transport.
 
-`12` не требует отдельного software channel для каждого внешнего места.
+Не нужен software channel для каждой внешней среды.
 
-Ручная отправка в social / partner/community канал остаётся валидным transport.
-
-## GAP — unified routing decision
-
-Независимо от того, отправляется сообщение вручную или automation, в runtime/operations пока нет подтверждённого единого contract:
+Для **controlled editorial outbound** нужен единый semantic contract:
 
 ```text
 Programming Moment
-+ Channel
++ Source / Channel
 + Target Intent
 + Message
 + Entry Object
 + Experience
++ Eligibility where relevant
 + Next Step
 ```
 
-Это основной semantic gap.
-
-Не следует решать его созданием «таблицы всех каналов» до Phase 0.
+Для **earned mention / personal Share** Programming Moment не является обязательным полем.
 
 ---
 
-# 12. KEEP / REFRAME / GAP by layer
+# 12. Analytics / attribution
 
 ## KEEP
 
-Сохранить без архитектурного rewrite:
+Current analytics уже знает operational entity opens / CTA clicks и такие dimensions, как:
 
-- `sitemap.xml`;
-- `robots.txt`;
-- canonical URL runtime;
-- existing OG/Twitter tags;
-- standalone Event pages;
-- Board `publicRoute` projection primitive;
-- Telegram worker/outbox delivery plumbing;
-- Telegram delivery states;
-- GA4 / Clarity consented analytics foundation;
-- entity open / CTA tracking;
-- placement / source-page context;
-- contextual recommendation tracking;
+- `entity_type`;
+- `entity_id`;
+- `placement`;
+- `source_page`.
+
+`recommendation_click` уже является primitive для continuation measurement.
+
+## GAP — semantic Distribution dimensions
+
+Current contract не выражает системно:
+
+- `distribution_trigger`;
+- `programming_moment?`;
+- `source`;
+- `channel`;
+- `target_intent`;
+- `entry_object`;
+- `message_variant?`;
+- `promised_experience`.
+
+`programming_moment` должен быть optional.
+
+UTM / referrer не заменяют intent.
+
+## PARTIAL GAP — qualified experience
+
+Route open не равен consumption.
+
+Для ключевых Forms нужен minimum success signal, например game start вместо page load.
+
+Точные event names / thresholds принадлежат `14 · Metrics & Signals`.
+
+`12` только определяет semantic question.
+
+## PARTIAL GAP — Thing → Thing
+
+`recommendation_click` — хороший primitive, но universal Product Thing semantics ещё нет.
+
+Не нужно из-за этого создавать новую Thing table.
+
+---
+
+# 13. Revised KEEP / REFRAME / GAP
+
+## KEEP
+
+- crawler discovery infrastructure;
+- canonical runtime;
+- OG / Twitter primitives;
+- standalone Event routes;
+- Board concrete routes;
+- Telegram transport / delivery states;
+- basic analytics;
+- source-page / placement context;
 - public Dementor routes.
 
 ## REFRAME
 
-Сохранить механизм, изменить его смысловую роль:
-
-- Artifact submit/publication must not itself be Telegram reason;
-- Home must not be default destination for precise invitations;
-- Board must not be default acquisition surface;
-- share/preview should preserve exact Entry Object rather than brand invitation;
-- channel cadence must consume Programming Moments, not create them.
+- Artifact submit cannot itself be Telegram reason;
+- Home is not default destination for precise promise;
+- Board is a destination surface, not generic channel;
+- Share must preserve exact object;
+- channel cadence cannot create Programming Moments;
+- Programming Moment requirement applies to editorial outbound, not all discovery.
 
 ## PARTIAL GAP
 
-Фундамент есть, но нужен completion:
-
-- Thing-specific social previews;
-- static canonical host consistency;
-- authored Thing → Dementor body-of-work continuation;
-- qualified experience consumption events;
-- Thing → Thing analytics beyond current supported entity routes.
+- Thing-specific previews;
+- static canonical-host consistency;
+- authored Thing → body of work;
+- delivery eligibility / permission beyond existing Telegram primitives;
+- qualified consumption;
+- Product-level Thing → Thing analytics.
 
 ## GAP
 
-Нужен новый semantic layer / small implementation:
+- unified trigger-aware routing policy;
+- `SOURCE / CHANNEL × INTENT × ENTRY OBJECT` decision for controlled distribution;
+- Programming Moment outbound gate;
+- semantic attribution dimensions;
+- destination QA;
+- physical Event → exact digital continuation.
 
-- `CHANNEL × INTENT × ENTRY OBJECT` routing decision;
-- Programming Moment–driven outbound eligibility;
-- target intent / Entry Object / Programming Moment analytics dimensions;
-- destination QA before send;
-- physical Event → exact digital continuation policy;
-- dedicated QR mechanic, only if actually needed;
-- direct Return attribution to Distribution context, if later justified.
+## NOT A REQUIRED GAP
 
----
-
-# 13. What this means for engineering
-
-Production review подтверждает исходную гипотезу:
-
-> **новой разработки значительно меньше, чем новой семантики.**
-
-Главное НЕ нужно строить заново:
-
-- crawler discovery;
-- canonical transport;
-- social metadata primitives;
-- Event detail pages;
-- Telegram delivery worker/outbox;
-- basic analytics;
-- Board entity routes.
-
-Главное нужно добавить / изменить:
-
-1. **semantic routing decision** перед distribution;
-2. **Programming Moment gate** для outbound channels;
-3. точный **Entry Object** вместо generic Home/Board routing;
-4. destination-specific preview consistency;
-5. semantic attribution;
-6. минимальные qualified-consumption / continuation signals.
-
-Это лучше делать adapter/policy-first, а не schema-first.
+- native Share API;
+- universal QR system;
+- universal distribution database;
+- perfect multi-touch attribution;
+- paid media infrastructure.
 
 ---
 
-# 14. Recommended production phases
+# 14. Engineering implication
+
+Самая точная engineering формула:
+
+```text
+EXISTING TRANSPORT
++ EXISTING PUBLIC OBJECTS
++ BASIC ATTRIBUTION
+
+MISSING:
+
+TRIGGER CLASSIFICATION
+→ INTENT
+→ PRECISE ENTRY OBJECT
+→ PROMISE / PREVIEW FIT
+→ ELIGIBILITY WHERE NEEDED
+→ QUALIFIED EXPERIENCE
+```
+
+Для editorial outbound дополнительно:
+
+```text
+PROGRAMMING MOMENT
+→ DISTRIBUTION DECISION
+→ DELIVERY
+```
+
+Новой разработки действительно меньше, чем новой semantic policy.
+
+---
+
+# 15. Recommended production phases
 
 ## Phase 0 — NO SCHEMA MIGRATION
 
-Взять 3–5 реальных Programming Moments разных типов и вручную / config-level выразить:
+Проверить 4–5 случаев разных trigger classes:
+
+1. Telegram/social editorial outbound с Programming Moment;
+2. Search → existing Thing;
+3. personal Share → exact Thing;
+4. Event / physical → exact continuation;
+5. direct return → Home / known object.
+
+Для controlled outbound вручную / config-level выразить:
 
 ```text
-programming_moment
+trigger_type
+programming_moment?
+source
 channel
-target_intent
+intent
 message
 entry_object
 promised_experience
 next_step
+eligibility
+attribution
 ```
 
-Проверить:
+Проверить destination / preview / fit / permission / consumption / continuation.
 
-- destination;
-- preview;
-- channel fit;
-- analytics payload;
-- continuation.
+## Phase 1 — Share / preview consistency
 
-## Phase 1 — Telegram semantic gate
+Закрыть exact-object preview и canonical-host consistency.
 
-Не переписывая worker/outbox, изменить eligibility/source so that send follows DistributionDecision / Programming Moment rather than raw Artifact submit/publication semantics.
+## Phase 2 — Telegram semantic gate
 
-## Phase 2 — Share / preview consistency
+Сохранить worker/outbox, изменить eligibility/source of send так, чтобы outbound следовал Programming Moment + DistributionDecision.
 
-Закрыть Thing-specific OG coverage и canonical host consistency.
+## Phase 3 — semantic attribution / eligibility
 
-Dedicated native Share UI добавлять только если он реально улучшает product flow.
+Добавить только необходимые dimensions и suppression rules.
 
-## Phase 3 — semantic analytics
+Не добавлять PII и universal marketing platform.
 
-Расширить allowed payload/event contract нужными Distribution dimensions.
+## Phase 4 — qualified consumption / continuation
 
-Не добавлять PII.
-
-## Phase 4 — qualified consumption / Thing → Thing
-
-Для ключевых Forms определить минимальные success signals и continuation events.
+Совместно с `14` определить minimum success signals для ключевых Forms.
 
 ## Phase 5 — Event physical continuation
 
-Добавить QR/short route только для реального Event use case, не как обязательную платформенную сущность.
+Добавить QR / short link только под доказанный Event use case.
 
 ---
 
-# 15. Production acceptance gate
+# 16. Production acceptance gate
 
-Перед реализацией channel-specific feature задавать:
+Перед channel-specific feature спросить:
 
-1. **Есть ли уже transport?** Если да — KEEP.
-2. **Проблема transport или semantic trigger?**
-3. **Какой Programming Moment запускает действие?**
-4. **Какой target intent?**
+1. **Какой trigger class?**
+2. **Если editorial outbound — какой Programming Moment?**
+3. **Есть ли уже transport?**
+4. **Какой intent?**
 5. **Какой exact Entry Object?**
-6. **Совпадает ли preview с promise?**
-7. **Какой qualified-consumption signal?**
-8. **Что является естественным next Thing / continuation?**
+6. **Совпадает ли preview / message с destination?**
+7. **Нужна ли delivery eligibility / permission?**
+8. **Что считается qualified experience?**
+9. **Какой continuation уместен?**
+10. **Принадлежит ли требуемая метрика `12` или уже `14`?**
 
-Если ответы требуют новой таблицы раньше, чем доказан routing policy, реализация преждевременна.
+Если Search / personal Share / direct return не имеют Programming Moment — это нормально.
 
 ---
 
@@ -671,24 +572,10 @@ Dedicated native Share UI добавлять только если он реал
 
 Текущая система — **частично готовый фундамент**, а не отсутствующая Distribution system.
 
-Самая точная формула production gap:
+Основной gap:
 
-```text
-EXISTING TRANSPORT
-+ EXISTING PUBLIC OBJECTS
-+ EXISTING BASIC ATTRIBUTION
+> **Dementor умеет технически доставлять и открывать objects, но пока не имеет единой trigger-aware policy, которая сохраняет intent от источника до experience.**
 
-MISSING:
+Первый правильный move:
 
-PROGRAMMING MOMENT
-→ CHANNEL × INTENT × ENTRY OBJECT
-→ EXACT PROMISE / DESTINATION
-→ QUALIFIED CONSUMPTION
-→ CONTINUATION / RETURN SIGNAL
-```
-
-Поэтому `12` не оправдывает новый большой infrastructure project.
-
-Первый правильный implementation move:
-
-> **добавить semantic routing layer перед уже существующими transport-механизмами и измерить качество встречи после click.**
+> **добавить semantic routing policy поверх существующих transport-механизмов, а Programming Moment использовать как обязательный gate только для controlled editorial outbound.**
