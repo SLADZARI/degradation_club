@@ -1,6 +1,6 @@
 # DEMENTOR CLUB — MARKETING POSITIONING & MESSAGING v1
 
-Status: **DRAFT / WORKING CANON CANDIDATE**  
+Status: **WORKING CANON**  
 Updated: **2026-09-15**
 
 ## Authority scope
