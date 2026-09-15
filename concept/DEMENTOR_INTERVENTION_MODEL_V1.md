@@ -1,6 +1,6 @@
 # DEMENTOR CLUB — DEMENTOR / INTERVENTION MODEL v1
 
-Status: **DRAFT / WORKING CANON CANDIDATE**  
+Status: **WORKING CANON / product utility authority**  
 Updated: **2026-09-15**
 
 ## Authority scope
