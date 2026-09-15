@@ -549,7 +549,60 @@ Utility Loop может быть редким, но сильным.
 
 ---
 
-# 17. Return surfaces
+# 17. Passive Return vs Active Follow
+
+Return Loop существует **до и независимо от механики Follow**.
+
+Человеку не нужно нажимать `следить`, `подписаться` или создавать специальную relation, чтобы существовало ожидание:
+
+- что станет с конкретной Thing;
+- что выпустит конкретный Dementor;
+- во что превратится Project;
+- чем закончится Series;
+- появится ли следующая версия.
+
+Это **Passive Return**: continuity живёт в памяти человека, программе и реальном развитии объекта.
+
+Пример:
+
+> человек сыграл в prototype, ничего не подписал, через месяц увидел продолжение или сам вспомнил о нём и вернулся.
+
+Это полноценный Thing / Project Return Loop.
+
+## Active Follow
+
+Follow — явный способ сказать системе:
+
+> **«это ожидание для меня уже существует; помоги мне не потерять его».**
+
+Active Follow может улучшать:
+
+- routing relevant Activity;
+- notification eligibility;
+- prioritization continuation;
+- персональную видимость meaningful History / Release.
+
+Но Follow **не создаёт ценность и не создаёт continuity сам по себе**.
+
+Если у объекта нет meaningful continuation, follow relation не даёт продукту права генерировать активность ради активности.
+
+Канонические правила:
+
+**CONTINUITY ≠ SUBSCRIPTION RELATION**
+
+**FOLLOW EXPLICITLY RECORDS EXPECTATION; IT DOES NOT CREATE THE EXPECTATION.**
+
+И:
+
+**NO FOLLOW REQUIRED FOR A HEALTHY RETURN LOOP.**
+
+Из этого следует важное продуктовое ограничение: нельзя измерять здоровье Thing / Dementor / Project loops только количеством follows или conversion в подписку.
+
+Человек может быть сильным returning audience, никогда не используя Follow.
+
+---
+
+# 18. Return surfaces
 
 Return reason не принадлежит поверхности.
 
@@ -573,7 +626,7 @@ Return reason не принадлежит поверхности.
 
 ---
 
-# 18. Activity и notifications
+# 19. Activity и notifications
 
 Activity может помочь доставить meaningful return trigger.
 
@@ -608,7 +661,7 @@ Notification допустим, если он несёт конкретный pay
 
 ---
 
-# 19. Frequency
+# 20. Frequency
 
 Нет канонической цели максимизировать Return Frequency.
 
@@ -629,7 +682,7 @@ Notification допустим, если он несёт конкретный pay
 
 ---
 
-# 20. Return closure
+# 21. Return closure
 
 Хороший loop умеет завершаться.
 
@@ -653,7 +706,7 @@ Loop закрывается, если:
 
 ---
 
-# 21. Loop stacking
+# 22. Loop stacking
 
 Один Return может активировать несколько loops.
 
@@ -681,7 +734,7 @@ Loop закрывается, если:
 
 ---
 
-# 22. Return priority
+# 23. Return priority
 
 Когда одновременно существует несколько причин вернуть человека, приоритет определяется не технической свежестью, а силой ожидаемой ценности.
 
@@ -698,7 +751,7 @@ Loop закрывается, если:
 
 ---
 
-# 23. Metrics
+# 24. Metrics
 
 Return Loops не требуют одной универсальной метрики.
 
@@ -738,7 +791,7 @@ Return Loops не требуют одной универсальной метр�
 
 ---
 
-# 24. Anti-signals
+# 25. Anti-signals
 
 Главные anti-signals:
 
@@ -759,7 +812,7 @@ Return Loops не требуют одной универсальной метр�
 
 ---
 
-# 25. Product QA for any Return trigger
+# 26. Product QA for any Return trigger
 
 Перед созданием механики возврата ответить:
 
@@ -780,7 +833,7 @@ Return Loops не требуют одной универсальной метр�
 
 ---
 
-# 26. Relationship with Content & Programming Model
+# 27. Relationship with Content & Programming Model
 
 `07` создаёт supply:
 
@@ -812,7 +865,7 @@ PROGRAMMING MOMENT / CONTEXTUAL TRIGGER
 
 ---
 
-# 27. Boundary with 09 · Contribution Model
+# 28. Boundary with 09 · Contribution Model
 
 `08` определяет Contributor Return только как loop:
 
