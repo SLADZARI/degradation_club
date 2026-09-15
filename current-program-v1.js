@@ -10,8 +10,6 @@ const PROGRAM=Object.freeze([
     currentTruth:'Курс готов к прохождению.',
     actionLabel:'ПРОЙТИ КУРС',
     href:'/courses/dengi-na-veter/',
-    analyticsEvent:'course_open',
-    analyticsType:'course',
     analyticsId:'dengi-na-veter'
   }),
   Object.freeze({
@@ -23,8 +21,6 @@ const PROGRAM=Object.freeze([
     currentTruth:'Публичная презентация проекта доступна. Публичный playable release пока не заявлен.',
     actionLabel:'ПОСМОТРЕТЬ LAB',
     href:'/projects/dementor-lab/',
-    analyticsEvent:'project_open',
-    analyticsType:'project',
     analyticsId:'dementor-lab'
   }),
   Object.freeze({
@@ -36,25 +32,12 @@ const PROGRAM=Object.freeze([
     currentTruth:'Событие запланировано. Дата, цена и открытая регистрация пока не заявлены.',
     actionLabel:'ПОСМОТРЕТЬ СОБЫТИЕ',
     href:'/events/fuengirola/',
-    analyticsEvent:'event_open',
-    analyticsType:'event',
     analyticsId:'fuengirola'
   })
 ]);
 
 export function getCurrentProgram(){
   return PROGRAM.map(item=>({...item}));
-}
-
-export function trackCurrentProgramAction(item,placement){
-  const analytics=window.DEMENTOR_ANALYTICS;
-  if(!analytics||typeof analytics.track!=='function')return false;
-  return analytics.track(item.analyticsEvent,{
-    entity_type:item.analyticsType,
-    entity_id:item.analyticsId,
-    placement,
-    cta_id:`current-program:${item.analyticsId}`
-  });
 }
 
 export function announceCurrentProgram(surface){
