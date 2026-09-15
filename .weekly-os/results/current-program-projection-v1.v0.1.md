@@ -187,13 +187,25 @@ Site Integrity / Release Readiness:
 
 This proves the exact G6 evidence head, not only the implementation candidate.
 
+## Exact-head G7 authorization evidence
+
+G7 authorization head:
+
+`32530297b466cd6c4d813417950f0dd1df9b2b27`
+
+Site Integrity / Release Readiness:
+
+- workflow run: `#1180` / Actions run `35001511990`;
+- conclusion: `SUCCESS`;
+- every workflow step through `Validate production artifact release gate`: `SUCCESS`.
+
+This proves the exact owner-authorized production-merge candidate before merge.
+
 ## G7 authorization boundary
 
 Owner authorized production merge on 2026-09-15 after the full G6 PASS.
 
-This Result update records that authorization and is documentation-only relative to the validated runtime. Because it creates a new exact branch head, the same full `Site Integrity / Release Readiness` workflow must pass on this authorization head before merge.
-
-If that exact-head workflow passes, PR #208 may be merged into `dementor-club-production` using the recorded production baseline and without any blind `dementor-club-site → production` merge.
+The exact owner-authorization head also passed the full release-readiness workflow. PR #208 may therefore be merged into `dementor-club-production` from the recorded production baseline without any blind `dementor-club-site → production` merge.
 
 **Production deploy remains unauthorized.**
 
@@ -205,7 +217,7 @@ No payment, Merch commerce, Membership/access redesign, Fuengirola registration 
 
 - **G5 BUILD — COMPLETE**
 - **G6 VALIDATION — COMPLETE**
-- **G7 RELEASE — production merge authorized; exact authorization head must pass full CI; deploy not authorized**
+- **G7 RELEASE — production merge authorized; exact authorization head full CI PASS; deploy not authorized**
 - G8 CLEANUP — after authorized release/live evidence
 
 `commit ≠ merge ≠ deploy`
