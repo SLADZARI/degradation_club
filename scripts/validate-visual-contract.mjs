@@ -14,7 +14,9 @@ const inkLayout = read('ink-layout-v2.css');
 const inkTuning = read('ink-layout-v2-tuning.css');
 const inkRuntime = read('ink-layout-v2.js');
 const home = read('index.html');
-const homeEventCss = read('home-event-fuengirola-20260828.css');
+const currentProgram = read('current-program-v1.js');
+const currentProgramCss = read('current-program-v1.css');
+const homeProgramRuntime = read('home-current-program-v1.js');
 const community = read('community/index.html');
 const communityCss = read('community-v2.css');
 const eventsIndex = read('events/index.html');
@@ -51,37 +53,38 @@ must(visual.includes('.dc-dementor-feature'), 'FEATURE contract missing');
 must(profile.includes('.dc-dementor-profile .dc-dementor-hero__portrait'), 'HERO portrait contract missing from canonical profile owner');
 must(illustrationSurfaces.includes('var(--dc-ink-bg-fuengirola)'), 'Fuengirola illustration surface token binding missing');
 
-// Browser G6 proves the accepted Home composition still depends on Home Hero Ink plus
-// several legacy Home/Fuengirola layout declarations in the shared Ink stylesheets.
-// Preserve those styles byte-for-byte in this cleanup. Runtime ownership is narrowed instead:
-// Home + About + Logic remain active; Community and Fuengirola-detail Ink runtime owners stay retired.
+// The accepted Home composition keeps Home Hero Ink but no longer has page-owned
+// course/Fuengirola feature blocks. Current Program is now the canonical Home owner.
 must(inkRuntime.includes("const layoutRoutes=new Set(['/','/about/','/projects/logic-awareness/']);"), 'Ink runtime scope must preserve Home + About + Logic only');
 must(inkRuntime.includes("mountExisting('.dc-ink-slot--home','.dc-hero','home')"), 'active Home Hero Ink integration missing');
 must(!inkRuntime.includes("if(path==='/community/')"), 'retired Community Ink runtime owner returned');
 must(!inkRuntime.includes("'/events/fuengirola/'"), 'Fuengirola detail must not become an Ink runtime route owner');
 must(inkLayout.includes('dc-has-integrated-ink--home') && inkLayout.includes('dc-ink-integrated--home'), 'active Home Ink layout rules missing');
 must(inkTuning.includes('dc-has-integrated-ink--home') && inkTuning.includes('dc-ink-integrated--home'), 'active Home Ink tuning rules missing');
-must(inkLayout.includes('.dc-home .dc-event[aria-labelledby="event-title"] .dc-event__top'), 'accepted Home Fuengirola Ink layout compatibility rules missing');
-must(inkTuning.includes('.dc-home .dc-event[aria-labelledby="event-title"] .dc-event__body'), 'accepted Home Fuengirola Ink tuning compatibility rules missing');
 
-must(home.includes('/courses/dumai-s-opasnostyu/'), 'Home course feature missing');
-must(home.includes('/events/fuengirola/'), 'Home event feature missing');
-must(visual.includes(".dc-home section.dc-event:has(a[href=\"/courses/dumai-s-opasnostyu/\"])"), 'Home course visual contract missing');
-// G6 visual evidence also proved the shared visual-standard Home/Fuengirola geometry is active.
-// Keep it until a dedicated owner migration can reproduce the browser reference exactly.
-must(visual.includes(".dc-home section.dc-event:has(a[href=\"/events/fuengirola/\"]) .dc-event__desc{grid-column:3/9}"), 'Home Fuengirola accepted shared layout geometry missing');
-must(homeEventCss.includes("background-image:url('/assets/ink/event-fuengirola-03.webp')!important"), 'Home Fuengirola canonical decodable event asset owner missing');
-must(!homeEventCss.includes('/assets/home/events/fuengirola-banner.webp'), 'Retired/corrupted Home Fuengirola banner path returned to runtime CSS');
-must(homeEventCss.includes('.dc-home .dc-event.dc-section::after'), 'Home Fuengirola defensive pseudo-layer suppression missing');
-must(homeEventCss.includes('content:none!important') && homeEventCss.includes('display:none!important') && homeEventCss.includes('background-image:none!important'), 'Home Fuengirola duplicate image overlay is not neutralized');
-must(homeEventCss.includes('width:100vw!important'), 'Home Fuengirola desktop feature is not full-bleed');
-must(homeEventCss.includes('margin:0 0 0 -50vw!important'), 'Home Fuengirola full-bleed viewport anchor missing');
-must(homeEventCss.includes('background-size:cover!important'), 'Home Fuengirola desktop image must cover the full feature');
-must(!homeEventCss.includes('Габиль Тагиев\\A дементор'), 'Home Fuengirola decorative duplicate Gabil treatment survived');
-must(relations.includes("add(fuengirola?.querySelector('.dc-event__meta'),'gabil','ДЕМЕНТОР СОБЫТИЯ')"), 'Home Fuengirola semantic Gabil relation owner missing');
-must(visual.includes('/assets/people/dementors/valentin/dementor_valentin.webp'), 'Valentin portrait binding missing');
-must((home.match(/<a class="dc-course-prototype__mentor"/g) || []).length === 1, 'Home course must contain exactly one Valentin mentor-card');
-must(!home.includes('Дементор: Валентин Лосев.'), 'Home duplicate textual Valentin attribution must stay removed');
+must(home.includes('id="current-program"'), 'Home Current Program section missing');
+must(home.includes('id="currentProgramHost"'), 'Home Current Program host missing');
+must(home.includes('/current-program-v1.css'), 'Home Current Program stylesheet missing');
+must(home.includes('/home-current-program-v1.js'), 'Home Current Program runtime missing');
+must(!home.includes('dc-course-prototype'), 'retired page-owned Home course feature returned');
+must(!home.includes('<section class="dc-event'), 'retired page-owned Home event feature returned');
+must(!home.includes('ACCESS AFTER JOIN'), 'retired Home Fuengirola Join gate returned');
+must(!home.includes('Подробности и возможность записаться доступны после вступления в клуб.'), 'retired Home Fuengirola membership promise returned');
+must(home.includes('id="events"'), 'legacy /#events anchor compatibility missing');
+
+for (const ref of ['program:dengi-na-veter','project:dementor-lab','event:fuengirola']) {
+  must(currentProgram.includes(`thingRef:'${ref}'`), `Current Program missing ${ref}`);
+}
+must((currentProgram.match(/thingRef:/g)||[]).length===3, 'Current Program must contain exactly three reviewed Things');
+must(currentProgram.includes("currentTruth:'Курс готов к прохождению.'"), 'Деньги на ветер ready-to-take truth missing');
+must(currentProgram.includes('Публичный playable release пока не заявлен'), 'Dementor Lab playable-release boundary missing');
+must(currentProgram.includes('Дата, цена и открытая регистрация пока не заявлены'), 'Fuengirola blocked-claim boundary missing');
+must(!currentProgram.includes('ne-komanda'), 'НЕ КОМАНДА must stay outside Current Program v0');
+must(!currentProgram.includes('dumai-s-opasnostyu'), 'Думай с опасностью must stay outside Current Program v0');
+must(homeProgramRuntime.includes("from '/current-program-v1.js'"), 'Home Current Program must consume shared projection owner');
+must(currentProgramCss.includes('.dc-current-program__grid'), 'Current Program grid visual owner missing');
+must(currentProgramCss.includes('.dc-current-program__card:first-child'), 'Current Program lead-card emphasis missing');
+must(currentProgramCss.includes('@media(max-width:900px)'), 'Current Program responsive contract missing');
 
 // Community hero owns one semantic source across desktop/mobile layouts.
 must((community.match(/<h1\b/g) || []).length === 1, 'Community hero must contain exactly one h1');
@@ -94,7 +97,7 @@ must(community.includes('hero-ref__content'), 'Community canonical hero content 
 must(communityCss.includes('.hero-ref__content'), 'Community canonical hero CSS owner missing');
 must(communityCss.includes('minmax(0,.9fr) minmax(0,1.35fr) minmax(0,.9fr)'), 'Community 1024-safe hero grid contract missing');
 
-// Events now presents the real event directly; lifecycle mechanics remain internal data, not public layout.
+// Events presents the real event directly; lifecycle mechanics remain internal data, not public layout.
 must((eventsIndex.match(/<div class="dc-programme__lane\b/g) || []).length === 1, 'Events must keep exactly one full programme lane for the real event');
 must((eventsIndex.match(/dc-programme__empty-state/g) || []).length === 0, 'Events empty lifecycle mechanics must stay out of public DOM');
 must(eventsIndex.includes('БЛИЖАЙШЕЕ СОБЫТИЕ'), 'Events visitor-facing current-event label missing');
@@ -155,10 +158,9 @@ if (fail.length) {
 }
 
 console.log('Dementor Club visual contract validation');
-console.log('✓ Home + About + Logic Ink runtime owners preserved; Community/Fuengirola runtime owners retired');
-console.log('✓ accepted Home/Home-Fuengirola Ink compatibility layout preserved byte-for-byte');
-console.log('✓ Home Fuengirola accepted shared layout preserved; route-specific owner suppresses older raster pseudo-layer');
-console.log('✓ Home Fuengirola one active raster owner and one semantic Gabil treatment');
+console.log('✓ Home Hero Ink owner preserved; retired page-owned course/event features stay absent');
+console.log('✓ Current Program v0 owns Home current-value composition with 3 reviewed Things');
+console.log('✓ Current Program visual owner has lead emphasis + responsive contract');
 console.log('✓ Community one-source hero; retired Ink Community runtime owner absent');
 console.log('✓ Events exposes one real event without lifecycle/process mechanics');
 console.log('✓ Merch static/runtime entity set = SH-DEM-01..04; missing runtime rows do not delete public entities');
