@@ -65,9 +65,10 @@
   .dc-board-fullscreen-v21 .dc-board-entry,
   .dc-board-fullscreen-v21 .dc-artifact-overlay{inset:132px 0 0!important}
 
-  /* One compact utility row: filters own the left edge, publish owns the right. */
+  /* One compact utility row. It starts below the real canonical navigation
+     envelope; the spatial viewport remains fullscreen underneath. */
   .dc-board-fullscreen-v21 .dc-board-filters{
-    top:10px!important;
+    top:34px!important;
     left:var(--dc-mobile-board-gutter)!important;
     right:auto!important;
     width:auto!important;
@@ -84,7 +85,7 @@
     font-size:8px!important;
   }
   .dc-board-fullscreen-v21 .dc-board-primary{
-    top:10px!important;
+    top:34px!important;
     left:auto!important;
     right:var(--dc-mobile-board-gutter)!important;
   }
@@ -96,9 +97,10 @@
   }
 
   /* Variant 3: all three Current Program Things are visible at once.
-     Program remains an overlay and only explicit CTA arrows receive pointers. */
+     Program begins after the utility row, remains an overlay, and only explicit
+     CTA arrows receive pointers. */
   .dc-board-fullscreen-v21 .dc-board-program{
-    top:58px!important;
+    top:84px!important;
     left:var(--dc-mobile-board-gutter)!important;
     right:var(--dc-mobile-board-gutter)!important;
     max-width:none!important;
