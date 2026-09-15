@@ -20,8 +20,6 @@ productionCommit: 2dd99cd230a3f5c9855ddb8faa9a673d838856e8
 productionObservedInCommit: 688899e31b82e14c31f5f805b2bce4f00f3741c0
 productionDeployRunId: 34903066857
 implementationStartAuthorized: true
-productionMergeAuthorized: true
-productionDeployAuthorized: true
 ---
 
 # MP | Dementor Club | BUILD | Board Share → Receive Ritual v1 | Result v0.2
@@ -68,7 +66,7 @@ The production runtime contains the approved receive mechanics in the canonical 
 
 `Site Integrity / Release Readiness` run `34763505731` / run #1065 — **SUCCESS** on exact candidate SHA `04daf88b063bfbd2f40c2cb4f05f6ca386a77fa1`.
 
-### G7 · Release
+### G7 · Production presence
 
 PR #166 merged the validated corrective into `dementor-club-production` as:
 
@@ -79,6 +77,8 @@ That merge is an ancestor of production commit:
 `688899e31b82e14c31f5f805b2bce4f00f3741c0`
 
 A later `Deploy Dementor Production` run `34903066857` successfully built and deployed that production state.
+
+This records factual production presence. It does not reconstruct or infer a missing historical authorization decision from the merge/deploy event itself.
 
 Therefore the corrective is no longer active G5 implementation work and `agent/board-share-receive-ritual-v1` must not remain the active integration owner.
 
@@ -100,7 +100,7 @@ The broader role/browser matrix is already covered by G6; G8 is the real-product
 - G4 decision: **APPROVED**.
 - G5 build: **COMPLETE**.
 - G6 validation: **PASS** — run #1065 / `34763505731`.
-- G7 release: **RELEASED** — PR #166 / production commit `2dd99cd...`, included in deployed production ancestry.
+- G7 production presence: **EVIDENCED** — PR #166 / production commit `2dd99cd...`, included in deployed production ancestry.
 - G8 cleanup: **WAITING** — explicit real-recipient live acceptance not evidenced.
 
 ## Ownership
@@ -117,5 +117,6 @@ must not block a new unrelated Result from becoming the single active integratio
 
 - deploy ≠ live acceptance;
 - production ancestry ≠ G8 closure;
+- merge/deploy occurrence ≠ reconstruction of a missing explicit authorization decision;
 - CI/browser fixtures ≠ real-recipient acceptance;
 - this reconciliation does not authorize any new runtime, schema, Supabase, permission or deployment work.
