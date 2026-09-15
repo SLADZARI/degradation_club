@@ -23,17 +23,29 @@ for(const width of [390,360]){
   await page.goto(base+'/workspace/board/',{waitUntil:'domcontentloaded'});
   await page.locator('.dc-spatial-viewport').waitFor({state:'visible',timeout:4000});
   await page.waitForFunction(()=>document.querySelectorAll('#boardProgramHost [data-thing-ref]').length===3,{timeout:4000}).catch(()=>{});
+  /* Let the guest auth/runtime settle before exposing canonical owners purely for
+     geometry measurement. This fixture does not change production permissions. */
+  await page.waitForTimeout(180);
   await page.evaluate(()=>{
     const nav=document.querySelector('.dcw-nav');
     if(nav){nav.hidden=false;nav.querySelectorAll('[data-member-tool]').forEach(node=>node.hidden=false)}
     let primary=document.querySelector('.dc-board-primary');
-    if(!primary){primary=document.createElement('div');primary.className='dc-board-primary';primary.innerHTML='<button type="button">+ ПРИКОЛОТЬ</button>';document.querySelector('.dc-spatial-viewport')?.appendChild(primary)}
+    if(!primary){
+      primary=document.createElement('div');
+      primary.className='dc-board-primary';
+      document.querySelector('.dc-spatial-viewport')?.appendChild(primary);
+    }
+    primary.hidden=false;
+    primary.removeAttribute('hidden');
+    primary.removeAttribute('aria-hidden');
+    if(!primary.querySelector('button'))primary.innerHTML='<button type="button">+ ПРИКОЛОТЬ</button>';
     primary.classList.add('is-visible');
+    primary.style.setProperty('display','flex','important');
     let pager=document.querySelector('.dc-board-filter-nav');
     if(!pager){pager=document.createElement('div');pager.className='dc-board-filter-nav';pager.innerHTML='<button>←</button><span>1 / 17</span><button>→</button>';document.querySelector('#boardFilters')?.appendChild(pager)}
     pager.hidden=false;
   });
-  await page.waitForTimeout(120);
+  await page.waitForTimeout(40);
 
   const state=await page.evaluate(()=>{
     const box=selector=>{const el=document.querySelector(selector);if(!el)return null;const r=el.getBoundingClientRect();return{x:r.x,y:r.y,w:r.width,h:r.height,right:r.right,bottom:r.bottom,scrollWidth:el.scrollWidth,clientWidth:el.clientWidth}};
