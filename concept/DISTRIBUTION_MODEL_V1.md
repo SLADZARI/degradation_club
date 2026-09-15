@@ -1,31 +1,31 @@
 # DEMENTOR CLUB — DISTRIBUTION MODEL v1
 
-Status: **DRAFT / WORKING CANON CANDIDATE**  
+Status: **WORKING CANON / distribution semantics authority**  
 Updated: **2026-09-15**
 
 ## Authority scope
 
-Этот документ является **distribution semantics authority** Dementor Club.
+Этот документ определяет, **как Dementor Club организует точную встречу человека с конкретной Thing / Release / Event / History / Project / authored work до и вокруг первого product experience**.
 
-Он определяет не список каналов, а правило, по которому редакционный момент превращается в точную внешнюю встречу человека с конкретной вещью.
+Он не является списком каналов и не является marketing calendar.
 
 Каноническая граница:
 
 > **AUDIENCE & ENTRY MAP DESCRIBES THE VISIT.**  
-> **DISTRIBUTION MODEL DESIGNS THE INVITATION.**
+> **DISTRIBUTION MODEL DESIGNS THE INVITATION / DISCOVERY PATH.**
 
 `12 · Distribution Model` отвечает:
 
-> **кого → с каким intent → через какой канал → каким сообщением → в какую конкретную точку продукта → ради какого experience → с каким естественным следующим шагом.**
+> **откуда человек приходит → с каким предполагаемым intent → через какой distribution path → какое обещание видит → в какой Entry Object попадает → какой experience получает → что естественно дальше.**
 
 Документ опирается на:
 
-- `03 · Audience & Entry Map` — кто пришёл, зачем и куда;
-- `07 · Content & Programming Model` — почему Thing важна сейчас;
-- `11 · Marketing Positioning & Messaging` — что человеку сказать и какое proof показать;
-- `08 · Return Loops` — почему после хорошего experience человек возвращается;
-- Product Model — что является Thing / Release / History / Project / Event;
-- Board Product Model — как живые Things показываются внутри Board.
+- `03 · Audience & Entry Map` — `SOURCE × INTENT × ENTRY OBJECT`;
+- `07 · Content & Programming Model` — почему Thing важна программе сейчас;
+- `08 · Return Loops` — почему человек потом возвращается;
+- `11 · Marketing Positioning & Messaging` — что обещаем и чем доказываем;
+- `05 · Product Model` — что является Thing / Release / History / Project / Event;
+- `06 · Board Product Model` — как живые Things показываются внутри Board.
 
 Он не переопределяет ни один из этих слоёв.
 
@@ -33,127 +33,243 @@ Updated: **2026-09-15**
 
 # 0. Главная модель
 
-Каноническая цепочка Distribution:
+Distribution шире, чем outbound-публикация.
 
-**PROGRAMMING MOMENT → CHANNEL FIT → TARGET INTENT → MESSAGE → ENTRY OBJECT → EXPERIENCE → NEXT THING / RETURN**
+Человек может встретить Dementor через:
 
-Со стороны человека:
+- редакционную отправку;
+- Search;
+- чужой Share;
+- QR / physical handoff;
+- ссылку от Dementor / партнёра;
+- прямой возврат;
+- persistent discoverability уже существующей Thing.
 
-**SOURCE → INTENT → PROMISE → ENTRY OBJECT → PROOF → NEXT THING**
+Поэтому общая цепочка:
 
-Это две стороны одной встречи.
+**DISTRIBUTION TRIGGER → INTENT HYPOTHESIS → SOURCE / CHANNEL FIT → PROMISE / PREVIEW → ENTRY OBJECT → EXPERIENCE → CONTINUATION**
 
-Programming решает, **почему сейчас есть смысл что-то вынести наружу**.
+Со стороны человека она совместима с `03`:
 
-Messaging решает, **что именно обещать и чем это доказать**.
+**SOURCE → INTENT → ENTRY OBJECT → EXPERIENCE → NEXT THING / RETURN**
 
-Distribution решает, **где, кому и в какую точку продукта доставить это обещание**.
+Для **editorial outbound** действует специальная цепочка:
 
-Return решает, **почему после первого удачного контакта человек снова появляется**.
+**PROGRAMMING MOMENT → DISTRIBUTION DECISION → CHANNEL / TRANSPORT → ENTRY OBJECT → EXPERIENCE**
 
----
+Это важная граница:
 
-# 1. Главный принцип
+> **PROGRAMMING MOMENT GATES EDITORIAL OUTBOUND. IT DOES NOT GATE ALL DISCOVERY.**
 
-> **DISTRIBUTE THE THING, NOT THE ORG CHART.**
-
-Distribution не должен вести человека через структуру Dementor, если его intent уже соответствует конкретной Thing / Release / Event / History / Dementor body of work.
-
-Плохая цепочка:
-
-**POST → HOME → SECTION → LIST → DETAIL → EXPERIENCE**
-
-если пост уже обещал конкретную игру.
-
-Предпочтительно:
-
-**POST → GAME**
-
-а уже после experience:
-
-**GAME → NEXT THING / PROGRAM / DEMENTOR / RETURN**
-
-Структура продукта может быть видна позже.
-
-Она не должна становиться обязательным тамбуром перед обещанным experience.
+Старая Thing может быть найдена через Search или переслана человеком без нового Programming Moment.
 
 ---
 
-# 2. Destination contract
+# 1. Пять типов Distribution Trigger
 
-Главное правило routing:
+Distribution action должен понимать, **почему встреча вообще возникла**.
 
-> **DESTINATION MUST MATCH THE PROMISE.**
+## A. EDITORIAL OUTBOUND
 
-Если сообщение обещает:
+Клуб сознательно выносит что-то наружу сейчас.
 
-- игру — человек должен попасть к игре;
-- Event — к Event;
-- конкретный release — к доступному release;
-- «что случилось дальше» — к relevant History / Thing context;
-- автора — к authored Thing или body of work;
-- участие — к реальной Participation Opportunity;
-- текущую программу — к Home;
-- «что сейчас происходит» — к Board.
+Примеры:
 
-Нельзя использовать generic landing page только потому, что он организационно удобнее.
+- Telegram post;
+- social post с invitation;
+- partner/community post;
+- authored outbound от Dementor, если он действует как часть программы.
 
-Distribution route — часть обещания.
+Здесь обязателен реальный **Programming Moment**.
 
-Неправильный destination превращает даже хороший message в misleading acquisition.
+Не:
+
+**PUBLISHED → SEND**
+
+А:
+
+**PROGRAMMING MOMENT → DISTRIBUTION DECISION → DELIVERY**
 
 ---
 
-# 3. Home и Board не являются default acquisition surfaces
+## B. PERSISTENT DISCOVERY
+
+Человек сам находит уже доступный объект.
+
+Примеры:
+
+- Search;
+- sitemap / indexed route;
+- сохранённая внешняя ссылка;
+- старый материал, найденный спустя месяцы.
+
+Здесь новый Programming Moment **не требуется**.
+
+Нужно, чтобы:
+
+- объект всё ещё существовал;
+- destination был корректным;
+- preview / metadata не лгали;
+- experience соответствовал intent.
+
+---
+
+## C. PERSON-MEDIATED SHARE
+
+Один человек пересылает Thing другому.
+
+Причина distribution здесь — **акт конкретного человека**, а не редакционная актуальность программы.
 
 Канонически:
 
-> **HOME IS NOT THE DEFAULT LANDING PAGE.**
+> **SHARE MAY EXTEND THE LIFE OF A THING WITHOUT CREATING A NEW PROGRAMMING MOMENT.**
 
-Home — обложка текущей программы.
+---
 
-Его естественный intent:
+## D. CONTEXTUAL HANDOFF
 
-> **«Что у них сейчас?»**
+Человек уже находится в конкретном физическом / внешнем контексте и получает точное продолжение.
 
-Поэтому Home хорошо подходит для:
+Примеры:
 
-- direct return;
-- brand/direct traffic;
-- общего curiosity без более точного объекта;
-- текущей программной обложки.
+- Event → QR → Event / Thing / Participation;
+- physical object → digital continuation;
+- partner experience → конкретная Thing;
+- выступление Dementor → authored work.
 
-Но если канал уже обещал конкретную Thing, Home не должен вставать между человеком и Thing.
+Главное:
+
+> **PHYSICAL / EXTERNAL CONTEXT SHOULD SURVIVE THE CLICK.**
+
+---
+
+## E. SELF-INITIATED RE-ENTRY
+
+Человек сам возвращается без нового внешнего сообщения.
+
+Примеры:
+
+- direct visit;
+- bookmark;
+- сохранённая ссылка;
+- повторное открытие знакомой Thing.
+
+Это связано с `08 Return Loops`, но routing всё равно должен дать ему точный destination.
+
+---
+
+# 2. Source ≠ Channel ≠ Transport ≠ Entry Object
+
+Чтобы не смешивать уровни, `12` использует четыре разных понятия.
+
+## SOURCE
+
+Откуда фактически пришёл человек.
+
+Это authority-понятие из `03`.
+
+Примеры:
+
+- search;
+- social;
+- Telegram;
+- direct share;
+- Event;
+- partner/community;
+- individual Dementor;
+- direct.
+
+## CHANNEL / DISTRIBUTION PATH
+
+Среда, через которую invitation / discovery происходит.
+
+Например Telegram, Instagram, Google Search, QR, personal link.
+
+## TRANSPORT
+
+Технический механизм доставки.
+
+Например:
+
+- canonical URL;
+- sitemap;
+- OG metadata;
+- Telegram outbox / worker;
+- UTM;
+- QR code;
+- copied link.
+
+Transport не определяет смысл distribution.
+
+## ENTRY OBJECT
+
+Самый точный продуктовый объект, который выполняет обещание / intent.
+
+Например:
+
+- конкретная Thing;
+- Release;
+- Event;
+- History context;
+- Project;
+- Dementor body of work;
+- Home;
+- Board, когда intent именно «что сейчас происходит?».
 
 Канонически:
 
-> **BOARD IS NOT THE DEFAULT ACQUISITION SURFACE.**
+**TRANSPORT ≠ MESSAGE ≠ ENTRY OBJECT.**
 
-Board отвечает на:
+И:
 
-> **«Что сейчас происходит?»**
+**BOARD / HOME / PROFILE ARE DESTINATION SURFACES, NOT CHANNELS.**
 
-Он уместен как entry object только когда именно этот intent обещан человеку.
+---
 
-Board не является универсальным destination для social / search / share / Telegram.
+# 3. Главный routing principle
+
+`03` уже фиксирует:
+
+**SOURCE × INTENT × ENTRY OBJECT**
+
+`12` добавляет operational question:
+
+**WHICH DISTRIBUTION PATH BEST PRESERVES THAT FIT?**
+
+Рабочая routing-формула:
+
+**TRIGGER × SOURCE / CHANNEL × INTENT × ENTRY OBJECT**
+
+Ни один элемент не определяет остальные автоматически.
+
+Telegram не является одной аудиторией.
+
+Search не является одним intent.
+
+Social не означает автоматически Home.
+
+Dementor profile не обязан быть первым destination при author intent.
 
 ---
 
 # 4. DistributionDecision
 
-Для реализации v1 достаточно семантического решения перед transport layer.
+Для editorial / controlled distribution v1 достаточно semantic decision перед transport layer.
 
 Рабочая модель:
 
 ```text
 DistributionDecision
-  programming_moment
+  trigger_type
+  programming_moment?      # required for editorial outbound
+  source
   channel
   target_intent
-  message_ref
+  message_ref / promise
   entry_object
   promised_experience
   next_step
+  delivery_eligibility?
   attribution_key?
 ```
 
@@ -165,96 +281,116 @@ DistributionDecision
 - in-memory adapter;
 - config;
 - analytics payload;
-- параметр automation;
+- automation parameter;
 - вычисляемый view model.
 
-Главная функция — заставить каждый distribution action ответить на один и тот же набор смысловых вопросов до отправки.
+Для Search / personal Share / direct return полноценный `DistributionDecision` может вообще не сохраняться как объект.
+
+Важно сохранить смысловые dimensions, а не навязать всем путям одну implementation structure.
 
 ---
 
-# 5. CHANNEL × INTENT × ENTRY OBJECT
+# 5. Destination contract
 
-Единый routing decision:
+Главное правило:
 
-> **CHANNEL × INTENT × ENTRY OBJECT**
+> **DESTINATION MUST MATCH THE PROMISE.**
 
-Ни один из трёх элементов не определяет остальные автоматически.
+Если invitation обещает:
 
-## Channel ≠ audience
+- игру — человек попадает к игре;
+- Event — к Event;
+- конкретный Release — к этому Release / experience;
+- «что случилось дальше» — к relevant History context;
+- автора — к authored Thing или body of work;
+- участие — к реальной Participation Opportunity;
+- текущую программу — к Home;
+- «что сейчас происходит» — к Board.
 
-Telegram не является «аудиторией Telegram».
+Плохая цепочка:
 
-Search не является «SEO-аудиторией».
+**POST → HOME → SECTION → LIST → DETAIL → EXPERIENCE**
 
-Social не означает один общий intent.
+если пост уже обещал конкретную игру.
 
-Один канал может обслуживать разные intent.
+Предпочтительно:
 
-Один intent может приходить из разных каналов.
-
-## Intent ≠ destination by default
-
-Даже одинаковый intent может требовать разных entry objects в зависимости от promise.
-
-Например curiosity может вести:
-
-- к конкретной игре;
-- к Event;
-- к History;
-- к authored Thing.
-
-## Entry Object ≠ navigation section
-
-Entry Object — **самый точный объект, который выполняет promise**.
-
-Это не обязательно route первого уровня.
-
----
-
-# 6. Channel matrix v1
-
-| Канал | Основной intent | Куда вести |
-|---|---|---|
-| **Share / личная ссылка** | «посмотри, это про нас/тебя» | конкретная Thing |
-| **Social** | поржать / узнать себя / curiosity | Thing или самостоятельный social experience |
-| **Telegram** | следующая Thing / meaningful continuation | Thing / Release / History / Event |
-| **Search** | конкретная ситуация / Thing / автор | самый точный соответствующий объект |
-| **Dementor** | интерес к автору / подходу | authored Thing → body of work |
-| **Event / QR** | продолжить физический experience | Event / Thing / History |
-| **External community / partner** | контекстный интерес | конкретная Thing / Event / Project |
-| **Direct** | «что у них сейчас?» | Home как обложка программы |
-| **Board** | «что сейчас происходит?» | Board — только при таком intent |
-
-Матрица задаёт default fit, а не жёсткую taxonomy.
-
-Editorial decision может выбрать другой destination, если он точнее выполняет promise.
-
----
-
-# 7. Programming Moment как причина distribution
-
-Distribution не начинается с события в CMS.
-
-Он начинается с **Programming Moment**.
-
-Programming Moment отвечает:
-
-> **Почему эта Thing / Release / History / Participation / Event достойна внимания именно сейчас?**
+**POST → GAME → NEXT THING / PROGRAM**
 
 Канонически:
 
-> **NOT EVERY RELEASE NEEDS EVERY CHANNEL.**
+> **DISTRIBUTE THE THING, NOT THE ORG CHART.**
 
-И шире:
+---
 
-- не каждый Release вообще требует external distribution;
-- не каждый Programming Moment подходит каждому каналу;
-- новый History event может быть сильнее нового Release;
-- открытая Participation Opportunity может быть причиной отдельной отправки;
-- Event может требовать повторной distribution из-за реального изменения условий или близости даты;
-- редакционное resurfacing старой Thing может быть полноценным Programming Moment без новой публикации.
+# 6. Home и Board
 
-Поэтому:
+## Home
+
+Home — обложка текущей программы.
+
+Естественный intent:
+
+> **«Что у них сейчас?»**
+
+Поэтому Home подходит для:
+
+- direct / brand traffic;
+- общего curiosity без более точного объекта;
+- self-initiated return к программе.
+
+Но:
+
+> **HOME IS NOT THE DEFAULT LANDING PAGE.**
+
+Если invitation уже обещал конкретную Thing, Home не должен быть промежуточным тамбуром.
+
+## Board
+
+Board отвечает:
+
+> **«Что сейчас происходит?»**
+
+Он может быть Entry Object только при таком intent.
+
+Канонически:
+
+> **BOARD IS NOT THE DEFAULT ACQUISITION SURFACE.**
+
+И:
+
+**BOARD DENSITY IS NOT A REPLACEMENT FOR ENTRY PRECISION.**
+
+---
+
+# 7. Distribution path matrix v1
+
+| Source / path | Typical intent | Preferred Entry Object |
+|---|---|---|
+| **Personal Share** | «посмотри это» / узнавание | exact Thing / Release |
+| **Social** | curiosity / узнавание / самостоятельный social experience | Thing или experience прямо в social |
+| **Telegram editorial outbound** | следующая Thing / meaningful continuation | Thing / Release / History / Event |
+| **Search** | конкретная Situation / Thing / автор / вопрос | самый точный relevant object |
+| **Individual Dementor** | автор / подход / конкретная работа | authored Thing → body of work |
+| **Event / QR / physical** | продолжить уже начатый experience | Event / Thing / action / History |
+| **Partner / external community** | контекстный интерес | Thing / Event / Project |
+| **Direct / bookmark** | «что сейчас?» или вернуться к знакомому | Home или exact known object |
+
+Это default fit, не жёсткая taxonomy.
+
+Home и Board здесь не каналы — это возможные destination surfaces.
+
+---
+
+# 8. Programming Moment и editorial outbound
+
+Programming Moment отвечает:
+
+> **Почему эта Thing достойна редакционного внимания именно сейчас?**
+
+Для controlled editorial outbound это обязательный gate.
+
+Канонически:
 
 **PUBLISHED ≠ DISTRIBUTE**
 
@@ -262,286 +398,268 @@ Programming Moment отвечает:
 
 **NEW ≠ IMPORTANT NOW**
 
+**NOT EVERY RELEASE NEEDS EVERY CHANNEL.**
+
+Сильными reasons могут быть:
+
+- New Release;
+- meaningful Continuation;
+- History event;
+- real Event window;
+- Open Participation;
+- editorial resurfacing с новой причиной внимания.
+
+Но это правило **не распространяется** на Search indexing, person-mediated Share или direct return.
+
 ---
 
-# 8. Channel fit
+# 9. Channel fit
 
-Channel fit определяется не только доступностью transport.
-
-Нужно проверить:
+Для editorial outbound проверить:
 
 1. **Есть ли Programming Moment?**
-2. **Есть ли на этом канале человек с релевантным intent?**
-3. **Можно ли передать promise без искажения?**
-4. **Есть ли точный Entry Object?**
-5. **Работает ли experience после перехода?**
-6. **Есть ли естественный next step?**
+2. **Какой target intent мы предполагаем?**
+3. **Почему именно этот channel подходит этому intent?**
+4. **Можно ли передать promise без искажения?**
+5. **Есть ли precise Entry Object?**
+6. **Работает ли experience после перехода?**
+7. **Есть ли natural next step?**
+8. **Разрешена / уместна ли доставка в этом channel context?**
 
-Если один канал требует слишком сильно обрезать смысл или ведёт к слабому destination — канал можно не использовать.
+Для persistent discovery / Share первый вопрос заменяется на:
+
+> **Какой trigger привёл человека сюда и сохраняет ли route его intent?**
 
 Distribution coverage не является целью само по себе.
 
 ---
 
-# 9. Share / личная ссылка
+# 10. Delivery eligibility / permission
 
-Share — не маленькая брендовая рекламная кампания.
+Наличие хорошего Programming Moment не означает право доставлять его человеку любым способом.
+
+Канонически:
+
+> **RELEVANCE DOES NOT OVERRIDE DELIVERY PERMISSION.**
+
+Для owned / individualized channels система должна учитывать там, где это применимо:
+
+- explicit subscription / follow / consent;
+- channel-level permissions;
+- audience eligibility;
+- suppression / unsubscribe state;
+- frequency / duplicate pressure;
+- literal Event / geographic eligibility, если invitation зависит от места.
+
+Эти правила не создают editorial importance.
+
+Они только отвечают:
+
+> **можно ли и уместно ли доставить уже принятое distribution decision именно сюда.**
+
+Не использовать consent как новый engagement trap.
+
+`08` остаётся authority: **RETURN FOLLOWS VALUE, NOT DEBT.**
+
+---
+
+# 11. Share
+
+Share — person-mediated distribution, а не маленькая brand campaign.
 
 Канонически:
 
 > **SHARE SHOULD PRESERVE THE THING’S CONTEXT AND PREVIEW, NOT TURN INTO A BRAND INVITE.**
 
-Получатель уже имеет сильный social proof:
-
-> **«Мне это прислал конкретный человек».**
-
-Поэтому shared destination должен сохранять:
+Shared destination должен сохранять:
 
 - identity конкретной Thing;
-- понятный title / premise;
-- релевантный preview;
+- title / premise;
+- relevant preview;
+- canonical URL;
 - прямой путь к experience;
-- при необходимости минимальный source / Dementor context.
+- минимальный author / source context, если он действительно нужен.
 
-Нельзя подменять shared Thing generic Home invitation.
+Получатель уже имеет отдельный proof:
 
-После experience можно показать:
+> **«Мне это прислал человек».**
 
-- related Thing;
-- next release;
-- Dementor body of work;
-- relevant History;
-- Program continuation.
+Для Share не нужен новый Programming Moment.
 
 ---
 
-# 10. Social
+# 12. Social
 
-Social может выполнять две разные роли.
+Social имеет два валидных режима.
 
-## A. Самостоятельный experience
+## A. Standalone experience
 
-Мем / короткое видео / observation / fragment может быть завершённым опытом прямо в social surface.
+Мем / видео / fragment / observation может закончиться прямо в social.
 
 Click не обязателен.
 
-## B. Invitation к product experience
+Это полноценный success, если experience был самостоятельным.
 
-Если post обещает продолжение, destination должен соответствовать обещанию.
+## B. Invitation
 
-Например:
+Если social message обещает product continuation:
 
 - «сыграть» → game;
-- «посмотреть полный эксперимент» → Thing;
 - «прийти» → Event;
-- «что из этого получилось» → History / relevant Thing view.
+- «посмотреть полную вещь» → Thing;
+- «что случилось дальше» → History context.
 
-Social не должен автоматически вести на Home только ради traffic capture.
+Social не должен автоматически вести на Home ради traffic capture.
 
 ---
 
-# 11. Telegram
+# 13. Telegram
 
-Telegram — канал **meaningful continuation**, а не зеркало публикационной базы.
+Telegram — существующий outbound transport и канал meaningful continuation.
 
-Канонически:
+Для editorial Telegram canonical chain:
 
-> **Причиной сообщения должен быть Programming Moment, а не факт «мы что-то опубликовали».**
-
-Telegram подходит, когда есть:
-
-- новая Thing, которую реально стоит открыть;
-- сильный Release;
-- meaningful History;
-- Event moment;
-- конкретное продолжение предыдущей программы;
-- важная Participation Opportunity;
-- editorial resurfacing с новой причиной внимания.
-
-Telegram transport может быть автоматизирован.
-
-Но автоматизация не должна заменять semantic decision.
-
-Правильная архитектура:
-
-**PROGRAMMING DECISION → DISTRIBUTION DECISION → TELEGRAM DELIVERY**
+**PROGRAMMING MOMENT → DISTRIBUTION DECISION → DELIVERY ELIGIBILITY → TELEGRAM OUTBOX / DELIVERY**
 
 Не:
 
-**ARTIFACT PUBLISHED → TELEGRAM**
+**ARTIFACT SUBMIT / PUBLISH → TELEGRAM**
+
+Telegram может быть автоматизирован после semantic decision.
+
+Automation не должна сама создавать причину отправки.
 
 ---
 
-# 12. Search / SEO
+# 14. Search / SEO
 
-Search — discovery surface с высоким риском перепутать discoverability и editorial strategy.
+Search — persistent discovery, а не только outbound distribution.
 
 Канонически:
 
 > **SITEMAP MAKES THINGS DISCOVERABLE. IT DOES NOT DECIDE WHAT SHOULD RANK.**
 
-Sitemap / robots / metadata отвечают за доступность и машинное понимание surfaces.
+Sitemap / robots / canonical / metadata отвечают за discoverability infrastructure.
 
-Они не определяют:
+`12` отвечает за semantic fit:
 
-- приоритет программы;
-- поисковый intent;
-- какую Thing нужно продвигать;
-- какую страницу считать лучшим answer;
-- какой message соответствует ситуации человека.
-
-Для Search destination должен быть максимально точным:
-
-**QUERY / SITUATION / INTENT → RELEVANT OBJECT**
+**QUERY / SITUATION / INTENT → RELEVANT ENTRY OBJECT**
 
 Не:
 
 **QUERY → HOME BY DEFAULT**
 
-Search copy должен сохранять clarity из `11`:
+Search destination не требует активного Programming Moment.
 
-**SITUATION → CONCRETE RESOURCE → WHAT IT DOES → optional Dementor context**
+Старая Thing может быть правильным answer сегодня, даже если она не находится в текущей editorial program.
 
----
+Search copy наследует `11`:
 
-# 13. Dementor distribution path
-
-Когда intent связан с человеком / автором / подходом, default путь:
-
-**AUTHORED THING → DEMENTOR BODY OF WORK**
-
-Не обязательно:
-
-**PROFILE → BIO → LIST → THING**
-
-Лучшее первое proof Dementor — его работа.
-
-Dementor profile / body of work становится продолжением после конкретной Thing или точкой entry при прямом author intent.
+**CONCRETE NEED / SITUATION → CONCRETE OBJECT → WHAT IT DOES**
 
 ---
 
-# 14. Event / QR
+# 15. Dementor-authored distribution
 
-Физический experience создаёт особый distribution context: человек уже находится внутри события или рядом с ним.
+Dementor может быть Source, но не universal catalog entry.
 
-QR / короткая ссылка должны продолжать конкретное состояние человека.
+При интересе к конкретному автору / подходу возможны два валидных entry:
+
+- direct author intent → Dementor body of work;
+- interest generated by a work → authored Thing → body of work.
+
+Предпочтительный proof:
+
+> **работа раньше биографии, когда человек ещё не знает автора.**
+
+Это сохраняет `Objects > Profiles` и `Situations > Skills`.
+
+---
+
+# 16. Event / QR / physical continuation
+
+Физический context уже содержит часть intent.
+
+Поэтому QR / short link должны продолжать именно этот context.
 
 Возможные destinations:
 
-- сам Event;
-- Thing, которую использовали на Event;
+- Event details;
+- конкретная Thing на Event;
 - инструкция / action;
+- Participation Opportunity;
 - History после Event;
-- related Thing;
-- конкретная Participation Opportunity.
-
-Не нужно после физического experience отправлять человека на Home, если существует точное продолжение.
+- related next Thing.
 
 Канонически:
 
-**PHYSICAL CONTEXT SHOULD SURVIVE THE CLICK.**
+> **PHYSICAL CONTEXT SHOULD SURVIVE THE CLICK.**
+
+QR — transport, не новая Product entity.
 
 ---
 
-# 15. External community / partner
+# 17. Partner / earned distribution
 
-В partner / community distribution главный asset — контекст источника.
+Partner / external community / earned mention имеет сильный source context.
 
-Сообщение должно объяснять, почему конкретная Thing / Event / Project релевантны именно этой среде.
+Нужно сохранять:
 
-Default destination:
+> **почему конкретная Thing / Event / Project релевантна именно этой среде.**
 
-- Thing;
-- Event;
-- Project, если обещан именно долгий совместный контекст.
+Default destination — конкретный object, а не generic Home.
 
-Нельзя использовать чужую аудиторию как generic top-of-funnel для Home без соответствующего intent.
+Если partner является payer / sponsor, economic / disclosure boundary принадлежит `13`, но destination и promise fit остаются под `12`.
 
 ---
 
-# 16. Direct
+# 18. Message adaptation
 
-Direct traffic отличается тем, что человек уже знает Dementor достаточно, чтобы прийти без внешнего promise.
+`11` остаётся authority для meaning / promise / proof.
 
-Основной intent:
-
-> **«Что у них сейчас?»**
-
-Здесь Home как обложка актуальной программы является естественным destination.
-
-Direct return — один из важных признаков, что distribution + experience создают узнаваемую программу, а не только одноразовые clicks.
-
----
-
-# 17. Board
-
-Board — внутренняя editorial surface living Things.
-
-Его естественный acquisition intent:
-
-> **«Что сейчас происходит?»**
-
-Поэтому Board может быть destination:
-
-- из direct navigation;
-- из message, обещающего current activity;
-- из operational/member context.
-
-Но generic external campaigns не должны использовать Board как универсальный landing page только потому, что там собрано много объектов.
-
-**BOARD DENSITY IS NOT A REPLACEMENT FOR ENTRY PRECISION.**
-
----
-
-# 18. Message adaptation by channel
-
-`11 · Marketing Positioning & Messaging` остаётся authority для meaning / promise / proof.
-
-Distribution не изобретает новое positioning для каждого канала.
-
-Он адаптирует:
+`12` может адаптировать под channel:
 
 - длину;
-- формат;
+- format;
 - media crop;
 - preview;
 - CTA surface;
 - timing;
-- context available in channel.
+- доступный context.
 
 Нельзя адаптировать:
 
 - факты;
 - availability;
+- authorship;
 - смысл Thing;
 - обещанный result;
-- authorship;
-- actual destination.
+- destination truth.
 
 Канонически:
 
-**ADAPT DELIVERY, NOT TRUTH.**
+> **ADAPT DELIVERY, NOT TRUTH.**
 
 ---
 
 # 19. Preview contract
 
-Preview является частью Distribution, потому что он формирует promise до click.
+Preview является частью promise до click.
 
 Для destination-specific distribution желательно сохранять:
 
-- Thing / Event / Project identity;
+- object identity;
 - relevant image / media;
 - premise;
-- literal availability where useful;
 - canonical URL;
-- source attribution.
+- literal availability, если materially relevant;
+- source / author attribution, если materially relevant.
 
-Generic brand OG image допустим как fallback.
+Generic brand preview допустим как fallback.
 
-Но он не должен заменять Thing-specific preview, когда конкретная Thing является объектом invitation.
+Но:
 
-Preview и landing должны выглядеть как одна и та же встреча.
+> **PREVIEW AND DESTINATION MUST DESCRIBE THE SAME EXPERIENCE.**
 
 ---
 
@@ -551,32 +669,35 @@ Distribution attribution имеет два уровня.
 
 ## Transport attribution
 
-Что уже обычно измеряют web / channel systems:
+Например:
 
-- source;
 - referrer;
-- UTM source;
-- UTM campaign;
+- source;
+- UTM;
 - source page;
-- outbound / inbound click.
+- delivery id;
+- click.
 
 ## Semantic attribution
 
-Что нужно понимать для Product Distribution:
+Там, где она реально нужна:
 
-- `programming_moment`;
+- `distribution_trigger`;
+- `programming_moment?`;
+- `source`;
 - `channel`;
 - `target_intent`;
 - `entry_object`;
-- optional `message_variant`;
-- whether promised experience was actually consumed;
-- what happened next.
+- `message_variant?`;
+- `promised_experience`.
 
-Semantic attribution не обязана становиться новой таблицей.
+`programming_moment` является optional, потому что Search / Share / direct discovery не обязаны иметь его.
 
-Она может быть частью analytics event payload / routing config.
+UTM не заменяет intent.
 
-Главное — не терять смысл после click.
+Referrer не заменяет promise.
+
+Semantic attribution не требует отдельной Distribution database по умолчанию.
 
 ---
 
@@ -586,292 +707,332 @@ Semantic attribution не обязана становиться новой та�
 
 > **A CLICK IS NOT SUCCESS IF THE THING DISAPPOINTS.**
 
-Impression и click — transport metrics.
+Impression и click — transport signals.
 
-Они полезны, но не доказывают quality of distribution.
+Distribution quality проверяется ближе к experience:
 
-Основная цепочка успеха:
+**QUALIFIED ENTRY → PROMISED EXPERIENCE → NATURAL CONTINUATION / SATISFIED EXIT → OPTIONAL RETURN**
 
-**QUALIFIED ENTRY CONSUMPTION → THING → THING → SHARE / MEANINGFUL CONTINUATION → RETURN**
+Если continuation уместен:
 
-Возможные ранние сигналы:
+**THING → THING**
 
-- promised experience реально начат / consumed;
-- человек открыл следующую Thing;
-- прошёл к relevant History / Event / body of work;
-- поделился;
-- выполнил promised Participation action;
-- вернулся напрямую позже.
+может быть сильным ранним сигналом Program discovery.
 
-Пример:
+Но не каждая хорошая Thing обязана породить второй click.
 
-**10 000 clicks на Home с нулевым пониманием / experience слабее, чем 500 людей, которые открыли конкретную игру и после неё сами открыли ещё одну Thing.**
+Это сохраняет Value Architecture:
 
-Оптимизация channel CTR не имеет права ухудшать promise-to-experience fit.
+> самостоятельный experience может закончиться сам на себе и всё равно быть успешным.
 
 ---
 
-# 22. Qualified entry
+# 22. Qualified Entry
 
-Qualified entry — не отдельный membership state.
+Qualified Entry — аналитическое понятие, не Product state.
 
-Это аналитическое понятие:
+Оно означает:
 
-> **человек пришёл в тот объект, который соответствовал его intent и promise, и реально встретил обещанный experience.**
+> **человек попал в объект, соответствующий его intent / promise, и реально встретил обещанный experience.**
 
 Примеры:
 
-- game invitation → game loaded / started;
-- Event invitation → meaningful Event detail consumed / registration action reached;
-- text invitation → text actually opened/read beyond immediate bounce;
-- author invitation → authored work/body of work reached;
+- game invitation → game started;
+- Event invitation → Event context реально просмотрен / relevant action reached;
+- text invitation → человек действительно начал читать, а не только загрузил route;
 - History invitation → relevant continuation viewed.
 
-Точные event definitions относятся к Metrics / Analytics implementation, не к Product ontology.
+Точные event names / thresholds принадлежат `14 · Metrics & Signals`.
+
+`12` определяет только semantic meaning.
 
 ---
 
-# 23. Editorial control
+# 23. Persistent discovery vs outbound
 
-Distribution является editorial decision до того, как становится automation.
+Канонические distribution layers:
 
-Редакция / programming layer определяет:
+- **persistent discoverability** — Search / sitemap / public routes / persistent links;
+- **editorial outbound** — Telegram / social / partner posts, инициированные клубом;
+- **person-mediated** — Share;
+- **contextual handoff** — Event / physical / external context;
+- **self-initiated re-entry** — direct / bookmark / known route.
 
-- какой Programming Moment достоин distribution;
-- кому он релевантен;
-- какой channel fit достаточен;
-- какой promise использовать;
-- какой Entry Object является точным;
-- какой next step естественен.
+Все они используют точность:
 
-Система может затем автоматизировать:
+**INTENT → PRECISE ENTRY OBJECT**
 
-- formatting;
-- scheduling;
-- preview generation;
-- delivery;
-- UTM / attribution;
-- repeatable channel mechanics.
-
-Но automation не должна сама создавать editorial importance из факта технической публикации.
+Но только controlled editorial outbound требует Programming Moment как обязательный gate.
 
 ---
 
-# 24. Persistent discovery vs outbound distribution
+# 24. Distribution does not own Programming
 
-Не вся Distribution является «отправкой».
+`07` решает:
 
-Search / sitemap / persistent links создают **discoverability layer**.
+> **почему Thing важна программе сейчас.**
 
-Telegram / social / partner posts создают **outbound invitation layer**.
+`12` решает:
 
-Share создаёт **person-mediated invitation layer**.
+> **если / когда возникает distribution opportunity, каким путём человек должен встретить эту Thing.**
 
-Direct создаёт **self-initiated return layer**.
+Нельзя строить программу из channel cadence:
 
-Все они используют один routing principle:
+- «пора поста»;
+- «надо пять публикаций»;
+- «канал молчит».
 
-**INTENT → PROMISE → PRECISE ENTRY OBJECT**
+Для outbound:
 
-Но timing model у них разный.
+> **PROGRAM FIRST. CHANNEL SECOND.**
+
+Для Search / Share / Direct:
+
+> **DISCOVERY MAY OUTLIVE THE PROGRAMMING MOMENT.**
 
 ---
 
-# 25. Distribution does not own Programming
+# 25. Distribution does not own Return
 
-Distribution не определяет, что важно сейчас.
+`12` может доставить следующую встречу и сохранить continuation.
 
-Он получает Programming Moment из `07`.
+Но `08` остаётся authority для:
 
-Поэтому нельзя строить программу из channel cadence:
+**TRIGGER → EXPECTATION → RETURN → PAYOFF.**
 
-- «пора ежедневного Telegram»;
-- «нужно 5 постов в неделю»;
-- «надо что-то отправить, потому что канал молчит».
+Notification / delivery не должна сама становиться причиной retention.
 
-Channel calendar может помогать operations.
+---
 
-Но он не является источником editorial reason.
+# 26. Boundary with Monetization
+
+`12` определяет:
+
+- source / channel fit;
+- destination;
+- promise-to-entry consistency;
+- distribution attribution semantics.
+
+`13` определяет:
+
+- что является paid value;
+- payer / offer / payment / delivery;
+- CAC / commercial attribution, когда paid acquisition реально существует;
+- channel economics / commercial CTA boundary после завершения `12`.
 
 Канонически:
 
-**PROGRAM FIRST. CHANNEL SECOND.**
+> **DISTRIBUTION MAY DELIVER AN OFFER. IT DOES NOT INVENT THE PAID VALUE.**
+
+Paid amplification не отменяет ни одного guardrail `12`.
 
 ---
 
-# 26. Distribution does not own Return
+# 27. Boundary with Metrics & Signals
 
-Distribution может показать natural next step.
+`12` определяет, **что distribution success означает семантически**:
 
-Но он не определяет весь Return system.
+- precise entry;
+- promise fulfilled;
+- qualified experience;
+- continuation when relevant.
 
-Граница:
+`14` должен определить:
 
-- `12` — как первая / следующая встреча доставлена и куда она ведёт;
-- `08` — почему у человека возникает ожидание / привычка / причина вернуться.
+- event names;
+- instrumentation;
+- thresholds;
+- dashboards;
+- attribution windows;
+- internal / test traffic exclusion;
+- metric ownership.
 
-Distribution success может включать Return as downstream signal, но не переопределяет Return Loop.
+Канонически:
 
----
-
-# 27. Distribution does not own Product ontology
-
-Channel-specific needs не создают новые Product states.
-
-Нельзя вводить:
-
-- `TELEGRAMMED` как состояние Thing;
-- `SEO READY` как Release State;
-- `SOCIAL` как Form только потому, что Thing была опубликована в social;
-- `SHARED` как History автоматически;
-- `FEATURED` как Product lifecycle state.
-
-Distribution facts могут существовать как analytics / delivery history.
-
-Они не должны мутировать Product Model.
+> **DISTRIBUTION DEFINES THE QUESTION. METRICS DEFINES THE MEASUREMENT CONTRACT.**
 
 ---
 
-# 28. Phase 0 implementation contract
+# 28. Distribution does not own Product ontology
 
-Первый implementation slice не требует schema migration.
+Нельзя вводить Product states:
 
-Нужно уметь для ограниченного набора реальных Programming Moments собрать:
+- `TELEGRAMMED`;
+- `SEO READY`;
+- `SHARED`;
+- `FEATURED`;
+- `SOCIAL` как Form только из-за канала.
+
+Distribution facts могут существовать как delivery / analytics history.
+
+Они не мутируют Thing lifecycle.
+
+---
+
+# 29. Phase 0 implementation contract
+
+Phase 0 не требует schema migration.
+
+Нужно проверить несколько **разных trigger classes**, а не только Programming Moments.
+
+Минимальный test set:
+
+1. editorial Telegram / social outbound с реальным Programming Moment;
+2. Search → precise existing Thing;
+3. personal Share → exact Thing preview;
+4. Event / physical handoff → exact continuation;
+5. direct return → Home или known object.
+
+Для controlled outbound выразить:
 
 ```text
-programming_moment
+trigger_type
+programming_moment?
+source
 channel
 intent
 message
 entry_object
 promised_experience
 next_step
+eligibility
 attribution
 ```
 
-и проверить:
+Проверить:
 
 - destination correctness;
 - preview correctness;
 - channel fit;
+- permission / eligibility where applicable;
 - attribution survival;
+- experience start;
 - post-entry continuation.
 
-Цель Phase 0 — доказать routing semantics на реальных Things до создания новых storage abstractions.
+Цель — доказать routing semantics до новых storage abstractions.
 
 ---
 
-# 29. Suggested implementation order
+# 30. Suggested implementation order
 
 ## Phase 0 — Semantic routing policy
 
 Без новой schema.
 
-На нескольких Things / Events / History moments проверить `CHANNEL × INTENT × ENTRY OBJECT`.
+Проверить trigger classes и precise destinations на ограниченном наборе реальных objects.
 
 ## Phase 1 — Destination-aware Share / Preview
 
-Сохранить существующий share / OG transport, но обеспечить Thing-specific context, canonical URL и preview consistency.
+Закрыть Thing-specific context, canonical URL и preview consistency.
 
-## Phase 2 — Programming Moment–driven outbound routing
+## Phase 2 — Programming Moment–driven outbound gate
 
-Telegram / social / partner distribution должны получать semantic decision, а не реагировать только на raw publication.
+Telegram / editorial social / partner outbound получают semantic decision, а не raw publication event.
 
-## Phase 3 — Semantic attribution
+## Phase 3 — Eligibility + semantic attribution
 
-Дополнить transport analytics значениями intent / entry object / programming moment там, где это реально нужно.
+Добавить только необходимые dimensions / suppression logic, не создавая universal marketing platform.
 
-## Phase 4 — Qualified consumption / continuation signals
+## Phase 4 — Qualified consumption / continuation
 
-Измерять не только click, но promised experience consumption, Thing → Thing и meaningful continuation.
+Для ключевых Forms определить minimal success signals совместно с `14`.
 
 ## Phase 5 — Automation where justified
 
-Автоматизировать repeatable delivery только после того, как routing policy доказана вручную / на ограниченном scope.
+Автоматизировать repeatable delivery только после доказанной routing policy.
 
 ---
 
-# 30. Non-goals v1
+# 31. Non-goals v1
 
 `12` не требует:
 
-- нового universal distribution database;
+- universal distribution database;
 - полного marketing automation platform;
 - обязательного paid media layer;
 - публикации каждой Thing во все каналы;
-- нового social network внутри Dementor;
+- нового social network;
 - funnel-first growth architecture;
-- переноса Programming в Telegram calendar;
-- переноса Messaging в channel templates;
-- превращения Home в универсальный acquisition landing;
-- превращения Board в универсальный acquisition landing;
-- переписывания Product ontology;
-- переписывания Return Loops;
-- новой taxonomy ради UTM;
-- schema migration на Phase 0.
+- channel calendar как Programming authority;
+- Home / Board redesign только ради acquisition;
+- новой Product taxonomy ради UTM;
+- schema migration на Phase 0;
+- идеального multi-touch attribution до появления доказанной необходимости.
 
 ---
 
-# 31. Anti-patterns
+# 32. Anti-patterns
 
 Критические anti-patterns:
 
 - every publish → every channel;
+- Programming Moment required for Search / personal Share;
 - Telegram as publication mirror;
-- social post → Home by default;
+- social → Home by default;
 - share → generic brand invite;
-- search query → Home despite a precise object;
-- author intent → generic Community index;
+- search query → Home despite precise object;
 - Event QR → Home;
-- Board as universal landing page;
+- Board treated as channel / universal landing;
+- Dementor profile treated as universal author entry;
 - sitemap treated as ranking strategy;
 - UTM treated as understanding intent;
-- CTR optimization that worsens destination fit;
-- channel calendar creating fake Programming Moments;
-- generic preview for a strong specific Thing;
-- measuring success only as impressions/clicks;
-- routing via internal org structure instead of promised experience.
+- paid promotion bypasses destination truth;
+- CTR optimization worsens promise-to-experience fit;
+- channel cadence creates fake Programming Moments;
+- repeated delivery ignores permission / suppression / fatigue;
+- generic preview replaces specific Thing;
+- success measured only by impressions / clicks;
+- routing follows org structure instead of promised experience.
 
 Главный anti-signal:
 
-> **Distribution знает, куда отправить пост, но не может объяснить, почему этот человек должен попасть именно в этот объект.**
+> **Distribution знает, куда отправить ссылку, но не может объяснить, почему этот человек должен попасть именно в этот объект.**
 
 ---
 
-# 32. Distribution QA
+# 33. Distribution QA
 
-Перед external distribution проверить:
+Для любого distribution path проверить:
 
-1. **Какой Programming Moment является причиной?**
-2. **Какой target intent?**
-3. **Почему выбран именно этот channel?**
-4. **Какой promise / message утверждён?**
-5. **Какой exact Entry Object выполняет promise?**
-6. **Можно ли перейти прямо к experience?**
-7. **Не вставили ли Home / Board только ради удобства?**
-8. **Совпадает ли preview с destination?**
-9. **Не искажены ли факты ради channel format?**
-10. **Какой один natural next step существует после experience?**
-11. **Что будет означать qualified consumption?**
-12. **Как поймём, что человек пошёл Thing → Thing / продолжил / вернулся?**
+1. **Какой trigger?**
+2. **Если это editorial outbound — какой Programming Moment?**
+3. **Какой предполагаемый intent?**
+4. **Какой source / channel / path?**
+5. **Какой promise / preview?**
+6. **Какой exact Entry Object выполняет promise?**
+7. **Можно ли перейти прямо к experience?**
+8. **Не вставили ли Home / Board только ради удобства?**
+9. **Разрешена / уместна ли доставка там, где permission применим?**
+10. **Совпадает ли preview с destination?**
+11. **Что считается qualified entry?**
+12. **Какой natural next step существует, если он вообще нужен?**
 
-Если на вопросы 1–6 нет ответа, distribution decision ещё не готов.
+Для Search / Share / Direct отсутствие Programming Moment **не является ошибкой**.
 
 ---
 
-# 33. Acceptance test
+# 34. Acceptance test
 
-Distribution Model работает, если для любого реального external action можно коротко ответить:
+Distribution Model работает, если для реального случая можно коротко ответить:
 
 ```text
-КТО / INTENT
-→ ПОЧЕМУ СЕЙЧАС / PROGRAMMING MOMENT
-→ ГДЕ / CHANNEL
-→ ЧТО ОБЕЩАЕМ / MESSAGE
-→ КУДА ВЕДЁМ / ENTRY OBJECT
-→ ЧТО ОН ТАМ ДЕЛАЕТ / EXPERIENCE
-→ ЧТО ЕСТЕСТВЕННО ДАЛЬШЕ / NEXT THING OR RETURN
-→ КАК ПОЙМЁМ, ЧТО ВСТРЕЧА СОСТОЯЛАСЬ / SUCCESS SIGNAL
+TRIGGER
+→ SOURCE / CHANNEL
+→ INTENT
+→ PROMISE
+→ ENTRY OBJECT
+→ EXPERIENCE
+→ CONTINUATION OR SATISFIED EXIT
+→ SUCCESS SIGNAL
+```
+
+Для editorial outbound дополнительно:
+
+```text
+PROGRAMMING MOMENT
+→ DISTRIBUTION DECISION
+→ ELIGIBILITY
+→ DELIVERY
 ```
 
 Фраза:
@@ -887,42 +1048,46 @@ Distribution Model работает, если для любого реально
 Главная рамка:
 
 > **AUDIENCE & ENTRY MAP DESCRIBES THE VISIT.**  
-> **DISTRIBUTION MODEL DESIGNS THE INVITATION.**
+> **DISTRIBUTION MODEL DESIGNS THE INVITATION / DISCOVERY PATH.**
 
-Главная цепочка:
+Общая цепочка:
 
-**PROGRAMMING MOMENT → CHANNEL FIT → TARGET INTENT → MESSAGE → ENTRY OBJECT → EXPERIENCE → NEXT THING / RETURN**
+**DISTRIBUTION TRIGGER → INTENT HYPOTHESIS → SOURCE / CHANNEL FIT → PROMISE / PREVIEW → ENTRY OBJECT → EXPERIENCE → CONTINUATION**
 
-Главный routing decision:
+Для editorial outbound:
 
-**CHANNEL × INTENT × ENTRY OBJECT**
+**PROGRAMMING MOMENT → DISTRIBUTION DECISION → CHANNEL / TRANSPORT → ENTRY OBJECT → EXPERIENCE**
 
 Главные guardrails:
 
-> **DISTRIBUTE THE THING, NOT THE ORG CHART.**
+**PROGRAMMING MOMENT GATES EDITORIAL OUTBOUND. IT DOES NOT GATE ALL DISCOVERY.**
 
-> **DESTINATION MUST MATCH THE PROMISE.**
+**DISTRIBUTE THE THING, NOT THE ORG CHART.**
 
-> **NOT EVERY RELEASE NEEDS EVERY CHANNEL.**
+**DESTINATION MUST MATCH THE PROMISE.**
 
-> **HOME IS NOT THE DEFAULT LANDING PAGE.**
+**HOME IS NOT THE DEFAULT LANDING PAGE.**
 
-> **BOARD IS NOT THE DEFAULT ACQUISITION SURFACE.**
+**BOARD IS NOT THE DEFAULT ACQUISITION SURFACE.**
 
-> **A CLICK IS NOT SUCCESS IF THE THING DISAPPOINTS.**
+**NOT EVERY RELEASE NEEDS EVERY CHANNEL.**
+
+**RELEVANCE DOES NOT OVERRIDE DELIVERY PERMISSION.**
+
+**A CLICK IS NOT SUCCESS IF THE THING DISAPPOINTS.**
 
 Для Search:
 
-> **SITEMAP MAKES THINGS DISCOVERABLE. IT DOES NOT DECIDE WHAT SHOULD RANK.**
+**SITEMAP MAKES THINGS DISCOVERABLE. IT DOES NOT DECIDE WHAT SHOULD RANK.**
 
 Для Share:
 
-> **SHARE SHOULD PRESERVE THE THING’S CONTEXT AND PREVIEW, NOT TURN INTO A BRAND INVITE.**
+**SHARE MAY EXTEND THE LIFE OF A THING WITHOUT CREATING A NEW PROGRAMMING MOMENT.**
 
-Для Telegram:
+Для Telegram editorial outbound:
 
-> **Причиной сообщения должен быть Programming Moment, а не факт «мы что-то опубликовали».**
+**PROGRAMMING MOMENT → DISTRIBUTION DECISION → TELEGRAM DELIVERY.**
 
-И итоговый success path:
+И главный смысл:
 
-**QUALIFIED ENTRY CONSUMPTION → THING → THING → SHARE / MEANINGFUL CONTINUATION → RETURN**
+> **Distribution не максимизирует охват. Она сохраняет соответствие между причиной встречи, ожиданием человека и тем experience, который он реально получает.**
