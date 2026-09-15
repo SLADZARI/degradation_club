@@ -1,6 +1,6 @@
 # DEMENTOR CLUB — MONETIZATION MAP v1
 
-Status: **DRAFT / WORKING CANON CANDIDATE — distribution economics pending 12**  
+Status: **WORKING CANON / monetization authority**  
 Updated: **2026-09-15**
 
 ## Authority scope
@@ -28,7 +28,9 @@ Updated: **2026-09-15**
 - `concept/CONTENT_PROGRAMMING_MODEL_V1.md` — почему Thing находится в программе сейчас;
 - `concept/RETURN_LOOPS_V1.md` — почему человек возвращается;
 - `concept/CONTRIBUTION_MODEL_V1.md` — editorial inbound и credit boundaries;
-- `concept/MARKETING_POSITIONING_MESSAGING_V1.md` — promise / proof / literal commercial messaging.
+- `concept/MARKETING_POSITIONING_MESSAGING_V1.md` — promise / proof / literal commercial messaging;
+- `concept/DISTRIBUTION_MODEL_V1.md` — routing / discovery authority;
+- `concept/MONETIZATION_DISTRIBUTION_ECONOMICS_V1.md` — companion authority для channel / acquisition economics.
 
 Он **не определяет**:
 
@@ -37,7 +39,8 @@ Updated: **2026-09-15**
 - checkout provider / payment processor;
 - налоги / юридические условия;
 - refund policy конкретного продукта;
-- channel attribution / CAC / paid acquisition rules до завершения `12 · Distribution Model`.
+- channel economics / CAC / attribution windows / paid acquisition mechanics — это `13B · Distribution Economics`;
+- exact event names, analytics instrumentation, dashboards, thresholds и reporting cadence — это `14 · Metrics & Signals` / implementation.
 
 Каноническая граница:
 
@@ -1057,40 +1060,47 @@ History может редакционно показать, что Thing / Proje
 
 ---
 
-# 33. Что `13` сознательно не делает до `12`
+# 33. 13A / 13B authority split
 
-Эта версия фиксирует **monetization architecture**, но намеренно не завершает distribution economics.
-
-До `12 · Distribution Model` не канонизируем:
-
-- channel → paid-object fit;
-- channel-specific commercial CTA;
-- paid acquisition model;
-- CAC;
-- attribution windows;
-- retargeting;
-- affiliate / referral economics;
-- partner acquisition channels;
-- channel-specific discounting;
-- campaign economics;
-- organic vs paid distribution mix;
-- external platform fees / economics, если они появляются.
-
-Это отдельный слой:
+После завершения `12 · Distribution Model` пункт `13` состоит из двух согласованных authority-слоёв.
 
 ## 13A — Monetization Architecture
 
-Отвечает:
+Этот документ отвечает:
 
 > **За какую конкретную ценность здесь вообще уместно платить?**
 
+Он определяет:
+
+- value object;
+- payer / user;
+- free / paid boundary;
+- offer semantics;
+- Membership test;
+- pricing / fulfillment discipline;
+- sponsor / editorial firewall.
+
 ## 13B — Distribution Economics
 
-После `12` ответит:
+`concept/MONETIZATION_DISTRIBUTION_ECONOMICS_V1.md` отвечает:
 
-> **Через какой канал человек встречает offer, как этот канал меняет упаковку и как мы измеряем экономику доставки paid value?**
+> **Когда paid value уже существует, как оценивать экономику её доставки через уже валидный distribution path?**
 
-Каноническая будущая связка:
+`13B` владеет:
+
+- channel × value-object fit;
+- acquisition mode;
+- commercial CTA fit by path;
+- Paid CAC / CPA semantics;
+- attribution windows;
+- paid acquisition economics;
+- retargeting guardrails;
+- referral / affiliate economics;
+- partner acquisition economics;
+- discounts / campaign economics;
+- external platform fees where they materially exist.
+
+Каноническая связка:
 
 ```text
 11
@@ -1099,34 +1109,64 @@ MESSAGE / PROMISE / PROOF
 →
 
 12
-CHANNEL / FORMAT / DELIVERY / RE-ENTRY
+DISTRIBUTION TRIGGER / ROUTING / ENTRY OBJECT
+
+→
+
+13A
+VALID VALUE / OFFER / PAYMENT SEMANTICS
 
 →
 
 13B
 COMMERCIAL ATTRIBUTION / CHANNEL ECONOMICS
+
+→
+
+14
+OBSERVABILITY / METRICS / SIGNALS
 ```
 
-При этом `13A` не должен быть переписан под особенности конкретного канала.
+При этом особенности канала **не имеют права переписывать 13A**.
+
+Канонически:
+
+**PAID DISTRIBUTION DOES NOT CREATE PRODUCT VALUE.**
 
 ---
 
-# 34. Что нужно будет проверить после `12`
+# 34. Boundary with 14 · Metrics & Signals
 
-После завершения Distribution Model вернуться к `13` и добавить минимум:
+`13` определяет **экономический смысл** того, что имеет значение.
 
-1. channel × value object matrix;
-2. где commercial CTA естественен, а где ломает entry experience;
-3. Search / utility → paid contextual value rules;
-4. Social → paid Thing / Event rules без постоянного sales pressure;
-5. Telegram / direct share → commercial re-entry boundaries;
-6. Event / physical distribution → checkout / ticket / preorder handoff;
-7. Dementor-authored distribution → attribution and commercial disclosure;
-8. partner / sponsor discovery flow;
-9. CAC / attribution definitions only where paid acquisition реально существует;
-10. retargeting guardrails в логике `RETURN FOLLOWS VALUE, NOT DEBT`.
+Например:
 
-После этого статус документа можно пересмотреть с `WORKING CANON CANDIDATE` на `WORKING CANON / monetization authority`.
+- что считать paid value;
+- что такое fulfillment;
+- где Paid CAC вообще имеет смысл;
+- почему CPA не равен CAC;
+- почему sponsor revenue не доказывает user willingness-to-pay;
+- почему repeat purchase нельзя подменять recurring billing.
+
+`14 · Metrics & Signals` определяет, **как эти понятия наблюдать и измерять**:
+
+- event names;
+- payload / counting semantics;
+- internal / test traffic exclusions;
+- attribution instrumentation;
+- windows для конкретных measurement questions;
+- dashboards;
+- baselines;
+- thresholds / alerts;
+- reporting cadence.
+
+Граница:
+
+**13 DEFINES ECONOMIC MEANING. 14 DEFINES OBSERVABILITY.**
+
+`14` не решает, что продавать, и не создаёт monetization hypothesis только потому, что её легко измерить.
+
+`13` не должен изобретать event schema или numeric targets вместо Metrics authority.
 
 ---
 
@@ -1247,6 +1287,8 @@ Dementor Club может зарабатывать деньги на реальн
 **DO NOT INVENT A SUBSCRIPTION BEFORE A RECURRING VALUE EXISTS.**
 
 **NAME THE VALUE, NOT THE STATUS.**
+
+**PAID DISTRIBUTION DOES NOT CREATE PRODUCT VALUE.**
 
 И главный тест:
 
