@@ -1,0 +1,75 @@
+name: Export Product Package 2026-09-15
+
+on:
+  push:
+    branches:
+      - export/product-package-2026-09-15
+
+permissions:
+  contents: read
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout package stack
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Build portable package
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT="DEMENTOR_PRODUCT_PACKAGE_2026-09-15"
+          mkdir -p "$ROOT/01-15_authorities" "$ROOT/brand_reference" "$ROOT/package" "$ROOT/implementation"
+
+          cp concept/DEMENTOR_CLUB_JTBD_PRODUCT_THESIS_V2.md "$ROOT/01-15_authorities/01_DEMENTOR_CLUB_JTBD_PRODUCT_THESIS_V2.md"
+          cp concept/CJM_CLUB_V1.md "$ROOT/01-15_authorities/02_CJM_CLUB_V1.md"
+          cp concept/CJM_BOARD_PARTICIPATION_V1.md "$ROOT/01-15_authorities/02B_CJM_BOARD_PARTICIPATION_V1.md"
+          cp concept/AUDIENCE_ENTRY_MAP_V1.md "$ROOT/01-15_authorities/03_AUDIENCE_ENTRY_MAP_V1.md"
+          cp concept/VALUE_ARCHITECTURE_V1.md "$ROOT/01-15_authorities/04_VALUE_ARCHITECTURE_V1.md"
+          cp concept/PRODUCT_MODEL_V1.md "$ROOT/01-15_authorities/05_PRODUCT_MODEL_V1.md"
+          cp concept/BOARD_PRODUCT_MODEL_V1.md "$ROOT/01-15_authorities/06_BOARD_PRODUCT_MODEL_V1.md"
+          cp concept/CONTENT_PROGRAMMING_MODEL_V1.md "$ROOT/01-15_authorities/07_CONTENT_PROGRAMMING_MODEL_V1.md"
+          cp concept/RETURN_LOOPS_V1.md "$ROOT/01-15_authorities/08_RETURN_LOOPS_V1.md"
+          cp concept/CONTRIBUTION_MODEL_V1.md "$ROOT/01-15_authorities/09_CONTRIBUTION_MODEL_V1.md"
+          cp concept/DEMENTOR_INTERVENTION_MODEL_V1.md "$ROOT/01-15_authorities/10_DEMENTOR_INTERVENTION_MODEL_V1.md"
+          cp concept/MARKETING_POSITIONING_MESSAGING_V1.md "$ROOT/01-15_authorities/11_MARKETING_POSITIONING_MESSAGING_V1.md"
+          cp concept/DISTRIBUTION_MODEL_V1.md "$ROOT/01-15_authorities/12_DISTRIBUTION_MODEL_V1.md"
+          cp concept/MONETIZATION_MAP_V1.md "$ROOT/01-15_authorities/13A_MONETIZATION_MAP_V1.md"
+          cp concept/MONETIZATION_DISTRIBUTION_ECONOMICS_V1.md "$ROOT/01-15_authorities/13B_MONETIZATION_DISTRIBUTION_ECONOMICS_V1.md"
+          cp concept/METRICS_SIGNALS_V1.md "$ROOT/01-15_authorities/14_METRICS_SIGNALS_V1.md"
+          cp concept/PRODUCT_PRINCIPLES_ANTIPATTERNS_V1.md "$ROOT/01-15_authorities/15_PRODUCT_PRINCIPLES_ANTIPATTERNS_V1.md"
+
+          cp concept/DEGRADATION_AS_A_SERVICE.md "$ROOT/brand_reference/DEGRADATION_AS_A_SERVICE.md"
+          cp concept/PRODUCT_MARKETING_PACKAGE_INDEX_V1.md "$ROOT/package/PRODUCT_MARKETING_PACKAGE_INDEX_V1_STALE_REFERENCE.md"
+          cp EXPORT_MANIFEST.md "$ROOT/README_MANIFEST.md"
+          cp operations/CURRENT_IMPLEMENTATION_STATE_2026-09-15.md "$ROOT/implementation/CURRENT_IMPLEMENTATION_STATE_2026-09-15.md"
+
+          git fetch origin dementor/product-production-audit-v1 dementor/product-runtime-harmonization-plan-v1
+          git show origin/dementor/product-production-audit-v1:operations/PRODUCT_TO_PRODUCTION_AUDIT_2026-09-15.md > "$ROOT/implementation/PRODUCT_TO_PRODUCTION_AUDIT_2026-09-15.md"
+          git show origin/dementor/product-runtime-harmonization-plan-v1:operations/PRODUCT_RUNTIME_HARMONIZATION_AUDIT_AND_IMPLEMENTATION_PLAN_2026-09-15.md > "$ROOT/implementation/PRODUCT_RUNTIME_HARMONIZATION_AUDIT_AND_IMPLEMENTATION_PLAN_2026-09-15.md"
+
+          cat > "$ROOT/implementation/READ_ME_FIRST.md" <<'EOF'
+          # READ ME FIRST
+
+          Recommended reading order for implementation:
+
+          1. `CURRENT_IMPLEMENTATION_STATE_2026-09-15.md` — consolidated verdict, risks and corrected execution order.
+          2. `PRODUCT_TO_PRODUCTION_AUDIT_2026-09-15.md` — current-state / truth audit (#196).
+          3. `PRODUCT_RUNTIME_HARMONIZATION_AUDIT_AND_IMPLEMENTATION_PLAN_2026-09-15.md` — implementation-plan candidate (#197); use together with the corrections in the current-state document.
+          4. `../README_MANIFEST.md` — authority source map.
+          5. `../01-15_authorities/` — primary semantic authorities.
+          EOF
+
+          printf 'Files: '; find "$ROOT" -type f | wc -l
+          find "$ROOT" -type f -print | sort
+
+      - name: Upload package archive
+        uses: actions/upload-artifact@v4
+        with:
+          name: DEMENTOR_PRODUCT_PACKAGE_2026-09-15
+          path: DEMENTOR_PRODUCT_PACKAGE_2026-09-15
+          if-no-files-found: error
+          retention-days: 7
