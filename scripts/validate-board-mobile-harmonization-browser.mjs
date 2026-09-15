@@ -66,6 +66,7 @@ for(const width of [390,360]){
   const primaryLinks=state.navLinks.filter(item=>['COMMUNITY BOARD','МОЙ КЛУБ','МОИ АРТЕФАКТЫ','МОЯ АКТИВНОСТЬ'].includes(item.text));
   expect(primaryLinks.length===4,`${label}: primary member nav set incomplete ${JSON.stringify(primaryLinks.map(x=>x.text))}`);
   expect(primaryLinks.every(inside),`${label}: primary nav item clipped ${JSON.stringify(primaryLinks)}`);
+  if(state.nav&&state.filters)expect(state.filters.y>=state.nav.bottom+8,`${label}: workspace nav collides with Board utilities ${JSON.stringify({nav:state.nav,filters:state.filters})}`);
   expect(inside(state.filters)&&inside(state.primary),`${label}: filter/publish row escapes viewport ${JSON.stringify({filters:state.filters,primary:state.primary})}`);
   if(state.filters&&state.primary){expect(Math.abs(state.filters.y-state.primary.y)<=4,`${label}: filters and publish action are not one row ${JSON.stringify({filters:state.filters,primary:state.primary})}`);expect(state.filters.right+4<=state.primary.x,`${label}: filters collide with publish action ${JSON.stringify({filters:state.filters,primary:state.primary})}`)}
   expect(inside(state.program),`${label}: Current Program host escapes viewport ${JSON.stringify(state.program)}`);
@@ -74,7 +75,7 @@ for(const width of [390,360]){
   expect((state.rail?.scrollWidth||0)<=((state.rail?.clientWidth||0)+1),`${label}: Variant 3 Program strip still requires horizontal scrolling ${JSON.stringify(state.rail)}`);
   if(state.filters&&state.program)expect(state.program.y>=state.filters.bottom+6,`${label}: Program strip collides with utility row ${JSON.stringify({filters:state.filters,program:state.program})}`);
   expect(inside(state.pager)&&inside(state.controls),`${label}: bottom dock escapes viewport ${JSON.stringify({pager:state.pager,controls:state.controls})}`);
-  if(state.pager&&state.controls)expect(state.pager.right+4<=state.controls.x,`${label}: pager overlaps spatial controls ${JSON.stringify({pager:state.pager,controls:state.controls})}`);
+  if(state.pager&&state.controls)expect(state.pager.bottom<=state.controls.y-4,`${label}: pager overlaps spatial controls ${JSON.stringify({pager:state.pager,controls:state.controls})}`);
   expect((state.viewport?.y??999)<=140,`${label}: harmonization displaced canonical fullscreen viewport ${JSON.stringify(state.viewport)}`);
   await page.screenshot({path:path.join(outDir,`board-${width}.png`),fullPage:false});
   await context.close();
@@ -83,7 +84,7 @@ await browser.close();await new Promise(resolve=>server.close(resolve));
 if(errors.length){console.error('BOARD MOBILE HARMONIZATION BLOCKED');for(const error of errors)console.error(`- ${error}`);process.exit(1)}
 console.log('Board mobile harmonization browser acceptance PASS');
 console.log('✓ 390 / 360 primary workspace chrome fits viewport');
-console.log('✓ filters + publish share one row');
+console.log('✓ canonical nav clears filters; filters + publish share one row');
 console.log('✓ all 3 Current Program cards visible without horizontal scroll');
-console.log('✓ pager + spatial controls share one safe-area-aware bottom baseline');
+console.log('✓ compact two-level bottom dock preserves pager / spatial-control clearance');
 console.log('✓ fullscreen spatial viewport ownership preserved');
