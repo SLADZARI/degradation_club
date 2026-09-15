@@ -70,15 +70,16 @@ for(const width of [1440,390]){
         const viewport=document.querySelector('.dc-spatial-viewport');
         const shell=document.querySelector('.dc-board-wall>.dc-board-shell');
         const rail=document.querySelector('.dc-board-program__rail');
-        if(!program||!viewport||!shell||!rail)return null;
-        const p=getComputedStyle(program),v=viewport.getBoundingClientRect(),s=getComputedStyle(shell),r=getComputedStyle(rail);
-        return{programPosition:p.position,viewportTop:v.top,viewportHeight:v.height,shellPosition:s.position,programPointer:p.pointerEvents,railPointer:r.pointerEvents,innerHeight};
+        const action=document.querySelector('.dc-board-program__card a[data-current-program-action]');
+        if(!program||!viewport||!shell||!rail||!action)return null;
+        const p=getComputedStyle(program),v=viewport.getBoundingClientRect(),s=getComputedStyle(shell),r=getComputedStyle(rail),a=getComputedStyle(action);
+        return{programPosition:p.position,viewportTop:v.top,viewportHeight:v.height,shellPosition:s.position,programPointer:p.pointerEvents,railPointer:r.pointerEvents,actionPointer:a.pointerEvents,innerHeight};
       });
       expect(geometry?.programPosition==='absolute',`${label}: Current Program still participates in fullscreen Board flow ${JSON.stringify(geometry)}`);
       expect(geometry?.shellPosition==='relative',`${label}: fullscreen Board shell does not own Program overlay placement ${JSON.stringify(geometry)}`);
       expect((geometry?.viewportTop??999)<=140,`${label}: Current Program displaced canonical Board viewport ${JSON.stringify(geometry)}`);
       expect((geometry?.viewportHeight??0)>=((geometry?.innerHeight??0)-140),`${label}: Board lost fullscreen remaining-height ownership ${JSON.stringify(geometry)}`);
-      expect(geometry?.programPointer==='none'&&geometry?.railPointer==='auto',`${label}: Program overlay pointer boundary drifted ${JSON.stringify(geometry)}`);
+      expect(geometry?.programPointer==='none'&&geometry?.railPointer==='none'&&geometry?.actionPointer==='auto',`${label}: Program overlay pointer boundary drifted ${JSON.stringify(geometry)}`);
     }
     await page.close();
   }
@@ -92,5 +93,5 @@ console.log('✓ Home + Workspace Board at 1440 / 390');
 console.log('✓ exact 3 Thing refs + exact destinations');
 console.log('✓ shared render evidence v0');
 console.log('✓ Program Things remain separate from Artifacts');
-console.log('✓ Board Program overlay preserves canonical fullscreen viewport geometry');
+console.log('✓ Board Program overlay preserves canonical fullscreen viewport and click-through geometry');
 console.log('✓ legacy Home course/event funnel blocks absent');
