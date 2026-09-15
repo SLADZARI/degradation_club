@@ -165,14 +165,17 @@
     font:900 14px/1 ui-monospace,SFMono-Regular,Menlo,monospace!important;
   }
 
-  /* Bottom controls become one safe-area-aware baseline instead of two islands. */
+  /* One compact bottom dock zone, two non-overlapping levels. Spatial controls
+     own the safe-area baseline; pager sits directly above them, preserving the
+     already-approved adaptive navigation contract while keeping the composition
+     visually unified. */
   .dc-board-fullscreen-v21 .dc-board-filter-nav{
     display:flex!important;
     position:fixed!important;
     left:var(--dc-mobile-board-gutter)!important;
     right:auto!important;
     top:auto!important;
-    bottom:var(--dc-mobile-board-bottom)!important;
+    bottom:calc(48px + env(safe-area-inset-bottom,0px))!important;
     margin:0!important;
     padding:3px!important;
     gap:3px!important;
@@ -199,40 +202,42 @@
     left:auto!important;
     right:var(--dc-mobile-board-gutter)!important;
     bottom:var(--dc-mobile-board-bottom)!important;
-    max-width:calc(100% - 126px)!important;
+    width:auto!important;
+    max-width:calc(100% - 16px)!important;
     gap:3px!important;
     padding:0!important;
     overflow:visible!important;
     flex-wrap:nowrap!important;
   }
   .dc-board-fullscreen-v21 .dc-spatial-control{
+    flex:0 0 auto!important;
     min-height:36px!important;
     height:36px!important;
-    padding:0 7px!important;
-    font-size:7.5px!important;
+    padding:0 5px!important;
+    font-size:7.2px!important;
     box-shadow:2px 2px 0 #111!important;
   }
   .dc-board-fullscreen-v21 .dc-spatial-control[data-zoom-in],
   .dc-board-fullscreen-v21 .dc-spatial-control[data-zoom-out],
   .dc-board-fullscreen-v21 .dc-spatial-control[data-tutorial-help]{
-    width:32px!important;
-    min-width:32px!important;
+    width:30px!important;
+    min-width:30px!important;
     padding:0!important;
   }
   .dc-board-fullscreen-v21 .dc-spatial-control[data-home]{
-    min-width:52px!important;
-    padding-inline:6px!important;
+    min-width:46px!important;
+    padding-inline:5px!important;
   }
   .dc-board-fullscreen-v21 .dc-spatial-control[data-mine]{
-    min-width:38px!important;
-    padding-inline:6px!important;
+    min-width:34px!important;
+    padding-inline:5px!important;
   }
 
-  /* The type drawer clears the unified dock and remains viewport-owned. */
+  /* The type drawer clears both levels of the unified dock. */
   .dc-board-fullscreen-v21 .dc-board-filter-drawer{
     left:var(--dc-mobile-board-gutter)!important;
     right:var(--dc-mobile-board-gutter)!important;
-    bottom:calc(54px + env(safe-area-inset-bottom,0px))!important;
-    max-height:min(62dvh,calc(100dvh - 205px))!important;
+    bottom:calc(94px + env(safe-area-inset-bottom,0px))!important;
+    max-height:min(62dvh,calc(100dvh - 245px))!important;
   }
 }
