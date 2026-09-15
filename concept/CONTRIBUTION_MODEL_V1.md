@@ -1,6 +1,6 @@
 # DEMENTOR CLUB — CONTRIBUTION MODEL v1
 
-Status: **DRAFT / WORKING CANON CANDIDATE**  
+Status: **WORKING CANON / contribution authority**  
 Updated: **2026-09-15**
 
 ## Authority scope
@@ -603,6 +603,69 @@ Contribution по умолчанию не должна становиться ч
 
 ---
 
+# 16A. Direct public publish — отдельный путь
+
+Contribution entry и direct public publish — **разные продуктовые контракты**.
+
+## Bring for editorial look
+
+Человек говорит по смыслу:
+
+> **«У меня есть что показать. Посмотрите, что здесь есть и что с этим можно сделать».**
+
+Это Contribution path.
+
+По умолчанию:
+
+- editorial inbound;
+- не публично;
+- требует editorial look;
+- disposition является payoff;
+- Thing / Release / Programming Moment могут появиться позже, но не гарантированы.
+
+## Publish ready Thing
+
+Человек говорит по смыслу:
+
+> **«Это уже самостоятельная вещь. Я намеренно публикую её как публичную Thing».**
+
+Это **не Contribution path по умолчанию**.
+
+Такой путь допустим, если:
+
+- продукт / permissions действительно разрешают direct publish;
+- человек явно понимает, что делает публичное действие;
+- payload уже выдерживает самостоятельную Thing / native Board Thing semantics;
+- provenance и authorship определены достаточно для публичного показа;
+- operational moderation / safety gates, если они нужны, сохраняются.
+
+Direct publish может использовать существующий Artifact runtime и создать public native Board Thing / ThingProjection без предварительного Contribution workflow.
+
+Но direct publish **не означает автоматически**:
+
+- editorial endorsement;
+- Programming Moment;
+- попадание на Home;
+- внешнюю distribution;
+- новый Release вне фактически доступного experience;
+- право обходить Content & Programming selection gate.
+
+Канонически:
+
+**CONTRIBUTION PATH ≠ DIRECT PUBLISH PATH**
+
+И:
+
+**PUBLICATION ≠ PROGRAMMING MOMENT**
+
+Direct published Thing может позже войти в Editorial Program только через обычный Programming decision из `07`.
+
+Если intent пользователя неясен, безопасный продуктовый default — **editorial inbound**, а не автоматическая публичность.
+
+Нельзя маскировать один путь под другой одной и той же кнопкой `Опубликовать`, если пользователь не понимает, публикует ли он вещь или приносит материал на editorial look.
+
+---
+
 # 17. Contribution и Program
 
 Contribution volume не является программой.
@@ -683,6 +746,8 @@ Contribution Model сохраняет эту границу.
 
 Если сама публикация является самостоятельной работой, Artifact может back Thing identity / projection.
 
+Этот режим может обслуживать **Direct public publish** и не обязан предварительно проходить Contribution workflow.
+
 ## Guardrails
 
 `artifact_type = idea` не означает `KEEP_AS_OBSERVATION`.
@@ -697,7 +762,7 @@ Contribution Model сохраняет эту границу.
 
 Канонически:
 
-**ARTIFACT MAY CARRY CONTRIBUTION. ARTIFACT DOES NOT DEFINE CONTRIBUTION MEANING.**
+**ARTIFACT MAY CARRY CONTRIBUTION. ARTIFACT MAY BACK A NATIVE THING. ARTIFACT DOES NOT DEFINE PRODUCT MEANING.**
 
 ---
 
@@ -737,6 +802,14 @@ Contribution Model сохраняет эту границу.
 
 Не заставлять выбирать ontology.
 
+## Direct publish entry
+
+Если такой capability разрешён, должен явно отвечать:
+
+> **Ты публикуешь уже готовую самостоятельную Thing.**
+
+Он не должен выглядеть как тот же самый editorial inbound flow.
+
 ## Contributor view
 
 Должен отвечать:
@@ -766,7 +839,8 @@ Contribution Model сохраняет эту границу.
 - Release;
 - Participation Opportunity;
 - Programming Moment;
-- History.
+- History;
+- direct-published native Thing там, где direct publish разрешён.
 
 Raw contribution не является обязательной public surface unit.
 
@@ -808,6 +882,8 @@ Contribution Model не должен оптимизироваться под м�
 
 Observation имеет право остаться Observation.
 
+Direct publish metrics также не должны смешиваться с Contribution metrics: количество public Things не измеряет качество editorial inbound.
+
 ---
 
 # 23. Anti-signals
@@ -815,6 +891,7 @@ Observation имеет право остаться Observation.
 Критические anti-signals:
 
 - raw submissions автоматически становятся public feed;
+- editorial inbound и direct publish выглядят как один неясный flow;
 - редакция оптимизирует publish rate;
 - человек обязан выбрать content type до отправки;
 - каждое Observation пытаются превратить в Thing;
@@ -826,6 +903,8 @@ Observation имеет право остаться Observation.
 - contributor автоматически становится Participant;
 - реакции / лайки определяют editorial disposition;
 - редакция молчит вместо `NO_ACTION / DECLINE`;
+- direct publish автоматически считается editorial endorsement;
+- direct published Thing автоматически попадает в Editorial Program;
 - volume submissions растёт быстрее способности редакции действительно смотреть на них;
 - creator profile становится обязательным условием принести Observation.
 
@@ -840,17 +919,20 @@ Observation имеет право остаться Observation.
 Перед созданием / изменением contribution mechanic ответить:
 
 1. Человек приносит Observation, ready Thing или contribution к существующей Thing?
-2. Нужно ли ему вообще выбирать тип до отправки?
-3. Что является immediate acknowledgement?
-4. Кто и как сделает editorial look?
-5. Как contributor узнает meaningful outcome?
-6. Что произойдёт при merge?
-7. Сохраняется ли provenance?
-8. Когда и на каком основании может появиться Thing?
-9. Не создаём ли Project раньше реального совместного making?
-10. Не публикуется ли raw contribution автоматически?
-11. Как закрывается `NO_ACTION / DECLINE`?
-12. Нужно ли человеку делать ещё что-то после outcome?
+2. Это **Bring for editorial look** или **Direct public publish**?
+3. Понимает ли человек, публично ли его действие?
+4. Нужно ли ему вообще выбирать тип до отправки?
+5. Что является immediate acknowledgement?
+6. Кто и как сделает editorial look?
+7. Как contributor узнает meaningful outcome?
+8. Что произойдёт при merge?
+9. Сохраняется ли provenance?
+10. Когда и на каком основании может появиться Thing?
+11. Не создаём ли Project раньше реального совместного making?
+12. Не публикуется ли raw contribution автоматически?
+13. Как закрывается `NO_ACTION / DECLINE`?
+14. Нужно ли человеку делать ещё что-то после outcome?
+15. Если это Direct publish, не выдаём ли мы publication за Programming Moment / editorial endorsement?
 
 Если система умеет только:
 
@@ -902,9 +984,15 @@ Contribution в Dementor — не публикация в пользовател
 **NO ACTION**  
 **DECLINE**
 
+При этом отдельный capability **Direct public publish** может существовать для готовой публичной Thing и не является Contribution path по умолчанию.
+
 Главные guardrails:
 
 **CONTRIBUTION ≠ THING ≠ PUBLICATION**
+
+**CONTRIBUTION PATH ≠ DIRECT PUBLISH PATH**
+
+**PUBLICATION ≠ PROGRAMMING MOMENT**
 
 **SUBMISSION STATUS ≠ EDITORIAL OUTCOME**
 
