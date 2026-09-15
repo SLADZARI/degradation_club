@@ -5,14 +5,14 @@
     "project": "dementor-club",
     "documentType": "STANDARD",
     "projectStage": "BUILD",
-    "gate": "G5_BUILD",
+    "gate": "G8_CLEANUP",
     "status": "APPROVED",
-    "version": "1.71",
-    "updated": "2026-09-13",
+    "version": "1.72",
+    "updated": "2026-09-15",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "1.70"
+    "supersedes": "1.71"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -21,12 +21,12 @@
   "defaultBranch": "main",
   "semanticSourceBranch": "dementor-club",
   "projectStage": "BUILD",
-  "gate": "G5_BUILD",
+  "gate": "G8_CLEANUP",
   "readFirst": [
     ".weekly-os/PROJECT.json",
     ".weekly-os/ARTIFACT_INDEX.json",
     ".weekly-os/APPROVED_STATE.json",
-    ".weekly-os/results/board-share-receive-ritual-v1.v0.1.md",
+    ".weekly-os/results/board-share-receive-ritual-v1.v0.2.md",
     "operations/BOARD_SHARE_RECEIVE_RITUAL_V1.md",
     ".weekly-os/results/board-navigation-adaptive-cards-v1.v1.0.md",
     "operations/BOARD_NAVIGATION_ADAPTIVE_CARDS_G8_2026-09-13.md",
@@ -71,12 +71,13 @@
     "legacyImplementationPointers": {"sourceSystem":"GIT","authorityType":"REFERENCE","paths":["app","src","supabase"]}
   },
   "protected": {"PRODUCT": null, "DOMAIN": null, "ARCHITECTURE": null, "DESIGN": null},
-  "currentResult": {"artifactId":"dementor-club.result.board-share-receive-ritual-v1","version":"0.1","status":"DRAFT","path":".weekly-os/results/board-share-receive-ritual-v1.v0.1.md","gate":"G5_BUILD"},
+  "currentResult": null,
   "waitingResults": [
+    {"artifactId":"dementor-club.result.board-share-receive-ritual-v1","version":"0.2","status":"WAITING","path":".weekly-os/results/board-share-receive-ritual-v1.v0.2.md","gate":"G8_CLEANUP","candidateCommit":"04daf88b063bfbd2f40c2cb4f05f6ca386a77fa1","integrationPullRequest":166,"productionCommit":"2dd99cd230a3f5c9855ddb8faa9a673d838856e8","productionObservedInCommit":"688899e31b82e14c31f5f805b2bce4f00f3741c0","productionDeployRunId":34903066857,"note":"G6 #1065 PASS; corrective #166 is merged and included in the current successful production deploy ancestry. Explicit authenticated recipient live acceptance remains required before DONE/G8 closure."},
     {"artifactId":"dementor-club.result.board-information-architecture-v1","version":"0.17","status":"WAITING","path":".weekly-os/results/board-information-architecture-v1.v0.17.md","gate":"G8_CLEANUP","productionCommit":"af28404048dfc918ada81298b0d184df407d0595","productionDeployRun":63,"productionDeployRunId":34719474734,"pagesArtifactId":10305938397,"note":"Corrective #156 is released; Result remains not DONE/G8 closed. The completed Board Navigation + Adaptive Cards Result extended presentation only and did not mutate Board IA semantics."},
     {"artifactId":"dementor-club.result.board-access-control-v2","version":"0.4","status":"WAITING","path":".weekly-os/results/board-access-control-v2.v0.4.md","gate":"G7_RELEASE","productionCommit":"a9511a271fbb3524c486c2a9ecd0dc8a3ff22380","productionDeployRun":47,"productionDeployRunId":34220090345,"pagesArtifactId":10053362035,"note":"Released and partially live-retested; residual authenticated role-state QA remains open."}
   ],
-  "activeIntegrationBranch": "agent/board-share-receive-ritual-v1",
+  "activeIntegrationBranch": null,
   "activeReleaseBranch": null,
   "reportPath": "operations/MEMBERSHIP_V2_PRODUCTION_FLOW_QA_2026-09-02.md",
   "completedResults": [
