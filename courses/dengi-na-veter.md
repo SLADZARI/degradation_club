@@ -1,11 +1,31 @@
 # Деньги на ветер
 
-Статус: approved concept / digital card-course MVP in development
+Статус: **READY / public course available for passage**
 
-Автор / дементор: **Никита**
-Slug: `dengi-na-veter`
-Public URL: `/courses/dengi-na-veter/`
+Автор / дементор: **Никита**  
+Slug: `dengi-na-veter`  
+Public URL: `/courses/dengi-na-veter/`  
 Формат: цифровой адаптивный карточечный курс.
+
+## Текущий публичный статус
+
+Owner decision от **2026-09-15**:
+
+> **Курс готов к прохождению.**
+
+Это означает, что текущий публичный course experience можно проходить по `/courses/dengi-na-veter/`.
+
+Эта фиксация **не означает автоматически**:
+
+- утверждённую цену;
+- открытый checkout / payment flow;
+- server-side / AI adaptive backend;
+- обязательный Membership;
+- коммерческий статус продукта.
+
+Цена, payment readiness и будущий server/AI-режим требуют отдельных источников и решений.
+
+Ниже сохранён продуктовый и исходный MVP-baseline курса. Решение о readiness supersedes прежнюю формулировку `MVP in development`, но не превращает будущие/неподтверждённые capabilities в существующие факты.
 
 ## Центральная формула
 
@@ -118,7 +138,7 @@ MVP может работать локально без внешнего AI: п�
 - Профиль: `/community/nikita/`
 - Сфера: Логика / Потребление / Контроль (требует отдельной канонической фиксации сфер в people/dementors.md перед публичной маркировкой)
 
-## MVP 0.1
+## MVP 0.1 / исходный implementation baseline
 
 Первая публичная версия должна содержать:
 - лендинг курса;
