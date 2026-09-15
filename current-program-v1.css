@@ -1,0 +1,14 @@
+.dc-current-program{border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--bg)}
+.dc-current-program__head{display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,.7fr);gap:30px;align-items:end;margin-bottom:38px}
+.dc-current-program__head h2{margin:12px 0 0;font-size:clamp(46px,7vw,108px);line-height:.86;letter-spacing:-.07em}
+.dc-current-program__head p:last-child{margin:0;font-size:18px;max-width:34ch;justify-self:end}
+.dc-current-program__grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:1px solid var(--line);border-left:1px solid var(--line)}
+.dc-current-program__card{min-height:420px;padding:24px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:18px;background:var(--bg)}
+.dc-current-program__card:first-child{background:var(--acid)}
+.dc-current-program__meta{display:flex;justify-content:space-between;gap:16px;font-size:10px;line-height:1.2;letter-spacing:.12em;text-transform:uppercase;opacity:.64}
+.dc-current-program__card h3{margin:72px 0 0;font-size:clamp(34px,4vw,62px);line-height:.9;letter-spacing:-.06em}
+.dc-current-program__premise{font-size:18px;line-height:1.34;margin:0;max-width:34ch}
+.dc-current-program__truth{font-size:13px;line-height:1.4;margin:auto 0 0;padding-top:22px;border-top:1px solid var(--line);opacity:.72}
+.dc-current-program__action{display:inline-flex;width:max-content;max-width:100%;align-items:center;justify-content:center;min-height:46px;margin-top:2px;padding:0 14px;border:1px solid var(--ink);font-size:11px;font-weight:900;letter-spacing:.05em;text-transform:uppercase}
+.dc-current-program__card:first-child .dc-current-program__action{background:var(--ink);color:var(--bg)}
+@media(max-width:900px){.dc-current-program__head{grid-template-columns:1fr}.dc-current-program__head p:last-child{justify-self:start}.dc-current-program__grid{grid-template-columns:1fr}.dc-current-program__card{min-height:320px}.dc-current-program__card h3{margin-top:36px}}
