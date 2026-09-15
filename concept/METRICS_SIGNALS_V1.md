@@ -1,6 +1,6 @@
 # DEMENTOR CLUB — METRICS & SIGNALS v1
 
-Status: **DRAFT / WORKING CANON CANDIDATE**  
+Status: **WORKING CANON / open stack**  
 Updated: **2026-09-15**
 
 ## Authority scope
@@ -13,19 +13,13 @@ Updated: **2026-09-15**
 
 - различие между event, signal, metric, KPI и target;
 - Product Health scorecard;
-- qualified entry и consumption semantics;
-- Thing → Thing / continuation measurement;
-- Return measurement;
-- Contribution / Participation / Intervention signals;
-- Distribution quality signals;
-- Commercial extension из `13 · Monetization Map`;
-- internal / test traffic exclusion;
-- event naming principles;
-- payload contract;
-- counting semantics;
-- review cadence;
-- thresholds / alert discipline;
-- anti-signals и vanity metrics.
+- entry / experience / continuation / return semantics;
+- Contribution / Participation / Intervention measurement;
+- Distribution quality measurement;
+- Commercial evidence semantics;
+- population / counting / attribution rules;
+- event / payload principles;
+- review cadence, targets, anti-signals и Phase 0 instrumentation.
 
 Документ опирается на:
 
@@ -36,18 +30,21 @@ Updated: **2026-09-15**
 - `09 · Contribution Model` — editorial outcome and closure;
 - `10 · Dementor / Intervention` — Situation → relevant Intervention;
 - `11 · Marketing Positioning & Messaging` — promise / proof / next Thing;
-- `12 · Distribution Model` — promise → precise Entry Object / qualified entry;
-- `13 · Monetization Map` — paid value / fulfillment / repeat, without making revenue the definition of product value.
+- `12 · Distribution Model` — routing / promise / Entry Object;
+- `13A · Monetization Architecture` — valid paid value;
+- `13B · Distribution Economics` — commercial path / experiment economics.
 
 Каноническая граница:
 
 > **PRODUCT MODELS DEFINE WHAT MATTERS. METRICS & SIGNALS DEFINE HOW WE OBSERVE WHETHER IT IS HAPPENING.**
 
-Главная система:
+`14` не переопределяет Product Value, Distribution logic, Return logic или commercial offer economics.
+
+Главная Product Health chain:
 
 **ENTRY → EXPERIENCE → CONTINUATION → RETURN → CONTRIBUTION / PARTICIPATION / INTERVENTION → RELEASE / HISTORY**
 
-Коммерческий extension:
+Commercial evidence extension:
 
 **VALUE → INTENT → COMMITMENT → PAYMENT → DELIVERY → REPEAT**
 
@@ -63,61 +60,37 @@ Pageviews, clicks, reactions и notification opens полезны как transpo
 
 Канонически:
 
-> **MEASURE THE VALUE CHAIN, NOT THE NOISE AROUND IT.**
+**MEASURE THE VALUE CHAIN, NOT THE NOISE AROUND IT.**
 
-И:
-
-> **ACTIVITY IS NOT VALUE UNTIL IT CHANGES THE USER’S EXPERIENCE OR EXPECTATION.**
+**ACTIVITY IS NOT VALUE UNTIL IT CHANGES THE USER’S EXPERIENCE, EXPECTATION OR REAL OUTCOME.**
 
 ---
 
 # 1. Event ≠ Signal ≠ Metric ≠ KPI ≠ Target
 
-Эти понятия нельзя смешивать.
-
 ## Event
 
-Технически зафиксированное событие.
+Технически наблюдаемое событие.
 
-Примеры:
-
-- человек открыл Event page;
-- нажал CTA;
-- открыл следующую Thing;
-- отправил Contribution;
-- сделал purchase.
-
-Event — наблюдение, а не вывод.
+Event — observation, не вывод.
 
 ## Signal
 
-Осмысленный факт или паттерн, который поддерживает / ослабляет product hypothesis.
-
-Пример:
-
-> человек открыл следующую самостоятельную Thing после завершения первой.
-
-Это сильнее, чем просто `page_view`.
+Осмысленный факт или паттерн, который поддерживает или ослабляет product hypothesis.
 
 ## Metric
 
 Агрегированная количественная мера.
 
-Пример:
-
-> доля qualified Thing entries, после которых была meaningful continuation.
-
 ## KPI
 
-Metric, выбранная для регулярного управленческого контроля конкретной цели / риска.
-
-Не каждая metric должна стать KPI.
+Metric, выбранная для регулярного управленческого контроля конкретной цели или риска.
 
 ## Target
 
 Явно принятый ожидаемый диапазон / направление.
 
-Target нельзя придумывать до появления baseline и реального operating context.
+Target не появляется до baseline и operating context.
 
 Канонически:
 
@@ -125,236 +98,154 @@ Target нельзя придумывать до появления baseline и �
 
 ---
 
-# 2. No single universal North Star
+# 2. No universal North Star
 
-На текущем этапе Dementor не должен выдумывать одну universal North Star Metric, которая якобы объясняет весь продукт.
+На текущем этапе Dementor не использует одну universal North Star Metric.
 
 Причина:
 
-- Thing может быть текстом, игрой, Event, Tool, Course, physical object;
-- audience use может завершиться хорошим one-off experience;
-- Return важен, но не обязателен после каждой Thing;
-- Contribution / Participation — optional branches;
-- Commercial action — ещё более optional;
+- Thing может быть текстом, игрой, Event, Tool, Course или physical object;
+- хороший one-off experience может быть complete use;
+- Return важен не после каждой Thing;
+- Contribution / Participation optional;
+- Commercial action ещё более optional;
 - high-frequency activity не является целью.
 
-Поэтому v1 использует **Product Health Scorecard**, а не одну магическую цифру.
+Поэтому v1 использует **Product Health Scorecard**.
 
-Главная логика:
+Канонически:
 
-**HEALTH = MULTIPLE INDEPENDENT SIGNALS THAT AGREE ABOUT VALUE**
+**HEALTH = MULTIPLE INDEPENDENT SIGNALS THAT AGREE ABOUT VALUE.**
 
 ---
 
 # 3. Product Health Scorecard v1
 
-Регулярный Product Health review должен смотреть минимум на семь блоков.
+Регулярный Product Health review смотрит семь блоков.
 
-## A. QUALIFIED ENTRY
+## A. QUALIFIED EXPERIENCE ENTRY
 
-Люди приходят в тот объект, который соответствует promise / intent.
+Человек попал в конкретный Entry Object и реально начал experience.
+
+Если существует explicit Distribution context, отдельно проверяется promise / intent fit.
 
 ## B. EXPERIENCE
 
-Люди реально получают обещанный experience, а не просто открывают страницу.
+Человек реально встретил обещанную Thing / Event / Tool / Course, а не только открыл URL.
 
 ## C. CONTINUATION
 
-После хорошего experience часть людей добровольно открывает следующий релевантный объект.
+После experience часть людей добровольно открывает следующий релевантный объект.
 
 ## D. RETURN
 
-Возникают реальные причины вернуться и они получают payoff.
+Возникает реальная причина вернуться, а Return получает payoff.
 
-## E. CONTRIBUTION / PARTICIPATION
+## E. CONTRIBUTION / PARTICIPATION / INTERVENTION
 
-Часть людей хочет не только смотреть, но и принести / сделать / вписаться там, где это уместно.
+Когда соответствующая ветка существует, человек получает meaningful response / action / outcome, а не просто interaction count.
 
 ## F. RELEASE / HISTORY
 
-Things реально живут: выходят, продолжаются, получают последствия, а не остаются вечной внутренней активностью.
+Things реально выходят, продолжаются и получают последствия.
 
 ## G. TRUST / DELIVERY
 
-Обещания совпадают с реальностью: destination, availability, editorial response, paid fulfillment.
+Promise совпадает с destination, availability, editorial response и paid fulfillment.
 
-Commercial Health добавляется отдельным блоком после реального payment evidence.
+**Commercial Health** — отдельное расширение только после real payment evidence.
 
 ---
 
-# 4. Metric hierarchy
+# 4. Evidence hierarchy
 
-Чтобы не смешивать transport и product health, используем четыре уровня.
+Уровни ниже описывают **силу evidence**, а не maturity ladder человека.
 
 ## LEVEL 0 · DELIVERY / EXPOSURE
 
-Показ / доставка сообщения.
+Impression, delivered message, search impression, social view.
 
-Примеры:
+## LEVEL 1 · ENTRY / OPEN
 
-- impression;
-- delivered Telegram message;
-- search impression;
-- social view;
-- email delivered, если появится.
-
-Это слабые signals.
-
-## LEVEL 1 · ENTRY
-
-Человек перешёл / открыл destination.
-
-Примеры:
-
-- page_view;
-- entity_open;
-- entry_object_open.
-
-Это ещё не Product Value.
+Page view, entity open, Entry Object open.
 
 ## LEVEL 2 · EXPERIENCE
 
-Человек реально встретил обещанную Thing / Event / Tool / Course.
-
-Это первый сильный слой.
+Человек реально начал experience соответствующего Form.
 
 ## LEVEL 3 · CONTINUATION / RETURN / ACTION
 
-Человек добровольно продолжил:
-
-- Thing → Thing;
-- вернулся;
-- поделился;
-- вписался;
-- принёс Contribution;
-- выразил конкретный value intent;
-- пришёл на Event;
-- использовал Tool повторно.
-
-Это более сильные сигналы.
+Thing → Thing, meaningful return, Share intent, Participation action, explicit value intent, Tool reuse.
 
 ## LEVEL 4 · CONSEQUENCE
 
-Появилось реальное последствие:
-
-- Contribution получила closure;
-- Participation привела к output;
-- Thing получила Release / History;
-- Intervention помогла изменить Situation;
-- paid value была доставлена;
-- покупка повторилась.
-
-Это не funnel stages человека.
-
-Это **уровни evidence strength**.
-
----
-
-# 5. Qualified Entry
-
-`12 · Distribution` задаёт принцип:
-
-> **A CLICK IS NOT SUCCESS IF THE THING DISAPPOINTS.**
-
-`14` определяет измерительный слой.
-
-Qualified Entry существует, когда:
-
-1. известен или разумно выведен Entry Object;
-2. promise / source соответствует этому объекту;
-3. человек действительно начал обещанный experience;
-4. visit не является явно internal / test / bot / broken navigation noise.
+Contribution closure, Participation output, Release / History, useful Intervention outcome, paid fulfillment, repeat.
 
 Канонически:
 
-**CLICK / OPEN ≠ QUALIFIED ENTRY**
-
-Рабочая формула:
-
-**QUALIFIED ENTRY = CORRECT DESTINATION + EXPERIENCE START**
-
-Если intent неизвестен, допускается weaker classification:
-
-`unclassified_entry`.
-
-Нельзя задним числом объявлять любой landing visit qualified только потому, что человек не bounced мгновенно.
+**HIGHER EVIDENCE MEANS CLOSER TO REAL VALUE OR CONSEQUENCE — NOT A “BETTER USER”.**
 
 ---
 
-# 6. Exposure vs Consumption
+# 5. Qualified Experience Entry ≠ Distribution Fit
 
-Главная проблема обычной web analytics: `page_view` слишком легко принять за consumption.
+Это принципиальное разделение `14`.
 
-Поэтому для каждого Form / surface нужен минимальный consumption contract.
+## Qualified Experience Entry
 
-## Text / Article / Long-form Thing
+Существует, когда:
 
-Possible consumption evidence:
+1. человек попал в конкретный Entry Object;
+2. реально начал соответствующий experience;
+3. visit не является явно bot / preview / internal test / broken navigation noise.
 
-- meaningful dwell time;
-- scroll / section progress;
-- explicit continue / next action;
-- return to same Thing.
+Рабочая формула:
 
-Ни один из signals по отдельности не гарантирует понимание текста.
+**QUALIFIED EXPERIENCE ENTRY = VALID ENTRY OBJECT + EXPERIENCE START + HUMAN / VALID POPULATION**
 
-## Video
+## Distribution-qualified entry
 
-Possible:
+Если существует explicit Distribution Decision / message / source context, дополнительно проверяется:
 
-- play;
-- meaningful watch threshold;
-- completion;
-- next Thing after watch.
+- promise → destination fit;
+- target intent → Entry Object fit;
+- routing context.
 
-## Game / Interactive Thing
+Рабочая формула:
 
-Possible:
+**DISTRIBUTION-QUALIFIED ENTRY = QUALIFIED EXPERIENCE ENTRY + PROMISE / INTENT FIT**
 
-- game start;
-- first meaningful action;
-- session completion / result where applicable;
-- replay;
-- continuation.
+Если source / intent неизвестны, experience может оставаться qualified, а Distribution Fit — `unknown`.
 
-## Tool
+Канонически:
 
-Possible:
+**UNKNOWN DISTRIBUTION CONTEXT ≠ FAILED EXPERIENCE.**
 
-- tool action executed;
-- output produced;
-- repeated use;
-- return when Situation repeats.
+**CLICK / OPEN ≠ QUALIFIED EXPERIENCE ENTRY.**
 
-## Event
+Нельзя объявлять visit qualified только потому, что человек не bounced мгновенно.
 
-Page open ≠ attendance.
+---
 
-Possible layers:
+# 6. Exposure ≠ Consumption
 
-- Event detail consumed;
-- registration / commitment;
-- actual attendance;
-- post-Event continuation.
+`page_view` и route open не являются consumption.
 
-## Course / Program
+Для каждого Form нужен минимальный experience contract.
 
-Possible:
+| Form | Минимальный meaningful evidence |
+| --- | --- |
+| Text / Article | meaningful dwell / progress / deliberate continuation |
+| Video | play + meaningful watch threshold where observable |
+| Game / Interactive | start + first meaningful action |
+| Tool | real tool action / output |
+| Event | detail consumption отдельно от commitment и attendance |
+| Course / Program | meaningful lesson/module progression, не просто open |
+| Physical Thing | order / pickup / ownership / QR continuation where observable |
 
-- course open;
-- lesson / module engagement;
-- meaningful progression;
-- return to sequence;
-- completion only where completion matters.
+Completion не обязана существовать для каждого Form.
 
-## Physical Thing
-
-Possible:
-
-- order / pickup;
-- QR / digital continuation;
-- repeat / History action;
-- explicit ownership / usage signal where available.
+Ни один proxy не должен притворяться доказательством понимания.
 
 Канонически:
 
@@ -362,33 +253,31 @@ Possible:
 
 ---
 
-# 7. Thing → Thing
+# 7. Thing → Thing continuation
 
-Один из ключевых ранних product signals Dementor:
+Ключевой ранний signal:
 
-> **после одной самостоятельной Thing человек добровольно открывает другую самостоятельную Thing.**
+> **после одной самостоятельной Thing человек добровольно переходит к другой самостоятельной Thing.**
 
-Это показывает не только интерес к одному объекту, но и вероятность того, что человек начал распознавать Dementor как программу / источник взгляда.
-
-Каноническая metric:
+Canonical metric:
 
 **THING → THING CONTINUATION RATE**
 
-Рабочий denominator:
+Denominator:
 
-> qualified Thing experiences, у которых реально существовал релевантный next Thing opportunity.
+> qualified source Thing experiences, у которых существовала релевантная continuation opportunity.
 
-Рабочий numerator:
+Numerator:
 
-> те из них, после которых человек в осмысленном окне открыл другую самостоятельную Thing через contextual / program continuation.
+> те из них, после которых человек в meaningful window начал experience другой самостоятельной Thing через contextual / program continuation.
 
 Не считать автоматически:
 
 - back navigation;
-- случайный nav click;
+- generic nav click;
 - Board refresh;
 - forced redirect;
-- technical prefetch;
+- prefetch;
 - same-Thing asset navigation.
 
 Канонически:
@@ -401,56 +290,35 @@ Possible:
 
 `08 · Return Loops` остаётся authority по смыслу Return.
 
-`14` определяет measurement.
-
-Return должен считаться относительно объекта ожидания / программы, а не только cookie revisit.
+`14` определяет observation / counting semantics.
 
 Минимальные classes:
 
-## Audience Return
+- Audience Return;
+- Thing Continuity Return;
+- Program Return;
+- Dementor Work Return;
+- Contributor / Participant Return;
+- Utility Return.
 
-Человек возвращается в Dementor после предыдущего completed / meaningful experience.
-
-## Thing Continuity Return
-
-Возвращается к той же Thing / continuation / History.
-
-## Program Return
-
-Возвращается посмотреть, что нового в программе.
-
-## Dementor Work Return
-
-Возвращается к body of work конкретного Dementor.
-
-## Participation / Contributor Return
-
-Возвращается за реальным outcome / continuation своей Contribution / Participation.
-
-## Utility Return
-
-Возвращается к Method / Tool / Situation resource, потому что Situation снова релевантна.
+Return считается относительно prior meaningful experience и соответствующего loop context, а не только как cookie revisit.
 
 ---
 
 # 9. Return windows
 
-Нельзя выбрать один universal 7-day / 30-day retention window для всех Loops.
+Universal `D7 / D30 retention` не является продуктовой истиной.
 
-Event, Tool, editorial Program и Contribution живут в разном ритме.
+Return window следует loop expectation:
 
-Поэтому Return window должен быть связан с loop semantics.
+- short editorial / continuation window;
+- Program window;
+- event-relative window;
+- promise-relative window;
+- situation-relative utility window;
+- contributor-outcome-relative window.
 
-Рабочий v1 подход:
-
-- **short window** — быстрые editorial / Thing continuation loops;
-- **medium window** — Program return;
-- **event-relative window** — before / after Event;
-- **promise-relative window** — когда обещано продолжение;
-- **situation-relative** — utility;
-- **contributor outcome-relative** — editorial response.
-
-Точные durations фиксируются после baseline.
+Точные durations фиксируются после baseline и реального operating rhythm.
 
 Канонически:
 
@@ -458,21 +326,27 @@ Event, Tool, editorial Program и Contribution живут в разном рит
 
 ---
 
-# 10. Return Quality
+# 10. Return Payoff
 
-Сам по себе revisit слаб.
+Revisit сам по себе — слабый signal.
 
-Strong Return должен иметь payoff.
+Сначала определяется **eligible Return**: возвращение, которое можно разумно связать с prior meaningful experience / loop expectation.
+
+Затем проверяется payoff.
 
 Working derived metric:
 
 **RETURN PAYOFF RATE**
 
-Вопрос:
+Denominator:
 
-> среди meaningful returns — сколько привели к обещанной / релевантной новой ценности?
+> eligible Returns, для которых существовал обещанный или релевантный payoff opportunity.
 
-Примеры payoff:
+Numerator:
+
+> те Returns, где человек реально получил / начал этот payoff experience.
+
+Payoff может быть:
 
 - новая Thing;
 - promised continuation;
@@ -482,73 +356,43 @@ Working derived metric:
 - Tool reuse;
 - Participation result.
 
-Anti-signal:
+Канонически:
 
-> человек возвращается часто, но всё реже может объяснить, зачем стоило вернуться.
+**RETURN FREQUENCY WITHOUT PAYOFF IS NOT RETENTION HEALTH.**
 
 ---
 
 # 11. Program Memory / Direct Return
 
-Direct return — важный сигнал, потому что человек сам вспомнил источник.
-
-Но его нельзя читать изолированно.
-
-Direct traffic может включать:
-
-- bookmarks;
-- browser autocomplete;
-- internal team use;
-- developer testing;
-- auth redirects;
-- unknown referrer loss.
-
-Поэтому полезный signal:
+Useful derived signal:
 
 **DIRECT RETURN AFTER PRIOR QUALIFIED EXPERIENCE**
 
 а не любой `Direct / None` session.
 
-Program Memory можно дополнительно наблюдать через:
+Direct traffic может включать bookmarks, autocomplete, internal use, auth redirects и referrer loss.
 
-- branded search;
-- direct Home return;
-- return to known Thing;
-- external share then later direct return.
-
-Это derived signal, не один event.
+Program Memory можно дополнительно наблюдать через branded search, direct Home return, return to known Thing и другие privacy-safe signals.
 
 ---
 
 # 12. Share
 
-Share — один из сильнейших voluntary signals, но требует аккуратности.
+Различать:
 
-Нужно различать:
-
-## Share Intent
-
-Человек нажал share / copy link.
-
-## Share Completion
-
-Мы знаем, что native share completed — только если platform даёт такой факт.
-
-## Share Visit
-
-Новый visit пришёл по shared link / attribution.
-
-## Share Continuation
-
-Получатель реально consumed Thing / продолжил дальше.
+- Share Intent;
+- Share Completion, только если platform даёт reliable fact;
+- Share Visit;
+- Recipient Qualified Experience;
+- Share Continuation.
 
 Канонически:
 
 **SHARE CLICK ≠ SUCCESSFUL WORD OF MOUTH.**
 
-Сильнее:
+Более сильная цепочка:
 
-**THING → SHARE → QUALIFIED ENTRY BY ANOTHER PERSON**
+**THING EXPERIENCE → SHARE → QUALIFIED EXPERIENCE BY RECIPIENT**
 
 Если privacy / platform ограничения не позволяют доказать цепочку, не симулировать certainty.
 
@@ -558,167 +402,99 @@ Share — один из сильнейших voluntary signals, но требу�
 
 `12` отвечает за routing semantics.
 
-`14` измеряет качество.
+`14` измеряет downstream quality.
 
-Core metrics:
+Core views:
 
-## Promise → Entry Fit
-
-Доля distribution entries, которые landed on intended Entry Object без generic detour.
-
-## Qualified Entry Rate
-
-Qualified experiences / entries по channel / trigger class.
-
-## Entry → Continuation
-
-Доля qualified entries, после которых человек сделал meaningful next step.
-
-## Channel Quality
-
-Не CTR, а downstream quality:
-
-**CHANNEL → QUALIFIED ENTRY → EXPERIENCE → CONTINUATION / RETURN**
-
-## Wrong Destination / Bounce Diagnostics
-
-Используется как negative signal, не как автоматический proof bad content.
+- Promise → Entry Fit;
+- Qualified Experience Entry Rate;
+- Distribution-qualified Entry Rate where context exists;
+- Entry → Continuation;
+- Channel → Experience → Continuation / Return;
+- wrong-destination diagnostics.
 
 Канонически:
 
 **CHANNEL SUCCESS IS DOWNSTREAM OF EXPERIENCE QUALITY.**
 
+Home, Board и Profile не считаются channels только потому, что через них происходит navigation.
+
 ---
 
-# 14. Home
+# 14. Surface signals
+
+## Home
 
 Home — cover of current program.
 
-Главные вопросы:
+Полезно смотреть:
 
-- нашёл ли человек текущую Thing;
-- открыл ли её;
-- продолжил ли к другой Thing;
-- вернулся ли позже.
+- Home → Thing;
+- Home → Thing → Thing;
+- direct Home return → program entry;
+- downstream continuation / share.
 
-Home pageviews сами по себе мало значат.
+Home pageviews и CTA CTR сами по себе слабые.
 
-Working signals:
-
-- `Home → Thing`;
-- `Home → Thing → Thing`;
-- direct return to Home followed by program entry;
-- share / continuation after Home-originated Thing.
-
-Не оптимизировать Home только под CTA CTR.
-
----
-
-# 15. Board
+## Board
 
 Board — radar текущего происходящего.
 
-Главные signals:
+Полезно смотреть:
 
-- Thing / Project / Event open from Board;
+- Thing / Project / Event open;
 - Participation Opportunity open;
 - meaningful continuation;
 - return to current happening.
 
-Не считать сильным product signal:
+Не считать сильным Product Health signal:
 
 - Board refresh;
 - filter change;
 - raw card impressions;
 - generic scroll depth.
 
-Board activity не должна маскировать отсутствие standalone Things / Releases.
+**BOARD ACTIVITY MUST NOT MASK THE ABSENCE OF RELEASES.**
 
 ---
 
-# 16. Contribution signals
+# 15. Contribution / Participation / Intervention
+
+## Contribution
 
 `09` задаёт:
 
 **BRING → ACKNOWLEDGE → EDITORIAL LOOK → DISPOSITION → CONSEQUENCE / CLOSURE**
 
-Metrics должны следовать этой модели.
+Health:
 
-Core signals:
-
-## Contribution Received
-
-Технический receipt.
-
-## Editorial Look Started
-
-Contribution реально попала в review.
-
-## Meaningful Disposition
-
-Есть явный editorial outcome.
-
-## Closure Delivered
-
-Contributor увидел / получил outcome.
-
-## Contributor Return
-
-После closure человек вернулся с новым вкладом / продолжил работу.
-
-Не оптимизировать:
-
-- количество submissions само по себе;
-- time-in-queue как engagement;
-- % публикации как цель.
+- Contribution Received;
+- Editorial Look Started;
+- Meaningful Disposition;
+- Closure Delivered;
+- Contributor Return.
 
 Канонически:
 
 **CONTRIBUTION HEALTH = MEANINGFUL EDITORIAL RESPONSE, NOT MAXIMUM ACCEPTANCE.**
 
----
+## Participation
 
-# 17. Participation signals
-
-Participation Opportunity — конкретная возможность действия.
-
-Core flow:
+Flow:
 
 **OPPORTUNITY VIEW → JOIN INTENT → PARTICIPANT RELATION → ACTION / OUTPUT → CLOSURE / CONTINUATION**
-
-Не каждая opportunity должна конвертироваться массово.
-
-Важно:
-
-- relevant joins;
-- participant action;
-- real output / continuation;
-- no-reaction-vacuum avoidance.
 
 Anti-signal:
 
 > много «вписался», мало реального совместного действия.
 
----
-
-# 18. Intervention signals
+## Intervention
 
 `10` задаёт:
 
 **SITUATION → INTERVENTION → RESOURCE / ACTION**
 
-Success не равен booking / click.
-
-Сильнее:
-
-- Situation recognised;
-- relevant resource chosen;
-- resource actually used;
-- user reports / demonstrates useful change;
-- smaller sufficient Intervention worked;
-- no unnecessary escalation.
-
-Commercial Interest — отдельный signal.
+Success требует Situation fit + actual use / useful action.
 
 Канонически:
 
@@ -726,160 +502,99 @@ Commercial Interest — отдельный signal.
 
 ---
 
-# 19. Release / History signals
+# 16. Release / History / Programming
 
-Product Health требует наблюдать, что Things выходят и продолжают жить.
+Product Health должен видеть, что Things выходят и продолжают жить.
 
-Possible metrics:
+Полезные signals:
 
-- Things with at least one Release;
+- Thing → Release;
 - Release → qualified experience;
 - Release → continuation;
-- meaningful History events;
-- History → renewed Thing attention;
-- Projects producing actual standalone outputs.
+- meaningful History event;
+- History → renewed attention;
+- Project → standalone output.
 
-Не считать сильным:
+Не считать сильными сами по себе:
 
 - commits;
 - internal status changes;
 - generic Activity events;
 - database updates.
 
-Канонически:
+Programming Moment оценивается downstream:
 
-**OUTPUT / RELEASE / HISTORY > INTERNAL ACTIVITY VOLUME.**
-
----
-
-# 20. Programming signals
-
-`07` отвечает, почему Thing важна сейчас.
-
-`14` наблюдает, работает ли этот выбор.
-
-Для Programming Moment полезно видеть:
-
-- distribution / surface exposure;
 - qualified experience;
 - continuation;
 - return;
-- meaningful reaction / share;
-- whether promised continuation later closed.
-
-Не следует оптимизировать editorial selection только по click-rate.
-
-Некоторые сильные Things могут быть нишевыми, но очень качественно работать для своего intent.
+- meaningful share / reaction where relevant;
+- closure promised continuation.
 
 Канонически:
+
+**OUTPUT / RELEASE / HISTORY > INTERNAL ACTIVITY VOLUME.**
 
 **PROGRAM QUALITY IS NOT THE SAME AS MAXIMUM REACH.**
 
 ---
 
-# 21. Monetization Value Discovery extension
+# 17. Commercial evidence
 
-`13` задаёт архитектуру денег.
+`13A` задаёт, за какую value допустим payment.
+
+`13B` задаёт economics и experiment-specific commercial path.
 
 `14` фиксирует evidence semantics.
 
-Current evidence ladder:
+Confidence ladder:
 
-**SEEN → CONSUMED → RETURNED → EXPRESSED INTENT → COMMITTED → PAID → REPEATED**
+**SEEN → CONSUMED → RETURNED → EXPRESSED INTENT → COMMITTED → PAID → DELIVERED → REPEATED**
 
 Это не user funnel.
 
-Это confidence ladder для конкретной paid-value hypothesis.
+Это evidence ladder для конкретной paid-value hypothesis.
 
-Главное различие:
+Канонически:
 
 **VALID MONETIZATION MODEL ≠ PROVEN PAID DEMAND.**
 
----
+**REVENUE IS EVIDENCE OF EXCHANGE; DELIVERY AND REPEAT SHOW WHETHER THE EXCHANGE CREATED DURABLE VALUE.**
 
-# 22. Intent classes
+Semantic intent classes:
 
-v1 фиксирует следующие semantic intent classes как допустимые instrumentation concepts:
-
-## THING INTEREST
-
-> «Хочу эту Thing / продолжение / экземпляр»
-
-## EXPERIENCE INTEREST
-
-> «Хочу попробовать / прийти / сыграть»
-
-## PARTICIPATION INTEREST
-
-> «Хочу вписаться»
-
-Не является payment intent.
-
-## INTERVENTION INTEREST
-
-> «Это моя Situation; мне нужен этот resource / action»
-
-## SUPPORT INTEREST
-
-> «Хочу помочь этой Thing / Release появиться / продолжаться»
-
-Эти classes — Product semantics.
-
-Event names ниже — instrumentation contract v1.
+- Thing Interest;
+- Experience Interest;
+- Participation Interest — не payment intent;
+- Intervention Interest;
+- Support Interest.
 
 ---
 
-# 23. Event naming principles
+# 18. Event contract
 
-Event names должны описывать observable action, а не маркетинговую интерпретацию.
+Event names описывают observable action, а не маркетинговую интерпретацию.
 
-Правила:
+Rules:
 
 1. lowercase `snake_case`;
 2. action-oriented;
-3. без PII;
-4. не кодировать channel в name — channel идёт payload;
-5. не плодить отдельное event name для каждого page slug;
-6. Product state не выводится только из analytics event;
-7. derived metrics не должны притворяться raw events.
+3. no PII;
+4. channel не кодируется в event name;
+5. не создавать event name на каждый slug;
+6. Product state не выводится из одного analytics event;
+7. derived metrics не притворяются raw events.
 
-Неправильно:
+Existing production events сохраняются для compatibility.
 
-- `telegram_user_loves_thing`;
-- `high_intent_user`;
-- `premium_person`;
-- `successful_return` как raw click event.
-
----
-
-# 24. Event contract v1
-
-Существующие production events сохраняются для compatibility.
-
-Дополнительный semantic layer рекомендуется вводить постепенно.
-
-## Existing compatible events — KEEP
-
-- `project_open`
-- `course_open`
-- `event_open`
-- `merch_open`
-- `*_cta_click`
-- `recommendation_click`
-- `external_community_click`
-- Join / auth / workspace operational events
-
-Они не являются всей Product Health model.
-
-## New semantic candidate events — ADD WHERE EVIDENCE EXISTS
+Candidate semantic events вводятся только там, где существует реальный Product question.
 
 ### Experience
 
 - `thing_experience_start`
-- `thing_experience_complete` — только где completion имеет реальный смысл
+- `thing_experience_complete` — только где completion имеет смысл
 - `tool_action`
 - `event_commitment`
-- `event_attendance` — только из достоверного attendance source
+- `event_attendance` — только из reliable attendance source
 
 ### Continuation
 
@@ -907,11 +622,8 @@ Event names должны описывать observable action, а не марк�
 - `payment_start`
 - `purchase`
 - `refund`
-- `repeat_purchase` should preferably be **derived** from purchase history, not manually emitted as an independent truth.
 
-Не нужно внедрять весь список сразу.
-
-Instrumentation добавляется только там, где существует понятный Product question.
+`repeat_purchase` предпочтительно derived из authoritative purchase history.
 
 Канонически:
 
@@ -919,13 +631,14 @@ Instrumentation добавляется только там, где сущест�
 
 ---
 
-# 25. Event payload contract
+# 19. Payload / privacy / identity
 
-Для semantic events минимальный безопасный payload, где applicable:
+Минимальный semantic payload, где applicable:
 
 ```text
 entity_type
 entity_id
+thing_id?
 placement
 source_page
 entry_source?
@@ -937,23 +650,11 @@ continuation_type?
 value_intent_class?
 ```
 
-Дополнительно для commercial events:
+Commercial events могут дополнительно использовать controlled value-object / amount / currency fields, если это соответствует payment / legal / privacy rules.
 
-```text
-value_object_type
-value_object_id
-payment_model?
-currency?
-amount?
-```
+Не отправлять:
 
-Financial fields должны соответствовать legal / privacy / payment infrastructure rules.
-
-Не отправлять в analytics:
-
-- email;
-- имя;
-- phone;
+- email / name / phone;
 - auth token;
 - raw Contribution body;
 - free-text Situation;
@@ -965,23 +666,19 @@ Financial fields должны соответствовать legal / privacy / p
 
 **SEMANTIC ATTRIBUTION WITHOUT PERSONAL DATA.**
 
----
-
-# 26. Identity and counting semantics
+**MEASURABILITY DOES NOT OVERRIDE PRIVACY.**
 
 Metrics должны различать:
 
 - event count;
 - session count;
-- unique anonymous user / browser where technically allowed;
+- anonymous browser / device where technically and legally allowed;
 - authenticated product relation where operationally necessary;
 - entity count.
 
-Нельзя смешивать:
+Authenticated account не является universal audience unit.
 
-> 100 events = 100 people.
-
-Нельзя также считать authenticated account универсальной единицей аудитории, потому что watching alone is complete use и login не обязателен.
+Cross-device identity не должна искусственно склеиваться ради красивой retention curve.
 
 Канонически:
 
@@ -989,52 +686,34 @@ Metrics должны различать:
 
 ---
 
-# 27. Internal / test traffic exclusion
+# 20. Population quality
 
-Текущая analytics history существенно загрязняется:
-
-- auth flows;
-- Workspace / Board internal use;
-- product testing;
-- developer / admin activity;
-- Google auth referrals.
-
-Поэтому market / product conclusions должны использовать явно отделённый population.
-
-Минимальные classes:
+Минимальные reporting classes:
 
 - `external_audience`;
 - `authenticated_member_or_contributor`;
 - `internal_admin_test`;
 - `unknown`.
 
-Implementation может использовать другие безопасные механизмы, но отчёт обязан показывать population definition.
+Bots, crawlers и social preview fetchers не попадают в qualified human experience where reasonably identifiable.
+
+Market / monetization conclusions требуют явно описанной population.
 
 Канонически:
 
 **NO MARKET CLAIM FROM AN UNCLASSIFIED INTERNAL-HEAVY SAMPLE.**
 
----
-
-# 28. Bot / crawler / preview traffic
-
-Search crawlers, social preview fetchers и automation могут создавать page requests без человеческого experience.
-
-Они не должны попадать в qualified consumption.
-
-Система может сохранять server / platform telemetry отдельно, но Product Health считает human experience only where reasonably identifiable.
+`unknown` лучше ложной точности.
 
 ---
 
-# 29. Attribution ownership
+# 21. Attribution ownership
 
-`12` владеет смыслом routing / distribution.
+Attribution имеет несколько owners по смыслу.
 
-`14` владеет measurement contract.
+## `12 · Distribution`
 
-Рабочее разделение:
-
-## `12`
+Определяет:
 
 - trigger;
 - target intent;
@@ -1043,160 +722,93 @@ Search crawlers, social preview fetchers и automation могут создава
 - Entry Object;
 - expected continuation.
 
-## `14`
+## `13B · Distribution Economics`
 
-- какие события фиксировать;
-- как связать entry с routing context;
-- как считать qualified experience;
-- attribution windows;
-- derived metrics;
-- thresholds / dashboards.
+Для commercial experiment определяет economic attribution policy:
 
-Attribution не должна переопределять Product semantics.
+- acquisition mode;
+- cost scope;
+- offer / experiment attribution rule;
+- commercial eligibility.
 
----
+## `14 · Metrics & Signals`
 
-# 30. Attribution windows
+Определяет:
 
-Attribution window зависит от вопроса.
-
-Примеры:
-
-- immediate distribution → entry: short window;
-- share → recipient visit: longer reasonable window;
-- Event interest → commitment: event-relative;
-- paid value discovery: object-specific;
-- return: expectation-relative.
-
-Не использовать один рекламный `last-click 30 days` как универсальную истину продукта.
+- какие observable events / dimensions нужны;
+- как связать entry с routing / experiment context;
+- как считать derived metrics;
+- как реализовать и явно маркировать measurement windows;
+- как показывать uncertainty / unknown attribution;
+- thresholds / dashboards / review semantics.
 
 Канонически:
 
-**ATTRIBUTION WINDOW FOLLOWS THE BEHAVIOUR BEING MEASURED.**
+**MEASUREMENT IMPLEMENTS ATTRIBUTION POLICY; IT DOES NOT INVENT PRODUCT OR COMMERCIAL CAUSALITY.**
 
 ---
 
-# 31. Dashboard architecture
+# 22. Attribution windows
+
+Нет одного universal attribution window.
+
+Measurement window следует поведению, которое измеряется:
+
+- distribution → entry: short / trigger-appropriate;
+- Share → recipient experience: reasonable share-specific;
+- Event intent → commitment: event-relative;
+- Return: expectation-relative;
+- utility: situation-relative.
+
+Для commercial experiment конкретная attribution policy / window задаётся `13B` или самим approved experiment; `14` реализует её и делает её видимой в отчёте.
+
+Канонически:
+
+**ATTRIBUTION WINDOW FOLLOWS THE BEHAVIOUR OR APPROVED EXPERIMENT BEING MEASURED.**
+
+Не использовать universal `last-click 30 days` как Product truth.
+
+---
+
+# 23. Review cadence / dashboards / targets
 
 v1 не требует большого BI stack.
 
-Достаточно нескольких рабочих views.
-
-## A. Product Health
-
-- qualified entry;
-- experience;
-- Thing → Thing;
-- Return;
-- share / continuation;
-- Release / History.
-
-## B. Programming / Distribution
-
-- Programming Moment;
-- source / channel;
-- Entry Object;
-- qualified consumption;
-- continuation;
-- return.
-
-## C. Contribution / Participation
-
-- received;
-- editorial disposition / join;
-- closure / action;
-- return.
-
-## D. Intervention
-
-- situation-fit intent;
-- resource use;
-- useful continuation;
-- paid action only where applicable.
-
-## E. Commercial Evidence
-
-- expressed intent;
-- commitment;
-- paid;
-- fulfillment;
-- refund / failure;
-- repeat.
-
-Главный принцип dashboard:
-
-> **show the causal product chain before aggregate totals.**
-
----
-
-# 32. Review cadence
-
-Рекомендуемый v1 cadence:
-
 ## Weekly Operating Review
 
-Смотреть operational anomalies и current Program signals:
+Operational anomalies:
 
 - broken destinations;
 - tracking gaps;
 - current Programming Moments;
-- qualified entry changes;
-- Contribution / Participation closure problems;
-- paid fulfillment incidents if any.
+- data-quality problems;
+- closure / fulfillment incidents.
 
 ## Monthly Product Health Review
 
-Смотреть patterns:
+Patterns:
 
+- qualified experience;
 - Thing → Thing;
-- Return quality;
-- source / intent / entry fit;
-- repeated high-quality Things / Forms;
+- Return + Return Payoff;
+- source / intent / Entry Object fit where known;
 - contributor / participant loops;
 - value intent;
-- monetization evidence.
+- Release / History;
+- commercial evidence where real.
 
 ## Quarterly Model Review
 
 Проверять:
 
-- нужны ли новые metrics;
 - какие metrics оказались vanity;
-- какие event names лишние;
+- какие events лишние;
 - появились ли baseline / targets;
-- не начали ли metrics искажать editorial behaviour.
+- не искажают ли metrics editorial / product behaviour.
 
-Не делать ежедневный KPI ritual ради ощущения контроля.
+Dashboard должен сначала показывать causal chain, потом totals.
 
----
-
-# 33. Thresholds
-
-Threshold нужен для принятия решения, а не для украшения dashboard.
-
-Типы threshold:
-
-## Operational threshold
-
-Например tracking failure / broken destination.
-
-Можно задать сразу.
-
-## Baseline deviation
-
-После достаточной истории.
-
-## Product hypothesis threshold
-
-Например repeated explicit intent from different people before payment test.
-
-Должен быть связан с конкретной hypothesis.
-
-## Commercial threshold
-
-Появляется только после real payments / fulfillment.
-
-Нельзя выдумывать CAC / conversion targets до реального channel economics.
+Target нужен только для решения.
 
 Канонически:
 
@@ -1204,78 +816,41 @@ Threshold нужен для принятия решения, а не для ук
 
 ---
 
-# 34. Leading vs Lagging signals
-
-## Leading
-
-- qualified experience;
-- continuation;
-- explicit intent;
-- commitment;
-- editorial closure;
-- repeat utility use.
-
-## Lagging
-
-- durable Return;
-- repeated Thing consumption;
-- repeat purchase;
-- sustainable Project output;
-- long-term Program Memory.
-
-Нельзя заменять lagging value красивыми leading activity numbers.
-
-Но нельзя и ждать год ради любого решения.
-
-Используем оба класса с ясной подписью.
-
----
-
-# 35. Vanity metrics
+# 24. Vanity metrics / anti-signals
 
 Vanity metric — не «плохая цифра».
 
-Это цифра, которой приписали больше смысла, чем она реально имеет.
+Это цифра, которой приписали больше смысла, чем она имеет.
 
-Типичные примеры:
+Типичные weak / diagnostic totals:
 
-- total pageviews;
+- pageviews;
 - total users;
 - followers;
-- likes;
-- reaction count;
-- number of artifacts;
-- number of Board cards;
+- likes / reactions;
+- Board cards;
 - notification opens;
-- raw registrations;
-- total submissions;
-- total sessions;
+- registrations;
+- submissions;
+- sessions;
 - time-on-site без context.
-
-Они могут быть useful diagnostics.
-
-Они не должны становиться доказательством Product Health без downstream evidence.
-
----
-
-# 36. Anti-signals
 
 Критические anti-signals:
 
-- pageviews растут, qualified experience падает;
-- CTR растёт, destination mismatch растёт;
-- Board activity растёт, Releases не появляются;
-- notifications растут, Return Payoff падает;
-- submissions растут, editorial closure падает;
-- joins растут, participation action отсутствует;
-- Event pageviews высокие, independent commitments отсутствуют;
-- Dementor profile views растут, authored work не открывают;
-- Intervention CTA clicks растут, Situation fit неизвестен;
+- pageviews ↑, qualified experience ↓;
+- CTR ↑, destination mismatch ↑;
+- Board activity ↑, Releases не появляются;
+- notifications ↑, Return Payoff ↓;
+- submissions ↑, editorial closure ↓;
+- joins ↑, participation action отсутствует;
+- Event opens высокие, commitments отсутствуют;
+- Dementor profile views ↑, authored work не открывают;
+- Intervention CTA clicks ↑, Situation fit неизвестен;
 - Membership interest выводят из Join opens;
-- revenue растёт, fulfillment / repeat падают;
+- revenue ↑, delivery / repeat ↓;
 - internal/test traffic считается market demand;
 - один power user создаёт видимость массового engagement;
-- targets начинают влиять на editorial selection сильнее, чем Product Model;
+- targets начинают влиять на editorial selection сильнее Product Model;
 - instrumentation существует, но никто не знает, какое решение она поддерживает.
 
 Главный anti-signal:
@@ -1284,102 +859,23 @@ Vanity metric — не «плохая цифра».
 
 ---
 
-# 37. Commercial Health extension
-
-Когда реальные paid objects появляются, Product Health получает дополнительный блок.
-
-Core commercial metrics:
-
-## Paid Value Usage
-
-Использована ли купленная ценность?
-
-## Fulfillment Rate
-
-Доставили ли обещанное?
-
-## Refund / Failure Rate
-
-Где promise ломается?
-
-## Paid → Product Return
-
-Вернулся ли человек к программе / Things, а не только в billing?
-
-## Repeat Purchase by Value
-
-Повторяется ли purchase сопоставимой самостоятельной ценности?
-
-## Revenue by Value Object
-
-Какие объекты реально создают revenue?
-
-## Payer / User split
-
-Кто платит и кто получает experience?
-
-Revenue не заменяет Product Health.
-
-Канонически:
-
-**REVENUE IS EVIDENCE OF EXCHANGE. FULFILLMENT AND REPEAT TELL US WHETHER THE EXCHANGE CREATED DURABLE VALUE.**
-
----
-
-# 38. Value discovery review
-
-До масштабирования monetization review должен отвечать:
-
-1. где есть real consumption;
-2. где есть continuation / return;
-3. где repeated explicit intent;
-4. где commitment;
-5. где первый payment;
-6. была ли value delivered;
-7. повторилось ли поведение у разных людей.
-
-Не начинать review с revenue dashboard, если payments ещё являются единичными experiments.
-
----
-
-# 39. Privacy / consent
-
-Analytics measurement подчиняется privacy / consent authority и runtime rules.
-
-Metrics Model не даёт права собирать данные только потому, что они удобны аналитически.
-
-Principles:
-
-- minimum necessary data;
-- consent where required;
-- no sensitive payloads;
-- no raw private Contribution / Situation text;
-- aggregation where sufficient;
-- deletion / retention according to legal policy;
-- no hidden identity stitching ради красивой retention curve.
-
-Канонически:
-
-**MEASURABILITY DOES NOT OVERRIDE PRIVACY.**
-
----
-
-# 40. Product QA for any new metric
+# 25. Product QA for any metric
 
 Перед добавлением metric ответить:
 
-1. **Какой Product question она отвечает?**
-2. **Какое решение изменится в зависимости от значения?**
-3. **Это raw event, derived signal, metric или KPI?**
-4. **Какая единица счёта?**
-5. **Какой population?**
-6. **Как исключён internal / test traffic?**
-7. **Не путаем ли exposure с consumption?**
-8. **Не путаем ли click с success?**
-9. **Не путаем ли activity с value?**
-10. **Не стимулирует ли metric плохое editorial / product behaviour?**
-11. **Можно ли получить ответ меньшим количеством instrumentation?**
-12. **Нужен ли target сейчас или пока только baseline?**
+1. Какой Product question она отвечает?
+2. Какое решение изменится?
+3. Это event, signal, metric, KPI или target?
+4. Какая единица счёта?
+5. Какая population?
+6. Как исключён / маркирован internal-test traffic?
+7. Не путаем ли exposure с experience?
+8. Не путаем ли click с success?
+9. Не путаем ли activity с value?
+10. Не стимулирует ли metric плохое behaviour?
+11. Можно ли ответить меньшим instrumentation?
+12. Нужен ли target или пока baseline?
+13. Какая uncertainty / unknown attribution остаётся?
 
 Если metric не меняет решение:
 
@@ -1387,23 +883,28 @@ Principles:
 
 ---
 
-# 41. Phase 0 implementation contract
+# 26. Phase 0 implementation contract
 
 Phase 0 не требует новой analytics platform или schema migration.
 
 Нужно:
 
 1. сохранить текущую GA4 / Clarity foundation;
-2. отделить internal / test population насколько practically possible;
-3. определить 3–5 реальных Things / Events для consumption semantics;
-4. добавить минимальный semantic instrumentation для:
-   - experience start;
-   - continuation;
-   - share intent where relevant;
-   - source / entry-object attribution;
-5. построить ручной / простой Product Health review;
-6. не вводить targets до baseline;
-7. проверить Thing → Thing и qualified entry на реальных sessions.
+2. отделить external / internal / unknown population насколько practically possible;
+3. выбрать 3–5 реальных Things / Events разных Forms;
+4. для каждого определить Entry Object и experience-start contract;
+5. добавить минимальный semantic instrumentation:
+   - `thing_experience_start`;
+   - `continuation_open`;
+   - Share intent where real;
+6. протянуть Distribution context только там, где он реально известен;
+7. собрать первый simple Product Health review;
+8. проверить Thing → Thing и Return на честной выборке;
+9. не вводить optimization targets до baseline.
+
+Первый инженерный приоритет:
+
+**HONEST SAMPLE + QUALIFIED EXPERIENCE + CONTINUATION.**
 
 Цель Phase 0:
 
@@ -1411,39 +912,7 @@ Phase 0 не требует новой analytics platform или schema migratio
 
 ---
 
-# 42. Suggested implementation order
-
-## Phase 0 — Population + semantic baseline
-
-Internal/test exclusion, current events audit, small sample of Things.
-
-## Phase 1 — Qualified experience
-
-Form-aware `experience_start` / minimal completion where meaningful.
-
-## Phase 2 — Continuation / Thing → Thing
-
-Contextual continuation attribution.
-
-## Phase 3 — Return semantics
-
-Expectation-relative derived Return metrics.
-
-## Phase 4 — Contribution / Participation / Intervention
-
-Add closure / action signals only where corresponding product flows are real.
-
-## Phase 5 — Commercial evidence
-
-Intent / commitment / payment / fulfillment / repeat after actual offer experiments.
-
-## Phase 6 — Dashboards / targets
-
-Only after stable event quality and baseline.
-
----
-
-# 43. Non-goals v1
+# 27. Non-goals v1
 
 `14` не требует:
 
@@ -1453,60 +922,31 @@ Only after stable event quality and baseline.
 - real-time executive dashboard;
 - growth funnel for every user;
 - mandatory login analytics;
-- scoring people by engagement;
-- predictive lead scoring;
+- engagement scoring;
+- predictive lead scoring / churn;
 - gamification metrics;
 - social graph metrics;
-- revenue as product truth;
-- daily active user target just because it is standard SaaS practice;
+- revenue as Product truth;
+- generic DAU target;
 - tracking every click;
 - PII enrichment;
+- hidden identity stitching;
 - instrumentation before Product question.
 
 ---
 
-# 44. Boundary with `12 · Distribution`
+# 28. Acceptance test
 
-`12`:
-
-> **как организовать точную встречу.**
-
-`14`:
-
-> **как понять, состоялась ли эта встреча и привела ли к ценности / продолжению.**
-
-Каноническая связка:
-
-**PROMISE → ENTRY OBJECT → QUALIFIED EXPERIENCE → CONTINUATION**
-
----
-
-# 45. Boundary with `13 · Monetization`
-
-`13`:
-
-> **за какую конкретную ценность допустим payment.**
-
-`14`:
-
-> **какое evidence показывает, что value существует, есть intent, exchange состоялся, promise выполнен и demand повторяется.**
-
-Канонически:
-
-**MONETIZATION MODEL ≠ MONETIZATION EVIDENCE.**
-
----
-
-# 46. Acceptance test
-
-Metrics & Signals Model работает, если на любой dashboard number можно ответить:
+Metrics & Signals Model считается рабочим, если на любую dashboard / report number можно ответить:
 
 ```text
 WHAT HAPPENED?
 → WHAT PRODUCT QUESTION DOES IT ANSWER?
 → WHAT POPULATION?
-→ WHAT VALUE / RISK DOES IT REPRESENT?
+→ WHAT EXPERIENCE / VALUE / RISK DOES IT REPRESENT?
 → IS IT RAW OR DERIVED?
+→ WHAT ATTRIBUTION / WINDOW RULE APPLIES?
+→ WHAT IS UNKNOWN?
 → WHAT DECISION CHANGES BECAUSE OF IT?
 ```
 
@@ -1520,11 +960,7 @@ WHAT HAPPENED?
 
 # Canonical summary
 
-Главный вопрос:
-
-> **Какие наблюдаемые сигналы доказывают, что Dementor создаёт ценность — а какие только создают видимость активности?**
-
-Главная product chain:
+Главная Product Health chain:
 
 **ENTRY → EXPERIENCE → CONTINUATION → RETURN → CONTRIBUTION / PARTICIPATION / INTERVENTION → RELEASE / HISTORY**
 
@@ -1536,7 +972,9 @@ Commercial evidence:
 
 **MEASURE THE VALUE CHAIN, NOT THE NOISE AROUND IT.**
 
-**CLICK / OPEN ≠ QUALIFIED ENTRY.**
+**CLICK / OPEN ≠ QUALIFIED EXPERIENCE ENTRY.**
+
+**UNKNOWN DISTRIBUTION CONTEXT ≠ FAILED EXPERIENCE.**
 
 **CONSUMPTION MUST BE FORM-AWARE.**
 
@@ -1544,9 +982,13 @@ Commercial evidence:
 
 **RETURN WINDOW FOLLOWS THE EXPECTATION, NOT A GENERIC SAAS RETENTION TEMPLATE.**
 
+**RETURN FREQUENCY WITHOUT PAYOFF IS NOT RETENTION HEALTH.**
+
 **PROGRAM QUALITY IS NOT THE SAME AS MAXIMUM REACH.**
 
 **VALID MONETIZATION MODEL ≠ PROVEN PAID DEMAND.**
+
+**MEASUREMENT IMPLEMENTS ATTRIBUTION POLICY; IT DOES NOT INVENT PRODUCT OR COMMERCIAL CAUSALITY.**
 
 **NO QUESTION → NO EVENT.**
 
@@ -1554,6 +996,6 @@ Commercial evidence:
 
 **MEASURABILITY DOES NOT OVERRIDE PRIVACY.**
 
-И главный anti-signal:
+Главный anti-signal:
 
 > **мы умеем показать рост активности, но не можем показать, какую самостоятельную ценность человек получил и почему захотел продолжить.**
