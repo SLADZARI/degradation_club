@@ -8,6 +8,7 @@ const spatialCss=read('community/board/board-spatial-v1.css');
 const filterCss=read('community/board/board-filters-v2.css');
 const qaCss=read('community/board/board-qa-fix-v1.css');
 const canonicalHeader=read('community/board/board-canonical-header-v2-2.css');
+const programCss=read('community/board/board-program-v1.css');
 const js=read('community/board/board-fullscreen-v2-1.js');
 const spatial=read('community/board/board-spatial-v1.js');
 const integrations=read('community/board/board-integrations-v1.js');
@@ -23,6 +24,10 @@ expect(!page.includes('dcw-topbar'),'duplicate Board topbar must not be in Board
 expect(!page.includes('board-personal-card-v2.js'),'personal membership card must not mount on Board');
 expect(css.includes('height:100dvh'),'Board must own full viewport height');
 expect(css.includes('overflow:hidden'),'Board page must suppress page scroll');
+expect(programCss.includes('.dc-board-fullscreen-v21 .dc-board-wall>.dc-board-shell{position:relative!important}'),'fullscreen Board shell must own Current Program overlay positioning');
+expect(programCss.includes('.dc-board-fullscreen-v21 .dc-board-program{position:absolute!important'),'Current Program must stay out of fullscreen Board document flow');
+expect(programCss.includes('pointer-events:none!important'),'Current Program overlay shell must not steal spatial pan outside its rail');
+expect(programCss.includes('.dc-board-fullscreen-v21 .dc-board-program__rail')&&programCss.includes('pointer-events:auto!important'),'Current Program actions must remain interactive inside the overlay');
 expect(css.includes('.dc-spatial-controls [data-slot],.dc-spatial-controls [data-mine]{display:none!important}'),'slot/mine controls need a default hidden state');
 expect(css.includes('body:has(.dc-spatial-world .dc-notice[data-artifact-owned="1"]) .dc-spatial-controls [data-mine]{display:inline-flex!important}'),'own-card locator must become visible when the user has an own live Artifact');
 expect(mobileAir.includes('.dc-board-fullscreen-v21 .dc-board-filters{overflow:visible!important}'),'mobile filter host must not clip the nested type drawer');
