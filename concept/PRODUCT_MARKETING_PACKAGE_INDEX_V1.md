@@ -145,42 +145,68 @@ Key decisions:
 
 **Question:** How does the stage of the club display living Things, Projects, Releases, History and Participation without becoming a forum or marketplace?
 
-**Status:** NEXT / PARTIALLY DEFINED IN JTBD + CJM + PRODUCT MODEL
+**Status:** WORKING CANON
 
-Must formalize:
-
-- Board source adapter around Artifact / entity projection / system;
-- card anatomy and information priority;
-- Thing identity on Board;
-- Form / Release State / Production State / Participation display rules;
-- how `ВЫШЛО + МУТЯТ v2` is represented without badge overload;
-- detail view;
-- History presentation;
-- Project relation;
-- editorial control;
-- Activity relationship;
-- compatibility with existing production Board contracts.
-
-Target source:
+Source:
 `concept/BOARD_PRODUCT_MODEL_V1.md`
+
+Production mapping:
+`operations/BOARD_PRODUCT_MODEL_PRODUCTION_MAPPING_2026-09-15.md`
+
+Core architecture:
+
+**CURRENT SOURCES → SEMANTIC PROJECTION → CONTEXTUAL PRESENTATION**
+
+Canonical projection union:
+
+**ThingProjection | AuxiliaryEntityProjection | SystemNotice**
+
+Key decisions:
+
+- **PROGRAM BOARD = THINGS FIRST**, not every Board object is a Thing;
+- Artifact may back a ThingProjection but does not define product meaning;
+- `source type ≠ Form`;
+- operational Artifact lifecycle remains separate from Production / Release semantics;
+- Production State = `IDLE / MAKING / STOPPED`;
+- `ПРИНЕСЛИ` is an editorial signal, not a Production State;
+- `RELEASED` should preferably be derived from audience-available Releases;
+- one Thing may have multiple Forms through multiple Releases;
+- Event Release means audience availability, not occurrence/completion;
+- `ВПИСАТЬСЯ` is Participation Opportunity, not lifecycle state;
+- **RICH MODEL → SPARSE CARD**;
+- one contextual signal + one primary action;
+- **RELEASE CTA > INTERNAL NAVIGATION**;
+- **FRESHNESS ≠ CREATED_AT ≠ PUBLISHED_AT**;
+- one Thing can receive different RELEASE / MAKING / PARTICIPATION / HISTORY / DEFAULT presentations depending on why it matters now;
+- Detail route may stay, but its information hierarchy must move from internal metadata to Thing meaning + action;
+- implementation starts with **Phase 0 semantic projection in memory**, before schema migration.
 
 ---
 
 ## 07 · Content & Programming Model
 
-**Question:** What makes Dementor feel like an ongoing program rather than a repository?
+**Question:** What makes Dementor feel like an ongoing program rather than a repository, and how does editorial programming decide what returns, repeats, develops anticipation, and becomes a recognizable rhythm over time?
 
-**Status:** TODO
+**Status:** NEXT
 
-Must define:
+Must define without redefining Board semantics:
 
 - editorial rhythm;
-- release types;
+- release types as programming units, referencing Product Model Release semantics rather than redefining them;
 - series;
 - recurring formats;
-- fresh / making / continuing;
+- editorial seasons / cycles if useful;
+- fresh / making / continuing as programming choices, not new lifecycle states;
 - relationship between authored program and contributions;
-- anticipation mechanics.
+- anticipation mechanics;
+- how Things are selected, sequenced, resurfaced and retired editorially;
+- how Board, Home, Activity and external distribution consume the same programming decisions differently;
+- how the program stays alive without requiring constant net-new content.
+
+Boundary with `06`:
+
+- `06` owns **how Board presents a Thing now**;
+- `07` owns **why this Thing is in the program now, what comes before/after it, and what recurring editorial structure makes people expect more**.
 
 Target source:
 `concept/CONTENT_PROGRAMMING_MODEL_V1.md`
@@ -359,7 +385,7 @@ Target source:
 
 **Question:** What must future design, product and marketing decisions not break?
 
-**Status:** PARTIALLY DEFINED IN JTBD + VALUE ARCHITECTURE + PRODUCT MODEL
+**Status:** PARTIALLY DEFINED IN JTBD + VALUE ARCHITECTURE + PRODUCT MODEL + BOARD PRODUCT MODEL
 
 Known principles:
 
@@ -369,6 +395,7 @@ Known principles:
 - Objects > Profiles;
 - Situations > Skills;
 - Form ≠ Project;
+- Source type ≠ Form;
 - Release State ≠ Production State ≠ Participation ≠ History;
 - Release > Completion;
 - Editorial reaction > Infinite publishing;
@@ -379,7 +406,10 @@ Known principles:
 - Value before CTA;
 - Paid value is not paid belonging;
 - Product semantics ≠ database table list;
-- Projection never becomes a second source of semantic truth.
+- Projection never becomes a second source of semantic truth;
+- Rich model → sparse card;
+- Release CTA > internal navigation;
+- Freshness ≠ created_at / published_at.
 
 Target source:
 `concept/PRODUCT_PRINCIPLES_ANTIPATTERNS_V1.md`
@@ -390,18 +420,17 @@ Target source:
 
 Current recommended sequence:
 
-1. **Board Product Model**
-2. **Content & Programming Model**
-3. **Return Loops**
-4. **Contribution Model**
-5. **Dementor / Intervention Model**
-6. **Marketing Positioning & Messaging**
-7. **Distribution Model**
-8. **Monetization Map**
-9. **Metrics & Signals**
-10. **Product Principles / Anti-patterns final consolidation**
+1. **Content & Programming Model**
+2. **Return Loops**
+3. **Contribution Model**
+4. **Dementor / Intervention Model**
+5. **Marketing Positioning & Messaging**
+6. **Distribution Model**
+7. **Monetization Map**
+8. **Metrics & Signals**
+9. **Product Principles / Anti-patterns final consolidation**
 
-Reason: product meaning, journeys, entry, value and core ontology are now mapped. Next make the existing Board express that model without forcing a destructive production rewrite.
+Board Product Model is now established as WORKING CANON. The next question is no longer what a Board object means or how it is rendered, but how Dementor creates an ongoing authored program from Things over time.
 
 ---
 
@@ -418,9 +447,10 @@ Reason: product meaning, journeys, entry, value and core ontology are now mapped
 
 - Value Architecture
 - Product Model
+- Board Product Model
 
 **NEXT**
 
-- Board Product Model
+- Content & Programming Model
 
 Everything else should reference the authorities above and must not redefine them silently.
