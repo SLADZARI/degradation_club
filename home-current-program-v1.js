@@ -1,4 +1,4 @@
-import {getCurrentProgram,trackCurrentProgramAction,announceCurrentProgram} from '/current-program-v1.js';
+import {getCurrentProgram,announceCurrentProgram} from '/current-program-v1.js';
 
 const host=document.getElementById('currentProgramHost');
 if(host){
@@ -10,12 +10,5 @@ if(host){
     <p class="dc-current-program__truth">${item.currentTruth}</p>
     <a class="dc-current-program__action" data-current-program-action href="${item.href}" data-analytics-cta="current-program:${item.analyticsId}">${item.actionLabel} →</a>
   </article>`).join('');
-  host.addEventListener('click',event=>{
-    const link=event.target.closest('[data-current-program-action]');
-    if(!link)return;
-    const card=link.closest('[data-thing-ref]');
-    const item=items.find(entry=>entry.thingRef===card?.dataset.thingRef);
-    if(item)trackCurrentProgramAction(item,'current-program-home');
-  });
   announceCurrentProgram('home');
 }
