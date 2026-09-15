@@ -37,7 +37,7 @@ The spatial world may remain larger than the viewport and pannable. The interfac
 1. compact mobile Workspace shell/navigation using the existing canonical Header/Workspace owner;
 2. one-row Board utility composition: `ВСЁ / ТИПЫ` + the existing publish action;
 3. Variant 3 Current Program strip: all three reviewed Things visible at once, no horizontal clipping;
-4. one safe-area-aware bottom baseline for pager + existing spatial controls;
+4. one compact safe-area-aware bottom dock zone with pager and existing spatial controls on two non-overlapping levels;
 5. responsive evidence at 390 and 360 px;
 6. no change to Artifact/world semantics, permissions, Membership, Current Program truth, Supabase or persistence.
 
@@ -61,10 +61,10 @@ At 390 and 360 px the Workspace shell, primary member nav, filter row, publish a
 All three Current Program cards are visible simultaneously. The strip itself does not require horizontal scrolling. Program Things remain separate from Artifacts and only explicit CTA arrows receive pointer events.
 
 ### AC4 · Utility hierarchy
-Filters and `+ ПРИКОЛОТЬ` share one compact row and do not overlap. Program strip begins below that row.
+Workspace navigation clears Board utilities. Filters and `+ ПРИКОЛОТЬ` share one compact row and do not overlap. Program strip begins below that row.
 
 ### AC5 · Bottom dock
-Pager and spatial controls share one safe-area-aware baseline without overlap or viewport escape.
+Pager and spatial controls form one compact safe-area-aware dock zone, remain fully inside the viewport, and preserve the existing approved no-overlap navigation clearance. The pager sits immediately above the spatial-control row rather than colliding with it.
 
 ### AC6 · Fullscreen ownership
 The Board spatial viewport keeps canonical fullscreen geometry; this corrective must not reintroduce the previous viewport displacement regression.
