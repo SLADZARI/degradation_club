@@ -1,0 +1,236 @@
+/* Board mobile harmonization v1
+   Cross-component mobile composition owner for the canonical Workspace Board.
+   It does not change Board semantics, Artifact ownership, permissions or spatial persistence.
+   Loaded after existing component styles so the mobile shell can coordinate them without
+   creating a second runtime mechanic. */
+
+@media (max-width:520px){
+  .dc-board-fullscreen-v21{
+    --dc-mobile-board-gutter:8px;
+    --dc-mobile-board-bottom:calc(8px + env(safe-area-inset-bottom,0px));
+  }
+
+  /* Workspace chrome: four ordinary member destinations fit as one deliberate row.
+     Role-only tools may continue horizontally after the primary set instead of making
+     the whole shell wider than the viewport. */
+  .dc-board-fullscreen-v21 .dcw-sidebar{
+    height:108px!important;
+    min-height:108px!important;
+    grid-template-rows:58px 50px!important;
+  }
+  .dc-board-fullscreen-v21 .dcw-brand{
+    height:58px!important;
+    min-height:58px!important;
+    padding-inline:12px!important;
+  }
+  .dc-board-fullscreen-v21 .dcw-brand span,
+  .dc-board-fullscreen-v21 .dcw-brand strong{font-size:15px!important}
+  .dc-board-fullscreen-v21 .dcw-session{
+    height:58px!important;
+    min-height:58px!important;
+    padding-inline:8px!important;
+    gap:4px!important;
+  }
+  .dc-board-fullscreen-v21 .dcw-session-avatar{
+    width:32px!important;
+    height:32px!important;
+    flex-basis:32px!important;
+  }
+  .dc-board-fullscreen-v21 .dcw-nav{
+    height:50px!important;
+    padding:5px 6px!important;
+    gap:3px!important;
+    overflow-x:auto!important;
+    overflow-y:hidden!important;
+    scroll-padding-inline:6px!important;
+  }
+  .dc-board-fullscreen-v21 .dcw-nav .dcw-nav-link:not([data-work-nav]):not([data-role-home]):not([data-role-tool]){
+    flex:1 1 0!important;
+    min-width:0!important;
+    max-width:none!important;
+    padding:6px 4px!important;
+    font-size:clamp(6.2px,1.75vw,7.1px)!important;
+    line-height:1.05!important;
+    white-space:normal!important;
+    text-align:center!important;
+  }
+  .dc-board-fullscreen-v21 .dcw-nav .dcw-nav-link[data-work-nav],
+  .dc-board-fullscreen-v21 .dcw-nav .dcw-nav-link[data-role-home],
+  .dc-board-fullscreen-v21 .dcw-nav .dcw-nav-link[data-role-tool]{
+    flex:0 0 auto!important;
+    min-width:max-content!important;
+    padding-inline:8px!important;
+  }
+  .dc-board-fullscreen-v21 .dcw-main{height:calc(100dvh - 132px)!important}
+  .dc-board-fullscreen-v21 .dc-board-entry,
+  .dc-board-fullscreen-v21 .dc-artifact-overlay{inset:132px 0 0!important}
+
+  /* One compact utility row: filters own the left edge, publish owns the right. */
+  .dc-board-fullscreen-v21 .dc-board-filters{
+    top:10px!important;
+    left:var(--dc-mobile-board-gutter)!important;
+    right:auto!important;
+    width:auto!important;
+    max-width:calc(100% - 132px)!important;
+    min-height:38px!important;
+    padding:3px!important;
+    gap:3px!important;
+    box-shadow:2px 2px 0 #111!important;
+    overflow:visible!important;
+  }
+  .dc-board-fullscreen-v21 .dc-board-filter{
+    min-height:32px!important;
+    padding:0 9px!important;
+    font-size:8px!important;
+  }
+  .dc-board-fullscreen-v21 .dc-board-primary{
+    top:10px!important;
+    left:auto!important;
+    right:var(--dc-mobile-board-gutter)!important;
+  }
+  .dc-board-fullscreen-v21 .dc-board-primary button{
+    min-height:38px!important;
+    padding:0 9px!important;
+    font-size:8px!important;
+    box-shadow:2px 2px 0 #111!important;
+  }
+
+  /* Variant 3: all three Current Program Things are visible at once.
+     Program remains an overlay and only explicit CTA arrows receive pointers. */
+  .dc-board-fullscreen-v21 .dc-board-program{
+    top:58px!important;
+    left:var(--dc-mobile-board-gutter)!important;
+    right:var(--dc-mobile-board-gutter)!important;
+    max-width:none!important;
+  }
+  .dc-board-fullscreen-v21 .dc-board-program__rail{
+    display:grid!important;
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+    width:100%!important;
+    max-width:none!important;
+    gap:5px!important;
+    overflow:visible!important;
+    padding:0!important;
+    scroll-snap-type:none!important;
+  }
+  .dc-board-fullscreen-v21 .dc-board-program__card{
+    width:auto!important;
+    min-width:0!important;
+    flex:initial!important;
+    min-height:68px!important;
+    padding:7px 7px 6px!important;
+    grid-template-columns:minmax(0,1fr) 26px!important;
+    grid-template-areas:'state action' 'title action'!important;
+    gap:3px 5px!important;
+    box-shadow:2px 2px 0 rgba(17,17,17,.28)!important;
+  }
+  .dc-board-fullscreen-v21 .dc-board-program__state{
+    font-size:0!important;
+    min-width:0!important;
+    opacity:.62!important;
+  }
+  .dc-board-fullscreen-v21 .dc-board-program__card[data-source-kind="program"] .dc-board-program__state::after{content:'КУРС'}
+  .dc-board-fullscreen-v21 .dc-board-program__card[data-source-kind="project"] .dc-board-program__state::after{content:'ПРОЕКТ'}
+  .dc-board-fullscreen-v21 .dc-board-program__card[data-source-kind="event"] .dc-board-program__state::after{content:'СОБЫТИЕ'}
+  .dc-board-fullscreen-v21 .dc-board-program__state::after{
+    font:900 6.5px/1 ui-monospace,SFMono-Regular,Menlo,monospace!important;
+    letter-spacing:.08em!important;
+  }
+  .dc-board-fullscreen-v21 .dc-board-program__card h3{
+    margin:0!important;
+    font-size:clamp(10px,3.1vw,12px)!important;
+    line-height:.94!important;
+    white-space:normal!important;
+    display:-webkit-box!important;
+    -webkit-box-orient:vertical!important;
+    -webkit-line-clamp:2!important;
+    overflow:hidden!important;
+    text-overflow:clip!important;
+  }
+  .dc-board-fullscreen-v21 .dc-board-program__card a{
+    width:26px!important;
+    height:30px!important;
+    min-width:26px!important;
+    padding:0!important;
+    font-size:0!important;
+    align-self:center!important;
+    display:inline-flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+  }
+  .dc-board-fullscreen-v21 .dc-board-program__card a::after{
+    content:'→';
+    font:900 14px/1 ui-monospace,SFMono-Regular,Menlo,monospace!important;
+  }
+
+  /* Bottom controls become one safe-area-aware baseline instead of two islands. */
+  .dc-board-fullscreen-v21 .dc-board-filter-nav{
+    display:flex!important;
+    position:fixed!important;
+    left:var(--dc-mobile-board-gutter)!important;
+    right:auto!important;
+    top:auto!important;
+    bottom:var(--dc-mobile-board-bottom)!important;
+    margin:0!important;
+    padding:3px!important;
+    gap:3px!important;
+    border:1px solid #111!important;
+    background:#f8f5ed!important;
+    box-shadow:2px 2px 0 #111!important;
+    z-index:175!important;
+  }
+  .dc-board-fullscreen-v21 .dc-board-filter-nav[hidden]{display:none!important}
+  .dc-board-fullscreen-v21 .dc-board-filter-nav button{
+    width:30px!important;
+    height:30px!important;
+    min-width:30px!important;
+    min-height:30px!important;
+    padding:0!important;
+    box-shadow:none!important;
+  }
+  .dc-board-fullscreen-v21 .dc-board-filter-nav span{
+    min-width:38px!important;
+    font-size:8px!important;
+  }
+  .dc-board-fullscreen-v21 .dc-spatial-controls{
+    top:auto!important;
+    left:auto!important;
+    right:var(--dc-mobile-board-gutter)!important;
+    bottom:var(--dc-mobile-board-bottom)!important;
+    max-width:calc(100% - 126px)!important;
+    gap:3px!important;
+    padding:0!important;
+    overflow:visible!important;
+    flex-wrap:nowrap!important;
+  }
+  .dc-board-fullscreen-v21 .dc-spatial-control{
+    min-height:36px!important;
+    height:36px!important;
+    padding:0 7px!important;
+    font-size:7.5px!important;
+    box-shadow:2px 2px 0 #111!important;
+  }
+  .dc-board-fullscreen-v21 .dc-spatial-control[data-zoom-in],
+  .dc-board-fullscreen-v21 .dc-spatial-control[data-zoom-out],
+  .dc-board-fullscreen-v21 .dc-spatial-control[data-tutorial-help]{
+    width:32px!important;
+    min-width:32px!important;
+    padding:0!important;
+  }
+  .dc-board-fullscreen-v21 .dc-spatial-control[data-home]{
+    min-width:52px!important;
+    padding-inline:6px!important;
+  }
+  .dc-board-fullscreen-v21 .dc-spatial-control[data-mine]{
+    min-width:38px!important;
+    padding-inline:6px!important;
+  }
+
+  /* The type drawer clears the unified dock and remains viewport-owned. */
+  .dc-board-fullscreen-v21 .dc-board-filter-drawer{
+    left:var(--dc-mobile-board-gutter)!important;
+    right:var(--dc-mobile-board-gutter)!important;
+    bottom:calc(54px + env(safe-area-inset-bottom,0px))!important;
+    max-height:min(62dvh,calc(100dvh - 205px))!important;
+  }
+}

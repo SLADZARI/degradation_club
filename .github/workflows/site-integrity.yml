@@ -82,6 +82,16 @@ jobs:
         run: node scripts/validate-board-public-activity-browser.mjs
       - name: Validate Current Program Home and Board browser acceptance
         run: node scripts/validate-current-program-browser.mjs
+      - name: Validate Board mobile harmonization browser acceptance
+        run: node scripts/validate-board-mobile-harmonization-browser.mjs
+      - name: Upload Board mobile harmonization references
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: board-mobile-harmonization-references
+          path: .qa/board-mobile-harmonization/*.png
+          if-no-files-found: warn
+          retention-days: 14
       - name: Validate public harmonization browser matrix
         run: node scripts/validate-public-harmonization-browser.mjs
       - name: Validate Projects v2 navigation and #44 browser regression
