@@ -2,13 +2,8 @@ import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';
 import {chromium} from 'playwright';
-import {PNG} from 'pngjs';
 
 const artifact=path.join(process.cwd(),'_site');
-const visualDir=path.join(process.cwd(),'.qa','public-harmonization');
-const visualBaselinePath=path.join(process.cwd(),'scripts','visual-baselines','home-fuengirola.json');
-fs.mkdirSync(visualDir,{recursive:true});
-const visualBaselines=fs.existsSync(visualBaselinePath)?JSON.parse(fs.readFileSync(visualBaselinePath,'utf8')):null;
 const errors=[];
 const expect=(ok,msg)=>{if(!ok)errors.push(msg)};
 const mime={'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.js':'text/javascript; charset=utf-8','.mjs':'text/javascript; charset=utf-8','.json':'application/json; charset=utf-8','.svg':'image/svg+xml','.png':'image/png','.webp':'image/webp','.jpg':'image/jpeg','.jpeg':'image/jpeg','.xml':'application/xml; charset=utf-8','.txt':'text/plain; charset=utf-8'};
@@ -19,41 +14,6 @@ function resolveFile(urlPath){
   const full=path.resolve(artifact,pathname.replace(/^\/+/,''));
   if(!full.startsWith(path.resolve(artifact)+path.sep)&&full!==path.resolve(artifact))return null;
   return full;
-}
-
-function visualHash(buffer,cols=32,rows=18){
-  const png=PNG.sync.read(buffer);
-  const cells=[];
-  for(let gy=0;gy<rows;gy++){
-    const y0=Math.floor(gy*png.height/rows),y1=Math.max(y0+1,Math.floor((gy+1)*png.height/rows));
-    for(let gx=0;gx<cols;gx++){
-      const x0=Math.floor(gx*png.width/cols),x1=Math.max(x0+1,Math.floor((gx+1)*png.width/cols));
-      let sum=0,count=0;
-      const sx=Math.max(1,Math.floor((x1-x0)/6)),sy=Math.max(1,Math.floor((y1-y0)/6));
-      for(let y=y0;y<y1;y+=sy){
-        for(let x=x0;x<x1;x+=sx){
-          const i=(y*png.width+x)*4;
-          const a=png.data[i+3]/255;
-          const r=png.data[i]*a+255*(1-a),g=png.data[i+1]*a+255*(1-a),b=png.data[i+2]*a+255*(1-a);
-          sum+=.2126*r+.7152*g+.0722*b;count++;
-        }
-      }
-      cells.push(sum/Math.max(1,count));
-    }
-  }
-  const avg=cells.reduce((a,b)=>a+b,0)/cells.length;
-  const bits=cells.map(v=>v>=avg?1:0);
-  let hex='';
-  for(let i=0;i<bits.length;i+=4){
-    let n=0;for(let j=0;j<4;j++)n=(n<<1)|(bits[i+j]||0);hex+=n.toString(16);
-  }
-  return hex;
-}
-
-function hammingHex(a,b){
-  if(typeof a!=='string'||typeof b!=='string'||a.length!==b.length)return Infinity;
-  const pop=[0,1,1,2,1,2,2,3,1,2,2,3,2,3,3,4];
-  let d=0;for(let i=0;i<a.length;i++)d+=pop[parseInt(a[i],16)^parseInt(b[i],16)];return d;
 }
 
 const server=http.createServer((req,res)=>{
@@ -77,7 +37,6 @@ const supabaseStub=`
 
 const routes=['/','/events/','/events/fuengirola/','/community/','/community/gabil/','/merch/'];
 const widths=[1440,1024,768,390,360];
-const visualWidths=new Set([1440,1024,390]);
 const forbidden=[
   'source-of-truth','canonical source-of-truth','participant relation from entity record','sales_state','production spec','CHECKOUT / DISABLED','PRICE / TBD','MECHANICS PENDING',
   'Пустое состояние — тоже данные','канонической записи события','OBJECT / WEAR / DROP сущности','WORKING ASSETS','MERCH CONTRACT'
@@ -119,7 +78,7 @@ for(const width of widths){
   for(const route of routes){
     const p=await c.newPage();
     await p.goto(base+route,{waitUntil:'domcontentloaded'});
-    await p.waitForTimeout(220);
+    await p.waitForTimeout(250);
     const label=`${route}@${width}`;
 
     const geometry=await p.evaluate(()=>({scrollWidth:document.documentElement.scrollWidth,clientWidth:document.documentElement.clientWidth}));
@@ -135,8 +94,9 @@ for(const width of widths){
       expect(headerBox.width<=width+1&&headerBox.width>=width-1,`${label}: Header width drifted ${headerBox.width}`);
     }
 
-    const publicText=(await p.locator('body').innerText()).toLowerCase();
-    for(const marker of forbidden)expect(!publicText.includes(marker.toLowerCase()),`${label}: forbidden public marker visible: ${marker}`);
+    const publicText=await p.locator('body').innerText();
+    const publicTextLower=publicText.toLowerCase();
+    for(const marker of forbidden)expect(!publicTextLower.includes(marker.toLowerCase()),`${label}: forbidden public marker visible: ${marker}`);
 
     if(width===1440){
       const health=await rasterHealth(p);
@@ -144,120 +104,23 @@ for(const width of widths){
     }
 
     if(route==='/'){
-      expect(await p.locator('.dc-course-prototype__mentor').count()===1,`${label}: Home Valentin mentor-card count drifted`);
-      expect(!(await p.locator('body').innerText()).includes('Дементор: Валентин Лосев.'),`${label}: Home duplicate Valentin attribution visible`);
-
-      const homeEvent=p.locator('section.dc-event:has(a[href="/events/fuengirola/"])');
-      expect(await homeEvent.count()===1,`${label}: Home Fuengirola feature missing/duplicated`);
-      if(await homeEvent.count()){
-        expect(await homeEvent.locator('.dc-dementor-link').count()===1,`${label}: Home Fuengirola must expose exactly one semantic Gabil relation after runtime`);
-        const eventBox=await homeEvent.boundingBox();
-        if(eventBox&&width>700){
-          expect(eventBox.x>=-1&&eventBox.x<=1,`${label}: Home Fuengirola is not full-bleed from viewport left ${JSON.stringify(eventBox)}`);
-          expect(eventBox.width>=width-1&&eventBox.width<=width+1,`${label}: Home Fuengirola is not viewport-wide ${JSON.stringify(eventBox)}`);
-        }
-
-        const shell=homeEvent.locator(':scope > .dc-shell');
-        const shellBox=await shell.boundingBox();
-        const layers=await homeEvent.evaluate(el=>{
-          const own=getComputedStyle(el);
-          const after=getComputedStyle(el,'::after');
-          const beforeVeil=getComputedStyle(el,'::before');
-          const shellEl=el.querySelector(':scope > .dc-shell');
-          const shellStyle=shellEl?getComputedStyle(shellEl):null;
-          const shellBefore=shellEl?getComputedStyle(shellEl,'::before'):null;
-          const action=el.querySelector('.dc-event__action');
-          const actionBefore=action?getComputedStyle(action,'::before'):null;
-          const actionAfter=action?getComputedStyle(action,'::after'):null;
-          const runtimeImgs=[...el.querySelectorAll('img')].filter(img=>{
-            const src=img.currentSrc||img.src||'';
-            const r=img.getBoundingClientRect();
-            const s=getComputedStyle(img);
-            return src.includes('event-fuengirola-03.webp')&&s.display!=='none'&&s.visibility!=='hidden'&&r.width>0&&r.height>0;
-          }).length;
-          const activeAssetOwners=[];
-          if(own.display!=='none'&&own.backgroundImage.includes('event-fuengirola-03.webp'))activeAssetOwners.push('section-background');
-          if(shellBefore&&shellBefore.display!=='none'&&shellBefore.content!=='none'&&shellBefore.backgroundImage.includes('event-fuengirola-03.webp'))activeAssetOwners.push('shell::before');
-          if(runtimeImgs)for(let i=0;i<runtimeImgs;i++)activeAssetOwners.push('runtime-img');
-          const alphas=[...beforeVeil.backgroundImage.matchAll(/rgba\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*,\s*([0-9.]+)\s*\)/g)].map(m=>Number(m[1]));
-          const stops=[...beforeVeil.backgroundImage.matchAll(/([0-9.]+)%/g)].map(m=>Number(m[1]));
-          return {
-            backgroundImage:own.backgroundImage,
-            backgroundSize:own.backgroundSize,
-            backgroundPosition:own.backgroundPosition,
-            shellBeforeDisplay:shellBefore?.display||null,
-            shellBeforeContent:shellBefore?.content||null,
-            shellBeforeBackgroundImage:shellBefore?.backgroundImage||null,
-            shellBeforeBackgroundSize:shellBefore?.backgroundSize||null,
-            activeAssetOwners,
-            runtimeImgs,
-            veilDisplay:beforeVeil.display,
-            veilBackground:beforeVeil.backgroundImage,
-            veilMaxAlpha:alphas.length?Math.max(...alphas):0,
-            veilEndPct:stops.length?Math.max(...stops):0,
-            shellBackground:shellStyle?.backgroundColor||null,
-            overlayDisplay:after.display,
-            overlayContent:after.content,
-            overlayBackgroundImage:after.backgroundImage,
-            actionBeforeDisplay:actionBefore?.display||null,
-            actionAfterDisplay:actionAfter?.display||null
-          };
-        });
-
-        expect(!layers.backgroundImage.includes('fuengirola-banner.webp'),`${label}: retired/corrupted Fuengirola banner returned to active background`);
-        expect(layers.runtimeImgs===0,`${label}: legacy/runtime Fuengirola img owner returned ${JSON.stringify(layers)}`);
-        expect(layers.activeAssetOwners.length===1,`${label}: Home Fuengirola must have exactly one active raster owner ${JSON.stringify(layers.activeAssetOwners)}`);
-        if(width>700){
-          expect(layers.backgroundImage.includes('event-fuengirola-03.webp'),`${label}: desktop/tablet canonical Fuengirola asset must be the section background`);
-          expect(layers.backgroundSize==='cover',`${label}: desktop/tablet Fuengirola section background must be cover; actual=${layers.backgroundSize}`);
-          expect(layers.activeAssetOwners[0]==='section-background',`${label}: desktop/tablet canonical owner drifted ${JSON.stringify(layers.activeAssetOwners)}`);
-          expect(!layers.shellBeforeBackgroundImage?.includes('event-fuengirola-03.webp'),`${label}: mobile strip leaked into desktop/tablet`);
-        }else{
-          expect(layers.backgroundImage==='none',`${label}: mobile section background must be absent; actual=${layers.backgroundImage}`);
-          expect(layers.shellBeforeDisplay!=='none'&&layers.shellBeforeBackgroundImage?.includes('event-fuengirola-03.webp'),`${label}: mobile canonical in-flow Fuengirola strip missing ${JSON.stringify(layers)}`);
-          expect(layers.shellBeforeBackgroundSize==='cover',`${label}: mobile canonical strip must use cover; actual=${layers.shellBeforeBackgroundSize}`);
-          expect(layers.activeAssetOwners[0]==='shell::before',`${label}: mobile canonical owner must be the in-flow strip ${JSON.stringify(layers.activeAssetOwners)}`);
-          expect(layers.veilDisplay==='none',`${label}: Home mobile must not use desktop veil`);
-        }
-
-        expect(layers.overlayDisplay==='none'&&layers.overlayBackgroundImage==='none',`${label}: duplicate Fuengirola pseudo-image layer survived ${JSON.stringify(layers)}`);
-        expect(layers.actionBeforeDisplay==='none'&&layers.actionAfterDisplay==='none',`${label}: decorative duplicate Gabil CTA pseudo-treatment survived ${JSON.stringify(layers)}`);
-        expect(layers.shellBackground==='rgba(0, 0, 0, 0)'||layers.shellBackground==='transparent',`${label}: Home Fuengirola copy shell became an opaque panel: ${layers.shellBackground}`);
-
-        if(width>1100){
-          expect(shellBox&&shellBox.width<=562&&shellBox.width>=500,`${label}: Home Fuengirola copy shell must stay in ~520–560px band ${JSON.stringify(shellBox)}`);
-          expect(layers.veilMaxAlpha<=.79&&layers.veilEndPct<=42,`${label}: Home veil too opaque/wide; visual-card regression ${JSON.stringify(layers)}`);
-        }else if(width>900){
-          expect(shellBox&&shellBox.width<=522,`${label}: Home Fuengirola 1024 copy shell too wide ${JSON.stringify(shellBox)}`);
-          expect(layers.veilMaxAlpha<=.81&&layers.veilEndPct<=49,`${label}: Home 1024 veil too opaque/wide ${JSON.stringify(layers)}`);
-        }else if(width>700){
-          expect(shellBox&&shellBox.width<=502,`${label}: Home Fuengirola tablet copy shell too wide ${JSON.stringify(shellBox)}`);
-          expect(layers.veilMaxAlpha<=.85&&layers.veilEndPct<=55,`${label}: Home tablet veil too opaque/wide ${JSON.stringify(layers)}`);
-        }
-
-        if(visualWidths.has(width)){
-          await homeEvent.scrollIntoViewIfNeeded();
-          await p.waitForTimeout(850);
-          const settled=await shell.evaluate(el=>({opacity:Number(getComputedStyle(el).opacity),visibleClass:el.classList.contains('is-visible')}));
-          expect(settled.opacity>=.99,`${label}: Home Fuengirola visual reference captured before reveal settled ${JSON.stringify(settled)}`);
-          expect(await homeEvent.locator('.dc-event__title').count()===1,`${label}: Home Fuengirola title missing before screenshot`);
-          expect(await homeEvent.locator('.dc-event__desc').count()===1,`${label}: Home Fuengirola description missing before screenshot`);
-          expect(await homeEvent.locator('.dc-event__action').count()===1,`${label}: Home Fuengirola CTA missing before screenshot`);
-          await p.addStyleTag({content:'.dc-global-header,a[href="#main-content"]{visibility:hidden!important}'});
-          const file=path.join(visualDir,`home-fuengirola-${width}.png`);
-          const shot=await homeEvent.screenshot({path:file,animations:'disabled'});
-          const hash=visualHash(shot);
-          console.log(`VISUAL_REF home-fuengirola@${width} hash=${hash}`);
-          const baseline=visualBaselines?.widths?.[String(width)];
-          if(!baseline){
-            errors.push(`${label}: visual baseline missing in ${path.relative(process.cwd(),visualBaselinePath)}; candidate hash=${hash}`);
-          }else{
-            const distance=hammingHex(hash,baseline.hash);
-            const maxDistance=Number.isFinite(baseline.maxDistance)?baseline.maxDistance:36;
-            expect(distance<=maxDistance,`${label}: visual screenshot drift ${distance}>${maxDistance}; hash=${hash}; baseline=${baseline.hash}`);
-          }
-        }
-      }
+      await p.waitForFunction(()=>document.querySelectorAll('#currentProgramHost [data-thing-ref]').length===3,{timeout:2500}).catch(()=>{});
+      expect(await p.locator('#current-program').count()===1,`${label}: Home Current Program section missing/duplicated`);
+      const cards=p.locator('#currentProgramHost [data-thing-ref]');
+      expect(await cards.count()===3,`${label}: Home Current Program must render exactly 3 Things`);
+      const refs=await cards.evaluateAll(nodes=>nodes.map(node=>node.getAttribute('data-thing-ref')));
+      expect(JSON.stringify(refs)===JSON.stringify(['program:dengi-na-veter','project:dementor-lab','event:fuengirola']),`${label}: Home Current Program order/truth drifted ${JSON.stringify(refs)}`);
+      const hrefs=await cards.locator('a[data-current-program-action]').evaluateAll(nodes=>nodes.map(node=>node.getAttribute('href')));
+      expect(JSON.stringify(hrefs)===JSON.stringify(['/courses/dengi-na-veter/','/projects/dementor-lab/','/events/fuengirola/']),`${label}: Home Current Program actions drifted ${JSON.stringify(hrefs)}`);
+      const labels=await cards.locator('a[data-current-program-action]').evaluateAll(nodes=>nodes.map(node=>(node.textContent||'').trim().replace(/\s*→$/,'')));
+      expect(JSON.stringify(labels)===JSON.stringify(['ПРОЙТИ КУРС','ПОСМОТРЕТЬ LAB','ПОСМОТРЕТЬ СОБЫТИЕ']),`${label}: Home Current Program labels drifted ${JSON.stringify(labels)}`);
+      expect(await p.locator('.dc-course-prototype').count()===0,`${label}: legacy Home course prototype survived`);
+      expect(await p.locator('section.dc-event').count()===0,`${label}: legacy page-owned Home event feature survived`);
+      expect(!publicText.includes('ACCESS AFTER JOIN'),`${label}: legacy Fuengirola Join gate visible`);
+      expect(!publicText.includes('Подробности и возможность записаться доступны после вступления в клуб.'),`${label}: legacy Fuengirola membership promise visible`);
+      expect(!publicText.includes('Думай с опасностью'),`${label}: non-selected course still dominates Home Current Program surface`);
+      const programBox=await p.locator('#current-program').boundingBox();
+      if(programBox)expect(programBox.x>=-1&&programBox.x+programBox.width<=width+1,`${label}: Current Program escapes viewport ${JSON.stringify(programBox)}`);
     }
 
     if(route==='/events/fuengirola/'){
@@ -272,7 +135,7 @@ for(const width of widths){
       if(await detailTitle.count()){
         const detailTitleBox=await detailTitle.boundingBox();
         const detailHeroBox=await p.locator('.dc-fuengirola-page .dc-entity-hero').boundingBox();
-        const detailTitleState=await detailTitle.evaluate(el=>{const s=getComputedStyle(el);return {display:s.display,visibility:s.visibility,opacity:Number(s.opacity),color:s.color,text:el.textContent?.trim()||''}});
+        const detailTitleState=await detailTitle.evaluate(el=>{const s=getComputedStyle(el);return {display:s.display,visibility:s.visibility,opacity:Number(s.opacity),text:el.textContent?.trim()||''}});
         expect(detailTitleState.text==='ФУЭНХИРОЛА'&&detailTitleState.display!=='none'&&detailTitleState.visibility!=='hidden'&&detailTitleState.opacity>.01&&detailTitleBox&&detailTitleBox.width>80&&detailTitleBox.height>30,`${label}: Fuengirola H1 is not visibly rendered ${JSON.stringify({detailTitleState,detailTitleBox})}`);
         if(detailTitleBox&&detailHeroBox)expect(detailTitleBox.y+detailTitleBox.height>detailHeroBox.y&&detailTitleBox.y<detailHeroBox.y+detailHeroBox.height,`${label}: Fuengirola H1 escaped the hero ${JSON.stringify({detailTitleBox,detailHeroBox})}`);
       }
@@ -375,9 +238,8 @@ console.log('✓ routes: /, /events/, /events/fuengirola/, /community/, /communi
 console.log('✓ widths: 1440 / 1024 / 768 / 390 / 360');
 console.log('✓ target-route raster assets browser-decode successfully at 1440');
 console.log('✓ no horizontal overflow; canonical Header geometry preserved');
-console.log('✓ Home Fuengirola breakpoint-aware single raster owner: section background >700, in-flow strip <=700');
-console.log('✓ Home Fuengirola one-poster veil/copy geometry + screenshot visual baselines at 1440/1024/390');
-console.log('✓ Home Fuengirola one semantic Gabil relation; Home Valentin; Community one-source hero');
+console.log('✓ Home Current Program renders exactly 3 reviewed Things with exact actions and no legacy course/event funnel blocks');
+console.log('✓ Community one-source hero remains intact');
 console.log('✓ Events listing has no persistent Fuengirola/Gabil presentation owners or orphan trace; compact Events header stays visible');
 console.log('✓ Fuengirola detail owns exactly one canonical hero raster + one Gabil portrait relation + visible H1; Merch live-catalog framing');
 console.log('✓ exact public implementation-marker denylist; mobile Events path remains tap-accessible');

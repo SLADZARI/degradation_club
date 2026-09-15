@@ -24,6 +24,7 @@
   <link rel="stylesheet" href="../../community/board/board-deeplink-auth-return-v1.css">
   <link rel="stylesheet" href="../../community/board/board-club-publisher-v1.css">
   <link rel="stylesheet" href="../../community/board/board-admin-telegram-optin-v1.css">
+  <link rel="stylesheet" href="../../community/board/board-program-v1.css">
   <script src="../../site-config.js"></script>
 </head>
 <body class="dc-system-page dcw-body dc-board-fullscreen-v21">
@@ -35,6 +36,7 @@
         <section class="dc-board-wall" aria-label="Community Board">
           <div class="dc-board-shell">
             <nav class="dc-board-filters" id="boardFilters" aria-label="Фильтры доски"></nav>
+            <section id="boardProgramHost" class="dc-board-program" aria-label="Current Program"></section>
             <div id="boardHost" class="dc-board-grid" aria-live="polite"><div class="dc-board-state">ЗАГРУЖАЕМ ДОСКУ…</div></div>
           </div>
         </section>
@@ -47,6 +49,7 @@
   </div>
   <script src="../workspace-shell-v1.js"></script>
   <script src="../../community/board/board-share-live-diagnostic-v1.js"></script>
+  <script type="module" src="../../community/board/board-program-v1.js"></script>
   <script type="module" src="../../community/board/board-entry-v2.js"></script>
   <script type="module" src="../../community/board/board-club-publisher-v1.js"></script>
   <script type="module" src="../../community/board/board-admin-telegram-optin-v1.js"></script>

@@ -60,6 +60,8 @@ jobs:
         run: node scripts/validate-board-public-activity-contract.mjs
       - name: Build production candidate artifact
         run: node scripts/build-pages.mjs
+      - name: Validate Current Program v1 contract
+        run: node scripts/validate-current-program-v1.mjs
       - name: Validate production analytics and consent
         run: node scripts/validate-production-analytics.mjs
       - name: Validate canonical shell integration
@@ -78,8 +80,8 @@ jobs:
         run: node scripts/validate-board-admin-telegram-optin-browser.mjs
       - name: Validate Board public activity browser acceptance
         run: node scripts/validate-board-public-activity-browser.mjs
-      - name: Diagnose Home Fuengirola mobile media owners
-        run: node scripts/diagnose-home-fuengirola-media.mjs
+      - name: Validate Current Program Home and Board browser acceptance
+        run: node scripts/validate-current-program-browser.mjs
       - name: Validate public harmonization browser matrix
         run: node scripts/validate-public-harmonization-browser.mjs
       - name: Validate Projects v2 navigation and #44 browser regression
@@ -90,14 +92,6 @@ jobs:
         with:
           name: projects-v2-visual-references
           path: .qa/projects-v2/*.png
-          if-no-files-found: error
-          retention-days: 14
-      - name: Upload Home Fuengirola visual references
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: home-fuengirola-visual-references
-          path: .qa/public-harmonization/home-fuengirola-*.png
           if-no-files-found: error
           retention-days: 14
       - name: Validate DC-9 login sync and cross-device recovery
