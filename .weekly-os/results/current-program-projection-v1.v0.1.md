@@ -199,6 +199,16 @@ Site Integrity / Release Readiness:
 - conclusion: `SUCCESS`;
 - every workflow step through `Validate production artifact release gate`: `SUCCESS`.
 
+Documentation-only evidence head:
+
+`a60afcb3cc8116127699dad41d14c486e11cc347`
+
+Site Integrity / Release Readiness:
+
+- workflow run: `#1181` / Actions run `35001881613`;
+- conclusion: `SUCCESS`;
+- every workflow step through `Validate production artifact release gate`: `SUCCESS`.
+
 This proves the exact owner-authorized production-merge candidate before merge.
 
 ## G7 authorization boundary
