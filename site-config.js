@@ -42,10 +42,10 @@ if(typeof document!=='undefined'){
     const isHome=runtimePath==='/'||runtimePath==='/index.html';
     const isBoardRoot=/^\/workspace\/board\/?(?:index\.html)?$/.test(runtimePath);
     const isArtifactDetail=runtimePath.startsWith('/community/artifact/');
-    // DSO Stage 1 is an approved public browser-local release: account sync may enrich it, but login must not gate entry.
+    // DSO Stage 1 is an approved public browser-local release: account sync may not create a login gate or server course state.
     const interactiveAuthRequired=runtimePath.includes('/courses/dengi-na-veter/');
     if(interactiveAuthRequired)addScript('/required-auth-v1.js',{module:true});
-    if(runtimePath.includes('/courses/dumai-s-opasnostyu/')||runtimePath.includes('/courses/dengi-na-veter/'))addScript('/program-account-sync-v1.js',{module:true});
+    if(runtimePath.includes('/courses/dengi-na-veter/'))addScript('/program-account-sync-v1.js',{module:true});
     if(runtimePath.includes('/merch/')||runtimePath.includes('/objects/'))addScript('/merch-runtime-v1.js',{module:true});
     if(isWorkspaceShell){addScript('/workspace-membership-link-v1.js?v=20260902-01');addScript('/workspace-owner-admin-tools-v1.js',{module:true});}
     if(isJoinAssessment){
