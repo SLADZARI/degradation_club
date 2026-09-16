@@ -230,6 +230,66 @@ if (fs.existsSync(siteConfigPath)) {
   const siteConfig = fs.readFileSync(siteConfigPath, 'utf8');
   if (!siteConfig.includes("canonicalOrigin:'https://dementor.club'") && !/canonicalOrigin\s*:\s*['"]https:\/\/dementor\.club['"]/.test(siteConfig)) errors.push('site-config.js: canonicalOrigin must be https://dementor.club');
   if (!/supabase\s*:\s*\{[\s\S]*?enabled\s*:\s*true/.test(siteConfig)) errors.push('site-config.js: Supabase production runtime must be enabled');
+
+  // #198 Commerce Truth Guard: current public promise must stay at or below real checkout readiness.
+  if (!/merch\s*:\s*\{[\s\S]*?checkoutEnabled\s*:\s*false/.test(siteConfig)) errors.push('site-config.js: #198 expects checkoutEnabled=false until commerce is separately approved');
+  if (!/checkoutProvider\s*:\s*null/.test(siteConfig)) errors.push('site-config.js: checkout provider must remain absent for the current commerce-readiness state');
+  if (!/checkoutUrl\s*:\s*null/.test(siteConfig)) errors.push('site-config.js: checkout URL must remain absent for the current commerce-readiness state');
+  if (!/preorderPaymentMethod\s*:\s*null/.test(siteConfig)) errors.push('site-config.js: preorder payment method must remain absent for the current commerce-readiness state');
+}
+
+// #198 Commerce Truth Guard validates the exact public-state derivation shipped in merch-runtime-v1.js.
+const merchRuntimePath = artifactPath('merch-runtime-v1.js');
+if (fs.existsSync(merchRuntimePath)) {
+  const merchRuntime = fs.readFileSync(merchRuntimePath, 'utf8');
+  const startMarker = '/* COMMERCE_TRUTH_GUARD_START */';
+  const endMarker = '/* COMMERCE_TRUTH_GUARD_END */';
+  const start = merchRuntime.indexOf(startMarker);
+  const end = merchRuntime.indexOf(endMarker);
+  if (start < 0 || end <= start) {
+    errors.push('merch-runtime-v1.js: commerce truth derivation block is missing');
+  } else {
+    const functionSource = merchRuntime.slice(start + startMarker.length, end).trim();
+    try {
+      const derivePublicCommerceState = new Function(`${functionSource}\nreturn derivePublicCommerceState;`)();
+      const closed = {checkoutEnabled:false,checkoutProvider:null,checkoutUrl:null,preorderPaymentMethod:null};
+      const checkout = {checkoutEnabled:true,checkoutProvider:'approved-provider',checkoutUrl:'https://checkout.example.test'};
+      const preorder = {...checkout,preorderPaymentMethod:'approved-method'};
+      const vectors = [
+        ['preorder',closed,'NOT OPEN','checkout disabled + source PREORDER'],
+        ['sold_out',closed,'NOT OPEN','checkout disabled + source SOLD OUT'],
+        ['available',closed,'NOT OPEN','checkout disabled + source AVAILABLE'],
+        ['available',checkout,'AVAILABLE','checkout ready + source AVAILABLE'],
+        ['preorder',checkout,'NOT OPEN','preorder without payment method'],
+        ['preorder',preorder,'PREORDER','preorder with separately ready payment method'],
+        ['sold_out',preorder,'NOT OPEN','raw SOLD OUT without canonical historical proof'],
+      ];
+      for (const [raw,commerce,expected,label] of vectors) {
+        const actual = derivePublicCommerceState(raw,commerce);
+        if (actual !== expected) errors.push(`merch-runtime-v1.js: ${label} projected ${actual}; expected ${expected}`);
+      }
+    } catch (error) {
+      errors.push(`merch-runtime-v1.js: commerce truth derivation cannot be executed by release guard (${error.message})`);
+    }
+  }
+  if (/\bstate\(item\.sales_state\)/.test(merchRuntime)) errors.push('merch-runtime-v1.js: raw sales_state is still projected directly into public state');
+  if (/\['available','preorder'\]\.includes\(item\.sales_state\)/.test(merchRuntime)) errors.push('merch-runtime-v1.js: checkout action still trusts raw sales_state directly');
+  if (!merchRuntime.includes("publicStates=[...items.values()].map(publicState)")) errors.push('merch-runtime-v1.js: Merch OPEN count must derive from readiness-gated public states');
+}
+
+const object001Path = artifactPath('objects/001-ne-nado/index.html');
+if (fs.existsSync(object001Path)) {
+  const object001 = fs.readFileSync(object001Path, 'utf8');
+  if (/€\s*220\b|EUR\s*220\b/i.test(object001)) errors.push('objects/001-ne-nado/: stale EUR 220 current-price fallback must not ship');
+  if (!object001.includes('dc-object-hero__price">PRICE UNAVAILABLE')) errors.push('objects/001-ne-nado/: pre-runtime hero price must fail closed instead of asserting stale commerce truth');
+  if (!/<span>Price<\/span><strong>PRICE UNAVAILABLE<\/strong>/.test(object001)) errors.push('objects/001-ne-nado/: pre-runtime fact price must fail closed');
+  if (!object001.includes('SALES / NOT OPEN')) errors.push('objects/001-ne-nado/: pre-runtime public sales state must remain NOT OPEN');
+}
+
+const merchIndexPath = artifactPath('merch/index.html');
+if (fs.existsSync(merchIndexPath)) {
+  const merchIndex = fs.readFileSync(merchIndexPath, 'utf8');
+  if (/OPEN ITEMS\s*\/\s*[1-9]/i.test(merchIndex)) errors.push('merch/: pre-runtime HTML must not claim actionable OPEN ITEMS');
 }
 
 const readinessPath = path.join(root, 'content/page-readiness.json');
@@ -310,4 +370,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log(`Production release guard passed: ${shippedHtmlRoutes.size} HTML routes covered; runtime references closed.`);
+console.log(`Production release guard passed: ${shippedHtmlRoutes.size} HTML routes covered; runtime references closed; commerce truth guard enforced.`);
