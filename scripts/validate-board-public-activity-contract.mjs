@@ -5,7 +5,9 @@ const exists=path=>fs.existsSync(path);
 const assert=(condition,message)=>{if(!condition)throw new Error(message)};
 
 const migrationPath='supabase/migrations/20260914090000_board_public_activity_read_v1.sql';
+const evidenceMigrationPath='supabase/migrations/20260916213500_evidence_hygiene_v1.sql';
 const migration=read(migrationPath);
+const evidenceMigration=read(evidenceMigrationPath);
 const activity=read('public-activity-v1.js');
 const activityCss=read('public-activity-v1.css');
 const media=read('community/board/board-artifact-media-v1.js');
@@ -27,6 +29,17 @@ assert(migration.includes("(a.published_at,a.id) < (p_before_published_at,p_befo
 assert(migration.includes('youtube\\.com/shorts'),'YouTube Shorts parser missing');
 assert(migration.includes('i.ytimg.com/vi/'),'YouTube thumbnail derivation missing');
 assert(migration.includes("'/workspace/board/?focus=artifact:'"),'Board focus URL missing');
+
+assert(evidenceMigration.includes("p_source_ref text default null::text"),'canonical Artifact create owner must accept optional source_ref');
+assert(evidenceMigration.includes("left(v_source_ref,3) <> 'qa:'"),'QA Artifact provenance must use the canonical qa: prefix');
+assert(evidenceMigration.includes("if not v_owner then raise exception 'QA_SOURCE_REF_OWNER_ADMIN_REQUIRED'"),'ordinary users must not be able to self-mark audience content as QA');
+assert(evidenceMigration.includes("source_ref\n  )")||evidenceMigration.includes('expires_at,source_ref'),'QA provenance must be written at Artifact creation');
+assert(evidenceMigration.includes("(a.source_ref is null or a.source_ref not like 'qa:%')"),'public Activity read model must exclude QA-marked Artifacts');
+assert(!/update\s+public\.dc_artifacts[\s\S]*source_ref/i.test(evidenceMigration),'Evidence Hygiene must not retrospectively rewrite Artifact source_ref');
+assert(!/insert\s+into\s+public\.dc_artifacts\s*\([^)]*provenance_status/is.test(evidenceMigration),'Evidence Hygiene must not write provenance_status');
+assert(!/update\s+public\.dc_artifacts[\s\S]{0,500}provenance_status/i.test(evidenceMigration),'Evidence Hygiene must not mutate provenance_status');
+assert(!evidenceMigration.includes('is_test'),'Evidence Hygiene must not add an is_test taxonomy');
+assert(!evidenceMigration.includes('evidence_type'),'Evidence Hygiene must not add an evidence_type taxonomy');
 
 assert(activity.includes('railDuration'),'Home rail duration must derive from content');
 assert(activity.includes("--dc-activity-duration"),'Home rail duration CSS variable missing');
