@@ -42,6 +42,7 @@ async function run(width){
  const label=`dso@${width}`;
  await page.goto(base+'/courses/dumai-s-opasnostyu/',{waitUntil:'domcontentloaded'});
  expect((await page.locator('body').innerText()).includes('PUBLIC RELEASE'),`${label}: route does not literally present PUBLIC RELEASE`);
+ expect(await page.locator('.dc-auth-required').count()===0,`${label}: public Stage 1 is still intercepted by mandatory auth`);
 
  // Fresh → start.
  await page.locator('#startBtn').click();
@@ -98,7 +99,7 @@ async function run(width){
  const cert=page.locator('.cert');
  const continuation=page.locator('[data-course-continuation]');
  expect(await cert.count()===1,`${label}: certificate missing`);
- expect((await cert.innerText()).includes('Сертификат повышенной подозрительности'),`${label}: wrong certificate semantics`);
+ expect((await cert.innerText()).toUpperCase().includes('СЕРТИФИКАТ ПОВЫШЕННОЙ ПОДОЗРИТЕЛЬНОСТИ'),`${label}: wrong certificate semantics`);
  expect(await continuation.count()===1,`${label}: expected exactly one continuation`);
  expect(await continuation.getAttribute('data-thing-ref')==='program:dengi-na-veter',`${label}: continuation Thing ref drifted`);
  expect(await page.locator('[data-course-continuation-action]').count()===1,`${label}: continuation primary action count drifted`);
