@@ -84,6 +84,8 @@ jobs:
         run: node scripts/validate-board-public-activity-browser.mjs
       - name: Validate Current Program Home and Board browser acceptance
         run: node scripts/validate-current-program-browser.mjs
+      - name: Validate Commerce Truth Guard browser acceptance
+        run: node scripts/validate-commerce-truth-guard-browser.mjs
       - name: Validate DSO Release Loop browser acceptance
         run: node scripts/validate-dumai-release-loop-browser.mjs
       - name: Validate Board mobile harmonization browser acceptance
