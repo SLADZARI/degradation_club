@@ -62,6 +62,8 @@ jobs:
         run: node scripts/build-pages.mjs
       - name: Validate Current Program v1 contract
         run: node scripts/validate-current-program-v1.mjs
+      - name: Validate DSO Release Loop v1 contract
+        run: node scripts/validate-dumai-release-loop-v1.mjs
       - name: Validate production analytics and consent
         run: node scripts/validate-production-analytics.mjs
       - name: Validate canonical shell integration
@@ -82,6 +84,8 @@ jobs:
         run: node scripts/validate-board-public-activity-browser.mjs
       - name: Validate Current Program Home and Board browser acceptance
         run: node scripts/validate-current-program-browser.mjs
+      - name: Validate DSO Release Loop browser acceptance
+        run: node scripts/validate-dumai-release-loop-browser.mjs
       - name: Validate Board mobile harmonization browser acceptance
         run: node scripts/validate-board-mobile-harmonization-browser.mjs
       - name: Upload Board mobile harmonization references
