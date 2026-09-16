@@ -4,15 +4,15 @@
     "artifactId": "dementor-club.kernel.project",
     "project": "dementor-club",
     "documentType": "STANDARD",
-    "projectStage": "VALIDATION",
-    "gate": "G6_VALIDATION",
+    "projectStage": "RELEASE",
+    "gate": "G7_RELEASE",
     "status": "APPROVED",
-    "version": "1.75",
+    "version": "1.76",
     "updated": "2026-09-16",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "1.74"
+    "supersedes": "1.75"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -20,13 +20,14 @@
   "canonicalRepository": "SLADZARI/degradation_club",
   "defaultBranch": "main",
   "semanticSourceBranch": "dementor-club",
-  "projectStage": "VALIDATION",
-  "gate": "G6_VALIDATION",
+  "projectStage": "RELEASE",
+  "gate": "G7_RELEASE",
   "readFirst": [
     ".weekly-os/PROJECT.json",
     ".weekly-os/ARTIFACT_INDEX.json",
     ".weekly-os/APPROVED_STATE.json",
-    ".weekly-os/results/dumai-s-opasnostyu-release-loop-v1.v0.2.md",
+    ".weekly-os/results/dumai-s-opasnostyu-release-loop-v1.v0.3.md",
+    "operations/DUMAI_S_OPASNOSTYU_RELEASE_LOOP_G7_MERGE_2026-09-16.md",
     "operations/DUMAI_S_OPASNOSTYU_RELEASE_LOOP_G6_2026-09-16.md",
     "operations/DUMAI_S_OPASNOSTYU_PUBLIC_RELEASE_DECISION_V1.md",
     "concept/PRODUCT_MARKETING_PACKAGE_INDEX_V1.md",
@@ -83,14 +84,14 @@
     "legacyImplementationPointers": {"sourceSystem":"GIT","authorityType":"REFERENCE","paths":["app","src","supabase"]}
   },
   "protected": {"PRODUCT": null, "DOMAIN": null, "ARCHITECTURE": null, "DESIGN": null},
-  "currentResult": {"artifactId":"dementor-club.result.dumai-s-opasnostyu-release-loop-v1","version":"0.2","status":"ACTIVE","path":".weekly-os/results/dumai-s-opasnostyu-release-loop-v1.v0.2.md","gate":"G6_VALIDATION","integrationBranch":"result/dumai-s-opasnostyu-release-loop-v1","productionBaseCommit":"48a18b5567804d29219efcea217b846f1ebdd675","candidateCommit":"bc36c67b17e37e9dd718298d08e971b78e39d242","integrationPullRequest":212,"validationRun":1194,"validationRunId":35075627995,"validationConclusion":"SUCCESS","g6Evidence":"operations/DUMAI_S_OPASNOSTYU_RELEASE_LOOP_G6_2026-09-16.md","implementationStartAuthorized":true,"productionMergeAuthorized":false,"productionDeployAuthorized":false},
+  "currentResult": {"artifactId":"dementor-club.result.dumai-s-opasnostyu-release-loop-v1","version":"0.3","status":"ACTIVE","path":".weekly-os/results/dumai-s-opasnostyu-release-loop-v1.v0.3.md","gate":"G7_RELEASE","integrationBranch":"result/dumai-s-opasnostyu-release-loop-v1","productionBaseCommit":"48a18b5567804d29219efcea217b846f1ebdd675","candidateCommit":"bc36c67b17e37e9dd718298d08e971b78e39d242","integrationPullRequest":212,"validationRun":1194,"validationRunId":35075627995,"validationConclusion":"SUCCESS","g6Evidence":"operations/DUMAI_S_OPASNOSTYU_RELEASE_LOOP_G6_2026-09-16.md","g7MergeEvidence":"operations/DUMAI_S_OPASNOSTYU_RELEASE_LOOP_G7_MERGE_2026-09-16.md","productionCommit":"88a5efdb92a7a30678c5fcc74f02de7886c46d65","productionAncestryVerified":true,"implementationStartAuthorized":true,"productionMergeAuthorized":true,"productionDeployAuthorized":false},
   "waitingResults": [
     {"artifactId":"dementor-club.result.board-share-receive-ritual-v1","version":"0.2","status":"WAITING","path":".weekly-os/results/board-share-receive-ritual-v1.v0.2.md","gate":"G8_CLEANUP","candidateCommit":"04daf88b063bfbd2f40c2cb4f05f6ca386a77fa1","integrationPullRequest":166,"productionCommit":"2dd99cd230a3f5c9855ddb8faa9a673d838856e8","productionObservedInCommit":"688899e31b82e14c31f5f805b2bce4f00f3741c0","productionDeployRunId":34903066857,"note":"G6 #1065 PASS; corrective #166 is merged and included in current successful production ancestry. Explicit authenticated recipient live acceptance remains required before DONE/G8 closure."},
     {"artifactId":"dementor-club.result.board-information-architecture-v1","version":"0.17","status":"WAITING","path":".weekly-os/results/board-information-architecture-v1.v0.17.md","gate":"G8_CLEANUP","productionCommit":"af28404048dfc918ada81298b0d184df407d0595","productionDeployRun":63,"productionDeployRunId":34719474734,"pagesArtifactId":10305938397,"note":"Corrective #156 is released; Result remains not DONE/G8 closed. Completed Board presentation Results do not mutate Board IA semantics."},
     {"artifactId":"dementor-club.result.board-access-control-v2","version":"0.4","status":"WAITING","path":".weekly-os/results/board-access-control-v2.v0.4.md","gate":"G7_RELEASE","productionCommit":"a9511a271fbb3524c486c2a9ecd0dc8a3ff22380","productionDeployRun":47,"productionDeployRunId":34220090345,"pagesArtifactId":10053362035,"note":"Released and partially live-retested; residual authenticated role-state QA remains open."}
   ],
-  "activeIntegrationBranch": "result/dumai-s-opasnostyu-release-loop-v1",
-  "activeReleaseBranch": null,
+  "activeIntegrationBranch": null,
+  "activeReleaseBranch": "dementor-club-production",
   "reportPath": "operations/MEMBERSHIP_V2_PRODUCTION_FLOW_QA_2026-09-02.md",
   "completedResults": [
     {"artifactId":"dementor-club.result.semantic-stack-harmonization-v1","version":"1.0","status":"APPROVED","path":".weekly-os/results/semantic-stack-harmonization-v1.v1.0.md","gate":"G8_CLEANUP","candidateCommit":"2cc19bc4bc4c45458151217904425ec18c032da0","integrationPullRequest":211,"semanticMergeCommit":"5db7dd4ccd4c97f67f59558cdb3648fece836d07","g8Evidence":"operations/PRODUCT_MARKETING_SEMANTIC_STACK_HARMONIZATION_G8_2026-09-16.md"},
@@ -125,6 +126,7 @@
     "approved Board type-language design from operations/BOARD_VISUAL_TYPE_LANGUAGE_V0.1.md",
     "Dumai s opasnostyu certificate as Membership, qualification, role, rank, permission or access entitlement",
     "G6 validation success as production merge or deploy authorization",
+    "production merge as production deploy authorization",
     "Phase 3 ThingProjection Runtime approval before Phase 2 production live G8 proof"
   ]
 }
