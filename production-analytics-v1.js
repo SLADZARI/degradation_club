@@ -8,6 +8,7 @@
   const CLARITY_ID='y9yuo1zabw';
   const CONSENT_KEY='dc_analytics_consent_v1';
   const AUTH_PENDING_KEY='dc_auth_complete_pending_v1';
+  const QA_SESSION_KEY='dc_qa_session_v1';
   const ALLOWED_EVENTS=new Set([
     'join_start','join_sphere_open','assessment_complete','auth_start','auth_complete','workspace_open',
     'project_open','course_open','course_cta_click','event_open','event_cta_click','merch_open','merch_cta_click',
@@ -16,9 +17,11 @@
   ]);
   const BLOCKED_KEYS=/^(email|e_mail|name|full_name|phone|telephone|token|access_token|refresh_token|user_id|userid|supabase_id|answer|answers|free_text)$/i;
   const isProduction=location.origin===ORIGIN;
+  const isQaSession=()=>{try{return sessionStorage.getItem(QA_SESSION_KEY)==='1';}catch{return false;}};
+  const qaSession=isProduction&&isQaSession();
   const api={production:isProduction,ga4:false,clarity:false,consent:null,track:()=>false};
   window.DEMENTOR_ANALYTICS=api;
-  if(!isProduction)return;
+  if(!isProduction||qaSession)return;
 
   const readConsent=()=>{try{return localStorage.getItem(CONSENT_KEY);}catch{return null;}};
   const writeConsent=value=>{try{localStorage.setItem(CONSENT_KEY,value);}catch{} api.consent=value;};
