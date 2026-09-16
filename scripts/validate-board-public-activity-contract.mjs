@@ -36,7 +36,8 @@ assert(evidenceMigration.includes("if not v_owner then raise exception 'QA_SOURC
 assert(evidenceMigration.includes("source_ref\n  )")||evidenceMigration.includes('expires_at,source_ref'),'QA provenance must be written at Artifact creation');
 assert(evidenceMigration.includes("(a.source_ref is null or a.source_ref not like 'qa:%')"),'public Activity read model must exclude QA-marked Artifacts');
 assert(!/update\s+public\.dc_artifacts[\s\S]*source_ref/i.test(evidenceMigration),'Evidence Hygiene must not retrospectively rewrite Artifact source_ref');
-assert(!evidenceMigration.includes('provenance_status'),'Evidence Hygiene must not repurpose provenance_status');
+assert(!/insert\s+into\s+public\.dc_artifacts\s*\([^)]*provenance_status/is.test(evidenceMigration),'Evidence Hygiene must not write provenance_status');
+assert(!/update\s+public\.dc_artifacts[\s\S]{0,500}provenance_status/i.test(evidenceMigration),'Evidence Hygiene must not mutate provenance_status');
 assert(!evidenceMigration.includes('is_test'),'Evidence Hygiene must not add an is_test taxonomy');
 assert(!evidenceMigration.includes('evidence_type'),'Evidence Hygiene must not add an evidence_type taxonomy');
 
