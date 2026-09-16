@@ -20,7 +20,17 @@ else{
   if(count(js,CLARITY)!==1) errors.push(`Clarity project id must occur exactly once in ${analyticsRel}`);
   if(!js.includes("const ORIGIN='https://dementor.club'")) errors.push('analytics runtime must be origin-locked to https://dementor.club');
   if(!js.includes("CONSENT_KEY='dc_analytics_consent_v1'")) errors.push('analytics runtime must use explicit persisted consent');
-  if(!js.includes("if(!isProduction)return")) errors.push('analytics runtime must fail closed outside production origin');
+  if(!js.includes("QA_SESSION_KEY='dc_qa_session_v1'")) errors.push('analytics runtime must use the canonical session-scoped QA marker');
+  if(!js.includes("sessionStorage.getItem(QA_SESSION_KEY)==='1'")) errors.push('QA marker must be read from sessionStorage');
+  if(js.includes("localStorage.getItem(QA_SESSION_KEY)")||js.includes("localStorage.setItem(QA_SESSION_KEY")) errors.push('QA analytics marker must never use localStorage');
+  if(!js.includes("if(!isProduction||qaSession)return")) errors.push('analytics runtime must fail closed outside production and during QA sessions');
+  const guardIndex=js.indexOf("if(!isProduction||qaSession)return");
+  const gaBootIndex=js.indexOf('const loadGA4=');
+  const clarityBootIndex=js.indexOf('const loadClarity=');
+  const consentBootIndex=js.indexOf('const boot=');
+  if(guardIndex<0||gaBootIndex<0||guardIndex>gaBootIndex) errors.push('QA guard must execute before GA4 boot owner is reachable');
+  if(guardIndex<0||clarityBootIndex<0||guardIndex>clarityBootIndex) errors.push('QA guard must execute before Clarity boot owner is reachable');
+  if(guardIndex<0||consentBootIndex<0||guardIndex>consentBootIndex) errors.push('QA guard must execute before consent boot');
   if(!js.includes("consent==='granted'")) errors.push('analytics runtime must not load trackers before granted consent');
   if(!js.includes("send_page_view:false")) errors.push('GA4 automatic page view must be disabled to prevent duplicates');
   if(!js.includes("pushState")||!js.includes("popstate")) errors.push('GA4 navigation tracking hooks are missing');
@@ -57,4 +67,4 @@ if(errors.length){
   errors.forEach(e=>console.error(`- ${e}`));
   process.exit(1);
 }
-console.log(`Production analytics guard passed: GA4 ${GA}, Clarity ${CLARITY}, explicit consent, one runtime per public HTML page.`);
+console.log(`Production analytics guard passed: GA4 ${GA}, Clarity ${CLARITY}, explicit consent, QA hard suppression, one runtime per public HTML page.`);
