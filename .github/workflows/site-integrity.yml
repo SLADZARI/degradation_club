@@ -82,6 +82,8 @@ jobs:
         run: node scripts/validate-board-admin-telegram-optin-browser.mjs
       - name: Validate Board public activity browser acceptance
         run: node scripts/validate-board-public-activity-browser.mjs
+      - name: Validate Evidence Hygiene browser acceptance
+        run: node scripts/validate-evidence-hygiene-browser.mjs
       - name: Validate Current Program Home and Board browser acceptance
         run: node scripts/validate-current-program-browser.mjs
       - name: Validate Commerce Truth Guard browser acceptance
