@@ -35,8 +35,8 @@ const supabaseStub=()=>`
   const user={id:'qa-browser-user',email:'qa-browser@dementor.invalid',user_metadata:{full_name:'QA Browser'}};
   const session=authenticated?{user}:null;const active={status:'active',valid_from:null,valid_to:null};
   const roleRows=owner?[{profile_id:user.id,role:'owner_admin',...active}]:[];const membership=member?{...active}:null;
-  const targetArtifact={id:'qa-target-artifact',author_profile_id:'qa-other-member',title:'Нужен человек на съёмку',body:'Ищем участника на клубную съёмку.',status:'active',visibility:'community',published_at:'2026-09-04T10:00:00Z',closed_at:null,expires_at:null,created_at:'2026-09-04T09:00:00Z',updated_at:'2026-09-04T10:00:00Z'};
-  const ownArtifact={id:'qa-own-artifact',author_profile_id:user.id,title:'Мой тестовый Artifact',body:'Архивная клубная запись.',status:'archived',visibility:'community',published_at:'2026-09-03T10:00:00Z',closed_at:'2026-09-04T08:00:00Z',expires_at:null,created_at:'2026-09-03T09:00:00Z',updated_at:'2026-09-04T08:00:00Z'};
+  const targetArtifact={id:'qa-target-artifact',author_profile_id:'qa-other-member',title:'Нужен человек на съёмку',body:'Ищем участника на клубную съёмку.',status:'active',visibility:'community',board_hidden_at:null,published_at:'2026-09-04T10:00:00Z',closed_at:null,expires_at:null,created_at:'2026-09-04T09:00:00Z',updated_at:'2026-09-04T10:00:00Z'};
+  const ownArtifact={id:'qa-own-artifact',author_profile_id:user.id,title:'Мой тестовый Artifact',body:'Архивная клубная запись.',status:'archived',visibility:'community',board_hidden_at:null,published_at:'2026-09-03T10:00:00Z',closed_at:'2026-09-04T08:00:00Z',expires_at:null,created_at:'2026-09-03T09:00:00Z',updated_at:'2026-09-04T08:00:00Z'};
   const activityRows={
     dc_artifacts:activityMode?[ownArtifact,targetArtifact]:[],
     dc_artifact_responses:activityMode?[{id:'qa-response',artifact_id:targetArtifact.id,responder_profile_id:user.id,message:'Я в деле',status:'submitted',created_at:'2026-09-04T11:00:00Z',updated_at:'2026-09-04T11:00:00Z',artifact:targetArtifact}]:[],
