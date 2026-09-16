@@ -11,6 +11,8 @@ const core=read('courses/dumai-s-opasnostyu/core.js');
 const screens1=read('courses/dumai-s-opasnostyu/screens-1.js');
 const screens3b=read('courses/dumai-s-opasnostyu/screens-3b.js');
 const bind=read('courses/dumai-s-opasnostyu/bind.js');
+const index=read('courses/dumai-s-opasnostyu/index.html');
+const siteConfig=read('site-config.js');
 const analytics=read('production-analytics-v1.js');
 
 expect(data.includes("version:'v1'"),'continuation v1 version missing');
@@ -25,6 +27,11 @@ expect(core.includes("lastSeenContinuationVersion:''"),'browser-local continuati
 expect(core.includes('function continuationViewModel()'),'continuation view-state contract missing');
 expect(core.includes("seen&&seen!==current"),'meaningful continuation delta contract missing');
 expect(core.includes("if(view.isNew)recordCourseEvent('return_payoff'"),'return_payoff is not gated by a real version delta');
+
+expect(!index.includes('/course-account-identity-v1.js'),'DSO public Stage 1 must not bind local course state to account identity');
+expect(siteConfig.includes("const interactiveAuthRequired=runtimePath.includes('/courses/dengi-na-veter/')"),'DSO leaked back into mandatory auth gate');
+expect(!siteConfig.includes("runtimePath.includes('/courses/dumai-s-opasnostyu/')||runtimePath.includes('/courses/dengi-na-veter/'))addScript('/program-account-sync-v1.js'"),'DSO leaked into server program sync');
+expect(siteConfig.includes("if(runtimePath.includes('/courses/dengi-na-veter/'))addScript('/program-account-sync-v1.js'"),'remaining Dengi program sync owner drifted unexpectedly');
 
 expect(screens3b.includes("recordCourseEvent('thing_experience_complete'"),'completion transition is not instrumented');
 expect(screens3b.includes("recordCourseEvent('completion_artifact_view'"),'certificate view is not instrumented');
@@ -53,6 +60,11 @@ if(fs.existsSync(built)){
   for(const rel of ['data.js','core.js','screens-1.js','screens-3b.js','bind.js'])expect(fs.existsSync(path.join(builtCourse,rel)),`built course missing ${rel}`);
   const builtAnalytics=path.join(built,'production-analytics-v1.js');
   expect(fs.existsSync(builtAnalytics),'built production analytics runtime missing');
+  const builtIndex=path.join(builtCourse,'index.html');
+  if(fs.existsSync(builtIndex)){
+    const html=fs.readFileSync(builtIndex,'utf8');
+    expect(!html.includes('/course-account-identity-v1.js'),'built DSO route unexpectedly binds local state to account identity');
+  }
   if(fs.existsSync(path.join(builtCourse,'screens-3b.js'))){
     const builtScreens=fs.readFileSync(path.join(builtCourse,'screens-3b.js'),'utf8');
     expect(builtScreens.includes('data-course-continuation'),'built certificate continuation missing');
@@ -66,6 +78,7 @@ if(errors.length){
 }
 console.log('Dumai s opasnostyu Release Loop v1 contract PASS');
 console.log('✓ PUBLIC RELEASE literal state');
+console.log('✓ browser-local Stage 1 has no mandatory auth/server course sync');
 console.log('✓ certificate remains completion artifact');
 console.log('✓ exactly one continuation: program:dengi-na-veter');
 console.log('✓ return_payoff requires continuation version delta');
