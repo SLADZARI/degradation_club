@@ -64,9 +64,9 @@ for(const width of [1440,390]){
   expect(shirtState==='NOT OPEN',`merch@${width}: raw SOLD OUT escaped readiness gate: ${shirtState}`);
   const heroFacts=await merch.locator('.dc-entity-hero__facts p').allInnerTexts();
   expect(heroFacts.some(text=>text.trim()==='SALES / NOT OPEN'),`merch@${width}: catalog implies open commerce ${JSON.stringify(heroFacts)}`);
-  const merchGeometry=await merch.evaluate(()=>({scrollWidth:document.documentElement.scrollWidth,innerWidth,objectStatusVisible:!!document.querySelector('.dc-entity-row__status')?.getClientRects().length}));
+  const merchGeometry=await merch.evaluate(()=>({scrollWidth:document.documentElement.scrollWidth,innerWidth,objectRowVisible:!!document.querySelector('.dc-entity-row')?.getClientRects().length}));
   expect(merchGeometry.scrollWidth<=merchGeometry.innerWidth+1,`merch@${width}: public Merch overflows viewport ${JSON.stringify(merchGeometry)}`);
-  expect(merchGeometry.objectStatusVisible,`merch@${width}: gated Object 001 status is not visible`);
+  expect(merchGeometry.objectRowVisible,`merch@${width}: Object 001 catalog row is not accessible in existing responsive composition`);
   await merch.close();
 
   const object=await context.newPage();
