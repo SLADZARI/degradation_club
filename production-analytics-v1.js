@@ -11,7 +11,8 @@
   const ALLOWED_EVENTS=new Set([
     'join_start','join_sphere_open','assessment_complete','auth_start','auth_complete','workspace_open',
     'project_open','course_open','course_cta_click','event_open','event_cta_click','merch_open','merch_cta_click',
-    'recommendation_click','external_community_click'
+    'recommendation_click','external_community_click',
+    'thing_experience_start','thing_meaningful_progress','thing_experience_complete','completion_artifact_view','continuation_open','return_payoff'
   ]);
   const BLOCKED_KEYS=/^(email|e_mail|name|full_name|phone|telephone|token|access_token|refresh_token|user_id|userid|supabase_id|answer|answers|free_text)$/i;
   const isProduction=location.origin===ORIGIN;
