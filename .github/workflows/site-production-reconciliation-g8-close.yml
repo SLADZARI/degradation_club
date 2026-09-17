@@ -1,0 +1,77 @@
+name: Close Site Production Reconciliation G8
+
+on:
+  push:
+    branches: [dementor-club]
+    paths:
+      - '.github/workflows/site-production-reconciliation-g8-close.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  close:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: dementor-club
+          fetch-depth: 0
+      - name: Close Result in kernel
+        shell: python
+        run: |
+          import json
+          from pathlib import Path
+          pp=Path('.weekly-os/PROJECT.json'); ip=Path('.weekly-os/ARTIFACT_INDEX.json')
+          p=json.loads(pp.read_text())
+          old='.weekly-os/results/site-production-reconciliation-v1.v0.2.md'
+          new='.weekly-os/results/site-production-reconciliation-v1.v1.0.md'
+          g8='operations/SITE_PRODUCTION_RECONCILIATION_G8_2026-09-17.md'
+          g6='operations/SITE_PRODUCTION_RECONCILIATION_G6_2026-09-17.md'
+          p['_artifact']['projectStage']='RELEASE'; p['_artifact']['gate']='G8_CLEANUP'; p['_artifact']['version']='1.99'; p['_artifact']['supersedes']='1.98'; p['_artifact']['updated']='2026-09-17'
+          p['projectStage']='RELEASE'; p['gate']='G8_CLEANUP'
+          rf=p['readFirst']
+          if old in rf: rf[rf.index(old)]=new
+          elif new not in rf: rf.insert(rf.index('.weekly-os/APPROVED_STATE.json')+1,new)
+          if g8 not in rf: rf.insert(rf.index(new)+1,g8)
+          if g6 not in rf: rf.insert(rf.index(g8)+1,g6)
+          completed=[x for x in p.get('completedResults',[]) if x.get('artifactId')!='dementor-club.result.site-production-reconciliation-v1']
+          completed.insert(0,{
+            'artifactId':'dementor-club.result.site-production-reconciliation-v1','version':'1.0','status':'APPROVED','path':new,'gate':'G8_CLEANUP','issue':221,
+            'productionBaseCommit':'23d4266a4009d34042b29ec1fb73fb0cbad6b62e','stagingHeadBefore':'7a036ba4cd7ccd635ba273931c2087227d0f4c94','stagingHeadAfter':'01e0919af5f539e111803387b5f1e86976fd3100',
+            'validationRunId':35265376043,'postRealignmentValidationRunId':35265865615,'validationConclusion':'SUCCESS','productionChanged':False,'productionDeployOccurred':False,
+            'g6Evidence':g6,'g8Evidence':g8,'note':'Staging reconciled to current production ancestry; behind=0; historical runtime delta not replayed; production unchanged.'
+          })
+          p['completedResults']=completed
+          p['currentResult']=None; p['activeIntegrationBranch']=None; p['activeReleaseBranch']=None
+          pp.write_text(json.dumps(p,ensure_ascii=False,separators=(',',':'))+'\n')
+
+          idx=json.loads(ip.read_text())
+          idx['_artifact']['projectStage']='RELEASE'; idx['_artifact']['gate']='G8_CLEANUP'; idx['_artifact']['version']='1.96'; idx['_artifact']['supersedes']='1.95'; idx['_artifact']['updated']='2026-09-17'
+          for item in idx['currentArtifacts']:
+            if item.get('artifactId')=='dementor-club.kernel.project': item['currentVersion']='1.99'; item['updated']='2026-09-17'
+            if item.get('artifactId')=='dementor-club.kernel.artifact-index': item['currentVersion']='1.96'; item['updated']='2026-09-17'
+            if item.get('artifactId')=='dementor-club.result.site-production-reconciliation-v1':
+              item.update({'currentVersion':'1.0','status':'APPROVED','location':new,'canonicalLocation':new,'relation':'COMPLETED_RESULT','gate':'G8_CLEANUP','stagingHeadAfter':'01e0919af5f539e111803387b5f1e86976fd3100','validationRunId':35265376043,'postRealignmentValidationRunId':35265865615,'validationConclusion':'SUCCESS','stagingRealignmentAuthorized':True,'productionMergeAuthorized':False,'productionDeployAuthorized':False,'g8Evidence':g8,'note':'G8 CLOSED; staging reconciled; production unchanged.'})
+          ip.write_text(json.dumps(idx,ensure_ascii=False,separators=(',',':'))+'\n')
+      - name: Verify closure
+        shell: python
+        run: |
+          import json
+          p=json.load(open('.weekly-os/PROJECT.json'))
+          assert p['_artifact']['version']=='1.99'
+          assert p['currentResult'] is None
+          assert p['activeIntegrationBranch'] is None
+          assert p['activeReleaseBranch'] is None
+          assert p['completedResults'][0]['artifactId']=='dementor-club.result.site-production-reconciliation-v1'
+          assert p['completedResults'][0]['productionChanged'] is False
+      - name: Commit closure, remove integration branch and self-remove
+        run: |
+          git config user.name SLEDZARI
+          git config user.email sharecraftwideo@gmail.com
+          git add .weekly-os/PROJECT.json .weekly-os/ARTIFACT_INDEX.json
+          git commit -m "kernel: close site-production reconciliation G8"
+          git push origin --delete result/site-production-reconciliation-v1 || true
+          git rm .github/workflows/site-production-reconciliation-g8-close.yml
+          git commit -m "chore: remove reconciliation G8 closure workflow"
+          git push origin dementor-club
