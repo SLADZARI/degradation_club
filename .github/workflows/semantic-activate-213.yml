@@ -1,0 +1,174 @@
+name: One-shot semantic activation #213
+
+on:
+  push:
+    branches:
+      - dementor-club
+    paths:
+      - .github/workflows/semantic-activate-213.yml
+
+permissions:
+  contents: write
+
+jobs:
+  activate-kernel:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: dementor-club
+          fetch-depth: 0
+
+      - name: Apply targeted #213 activation
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          project_path = Path('.weekly-os/PROJECT.json')
+          index_path = Path('.weekly-os/ARTIFACT_INDEX.json')
+          result_path = Path('.weekly-os/results/thing-projection-runtime-v1.v0.1.md')
+
+          project = json.loads(project_path.read_text())
+          index = json.loads(index_path.read_text())
+
+          assert result_path.exists(), 'ThingProjection Result artifact missing'
+          assert project['_artifact']['version'] == '1.90', project['_artifact']['version']
+          assert project.get('currentResult') is None, project.get('currentResult')
+          assert project.get('activeIntegrationBranch') is None, project.get('activeIntegrationBranch')
+          assert project.get('activeReleaseBranch') is None, project.get('activeReleaseBranch')
+          assert index['_artifact']['version'] == '1.87', index['_artifact']['version']
+
+          # PROJECT: activate exactly one current Result.
+          a = project['_artifact']
+          a['projectStage'] = 'BUILD'
+          a['gate'] = 'G5_BUILD'
+          a['version'] = '1.91'
+          a['updated'] = '2026-09-17'
+          a['supersedes'] = '1.90'
+          project['projectStage'] = 'BUILD'
+          project['gate'] = 'G5_BUILD'
+
+          result_ref = '.weekly-os/results/thing-projection-runtime-v1.v0.1.md'
+          read_first = [p for p in project.get('readFirst', []) if p != result_ref]
+          approved_state = '.weekly-os/APPROVED_STATE.json'
+          assert approved_state in read_first
+          pos = read_first.index(approved_state) + 1
+          read_first.insert(pos, result_ref)
+          project['readFirst'] = read_first
+
+          project['currentResult'] = {
+              'artifactId': 'dementor-club.result.thing-projection-runtime-v1',
+              'version': '0.1',
+              'status': 'DRAFT',
+              'path': result_ref,
+              'gate': 'G5_BUILD',
+              'issue': 213,
+              'integrationBranch': 'result/thing-projection-runtime-v1',
+              'productionBaseCommit': '374defbe583fac0839a43611b151d1104b47a42b',
+              'activationAuthorized': True,
+              'implementationStartAuthorized': False,
+              'productionMergeAuthorized': False,
+              'productionDeployAuthorized': False,
+              'note': 'Governance activated after fresh production proof; runtime implementation not started. #202 is an ownership guardrail outside this Result; #214 remains excluded.'
+          }
+          project['activeIntegrationBranch'] = 'result/thing-projection-runtime-v1'
+          project['activeReleaseBranch'] = None
+
+          # ARTIFACT_INDEX: register the current Result without rewriting history.
+          ia = index['_artifact']
+          ia['projectStage'] = 'BUILD'
+          ia['gate'] = 'G5_BUILD'
+          ia['version'] = '1.88'
+          ia['updated'] = '2026-09-17'
+          ia['supersedes'] = '1.87'
+
+          current = index.get('currentArtifacts', [])
+          for item in current:
+              if item.get('artifactId') == 'dementor-club.kernel.project':
+                  item['currentVersion'] = '1.91'
+                  item['updated'] = '2026-09-17'
+              elif item.get('artifactId') == 'dementor-club.kernel.artifact-index':
+                  item['currentVersion'] = '1.88'
+                  item['updated'] = '2026-09-17'
+
+          aid = 'dementor-club.result.thing-projection-runtime-v1'
+          assert not any(x.get('artifactId') == aid for x in current), 'duplicate ThingProjection Result pointer'
+          active = {
+              'artifactId': aid,
+              'documentType': 'RESULT',
+              'currentVersion': '0.1',
+              'status': 'DRAFT',
+              'location': result_ref,
+              'sourceSystem': 'GIT',
+              'authorityType': 'IMPLEMENTATION_AUTHORITY',
+              'updated': '2026-09-17',
+              'canonicalProject': 'dementor-club',
+              'canonicalLocation': result_ref,
+              'relation': 'CURRENT_RESULT',
+              'gate': 'G5_BUILD',
+              'issue': 213,
+              'integrationBranch': 'result/thing-projection-runtime-v1',
+              'productionBaseCommit': '374defbe583fac0839a43611b151d1104b47a42b',
+              'activationAuthorized': True,
+              'implementationStartAuthorized': False,
+              'productionMergeAuthorized': False,
+              'productionDeployAuthorized': False,
+              'note': 'Activated governance only; runtime implementation not started. Catalog/#202 and Contribution/#214 are excluded from implementation scope.',
+              'referencedBy': []
+          }
+          insert_at = 0
+          for n, item in enumerate(current):
+              if item.get('artifactId') == 'dementor-club.kernel.approved-state':
+                  insert_at = n + 1
+                  break
+          current.insert(insert_at, active)
+          index['currentArtifacts'] = current
+
+          project_path.write_text(json.dumps(project, ensure_ascii=False, separators=(',', ':')) + '\n')
+          index_path.write_text(json.dumps(index, ensure_ascii=False, separators=(',', ':')) + '\n')
+          PY
+
+      - name: Verify activation invariants
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=json.load(open('.weekly-os/PROJECT.json'))
+          i=json.load(open('.weekly-os/ARTIFACT_INDEX.json'))
+          a=json.load(open('.weekly-os/APPROVED_STATE.json'))
+          r=Path('.weekly-os/results/thing-projection-runtime-v1.v0.1.md').read_text()
+          assert p['_artifact']['version']=='1.91'
+          assert p['_artifact']['supersedes']=='1.90'
+          assert p['projectStage']=='BUILD' and p['gate']=='G5_BUILD'
+          assert p['currentResult']['artifactId']=='dementor-club.result.thing-projection-runtime-v1'
+          assert p['currentResult']['implementationStartAuthorized'] is False
+          assert p['activeIntegrationBranch']=='result/thing-projection-runtime-v1'
+          assert p['activeReleaseBranch'] is None
+          assert p['readFirst'][3]=='.weekly-os/results/thing-projection-runtime-v1.v0.1.md'
+          assert i['_artifact']['version']=='1.88'
+          hits=[x for x in i['currentArtifacts'] if x.get('artifactId')=='dementor-club.result.thing-projection-runtime-v1']
+          assert len(hits)==1
+          assert hits[0]['relation']=='CURRENT_RESULT' and hits[0]['gate']=='G5_BUILD'
+          assert hits[0]['implementationStartAuthorized'] is False
+          assert a['_artifact']['version']=='1.0'
+          assert 'integrationBranch: result/thing-projection-runtime-v1' in r
+          assert 'productionBaseCommit: 374defbe583fac0839a43611b151d1104b47a42b' in r
+          print('#213 activation invariants PASS')
+          PY
+          git diff --exit-code HEAD -- .weekly-os/APPROVED_STATE.json
+          CHANGED="$(git diff --name-only HEAD)"
+          printf '%s\n' "$CHANGED"
+          test "$(printf '%s\n' "$CHANGED" | grep -Ev '^(.weekly-os/PROJECT.json|.weekly-os/ARTIFACT_INDEX.json)$' | sed '/^$/d' | wc -l)" -eq 0
+
+      - name: Commit activation and self-remove
+        shell: bash
+        run: |
+          rm -f .github/workflows/semantic-activate-213.yml
+          git config user.name "SLEDZARI"
+          git config user.email "sharecraftwideo@gmail.com"
+          git add .weekly-os/PROJECT.json .weekly-os/ARTIFACT_INDEX.json .github/workflows/semantic-activate-213.yml
+          git commit -m "kernel: activate ThingProjection Runtime v1"
+          git push origin HEAD:dementor-club
