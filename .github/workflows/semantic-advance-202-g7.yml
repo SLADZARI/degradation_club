@@ -1,0 +1,187 @@
+name: One-shot semantic advance 202 G7
+
+on:
+  push:
+    branches: [dementor-club]
+    paths:
+      - '.github/workflows/semantic-advance-202-g7.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  advance-kernel:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: dementor-club
+          fetch-depth: 0
+      - name: Advance current Result to validated G7 RC
+        shell: python
+        run: |
+          import json
+          from pathlib import Path
+
+          old_result_path='.weekly-os/results/catalog-release-truth-v1.v0.1.md'
+          result_path='.weekly-os/results/catalog-release-truth-v1.v0.2.md'
+          g6_path='operations/CATALOG_RELEASE_TRUTH_G6_2026-09-17.md'
+          g7_path='operations/CATALOG_RELEASE_TRUTH_G7_RELEASE_CANDIDATE_2026-09-17.md'
+          candidate='e24c3811803b4bf6443f54a30bd9c15495cd54d1'
+          production='23d4266a4009d34042b29ec1fb73fb0cbad6b62e'
+
+          p=Path('.weekly-os/PROJECT.json')
+          project=json.loads(p.read_text())
+          assert project['_artifact']['version']=='2.00'
+          assert project.get('gate')=='G5_BUILD'
+          current=project.get('currentResult') or {}
+          assert current.get('artifactId')=='dementor-club.result.catalog-release-truth-v1'
+          assert current.get('version')=='0.1'
+          assert current.get('issue')==202
+          assert current.get('productionMergeAuthorized') is False
+          assert current.get('productionDeployAuthorized') is False
+          assert project.get('activeIntegrationBranch')=='result/catalog-release-truth-v1'
+          assert project.get('activeReleaseBranch') is None
+
+          project['_artifact']['supersedes']='2.00'
+          project['_artifact']['version']='2.01'
+          project['_artifact']['projectStage']='RELEASE'
+          project['_artifact']['gate']='G7_RELEASE'
+          project['_artifact']['updated']='2026-09-17'
+          project['projectStage']='RELEASE'
+          project['gate']='G7_RELEASE'
+          project['currentResult']={
+            'artifactId':'dementor-club.result.catalog-release-truth-v1',
+            'version':'0.2',
+            'status':'DRAFT',
+            'path':result_path,
+            'gate':'G7_RELEASE',
+            'issue':202,
+            'integrationBranch':'result/catalog-release-truth-v1',
+            'releaseBranch':'release/catalog-release-truth-v1',
+            'productionBaseCommit':production,
+            'candidateCommit':candidate,
+            'integrationPullRequest':222,
+            'stagingMergeCommit':'61d85d95bd95dfb536acdd363b45d2773a4b2ca5',
+            'releasePullRequest':223,
+            'validationRunId':35274121432,
+            'releaseValidationRunId':35275186704,
+            'validationConclusion':'SUCCESS',
+            'activationAuthorized':True,
+            'implementationStartAuthorized':True,
+            'productionMergeAuthorized':False,
+            'productionDeployAuthorized':False,
+            'g6Evidence':g6_path,
+            'g7Evidence':g7_path,
+            'note':'Clean production RC validated; PR #223 remains open. Production merge and deploy are explicitly locked pending separate authorization.'
+          }
+          project['activeReleaseBranch']='release/catalog-release-truth-v1'
+          rf=project.get('readFirst',[])
+          tail=[x for x in rf[3:] if x not in {old_result_path,result_path,g6_path,g7_path}]
+          project['readFirst']=rf[:3]+[result_path,g7_path,g6_path]+tail
+          p.write_text(json.dumps(project,ensure_ascii=False,separators=(',',':'))+'\n')
+
+          ip=Path('.weekly-os/ARTIFACT_INDEX.json')
+          index=json.loads(ip.read_text())
+          assert index['_artifact']['version']=='1.97'
+          assert index['_artifact']['gate']=='G5_BUILD'
+          index['_artifact']['supersedes']='1.97'
+          index['_artifact']['version']='1.98'
+          index['_artifact']['projectStage']='RELEASE'
+          index['_artifact']['gate']='G7_RELEASE'
+          index['_artifact']['updated']='2026-09-17'
+          if 'projectStage' in index: index['projectStage']='RELEASE'
+          if 'gate' in index: index['gate']='G7_RELEASE'
+
+          artifacts=index['currentArtifacts']
+          for a in artifacts:
+            if a.get('artifactId')=='dementor-club.kernel.project': a['currentVersion']='2.01'
+            if a.get('artifactId')=='dementor-club.kernel.artifact-index': a['currentVersion']='1.98'
+
+          currents=[a for a in artifacts if a.get('relation')=='CURRENT_RESULT']
+          assert len(currents)==1
+          cr=currents[0]
+          assert cr.get('artifactId')=='dementor-club.result.catalog-release-truth-v1'
+          assert cr.get('currentVersion')=='0.1'
+          cr.update({
+            'currentVersion':'0.2',
+            'status':'DRAFT',
+            'location':result_path,
+            'canonicalLocation':result_path,
+            'updated':'2026-09-17',
+            'gate':'G7_RELEASE',
+            'issue':202,
+            'integrationBranch':'result/catalog-release-truth-v1',
+            'releaseBranch':'release/catalog-release-truth-v1',
+            'productionBaseCommit':production,
+            'candidateCommit':candidate,
+            'integrationPullRequest':222,
+            'stagingMergeCommit':'61d85d95bd95dfb536acdd363b45d2773a4b2ca5',
+            'releasePullRequest':223,
+            'validationRunId':35274121432,
+            'releaseValidationRunId':35275186704,
+            'validationConclusion':'SUCCESS',
+            'activationAuthorized':True,
+            'implementationStartAuthorized':True,
+            'productionMergeAuthorized':False,
+            'productionDeployAuthorized':False,
+            'g6Evidence':g6_path,
+            'g7Evidence':g7_path
+          })
+
+          def add_once(entry):
+            matches=[a for a in artifacts if a.get('artifactId')==entry['artifactId']]
+            assert len(matches)<=1
+            if not matches: artifacts.append(entry)
+
+          add_once({
+            'artifactId':'dementor-club.operations.catalog-release-truth-g6-2026-09-17',
+            'documentType':'VALIDATION_EVIDENCE','currentVersion':'1.0','status':'PASS',
+            'location':g6_path,'sourceSystem':'GIT','authorityType':'VALIDATION_EVIDENCE',
+            'updated':'2026-09-17','canonicalProject':'dementor-club','canonicalLocation':g6_path,
+            'relation':'G6_EVIDENCE','result':'dementor-club.result.catalog-release-truth-v1',
+            'candidateCommit':candidate,'validationRunId':35274121432,'validationConclusion':'SUCCESS','referencedBy':[]
+          })
+          add_once({
+            'artifactId':'dementor-club.operations.catalog-release-truth-g7-release-candidate-2026-09-17',
+            'documentType':'RELEASE_EVIDENCE','currentVersion':'1.0','status':'PASS_CLEAN_RC_VALIDATED',
+            'location':g7_path,'sourceSystem':'GIT','authorityType':'RELEASE_EVIDENCE',
+            'updated':'2026-09-17','canonicalProject':'dementor-club','canonicalLocation':g7_path,
+            'relation':'G7_RELEASE_EVIDENCE','result':'dementor-club.result.catalog-release-truth-v1',
+            'releaseCandidateCommit':candidate,'pullRequest':223,'productionBaseCommit':production,
+            'validationRun':1204,'validationRunId':35275186704,'validationConclusion':'SUCCESS',
+            'productionMergeAuthorized':False,'productionDeployAuthorized':False,'referencedBy':[]
+          })
+          ip.write_text(json.dumps(index,ensure_ascii=False,separators=(',',':'))+'\n')
+
+          approved=json.loads(Path('.weekly-os/APPROVED_STATE.json').read_text())
+          assert approved['_artifact']['version']=='1.0'
+          assert all(approved['protected'][k]['artifactId'] is None for k in ('PRODUCT','DOMAIN','ARCHITECTURE','DESIGN'))
+      - name: Remove one-shot workflow
+        run: rm .github/workflows/semantic-advance-202-g7.yml
+      - name: Verify G7 kernel invariants
+        shell: python
+        run: |
+          import json
+          from pathlib import Path
+          p=json.loads(Path('.weekly-os/PROJECT.json').read_text())
+          i=json.loads(Path('.weekly-os/ARTIFACT_INDEX.json').read_text())
+          a=json.loads(Path('.weekly-os/APPROVED_STATE.json').read_text())
+          assert p['_artifact']['version']=='2.01'
+          assert p['gate']=='G7_RELEASE'
+          assert p['currentResult']['version']=='0.2'
+          assert p['currentResult']['releasePullRequest']==223
+          assert p['currentResult']['productionMergeAuthorized'] is False
+          assert p['currentResult']['productionDeployAuthorized'] is False
+          assert p['activeIntegrationBranch']=='result/catalog-release-truth-v1'
+          assert p['activeReleaseBranch']=='release/catalog-release-truth-v1'
+          current=[x for x in i['currentArtifacts'] if x.get('relation')=='CURRENT_RESULT']
+          assert len(current)==1 and current[0]['currentVersion']=='0.2' and current[0]['gate']=='G7_RELEASE'
+          assert a['_artifact']['version']=='1.0'
+      - name: Commit G7 kernel advance and self-remove
+        run: |
+          git config user.name 'SLEDZARI'
+          git config user.email 'sharecraftwideo@gmail.com'
+          git add .weekly-os/PROJECT.json .weekly-os/ARTIFACT_INDEX.json .github/workflows/semantic-advance-202-g7.yml
+          git commit -m 'kernel(#202): point current Result to validated G7 RC'
+          git push origin HEAD:dementor-club
