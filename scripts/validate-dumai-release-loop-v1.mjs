@@ -6,6 +6,7 @@ const errors=[];
 const expect=(ok,msg)=>{if(!ok)errors.push(msg)};
 const read=rel=>fs.readFileSync(path.join(root,rel),'utf8');
 
+const projection=read('thing-projection-v1.js');
 const data=read('courses/dumai-s-opasnostyu/data.js');
 const core=read('courses/dumai-s-opasnostyu/core.js');
 const screens1=read('courses/dumai-s-opasnostyu/screens-1.js');
@@ -15,11 +16,19 @@ const index=read('courses/dumai-s-opasnostyu/index.html');
 const siteConfig=read('site-config.js');
 const analytics=read('production-analytics-v1.js');
 
+expect(projection.includes("thingRef:'program:dengi-na-veter'"),'shared Program projection Thing ref drifted');
+expect(projection.includes("href:'/courses/dengi-na-veter/'"),'shared Program projection route drifted');
+expect(projection.includes("currentTruth:'Курс готов к прохождению.'"),'shared Program projection current truth drifted');
+expect(projection.includes("title:'ДЕНЬГИ НА ВЕТЕР'"),'shared Program projection title drifted');
 expect(data.includes("version:'v1'"),'continuation v1 version missing');
-expect(data.includes("thingRef:'program:dengi-na-veter'"),'continuation Thing ref drifted');
-expect(data.includes("href:'/courses/dengi-na-veter/'"),'continuation route drifted');
-expect(data.includes("actionLabel:'ПРОЙТИ КУРС'"),'continuation CTA drifted');
-expect(data.includes("currentTruth:'Курс готов к прохождению.'"),'continuation current truth drifted');
+expect(data.includes('...globalThis.readDengiNaVeterThingProjection()'),'DSO continuation must consume shared Program projection');
+expect(data.includes("actionLabel:'ПРОЙТИ КУРС'"),'continuation contextual CTA drifted');
+expect(!data.includes("thingRef:'program:dengi-na-veter'"),'DSO data must not duplicate Dengi thingRef truth');
+expect(!data.includes("href:'/courses/dengi-na-veter/'"),'DSO data must not duplicate Dengi canonical route');
+expect(!data.includes("currentTruth:'Курс готов к прохождению.'"),'DSO data must not duplicate Dengi current truth');
+expect(!data.includes("title:'ДЕНЬГИ НА ВЕТЕР'"),'DSO data must not duplicate Dengi title projection');
+expect(index.includes('/thing-projection-v1.js'),'DSO route must load ThingProjection v1 boundary');
+expect(index.indexOf('/thing-projection-v1.js')<index.indexOf('./data.js'),'ThingProjection boundary must load before DSO continuation composition');
 
 expect(screens1.includes('ONLINE COURSE / PUBLIC RELEASE'),'public route does not literally identify the course as a release');
 expect(bind.includes("'PUBLIC RELEASE / STAGE 1'"),'course chrome does not preserve PUBLIC RELEASE state');
@@ -58,12 +67,19 @@ const built=path.join(root,'_site');
 if(fs.existsSync(built)){
   const builtCourse=path.join(built,'courses/dumai-s-opasnostyu');
   for(const rel of ['data.js','core.js','screens-1.js','screens-3b.js','bind.js'])expect(fs.existsSync(path.join(builtCourse,rel)),`built course missing ${rel}`);
+  expect(fs.existsSync(path.join(built,'thing-projection-v1.js')),'built ThingProjection runtime missing');
   const builtAnalytics=path.join(built,'production-analytics-v1.js');
   expect(fs.existsSync(builtAnalytics),'built production analytics runtime missing');
   const builtIndex=path.join(builtCourse,'index.html');
   if(fs.existsSync(builtIndex)){
     const html=fs.readFileSync(builtIndex,'utf8');
     expect(!html.includes('/course-account-identity-v1.js'),'built DSO route unexpectedly binds local state to account identity');
+    expect(html.includes('/thing-projection-v1.js'),'built DSO route missing ThingProjection boundary');
+    expect(html.indexOf('/thing-projection-v1.js')<html.indexOf('./data.js'),'built DSO route loads continuation data before ThingProjection boundary');
+  }
+  if(fs.existsSync(path.join(builtCourse,'data.js'))){
+    const builtData=fs.readFileSync(path.join(builtCourse,'data.js'),'utf8');
+    expect(builtData.includes('...globalThis.readDengiNaVeterThingProjection()'),'built DSO continuation lost shared projection boundary');
   }
   if(fs.existsSync(path.join(builtCourse,'screens-3b.js'))){
     const builtScreens=fs.readFileSync(path.join(builtCourse,'screens-3b.js'),'utf8');
@@ -80,6 +96,6 @@ console.log('Dumai s opasnostyu Release Loop v1 contract PASS');
 console.log('✓ PUBLIC RELEASE literal state');
 console.log('✓ browser-local Stage 1 has no mandatory auth/server course sync');
 console.log('✓ certificate remains completion artifact');
-console.log('✓ exactly one continuation: program:dengi-na-veter');
+console.log('✓ continuation consumes shared program:dengi-na-veter projection boundary');
 console.log('✓ return_payoff requires continuation version delta');
 console.log('✓ existing production analytics owner carries six causal events');
