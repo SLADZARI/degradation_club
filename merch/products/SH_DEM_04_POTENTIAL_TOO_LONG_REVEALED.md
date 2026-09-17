@@ -7,7 +7,7 @@
 - `public_url`: /merch/drop-001/potential-too-long-revealed/
 - `category`: apparel / t-shirt
 - `line`: Classic Dementor T-Shirts
-- `status`: working-assets-present
+- `status`: active-public-product
 - `sales_state`: not-open
 - `drop`: DROP 001
 - `short_idea`: `ВАШ ПОТЕНЦИАЛ СЛИШКОМ ДОЛГО ОСТАВАЛСЯ РАСКРЫТЫМ.`
@@ -32,8 +32,18 @@
 - `placement_tags`: HOME_INLINE; POST_JOIN_RESULT; MERCH_CROSSSELL; FOOTER_ROTATION; POPUP_CONTEXTUAL
 - `recommendation_priority`: 70
 - `approved_phrases`: `ВАШ ПОТЕНЦИАЛ СЛИШКОМ ДОЛГО ОСТАВАЛСЯ РАСКРЫТЫМ.`; `DEMENTOR CLUB`
-- `prohibited_presentation`: do not infer fabric composition, GSM, fit, size range, print technique, price, edition or availability from the mockup; do not present as available until sales_state is approved
-- `updated_at`: 2026-08-29
+- `prohibited_presentation`: do not infer fabric composition, GSM, fit, size range, print technique, price, edition or availability from the mockup; do not present as available/open for sale until a separate sales decision; do not infer that missing operational registry state means the product is only a concept/preview
+- `updated_at`: 2026-09-18
+
+## Approved current product truth
+
+- Product disposition: `ACTIVE_PUBLIC_PRODUCT`.
+- Meaning: a real future Dementor Club product, not concept and not preview.
+- Current sales state: `NOT OPEN`.
+- Price: not approved / unknown.
+- Availability: not approved / unknown.
+- A public route/card may represent this real future product without implying price, availability, preorder, checkout readiness or open sales.
+- Whether an operational `dc_merch_items` row should exist now is intentionally unresolved here and belongs to a separate implementation/operational-alignment boundary.
 
 ## Visual specification confirmed from uploaded mockup
 
@@ -64,6 +74,10 @@
 - `production_cost_ceiling_eur`: MISSING
 - `availability`: MISSING
 - `shipping_weight`: MISSING
+
+## Authority
+
+Owner source-truth decision: `operations/MERCH_SOURCE_TRUTH_DECISION_V1.md` (#199).
 
 ## Source
 
