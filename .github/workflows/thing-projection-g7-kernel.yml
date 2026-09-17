@@ -1,0 +1,116 @@
+name: ThingProjection #213 G7 kernel prep
+
+on:
+  push:
+    branches:
+      - dementor-club
+    paths:
+      - .github/workflows/thing-projection-g7-kernel.yml
+
+permissions:
+  contents: write
+
+jobs:
+  update-kernel:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: dementor-club
+          fetch-depth: 0
+      - name: Update PROJECT and ARTIFACT_INDEX
+        run: |
+          node <<'NODE'
+          const fs=require('fs');
+          const p='.weekly-os/PROJECT.json';
+          const i='.weekly-os/ARTIFACT_INDEX.json';
+          const P=JSON.parse(fs.readFileSync(p,'utf8'));
+          const I=JSON.parse(fs.readFileSync(i,'utf8'));
+
+          P._artifact.projectStage='RELEASE';
+          P._artifact.gate='G7_RELEASE';
+          P._artifact.version='1.93';
+          P._artifact.supersedes='1.92';
+          P.projectStage='RELEASE';
+          P.gate='G7_RELEASE';
+          P.activeReleaseBranch='release/thing-projection-runtime-v1';
+          if(!P.readFirst.includes('operations/THING_PROJECTION_RUNTIME_G6_2026-09-17.md')){
+            const idx=P.readFirst.indexOf('.weekly-os/results/thing-projection-runtime-v1.v0.1.md');
+            P.readFirst.splice(idx+1,0,'operations/THING_PROJECTION_RUNTIME_G6_2026-09-17.md');
+          }
+          Object.assign(P.currentResult,{
+            gate:'G7_RELEASE',
+            candidateCommit:'7dc040fe90696caf303b0fb43f1f53296ad7fd97',
+            validationRunId:35254861885,
+            validationConclusion:'SUCCESS',
+            g6Evidence:'operations/THING_PROJECTION_RUNTIME_G6_2026-09-17.md',
+            releaseBranch:'release/thing-projection-runtime-v1',
+            productionMergeAuthorized:false,
+            productionDeployAuthorized:false,
+            note:'G6 PASS on exact candidate 7dc040fe... via run 35254861885. Clean G7 release candidate preparation authorized; production merge and deploy remain unauthorized. #202 remains ownership guardrail; #214 remains excluded.'
+          });
+
+          I._artifact.projectStage='RELEASE';
+          I._artifact.gate='G7_RELEASE';
+          I._artifact.version='1.90';
+          I._artifact.supersedes='1.89';
+          const projectRec=I.currentArtifacts.find(x=>x.artifactId==='dementor-club.kernel.project');
+          const indexRec=I.currentArtifacts.find(x=>x.artifactId==='dementor-club.kernel.artifact-index');
+          const resultRec=I.currentArtifacts.find(x=>x.artifactId==='dementor-club.result.thing-projection-runtime-v1');
+          if(!projectRec||!indexRec||!resultRec) throw new Error('required kernel records missing');
+          projectRec.currentVersion='1.93'; projectRec.updated='2026-09-17';
+          indexRec.currentVersion='1.90'; indexRec.updated='2026-09-17';
+          Object.assign(resultRec,{
+            gate:'G7_RELEASE',
+            candidateCommit:'7dc040fe90696caf303b0fb43f1f53296ad7fd97',
+            validationRunId:35254861885,
+            validationConclusion:'SUCCESS',
+            g6Evidence:'operations/THING_PROJECTION_RUNTIME_G6_2026-09-17.md',
+            releaseBranch:'release/thing-projection-runtime-v1',
+            productionMergeAuthorized:false,
+            productionDeployAuthorized:false,
+            note:'G6 PASS on exact candidate 7dc040fe...; clean G7 release candidate preparation in progress. Production merge/deploy remain unauthorized.'
+          });
+          if(!I.currentArtifacts.find(x=>x.artifactId==='dementor-club.operations.thing-projection-runtime-g6-2026-09-17')){
+            I.currentArtifacts.splice(I.currentArtifacts.indexOf(resultRec)+1,0,{
+              artifactId:'dementor-club.operations.thing-projection-runtime-g6-2026-09-17',
+              documentType:'VALIDATION_EVIDENCE',
+              currentVersion:'1.0',
+              status:'PASS',
+              location:'operations/THING_PROJECTION_RUNTIME_G6_2026-09-17.md',
+              sourceSystem:'GIT',
+              authorityType:'VALIDATION_EVIDENCE',
+              updated:'2026-09-17',
+              canonicalProject:'dementor-club',
+              canonicalLocation:'operations/THING_PROJECTION_RUNTIME_G6_2026-09-17.md',
+              relation:'G6_EVIDENCE',
+              result:'dementor-club.result.thing-projection-runtime-v1',
+              candidateCommit:'7dc040fe90696caf303b0fb43f1f53296ad7fd97',
+              validationRunId:35254861885,
+              validationConclusion:'SUCCESS',
+              referencedBy:[]
+            });
+          }
+          fs.writeFileSync(p,JSON.stringify(P));
+          fs.writeFileSync(i,JSON.stringify(I));
+          NODE
+      - name: Verify G7 kernel invariants
+        run: |
+          node <<'NODE'
+          const fs=require('fs');
+          const P=JSON.parse(fs.readFileSync('.weekly-os/PROJECT.json','utf8'));
+          const I=JSON.parse(fs.readFileSync('.weekly-os/ARTIFACT_INDEX.json','utf8'));
+          if(P.gate!=='G7_RELEASE'||P._artifact.version!=='1.93') throw new Error('PROJECT not G7/1.93');
+          if(P.activeReleaseBranch!=='release/thing-projection-runtime-v1') throw new Error('release branch pointer missing');
+          if(P.currentResult.productionMergeAuthorized!==false||P.currentResult.productionDeployAuthorized!==false) throw new Error('release authorization boundary broken');
+          if(P.currentResult.validationRunId!==35254861885) throw new Error('G6 evidence run mismatch');
+          if(I._artifact.version!=='1.90'||I._artifact.gate!=='G7_RELEASE') throw new Error('INDEX not G7/1.90');
+          NODE
+      - name: Commit kernel update and self-remove
+        run: |
+          rm -f .github/workflows/thing-projection-g7-kernel.yml
+          git config user.name "SLEDZARI"
+          git config user.email "sharecraftwideo@gmail.com"
+          git add .weekly-os/PROJECT.json .weekly-os/ARTIFACT_INDEX.json .github/workflows/thing-projection-g7-kernel.yml
+          git commit -m "kernel: advance ThingProjection Runtime v1 to G7 release prep"
+          git push origin HEAD:dementor-club
