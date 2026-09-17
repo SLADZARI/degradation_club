@@ -7,12 +7,12 @@
     "projectStage": "BUILD",
     "gate": "G5_BUILD",
     "status": "APPROVED",
-    "version": "2.06",
+    "version": "2.07",
     "updated": "2026-09-18",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.05"
+    "supersedes": "2.06"
   },
   "currentArtifacts": [
     {
@@ -728,14 +728,14 @@
     {
       "artifactId": "dementor-club.result.board-relations-v1",
       "documentType": "RESULT",
-      "currentVersion": "0.2",
+      "currentVersion": "0.3",
       "status": "ACTIVE",
-      "location": ".weekly-os/results/board-relations-v1.v0.2.md",
+      "location": ".weekly-os/results/board-relations-v1.v0.3.md",
       "sourceSystem": "GIT",
       "authorityType": "IMPLEMENTATION_AUTHORITY",
       "updated": "2026-09-18",
       "canonicalProject": "dementor-club",
-      "canonicalLocation": ".weekly-os/results/board-relations-v1.v0.2.md",
+      "canonicalLocation": ".weekly-os/results/board-relations-v1.v0.3.md",
       "relation": "CURRENT_RESULT",
       "gate": "G5_BUILD",
       "specification": "operations/BOARD_INFORMATION_ARCHITECTURE_V1.md",
@@ -743,7 +743,7 @@
       "plannedIntegrationBranch": "result/board-relations-v1",
       "implementationStartAuthorized": true,
       "blockingGate": "IDENTITY_CONTRACT",
-      "note": "Single active Batch C implementation Result. G4 identity contract accepted. Pre-persistence assignment/pairing contracts are next; schema/RLS/UI mutation has not begun.",
+      "note": "ACTIVE Batch C Result. G4 identity contract accepted; G5 assignment predicate, relation pairing matrix and slug rename invariant recorded. Persistence/schema/RLS/UI mutation has not begun.",
       "referencedBy": [],
       "identityContractEvidence": "operations/BOARD_RELATIONS_G4_IDENTITY_CONTRACT_2026-09-18.md",
       "identityContractStatus": "ACCEPTED",
@@ -754,7 +754,29 @@
       "schemaMutationAuthorized": false,
       "productionMergeAuthorized": false,
       "productionDeployAuthorized": false,
-      "liveDatabaseMutationAuthorized": false
+      "liveDatabaseMutationAuthorized": false,
+      "prePersistenceContractEvidence": "operations/BOARD_RELATIONS_G5_PRE_PERSISTENCE_CONTRACT_2026-09-18.md",
+      "prePersistenceCheckpoint": "COMPLETE"
+    },
+    {
+      "artifactId": "dementor-club.evidence.board-relations-g5-pre-persistence-contract-2026-09-18",
+      "documentType": "TECHNICAL_CONTRACT_EVIDENCE",
+      "currentVersion": "1.0",
+      "status": "APPROVED_EVIDENCE",
+      "location": "operations/BOARD_RELATIONS_G5_PRE_PERSISTENCE_CONTRACT_2026-09-18.md",
+      "sourceSystem": "GIT",
+      "authorityType": "EVIDENCE",
+      "updated": "2026-09-18",
+      "canonicalProject": "dementor-club",
+      "canonicalLocation": "operations/BOARD_RELATIONS_G5_PRE_PERSISTENCE_CONTRACT_2026-09-18.md",
+      "relation": "G5_EVIDENCE",
+      "result": "dementor-club.result.board-relations-v1",
+      "runtimeMutation": false,
+      "schemaMutation": false,
+      "checkpoint": "PRE_PERSISTENCE_COMPLETE",
+      "referencedBy": [
+        "dementor-club.result.board-relations-v1"
+      ]
     },
     {
       "artifactId": "dementor-club.evidence.board-relations-g4-identity-contract-2026-09-18",
