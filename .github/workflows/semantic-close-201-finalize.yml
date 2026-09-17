@@ -1,0 +1,54 @@
+name: One-shot finalize #201 G8 index
+
+on:
+  push:
+    branches:
+      - dementor-club
+    paths:
+      - .github/workflows/semantic-close-201-finalize.yml
+
+permissions:
+  contents: write
+
+jobs:
+  finalize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: dementor-club
+          fetch-depth: 0
+      - name: Close stale G8 index field
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          path = Path('.weekly-os/ARTIFACT_INDEX.json')
+          data = json.loads(path.read_text())
+          hit = False
+          for item in data.get('currentArtifacts', []):
+              if item.get('artifactId') == 'dementor-club.result.evidence-hygiene-v1':
+                  item['g8Status'] = 'CLOSED'
+                  hit = True
+          assert hit
+          path.write_text(json.dumps(data, ensure_ascii=False, separators=(',', ':')) + '\n')
+          PY
+      - name: Verify and self-remove
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          i=json.load(open('.weekly-os/ARTIFACT_INDEX.json'))
+          eh=next(x for x in i['currentArtifacts'] if x.get('artifactId')=='dementor-club.result.evidence-hygiene-v1')
+          assert eh['g8Status']=='CLOSED'
+          assert eh['relation']=='COMPLETED_RESULT'
+          assert eh['status']=='APPROVED'
+          print('G8 index closure PASS')
+          PY
+          rm -f .github/workflows/semantic-close-201-finalize.yml
+          git config user.name "SLEDZARI"
+          git config user.email "sharecraftwideo@gmail.com"
+          git add .weekly-os/ARTIFACT_INDEX.json .github/workflows/semantic-close-201-finalize.yml
+          git commit -m "docs: finalize #201 G8 index status"
+          git push origin HEAD:dementor-club
