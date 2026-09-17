@@ -7,12 +7,12 @@
     "projectStage": "RELEASE",
     "gate": "G8_CLEANUP",
     "status": "APPROVED",
-    "version": "2.04",
+    "version": "2.05",
     "updated": "2026-09-18",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.03"
+    "supersedes": "2.04"
   },
   "currentArtifacts": [
     {
@@ -743,8 +743,31 @@
       "plannedIntegrationBranch": "result/board-relations-v1",
       "implementationStartAuthorized": false,
       "blockingGate": "IDENTITY_CONTRACT",
-      "note": "Batch C successor draft only. Not currentResult; no active branch; identity contract must be accepted before schema/RPC/RLS/UI implementation.",
-      "referencedBy": []
+      "note": "Batch C successor draft only. G4 identity contract is READY_FOR_ACTIVATION, but Result is not currentResult and no integration branch/implementation/schema/runtime work is authorized until separate owner activation.",
+      "referencedBy": [],
+      "identityContractEvidence": "operations/BOARD_RELATIONS_G4_IDENTITY_CONTRACT_2026-09-18.md",
+      "identityContractStatus": "READY_FOR_ACTIVATION"
+    },
+    {
+      "artifactId": "dementor-club.evidence.board-relations-g4-identity-contract-2026-09-18",
+      "documentType": "TECHNICAL_CONTRACT_EVIDENCE",
+      "currentVersion": "1.0",
+      "status": "READY_FOR_ACTIVATION",
+      "location": "operations/BOARD_RELATIONS_G4_IDENTITY_CONTRACT_2026-09-18.md",
+      "sourceSystem": "GIT",
+      "authorityType": "EVIDENCE",
+      "updated": "2026-09-18",
+      "canonicalProject": "dementor-club",
+      "canonicalLocation": "operations/BOARD_RELATIONS_G4_IDENTITY_CONTRACT_2026-09-18.md",
+      "relation": "G4_EVIDENCE",
+      "result": "dementor-club.result.board-relations-v1",
+      "productionInspectedAt": "2dae3b6ece79652c81af780c049521fda7262726",
+      "recommendation": "READY_FOR_ACTIVATION",
+      "runtimeMutation": false,
+      "schemaMutation": false,
+      "referencedBy": [
+        "dementor-club.result.board-relations-v1"
+      ]
     },
     {
       "artifactId": "dementor-club.result.public-site-visual-tech-debt-cleanup-v1",
