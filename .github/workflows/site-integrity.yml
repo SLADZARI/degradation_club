@@ -28,6 +28,8 @@ jobs:
         run: node scripts/validate-supabase-release-contract.mjs
       - name: Validate registry, routes and feature state
         run: node scripts/validate-site.mjs
+      - name: Validate Catalog and release truth contract
+        run: node scripts/validate-catalog-release-truth-v1.mjs
       - name: Validate page content readiness
         run: node scripts/validate-content-readiness.mjs
       - name: Validate visual contract
