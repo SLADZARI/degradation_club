@@ -1,0 +1,38 @@
+name: Catalog Release Truth G8 Close
+
+on:
+  push:
+    branches:
+      - dementor-club
+    paths:
+      - '.github/workflows/catalog-release-truth-g8-close.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  close:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: dementor-club
+          fetch-depth: 0
+      - name: Prepare G8 closure state
+        run: python .weekly-os/tmp_catalog_release_truth_g8.py
+      - name: Delete retired #202 branches
+        run: |
+          set -euo pipefail
+          for branch in result/catalog-release-truth-v1 release/catalog-release-truth-v1; do
+            git ls-remote --exit-code --heads origin "refs/heads/$branch" >/dev/null
+          done
+          git push origin --delete result/catalog-release-truth-v1
+          git push origin --delete release/catalog-release-truth-v1
+      - name: Commit semantic closure and self-cleanup
+        run: |
+          set -euo pipefail
+          git config user.name 'SLEDZARI'
+          git config user.email 'sharecraftwideo@gmail.com'
+          git add -A
+          git commit -m 'kernel(#202): close Catalog Release Truth at G8'
+          git push origin HEAD:dementor-club
