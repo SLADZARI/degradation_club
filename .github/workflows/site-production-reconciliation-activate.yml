@@ -1,0 +1,121 @@
+name: Activate Site Production Reconciliation
+
+on:
+  push:
+    branches: [dementor-club]
+    paths:
+      - '.github/workflows/site-production-reconciliation-activate.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  activate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: dementor-club
+          fetch-depth: 0
+      - name: Activate Result in kernel
+        shell: python
+        run: |
+          import json
+          from pathlib import Path
+
+          project_path = Path('.weekly-os/PROJECT.json')
+          index_path = Path('.weekly-os/ARTIFACT_INDEX.json')
+          result_path = '.weekly-os/results/site-production-reconciliation-v1.v0.1.md'
+
+          project = json.loads(project_path.read_text())
+          project['_artifact']['projectStage'] = 'BUILD'
+          project['_artifact']['gate'] = 'G5_BUILD'
+          project['_artifact']['version'] = '1.97'
+          project['_artifact']['supersedes'] = '1.96'
+          project['_artifact']['updated'] = '2026-09-17'
+          project['projectStage'] = 'BUILD'
+          project['gate'] = 'G5_BUILD'
+          read_first = project['readFirst']
+          if result_path not in read_first:
+              pos = read_first.index('.weekly-os/APPROVED_STATE.json') + 1
+              read_first.insert(pos, result_path)
+          project['currentResult'] = {
+              'artifactId': 'dementor-club.result.site-production-reconciliation-v1',
+              'version': '0.1',
+              'status': 'ACTIVE',
+              'path': result_path,
+              'gate': 'G5_BUILD',
+              'issue': 221,
+              'integrationBranch': 'result/site-production-reconciliation-v1',
+              'productionBaseCommit': '23d4266a4009d34042b29ec1fb73fb0cbad6b62e',
+              'stagingHeadBefore': '919dbe7bfedc8bd97072db5d0716c29fd1a9a2ab',
+              'mergeBaseBefore': '8194f580b7fd26bc748e0c0a8514119d7764a7e5',
+              'implementationStartAuthorized': True,
+              'stagingRealignmentAuthorized': False,
+              'productionMergeAuthorized': False,
+              'productionDeployAuthorized': False,
+              'note': 'Reconcile staging from current production baseline by inventory; PR #21 is not a blind merge source.'
+          }
+          project['activeIntegrationBranch'] = 'result/site-production-reconciliation-v1'
+          project['activeReleaseBranch'] = None
+          project_path.write_text(json.dumps(project, ensure_ascii=False, separators=(',', ':')) + '\n')
+
+          index = json.loads(index_path.read_text())
+          index['_artifact']['projectStage'] = 'BUILD'
+          index['_artifact']['gate'] = 'G5_BUILD'
+          index['_artifact']['version'] = '1.94'
+          index['_artifact']['supersedes'] = '1.93'
+          index['_artifact']['updated'] = '2026-09-17'
+          for item in index['currentArtifacts']:
+              if item.get('artifactId') == 'dementor-club.kernel.project':
+                  item['currentVersion'] = '1.97'
+                  item['updated'] = '2026-09-17'
+              if item.get('artifactId') == 'dementor-club.kernel.artifact-index':
+                  item['currentVersion'] = '1.94'
+                  item['updated'] = '2026-09-17'
+          index['currentArtifacts'] = [i for i in index['currentArtifacts'] if i.get('artifactId') != 'dementor-club.result.site-production-reconciliation-v1']
+          index['currentArtifacts'].insert(3, {
+              'artifactId': 'dementor-club.result.site-production-reconciliation-v1',
+              'documentType': 'RESULT',
+              'currentVersion': '0.1',
+              'status': 'ACTIVE',
+              'location': result_path,
+              'sourceSystem': 'GIT',
+              'authorityType': 'IMPLEMENTATION_AUTHORITY',
+              'updated': '2026-09-17',
+              'canonicalProject': 'dementor-club',
+              'canonicalLocation': result_path,
+              'relation': 'CURRENT_RESULT',
+              'gate': 'G5_BUILD',
+              'issue': 221,
+              'integrationBranch': 'result/site-production-reconciliation-v1',
+              'productionBaseCommit': '23d4266a4009d34042b29ec1fb73fb0cbad6b62e',
+              'stagingHeadBefore': '919dbe7bfedc8bd97072db5d0716c29fd1a9a2ab',
+              'mergeBaseBefore': '8194f580b7fd26bc748e0c0a8514119d7764a7e5',
+              'implementationStartAuthorized': True,
+              'stagingRealignmentAuthorized': False,
+              'productionMergeAuthorized': False,
+              'productionDeployAuthorized': False,
+              'note': 'Active reconciliation only; production mutation out of scope.',
+              'referencedBy': []
+          })
+          index_path.write_text(json.dumps(index, ensure_ascii=False, separators=(',', ':')) + '\n')
+      - name: Verify activation
+        shell: python
+        run: |
+          import json
+          p=json.load(open('.weekly-os/PROJECT.json'))
+          assert p['currentResult']['artifactId']=='dementor-club.result.site-production-reconciliation-v1'
+          assert p['activeIntegrationBranch']=='result/site-production-reconciliation-v1'
+          assert p['activeReleaseBranch'] is None
+          assert p['currentResult']['productionMergeAuthorized'] is False
+          assert p['currentResult']['productionDeployAuthorized'] is False
+      - name: Commit activation and self-remove
+        run: |
+          git config user.name SLEDZARI
+          git config user.email sharecraftwideo@gmail.com
+          git add .weekly-os/PROJECT.json .weekly-os/ARTIFACT_INDEX.json
+          git commit -m "kernel: activate site-production reconciliation v1"
+          git rm .github/workflows/site-production-reconciliation-activate.yml
+          git commit -m "chore: remove reconciliation activation workflow"
+          git push origin dementor-club
