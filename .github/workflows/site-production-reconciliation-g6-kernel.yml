@@ -1,0 +1,84 @@
+name: Site Production Reconciliation G6 Kernel
+
+on:
+  push:
+    branches: [dementor-club]
+    paths:
+      - '.github/workflows/site-production-reconciliation-g6-kernel.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: dementor-club
+          fetch-depth: 0
+      - name: Update kernel
+        shell: python
+        run: |
+          import json
+          from pathlib import Path
+          pp=Path('.weekly-os/PROJECT.json')
+          ip=Path('.weekly-os/ARTIFACT_INDEX.json')
+          p=json.loads(pp.read_text())
+          old='.weekly-os/results/site-production-reconciliation-v1.v0.1.md'
+          new='.weekly-os/results/site-production-reconciliation-v1.v0.2.md'
+          ev='operations/SITE_PRODUCTION_RECONCILIATION_G6_2026-09-17.md'
+          p['_artifact']['projectStage']='VALIDATION'
+          p['_artifact']['gate']='G6_VALIDATION'
+          p['_artifact']['version']='1.98'
+          p['_artifact']['supersedes']='1.97'
+          p['projectStage']='VALIDATION'
+          p['gate']='G6_VALIDATION'
+          rf=p['readFirst']
+          if old in rf: rf[rf.index(old)]=new
+          elif new not in rf: rf.insert(rf.index('.weekly-os/APPROVED_STATE.json')+1,new)
+          if ev not in rf: rf.insert(rf.index(new)+1,ev)
+          p['currentResult']={
+            'artifactId':'dementor-club.result.site-production-reconciliation-v1',
+            'version':'0.2','status':'G6_PASS_REALIGNMENT_READY','path':new,'gate':'G6_VALIDATION','issue':221,
+            'integrationBranch':'result/site-production-reconciliation-v1',
+            'productionBaseCommit':'23d4266a4009d34042b29ec1fb73fb0cbad6b62e',
+            'stagingHeadBefore':'7a036ba4cd7ccd635ba273931c2087227d0f4c94',
+            'mergeBaseBefore':'8194f580b7fd26bc748e0c0a8514119d7764a7e5',
+            'candidateCommit':'01e0919af5f539e111803387b5f1e86976fd3100',
+            'validationRunId':35265376043,'validationConclusion':'SUCCESS',
+            'implementationStartAuthorized':True,'stagingRealignmentAuthorized':True,
+            'productionMergeAuthorized':False,'productionDeployAuthorized':False,
+            'g6Evidence':ev,
+            'note':'Full production-equivalent G6 PASS. Staging realignment only is authorized; production remains immutable.'
+          }
+          pp.write_text(json.dumps(p,ensure_ascii=False,separators=(',',':'))+'\n')
+
+          idx=json.loads(ip.read_text())
+          idx['_artifact']['projectStage']='VALIDATION'; idx['_artifact']['gate']='G6_VALIDATION'
+          idx['_artifact']['version']='1.95'; idx['_artifact']['supersedes']='1.94'; idx['_artifact']['updated']='2026-09-17'
+          for item in idx['currentArtifacts']:
+            if item.get('artifactId')=='dementor-club.kernel.project': item['currentVersion']='1.98'; item['updated']='2026-09-17'
+            if item.get('artifactId')=='dementor-club.kernel.artifact-index': item['currentVersion']='1.95'; item['updated']='2026-09-17'
+            if item.get('artifactId')=='dementor-club.result.site-production-reconciliation-v1':
+              item.update({'currentVersion':'0.2','status':'G6_PASS_REALIGNMENT_READY','location':new,'canonicalLocation':new,'gate':'G6_VALIDATION','candidateCommit':'01e0919af5f539e111803387b5f1e86976fd3100','validationRunId':35265376043,'validationConclusion':'SUCCESS','stagingRealignmentAuthorized':True,'productionMergeAuthorized':False,'productionDeployAuthorized':False,'note':'G6 PASS; only staging realignment is authorized.'})
+          ip.write_text(json.dumps(idx,ensure_ascii=False,separators=(',',':'))+'\n')
+      - name: Verify
+        shell: python
+        run: |
+          import json
+          p=json.load(open('.weekly-os/PROJECT.json'))
+          assert p['_artifact']['version']=='1.98'
+          assert p['currentResult']['version']=='0.2'
+          assert p['currentResult']['stagingRealignmentAuthorized'] is True
+          assert p['currentResult']['productionMergeAuthorized'] is False
+          assert p['currentResult']['productionDeployAuthorized'] is False
+      - name: Commit and self-remove
+        run: |
+          git config user.name SLEDZARI
+          git config user.email sharecraftwideo@gmail.com
+          git add .weekly-os/PROJECT.json .weekly-os/ARTIFACT_INDEX.json
+          git commit -m "kernel: record reconciliation G6 pass"
+          git rm .github/workflows/site-production-reconciliation-g6-kernel.yml
+          git commit -m "chore: remove reconciliation G6 kernel workflow"
+          git push origin dementor-club
