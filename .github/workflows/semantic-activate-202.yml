@@ -1,0 +1,131 @@
+name: One-shot semantic activation 202
+
+on:
+  push:
+    branches: [dementor-club]
+    paths:
+      - '.github/workflows/semantic-activate-202.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  activate-kernel:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: dementor-club
+          fetch-depth: 0
+      - name: Apply targeted kernel activation
+        shell: python
+        run: |
+          import json
+          from pathlib import Path
+
+          result_path = '.weekly-os/results/catalog-release-truth-v1.v0.1.md'
+          result = {
+            'artifactId': 'dementor-club.result.catalog-release-truth-v1',
+            'version': '0.1',
+            'status': 'DRAFT',
+            'path': result_path,
+            'gate': 'G5_BUILD',
+            'issue': 202,
+            'integrationBranch': 'result/catalog-release-truth-v1',
+            'productionBaseCommit': '23d4266a4009d34042b29ec1fb73fb0cbad6b62e',
+            'activationAuthorized': True,
+            'implementationStartAuthorized': True,
+            'productionMergeAuthorized': False,
+            'productionDeployAuthorized': False,
+            'note': 'Active G5 Result for Catalog/release truth only. Board QA tails do not block it; #199/#204/#214 remain decision-only and excluded.'
+          }
+
+          p = Path('.weekly-os/PROJECT.json')
+          project = json.loads(p.read_text())
+          assert project.get('currentResult') is None, project.get('currentResult')
+          assert project.get('activeIntegrationBranch') is None, project.get('activeIntegrationBranch')
+          old_project_version = project['_artifact']['version']
+          project['_artifact']['supersedes'] = old_project_version
+          project['_artifact']['version'] = '2.00'
+          project['_artifact']['projectStage'] = 'BUILD'
+          project['_artifact']['gate'] = 'G5_BUILD'
+          project['_artifact']['updated'] = '2026-09-17'
+          project['projectStage'] = 'BUILD'
+          project['gate'] = 'G5_BUILD'
+          project['currentResult'] = result
+          project['activeIntegrationBranch'] = 'result/catalog-release-truth-v1'
+          project['activeReleaseBranch'] = None
+          rf = project.get('readFirst', [])
+          project['readFirst'] = rf[:3] + ([result_path] if result_path not in rf else []) + [x for x in rf[3:] if x != result_path]
+          p.write_text(json.dumps(project, ensure_ascii=False, separators=(',', ':')) + '\n')
+
+          i = Path('.weekly-os/ARTIFACT_INDEX.json')
+          index = json.loads(i.read_text())
+          old_index_version = index['_artifact']['version']
+          index['_artifact']['supersedes'] = old_index_version
+          index['_artifact']['version'] = '1.97'
+          index['_artifact']['projectStage'] = 'BUILD'
+          index['_artifact']['gate'] = 'G5_BUILD'
+          index['_artifact']['updated'] = '2026-09-17'
+          if 'projectStage' in index: index['projectStage'] = 'BUILD'
+          if 'gate' in index: index['gate'] = 'G5_BUILD'
+
+          artifacts = index['currentArtifacts']
+          for a in artifacts:
+            if a.get('artifactId') == 'dementor-club.kernel.project':
+              a['currentVersion'] = '2.00'
+            elif a.get('artifactId') == 'dementor-club.kernel.artifact-index':
+              a['currentVersion'] = '1.97'
+          assert not any(a.get('relation') == 'CURRENT_RESULT' for a in artifacts), 'CURRENT_RESULT already exists'
+          artifacts.append({
+            'artifactId': result['artifactId'],
+            'documentType': 'RESULT',
+            'currentVersion': '0.1',
+            'status': 'DRAFT',
+            'location': result_path,
+            'sourceSystem': 'GIT',
+            'authorityType': 'IMPLEMENTATION_AUTHORITY',
+            'updated': '2026-09-17',
+            'canonicalProject': 'dementor-club',
+            'canonicalLocation': result_path,
+            'relation': 'CURRENT_RESULT',
+            'gate': 'G5_BUILD',
+            'issue': 202,
+            'integrationBranch': 'result/catalog-release-truth-v1',
+            'productionBaseCommit': result['productionBaseCommit'],
+            'activationAuthorized': True,
+            'implementationStartAuthorized': True,
+            'productionMergeAuthorized': False,
+            'productionDeployAuthorized': False,
+            'referencedBy': []
+          })
+          i.write_text(json.dumps(index, ensure_ascii=False, separators=(',', ':')) + '\n')
+
+          approved = json.loads(Path('.weekly-os/APPROVED_STATE.json').read_text())
+          assert approved['_artifact']['version'] == '1.0'
+          assert all(approved['protected'][k]['artifactId'] is None for k in ('PRODUCT','DOMAIN','ARCHITECTURE','DESIGN'))
+      - name: Remove one-shot workflow
+        run: rm .github/workflows/semantic-activate-202.yml
+      - name: Verify activation invariants
+        shell: python
+        run: |
+          import json
+          from pathlib import Path
+          p=json.loads(Path('.weekly-os/PROJECT.json').read_text())
+          i=json.loads(Path('.weekly-os/ARTIFACT_INDEX.json').read_text())
+          a=json.loads(Path('.weekly-os/APPROVED_STATE.json').read_text())
+          assert p['currentResult']['issue']==202
+          assert p['activeIntegrationBranch']=='result/catalog-release-truth-v1'
+          assert p['gate']=='G5_BUILD'
+          assert p['currentResult']['productionMergeAuthorized'] is False
+          assert p['currentResult']['productionDeployAuthorized'] is False
+          current=[x for x in i['currentArtifacts'] if x.get('relation')=='CURRENT_RESULT']
+          assert len(current)==1 and current[0]['issue']==202
+          assert a['_artifact']['version']=='1.0'
+      - name: Commit activation and self-remove
+        run: |
+          git config user.name 'SLEDZARI'
+          git config user.email 'sharecraftwideo@gmail.com'
+          git add .weekly-os/PROJECT.json .weekly-os/ARTIFACT_INDEX.json .github/workflows/semantic-activate-202.yml
+          git commit -m 'kernel: activate Catalog / Release Truth v1'
+          git push origin HEAD:dementor-club
