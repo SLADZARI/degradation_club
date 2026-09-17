@@ -1,0 +1,29 @@
+name: Semantic post-merge 202 r3
+
+on:
+  push:
+    branches:
+      - dementor-club
+    paths:
+      - '.github/workflows/semantic-post-merge-202-r3.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  checkpoint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: dementor-club
+          fetch-depth: 0
+      - name: Apply semantic checkpoint
+        run: python .weekly-os/tmp_post_merge_202.py
+      - name: Commit checkpoint and cleanup
+        run: |
+          git config user.name 'SLEDZARI'
+          git config user.email 'sharecraftwideo@gmail.com'
+          git add -A
+          git commit -m 'kernel(#202): record production merge and hold deploy'
+          git push origin HEAD:dementor-club
