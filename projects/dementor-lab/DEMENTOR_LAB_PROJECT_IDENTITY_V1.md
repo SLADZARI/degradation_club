@@ -3,28 +3,28 @@ artifactId: dementor-lab.decision.project-identity
 project: dementor-lab
 documentType: DECISION
 projectStage: DECISION
-status: DRAFT
-version: 0.1
+status: APPROVED
+version: 1.0
 updated: 2026-09-17
 owner: Dementor Club
 sourceSystem: GIT
-authorityType: REFERENCE
+authorityType: APPROVED_AUTHORITY
 supersedes: null
 ---
 
 # DEMENTOR LAB — Project Identity v1
 
-**STATUS:** DRAFT / DECISION PREPARATION / NO RUNTIME EFFECT  
+**STATUS:** APPROVED LOCAL PROJECT IDENTITY DECISION  
 **SOURCE-OF-TRUTH BRANCH:** `dementor-club`  
 **SCOPE:** project identity only
 
 ## 1. Purpose
 
-This draft prepares one narrow project-local Decision for **DEMENTOR LAB**.
+This approved local Project identity Decision defines one narrow project-local authority for **DEMENTOR LAB**.
 
 Its purpose is only to define the stable identity tuple that other semantic projections may reference without making Current Program, Catalog, a route page, runtime code or a generic registry the owner of Project identity.
 
-If approved, this artifact would govern only:
+This artifact governs only:
 
 - canonical project name;
 - source kind;
@@ -35,7 +35,7 @@ If approved, this artifact would govern only:
 
 It does **not** approve or redefine Product, runtime, gameplay, release, programming, Catalog or route-page semantics.
 
-## 2. Proposed identity tuple
+## 2. Approved identity tuple
 
 ```text
 canonicalName: DEMENTOR LAB
@@ -84,7 +84,7 @@ Therefore:
 thingRef = project:dementor-lab
 ```
 
-This draft does not establish a universal Project registry or a generic identity system for every Dementor Club Project. It records the derivation for this existing Project only.
+This Decision does not establish a universal Project registry or a generic identity system for every Dementor Club Project. It records the derivation for this existing Project only.
 
 ### Canonical public route
 
@@ -96,7 +96,7 @@ The route is the canonical public destination for this Project identity. The rou
 
 ## 3. Project-local authority boundary
 
-If approved, `projects/dementor-lab/DEMENTOR_LAB_PROJECT_IDENTITY_V1.md` becomes the project-local authority only for the identity tuple defined in section 2.
+`projects/dementor-lab/DEMENTOR_LAB_PROJECT_IDENTITY_V1.md` is the project-local authority only for the identity tuple defined in section 2.
 
 The boundary is explicit:
 
@@ -124,7 +124,7 @@ Consequences:
 
 `projects/dementor-lab/DEMENTOR_LAB_RUNTIME_SEMANTIC_DECISIONS_V0.1.md` retains authority only over the runtime semantics it explicitly approves.
 
-Approval of this identity Decision would not expand, reduce or supersede that runtime-semantics authority.
+Approval of this identity Decision does not expand, reduce or supersede that runtime-semantics authority.
 
 ### Game Architecture
 
@@ -144,7 +144,7 @@ Fermentation demonstrates that a Dementor Club Project may keep its own semantic
 
 Only that authority-placement pattern is reused here.
 
-This draft does **not** copy or inherit Fermentation's protected PRODUCT authority, Product model, approval state, gate state or implementation boundary.
+This Decision does **not** copy or inherit Fermentation's protected PRODUCT authority, Product model, approval state, gate state or implementation boundary.
 
 In particular:
 
@@ -172,11 +172,11 @@ This Decision does not:
 - activate issue #213;
 - create a Result or integration branch.
 
-## 7. Approval effect
+## 7. Approval / authority effect
 
-Until explicitly approved, this file is **DRAFT / REFERENCE only** and has no runtime or semantic promotion effect.
+Explicit owner approval: **2026-09-17**.
 
-If approved, the narrow authority chain becomes:
+The approved narrow authority chain is:
 
 ```text
 projects/dementor-lab/DEMENTOR_LAB_PROJECT_IDENTITY_V1.md
