@@ -8,8 +8,7 @@ p = json.loads(P.read_text())
 i = json.loads(I.read_text())
 c = p['currentResult']
 
-assert p['_artifact']['version'] == '2.01'
-assert i['_artifact']['version'] == '1.98'
+# Preserve any concurrently approved semantic authorities. Only #202 current Result may be mutated here.
 assert c['artifactId'] == 'dementor-club.result.catalog-release-truth-v1'
 assert c['version'] == '0.2'
 assert c['gate'] == 'G7_RELEASE'
@@ -17,6 +16,20 @@ assert c['candidateCommit'] == 'e24c3811803b4bf6443f54a30bd9c15495cd54d1'
 assert c['releasePullRequest'] == 223
 assert c['productionMergeAuthorized'] is False
 assert c['productionDeployAuthorized'] is False
+
+
+def bump_version(value: str) -> str:
+    major, minor = value.split('.')
+    m, n = int(major), int(minor) + 1
+    if n >= 100:
+        m += 1
+        n = 0
+    return f'{m}.{n:02d}'
+
+project_old = p['_artifact']['version']
+index_old = i['_artifact']['version']
+project_new = bump_version(project_old)
+index_new = bump_version(index_old)
 
 old = Path('.weekly-os/results/catalog-release-truth-v1.v0.2.md')
 new = Path('.weekly-os/results/catalog-release-truth-v1.v0.3.md')
@@ -91,8 +104,8 @@ No `Deploy Dementor Production` run exists for `2dae3b6ece79652c81af780c049521fd
 `MERGE ≠ DEPLOY AUTHORIZATION ≠ DEPLOY ≠ LIVE RETEST ≠ G8`
 '''), encoding='utf-8')
 
-p['_artifact']['version'] = '2.02'
-p['_artifact']['supersedes'] = '2.01'
+p['_artifact']['version'] = project_new
+p['_artifact']['supersedes'] = project_old
 p['_artifact']['projectStage'] = 'RELEASE'
 p['_artifact']['gate'] = 'G7_RELEASE'
 p['projectStage'] = 'RELEASE'
@@ -114,16 +127,16 @@ c.update({
     'note': 'Production merged exact validated #202 RC as 2dae3b6e...; deploy remains explicitly locked. No live retest/G8 closure and no next runtime Result until separate deploy authorization.'
 })
 
-i['_artifact']['version'] = '1.99'
-i['_artifact']['supersedes'] = '1.98'
+i['_artifact']['version'] = index_new
+i['_artifact']['supersedes'] = index_old
 i['_artifact']['projectStage'] = 'RELEASE'
 i['_artifact']['gate'] = 'G7_RELEASE'
 entries = i['currentArtifacts']
 by = {e['artifactId']: e for e in entries}
-assert by['dementor-club.kernel.project']['currentVersion'] == '2.01'
-assert by['dementor-club.kernel.artifact-index']['currentVersion'] == '1.98'
-by['dementor-club.kernel.project']['currentVersion'] = '2.02'
-by['dementor-club.kernel.artifact-index']['currentVersion'] = '1.99'
+assert by['dementor-club.kernel.project']['currentVersion'] == project_old
+assert by['dementor-club.kernel.artifact-index']['currentVersion'] == index_old
+by['dementor-club.kernel.project']['currentVersion'] = project_new
+by['dementor-club.kernel.artifact-index']['currentVersion'] = index_new
 r = by['dementor-club.result.catalog-release-truth-v1']
 assert r['currentVersion'] == '0.2'
 r.update({
@@ -168,6 +181,7 @@ for path in [
     '.github/workflows/semantic-post-merge-202.yml',
     '.github/workflows/semantic-post-merge-202-r2.yml',
     '.github/workflows/semantic-post-merge-202-r3.yml',
+    '.github/workflows/semantic-post-merge-202-r4.yml',
     '.weekly-os/tmp_post_merge_202.py',
 ]:
     Path(path).unlink(missing_ok=True)
@@ -176,8 +190,8 @@ for path in [
 p2 = json.loads(P.read_text())
 i2 = json.loads(I.read_text())
 c2 = p2['currentResult']
-assert p2['_artifact']['version'] == '2.02'
-assert i2['_artifact']['version'] == '1.99'
+assert p2['_artifact']['version'] == project_new
+assert i2['_artifact']['version'] == index_new
 assert c2['version'] == '0.3'
 assert c2['productionCommit'] == '2dae3b6ece79652c81af780c049521fda7262726'
 assert c2['productionMergeAuthorized'] is True
