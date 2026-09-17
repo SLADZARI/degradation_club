@@ -1,26 +1,26 @@
+import '/thing-projection-v1.js';
+
 export const CURRENT_PROGRAM_VERSION='v0';
+
+const readDengiNaVeter=globalThis.readDengiNaVeterThingProjection;
+const readDementorLab=globalThis.readDementorLabThingProjection;
+if(typeof readDengiNaVeter!=='function'||typeof readDementorLab!=='function')throw new Error('ThingProjection Runtime v1 adapters missing');
 
 const PROGRAM=Object.freeze([
   Object.freeze({
-    thingRef:'program:dengi-na-veter',
+    ...readDengiNaVeter(),
     sourceKind:'program',
-    title:'ДЕНЬГИ НА ВЕТЕР',
     stateLabel:'КУРС / МОЖНО ПРОЙТИ',
-    premise:'Цифровой карточечный курс о логике трат и необходимости рационально объяснять каждую покупку.',
-    currentTruth:'Курс готов к прохождению.',
     actionLabel:'ПРОЙТИ КУРС',
-    href:'/courses/dengi-na-veter/',
     analyticsId:'dengi-na-veter'
   }),
   Object.freeze({
-    thingRef:'project:dementor-lab',
+    ...readDementorLab(),
     sourceKind:'project',
-    title:'DEMENTOR LAB',
     stateLabel:'ПРОЕКТ / СЕЙЧАС МУТЯТ',
     premise:'Проект о причинно-следственных мозгах: меняем внутреннюю схему и смотрим, как из неё получается другое поведение.',
     currentTruth:'Публичная презентация проекта доступна. Публичный playable release пока не заявлен.',
     actionLabel:'ПОСМОТРЕТЬ LAB',
-    href:'/projects/dementor-lab/',
     analyticsId:'dementor-lab'
   }),
   Object.freeze({
