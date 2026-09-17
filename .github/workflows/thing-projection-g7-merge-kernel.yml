@@ -130,3 +130,5 @@ jobs:
           git add .weekly-os/PROJECT.json .weekly-os/ARTIFACT_INDEX.json .github/workflows/thing-projection-g7-merge-kernel.yml
           git commit -m "kernel: record ThingProjection v1 production merge"
           git push origin HEAD:dementor-club
+
+# retrigger after workflow registration
