@@ -1,0 +1,71 @@
+name: ThingProjection #213 clean G7 release candidate
+
+on:
+  push:
+    branches:
+      - dementor-club
+    paths:
+      - .github/workflows/thing-projection-g7-rc.yml
+
+permissions:
+  contents: write
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: dementor-club-production
+          fetch-depth: 0
+      - name: Build clean release candidate from production baseline
+        run: |
+          test "$(git rev-parse HEAD)" = "374defbe583fac0839a43611b151d1104b47a42b"
+          git config user.name "SLEDZARI"
+          git config user.email "sharecraftwideo@gmail.com"
+          git checkout -B release/thing-projection-runtime-v1
+          for f in \
+            thing-projection-v1.js \
+            current-program-v1.js \
+            courses/dumai-s-opasnostyu/data.js \
+            courses/dumai-s-opasnostyu/index.html \
+            scripts/validate-current-program-v1.mjs \
+            scripts/validate-dumai-release-loop-v1.mjs \
+            scripts/validate-visual-contract.mjs; do
+            git checkout 7dc040fe90696caf303b0fb43f1f53296ad7fd97 -- "$f"
+          done
+          git add thing-projection-v1.js current-program-v1.js courses/dumai-s-opasnostyu/data.js courses/dumai-s-opasnostyu/index.html scripts/validate-current-program-v1.mjs scripts/validate-dumai-release-loop-v1.mjs scripts/validate-visual-contract.mjs
+          git commit -m "release: ThingProjection Runtime v1 clean candidate"
+          git push --force-with-lease origin HEAD:release/thing-projection-runtime-v1
+      - name: Verify exact diff boundary
+        run: |
+          files=$(git diff --name-only 374defbe583fac0839a43611b151d1104b47a42b...HEAD | sort)
+          expected=$(printf '%s\n' \
+            courses/dumai-s-opasnostyu/data.js \
+            courses/dumai-s-opasnostyu/index.html \
+            current-program-v1.js \
+            scripts/validate-current-program-v1.mjs \
+            scripts/validate-dumai-release-loop-v1.mjs \
+            scripts/validate-visual-contract.mjs \
+            thing-projection-v1.js | sort)
+          test "$files" = "$expected"
+          test "$(git rev-list --count 374defbe583fac0839a43611b151d1104b47a42b..HEAD)" = "1"
+          test "$(git rev-list --count HEAD..374defbe583fac0839a43611b151d1104b47a42b)" = "0"
+
+  cleanup:
+    if: always()
+    needs: prepare
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: dementor-club
+          fetch-depth: 0
+      - name: Self-remove one-shot workflow
+        run: |
+          rm -f .github/workflows/thing-projection-g7-rc.yml
+          git config user.name "SLEDZARI"
+          git config user.email "sharecraftwideo@gmail.com"
+          git add .github/workflows/thing-projection-g7-rc.yml
+          git commit -m "chore: remove ThingProjection G7 RC workflow" || exit 0
+          git push origin HEAD:dementor-club
