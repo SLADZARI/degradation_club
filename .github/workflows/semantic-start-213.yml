@@ -1,0 +1,153 @@
+name: One-shot implementation start #213
+
+on:
+  push:
+    branches:
+      - dementor-club
+    paths:
+      - .github/workflows/semantic-start-213.yml
+
+permissions:
+  contents: write
+
+jobs:
+  authorize-start:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: dementor-club
+          fetch-depth: 0
+
+      - name: Authorize #213 G5 implementation start
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          project_path = Path('.weekly-os/PROJECT.json')
+          index_path = Path('.weekly-os/ARTIFACT_INDEX.json')
+          result_path = Path('.weekly-os/results/thing-projection-runtime-v1.v0.1.md')
+
+          project = json.loads(project_path.read_text())
+          index = json.loads(index_path.read_text())
+          result = result_path.read_text()
+
+          aid = 'dementor-club.result.thing-projection-runtime-v1'
+          branch = 'result/thing-projection-runtime-v1'
+          base = '374defbe583fac0839a43611b151d1104b47a42b'
+
+          assert project['_artifact']['version'] == '1.91', project['_artifact']['version']
+          assert project['projectStage'] == 'BUILD' and project['gate'] == 'G5_BUILD'
+          assert project['currentResult']['artifactId'] == aid
+          assert project['currentResult']['integrationBranch'] == branch
+          assert project['currentResult']['productionBaseCommit'] == base
+          assert project['currentResult']['activationAuthorized'] is True
+          assert project['currentResult']['implementationStartAuthorized'] is False
+          assert project['currentResult']['productionMergeAuthorized'] is False
+          assert project['currentResult']['productionDeployAuthorized'] is False
+          assert project['activeIntegrationBranch'] == branch
+          assert project['activeReleaseBranch'] is None
+          assert index['_artifact']['version'] == '1.88', index['_artifact']['version']
+          hit = next(x for x in index['currentArtifacts'] if x.get('artifactId') == aid)
+          assert hit['relation'] == 'CURRENT_RESULT'
+          assert hit['implementationStartAuthorized'] is False
+          assert 'implementationStartAuthorized: false' in result
+
+          # PROJECT v1.92: authorize implementation only.
+          pa = project['_artifact']
+          pa['version'] = '1.92'
+          pa['supersedes'] = '1.91'
+          pa['updated'] = '2026-09-17'
+          project['currentResult']['implementationStartAuthorized'] = True
+          project['currentResult']['note'] = (
+              'G5 runtime implementation start explicitly authorized by owner on 2026-09-17. '
+              '#202 remains an ownership guardrail outside this Result; #214 remains excluded. '
+              'Production merge and deploy remain unauthorized.'
+          )
+
+          # ARTIFACT_INDEX v1.89: mirror the same single authorization change.
+          ia = index['_artifact']
+          ia['version'] = '1.89'
+          ia['supersedes'] = '1.88'
+          ia['updated'] = '2026-09-17'
+          for item in index['currentArtifacts']:
+              if item.get('artifactId') == 'dementor-club.kernel.project':
+                  item['currentVersion'] = '1.92'
+                  item['updated'] = '2026-09-17'
+              elif item.get('artifactId') == 'dementor-club.kernel.artifact-index':
+                  item['currentVersion'] = '1.89'
+                  item['updated'] = '2026-09-17'
+              elif item.get('artifactId') == aid:
+                  item['implementationStartAuthorized'] = True
+                  item['note'] = (
+                      'G5 runtime implementation start explicitly authorized by owner on 2026-09-17. '
+                      'Catalog/#202 and Contribution/#214 remain excluded. Production merge/deploy remain unauthorized.'
+                  )
+
+          # Result v0.1 remains the same Result/scope; only start authorization/status wording changes.
+          result = result.replace('implementationStartAuthorized: false', 'implementationStartAuthorized: true', 1)
+          result = result.replace(
+              '**ACTIVE / G5 BUILD / GOVERNANCE ACTIVATED / RUNTIME IMPLEMENTATION NOT STARTED**',
+              '**ACTIVE / G5 BUILD / IMPLEMENTATION START AUTHORIZED**',
+              1,
+          )
+          result = result.replace(
+              'This Result activates issue #213 as the one current integration Result. Activation itself does not authorize production merge, production deploy, database mutation or semantic expansion beyond the scope below.',
+              'This Result is the one current integration Result. Owner authorization on 2026-09-17 permits G5 runtime implementation inside the approved scope below. Production merge, production deploy, database mutation and semantic expansion beyond this Result remain unauthorized.',
+              1,
+          )
+          result = result.replace(
+              'This activation authorizes only Result ownership and its one integration branch. Runtime implementation requires an explicit implementation-start checkpoint before code mutation.',
+              'Result ownership, its one integration branch, and G5 runtime implementation are authorized. This implementation-start checkpoint does not authorize production merge, production deploy, database mutation, or scope expansion.',
+              1,
+          )
+
+          project_path.write_text(json.dumps(project, ensure_ascii=False, separators=(',', ':')) + '\n')
+          index_path.write_text(json.dumps(index, ensure_ascii=False, separators=(',', ':')) + '\n')
+          result_path.write_text(result)
+          PY
+
+      - name: Verify start authorization invariants
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=json.load(open('.weekly-os/PROJECT.json'))
+          i=json.load(open('.weekly-os/ARTIFACT_INDEX.json'))
+          a=json.load(open('.weekly-os/APPROVED_STATE.json'))
+          r=Path('.weekly-os/results/thing-projection-runtime-v1.v0.1.md').read_text()
+          aid='dementor-club.result.thing-projection-runtime-v1'
+          assert p['_artifact']['version']=='1.92' and p['_artifact']['supersedes']=='1.91'
+          assert p['currentResult']['artifactId']==aid
+          assert p['currentResult']['implementationStartAuthorized'] is True
+          assert p['currentResult']['productionMergeAuthorized'] is False
+          assert p['currentResult']['productionDeployAuthorized'] is False
+          assert p['activeIntegrationBranch']=='result/thing-projection-runtime-v1'
+          assert p['activeReleaseBranch'] is None
+          assert i['_artifact']['version']=='1.89' and i['_artifact']['supersedes']=='1.88'
+          hit=next(x for x in i['currentArtifacts'] if x.get('artifactId')==aid)
+          assert hit['implementationStartAuthorized'] is True
+          assert hit['productionMergeAuthorized'] is False
+          assert hit['productionDeployAuthorized'] is False
+          assert 'implementationStartAuthorized: true' in r
+          assert 'IMPLEMENTATION START AUTHORIZED' in r
+          assert a['_artifact']['version']=='1.0'
+          print('#213 implementation-start invariants PASS')
+          PY
+          git diff --exit-code HEAD -- .weekly-os/APPROVED_STATE.json
+          CHANGED="$(git diff --name-only HEAD)"
+          printf '%s\n' "$CHANGED"
+          test "$(printf '%s\n' "$CHANGED" | grep -Ev '^(.weekly-os/PROJECT.json|.weekly-os/ARTIFACT_INDEX.json|.weekly-os/results/thing-projection-runtime-v1.v0.1.md)$' | sed '/^$/d' | wc -l)" -eq 0
+
+      - name: Commit authorization and self-remove
+        shell: bash
+        run: |
+          rm -f .github/workflows/semantic-start-213.yml
+          git config user.name "SLEDZARI"
+          git config user.email "sharecraftwideo@gmail.com"
+          git add .weekly-os/PROJECT.json .weekly-os/ARTIFACT_INDEX.json .weekly-os/results/thing-projection-runtime-v1.v0.1.md .github/workflows/semantic-start-213.yml
+          git commit -m "kernel: authorize ThingProjection Runtime v1 implementation"
+          git push origin HEAD:dementor-club
