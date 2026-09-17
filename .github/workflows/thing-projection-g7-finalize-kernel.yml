@@ -1,0 +1,147 @@
+name: ThingProjection #213 finalize G7 kernel
+
+on:
+  push:
+    branches:
+      - dementor-club
+    paths:
+      - .github/workflows/thing-projection-g7-finalize-kernel.yml
+
+permissions:
+  contents: write
+
+jobs:
+  finalize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: dementor-club
+          fetch-depth: 0
+      - name: Finalize G7 kernel state
+        run: |
+          node <<'NODE'
+          const fs=require('fs');
+          const p='.weekly-os/PROJECT.json';
+          const i='.weekly-os/ARTIFACT_INDEX.json';
+          const P=JSON.parse(fs.readFileSync(p,'utf8'));
+          const I=JSON.parse(fs.readFileSync(i,'utf8'));
+
+          P._artifact.version='1.94';
+          P._artifact.supersedes='1.93';
+          P._artifact.projectStage='RELEASE';
+          P._artifact.gate='G7_RELEASE';
+          P.projectStage='RELEASE';
+          P.gate='G7_RELEASE';
+          P.activeIntegrationBranch='result/thing-projection-runtime-v1';
+          P.activeReleaseBranch='release/thing-projection-runtime-v1';
+          const oldResult='.weekly-os/results/thing-projection-runtime-v1.v0.1.md';
+          const newResult='.weekly-os/results/thing-projection-runtime-v1.v0.2.md';
+          const oldIdx=P.readFirst.indexOf(oldResult);
+          if(oldIdx>=0) P.readFirst[oldIdx]=newResult;
+          if(!P.readFirst.includes(newResult)) P.readFirst.splice(3,0,newResult);
+          const g6='operations/THING_PROJECTION_RUNTIME_G6_2026-09-17.md';
+          const g7='operations/THING_PROJECTION_RUNTIME_G7_RELEASE_CANDIDATE_2026-09-17.md';
+          if(!P.readFirst.includes(g6)) P.readFirst.splice(P.readFirst.indexOf(newResult)+1,0,g6);
+          if(!P.readFirst.includes(g7)) P.readFirst.splice(P.readFirst.indexOf(g6)+1,0,g7);
+          P.currentResult={
+            ...P.currentResult,
+            artifactId:'dementor-club.result.thing-projection-runtime-v1',
+            version:'0.2',
+            status:'CLEAN_RC_VALIDATED_MERGE_LOCKED',
+            path:newResult,
+            gate:'G7_RELEASE',
+            issue:213,
+            integrationBranch:'result/thing-projection-runtime-v1',
+            releaseBranch:'release/thing-projection-runtime-v1',
+            productionBaseCommit:'374defbe583fac0839a43611b151d1104b47a42b',
+            candidateCommit:'7dc040fe90696caf303b0fb43f1f53296ad7fd97',
+            releaseCandidateCommit:'40b5d55cdf8c1fd137dacc7fd2fcee9f62438f01',
+            releasePullRequest:220,
+            validationRun:1200,
+            validationRunId:35256632481,
+            validationConclusion:'SUCCESS',
+            g6Evidence:g6,
+            releaseEvidence:g7,
+            activationAuthorized:true,
+            implementationStartAuthorized:true,
+            productionMergeAuthorized:false,
+            productionDeployAuthorized:false,
+            note:'G7 clean release candidate 40b5d55c... validated by Site Integrity #1200 / 35256632481 SUCCESS. PR #220 remains Draft. Production merge and deploy are not authorized. #202 remains ownership guardrail; #214 remains excluded.'
+          };
+
+          I._artifact.version='1.91';
+          I._artifact.supersedes='1.90';
+          I._artifact.projectStage='RELEASE';
+          I._artifact.gate='G7_RELEASE';
+          const projectRec=I.currentArtifacts.find(x=>x.artifactId==='dementor-club.kernel.project');
+          const indexRec=I.currentArtifacts.find(x=>x.artifactId==='dementor-club.kernel.artifact-index');
+          const resultRec=I.currentArtifacts.find(x=>x.artifactId==='dementor-club.result.thing-projection-runtime-v1');
+          if(!projectRec||!indexRec||!resultRec) throw new Error('required records missing');
+          projectRec.currentVersion='1.94'; projectRec.updated='2026-09-17';
+          indexRec.currentVersion='1.91'; indexRec.updated='2026-09-17';
+          Object.assign(resultRec,{
+            currentVersion:'0.2',
+            status:'CLEAN_RC_VALIDATED_MERGE_LOCKED',
+            location:newResult,
+            canonicalLocation:newResult,
+            gate:'G7_RELEASE',
+            candidateCommit:'7dc040fe90696caf303b0fb43f1f53296ad7fd97',
+            releaseBranch:'release/thing-projection-runtime-v1',
+            releaseCandidateCommit:'40b5d55cdf8c1fd137dacc7fd2fcee9f62438f01',
+            releasePullRequest:220,
+            validationRun:1200,
+            validationRunId:35256632481,
+            validationConclusion:'SUCCESS',
+            g6Evidence:g6,
+            releaseEvidence:g7,
+            productionMergeAuthorized:false,
+            productionDeployAuthorized:false,
+            note:'Clean G7 RC validated against production target. PR #220 Draft; merge/deploy remain unauthorized.'
+          });
+          if(!I.currentArtifacts.find(x=>x.artifactId==='dementor-club.operations.thing-projection-runtime-g7-release-candidate-2026-09-17')){
+            I.currentArtifacts.splice(I.currentArtifacts.indexOf(resultRec)+2,0,{
+              artifactId:'dementor-club.operations.thing-projection-runtime-g7-release-candidate-2026-09-17',
+              documentType:'RELEASE_EVIDENCE',
+              currentVersion:'1.0',
+              status:'PASS_CLEAN_RC_VALIDATED',
+              location:g7,
+              sourceSystem:'GIT',
+              authorityType:'RELEASE_EVIDENCE',
+              updated:'2026-09-17',
+              canonicalProject:'dementor-club',
+              canonicalLocation:g7,
+              relation:'G7_RELEASE_EVIDENCE',
+              result:'dementor-club.result.thing-projection-runtime-v1',
+              releaseCandidateCommit:'40b5d55cdf8c1fd137dacc7fd2fcee9f62438f01',
+              pullRequest:220,
+              validationRun:1200,
+              validationRunId:35256632481,
+              validationConclusion:'SUCCESS',
+              referencedBy:[]
+            });
+          }
+          fs.writeFileSync(p,JSON.stringify(P));
+          fs.writeFileSync(i,JSON.stringify(I));
+          NODE
+      - name: Verify final G7 kernel invariants
+        run: |
+          node <<'NODE'
+          const fs=require('fs');
+          const P=JSON.parse(fs.readFileSync('.weekly-os/PROJECT.json','utf8'));
+          const I=JSON.parse(fs.readFileSync('.weekly-os/ARTIFACT_INDEX.json','utf8'));
+          if(P._artifact.version!=='1.94'||P.gate!=='G7_RELEASE') throw new Error('PROJECT version/gate mismatch');
+          if(P.currentResult.version!=='0.2'||P.currentResult.releaseCandidateCommit!=='40b5d55cdf8c1fd137dacc7fd2fcee9f62438f01') throw new Error('Result RC mismatch');
+          if(P.currentResult.productionMergeAuthorized!==false||P.currentResult.productionDeployAuthorized!==false) throw new Error('authorization boundary broken');
+          if(I._artifact.version!=='1.91') throw new Error('INDEX version mismatch');
+          const r=I.currentArtifacts.find(x=>x.artifactId==='dementor-club.result.thing-projection-runtime-v1');
+          if(!r||r.currentVersion!=='0.2'||r.releasePullRequest!==220) throw new Error('INDEX result mismatch');
+          NODE
+      - name: Commit kernel finalization and self-remove
+        run: |
+          rm -f .github/workflows/thing-projection-g7-finalize-kernel.yml
+          git config user.name "SLEDZARI"
+          git config user.email "sharecraftwideo@gmail.com"
+          git add .weekly-os/PROJECT.json .weekly-os/ARTIFACT_INDEX.json .github/workflows/thing-projection-g7-finalize-kernel.yml
+          git commit -m "kernel: record ThingProjection v1 validated G7 RC"
+          git push origin HEAD:dementor-club
