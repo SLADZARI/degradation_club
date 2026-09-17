@@ -15,7 +15,7 @@ issue: 213
 integrationBranch: result/thing-projection-runtime-v1
 productionBaseCommit: 374defbe583fac0839a43611b151d1104b47a42b
 activationAuthorized: true
-implementationStartAuthorized: false
+implementationStartAuthorized: true
 productionMergeAuthorized: false
 productionDeployAuthorized: false
 liveDatabaseMutationAuthorized: false
@@ -25,9 +25,9 @@ liveDatabaseMutationAuthorized: false
 
 ## Status
 
-**ACTIVE / G5 BUILD / GOVERNANCE ACTIVATED / RUNTIME IMPLEMENTATION NOT STARTED**
+**ACTIVE / G5 BUILD / IMPLEMENTATION START AUTHORIZED**
 
-This Result activates issue #213 as the one current integration Result. Activation itself does not authorize production merge, production deploy, database mutation or semantic expansion beyond the scope below.
+This Result is the one current integration Result. Owner authorization on 2026-09-17 permits G5 runtime implementation inside the approved scope below. Production merge, production deploy, database mutation and semantic expansion beyond this Result remain unauthorized.
 
 ## Goal
 
@@ -167,7 +167,7 @@ Before G6, the candidate must prove all of the following on the exact Result hea
 
 Current gate: **G5_BUILD**.
 
-This activation authorizes only Result ownership and its one integration branch. Runtime implementation requires an explicit implementation-start checkpoint before code mutation.
+Result ownership, its one integration branch, and G5 runtime implementation are authorized. This implementation-start checkpoint does not authorize production merge, production deploy, database mutation, or scope expansion.
 
 `commit ≠ merge ≠ deploy`.
 
