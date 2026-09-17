@@ -1,8 +1,9 @@
-STATUS=READY_FOR_MANUAL_APPROVAL
+STATUS=NON_AUTHORITATIVE_REFERENCE
 DOMAIN=dementor.club
 SOURCE_BRANCH=dementor-club-production
-RELEASE=2026-08-29-custom-domain-bootstrap-r4
-CI_STATUS=GREEN
-DEPLOY_MODE=MANUAL_ONLY
-RELEASE_GUARD=PASSED
-PENDING=Human final visual review; explicit manual production approval; GitHub branch ruleset still not enforced in repository settings
+CURRENT_DEPLOY_TRUTH=GITHUB_ACTIONS_LATEST_SUCCESSFUL_DEPLOY
+CURRENT_DEPLOY_WORKFLOW=Deploy Dementor Production
+LAST_OBSERVED_PRODUCTION_COMMIT=23d4266a4009d34042b29ec1fb73fb0cbad6b62e
+LAST_OBSERVED_DEPLOY_RUN_ID=35259685738
+LAST_OBSERVED_DEPLOY_STATUS=SUCCESS
+NOTE=This file is a pointer/snapshot only. Do not use it to decide whether production is pending, deployed, or approved. Current deployment truth comes from the latest successful authorized GitHub Actions deployment and its recorded release evidence.
