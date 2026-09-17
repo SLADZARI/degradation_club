@@ -4,15 +4,15 @@
     "artifactId": "dementor-club.kernel.project",
     "project": "dementor-club",
     "documentType": "STANDARD",
-    "projectStage": "RELEASE",
-    "gate": "G8_CLEANUP",
+    "projectStage": "BUILD",
+    "gate": "G5_BUILD",
     "status": "APPROVED",
-    "version": "2.08",
+    "version": "2.09",
     "updated": "2026-09-18",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.07"
+    "supersedes": "2.08"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -20,8 +20,8 @@
   "canonicalRepository": "SLADZARI/degradation_club",
   "defaultBranch": "main",
   "semanticSourceBranch": "dementor-club",
-  "projectStage": "RELEASE",
-  "gate": "G8_CLEANUP",
+  "projectStage": "BUILD",
+  "gate": "G5_BUILD",
   "readFirst": [
     ".weekly-os/PROJECT.json",
     ".weekly-os/ARTIFACT_INDEX.json",
@@ -82,7 +82,7 @@
     "operations/BOARD_VISUAL_TYPE_LANGUAGE_V0.1.md",
     ".weekly-os/results/board-information-architecture-v1.v0.18.md",
     "operations/BOARD_INFORMATION_ARCHITECTURE_V1.md",
-    ".weekly-os/results/board-relations-v1.v0.1.md",
+    ".weekly-os/results/board-relations-v1.v0.2.md",
     "operations/BOARD_RELATIONS_G4_IDENTITY_CONTRACT_2026-09-18.md",
     "operations/BOARD_TELEGRAM_PROMOTION_V1.md",
     "operations/BOARD_TELEGRAM_WORKER_SCHEDULER_G8_PRODUCTION_VALIDATION_2026-09-12.md",
@@ -137,7 +137,7 @@
       "authorityType": "APPROVED_AUTHORITY",
       "path": "operations/BOARD_INFORMATION_ARCHITECTURE_V1.md",
       "scope": "Community Board information architecture and lifecycle semantics",
-      "note": "Project-local approved authority. board-information-architecture-v1 v0.18 remains evidence-only WAITING/G8. Batch C successor board-relations-v1 v0.1 has G4 identity evidence READY_FOR_ACTIVATION but is not activated; currentResult and active branches remain null."
+      "note": "Project-local approved authority. board-information-architecture-v1 v0.18 remains evidence-only WAITING/G8 and no longer owns Batch C/D implementation. board-relations-v1 v0.2 is the single ACTIVE G5 Batch C Result; G4 identity contract accepted; production/live DB authorization remains false."
     },
     "boardShareReceiveRitualV1": {
       "sourceSystem": "GIT",
@@ -233,7 +233,26 @@
     "ARCHITECTURE": null,
     "DESIGN": null
   },
-  "currentResult": null,
+  "currentResult": {
+    "artifactId": "dementor-club.result.board-relations-v1",
+    "version": "0.2",
+    "status": "ACTIVE",
+    "path": ".weekly-os/results/board-relations-v1.v0.2.md",
+    "gate": "G5_BUILD",
+    "integrationBranch": "result/board-relations-v1",
+    "integrationBaseRef": "dementor-club-site",
+    "integrationBaseCommit": "61d85d95bd95dfb536acdd363b45d2773a4b2ca5",
+    "productionBaseCommit": "2dae3b6ece79652c81af780c049521fda7262726",
+    "activationAuthorized": true,
+    "implementationStartAuthorized": true,
+    "schemaMutationAuthorized": false,
+    "productionMergeAuthorized": false,
+    "productionDeployAuthorized": false,
+    "liveDatabaseMutationAuthorized": false,
+    "identityContractEvidence": "operations/BOARD_RELATIONS_G4_IDENTITY_CONTRACT_2026-09-18.md",
+    "identityContractStatus": "ACCEPTED",
+    "note": "Batch C successor activated after accepted G4 identity contract. First G5 checkpoint is assignment permission predicate + relation compatibility matrix + slug rename invariant before persistence design."
+  },
   "waitingResults": [
     {
       "artifactId": "dementor-club.result.board-share-receive-ritual-v1",
@@ -274,7 +293,7 @@
       "note": "Released and partially live-retested; residual authenticated role-state QA remains open."
     }
   ],
-  "activeIntegrationBranch": null,
+  "activeIntegrationBranch": "result/board-relations-v1",
   "activeReleaseBranch": null,
   "reportPath": "operations/MEMBERSHIP_V2_PRODUCTION_FLOW_QA_2026-09-02.md",
   "completedResults": [
