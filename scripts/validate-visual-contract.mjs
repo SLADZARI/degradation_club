@@ -14,6 +14,7 @@ const inkLayout = read('ink-layout-v2.css');
 const inkTuning = read('ink-layout-v2-tuning.css');
 const inkRuntime = read('ink-layout-v2.js');
 const home = read('index.html');
+const thingProjection = read('thing-projection-v1.js');
 const currentProgram = read('current-program-v1.js');
 const currentProgramCss = read('current-program-v1.css');
 const homeProgramRuntime = read('home-current-program-v1.js');
@@ -72,16 +73,21 @@ must(!home.includes('ACCESS AFTER JOIN'), 'retired Home Fuengirola Join gate ret
 must(!home.includes('Подробности и возможность записаться доступны после вступления в клуб.'), 'retired Home Fuengirola membership promise returned');
 must(home.includes('id="events"'), 'legacy /#events anchor compatibility missing');
 
-for (const ref of ['program:dengi-na-veter','project:dementor-lab','event:fuengirola']) {
-  must(currentProgram.includes(`thingRef:'${ref}'`), `Current Program missing ${ref}`);
+// ThingProjection v1 owns the extracted Program + Project read boundary; Current Program
+// remains the curated composition and keeps Event/Fuengirola local until its owner is proven.
+for (const ref of ['program:dengi-na-veter','project:dementor-lab']) {
+  must(thingProjection.includes(`thingRef:'${ref}'`), `ThingProjection missing ${ref}`);
 }
-must((currentProgram.match(/thingRef:/g)||[]).length===3, 'Current Program must contain exactly three reviewed Things');
-must(currentProgram.includes("currentTruth:'Курс готов к прохождению.'"), 'Деньги на ветер ready-to-take truth missing');
+must((thingProjection.match(/thingRef:/g)||[]).length===2, 'ThingProjection must contain exactly the two extracted source kinds');
+must(!thingProjection.includes('event:fuengirola'), 'ThingProjection must not absorb Event/Fuengirola');
+must(currentProgram.includes("thingRef:'event:fuengirola'"), 'Current Program missing composition-local event:fuengirola');
+must((currentProgram.match(/thingRef:/g)||[]).length===1, 'Current Program may keep only the non-extracted Event as a literal thingRef');
+must(thingProjection.includes("currentTruth:'Курс готов к прохождению.'"), 'Деньги на ветер ready-to-take truth missing from ThingProjection');
 must(currentProgram.includes('Публичный playable release пока не заявлен'), 'Dementor Lab playable-release boundary missing');
 must(currentProgram.includes('Дата, цена и открытая регистрация пока не заявлены'), 'Fuengirola blocked-claim boundary missing');
 must(!currentProgram.includes('ne-komanda'), 'НЕ КОМАНДА must stay outside Current Program v0');
 must(!currentProgram.includes('dumai-s-opasnostyu'), 'Думай с опасностью must stay outside Current Program v0');
-must(homeProgramRuntime.includes("from '/current-program-v1.js'"), 'Home Current Program must consume shared projection owner');
+must(homeProgramRuntime.includes("from '/current-program-v1.js'"), 'Home Current Program must consume shared composition owner');
 must(currentProgramCss.includes('.dc-current-program__grid'), 'Current Program grid visual owner missing');
 must(currentProgramCss.includes('.dc-current-program__card:first-child'), 'Current Program lead-card emphasis missing');
 must(currentProgramCss.includes('@media(max-width:900px)'), 'Current Program responsive contract missing');
@@ -159,7 +165,7 @@ if (fail.length) {
 
 console.log('Dementor Club visual contract validation');
 console.log('✓ Home Hero Ink owner preserved; retired page-owned course/event features stay absent');
-console.log('✓ Current Program v0 owns Home current-value composition with 3 reviewed Things');
+console.log('✓ ThingProjection owns Dengi + Lab read boundary; Current Program keeps one local Event and three reviewed Things');
 console.log('✓ Current Program visual owner has lead emphasis + responsive contract');
 console.log('✓ Community one-source hero; retired Ink Community runtime owner absent');
 console.log('✓ Events exposes one real event without lifecycle/process mechanics');
