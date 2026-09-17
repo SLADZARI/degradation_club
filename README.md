@@ -1,112 +1,85 @@
 # Dementor Club — Official Site
 
-Production snapshot официального сайта клуба.
+Development/staging surface for the official Dementor Club site.
 
 ## Branch role
 
-`dementor-club-production` = **PRODUCTION SNAPSHOT**.
+`dementor-club-site` = **DEVELOPMENT / STAGING**.
 
-Это единственная ветка, из которой разрешена публикация официального сайта на `https://dementor.club`.
+`dementor-club-production` = **PRODUCTION BASELINE** and the only branch used by the canonical production Pages deploy.
 
-Рабочая разработка, визуальные тесты и макеты выполняются в `dementor-club-site`. Изменения попадают сюда только после прохождения approval + QA.
-
-Полный release contract: `docs/deployment.md`.
-Главное правило утверждения: `dementor-club/operations/PRODUCTION_RELEASE_POLICY_V1.md`.
-
-## Production rule
+`dementor-club` = **semantic source / Weekly OS governance**. Product meaning, approved local Decisions, Results and authority pointers are resolved there before implementation.
 
 `STAGING ≠ PRODUCTION`.
 
-Макет может быть утверждён на тестовом материале. Это утверждает дизайн, композицию и responsive-поведение, но **не утверждает тестовый материал к публикации**.
+A commit to staging is not a release. A merge is not a deploy.
 
-До production обязательно:
+## Required entry before substantial implementation
 
-1. source facts/content approved в ответственном source-of-truth;
-2. layout approved на staging;
-3. test/demo/mock/placeholder content заменён на отдельно утверждённый public content;
-4. final candidate просмотрен снова уже с реальным контентом;
-5. production validators пройдены;
-6. получено явное release approval;
-7. только после этого выполняется production release action.
+Read in this order from the semantic branch:
 
-## Что хранится здесь
+1. `.weekly-os/PROJECT.json`
+2. `.weekly-os/ARTIFACT_INDEX.json`
+3. `.weekly-os/APPROVED_STATE.json`
+4. `readFirst`
+5. current Result
+6. current Gate
+7. existing implementation owners
 
-- production candidate/site snapshot;
-- UI-компоненты и стили;
-- маршруты и страницы;
-- SEO/metadata;
-- production-safe интеграции;
-- контентные маппинги из ветки `dementor-club`;
-- deployment/QA документация.
+Then extend the existing canonical owner instead of creating a parallel mechanism.
 
-## Обязательная дизайн-документация
+## Development rule
 
-- `docs/DESIGN_PRESENTATION_GUIDE.md`
-- `docs/ENTITY_PRESENTATION_STANDARD_v1.md`
-- `docs/COMPONENT_SYSTEM_v1.md`
-- `docs/GLOBAL_HEADER_v1.md`
-- `docs/MOTION_NAV_SEO_IMPLEMENTATION_v1.md`
-- `docs/PRODUCTION_QA_v1.md`
-- `docs/SITE_HARMONIZATION_AUDIT_2026-08-26.md`
-- `docs/deployment.md`
-- `docs/PUBLISHING_PLAYBOOK_v1.md`
-- `docs/OPERATIONS_RUNBOOK_v1.md`
-- `docs/FEATURE_ACTIVATION_MATRIX_v1.md`
-- `references/REFERENCE_RESPONSIBILITIES.md`
+A significant implementation belongs to one active Result and one active integration branch.
 
-## Asset rules
+Do not use branch age, filename, `latest`, or implementation presence as semantic authority.
 
-- `assets/ink/README.md` — production contract для Dementor Ink.
-- `assets/social/README.md` — OpenGraph/social preview contract.
+Do not restore legacy auth, Board, DC-9, shell, Catalog, DB or QA mechanisms merely because they existed on an older staging snapshot.
 
-**Artistic illustrations are raster-only.** Для Dementor Ink и social artwork используем WebP / PNG / JPG. SVG не используется как формат художественной иллюстрации и не должен появляться через autotrace/vectorization.
+## Release rule
 
-## Source-of-truth
+Because staging and production historically diverged, never blind-merge `dementor-club-site` into `dementor-club-production`.
 
-Смыслы, правила клуба, продукты и утверждённые тексты сначала фиксируются в ветке `dementor-club`. Production branch не является местом принятия смысловых решений.
+For a production-changing Result:
 
-«Логика и осознанность» развивается независимо в `logic-awareness`; production website представляет только publishable/approved состояние проекта.
+1. implement and validate the Result;
+2. start a clean release candidate from the current `dementor-club-production` baseline;
+3. apply only the required validated Result diff;
+4. run the current Site Integrity / browser / route / auth regression stack;
+5. merge to production only after explicit owner authorization;
+6. deploy only after a separate explicit owner authorization;
+7. live-retest the deployed result;
+8. complete G8 cleanup.
 
-## Production domain
-
-Canonical origin:
-
-`https://dementor.club`
-
-Legacy `https://sladzari.github.io/degradation_club/` не является canonical production origin и не должен попадать в production artifact.
-
-## Release validation
-
-Production workflow выполняет:
-
-```bash
-node scripts/validate-site.mjs
-node scripts/validate-content-readiness.mjs
-node scripts/validate-visual-contract.mjs
-node scripts/validate-production-release.mjs
-```
-
-Любая validation error блокирует deployment.
-
-Production workflow: `.github/workflows/deploy-pages.yml`.
-
-Обычные push с изменениями сайта не публикуют домен. Release требует отдельного явного approval action согласно `docs/deployment.md`.
-
-## External feature activation
-
-UI readiness ≠ feature live.
-
-Contacts, Donate, Merch checkout, Event registration и Membership/other integrations включаются только после утверждения реального provider/endpoint и соответствующего source-of-truth состояния.
-
-## Deployment status
-
-Production branch: `dementor-club-production`.
+Canonical production deploy workflow: `.github/workflows/deploy-pages.yml`.
+Canonical validation workflow: `.github/workflows/site-integrity.yml`.
 Canonical domain: `https://dementor.club`.
 
-Не считать новый production опубликованным, пока workflow не завершился успешно и live routes не прошли smoke verification.
+## Site responsibilities
+
+This branch may contain current implementation work for:
+
+- public routes and responsive UI;
+- canonical Header/Footer integration;
+- Workspace surfaces;
+- DC-9 implementation;
+- Board implementation;
+- SEO / metadata / OpenGraph;
+- production-safe integrations;
+- release validators and browser regression tests.
+
+Semantic/product truth remains outside this branch unless an approved authority explicitly says otherwise.
+
+## Safety
+
+- test/demo/mock content is not approved public content;
+- UI readiness does not mean a feature is live;
+- production DB writes/migrations require their own authorized release path;
+- internal QA/design surfaces must not leak into the public production artifact;
+- legacy routes and compatibility runtime should be removed when their canonical owner no longer requires them;
+- production changes require evidence, not assumption.
 
 ## Storage split
 
-GitHub stores optimized delivery assets, code and implementation rules.
-
-Google Drive stores high-resolution raster masters, photos/video, design exports, presentations and heavy source assets.
+GitHub stores code and optimized delivery assets.
+Google Drive stores heavy source assets and masters according to the project source map.
