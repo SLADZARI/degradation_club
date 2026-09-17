@@ -7,12 +7,12 @@
     "projectStage": "RELEASE",
     "gate": "G8_CLEANUP",
     "status": "APPROVED",
-    "version": "2.07",
+    "version": "2.08",
     "updated": "2026-09-18",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.06"
+    "supersedes": "2.07"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -83,6 +83,7 @@
     ".weekly-os/results/board-information-architecture-v1.v0.18.md",
     "operations/BOARD_INFORMATION_ARCHITECTURE_V1.md",
     ".weekly-os/results/board-relations-v1.v0.1.md",
+    "operations/BOARD_RELATIONS_G4_IDENTITY_CONTRACT_2026-09-18.md",
     "operations/BOARD_TELEGRAM_PROMOTION_V1.md",
     "operations/BOARD_TELEGRAM_WORKER_SCHEDULER_G8_PRODUCTION_VALIDATION_2026-09-12.md",
     "operations/BOARD_INFORMATION_ARCHITECTURE_G8_CLEANUP_INVENTORY_2026-09-12.md",
@@ -136,7 +137,7 @@
       "authorityType": "APPROVED_AUTHORITY",
       "path": "operations/BOARD_INFORMATION_ARCHITECTURE_V1.md",
       "scope": "Community Board information architecture and lifecycle semantics",
-      "note": "Project-local approved authority. Result v0.18 remains evidence-only WAITING / G8 with authenticated acceptance debt; it no longer owns Batch C/D implementation. board-relations-v1 v0.1 is a non-activated Batch C draft and has no active branch."
+      "note": "Project-local approved authority. board-information-architecture-v1 v0.18 remains evidence-only WAITING/G8. Batch C successor board-relations-v1 v0.1 has G4 identity evidence READY_FOR_ACTIVATION but is not activated; currentResult and active branches remain null."
     },
     "boardShareReceiveRitualV1": {
       "sourceSystem": "GIT",
