@@ -7,12 +7,12 @@
     "projectStage": "BUILD",
     "gate": "G5_BUILD",
     "status": "APPROVED",
-    "version": "2.09",
+    "version": "2.10",
     "updated": "2026-09-18",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.08"
+    "supersedes": "2.09"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -82,8 +82,9 @@
     "operations/BOARD_VISUAL_TYPE_LANGUAGE_V0.1.md",
     ".weekly-os/results/board-information-architecture-v1.v0.18.md",
     "operations/BOARD_INFORMATION_ARCHITECTURE_V1.md",
-    ".weekly-os/results/board-relations-v1.v0.2.md",
+    ".weekly-os/results/board-relations-v1.v0.3.md",
     "operations/BOARD_RELATIONS_G4_IDENTITY_CONTRACT_2026-09-18.md",
+    "operations/BOARD_RELATIONS_G5_PRE_PERSISTENCE_CONTRACT_2026-09-18.md",
     "operations/BOARD_TELEGRAM_PROMOTION_V1.md",
     "operations/BOARD_TELEGRAM_WORKER_SCHEDULER_G8_PRODUCTION_VALIDATION_2026-09-12.md",
     "operations/BOARD_INFORMATION_ARCHITECTURE_G8_CLEANUP_INVENTORY_2026-09-12.md",
@@ -137,7 +138,7 @@
       "authorityType": "APPROVED_AUTHORITY",
       "path": "operations/BOARD_INFORMATION_ARCHITECTURE_V1.md",
       "scope": "Community Board information architecture and lifecycle semantics",
-      "note": "Project-local approved authority. board-information-architecture-v1 v0.18 remains evidence-only WAITING/G8 and no longer owns Batch C/D implementation. board-relations-v1 v0.2 is the single ACTIVE G5 Batch C Result; G4 identity contract accepted; production/live DB authorization remains false."
+      "note": "Project-local approved authority. board-information-architecture-v1 v0.18 remains evidence-only WAITING/G8. board-relations-v1 v0.3 is the single ACTIVE G5 Batch C Result. G4 identity and G5 pre-persistence contracts are recorded; schema/live DB/production authorization remains false."
     },
     "boardShareReceiveRitualV1": {
       "sourceSystem": "GIT",
@@ -235,9 +236,9 @@
   },
   "currentResult": {
     "artifactId": "dementor-club.result.board-relations-v1",
-    "version": "0.2",
+    "version": "0.3",
     "status": "ACTIVE",
-    "path": ".weekly-os/results/board-relations-v1.v0.2.md",
+    "path": ".weekly-os/results/board-relations-v1.v0.3.md",
     "gate": "G5_BUILD",
     "integrationBranch": "result/board-relations-v1",
     "integrationBaseRef": "dementor-club-site",
@@ -251,7 +252,9 @@
     "liveDatabaseMutationAuthorized": false,
     "identityContractEvidence": "operations/BOARD_RELATIONS_G4_IDENTITY_CONTRACT_2026-09-18.md",
     "identityContractStatus": "ACCEPTED",
-    "note": "Batch C successor activated after accepted G4 identity contract. First G5 checkpoint is assignment permission predicate + relation compatibility matrix + slug rename invariant before persistence design."
+    "note": "G4 accepted. G5 assignment permission predicate, relation type × endpoint compatibility matrix and slug rename invariant are recorded. STOP before substantial schema mutation; next is fresh existing-persistence inventory and minimal proposal.",
+    "prePersistenceContractEvidence": "operations/BOARD_RELATIONS_G5_PRE_PERSISTENCE_CONTRACT_2026-09-18.md",
+    "prePersistenceCheckpoint": "COMPLETE"
   },
   "waitingResults": [
     {
