@@ -126,7 +126,7 @@ Safe direction to validate, not yet an approved new contract:
 - Board card IDs and `dc_entities` UUIDs remain implementation locators, never global semantic identity by themselves;
 - relations remain separately persisted facts and do not become source-object owners.
 
-This compatibility decision should be resolved together with the Project/Event projection boundary in #204 before implementing Batch C, but #204 preparation does not block #200/#202 and does not require Board QA-tail closure.
+This compatibility gap requires its own explicit semantic resolution before Batch C implementation. It must not be silently folded into a Board-only DB identity. Issue #204 concerns Fuengirola onboarding/access policy and is unrelated; #204 remains a parallel decision package and neither blocks #200/#202 nor supplies the relation identity decision.
 
 ## 4. Continuation conclusion
 
