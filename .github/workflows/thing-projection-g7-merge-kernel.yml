@@ -30,7 +30,7 @@ jobs:
 
           assert p['_artifact']['version'] == '1.94'
           assert a['_artifact']['version'] == '1.91'
-          cr = p['authority']['currentResult']
+          cr = p['currentResult']
           assert cr['artifactId'] == 'dementor-club.result.thing-projection-runtime-v1'
           assert cr['version'] == '0.2'
           assert cr['releaseCandidateCommit'] == '40b5d55cdf8c1fd137dacc7fd2fcee9f62438f01'
@@ -111,7 +111,7 @@ jobs:
           import json
           p=json.load(open('.weekly-os/PROJECT.json'))
           a=json.load(open('.weekly-os/ARTIFACT_INDEX.json'))
-          cr=p['authority']['currentResult']
+          cr=p['currentResult']
           assert p['_artifact']['version']=='1.95'
           assert a['_artifact']['version']=='1.92'
           assert cr['version']=='0.3'
@@ -130,5 +130,3 @@ jobs:
           git add .weekly-os/PROJECT.json .weekly-os/ARTIFACT_INDEX.json .github/workflows/thing-projection-g7-merge-kernel.yml
           git commit -m "kernel: record ThingProjection v1 production merge"
           git push origin HEAD:dementor-club
-
-# retrigger after workflow registration
