@@ -7,12 +7,12 @@
     "projectStage": "RELEASE",
     "gate": "G7_RELEASE",
     "status": "APPROVED",
-    "version": "2.23",
+    "version": "2.24",
     "updated": "2026-09-18",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.22"
+    "supersedes": "2.23"
   },
   "currentArtifacts": [
     {
@@ -759,22 +759,22 @@
     {
       "artifactId": "dementor-club.result.board-relations-v1",
       "documentType": "RESULT",
-      "currentVersion": "1.7",
+      "currentVersion": "1.8",
       "status": "ACTIVE",
-      "location": ".weekly-os/results/board-relations-v1.v1.7.md",
+      "location": ".weekly-os/results/board-relations-v1.v1.8.md",
       "sourceSystem": "GIT",
       "authorityType": "IMPLEMENTATION_AUTHORITY",
       "updated": "2026-09-18",
       "canonicalProject": "dementor-club",
-      "canonicalLocation": ".weekly-os/results/board-relations-v1.v1.7.md",
+      "canonicalLocation": ".weekly-os/results/board-relations-v1.v1.8.md",
       "relation": "CURRENT_RESULT",
       "gate": "G7_RELEASE",
       "specification": "operations/BOARD_INFORMATION_ARCHITECTURE_V1.md",
       "integrationBranch": "result/board-relations-v1",
       "plannedIntegrationBranch": "result/board-relations-v1",
       "implementationStartAuthorized": true,
-      "blockingGate": null,
-      "note": "Owner-authorized production release execution in progress. Exact production SHA 2b17d54f.... One pending Board Relations migration, no drift; canonical backend deploy next.",
+      "blockingGate": "PRODUCTION_WORKFLOW_TRIGGER_AUTH",
+      "note": "Production release authorized but blocked before deployment by missing authenticated workflow trigger path. Backend preflight clean; no production mutation.",
       "referencedBy": [],
       "identityContractEvidence": "operations/BOARD_RELATIONS_G4_IDENTITY_CONTRACT_2026-09-18.md",
       "identityContractStatus": "ACCEPTED",
@@ -809,7 +809,7 @@
       "dragDetailSuppressionStatus": "PASS_AT_DRAG_ASSERTION_1222",
       "deepLinkStaleFocusStatus": "PASS",
       "permissionInteractionStatus": "PASS",
-      "gateReadiness": "RELEASE_EXECUTION_IN_PROGRESS",
+      "gateReadiness": "BLOCKED",
       "g6ValidationEvidence": "operations/BOARD_RELATIONS_G6_2026-09-18.md",
       "g6ValidationStatus": "PASS",
       "g6CandidateCommit": "20aa71c1db76cbe238c96587523012ecdec7d46f",
@@ -834,7 +834,8 @@
       "g7ValidationConclusion": "SUCCESS",
       "productionMergeCompleted": true,
       "productionCommit": "2b17d54faaf3eb3eafb287cef1211554b28871b2",
-      "releaseExecutionStatus": "IN_PROGRESS"
+      "releaseExecutionStatus": "BLOCKED_TOOLING_AUTH",
+      "releaseBlockerEvidence": "operations/BOARD_RELATIONS_PRODUCTION_RELEASE_TOOLING_BLOCKER_2026-09-18.md"
     },
     {
       "artifactId": "dementor-club.evidence.board-relations-g5-persistence-design-2026-09-18",
@@ -1399,6 +1400,21 @@
       "referencedBy": [
         "dementor-club.result.board-relations-v1"
       ]
+    },
+    {
+      "artifactId": "dementor-club.operations.board-relations-production-release-tooling-blocker-2026-09-18",
+      "documentType": "RELEASE_EVIDENCE",
+      "currentVersion": "1.0",
+      "status": "BLOCKED_TOOLING_AUTH",
+      "location": "operations/BOARD_RELATIONS_PRODUCTION_RELEASE_TOOLING_BLOCKER_2026-09-18.md",
+      "sourceSystem": "GIT",
+      "authorityType": "RELEASE_EVIDENCE",
+      "updated": "2026-09-18",
+      "canonicalProject": "dementor-club",
+      "canonicalLocation": "operations/BOARD_RELATIONS_PRODUCTION_RELEASE_TOOLING_BLOCKER_2026-09-18.md",
+      "result": "dementor-club.result.board-relations-v1",
+      "productionCommit": "2b17d54faaf3eb3eafb287cef1211554b28871b2",
+      "verdict": "BLOCKED_TOOLING_AUTH"
     }
   ],
   "referenceArtifacts": [
