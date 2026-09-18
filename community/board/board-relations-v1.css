@@ -19,6 +19,7 @@
   vector-effect:non-scaling-stroke;
 }
 .dc-board-relation-line[data-relation-type="RELATED_TO"]{stroke-dasharray:5 9}
+.dc-board-relation-line[hidden]{display:none}
 .dc-board-relations-layer marker path{fill:#111}
 .dc-spatial-world>.dc-notice,
 .dc-spatial-world>.dc-projection{z-index:2}

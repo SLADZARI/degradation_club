@@ -175,7 +175,7 @@ try{
         });
       });
     });
-    await page.waitForFunction(()=>document.querySelectorAll('.dc-board-relation-line').length===3,{timeout:5000});
+    await page.waitForFunction(()=>document.querySelectorAll('.dc-board-relation-line:not([hidden])').length===3,{timeout:5000});
 
     const mapping=await page.evaluate(()=>{
       const pick=selector=>{const el=document.querySelector(selector);return el?{sourceId:el.dataset.sourceId||null,sourceType:el.dataset.sourceType||null,relationKind:el.dataset.relationKind||null,relationSourceId:el.dataset.relationSourceId||null}:null};
@@ -236,9 +236,9 @@ try{
     // Hidden/filtered endpoint removes corresponding canvas lines.
     await page.locator('[data-board-filter-drawer]').click();
     await page.locator('[data-board-detail-filter="artifact"]').click();
-    await page.waitForFunction(()=>document.querySelectorAll('.dc-board-relation-line').length===0,{timeout:3000});
+    await page.waitForFunction(()=>document.querySelectorAll('.dc-board-relation-line:not([hidden])').length===0,{timeout:3000});
     await page.locator('[data-board-filter="all"]').click();
-    await page.waitForFunction(()=>document.querySelectorAll('.dc-board-relation-line').length===3,{timeout:3000});
+    await page.waitForFunction(()=>document.querySelectorAll('.dc-board-relation-line:not([hidden])').length===3,{timeout:3000});
 
     // Real existing drag owner moves card; relation layer follows style/position changes.
     await page.evaluate(()=>{
@@ -290,7 +290,7 @@ try{
       await select.selectOption(option.value);
       await ownBlock.locator('[data-relation-save]').click();
       await page.waitForFunction(()=>globalThis.__QA_RPC_CALLS__.some(call=>call.name==='dc_board_relation_create_v1'),{timeout:2500});
-      await page.waitForFunction(()=>document.querySelectorAll('.dc-board-relation-line').length===4,{timeout:3000});
+      await page.waitForFunction(()=>document.querySelectorAll('.dc-board-relation-line:not([hidden])').length===4,{timeout:3000});
     }
 
     // Server permission reject must fail closed and preserve canonical index.
@@ -327,7 +327,7 @@ try{
   // Mobile/fullscreen regression: same owner, no second layout system.
   {
     const{ctx,page,errors}=await openBoard(browser,'available',{width:390,height:844});
-    await page.waitForFunction(()=>document.querySelectorAll('.dc-board-relation-line').length===3,{timeout:5000});
+    await page.waitForFunction(()=>document.querySelectorAll('.dc-board-relation-line:not([hidden])').length===3,{timeout:5000});
     const state=await page.evaluate(()=>{
       const world=document.querySelector('.dc-spatial-world');
       const layer=document.querySelector('.dc-board-relations-layer');

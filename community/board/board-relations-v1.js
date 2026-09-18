@@ -296,20 +296,29 @@ function renderLines(){
   const map=endpointMap();
   const svg=ensureLayer();if(!svg)return;
   svg.hidden=!relationsVisible;
-  svg.querySelectorAll('.dc-board-relation-line').forEach(node=>node.remove());
-  if(!relationsVisible)return;
+  const existingLines=new Map([...svg.querySelectorAll('.dc-board-relation-line')].map(line=>[line.dataset.relationId,line]));
+  const activeIds=new Set();
   for(const row of relationRows){
+    activeIds.add(row.relation_id);
+    let line=existingLines.get(row.relation_id);
+    if(!line){
+      line=document.createElementNS('http://www.w3.org/2000/svg','line');
+      line.dataset.relationId=row.relation_id;
+      line.classList.add('dc-board-relation-line');
+      svg.appendChild(line);
+    }
+    line.dataset.relationType=row.relation_type;
+    if(row.relation_type==='RELATED_TO')line.removeAttribute('marker-end');
+    else line.setAttribute('marker-end','url(#dc-board-relation-arrow)');
     const origin=map.get(endpointKey(row.origin_kind,row.origin_source_id));
     const target=map.get(endpointKey(row.target_kind,row.target_source_id));
-    if(!origin||!target||!cardVisible(origin.card)||!cardVisible(target.card))continue;
+    const visible=Boolean(origin&&target&&cardVisible(origin.card)&&cardVisible(target.card));
+    line.hidden=!visible;
+    if(!visible)continue;
     const a=cardCenter(origin.card),b=cardCenter(target.card);
-    const line=document.createElementNS('http://www.w3.org/2000/svg','line');
     line.setAttribute('x1',String(a.x));line.setAttribute('y1',String(a.y));line.setAttribute('x2',String(b.x));line.setAttribute('y2',String(b.y));
-    line.dataset.relationId=row.relation_id;line.dataset.relationType=row.relation_type;
-    line.classList.add('dc-board-relation-line');
-    if(row.relation_type!=='RELATED_TO')line.setAttribute('marker-end','url(#dc-board-relation-arrow)');
-    svg.appendChild(line);
   }
+  for(const [id,line] of existingLines)if(!activeIds.has(id))line.remove();
 }
 function updateToggle(){
   const controls=document.querySelector('.dc-spatial-controls');

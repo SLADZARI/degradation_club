@@ -66,6 +66,9 @@ for(const eventName of ['dc:board-projections-updated','dc:board-layout-updated'
 }
 expect(runtime.includes("attributeFilter:['style','hidden','class','data-relation-kind','data-relation-source-id']"),'drag/style/filter observer contract missing');
 expect(runtime.includes("parseFloat(card.style.left)")&&runtime.includes("parseFloat(card.style.top)"),'relation lines do not project existing card coordinates');
+expect(runtime.includes("const existingLines=new Map([...svg.querySelectorAll('.dc-board-relation-line')]")&&runtime.includes("let line=existingLines.get(row.relation_id)"),'relation canvas must reconcile existing SVG nodes instead of rebuilding them on every spatial update');
+expect(!runtime.includes("svg.querySelectorAll('.dc-board-relation-line').forEach(node=>node.remove())"),'relation canvas rebuilds every line on drag/layout and can wake unrelated childList owners');
+expect(css.includes('.dc-board-relation-line[hidden]{display:none}'),'filtered/hidden relation line presentation contract missing');
 expect(!runtime.includes('dc_artifact_board_positions'),'relation runtime must not own/persist spatial coordinates');
 expect(!runtime.includes('deterministicPlatformPosition')&&!runtime.includes('fallbackMemberPosition'),'relation runtime contains a parallel layout engine');
 expect(runtime.includes("card.hidden||card.classList.contains('dc-board-filtered')"),'hidden/filtered endpoint line suppression missing');
