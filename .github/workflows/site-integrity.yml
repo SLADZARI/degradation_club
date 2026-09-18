@@ -48,6 +48,8 @@ jobs:
         run: node scripts/validate-board-batch-a-contract.mjs
       - name: Validate Board Information Architecture Batch B contract
         run: node scripts/validate-board-batch-b-contract.mjs
+      - name: Validate Board Relations v1 schema contract
+        run: node scripts/validate-board-relations-v1.mjs
       - name: Validate Board Telegram Promotion v1 contract
         run: node scripts/validate-board-telegram-promotion-contract.mjs
       - name: Validate OWNER_ADMIN Telegram opt-in contract
