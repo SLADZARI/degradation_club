@@ -228,10 +228,11 @@ try{
     expect(movableState.movable===true,`desktop drag: canonical own-movable state missing ${JSON.stringify(movableState)}`);
     const before=await lineCoords(page,'77777777-7777-4777-8777-777777777771');
     const beforeCard=await ownCard.evaluate(card=>({left:parseFloat(card.style.left)||0,top:parseFloat(card.style.top)||0}));
-    const title=ownCard.locator('h3');const box=await title.boundingBox();
+    const box=await ownCard.boundingBox();
     if(box){
-      await page.mouse.move(box.x+Math.min(40,box.width/2),box.y+Math.min(18,box.height/2));
-      await page.mouse.down();await page.mouse.move(box.x+130,box.y+65,{steps:6});await page.mouse.up();
+      const startX=box.x+Math.min(80,box.width*.25),startY=box.y+Math.min(90,box.height*.35);
+      await page.mouse.move(startX,startY);
+      await page.mouse.down();await page.mouse.move(startX+70,startY+45,{steps:5});await page.mouse.up();
       await page.waitForFunction(({left,top})=>{
         const card=document.querySelector('.dc-notice[data-artifact-owned="1"]');
         return card&&(Math.abs((parseFloat(card.style.left)||0)-left)>2||Math.abs((parseFloat(card.style.top)||0)-top)>2);
@@ -239,8 +240,13 @@ try{
       await page.waitForTimeout(120);
       const afterCard=await ownCard.evaluate(card=>({left:parseFloat(card.style.left)||0,top:parseFloat(card.style.top)||0}));
       const after=await lineCoords(page,'77777777-7777-4777-8777-777777777771');
+      const dragState=await page.evaluate(()=>({
+        dragged:document.querySelector('.dc-notice[data-artifact-owned="1"]')?.dataset.boardJustDragged||null,
+        overlay:document.documentElement.dataset.boardArtifactOpen||null
+      }));
+      if(!dragState.dragged||dragState.overlay)throw new Error(`desktop drag: canonical drag opened Artifact detail or missed drag marker ${JSON.stringify(dragState)}`);
       expect(after.x1!==before.x1||after.y1!==before.y1,`desktop drag: relation line did not follow canonical card movement ${JSON.stringify({before,beforeCard,afterCard,after})}`);
-    }else failures.push('desktop drag: own Artifact title has no bounding box');
+    }else failures.push('desktop drag: own Artifact card has no bounding box');
 
     // Create success through canonical RPC then one canonical re-read.
     // Bring the moved Artifact back through the existing fullscreen/camera owner before real pointer interaction.
