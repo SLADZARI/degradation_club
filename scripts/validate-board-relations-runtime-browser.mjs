@@ -152,6 +152,29 @@ try{
   // Sequential desktop acceptance on canonical Board.
   {
     const{ctx,page,errors}=await openBoard(browser,'available',{width:1440,height:900});
+    await page.evaluate(()=>{
+      globalThis.__QA_RELATION_UI_EVENTS__=[];
+      document.addEventListener('click',event=>{
+        const card=event.target.closest?.('.dc-notice[data-artifact]');
+        if(!card)return;
+        globalThis.__QA_RELATION_UI_EVENTS__.push({
+          type:'click',
+          artifact:card.dataset.artifact||null,
+          dragged:card.dataset.boardJustDragged||null,
+          delta:card.dataset.boardJustDragged?Date.now()-Number(card.dataset.boardJustDragged):null,
+          target:event.target?.tagName||null,
+          targetClass:event.target?.className||null,
+          overlay:document.documentElement.dataset.boardArtifactOpen||null
+        });
+      },true);
+      window.addEventListener('dc:board-focus-target',event=>{
+        globalThis.__QA_RELATION_UI_EVENTS__.push({
+          type:'focus-target',
+          artifact:event.detail?.node?.dataset?.artifact||null,
+          open:event.detail?.open??null
+        });
+      });
+    });
     await page.waitForFunction(()=>document.querySelectorAll('.dc-board-relation-line').length===3,{timeout:5000});
 
     const mapping=await page.evaluate(()=>{
@@ -244,7 +267,8 @@ try{
         dragged:document.querySelector('.dc-notice[data-artifact-owned="1"]')?.dataset.boardJustDragged||null,
         overlay:document.documentElement.dataset.boardArtifactOpen||null,
         overlayHidden:document.querySelector('.dc-artifact-overlay')?.hidden??null,
-        overlaySrc:document.querySelector('.dc-artifact-overlay iframe')?.getAttribute('src')||null
+        overlaySrc:document.querySelector('.dc-artifact-overlay iframe')?.getAttribute('src')||null,
+        uiEvents:(globalThis.__QA_RELATION_UI_EVENTS__||[]).slice(-12)
       }));
       if(!dragState.dragged||dragState.overlay)throw new Error(`desktop drag: canonical drag opened Artifact detail or missed drag marker ${JSON.stringify(dragState)}`);
       expect(after.x1!==before.x1||after.y1!==before.y1,`desktop drag: relation line did not follow canonical card movement ${JSON.stringify({before,beforeCard,afterCard,after})}`);
