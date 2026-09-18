@@ -196,7 +196,7 @@ try{
     const overlay=page.locator('.dc-artifact-overlay');await overlay.waitFor({state:'visible',timeout:3000});
     const frame=page.frameLocator('.dc-artifact-overlay iframe');
     await frame.locator('#artifactHost').waitFor({state:'attached',timeout:4000});
-    await page.waitForTimeout(700);
+    await frame.locator('.dc-artifact-record').waitFor({state:'attached',timeout:7000});
     const artifactDetailState=await frame.locator('body').evaluate(()=>{
       const state=document.getElementById('artifactState')?.textContent||'';
       const host=document.getElementById('artifactHost');
@@ -299,6 +299,7 @@ try{
     });
     const mobileOverlay=page.locator('.dc-artifact-overlay');await mobileOverlay.waitFor({state:'visible',timeout:3000});
     const mobileFrame=page.frameLocator('.dc-artifact-overlay iframe');await mobileFrame.locator('#artifactHost').waitFor({state:'attached',timeout:4000});
+    await mobileFrame.locator('.dc-artifact-record').waitFor({state:'attached',timeout:7000});
     const mobileDetail=page.locator('.dc-artifact-overlay__panel > [data-relation-detail-host] .dc-board-relations-block[data-relation-detail="1"]');
     await mobileDetail.waitFor({state:'visible',timeout:4000});
     const mobileDetailGeo=await page.evaluate(()=>{
