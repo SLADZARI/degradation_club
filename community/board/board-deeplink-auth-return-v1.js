@@ -303,6 +303,7 @@ function installHistoryBridge(){
   document.addEventListener('click',event=>{
     const interactive=event.target.closest?.('a,button,input,textarea,select,label,dialog');if(interactive)return;
     const card=event.target.closest?.('.dc-notice[data-artifact]');if(!card||card.hidden||card.classList.contains('dc-board-filtered'))return;
+    if(Number(card.dataset.boardJustDragged||0)>Date.now()-650)return;
     const id=card.dataset.artifact;if(id&&!sameFocus('artifact',id))setFocus('artifact',id,{pushed:true});
   },true);
   window.addEventListener('popstate',()=>{popHandling=true;sharedArrivalMode=null;sharedArrivalStarted=false;closePostcard({restoreFocus:false});const focus=parseFocus();if(focus)scheduleResolve();else window.dispatchEvent(new CustomEvent('dc:board-close-artifact'));setTimeout(()=>{popHandling=false},0)});

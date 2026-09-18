@@ -264,13 +264,16 @@ try{
       const afterCard=await ownCard.evaluate(card=>({left:parseFloat(card.style.left)||0,top:parseFloat(card.style.top)||0}));
       const after=await lineCoords(page,'77777777-7777-4777-8777-777777777771');
       const dragState=await page.evaluate(()=>({
+        artifact:document.querySelector('.dc-notice[data-artifact-owned="1"]')?.dataset.artifact||null,
         dragged:document.querySelector('.dc-notice[data-artifact-owned="1"]')?.dataset.boardJustDragged||null,
         overlay:document.documentElement.dataset.boardArtifactOpen||null,
         overlayHidden:document.querySelector('.dc-artifact-overlay')?.hidden??null,
         overlaySrc:document.querySelector('.dc-artifact-overlay iframe')?.getAttribute('src')||null,
+        focus:new URL(location.href).searchParams.get('focus')||null,
         uiEvents:(globalThis.__QA_RELATION_UI_EVENTS__||[]).slice(-12)
       }));
       if(!dragState.dragged||dragState.overlay)throw new Error(`desktop drag: canonical drag opened Artifact detail or missed drag marker ${JSON.stringify(dragState)}`);
+      if(dragState.focus===`artifact:${String(dragState.artifact||'').toLowerCase()}`)throw new Error(`desktop drag: deep-link history owner persisted stale Artifact focus ${JSON.stringify(dragState)}`);
       expect(after.x1!==before.x1||after.y1!==before.y1,`desktop drag: relation line did not follow canonical card movement ${JSON.stringify({before,beforeCard,afterCard,after})}`);
     }else failures.push('desktop drag: own Artifact card has no bounding box');
 
