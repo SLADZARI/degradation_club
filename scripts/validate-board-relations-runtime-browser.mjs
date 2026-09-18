@@ -225,6 +225,12 @@ try{
     }else failures.push('desktop drag: own Artifact title has no bounding box');
 
     // Create success through canonical RPC then one canonical re-read.
+    // Bring the moved Artifact back through the existing fullscreen/camera owner before real pointer interaction.
+    await page.evaluate(()=>{
+      const node=document.querySelector('.dc-notice[data-artifact-owned="1"]');
+      window.dispatchEvent(new CustomEvent('dc:board-focus-target',{detail:{node,open:false}}));
+    });
+    await page.waitForTimeout(180);
     await ownBlock.evaluate(el=>el.open=true);
     await ownBlock.locator('[data-relation-add]').click();
     const select=ownBlock.locator('[data-relation-choice]');
@@ -240,6 +246,11 @@ try{
     // Server permission reject must fail closed and preserve canonical index.
     await page.evaluate(()=>{globalThis.__QA_RELATION_REJECT__=true});
     const refreshedOwn=page.locator('.dc-notice[data-artifact-owned="1"] [data-relation-block]');
+    await page.evaluate(()=>{
+      const node=document.querySelector('.dc-notice[data-artifact-owned="1"]');
+      window.dispatchEvent(new CustomEvent('dc:board-focus-target',{detail:{node,open:false}}));
+    });
+    await page.waitForTimeout(120);
     await refreshedOwn.evaluate(el=>el.open=true);await refreshedOwn.locator('[data-relation-add]').click();
     const rejectSelect=refreshedOwn.locator('[data-relation-choice]');
     const rejectOption=await rejectSelect.locator('option').evaluateAll(options=>options.map(o=>({value:o.value,text:o.textContent||''})).find(o=>o.text.includes('РЕЗУЛЬТАТ ДЛЯ')&&o.text.includes('OTHER ARTIFACT')));
