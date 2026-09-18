@@ -7,12 +7,12 @@
     "projectStage": "BUILD",
     "gate": "G5_BUILD",
     "status": "APPROVED",
-    "version": "2.13",
+    "version": "2.14",
     "updated": "2026-09-18",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.12"
+    "supersedes": "2.13"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -83,10 +83,11 @@
     "operations/BOARD_VISUAL_TYPE_LANGUAGE_V0.1.md",
     ".weekly-os/results/board-information-architecture-v1.v0.18.md",
     "operations/BOARD_INFORMATION_ARCHITECTURE_V1.md",
-    ".weekly-os/results/board-relations-v1.v0.5.md",
+    ".weekly-os/results/board-relations-v1.v0.6.md",
     "operations/BOARD_RELATIONS_G4_IDENTITY_CONTRACT_2026-09-18.md",
     "operations/BOARD_RELATIONS_G5_PRE_PERSISTENCE_CONTRACT_2026-09-18.md",
     "operations/BOARD_RELATIONS_G5_PERSISTENCE_DESIGN_2026-09-18.md",
+    "operations/BOARD_RELATIONS_G5_SCHEMA_CONTRACT_VALIDATION_2026-09-18.md",
     "operations/BOARD_TELEGRAM_PROMOTION_V1.md",
     "operations/BOARD_TELEGRAM_WORKER_SCHEDULER_G8_PRODUCTION_VALIDATION_2026-09-12.md",
     "operations/BOARD_INFORMATION_ARCHITECTURE_G8_CLEANUP_INVENTORY_2026-09-12.md",
@@ -140,7 +141,7 @@
       "authorityType": "APPROVED_AUTHORITY",
       "path": "operations/BOARD_INFORMATION_ARCHITECTURE_V1.md",
       "scope": "Community Board information architecture and lifecycle semantics",
-      "note": "Project-local approved authority. board-information-architecture-v1 v0.18 remains evidence-only WAITING/G8. board-relations-v1 v0.5 is the single ACTIVE G5 Batch C Result. Schema/RPC/RLS branch implementation is authorized; live DB mutation, production merge/deploy and runtime/UI remain unauthorized."
+      "note": "Project-local approved authority. board-information-architecture-v1 v0.18 remains evidence-only WAITING/G8. board-relations-v1 v0.6 is the single ACTIVE G5 Batch C Result. Schema/RPC/RLS branch contract PASS; live DB mutation, staging/production merge/deploy and runtime/UI remain unauthorized."
     },
     "boardShareReceiveRitualV1": {
       "sourceSystem": "GIT",
@@ -245,9 +246,9 @@
   },
   "currentResult": {
     "artifactId": "dementor-club.result.board-relations-v1",
-    "version": "0.5",
+    "version": "0.6",
     "status": "ACTIVE",
-    "path": ".weekly-os/results/board-relations-v1.v0.5.md",
+    "path": ".weekly-os/results/board-relations-v1.v0.6.md",
     "gate": "G5_BUILD",
     "integrationBranch": "result/board-relations-v1",
     "integrationBaseRef": "dementor-club-site",
@@ -261,11 +262,17 @@
     "liveDatabaseMutationAuthorized": false,
     "identityContractEvidence": "operations/BOARD_RELATIONS_G4_IDENTITY_CONTRACT_2026-09-18.md",
     "identityContractStatus": "ACCEPTED",
-    "note": "Persistence design accepted. Owner authorized schema/RPC/RLS implementation in result/board-relations-v1 only. Live DB mutation, production merge/deploy and runtime/UI remain unauthorized.",
+    "note": "Schema/RPC/RLS branch contract passed Site Integrity on exact head 980c83e... . Live DB mutation, staging/production merge/deploy and runtime/UI remain unauthorized. STOP before runtime increment.",
     "prePersistenceContractEvidence": "operations/BOARD_RELATIONS_G5_PRE_PERSISTENCE_CONTRACT_2026-09-18.md",
     "prePersistenceCheckpoint": "COMPLETE",
     "persistenceDesignEvidence": "operations/BOARD_RELATIONS_G5_PERSISTENCE_DESIGN_2026-09-18.md",
-    "persistenceDesignStatus": "READY_FOR_SCHEMA_MUTATION"
+    "persistenceDesignStatus": "READY_FOR_SCHEMA_MUTATION",
+    "schemaContractEvidence": "operations/BOARD_RELATIONS_G5_SCHEMA_CONTRACT_VALIDATION_2026-09-18.md",
+    "schemaContractStatus": "PASS",
+    "candidateCommit": "980c83e26d16219a04254a480671e20de77fe1bb",
+    "integrationPullRequest": 225,
+    "validationRunId": 35321118124,
+    "validationConclusion": "SUCCESS"
   },
   "waitingResults": [
     {
