@@ -146,7 +146,7 @@
       "authorityType": "APPROVED_AUTHORITY",
       "path": "operations/BOARD_INFORMATION_ARCHITECTURE_V1.md",
       "scope": "Community Board information architecture and lifecycle semantics",
-      "note": "Project-local approved authority. board-relations-v1 v0.8 is the single ACTIVE G5 Batch C Result. Runtime browser validation BLOCKED on repeated drag/detail suppression failure. No further mutation until explicit owner decision; live DB and merge/deploy gates remain closed."
+      "note": "Project-local approved authority. board-relations-v1 v1.1 is the single ACTIVE G5 Batch C Result. G5 runtime contract PASS on exact candidate 20aa71c1db76cbe238c96587523012ecdec7d46f. READY_FOR_NEXT_GATE. Live DB mutation and production merge/deploy remain unauthorized."
     },
     "boardShareReceiveRitualV1": {
       "sourceSystem": "GIT",
