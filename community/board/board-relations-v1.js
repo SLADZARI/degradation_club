@@ -313,7 +313,7 @@ function renderLines(){
     const origin=map.get(endpointKey(row.origin_kind,row.origin_source_id));
     const target=map.get(endpointKey(row.target_kind,row.target_source_id));
     const visible=Boolean(origin&&target&&cardVisible(origin.card)&&cardVisible(target.card));
-    line.hidden=!visible;
+    line.toggleAttribute('hidden',!visible);
     if(!visible)continue;
     const a=cardCenter(origin.card),b=cardCenter(target.card);
     line.setAttribute('x1',String(a.x));line.setAttribute('y1',String(a.y));line.setAttribute('x2',String(b.x));line.setAttribute('y2',String(b.y));
