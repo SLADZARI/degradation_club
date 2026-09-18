@@ -4,15 +4,15 @@
     "artifactId": "dementor-club.kernel.project",
     "project": "dementor-club",
     "documentType": "STANDARD",
-    "projectStage": "VALIDATION",
-    "gate": "G6_VALIDATION",
+    "projectStage": "RELEASE",
+    "gate": "G7_RELEASE",
     "status": "APPROVED",
-    "version": "2.23",
+    "version": "2.24",
     "updated": "2026-09-18",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.22"
+    "supersedes": "2.23"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -84,7 +84,7 @@
     "operations/BOARD_VISUAL_TYPE_LANGUAGE_V0.1.md",
     ".weekly-os/results/board-information-architecture-v1.v0.18.md",
     "operations/BOARD_INFORMATION_ARCHITECTURE_V1.md",
-    ".weekly-os/results/board-relations-v1.v1.4.md",
+    ".weekly-os/results/board-relations-v1.v1.5.md",
     "operations/BOARD_RELATIONS_G4_IDENTITY_CONTRACT_2026-09-18.md",
     "operations/BOARD_RELATIONS_G5_PRE_PERSISTENCE_CONTRACT_2026-09-18.md",
     "operations/BOARD_RELATIONS_G5_PERSISTENCE_DESIGN_2026-09-18.md",
@@ -148,7 +148,7 @@
       "authorityType": "APPROVED_AUTHORITY",
       "path": "operations/BOARD_INFORMATION_ARCHITECTURE_V1.md",
       "scope": "Community Board information architecture and lifecycle semantics",
-      "note": "Project-local approved authority. board-relations-v1 v1.4 is the single ACTIVE G6 Batch C Result. G6 PASS on exact candidate 20aa71c1db76cbe238c96587523012ecdec7d46f via Site Integrity #1222 attempt 2 SUCCESS. Diff boundary is PASS_WITH_INHERITED_BASE_DELTA: 11 Result-owned files; 4 staging reconciliation/evidence files are inherited and excluded from future clean G7 RC. Live DB mutation and production merge/deploy remain unauthorized."
+      "note": "Project-local approved authority. board-relations-v1 v1.5 is the single ACTIVE G7 Batch C Result. G6 PASS. Clean RC 84488dee... is built from production baseline 2dae3b6... with exactly 11 Result-owned files; draft PR #226 is validation-only. Live DB mutation and production merge/deploy remain unauthorized."
     },
     "boardShareReceiveRitualV1": {
       "sourceSystem": "GIT",
@@ -260,10 +260,10 @@
   },
   "currentResult": {
     "artifactId": "dementor-club.result.board-relations-v1",
-    "version": "1.4",
+    "version": "1.5",
     "status": "ACTIVE",
-    "path": ".weekly-os/results/board-relations-v1.v1.4.md",
-    "gate": "G6_VALIDATION",
+    "path": ".weekly-os/results/board-relations-v1.v1.5.md",
+    "gate": "G7_RELEASE",
     "integrationBranch": "result/board-relations-v1",
     "integrationBaseRef": "dementor-club-site",
     "integrationBaseCommit": "61d85d95bd95dfb536acdd363b45d2773a4b2ca5",
@@ -276,7 +276,7 @@
     "liveDatabaseMutationAuthorized": false,
     "identityContractEvidence": "operations/BOARD_RELATIONS_G4_IDENTITY_CONTRACT_2026-09-18.md",
     "identityContractStatus": "ACCEPTED",
-    "note": "G6 PASS on exact candidate 20aa71c1... via Site Integrity #1222 attempt 2 SUCCESS. Result-owned delta is exactly 11 files; 4 integration-base reconciliation/evidence files are inherited by provenance and excluded from future clean G7 RC. Live DB/staging/production unchanged; PR #225 remains draft/unmerged. STOP before G7.",
+    "note": "G7 clean RC validation in progress. Fresh release branch from exact production baseline contains exactly 11 Result-owned Board Relations files and excludes all 4 inherited staging reconciliation/evidence files. Draft PR #226 targets production only to run exact-head CI.",
     "prePersistenceContractEvidence": "operations/BOARD_RELATIONS_G5_PRE_PERSISTENCE_CONTRACT_2026-09-18.md",
     "prePersistenceCheckpoint": "COMPLETE",
     "persistenceDesignEvidence": "operations/BOARD_RELATIONS_G5_PERSISTENCE_DESIGN_2026-09-18.md",
@@ -301,7 +301,7 @@
     "dragDetailSuppressionStatus": "PASS_AT_DRAG_ASSERTION_1222",
     "deepLinkStaleFocusStatus": "PASS",
     "permissionInteractionStatus": "PASS",
-    "gateReadiness": "READY_FOR_CLEAN_G7_RELEASE_CANDIDATE_PREPARATION",
+    "gateReadiness": "IN_PROGRESS",
     "g6ValidationEvidence": "operations/BOARD_RELATIONS_G6_2026-09-18.md",
     "g6ValidationStatus": "PASS",
     "g6CandidateCommit": "20aa71c1db76cbe238c96587523012ecdec7d46f",
@@ -326,7 +326,14 @@
     "g6ResultOwnedDeltaFileCount": 11,
     "g6IntegrationBase": "61d85d95bd95dfb536acdd363b45d2773a4b2ca5",
     "g6ValidationRunNumber": 1222,
-    "g6ValidationRunAttempt": 2
+    "g6ValidationRunAttempt": 2,
+    "releaseBranch": "release/board-relations-v1",
+    "releaseCandidateCommit": "84488dee34358b4b3efdc0f7d09a992ae88b8dd0",
+    "releasePullRequest": 226,
+    "g7CleanRcStatus": "IN_PROGRESS",
+    "g7ExactDiffFileCount": 11,
+    "g7ValidationRunId": null,
+    "g7ValidationConclusion": null
   },
   "waitingResults": [
     {
