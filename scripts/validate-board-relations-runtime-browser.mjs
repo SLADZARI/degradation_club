@@ -188,7 +188,11 @@ try{
     expect(practiceText.includes('ПРОДОЛЖЕНО')&&practiceText.includes('QA COURSE'),`desktop detail: CONTINUES inverse missing ${practiceText}`);
 
     // Existing Artifact fullscreen/detail shell receives the same relation block.
-    await page.locator('.dc-notice[data-artifact-owned="1"] h3').click();
+    // Use the canonical fullscreen focus/open event so the QA path respects the existing camera owner.
+    await page.evaluate(()=>{
+      const node=document.querySelector('.dc-notice[data-artifact-owned="1"]');
+      window.dispatchEvent(new CustomEvent('dc:board-focus-target',{detail:{node,open:true}}));
+    });
     const overlay=page.locator('.dc-artifact-overlay');await overlay.waitFor({state:'visible',timeout:3000});
     const frame=page.frameLocator('.dc-artifact-overlay iframe');
     await frame.locator('.dc-artifact-record').waitFor({state:'visible',timeout:4000});
