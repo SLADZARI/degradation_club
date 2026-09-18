@@ -4,15 +4,15 @@
     "artifactId": "dementor-club.kernel.artifact-index",
     "project": "dementor-club",
     "documentType": "STANDARD",
-    "projectStage": "BUILD",
-    "gate": "G5_BUILD",
+    "projectStage": "VALIDATION",
+    "gate": "G6_VALIDATION",
     "status": "APPROVED",
-    "version": "2.17",
+    "version": "2.18",
     "updated": "2026-09-18",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.16"
+    "supersedes": "2.17"
   },
   "currentArtifacts": [
     {
@@ -759,22 +759,22 @@
     {
       "artifactId": "dementor-club.result.board-relations-v1",
       "documentType": "RESULT",
-      "currentVersion": "1.1",
+      "currentVersion": "1.2",
       "status": "ACTIVE",
-      "location": ".weekly-os/results/board-relations-v1.v1.1.md",
+      "location": ".weekly-os/results/board-relations-v1.v1.2.md",
       "sourceSystem": "GIT",
       "authorityType": "IMPLEMENTATION_AUTHORITY",
       "updated": "2026-09-18",
       "canonicalProject": "dementor-club",
-      "canonicalLocation": ".weekly-os/results/board-relations-v1.v1.1.md",
+      "canonicalLocation": ".weekly-os/results/board-relations-v1.v1.2.md",
       "relation": "CURRENT_RESULT",
-      "gate": "G5_BUILD",
+      "gate": "G6_VALIDATION",
       "specification": "operations/BOARD_INFORMATION_ARCHITECTURE_V1.md",
       "integrationBranch": "result/board-relations-v1",
       "plannedIntegrationBranch": "result/board-relations-v1",
       "implementationStartAuthorized": true,
-      "blockingGate": null,
-      "note": "ACTIVE Batch C Result. G5 runtime contract PASS on exact candidate 20aa71c1... / Site Integrity #1222 SUCCESS. Ready for next gate; no merge/deploy/live DB mutation authorized.",
+      "blockingGate": "G6_DIFF_BOUNDARY",
+      "note": "ACTIVE Batch C Result in G6_VALIDATION. G5 runtime PASS. G6 blocked because exact candidate vs production baseline includes 4 inherited staging-only reconciliation files outside reviewed Board Relations scope. No release-readiness run launched.",
       "referencedBy": [],
       "identityContractEvidence": "operations/BOARD_RELATIONS_G4_IDENTITY_CONTRACT_2026-09-18.md",
       "identityContractStatus": "ACCEPTED",
@@ -809,7 +809,12 @@
       "dragDetailSuppressionStatus": "PASS_AT_DRAG_ASSERTION_1222",
       "deepLinkStaleFocusStatus": "PASS",
       "permissionInteractionStatus": "PASS",
-      "gateReadiness": "READY_FOR_NEXT_GATE"
+      "gateReadiness": "BLOCKED",
+      "g6ValidationEvidence": "operations/BOARD_RELATIONS_G6_DIFF_BOUNDARY_BLOCKER_2026-09-18.md",
+      "g6ValidationStatus": "BLOCKED",
+      "g6CandidateCommit": "20aa71c1db76cbe238c96587523012ecdec7d46f",
+      "g6ProductionBaseline": "2dae3b6ece79652c81af780c049521fda7262726",
+      "g6ValidationConclusion": "BLOCKED_BEFORE_RUN"
     },
     {
       "artifactId": "dementor-club.evidence.board-relations-g5-persistence-design-2026-09-18",
@@ -1289,6 +1294,30 @@
       "liveDatabaseMutation": false,
       "productionMutation": false,
       "verdict": "G5_RUNTIME_CONTRACT_PASS",
+      "referencedBy": [
+        "dementor-club.result.board-relations-v1"
+      ]
+    },
+    {
+      "artifactId": "dementor-club.evidence.board-relations-g6-diff-boundary-blocker-2026-09-18",
+      "documentType": "VALIDATION_EVIDENCE",
+      "currentVersion": "1.0",
+      "status": "BLOCKER_EVIDENCE",
+      "location": "operations/BOARD_RELATIONS_G6_DIFF_BOUNDARY_BLOCKER_2026-09-18.md",
+      "sourceSystem": "GIT",
+      "authorityType": "VALIDATION_EVIDENCE",
+      "updated": "2026-09-18",
+      "canonicalProject": "dementor-club",
+      "canonicalLocation": "operations/BOARD_RELATIONS_G6_DIFF_BOUNDARY_BLOCKER_2026-09-18.md",
+      "relation": "G6_BLOCKER_EVIDENCE",
+      "result": "dementor-club.result.board-relations-v1",
+      "productionBaseline": "2dae3b6ece79652c81af780c049521fda7262726",
+      "candidateCommit": "20aa71c1db76cbe238c96587523012ecdec7d46f",
+      "validationConclusion": "BLOCKED_BEFORE_RUN",
+      "blockingGate": "G6_DIFF_BOUNDARY",
+      "liveDatabaseMutation": false,
+      "productionMutation": false,
+      "verdict": "G6_BLOCKED",
       "referencedBy": [
         "dementor-club.result.board-relations-v1"
       ]
