@@ -242,7 +242,9 @@ try{
       const after=await lineCoords(page,'77777777-7777-4777-8777-777777777771');
       const dragState=await page.evaluate(()=>({
         dragged:document.querySelector('.dc-notice[data-artifact-owned="1"]')?.dataset.boardJustDragged||null,
-        overlay:document.documentElement.dataset.boardArtifactOpen||null
+        overlay:document.documentElement.dataset.boardArtifactOpen||null,
+        overlayHidden:document.querySelector('.dc-artifact-overlay')?.hidden??null,
+        overlaySrc:document.querySelector('.dc-artifact-overlay iframe')?.getAttribute('src')||null
       }));
       if(!dragState.dragged||dragState.overlay)throw new Error(`desktop drag: canonical drag opened Artifact detail or missed drag marker ${JSON.stringify(dragState)}`);
       expect(after.x1!==before.x1||after.y1!==before.y1,`desktop drag: relation line did not follow canonical card movement ${JSON.stringify({before,beforeCard,afterCard,after})}`);
