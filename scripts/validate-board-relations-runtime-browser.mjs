@@ -195,7 +195,14 @@ try{
     });
     const overlay=page.locator('.dc-artifact-overlay');await overlay.waitFor({state:'visible',timeout:3000});
     const frame=page.frameLocator('.dc-artifact-overlay iframe');
-    await frame.locator('.dc-artifact-record').waitFor({state:'visible',timeout:4000});
+    await frame.locator('#artifactHost').waitFor({state:'attached',timeout:4000});
+    await page.waitForTimeout(700);
+    const artifactDetailState=await frame.locator('body').evaluate(()=>{
+      const state=document.getElementById('artifactState')?.textContent||'';
+      const host=document.getElementById('artifactHost');
+      return {state,host:(host?.textContent||'').replace(/\\s+/g,' ').trim(),record:document.querySelectorAll('.dc-artifact-record').length};
+    });
+    if(artifactDetailState.record!==1)throw new Error(`Artifact detail fixture did not render: ${JSON.stringify(artifactDetailState)} | pageerrors=${errors.join(' | ')}`);
     await frame.locator('.dc-board-relations-block[data-relation-detail="1"]').waitFor({state:'attached',timeout:4000});
     expect(((await frame.locator('.dc-board-relations-block[data-relation-detail="1"]').innerText()).replace(/\s+/g,' ')).includes('QA EVENT'),'desktop Artifact detail: relation block not injected into canonical overlay detail');
     await page.locator('.dc-artifact-overlay__close').click();await overlay.waitFor({state:'hidden',timeout:2000});
