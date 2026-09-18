@@ -7,12 +7,12 @@
     "projectStage": "RELEASE",
     "gate": "G7_RELEASE",
     "status": "APPROVED",
-    "version": "2.2699999999999996",
+    "version": "2.27",
     "updated": "2026-09-18",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.25"
+    "supersedes": "2.26"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
