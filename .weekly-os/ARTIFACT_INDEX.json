@@ -7,12 +7,12 @@
     "projectStage": "BUILD",
     "gate": "G5_BUILD",
     "status": "APPROVED",
-    "version": "2.13",
+    "version": "2.14",
     "updated": "2026-09-18",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.12"
+    "supersedes": "2.13"
   },
   "currentArtifacts": [
     {
@@ -759,22 +759,22 @@
     {
       "artifactId": "dementor-club.result.board-relations-v1",
       "documentType": "RESULT",
-      "currentVersion": "0.7",
+      "currentVersion": "0.8",
       "status": "ACTIVE",
-      "location": ".weekly-os/results/board-relations-v1.v0.7.md",
+      "location": ".weekly-os/results/board-relations-v1.v0.8.md",
       "sourceSystem": "GIT",
       "authorityType": "IMPLEMENTATION_AUTHORITY",
       "updated": "2026-09-18",
       "canonicalProject": "dementor-club",
-      "canonicalLocation": ".weekly-os/results/board-relations-v1.v0.7.md",
+      "canonicalLocation": ".weekly-os/results/board-relations-v1.v0.8.md",
       "relation": "CURRENT_RESULT",
       "gate": "G5_BUILD",
       "specification": "operations/BOARD_INFORMATION_ARCHITECTURE_V1.md",
       "integrationBranch": "result/board-relations-v1",
       "plannedIntegrationBranch": "result/board-relations-v1",
       "implementationStartAuthorized": true,
-      "blockingGate": "RUNTIME_CONTRACT_VALIDATION",
-      "note": "ACTIVE Batch C Result. Schema contract PASS; runtime adapter + canvas/detail presentation increment authorized. Live DB mutation and staging/production merge/deploy remain unauthorized.",
+      "blockingGate": "RUNTIME_BROWSER_DRAG_DETAIL_SUPPRESSION",
+      "note": "ACTIVE Batch C Result. Runtime browser validation BLOCKED on repeated same-cause drag/detail suppression failure. Stop fix loop pending owner decision. Live DB and staging/production merge/deploy remain unauthorized.",
       "referencedBy": [],
       "identityContractEvidence": "operations/BOARD_RELATIONS_G4_IDENTITY_CONTRACT_2026-09-18.md",
       "identityContractStatus": "ACCEPTED",
@@ -796,7 +796,13 @@
       "integrationPullRequest": 225,
       "validationRunId": 35321118124,
       "validationConclusion": "SUCCESS",
-      "runtimeIncrementAuthorized": true
+      "runtimeIncrementAuthorized": true,
+      "runtimeValidationEvidence": "operations/BOARD_RELATIONS_G5_RUNTIME_BLOCKER_2026-09-18.md",
+      "runtimeValidationStatus": "BLOCKED",
+      "runtimeCandidateCommit": "cc8b2f51ca9dc1f4bdc53dd0210834404bc8ef1c",
+      "runtimeValidationRunId": 35327830885,
+      "runtimeValidationRunNumber": 1218,
+      "runtimeValidationConclusion": "FAILURE"
     },
     {
       "artifactId": "dementor-club.evidence.board-relations-g5-persistence-design-2026-09-18",
@@ -1172,6 +1178,31 @@
       "liveDatabaseMutation": false,
       "productionMutation": false,
       "verdict": "SCHEMA_CONTRACT_PASS",
+      "referencedBy": [
+        "dementor-club.result.board-relations-v1"
+      ]
+    },
+    {
+      "artifactId": "dementor-club.evidence.board-relations-g5-runtime-blocker-2026-09-18",
+      "documentType": "QA_EVIDENCE",
+      "currentVersion": "1.0",
+      "status": "BLOCKER_EVIDENCE",
+      "location": "operations/BOARD_RELATIONS_G5_RUNTIME_BLOCKER_2026-09-18.md",
+      "sourceSystem": "GIT",
+      "authorityType": "EVIDENCE",
+      "updated": "2026-09-18",
+      "canonicalProject": "dementor-club",
+      "canonicalLocation": "operations/BOARD_RELATIONS_G5_RUNTIME_BLOCKER_2026-09-18.md",
+      "relation": "G5_BLOCKER_EVIDENCE",
+      "result": "dementor-club.result.board-relations-v1",
+      "candidateCommit": "cc8b2f51ca9dc1f4bdc53dd0210834404bc8ef1c",
+      "validationRunId": 35327830885,
+      "validationRunNumber": 1218,
+      "validationConclusion": "FAILURE",
+      "blockingStep": 48,
+      "liveDatabaseMutation": false,
+      "productionMutation": false,
+      "verdict": "G5_RUNTIME_CONTRACT_BLOCKED",
       "referencedBy": [
         "dementor-club.result.board-relations-v1"
       ]
