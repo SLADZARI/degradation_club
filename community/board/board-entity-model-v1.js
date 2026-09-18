@@ -47,6 +47,8 @@ export function entityToBoardProjection(entity,event,program){
     sourceMode:BOARD_SOURCE_MODES.ENTITY_PROJECTION,
     sourceType:kind,
     sourceId:entity.id,
+    relationKind:isEvent?'event':isProgram?'program':null,
+    relationSourceId:(isEvent||isProgram)?entity.slug:null,
     slug:entity.slug,
     title:entity.title,
     body:entity.summary||program?.content_summary||'',

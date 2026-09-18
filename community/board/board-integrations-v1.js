@@ -43,6 +43,8 @@ function markMemberCards(){
     card.dataset.boardSource='member';
     card.dataset.sourceMode=BOARD_SOURCE_MODES.ARTIFACT;
     card.dataset.sourceType='artifact';
+    card.dataset.relationKind='artifact';
+    card.dataset.relationSourceId=card.dataset.artifact||'';
     card.dataset.forming='0';
   });
 }

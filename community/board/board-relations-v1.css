@@ -1,0 +1,149 @@
+/* Board Relations v1 — presentation only.
+   Canonical coordinates remain owned by board-spatial-v1 / board-layout-v2. */
+.dc-board-relations-layer{
+  position:absolute;
+  left:0;
+  top:0;
+  width:12000px;
+  height:8000px;
+  overflow:visible;
+  pointer-events:none;
+  z-index:0;
+  color:#111;
+}
+.dc-board-relations-layer[hidden]{display:none}
+.dc-board-relation-line{
+  stroke:rgba(17,17,17,.48);
+  stroke-width:3;
+  stroke-dasharray:12 10;
+  vector-effect:non-scaling-stroke;
+}
+.dc-board-relation-line[data-relation-type="RELATED_TO"]{stroke-dasharray:5 9}
+.dc-board-relations-layer marker path{fill:#111}
+.dc-spatial-world>.dc-notice,
+.dc-spatial-world>.dc-projection{z-index:2}
+
+.dc-board-relations-block{
+  margin-top:10px;
+  border-top:1px dashed rgba(17,17,17,.55);
+  padding-top:8px;
+  font:800 9px/1.35 ui-monospace,SFMono-Regular,Menlo,monospace;
+  text-transform:uppercase;
+}
+.dc-board-relations-block>summary{
+  cursor:pointer;
+  list-style:none;
+  letter-spacing:.04em;
+  display:flex;
+  align-items:center;
+  min-height:24px;
+}
+.dc-board-relations-block>summary::-webkit-details-marker{display:none}
+.dc-board-relations-block>summary::before{content:'＋';margin-right:7px}
+.dc-board-relations-block[open]>summary::before{content:'−'}
+.dc-board-relations-block__body{
+  display:grid;
+  gap:6px;
+  margin-top:7px;
+}
+.dc-board-relation-row{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:5px;
+  align-items:stretch;
+}
+.dc-board-relation-link,
+.dc-board-relation-delete,
+.dc-board-relation-add,
+.dc-board-relation-form button,
+.dc-board-relation-form select{
+  border:1px solid #111;
+  border-radius:0;
+  background:#fbf8f0;
+  color:#111;
+  font:800 9px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace;
+  text-transform:uppercase;
+}
+.dc-board-relation-link{
+  min-width:0;
+  padding:6px 7px;
+  text-align:left;
+  cursor:pointer;
+}
+.dc-board-relation-link span{
+  display:block;
+  opacity:.62;
+  font-size:8px;
+  margin-bottom:2px;
+}
+.dc-board-relation-link strong{
+  display:block;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.dc-board-relation-delete{
+  width:30px;
+  min-height:30px;
+  cursor:pointer;
+}
+.dc-board-relation-add{
+  min-height:30px;
+  padding:5px 8px;
+  width:max-content;
+  cursor:pointer;
+}
+.dc-board-relation-form{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto auto;
+  gap:5px;
+}
+.dc-board-relation-form[hidden]{display:none}
+.dc-board-relation-form select{
+  min-width:0;
+  padding:6px;
+}
+.dc-board-relation-form button{
+  min-height:30px;
+  padding:5px 8px;
+  cursor:pointer;
+}
+.dc-board-relation-link:hover,
+.dc-board-relation-delete:hover,
+.dc-board-relation-add:hover,
+.dc-board-relation-form button:hover,
+.dc-board-relation-link:focus-visible,
+.dc-board-relation-delete:focus-visible,
+.dc-board-relation-add:focus-visible,
+.dc-board-relation-form button:focus-visible,
+.dc-board-relation-form select:focus-visible{
+  background:#d8ff3e;
+  outline:2px solid #111;
+  outline-offset:1px;
+}
+.dc-board-relation-empty{opacity:.58;padding:3px 0}
+.dc-board-relation-status{
+  padding:5px 7px;
+  border-left:3px solid #111;
+  background:rgba(17,17,17,.05);
+}
+.dc-board-relation-status[data-state="error"]{background:rgba(17,17,17,.12)}
+.dc-board-relation-status[data-state="success"]{background:#d8ff3e}
+.dc-board-relations-toggle{min-width:max-content}
+
+.dc-artifact-record .dc-board-relations-block{
+  margin:24px 0 0;
+  padding-top:14px;
+}
+.dc-artifact-record .dc-board-relations-block__body{
+  max-width:760px;
+}
+@media(max-width:768px){
+  .dc-board-relations-block{font-size:8px}
+  .dc-board-relation-form{grid-template-columns:1fr 1fr}
+  .dc-board-relation-form select{grid-column:1/-1;min-height:38px}
+  .dc-board-relation-form button{min-height:38px}
+}
+@media(prefers-reduced-motion:reduce){
+  .dc-board-relation-line{transition:none}
+}
