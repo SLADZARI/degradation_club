@@ -235,6 +235,7 @@ async function deleteRelation(card,relationId,statusRoot=card){
 function wireBlock(block,endpoint,card){
   if(!block||block.dataset.relationBound==='1')return;
   block.dataset.relationBound='1';
+  block.addEventListener('toggle',()=>schedulePresentation());
   block.addEventListener('click',event=>{
     const focus=event.target.closest?.('[data-relation-focus]');
     if(focus){event.preventDefault();const key=focus.dataset.relationFocus;const inDetail=block.dataset.relationDetail==='1';if(inDetail){window.dispatchEvent(new CustomEvent('dc:board-close-artifact'));setTimeout(()=>focusEndpoint(key),80)}else focusEndpoint(key);return}

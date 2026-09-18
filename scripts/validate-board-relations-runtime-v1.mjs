@@ -87,6 +87,8 @@ expect((html.match(/board-relations-v1\.css/g)||[]).length===1,'workspace must l
 expect(css.includes('.dc-board-relations-layer'),'relation line CSS missing');
 expect(css.includes('.dc-board-relations-block'),'relation block CSS missing');
 expect(css.includes('.dc-board-relation-form'),'relation controls CSS missing');
+expect(css.includes(':has(> .dc-board-relations-block[open])')&&css.includes('max-height:none!important')&&css.includes('overflow:visible!important'),'expanded relation controls can be clipped by canonical Board card max-height');
+expect(runtime.includes("block.addEventListener('toggle',()=>schedulePresentation())"),'relation line presentation does not refresh when inline relation detail expands/collapses');
 
 // Protected files remain semantically unhooked from Board Relations.
 for(const protectedFile of ['thing-projection-v1.js','dementor-relations-v1.js']){

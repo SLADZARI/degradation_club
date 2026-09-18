@@ -41,6 +41,12 @@
 .dc-board-relations-block>summary::-webkit-details-marker{display:none}
 .dc-board-relations-block>summary::before{content:'＋';margin-right:7px}
 .dc-board-relations-block[open]>summary::before{content:'−'}
+.dc-spatial-world>.dc-notice:has(> .dc-board-relations-block[open]),
+.dc-spatial-world>.dc-projection:has(> .dc-board-relations-block[open]){
+  max-height:none!important;
+  overflow:visible!important;
+  z-index:8!important;
+}
 .dc-board-relations-block__body{
   display:grid;
   gap:6px;
