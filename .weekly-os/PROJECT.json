@@ -7,12 +7,12 @@
     "projectStage": "RELEASE",
     "gate": "G7_RELEASE",
     "status": "APPROVED",
-    "version": "2.27",
+    "version": "2.28",
     "updated": "2026-09-18",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.26"
+    "supersedes": "2.27"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -84,7 +84,7 @@
     "operations/BOARD_VISUAL_TYPE_LANGUAGE_V0.1.md",
     ".weekly-os/results/board-information-architecture-v1.v0.18.md",
     "operations/BOARD_INFORMATION_ARCHITECTURE_V1.md",
-    ".weekly-os/results/board-relations-v1.v1.7.md",
+    ".weekly-os/results/board-relations-v1.v1.8.md",
     "operations/BOARD_RELATIONS_G4_IDENTITY_CONTRACT_2026-09-18.md",
     "operations/BOARD_RELATIONS_G5_PRE_PERSISTENCE_CONTRACT_2026-09-18.md",
     "operations/BOARD_RELATIONS_G5_PERSISTENCE_DESIGN_2026-09-18.md",
@@ -115,7 +115,8 @@
     "README.md",
     "operations/IDENTITY_MEMBERSHIP_AND_ENTITY_BOUNDARY_V0.2.md",
     "operations/DEMENTOR_ENTITY_MAP_AND_WORKSPACE_MODULES_V0.1.md",
-    "operations/UNIVERSAL_WORKSPACE_WIREFRAME_SPEC_V0.1.md"
+    "operations/UNIVERSAL_WORKSPACE_WIREFRAME_SPEC_V0.1.md",
+    "operations/BOARD_RELATIONS_PRODUCTION_RELEASE_TOOLING_BLOCKER_2026-09-18.md"
   ],
   "authority": {
     "mpDslCore": {
@@ -261,9 +262,9 @@
   },
   "currentResult": {
     "artifactId": "dementor-club.result.board-relations-v1",
-    "version": "1.7",
+    "version": "1.8",
     "status": "ACTIVE",
-    "path": ".weekly-os/results/board-relations-v1.v1.7.md",
+    "path": ".weekly-os/results/board-relations-v1.v1.8.md",
     "gate": "G7_RELEASE",
     "integrationBranch": "result/board-relations-v1",
     "integrationBaseRef": "dementor-club-site",
@@ -277,7 +278,7 @@
     "liveDatabaseMutationAuthorized": true,
     "identityContractEvidence": "operations/BOARD_RELATIONS_G4_IDENTITY_CONTRACT_2026-09-18.md",
     "identityContractStatus": "ACCEPTED",
-    "note": "Owner release authorized. PR #226 merged to production SHA 2b17d54f.... Read-only preflight proves exactly one pending migration 20260918094000_board_relations_v1.sql and no migration drift. Canonical backend deploy authorized; Telegram worker deploy remains false. Production failures require STOP + evidence.",
+    "note": "Owner release authorization remains valid. Backend preflight is clean with exactly one pending migration, but canonical GitHub workflow could not be triggered because the available browser automation had no authenticated GitHub session and the connected GitHub connector exposes no workflow_dispatch. No production mutation occurred.",
     "prePersistenceContractEvidence": "operations/BOARD_RELATIONS_G5_PRE_PERSISTENCE_CONTRACT_2026-09-18.md",
     "prePersistenceCheckpoint": "COMPLETE",
     "persistenceDesignEvidence": "operations/BOARD_RELATIONS_G5_PERSISTENCE_DESIGN_2026-09-18.md",
@@ -295,14 +296,14 @@
     "runtimeValidationRunId": 35332109233,
     "runtimeValidationRunNumber": 1222,
     "runtimeValidationConclusion": "SUCCESS",
-    "blockingGate": null,
+    "blockingGate": "PRODUCTION_WORKFLOW_TRIGGER_AUTH",
     "runtimeValidationBlocker": null,
     "previousDragDetailBlockerStatus": "UNRESOLVED_NOT_EXERCISED_IN_1220",
     "filterLineVisibilityStatus": "PASS",
     "dragDetailSuppressionStatus": "PASS_AT_DRAG_ASSERTION_1222",
     "deepLinkStaleFocusStatus": "PASS",
     "permissionInteractionStatus": "PASS",
-    "gateReadiness": "RELEASE_EXECUTION_IN_PROGRESS",
+    "gateReadiness": "BLOCKED",
     "g6ValidationEvidence": "operations/BOARD_RELATIONS_G6_2026-09-18.md",
     "g6ValidationStatus": "PASS",
     "g6CandidateCommit": "20aa71c1db76cbe238c96587523012ecdec7d46f",
@@ -343,7 +344,11 @@
     "backendProductionDeployAuthorized": true,
     "pagesProductionDeployAuthorized": true,
     "telegramWorkerDeployAuthorized": false,
-    "releaseExecutionStatus": "IN_PROGRESS"
+    "releaseExecutionStatus": "BLOCKED_TOOLING_AUTH",
+    "backendWorkflowRunId": null,
+    "pagesWorkflowRunId": null,
+    "liveRetestStatus": "NOT_STARTED",
+    "releaseBlockerEvidence": "operations/BOARD_RELATIONS_PRODUCTION_RELEASE_TOOLING_BLOCKER_2026-09-18.md"
   },
   "waitingResults": [
     {
