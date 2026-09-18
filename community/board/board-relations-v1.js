@@ -237,7 +237,7 @@ function wireBlock(block,endpoint,card){
   block.dataset.relationBound='1';
   block.addEventListener('click',event=>{
     const focus=event.target.closest?.('[data-relation-focus]');
-    if(focus){event.preventDefault();const key=focus.dataset.relationFocus;if(block.ownerDocument!==document){window.dispatchEvent(new CustomEvent('dc:board-close-artifact'));setTimeout(()=>focusEndpoint(key),80)}else focusEndpoint(key);return}
+    if(focus){event.preventDefault();const key=focus.dataset.relationFocus;const inDetail=block.dataset.relationDetail==='1';if(inDetail){window.dispatchEvent(new CustomEvent('dc:board-close-artifact'));setTimeout(()=>focusEndpoint(key),80)}else focusEndpoint(key);return}
     const add=event.target.closest?.('[data-relation-add]');
     if(add){event.preventDefault();const form=block.querySelector('[data-relation-form]');if(form)form.hidden=false;return}
     const cancel=event.target.closest?.('[data-relation-cancel]');
@@ -385,33 +385,31 @@ async function loadPermissionMirror(){
   if(error){console.info('[DC Board relations] scoped permission mirror unavailable; entity mutation controls stay closed',error.message);return}
   scopedEntityIds=new Set((data||[]).filter(row=>row.role==='dementor'&&row.provenance_status==='confirmed'&&activeWindow(row)).map(row=>String(row.entity_id)));
 }
+function clearArtifactDetail(){
+  document.querySelector('.dc-artifact-overlay__panel > [data-relation-detail-host]')?.remove();
+}
 function injectArtifactDetail(){
+  clearArtifactDetail();
   if(!backendAvailable||!relationRows)return;
-  const frame=document.querySelector('.dc-artifact-overlay iframe');
-  if(!frame||frame.src==='about:blank')return;
-  let doc=null;try{doc=frame.contentDocument}catch{return}
-  if(!doc)return;
-  const path=(()=>{try{return new URL(frame.contentWindow.location.href).pathname}catch{return''}})();
+  const overlay=document.querySelector('.dc-artifact-overlay:not([hidden])');
+  const frame=overlay?.querySelector('iframe');
+  const panel=overlay?.querySelector('.dc-artifact-overlay__panel');
+  if(!frame||!panel||frame.src==='about:blank')return;
+  let path='';
+  try{path=new URL(frame.src,location.href).pathname}catch{return}
   const match=path.match(/^\/community\/artifact\/([^/]+)\/?$/);
   if(!match)return;
   const card=supportedCards().find(node=>node.dataset.relationKind==='artifact'&&node.dataset.relationSourceId===match[1]);
   if(!card)return;
   const endpoint=endpointFromCard(card);
-  const record=doc.querySelector('.dc-artifact-record');
-  if(!record)return;
-  if(!doc.querySelector('link[data-board-relations-style]')){
-    const link=doc.createElement('link');
-    link.rel='stylesheet';
-    link.href='/community/board/board-relations-v1.css';
-    link.dataset.boardRelationsStyle='1';
-    doc.head.appendChild(link);
-  }
-  record.querySelector('[data-relation-block]')?.remove();
   const html=blockHtml(endpoint,{detail:true});if(!html)return;
-  const actions=record.querySelector('.dc-artifact-actions');
-  if(actions)actions.insertAdjacentHTML('beforebegin',html);else record.insertAdjacentHTML('beforeend',html);
-  const block=record.querySelector('[data-relation-block]');
-  wireBlock(block,endpoint,card);
+  const host=document.createElement('section');
+  host.className='dc-board-relation-detail-host';
+  host.dataset.relationDetailHost='1';
+  host.setAttribute('aria-label','Связи Artifact');
+  host.innerHTML=html;
+  panel.appendChild(host);
+  wireBlock(host.querySelector('[data-relation-block]'),endpoint,card);
 }
 function bindArtifactOverlay(){
   const bindFrame=()=>{
@@ -419,20 +417,13 @@ function bindArtifactOverlay(){
     if(!frame||frame.dataset.dcRelationsBound==='1')return;
     frame.dataset.dcRelationsBound='1';
     frame.addEventListener('load',()=>{
-      if(frame.src==='about:blank')return;
-      try{
-        const doc=frame.contentDocument;if(!doc)return;
-        const host=doc.getElementById('artifactHost');
-        if(!host)return;
-        injectArtifactDetail();
-        const nested=new MutationObserver(()=>injectArtifactDetail());
-        nested.observe(host,{childList:true});
-        frame.addEventListener('load',()=>nested.disconnect(),{once:true});
-      }catch{}
+      if(frame.src==='about:blank'){clearArtifactDetail();return}
+      injectArtifactDetail();
     });
   };
   bindFrame();
   new MutationObserver(bindFrame).observe(document.body,{childList:true,subtree:true});
+  window.addEventListener('dc:board-artifact-closed',clearArtifactDetail);
 }
 function installObservers(){
   if(boardHost){
