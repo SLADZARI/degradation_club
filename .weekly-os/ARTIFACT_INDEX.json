@@ -7,12 +7,12 @@
     "projectStage": "RELEASE",
     "gate": "G7_RELEASE",
     "status": "APPROVED",
-    "version": "2.21",
+    "version": "2.22",
     "updated": "2026-09-18",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.20"
+    "supersedes": "2.21"
   },
   "currentArtifacts": [
     {
@@ -759,14 +759,14 @@
     {
       "artifactId": "dementor-club.result.board-relations-v1",
       "documentType": "RESULT",
-      "currentVersion": "1.5",
+      "currentVersion": "1.6",
       "status": "ACTIVE",
-      "location": ".weekly-os/results/board-relations-v1.v1.5.md",
+      "location": ".weekly-os/results/board-relations-v1.v1.6.md",
       "sourceSystem": "GIT",
       "authorityType": "IMPLEMENTATION_AUTHORITY",
       "updated": "2026-09-18",
       "canonicalProject": "dementor-club",
-      "canonicalLocation": ".weekly-os/results/board-relations-v1.v1.5.md",
+      "canonicalLocation": ".weekly-os/results/board-relations-v1.v1.6.md",
       "relation": "CURRENT_RESULT",
       "gate": "G7_RELEASE",
       "specification": "operations/BOARD_INFORMATION_ARCHITECTURE_V1.md",
@@ -774,7 +774,7 @@
       "plannedIntegrationBranch": "result/board-relations-v1",
       "implementationStartAuthorized": true,
       "blockingGate": null,
-      "note": "ACTIVE G7 clean RC validation. Fresh production-based RC contains exactly 11 Result-owned files; inherited staging reconciliation/evidence files are absent. Draft PR #226 validation-only; merge/deploy/live DB mutation unauthorized.",
+      "note": "ACTIVE G7 Result. Clean production-based RC validated with exact 11-file diff and Site Integrity #1223 SUCCESS. PR #226 remains draft/unmerged; live DB and production remain unchanged.",
       "referencedBy": [],
       "identityContractEvidence": "operations/BOARD_RELATIONS_G4_IDENTITY_CONTRACT_2026-09-18.md",
       "identityContractStatus": "ACCEPTED",
@@ -809,7 +809,7 @@
       "dragDetailSuppressionStatus": "PASS_AT_DRAG_ASSERTION_1222",
       "deepLinkStaleFocusStatus": "PASS",
       "permissionInteractionStatus": "PASS",
-      "gateReadiness": "IN_PROGRESS",
+      "gateReadiness": "READY_FOR_RELEASE_DECISION",
       "g6ValidationEvidence": "operations/BOARD_RELATIONS_G6_2026-09-18.md",
       "g6ValidationStatus": "PASS",
       "g6CandidateCommit": "20aa71c1db76cbe238c96587523012ecdec7d46f",
@@ -825,8 +825,13 @@
       "releaseBranch": "release/board-relations-v1",
       "releaseCandidateCommit": "84488dee34358b4b3efdc0f7d09a992ae88b8dd0",
       "releasePullRequest": 226,
-      "g7CleanRcStatus": "IN_PROGRESS",
-      "g7ExactDiffFileCount": 11
+      "g7CleanRcStatus": "PASS",
+      "g7ExactDiffFileCount": 11,
+      "g7ReleaseEvidence": "operations/BOARD_RELATIONS_G7_RELEASE_CANDIDATE_2026-09-18.md",
+      "g7ValidationRunId": 35335597023,
+      "g7ValidationRunNumber": 1223,
+      "g7ValidationRunAttempt": 1,
+      "g7ValidationConclusion": "SUCCESS"
     },
     {
       "artifactId": "dementor-club.evidence.board-relations-g5-persistence-design-2026-09-18",
@@ -1360,6 +1365,34 @@
       "liveDatabaseMutation": false,
       "productionMutation": false,
       "verdict": "G6_PASS",
+      "referencedBy": [
+        "dementor-club.result.board-relations-v1"
+      ]
+    },
+    {
+      "artifactId": "dementor-club.operations.board-relations-g7-release-candidate-2026-09-18",
+      "documentType": "RELEASE_EVIDENCE",
+      "currentVersion": "1.0",
+      "status": "PASS_CLEAN_RC_VALIDATED",
+      "location": "operations/BOARD_RELATIONS_G7_RELEASE_CANDIDATE_2026-09-18.md",
+      "sourceSystem": "GIT",
+      "authorityType": "RELEASE_EVIDENCE",
+      "updated": "2026-09-18",
+      "canonicalProject": "dementor-club",
+      "canonicalLocation": "operations/BOARD_RELATIONS_G7_RELEASE_CANDIDATE_2026-09-18.md",
+      "relation": "G7_RELEASE_CANDIDATE_EVIDENCE",
+      "result": "dementor-club.result.board-relations-v1",
+      "productionBaseCommit": "2dae3b6ece79652c81af780c049521fda7262726",
+      "releaseBranch": "release/board-relations-v1",
+      "releaseCandidateCommit": "84488dee34358b4b3efdc0f7d09a992ae88b8dd0",
+      "pullRequest": 226,
+      "validationRun": 1223,
+      "validationRunId": 35335597023,
+      "validationConclusion": "SUCCESS",
+      "exactDiffFileCount": 11,
+      "liveDatabaseMutation": false,
+      "productionMutation": false,
+      "verdict": "G7_CLEAN_RC_PASS",
       "referencedBy": [
         "dementor-club.result.board-relations-v1"
       ]
