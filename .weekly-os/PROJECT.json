@@ -7,12 +7,12 @@
     "projectStage": "VALIDATION",
     "gate": "G6_VALIDATION",
     "status": "APPROVED",
-    "version": "2.21",
+    "version": "2.22",
     "updated": "2026-09-18",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.20"
+    "supersedes": "2.21"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -84,7 +84,7 @@
     "operations/BOARD_VISUAL_TYPE_LANGUAGE_V0.1.md",
     ".weekly-os/results/board-information-architecture-v1.v0.18.md",
     "operations/BOARD_INFORMATION_ARCHITECTURE_V1.md",
-    ".weekly-os/results/board-relations-v1.v1.2.md",
+    ".weekly-os/results/board-relations-v1.v1.3.md",
     "operations/BOARD_RELATIONS_G4_IDENTITY_CONTRACT_2026-09-18.md",
     "operations/BOARD_RELATIONS_G5_PRE_PERSISTENCE_CONTRACT_2026-09-18.md",
     "operations/BOARD_RELATIONS_G5_PERSISTENCE_DESIGN_2026-09-18.md",
@@ -147,7 +147,7 @@
       "authorityType": "APPROVED_AUTHORITY",
       "path": "operations/BOARD_INFORMATION_ARCHITECTURE_V1.md",
       "scope": "Community Board information architecture and lifecycle semantics",
-      "note": "Project-local approved authority. board-relations-v1 v1.2 is the single ACTIVE G6 Batch C Result. G5 runtime contract PASS on exact candidate 20aa71c1db76cbe238c96587523012ecdec7d46f. G6 is BLOCKED on exact production diff boundary because staging-only reconciliation files are inherited outside the Board Relations scope. Live DB mutation and production merge/deploy remain unauthorized."
+      "note": "Project-local approved authority. board-relations-v1 v1.3 is the single ACTIVE G6 Batch C Result. G5 runtime contract PASS on exact candidate 20aa71c1db76cbe238c96587523012ecdec7d46f. G6 diff boundary is PASS_WITH_INHERITED_BASE_DELTA by three-way provenance; 4 staging reconciliation/evidence files are inherited and not Result-owned. Live DB mutation and production merge/deploy remain unauthorized."
     },
     "boardShareReceiveRitualV1": {
       "sourceSystem": "GIT",
@@ -259,9 +259,9 @@
   },
   "currentResult": {
     "artifactId": "dementor-club.result.board-relations-v1",
-    "version": "1.2",
+    "version": "1.3",
     "status": "ACTIVE",
-    "path": ".weekly-os/results/board-relations-v1.v1.2.md",
+    "path": ".weekly-os/results/board-relations-v1.v1.3.md",
     "gate": "G6_VALIDATION",
     "integrationBranch": "result/board-relations-v1",
     "integrationBaseRef": "dementor-club-site",
@@ -275,7 +275,7 @@
     "liveDatabaseMutationAuthorized": false,
     "identityContractEvidence": "operations/BOARD_RELATIONS_G4_IDENTITY_CONTRACT_2026-09-18.md",
     "identityContractStatus": "ACCEPTED",
-    "note": "G6 entered on exact candidate 20aa71c1... after G5 PASS. Preflight exact diff vs production baseline 2dae3b6... contains 4 inherited staging-only reconciliation files beyond the 11 reviewed Board Relations files, so G6 is blocked before release-readiness run. Live DB/staging/production remain unchanged.",
+    "note": "G6 diff boundary resolved by provenance, not branch rewrite. Result-owned delta is exactly 11 Board Relations files from integration base to candidate; 4 reconciliation/evidence files are inherited from integration base and are explicitly excluded from Result scope and future clean G7 RC. Exact-head G6 validation is in progress.",
     "prePersistenceContractEvidence": "operations/BOARD_RELATIONS_G5_PRE_PERSISTENCE_CONTRACT_2026-09-18.md",
     "prePersistenceCheckpoint": "COMPLETE",
     "persistenceDesignEvidence": "operations/BOARD_RELATIONS_G5_PERSISTENCE_DESIGN_2026-09-18.md",
@@ -293,16 +293,16 @@
     "runtimeValidationRunId": 35332109233,
     "runtimeValidationRunNumber": 1222,
     "runtimeValidationConclusion": "SUCCESS",
-    "blockingGate": "G6_DIFF_BOUNDARY",
+    "blockingGate": null,
     "runtimeValidationBlocker": null,
     "previousDragDetailBlockerStatus": "UNRESOLVED_NOT_EXERCISED_IN_1220",
     "filterLineVisibilityStatus": "PASS",
     "dragDetailSuppressionStatus": "PASS_AT_DRAG_ASSERTION_1222",
     "deepLinkStaleFocusStatus": "PASS",
     "permissionInteractionStatus": "PASS",
-    "gateReadiness": "BLOCKED",
+    "gateReadiness": "IN_PROGRESS",
     "g6ValidationEvidence": "operations/BOARD_RELATIONS_G6_DIFF_BOUNDARY_BLOCKER_2026-09-18.md",
-    "g6ValidationStatus": "BLOCKED",
+    "g6ValidationStatus": "IN_PROGRESS",
     "g6CandidateCommit": "20aa71c1db76cbe238c96587523012ecdec7d46f",
     "g6ProductionBaseline": "2dae3b6ece79652c81af780c049521fda7262726",
     "g6Topology": {
@@ -314,7 +314,15 @@
     "g6AllowedImplementationFileCount": 11,
     "g6InheritedUnrelatedFileCount": 4,
     "g6ValidationRunId": null,
-    "g6ValidationConclusion": "BLOCKED_BEFORE_RUN"
+    "g6ValidationConclusion": null,
+    "g6DiffBoundaryStatus": "PASS_WITH_INHERITED_BASE_DELTA",
+    "g6InheritedBaseDelta": [
+      "README.md",
+      "operations/SITE_PRODUCTION_RECONCILIATION_CLASSIFICATION_2026-09-17.md",
+      "operations/SITE_PRODUCTION_RECONCILIATION_INVENTORY_2026-09-17.md",
+      "operations/SITE_PRODUCTION_RECONCILIATION_RESIDUAL_REVIEW_2026-09-17.md"
+    ],
+    "g6ResultOwnedDeltaFileCount": 11
   },
   "waitingResults": [
     {
