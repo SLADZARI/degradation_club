@@ -72,8 +72,11 @@ expect(runtime.includes("card.hidden||card.classList.contains('dc-board-filtered
 
 // Detail integration extends existing card/Artifact overlay surfaces; no parallel shell.
 expect(runtime.includes("card.querySelector(':scope > [data-relation-block]')"),'canonical card relation block integration missing');
-expect(runtime.includes("document.querySelector('.dc-artifact-overlay iframe')"),'existing Artifact overlay/detail integration missing');
-expect(runtime.includes("doc.querySelector('.dc-artifact-record')"),'Artifact canonical detail record integration missing');
+expect(runtime.includes("document.querySelector('.dc-artifact-overlay:not([hidden])')"),'existing Artifact overlay state is not reused');
+expect(runtime.includes("overlay?.querySelector('iframe')"),'existing Artifact iframe/detail owner is not reused');
+expect(runtime.includes("overlay?.querySelector('.dc-artifact-overlay__panel')"),'existing Artifact overlay panel is not reused');
+expect(runtime.includes("host.dataset.relationDetailHost='1'")&&runtime.includes('panel.appendChild(host)'),'relation detail block is not mounted inside canonical Artifact overlay panel');
+expect(css.includes('.dc-board-relation-detail-host'),'Artifact overlay relation block presentation missing');
 for(const forbidden of ['createElement(\'dialog\')','relation-modal','relation-drawer','relation-overlay']){
   expect(!runtime.includes(forbidden),`parallel relation detail shell detected: ${forbidden}`);
 }

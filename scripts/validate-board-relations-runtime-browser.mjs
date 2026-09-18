@@ -203,8 +203,15 @@ try{
       return {state,host:(host?.textContent||'').replace(/\\s+/g,' ').trim(),record:document.querySelectorAll('.dc-artifact-record').length};
     });
     if(artifactDetailState.record!==1)throw new Error(`Artifact detail fixture did not render: ${JSON.stringify(artifactDetailState)} | pageerrors=${errors.join(' | ')}`);
-    await frame.locator('.dc-board-relations-block[data-relation-detail="1"]').waitFor({state:'attached',timeout:4000});
-    expect(((await frame.locator('.dc-board-relations-block[data-relation-detail="1"]').innerText()).replace(/\s+/g,' ')).includes('QA EVENT'),'desktop Artifact detail: relation block not injected into canonical overlay detail');
+    const detailBlock=page.locator('.dc-artifact-overlay__panel > [data-relation-detail-host] .dc-board-relations-block[data-relation-detail="1"]');
+    await detailBlock.waitFor({state:'visible',timeout:4000});
+    expect(((await detailBlock.innerText()).replace(/\s+/g,' ')).includes('QA EVENT'),'desktop Artifact detail: relation block not integrated into canonical overlay panel');
+    const detailGeometry=await page.evaluate(()=>{
+      const panel=document.querySelector('.dc-artifact-overlay__panel')?.getBoundingClientRect();
+      const host=document.querySelector('.dc-artifact-overlay__panel > [data-relation-detail-host]')?.getBoundingClientRect();
+      return panel&&host?{panel:{left:panel.left,right:panel.right,top:panel.top,bottom:panel.bottom},host:{left:host.left,right:host.right,top:host.top,bottom:host.bottom}}:null;
+    });
+    expect(detailGeometry&&detailGeometry.host.left>=detailGeometry.panel.left&&detailGeometry.host.right<=detailGeometry.panel.right&&detailGeometry.host.top>=detailGeometry.panel.top&&detailGeometry.host.bottom<=detailGeometry.panel.bottom,`desktop Artifact detail: relation block escapes canonical overlay panel ${JSON.stringify(detailGeometry)}`);
     await page.locator('.dc-artifact-overlay__close').click();await overlay.waitFor({state:'hidden',timeout:2000});
 
     // Hidden/filtered endpoint removes corresponding canvas lines.
@@ -285,6 +292,23 @@ try{
     expect(state.toggleVisible,'mobile: relation visibility control missing from existing spatial controls');
     expect(state.docWidth<=state.innerWidth+2,`mobile: relation UI creates document overflow ${JSON.stringify(state)}`);
     expect(state.blockWidth<=state.cardWidth+1,`mobile: relation block escapes canonical card ${JSON.stringify(state)}`);
+
+    await page.evaluate(()=>{
+      const node=document.querySelector('.dc-notice[data-artifact-owned="1"]');
+      window.dispatchEvent(new CustomEvent('dc:board-focus-target',{detail:{node,open:true}}));
+    });
+    const mobileOverlay=page.locator('.dc-artifact-overlay');await mobileOverlay.waitFor({state:'visible',timeout:3000});
+    const mobileFrame=page.frameLocator('.dc-artifact-overlay iframe');await mobileFrame.locator('#artifactHost').waitFor({state:'attached',timeout:4000});
+    const mobileDetail=page.locator('.dc-artifact-overlay__panel > [data-relation-detail-host] .dc-board-relations-block[data-relation-detail="1"]');
+    await mobileDetail.waitFor({state:'visible',timeout:4000});
+    const mobileDetailGeo=await page.evaluate(()=>{
+      const panel=document.querySelector('.dc-artifact-overlay__panel')?.getBoundingClientRect();
+      const host=document.querySelector('.dc-artifact-overlay__panel > [data-relation-detail-host]')?.getBoundingClientRect();
+      return panel&&host?{panelW:panel.width,panelH:panel.height,hostW:host.width,hostH:host.height,inside:host.left>=panel.left&&host.right<=panel.right&&host.top>=panel.top&&host.bottom<=panel.bottom}:null;
+    });
+    expect(mobileDetailGeo?.inside===true,`mobile: Artifact relation detail escapes canonical fullscreen panel ${JSON.stringify(mobileDetailGeo)}`);
+    await page.locator('.dc-artifact-overlay__close').click();await mobileOverlay.waitFor({state:'hidden',timeout:2000});
+
     expect(!errors.length,`mobile page errors: ${errors.join(' | ')}`);
     await page.screenshot({path:path.join(outDir,'mobile-390.png'),fullPage:false});
     await ctx.close();
