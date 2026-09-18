@@ -7,12 +7,12 @@
     "projectStage": "BUILD",
     "gate": "G5_BUILD",
     "status": "APPROVED",
-    "version": "2.16",
+    "version": "2.17",
     "updated": "2026-09-18",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.15"
+    "supersedes": "2.16"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -84,11 +84,12 @@
     "operations/BOARD_VISUAL_TYPE_LANGUAGE_V0.1.md",
     ".weekly-os/results/board-information-architecture-v1.v0.18.md",
     "operations/BOARD_INFORMATION_ARCHITECTURE_V1.md",
-    ".weekly-os/results/board-relations-v1.v0.7.md",
+    ".weekly-os/results/board-relations-v1.v0.8.md",
     "operations/BOARD_RELATIONS_G4_IDENTITY_CONTRACT_2026-09-18.md",
     "operations/BOARD_RELATIONS_G5_PRE_PERSISTENCE_CONTRACT_2026-09-18.md",
     "operations/BOARD_RELATIONS_G5_PERSISTENCE_DESIGN_2026-09-18.md",
     "operations/BOARD_RELATIONS_G5_SCHEMA_CONTRACT_VALIDATION_2026-09-18.md",
+    "operations/BOARD_RELATIONS_G5_RUNTIME_BLOCKER_2026-09-18.md",
     "operations/BOARD_TELEGRAM_PROMOTION_V1.md",
     "operations/BOARD_TELEGRAM_WORKER_SCHEDULER_G8_PRODUCTION_VALIDATION_2026-09-12.md",
     "operations/BOARD_INFORMATION_ARCHITECTURE_G8_CLEANUP_INVENTORY_2026-09-12.md",
@@ -142,7 +143,7 @@
       "authorityType": "APPROVED_AUTHORITY",
       "path": "operations/BOARD_INFORMATION_ARCHITECTURE_V1.md",
       "scope": "Community Board information architecture and lifecycle semantics",
-      "note": "Project-local approved authority. board-relations-v1 v0.7 is the single ACTIVE G5 Batch C Result. Runtime adapter + canvas/detail presentation increment authorized; live DB mutation and staging/production merge/deploy remain unauthorized."
+      "note": "Project-local approved authority. board-relations-v1 v0.8 is the single ACTIVE G5 Batch C Result. Runtime browser validation BLOCKED on repeated drag/detail suppression failure. No further mutation until explicit owner decision; live DB and merge/deploy gates remain closed."
     },
     "boardShareReceiveRitualV1": {
       "sourceSystem": "GIT",
@@ -254,9 +255,9 @@
   },
   "currentResult": {
     "artifactId": "dementor-club.result.board-relations-v1",
-    "version": "0.7",
+    "version": "0.8",
     "status": "ACTIVE",
-    "path": ".weekly-os/results/board-relations-v1.v0.7.md",
+    "path": ".weekly-os/results/board-relations-v1.v0.8.md",
     "gate": "G5_BUILD",
     "integrationBranch": "result/board-relations-v1",
     "integrationBaseRef": "dementor-club-site",
@@ -270,7 +271,7 @@
     "liveDatabaseMutationAuthorized": false,
     "identityContractEvidence": "operations/BOARD_RELATIONS_G4_IDENTITY_CONTRACT_2026-09-18.md",
     "identityContractStatus": "ACCEPTED",
-    "note": "Schema contract PASS. Owner authorized the next G5 runtime adapter + canvas/detail presentation increment on result/board-relations-v1 only. Live DB mutation and all merge/deploy gates remain closed.",
+    "note": "G5 runtime browser validation is BLOCKED on repeated same-cause drag/detail suppression failure at exact candidate cc8b2f51... / run #1218. Per owner instruction, stop the fix loop. No live DB, staging/production merge, deploy or G6 work.",
     "prePersistenceContractEvidence": "operations/BOARD_RELATIONS_G5_PRE_PERSISTENCE_CONTRACT_2026-09-18.md",
     "prePersistenceCheckpoint": "COMPLETE",
     "persistenceDesignEvidence": "operations/BOARD_RELATIONS_G5_PERSISTENCE_DESIGN_2026-09-18.md",
@@ -281,7 +282,14 @@
     "integrationPullRequest": 225,
     "validationRunId": 35321118124,
     "validationConclusion": "SUCCESS",
-    "runtimeIncrementAuthorized": true
+    "runtimeIncrementAuthorized": true,
+    "runtimeValidationEvidence": "operations/BOARD_RELATIONS_G5_RUNTIME_BLOCKER_2026-09-18.md",
+    "runtimeValidationStatus": "BLOCKED",
+    "runtimeCandidateCommit": "cc8b2f51ca9dc1f4bdc53dd0210834404bc8ef1c",
+    "runtimeValidationRunId": 35327830885,
+    "runtimeValidationRunNumber": 1218,
+    "runtimeValidationConclusion": "FAILURE",
+    "blockingGate": "RUNTIME_BROWSER_DRAG_DETAIL_SUPPRESSION"
   },
   "waitingResults": [
     {
