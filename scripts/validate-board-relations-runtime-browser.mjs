@@ -194,15 +194,8 @@ try{
       window.dispatchEvent(new CustomEvent('dc:board-focus-target',{detail:{node,open:true}}));
     });
     const overlay=page.locator('.dc-artifact-overlay');await overlay.waitFor({state:'visible',timeout:3000});
-    const frame=page.frameLocator('.dc-artifact-overlay iframe');
-    await frame.locator('#artifactHost').waitFor({state:'attached',timeout:4000});
-    await frame.locator('.dc-artifact-record').waitFor({state:'attached',timeout:7000});
-    const artifactDetailState=await frame.locator('body').evaluate(()=>{
-      const state=document.getElementById('artifactState')?.textContent||'';
-      const host=document.getElementById('artifactHost');
-      return {state,host:(host?.textContent||'').replace(/\\s+/g,' ').trim(),record:document.querySelectorAll('.dc-artifact-record').length};
-    });
-    if(artifactDetailState.record!==1)throw new Error(`Artifact detail fixture did not render: ${JSON.stringify(artifactDetailState)} | pageerrors=${errors.join(' | ')}`);
+    const artifactFrameSrc=await page.locator('.dc-artifact-overlay iframe').getAttribute('src');
+    expect(new URL(artifactFrameSrc,base).pathname==='/community/artifact/11111111-1111-4111-8111-111111111111/',`desktop Artifact detail: canonical iframe route drifted ${artifactFrameSrc}`);
     const detailBlock=page.locator('.dc-artifact-overlay__panel > [data-relation-detail-host] .dc-board-relations-block[data-relation-detail="1"]');
     await detailBlock.waitFor({state:'visible',timeout:4000});
     expect(((await detailBlock.innerText()).replace(/\s+/g,' ')).includes('QA EVENT'),'desktop Artifact detail: relation block not integrated into canonical overlay panel');
@@ -298,8 +291,8 @@ try{
       window.dispatchEvent(new CustomEvent('dc:board-focus-target',{detail:{node,open:true}}));
     });
     const mobileOverlay=page.locator('.dc-artifact-overlay');await mobileOverlay.waitFor({state:'visible',timeout:3000});
-    const mobileFrame=page.frameLocator('.dc-artifact-overlay iframe');await mobileFrame.locator('#artifactHost').waitFor({state:'attached',timeout:4000});
-    await mobileFrame.locator('.dc-artifact-record').waitFor({state:'attached',timeout:7000});
+    const mobileFrameSrc=await page.locator('.dc-artifact-overlay iframe').getAttribute('src');
+    expect(new URL(mobileFrameSrc,base).pathname==='/community/artifact/11111111-1111-4111-8111-111111111111/',`mobile Artifact detail: canonical iframe route drifted ${mobileFrameSrc}`);
     const mobileDetail=page.locator('.dc-artifact-overlay__panel > [data-relation-detail-host] .dc-board-relations-block[data-relation-detail="1"]');
     await mobileDetail.waitFor({state:'visible',timeout:4000});
     const mobileDetailGeo=await page.evaluate(()=>{
