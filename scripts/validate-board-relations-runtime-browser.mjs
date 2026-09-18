@@ -175,12 +175,15 @@ try{
 
     const ownBlock=page.locator('.dc-notice[data-artifact-owned="1"] [data-relation-block]');
     await ownBlock.waitFor({state:'attached',timeout:3000});
+    await ownBlock.evaluate(el=>el.open=true);
     const ownText=(await ownBlock.innerText()).replace(/\s+/g,' ');
     expect(ownText.includes('СВЯЗАНО С')&&ownText.includes('QA EVENT'),`desktop detail: RELATED_TO missing ${ownText}`);
     expect(ownText.includes('О')&&ownText.includes('QA COURSE'),`desktop detail: ABOUT forward presentation missing ${ownText}`);
 
     const courseBlock=page.locator('[data-board-source="platform"][data-source-type="course"] [data-relation-block]');
     const practiceBlock=page.locator('[data-board-source="platform"][data-source-type="practice"] [data-relation-block]');
+    await courseBlock.evaluate(el=>el.open=true);
+    await practiceBlock.evaluate(el=>el.open=true);
     const courseText=(await courseBlock.innerText()).replace(/\s+/g,' ');
     const practiceText=(await practiceBlock.innerText()).replace(/\s+/g,' ');
     expect(courseText.includes('УПОМИНАЕТСЯ В')&&courseText.includes('OWN ARTIFACT'),`desktop detail: ABOUT inverse presentation missing ${courseText}`);
@@ -215,13 +218,28 @@ try{
     await page.waitForFunction(()=>document.querySelectorAll('.dc-board-relation-line').length===3,{timeout:3000});
 
     // Real existing drag owner moves card; relation layer follows style/position changes.
+    await page.evaluate(()=>{
+      const node=document.querySelector('.dc-notice[data-artifact-owned="1"]');
+      window.dispatchEvent(new CustomEvent('dc:board-focus-target',{detail:{node,open:false}}));
+    });
+    await page.waitForTimeout(180);
+    const ownCard=page.locator('.dc-notice[data-artifact-owned="1"]');
+    const movableState=await ownCard.evaluate(card=>({movable:card.classList.contains('is-own-movable'),left:card.style.left,top:card.style.top}));
+    expect(movableState.movable===true,`desktop drag: canonical own-movable state missing ${JSON.stringify(movableState)}`);
     const before=await lineCoords(page,'77777777-7777-4777-8777-777777777771');
-    const title=page.locator('.dc-notice[data-artifact-owned="1"] h3');const box=await title.boundingBox();
+    const beforeCard=await ownCard.evaluate(card=>({left:parseFloat(card.style.left)||0,top:parseFloat(card.style.top)||0}));
+    const title=ownCard.locator('h3');const box=await title.boundingBox();
     if(box){
       await page.mouse.move(box.x+Math.min(40,box.width/2),box.y+Math.min(18,box.height/2));
-      await page.mouse.down();await page.mouse.move(box.x+130,box.y+65,{steps:6});await page.mouse.up();await page.waitForTimeout(250);
+      await page.mouse.down();await page.mouse.move(box.x+130,box.y+65,{steps:6});await page.mouse.up();
+      await page.waitForFunction(({left,top})=>{
+        const card=document.querySelector('.dc-notice[data-artifact-owned="1"]');
+        return card&&(Math.abs((parseFloat(card.style.left)||0)-left)>2||Math.abs((parseFloat(card.style.top)||0)-top)>2);
+      },beforeCard,{timeout:2500});
+      await page.waitForTimeout(120);
+      const afterCard=await ownCard.evaluate(card=>({left:parseFloat(card.style.left)||0,top:parseFloat(card.style.top)||0}));
       const after=await lineCoords(page,'77777777-7777-4777-8777-777777777771');
-      expect(after.x1!==before.x1||after.y1!==before.y1,`desktop drag: relation line did not follow canonical card movement ${JSON.stringify({before,after})}`);
+      expect(after.x1!==before.x1||after.y1!==before.y1,`desktop drag: relation line did not follow canonical card movement ${JSON.stringify({before,beforeCard,afterCard,after})}`);
     }else failures.push('desktop drag: own Artifact title has no bounding box');
 
     // Create success through canonical RPC then one canonical re-read.
