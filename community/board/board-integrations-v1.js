@@ -27,7 +27,8 @@ function renderProjection(item){
   const route=item.publicRoute;
   const location=item.location?`<div class="dc-projection__line" dir="auto">${esc(item.location)}</div>`:'';
   const action=route?`<a class="dc-board-action small" href="${esc(route)}">ОТКРЫТЬ →</a>`:'';
-  return `<article class="${projectionClass(item)}" data-board-source="platform" data-source-mode="${BOARD_SOURCE_MODES.ENTITY_PROJECTION}" data-source-id="${esc(item.sourceId)}" data-source-type="${esc(item.sourceType)}" data-forming="${item.isForming?'1':'0'}">
+  const relationAttrs=item.relationKind&&item.relationSourceId?` data-relation-kind="${esc(item.relationKind)}" data-relation-source-id="${esc(item.relationSourceId)}"`:'';
+  return `<article class="${projectionClass(item)}" data-board-source="platform" data-source-mode="${BOARD_SOURCE_MODES.ENTITY_PROJECTION}" data-source-id="${esc(item.sourceId)}" data-source-type="${esc(item.sourceType)}"${relationAttrs} data-forming="${item.isForming?'1':'0'}">
     <div class="dc-notice__meta"><span>DEMENTOR CLUB / ${esc(item.sourceType.toUpperCase())}</span><span>${esc(statusLabel(item))}</span></div>
     <div class="dc-projection__authority">CLUB / OFFICIAL</div>
     <h3 dir="auto">${esc(item.title)}</h3>
@@ -43,6 +44,8 @@ function markMemberCards(){
     card.dataset.boardSource='member';
     card.dataset.sourceMode=BOARD_SOURCE_MODES.ARTIFACT;
     card.dataset.sourceType='artifact';
+    card.dataset.relationKind='artifact';
+    card.dataset.relationSourceId=card.dataset.artifact||'';
     card.dataset.forming='0';
   });
 }
