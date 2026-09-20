@@ -7,12 +7,12 @@
     "projectStage": "RELEASE",
     "gate": "G8_CLEANUP",
     "status": "APPROVED",
-    "version": "2.29",
+    "version": "2.30",
     "updated": "2026-09-20",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.28"
+    "supersedes": "2.29"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -111,6 +111,7 @@
     "operations/PUBLIC_SITE_VISUAL_HARMONIZATION_LIVE_SMOKE_2026-09-10.md",
     ".weekly-os/results/dc9-membership-semantic-integrity-v1.v1.0.md",
     "operations/MEMBERSHIP_V2_PRODUCTION_FLOW_QA_2026-09-02.md",
+    "operations/STABILIZATION_BQA_TRIAGE_2026-09-20.md",
     ".weekly-os/results/workspace-top-navigation.v1.0.md",
     ".weekly-os/results/qa-portal-harmonization.v1.0.md",
     "README.md",
@@ -279,7 +280,7 @@
     "liveDatabaseMutationAuthorized": true,
     "identityContractEvidence": "operations/BOARD_RELATIONS_G4_IDENTITY_CONTRACT_2026-09-18.md",
     "identityContractStatus": "ACCEPTED",
-    "note": "Board Relations v1 is released to production at 2b17d54f.... Canonical backend run 35337545873 and Pages run 35337764457 both succeeded; board_relations_v1 migration is live. The previous tooling-auth blocker is historical. Current gate is live QA/stabilization and G8 cleanup; stable product acceptance is not yet claimed.",
+    "note": "Board Relations v1 is released to production at 2b17d54f.... Canonical backend run 35337545873 and Pages run 35337764457 both succeeded; board_relations_v1 migration is live. Current gate is G8 live QA/stabilization. Parent stabilization issue #228 is active; first clean corrective batch is #229 (BQA-11/12/13 public Activity truth boundary). Stable product acceptance is not yet claimed.",
     "prePersistenceContractEvidence": "operations/BOARD_RELATIONS_G5_PRE_PERSISTENCE_CONTRACT_2026-09-18.md",
     "prePersistenceCheckpoint": "COMPLETE",
     "persistenceDesignEvidence": "operations/BOARD_RELATIONS_G5_PERSISTENCE_DESIGN_2026-09-18.md",
@@ -701,5 +702,14 @@
     "global Dementor role, scoped dc_entity_assignments role=dementor or Board Relations permission as Contribution editorial/reviewer authority",
     "WITHDRAWN as erasure of historical Contribution RECEIVED or automatic reversal of already-established #214 activation evidence",
     "project-wide CONTRIBUTION_MODEL_V1 approval from Contribution Inbound & Editorial Workflow v1"
-  ]
+  ],
+  "stabilization": {
+    "status": "ACTIVE",
+    "parentIssue": 228,
+    "plan": "operations/STABILIZATION_BQA_TRIAGE_2026-09-20.md",
+    "activeBatchIssue": 229,
+    "activeBatch": "PUBLIC_ACTIVITY_TRUTH_BOUNDARY",
+    "scopeFreeze": true,
+    "nextAfterStable": "CONTRIBUTION_RECEIPT_RUNTIME_THEN_ISSUE_227"
+  }
 }
