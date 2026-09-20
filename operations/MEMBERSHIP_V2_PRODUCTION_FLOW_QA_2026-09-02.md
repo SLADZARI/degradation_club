@@ -1518,3 +1518,54 @@ Ordinary user images are normalized in-browser to a bounded WebP representation 
 **Status**
 BACKLOG / MEDIA PIPELINE HARDENING.
 Implementation should be grouped with the current media Result only after owner inventory and exact BQA-11/BQA-14 root causes are known.
+
+
+#### BQA-21 — Project video fragment does not render on public Projects page
+Severity: **P1 / PUBLIC MEDIA EXPERIENCE**
+
+**FACT**
+On the public Projects surface, a section labeled `LIVE FRAGMENT` / `VIDEO ↗` renders as a large black media area without visible video content or playback affordance.
+
+The second live mobile screenshot confirms the surrounding Projects page content and Board CTA render normally, so the failure is scoped to the project media/video presentation rather than the whole page.
+
+**User impact**
+- a primary project proof/experience is replaced by an empty black block;
+- mobile viewport is consumed by non-functional media;
+- the user receives a strong promise (`VIDEO`) but no experience.
+
+**QA classification**
+Public media rendering defect until exact source/owner inventory proves otherwise.
+
+**Required inventory before fix**
+- canonical Projects media owner;
+- source URL / embed type for this project;
+- whether the page expects YouTube/Vimeo/native video/iframe;
+- mobile autoplay / playsinline / controls contract;
+- poster/fallback behavior;
+- CSP / iframe allowlist / mixed-content issues;
+- lazy-loading / intersection-observer behavior;
+- whether the source still exists and is publicly reachable.
+
+**Required reproduction**
+- iOS Safari;
+- mobile Chromium where available;
+- desktop Chromium;
+- reload while section is in viewport;
+- open direct project media URL;
+- verify network/embed errors;
+- verify controls/poster/iframe DOM;
+- test with and without reduced-data/low-power conditions if relevant.
+
+**Failure-state requirement**
+If the video source cannot render, do not leave a full-height black rectangle. Show a stable poster/fallback plus an explicit `ОТКРЫТЬ ВИДЕО` / external-link action using the existing media owner.
+
+**Acceptance**
+- valid project video displays or exposes a working play/open path on mobile and desktop;
+- no empty black media block;
+- aspect ratio remains stable;
+- fallback does not create a second media system;
+- public page remains performant and accessible.
+
+**Status**
+OPEN / LIVE MOBILE EVIDENCE CAPTURED.
+Root cause pending exact project/media source inspection.
