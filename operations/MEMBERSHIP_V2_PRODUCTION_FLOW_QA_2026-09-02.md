@@ -1286,3 +1286,68 @@ Likely separate transport/OG owner; do not mix with Board card rendering unless 
 This is a Board Relations UX hardening finding, not a new relation architecture Result by default.
 
 No implementation is authorized by this triage. Next step is owner inventory + exact reproduction before grouping into one or more Results.
+
+
+#### BQA-16 — Hide relations control does not hide visible lines
+Severity: **P1 / FUNCTIONAL UX**
+
+**FACT**
+On live mobile Board, activating the relation visibility control does not remove the currently visible relation lines.
+
+The screenshot shows the relation layer still rendered after the user attempts to hide it.
+
+**Expected**
+The existing Board Information Architecture explicitly requires a `SHOW RELATIONS / HIDE RELATIONS` toggle. When hidden, relation lines should disappear without mutating relation data.
+
+**Actual**
+The control state/action does not produce the expected presentation change.
+
+**QA classification**
+Runtime/presentation defect inside the existing canonical Board Relations owner. Do not create a second relation visibility mechanism.
+
+**Required reproduction**
+- mobile Safari / iOS;
+- desktop Chromium;
+- with at least one visible relation;
+- toggle visible → hidden → visible;
+- refresh after each state;
+- verify whether state is ephemeral or persisted by current contract;
+- verify filters + relation toggle together.
+
+**Acceptance**
+- hide removes all relation-line presentation immediately;
+- show restores the same currently valid relation lines;
+- relation data remains unchanged;
+- no stale SVG/line node remains visible;
+- filters/drag/fullscreen continue to work.
+
+---
+
+#### BQA-17 — Relations should be opt-in at first Board entry
+Severity: **P1 / INFORMATION HIERARCHY**
+
+**OBSERVATION**
+On first Board entry the relation layer is visually prominent and adds cognitive load before the user has chosen to inspect relationships.
+
+Owner UX proposal from live QA:
+- default Board presentation starts with relations hidden;
+- expose a clear `СВЯЗИ` control;
+- only render/show the relation layer after explicit user activation.
+
+**Why this matters**
+The Board Product Model is Things-first and the card/detail should help the user understand the Thing before exposing secondary structure. Relations are context, not the primary first-frame experience.
+
+**Status**
+This is a **UX proposal requiring authority/design check**, not yet an approved behavior change.
+
+**Validation questions**
+- Does first-time comprehension improve with relations hidden?
+- Can returning users still quickly reveal relations?
+- Is the control discoverable without dominating the screen?
+- Does hidden-by-default reduce confusion on mobile?
+- Should the preference persist per user/session, or reset each visit?
+
+**Acceptance candidate**
+First Board entry is legible without relation noise, and relation context becomes available through one clear control without losing data or discoverability.
+
+Do not implement until current relation-layer owner and state contract are inventoried.
