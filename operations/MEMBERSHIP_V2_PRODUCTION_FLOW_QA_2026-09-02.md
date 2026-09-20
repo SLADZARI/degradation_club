@@ -1391,3 +1391,54 @@ On mobile, the first Board viewport prioritizes the living spatial Board. Offici
 **Status**
 OPEN / UX PROBLEM CONFIRMED BY USER TEST + LIVE SCREENSHOT.
 Exact interaction solution requires design/owner inventory before implementation.
+
+
+#### BQA-19 — Artifact detail can remain stuck in LOADING
+Severity: **P0/P1 / FUNCTIONAL ACCESS + MOBILE**
+
+**FACT**
+On live mobile Board, opening an Artifact can produce a detail surface that remains in a loading state:
+- header state: `LOADING`;
+- body: `ЗАГРУЖАЕМ ARTIFACT…`;
+- relation section still renders separately below.
+
+The user reported that the card did not load.
+
+A second screenshot from the same live session shows the same Board later rendering a different card normally, which suggests the Board shell itself is alive and the failure is likely scoped to Artifact detail resolution/loading rather than a total page failure.
+
+**User impact**
+- user opens a Thing but receives no content;
+- Board context is interrupted by a dead-end detail surface;
+- relation controls may appear while primary Thing content is unresolved, which makes the state especially confusing.
+
+**QA classification**
+Functional runtime defect until proven otherwise.
+
+Do not treat this as a mere slow network case without reproduction/evidence.
+
+**Required reproduction**
+- exact Artifact/Thing id if recoverable from URL/state;
+- iOS Safari / in-app browser;
+- open from Board card;
+- open from share/deep-link if same target is available;
+- refresh while detail is open;
+- close → reopen;
+- test same Artifact on desktop Chromium;
+- test another Artifact in same session;
+- inspect network/API response and timeout/error path;
+- verify whether media payload, permission resolution or detail adapter stalls;
+- verify stale `focus=artifact:...` state handling.
+
+**Failure-state requirement**
+If detail cannot resolve, the UI must fail closed into a clear recoverable error state rather than indefinite `LOADING`.
+
+**Acceptance**
+- target Artifact resolves and renders within normal loading bounds; or
+- if unavailable/denied/error, the canonical detail owner shows a stable explicit error/missing state;
+- no indefinite spinner/loading placeholder;
+- close/back returns cleanly to Board;
+- relation section must not imply a successful target resolution when the primary detail failed.
+
+**Status**
+OPEN / LIVE REPRODUCTION EVIDENCE CAPTURED.
+Root cause and exact owner inventory pending.
