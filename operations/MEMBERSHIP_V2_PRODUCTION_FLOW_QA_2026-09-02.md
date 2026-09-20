@@ -1102,3 +1102,187 @@ First collect enough evidence to distinguish:
 - canonical-owner defect from duplicate-owner temptation.
 
 This section authorizes **QA collection only**. It does not authorize runtime/schema/access-model mutation or production deployment.
+
+
+### 19.12 Live findings — 2026-09-20
+
+Status: **OPEN / EVIDENCE COLLECTED / ROOT-CAUSE INVENTORY PENDING**
+
+Source: owner live mobile QA screenshots and direct observation on 2026-09-20.
+
+#### BQA-11 — Board media does not propagate into public/current-program presentation
+Severity: **P1 / INFORMATION LOSS**
+
+**FACT**
+Board-origin Things/cards with image/media can appear on the public `СЕЙЧАС В КЛУБЕ` surface without their media. The public card falls back to a large numeric placeholder (`01 / 02 / 03`) even when the source Board object contains an image.
+
+**Observed impact**
+- public card becomes materially less informative;
+- image-backed Thing loses the strongest proof/context available in the source;
+- this conflicts with Board Product Model guidance that media should be exposed when it is the experience or a strong proof.
+
+**QA classification**
+Likely projection/composition defect, not authorization to add a second media owner.
+
+**Required inventory before fix**
+- current Board media owner;
+- ThingProjection media field;
+- Current Program/public composition field mapping;
+- fallback/placeholder rules;
+- mobile image loading behavior.
+
+**Acceptance**
+If an eligible projected Thing has canonical readable media, the public/current-program card uses that media according to the existing card system. No duplicate upload or parallel image field is introduced.
+
+---
+
+#### BQA-12 — Every new Board publication appears on Home / public activity
+Severity: **P0/P1 / PRODUCT SEMANTICS + VISIBILITY**
+
+**FACT**
+Current behavior appears to promote every newly published Board item into the public `СЕЙЧАС В КЛУБЕ` surface.
+
+**Expected**
+Board publication/existence must not automatically equal public editorial prominence.
+
+Canonical content/programming rule already states:
+`THING EXISTENCE ≠ PROGRAM RELEVANCE`
+
+and editorial outbound/program prominence requires a real Programming Moment / editorial reason.
+
+**Observed risk**
+- private-ish/internal notes can leak into a public-facing program surface;
+- Home becomes a mirror of Board activity instead of an editorial program;
+- weak/test/internal cards dilute the product;
+- users may infer that “publish to Board” means “publish to everyone”.
+
+**QA classification**
+This is both a behavior bug and an access/visibility decision boundary.
+
+**Do not fix by**
+- hiding random cards client-side;
+- adding a second Home-only publishing system;
+- equating reaction count alone with public relevance.
+
+**Required decision/inventory**
+Determine the canonical promotion gate from Board/ThingProjection into Home/Current Program:
+- explicit Programming Moment / editorial inclusion;
+- current meaningful relation/history signal where relevant;
+- explicit public eligibility;
+- actual visibility permission.
+
+Until authority is resolved, no assumption that “has relation + interest” alone is sufficient. The user's observed need is valid, but exact promotion semantics require authority check.
+
+**Acceptance**
+A new Board publication does not appear on public Home merely because it exists. Public Home shows only objects that are both:
+1. allowed for public visibility; and
+2. editorially selected/relevant under the Current Program / Programming contract.
+
+---
+
+#### BQA-13 — Visibility layers are not explicit enough at publish time
+Severity: **P0/P1 / PRIVACY EXPECTATION**
+
+**FACT**
+Live use now demonstrates the concrete need to distinguish at least:
+- public;
+- authenticated/Board-readable;
+- creator/private draft;
+- scoped collaborators/contributors;
+- Member;
+- Dementor-scoped;
+- Owner/Admin operational.
+
+The project does **not** yet have authority to materialize all of these as generic new access levels.
+
+**Observed risk**
+A user can create a note believing it is “for us” while the system may expose it more broadly through Board/Home/share projections.
+
+**QA requirement**
+For every creation/publish flow, capture:
+`what user thinks audience is → actual audience → enforcement owner`.
+
+**Acceptance**
+No content becomes public merely through projection/composition unless the canonical visibility owner permits it. UI wording must not imply privacy that is not enforced server-side.
+
+---
+
+#### BQA-14 — Shared Artifact preview image is broken/cropped
+Severity: **P1 / DISTRIBUTION EXPERIENCE**
+
+**FACT**
+Telegram share preview for an Artifact renders a visibly broken/cropped image area: only the upper strip of the intended image is visible and the rest appears as a flat gray block.
+
+**Product impact**
+The share transport does not preserve the Thing's visual context and weakens the entry experience before the recipient reaches Dementor.
+
+Distribution authority requires the preview/transport to preserve the promise and route to the exact Entry Object; person-mediated share may extend a Thing without creating a Programming Moment, but the preview must not visually misrepresent the Thing.
+
+**Required inventory before fix**
+- current `/share/artifact/?id=...` transport owner;
+- OG/social image source;
+- generated raster dimensions;
+- object-fit/crop pipeline;
+- Telegram cache behavior;
+- whether source media is public-safe for preview.
+
+**Acceptance**
+A shared Artifact produces a stable social preview with correct aspect/crop and no gray/broken region, without exposing private Artifact body/media before authorization.
+
+---
+
+#### BQA-15 — Relation selector becomes visually unscalable
+Severity: **P1 / USABILITY + SCALE**
+
+**FACT**
+On mobile, the relation target selector already displays a long visually dense list of entries such as:
+- `РЕЗУЛЬТАТ ДЛЯ · …`
+- `ПРОДОЛЖАЕТ · …`
+- `О · …`
+- `СВЯЗАНО С · …`
+
+With the current small number of cards the list is already difficult to scan. Growth in card count will multiply target × relation-type combinations and make the selector impractical.
+
+**Root interaction issue**
+The UI appears to present a flattened cross-product of:
+`relation type × target`
+instead of helping the user first identify the Thing and then the meaning of the relation.
+
+**Do not infer implementation yet.**
+The approved relation meanings remain valid; this finding concerns interaction/presentation, not a request for new relation ontology.
+
+**QA questions**
+- Can the user find a known target in under 10 seconds?
+- Can the user distinguish relation type from target name?
+- Does the list remain usable at 20 / 50 / 100 visible Things?
+- Does mobile remain keyboard/search accessible?
+- Is there an existing canonical target picker/search component to extend?
+
+**Acceptance**
+Relation creation remains understandable and operable as Board size grows. The UI must not render an unbounded flat relation-type × target list as the only path if that fails usability validation.
+
+---
+
+### 19.13 Immediate triage from these findings
+
+Group the observations before implementation:
+
+**Cluster A — Public projection / visibility**
+- BQA-11 media loss in public projection;
+- BQA-12 automatic Home promotion;
+- BQA-13 visibility expectation/layers.
+
+Likely shared boundary:
+`Board source → ThingProjection → Current Program / public composition → visibility gate`.
+
+**Cluster B — Share transport**
+- BQA-14 broken Artifact preview image.
+
+Likely separate transport/OG owner; do not mix with Board card rendering unless inventory proves one owner.
+
+**Cluster C — Relations interaction scale**
+- BQA-15 relation selector scalability.
+
+This is a Board Relations UX hardening finding, not a new relation architecture Result by default.
+
+No implementation is authorized by this triage. Next step is owner inventory + exact reproduction before grouping into one or more Results.
