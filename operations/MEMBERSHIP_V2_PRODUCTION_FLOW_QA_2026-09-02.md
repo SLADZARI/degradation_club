@@ -1442,3 +1442,79 @@ If detail cannot resolve, the UI must fail closed into a clear recoverable error
 **Status**
 OPEN / LIVE REPRODUCTION EVIDENCE CAPTURED.
 Root cause and exact owner inventory pending.
+
+
+#### BQA-20 — Client-side image normalization before Storage upload
+Severity: **P1 / PERFORMANCE + STORAGE + MEDIA CONSISTENCY**
+
+**OBSERVATION / PROPOSAL**
+Current Board composer uploads the selected JPEG / PNG / WebP file substantially as-is into the canonical private Supabase bucket `dc-community-artifacts`.
+
+Given current Free-tier storage/egress constraints and the newly observed public/share media issues, the upload pipeline should be evaluated for client-side normalization before Storage upload.
+
+**Canonical owner to extend**
+Existing Board composer / Artifact media upload path in `community/board/board.js`.
+
+Do not create:
+- a second media table;
+- a second bucket;
+- a parallel upload service;
+- duplicate media ownership.
+
+**Target behavior to validate**
+`user selects image → browser decode/resize → WebP encode → size check → upload normalized file → dc_artifact_media metadata`
+
+**Candidate technical contract**
+- accepted input remains JPEG / PNG / WebP;
+- resize longest edge to approximately **1600–1920 px**;
+- encode to WebP at approximately **0.80–0.85 quality**;
+- target ordinary output roughly **200–500 KB** where source content allows;
+- if normalized output is unexpectedly larger than the original, keep the smaller valid representation;
+- preserve source metadata in `dc_artifact_media.metadata`:
+  - original filename;
+  - original MIME;
+  - original byte size;
+  - original dimensions where available;
+  - normalized MIME;
+  - normalized byte size;
+  - normalized dimensions;
+- resulting Storage object uses `.webp` and `image/webp`;
+- image decode/encode failure must produce a recoverable composer error and must not publish a broken Artifact;
+- orientation must remain visually correct after normalization;
+- user-supplied EXIF / location metadata should not be relied upon downstream and should not survive by accident if canvas-based re-encode strips it.
+
+**Why this belongs in current QA/media cluster**
+Expected benefits:
+- substantially lower Supabase Storage use;
+- substantially lower media egress;
+- faster Board card/detail loading;
+- more predictable dimensions/MIME for Current Program/Home projection;
+- more predictable source for Share / OG preview generation;
+- one canonical browser-upload representation instead of arbitrary phone-camera payloads.
+
+This improvement does **not** by itself resolve:
+- BQA-11 Home/public media projection;
+- BQA-14 Share/OG broken crop;
+- visibility/publication permission.
+
+Those remain separate projection/transport/access findings.
+
+**Required validation**
+- iOS Safari photo from camera roll;
+- Android/Chromium equivalent where available;
+- desktop JPEG/PNG/WebP;
+- portrait and landscape;
+- transparent PNG;
+- large phone image near current 4 MB UI limit;
+- small image that should not be needlessly enlarged;
+- upload → Board render → detail render;
+- signed URL still resolves canonical private media;
+- publish failure cleanup removes orphan upload;
+- archived/remove behavior still deletes/retains media according to current canonical contract.
+
+**Acceptance candidate**
+Ordinary user images are normalized in-browser to a bounded WebP representation before the existing canonical Storage upload, with no new media owner and no regression in Board/detail/share projection contracts.
+
+**Status**
+BACKLOG / MEDIA PIPELINE HARDENING.
+Implementation should be grouped with the current media Result only after owner inventory and exact BQA-11/BQA-14 root causes are known.
