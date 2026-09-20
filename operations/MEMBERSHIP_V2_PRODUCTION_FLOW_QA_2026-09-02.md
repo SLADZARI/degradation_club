@@ -1351,3 +1351,43 @@ This is a **UX proposal requiring authority/design check**, not yet an approved 
 First Board entry is legible without relation noise, and relation context becomes available through one clear control without losing data or discoverability.
 
 Do not implement until current relation-layer owner and state contract are inventoried.
+
+
+#### BQA-18 — Official projections consume too much first-screen Board space
+Severity: **P1 / MOBILE INFORMATION HIERARCHY**
+
+**FACT**
+External-to-core testing raised a repeated complaint that the fixed/official projection cards at the top of the Board — currently including examples such as:
+- course `ДЕНЬГИ НА ВЕТЕР`;
+- project `DEMENTOR LAB`;
+- event `ФУЭНХИРОЛА`;
+
+consume a disproportionate amount of the initial mobile viewport before the user reaches the living spatial Board content.
+
+The current live screenshot confirms that a substantial part of the first screen is occupied by the official-projection row plus shell/filter controls, leaving the actual Board cards below the fold/partially obscured.
+
+**User impact**
+- user enters the Board but does not immediately see the living Board;
+- persistent official containers compete with current Things for attention;
+- the Board can feel like a portal/navigation page instead of a spatial map of current club life;
+- on mobile the cost is especially high because vertical space is scarce.
+
+**Product boundary**
+Board Information Architecture allows Project / Event / Program projections, but they are supporting projections and must not compete with Things for the primary role of the Board.
+
+This finding does **not** authorize removing those projections or creating a second navigation surface.
+
+**QA questions**
+- Can a first-time mobile user see at least one real current Board Thing without scrolling?
+- How much of the first viewport is consumed by shell + filters + official projections?
+- Are all top projections relevant enough to be permanently pinned?
+- Could the existing projection row become collapsible / horizontally compact / context-triggered without losing discoverability?
+- Do desktop and mobile need different density while preserving one canonical projection owner?
+- Are some of these items better represented in Current Program/Home than as persistent Board chrome?
+
+**Acceptance candidate**
+On mobile, the first Board viewport prioritizes the living spatial Board. Official Project/Event/Course projections remain discoverable but do not permanently consume a dominant share of the initial screen.
+
+**Status**
+OPEN / UX PROBLEM CONFIRMED BY USER TEST + LIVE SCREENSHOT.
+Exact interaction solution requires design/owner inventory before implementation.
