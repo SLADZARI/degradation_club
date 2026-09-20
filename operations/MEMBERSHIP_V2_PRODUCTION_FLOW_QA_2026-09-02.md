@@ -1627,3 +1627,16 @@ A user who wants to start a course or project can, without core-team explanation
 **Status**
 OPEN / USER-REPORTED PRODUCT GAP.
 Requires authority + current owner inventory before implementation because changing Project/Program creation ownership is a semantic boundary.
+
+**Owner direction captured 2026-09-20 (NOT YET CANON / requires decision package)**
+- registered/authenticated users: consume/react to existing Things within current access rules;
+- active Members: may bring/publish an idea and express intent to develop it into a Course / Project / Product, but do **not** create the canonical Course / Project automatically;
+- candidate development should be informed by real signals such as interest and meaningful relations;
+- proposed gate: **2 independent Dementor supports** before the idea can move toward canonical Course / Project / Product creation;
+- canonical Course / Project / Product creation is proposed as a Dementor-side action, while the resulting owner/lead may be the Member who initiated the idea;
+- final decision should remain manual in v1; no automatic entity creation from thresholds;
+- exact meaning of the two Dementor supports is unresolved: support signal vs authoritative approval.
+
+**Authority conflict to resolve before implementation**
+Current approved Contribution Inbound & Editorial Workflow v1 says editorial/review authority is `OWNER_ADMIN ONLY` and explicitly states `GLOBAL DEMENTOR ≠ CONTRIBUTION REVIEWER`. Current Board authority also states Dementor role alone does not grant global moderation. Therefore any implementation where two Dementor approvals become authoritative must go through Change Control / Change Proposal rather than a silent BQA-22 UX fix.
+
