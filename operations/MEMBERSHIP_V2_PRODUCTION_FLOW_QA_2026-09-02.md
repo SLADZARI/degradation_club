@@ -4,6 +4,7 @@ Status: **ACTIVE / MEMBERSHIP V2 CORE PASS / DC-9 SEMANTIC INTEGRITY QA-MEM-035�
 Date opened: **2026-09-02**  
 Last live regression pass: **2026-09-08**  
 Operating update: **2026-09-08**  
+Behavioral QA extension: **2026-09-20**  
 Environment: **PRODUCTION / https://dementor.club**  
 Source of truth: `dementor-club`  
 Implementation branch: **per Result; closed DC-9 Result has no active integration branch**  
@@ -862,3 +863,242 @@ Branch audit was completed. Old merged implementation branches are no longer act
 This closure does **not** close `dementor-club.result.board-access-control-v2`. Board remains **WAITING** for its residual authenticated Guest / State5 / OwnerAdmin role-state retests, even though mobile Board spot-check and phone → desktop card-position persistence are now live-confirmed.
 
 **QA-MEM-035…042 are closed. DC-9 / Membership Semantic Integrity Result is closed at G8_CLEANUP.**
+
+
+## 19. Board / Participation Behavioral QA — external-to-core — 2026-09-20
+
+Status: **ACTIVE QA / EVIDENCE COLLECTION / NO IMPLEMENTATION AUTHORIZATION**
+
+### 19.1 Why this layer exists
+
+The 2026-09-19 Gabil / Zhenya / Nikita pilot and the first live Board use exposed a class of failures not adequately represented by technical PASS/FAIL alone.
+
+The primary test subject is an **external-to-core user**: a person who knows Dementor Club and can participate, but is not present in the daily implementation context.
+
+A scenario is not considered behaviorally passed merely because the button works or the RPC succeeds. The user must be able to understand the context, discover the action, predict its consequence closely enough, perform it, understand what happened, and later recover the continuation without a core-team explanation.
+
+Primary behavioral chain:
+
+`ENTRY → UNDERSTAND → OPEN → ACT → CONSEQUENCE → RETURN`
+
+Canonical product constraints remain owned by Product Thesis / CJM / Board Participation authorities. This section is QA evidence only and does not silently redefine product semantics.
+
+### 19.2 Evidence fields for behavioral findings
+
+For each behavioral finding capture:
+
+- **FACT / observed failure**;
+- **EXPECTED BY USER** — what the user believed would happen;
+- **ACTUAL** — what happened;
+- **PROMPT REQUIRED?** — whether Zhenya/Nikita/core team had to explain the next move;
+- **CONSEQUENCE UNDERSTOOD?** — whether the user could explain what their action changed;
+- **RETURN RECOVERABLE?** — whether the user could find the Thing/action again after refresh or later return;
+- **user state / role**;
+- **surface / route**;
+- **current canonical owner**;
+- **severity**;
+- **authority / decision requirement**;
+- **Result / Gate if implementation becomes necessary**;
+- **validation evidence required**.
+
+Behavioral verdicts:
+
+- **UNASSISTED PASS** — the user completes and understands the scenario without explanation;
+- **ASSISTED PASS** — runtime works, but explanation from the core team is required;
+- **FAIL** — the intended action or consequence is not achievable/understandable;
+- **PRODUCT GAP** — the user job is valid but no approved/runtime capability currently closes it;
+- **DECISION NEEDED** — the observed need would change access, entity/state meaning, ownership or another approved boundary.
+
+An **ASSISTED PASS is not closure** for discoverability/comprehension findings.
+
+### 19.3 Manual behavioral suite
+
+Run at minimum with Gabil and other external-to-core testers:
+
+| ID | Scenario | Main question |
+|---|---|---|
+| BQA-01 | Telegram/share → received Artifact | Does the user understand what was received and what they can do next? |
+| BQA-02 | received Artifact → Board context | Does the user understand where they are and how the Artifact relates to the Board? |
+| BQA-03 | card/detail → close/minimize/back | Can the user recover Board context without instruction? |
+| BQA-04 | relation create | Can the user discover the relation action without being told where it is? |
+| BQA-05 | relation consequence | After create/delete/refresh, does the user understand what relation changed and where it is visible? |
+| BQA-06 | another person's Thing | Can the user understand how to react/respond/relate/participate without believing they must take ownership? |
+| BQA-07 | “I have an idea/material” | Can the user find an honest path without needing to understand internal taxonomy? |
+| BQA-08 | authenticated Guest / Applicant Board | Does the user understand what they may do without membership and what remains gated? |
+| BQA-09 | return after 1–3 days | Can the user find a familiar Thing, understand meaningful delta and identify a next move? |
+| BQA-10 | Home / public program → Thing → continuation | Can the user receive value and move to another meaningful Thing without mandatory login/Board explanation? |
+
+Technical persistence, delete, drag, filter, deep-link, mobile/fullscreen and permission assertions already covered by Board/portal regression remain required and must not be duplicated as a second runtime owner.
+
+### 19.4 Context comprehension / meaningful return
+
+Test whether a user returning after absence can answer, without a core-team briefing:
+
+1. What is happening now?
+2. Which Things changed meaningfully?
+3. Which Thing is relevant to me?
+4. What can I do with it?
+5. Where will I see the consequence later?
+
+Do **not** equate this need with approval for a full Activity feed, technical timeline, chat mirror or online-presence system.
+
+First test whether existing Current Program + ThingProjection + Relations + meaningful History/continuation are sufficient.
+
+If they are not sufficient, record the missing context precisely before proposing a new owner/surface.
+
+### 19.5 Action discoverability and reaction-vacuum checks
+
+For every visible card/detail action touched by QA, verify:
+
+`WHAT IS THIS → WHY IS IT INTERESTING → WHAT IS HAPPENING NOW → CAN I DO SOMETHING?`
+
+Then verify:
+
+`ACTION → ACKNOWLEDGEMENT → VISIBLE CONSEQUENCE → RETURN PATH`
+
+Examples include:
+- reaction;
+- response;
+- relation create/delete;
+- share receive/accept/stay;
+- participation action where approved;
+- contribution receipt when such runtime exists.
+
+A technically successful action with no understandable acknowledgement/continuation remains a behavioral finding.
+
+### 19.6 Contribution vs Direct Publish — known product/runtime gap
+
+The external-to-core question:
+
+> “What happens to my idea now? Do I have to carry it myself, can somebody else pick it up, or does it just hang there?”
+
+must not be silently mapped to “create another Artifact”.
+
+Current QA classification:
+
+`BRING → RECEIVED → EDITORIAL LOOK → DISPOSITION → CLOSURE / CONSEQUENCE`
+
+is the target semantic sequence for Contribution, but QA must not report it as implemented merely because Artifact creation exists.
+
+Until a released canonical Contribution receipt runtime exists:
+- classify “bring raw idea/material” failures as **PRODUCT GAP** unless a current authority says otherwise;
+- do not auto-publish raw inbound;
+- do not consume a public Artifact slot by assumption;
+- keep Direct Publish a distinct path;
+- do not build a parallel inbox/editorial queue from QA alone.
+
+### 19.7 Ownership-perception QA
+
+A user must be able to distinguish, in context:
+
+- view;
+- react;
+- respond;
+- relate;
+- participate;
+- bring their own material;
+- create/publish their own Artifact where allowed;
+- moderate/own.
+
+A relation to another Thing does **not** transfer ownership, membership, role or permission.
+
+Test specifically whether a user can add value to another person's Thing without believing:
+- they now own the Thing;
+- they must take the whole project;
+- relation means role assignment;
+- reaction means participation commitment.
+
+### 19.8 Visibility / access layers — QA question, not a new access decision
+
+The 2026-09-19 pilot raised a recurring unresolved product question:
+
+**what is visible to everyone, what only to the creator/contributors, what only to Dementors, and what only to Owner/Admin?**
+
+This section does **not** approve a new multi-level access model.
+
+Known current Board access authority remains `operations/BOARD_ACCESS_AND_OWNER_ADMIN_V2.md`:
+- unauthenticated user cannot open Board;
+- authenticated Guest / Applicant can open/read Board, focus/open live Artifacts, react and respond, but cannot create/move/close Board Artifacts;
+- Member can create under the approved Member rules and control their own Artifact;
+- Dementor role alone does not grant global moderation;
+- Owner Admin has explicit global Board moderation authority;
+- UI visibility is never authorization; canonical RPC/RLS remains authoritative.
+
+Separate from those user-state capabilities, QA must now capture **object/content visibility expectation** for each real pilot object.
+
+Use this provisional QA matrix:
+
+| Visibility question | QA status |
+|---|---|
+| Public / no-auth preview or exact Thing experience | TEST PER OBJECT / authority-dependent |
+| Authenticated Board-readable | CURRENT BOARD AUTHORITY EXISTS |
+| Creator/author-only draft/private state | INVENTORY CURRENT OWNER BEFORE CHANGE |
+| Contributors / scoped project participants | DECISION NEEDED if no current canonical owner |
+| Member-visible | TEST CURRENT RULE; do not infer from “club” wording |
+| Dementor-only | DECISION NEEDED unless an existing authority explicitly owns it |
+| Owner/Admin-only operational/moderation state | CURRENT ROLE AUTHORITY exists only for approved operational scope |
+| Editorial/private inbound Contribution | APPROVED semantic direction; runtime must be verified separately |
+
+For every visibility bug/observation record:
+
+`OBJECT → DATA/FIELD → EXPECTED AUDIENCE → ACTUAL AUDIENCE → CURRENT AUTHORITY → ENFORCEMENT OWNER → UI OWNER`
+
+Mandatory security rule:
+
+**UI-hidden ≠ private.**
+
+Before closing any visibility finding, prove enforcement at the canonical data/RPC/RLS/read-path boundary, not only CSS/conditional rendering.
+
+### 19.9 Visibility pilot cases
+
+Use real cases before inventing generic levels:
+
+- shared Artifact arriving from Telegram;
+- “design/site for food” Thing;
+- Andrus pilot context;
+- Gabil's game/course/idea;
+- a real creator-owned Artifact;
+- a Member-authored Artifact viewed by another Member/Guest;
+- an Owner/Admin moderation case;
+- future Contribution receipt when runtime exists.
+
+For each case answer:
+
+1. Who can discover that the object exists?
+2. Who can open its body/details?
+3. Who can see relations/history?
+4. Who can react/respond?
+5. Who can contribute/participate?
+6. Who can edit the canonical object?
+7. Who can move/hide/moderate its Board projection?
+8. What, if anything, can appear on public Home/Program?
+9. Does share/deep-link preserve the same permission boundary?
+10. Is the privacy enforced server-side?
+
+If no approved authority answers a question, record **DECISION NEEDED** rather than inventing a layer.
+
+### 19.10 Current behavioral acceptance criterion
+
+The primary external-to-core acceptance test is:
+
+> A user who is not in the daily core implementation context enters without assistance, understands what is happening, finds one relevant Thing, understands one available action, performs it, understands the consequence, and can later recover the continuation.
+
+Until this is an **UNASSISTED PASS**, do not close the corresponding usability finding merely because technical sub-tests pass.
+
+### 19.11 Bug collection mode
+
+From 2026-09-20, new Board / Home / share / participation observations may be appended to this ledger before implementation.
+
+Collection order:
+
+`OBSERVATION → CLASSIFY → AUTHORITY CHECK → OWNER INVENTORY → DECISION NEEDED? → GROUP INTO COHERENT RESULT → IMPLEMENT → G6 → RELEASE → LIVE RETEST → G8`
+
+Do not fix each observation immediately.
+
+First collect enough evidence to distinguish:
+- one root-cause UX problem from several symptoms;
+- missing capability from bad discoverability;
+- permission bug from visibility-copy ambiguity;
+- canonical-owner defect from duplicate-owner temptation.
+
+This section authorizes **QA collection only**. It does not authorize runtime/schema/access-model mutation or production deployment.
