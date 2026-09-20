@@ -1569,3 +1569,61 @@ If the video source cannot render, do not leave a full-height black rectangle. S
 **Status**
 OPEN / LIVE MOBILE EVIDENCE CAPTURED.
 Root cause pending exact project/media source inspection.
+
+
+#### BQA-22 — User cannot tell how to create a course or project
+Severity: **P1 / JTBD + CAPABILITY DISCOVERABILITY**
+
+**FACT**
+User feedback: it is unclear how to create a personal course or project.
+
+This is a direct external-to-core usability signal.
+
+**Observed product ambiguity**
+The current Board composer lets a Member create an Artifact publication subtype, but a Course / Program / Project is a canonical entity with a different owner and lifecycle. The UI currently does not make the handoff obvious enough.
+
+A user can reasonably see existing Course / Project projections on Board and infer:
+> “I should be able to create one of these here.”
+
+But the current product does not clearly answer:
+- where that creation starts;
+- who is allowed to create it;
+- whether a raw idea should first be a Contribution / Artifact;
+- when something becomes a real Project / Program;
+- who owns the conversion/approval step.
+
+**Do not solve by**
+- adding `PROJECT` or `COURSE` as just another Artifact subtype;
+- creating a second Project/Course owner inside Board;
+- auto-promoting any idea into a Project;
+- exposing internal ontology first and asking the user to choose.
+
+**Relevant JTBD**
+For the user the job is closer to:
+- “I want to make a course.”
+- “I want to start a project.”
+- “I have an idea and want to understand the next step.”
+
+The product should route that intent to the canonical owner without forcing the user to understand internal entity taxonomy.
+
+**QA questions**
+1. From Board/Home/Workspace, can a Member discover where to start a course/project?
+2. If direct creation is not allowed, is the next valid step explicit?
+3. Does the UI distinguish:
+   `IDEA / CONTRIBUTION → possible Project/Program`
+   from
+   `DIRECT PUBLISH → Artifact`?
+4. Can a user understand what happens after submitting the intent?
+5. Is ownership/approval clear without exposing internal implementation details?
+
+**Acceptance candidate**
+A user who wants to start a course or project can, without core-team explanation:
+- find the entry action;
+- understand what information to provide;
+- understand whether they are creating a draft/proposal or the canonical entity itself;
+- know what happens next;
+- later find the continuation/result.
+
+**Status**
+OPEN / USER-REPORTED PRODUCT GAP.
+Requires authority + current owner inventory before implementation because changing Project/Program creation ownership is a semantic boundary.
