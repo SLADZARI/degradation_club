@@ -4,15 +4,15 @@
     "artifactId": "dementor-club.kernel.artifact-index",
     "project": "dementor-club",
     "documentType": "STANDARD",
-    "projectStage": "BUILD",
-    "gate": "G5_BUILD",
+    "projectStage": "RELEASE",
+    "gate": "G7_RELEASE",
     "status": "APPROVED",
-    "version": "2.35",
+    "version": "2.36",
     "updated": "2026-09-21",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.34"
+    "supersedes": "2.35"
   },
   "currentArtifacts": [
     {
@@ -1785,14 +1785,14 @@
       "documentType": "RESULT",
       "currentVersion": "0.1",
       "status": "ACTIVE",
-      "location": ".weekly-os/results/artifact-share-social-preview-v1.v0.1.md",
+      "location": ".weekly-os/results/artifact-share-social-preview-v1.v0.2.md",
       "sourceSystem": "GIT",
       "authorityType": "IMPLEMENTATION_AUTHORITY",
       "updated": "2026-09-21",
       "canonicalProject": "dementor-club",
       "canonicalLocation": ".weekly-os/results/artifact-share-social-preview-v1.v0.1.md",
       "relation": "CURRENT_RESULT",
-      "gate": "G5_BUILD",
+      "gate": "G7_RELEASE",
       "parentIssue": 228,
       "scope": [
         "STAB-04",
@@ -1809,8 +1809,17 @@
       "productionMergeAuthorized": false,
       "productionDeployAuthorized": false,
       "blockingGate": null,
-      "gateReadiness": "G5_BUILD_IN_PROGRESS",
-      "note": "STAB-04 corrective for BQA-14. Existing share/social owner only; dedicated public-safe 1200×630 preview and stronger binary validation; no private Artifact media exposure."
+      "gateReadiness": "READY_FOR_RELEASE_DECISION",
+      "note": "STAB-04 corrective for BQA-14. Existing share/social owner only; dedicated public-safe 1200×630 preview and stronger binary validation; no private Artifact media exposure.",
+      "version": "0.2",
+      "projectStage": "RELEASE",
+      "candidateCommit": "e51d4bee5b5722bc419f8dd78e0012e8a5ab1907",
+      "releaseCandidateCommit": "e51d4bee5b5722bc419f8dd78e0012e8a5ab1907",
+      "integrationPullRequest": 233,
+      "validationRunNumber": 1230,
+      "validationRunId": 35648978456,
+      "validationConclusion": "SUCCESS",
+      "exactDiffFileCount": 5
     }
   ],
   "referenceArtifacts": [
