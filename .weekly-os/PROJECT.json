@@ -4,15 +4,15 @@
     "artifactId": "dementor-club.kernel.project",
     "project": "dementor-club",
     "documentType": "STANDARD",
-    "projectStage": "RELEASE",
-    "gate": "G7_RELEASE",
+    "projectStage": "BUILD",
+    "gate": "G5_BUILD",
     "status": "APPROVED",
-    "version": "2.46",
+    "version": "2.47",
     "updated": "2026-09-21",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.45"
+    "supersedes": "2.46"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -20,8 +20,8 @@
   "canonicalRepository": "SLADZARI/degradation_club",
   "defaultBranch": "main",
   "semanticSourceBranch": "dementor-club",
-  "projectStage": "RELEASE",
-  "gate": "G7_RELEASE",
+  "projectStage": "BUILD",
+  "gate": "G5_BUILD",
   "readFirst": [
     ".weekly-os/PROJECT.json",
     ".weekly-os/ARTIFACT_INDEX.json",
@@ -140,7 +140,10 @@
     ".weekly-os/results/artifact-share-social-preview-v1.v0.3.md",
     "operations/ARTIFACT_SHARE_SOCIAL_PREVIEW_G7_MERGE_2026-09-21.md",
     ".weekly-os/results/artifact-share-social-preview-v1.v0.4.md",
-    "operations/ARTIFACT_SHARE_SOCIAL_PREVIEW_PAGES_RELEASE_2026-09-21.md"
+    "operations/ARTIFACT_SHARE_SOCIAL_PREVIEW_PAGES_RELEASE_2026-09-21.md",
+    ".weekly-os/results/artifact-share-social-preview-v1.v0.5.md",
+    "operations/ARTIFACT_SHARE_SOCIAL_PREVIEW_LIVE_RETEST_2026-09-21.md",
+    ".weekly-os/results/projects-public-media-fallback-v1.v0.1.md"
   ],
   "authority": {
     "mpDslCore": {
@@ -285,47 +288,29 @@
     "DESIGN": null
   },
   "currentResult": {
-    "artifactId": "dementor-club.result.artifact-share-social-preview-v1",
-    "version": "0.4",
+    "artifactId": "dementor-club.result.projects-public-media-fallback-v1",
+    "version": "0.1",
     "status": "ACTIVE",
-    "path": ".weekly-os/results/artifact-share-social-preview-v1.v0.4.md",
-    "gate": "G7_RELEASE",
+    "path": ".weekly-os/results/projects-public-media-fallback-v1.v0.1.md",
+    "gate": "G5_BUILD",
     "parentIssue": 228,
     "scope": [
-      "STAB-04",
-      "BQA-14"
+      "STAB-05",
+      "BQA-21"
     ],
-    "integrationBranch": "result/artifact-share-social-preview-v1",
+    "integrationBranch": "result/projects-public-media-fallback-v1",
     "integrationBaseRef": "dementor-club-production",
-    "integrationBaseCommit": "692c87da4a15a986861c18d41fc9861aa1cb08f6",
-    "productionBaseCommit": "692c87da4a15a986861c18d41fc9861aa1cb08f6",
+    "integrationBaseCommit": "440ebce65efc46831a5736fc74a9bf798bf991d5",
+    "productionBaseCommit": "440ebce65efc46831a5736fc74a9bf798bf991d5",
     "implementationStartAuthorized": true,
     "schemaMutationAuthorized": false,
     "semanticMutationRequired": false,
     "changeProposalRequired": false,
-    "productionMergeAuthorized": true,
-    "productionDeployAuthorized": true,
+    "productionMergeAuthorized": false,
+    "productionDeployAuthorized": false,
     "blockingGate": null,
-    "gateReadiness": "PAGES_DEPLOYED_AWAITING_LIVE_RETEST",
-    "note": "STAB-04 production 440ebce6... deployed successfully by Deploy Dementor Production #126 / 35658317210 on exact SHA. Supabase deploy not required/not run. External fresh share-preview acceptance still pending; do not move to WAITING/G8 or start STAB-05 yet.",
-    "candidateCommit": "e51d4bee5b5722bc419f8dd78e0012e8a5ab1907",
-    "releaseCandidateCommit": "e51d4bee5b5722bc419f8dd78e0012e8a5ab1907",
-    "integrationPullRequest": 233,
-    "validationRunNumber": 1230,
-    "validationRunId": 35648978456,
-    "validationConclusion": "SUCCESS",
-    "exactDiffFileCount": 5,
-    "backendProductionDeployRequired": false,
-    "liveDatabaseMutationRequired": false,
-    "productionCommit": "440ebce65efc46831a5736fc74a9bf798bf991d5",
-    "productionMergeCommit": "440ebce65efc46831a5736fc74a9bf798bf991d5",
-    "mergeEvidence": "operations/ARTIFACT_SHARE_SOCIAL_PREVIEW_G7_MERGE_2026-09-21.md",
-    "productionPagesRunNumber": 126,
-    "productionPagesRunId": 35658317210,
-    "productionPagesConclusion": "SUCCESS",
-    "productionPagesExactShaVerified": true,
-    "liveRetestStatus": "PENDING_EXTERNAL_FRESH_PREVIEW",
-    "pagesReleaseEvidence": "operations/ARTIFACT_SHARE_SOCIAL_PREVIEW_PAGES_RELEASE_2026-09-21.md"
+    "gateReadiness": "G5_BUILD_IN_PROGRESS",
+    "note": "STAB-04 released at production 440ebce6... and owner-confirmed fresh Telegram Artifact share preview PASS. STAB-04 moved to WAITING/G8 with no active integration branch. STAB-05 / BQA-21 is now the single active implementation Result on exact current production."
   },
   "waitingResults": [
     {
