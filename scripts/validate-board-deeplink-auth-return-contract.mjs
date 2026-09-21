@@ -63,8 +63,11 @@ must(share.includes('<meta property="og:title" content="Вам передали 
 must(share.includes('<meta property="og:description" content="Открыть внутри DEMENTOR CLUB">'),'OG description must stay generic across Artifact UUIDs');
 must(share.includes('<meta property="og:url" content="https://dementor.club/share/artifact/">'),'OG URL must identify generic transport surface, not UUID');
 must(!/og:(?:title|description|url)[^>]+(?:\$\{|id\b|searchParams)/i.test(share),'OG metadata must not become UUID-specific client metadata');
-must(share.includes('/assets/ink/community-hero-01.webp'),'stable Community hero share image missing from OG surface');
-must(share.includes('og:image:alt" content="Люди Dementor Club"'),'OG image alt missing');
+must(share.includes('/assets/social/dementor-artifact-share-v1-20260921.png'),'dedicated public-safe Artifact share image missing from OG surface');
+must(share.includes('og:image:type" content="image/png"'),'Artifact share OG MIME must match dedicated PNG');
+must(share.includes('og:image:width" content="1200"')&&share.includes('og:image:height" content="630"'),'Artifact share OG dimensions must declare 1200x630');
+must(share.includes('twitter:image" content="https://dementor.club/assets/social/dementor-artifact-share-v1-20260921.png"'),'Twitter image must match dedicated Artifact OG image');
+must(share.includes('og:image:alt" content="Вам передали артефакт — Dementor Club"'),'Artifact share OG image alt missing');
 must(share.includes("target.searchParams.set('focus',`artifact:${id.toLowerCase()}`)")&&share.includes("target.searchParams.set('from','share')"),'share surface does not route human to exact Board Artifact receive state');
 must(share.includes("if(!UUID.test(id))")&&share.includes('ССЫЛКА НЕ СОБРАЛАСЬ.')&&!share.includes("setTimeout(()=>location.replace('/workspace/board/')"),'invalid share id must stay on transport surface without random Board redirect');
 must(share.includes('<noscript>')&&share.includes('Для доставки нужен JavaScript.'),'share surface noscript fallback missing');
@@ -79,7 +82,7 @@ console.log('✓ stay/close consumes both from=share and focus without resolver 
 console.log('✓ Artifact Share lives in open detail action row; Entity Share remains direct');
 console.log('✓ Sender postcard reuses canonical Workspace identity and shows brand');
 console.log('✓ unauth shared entry preserves exact OAuth return without pre-auth target lookup');
-console.log('✓ /share/artifact stays transport-only with generic Community OG image + validated UUID redirect');
+console.log('✓ /share/artifact stays transport-only with dedicated public-safe Artifact OG image + validated UUID redirect');
 console.log('✓ invalid UUID stays on transport surface and noscript fallback exists');
 console.log('✓ existing fullscreen owner and permission boundaries preserved');
 console.log('0 error(s)');

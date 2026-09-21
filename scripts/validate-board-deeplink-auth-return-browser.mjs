@@ -26,7 +26,7 @@ document.querySelector('[data-overlay-close]').addEventListener('click',()=>{con
 </script>
 <script type="module" src="/community/board/board-deeplink-auth-return-v1.js"></script>
 </body></html>`}
-const mime={'.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.html':'text/html; charset=utf-8','.webp':'image/webp','.svg':'image/svg+xml'};
+const mime={'.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.html':'text/html; charset=utf-8','.png':'image/png','.jpg':'image/jpeg','.jpeg':'image/jpeg','.webp':'image/webp','.svg':'image/svg+xml'};
 const server=http.createServer((req,res)=>{const u=new URL(req.url,'http://local');if(u.pathname==='/__deeplink_harness__'){res.setHeader('content-type','text/html; charset=utf-8');res.end(harness());return}if(u.pathname==='/community-runtime-v1.js'){res.setHeader('content-type','text/javascript; charset=utf-8');res.end(runtimeStub);return}const requestPath=u.pathname.endsWith('/')?`${u.pathname}index.html`:u.pathname;const file=path.resolve(root,requestPath.replace(/^\/+/,''));if(!file.startsWith(root)||!fs.existsSync(file)||!fs.statSync(file).isFile()){res.statusCode=404;res.end('not found');return}res.setHeader('content-type',mime[path.extname(file)]||'application/octet-stream');res.end(fs.readFileSync(file))});
 await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));const base=`http://127.0.0.1:${server.address().port}`;
 
@@ -146,6 +146,23 @@ try{
 
   const entity=await browser.newPage();await entity.goto(`${base}/__deeplink_harness__?focus=entity:${ENT}`);await entity.waitForFunction(()=>globalThis.__DC_FOCUS?.type==='entity');const entityShare=entity.locator('.dc-projection > [data-board-share]');await entityShare.waitFor({state:'visible'});expect(await entity.locator('.dc-artifact-overlay').evaluate(el=>el.hidden),'entity deeplink: must not open Artifact overlay');await entityShare.click();const entityCopied=new URL(await entity.evaluate(()=>globalThis.__DC_COPIED));expect(entityCopied.searchParams.get('focus')===`entity:${ENT}`,'entity share: existing focus link regressed');await entity.close();
 
+  const freshPreviewUrl=`${base}/share/artifact/?id=${ART}&preview=stab04-candidate`;
+  const previewResponse=await fetch(freshPreviewUrl);
+  const previewHtml=await previewResponse.text();
+  const previewImage='https://dementor.club/assets/social/dementor-artifact-share-v1-20260921.png';
+  expect(previewResponse.ok,'fresh social preview: built share URL did not return HTML');
+  expect(previewHtml.includes(`<meta property="og:image" content="${previewImage}">`),'fresh social preview: dedicated og:image missing from built head');
+  expect(previewHtml.includes(`<meta property="og:image:secure_url" content="${previewImage}">`),'fresh social preview: secure image URL drifted');
+  expect(previewHtml.includes('<meta property="og:image:type" content="image/png">'),'fresh social preview: MIME metadata drifted');
+  expect(previewHtml.includes('<meta property="og:image:width" content="1200">')&&previewHtml.includes('<meta property="og:image:height" content="630">'),'fresh social preview: 1200x630 metadata drifted');
+  expect(previewHtml.includes(`<meta name="twitter:image" content="${previewImage}">`),'fresh social preview: twitter:image != og:image');
+  expect(!/dc-community-artifacts|storage\/v1|signedMediaUrl|token=/i.test(previewHtml),'fresh social preview: private Artifact media leaked into built head');
+  const previewAsset=await fetch(`${base}/assets/social/dementor-artifact-share-v1-20260921.png?preview=stab04-candidate`);
+  expect(previewAsset.ok,'fresh social preview: dedicated raster is not fetchable from built artifact');
+  expect((previewAsset.headers.get('content-type')||'').startsWith('image/png'),'fresh social preview: built raster MIME is not image/png');
+  const previewBytes=await previewAsset.arrayBuffer();
+  expect(previewBytes.byteLength>32,'fresh social preview: dedicated raster response is incomplete');
+
   const social=await browser.newPage();await social.goto(`${base}/share/artifact/?id=${ART}`,{waitUntil:'domcontentloaded'});await social.waitForURL(url=>url.pathname==='/workspace/board/'&&url.searchParams.get('from')==='share');expect(new URL(social.url()).searchParams.get('focus')===`artifact:${ART}`,'social share surface: human redirect lost exact Artifact');await social.close();
 
   const invalid=await browser.newPage();await invalid.goto(`${base}/share/artifact/?id=not-a-uuid`);await invalid.waitForTimeout(650);expect(new URL(invalid.url()).pathname==='/share/artifact/','invalid transport id: must not redirect to Board');expect(await invalid.getByText('ССЫЛКА НЕ СОБРАЛАСЬ.').count()===1,'invalid transport id: error state missing');expect(await invalid.getByRole('link',{name:'DEMENTOR CLUB →'}).getAttribute('href')==='/' ,'invalid transport id: safe club fallback missing');await invalid.close();
@@ -179,4 +196,5 @@ console.log('✓ all authenticated Board states stop at persistent incoming post
 console.log('✓ explicit accept consumes from=share, retains focus and opens exact Artifact');
 console.log('✓ stay / close / Escape / backdrop consume both from=share and focus and remain on Board');
 console.log('✓ receive accept/stay matrix passes Chromium + WebKit on desktop and 390px mobile');
+console.log('✓ fresh built share URL exposes dedicated public-safe 1200x630 PNG head + fetchable raster without private media');
 console.log('✓ ordinary non-share focus/history, Sender Share, Entity Share and transport behavior remain valid');
