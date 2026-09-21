@@ -7,12 +7,12 @@
     "projectStage": "RELEASE",
     "gate": "G7_RELEASE",
     "status": "APPROVED",
-    "version": "2.33",
+    "version": "2.34",
     "updated": "2026-09-21",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.32"
+    "supersedes": "2.33"
   },
   "currentArtifacts": [
     {
@@ -1698,7 +1698,7 @@
       "productionMergeAuthorized": false,
       "productionDeployAuthorized": false,
       "blockingGate": null,
-      "gateReadiness": "READY_FOR_RELEASE_DECISION",
+      "gateReadiness": "BLOCKED_LIVE_AUTH_RETEST",
       "note": "STAB-03 / BQA-16 exact candidate 3a017d75... validated on exact production baseline 354d7ea9... by Site Integrity #1227 / 35643952922 SUCCESS. PR #232 remains DRAFT/UNMERGED; STOP pending owner release decision.",
       "candidateCommit": "3a017d75271578089d5b108375b03c73dcf7832c",
       "integrationPullRequest": 232,
@@ -1716,7 +1716,10 @@
       "g7ValidationRunNumber": 1227,
       "g7ValidationConclusion": "SUCCESS",
       "backendProductionDeployRequired": false,
-      "liveDatabaseMutationRequired": false
+      "liveDatabaseMutationRequired": false,
+      "version": "0.3",
+      "path": ".weekly-os/results/board-relations-visibility-toggle-v1.v0.3.md",
+      "productionCommit": "692c87da4a15a986861c18d41fc9861aa1cb08f6"
     },
     {
       "artifactId": "dementor-club.operations.board-relations-visibility-toggle-g6-2026-09-21",
