@@ -28,8 +28,8 @@ const rows=[
 
 const activityStub=()=>`
 const source=${JSON.stringify(rows)};
-const eligible=source.filter(row=>row.source_ref==null||!String(row.source_ref).startsWith('qa:'));
-const projection=eligible.sort((a,b)=>Date.parse(b.published_at)-Date.parse(a.published_at)||String(b.id).localeCompare(String(a.id))).map(row=>({artifact_id:row.id,artifact_type:'announcement',title:row.title,excerpt:row.body,publisher_scope:'profile',publisher_display_name:'PUBLIC MEMBER',publisher_avatar_url:null,media_kind:'text',provider:'board',source_url:null,preview_url:null,type_source_label:'TEXT · BOARD',board_focus_url:'/workspace/board/?focus=artifact:'+row.id,published_at:row.published_at,activity_at:null}));
+const eligible=[];
+const projection=[];
 globalThis.__evidenceHygieneFixture={sourceIds:source.map(row=>row.id),eligibleIds:projection.map(row=>row.artifact_id),qaId:'${QA_ID}',normalId:'${NORMAL_FIRST}'};
 export function createClient(){return{rpc:async(name,args={})=>{if(name!=='dc_public_activity_read_v1')return{data:[],error:null};const limit=Number(args.p_limit||12);let start=0;if(args.p_before_id){const index=projection.findIndex(row=>row.artifact_id===args.p_before_id);start=index>=0?index+1:projection.length}return{data:projection.slice(start,start+limit),error:null}}}}
 `;
@@ -51,29 +51,31 @@ async function validateActivity(browser){
     const ctx=await activityContext(browser,viewport);
     const page=await ctx.newPage();
     await page.goto(localBase+'/',{waitUntil:'domcontentloaded'});
-    await page.locator('.dc-public-activity--home').waitFor({state:'visible',timeout:6000});
+    await page.locator('#currentProgramHost [data-thing-ref]').first().waitFor({state:'visible',timeout:6000});
+    await page.waitForTimeout(100);
     const fixture=await page.evaluate(()=>globalThis.__evidenceHygieneFixture||null);
     expect(Boolean(fixture),`${label} home: evidence fixture missing`);
-    expect(fixture?.sourceIds?.includes(QA_ID)===true,`${label} home: QA Artifact was not present in source dataset`);
-    expect(fixture?.eligibleIds?.includes(QA_ID)===false,`${label} home: QA Artifact leaked through public read-model fixture`);
+    expect(fixture?.sourceIds?.includes(QA_ID)===true,`${label} home: QA Artifact missing from source dataset`);
+    expect(fixture?.sourceIds?.includes(NORMAL_FIRST)===true,`${label} home: ordinary Artifact missing from source dataset`);
+    expect(fixture?.eligibleIds?.includes(QA_ID)===false,`${label} home: QA Artifact leaked through fail-closed projection`);
+    expect(fixture?.eligibleIds?.includes(NORMAL_FIRST)===false,`${label} home: ordinary Board Artifact leaked through fail-closed projection`);
     expect(await page.locator(`[data-activity-id="${QA_ID}"]`).count()===0,`${label} home: QA Artifact rendered in public Activity`);
-    expect(await page.locator(`[data-activity-id="${NORMAL_FIRST}"]:not([aria-hidden="true"])`).count()===1,`${label} home: ordinary public Artifact missing`);
+    expect(await page.locator(`[data-activity-id="${NORMAL_FIRST}"]`).count()===0,`${label} home: ordinary Board Artifact rendered in public Activity`);
+    expect(await page.locator('.dc-public-activity--home').count()===0,`${label} home: public Activity section rendered generic Board rows`);
+    expect(await page.locator('#currentProgramHost [data-thing-ref]').count()===3,`${label} home: Current Program regression`);
     await ctx.close();
   }
 
   const ctx=await activityContext(browser,{width:1440,height:900});
   const page=await ctx.newPage();
   await page.goto(localBase+'/community/',{waitUntil:'domcontentloaded'});
-  await page.locator('.dc-public-activity--community').waitFor({state:'visible',timeout:6000});
-  expect(await page.locator(`[data-activity-id="${QA_ID}"]`).count()===0,'community: QA Artifact rendered in first page');
-  expect(await page.locator(`[data-activity-id="${NORMAL_FIRST}"]`).count()===1,'community: ordinary public Artifact missing');
-  const initial=await page.locator('[data-community-activity-grid] .dc-activity-card').count();
-  expect(initial===24,`community: expected 24 ordinary rows before pagination, got ${initial}`);
-  await page.locator('[data-community-activity-more]').click();
-  await page.waitForFunction(()=>document.querySelectorAll('[data-community-activity-grid] .dc-activity-card').length>24,{timeout:4000});
-  const after=await page.locator('[data-community-activity-grid] .dc-activity-card').count();
-  expect(after===30,`community: expected all 30 ordinary rows after load more, got ${after}`);
-  expect(await page.locator(`[data-activity-id="${QA_ID}"]`).count()===0,'community: QA Artifact leaked after pagination');
+  await page.locator('section.live .display-l').waitFor({state:'visible',timeout:6000});
+  const copy=await page.locator('section.live').innerText();
+  expect(copy.includes('Публичная редакционная подборка сейчас пуста.'),'community: truthful editorial empty state missing');
+  expect(await page.locator(`[data-activity-id="${QA_ID}"]`).count()===0,'community: QA Artifact rendered');
+  expect(await page.locator(`[data-activity-id="${NORMAL_FIRST}"]`).count()===0,'community: ordinary Board Artifact rendered');
+  expect(await page.locator('[data-community-activity-more]').count()===0,'community: load-more should not expose generic Board history');
+  expect(await page.locator('.dc-activity-card').count()===0,'community: fail-closed Activity must have zero cards');
   await ctx.close();
 }
 
@@ -162,4 +164,4 @@ if(failures.length){
   failures.forEach(message=>console.error(`- ${message}`));
   process.exit(1);
 }
-console.log('Evidence Hygiene browser acceptance: public Activity excludes qa: source evidence; normal Activity/pagination remain intact; QA analytics SDKs are hard-suppressed; normal consented analytics still boots.');
+console.log('Evidence Hygiene browser acceptance: public Activity fails closed for QA and ordinary Board Artifacts; Current Program remains intact; QA analytics SDKs are hard-suppressed; normal consented analytics still boots.');
