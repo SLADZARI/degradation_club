@@ -4,15 +4,15 @@
     "artifactId": "dementor-club.kernel.project",
     "project": "dementor-club",
     "documentType": "STANDARD",
-    "projectStage": "RELEASE",
-    "gate": "G7_RELEASE",
+    "projectStage": "BUILD",
+    "gate": "G5_BUILD",
     "status": "APPROVED",
-    "version": "2.42",
+    "version": "2.43",
     "updated": "2026-09-21",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.41"
+    "supersedes": "2.42"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -20,8 +20,8 @@
   "canonicalRepository": "SLADZARI/degradation_club",
   "defaultBranch": "main",
   "semanticSourceBranch": "dementor-club",
-  "projectStage": "RELEASE",
-  "gate": "G7_RELEASE",
+  "projectStage": "BUILD",
+  "gate": "G5_BUILD",
   "readFirst": [
     ".weekly-os/PROJECT.json",
     ".weekly-os/ARTIFACT_INDEX.json",
@@ -130,7 +130,10 @@
     "operations/ARTIFACT_DETAIL_TERMINAL_STATE_LIVE_RETEST_2026-09-21.md",
     ".weekly-os/results/board-relations-visibility-toggle-v1.v0.2.md",
     "operations/BOARD_RELATIONS_VISIBILITY_TOGGLE_G6_2026-09-21.md",
-    "operations/BOARD_RELATIONS_VISIBILITY_TOGGLE_G7_RELEASE_CANDIDATE_2026-09-21.md"
+    "operations/BOARD_RELATIONS_VISIBILITY_TOGGLE_G7_RELEASE_CANDIDATE_2026-09-21.md",
+    ".weekly-os/results/board-relations-visibility-toggle-v1.v0.4.md",
+    "operations/BOARD_RELATIONS_VISIBILITY_TOGGLE_LIVE_RETEST_2026-09-21.md",
+    ".weekly-os/results/artifact-share-social-preview-v1.v0.1.md"
   ],
   "authority": {
     "mpDslCore": {
@@ -275,46 +278,29 @@
     "DESIGN": null
   },
   "currentResult": {
-    "artifactId": "dementor-club.result.board-relations-visibility-toggle-v1",
-    "version": "0.3",
+    "artifactId": "dementor-club.result.artifact-share-social-preview-v1",
+    "version": "0.1",
     "status": "ACTIVE",
-    "path": ".weekly-os/results/board-relations-visibility-toggle-v1.v0.3.md",
-    "gate": "G7_RELEASE",
+    "path": ".weekly-os/results/artifact-share-social-preview-v1.v0.1.md",
+    "gate": "G5_BUILD",
     "parentIssue": 228,
     "scope": [
-      "STAB-03",
-      "BQA-16"
+      "STAB-04",
+      "BQA-14"
     ],
-    "integrationBranch": "result/board-relations-visibility-toggle-v1",
+    "integrationBranch": "result/artifact-share-social-preview-v1",
     "integrationBaseRef": "dementor-club-production",
-    "integrationBaseCommit": "354d7ea9b176b55f2d4386b178f61cd9cd0e68ef",
-    "productionBaseCommit": "354d7ea9b176b55f2d4386b178f61cd9cd0e68ef",
+    "integrationBaseCommit": "692c87da4a15a986861c18d41fc9861aa1cb08f6",
+    "productionBaseCommit": "692c87da4a15a986861c18d41fc9861aa1cb08f6",
     "implementationStartAuthorized": true,
     "schemaMutationAuthorized": false,
     "semanticMutationRequired": false,
     "changeProposalRequired": false,
-    "productionMergeAuthorized": true,
-    "productionDeployAuthorized": true,
+    "productionMergeAuthorized": false,
+    "productionDeployAuthorized": false,
     "blockingGate": null,
-    "gateReadiness": "BLOCKED_LIVE_AUTH_RETEST",
-    "note": "STAB-03 / BQA-16 candidate 3a017d75... merged as production 692c87da...; canonical Pages run #125 / 35645805930 SUCCESS on exact production SHA. Authenticated live Board retest is BLOCKED because available production browser session is logged out. Remain ACTIVE / G7_RELEASE; do not activate STAB-04 until authenticated live acceptance PASS.",
-    "candidateCommit": "3a017d75271578089d5b108375b03c73dcf7832c",
-    "releaseCandidateCommit": "3a017d75271578089d5b108375b03c73dcf7832c",
-    "integrationPullRequest": 232,
-    "validationRunNumber": 1227,
-    "validationRunId": 35643952922,
-    "validationConclusion": "SUCCESS",
-    "exactDiffFileCount": 2,
-    "backendProductionDeployRequired": false,
-    "liveDatabaseMutationRequired": false,
-    "productionCommit": "692c87da4a15a986861c18d41fc9861aa1cb08f6",
-    "productionMergeCommit": "692c87da4a15a986861c18d41fc9861aa1cb08f6",
-    "productionPagesRunNumber": 125,
-    "productionPagesRunId": 35645805930,
-    "productionPagesConclusion": "SUCCESS",
-    "productionPagesExactShaVerified": true,
-    "liveRetestEvidence": "operations/BOARD_RELATIONS_VISIBILITY_TOGGLE_LIVE_RETEST_2026-09-21.md",
-    "liveRetestStatus": "BLOCKED_NO_AUTHENTICATED_SESSION"
+    "gateReadiness": "G5_BUILD_IN_PROGRESS",
+    "note": "STAB-03 released at production 692c87da... and owner-confirmed live relation visibility retest PASS. STAB-03 moved to WAITING/G8 with no active integration branch. STAB-04 / BQA-14 is now the single active implementation Result on exact current production."
   },
   "waitingResults": [
     {
