@@ -4,15 +4,15 @@
     "artifactId": "dementor-club.kernel.project",
     "project": "dementor-club",
     "documentType": "STANDARD",
-    "projectStage": "BUILD",
-    "gate": "G5_BUILD",
+    "projectStage": "RELEASE",
+    "gate": "G7_RELEASE",
     "status": "APPROVED",
-    "version": "2.47",
+    "version": "2.48",
     "updated": "2026-09-21",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.46"
+    "supersedes": "2.47"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -20,8 +20,8 @@
   "canonicalRepository": "SLADZARI/degradation_club",
   "defaultBranch": "main",
   "semanticSourceBranch": "dementor-club",
-  "projectStage": "BUILD",
-  "gate": "G5_BUILD",
+  "projectStage": "RELEASE",
+  "gate": "G7_RELEASE",
   "readFirst": [
     ".weekly-os/PROJECT.json",
     ".weekly-os/ARTIFACT_INDEX.json",
@@ -143,7 +143,10 @@
     "operations/ARTIFACT_SHARE_SOCIAL_PREVIEW_PAGES_RELEASE_2026-09-21.md",
     ".weekly-os/results/artifact-share-social-preview-v1.v0.5.md",
     "operations/ARTIFACT_SHARE_SOCIAL_PREVIEW_LIVE_RETEST_2026-09-21.md",
-    ".weekly-os/results/projects-public-media-fallback-v1.v0.1.md"
+    ".weekly-os/results/projects-public-media-fallback-v1.v0.1.md",
+    ".weekly-os/results/projects-public-media-fallback-v1.v0.2.md",
+    "operations/PROJECTS_PUBLIC_MEDIA_FALLBACK_G6_2026-09-21.md",
+    "operations/PROJECTS_PUBLIC_MEDIA_FALLBACK_G7_RELEASE_CANDIDATE_2026-09-21.md"
   ],
   "authority": {
     "mpDslCore": {
@@ -289,10 +292,10 @@
   },
   "currentResult": {
     "artifactId": "dementor-club.result.projects-public-media-fallback-v1",
-    "version": "0.1",
+    "version": "0.2",
     "status": "ACTIVE",
-    "path": ".weekly-os/results/projects-public-media-fallback-v1.v0.1.md",
-    "gate": "G5_BUILD",
+    "path": ".weekly-os/results/projects-public-media-fallback-v1.v0.2.md",
+    "gate": "G7_RELEASE",
     "parentIssue": 228,
     "scope": [
       "STAB-05",
@@ -309,8 +312,17 @@
     "productionMergeAuthorized": false,
     "productionDeployAuthorized": false,
     "blockingGate": null,
-    "gateReadiness": "G5_BUILD_IN_PROGRESS",
-    "note": "STAB-04 released at production 440ebce6... and owner-confirmed fresh Telegram Artifact share preview PASS. STAB-04 moved to WAITING/G8 with no active integration branch. STAB-05 / BQA-21 is now the single active implementation Result on exact current production."
+    "gateReadiness": "READY_FOR_RELEASE_DECISION",
+    "note": "STAB-05 / BQA-21 validated candidate 581468fb... from exact production 440ebce6.... External YouTube source dWokndhJLKQ verified unavailable, so the inert 9:16 media promise and broken link are collapsed into a compact unavailable state. Site Integrity #1232 / 35660069754 SUCCESS, including Projects browser regression at 1440/390/360 + reload. PR #234 remains DRAFT/UNMERGED. STOP pending owner release decision; STAB-06 not started.",
+    "candidateCommit": "581468fbf4b2b321bd2c2a16bd9e65a9e12e3a4f",
+    "releaseCandidateCommit": "581468fbf4b2b321bd2c2a16bd9e65a9e12e3a4f",
+    "integrationPullRequest": 234,
+    "validationRunNumber": 1232,
+    "validationRunId": 35660069754,
+    "validationConclusion": "SUCCESS",
+    "exactDiffFileCount": 3,
+    "backendProductionDeployRequired": false,
+    "liveDatabaseMutationRequired": false
   },
   "waitingResults": [
     {
