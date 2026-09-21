@@ -1,14 +1,45 @@
-import {getClient,currentSession,loginWithGoogle,getEntryStatus,signedMediaUrl,esc,formatDate,errorMessage,route} from '/community-runtime-v1.js';
+import {getClient,loginWithGoogle,signedMediaUrl,esc,formatDate,errorMessage,route} from '/community-runtime-v1.js';
 import {resolveBoardUserState,isBoardMemberState,BOARD_USER_STATES} from '/community/board/board-user-state-v2.js';
 import {artifactSubtypeLabel} from '/community/board/board-entity-model-v1.js';
 
 const host=document.getElementById('artifactHost');
 const stateEl=document.getElementById('artifactState');
 const BOARD_PATH=route('/workspace/board/');
-let client=null,session=null,boardState=null,artifact=null,reactions=[],responses=[],guestMode=false,guestInterest=false,guestInterestCount=0,guestResponseSubmitted=false,promotion=null;
+window.__DC_ARTIFACT_RUNTIME_STARTED__=true;
+const QA_TIMEOUTS=window.__DC_ARTIFACT_TEST_TIMEOUTS__||{};
+const ESSENTIAL_TIMEOUT_MS=Math.max(100,Number(QA_TIMEOUTS.essential)||6500);
+const OPTIONAL_TIMEOUT_MS=Math.max(80,Number(QA_TIMEOUTS.optional)||1800);
+let client=null,session=null,boardState=null,artifact=null,reactions=[],responses=[],guestMode=false,guestInterest=false,guestInterestCount=0,guestResponseSubmitted=false,promotion=null,enrichmentState='pending';
+
+function timeoutError(code){const error=new Error(code);error.code=code;return error}
+function withDeadline(value,ms,code){
+  let timer=null;
+  const timeout=new Promise((_,reject)=>{timer=setTimeout(()=>reject(timeoutError(code)),ms)});
+  return Promise.race([Promise.resolve(value),timeout]).finally(()=>clearTimeout(timer));
+}
+async function optionalResult(value,label){
+  try{const result=await withDeadline(value,OPTIONAL_TIMEOUT_MS,`OPTIONAL_${label}_TIMEOUT`);if(result?.error)throw result.error;return{ok:true,data:result?.data??null}}catch(error){console.warn('[Artifact detail optional]',label,error);return{ok:false,data:null,error}}
+}
+async function optionalValue(value,label){
+  try{return{ok:true,data:await withDeadline(value,OPTIONAL_TIMEOUT_MS,`OPTIONAL_${label}_TIMEOUT`)}}catch(error){console.warn('[Artifact detail optional]',label,error);return{ok:false,data:null,error}}
+}
 
 function idFromLocation(){const query=new URLSearchParams(location.search).get('id');if(query)return query;const parts=location.pathname.split('/').filter(Boolean);const i=parts.indexOf('artifact');return i>=0&&parts[i+1]&&parts[i+1]!=='index.html'?parts[i+1]:null}
-function fail(error){stateEl.textContent='ERROR';host.innerHTML=`<div class="dc-artifact-error">${esc(errorMessage(error))}</div>`}
+function terminalKind(error){
+  const raw=String(error?.code||error?.message||error||'');
+  if(raw.includes('ARTIFACT_ID_REQUIRED'))return 'INVALID';
+  if(raw.includes('ARTIFACT_NOT_FOUND'))return 'NOT FOUND';
+  if(/MEMBERSHIP_REQUIRED|42501|permission|denied|forbidden|row.level.security|not authorized/i.test(raw))return 'DENIED';
+  return 'ERROR';
+}
+function fail(error){
+  const state=terminalKind(error);stateEl.textContent=state;
+  const raw=String(error?.code||error?.message||error||'');
+  const copy=state==='INVALID'?'Некорректная ссылка на Artifact.':state==='NOT FOUND'?'Artifact не найден или больше недоступен.':state==='DENIED'?'У текущего аккаунта нет доступа к этому Artifact.':errorMessage(error);
+  const joinRecovery=raw.includes('MEMBERSHIP_REQUIRED')?`<a class="dc-artifact-action" href="${route('/join/')}">ПРОЙТИ GATE →</a>`:'';
+  host.innerHTML=`<div class="dc-artifact-error"><strong>${esc(state)}</strong><p>${esc(copy)}</p><div class="dc-artifact-actions"><button class="dc-artifact-action" type="button" id="artifactRetry">ПОВТОРИТЬ</button>${joinRecovery}<a class="dc-artifact-action" href="${BOARD_PATH}" id="detailBack">← BOARD</a></div></div>`;
+  document.getElementById('artifactRetry')?.addEventListener('click',()=>location.reload());
+}
 function avatar(profile){if(profile?.avatar_url)return `<img class="dc-artifact-avatar" src="${esc(profile.avatar_url)}" alt="">`;return `<span class="dc-artifact-avatar empty">${esc(String(profile?.display_name||'?').charAt(0).toUpperCase())}</span>`}
 function cameFromBoard(){try{if(!document.referrer)return false;const ref=new URL(document.referrer),board=new URL(BOARD_PATH,location.origin);const normalize=value=>value.replace(/\/+$/,'/');return ref.origin===location.origin&&normalize(ref.pathname)===normalize(board.pathname)}catch{return false}}
 function returnToBoard(event){event?.preventDefault();if(cameFromBoard()&&history.length>1){history.back();return}location.assign(BOARD_PATH)}
@@ -22,29 +53,46 @@ function promotionLabel(row){
   if(!row)return'';const count=Math.max(0,Number(row.support_count||0));const threshold=Math.max(0,Number(row.promotion_threshold||0));const status=String(row.delivery_status||'');
   if(status==='sent')return '✓ TELEGRAM';if(status==='pending')return `${count}/${threshold} · В ОЧЕРЕДИ`;if(status==='processing')return `${count}/${threshold} · ОТПРАВЛЯЕТСЯ`;if(status==='suppressed')return 'TELEGRAM ОТКЛЮЧЁН';if(status==='delivery_unknown')return 'ТРЕБУЕТ ПРОВЕРКИ';if(status==='cancelled')return 'TELEGRAM ОТМЕНЁН';if(status==='failed')return 'TELEGRAM · ОШИБКА ДОСТАВКИ';if(status==='held'&&threshold>0)return `TELEGRAM · ${count}/${threshold}`;return '';
 }
-async function loadPromotion(){
-  const {data,error}=await client.rpc('dc_board_promotion_state_read_v1');if(error)throw error;const id=artifact?.id||idFromLocation();promotion=(data||[]).find(row=>row.artifact_id===id)||null;
+async function readPromotion(){
+  const {data,error}=await client.rpc('dc_board_promotion_state_read_v1');if(error)throw error;const id=artifact?.id||idFromLocation();return(data||[]).find(row=>row.artifact_id===id)||null;
+}
+async function signMedia(media){
+  const signed=await Promise.all((media||[]).map(async item=>{const result=await optionalValue(signedMediaUrl(client,item.storage_path),'MEDIA_SIGN');return{...item,url:result.ok?result.data:null}}));
+  return signed;
 }
 
 async function loadMember(){
   const id=idFromLocation();if(!id)throw new Error('ARTIFACT_ID_REQUIRED');
-  const result=await client.from('dc_artifacts').select('id,author_profile_id,artifact_type,title,body,external_url,status,visibility,starts_at,activity_at,expires_at,published_at,created_at,closed_at').eq('id',id).maybeSingle();if(result.error)throw result.error;if(!result.data)throw new Error('ARTIFACT_NOT_FOUND');artifact=result.data;
-  const [profileResult,reactionResult,mediaResult,responseResult]=await Promise.all([
-    client.from('dc_member_public_profiles').select('profile_id,display_name,nickname,avatar_url,member_since').eq('profile_id',artifact.author_profile_id).maybeSingle(),
-    client.from('dc_artifact_reactions').select('id,profile_id,reaction_type').eq('artifact_id',artifact.id),
-    client.from('dc_artifact_media').select('id,media_type,storage_path,metadata').eq('artifact_id',artifact.id),
-    client.from('dc_artifact_responses').select('id,responder_profile_id,message,status,created_at').eq('artifact_id',artifact.id)
-  ]);for(const r of [profileResult,reactionResult,mediaResult,responseResult])if(r.error)throw r.error;
-  await loadPromotion();
-  reactions=reactionResult.data||[];responses=responseResult.data||[];const profile=profileResult.data||null;const media=mediaResult.data||[];const signed=[];for(const item of media){let url=null;try{url=await signedMediaUrl(client,item.storage_path)}catch{}signed.push({...item,url})}render(profile,signed);
+  const result=await withDeadline(client.from('dc_artifacts').select('id,author_profile_id,artifact_type,title,body,external_url,status,visibility,starts_at,activity_at,expires_at,published_at,created_at,closed_at').eq('id',id).maybeSingle(),ESSENTIAL_TIMEOUT_MS,'ARTIFACT_PRIMARY_TIMEOUT');
+  if(result.error)throw result.error;if(!result.data)throw new Error('ARTIFACT_NOT_FOUND');artifact=result.data;
+  enrichmentState='pending';promotion=null;reactions=[];responses=[];render(null,[]);
+  const [profileResult,reactionResult,mediaResult,responseResult,promotionResult]=await Promise.all([
+    optionalResult(client.from('dc_member_public_profiles').select('profile_id,display_name,nickname,avatar_url,member_since').eq('profile_id',artifact.author_profile_id).maybeSingle(),'PROFILE'),
+    optionalResult(client.from('dc_artifact_reactions').select('id,profile_id,reaction_type').eq('artifact_id',artifact.id),'REACTIONS'),
+    optionalResult(client.from('dc_artifact_media').select('id,media_type,storage_path,metadata').eq('artifact_id',artifact.id),'MEDIA'),
+    optionalResult(client.from('dc_artifact_responses').select('id,responder_profile_id,message,status,created_at').eq('artifact_id',artifact.id),'RESPONSES'),
+    optionalValue(readPromotion(),'PROMOTION')
+  ]);
+  reactions=reactionResult.ok?(reactionResult.data||[]):[];
+  responses=responseResult.ok?(responseResult.data||[]):[];
+  promotion=promotionResult.ok?promotionResult.data:null;
+  const profile=profileResult.ok?(profileResult.data||null):null;
+  const signed=mediaResult.ok?await signMedia(mediaResult.data||[]):[];
+  enrichmentState=reactionResult.ok&&responseResult.ok?'ready':'degraded';
+  render(profile,signed);
 }
 
 async function loadGuest(){
   const id=idFromLocation();if(!id)throw new Error('ARTIFACT_ID_REQUIRED');
-  const {data,error}=await client.rpc('dc_guest_board_artifact_detail_read_v1',{p_artifact_id:id});if(error)throw error;const payload=Array.isArray(data)?data[0]:data;if(!payload?.artifact)throw new Error('ARTIFACT_NOT_FOUND');artifact=payload.artifact;
-  await loadPromotion();
+  const result=await withDeadline(client.rpc('dc_guest_board_artifact_detail_read_v1',{p_artifact_id:id}),ESSENTIAL_TIMEOUT_MS,'ARTIFACT_PRIMARY_TIMEOUT');
+  if(result.error)throw result.error;const payload=Array.isArray(result.data)?result.data[0]:result.data;if(!payload?.artifact)throw new Error('ARTIFACT_NOT_FOUND');artifact=payload.artifact;
   reactions=Array.from({length:Math.max(0,Number(payload.reaction_count||0))},(_,i)=>({id:`count-${i}`}));responses=[];guestInterest=payload.my_guest_interest===true;guestInterestCount=Math.max(0,Number(payload.guest_interest_count||0));guestResponseSubmitted=payload.my_guest_response_submitted===true;
-  const signed=[];for(const item of payload.media||[]){let url=null;try{url=await signedMediaUrl(client,item.storage_path)}catch{}signed.push({...item,url})}render(payload.author||null,signed);
+  enrichmentState='ready';promotion=null;render(payload.author||null,[]);
+  const [promotionResult,signed]=await Promise.all([
+    optionalValue(readPromotion(),'PROMOTION'),
+    signMedia(payload.media||[])
+  ]);
+  promotion=promotionResult.ok?promotionResult.data:null;render(payload.author||null,signed);
 }
 async function load(){return guestMode?loadGuest():loadMember()}
 
@@ -64,9 +112,12 @@ function render(profile,media){
   const item=media[0];let mediaHtml='';if(item?.url)mediaHtml=item.media_type==='image'?`<div class="dc-artifact-media"><img src="${esc(item.url)}" alt="Прикреплённое изображение"></div>`:`<div class="dc-artifact-media"><a class="dc-artifact-file" href="${esc(item.url)}" target="_blank" rel="noopener">ФАЙЛ / ${esc(item.metadata?.name||'ОТКРЫТЬ')} ↗</a></div>`;
   stateEl.textContent=`ARTIFACT / ${artifact.status.toUpperCase()}`;
   const responseControl=historical?'<span class="dc-artifact-action" aria-disabled="true">ОТКЛИКИ ЗАКРЫТЫ / HISTORY</span>':mine?`<span class="dc-artifact-action" aria-disabled="true">ОТКЛИКОВ / ${incoming}</span>`:`<button class="dc-artifact-action${myResponse?' primary':''}" type="button" id="detailResponse" ${myResponse?'disabled':''}>${myResponse?'ОТКЛИК ОТПРАВЛЕН':'ОТКЛИКНУТЬСЯ'}</button>`;
+  const interactionControls=enrichmentState==='ready'
+    ?`<span class="dc-artifact-action" aria-disabled="true">ИНТЕРЕСНО / ${reactionTotal()}</span><button class="dc-artifact-action${myReaction?' primary':''}" type="button" id="detailReaction">${myReaction?'✓ ИНТЕРЕСНО':'МНЕ ЭТО НАДО'}</button>${responseControl}${promotionControls()}`
+    :`<span class="dc-artifact-action" aria-disabled="true">${enrichmentState==='pending'?'ДОГРУЖАЕМ ДЕЙСТВИЯ…':'ДЕЙСТВИЯ ВРЕМЕННО НЕДОСТУПНЫ'}</span>`;
   const activity=artifact.activity_at?`<div class="dc-artifact-meta"><span>КОГДА / ${esc(formatActivityDate(artifact.activity_at))}</span></div>`:'';
   const type=artifactSubtypeLabel(String(artifact.artifact_type||'announcement').toLowerCase());
-  host.innerHTML=`<article class="dc-artifact-record${historical?' is-history':''}" data-artifact-status="${esc(artifact.status)}"><div class="dc-artifact-meta"><span>ID / ${esc(artifact.id.slice(0,8).toUpperCase())}</span><span>TYPE / ${esc(type)}</span><span>STATUS / ${esc(artifact.status.toUpperCase())}</span><span>${artifact.expires_at?`EXPIRES / ${formatDate(artifact.expires_at)}`:'PERSISTENT'}</span></div>${activity}<div class="dc-artifact-author">${avatar(profile)}<div><strong>${esc(profile?.display_name||'MEMBER')}</strong>${profile?.nickname?`<span>@${esc(profile.nickname.replace(/^@/,''))}</span>`:''}</div></div>${artifact.title?`<h1>${esc(artifact.title)}</h1>`:'<h1>ARTIFACT.</h1>'}<div class="dc-artifact-body">${renderArtifactBody(artifact.body)}</div>${mediaHtml}${artifact.external_url?`<p><a class="dc-artifact-link" href="${esc(artifact.external_url)}" target="_blank" rel="noopener">ВНЕШНЯЯ ССЫЛКА ↗</a></p>`:''}<div class="dc-artifact-actions"><span class="dc-artifact-action" aria-disabled="true">ИНТЕРЕСНО / ${reactionTotal()}</span><button class="dc-artifact-action${myReaction?' primary':''}" type="button" id="detailReaction">${myReaction?'✓ ИНТЕРЕСНО':'МНЕ ЭТО НАДО'}</button>${responseControl}${mine&&artifact.status==='active'?'<button class="dc-artifact-action" type="button" id="detailClose">УБРАТЬ С ДОСКИ</button>':''}${promotionControls()}<a class="dc-artifact-action" href="${BOARD_PATH}" id="detailBack">← BOARD</a></div><div id="responseHost"></div></article>`;
+  host.innerHTML=`<article class="dc-artifact-record${historical?' is-history':''}" data-artifact-status="${esc(artifact.status)}"><div class="dc-artifact-meta"><span>ID / ${esc(artifact.id.slice(0,8).toUpperCase())}</span><span>TYPE / ${esc(type)}</span><span>STATUS / ${esc(artifact.status.toUpperCase())}</span><span>${artifact.expires_at?`EXPIRES / ${formatDate(artifact.expires_at)}`:'PERSISTENT'}</span></div>${activity}<div class="dc-artifact-author">${avatar(profile)}<div><strong>${esc(profile?.display_name||'MEMBER')}</strong>${profile?.nickname?`<span>@${esc(profile.nickname.replace(/^@/,''))}</span>`:''}</div></div>${artifact.title?`<h1>${esc(artifact.title)}</h1>`:'<h1>ARTIFACT.</h1>'}<div class="dc-artifact-body">${renderArtifactBody(artifact.body)}</div>${mediaHtml}${artifact.external_url?`<p><a class="dc-artifact-link" href="${esc(artifact.external_url)}" target="_blank" rel="noopener">ВНЕШНЯЯ ССЫЛКА ↗</a></p>`:''}<div class="dc-artifact-actions">${interactionControls}${mine&&artifact.status==='active'?'<button class="dc-artifact-action" type="button" id="detailClose">УБРАТЬ С ДОСКИ</button>':''}<a class="dc-artifact-action" href="${BOARD_PATH}" id="detailBack">← BOARD</a></div><div id="responseHost"></div></article>`;
 }
 
 async function supportPromotion(event){const button=event.currentTarget;button.disabled=true;const result=await client.rpc('dc_support_artifact_promotion_v1',{p_artifact_id:artifact.id});if(result.error){button.disabled=false;fail(result.error);return}await load()}
@@ -83,9 +134,11 @@ async function sendResponse(event){if(isHistorical())return;const button=event.c
 async function closeArtifact(){if(!confirm('Убрать Artifact с активной доски и перенести в архив?'))return;const result=await client.rpc('dc_close_artifact_v1',{p_artifact_id:artifact.id});if(result.error){fail(result.error);return}location.assign(BOARD_PATH)}
 
 async function boot(){
-  bindBoardReturn();client=getClient();session=await currentSession(client);
-  if(!session){stateEl.textContent='AUTH REQUIRED';host.innerHTML='<div class="dc-artifact-service"><button class="dc-artifact-action primary" id="artifactLogin" type="button">ВОЙТИ ЧЕРЕЗ GOOGLE →</button></div>';document.getElementById('artifactLogin').onclick=()=>loginWithGoogle(location.pathname+location.search,client).catch(fail);return}
-  boardState=await resolveBoardUserState(client);guestMode=!isBoardMemberState(boardState.key)&&boardState.key!==BOARD_USER_STATES.UNAUTHENTICATED;if(boardState.key===BOARD_USER_STATES.UNAUTHENTICATED){stateEl.textContent='AUTH REQUIRED';return}if(guestMode){await loadGuest();return}
-  const status=await getEntryStatus(client);if(!status.membership_active&&!isBoardMemberState(boardState.key)){stateEl.textContent='MEMBERSHIP REQUIRED';host.innerHTML=`<div class="dc-artifact-service">ARTIFACT ДОСТУПЕН ПОСЛЕ ВХОДА. <a href="${route('/join/')}">ПРОЙТИ GATE →</a></div>`;return}await loadMember();
+  bindBoardReturn();client=getClient();
+  boardState=await withDeadline(resolveBoardUserState(client),ESSENTIAL_TIMEOUT_MS,'ARTIFACT_ACCESS_STATE_TIMEOUT');session=boardState.session||null;
+  if(boardState.key===BOARD_USER_STATES.UNAUTHENTICATED){stateEl.textContent='AUTH REQUIRED';host.innerHTML='<div class="dc-artifact-service"><button class="dc-artifact-action primary" id="artifactLogin" type="button">ВОЙТИ ЧЕРЕЗ GOOGLE →</button></div>';document.getElementById('artifactLogin').onclick=()=>loginWithGoogle(location.pathname+location.search,client).catch(fail);return}
+  guestMode=!isBoardMemberState(boardState.key);
+  if(guestMode){await loadGuest();return}
+  await loadMember();
 }
 boot().catch(fail);
