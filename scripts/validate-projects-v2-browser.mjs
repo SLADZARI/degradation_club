@@ -81,7 +81,7 @@ for(const width of widths){
         return {
           state:owner?.getAttribute('data-project-media-state')||null,
           visible:!!owner&&getComputedStyle(owner).display!=='none'&&rect?.width>0&&rect?.height>0,
-          text:(status?.textContent||'').trim().replace(/\s+/g,' '),
+          text:(status?.querySelector('strong')?.innerText||'').trim().replace(/\s+/g,' '),
           iframeCount:owner?.querySelectorAll('iframe').length??-1,
           videoCount:owner?.querySelectorAll('video').length??-1,
           interactiveCount:owner?.querySelectorAll('a[href],button,input,select,textarea,[tabindex]:not([tabindex="-1"])').length??-1,
