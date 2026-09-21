@@ -7,12 +7,12 @@
     "projectStage": "RELEASE",
     "gate": "G8_CLEANUP",
     "status": "APPROVED",
-    "version": "2.26",
+    "version": "2.27",
     "updated": "2026-09-21",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.25"
+    "supersedes": "2.26"
   },
   "currentArtifacts": [
     {
@@ -1449,16 +1449,16 @@
     {
       "artifactId": "dementor-club.result.public-activity-truth-boundary-v1",
       "documentType": "RESULT",
-      "currentVersion": "0.1",
+      "currentVersion": "0.2",
       "status": "ACTIVE",
-      "location": ".weekly-os/results/public-activity-truth-boundary-v1.v0.1.md",
+      "location": ".weekly-os/results/public-activity-truth-boundary-v1.v0.2.md",
       "sourceSystem": "GIT",
       "authorityType": "IMPLEMENTATION_AUTHORITY",
       "updated": "2026-09-21",
       "canonicalProject": "dementor-club",
-      "canonicalLocation": ".weekly-os/results/public-activity-truth-boundary-v1.v0.1.md",
+      "canonicalLocation": ".weekly-os/results/public-activity-truth-boundary-v1.v0.2.md",
       "relation": "CURRENT_RESULT",
-      "gate": "G5_BUILD",
+      "gate": "G6_VALIDATION",
       "parentIssue": 228,
       "correctiveIssue": 229,
       "scope": [
@@ -1479,8 +1479,35 @@
       "productionMergeAuthorized": false,
       "productionDeployAuthorized": false,
       "blockingGate": null,
-      "gateReadiness": "G5_BUILD_IN_PROGRESS",
-      "note": "STAB-01 fail-closed corrective. Branch intentionally bases directly on exact production; staging divergence is excluded and staging is not mutated."
+      "gateReadiness": "READY_FOR_CLEAN_RELEASE_DECISION",
+      "note": "Validated clean STAB-01 candidate on exact production base. Full Site Integrity #1224 SUCCESS. Five-file diff only. Live DB/production unchanged; waiting for separate release decision.",
+      "candidateCommit": "40ba7ecea44206ded37ceb714d2becb6f2698c12",
+      "integrationPullRequest": 230,
+      "validationEvidence": "operations/PUBLIC_ACTIVITY_TRUTH_BOUNDARY_G6_2026-09-21.md",
+      "validationRunId": 35608787457,
+      "validationRunNumber": 1224,
+      "validationConclusion": "SUCCESS",
+      "exactDiffFileCount": 5,
+      "migrationPath": "supabase/migrations/20260921134959_public_activity_truth_boundary_v1.sql",
+      "liveMigrationApplied": false
+    },
+    {
+      "artifactId": "dementor-club.operations.public-activity-truth-boundary-g6-2026-09-21",
+      "documentType": "VALIDATION_EVIDENCE",
+      "currentVersion": "1.0",
+      "status": "PASS",
+      "location": "operations/PUBLIC_ACTIVITY_TRUTH_BOUNDARY_G6_2026-09-21.md",
+      "sourceSystem": "GIT",
+      "authorityType": "VALIDATION_EVIDENCE",
+      "updated": "2026-09-21",
+      "canonicalProject": "dementor-club",
+      "canonicalLocation": "operations/PUBLIC_ACTIVITY_TRUTH_BOUNDARY_G6_2026-09-21.md",
+      "result": "dementor-club.result.public-activity-truth-boundary-v1",
+      "gate": "G6_VALIDATION",
+      "candidateCommit": "40ba7ecea44206ded37ceb714d2becb6f2698c12",
+      "validationRunId": 35608787457,
+      "validationConclusion": "SUCCESS",
+      "verdict": "READY_FOR_CLEAN_RELEASE_DECISION"
     }
   ],
   "referenceArtifacts": [
