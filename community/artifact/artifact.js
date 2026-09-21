@@ -29,13 +29,15 @@ function terminalKind(error){
   const raw=String(error?.code||error?.message||error||'');
   if(raw.includes('ARTIFACT_ID_REQUIRED'))return 'INVALID';
   if(raw.includes('ARTIFACT_NOT_FOUND'))return 'NOT FOUND';
-  if(/42501|permission|denied|forbidden|row.level.security|not authorized/i.test(raw))return 'DENIED';
+  if(/MEMBERSHIP_REQUIRED|42501|permission|denied|forbidden|row.level.security|not authorized/i.test(raw))return 'DENIED';
   return 'ERROR';
 }
 function fail(error){
   const state=terminalKind(error);stateEl.textContent=state;
+  const raw=String(error?.code||error?.message||error||'');
   const copy=state==='INVALID'?'Некорректная ссылка на Artifact.':state==='NOT FOUND'?'Artifact не найден или больше недоступен.':state==='DENIED'?'У текущего аккаунта нет доступа к этому Artifact.':errorMessage(error);
-  host.innerHTML=`<div class="dc-artifact-error"><strong>${esc(state)}</strong><p>${esc(copy)}</p><div class="dc-artifact-actions"><button class="dc-artifact-action" type="button" id="artifactRetry">ПОВТОРИТЬ</button><a class="dc-artifact-action" href="${BOARD_PATH}" id="detailBack">← BOARD</a></div></div>`;
+  const joinRecovery=raw.includes('MEMBERSHIP_REQUIRED')?`<a class="dc-artifact-action" href="${route('/join/')}">ПРОЙТИ GATE →</a>`:'';
+  host.innerHTML=`<div class="dc-artifact-error"><strong>${esc(state)}</strong><p>${esc(copy)}</p><div class="dc-artifact-actions"><button class="dc-artifact-action" type="button" id="artifactRetry">ПОВТОРИТЬ</button>${joinRecovery}<a class="dc-artifact-action" href="${BOARD_PATH}" id="detailBack">← BOARD</a></div></div>`;
   document.getElementById('artifactRetry')?.addEventListener('click',()=>location.reload());
 }
 function avatar(profile){if(profile?.avatar_url)return `<img class="dc-artifact-avatar" src="${esc(profile.avatar_url)}" alt="">`;return `<span class="dc-artifact-avatar empty">${esc(String(profile?.display_name||'?').charAt(0).toUpperCase())}</span>`}
