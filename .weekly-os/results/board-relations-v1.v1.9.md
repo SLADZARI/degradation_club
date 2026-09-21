@@ -3,10 +3,10 @@ artifactId: dementor-club.result.board-relations-v1
 project: dementor-club
 documentType: RESULT
 projectStage: RELEASE
-gate: G7_RELEASE
+gate: G8_CLEANUP
 status: WAITING
 version: 1.9
-updated: 2026-09-18
+updated: 2026-09-21
 owner: Modern Pilgrims
 sourceSystem: GIT
 authorityType: IMPLEMENTATION_AUTHORITY
@@ -19,7 +19,8 @@ prePersistenceContractEvidence: operations/BOARD_RELATIONS_G5_PRE_PERSISTENCE_CO
 prePersistenceCheckpoint: COMPLETE
 persistenceDesignEvidence: operations/BOARD_RELATIONS_G5_PERSISTENCE_DESIGN_2026-09-18.md
 persistenceDesignStatus: READY_FOR_SCHEMA_MUTATION
-integrationBranch: result/board-relations-v1
+integrationBranch: null
+activeIntegrationOwnership: false
 integrationBaseRef: dementor-club-site
 integrationBaseCommit: 61d85d95bd95dfb536acdd363b45d2773a4b2ca5
 productionBaseCommit: 2dae3b6ece79652c81af780c049521fda7262726
