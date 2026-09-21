@@ -7,12 +7,12 @@
     "projectStage": "RELEASE",
     "gate": "G8_CLEANUP",
     "status": "APPROVED",
-    "version": "2.27",
+    "version": "2.28",
     "updated": "2026-09-21",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.26"
+    "supersedes": "2.27"
   },
   "currentArtifacts": [
     {
@@ -1449,16 +1449,16 @@
     {
       "artifactId": "dementor-club.result.public-activity-truth-boundary-v1",
       "documentType": "RESULT",
-      "currentVersion": "0.2",
+      "currentVersion": "0.3",
       "status": "ACTIVE",
-      "location": ".weekly-os/results/public-activity-truth-boundary-v1.v0.2.md",
+      "location": ".weekly-os/results/public-activity-truth-boundary-v1.v0.3.md",
       "sourceSystem": "GIT",
       "authorityType": "IMPLEMENTATION_AUTHORITY",
       "updated": "2026-09-21",
       "canonicalProject": "dementor-club",
-      "canonicalLocation": ".weekly-os/results/public-activity-truth-boundary-v1.v0.2.md",
+      "canonicalLocation": ".weekly-os/results/public-activity-truth-boundary-v1.v0.3.md",
       "relation": "CURRENT_RESULT",
-      "gate": "G6_VALIDATION",
+      "gate": "G7_RELEASE",
       "parentIssue": 228,
       "correctiveIssue": 229,
       "scope": [
@@ -1479,8 +1479,8 @@
       "productionMergeAuthorized": false,
       "productionDeployAuthorized": false,
       "blockingGate": null,
-      "gateReadiness": "READY_FOR_CLEAN_RELEASE_DECISION",
-      "note": "Validated clean STAB-01 candidate on exact production base. Full Site Integrity #1224 SUCCESS. Five-file diff only. Live DB/production unchanged; waiting for separate release decision.",
+      "gateReadiness": "READY_FOR_RELEASE_DECISION",
+      "note": "G7 preflight PASS. Clean RC equals validated candidate. Read-only live ledger shows one pending STAB-01 migration, no drift. No live apply/merge/deploy authorized.",
       "candidateCommit": "40ba7ecea44206ded37ceb714d2becb6f2698c12",
       "integrationPullRequest": 230,
       "validationEvidence": "operations/PUBLIC_ACTIVITY_TRUTH_BOUNDARY_G6_2026-09-21.md",
@@ -1489,7 +1489,18 @@
       "validationConclusion": "SUCCESS",
       "exactDiffFileCount": 5,
       "migrationPath": "supabase/migrations/20260921134959_public_activity_truth_boundary_v1.sql",
-      "liveMigrationApplied": false
+      "liveMigrationApplied": false,
+      "releaseCandidateCommit": "40ba7ecea44206ded37ceb714d2becb6f2698c12",
+      "releasePullRequest": 230,
+      "g7ReleaseEvidence": "operations/PUBLIC_ACTIVITY_TRUTH_BOUNDARY_G7_RELEASE_CANDIDATE_2026-09-21.md",
+      "g7PreflightStatus": "PASS",
+      "g7ExactDiffFileCount": 5,
+      "g7ValidationRunId": 35608787457,
+      "g7ValidationRunNumber": 1224,
+      "g7ValidationConclusion": "SUCCESS",
+      "pendingMigration": "20260921134959_public_activity_truth_boundary_v1.sql",
+      "migrationDrift": "NONE",
+      "dryRunResult": "NOT_EXECUTED_NO_SAFE_DRY_RUN_ONLY_PATH"
     },
     {
       "artifactId": "dementor-club.operations.public-activity-truth-boundary-g6-2026-09-21",
@@ -1508,6 +1519,25 @@
       "validationRunId": 35608787457,
       "validationConclusion": "SUCCESS",
       "verdict": "READY_FOR_CLEAN_RELEASE_DECISION"
+    },
+    {
+      "artifactId": "dementor-club.operations.public-activity-truth-boundary-g7-release-candidate-2026-09-21",
+      "documentType": "RELEASE_EVIDENCE",
+      "currentVersion": "1.0",
+      "status": "PASS",
+      "location": "operations/PUBLIC_ACTIVITY_TRUTH_BOUNDARY_G7_RELEASE_CANDIDATE_2026-09-21.md",
+      "sourceSystem": "GIT",
+      "authorityType": "RELEASE_EVIDENCE",
+      "updated": "2026-09-21",
+      "canonicalProject": "dementor-club",
+      "canonicalLocation": "operations/PUBLIC_ACTIVITY_TRUTH_BOUNDARY_G7_RELEASE_CANDIDATE_2026-09-21.md",
+      "result": "dementor-club.result.public-activity-truth-boundary-v1",
+      "gate": "G7_RELEASE",
+      "productionBaseline": "2b17d54faaf3eb3eafb287cef1211554b28871b2",
+      "releaseCandidateCommit": "40ba7ecea44206ded37ceb714d2becb6f2698c12",
+      "validationRunId": 35608787457,
+      "validationConclusion": "SUCCESS",
+      "verdict": "READY_FOR_RELEASE_DECISION"
     }
   ],
   "referenceArtifacts": [
