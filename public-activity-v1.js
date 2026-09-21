@@ -44,7 +44,7 @@ function homeSection(rows){
 
 function communitySection(rows){
   const section=document.createElement('section');section.className='dc-public-activity dc-public-activity--community';section.id='activity';section.setAttribute('aria-labelledby','dc-community-activity-title');
-  section.innerHTML=`<div class="dc-public-activity__head shell"><div><p class="kicker">BOARD / PUBLIC ACTIVITY</p><h2 id="dc-community-activity-title">СЕЙЧАС В КЛУБЕ</h2><p class="body">Публичные материалы Community Board. Публикуются один раз и здесь появляются без ручного дубля.</p></div><a href="/workspace/board/">ОТКРЫТЬ BOARD →</a></div><div class="dc-public-activity__grid shell" data-community-activity-grid>${rows.map((row,index)=>card(row,index)).join('')}</div><div class="dc-public-activity__more shell"><button type="button" data-community-activity-more>ПОКАЗАТЬ ЕЩЁ →</button><small data-community-activity-status aria-live="polite"></small></div>`;
+  section.innerHTML=`<div class="dc-public-activity__head shell"><div><p class="kicker">BOARD / PUBLIC ACTIVITY</p><h2 id="dc-community-activity-title">СЕЙЧАС В КЛУБЕ</h2><p class="body">Редакционно отобранные материалы клубной жизни. Публикация на Board сама по себе не делает материал публичным.</p></div><a href="/workspace/board/">ОТКРЫТЬ BOARD →</a></div><div class="dc-public-activity__grid shell" data-community-activity-grid>${rows.map((row,index)=>card(row,index)).join('')}</div><div class="dc-public-activity__more shell"><button type="button" data-community-activity-more>ПОКАЗАТЬ ЕЩЁ →</button><small data-community-activity-status aria-live="polite"></small></div>`;
   return section;
 }
 
@@ -74,7 +74,7 @@ async function loadMoreCommunity(){
 function renderCommunity(rows,client){
   const old=document.querySelector('section.live');
   if(!old)return;
-  if(!rows.length){old.innerHTML='<div class="shell"><p class="kicker">BOARD / PUBLIC ACTIVITY</p><h2 class="display-l">СЕЙЧАС В КЛУБЕ.</h2><p class="body">Публичных публикаций на Board пока нет.</p></div>';return}
+  if(!rows.length){old.innerHTML='<div class="shell"><p class="kicker">BOARD / PUBLIC ACTIVITY</p><h2 class="display-l">СЕЙЧАС В КЛУБЕ.</h2><p class="body">Публичная редакционная подборка сейчас пуста. Публикации Community Board продолжают жить внутри Board и не становятся публичными автоматически.</p></div>';return}
   old.replaceWith(communitySection(rows));communityState.client=client;communityState.rows=[...rows];communityState.done=rows.length<COMMUNITY_LIMIT;communityState.loading=false;
   document.querySelector('[data-community-activity-more]')?.addEventListener('click',loadMoreCommunity);syncCommunityMore();
 }
