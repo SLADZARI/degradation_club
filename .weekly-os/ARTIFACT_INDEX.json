@@ -7,12 +7,12 @@
     "projectStage": "RELEASE",
     "gate": "G8_CLEANUP",
     "status": "APPROVED",
-    "version": "2.30",
+    "version": "2.31",
     "updated": "2026-09-21",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.29"
+    "supersedes": "2.30"
   },
   "currentArtifacts": [
     {
@@ -1547,16 +1547,16 @@
     {
       "artifactId": "dementor-club.result.artifact-detail-terminal-state-v1",
       "documentType": "RESULT",
-      "currentVersion": "0.2",
+      "currentVersion": "0.3",
       "status": "ACTIVE",
-      "location": ".weekly-os/results/artifact-detail-terminal-state-v1.v0.2.md",
+      "location": ".weekly-os/results/artifact-detail-terminal-state-v1.v0.3.md",
       "sourceSystem": "GIT",
       "authorityType": "IMPLEMENTATION_AUTHORITY",
       "updated": "2026-09-21",
       "canonicalProject": "dementor-club",
-      "canonicalLocation": ".weekly-os/results/artifact-detail-terminal-state-v1.v0.2.md",
+      "canonicalLocation": ".weekly-os/results/artifact-detail-terminal-state-v1.v0.3.md",
       "relation": "CURRENT_RESULT",
-      "gate": "G6_VALIDATION",
+      "gate": "G7_RELEASE",
       "parentIssue": 228,
       "scope": [
         "STAB-02",
@@ -1573,15 +1573,26 @@
       "productionMergeAuthorized": false,
       "productionDeployAuthorized": false,
       "blockingGate": null,
-      "gateReadiness": "READY_FOR_CLEAN_RELEASE_DECISION",
-      "note": "Validated clean STAB-02 candidate on exact production base. Full Site Integrity #1226 SUCCESS after in-scope Join recovery correction. Three-file diff only. No production merge/deploy authorized.",
+      "gateReadiness": "READY_FOR_RELEASE_DECISION",
+      "note": "G7 preflight PASS. Clean RC equals validated candidate; no backend deploy required; PR #231 remains draft/unmerged; no production merge/deploy authorized.",
       "candidateCommit": "a6f73dbfc071085dc5e4b1147c902477af6f117e",
       "integrationPullRequest": 231,
       "validationEvidence": "operations/ARTIFACT_DETAIL_TERMINAL_STATE_G6_2026-09-21.md",
       "validationRunId": 35629843997,
       "validationRunNumber": 1226,
       "validationConclusion": "SUCCESS",
-      "exactDiffFileCount": 3
+      "exactDiffFileCount": 3,
+      "releaseCandidateCommit": "a6f73dbfc071085dc5e4b1147c902477af6f117e",
+      "releasePullRequest": 231,
+      "g7ReleaseEvidence": "operations/ARTIFACT_DETAIL_TERMINAL_STATE_G7_RELEASE_CANDIDATE_2026-09-21.md",
+      "g7PreflightStatus": "PASS",
+      "g7ExactDiffFileCount": 3,
+      "g7ValidationRunId": 35629843997,
+      "g7ValidationRunNumber": 1226,
+      "g7ValidationConclusion": "SUCCESS",
+      "backendProductionDeployRequired": false,
+      "liveDatabaseMutationRequired": false,
+      "stagingDependency": false
     },
     {
       "artifactId": "dementor-club.operations.public-activity-truth-boundary-authenticated-live-retest-2026-09-21",
@@ -1615,6 +1626,25 @@
       "validationRunId": 35629843997,
       "validationConclusion": "SUCCESS",
       "verdict": "READY_FOR_CLEAN_RELEASE_DECISION"
+    },
+    {
+      "artifactId": "dementor-club.operations.artifact-detail-terminal-state-g7-release-candidate-2026-09-21",
+      "documentType": "RELEASE_EVIDENCE",
+      "currentVersion": "1.0",
+      "status": "PASS",
+      "location": "operations/ARTIFACT_DETAIL_TERMINAL_STATE_G7_RELEASE_CANDIDATE_2026-09-21.md",
+      "sourceSystem": "GIT",
+      "authorityType": "RELEASE_EVIDENCE",
+      "updated": "2026-09-21",
+      "canonicalProject": "dementor-club",
+      "canonicalLocation": "operations/ARTIFACT_DETAIL_TERMINAL_STATE_G7_RELEASE_CANDIDATE_2026-09-21.md",
+      "result": "dementor-club.result.artifact-detail-terminal-state-v1",
+      "gate": "G7_RELEASE",
+      "productionBaseline": "0852d2602df5593deead797b20c50daa36fe1c1c",
+      "releaseCandidateCommit": "a6f73dbfc071085dc5e4b1147c902477af6f117e",
+      "validationRunId": 35629843997,
+      "validationConclusion": "SUCCESS",
+      "verdict": "READY_FOR_RELEASE_DECISION"
     }
   ],
   "referenceArtifacts": [
