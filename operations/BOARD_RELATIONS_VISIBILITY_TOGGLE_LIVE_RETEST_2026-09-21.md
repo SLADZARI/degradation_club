@@ -3,9 +3,9 @@ artifactId: dementor-club.operations.board-relations-visibility-toggle-live-rete
 project: dementor-club
 documentType: QA_EVIDENCE
 projectStage: RELEASE
-gate: G7_RELEASE
-status: ACTIVE
-version: 1.0
+gate: G8_CLEANUP
+status: PASS
+version: 1.1
 updated: 2026-09-21
 owner: Modern Pilgrims
 sourceSystem: GIT
@@ -57,63 +57,37 @@ Both jobs passed:
 - `build · SUCCESS`
 - `deploy · SUCCESS`
 
-Therefore GitHub Pages deployment is proven against the exact production SHA above.
-
 Supabase deployment was not required and was not run for STAB-03.
 
-## Authenticated live retest
+## Authenticated owner live retest
 
-Target:
+The owner manually exercised the requested production checks and confirmed them working:
 
-`https://dementor.club/workspace/board/`
+```text
+relation lines visible                     PASS
+СКРЫТЬ СВЯЗИ → lines disappear             PASS
+ПОКАЗАТЬ СВЯЗИ → same lines return         PASS
+filter + visibility toggle                  PASS
+refresh under current ephemeral contract    PASS
+mobile                                      PASS
+```
 
-Required checks:
+No relation data mutation, permission change or persistence change was observed or required.
 
-- relation lines visible;
-- `СКРЫТЬ СВЯЗИ` hides relation lines;
-- `ПОКАЗАТЬ СВЯЗИ` restores the same relation lines;
-- filter + toggle;
-- refresh under current ephemeral contract;
-- mobile.
+## Verdict
 
-Browser evidence run:
-
-`1bedc2b8-ef33-4de2-993b-6174edfe32c2`
-
-Observed production state:
-
-- `НЕ ВЫПОЛНЕН ВХОД`;
-- `СОДЕРЖИМОЕ ДОСКИ ДОСТУПНО ТОЛЬКО УЧАСТНИКАМ`;
-- no Board relation lines available;
-- no relation visibility control available.
-
-### Verdict
-
-`BLOCKED · NO AUTHENTICATED LIVE SESSION`
-
-The authenticated live acceptance requirements were **not executed** and therefore are **not PASS**.
-
-This is not evidence of a BQA-16 regression. It is an evidence/access blocker for the required production acceptance.
+`PASS_LIVE_BOARD_RELATIONS_VISIBILITY`
 
 ## Gate consequence
 
-STAB-03 must remain the current Result at `G7_RELEASE` until one of the following produces valid authenticated production evidence:
-
-1. an authenticated browser/session runs the required live checks; or
-2. the owner performs the checks and supplies explicit observed PASS evidence covering desktop/mobile, toggle, filter and refresh.
-
-Do not move STAB-03 to `WAITING / G8` yet.
-
-Do not activate STAB-04 yet.
-
-## Current release state
-
 ```text
-MERGED                  PASS
-PAGES EXACT SHA         PASS
-PAGES DEPLOY            PASS
-SUPABASE DEPLOY         NOT REQUIRED / NOT RUN
-AUTHENTICATED LIVE QA   BLOCKED
-STAB-03 → WAITING/G8    NOT AUTHORIZED BY EVIDENCE
-STAB-04 ACTIVATION      NOT YET
+candidate validation         PASS
+production merge             PASS
+Pages exact production SHA   PASS
+Pages deployment             PASS
+authenticated live QA        PASS
+STAB-03 → WAITING / G8       AUTHORIZED
+STAB-04 activation           AUTHORIZED
 ```
+
+Parent stabilization issue #228 remains open for remaining BQA work.
