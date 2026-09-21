@@ -17,7 +17,25 @@
   <div class="dc-artifact-top"><a href="/workspace/board/" id="artifactBackTop">← BOARD</a><span id="artifactState">LOADING</span></div>
   <div id="artifactHost" aria-live="polite"><div class="dc-artifact-service">ЗАГРУЖАЕМ ARTIFACT…</div></div>
 </main>
-<script type="module" src="/community/artifact/artifact.js"></script>
+<script type="module" id="artifactRuntime" src="/community/artifact/artifact.js"></script>
+<script>
+(()=>{
+  const runtime=document.getElementById('artifactRuntime');
+  const state=document.getElementById('artifactState');
+  const host=document.getElementById('artifactHost');
+  const timeout=Math.max(250,Number(window.__DC_ARTIFACT_BOOT_WATCHDOG_MS__)||9000);
+  let terminal=false;
+  const failBootstrap=()=>{
+    if(terminal||state?.textContent!=='LOADING')return;
+    terminal=true;
+    state.textContent='ERROR';
+    host.innerHTML='<div class="dc-artifact-error" data-artifact-bootstrap-fallback><strong>ERROR</strong><p>Artifact runtime не запустился. Можно повторить открытие или вернуться на Board.</p><div class="dc-artifact-actions"><button class="dc-artifact-action" type="button" id="artifactBootstrapRetry">ПОВТОРИТЬ</button><a class="dc-artifact-action" href="/workspace/board/" id="detailBack">← BOARD</a></div></div>';
+    document.getElementById('artifactBootstrapRetry')?.addEventListener('click',()=>location.reload());
+  };
+  runtime?.addEventListener('error',failBootstrap,{once:true});
+  setTimeout(()=>{if(!window.__DC_ARTIFACT_RUNTIME_STARTED__)failBootstrap()},timeout);
+})();
+</script>
 <script type="module" src="/community/artifact/artifact-club-publisher-v1.js"></script>
 </body>
 </html>
