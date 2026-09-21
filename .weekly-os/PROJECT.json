@@ -4,15 +4,15 @@
     "artifactId": "dementor-club.kernel.project",
     "project": "dementor-club",
     "documentType": "STANDARD",
-    "projectStage": "BUILD",
-    "gate": "G5_BUILD",
+    "projectStage": "RELEASE",
+    "gate": "G7_RELEASE",
     "status": "APPROVED",
-    "version": "2.43",
+    "version": "2.44",
     "updated": "2026-09-21",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.42"
+    "supersedes": "2.43"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -20,8 +20,8 @@
   "canonicalRepository": "SLADZARI/degradation_club",
   "defaultBranch": "main",
   "semanticSourceBranch": "dementor-club",
-  "projectStage": "BUILD",
-  "gate": "G5_BUILD",
+  "projectStage": "RELEASE",
+  "gate": "G7_RELEASE",
   "readFirst": [
     ".weekly-os/PROJECT.json",
     ".weekly-os/ARTIFACT_INDEX.json",
@@ -133,7 +133,10 @@
     "operations/BOARD_RELATIONS_VISIBILITY_TOGGLE_G7_RELEASE_CANDIDATE_2026-09-21.md",
     ".weekly-os/results/board-relations-visibility-toggle-v1.v0.4.md",
     "operations/BOARD_RELATIONS_VISIBILITY_TOGGLE_LIVE_RETEST_2026-09-21.md",
-    ".weekly-os/results/artifact-share-social-preview-v1.v0.1.md"
+    ".weekly-os/results/artifact-share-social-preview-v1.v0.1.md",
+    ".weekly-os/results/artifact-share-social-preview-v1.v0.2.md",
+    "operations/ARTIFACT_SHARE_SOCIAL_PREVIEW_G6_2026-09-21.md",
+    "operations/ARTIFACT_SHARE_SOCIAL_PREVIEW_G7_RELEASE_CANDIDATE_2026-09-21.md"
   ],
   "authority": {
     "mpDslCore": {
@@ -279,10 +282,10 @@
   },
   "currentResult": {
     "artifactId": "dementor-club.result.artifact-share-social-preview-v1",
-    "version": "0.1",
+    "version": "0.2",
     "status": "ACTIVE",
-    "path": ".weekly-os/results/artifact-share-social-preview-v1.v0.1.md",
-    "gate": "G5_BUILD",
+    "path": ".weekly-os/results/artifact-share-social-preview-v1.v0.2.md",
+    "gate": "G7_RELEASE",
     "parentIssue": 228,
     "scope": [
       "STAB-04",
@@ -299,8 +302,17 @@
     "productionMergeAuthorized": false,
     "productionDeployAuthorized": false,
     "blockingGate": null,
-    "gateReadiness": "G5_BUILD_IN_PROGRESS",
-    "note": "STAB-03 released at production 692c87da... and owner-confirmed live relation visibility retest PASS. STAB-03 moved to WAITING/G8 with no active integration branch. STAB-04 / BQA-14 is now the single active implementation Result on exact current production."
+    "gateReadiness": "READY_FOR_RELEASE_DECISION",
+    "note": "STAB-04 / BQA-14 validated candidate e51d4bee... from exact production 692c87da.... Site Integrity #1230 / 35648978456 SUCCESS, including built fresh share URL validation with dedicated public-safe 1200x630 PNG and no private media leakage. PR #233 remains DRAFT/UNMERGED. STOP pending owner release decision; STAB-05 not started.",
+    "candidateCommit": "e51d4bee5b5722bc419f8dd78e0012e8a5ab1907",
+    "releaseCandidateCommit": "e51d4bee5b5722bc419f8dd78e0012e8a5ab1907",
+    "integrationPullRequest": 233,
+    "validationRunNumber": 1230,
+    "validationRunId": 35648978456,
+    "validationConclusion": "SUCCESS",
+    "exactDiffFileCount": 5,
+    "backendProductionDeployRequired": false,
+    "liveDatabaseMutationRequired": false
   },
   "waitingResults": [
     {
