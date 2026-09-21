@@ -7,12 +7,12 @@
     "projectStage": "RELEASE",
     "gate": "G7_RELEASE",
     "status": "APPROVED",
-    "version": "2.48",
-    "updated": "2026-09-21",
+    "version": "2.49",
+    "updated": "2026-09-22",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.47"
+    "supersedes": "2.48"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -146,7 +146,9 @@
     ".weekly-os/results/projects-public-media-fallback-v1.v0.1.md",
     ".weekly-os/results/projects-public-media-fallback-v1.v0.2.md",
     "operations/PROJECTS_PUBLIC_MEDIA_FALLBACK_G6_2026-09-21.md",
-    "operations/PROJECTS_PUBLIC_MEDIA_FALLBACK_G7_RELEASE_CANDIDATE_2026-09-21.md"
+    "operations/PROJECTS_PUBLIC_MEDIA_FALLBACK_G7_RELEASE_CANDIDATE_2026-09-21.md",
+    ".weekly-os/results/projects-public-media-fallback-v1.v0.3.md",
+    "operations/PROJECTS_PUBLIC_MEDIA_FALLBACK_G7_MERGE_2026-09-22.md"
   ],
   "authority": {
     "mpDslCore": {
@@ -292,9 +294,9 @@
   },
   "currentResult": {
     "artifactId": "dementor-club.result.projects-public-media-fallback-v1",
-    "version": "0.2",
+    "version": "0.3",
     "status": "ACTIVE",
-    "path": ".weekly-os/results/projects-public-media-fallback-v1.v0.2.md",
+    "path": ".weekly-os/results/projects-public-media-fallback-v1.v0.3.md",
     "gate": "G7_RELEASE",
     "parentIssue": 228,
     "scope": [
@@ -309,11 +311,11 @@
     "schemaMutationAuthorized": false,
     "semanticMutationRequired": false,
     "changeProposalRequired": false,
-    "productionMergeAuthorized": false,
+    "productionMergeAuthorized": true,
     "productionDeployAuthorized": false,
     "blockingGate": null,
-    "gateReadiness": "READY_FOR_RELEASE_DECISION",
-    "note": "STAB-05 / BQA-21 validated candidate 581468fb... from exact production 440ebce6.... External YouTube source dWokndhJLKQ verified unavailable, so the inert 9:16 media promise and broken link are collapsed into a compact unavailable state. Site Integrity #1232 / 35660069754 SUCCESS, including Projects browser regression at 1440/390/360 + reload. PR #234 remains DRAFT/UNMERGED. STOP pending owner release decision; STAB-06 not started.",
+    "gateReadiness": "MERGED_AWAITING_PAGES_DEPLOY",
+    "note": "STAB-05 / BQA-21 exact validated candidate 581468fb... merged via PR #234 to production 4a8e95cb.... Exact old-production→new-production content delta remains 3 STAB-05 files; candidate→production content diff = 0. Supabase deploy not required/not run. Await Pages deploy + live Projects retest. STAB-06 not started.",
     "candidateCommit": "581468fbf4b2b321bd2c2a16bd9e65a9e12e3a4f",
     "releaseCandidateCommit": "581468fbf4b2b321bd2c2a16bd9e65a9e12e3a4f",
     "integrationPullRequest": 234,
@@ -322,7 +324,10 @@
     "validationConclusion": "SUCCESS",
     "exactDiffFileCount": 3,
     "backendProductionDeployRequired": false,
-    "liveDatabaseMutationRequired": false
+    "liveDatabaseMutationRequired": false,
+    "productionCommit": "4a8e95cb669dab660a7afe381e580278d4575a2a",
+    "productionMergeCommit": "4a8e95cb669dab660a7afe381e580278d4575a2a",
+    "mergeEvidence": "operations/PROJECTS_PUBLIC_MEDIA_FALLBACK_G7_MERGE_2026-09-22.md"
   },
   "waitingResults": [
     {
