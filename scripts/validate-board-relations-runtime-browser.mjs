@@ -196,6 +196,28 @@ try{
     const initialReads=await rpcCalls(page,'dc_board_relations_read_v1');
     expect(initialReads.length===1,`desktop: expected one initial canonical relation read, got ${initialReads.length}`);
 
+    // BQA-16: the existing control owns presentation only. Hide/show must preserve
+    // the same relation nodes/data and use the parent's canonical hidden attribute.
+    const relationLayer=page.locator('.dc-board-relations-layer');
+    const relationToggle=page.locator('[data-relations-toggle]');
+    const relationIdsBefore=await page.locator('.dc-board-relation-line').evaluateAll(lines=>lines.map(line=>line.dataset.relationId).sort());
+    expect((await relationToggle.innerText())==='СКРЫТЬ СВЯЗИ','desktop toggle: initial visible-state label drifted');
+    expect((await relationLayer.getAttribute('hidden'))===null,'desktop toggle: relation layer unexpectedly starts hidden');
+    await relationToggle.click();
+    await page.waitForFunction(()=>document.querySelector('.dc-board-relations-layer')?.hasAttribute('hidden'),{timeout:2000});
+    expect(!(await relationLayer.isVisible()),'desktop toggle: parent SVG remains visibly rendered after hide');
+    expect((await relationToggle.innerText())==='ПОКАЗАТЬ СВЯЗИ','desktop toggle: hidden-state label drifted');
+    const relationIdsHidden=await page.locator('.dc-board-relation-line').evaluateAll(lines=>lines.map(line=>line.dataset.relationId).sort());
+    expect(JSON.stringify(relationIdsHidden)===JSON.stringify(relationIdsBefore),`desktop toggle: hide mutated relation line identity ${JSON.stringify({relationIdsBefore,relationIdsHidden})}`);
+    expect((await rpcCalls(page,'dc_board_relations_read_v1')).length===1,'desktop toggle: presentation hide unexpectedly re-read relation data');
+    await relationToggle.click();
+    await page.waitForFunction(()=>!document.querySelector('.dc-board-relations-layer')?.hasAttribute('hidden'),{timeout:2000});
+    await page.waitForFunction(()=>document.querySelectorAll('.dc-board-relation-line:not([hidden])').length===3,{timeout:2000});
+    const relationIdsShown=await page.locator('.dc-board-relation-line').evaluateAll(lines=>lines.map(line=>line.dataset.relationId).sort());
+    expect(JSON.stringify(relationIdsShown)===JSON.stringify(relationIdsBefore),`desktop toggle: show did not restore the same relation lines ${JSON.stringify({relationIdsBefore,relationIdsShown})}`);
+    expect((await relationToggle.innerText())==='СКРЫТЬ СВЯЗИ','desktop toggle: visible-state label did not restore');
+    expect((await rpcCalls(page,'dc_board_relations_read_v1')).length===1,'desktop toggle: presentation show unexpectedly re-read relation data');
+
     const ownBlock=page.locator('.dc-notice[data-artifact-owned="1"] [data-relation-block]');
     await ownBlock.waitFor({state:'attached',timeout:3000});
     await ownBlock.evaluate(el=>el.open=true);
@@ -233,12 +255,18 @@ try{
     expect(detailGeometry&&detailGeometry.host.left>=detailGeometry.panel.left&&detailGeometry.host.right<=detailGeometry.panel.right&&detailGeometry.host.top>=detailGeometry.panel.top&&detailGeometry.host.bottom<=detailGeometry.panel.bottom,`desktop Artifact detail: relation block escapes canonical overlay panel ${JSON.stringify(detailGeometry)}`);
     await page.locator('.dc-artifact-overlay__close').click();await overlay.waitFor({state:'hidden',timeout:2000});
 
-    // Hidden/filtered endpoint removes corresponding canvas lines.
+    // Filters and relation visibility must compose without a second owner.
     await page.locator('[data-board-filter-drawer]').click();
     await page.locator('[data-board-detail-filter="artifact"]').click();
     await page.waitForFunction(()=>document.querySelectorAll('.dc-board-relation-line:not([hidden])').length===0,{timeout:3000});
+    await relationToggle.click();
+    await page.waitForFunction(()=>document.querySelector('.dc-board-relations-layer')?.hasAttribute('hidden'),{timeout:2000});
     await page.locator('[data-board-filter="all"]').click();
     await page.waitForFunction(()=>document.querySelectorAll('.dc-board-relation-line:not([hidden])').length===3,{timeout:3000});
+    expect(!(await relationLayer.isVisible()),'desktop filter+toggle: restoring filter made hidden parent SVG visible');
+    await relationToggle.click();
+    await page.waitForFunction(()=>!document.querySelector('.dc-board-relations-layer')?.hasAttribute('hidden'),{timeout:2000});
+    await page.waitForFunction(()=>document.querySelectorAll('.dc-board-relation-line:not([hidden])').length===3,{timeout:2000});
 
     // Real existing drag owner moves card; relation layer follows style/position changes.
     await page.evaluate(()=>{
@@ -327,6 +355,25 @@ try{
     await ctx.close();
   }
 
+  // Visibility preference is intentionally ephemeral in the current contract.
+  {
+    const{ctx,page,errors}=await openBoard(browser,'available',{width:1440,height:900});
+    await page.waitForFunction(()=>document.querySelectorAll('.dc-board-relation-line:not([hidden])').length===3,{timeout:5000});
+    const toggle=page.locator('[data-relations-toggle]');
+    await toggle.click();
+    await page.waitForFunction(()=>document.querySelector('.dc-board-relations-layer')?.hasAttribute('hidden'),{timeout:2000});
+    await page.reload({waitUntil:'domcontentloaded'});
+    await page.locator('.dc-spatial-viewport').waitFor({state:'visible',timeout:7000});
+    await page.waitForFunction(()=>document.querySelectorAll('.dc-notice[data-artifact]').length>=2,{timeout:6000});
+    await page.waitForFunction(()=>document.documentElement.dataset.dcBoardRelations==='ready',{timeout:6000});
+    await page.waitForFunction(()=>document.querySelectorAll('.dc-board-relation-line:not([hidden])').length===3,{timeout:5000});
+    expect(!document.documentElement.hasAttribute('data-bqa16-persisted'),'desktop refresh: unexpected persistence marker appeared');
+    expect((await page.locator('.dc-board-relations-layer').getAttribute('hidden'))===null,'desktop refresh: ephemeral hidden state persisted across reload');
+    expect((await page.locator('[data-relations-toggle]').innerText())==='СКРЫТЬ СВЯЗИ','desktop refresh: control did not reset to current visible default');
+    expect(!errors.length,`desktop refresh page errors: ${errors.join(' | ')}`);
+    await ctx.close();
+  }
+
   // Mobile/fullscreen regression: same owner, no second layout system.
   {
     const{ctx,page,errors}=await openBoard(browser,'available',{width:390,height:844});
@@ -350,6 +397,17 @@ try{
     expect(state.docWidth<=state.innerWidth+2,`mobile: relation UI creates document overflow ${JSON.stringify(state)}`);
     expect(state.blockWidth<=state.cardWidth+1,`mobile: relation block escapes canonical card ${JSON.stringify(state)}`);
 
+    const mobileLayer=page.locator('.dc-board-relations-layer');
+    const mobileToggle=page.locator('[data-relations-toggle]');
+    const mobileIdsBefore=await page.locator('.dc-board-relation-line').evaluateAll(lines=>lines.map(line=>line.dataset.relationId).sort());
+    await mobileToggle.click();
+    await page.waitForFunction(()=>document.querySelector('.dc-board-relations-layer')?.hasAttribute('hidden'),{timeout:2000});
+    expect(!(await mobileLayer.isVisible()),'mobile 390 toggle: relation layer remains visible after hide');
+    expect(JSON.stringify(await page.locator('.dc-board-relation-line').evaluateAll(lines=>lines.map(line=>line.dataset.relationId).sort()))===JSON.stringify(mobileIdsBefore),'mobile 390 toggle: hide changed relation line identity');
+    await mobileToggle.click();
+    await page.waitForFunction(()=>!document.querySelector('.dc-board-relations-layer')?.hasAttribute('hidden'),{timeout:2000});
+    await page.waitForFunction(()=>document.querySelectorAll('.dc-board-relation-line:not([hidden])').length===3,{timeout:2000});
+
     await page.evaluate(()=>{
       const node=document.querySelector('.dc-notice[data-artifact-owned="1"]');
       window.dispatchEvent(new CustomEvent('dc:board-focus-target',{detail:{node,open:true}}));
@@ -369,6 +427,33 @@ try{
 
     expect(!errors.length,`mobile page errors: ${errors.join(' | ')}`);
     await page.screenshot({path:path.join(outDir,'mobile-390.png'),fullPage:false});
+    await ctx.close();
+  }
+
+  // Narrow mobile regression for BQA-16: same owner and same relation identities.
+  {
+    const{ctx,page,errors}=await openBoard(browser,'available',{width:360,height:800});
+    await page.waitForFunction(()=>document.querySelectorAll('.dc-board-relation-line:not([hidden])').length===3,{timeout:5000});
+    const state=await page.evaluate(()=>({
+      docWidth:document.documentElement.scrollWidth,
+      innerWidth,
+      layerInside:document.querySelector('.dc-board-relations-layer')?.parentElement===document.querySelector('.dc-spatial-world')
+    }));
+    expect(state.layerInside,'mobile 360: relation layer escaped canonical spatial world');
+    expect(state.docWidth<=state.innerWidth+2,`mobile 360: relation UI creates document overflow ${JSON.stringify(state)}`);
+    const toggle=page.locator('[data-relations-toggle]');
+    const layer=page.locator('.dc-board-relations-layer');
+    const before=await page.locator('.dc-board-relation-line').evaluateAll(lines=>lines.map(line=>line.dataset.relationId).sort());
+    await toggle.click();
+    await page.waitForFunction(()=>document.querySelector('.dc-board-relations-layer')?.hasAttribute('hidden'),{timeout:2000});
+    expect(!(await layer.isVisible()),'mobile 360 toggle: relation layer remains visible after hide');
+    await toggle.click();
+    await page.waitForFunction(()=>!document.querySelector('.dc-board-relations-layer')?.hasAttribute('hidden'),{timeout:2000});
+    await page.waitForFunction(()=>document.querySelectorAll('.dc-board-relation-line:not([hidden])').length===3,{timeout:2000});
+    const after=await page.locator('.dc-board-relation-line').evaluateAll(lines=>lines.map(line=>line.dataset.relationId).sort());
+    expect(JSON.stringify(after)===JSON.stringify(before),`mobile 360 toggle: show did not restore same relation lines ${JSON.stringify({before,after})}`);
+    expect(!errors.length,`mobile 360 page errors: ${errors.join(' | ')}`);
+    await page.screenshot({path:path.join(outDir,'mobile-360.png'),fullPage:false});
     await ctx.close();
   }
 
@@ -408,7 +493,9 @@ if(failures.length){
 console.log('Board Relations v1 browser acceptance PASS');
 console.log('- desktop endpoint mapping + relation canvas/detail PASS');
 console.log('- Course/Practice → Program normalization PASS');
-console.log('- filter/hide + canonical drag line updates PASS');
+console.log('- visibility toggle hide/show + relation identity preservation PASS');
+console.log('- filter + toggle composition + canonical drag line updates PASS');
+console.log('- refresh resets current ephemeral visibility state PASS');
 console.log('- create/delete + permission reject fixtures PASS');
-console.log('- mobile/fullscreen PASS');
+console.log('- mobile 390/360 + fullscreen PASS');
 console.log('- RPC unavailable + invalid payload fail-closed PASS');
