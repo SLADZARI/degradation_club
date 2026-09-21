@@ -7,12 +7,12 @@
     "projectStage": "RELEASE",
     "gate": "G7_RELEASE",
     "status": "APPROVED",
-    "version": "2.33",
+    "version": "2.34",
     "updated": "2026-09-21",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.32"
+    "supersedes": "2.33"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -287,12 +287,12 @@
     "schemaExpansionAuthorized": false,
     "semanticMutationRequired": false,
     "changeProposalRequired": false,
-    "liveDatabaseMutationAuthorized": false,
-    "productionMergeAuthorized": false,
-    "productionDeployAuthorized": false,
+    "liveDatabaseMutationAuthorized": true,
+    "productionMergeAuthorized": true,
+    "productionDeployAuthorized": true,
     "blockingGate": null,
     "gateReadiness": "READY_FOR_RELEASE_DECISION",
-    "note": "G7 release candidate precheck PASS. Exact RC remains 40ba7ece... on clean production base with five Result-owned files and CI #1224 SUCCESS. Read-only Supabase preflight shows exactly one pending migration and no drift. Canonical workflow dry-run was not dispatched because it has no dry-run-only path and would continue to apply. STOP pending owner release authorization.",
+    "note": "Owner authorized STAB-01 release. PR #230 merged exact RC to production commit 0852d260... with the same five-file delta. Backend/Pages release remains blocked only because available tooling cannot dispatch the authenticated canonical GitHub workflow; live DB and Pages are unchanged. Resume from canonical backend workflow; Telegram worker remains excluded.",
     "candidateCommit": "40ba7ecea44206ded37ceb714d2becb6f2698c12",
     "integrationPullRequest": 230,
     "validationEvidence": "operations/PUBLIC_ACTIVITY_TRUTH_BOUNDARY_G6_2026-09-21.md",
@@ -315,7 +315,14 @@
     "pendingMigration": "20260921134959_public_activity_truth_boundary_v1.sql",
     "extraPendingMigrations": [],
     "migrationDrift": "NONE",
-    "dryRunResult": "NOT_EXECUTED_NO_SAFE_DRY_RUN_ONLY_PATH"
+    "dryRunResult": "NOT_EXECUTED_NO_SAFE_DRY_RUN_ONLY_PATH",
+    "productionMergeCompleted": true,
+    "productionCommit": "0852d2602df5593deead797b20c50daa36fe1c1c",
+    "releaseExecutionStatus": "BLOCKED_TOOLING_AUTH",
+    "backendWorkflowRunId": null,
+    "pagesWorkflowRunId": null,
+    "liveRetestStatus": "NOT_STARTED",
+    "releaseBlockerEvidence": "operations/PUBLIC_ACTIVITY_TRUTH_BOUNDARY_RELEASE_TOOLING_BLOCKER_2026-09-21.md"
   },
   "waitingResults": [
     {
