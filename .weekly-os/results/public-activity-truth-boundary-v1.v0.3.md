@@ -206,3 +206,47 @@ liveRetestStatus = NOT_STARTED
 ```
 
 Owner authorization remains valid. Resume from the canonical backend workflow; do not apply the migration ad hoc.
+
+
+## Backend production release
+
+Owner-authorized backend release completed through the canonical workflow.
+
+```text
+productionCommit = 0852d2602df5593deead797b20c50daa36fe1c1c
+workflow = Deploy Dementor Supabase Production
+runNumber = 7
+runId = 35621963033
+jobId = 106406947641
+conclusion = SUCCESS
+```
+
+Migration boundary:
+
+```text
+before = 57
+pending = 20260921134959_public_activity_truth_boundary_v1
+dryRun = exactly one pending migration
+apply = SUCCESS
+after = 58
+latest = 20260921134959_public_activity_truth_boundary_v1
+extraPending = none
+drift = none
+```
+
+Telegram worker deployment was skipped.
+
+Evidence:
+
+`operations/PUBLIC_ACTIVITY_TRUTH_BOUNDARY_BACKEND_RELEASE_2026-09-21.md`
+
+```text
+productionMergeCompleted = true
+backendProductionDeployCompleted = true
+liveMigrationApplied = true
+pagesProductionDeployCompleted = false
+liveRetestStatus = NOT_STARTED
+releaseExecutionStatus = BACKEND_RELEASED_PAGES_PENDING
+```
+
+Next checkpoint: canonical Pages production deploy for exact production commit, then live retest.
