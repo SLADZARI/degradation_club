@@ -6,8 +6,10 @@ const assert=(condition,message)=>{if(!condition)throw new Error(message)};
 
 const migrationPath='supabase/migrations/20260914090000_board_public_activity_read_v1.sql';
 const evidenceMigrationPath='supabase/migrations/20260916213500_evidence_hygiene_v1.sql';
+const truthBoundaryMigrationPath='supabase/migrations/20260921134959_public_activity_truth_boundary_v1.sql';
 const migration=read(migrationPath);
 const evidenceMigration=read(evidenceMigrationPath);
+const truthBoundaryMigration=read(truthBoundaryMigrationPath);
 const activity=read('public-activity-v1.js');
 const activityCss=read('public-activity-v1.css');
 const media=read('community/board/board-artifact-media-v1.js');
@@ -41,6 +43,18 @@ assert(!/update\s+public\.dc_artifacts[\s\S]{0,500}provenance_status/i.test(evid
 assert(!evidenceMigration.includes('is_test'),'Evidence Hygiene must not add an is_test taxonomy');
 assert(!evidenceMigration.includes('evidence_type'),'Evidence Hygiene must not add an evidence_type taxonomy');
 
+assert(truthBoundaryMigration.includes('dc_public_activity_read_v1'),'STAB-01 corrective must replace the canonical public Activity RPC');
+assert(truthBoundaryMigration.includes('NO_RELEASED_GENERIC_EDITORIAL_ELIGIBILITY_OWNER'),'STAB-01 fail-closed authority marker missing');
+assert(/where\s+false\s*;/i.test(truthBoundaryMigration),'STAB-01 public Activity RPC must fail closed');
+assert(!truthBoundaryMigration.includes('from public.dc_artifacts'),'STAB-01 public read must not derive anonymous eligibility from Board Artifact rows');
+assert(!truthBoundaryMigration.includes('from public.dc_artifact_media'),'STAB-01 public read must not expose private Board media');
+assert(truthBoundaryMigration.includes("grant execute on function public.dc_public_activity_read_v1(integer,timestamptz,uuid) to anon, authenticated"),'STAB-01 must preserve the existing public RPC ACL surface while returning zero generic rows');
+for(const forbidden of ['public=true','editorial=true','featured=true','programmed=true','home_visible=true','create table','alter table public.dc_artifacts add'])
+  assert(!truthBoundaryMigration.toLowerCase().includes(forbidden),'STAB-01 must not invent generic editorial/schema state: '+forbidden);
+assert(activity.includes('Публикация на Board сама по себе не делает материал публичным.'),'public Activity rendered-state copy must preserve Board/public distinction');
+assert(activity.includes('Публичная редакционная подборка сейчас пуста.'),'public Activity empty state must describe editorial emptiness, not absence of Board content');
+assert(!activity.includes('Публичных публикаций на Board пока нет.'),'legacy false Board-empty copy remains');
+
 assert(activity.includes('railDuration'),'Home rail duration must derive from content');
 assert(activity.includes("--dc-activity-duration"),'Home rail duration CSS variable missing');
 assert(!activityCss.includes('46s'),'fixed 46s rail duration must not remain');
@@ -64,7 +78,7 @@ assert(siteConfig.includes("addScript('/public-activity-v1.js',{module:true})"),
 assert(siteConfig.includes("addScript('/community/board/board-artifact-media-v1.js',{module:true})"),'Board/Artifact media runtime not wired');
 
 assert(browser.includes('for(const width of [390,360])'),'browser evidence must cover both 390px and 360px Home mobile');
-for(const token of ['PROFILE TEXT','PRIVATE IMAGE','HIDDEN FIXTURE','FUTURE FIXTURE','EXPIRED FIXTURE','assertRuntimeExclusions','Artifact detail presentation diagnostic'])assert(browser.includes(token),`browser evidence missing ${token}`);
+for(const token of ['PROFILE TEXT','CLUB ARTIFACT','PRIVATE IMAGE','VIDEO ARTIFACT','QA ARTIFACT','privateStoragePath','eligibleIds','Artifact detail presentation diagnostic'])assert(browser.includes(token),`browser evidence missing ${token}`);
 assert(browser.includes('privateStoragePath'),'private-image fixture must carry a private storage path for leak evidence');
 assert(browser.includes("eligibleIds"),'browser fixture must expose runtime eligibility evidence');
 
