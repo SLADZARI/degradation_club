@@ -4,15 +4,15 @@
     "artifactId": "dementor-club.kernel.project",
     "project": "dementor-club",
     "documentType": "STANDARD",
-    "projectStage": "BUILD",
-    "gate": "G5_BUILD",
+    "projectStage": "VALIDATION",
+    "gate": "G6_VALIDATION",
     "status": "APPROVED",
-    "version": "2.37",
+    "version": "2.38",
     "updated": "2026-09-21",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.36"
+    "supersedes": "2.37"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -20,8 +20,8 @@
   "canonicalRepository": "SLADZARI/degradation_club",
   "defaultBranch": "main",
   "semanticSourceBranch": "dementor-club",
-  "projectStage": "BUILD",
-  "gate": "G5_BUILD",
+  "projectStage": "VALIDATION",
+  "gate": "G6_VALIDATION",
   "readFirst": [
     ".weekly-os/PROJECT.json",
     ".weekly-os/ARTIFACT_INDEX.json",
@@ -123,7 +123,8 @@
     "operations/DEMENTOR_ENTITY_MAP_AND_WORKSPACE_MODULES_V0.1.md",
     "operations/UNIVERSAL_WORKSPACE_WIREFRAME_SPEC_V0.1.md",
     "operations/BOARD_RELATIONS_PRODUCTION_RELEASE_TOOLING_BLOCKER_2026-09-18.md",
-    ".weekly-os/results/artifact-detail-terminal-state-v1.v0.1.md"
+    ".weekly-os/results/artifact-detail-terminal-state-v1.v0.2.md",
+    "operations/ARTIFACT_DETAIL_TERMINAL_STATE_G6_2026-09-21.md"
   ],
   "authority": {
     "mpDslCore": {
@@ -269,10 +270,10 @@
   },
   "currentResult": {
     "artifactId": "dementor-club.result.artifact-detail-terminal-state-v1",
-    "version": "0.1",
+    "version": "0.2",
     "status": "ACTIVE",
-    "path": ".weekly-os/results/artifact-detail-terminal-state-v1.v0.1.md",
-    "gate": "G5_BUILD",
+    "path": ".weekly-os/results/artifact-detail-terminal-state-v1.v0.2.md",
+    "gate": "G6_VALIDATION",
     "parentIssue": 228,
     "scope": [
       "STAB-02",
@@ -289,8 +290,18 @@
     "productionMergeAuthorized": false,
     "productionDeployAuthorized": false,
     "blockingGate": null,
-    "gateReadiness": "G5_BUILD_IN_PROGRESS",
-    "note": "STAB-02 reliability corrective for BQA-19. Clean implementation branch must be based directly on exact production because dementor-club-site remains diverged with unrelated reconciliation debt."
+    "gateReadiness": "READY_FOR_CLEAN_RELEASE_DECISION",
+    "note": "STAB-02 validated candidate PASS. Primary Artifact render no longer waits on optional enrichment; essential stalls are bounded; bootstrap failure has recoverable terminal fallback. Exact production-based diff is three Result-owned files. Draft PR #231 unmerged; production unchanged. STOP pending owner release decision.",
+    "candidateCommit": "a6f73dbfc071085dc5e4b1147c902477af6f117e",
+    "integrationPullRequest": 231,
+    "validationEvidence": "operations/ARTIFACT_DETAIL_TERMINAL_STATE_G6_2026-09-21.md",
+    "validationRunId": 35629843997,
+    "validationRunNumber": 1226,
+    "validationConclusion": "SUCCESS",
+    "previousValidationRunId": 35629731586,
+    "previousValidationRunNumber": 1225,
+    "previousValidationConclusion": "FAIL_CANONICAL_JOIN_RECOVERY",
+    "exactDiffFileCount": 3
   },
   "waitingResults": [
     {
