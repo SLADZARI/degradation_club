@@ -4,15 +4,15 @@
     "artifactId": "dementor-club.kernel.artifact-index",
     "project": "dementor-club",
     "documentType": "STANDARD",
-    "projectStage": "BUILD",
-    "gate": "G5_BUILD",
+    "projectStage": "RELEASE",
+    "gate": "G7_RELEASE",
     "status": "APPROVED",
-    "version": "2.39",
+    "version": "2.40",
     "updated": "2026-09-21",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.38"
+    "supersedes": "2.39"
   },
   "currentArtifacts": [
     {
@@ -1854,17 +1854,17 @@
       "artifactId": "dementor-club.result.projects-public-media-fallback-v1",
       "documentType": "RESULT",
       "currentVersion": "0.1",
-      "version": "0.1",
+      "version": "0.2",
       "status": "ACTIVE",
-      "location": ".weekly-os/results/projects-public-media-fallback-v1.v0.1.md",
-      "path": ".weekly-os/results/projects-public-media-fallback-v1.v0.1.md",
+      "location": ".weekly-os/results/projects-public-media-fallback-v1.v0.2.md",
+      "path": ".weekly-os/results/projects-public-media-fallback-v1.v0.2.md",
       "sourceSystem": "GIT",
       "authorityType": "IMPLEMENTATION_AUTHORITY",
       "updated": "2026-09-21",
       "canonicalProject": "dementor-club",
       "canonicalLocation": ".weekly-os/results/projects-public-media-fallback-v1.v0.1.md",
       "relation": "CURRENT_RESULT",
-      "gate": "G5_BUILD",
+      "gate": "G7_RELEASE",
       "parentIssue": 228,
       "scope": [
         "STAB-05",
@@ -1881,8 +1881,16 @@
       "productionMergeAuthorized": false,
       "productionDeployAuthorized": false,
       "blockingGate": null,
-      "gateReadiness": "G5_BUILD_IN_PROGRESS",
-      "note": "STAB-05 corrective for BQA-21. Fix only public Projects media promise on /projects/ using existing page/presentation owner and existing media interaction patterns; no new Project/media system."
+      "gateReadiness": "READY_FOR_RELEASE_DECISION",
+      "note": "STAB-05 corrective for BQA-21. Fix only public Projects media promise on /projects/ using existing page/presentation owner and existing media interaction patterns; no new Project/media system.",
+      "projectStage": "RELEASE",
+      "candidateCommit": "581468fbf4b2b321bd2c2a16bd9e65a9e12e3a4f",
+      "releaseCandidateCommit": "581468fbf4b2b321bd2c2a16bd9e65a9e12e3a4f",
+      "integrationPullRequest": 234,
+      "validationRunNumber": 1232,
+      "validationRunId": 35660069754,
+      "validationConclusion": "SUCCESS",
+      "exactDiffFileCount": 3
     }
   ],
   "referenceArtifacts": [
