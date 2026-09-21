@@ -38,7 +38,7 @@ const routes=[
   '/projects/dementor-battle/',
   '/projects/dementor-robo-games/'
 ];
-const widths=[1440,390];
+const widths=[1440,390,360];
 const visualRoutes=new Map([
   ['/projects/','hub'],
   ['/projects/dementor-lab/','lab']
@@ -62,15 +62,56 @@ for(const width of widths){
     expect(state.overflow<=1,`${width}px ${route}: horizontal overflow ${state.overflow}px`);
     expect(state.header,`${width}px ${route}: canonical public Header missing`);
 
-    if(route==='/projects/'&&width===390){
+    if(route==='/projects/'&&(width===390||width===360)){
       const headings=await page.evaluate(()=>[...document.querySelectorAll('.dc-projects-v2__territory-main h2,.dc-projects-v2__final-grid h2')].map(el=>({
         text:(el.textContent||'').trim().replace(/\s+/g,' '),
         scrollWidth:el.scrollWidth,
         clientWidth:el.clientWidth
       })));
       for(const heading of headings){
-        expect(heading.scrollWidth<=heading.clientWidth+1,`390px Projects hub: heading clips inside its owner: ${heading.text} (${heading.scrollWidth}px > ${heading.clientWidth}px)`);
+        expect(heading.scrollWidth<=heading.clientWidth+1,`${width}px Projects hub: heading clips inside its owner: ${heading.text} (${heading.scrollWidth}px > ${heading.clientWidth}px)`);
       }
+    }
+
+    if(route==='/projects/'){
+      const media=await page.evaluate(()=>{
+        const owner=document.querySelector('[data-project-media-state]');
+        const rect=owner?.getBoundingClientRect()||null;
+        const status=owner?.querySelector('.dc-projects-v2__hero-reel-status')||null;
+        return {
+          state:owner?.getAttribute('data-project-media-state')||null,
+          visible:!!owner&&getComputedStyle(owner).display!=='none'&&rect?.width>0&&rect?.height>0,
+          text:(status?.querySelector('strong')?.innerText||'').trim().replace(/\s+/g,' '),
+          iframeCount:owner?.querySelectorAll('iframe').length??-1,
+          videoCount:owner?.querySelectorAll('video').length??-1,
+          interactiveCount:owner?.querySelectorAll('a[href],button,input,select,textarea,[tabindex]:not([tabindex="-1"])').length??-1,
+          legacyFrame:!!document.querySelector('.dc-projects-v2__hero-reel-frame'),
+          brokenSourceLinks:[...document.querySelectorAll('a[href]')].filter(a=>/dWokndhJLKQ|youtube\.com\/shorts/i.test(a.href)).length,
+          width:rect?.width??0,
+          height:rect?.height??0,
+          viewportWidth:innerWidth,
+          viewportHeight:innerHeight
+        };
+      });
+      expect(media.state==='unavailable',`${width}px Projects hub: canonical media state must be unavailable after source verification`);
+      expect(media.visible,`${width}px Projects hub: unavailable media state is not visible`);
+      expect(/ФРАГМЕНТ ВРЕМЕННО НЕДОСТУПЕН/.test(media.text),`${width}px Projects hub: explicit unavailable copy missing`);
+      expect(media.iframeCount===0&&media.videoCount===0,`${width}px Projects hub: unavailable state must not create iframe/video runtime`);
+      expect(media.interactiveCount===0,`${width}px Projects hub: unavailable state must not expose dead keyboard-focusable media controls`);
+      expect(!media.legacyFrame,`${width}px Projects hub: legacy 9:16 empty media frame survived`);
+      expect(media.brokenSourceLinks===0,`${width}px Projects hub: unavailable YouTube source link survived`);
+      expect(media.width<=media.viewportWidth+1,`${width}px Projects hub: media fallback exceeds viewport width`);
+      expect(media.height<media.viewportHeight*.75,`${width}px Projects hub: unavailable media fallback still consumes excessive viewport height (${media.height}px)`);
+
+      await page.reload({waitUntil:'load'});
+      await page.waitForSelector('[data-project-media-state="unavailable"]');
+      const reloaded=await page.evaluate(()=>({
+        state:document.querySelector('[data-project-media-state]')?.getAttribute('data-project-media-state')||null,
+        legacyFrame:!!document.querySelector('.dc-projects-v2__hero-reel-frame'),
+        brokenSourceLinks:[...document.querySelectorAll('a[href]')].filter(a=>/dWokndhJLKQ|youtube\.com\/shorts/i.test(a.href)).length
+      }));
+      expect(reloaded.state==='unavailable',`${width}px Projects hub reload: media fallback state drifted`);
+      expect(!reloaded.legacyFrame&&reloaded.brokenSourceLinks===0,`${width}px Projects hub reload: inert video promise returned`);
     }
 
     const visualName=visualRoutes.get(route);
@@ -149,4 +190,4 @@ if(errors.length){
   for(const e of errors)console.error(`- ${e}`);
   process.exit(1);
 }
-console.log('Projects v2 browser regression PASS: fresh-top + Logic hashes + history restoration + no overflow + mobile heading fit + canonical shell/routes on 1440/390. Visual evidence captured for Hub + Lab.');
+console.log('Projects v2 browser regression PASS: fresh-top + Logic hashes + history restoration + no overflow + mobile heading fit + canonical shell/routes on 1440/390/360 + BQA-21 unavailable-media fallback/reload contract. Visual evidence captured for Hub + Lab.');
