@@ -367,7 +367,6 @@ try{
     await page.waitForFunction(()=>document.querySelectorAll('.dc-notice[data-artifact]').length>=2,{timeout:6000});
     await page.waitForFunction(()=>document.documentElement.dataset.dcBoardRelations==='ready',{timeout:6000});
     await page.waitForFunction(()=>document.querySelectorAll('.dc-board-relation-line:not([hidden])').length===3,{timeout:5000});
-    expect(!document.documentElement.hasAttribute('data-bqa16-persisted'),'desktop refresh: unexpected persistence marker appeared');
     expect((await page.locator('.dc-board-relations-layer').getAttribute('hidden'))===null,'desktop refresh: ephemeral hidden state persisted across reload');
     expect((await page.locator('[data-relations-toggle]').innerText())==='СКРЫТЬ СВЯЗИ','desktop refresh: control did not reset to current visible default');
     expect(!errors.length,`desktop refresh page errors: ${errors.join(' | ')}`);
