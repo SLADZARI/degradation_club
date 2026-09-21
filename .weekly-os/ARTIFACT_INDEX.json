@@ -7,12 +7,12 @@
     "projectStage": "RELEASE",
     "gate": "G7_RELEASE",
     "status": "APPROVED",
-    "version": "2.36",
+    "version": "2.37",
     "updated": "2026-09-21",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.35"
+    "supersedes": "2.36"
   },
   "currentArtifacts": [
     {
@@ -1785,7 +1785,7 @@
       "documentType": "RESULT",
       "currentVersion": "0.1",
       "status": "ACTIVE",
-      "location": ".weekly-os/results/artifact-share-social-preview-v1.v0.2.md",
+      "location": ".weekly-os/results/artifact-share-social-preview-v1.v0.3.md",
       "sourceSystem": "GIT",
       "authorityType": "IMPLEMENTATION_AUTHORITY",
       "updated": "2026-09-21",
@@ -1809,9 +1809,9 @@
       "productionMergeAuthorized": false,
       "productionDeployAuthorized": false,
       "blockingGate": null,
-      "gateReadiness": "READY_FOR_RELEASE_DECISION",
+      "gateReadiness": "MERGED_AWAITING_PAGES_DEPLOY",
       "note": "STAB-04 corrective for BQA-14. Existing share/social owner only; dedicated public-safe 1200×630 preview and stronger binary validation; no private Artifact media exposure.",
-      "version": "0.2",
+      "version": "0.3",
       "projectStage": "RELEASE",
       "candidateCommit": "e51d4bee5b5722bc419f8dd78e0012e8a5ab1907",
       "releaseCandidateCommit": "e51d4bee5b5722bc419f8dd78e0012e8a5ab1907",
@@ -1819,7 +1819,8 @@
       "validationRunNumber": 1230,
       "validationRunId": 35648978456,
       "validationConclusion": "SUCCESS",
-      "exactDiffFileCount": 5
+      "exactDiffFileCount": 5,
+      "productionCommit": "440ebce65efc46831a5736fc74a9bf798bf991d5"
     }
   ],
   "referenceArtifacts": [
