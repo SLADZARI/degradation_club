@@ -20,9 +20,9 @@ integrationBranch: result/public-activity-truth-boundary-v1
 productionBaseCommit: 2b17d54faaf3eb3eafb287cef1211554b28871b2
 implementationStartAuthorized: true
 technicalCorrectiveMigrationAuthorized: true
-liveDatabaseMutationAuthorized: false
-productionMergeAuthorized: false
-productionDeployAuthorized: false
+liveDatabaseMutationAuthorized: true
+productionMergeAuthorized: true
+productionDeployAuthorized: true
 semanticMutationRequired: false
 changeProposalRequired: false
 schemaExpansionAuthorized: false
@@ -172,3 +172,37 @@ productionDeployAuthorized = false
 ```
 
 STOP pending owner release authorization.
+
+
+## Owner release authorization + execution checkpoint
+
+Owner explicitly authorized release after G7 PASS.
+
+PR #230 was marked ready and merged with expected head:
+
+```text
+RC = 40ba7ecea44206ded37ceb714d2becb6f2698c12
+production merge commit = 0852d2602df5593deead797b20c50daa36fe1c1c
+```
+
+Post-merge production diff from the prior baseline contains the same exact five STAB-01 files and no unrelated staging/reconciliation delta.
+
+Backend and Pages production release are authorized for the exact merged production commit. Live DB mutation is authorized only through the canonical Supabase production workflow; Telegram worker deployment remains excluded.
+
+Canonical backend workflow dispatch could not be completed with the available tooling because the browser session was unauthenticated and the connected GitHub integration exposes no workflow_dispatch action.
+
+Evidence:
+
+`operations/PUBLIC_ACTIVITY_TRUTH_BOUNDARY_RELEASE_TOOLING_BLOCKER_2026-09-21.md`
+
+```text
+productionMergeCompleted = true
+productionCommit = 0852d2602df5593deead797b20c50daa36fe1c1c
+releaseExecutionStatus = BLOCKED_TOOLING_AUTH
+backendWorkflowRunId = null
+pagesWorkflowRunId = null
+liveMigrationApplied = false
+liveRetestStatus = NOT_STARTED
+```
+
+Owner authorization remains valid. Resume from the canonical backend workflow; do not apply the migration ad hoc.
