@@ -4,15 +4,15 @@
     "artifactId": "dementor-club.kernel.project",
     "project": "dementor-club",
     "documentType": "STANDARD",
-    "projectStage": "RELEASE",
-    "gate": "G7_RELEASE",
+    "projectStage": "BUILD",
+    "gate": "G5_BUILD",
     "status": "APPROVED",
-    "version": "2.39",
+    "version": "2.40",
     "updated": "2026-09-21",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.38"
+    "supersedes": "2.39"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -20,8 +20,8 @@
   "canonicalRepository": "SLADZARI/degradation_club",
   "defaultBranch": "main",
   "semanticSourceBranch": "dementor-club",
-  "projectStage": "RELEASE",
-  "gate": "G7_RELEASE",
+  "projectStage": "BUILD",
+  "gate": "G5_BUILD",
   "readFirst": [
     ".weekly-os/PROJECT.json",
     ".weekly-os/ARTIFACT_INDEX.json",
@@ -125,7 +125,10 @@
     "operations/BOARD_RELATIONS_PRODUCTION_RELEASE_TOOLING_BLOCKER_2026-09-18.md",
     ".weekly-os/results/artifact-detail-terminal-state-v1.v0.3.md",
     "operations/ARTIFACT_DETAIL_TERMINAL_STATE_G7_RELEASE_CANDIDATE_2026-09-21.md",
-    "operations/ARTIFACT_DETAIL_TERMINAL_STATE_G6_2026-09-21.md"
+    "operations/ARTIFACT_DETAIL_TERMINAL_STATE_G6_2026-09-21.md",
+    ".weekly-os/results/artifact-detail-terminal-state-v1.v0.4.md",
+    "operations/ARTIFACT_DETAIL_TERMINAL_STATE_LIVE_RETEST_2026-09-21.md",
+    ".weekly-os/results/board-relations-visibility-toggle-v1.v0.1.md"
   ],
   "authority": {
     "mpDslCore": {
@@ -270,20 +273,20 @@
     "DESIGN": null
   },
   "currentResult": {
-    "artifactId": "dementor-club.result.artifact-detail-terminal-state-v1",
-    "version": "0.3",
+    "artifactId": "dementor-club.result.board-relations-visibility-toggle-v1",
+    "version": "0.1",
     "status": "ACTIVE",
-    "path": ".weekly-os/results/artifact-detail-terminal-state-v1.v0.3.md",
-    "gate": "G7_RELEASE",
+    "path": ".weekly-os/results/board-relations-visibility-toggle-v1.v0.1.md",
+    "gate": "G5_BUILD",
     "parentIssue": 228,
     "scope": [
-      "STAB-02",
-      "BQA-19"
+      "STAB-03",
+      "BQA-16"
     ],
-    "integrationBranch": "result/artifact-detail-terminal-state-v1",
+    "integrationBranch": "result/board-relations-visibility-toggle-v1",
     "integrationBaseRef": "dementor-club-production",
-    "integrationBaseCommit": "0852d2602df5593deead797b20c50daa36fe1c1c",
-    "productionBaseCommit": "0852d2602df5593deead797b20c50daa36fe1c1c",
+    "integrationBaseCommit": "354d7ea9b176b55f2d4386b178f61cd9cd0e68ef",
+    "productionBaseCommit": "354d7ea9b176b55f2d4386b178f61cd9cd0e68ef",
     "implementationStartAuthorized": true,
     "schemaMutationAuthorized": false,
     "semanticMutationRequired": false,
@@ -291,30 +294,8 @@
     "productionMergeAuthorized": false,
     "productionDeployAuthorized": false,
     "blockingGate": null,
-    "gateReadiness": "READY_FOR_RELEASE_DECISION",
-    "note": "STAB-02 G7 preflight PASS. Exact validated candidate unchanged on clean production base with three Result-owned files. No backend/Supabase deploy required. PR #231 remains draft/unmerged. STOP pending owner release decision.",
-    "candidateCommit": "a6f73dbfc071085dc5e4b1147c902477af6f117e",
-    "integrationPullRequest": 231,
-    "validationEvidence": "operations/ARTIFACT_DETAIL_TERMINAL_STATE_G6_2026-09-21.md",
-    "validationRunId": 35629843997,
-    "validationRunNumber": 1226,
-    "validationConclusion": "SUCCESS",
-    "previousValidationRunId": 35629731586,
-    "previousValidationRunNumber": 1225,
-    "previousValidationConclusion": "FAIL_CANONICAL_JOIN_RECOVERY",
-    "exactDiffFileCount": 3,
-    "releaseCandidateCommit": "a6f73dbfc071085dc5e4b1147c902477af6f117e",
-    "releasePullRequest": 231,
-    "g7ReleaseEvidence": "operations/ARTIFACT_DETAIL_TERMINAL_STATE_G7_RELEASE_CANDIDATE_2026-09-21.md",
-    "g7PreflightStatus": "PASS",
-    "g7ExactDiffFileCount": 3,
-    "g7ValidationRunId": 35629843997,
-    "g7ValidationRunNumber": 1226,
-    "g7ValidationConclusion": "SUCCESS",
-    "previousRegressionCorrected": true,
-    "backendProductionDeployRequired": false,
-    "liveDatabaseMutationRequired": false,
-    "stagingDependency": false
+    "gateReadiness": "G5_BUILD_IN_PROGRESS",
+    "note": "STAB-02 released at production 354d7ea9... and owner-confirmed live retest PASS. STAB-02 moved to WAITING/G8 with no active integration branch. STAB-03 / BQA-16 is now the single active implementation Result on exact current production."
   },
   "waitingResults": [
     {
