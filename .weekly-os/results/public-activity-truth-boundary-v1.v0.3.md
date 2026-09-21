@@ -250,3 +250,38 @@ releaseExecutionStatus = BACKEND_RELEASED_PAGES_PENDING
 ```
 
 Next checkpoint: canonical Pages production deploy for exact production commit, then live retest.
+
+
+## Pages production deploy + anonymous live smoke
+
+```text
+workflow = Deploy Dementor Production
+runNumber = 123
+runId = 35622547055
+conclusion = SUCCESS
+productionCommit = 0852d2602df5593deead797b20c50daa36fe1c1c
+artifactId = 10650177738
+artifactDigest = sha256:9f3062f3cb0177b0b5319fdc17a7912e95fd973559c55773ef9dca91de573e9b
+```
+
+The build checked out the exact production commit and the deploy job created the Pages deployment for that same SHA.
+
+Anonymous live smoke passed on Home and `/community/`:
+
+- ordinary Board artifacts `Сайт за Еду` and `Новые связи - новая борда` are absent;
+- Current Program remains present on Home;
+- Community public editorial activity is empty rather than leaking Board publications;
+- no obvious private Board media URL/token/storage-path strings were detected.
+
+Evidence:
+
+`operations/PUBLIC_ACTIVITY_TRUTH_BOUNDARY_PAGES_LIVE_SMOKE_2026-09-21.md`
+
+```text
+pagesProductionDeployCompleted = true
+anonymousLiveSmoke = PASS
+authenticatedBoardLiveRetest = PENDING
+releaseExecutionStatus = LIVE_ANON_PASS_AUTH_PENDING
+```
+
+Do not close STAB-01 until authenticated Board live smoke confirms publication/media behavior remains intact.
