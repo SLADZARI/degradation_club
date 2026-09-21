@@ -7,12 +7,12 @@
     "projectStage": "RELEASE",
     "gate": "G7_RELEASE",
     "status": "APPROVED",
-    "version": "2.44",
+    "version": "2.45",
     "updated": "2026-09-21",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.43"
+    "supersedes": "2.44"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -136,7 +136,9 @@
     ".weekly-os/results/artifact-share-social-preview-v1.v0.1.md",
     ".weekly-os/results/artifact-share-social-preview-v1.v0.2.md",
     "operations/ARTIFACT_SHARE_SOCIAL_PREVIEW_G6_2026-09-21.md",
-    "operations/ARTIFACT_SHARE_SOCIAL_PREVIEW_G7_RELEASE_CANDIDATE_2026-09-21.md"
+    "operations/ARTIFACT_SHARE_SOCIAL_PREVIEW_G7_RELEASE_CANDIDATE_2026-09-21.md",
+    ".weekly-os/results/artifact-share-social-preview-v1.v0.3.md",
+    "operations/ARTIFACT_SHARE_SOCIAL_PREVIEW_G7_MERGE_2026-09-21.md"
   ],
   "authority": {
     "mpDslCore": {
@@ -282,9 +284,9 @@
   },
   "currentResult": {
     "artifactId": "dementor-club.result.artifact-share-social-preview-v1",
-    "version": "0.2",
+    "version": "0.3",
     "status": "ACTIVE",
-    "path": ".weekly-os/results/artifact-share-social-preview-v1.v0.2.md",
+    "path": ".weekly-os/results/artifact-share-social-preview-v1.v0.3.md",
     "gate": "G7_RELEASE",
     "parentIssue": 228,
     "scope": [
@@ -299,11 +301,11 @@
     "schemaMutationAuthorized": false,
     "semanticMutationRequired": false,
     "changeProposalRequired": false,
-    "productionMergeAuthorized": false,
+    "productionMergeAuthorized": true,
     "productionDeployAuthorized": false,
     "blockingGate": null,
-    "gateReadiness": "READY_FOR_RELEASE_DECISION",
-    "note": "STAB-04 / BQA-14 validated candidate e51d4bee... from exact production 692c87da.... Site Integrity #1230 / 35648978456 SUCCESS, including built fresh share URL validation with dedicated public-safe 1200x630 PNG and no private media leakage. PR #233 remains DRAFT/UNMERGED. STOP pending owner release decision; STAB-05 not started.",
+    "gateReadiness": "MERGED_AWAITING_PAGES_DEPLOY",
+    "note": "STAB-04 / BQA-14 exact validated candidate e51d4bee... merged via PR #233 to production 440ebce6.... Exact old-production→new-production content delta remains 5 STAB-04 files; candidate→production content diff = 0. Supabase deploy not required/not run. Await Pages deploy + live/fresh-preview retest. STAB-05 not started.",
     "candidateCommit": "e51d4bee5b5722bc419f8dd78e0012e8a5ab1907",
     "releaseCandidateCommit": "e51d4bee5b5722bc419f8dd78e0012e8a5ab1907",
     "integrationPullRequest": 233,
@@ -312,7 +314,10 @@
     "validationConclusion": "SUCCESS",
     "exactDiffFileCount": 5,
     "backendProductionDeployRequired": false,
-    "liveDatabaseMutationRequired": false
+    "liveDatabaseMutationRequired": false,
+    "productionCommit": "440ebce65efc46831a5736fc74a9bf798bf991d5",
+    "productionMergeCommit": "440ebce65efc46831a5736fc74a9bf798bf991d5",
+    "mergeEvidence": "operations/ARTIFACT_SHARE_SOCIAL_PREVIEW_G7_MERGE_2026-09-21.md"
   },
   "waitingResults": [
     {
