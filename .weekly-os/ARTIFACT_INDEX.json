@@ -7,12 +7,12 @@
     "projectStage": "RELEASE",
     "gate": "G7_RELEASE",
     "status": "APPROVED",
-    "version": "2.40",
-    "updated": "2026-09-21",
+    "version": "2.41",
+    "updated": "2026-09-22",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.39"
+    "supersedes": "2.40"
   },
   "currentArtifacts": [
     {
@@ -1854,10 +1854,10 @@
       "artifactId": "dementor-club.result.projects-public-media-fallback-v1",
       "documentType": "RESULT",
       "currentVersion": "0.1",
-      "version": "0.2",
+      "version": "0.3",
       "status": "ACTIVE",
-      "location": ".weekly-os/results/projects-public-media-fallback-v1.v0.2.md",
-      "path": ".weekly-os/results/projects-public-media-fallback-v1.v0.2.md",
+      "location": ".weekly-os/results/projects-public-media-fallback-v1.v0.3.md",
+      "path": ".weekly-os/results/projects-public-media-fallback-v1.v0.3.md",
       "sourceSystem": "GIT",
       "authorityType": "IMPLEMENTATION_AUTHORITY",
       "updated": "2026-09-21",
@@ -1881,7 +1881,7 @@
       "productionMergeAuthorized": false,
       "productionDeployAuthorized": false,
       "blockingGate": null,
-      "gateReadiness": "READY_FOR_RELEASE_DECISION",
+      "gateReadiness": "MERGED_AWAITING_PAGES_DEPLOY",
       "note": "STAB-05 corrective for BQA-21. Fix only public Projects media promise on /projects/ using existing page/presentation owner and existing media interaction patterns; no new Project/media system.",
       "projectStage": "RELEASE",
       "candidateCommit": "581468fbf4b2b321bd2c2a16bd9e65a9e12e3a4f",
@@ -1890,7 +1890,8 @@
       "validationRunNumber": 1232,
       "validationRunId": 35660069754,
       "validationConclusion": "SUCCESS",
-      "exactDiffFileCount": 3
+      "exactDiffFileCount": 3,
+      "productionCommit": "4a8e95cb669dab660a7afe381e580278d4575a2a"
     }
   ],
   "referenceArtifacts": [
