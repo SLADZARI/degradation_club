@@ -295,7 +295,7 @@ function renderLines(){
   if(!backendAvailable||!relationRows?.length){existing?.remove();return}
   const map=endpointMap();
   const svg=ensureLayer();if(!svg)return;
-  svg.hidden=!relationsVisible;
+  svg.toggleAttribute('hidden',!relationsVisible);
   const existingLines=new Map([...svg.querySelectorAll('.dc-board-relation-line')].map(line=>[line.dataset.relationId,line]));
   const activeIds=new Set();
   for(const row of relationRows){
