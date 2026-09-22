@@ -5,11 +5,12 @@ documentType: RELEASE_EVIDENCE
 projectStage: BUILD
 gate: G7_RELEASE
 status: APPROVED
-version: 1.0
+version: 1.1
 updated: 2026-09-22
 owner: Modern Pilgrims
 sourceSystem: GIT
 authorityType: QA_EVIDENCE
+supersedes: 1.0
 parentIssue: 228
 scope:
   - STAB-06
@@ -18,46 +19,29 @@ scope:
 
 # STAB-06 · Board View Model corrective · G7 release candidate
 
-## Production
-
-Exact baseline:
-
+Production baseline remains exact:
 `d4d1e2f45883beff973a5cd5827e6f71065c0575`
 
-Fresh compare after validation:
-
-```text
-production vs baseline = identical
-ahead = 0
-behind = 0
-```
-
-## Validated corrective candidate
-
-`155565786ac969c63a692006c145e4f4e266090d`
+Final validated candidate:
+`8180b4a7b7caf37738604321fe5a34c344455b60`
 
 PR:
-
 `#239 · OPEN / DRAFT / UNMERGED / mergeable`
 
 Validation:
+`Site Integrity / Release Readiness #1243 / 35777088217 · SUCCESS`
+
+The previous candidate `155565786ac969c63a692006c145e4f4e266090d` / #1241 is superseded by this candidate after camera-fit correction.
+
+Exact production → candidate:
 
 ```text
-Site Integrity / Release Readiness #1241
-run id = 35773470724
-conclusion = SUCCESS
-```
-
-## Exact production → candidate diff
-
-```text
-ahead = 11 commits
+ahead = 13
 behind = 0
 changed files = 7
 ```
 
-Exact files:
-
+Files:
 1. `community/board/board-entity-model-v1.js`
 2. `community/board/board-fullscreen-v2-1.js`
 3. `community/board/board-integrations-v1.js`
@@ -66,26 +50,24 @@ Exact files:
 6. `scripts/validate-board-navigation-adaptive-cards-browser.mjs`
 7. `scripts/validate-board-v21-contract.mjs`
 
-No CSS file changed in the corrective because the mobile Program-strip suppression and desktop Program presentation from the first STAB-06 release remain valid.
+Fresh production compare during validation:
+```text
+production = d4d1e2f45883beff973a5cd5827e6f71065c0575
+ahead = 0
+behind = 0
+content diff = 0
+```
 
-`current-program-v1.js` is unchanged.
-
-## Release boundary
+`current-program-v1.js` remains byte-identical to production.
 
 ```text
 schema mutation = NO
 semantic domain mutation = NO
 Change Proposal = NO
-backend production deploy required = NO
 Supabase deploy required = NO
 production merge authorized = NO
 production deploy authorized = NO
+gateReadiness = READY_FOR_RELEASE_DECISION
 ```
 
-## G7 verdict
-
-`READY_FOR_RELEASE_DECISION`
-
-STOP.
-
-Do not mark PR ready, merge, deploy or start STAB-07 without a new owner release decision.
+STOP at exact validated corrective candidate.
