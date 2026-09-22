@@ -4,21 +4,21 @@
     "artifactId": "dementor-club.kernel.artifact-index",
     "project": "dementor-club",
     "documentType": "STANDARD",
-    "projectStage": "RELEASE",
+    "projectStage": "BUILD",
     "gate": "G8_CLEANUP",
     "status": "APPROVED",
-    "version": "2.47",
+    "version": "2.48",
     "updated": "2026-09-22",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.46"
+    "supersedes": "2.47"
   },
   "currentArtifacts": [
     {
       "artifactId": "dementor-club.kernel.project",
       "documentType": "STANDARD",
-      "currentVersion": "2.50",
+      "currentVersion": "2.56",
       "status": "APPROVED",
       "location": ".weekly-os/PROJECT.json",
       "sourceSystem": "GIT",
@@ -32,7 +32,7 @@
     {
       "artifactId": "dementor-club.kernel.artifact-index",
       "documentType": "STANDARD",
-      "currentVersion": "2.42",
+      "currentVersion": "2.48",
       "status": "APPROVED",
       "location": ".weekly-os/ARTIFACT_INDEX.json",
       "sourceSystem": "GIT",
@@ -1853,17 +1853,17 @@
     {
       "artifactId": "dementor-club.result.projects-public-media-fallback-v1",
       "documentType": "RESULT",
-      "currentVersion": "0.7",
-      "version": "0.7",
-      "status": "WAITING",
-      "location": ".weekly-os/results/projects-public-media-fallback-v1.v0.7.md",
-      "path": ".weekly-os/results/projects-public-media-fallback-v1.v0.7.md",
+      "currentVersion": "1.0",
+      "version": "1.0",
+      "status": "APPROVED",
+      "location": ".weekly-os/results/projects-public-media-fallback-v1.v1.0.md",
+      "path": ".weekly-os/results/projects-public-media-fallback-v1.v1.0.md",
       "sourceSystem": "GIT",
       "authorityType": "IMPLEMENTATION_AUTHORITY",
       "updated": "2026-09-22",
       "canonicalProject": "dementor-club",
       "canonicalLocation": ".weekly-os/results/projects-public-media-fallback-v1.v0.1.md",
-      "relation": "CURRENT_RESULT",
+      "relation": "COMPLETED_RESULT",
       "gate": "G8_CLEANUP",
       "parentIssue": 228,
       "scope": [
@@ -1878,12 +1878,8 @@
       "schemaMutationAuthorized": false,
       "semanticMutationRequired": false,
       "changeProposalRequired": false,
-      "productionMergeAuthorized": true,
-      "productionDeployAuthorized": false,
-      "blockingGate": null,
-      "gateReadiness": "G8_CLEANUP_PENDING",
       "note": "STAB-05 runtime release accepted live by owner. WAITING / G8_CLEANUP; integrationBranch null; liveRetestStatus PASS. Pages #129 exact production SHA PASS. Supabase not required/not run. STAB-06 not started.",
-      "projectStage": "RELEASE",
+      "projectStage": "BUILD",
       "candidateCommit": "91607fdbd02b815122ce25c7a8920691dda6320f",
       "releaseCandidateCommit": "91607fdbd02b815122ce25c7a8920691dda6320f",
       "integrationPullRequest": 236,
@@ -1898,7 +1894,42 @@
       "productionPagesConclusion": "SUCCESS",
       "productionPagesExactShaVerified": true,
       "liveRetestStatus": "PASS",
-      "liveEvidence": "operations/PROJECTS_PUBLIC_MEDIA_FALLBACK_LIVE_ACCEPTANCE_2026-09-22.md"
+      "liveEvidence": "operations/PROJECTS_PUBLIC_MEDIA_FALLBACK_LIVE_ACCEPTANCE_2026-09-22.md",
+      "g8Evidence": "operations/PROJECTS_PUBLIC_MEDIA_FALLBACK_G8_2026-09-22.md"
+    },
+    {
+      "artifactId": "dementor-club.decision.mp-dsl-lifecycle-field-mapping-v1",
+      "documentType": "DECISION",
+      "currentVersion": "1.0",
+      "status": "APPROVED",
+      "location": "operations/MP_DSL_LIFECYCLE_FIELD_MAPPING_DECISION_V1.md",
+      "sourceSystem": "GIT",
+      "authorityType": "APPROVED_AUTHORITY",
+      "updated": "2026-09-22",
+      "canonicalProject": "dementor-club",
+      "canonicalLocation": "operations/MP_DSL_LIFECYCLE_FIELD_MAPPING_DECISION_V1.md",
+      "relation": "GOVERNANCE_AUTHORITY",
+      "gate": "G8_CLEANUP",
+      "referencedBy": [
+        "dementor-club.result.projects-public-media-fallback-v1"
+      ]
+    },
+    {
+      "artifactId": "dementor-club.report.projects-public-media-fallback-g8-2026-09-22",
+      "documentType": "REPORT",
+      "currentVersion": "1.0",
+      "status": "APPROVED",
+      "location": "operations/PROJECTS_PUBLIC_MEDIA_FALLBACK_G8_2026-09-22.md",
+      "sourceSystem": "GIT",
+      "authorityType": "EVIDENCE",
+      "updated": "2026-09-22",
+      "canonicalProject": "dementor-club",
+      "canonicalLocation": "operations/PROJECTS_PUBLIC_MEDIA_FALLBACK_G8_2026-09-22.md",
+      "relation": "G8_EVIDENCE",
+      "gate": "G8_CLEANUP",
+      "referencedBy": [
+        "dementor-club.result.projects-public-media-fallback-v1"
+      ]
     }
   ],
   "referenceArtifacts": [

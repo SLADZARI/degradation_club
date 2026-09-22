@@ -4,15 +4,15 @@
     "artifactId": "dementor-club.kernel.project",
     "project": "dementor-club",
     "documentType": "STANDARD",
-    "projectStage": "RELEASE",
+    "projectStage": "BUILD",
     "gate": "G8_CLEANUP",
     "status": "APPROVED",
-    "version": "2.55",
+    "version": "2.56",
     "updated": "2026-09-22",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.54"
+    "supersedes": "2.55"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -20,12 +20,13 @@
   "canonicalRepository": "SLADZARI/degradation_club",
   "defaultBranch": "main",
   "semanticSourceBranch": "dementor-club",
-  "projectStage": "RELEASE",
+  "projectStage": "BUILD",
   "gate": "G8_CLEANUP",
   "readFirst": [
     ".weekly-os/PROJECT.json",
     ".weekly-os/ARTIFACT_INDEX.json",
     ".weekly-os/APPROVED_STATE.json",
+    "operations/MP_DSL_LIFECYCLE_FIELD_MAPPING_DECISION_V1.md",
     "operations/FUENGIROLA_ACCESS_POLICY_DECISION_V1.md",
     "operations/MERCH_CANONICAL_OWNERSHIP_AND_OWNER_WRITE_PATH_V1.md",
     "operations/MERCH_SOURCE_TRUTH_DECISION_V1.md",
@@ -154,15 +155,16 @@
     "operations/PROJECTS_PUBLIC_MEDIA_FALLBACK_LIVE_CORRECTIVE_G7_RELEASE_CANDIDATE_2026-09-22.md",
     ".weekly-os/results/projects-public-media-fallback-v1.v0.6.md",
     "operations/PROJECTS_PUBLIC_MEDIA_FALLBACK_LIVE_CORRECTIVE_G7_MERGE_2026-09-22.md",
-    ".weekly-os/results/projects-public-media-fallback-v1.v0.7.md",
-    "operations/PROJECTS_PUBLIC_MEDIA_FALLBACK_LIVE_ACCEPTANCE_2026-09-22.md"
+    "operations/PROJECTS_PUBLIC_MEDIA_FALLBACK_LIVE_ACCEPTANCE_2026-09-22.md",
+    ".weekly-os/results/projects-public-media-fallback-v1.v1.0.md",
+    "operations/PROJECTS_PUBLIC_MEDIA_FALLBACK_G8_2026-09-22.md"
   ],
   "authority": {
     "mpDslCore": {
       "sourceSystem": "DRIVE",
       "authorityType": "REFERENCE",
       "url": "https://docs.google.com/document/d/1fYwfF8IpvXh36qIAJxylT6oebOfaqJ_-L2MslXRHHOg/edit",
-      "note": "MP_DSL v0.1 source artifacts remain DRAFT / REFERENCE. Dementor Club uses only explicitly approved local rules."
+      "note": "MP_DSL source artifacts remain REFERENCE unless locally approved. Field semantics for projectStage/gate/artifact status/workStatus are locally approved by operations/MP_DSL_LIFECYCLE_FIELD_MAPPING_DECISION_V1.md."
     },
     "semanticSource": {
       "repository": "SLADZARI/degradation_club",
@@ -291,6 +293,13 @@
       "path": "operations/CONTRIBUTION_INBOUND_AND_EDITORIAL_WORKFLOW_V1.md",
       "scope": "Project-local Contribution inbound receipt, workflow, disposition, reviewer, closure and #214 activation-bridge semantics",
       "note": "Approved narrow Contribution architecture only. v1 = MEMBERS ONLY, one canonical inbound record, RECEIVED requires server validation + committed canonical record + durable payload/reference, OWNER_ADMIN ONLY review authority, UNSCOPED CONTRIBUTION means target = none, status and disposition remain separate, media/context runtime deferred. No Result/runtime/schema/UI/Membership/activation-runtime authorization; full CONTRIBUTION_MODEL_V1 remains WORKING CANON."
+    },
+    "mpDslLifecycleFieldMappingV1": {
+      "sourceSystem": "GIT",
+      "authorityType": "APPROVED_AUTHORITY",
+      "path": "operations/MP_DSL_LIFECYCLE_FIELD_MAPPING_DECISION_V1.md",
+      "scope": "Dementor Club machine/governance field semantics only: projectStage, gate, Artifact lifecycle status and operational workStatus.",
+      "note": "Does not promote MP_DSL Product/Domain/Architecture/Design artifacts into project authority."
     }
   },
   "protected": {
@@ -299,50 +308,7 @@
     "ARCHITECTURE": null,
     "DESIGN": null
   },
-  "currentResult": {
-    "artifactId": "dementor-club.result.projects-public-media-fallback-v1",
-    "version": "0.7",
-    "status": "WAITING",
-    "path": ".weekly-os/results/projects-public-media-fallback-v1.v0.7.md",
-    "gate": "G8_CLEANUP",
-    "parentIssue": 228,
-    "scope": [
-      "STAB-05",
-      "BQA-21"
-    ],
-    "integrationBranch": null,
-    "integrationBaseRef": "dementor-club-production",
-    "integrationBaseCommit": "4a8e95cb669dab660a7afe381e580278d4575a2a",
-    "productionBaseCommit": "4a8e95cb669dab660a7afe381e580278d4575a2a",
-    "implementationStartAuthorized": true,
-    "schemaMutationAuthorized": false,
-    "semanticMutationRequired": false,
-    "changeProposalRequired": false,
-    "productionMergeAuthorized": true,
-    "productionDeployAuthorized": true,
-    "blockingGate": null,
-    "gateReadiness": "G8_CLEANUP_PENDING",
-    "note": "STAB-05 runtime release accepted live by owner on production 287b4852.... Pages run #129 / 35708869679 SUCCESS on exact production SHA. Human browser: real YouTube player PASS, playback PASS, 9:16 PASS, rejected unavailable copy absent PASS, empty black media absent PASS. Supabase not required/not run. Result is WAITING / G8_CLEANUP with integrationBranch null. STAB-06 not started.",
-    "candidateCommit": "91607fdbd02b815122ce25c7a8920691dda6320f",
-    "releaseCandidateCommit": "91607fdbd02b815122ce25c7a8920691dda6320f",
-    "integrationPullRequest": 236,
-    "validationRunNumber": 1233,
-    "validationRunId": 35671603405,
-    "validationConclusion": "SUCCESS",
-    "exactDiffFileCount": 3,
-    "backendProductionDeployRequired": false,
-    "liveDatabaseMutationRequired": false,
-    "productionCommit": "287b485293d68098dfd3c9302785369a735d42e2",
-    "productionMergeCommit": "287b485293d68098dfd3c9302785369a735d42e2",
-    "mergeEvidence": "operations/PROJECTS_PUBLIC_MEDIA_FALLBACK_LIVE_CORRECTIVE_G7_MERGE_2026-09-22.md",
-    "productionPagesRunNumber": 129,
-    "productionPagesRunId": 35708869679,
-    "productionPagesConclusion": "SUCCESS",
-    "productionPagesExactShaVerified": true,
-    "productionDeployStatus": "SUCCESS",
-    "liveRetestStatus": "PASS",
-    "liveEvidence": "operations/PROJECTS_PUBLIC_MEDIA_FALLBACK_LIVE_ACCEPTANCE_2026-09-22.md"
-  },
+  "currentResult": null,
   "waitingResults": [
     {
       "artifactId": "dementor-club.result.board-share-receive-ritual-v1",
@@ -408,7 +374,7 @@
       "note": "STAB-01 released and live-retested. Anonymous smoke PASS and owner-confirmed authenticated Board/private-image retest PASS. Residual parent stabilization #228 remains open; no active implementation ownership."
     }
   ],
-  "activeIntegrationBranch": "result/projects-public-media-fallback-v1",
+  "activeIntegrationBranch": null,
   "activeReleaseBranch": null,
   "reportPath": "operations/MEMBERSHIP_V2_PRODUCTION_FLOW_QA_2026-09-02.md",
   "completedResults": [
@@ -654,6 +620,27 @@
       "status": "APPROVED",
       "productionCommit": "64a0de9c6f9c3accc033950b1f757224edde3c19",
       "productionDeployRun": 38
+    },
+    {
+      "artifactId": "dementor-club.result.projects-public-media-fallback-v1",
+      "version": "1.0",
+      "status": "APPROVED",
+      "path": ".weekly-os/results/projects-public-media-fallback-v1.v1.0.md",
+      "gate": "G8_CLEANUP",
+      "parentIssue": 228,
+      "scope": [
+        "STAB-05",
+        "BQA-21"
+      ],
+      "productionCommit": "287b485293d68098dfd3c9302785369a735d42e2",
+      "integrationPullRequest": 236,
+      "validationRunId": 35671603405,
+      "productionDeployRunId": 35708869679,
+      "liveRetest": "PASS_OWNER_HUMAN_BROWSER_2026-09-22",
+      "liveEvidence": "operations/PROJECTS_PUBLIC_MEDIA_FALLBACK_LIVE_ACCEPTANCE_2026-09-22.md",
+      "g8Evidence": "operations/PROJECTS_PUBLIC_MEDIA_FALLBACK_G8_2026-09-22.md",
+      "integrationBranch": null,
+      "note": "STAB-05 accepted live and closed at G8. No Supabase/runtime DB mutation required. Project lifecycle remains BUILD; G8 is engineering gate evidence."
     }
   ],
   "legacyWeeklyOs": {
