@@ -4,6 +4,7 @@ const boardHost=document.getElementById('boardHost');
 const client=getClient();
 const WORLD={w:12000,h:8000};
 const WORLD_CENTER={x:WORLD.w/2,y:WORLD.h/2};
+const CAMERA_MIN_SCALE=.03;
 const CAMERA_MIN_SCALE=.06;
 const CAMERA_MAX_SCALE=1.6;
 let viewport=null;
