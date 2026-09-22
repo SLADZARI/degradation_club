@@ -5,14 +5,14 @@
     "project": "dementor-club",
     "documentType": "STANDARD",
     "projectStage": "BUILD",
-    "gate": "G5_BUILD",
+    "gate": "G7_RELEASE",
     "status": "APPROVED",
-    "version": "2.57",
+    "version": "2.58",
     "updated": "2026-09-22",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.56"
+    "supersedes": "2.57"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -21,7 +21,7 @@
   "defaultBranch": "main",
   "semanticSourceBranch": "dementor-club",
   "projectStage": "BUILD",
-  "gate": "G5_BUILD",
+  "gate": "G7_RELEASE",
   "readFirst": [
     ".weekly-os/PROJECT.json",
     ".weekly-os/ARTIFACT_INDEX.json",
@@ -159,7 +159,10 @@
     ".weekly-os/results/projects-public-media-fallback-v1.v1.0.md",
     "operations/PROJECTS_PUBLIC_MEDIA_FALLBACK_G8_2026-09-22.md",
     "operations/BOARD_MOBILE_CURRENT_PROGRAM_FILTER_DECISION_V1.md",
-    ".weekly-os/results/board-mobile-information-hierarchy-v1.v0.1.md"
+    ".weekly-os/results/board-mobile-information-hierarchy-v1.v0.1.md",
+    ".weekly-os/results/board-mobile-information-hierarchy-v1.v0.2.md",
+    "operations/BOARD_MOBILE_INFORMATION_HIERARCHY_G6_2026-09-22.md",
+    "operations/BOARD_MOBILE_INFORMATION_HIERARCHY_G7_RELEASE_CANDIDATE_2026-09-22.md"
   ],
   "authority": {
     "mpDslCore": {
@@ -319,10 +322,10 @@
   },
   "currentResult": {
     "artifactId": "dementor-club.result.board-mobile-information-hierarchy-v1",
-    "version": "0.1",
-    "status": "ACTIVE",
-    "path": ".weekly-os/results/board-mobile-information-hierarchy-v1.v0.1.md",
-    "gate": "G5_BUILD",
+    "version": "0.2",
+    "status": "REVIEW",
+    "path": ".weekly-os/results/board-mobile-information-hierarchy-v1.v0.2.md",
+    "gate": "G7_RELEASE",
     "parentIssue": 228,
     "scope": [
       "STAB-06",
@@ -339,8 +342,20 @@
     "productionMergeAuthorized": false,
     "productionDeployAuthorized": false,
     "blockingGate": null,
-    "gateReadiness": "G5_BUILD_IN_PROGRESS",
-    "note": "Owner approved STAB-06 mobile hierarchy: remove standalone mobile Current Program strip, move Current Program into existing filters, and add compact canonical type/program-affiliation badges to Board cards. Desktop Current Program unchanged. Exact production baseline 287b4852...."
+    "gateReadiness": "READY_FOR_RELEASE_DECISION",
+    "note": "STAB-06 / BQA-18 validated candidate fbc89112... from exact production 287b4852.... Site Integrity #1238 / 35740224085 SUCCESS, including mobile 390/360 Program-strip removal, exact Current Program affiliation/type composition, canonical badges, МОЁ/pager/zoom, desktop Current Program invariance and Board Relations regression. PR #238 remains DRAFT/UNMERGED. Project lifecycle remains BUILD; Result artifact is REVIEW with workStatus ACTIVE under the locally approved field mapping. STOP pending owner release decision; STAB-07 not started.",
+    "workStatus": "ACTIVE",
+    "candidateCommit": "fbc891126532939a0a7350d18d19dbae807fb76f",
+    "releaseCandidateCommit": "fbc891126532939a0a7350d18d19dbae807fb76f",
+    "integrationPullRequest": 238,
+    "validationRunNumber": 1238,
+    "validationRunId": 35740224085,
+    "validationConclusion": "SUCCESS",
+    "exactDiffFileCount": 8,
+    "backendProductionDeployRequired": false,
+    "liveDatabaseMutationRequired": false,
+    "g6Evidence": "operations/BOARD_MOBILE_INFORMATION_HIERARCHY_G6_2026-09-22.md",
+    "g7ReleaseCandidateEvidence": "operations/BOARD_MOBILE_INFORMATION_HIERARCHY_G7_RELEASE_CANDIDATE_2026-09-22.md"
   },
   "waitingResults": [
     {
