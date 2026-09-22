@@ -87,7 +87,11 @@ function applyView({announce=true}={}){
     card.setAttribute('aria-hidden',hidden?'true':'false');
   });
   document.documentElement.dataset.boardView=activeView;
-  filterHost?.querySelectorAll('[data-board-view]').forEach(button=>{
+  const viewControls=[
+    ...[...(filterHost?.querySelectorAll('[data-board-view]')||[])],
+    ...[...(drawer?.querySelectorAll('[data-board-view]')||[])]
+  ];
+  [...new Set(viewControls)].forEach(button=>{
     const active=button.dataset.boardView===activeView;
     button.classList.toggle('active',active);
     button.setAttribute('aria-pressed',active?'true':'false');
