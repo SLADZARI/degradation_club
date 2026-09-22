@@ -85,7 +85,7 @@ function applyFilter({announce=true}={}){
   const programButton=drawer?.querySelector('[data-board-program-filter]');
   if(programButton){programButton.classList.toggle('active',currentProgramOnly);programButton.setAttribute('aria-pressed',currentProgramOnly?'true':'false')}
   const filterButton=filterHost?.querySelector('[data-board-filter-drawer]');
-  if(filterButton)filterButton.classList.toggle('active',BOARD_DETAIL_FILTERS.some(([id])=>id===activeFilter));
+  if(filterButton)filterButton.classList.toggle('active',BOARD_DETAIL_FILTERS.some(([id])=>id===activeFilter)||currentProgramOnly);
   if(announce){window.dispatchEvent(new CustomEvent('dc:board-filter-changed',{detail:{filter:activeFilter,currentProgram:currentProgramOnly}}));window.dispatchEvent(new CustomEvent('dc:board-layout-request'))}
 }
 
@@ -121,14 +121,15 @@ function installFilters(){
   ensureDrawer();
   filterHost.addEventListener('click',event=>{
     const drawerButton=event.target.closest('[data-board-filter-drawer]');if(drawerButton){drawer?.hidden?openDrawer():closeDrawer();return}
-    const button=event.target.closest('[data-board-filter]');if(!button)return;activeFilter=button.dataset.boardFilter||'all';applyFilter();closeDrawer();
+    const button=event.target.closest('[data-board-filter]');if(!button)return;activeFilter=button.dataset.boardFilter||'all';if(activeFilter==='all')currentProgramOnly=false;applyFilter();closeDrawer();
   });
 }
 
 function installOwnLocatorFilterBridge(){
   document.addEventListener('click',event=>{
-    if(!event.target.closest?.('[data-mine]')||activeFilter==='artifact')return;
-    activeFilter='artifact';applyFilter();closeDrawer();
+    if(!event.target.closest?.('[data-mine]'))return;
+    if(activeFilter==='artifact'&&!currentProgramOnly)return;
+    activeFilter='artifact';currentProgramOnly=false;applyFilter();closeDrawer();
   },true);
 }
 
