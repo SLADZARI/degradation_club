@@ -5,14 +5,14 @@
     "project": "dementor-club",
     "documentType": "STANDARD",
     "projectStage": "RELEASE",
-    "gate": "G7_RELEASE",
+    "gate": "G8_CLEANUP",
     "status": "APPROVED",
-    "version": "2.54",
+    "version": "2.55",
     "updated": "2026-09-22",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.53"
+    "supersedes": "2.54"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -21,7 +21,7 @@
   "defaultBranch": "main",
   "semanticSourceBranch": "dementor-club",
   "projectStage": "RELEASE",
-  "gate": "G7_RELEASE",
+  "gate": "G8_CLEANUP",
   "readFirst": [
     ".weekly-os/PROJECT.json",
     ".weekly-os/ARTIFACT_INDEX.json",
@@ -153,7 +153,9 @@
     "operations/PROJECTS_PUBLIC_MEDIA_FALLBACK_LIVE_CORRECTIVE_G6_2026-09-22.md",
     "operations/PROJECTS_PUBLIC_MEDIA_FALLBACK_LIVE_CORRECTIVE_G7_RELEASE_CANDIDATE_2026-09-22.md",
     ".weekly-os/results/projects-public-media-fallback-v1.v0.6.md",
-    "operations/PROJECTS_PUBLIC_MEDIA_FALLBACK_LIVE_CORRECTIVE_G7_MERGE_2026-09-22.md"
+    "operations/PROJECTS_PUBLIC_MEDIA_FALLBACK_LIVE_CORRECTIVE_G7_MERGE_2026-09-22.md",
+    ".weekly-os/results/projects-public-media-fallback-v1.v0.7.md",
+    "operations/PROJECTS_PUBLIC_MEDIA_FALLBACK_LIVE_ACCEPTANCE_2026-09-22.md"
   ],
   "authority": {
     "mpDslCore": {
@@ -299,16 +301,16 @@
   },
   "currentResult": {
     "artifactId": "dementor-club.result.projects-public-media-fallback-v1",
-    "version": "0.6",
-    "status": "ACTIVE",
-    "path": ".weekly-os/results/projects-public-media-fallback-v1.v0.6.md",
-    "gate": "G7_RELEASE",
+    "version": "0.7",
+    "status": "WAITING",
+    "path": ".weekly-os/results/projects-public-media-fallback-v1.v0.7.md",
+    "gate": "G8_CLEANUP",
     "parentIssue": 228,
     "scope": [
       "STAB-05",
       "BQA-21"
     ],
-    "integrationBranch": "result/projects-public-media-fallback-v1",
+    "integrationBranch": null,
     "integrationBaseRef": "dementor-club-production",
     "integrationBaseCommit": "4a8e95cb669dab660a7afe381e580278d4575a2a",
     "productionBaseCommit": "4a8e95cb669dab660a7afe381e580278d4575a2a",
@@ -317,10 +319,10 @@
     "semanticMutationRequired": false,
     "changeProposalRequired": false,
     "productionMergeAuthorized": true,
-    "productionDeployAuthorized": false,
+    "productionDeployAuthorized": true,
     "blockingGate": null,
-    "gateReadiness": "MERGED_AWAITING_PAGES_DEPLOY",
-    "note": "STAB-05 live corrective exact candidate 91607fdb... merged via PR #236 to production 287b4852.... Exact old-production→new-production content delta is 3 files; candidate→production content diff = 0. Supabase deploy not required/not run. Await Pages deploy + live human playback acceptance. STAB-06 not started.",
+    "gateReadiness": "G8_CLEANUP_PENDING",
+    "note": "STAB-05 runtime release accepted live by owner on production 287b4852.... Pages run #129 / 35708869679 SUCCESS on exact production SHA. Human browser: real YouTube player PASS, playback PASS, 9:16 PASS, rejected unavailable copy absent PASS, empty black media absent PASS. Supabase not required/not run. Result is WAITING / G8_CLEANUP with integrationBranch null. STAB-06 not started.",
     "candidateCommit": "91607fdbd02b815122ce25c7a8920691dda6320f",
     "releaseCandidateCommit": "91607fdbd02b815122ce25c7a8920691dda6320f",
     "integrationPullRequest": 236,
@@ -332,7 +334,14 @@
     "liveDatabaseMutationRequired": false,
     "productionCommit": "287b485293d68098dfd3c9302785369a735d42e2",
     "productionMergeCommit": "287b485293d68098dfd3c9302785369a735d42e2",
-    "mergeEvidence": "operations/PROJECTS_PUBLIC_MEDIA_FALLBACK_LIVE_CORRECTIVE_G7_MERGE_2026-09-22.md"
+    "mergeEvidence": "operations/PROJECTS_PUBLIC_MEDIA_FALLBACK_LIVE_CORRECTIVE_G7_MERGE_2026-09-22.md",
+    "productionPagesRunNumber": 129,
+    "productionPagesRunId": 35708869679,
+    "productionPagesConclusion": "SUCCESS",
+    "productionPagesExactShaVerified": true,
+    "productionDeployStatus": "SUCCESS",
+    "liveRetestStatus": "PASS",
+    "liveEvidence": "operations/PROJECTS_PUBLIC_MEDIA_FALLBACK_LIVE_ACCEPTANCE_2026-09-22.md"
   },
   "waitingResults": [
     {
