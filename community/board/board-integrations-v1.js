@@ -126,17 +126,17 @@ function ensureProjections(){
   window.dispatchEvent(new CustomEvent('dc:board-projections-updated'));window.dispatchEvent(new CustomEvent('dc:board-layout-request'));
 }
 
-function closeDrawer(){if(!drawer)return;drawer.hidden=true;filterHost?.querySelector('[data-board-filter-drawer]')?.setAttribute('aria-expanded','false')}
+function closeDrawer({restoreFocus=false}={}){if(!drawer)return;const trigger=filterHost?.querySelector('[data-board-filter-drawer]');drawer.hidden=true;trigger?.setAttribute('aria-expanded','false');if(restoreFocus)trigger?.focus({preventScroll:true})}
 function openDrawer(){if(!drawer)return;drawer.scrollTop=0;drawer.hidden=false;filterHost?.querySelector('[data-board-filter-drawer]')?.setAttribute('aria-expanded','true');(drawer.querySelector('[data-board-view].active')||drawer.querySelector('[data-board-view]'))?.focus({preventScroll:true})}
 function ensureDrawer(){
   if(drawer)return drawer;
   drawer=document.createElement('div');drawer.className='dc-board-filter-drawer';drawer.hidden=true;
   drawer.innerHTML=`<div class="dc-board-filter-drawer__head"><strong>ВИД ДОСКИ</strong><button type="button" data-filter-close aria-label="Закрыть выбор вида">×</button></div><div class="dc-board-filter-drawer__grid">${BOARD_VIEW_FILTERS.map(([id,label])=>`<button class="dc-board-filter" type="button" data-board-view="${id}" data-board-detail-filter="${id}"${id==='current-program'?' data-board-program-filter':''} aria-pressed="false">${label}</button>`).join('')}</div>`;
   (window.matchMedia('(max-width:900px)').matches?document.body:filterHost)?.appendChild(drawer);
-  drawer.querySelector('[data-filter-close]').onclick=closeDrawer;
+  drawer.querySelector('[data-filter-close]').onclick=()=>closeDrawer({restoreFocus:true});
   drawer.addEventListener('click',event=>{
     const button=event.target.closest('[data-board-view]');if(!button)return;
-    setView(button.dataset.boardView||'all');
+    setView(button.dataset.boardView||'all',{close:false});closeDrawer({restoreFocus:true});
   });
   return drawer;
 }
