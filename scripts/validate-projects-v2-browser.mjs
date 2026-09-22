@@ -76,44 +76,73 @@ for(const width of widths){
     if(route==='/projects/'){
       const media=await page.evaluate(()=>{
         const owner=document.querySelector('[data-project-media-state]');
-        const rect=owner?.getBoundingClientRect()||null;
-        const status=owner?.querySelector('.dc-projects-v2__hero-reel-status')||null;
+        const frame=owner?.querySelector('.dc-projects-v2__hero-reel-frame')||null;
+        const iframe=frame?.querySelector('iframe')||null;
+        const fallback=frame?.querySelector('.dc-projects-v2__hero-reel-fallback')||null;
+        const open=owner?.querySelector('.dc-projects-v2__hero-reel-label a[href]')||null;
+        const rect=frame?.getBoundingClientRect()||null;
+        const src=iframe?.getAttribute('src')||'';
+        const url=src?new URL(src,location.href):null;
+        const style=fallback?getComputedStyle(fallback):null;
         return {
           state:owner?.getAttribute('data-project-media-state')||null,
-          visible:!!owner&&getComputedStyle(owner).display!=='none'&&rect?.width>0&&rect?.height>0,
-          text:(status?.querySelector('strong')?.innerText||'').trim().replace(/\s+/g,' '),
+          ownerVisible:!!owner&&getComputedStyle(owner).display!=='none',
+          frameVisible:!!frame&&rect?.width>0&&rect?.height>0,
           iframeCount:owner?.querySelectorAll('iframe').length??-1,
           videoCount:owner?.querySelectorAll('video').length??-1,
-          interactiveCount:owner?.querySelectorAll('a[href],button,input,select,textarea,[tabindex]:not([tabindex="-1"])').length??-1,
-          legacyFrame:!!document.querySelector('.dc-projects-v2__hero-reel-frame'),
-          brokenSourceLinks:[...document.querySelectorAll('a[href]')].filter(a=>/dWokndhJLKQ|youtube\.com\/shorts/i.test(a.href)).length,
+          src,
+          origin:url?.origin||null,
+          path:url?.pathname||null,
+          autoplay:url?.searchParams.get('autoplay'),
+          mute:url?.searchParams.get('mute'),
+          playsinline:url?.searchParams.get('playsinline'),
+          loop:url?.searchParams.get('loop'),
+          playlist:url?.searchParams.get('playlist'),
+          controls:url?.searchParams.get('controls'),
+          iframeTitle:iframe?.getAttribute('title')||'',
+          iframeAllow:iframe?.getAttribute('allow')||'',
+          externalHref:open?.href||null,
+          externalTarget:open?.getAttribute('target')||null,
+          externalRel:open?.getAttribute('rel')||'',
+          externalText:(open?.innerText||'').trim().replace(/\s+/g,' '),
+          unavailableCopy:/ФРАГМЕНТ\s+ВРЕМЕННО\s+НЕДОСТУПЕН|Источник видео больше не воспроизводится/i.test(owner?.innerText||''),
+          fallbackVisible:!!fallback&&style?.display!=='none',
+          fallbackBackground:style?.backgroundColor||null,
           width:rect?.width??0,
           height:rect?.height??0,
-          viewportWidth:innerWidth,
-          viewportHeight:innerHeight
+          viewportWidth:innerWidth
         };
       });
-      expect(media.state==='unavailable',`${width}px Projects hub: canonical media state must be unavailable after source verification`);
-      expect(media.visible,`${width}px Projects hub: unavailable media state is not visible`);
-      expect(/ФРАГМЕНТ ВРЕМЕННО НЕДОСТУПЕН/.test(media.text),`${width}px Projects hub: explicit unavailable copy missing`);
-      expect(media.iframeCount===0&&media.videoCount===0,`${width}px Projects hub: unavailable state must not create iframe/video runtime`);
-      expect(media.interactiveCount===0,`${width}px Projects hub: unavailable state must not expose dead keyboard-focusable media controls`);
-      expect(!media.legacyFrame,`${width}px Projects hub: legacy 9:16 empty media frame survived`);
-      expect(media.brokenSourceLinks===0,`${width}px Projects hub: unavailable YouTube source link survived`);
-      expect(media.width<=media.viewportWidth+1,`${width}px Projects hub: media fallback exceeds viewport width`);
-      expect(media.height<media.viewportHeight*.75,`${width}px Projects hub: unavailable media fallback still consumes excessive viewport height (${media.height}px)`);
+      expect(media.state==='video',`${width}px Projects hub: canonical media state must be video`);
+      expect(media.ownerVisible&&media.frameVisible,`${width}px Projects hub: video owner/frame is not visible`);
+      expect(media.iframeCount===1&&media.videoCount===0,`${width}px Projects hub: expected one canonical iframe and no parallel video runtime`);
+      expect(media.origin==='https://www.youtube-nocookie.com'&&media.path==='/embed/dWokndhJLKQ',`${width}px Projects hub: privacy-respecting YouTube embed source drifted (${media.src})`);
+      expect(media.autoplay==='1'&&media.mute==='1'&&media.playsinline==='1'&&media.loop==='1'&&media.playlist==='dWokndhJLKQ',`${width}px Projects hub: autoplay/mute/playsinline/loop contract drifted`);
+      expect(media.controls==='1',`${width}px Projects hub: iframe controls must remain available when autoplay is blocked`);
+      expect(/autoplay/.test(media.iframeAllow),`${width}px Projects hub: iframe allow contract must include autoplay`);
+      expect(media.iframeTitle.length>8,`${width}px Projects hub: iframe accessible title missing`);
+      expect(media.externalHref==='https://www.youtube.com/shorts/dWokndhJLKQ',`${width}px Projects hub: manual external playback fallback drifted`);
+      expect(media.externalTarget==='_blank'&&/noopener/.test(media.externalRel)&&/noreferrer/.test(media.externalRel),`${width}px Projects hub: external playback fallback security contract drifted`);
+      expect(/ОТКРЫТЬ ВИДЕО/.test(media.externalText),`${width}px Projects hub: visible manual playback affordance missing`);
+      expect(!media.unavailableCopy,`${width}px Projects hub: owner-rejected unavailable message survived`);
+      expect(media.fallbackVisible,`${width}px Projects hub: non-black fallback layer missing behind iframe`);
+      expect(media.width<=media.viewportWidth+1,`${width}px Projects hub: video frame exceeds viewport width`);
+      const ratio=media.width&&media.height?media.width/media.height:0;
+      expect(Math.abs(ratio-(9/16))<0.03,`${width}px Projects hub: video frame must stay 9:16, got ${ratio.toFixed(3)}`);
 
       await page.reload({waitUntil:'load'});
-      await page.waitForSelector('[data-project-media-state="unavailable"]');
+      await page.waitForSelector('[data-project-media-state="video"] iframe');
       const reloaded=await page.evaluate(()=>({
         state:document.querySelector('[data-project-media-state]')?.getAttribute('data-project-media-state')||null,
-        legacyFrame:!!document.querySelector('.dc-projects-v2__hero-reel-frame'),
-        brokenSourceLinks:[...document.querySelectorAll('a[href]')].filter(a=>/dWokndhJLKQ|youtube\.com\/shorts/i.test(a.href)).length
+        iframeSrc:document.querySelector('[data-project-media-state="video"] iframe')?.getAttribute('src')||'',
+        fallbackLink:document.querySelector('.dc-projects-v2__hero-reel-label a[href]')?.href||null,
+        unavailableCopy:/ФРАГМЕНТ\s+ВРЕМЕННО\s+НЕДОСТУПЕН|Источник видео больше не воспроизводится/i.test(document.querySelector('[data-project-media-state]')?.innerText||'')
       }));
-      expect(reloaded.state==='unavailable',`${width}px Projects hub reload: media fallback state drifted`);
-      expect(!reloaded.legacyFrame&&reloaded.brokenSourceLinks===0,`${width}px Projects hub reload: inert video promise returned`);
+      expect(reloaded.state==='video',`${width}px Projects hub reload: video state drifted`);
+      expect(/youtube-nocookie\.com\/embed\/dWokndhJLKQ/.test(reloaded.iframeSrc),`${width}px Projects hub reload: iframe source drifted`);
+      expect(reloaded.fallbackLink==='https://www.youtube.com/shorts/dWokndhJLKQ',`${width}px Projects hub reload: manual fallback link drifted`);
+      expect(!reloaded.unavailableCopy,`${width}px Projects hub reload: rejected unavailable state returned`);
     }
-
     const visualName=visualRoutes.get(route);
     if(visualName){
       await page.screenshot({path:path.join(qaDir,`projects-v2-${visualName}-${width}.png`),fullPage:true});
@@ -190,4 +219,4 @@ if(errors.length){
   for(const e of errors)console.error(`- ${e}`);
   process.exit(1);
 }
-console.log('Projects v2 browser regression PASS: fresh-top + Logic hashes + history restoration + no overflow + mobile heading fit + canonical shell/routes on 1440/390/360 + BQA-21 unavailable-media fallback/reload contract. Visual evidence captured for Hub + Lab.');
+console.log('Projects v2 browser regression PASS: fresh-top + Logic hashes + history restoration + no overflow + mobile heading fit + canonical shell/routes on 1440/390/360 + BQA-21 9:16 youtube-nocookie autoplay/muted/playsinline/manual-fallback/reload contract. Visual evidence captured for Hub + Lab.');
