@@ -20,9 +20,15 @@ const ownArtifact={id:'qa-artifact-own',author_profile_id:user.id,artifact_type:
 const otherArtifact={id:'qa-artifact-other',author_profile_id:other,artifact_type:'post',title:'ДЛИННАЯ КАРТОЧКА ДЛЯ ПРОВЕРКИ ИЕРАРХИИ',body:'Это более длинный текст карточки, который нужен только для проверки существующей размерной и типографической иерархии на пространственной доске. '.repeat(8),external_url:null,status:'active',visibility:'community',starts_at:null,activity_at:null,expires_at:null,published_at:'2026-09-12T10:00:00Z',created_at:'2026-09-12T09:55:00Z'};
 const artifacts=[ownArtifact,otherArtifact];
 const profiles=[{profile_id:user.id,display_name:'QA Owner',nickname:'qa',avatar_url:null,member_since:'2026-09-01'},{profile_id:other,display_name:'Other Member',nickname:'other',avatar_url:null,member_since:'2026-09-01'}];
+const projections=[
+ {entity_id:'entity-program-dnv',entity_type:'program',slug:'dengi-na-veter',title:'ДЕНЬГИ НА ВЕТЕР',status:'active',summary:'Course',source_system:'dementor-club',provenance_status:'confirmed',program_type:'course',delivery_mode:'public',content_summary:'Course'},
+ {entity_id:'entity-project-lab',entity_type:'project',slug:'dementor-lab',title:'DEMENTOR LAB',status:'active',summary:'Lab',source_system:'dementor-club',provenance_status:'confirmed'},
+ {entity_id:'entity-event-fuengirola',entity_type:'event',slug:'fuengirola',title:'ФУЭНХИРОЛА',status:'planned',summary:'Event',source_system:'dementor-club',provenance_status:'confirmed',event_location:'Fuengirola'},
+ {entity_id:'entity-project-outside',entity_type:'project',slug:'outside-lab',title:'DEMENTOR LAB',status:'active',summary:'Same title, different exact identity',source_system:'dementor-club',provenance_status:'confirmed'}
+];
 const rowsFor=t=>t==='join_applications'?[]:t==='dc_role_assignments'?[]:t==='profiles'?[{id:user.id,full_name:'QA',display_name:'QA'}]:t==='dc_system_memberships'?[{profile_id:user.id,status:'active'}]:t==='dc_artifacts'?artifacts:t==='dc_member_public_profiles'?profiles:t==='dc_artifact_reactions'?[]:t==='dc_artifact_responses'?[]:t==='dc_artifact_media'?[]:t==='dc_artifact_board_positions'?[{artifact_id:ownArtifact.id,board_id:'community',x:1200,y:900,rotation:0,size_class:null,position_version:1},{artifact_id:otherArtifact.id,board_id:'community',x:1700,y:1050,rotation:0,size_class:null,position_version:1}]:[];
 const query=t=>{let rows=[...rowsFor(t)];const q={select(){return q},eq(k,v){rows=rows.filter(r=>r?.[k]===v);return q},neq(k,v){rows=rows.filter(r=>r?.[k]!==v);return q},in(k,values){rows=rows.filter(r=>values.includes(r?.[k]));return q},is(){return q},order(){return q},limit(n){rows=rows.slice(0,n);return q},range(){return q},insert(){return q},upsert(){return q},update(){return q},delete(){return q},maybeSingle(){return Promise.resolve({data:rows[0]||null,error:null})},single(){return Promise.resolve({data:rows[0]||null,error:null})},then(resolve,reject){return Promise.resolve({data:rows,error:null}).then(resolve,reject)}};return q};
-export function createClient(){return{auth:{getSession:async()=>({data:{session}}),getUser:async()=>({data:{user}}),signOut:async()=>({}),onAuthStateChange:()=>({data:{subscription:{unsubscribe(){}}}})},from:query,rpc:async(name)=>{if(name==='dc_member_entry_status_v1')return{data:{membership_active:true,community_activation_state:'MEMBER_ACTIVATED',sphere_count:9,sphere_gate_complete:true,artifact_slots_available:0,artifact_slots_consuming:1,published_artifact_count:1},error:null};if(name==='dc_board_entity_projection_read_v1')return{data:[],error:null};if(name==='dc_board_promotion_state_read_v1')return{data:[],error:null};if(name==='dc_normalize_artifact_lifecycle_v1')return{data:[],error:null};if(name==='dc_guest_board_read_v1')return{data:[],error:null};return{data:[],error:null}},storage:{from:()=>({createSignedUrl:async()=>({data:{signedUrl:'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22320%22 height=%22160%22/%3E'}}),upload:async()=>({data:{},error:null}),remove:async()=>({data:{}})})},functions:{invoke:async()=>({data:{}})}}}`;
+export function createClient(){return{auth:{getSession:async()=>({data:{session}}),getUser:async()=>({data:{user}}),signOut:async()=>({}),onAuthStateChange:()=>({data:{subscription:{unsubscribe(){}}}})},from:query,rpc:async(name)=>{if(name==='dc_member_entry_status_v1')return{data:{membership_active:true,community_activation_state:'MEMBER_ACTIVATED',sphere_count:9,sphere_gate_complete:true,artifact_slots_available:0,artifact_slots_consuming:1,published_artifact_count:1},error:null};if(name==='dc_board_entity_projection_read_v1')return{data:projections,error:null};if(name==='dc_board_promotion_state_read_v1')return{data:[],error:null};if(name==='dc_normalize_artifact_lifecycle_v1')return{data:[],error:null};if(name==='dc_guest_board_read_v1')return{data:[],error:null};return{data:[],error:null}},storage:{from:()=>({createSignedUrl:async()=>({data:{signedUrl:'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22320%22 height=%22160%22/%3E'}}),upload:async()=>({data:{},error:null}),remove:async()=>({data:{}})})},functions:{invoke:async()=>({data:{}})}}}`;
 
 async function openBoard(browser,viewport){
   const ctx=await browser.newContext({viewport});
@@ -31,7 +37,7 @@ async function openBoard(browser,viewport){
   const page=await ctx.newPage();const errors=[];page.on('pageerror',error=>errors.push(error.message));
   await page.goto(base+'/workspace/board/',{waitUntil:'domcontentloaded'});
   await page.locator('.dc-spatial-viewport').waitFor({state:'visible',timeout:6000});
-  await page.waitForFunction(()=>document.querySelectorAll('.dc-notice[data-artifact]').length>=2,{timeout:5000});
+  await page.waitForFunction(()=>document.querySelectorAll('.dc-notice[data-artifact]').length>=2&&document.querySelectorAll('[data-board-source="platform"]').length===4,{timeout:5000});
   return{ctx,page,errors};
 }
 
@@ -48,20 +54,48 @@ async function metrics(page,selector){return page.locator(selector).evaluate(car
 
 const browser=await chromium.launch({headless:true});
 try{
-  for(const viewport of [{width:390,height:844,label:'390'},{width:430,height:844,label:'430'}]){
+  for(const viewport of [{width:390,height:844,label:'390'},{width:360,height:800,label:'360'}]){
     const{ctx,page,errors}=await openBoard(browser,viewport);
     const nav=page.locator('.dc-board-filter-nav');await nav.waitFor({state:'visible',timeout:3000});
-    const initial=await nav.locator('[data-pos]').innerText();expect(initial==='1 / 2',`nav-${viewport.label}: initial position ${initial}`);
+    const initial=await nav.locator('[data-pos]').innerText();const initialMatch=initial.match(/^(\d+) \/ (\d+)$/);expect(!!initialMatch&&Number(initialMatch[1])===1&&Number(initialMatch[2])>=2,`nav-${viewport.label}: initial position ${initial}`);const total=initialMatch?Number(initialMatch[2]):0;
     const clearance=await page.evaluate(()=>{const n=document.querySelector('.dc-board-filter-nav')?.getBoundingClientRect(),c=document.querySelector('.dc-spatial-controls')?.getBoundingClientRect();return{navTop:n?.top,navBottom:n?.bottom,controlsTop:c?.top,controlsBottom:c?.bottom}});
     expect(clearance.navBottom<=clearance.controlsTop-4,`nav-${viewport.label}: navigator overlaps spatial controls ${JSON.stringify(clearance)}`);
-    const before=await page.locator('.dc-spatial-world').evaluate(el=>el.style.transform);
     await nav.locator('[data-next]').click();await page.waitForTimeout(80);
-    const after=await page.locator('.dc-spatial-world').evaluate(el=>el.style.transform);
-    const nextPos=await nav.locator('[data-pos]').innerText();expect(after!==before,`nav-${viewport.label}: next did not move camera`);expect(nextPos==='2 / 2',`nav-${viewport.label}: next position ${nextPos}`);
-    await nav.locator('[data-prev]').click();await page.waitForTimeout(60);expect((await nav.locator('[data-pos]').innerText())==='1 / 2',`nav-${viewport.label}: prev did not return`);
+    const nextPos=await nav.locator('[data-pos]').innerText();expect(nextPos===`2 / ${total}`,`nav-${viewport.label}: next position ${nextPos}`);
+    await nav.locator('[data-prev]').click();await page.waitForTimeout(60);expect((await nav.locator('[data-pos]').innerText())===`1 / ${total}`,`nav-${viewport.label}: prev did not return`);
+    const zoomBefore=await page.locator('.dc-spatial-world').evaluate(el=>el.style.transform);await page.locator('[data-zoom-in]').click();await page.waitForTimeout(60);const zoomAfter=await page.locator('.dc-spatial-world').evaluate(el=>el.style.transform);expect(zoomAfter!==zoomBefore,`zoom-${viewport.label}: zoom-in no longer changes spatial transform`);await page.locator('[data-zoom-out]').click();
 
     await page.locator('[data-board-filter-drawer]').click();const drawer=page.locator('.dc-board-filter-drawer');await drawer.waitFor({state:'visible',timeout:2000});
-    const stack=await page.evaluate(()=>{const d=document.querySelector('.dc-board-filter-drawer')?.getBoundingClientRect(),n=document.querySelector('.dc-board-filter-nav')?.getBoundingClientRect();return{drawerBottom:d?.bottom,navTop:n?.top}});expect(stack.drawerBottom<=stack.navTop-4,`nav-${viewport.label}: drawer overlaps navigator ${JSON.stringify(stack)}`);await page.locator('[data-filter-close]').click();
+    const stack=await page.evaluate(()=>{const d=document.querySelector('.dc-board-filter-drawer')?.getBoundingClientRect(),n=document.querySelector('.dc-board-filter-nav')?.getBoundingClientRect();return{drawerBottom:d?.bottom,navTop:n?.top}});expect(stack.drawerBottom<=stack.navTop-4,`nav-${viewport.label}: drawer overlaps navigator ${JSON.stringify(stack)}`);
+    const programFilter=drawer.locator('[data-board-program-filter]');expect(await programFilter.count()===1,`filter-${viewport.label}: Current Program affiliation control missing`);expect(await programFilter.getAttribute('aria-pressed')==='false',`filter-${viewport.label}: Current Program must default off`);
+    await programFilter.click();await page.waitForTimeout(80);
+    const programOnly=await page.locator('[data-board-source]:not([hidden])').evaluateAll(nodes=>nodes.map(node=>({ref:node.dataset.thingRef||null,source:node.dataset.boardSource,type:node.dataset.sourceType,program:node.dataset.currentProgram,badges:[...node.querySelectorAll(':scope > .dc-board-badges .dc-board-badge')].map(x=>x.textContent.trim())})));
+    expect(programOnly.length===3,`filter-${viewport.label}: Current Program should isolate exactly 3 canonical cards ${JSON.stringify(programOnly)}`);
+    expect(programOnly.map(x=>x.ref).sort().join('|')==='event:fuengirola|program:dengi-na-veter|project:dementor-lab',`filter-${viewport.label}: Current Program exact identity mismatch ${JSON.stringify(programOnly)}`);
+    expect(programOnly.every(x=>x.program==='1'&&x.badges.includes('В ПРОГРАММЕ')),`filter-${viewport.label}: Current Program badge missing on exact match ${JSON.stringify(programOnly)}`);
+    expect(!programOnly.some(x=>x.ref==='project:outside-lab'),`filter-${viewport.label}: title-based false positive entered Current Program`);
+
+    await drawer.locator('[data-board-detail-filter="program"]').click();await page.waitForTimeout(80);
+    const composed=await page.locator('[data-board-source]:not([hidden])').evaluateAll(nodes=>nodes.map(node=>({ref:node.dataset.thingRef,type:node.dataset.sourceType,program:node.dataset.currentProgram})));
+    expect(composed.length===1&&composed[0].ref==='program:dengi-na-veter',`filter-${viewport.label}: object type + Program affiliation do not compose ${JSON.stringify(composed)}`);
+
+    await page.locator('[data-board-filter="all"]').click();await page.waitForTimeout(80);
+    const restored=await page.locator('[data-board-source]:not([hidden])').count();expect(restored===6,`filter-${viewport.label}: ВСЁ did not restore Board (${restored})`);
+
+    const badgeState=await page.evaluate(()=>({
+      artifact:[...document.querySelectorAll('.dc-notice[data-artifact]')].map(x=>({subtype:x.dataset.artifactSubtype,badges:[...x.querySelectorAll(':scope > .dc-board-badges .dc-board-badge')].map(b=>b.textContent.trim()),program:x.dataset.currentProgram})),
+      platform:[...document.querySelectorAll('[data-board-source="platform"]')].map(x=>({ref:x.dataset.thingRef,type:x.dataset.sourceType,badges:[...x.querySelectorAll(':scope > .dc-board-badges .dc-board-badge')].map(b=>b.textContent.trim()),program:x.dataset.currentProgram}))
+    }));
+    expect(badgeState.artifact.some(x=>x.subtype==='announcement'&&x.badges.includes('ОБЪЯВЛЕНИЕ'))&&badgeState.artifact.some(x=>x.subtype==='post'&&x.badges.includes('ПОСТ')),`badge-${viewport.label}: Artifact subtype badges incorrect ${JSON.stringify(badgeState.artifact)}`);
+    expect(badgeState.artifact.every(x=>x.program==='0'&&!x.badges.includes('В ПРОГРАММЕ')),`badge-${viewport.label}: Artifact received false Program affiliation ${JSON.stringify(badgeState.artifact)}`);
+    expect(badgeState.platform.some(x=>x.ref==='event:fuengirola'&&x.badges.includes('СОБЫТИЕ'))&&badgeState.platform.some(x=>x.ref==='program:dengi-na-veter'&&x.badges.includes('КУРС / ПРОГРАММА'))&&badgeState.platform.some(x=>x.ref==='project:dementor-lab'&&x.badges.includes('ПРОЕКТ / ПРОДУКТ')),`badge-${viewport.label}: platform type badges incorrect ${JSON.stringify(badgeState.platform)}`);
+    expect(badgeState.platform.find(x=>x.ref==='project:outside-lab')?.program==='0'&&!badgeState.platform.find(x=>x.ref==='project:outside-lab')?.badges.includes('В ПРОГРАММЕ'),`badge-${viewport.label}: non-member projection received Program badge`);
+
+    await page.locator('[data-mine]').click();await page.waitForTimeout(60);
+    const mineVisible=await page.locator('[data-board-source]:not([hidden])').evaluateAll(nodes=>nodes.map(node=>node.dataset.boardSource));
+    expect(mineVisible.length===2&&mineVisible.every(x=>x==='member'),`mine-${viewport.label}: МОЁ filter no longer resets affiliation to member Artifacts ${JSON.stringify(mineVisible)}`);
+    await page.locator('[data-board-filter="all"]').click();
+    await page.locator('[data-filter-close]').click().catch(()=>{});
 
     const card='.dc-notice[data-artifact="qa-artifact-own"]';
     await setImage(page,card,320,160);const landscape=await metrics(page,card);
@@ -82,8 +116,9 @@ try{
   const{ctx,page,errors}=await openBoard(browser,{width:1440,height:900});
   const nav=page.locator('.dc-board-filter-nav');await nav.waitFor({state:'visible',timeout:3000});
   const desktopPosition=await nav.evaluate(el=>getComputedStyle(el).position);expect(desktopPosition!=='fixed',`desktop: navigator unexpectedly changed to fixed composition`);
+  const desktopProgram=await page.evaluate(()=>{const host=document.querySelector('.dc-board-program');return{display:host?getComputedStyle(host).display:null,cards:host?.querySelectorAll('.dc-board-program__card').length||0}});expect(desktopProgram.display!=='none'&&desktopProgram.cards===3,`desktop: existing Current Program presentation changed ${JSON.stringify(desktopProgram)}`);
   const card='.dc-notice[data-artifact="qa-artifact-own"]';await setImage(page,card,420,210);const landscape=await metrics(page,card);await setImage(page,card,210,420);const portrait=await metrics(page,card);expect(landscape.img.ratio>1.7&&portrait.img.ratio<.7,`desktop: source proportions not preserved`);expect(portrait.img.h>landscape.img.h,`desktop: portrait card visual is not taller`);expect(!errors.length,`desktop: ${errors.join(' | ')}`);await ctx.close();
 }finally{await browser.close();server.close()}
 
 if(failures.length){console.error(`Board navigation/adaptive cards acceptance failed (${failures.length})`);for(const failure of failures)console.error(`- ${failure}`);process.exit(1)}
-console.log('Board navigation/adaptive cards browser acceptance passed');
+console.log('Board navigation/adaptive cards browser acceptance passed: 390/360 pager + Current Program affiliation/type composition + canonical badges + МОЁ + adaptive cards; desktop invariant retained');

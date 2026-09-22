@@ -16,6 +16,31 @@ export function artifactSubtypeLabel(value){
   return ARTIFACT_SUBTYPES.find(([id])=>id===type)?.[1]||'ОБЪЯВЛЕНИЕ';
 }
 
+export function boardSourceTypeLabel(value){
+  const type=String(value||'').toLowerCase();
+  const map={
+    event:'СОБЫТИЕ',
+    course:'КУРС / ПРОГРАММА',
+    program:'КУРС / ПРОГРАММА',
+    practice:'ПРАКТИКА',
+    project:'ПРОЕКТ / ПРОДУКТ',
+    product:'ПРОЕКТ / ПРОДУКТ',
+    article:'СТАТЬЯ / КОНТЕНТ',
+    content:'СТАТЬЯ / КОНТЕНТ'
+  };
+  return map[type]||String(value||'').toUpperCase();
+}
+
+export function boardProjectionThingRef(item){
+  const slug=String(item?.slug||'').trim();
+  if(!slug)return null;
+  const type=String(item?.sourceType||'').toLowerCase();
+  if(type==='event')return `event:${slug}`;
+  if(['program','course','practice'].includes(type))return `program:${slug}`;
+  if(['project','product'].includes(type))return `project:${slug}`;
+  return null;
+}
+
 // Workshop 02 made ВСЁ the only required source-level control in v1.
 // Object type is a separate dimension exposed by the detail filter drawer.
 export const BOARD_FILTERS=[

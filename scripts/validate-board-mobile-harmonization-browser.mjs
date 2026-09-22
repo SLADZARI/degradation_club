@@ -49,12 +49,12 @@ for(const width of [390,360]){
 
   const state=await page.evaluate(()=>{
     const box=selector=>{const el=document.querySelector(selector);if(!el)return null;const r=el.getBoundingClientRect();return{x:r.x,y:r.y,w:r.width,h:r.height,right:r.right,bottom:r.bottom,scrollWidth:el.scrollWidth,clientWidth:el.clientWidth}};
-    const boxes=selector=>[...document.querySelectorAll(selector)].filter(el=>!el.hidden&&getComputedStyle(el).display!=='none').map(el=>{const r=el.getBoundingClientRect();return{x:r.x,y:r.y,w:r.width,h:r.height,right:r.right,bottom:r.bottom,text:(el.textContent||'').trim()}});
+    const boxes=selector=>[...document.querySelectorAll(selector)].filter(el=>!el.hidden&&getComputedStyle(el).display!=='none'&&el.getClientRects().length>0).map(el=>{const r=el.getBoundingClientRect();return{x:r.x,y:r.y,w:r.width,h:r.height,right:r.right,bottom:r.bottom,text:(el.textContent||'').trim()}});
     return{
       docScrollWidth:document.documentElement.scrollWidth,
       innerWidth,
       sidebar:box('.dcw-sidebar'),nav:box('.dcw-nav'),navLinks:boxes('.dcw-nav .dcw-nav-link'),
-      filters:box('.dc-board-filters'),primary:box('.dc-board-primary'),program:box('.dc-board-program'),rail:box('.dc-board-program__rail'),cards:boxes('.dc-board-program__card'),
+      filters:box('.dc-board-filters'),primary:box('.dc-board-primary'),program:box('.dc-board-program'),programDisplay:getComputedStyle(document.querySelector('.dc-board-program')).display,visibleProgramCards:boxes('.dc-board-program__card').length,
       pager:box('.dc-board-filter-nav'),controls:box('.dc-spatial-controls'),viewport:box('.dc-spatial-viewport')
     };
   });
@@ -69,11 +69,9 @@ for(const width of [390,360]){
   if(state.nav&&state.filters)expect(state.filters.y>=state.nav.bottom+8,`${label}: workspace nav collides with Board utilities ${JSON.stringify({nav:state.nav,filters:state.filters})}`);
   expect(inside(state.filters)&&inside(state.primary),`${label}: filter/publish row escapes viewport ${JSON.stringify({filters:state.filters,primary:state.primary})}`);
   if(state.filters&&state.primary){expect(Math.abs(state.filters.y-state.primary.y)<=4,`${label}: filters and publish action are not one row ${JSON.stringify({filters:state.filters,primary:state.primary})}`);expect(state.filters.right+4<=state.primary.x,`${label}: filters collide with publish action ${JSON.stringify({filters:state.filters,primary:state.primary})}`)}
-  expect(inside(state.program),`${label}: Current Program host escapes viewport ${JSON.stringify(state.program)}`);
-  expect(state.cards.length===3,`${label}: Current Program must expose exactly three cards`);
-  expect(state.cards.every(inside),`${label}: Current Program card clipped ${JSON.stringify(state.cards)}`);
-  expect((state.rail?.scrollWidth||0)<=((state.rail?.clientWidth||0)+1),`${label}: Variant 3 Program strip still requires horizontal scrolling ${JSON.stringify(state.rail)}`);
-  if(state.filters&&state.program)expect(state.program.y>=state.filters.bottom+6,`${label}: Program strip collides with utility row ${JSON.stringify({filters:state.filters,program:state.program})}`);
+  expect(state.programDisplay==='none',`${label}: standalone Current Program strip remains visible (${state.programDisplay})`);
+  expect(state.visibleProgramCards===0,`${label}: standalone Current Program cards still consume mobile first frame`);
+  if(state.filters&&state.viewport)expect(state.filters.bottom-state.viewport.y<92,`${label}: utility chrome still consumes excessive first-frame height ${JSON.stringify({filters:state.filters,viewport:state.viewport})}`);
   expect(inside(state.pager)&&inside(state.controls),`${label}: bottom dock escapes viewport ${JSON.stringify({pager:state.pager,controls:state.controls})}`);
   if(state.pager&&state.controls)expect(state.pager.bottom<=state.controls.y-4,`${label}: pager overlaps spatial controls ${JSON.stringify({pager:state.pager,controls:state.controls})}`);
   expect((state.viewport?.y??999)<=140,`${label}: harmonization displaced canonical fullscreen viewport ${JSON.stringify(state.viewport)}`);
@@ -85,6 +83,6 @@ if(errors.length){console.error('BOARD MOBILE HARMONIZATION BLOCKED');for(const 
 console.log('Board mobile harmonization browser acceptance PASS');
 console.log('✓ 390 / 360 primary workspace chrome fits viewport');
 console.log('✓ canonical nav clears filters; filters + publish share one row');
-console.log('✓ all 3 Current Program cards visible without horizontal scroll');
+console.log('✓ standalone Current Program strip is absent at 390 / 360; spatial Board owns the first frame');
 console.log('✓ compact two-level bottom dock preserves pager / spatial-control clearance');
 console.log('✓ fullscreen spatial viewport ownership preserved');

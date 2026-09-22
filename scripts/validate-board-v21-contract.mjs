@@ -41,7 +41,7 @@ expect(qaCss.includes('.dc-board-first-entry-focus .dc-board-wall{opacity:.72;fi
 expect(spatial.includes('data-mine>МОЁ</button>'),'own-card locator control missing from canonical spatial controls');
 expect(spatial.includes("controls.querySelector('[data-mine]').onclick=focusMine"),'own-card locator is not bound to canonical focusMine()');
 expect(integrations.includes('installOwnLocatorFilterBridge'),'own-card locator filter bridge missing from canonical Board filter owner');
-expect(integrations.includes("activeFilter='artifact';applyFilter();closeDrawer()"),'own-card locator must reveal Artifact/publication cards before canonical spatial focus runs');
+expect(integrations.includes("activeFilter='artifact';currentProgramOnly=false;applyFilter();closeDrawer()"),'own-card locator must reveal Artifact/publication cards and clear Program affiliation before canonical spatial focus runs');
 expect(js.includes("'+ ПРИКОЛОТЬ'")||js.includes("'+ ПРИКОЛОТЬ"),'primary publish CTA missing');
 expect(js.includes("'МОЁ ОБЪЯВЛЕНИЕ'"),'occupied-slot CTA missing');
 expect(js.includes('dc-board-filter-nav'),'filter previous/next navigation missing');
