@@ -1,10 +1,13 @@
 import {getClient,currentSession,esc} from '/community-runtime-v1.js';
-import {BOARD_FILTERS,BOARD_DETAIL_FILTERS,BOARD_SOURCE_MODES,entityToBoardProjection,isProjectionVisible,matchesBoardFilter} from '/community/board/board-entity-model-v1.js';
+import {BOARD_FILTERS,BOARD_DETAIL_FILTERS,BOARD_SOURCE_MODES,artifactSubtypeLabel,boardProjectionThingRef,boardSourceTypeLabel,entityToBoardProjection,isProjectionVisible,matchesBoardFilter} from '/community/board/board-entity-model-v1.js';
+import {getCurrentProgram} from '/current-program-v1.js';
 
 const boardHost=document.getElementById('boardHost');
 const filterHost=document.getElementById('boardFilters');
 let client=null;
 let activeFilter='all';
+let currentProgramOnly=false;
+const currentProgramRefs=new Set(getCurrentProgram().map(item=>String(item.thingRef||'')).filter(Boolean));
 let projections=[];
 let rendering=false;
 let drawer=null;
@@ -28,7 +31,11 @@ function renderProjection(item){
   const location=item.location?`<div class="dc-projection__line" dir="auto">${esc(item.location)}</div>`:'';
   const action=route?`<a class="dc-board-action small" href="${esc(route)}">ОТКРЫТЬ →</a>`:'';
   const relationAttrs=item.relationKind&&item.relationSourceId?` data-relation-kind="${esc(item.relationKind)}" data-relation-source-id="${esc(item.relationSourceId)}"`:'';
-  return `<article class="${projectionClass(item)}" data-board-source="platform" data-source-mode="${BOARD_SOURCE_MODES.ENTITY_PROJECTION}" data-source-id="${esc(item.sourceId)}" data-source-type="${esc(item.sourceType)}"${relationAttrs} data-forming="${item.isForming?'1':'0'}">
+  const thingRef=boardProjectionThingRef(item);
+  const inCurrentProgram=!!thingRef&&currentProgramRefs.has(thingRef);
+  const badges=`<div class="dc-board-badges" aria-hidden="true"><span class="dc-board-badge">${esc(boardSourceTypeLabel(item.sourceType))}</span>${inCurrentProgram?'<span class="dc-board-badge dc-board-badge--program">В ПРОГРАММЕ</span>':''}</div>`;
+  return `<article class="${projectionClass(item)}" data-board-source="platform" data-source-mode="${BOARD_SOURCE_MODES.ENTITY_PROJECTION}" data-source-id="${esc(item.sourceId)}" data-source-type="${esc(item.sourceType)}" data-thing-ref="${esc(thingRef||'')}" data-current-program="${inCurrentProgram?'1':'0'}"${relationAttrs} data-forming="${item.isForming?'1':'0'}">
+    ${badges}
     <div class="dc-notice__meta"><span>DEMENTOR CLUB / ${esc(item.sourceType.toUpperCase())}</span><span>${esc(statusLabel(item))}</span></div>
     <div class="dc-projection__authority">CLUB / OFFICIAL</div>
     <h3 dir="auto">${esc(item.title)}</h3>
@@ -40,13 +47,21 @@ function renderProjection(item){
 }
 
 function markMemberCards(){
-  boardHost?.querySelectorAll('.dc-notice[data-artifact]:not([data-board-source])').forEach(card=>{
+  boardHost?.querySelectorAll('.dc-notice[data-artifact]').forEach(card=>{
     card.dataset.boardSource='member';
     card.dataset.sourceMode=BOARD_SOURCE_MODES.ARTIFACT;
     card.dataset.sourceType='artifact';
     card.dataset.relationKind='artifact';
     card.dataset.relationSourceId=card.dataset.artifact||'';
+    card.dataset.currentProgram='0';
     card.dataset.forming='0';
+    if(!card.querySelector(':scope > .dc-board-badges')){
+      const badges=document.createElement('div');
+      badges.className='dc-board-badges';
+      badges.setAttribute('aria-hidden','true');
+      badges.innerHTML=`<span class="dc-board-badge">${esc(artifactSubtypeLabel(card.dataset.artifactSubtype))}</span>`;
+      card.prepend(badges);
+    }
   });
 }
 
@@ -60,16 +75,18 @@ function applyFilter({announce=true}={}){
       sourceType:card.dataset.sourceType,
       isForming:card.dataset.forming==='1'
     };
-    const hidden=!matchesBoardFilter(item,activeFilter);
+    const hidden=!matchesBoardFilter(item,activeFilter)||(currentProgramOnly&&card.dataset.currentProgram!=='1');
     card.hidden=hidden;
     card.classList.toggle('dc-board-filtered',hidden);
     card.setAttribute('aria-hidden',hidden?'true':'false');
   });
   filterHost?.querySelectorAll('[data-board-filter]').forEach(button=>button.classList.toggle('active',button.dataset.boardFilter===activeFilter));
   drawer?.querySelectorAll('[data-board-detail-filter]').forEach(button=>button.classList.toggle('active',button.dataset.boardDetailFilter===activeFilter));
+  const programButton=drawer?.querySelector('[data-board-program-filter]');
+  if(programButton){programButton.classList.toggle('active',currentProgramOnly);programButton.setAttribute('aria-pressed',currentProgramOnly?'true':'false')}
   const filterButton=filterHost?.querySelector('[data-board-filter-drawer]');
   if(filterButton)filterButton.classList.toggle('active',BOARD_DETAIL_FILTERS.some(([id])=>id===activeFilter));
-  if(announce){window.dispatchEvent(new CustomEvent('dc:board-filter-changed',{detail:{filter:activeFilter}}));window.dispatchEvent(new CustomEvent('dc:board-layout-request'))}
+  if(announce){window.dispatchEvent(new CustomEvent('dc:board-filter-changed',{detail:{filter:activeFilter,currentProgram:currentProgramOnly}}));window.dispatchEvent(new CustomEvent('dc:board-layout-request'))}
 }
 
 function ensureProjections(){
@@ -87,10 +104,14 @@ function openDrawer(){if(!drawer)return;drawer.scrollTop=0;drawer.hidden=false;f
 function ensureDrawer(){
   if(drawer)return drawer;
   drawer=document.createElement('div');drawer.className='dc-board-filter-drawer';drawer.hidden=true;
-  drawer.innerHTML=`<div class="dc-board-filter-drawer__head"><strong>ТИП ОБЪЕКТА</strong><button type="button" data-filter-close aria-label="Закрыть фильтры">×</button></div><div class="dc-board-filter-drawer__grid">${BOARD_DETAIL_FILTERS.map(([id,label])=>`<button class="dc-board-filter" type="button" data-board-detail-filter="${id}">${label}</button>`).join('')}</div>`;
+  drawer.innerHTML=`<div class="dc-board-filter-drawer__head"><strong>ТИП ОБЪЕКТА</strong><button type="button" data-filter-close aria-label="Закрыть фильтры">×</button></div><div class="dc-board-filter-drawer__grid">${BOARD_DETAIL_FILTERS.map(([id,label])=>`<button class="dc-board-filter" type="button" data-board-detail-filter="${id}">${label}</button>`).join('')}</div><div class="dc-board-filter-drawer__section"><strong>ПРИНАДЛЕЖНОСТЬ</strong><button class="dc-board-filter" type="button" data-board-program-filter aria-pressed="false">ТЕКУЩАЯ ПРОГРАММА</button></div>`;
   (window.matchMedia('(max-width:900px)').matches?document.body:filterHost)?.appendChild(drawer);
   drawer.querySelector('[data-filter-close]').onclick=closeDrawer;
-  drawer.addEventListener('click',event=>{const button=event.target.closest('[data-board-detail-filter]');if(!button)return;activeFilter=button.dataset.boardDetailFilter||'all';applyFilter();closeDrawer()});
+  drawer.addEventListener('click',event=>{
+    const programButton=event.target.closest('[data-board-program-filter]');
+    if(programButton){currentProgramOnly=!currentProgramOnly;applyFilter();return}
+    const button=event.target.closest('[data-board-detail-filter]');if(!button)return;activeFilter=button.dataset.boardDetailFilter||'all';applyFilter();closeDrawer()
+  });
   return drawer;
 }
 
