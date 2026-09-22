@@ -114,6 +114,7 @@ function applyView({announce=true}={}){
 function setView(next,{announce=true,close=true}={}){
   const view=String(next||'all');
   if(!isBoardView(view))return false;
+  if(announce)window.dispatchEvent(new CustomEvent('dc:board-user-navigation',{detail:{kind:'view',view}}));
   activeView=view;
   applyView({announce});
   if(close)closeDrawer();
