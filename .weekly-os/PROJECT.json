@@ -7,12 +7,12 @@
     "projectStage": "BUILD",
     "gate": "G7_RELEASE",
     "status": "APPROVED",
-    "version": "2.58",
+    "version": "2.59",
     "updated": "2026-09-22",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.57"
+    "supersedes": "2.58"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -162,7 +162,9 @@
     ".weekly-os/results/board-mobile-information-hierarchy-v1.v0.1.md",
     ".weekly-os/results/board-mobile-information-hierarchy-v1.v0.2.md",
     "operations/BOARD_MOBILE_INFORMATION_HIERARCHY_G6_2026-09-22.md",
-    "operations/BOARD_MOBILE_INFORMATION_HIERARCHY_G7_RELEASE_CANDIDATE_2026-09-22.md"
+    "operations/BOARD_MOBILE_INFORMATION_HIERARCHY_G7_RELEASE_CANDIDATE_2026-09-22.md",
+    ".weekly-os/results/board-mobile-information-hierarchy-v1.v0.3.md",
+    "operations/BOARD_MOBILE_INFORMATION_HIERARCHY_G7_PRODUCTION_PAGES_2026-09-22.md"
   ],
   "authority": {
     "mpDslCore": {
@@ -322,9 +324,9 @@
   },
   "currentResult": {
     "artifactId": "dementor-club.result.board-mobile-information-hierarchy-v1",
-    "version": "0.2",
+    "version": "0.3",
     "status": "REVIEW",
-    "path": ".weekly-os/results/board-mobile-information-hierarchy-v1.v0.2.md",
+    "path": ".weekly-os/results/board-mobile-information-hierarchy-v1.v0.3.md",
     "gate": "G7_RELEASE",
     "parentIssue": 228,
     "scope": [
@@ -339,11 +341,11 @@
     "schemaMutationAuthorized": false,
     "semanticMutationRequired": false,
     "changeProposalRequired": false,
-    "productionMergeAuthorized": false,
-    "productionDeployAuthorized": false,
+    "productionMergeAuthorized": true,
+    "productionDeployAuthorized": true,
     "blockingGate": null,
-    "gateReadiness": "READY_FOR_RELEASE_DECISION",
-    "note": "STAB-06 / BQA-18 validated candidate fbc89112... from exact production 287b4852.... Site Integrity #1238 / 35740224085 SUCCESS, including mobile 390/360 Program-strip removal, exact Current Program affiliation/type composition, canonical badges, МОЁ/pager/zoom, desktop Current Program invariance and Board Relations regression. PR #238 remains DRAFT/UNMERGED. Project lifecycle remains BUILD; Result artifact is REVIEW with workStatus ACTIVE under the locally approved field mapping. STOP pending owner release decision; STAB-07 not started.",
+    "gateReadiness": "PAGES_DEPLOYED_AWAITING_OWNER_LIVE_RETEST",
+    "note": "STAB-06 exact candidate fbc89112... merged via PR #238 to production d4d1e2f4.... Exact 8-file content delta; candidate→production diff 0. Pages #130 / 35754639231 SUCCESS on exact production SHA. Supabase not required/not run. Authenticated owner live Board retest remains pending; keep REVIEW / workStatus ACTIVE / G7_RELEASE and integrationBranch until live PASS. STAB-07 not started.",
     "workStatus": "ACTIVE",
     "candidateCommit": "fbc891126532939a0a7350d18d19dbae807fb76f",
     "releaseCandidateCommit": "fbc891126532939a0a7350d18d19dbae807fb76f",
@@ -355,7 +357,15 @@
     "backendProductionDeployRequired": false,
     "liveDatabaseMutationRequired": false,
     "g6Evidence": "operations/BOARD_MOBILE_INFORMATION_HIERARCHY_G6_2026-09-22.md",
-    "g7ReleaseCandidateEvidence": "operations/BOARD_MOBILE_INFORMATION_HIERARCHY_G7_RELEASE_CANDIDATE_2026-09-22.md"
+    "g7ReleaseCandidateEvidence": "operations/BOARD_MOBILE_INFORMATION_HIERARCHY_G7_RELEASE_CANDIDATE_2026-09-22.md",
+    "productionCommit": "d4d1e2f45883beff973a5cd5827e6f71065c0575",
+    "productionMergeCommit": "d4d1e2f45883beff973a5cd5827e6f71065c0575",
+    "productionPagesRunNumber": 130,
+    "productionPagesRunId": 35754639231,
+    "productionPagesConclusion": "SUCCESS",
+    "productionPagesExactShaVerified": true,
+    "liveRetestStatus": "PENDING",
+    "pagesReleaseEvidence": "operations/BOARD_MOBILE_INFORMATION_HIERARCHY_G7_PRODUCTION_PAGES_2026-09-22.md"
   },
   "waitingResults": [
     {
