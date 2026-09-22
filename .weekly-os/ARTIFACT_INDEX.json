@@ -7,12 +7,12 @@
     "projectStage": "BUILD",
     "gate": "G7_RELEASE",
     "status": "APPROVED",
-    "version": "2.55",
+    "version": "2.56",
     "updated": "2026-09-22",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.54"
+    "supersedes": "2.55"
   },
   "currentArtifacts": [
     {
@@ -1956,11 +1956,11 @@
     {
       "artifactId": "dementor-club.result.board-mobile-information-hierarchy-v1",
       "documentType": "RESULT",
-      "currentVersion": "0.6",
-      "version": "0.6",
+      "currentVersion": "0.7",
+      "version": "0.7",
       "status": "REVIEW",
-      "location": ".weekly-os/results/board-mobile-information-hierarchy-v1.v0.6.md",
-      "path": ".weekly-os/results/board-mobile-information-hierarchy-v1.v0.6.md",
+      "location": ".weekly-os/results/board-mobile-information-hierarchy-v1.v0.7.md",
+      "path": ".weekly-os/results/board-mobile-information-hierarchy-v1.v0.7.md",
       "sourceSystem": "GIT",
       "authorityType": "IMPLEMENTATION_AUTHORITY",
       "updated": "2026-09-22",
@@ -1981,11 +1981,11 @@
       "schemaMutationAuthorized": false,
       "semanticMutationRequired": false,
       "changeProposalRequired": false,
-      "productionMergeAuthorized": false,
+      "productionMergeAuthorized": true,
       "productionDeployAuthorized": false,
       "blockingGate": null,
-      "gateReadiness": "READY_FOR_RELEASE_DECISION",
-      "note": "STAB-06 final Board View corrective candidate 8180b4a7... validated by Site Integrity #1243. Exact 7-file diff from production d4d1e2f4.... One-active View sequence PASS on 390/360/desktop. Prior 15556578... candidate superseded after camera-fit correction. PR #239 DRAFT/UNMERGED. No merge/deploy/Supabase; STAB-07 not started.",
+      "gateReadiness": "MERGED_AWAITING_PAGES_DEPLOY",
+      "note": "STAB-06 final Board View corrective merged to production bdd23f80... via PR #239. Exact 7-file content delta; candidate→production diff 0. Supabase not required/not run. Pages not run in this step; remain G7.",
       "workStatus": "ACTIVE",
       "projectStage": "BUILD",
       "candidateCommit": "8180b4a7b7caf37738604321fe5a34c344455b60",
@@ -1995,12 +1995,14 @@
       "validationRunId": 35777088217,
       "validationConclusion": "SUCCESS",
       "exactDiffFileCount": 7,
-      "productionCommit": "d4d1e2f45883beff973a5cd5827e6f71065c0575",
+      "productionCommit": "bdd23f80d12bd38a82b5afe2c1257e22d4e64beb",
       "productionPagesRunNumber": 130,
       "productionPagesRunId": 35754639231,
       "productionPagesConclusion": "SUCCESS",
       "productionPagesExactShaVerified": true,
-      "liveRetestStatus": "CORRECTIVE_CANDIDATE_VALIDATED"
+      "liveRetestStatus": "MERGED_AWAITING_DEPLOY",
+      "productionMergeCommit": "bdd23f80d12bd38a82b5afe2c1257e22d4e64beb",
+      "mergeEvidence": "operations/BOARD_VIEW_MODEL_CORRECTIVE_G7_MERGE_2026-09-22.md"
     },
     {
       "artifactId": "dementor-club.decision.board-view-model-v1",
@@ -2088,6 +2090,27 @@
       "validationRunId": 35777088217,
       "validationConclusion": "SUCCESS",
       "verdict": "READY_FOR_RELEASE_DECISION"
+    },
+    {
+      "artifactId": "dementor-club.operations.board-view-model-corrective-g7-merge-2026-09-22",
+      "documentType": "RELEASE_EVIDENCE",
+      "currentVersion": "1.0",
+      "version": "1.0",
+      "status": "APPROVED",
+      "location": "operations/BOARD_VIEW_MODEL_CORRECTIVE_G7_MERGE_2026-09-22.md",
+      "path": "operations/BOARD_VIEW_MODEL_CORRECTIVE_G7_MERGE_2026-09-22.md",
+      "sourceSystem": "GIT",
+      "authorityType": "QA_EVIDENCE",
+      "updated": "2026-09-22",
+      "canonicalProject": "dementor-club",
+      "canonicalLocation": "operations/BOARD_VIEW_MODEL_CORRECTIVE_G7_MERGE_2026-09-22.md",
+      "relation": "CURRENT_EVIDENCE",
+      "result": "dementor-club.result.board-mobile-information-hierarchy-v1",
+      "gate": "G7_RELEASE",
+      "candidateCommit": "8180b4a7b7caf37738604321fe5a34c344455b60",
+      "productionCommit": "bdd23f80d12bd38a82b5afe2c1257e22d4e64beb",
+      "integrationPullRequest": 239,
+      "verdict": "MERGED_AWAITING_PAGES_DEPLOY"
     }
   ],
   "referenceArtifacts": [
