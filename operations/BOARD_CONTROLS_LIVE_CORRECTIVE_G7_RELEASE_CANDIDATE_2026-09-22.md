@@ -5,11 +5,12 @@ documentType: RELEASE_EVIDENCE
 projectStage: BUILD
 gate: G7_RELEASE
 status: APPROVED
-version: 1.0
+version: 1.1
 updated: 2026-09-22
 owner: Modern Pilgrims
 sourceSystem: GIT
 authorityType: QA_EVIDENCE
+supersedes: 1.0
 parentIssue: 228
 scope:
   - STAB-06
@@ -22,9 +23,9 @@ Production baseline:
 
 `bdd23f80d12bd38a82b5afe2c1257e22d4e64beb`
 
-Validated candidate:
+Final validated candidate:
 
-`4669a1e7266b162e34c5f2792702d5efc0b8e93c`
+`a067ff50cab5b45177d163ec086f116b177f89b3`
 
 PR:
 
@@ -32,23 +33,31 @@ PR:
 
 Validation:
 
-`Site Integrity / Release Readiness #1244 / 35785111215 · SUCCESS`
+```text
+Site Integrity / Release Readiness #1250
+run id = 35787057332
+attempt = 2
+conclusion = SUCCESS
+```
+
+The previous candidate `4669a1e7266b162e34c5f2792702d5efc0b8e93c` is superseded by this candidate after hardening the drawer paint-order and queued deep-link resolver race.
 
 Exact production → candidate:
 
 ```text
-ahead = 5
+ahead = 11
 behind = 0
-changed files = 5
+changed files = 6
 ```
 
 Files:
 
 1. `community/board/board-deeplink-auth-return-v1.js`
-2. `community/board/board-fullscreen-v2-1.js`
-3. `community/board/board-integrations-v1.js`
-4. `scripts/validate-board-deeplink-auth-return-browser.mjs`
-5. `scripts/validate-board-navigation-adaptive-cards-browser.mjs`
+2. `community/board/board-fullscreen-v2-1.css`
+3. `community/board/board-fullscreen-v2-1.js`
+4. `community/board/board-integrations-v1.js`
+5. `scripts/validate-board-deeplink-auth-return-browser.mjs`
+6. `scripts/validate-board-navigation-adaptive-cards-browser.mjs`
 
 Fresh production compare:
 
