@@ -5,14 +5,14 @@
     "project": "dementor-club",
     "documentType": "STANDARD",
     "projectStage": "BUILD",
-    "gate": "G8_CLEANUP",
+    "gate": "G5_BUILD",
     "status": "APPROVED",
-    "version": "2.56",
+    "version": "2.57",
     "updated": "2026-09-22",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.55"
+    "supersedes": "2.56"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -21,7 +21,7 @@
   "defaultBranch": "main",
   "semanticSourceBranch": "dementor-club",
   "projectStage": "BUILD",
-  "gate": "G8_CLEANUP",
+  "gate": "G5_BUILD",
   "readFirst": [
     ".weekly-os/PROJECT.json",
     ".weekly-os/ARTIFACT_INDEX.json",
@@ -157,7 +157,9 @@
     "operations/PROJECTS_PUBLIC_MEDIA_FALLBACK_LIVE_CORRECTIVE_G7_MERGE_2026-09-22.md",
     "operations/PROJECTS_PUBLIC_MEDIA_FALLBACK_LIVE_ACCEPTANCE_2026-09-22.md",
     ".weekly-os/results/projects-public-media-fallback-v1.v1.0.md",
-    "operations/PROJECTS_PUBLIC_MEDIA_FALLBACK_G8_2026-09-22.md"
+    "operations/PROJECTS_PUBLIC_MEDIA_FALLBACK_G8_2026-09-22.md",
+    "operations/BOARD_MOBILE_CURRENT_PROGRAM_FILTER_DECISION_V1.md",
+    ".weekly-os/results/board-mobile-information-hierarchy-v1.v0.1.md"
   ],
   "authority": {
     "mpDslCore": {
@@ -300,6 +302,13 @@
       "path": "operations/MP_DSL_LIFECYCLE_FIELD_MAPPING_DECISION_V1.md",
       "scope": "Dementor Club machine/governance field semantics only: projectStage, gate, Artifact lifecycle status and operational workStatus.",
       "note": "Does not promote MP_DSL Product/Domain/Architecture/Design artifacts into project authority."
+    },
+    "boardMobileCurrentProgramFilterDecisionV1": {
+      "sourceSystem": "GIT",
+      "authorityType": "APPROVED_AUTHORITY",
+      "path": "operations/BOARD_MOBILE_CURRENT_PROGRAM_FILTER_DECISION_V1.md",
+      "scope": "STAB-06 / BQA-18 mobile Board Current Program/filter/card-badge presentation only",
+      "note": "Owner-approved local design rule. Current Program stays canonical in current-program-v1.js; mobile overlay removed, existing filters extended, no new ontology or MP_DSL semantics."
     }
   },
   "protected": {
@@ -308,7 +317,31 @@
     "ARCHITECTURE": null,
     "DESIGN": null
   },
-  "currentResult": null,
+  "currentResult": {
+    "artifactId": "dementor-club.result.board-mobile-information-hierarchy-v1",
+    "version": "0.1",
+    "status": "ACTIVE",
+    "path": ".weekly-os/results/board-mobile-information-hierarchy-v1.v0.1.md",
+    "gate": "G5_BUILD",
+    "parentIssue": 228,
+    "scope": [
+      "STAB-06",
+      "BQA-18"
+    ],
+    "integrationBranch": "result/board-mobile-information-hierarchy-v1",
+    "integrationBaseRef": "dementor-club-production",
+    "integrationBaseCommit": "287b485293d68098dfd3c9302785369a735d42e2",
+    "productionBaseCommit": "287b485293d68098dfd3c9302785369a735d42e2",
+    "implementationStartAuthorized": true,
+    "schemaMutationAuthorized": false,
+    "semanticMutationRequired": false,
+    "changeProposalRequired": false,
+    "productionMergeAuthorized": false,
+    "productionDeployAuthorized": false,
+    "blockingGate": null,
+    "gateReadiness": "G5_BUILD_IN_PROGRESS",
+    "note": "Owner approved STAB-06 mobile hierarchy: remove standalone mobile Current Program strip, move Current Program into existing filters, and add compact canonical type/program-affiliation badges to Board cards. Desktop Current Program unchanged. Exact production baseline 287b4852...."
+  },
   "waitingResults": [
     {
       "artifactId": "dementor-club.result.board-share-receive-ritual-v1",
