@@ -96,73 +96,16 @@
     box-shadow:2px 2px 0 #111!important;
   }
 
-  /* Variant 3: all three Current Program Things are visible at once.
-     Program begins after the utility row, remains an overlay, and only explicit
-     CTA arrows receive pointers. */
-  .dc-board-fullscreen-v21 .dc-board-program{
-    top:84px!important;
-    left:var(--dc-mobile-board-gutter)!important;
-    right:var(--dc-mobile-board-gutter)!important;
-    max-width:none!important;
-  }
-  .dc-board-fullscreen-v21 .dc-board-program__rail{
-    display:grid!important;
-    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  /* STAB-06 / BQA-18: mobile first frame belongs to the spatial Board.
+     Current Program remains canonically composed by current-program-v1.js and is
+     available through the existing filter drawer; only the standalone mobile rail
+     is visually suppressed. Desktop presentation is untouched. */
+  .dc-board-fullscreen-v21 .dc-board-program{display:none!important}
+
+  /* Affiliation remains an orthogonal option inside the existing drawer. */
+  .dc-board-fullscreen-v21 .dc-board-filter-drawer__section .dc-board-filter{
     width:100%!important;
-    max-width:none!important;
-    gap:5px!important;
-    overflow:visible!important;
-    padding:0!important;
-    scroll-snap-type:none!important;
-  }
-  .dc-board-fullscreen-v21 .dc-board-program__card{
-    width:auto!important;
-    min-width:0!important;
-    flex:initial!important;
-    min-height:68px!important;
-    padding:7px 7px 6px!important;
-    grid-template-columns:minmax(0,1fr) 26px!important;
-    grid-template-areas:'state action' 'title action'!important;
-    gap:3px 5px!important;
-    box-shadow:2px 2px 0 rgba(17,17,17,.28)!important;
-  }
-  .dc-board-fullscreen-v21 .dc-board-program__state{
-    font-size:0!important;
-    min-width:0!important;
-    opacity:.62!important;
-  }
-  .dc-board-fullscreen-v21 .dc-board-program__card[data-source-kind="program"] .dc-board-program__state::after{content:'КУРС'}
-  .dc-board-fullscreen-v21 .dc-board-program__card[data-source-kind="project"] .dc-board-program__state::after{content:'ПРОЕКТ'}
-  .dc-board-fullscreen-v21 .dc-board-program__card[data-source-kind="event"] .dc-board-program__state::after{content:'СОБЫТИЕ'}
-  .dc-board-fullscreen-v21 .dc-board-program__state::after{
-    font:900 6.5px/1 ui-monospace,SFMono-Regular,Menlo,monospace!important;
-    letter-spacing:.08em!important;
-  }
-  .dc-board-fullscreen-v21 .dc-board-program__card h3{
-    margin:0!important;
-    font-size:clamp(10px,3.1vw,12px)!important;
-    line-height:.94!important;
-    white-space:normal!important;
-    display:-webkit-box!important;
-    -webkit-box-orient:vertical!important;
-    -webkit-line-clamp:2!important;
-    overflow:hidden!important;
-    text-overflow:clip!important;
-  }
-  .dc-board-fullscreen-v21 .dc-board-program__card a{
-    width:26px!important;
-    height:30px!important;
-    min-width:26px!important;
-    padding:0!important;
-    font-size:0!important;
-    align-self:center!important;
-    display:inline-flex!important;
-    align-items:center!important;
-    justify-content:center!important;
-  }
-  .dc-board-fullscreen-v21 .dc-board-program__card a::after{
-    content:'→';
-    font:900 14px/1 ui-monospace,SFMono-Regular,Menlo,monospace!important;
+    justify-content:flex-start!important;
   }
 
   /* One compact bottom dock zone, two non-overlapping levels. Spatial controls
