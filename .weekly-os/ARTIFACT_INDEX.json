@@ -5,14 +5,14 @@
     "project": "dementor-club",
     "documentType": "STANDARD",
     "projectStage": "BUILD",
-    "gate": "G8_CLEANUP",
+    "gate": "G5_BUILD",
     "status": "APPROVED",
-    "version": "2.48",
+    "version": "2.49",
     "updated": "2026-09-22",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.47"
+    "supersedes": "2.48"
   },
   "currentArtifacts": [
     {
@@ -1930,6 +1930,61 @@
       "referencedBy": [
         "dementor-club.result.projects-public-media-fallback-v1"
       ]
+    },
+    {
+      "artifactId": "dementor-club.operations.board-mobile-current-program-filter-decision-v1",
+      "documentType": "DECISION",
+      "currentVersion": "1.0",
+      "version": "1.0",
+      "status": "APPROVED",
+      "location": "operations/BOARD_MOBILE_CURRENT_PROGRAM_FILTER_DECISION_V1.md",
+      "path": "operations/BOARD_MOBILE_CURRENT_PROGRAM_FILTER_DECISION_V1.md",
+      "sourceSystem": "GIT",
+      "authorityType": "APPROVED_AUTHORITY",
+      "updated": "2026-09-22",
+      "canonicalProject": "dementor-club",
+      "canonicalLocation": "operations/BOARD_MOBILE_CURRENT_PROGRAM_FILTER_DECISION_V1.md",
+      "relation": "APPROVED_AUTHORITY",
+      "gate": "G5_BUILD",
+      "parentIssue": 228,
+      "scope": [
+        "STAB-06",
+        "BQA-18"
+      ]
+    },
+    {
+      "artifactId": "dementor-club.result.board-mobile-information-hierarchy-v1",
+      "documentType": "RESULT",
+      "currentVersion": "0.1",
+      "version": "0.1",
+      "status": "ACTIVE",
+      "location": ".weekly-os/results/board-mobile-information-hierarchy-v1.v0.1.md",
+      "path": ".weekly-os/results/board-mobile-information-hierarchy-v1.v0.1.md",
+      "sourceSystem": "GIT",
+      "authorityType": "IMPLEMENTATION_AUTHORITY",
+      "updated": "2026-09-22",
+      "canonicalProject": "dementor-club",
+      "canonicalLocation": ".weekly-os/results/board-mobile-information-hierarchy-v1.v0.1.md",
+      "relation": "CURRENT_RESULT",
+      "gate": "G5_BUILD",
+      "parentIssue": 228,
+      "scope": [
+        "STAB-06",
+        "BQA-18"
+      ],
+      "integrationBranch": "result/board-mobile-information-hierarchy-v1",
+      "integrationBaseRef": "dementor-club-production",
+      "integrationBaseCommit": "287b485293d68098dfd3c9302785369a735d42e2",
+      "productionBaseCommit": "287b485293d68098dfd3c9302785369a735d42e2",
+      "implementationStartAuthorized": true,
+      "schemaMutationAuthorized": false,
+      "semanticMutationRequired": false,
+      "changeProposalRequired": false,
+      "productionMergeAuthorized": false,
+      "productionDeployAuthorized": false,
+      "blockingGate": null,
+      "gateReadiness": "G5_BUILD_IN_PROGRESS",
+      "note": "Owner-approved STAB-06 mobile Board hierarchy. Remove standalone mobile Current Program overlay; expose Current Program through existing filters; add canonical type badges and exact-identity В ПРОГРАММЕ badge. Desktop unchanged."
     }
   ],
   "referenceArtifacts": [
