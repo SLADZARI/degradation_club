@@ -40,8 +40,10 @@ expect(!/\.dc-board-first-entry-focus \.dc-board-wall\{[^}]*pointer-events\s*:\s
 expect(qaCss.includes('.dc-board-first-entry-focus .dc-board-wall{opacity:.72;filter:grayscale(.25);pointer-events:auto;'),'first Artifact focus must preserve a visible, interactive Board');
 expect(spatial.includes('data-mine>МОЁ</button>'),'own-card locator control missing from canonical spatial controls');
 expect(spatial.includes("controls.querySelector('[data-mine]').onclick=focusMine"),'own-card locator is not bound to canonical focusMine()');
-expect(integrations.includes('installOwnLocatorFilterBridge'),'own-card locator filter bridge missing from canonical Board filter owner');
-expect(integrations.includes("activeFilter='artifact';currentProgramOnly=false;applyFilter();closeDrawer()"),'own-card locator must reveal Artifact/publication cards and clear Program affiliation before canonical spatial focus runs');
+expect(integrations.includes("let activeView='all'"),'canonical one-active Board View state missing');
+expect(!integrations.includes('currentProgramOnly')&&!integrations.includes('activeFilter'),'legacy compound Board filter state remains');
+expect(integrations.includes("window.addEventListener('dc:board-request-view'"),'Board View request bridge missing from canonical filter owner');
+expect(spatial.includes("detail:{view:'all',reason:'mine'}"),'МОЁ locator must reveal its target through the canonical ВСЁ View without creating a mine filter');
 expect(js.includes("'+ ПРИКОЛОТЬ'")||js.includes("'+ ПРИКОЛОТЬ"),'primary publish CTA missing');
 expect(js.includes("'МОЁ ОБЪЯВЛЕНИЕ'"),'occupied-slot CTA missing');
 expect(js.includes('dc-board-filter-nav'),'filter previous/next navigation missing');
