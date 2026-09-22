@@ -380,7 +380,11 @@
     "liveRetestStatus": "CORRECTIVE_CANDIDATE_VALIDATED",
     "productionCommit": "bdd23f80d12bd38a82b5afe2c1257e22d4e64beb",
     "productionMergeCommit": "bdd23f80d12bd38a82b5afe2c1257e22d4e64beb",
-    "mergeEvidence": "operations/BOARD_VIEW_MODEL_CORRECTIVE_G7_MERGE_2026-09-22.md"
+    "mergeEvidence": "operations/BOARD_VIEW_MODEL_CORRECTIVE_G7_MERGE_2026-09-22.md",
+    "productionPagesRunNumber": 131,
+    "productionPagesRunId": 35781834222,
+    "productionPagesConclusion": "SUCCESS",
+    "productionPagesExactShaVerified": true
   },
   "waitingResults": [
     {
