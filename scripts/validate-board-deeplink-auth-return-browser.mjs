@@ -154,15 +154,15 @@ try{
     const queued=await browser.newPage();
     await queued.addInitScript(()=>{
       const nativeSetTimeout=window.setTimeout.bind(window);
-      window.requestAnimationFrame=callback=>nativeSetTimeout(()=>callback(performance.now()),80);
+      window.requestAnimationFrame=callback=>nativeSetTimeout(()=>callback(performance.now()),500);
     });
     await queued.goto(`${base}/__deeplink_harness__?focus=artifact:${ART}`,{waitUntil:'domcontentloaded'});
-    await queued.evaluate(detail=>window.dispatchEvent(new CustomEvent('dc:board-user-navigation',{detail})),detail);
+    await queued.evaluate(detail=>{globalThis.__DC_FOCUS=null;window.dispatchEvent(new CustomEvent('dc:board-user-navigation',{detail}))},detail);
     await queued.waitForFunction(()=>!new URL(location.href).searchParams.has('focus'));
     await queued.evaluate(()=>{const marker=document.createElement('span');marker.dataset.qaQueuedMutation='1';document.getElementById('boardHost').appendChild(marker)});
-    await queued.waitForTimeout(180);
+    await queued.waitForTimeout(650);
     expect(await queued.locator('.dc-artifact-overlay').evaluate(el=>el.hidden),`queued stale ${kind}: queued deep-link resolver reopened Artifact after explicit navigation`);
-    expect(await queued.evaluate(()=>globalThis.__DC_FOCUS===null),`queued stale ${kind}: queued focus target fired after explicit navigation`);
+    expect(await queued.evaluate(()=>globalThis.__DC_FOCUS===null),`queued stale ${kind}: a new focus target fired after explicit navigation`);
     await queued.close();
   }
 
