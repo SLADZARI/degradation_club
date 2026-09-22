@@ -5,11 +5,12 @@ documentType: QA_EVIDENCE
 projectStage: BUILD
 gate: G6_VALIDATION
 status: APPROVED
-version: 1.0
+version: 1.1
 updated: 2026-09-22
 owner: Modern Pilgrims
 sourceSystem: GIT
 authorityType: QA_EVIDENCE
+supersedes: 1.0
 parentIssue: 228
 scope:
   - STAB-06
@@ -18,91 +19,88 @@ scope:
 
 # STAB-06 · Board controls live corrective · G6 validation
 
-## Production baseline
+Production baseline:
 
 `bdd23f80d12bd38a82b5afe2c1257e22d4e64beb`
 
-Pages baseline:
+Owner live-QA baseline:
 
 `Deploy Dementor Production #131 / 35781834222 · SUCCESS`
 
-Owner live QA evidence:
+Final validated corrective candidate:
 
-`operations/BOARD_CONTROLS_LIVE_QA_CORRECTIVE_2026-09-22.md`
-
-## Exact candidate
-
-`4669a1e7266b162e34c5f2792702d5efc0b8e93c`
+`a067ff50cab5b45177d163ec086f116b177f89b3`
 
 PR:
 
-`#240 · DRAFT / UNMERGED`
+`#240 · OPEN / DRAFT / UNMERGED`
 
-Validation:
+Canonical validation:
 
-`Site Integrity / Release Readiness #1244 / 35785111215 · SUCCESS`
+```text
+Site Integrity / Release Readiness #1250
+run id = 35787057332
+attempt = 2
+conclusion = SUCCESS
+```
 
-## Root corrections
+Attempt 1 failed only because Playwright WebKit returned an internal browser error during an existing Board Share `page.goto`. No code was changed for that infrastructure failure. Attempt 2 on the exact same candidate passed the full suite.
 
-### Desktop View drawer composition
+## Validated corrective
 
-The existing `boardProgramHost` is now moved by the existing fullscreen composition owner into the same `.dc-spatial-viewport` composition as `boardFilters`.
+Desktop View drawer:
+- Current Program and Board View controls share the existing fullscreen viewport composition;
+- Current Program is composed before the controls;
+- View controls own a higher stacking level;
+- open drawer owns a higher stacking level than Current Program;
+- wide-desktop 2560×1080 regression verifies the paint-order contract.
 
-No Current Program renderer/composition semantics changed.
-
-Result:
-
-`View drawer > standalone Current Program presentation > spatial cards`
-
-The browser regression opens the real desktop drawer at an actual overlap with Current Program and verifies through `elementFromPoint` that the drawer owns the top interactive/visual point.
-
-### Stale deep-link focus lifecycle
-
-Explicit Board View and pager navigation now emit one existing-runtime navigation signal before their reflow/focus work.
-
-The canonical deep-link owner consumes a stale `focus=artifact:<uuid>` synchronously on that explicit Board navigation.
-
-A later Board DOM mutation therefore cannot re-resolve/reopen the old Artifact.
-
-Shared incoming Artifact presentation remains protected by the existing shared-arrival state and is not silently consumed by this corrective.
-
-## Browser evidence
+Stale Artifact focus:
+- explicit View/pager navigation emits the existing Board user-navigation signal before reflow/focus;
+- deep-link owner consumes stale `focus=artifact:<uuid>`;
+- queued focus resolvers are invalidated by generation;
+- stale Artifact overlay is closed;
+- later Board mutations cannot resurrect the consumed focus;
+- shared-arrival postcard semantics remain preserved.
 
 PASS:
-
 - Board live corrective browser acceptance;
-- Board navigation/adaptive cards browser acceptance;
-- desktop drawer-over-Program composition;
-- one-active View sequence on 390 / 360 / desktop;
+- Board navigation/adaptive cards acceptance;
 - Board mobile harmonization;
-- Board Relations v1 runtime;
+- wide-desktop drawer-over-Program guard;
+- Board Relations browser acceptance;
+- Board deep-link auth-return contract;
 - Board deep-link auth-return browser acceptance;
-- stale `focus=artifact` consumed by both View and pager navigation;
-- later Board mutation does not reopen/refocus the stale Artifact;
-- ordinary non-share focus/history remains valid;
-- Sender Share / Entity Share / shared Receive flows remain valid;
-- Current Program v1 contract;
+- queued deep-link resolver race;
+- Board Share on movable own card;
+- Board v2.1 state matrix;
+- Current Program browser acceptance;
 - built JavaScript syntax;
 - production route manifest;
-- production release guard.
+- production artifact release gate.
 
-## Exact diff
+Exact production → candidate:
 
-Production → candidate = exactly 5 existing files:
+```text
+ahead = 11
+behind = 0
+changed files = 6
+```
+
+Files:
 
 1. `community/board/board-deeplink-auth-return-v1.js`
-2. `community/board/board-fullscreen-v2-1.js`
-3. `community/board/board-integrations-v1.js`
-4. `scripts/validate-board-deeplink-auth-return-browser.mjs`
-5. `scripts/validate-board-navigation-adaptive-cards-browser.mjs`
+2. `community/board/board-fullscreen-v2-1.css`
+3. `community/board/board-fullscreen-v2-1.js`
+4. `community/board/board-integrations-v1.js`
+5. `scripts/validate-board-deeplink-auth-return-browser.mjs`
+6. `scripts/validate-board-navigation-adaptive-cards-browser.mjs`
 
-`current-program-v1.js` is unchanged.
-
-No CSS owner was added or changed.
+`current-program-v1.js` remains unchanged.
 
 Schema/RPC/RLS mutation = NO.
 Semantic domain mutation = NO.
 Change Proposal = NO.
 Supabase = NOT REQUIRED.
 
-G6 verdict: PASS.
+G6 verdict: APPROVED.
