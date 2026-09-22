@@ -56,6 +56,20 @@ export const BOARD_DETAIL_FILTERS=[
   ['content','СТАТЬИ / КОНТЕНТ']
 ];
 
+export const BOARD_VIEW_FILTERS=Object.freeze([
+  ['current-program','ТЕКУЩАЯ ПРОГРАММА'],
+  ...BOARD_DETAIL_FILTERS
+]);
+
+export function boardViewLabel(value){
+  if(value==='all')return 'ВСЁ';
+  return BOARD_VIEW_FILTERS.find(([id])=>id===value)?.[1]||'ВСЁ';
+}
+
+export function isBoardView(value){
+  return value==='all'||BOARD_VIEW_FILTERS.some(([id])=>id===value);
+}
+
 const ACTIVEISH=new Set(['active','announced','registration','planned','approved-draft','mvp-in-development']);
 const FORMING=new Set(['planned','approved-draft','mvp-in-development']);
 
