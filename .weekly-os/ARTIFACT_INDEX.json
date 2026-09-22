@@ -4,15 +4,15 @@
     "artifactId": "dementor-club.kernel.artifact-index",
     "project": "dementor-club",
     "documentType": "STANDARD",
-    "projectStage": "BUILD",
+    "projectStage": "RELEASE",
     "gate": "G7_RELEASE",
     "status": "APPROVED",
-    "version": "2.44",
+    "version": "2.45",
     "updated": "2026-09-22",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.43"
+    "supersedes": "2.44"
   },
   "currentArtifacts": [
     {
@@ -1855,7 +1855,7 @@
       "documentType": "RESULT",
       "currentVersion": "0.5",
       "version": "0.5",
-      "status": "REVIEW",
+      "status": "ACTIVE",
       "location": ".weekly-os/results/projects-public-media-fallback-v1.v0.5.md",
       "path": ".weekly-os/results/projects-public-media-fallback-v1.v0.5.md",
       "sourceSystem": "GIT",
@@ -1882,8 +1882,8 @@
       "productionDeployAuthorized": false,
       "blockingGate": null,
       "gateReadiness": "READY_FOR_RELEASE_DECISION",
-      "note": "STAB-05 live corrective remains ACTIVE work at G7_RELEASE. Artifact lifecycle is REVIEW; project lifecycle remains BUILD. Candidate 91607fdb... is PR #236 DRAFT/UNMERGED. Production baseline is 4a8e95cb....",
-      "projectStage": "BUILD",
+      "note": "STAB-05 live corrective remains ACTIVE under the project-local RELEASE / G7_RELEASE contract. Candidate 91607fdb... remains PR #236 DRAFT/UNMERGED; validation #1233 SUCCESS; exact diff 3 files; production baseline 4a8e95cb.... MP_DSL lifecycle semantics are not applied.",
+      "projectStage": "RELEASE",
       "candidateCommit": "91607fdbd02b815122ce25c7a8920691dda6320f",
       "releaseCandidateCommit": "91607fdbd02b815122ce25c7a8920691dda6320f",
       "integrationPullRequest": 236,
@@ -1891,8 +1891,7 @@
       "validationRunId": 35671603405,
       "validationConclusion": "SUCCESS",
       "exactDiffFileCount": 3,
-      "productionCommit": "4a8e95cb669dab660a7afe381e580278d4575a2a",
-      "workStatus": "ACTIVE"
+      "productionCommit": "4a8e95cb669dab660a7afe381e580278d4575a2a"
     }
   ],
   "referenceArtifacts": [
