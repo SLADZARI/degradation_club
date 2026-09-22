@@ -5,11 +5,12 @@ documentType: QA_EVIDENCE
 projectStage: BUILD
 gate: G6_VALIDATION
 status: APPROVED
-version: 1.0
+version: 1.1
 updated: 2026-09-22
 owner: Modern Pilgrims
 sourceSystem: GIT
 authorityType: QA_EVIDENCE
+supersedes: 1.0
 parentIssue: 228
 scope:
   - STAB-06
@@ -18,98 +19,45 @@ scope:
 
 # STAB-06 · Board View Model corrective · G6 validation
 
-## Authority
-
-Approved local decision:
-
+Approved authority:
 `operations/BOARD_VIEW_MODEL_DECISION_V1.md`
 
-Live QA evidence:
-
+Owner live-QA corrective evidence:
 `operations/BOARD_VIEW_LIVE_QA_CORRECTIVE_2026-09-22.md`
 
-## Exact identity
-
 Production baseline:
-
 `d4d1e2f45883beff973a5cd5827e6f71065c0575`
 
 Integration branch:
-
 `result/board-mobile-information-hierarchy-v1`
 
-Validated corrective candidate:
-
-`155565786ac969c63a692006c145e4f4e266090d`
+Final validated corrective candidate:
+`8180b4a7b7caf37738604321fe5a34c344455b60`
 
 Draft PR:
-
 `#239`
 
 Canonical validation:
+`Site Integrity / Release Readiness #1243 / 35777088217 · SUCCESS`
 
-```text
-Site Integrity / Release Readiness #1241
-run id = 35773470724
-head SHA = 155565786ac969c63a692006c145e4f4e266090d
-status = COMPLETED
-conclusion = SUCCESS
-```
+The intermediate candidate `155565786ac969c63a692006c145e4f4e266090d` / #1241 was superseded after a real camera-fit blocker was found on the required full visible set.
 
-## Corrective behavior
+## Validated behavior
 
-The user-facing compound state:
+- one user-facing state: `activeView`;
+- no `activeFilter + currentProgramOnly` compound UI state;
+- Views replace one another;
+- Current Program membership remains exact-only through unchanged `getCurrentProgram()` composition + canonical thingRef/source-type+slug identity;
+- no title matching;
+- no Relations-derived affiliation;
+- `МОЁ` remains locator/focus, not a persistent View;
+- Relations show/hide does not alter visible Things;
+- every explicit View change fits the camera to the visible set;
+- persisted card coordinates are unchanged by View fit;
+- pager reflects the visible set;
+- pan/zoom remain usable after auto-fit.
 
-```text
-activeFilter
-+
-currentProgramOnly
-```
-
-was removed.
-
-Canonical presentation state is now:
-
-`one active Board View`
-
-Views:
-
-- `ВСЁ`
-- `ТЕКУЩАЯ ПРОГРАММА`
-- `ОБЪЯВЛЕНИЯ / ПУБЛИКАЦИИ`
-- `СОБЫТИЯ`
-- `КУРСЫ / ПРОГРАММЫ`
-- `ПРАКТИКИ`
-- `ПРОЕКТЫ / ПРОДУКТЫ`
-- `СТАТЬИ / КОНТЕНТ`
-
-Selecting a View replaces the previous View.
-
-Current Program membership remains exact-only through canonical thingRef/source-type+slug identity and `getCurrentProgram()`.
-
-No title matching and no Relations-derived affiliation.
-
-## Camera corrective
-
-Initial browser run #1239 exposed a real camera-fit blocker: the historical minimum scale of `0.28` could not fit widely distributed visible Things on mobile.
-
-The canonical spatial owner was corrected to allow a wider fit range.
-
-This changes camera only.
-
-Persisted card coordinates are not mutated by View fit.
-
-After fit, manual zoom remains available.
-
-## Browser evidence
-
-Existing Board navigation/adaptive-card regression now runs the required sequence on:
-
-- 390;
-- 360;
-- desktop 1440.
-
-Sequence:
+Required sequence PASS on 390 / 360 / desktop:
 
 ```text
 ВСЁ
@@ -119,76 +67,46 @@ Sequence:
 → ВСЁ
 ```
 
-PASS assertions include:
-
+PASS includes:
 - exactly one active View;
-- expected visible Thing set;
+- expected visible set at every step;
 - no stale Current Program condition;
-- same-title false-positive guard;
-- camera fits each visible set;
-- pager reflects each visible set;
-- persisted `left/top` unchanged across View changes;
-- Artifact badges for announcement/post/idea/request;
-- platform type badges;
+- non-affiliated Course visible in Programs View;
+- non-affiliated same-title Project visible in Projects View;
+- camera fit + pager correctness;
+- coordinate invariance;
+- canonical Artifact badges ОБЪЯВЛЕНИЕ / ПОСТ / ИДЕЯ / ЗАПРОС;
+- canonical platform badges;
 - `В ПРОГРАММЕ` exact-match only;
-- `МОЁ` is locator/focus and does not establish a mine filter;
-- Relations show/hide does not alter the visible Thing set;
-- desktop/mobile View semantics equal;
 - mobile standalone Program strip absent;
-- desktop Program presentation unchanged;
-- zoom remains free after fit;
-- no horizontal overflow;
-- drawer focus returns to the existing View trigger.
+- desktop standalone Program presentation unchanged;
+- focus return from View drawer;
+- no horizontal overflow.
 
-Canonical CI log:
-
-```text
-Board navigation/adaptive cards browser acceptance passed:
-one-active View sequence on 390/360/desktop +
-exact Program identity +
-camera fit/pager/coordinate invariance +
-canonical badges +
-МОЁ locator +
-relations-visible-set invariance +
-adaptive media
-```
-
-Additional existing regressions PASS:
-
+Additional PASS in #1243:
 - Board mobile harmonization;
-- Board Relations runtime browser acceptance;
-- canonical drag line updates;
-- Board v2.1 fullscreen composition contract;
-- Board Information Architecture Batch B contract;
+- Board Relations runtime;
+- Board v2.1 fullscreen composition;
+- Board Information Architecture Batch B;
 - Current Program v1 contract;
+- built JavaScript syntax;
 - production route manifest;
 - production release guard.
 
-## Boundary
+Exact changed files remain limited to seven existing Board owners/validators:
+1. `community/board/board-entity-model-v1.js`
+2. `community/board/board-fullscreen-v2-1.js`
+3. `community/board/board-integrations-v1.js`
+4. `community/board/board-spatial-v1.js`
+5. `scripts/validate-board-batch-b-contract.mjs`
+6. `scripts/validate-board-navigation-adaptive-cards-browser.mjs`
+7. `scripts/validate-board-v21-contract.mjs`
 
-`current-program-v1.js` remains byte-identical to production.
-
-No changes to:
-
-- Current Program composition/order/content;
-- Artifact subtype semantics;
-- relation ontology/permissions;
-- BQA-15;
-- BQA-17;
-- BQA-22;
-- Contribution;
-- Membership / DC-9;
-- auth;
-- schema / RPC / RLS;
-- STAB-05;
-- STAB-07.
+`current-program-v1.js` remains unchanged.
 
 Schema mutation = NO.
-
 Semantic domain mutation = NO.
-
 Change Proposal = NO.
+Supabase = NOT REQUIRED.
 
-## G6 verdict
-
-`PASS`
+G6 validation: APPROVED.
