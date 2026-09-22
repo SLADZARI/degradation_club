@@ -4,15 +4,15 @@
     "artifactId": "dementor-club.kernel.project",
     "project": "dementor-club",
     "documentType": "STANDARD",
-    "projectStage": "RELEASE",
+    "projectStage": "BUILD",
     "gate": "G7_RELEASE",
     "status": "APPROVED",
-    "version": "2.51",
+    "version": "2.52",
     "updated": "2026-09-22",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.50"
+    "supersedes": "2.51"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -20,7 +20,7 @@
   "canonicalRepository": "SLADZARI/degradation_club",
   "defaultBranch": "main",
   "semanticSourceBranch": "dementor-club",
-  "projectStage": "RELEASE",
+  "projectStage": "BUILD",
   "gate": "G7_RELEASE",
   "readFirst": [
     ".weekly-os/PROJECT.json",
@@ -149,7 +149,7 @@
     "operations/PROJECTS_PUBLIC_MEDIA_FALLBACK_G7_RELEASE_CANDIDATE_2026-09-21.md",
     ".weekly-os/results/projects-public-media-fallback-v1.v0.3.md",
     "operations/PROJECTS_PUBLIC_MEDIA_FALLBACK_G7_MERGE_2026-09-22.md",
-    ".weekly-os/results/projects-public-media-fallback-v1.v0.4.md",
+    ".weekly-os/results/projects-public-media-fallback-v1.v0.5.md",
     "operations/PROJECTS_PUBLIC_MEDIA_FALLBACK_LIVE_CORRECTIVE_G6_2026-09-22.md",
     "operations/PROJECTS_PUBLIC_MEDIA_FALLBACK_LIVE_CORRECTIVE_G7_RELEASE_CANDIDATE_2026-09-22.md"
   ],
@@ -297,9 +297,9 @@
   },
   "currentResult": {
     "artifactId": "dementor-club.result.projects-public-media-fallback-v1",
-    "version": "0.4",
-    "status": "ACTIVE",
-    "path": ".weekly-os/results/projects-public-media-fallback-v1.v0.4.md",
+    "version": "0.5",
+    "status": "REVIEW",
+    "path": ".weekly-os/results/projects-public-media-fallback-v1.v0.5.md",
     "gate": "G7_RELEASE",
     "parentIssue": 228,
     "scope": [
@@ -318,7 +318,7 @@
     "productionDeployAuthorized": false,
     "blockingGate": null,
     "gateReadiness": "READY_FOR_RELEASE_DECISION",
-    "note": "STAB-05 live corrective validated after owner correction: video id dWokndhJLKQ is canonical existing source; prior automated unavailable verdict is superseded for Product truth. Candidate 91607fdb... restores 9:16 youtube-nocookie embed with muted autoplay request, playsinline, loop, controls and external fallback. Site Integrity #1233 SUCCESS. Parent-page preview renders real YouTube player; automated playback blocked by YouTube anti-bot overlay, so post-deploy human playback remains required. PR #236 DRAFT/UNMERGED. STOP; STAB-06 not started.",
+    "note": "STAB-05 live corrective validated after owner correction. MP_DSL lifecycle reconciliation: projectStage remains BUILD while engineering gate is G7_RELEASE; Result artifact lifecycle is REVIEW with workStatus ACTIVE. Candidate 91607fdb... remains DRAFT/UNMERGED in PR #236. Production baseline is 4a8e95cb.... No merge/deploy/Supabase authorization. STOP; STAB-06 not started.",
     "candidateCommit": "91607fdbd02b815122ce25c7a8920691dda6320f",
     "releaseCandidateCommit": "91607fdbd02b815122ce25c7a8920691dda6320f",
     "integrationPullRequest": 236,
@@ -330,7 +330,8 @@
     "liveDatabaseMutationRequired": false,
     "productionCommit": "4a8e95cb669dab660a7afe381e580278d4575a2a",
     "productionMergeCommit": "4a8e95cb669dab660a7afe381e580278d4575a2a",
-    "mergeEvidence": "operations/PROJECTS_PUBLIC_MEDIA_FALLBACK_G7_MERGE_2026-09-22.md"
+    "mergeEvidence": "operations/PROJECTS_PUBLIC_MEDIA_FALLBACK_G7_MERGE_2026-09-22.md",
+    "workStatus": "ACTIVE"
   },
   "waitingResults": [
     {
