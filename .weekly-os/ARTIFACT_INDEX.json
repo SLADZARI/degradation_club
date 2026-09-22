@@ -5,14 +5,14 @@
     "project": "dementor-club",
     "documentType": "STANDARD",
     "projectStage": "BUILD",
-    "gate": "G5_BUILD",
+    "gate": "G7_RELEASE",
     "status": "APPROVED",
-    "version": "2.49",
+    "version": "2.50",
     "updated": "2026-09-22",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.48"
+    "supersedes": "2.49"
   },
   "currentArtifacts": [
     {
@@ -1955,18 +1955,18 @@
     {
       "artifactId": "dementor-club.result.board-mobile-information-hierarchy-v1",
       "documentType": "RESULT",
-      "currentVersion": "0.1",
-      "version": "0.1",
-      "status": "ACTIVE",
-      "location": ".weekly-os/results/board-mobile-information-hierarchy-v1.v0.1.md",
-      "path": ".weekly-os/results/board-mobile-information-hierarchy-v1.v0.1.md",
+      "currentVersion": "0.2",
+      "version": "0.2",
+      "status": "REVIEW",
+      "location": ".weekly-os/results/board-mobile-information-hierarchy-v1.v0.2.md",
+      "path": ".weekly-os/results/board-mobile-information-hierarchy-v1.v0.2.md",
       "sourceSystem": "GIT",
       "authorityType": "IMPLEMENTATION_AUTHORITY",
       "updated": "2026-09-22",
       "canonicalProject": "dementor-club",
       "canonicalLocation": ".weekly-os/results/board-mobile-information-hierarchy-v1.v0.1.md",
       "relation": "CURRENT_RESULT",
-      "gate": "G5_BUILD",
+      "gate": "G7_RELEASE",
       "parentIssue": 228,
       "scope": [
         "STAB-06",
@@ -1983,8 +1983,17 @@
       "productionMergeAuthorized": false,
       "productionDeployAuthorized": false,
       "blockingGate": null,
-      "gateReadiness": "G5_BUILD_IN_PROGRESS",
-      "note": "Owner-approved STAB-06 mobile Board hierarchy. Remove standalone mobile Current Program overlay; expose Current Program through existing filters; add canonical type badges and exact-identity В ПРОГРАММЕ badge. Desktop unchanged."
+      "gateReadiness": "READY_FOR_RELEASE_DECISION",
+      "note": "STAB-06 validated candidate fbc89112... on exact production 287b4852.... PR #238 DRAFT/UNMERGED; Site Integrity #1238 SUCCESS; workStatus ACTIVE at G7_RELEASE; merge/deploy unauthorized; STAB-07 not started.",
+      "workStatus": "ACTIVE",
+      "projectStage": "BUILD",
+      "candidateCommit": "fbc891126532939a0a7350d18d19dbae807fb76f",
+      "releaseCandidateCommit": "fbc891126532939a0a7350d18d19dbae807fb76f",
+      "integrationPullRequest": 238,
+      "validationRunNumber": 1238,
+      "validationRunId": 35740224085,
+      "validationConclusion": "SUCCESS",
+      "exactDiffFileCount": 8
     }
   ],
   "referenceArtifacts": [
