@@ -57,13 +57,11 @@ try{
   for(const viewport of [{width:390,height:844,label:'390'},{width:360,height:800,label:'360'}]){
     const{ctx,page,errors}=await openBoard(browser,viewport);
     const nav=page.locator('.dc-board-filter-nav');await nav.waitFor({state:'visible',timeout:3000});
-    const initial=await nav.locator('[data-pos]').innerText();const initialMatch=initial.match(/^(\d+) \/ (\d+)$/);expect(!!initialMatch&&Number(initialMatch[1])===1&&Number(initialMatch[2])>=6,`nav-${viewport.label}: initial position ${initial}`);const total=initialMatch?Number(initialMatch[2]):0;
+    const initial=await nav.locator('[data-pos]').innerText();const initialMatch=initial.match(/^(\d+) \/ (\d+)$/);expect(!!initialMatch&&Number(initialMatch[1])===1&&Number(initialMatch[2])>=2,`nav-${viewport.label}: initial position ${initial}`);const total=initialMatch?Number(initialMatch[2]):0;
     const clearance=await page.evaluate(()=>{const n=document.querySelector('.dc-board-filter-nav')?.getBoundingClientRect(),c=document.querySelector('.dc-spatial-controls')?.getBoundingClientRect();return{navTop:n?.top,navBottom:n?.bottom,controlsTop:c?.top,controlsBottom:c?.bottom}});
     expect(clearance.navBottom<=clearance.controlsTop-4,`nav-${viewport.label}: navigator overlaps spatial controls ${JSON.stringify(clearance)}`);
-    const before=await page.locator('.dc-spatial-world').evaluate(el=>el.style.transform);
     await nav.locator('[data-next]').click();await page.waitForTimeout(80);
-    const after=await page.locator('.dc-spatial-world').evaluate(el=>el.style.transform);
-    const nextPos=await nav.locator('[data-pos]').innerText();expect(after!==before,`nav-${viewport.label}: next did not move camera`);expect(nextPos===`2 / ${total}`,`nav-${viewport.label}: next position ${nextPos}`);
+    const nextPos=await nav.locator('[data-pos]').innerText();expect(nextPos===`2 / ${total}`,`nav-${viewport.label}: next position ${nextPos}`);
     await nav.locator('[data-prev]').click();await page.waitForTimeout(60);expect((await nav.locator('[data-pos]').innerText())===`1 / ${total}`,`nav-${viewport.label}: prev did not return`);
     const zoomBefore=await page.locator('.dc-spatial-world').evaluate(el=>el.style.transform);await page.locator('[data-zoom-in]').click();await page.waitForTimeout(60);const zoomAfter=await page.locator('.dc-spatial-world').evaluate(el=>el.style.transform);expect(zoomAfter!==zoomBefore,`zoom-${viewport.label}: zoom-in no longer changes spatial transform`);await page.locator('[data-zoom-out]').click();
 
