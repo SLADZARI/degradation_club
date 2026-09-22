@@ -7,12 +7,12 @@
     "projectStage": "BUILD",
     "gate": "G7_RELEASE",
     "status": "APPROVED",
-    "version": "2.53",
+    "version": "2.54",
     "updated": "2026-09-22",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.52"
+    "supersedes": "2.53"
   },
   "currentArtifacts": [
     {
@@ -1956,11 +1956,11 @@
     {
       "artifactId": "dementor-club.result.board-mobile-information-hierarchy-v1",
       "documentType": "RESULT",
-      "currentVersion": "0.5",
-      "version": "0.5",
+      "currentVersion": "0.6",
+      "version": "0.6",
       "status": "REVIEW",
-      "location": ".weekly-os/results/board-mobile-information-hierarchy-v1.v0.5.md",
-      "path": ".weekly-os/results/board-mobile-information-hierarchy-v1.v0.5.md",
+      "location": ".weekly-os/results/board-mobile-information-hierarchy-v1.v0.6.md",
+      "path": ".weekly-os/results/board-mobile-information-hierarchy-v1.v0.6.md",
       "sourceSystem": "GIT",
       "authorityType": "IMPLEMENTATION_AUTHORITY",
       "updated": "2026-09-22",
@@ -1985,14 +1985,14 @@
       "productionDeployAuthorized": false,
       "blockingGate": null,
       "gateReadiness": "READY_FOR_RELEASE_DECISION",
-      "note": "STAB-06 Board View corrective validated. One-active View sequence PASS on 390/360/desktop; exact Program identity, camera fit/pager/coordinate invariance, МОЁ locator and relations-visible-set invariance PASS. Candidate 15556578... / PR #239 DRAFT/UNMERGED. Production d4d1e2f4... unchanged. No merge/deploy/Supabase; STAB-07 not started.",
+      "note": "STAB-06 final Board View corrective candidate 8180b4a7... validated by Site Integrity #1243. Exact 7-file diff from production d4d1e2f4.... One-active View sequence PASS on 390/360/desktop. Prior 15556578... candidate superseded after camera-fit correction. PR #239 DRAFT/UNMERGED. No merge/deploy/Supabase; STAB-07 not started.",
       "workStatus": "ACTIVE",
       "projectStage": "BUILD",
-      "candidateCommit": "155565786ac969c63a692006c145e4f4e266090d",
-      "releaseCandidateCommit": "155565786ac969c63a692006c145e4f4e266090d",
+      "candidateCommit": "8180b4a7b7caf37738604321fe5a34c344455b60",
+      "releaseCandidateCommit": "8180b4a7b7caf37738604321fe5a34c344455b60",
       "integrationPullRequest": 239,
-      "validationRunNumber": 1241,
-      "validationRunId": 35773470724,
+      "validationRunNumber": 1243,
+      "validationRunId": 35777088217,
       "validationConclusion": "SUCCESS",
       "exactDiffFileCount": 7,
       "productionCommit": "d4d1e2f45883beff973a5cd5827e6f71065c0575",
@@ -2000,7 +2000,7 @@
       "productionPagesRunId": 35754639231,
       "productionPagesConclusion": "SUCCESS",
       "productionPagesExactShaVerified": true,
-      "liveRetestStatus": "CORRECTIVE_REQUIRED"
+      "liveRetestStatus": "CORRECTIVE_CANDIDATE_VALIDATED"
     },
     {
       "artifactId": "dementor-club.decision.board-view-model-v1",
