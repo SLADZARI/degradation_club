@@ -41,7 +41,7 @@ const requiredFilterIds=['artifact','event','program','practice','project','cont
 for(const id of requiredFilterIds)expect(model.includes(`['${id}'`),`canonical Board object filter missing: ${id}`);
 expect(!model.includes("['forming'"),'ambiguous ФОРМИРУЕТСЯ global filter remains');
 expect(!model.includes("['member','ОТ ЛЮДЕЙ']")&&!model.includes("['platform','ОТ КЛУБА']"),'legacy source filter controls remain canonical');
-expect(integrations.includes("activeFilter='artifact';applyFilter();closeDrawer()"),'own-card locator does not bridge to the Artifact/publications filter');
+expect(integrations.includes("activeFilter='artifact';currentProgramOnly=false;applyFilter();closeDrawer()"),'own-card locator does not bridge to the Artifact/publications filter while clearing Program affiliation');
 expect(integrations.includes('ТИП ОБЪЕКТА'),'object-type filter drawer is not the canonical visible dimension');
 
 // No lifecycle filter or Content CMS is introduced by Batch B.
