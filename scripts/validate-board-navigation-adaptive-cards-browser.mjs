@@ -132,7 +132,25 @@ try{
       });
       expect(layering.sameViewport,`desktop layering: filters and Current Program are not in the same fullscreen viewport composition ${JSON.stringify(layering)}`);
       expect(layering.overlaps,`desktop layering: QA fixture did not reproduce drawer/Program overlap ${JSON.stringify(layering)}`);
-      expect(layering.drawerOwnsPoint,`desktop layering: Current Program visually/pointer-wise covers the open View drawer ${JSON.stringify(layering)}`);
+      expect(layering.drawerOwnsPoint,`desktop layering: Current Program pointer-wise covers the open View drawer ${JSON.stringify(layering)}`);
+      const paintOrder=await page.evaluate(()=>{
+        const viewport=document.querySelector('.dc-spatial-viewport');
+        const filters=document.getElementById('boardFilters');
+        const programHost=document.getElementById('boardProgramHost');
+        const program=document.querySelector('.dc-board-program');
+        const drawer=document.querySelector('.dc-board-filter-drawer');
+        const children=[...(viewport?.children||[])];
+        const number=value=>{const n=Number.parseInt(value,10);return Number.isFinite(n)?n:0};
+        return{
+          programBeforeFilters:children.indexOf(programHost)>=0&&children.indexOf(filters)>=0&&children.indexOf(programHost)<children.indexOf(filters),
+          filtersZ:number(filters?getComputedStyle(filters).zIndex:0),
+          programZ:number(program?getComputedStyle(program).zIndex:0),
+          drawerZ:number(drawer?getComputedStyle(drawer).zIndex:0)
+        };
+      });
+      expect(paintOrder.programBeforeFilters,`desktop layering: DOM paint-order fallback does not keep Program before View controls ${JSON.stringify(paintOrder)}`);
+      expect(paintOrder.filtersZ>paintOrder.programZ,`desktop layering: View controls stacking level is not above Current Program ${JSON.stringify(paintOrder)}`);
+      expect(paintOrder.drawerZ>paintOrder.programZ,`desktop layering: open drawer stacking level is not above Current Program ${JSON.stringify(paintOrder)}`);
       await drawer.locator('[data-filter-close]').click();await drawer.waitFor({state:'hidden',timeout:2000});
     }
 
@@ -218,6 +236,36 @@ try{
   }
 
   expect(JSON.stringify(semanticSnapshots['390'])===JSON.stringify(semanticSnapshots['360'])&&JSON.stringify(semanticSnapshots['390'])===JSON.stringify(semanticSnapshots.desktop),`cross-device: Board View semantics differ across 390/360/desktop ${JSON.stringify(semanticSnapshots)}`);
+
+  // Owner live-QA viewport: wide desktop must preserve the same paint order.
+  {
+    const{ctx,page,errors}=await openBoard(browser,{width:2560,height:1080,label:'wide-desktop'});
+    const trigger=page.locator('[data-board-filter-drawer]');await trigger.click();
+    const drawer=page.locator('.dc-board-filter-drawer');await drawer.waitFor({state:'visible',timeout:2000});
+    const wide=await page.evaluate(()=>{
+      const viewport=document.querySelector('.dc-spatial-viewport');
+      const filters=document.getElementById('boardFilters');
+      const programHost=document.getElementById('boardProgramHost');
+      const program=document.querySelector('.dc-board-program');
+      const drawer=document.querySelector('.dc-board-filter-drawer');
+      const children=[...(viewport?.children||[])];
+      const number=value=>{const n=Number.parseInt(value,10);return Number.isFinite(n)?n:0};
+      const d=drawer?.getBoundingClientRect(),p=program?.getBoundingClientRect();
+      return{
+        sameViewport:filters?.parentElement===viewport&&programHost?.parentElement===viewport,
+        programBeforeFilters:children.indexOf(programHost)>=0&&children.indexOf(filters)>=0&&children.indexOf(programHost)<children.indexOf(filters),
+        filtersZ:number(filters?getComputedStyle(filters).zIndex:0),
+        programZ:number(program?getComputedStyle(program).zIndex:0),
+        drawerZ:number(drawer?getComputedStyle(drawer).zIndex:0),
+        overlaps:!!d&&!!p&&Math.min(d.right,p.right)-Math.max(d.left,p.left)>8&&Math.min(d.bottom,p.bottom)-Math.max(d.top,p.top)>8
+      };
+    });
+    expect(wide.sameViewport&&wide.programBeforeFilters,`wide desktop layering: Program/filters composition order drifted ${JSON.stringify(wide)}`);
+    expect(wide.filtersZ>wide.programZ&&wide.drawerZ>wide.programZ,`wide desktop layering: drawer is not painted above Current Program ${JSON.stringify(wide)}`);
+    expect(wide.overlaps,`wide desktop layering: fixture did not reproduce owner overlap geometry ${JSON.stringify(wide)}`);
+    expect(!errors.length,`wide desktop layering: ${errors.join(' | ')}`);
+    await ctx.close();
+  }
 }finally{await browser.close();server.close()}
 
 if(failures.length){console.error(`Board navigation/adaptive cards acceptance failed (${failures.length})`);for(const failure of failures)console.error(`- ${failure}`);process.exit(1)}
