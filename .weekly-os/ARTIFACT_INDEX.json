@@ -7,12 +7,12 @@
     "projectStage": "RELEASE",
     "gate": "G7_RELEASE",
     "status": "APPROVED",
-    "version": "2.45",
+    "version": "2.46",
     "updated": "2026-09-22",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.44"
+    "supersedes": "2.45"
   },
   "currentArtifacts": [
     {
@@ -1853,11 +1853,11 @@
     {
       "artifactId": "dementor-club.result.projects-public-media-fallback-v1",
       "documentType": "RESULT",
-      "currentVersion": "0.5",
-      "version": "0.5",
+      "currentVersion": "0.6",
+      "version": "0.6",
       "status": "ACTIVE",
-      "location": ".weekly-os/results/projects-public-media-fallback-v1.v0.5.md",
-      "path": ".weekly-os/results/projects-public-media-fallback-v1.v0.5.md",
+      "location": ".weekly-os/results/projects-public-media-fallback-v1.v0.6.md",
+      "path": ".weekly-os/results/projects-public-media-fallback-v1.v0.6.md",
       "sourceSystem": "GIT",
       "authorityType": "IMPLEMENTATION_AUTHORITY",
       "updated": "2026-09-22",
@@ -1878,11 +1878,11 @@
       "schemaMutationAuthorized": false,
       "semanticMutationRequired": false,
       "changeProposalRequired": false,
-      "productionMergeAuthorized": false,
+      "productionMergeAuthorized": true,
       "productionDeployAuthorized": false,
       "blockingGate": null,
-      "gateReadiness": "READY_FOR_RELEASE_DECISION",
-      "note": "STAB-05 live corrective remains ACTIVE under the project-local RELEASE / G7_RELEASE contract. Candidate 91607fdb... remains PR #236 DRAFT/UNMERGED; validation #1233 SUCCESS; exact diff 3 files; production baseline 4a8e95cb.... MP_DSL lifecycle semantics are not applied.",
+      "gateReadiness": "MERGED_AWAITING_PAGES_DEPLOY",
+      "note": "STAB-05 live corrective exact candidate 91607fdb... merged to production 287b4852... via PR #236. Exact 3-file content delta; candidate→production content diff 0. Supabase not run. Await Pages deploy + live human playback acceptance.",
       "projectStage": "RELEASE",
       "candidateCommit": "91607fdbd02b815122ce25c7a8920691dda6320f",
       "releaseCandidateCommit": "91607fdbd02b815122ce25c7a8920691dda6320f",
@@ -1891,7 +1891,8 @@
       "validationRunId": 35671603405,
       "validationConclusion": "SUCCESS",
       "exactDiffFileCount": 3,
-      "productionCommit": "4a8e95cb669dab660a7afe381e580278d4575a2a"
+      "productionCommit": "287b485293d68098dfd3c9302785369a735d42e2",
+      "productionMergeCommit": "287b485293d68098dfd3c9302785369a735d42e2"
     }
   ],
   "referenceArtifacts": [
