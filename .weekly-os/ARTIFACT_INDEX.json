@@ -7,12 +7,12 @@
     "projectStage": "BUILD",
     "gate": "G7_RELEASE",
     "status": "APPROVED",
-    "version": "2.54",
+    "version": "2.55",
     "updated": "2026-09-22",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.53"
+    "supersedes": "2.54"
   },
   "currentArtifacts": [
     {
@@ -2043,6 +2043,51 @@
         "STAB-06",
         "BQA-18"
       ]
+    },
+    {
+      "artifactId": "dementor-club.operations.board-view-model-corrective-g6-2026-09-22",
+      "documentType": "VALIDATION_EVIDENCE",
+      "currentVersion": "1.1",
+      "version": "1.1",
+      "status": "APPROVED",
+      "location": "operations/BOARD_VIEW_MODEL_CORRECTIVE_G6_2026-09-22.md",
+      "path": "operations/BOARD_VIEW_MODEL_CORRECTIVE_G6_2026-09-22.md",
+      "sourceSystem": "GIT",
+      "authorityType": "QA_EVIDENCE",
+      "updated": "2026-09-22",
+      "canonicalProject": "dementor-club",
+      "canonicalLocation": "operations/BOARD_VIEW_MODEL_CORRECTIVE_G6_2026-09-22.md",
+      "relation": "CURRENT_EVIDENCE",
+      "result": "dementor-club.result.board-mobile-information-hierarchy-v1",
+      "gate": "G6_VALIDATION",
+      "candidateCommit": "8180b4a7b7caf37738604321fe5a34c344455b60",
+      "validationRunNumber": 1243,
+      "validationRunId": 35777088217,
+      "validationConclusion": "SUCCESS",
+      "verdict": "VALIDATED_CANDIDATE"
+    },
+    {
+      "artifactId": "dementor-club.operations.board-view-model-corrective-g7-release-candidate-2026-09-22",
+      "documentType": "RELEASE_EVIDENCE",
+      "currentVersion": "1.1",
+      "version": "1.1",
+      "status": "APPROVED",
+      "location": "operations/BOARD_VIEW_MODEL_CORRECTIVE_G7_RELEASE_CANDIDATE_2026-09-22.md",
+      "path": "operations/BOARD_VIEW_MODEL_CORRECTIVE_G7_RELEASE_CANDIDATE_2026-09-22.md",
+      "sourceSystem": "GIT",
+      "authorityType": "QA_EVIDENCE",
+      "updated": "2026-09-22",
+      "canonicalProject": "dementor-club",
+      "canonicalLocation": "operations/BOARD_VIEW_MODEL_CORRECTIVE_G7_RELEASE_CANDIDATE_2026-09-22.md",
+      "relation": "CURRENT_EVIDENCE",
+      "result": "dementor-club.result.board-mobile-information-hierarchy-v1",
+      "gate": "G7_RELEASE",
+      "productionBaseline": "d4d1e2f45883beff973a5cd5827e6f71065c0575",
+      "releaseCandidateCommit": "8180b4a7b7caf37738604321fe5a34c344455b60",
+      "validationRunNumber": 1243,
+      "validationRunId": 35777088217,
+      "validationConclusion": "SUCCESS",
+      "verdict": "READY_FOR_RELEASE_DECISION"
     }
   ],
   "referenceArtifacts": [
