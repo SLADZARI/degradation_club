@@ -11,6 +11,7 @@ let activeShareTrigger=null;
 let sharedArrivalMode=null;
 let sharedArrivalStarted=false;
 let artifactFrameObserver=null;
+let focusResolveGeneration=0;
 
 function parseFocus(){
   const raw=new URL(location.href).searchParams.get('focus')||'';
@@ -61,9 +62,12 @@ function consumeSharePresentation(){
 }
 function consumeBoardNavigationFocus(){
   if(sharedArrivalMode)return;
-  if(!parseFocus())return;
+  const focus=parseFocus();
+  focusResolveGeneration+=1;
   clearTimeout(missingTimer);missingTimer=null;
+  if(!focus)return;
   clearFocus({replace:true});
+  window.dispatchEvent(new CustomEvent('dc:board-close-artifact'));
 }
 function targetNode(focus){
   if(!focus||!boardHost)return null;
@@ -99,8 +103,16 @@ function resolveCurrentFocus({allowMissing=false}={}){
   openResolvedFocus(node,focus);return true;
 }
 function scheduleResolve(){
-  if(resolving)return;resolving=true;
-  requestAnimationFrame(()=>{resolving=false;if(resolveCurrentFocus())return;clearTimeout(missingTimer);missingTimer=setTimeout(()=>resolveCurrentFocus({allowMissing:true}),4200)});
+  if(resolving)return;
+  const generation=focusResolveGeneration;
+  resolving=true;
+  requestAnimationFrame(()=>{
+    resolving=false;
+    if(generation!==focusResolveGeneration||!parseFocus())return;
+    if(resolveCurrentFocus())return;
+    clearTimeout(missingTimer);
+    missingTimer=setTimeout(()=>{if(generation===focusResolveGeneration&&parseFocus())resolveCurrentFocus({allowMissing:true})},4200);
+  });
 }
 async function copyText(text){
   try{await navigator.clipboard.writeText(text);return true}catch{}
