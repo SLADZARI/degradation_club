@@ -135,6 +135,20 @@ try{
   await backdrop.goto(`${base}/__deeplink_harness__?state=MEMBER_ACTIVATED&focus=artifact:${ART}&from=share`);
   await stayShared(backdrop,'member backdrop action','backdrop');await backdrop.close();
 
+  for(const [kind,detail] of [['view',{kind:'view',view:'all'}],['pager',{kind:'pager',delta:1}]]){
+    const stale=await browser.newPage();
+    await stale.goto(`${base}/__deeplink_harness__?focus=artifact:${ART}`);await stale.waitForFunction(()=>globalThis.__DC_FOCUS?.type==='artifact');
+    await stale.evaluate(()=>{document.querySelector('.dc-artifact-overlay').hidden=true;globalThis.__DC_FOCUS=null});
+    expect(new URL(stale.url()).searchParams.get('focus')===`artifact:${ART}`,`stale ${kind}: fixture lost focus before explicit Board navigation`);
+    await stale.evaluate(detail=>window.dispatchEvent(new CustomEvent('dc:board-user-navigation',{detail})),detail);
+    await stale.waitForFunction(()=>!new URL(location.href).searchParams.has('focus'));
+    await stale.evaluate(()=>{const marker=document.createElement('span');marker.dataset.qaMutation='1';document.getElementById('boardHost').appendChild(marker)});
+    await stale.waitForTimeout(140);
+    expect(await stale.locator('.dc-artifact-overlay').evaluate(el=>el.hidden),`stale ${kind}: old Artifact focus reopened after explicit Board navigation`);
+    expect(await stale.evaluate(()=>globalThis.__DC_FOCUS===null),`stale ${kind}: deep-link focus target fired again after explicit Board navigation`);
+    await stale.close();
+  }
+
   const artifact=await browser.newPage();
   await artifact.goto(`${base}/__deeplink_harness__?focus=artifact:${ART}`);await artifact.waitForFunction(()=>globalThis.__DC_FOCUS?.type==='artifact');
   expect(await artifact.locator('.dc-board-share-postcard-layer:visible').count()===0,'ordinary deeplink: receive postcard must not appear without from=share');
@@ -198,3 +212,4 @@ console.log('✓ stay / close / Escape / backdrop consume both from=share and fo
 console.log('✓ receive accept/stay matrix passes Chromium + WebKit on desktop and 390px mobile');
 console.log('✓ fresh built share URL exposes dedicated public-safe 1200x630 PNG head + fetchable raster without private media');
 console.log('✓ ordinary non-share focus/history, Sender Share, Entity Share and transport behavior remain valid');
+console.log('✓ explicit Board View/pager navigation consumes stale focus=artifact before later Board mutations can reopen it');
