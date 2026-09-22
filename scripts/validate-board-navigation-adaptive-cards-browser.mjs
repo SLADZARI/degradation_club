@@ -119,7 +119,22 @@ try{
     const persisted=initial.positions;
 
     if(viewport.label!=='desktop')expect(initial.programStrip==='none',`view-${viewport.label}: standalone Current Program strip remains visible`);
-    else expect(initial.programStrip!=='none',`view-desktop: standalone Current Program presentation changed`);
+    else{
+      expect(initial.programStrip!=='none',`view-desktop: standalone Current Program presentation changed`);
+      const trigger=page.locator('[data-board-filter-drawer]');await trigger.click();
+      const drawer=page.locator('.dc-board-filter-drawer');await drawer.waitFor({state:'visible',timeout:2000});
+      const layering=await page.evaluate(()=>{
+        const viewport=document.querySelector('.dc-spatial-viewport'),filters=document.getElementById('boardFilters'),program=document.getElementById('boardProgramHost'),drawer=document.querySelector('.dc-board-filter-drawer');
+        const d=drawer?.getBoundingClientRect(),p=program?.getBoundingClientRect();
+        const left=Math.max(d?.left||0,p?.left||0),right=Math.min(d?.right||0,p?.right||0),top=Math.max(d?.top||0,p?.top||0),bottom=Math.min(d?.bottom||0,p?.bottom||0);
+        const overlaps=right-left>8&&bottom-top>8;const x=left+Math.max(4,(right-left)/2),y=top+Math.max(4,(bottom-top)/2);const topNode=overlaps?document.elementFromPoint(x,y):null;
+        return{sameViewport:filters?.parentElement===viewport&&program?.parentElement===viewport,overlaps,drawerOwnsPoint:!!topNode&&drawer.contains(topNode),drawerZ:getComputedStyle(filters).zIndex,programZ:getComputedStyle(program).zIndex};
+      });
+      expect(layering.sameViewport,`desktop layering: filters and Current Program are not in the same fullscreen viewport composition ${JSON.stringify(layering)}`);
+      expect(layering.overlaps,`desktop layering: QA fixture did not reproduce drawer/Program overlap ${JSON.stringify(layering)}`);
+      expect(layering.drawerOwnsPoint,`desktop layering: Current Program visually/pointer-wise covers the open View drawer ${JSON.stringify(layering)}`);
+      await drawer.locator('[data-filter-close]').click();await drawer.waitFor({state:'hidden',timeout:2000});
+    }
 
     const current=await chooseView(page,'current-program');
     expect(current.view==='current-program'&&current.active.length===1&&current.active[0]==='current-program',`view-${viewport.label}: Current Program is not the single active View ${JSON.stringify(current.active)}`);
@@ -206,4 +221,4 @@ try{
 }finally{await browser.close();server.close()}
 
 if(failures.length){console.error(`Board navigation/adaptive cards acceptance failed (${failures.length})`);for(const failure of failures)console.error(`- ${failure}`);process.exit(1)}
-console.log('Board navigation/adaptive cards browser acceptance passed: one-active View sequence on 390/360/desktop + exact Program identity + camera fit/pager/coordinate invariance + canonical badges + МОЁ locator + relations-visible-set invariance + adaptive media');
+console.log('Board navigation/adaptive cards browser acceptance passed: one-active View sequence on 390/360/desktop + desktop drawer-over-Program composition + exact Program identity + camera fit/pager/coordinate invariance + canonical badges + МОЁ locator + relations-visible-set invariance + adaptive media');
