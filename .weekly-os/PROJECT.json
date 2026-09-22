@@ -5,14 +5,14 @@
     "project": "dementor-club",
     "documentType": "STANDARD",
     "projectStage": "BUILD",
-    "gate": "G7_RELEASE",
+    "gate": "G5_BUILD",
     "status": "APPROVED",
-    "version": "2.59",
+    "version": "2.60",
     "updated": "2026-09-22",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.58"
+    "supersedes": "2.59"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -21,7 +21,7 @@
   "defaultBranch": "main",
   "semanticSourceBranch": "dementor-club",
   "projectStage": "BUILD",
-  "gate": "G7_RELEASE",
+  "gate": "G5_BUILD",
   "readFirst": [
     ".weekly-os/PROJECT.json",
     ".weekly-os/ARTIFACT_INDEX.json",
@@ -164,7 +164,10 @@
     "operations/BOARD_MOBILE_INFORMATION_HIERARCHY_G6_2026-09-22.md",
     "operations/BOARD_MOBILE_INFORMATION_HIERARCHY_G7_RELEASE_CANDIDATE_2026-09-22.md",
     ".weekly-os/results/board-mobile-information-hierarchy-v1.v0.3.md",
-    "operations/BOARD_MOBILE_INFORMATION_HIERARCHY_G7_PRODUCTION_PAGES_2026-09-22.md"
+    "operations/BOARD_MOBILE_INFORMATION_HIERARCHY_G7_PRODUCTION_PAGES_2026-09-22.md",
+    "operations/BOARD_VIEW_MODEL_DECISION_V1.md",
+    "operations/BOARD_VIEW_LIVE_QA_CORRECTIVE_2026-09-22.md",
+    ".weekly-os/results/board-mobile-information-hierarchy-v1.v0.4.md"
   ],
   "authority": {
     "mpDslCore": {
@@ -314,6 +317,13 @@
       "path": "operations/BOARD_MOBILE_CURRENT_PROGRAM_FILTER_DECISION_V1.md",
       "scope": "STAB-06 / BQA-18 mobile Board Current Program/filter/card-badge presentation only",
       "note": "Owner-approved local design rule. Current Program stays canonical in current-program-v1.js; mobile overlay removed, existing filters extended, no new ontology or MP_DSL semantics."
+    },
+    "boardViewModelV1": {
+      "sourceSystem": "GIT",
+      "authorityType": "APPROVED_AUTHORITY",
+      "path": "operations/BOARD_VIEW_MODEL_DECISION_V1.md",
+      "scope": "STAB-06 Board View semantics, Current Program presentation mapping, card badge/view/camera interaction across desktop/mobile",
+      "note": "Supersedes only the orthogonal Current Program filter behavior and mobile-only filter semantics from BOARD_MOBILE_CURRENT_PROGRAM_FILTER_DECISION_V1. Preserves mobile first-frame and exact-affiliation/card-badge rules."
     }
   },
   "protected": {
@@ -324,10 +334,11 @@
   },
   "currentResult": {
     "artifactId": "dementor-club.result.board-mobile-information-hierarchy-v1",
-    "version": "0.3",
+    "version": "0.4",
     "status": "REVIEW",
-    "path": ".weekly-os/results/board-mobile-information-hierarchy-v1.v0.3.md",
-    "gate": "G7_RELEASE",
+    "workStatus": "ACTIVE",
+    "path": ".weekly-os/results/board-mobile-information-hierarchy-v1.v0.4.md",
+    "gate": "G5_BUILD",
     "parentIssue": 228,
     "scope": [
       "STAB-06",
@@ -335,37 +346,17 @@
     ],
     "integrationBranch": "result/board-mobile-information-hierarchy-v1",
     "integrationBaseRef": "dementor-club-production",
-    "integrationBaseCommit": "287b485293d68098dfd3c9302785369a735d42e2",
-    "productionBaseCommit": "287b485293d68098dfd3c9302785369a735d42e2",
+    "integrationBaseCommit": "d4d1e2f45883beff973a5cd5827e6f71065c0575",
+    "productionBaseCommit": "d4d1e2f45883beff973a5cd5827e6f71065c0575",
     "implementationStartAuthorized": true,
     "schemaMutationAuthorized": false,
     "semanticMutationRequired": false,
     "changeProposalRequired": false,
-    "productionMergeAuthorized": true,
-    "productionDeployAuthorized": true,
+    "productionMergeAuthorized": false,
+    "productionDeployAuthorized": false,
     "blockingGate": null,
-    "gateReadiness": "PAGES_DEPLOYED_AWAITING_OWNER_LIVE_RETEST",
-    "note": "STAB-06 exact candidate fbc89112... merged via PR #238 to production d4d1e2f4.... Exact 8-file content delta; candidate→production diff 0. Pages #130 / 35754639231 SUCCESS on exact production SHA. Supabase not required/not run. Authenticated owner live Board retest remains pending; keep REVIEW / workStatus ACTIVE / G7_RELEASE and integrationBranch until live PASS. STAB-07 not started.",
-    "workStatus": "ACTIVE",
-    "candidateCommit": "fbc891126532939a0a7350d18d19dbae807fb76f",
-    "releaseCandidateCommit": "fbc891126532939a0a7350d18d19dbae807fb76f",
-    "integrationPullRequest": 238,
-    "validationRunNumber": 1238,
-    "validationRunId": 35740224085,
-    "validationConclusion": "SUCCESS",
-    "exactDiffFileCount": 8,
-    "backendProductionDeployRequired": false,
-    "liveDatabaseMutationRequired": false,
-    "g6Evidence": "operations/BOARD_MOBILE_INFORMATION_HIERARCHY_G6_2026-09-22.md",
-    "g7ReleaseCandidateEvidence": "operations/BOARD_MOBILE_INFORMATION_HIERARCHY_G7_RELEASE_CANDIDATE_2026-09-22.md",
-    "productionCommit": "d4d1e2f45883beff973a5cd5827e6f71065c0575",
-    "productionMergeCommit": "d4d1e2f45883beff973a5cd5827e6f71065c0575",
-    "productionPagesRunNumber": 130,
-    "productionPagesRunId": 35754639231,
-    "productionPagesConclusion": "SUCCESS",
-    "productionPagesExactShaVerified": true,
-    "liveRetestStatus": "PENDING",
-    "pagesReleaseEvidence": "operations/BOARD_MOBILE_INFORMATION_HIERARCHY_G7_PRODUCTION_PAGES_2026-09-22.md"
+    "gateReadiness": "CORRECTIVE_BUILD_AUTHORIZED",
+    "note": "Owner live QA found hidden compound View/filter state and camera ambiguity after the first STAB-06 deployment. Approved Board View Model v1 replaces user-facing activeFilter + currentProgramOnly composition with one canonical View at a time across mobile/desktop; mobile Program strip remains suppressed; badges/identity remain canonical. Same Result/branch; corrective starts from exact production d4d1e2f4...."
   },
   "waitingResults": [
     {
