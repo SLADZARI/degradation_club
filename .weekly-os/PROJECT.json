@@ -7,12 +7,12 @@
     "projectStage": "BUILD",
     "gate": "G7_RELEASE",
     "status": "APPROVED",
-    "version": "2.65",
+    "version": "2.66",
     "updated": "2026-09-22",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.64"
+    "supersedes": "2.65"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -178,7 +178,8 @@
     "operations/BOARD_CONTROLS_LIVE_QA_CORRECTIVE_2026-09-22.md",
     ".weekly-os/results/board-mobile-information-hierarchy-v1.v0.9.md",
     "operations/BOARD_CONTROLS_LIVE_CORRECTIVE_G6_2026-09-22.md",
-    "operations/BOARD_CONTROLS_LIVE_CORRECTIVE_G7_RELEASE_CANDIDATE_2026-09-22.md"
+    "operations/BOARD_CONTROLS_LIVE_CORRECTIVE_G7_RELEASE_CANDIDATE_2026-09-22.md",
+    ".weekly-os/results/board-mobile-information-hierarchy-v1.v0.10.md"
   ],
   "authority": {
     "mpDslCore": {
@@ -345,10 +346,10 @@
   },
   "currentResult": {
     "artifactId": "dementor-club.result.board-mobile-information-hierarchy-v1",
-    "version": "0.9",
+    "version": "0.10",
     "status": "REVIEW",
     "workStatus": "ACTIVE",
-    "path": ".weekly-os/results/board-mobile-information-hierarchy-v1.v0.9.md",
+    "path": ".weekly-os/results/board-mobile-information-hierarchy-v1.v0.10.md",
     "gate": "G7_RELEASE",
     "parentIssue": 228,
     "scope": [
@@ -367,14 +368,14 @@
     "productionDeployAuthorized": false,
     "blockingGate": null,
     "gateReadiness": "READY_FOR_RELEASE_DECISION",
-    "note": "STAB-06 live controls corrective candidate 4669a1e7... validated on exact production bdd23f80... / Pages #131. PR #240 DRAFT/UNMERGED. Site Integrity #1244 / 35785111215 SUCCESS. Desktop drawer-over-Program and stale focus=artifact consumption for View/pager PASS. Exact diff 5 files. No merge/deploy/Supabase. STAB-07 not started.",
-    "candidateCommit": "4669a1e7266b162e34c5f2792702d5efc0b8e93c",
-    "releaseCandidateCommit": "4669a1e7266b162e34c5f2792702d5efc0b8e93c",
+    "note": "STAB-06 live controls corrective final candidate a067ff50... validated on exact production bdd23f80.... PR #240 DRAFT/UNMERGED. Site Integrity #1250 / 35787057332 attempt 2 SUCCESS. Desktop/wide-desktop drawer-over-Program, stale focus=artifact consumption for View/pager, queued resolver race, Board Share regression, route manifest and release guard PASS. Exact diff 6 files. No merge/deploy/Supabase. STAB-07 not started.",
+    "candidateCommit": "a067ff50cab5b45177d163ec086f116b177f89b3",
+    "releaseCandidateCommit": "a067ff50cab5b45177d163ec086f116b177f89b3",
     "integrationPullRequest": 240,
-    "validationRunNumber": 1244,
-    "validationRunId": 35785111215,
+    "validationRunNumber": 1250,
+    "validationRunId": 35787057332,
     "validationConclusion": "SUCCESS",
-    "exactDiffFileCount": 5,
+    "exactDiffFileCount": 6,
     "g6Evidence": "operations/BOARD_CONTROLS_LIVE_CORRECTIVE_G6_2026-09-22.md",
     "g7ReleaseCandidateEvidence": "operations/BOARD_CONTROLS_LIVE_CORRECTIVE_G7_RELEASE_CANDIDATE_2026-09-22.md",
     "liveRetestStatus": "CORRECTIVE_CANDIDATE_VALIDATED",
@@ -384,7 +385,8 @@
     "productionPagesRunNumber": 131,
     "productionPagesRunId": 35781834222,
     "productionPagesConclusion": "SUCCESS",
-    "productionPagesExactShaVerified": true
+    "productionPagesExactShaVerified": true,
+    "validationRunAttempt": 2
   },
   "waitingResults": [
     {
