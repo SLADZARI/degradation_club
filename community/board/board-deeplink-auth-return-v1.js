@@ -59,6 +59,12 @@ function consumeSharePresentation(){
   url.searchParams.delete('from');
   history.replaceState({...history.state,dcBoardSharedArrival:true},'',url);
 }
+function consumeBoardNavigationFocus(){
+  if(sharedArrivalMode)return;
+  if(!parseFocus())return;
+  clearTimeout(missingTimer);missingTimer=null;
+  clearFocus({replace:true});
+}
 function targetNode(focus){
   if(!focus||!boardHost)return null;
   const nodes=focus.type==='artifact'?[...boardHost.querySelectorAll('.dc-notice[data-artifact]')]:[...boardHost.querySelectorAll('.dc-projection[data-source-id]')];
@@ -332,6 +338,7 @@ async function init(){
   if(focus&&!session){if(shared)showReceiveAuthPostcard();else renderAuthGate();return}
   if(!session)return;
   installHistoryBridge();installArtifactDetailShareBridge();addEntityShareButtons();
+  window.addEventListener('dc:board-user-navigation',consumeBoardNavigationFocus);
   window.addEventListener('dc:board-guest-read-ready',()=>{addEntityShareButtons();scheduleResolve()});
   window.addEventListener('dc:board-projections-updated',()=>{addEntityShareButtons();scheduleResolve()});
   window.addEventListener('dc:board-layout-request',()=>addEntityShareButtons());
