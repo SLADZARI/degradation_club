@@ -149,6 +149,23 @@ try{
     await stale.close();
   }
 
+  // Race regression: explicit Board navigation wins even if a deep-link resolver is already queued.
+  for(const [kind,detail] of [['view',{kind:'view',view:'all'}],['pager',{kind:'pager',delta:1}]]) {
+    const queued=await browser.newPage();
+    await queued.addInitScript(()=>{
+      const nativeSetTimeout=window.setTimeout.bind(window);
+      window.requestAnimationFrame=callback=>nativeSetTimeout(()=>callback(performance.now()),80);
+    });
+    await queued.goto(`${base}/__deeplink_harness__?focus=artifact:${ART}`,{waitUntil:'domcontentloaded'});
+    await queued.evaluate(detail=>window.dispatchEvent(new CustomEvent('dc:board-user-navigation',{detail})),detail);
+    await queued.waitForFunction(()=>!new URL(location.href).searchParams.has('focus'));
+    await queued.evaluate(()=>{const marker=document.createElement('span');marker.dataset.qaQueuedMutation='1';document.getElementById('boardHost').appendChild(marker)});
+    await queued.waitForTimeout(180);
+    expect(await queued.locator('.dc-artifact-overlay').evaluate(el=>el.hidden),`queued stale ${kind}: queued deep-link resolver reopened Artifact after explicit navigation`);
+    expect(await queued.evaluate(()=>globalThis.__DC_FOCUS===null),`queued stale ${kind}: queued focus target fired after explicit navigation`);
+    await queued.close();
+  }
+
   const artifact=await browser.newPage();
   await artifact.goto(`${base}/__deeplink_harness__?focus=artifact:${ART}`);await artifact.waitForFunction(()=>globalThis.__DC_FOCUS?.type==='artifact');
   expect(await artifact.locator('.dc-board-share-postcard-layer:visible').count()===0,'ordinary deeplink: receive postcard must not appear without from=share');
@@ -212,4 +229,4 @@ console.log('✓ stay / close / Escape / backdrop consume both from=share and fo
 console.log('✓ receive accept/stay matrix passes Chromium + WebKit on desktop and 390px mobile');
 console.log('✓ fresh built share URL exposes dedicated public-safe 1200x630 PNG head + fetchable raster without private media');
 console.log('✓ ordinary non-share focus/history, Sender Share, Entity Share and transport behavior remain valid');
-console.log('✓ explicit Board View/pager navigation consumes stale focus=artifact before later Board mutations can reopen it');
+console.log('✓ explicit Board View/pager navigation consumes stale focus=artifact, including queued resolver races, before later Board mutations can reopen it');
