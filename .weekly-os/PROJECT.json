@@ -4,15 +4,15 @@
     "artifactId": "dementor-club.kernel.project",
     "project": "dementor-club",
     "documentType": "STANDARD",
-    "projectStage": "RELEASE",
+    "projectStage": "BUILD",
     "gate": "G7_RELEASE",
     "status": "APPROVED",
-    "version": "2.49",
+    "version": "2.50",
     "updated": "2026-09-22",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.48"
+    "supersedes": "2.49"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -20,7 +20,7 @@
   "canonicalRepository": "SLADZARI/degradation_club",
   "defaultBranch": "main",
   "semanticSourceBranch": "dementor-club",
-  "projectStage": "RELEASE",
+  "projectStage": "BUILD",
   "gate": "G7_RELEASE",
   "readFirst": [
     ".weekly-os/PROJECT.json",
@@ -394,7 +394,7 @@
       "note": "STAB-01 released and live-retested. Anonymous smoke PASS and owner-confirmed authenticated Board/private-image retest PASS. Residual parent stabilization #228 remains open; no active implementation ownership."
     }
   ],
-  "activeIntegrationBranch": "result/artifact-detail-terminal-state-v1",
+  "activeIntegrationBranch": "result/projects-public-media-fallback-v1",
   "activeReleaseBranch": null,
   "reportPath": "operations/MEMBERSHIP_V2_PRODUCTION_FLOW_QA_2026-09-02.md",
   "completedResults": [
