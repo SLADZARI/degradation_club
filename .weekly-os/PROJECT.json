@@ -7,12 +7,12 @@
     "projectStage": "BUILD",
     "gate": "G7_RELEASE",
     "status": "APPROVED",
-    "version": "2.66",
+    "version": "2.67",
     "updated": "2026-09-22",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.65"
+    "supersedes": "2.66"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -179,7 +179,9 @@
     ".weekly-os/results/board-mobile-information-hierarchy-v1.v0.9.md",
     "operations/BOARD_CONTROLS_LIVE_CORRECTIVE_G6_2026-09-22.md",
     "operations/BOARD_CONTROLS_LIVE_CORRECTIVE_G7_RELEASE_CANDIDATE_2026-09-22.md",
-    ".weekly-os/results/board-mobile-information-hierarchy-v1.v0.10.md"
+    ".weekly-os/results/board-mobile-information-hierarchy-v1.v0.10.md",
+    ".weekly-os/results/board-mobile-information-hierarchy-v1.v0.11.md",
+    "operations/BOARD_CONTROLS_LIVE_CORRECTIVE_G7_MERGE_2026-09-22.md"
   ],
   "authority": {
     "mpDslCore": {
@@ -346,10 +348,10 @@
   },
   "currentResult": {
     "artifactId": "dementor-club.result.board-mobile-information-hierarchy-v1",
-    "version": "0.10",
+    "version": "0.11",
     "status": "REVIEW",
     "workStatus": "ACTIVE",
-    "path": ".weekly-os/results/board-mobile-information-hierarchy-v1.v0.10.md",
+    "path": ".weekly-os/results/board-mobile-information-hierarchy-v1.v0.11.md",
     "gate": "G7_RELEASE",
     "parentIssue": 228,
     "scope": [
@@ -364,11 +366,11 @@
     "schemaMutationAuthorized": false,
     "semanticMutationRequired": false,
     "changeProposalRequired": false,
-    "productionMergeAuthorized": false,
+    "productionMergeAuthorized": true,
     "productionDeployAuthorized": false,
     "blockingGate": null,
-    "gateReadiness": "READY_FOR_RELEASE_DECISION",
-    "note": "STAB-06 live controls corrective final candidate a067ff50... validated on exact production bdd23f80.... PR #240 DRAFT/UNMERGED. Site Integrity #1250 / 35787057332 attempt 2 SUCCESS. Desktop/wide-desktop drawer-over-Program, stale focus=artifact consumption for View/pager, queued resolver race, Board Share regression, route manifest and release guard PASS. Exact diff 6 files. No merge/deploy/Supabase. STAB-07 not started.",
+    "gateReadiness": "MERGED_AWAITING_PAGES_DEPLOY",
+    "note": "STAB-06 live-controls corrective candidate a067ff50... merged via PR #240 to production a26edad3.... Exact old-production→new-production content delta is 6 files; candidate→production content diff = 0. Supabase not required/not run. Pages deploy not run in this step. Keep REVIEW / workStatus ACTIVE / G7_RELEASE until deploy/live acceptance. STAB-07 not started.",
     "candidateCommit": "a067ff50cab5b45177d163ec086f116b177f89b3",
     "releaseCandidateCommit": "a067ff50cab5b45177d163ec086f116b177f89b3",
     "integrationPullRequest": 240,
@@ -378,10 +380,10 @@
     "exactDiffFileCount": 6,
     "g6Evidence": "operations/BOARD_CONTROLS_LIVE_CORRECTIVE_G6_2026-09-22.md",
     "g7ReleaseCandidateEvidence": "operations/BOARD_CONTROLS_LIVE_CORRECTIVE_G7_RELEASE_CANDIDATE_2026-09-22.md",
-    "liveRetestStatus": "CORRECTIVE_CANDIDATE_VALIDATED",
-    "productionCommit": "bdd23f80d12bd38a82b5afe2c1257e22d4e64beb",
-    "productionMergeCommit": "bdd23f80d12bd38a82b5afe2c1257e22d4e64beb",
-    "mergeEvidence": "operations/BOARD_VIEW_MODEL_CORRECTIVE_G7_MERGE_2026-09-22.md",
+    "liveRetestStatus": "MERGED_AWAITING_DEPLOY",
+    "productionCommit": "a26edad33839f0fef10c561570507e1ef0a4435d",
+    "productionMergeCommit": "a26edad33839f0fef10c561570507e1ef0a4435d",
+    "mergeEvidence": "operations/BOARD_CONTROLS_LIVE_CORRECTIVE_G7_MERGE_2026-09-22.md",
     "productionPagesRunNumber": 131,
     "productionPagesRunId": 35781834222,
     "productionPagesConclusion": "SUCCESS",
