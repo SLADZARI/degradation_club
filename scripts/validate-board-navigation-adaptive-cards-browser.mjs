@@ -65,6 +65,7 @@ try{
     const after=await page.locator('.dc-spatial-world').evaluate(el=>el.style.transform);
     const nextPos=await nav.locator('[data-pos]').innerText();expect(after!==before,`nav-${viewport.label}: next did not move camera`);expect(nextPos===`2 / ${total}`,`nav-${viewport.label}: next position ${nextPos}`);
     await nav.locator('[data-prev]').click();await page.waitForTimeout(60);expect((await nav.locator('[data-pos]').innerText())===`1 / ${total}`,`nav-${viewport.label}: prev did not return`);
+    const zoomBefore=await page.locator('.dc-spatial-world').evaluate(el=>el.style.transform);await page.locator('[data-zoom-in]').click();await page.waitForTimeout(60);const zoomAfter=await page.locator('.dc-spatial-world').evaluate(el=>el.style.transform);expect(zoomAfter!==zoomBefore,`zoom-${viewport.label}: zoom-in no longer changes spatial transform`);await page.locator('[data-zoom-out]').click();
 
     await page.locator('[data-board-filter-drawer]').click();const drawer=page.locator('.dc-board-filter-drawer');await drawer.waitFor({state:'visible',timeout:2000});
     const stack=await page.evaluate(()=>{const d=document.querySelector('.dc-board-filter-drawer')?.getBoundingClientRect(),n=document.querySelector('.dc-board-filter-nav')?.getBoundingClientRect();return{drawerBottom:d?.bottom,navTop:n?.top}});expect(stack.drawerBottom<=stack.navTop-4,`nav-${viewport.label}: drawer overlaps navigator ${JSON.stringify(stack)}`);
@@ -117,6 +118,7 @@ try{
   const{ctx,page,errors}=await openBoard(browser,{width:1440,height:900});
   const nav=page.locator('.dc-board-filter-nav');await nav.waitFor({state:'visible',timeout:3000});
   const desktopPosition=await nav.evaluate(el=>getComputedStyle(el).position);expect(desktopPosition!=='fixed',`desktop: navigator unexpectedly changed to fixed composition`);
+  const desktopProgram=await page.evaluate(()=>{const host=document.querySelector('.dc-board-program');return{display:host?getComputedStyle(host).display:null,cards:host?.querySelectorAll('.dc-board-program__card').length||0}});expect(desktopProgram.display!=='none'&&desktopProgram.cards===3,`desktop: existing Current Program presentation changed ${JSON.stringify(desktopProgram)}`);
   const card='.dc-notice[data-artifact="qa-artifact-own"]';await setImage(page,card,420,210);const landscape=await metrics(page,card);await setImage(page,card,210,420);const portrait=await metrics(page,card);expect(landscape.img.ratio>1.7&&portrait.img.ratio<.7,`desktop: source proportions not preserved`);expect(portrait.img.h>landscape.img.h,`desktop: portrait card visual is not taller`);expect(!errors.length,`desktop: ${errors.join(' | ')}`);await ctx.close();
 }finally{await browser.close();server.close()}
 
