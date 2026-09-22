@@ -5,14 +5,14 @@
     "project": "dementor-club",
     "documentType": "STANDARD",
     "projectStage": "RELEASE",
-    "gate": "G7_RELEASE",
+    "gate": "G8_CLEANUP",
     "status": "APPROVED",
-    "version": "2.46",
+    "version": "2.47",
     "updated": "2026-09-22",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.45"
+    "supersedes": "2.46"
   },
   "currentArtifacts": [
     {
@@ -1853,24 +1853,24 @@
     {
       "artifactId": "dementor-club.result.projects-public-media-fallback-v1",
       "documentType": "RESULT",
-      "currentVersion": "0.6",
-      "version": "0.6",
-      "status": "ACTIVE",
-      "location": ".weekly-os/results/projects-public-media-fallback-v1.v0.6.md",
-      "path": ".weekly-os/results/projects-public-media-fallback-v1.v0.6.md",
+      "currentVersion": "0.7",
+      "version": "0.7",
+      "status": "WAITING",
+      "location": ".weekly-os/results/projects-public-media-fallback-v1.v0.7.md",
+      "path": ".weekly-os/results/projects-public-media-fallback-v1.v0.7.md",
       "sourceSystem": "GIT",
       "authorityType": "IMPLEMENTATION_AUTHORITY",
       "updated": "2026-09-22",
       "canonicalProject": "dementor-club",
       "canonicalLocation": ".weekly-os/results/projects-public-media-fallback-v1.v0.1.md",
       "relation": "CURRENT_RESULT",
-      "gate": "G7_RELEASE",
+      "gate": "G8_CLEANUP",
       "parentIssue": 228,
       "scope": [
         "STAB-05",
         "BQA-21"
       ],
-      "integrationBranch": "result/projects-public-media-fallback-v1",
+      "integrationBranch": null,
       "integrationBaseRef": "dementor-club-production",
       "integrationBaseCommit": "4a8e95cb669dab660a7afe381e580278d4575a2a",
       "productionBaseCommit": "4a8e95cb669dab660a7afe381e580278d4575a2a",
@@ -1881,8 +1881,8 @@
       "productionMergeAuthorized": true,
       "productionDeployAuthorized": false,
       "blockingGate": null,
-      "gateReadiness": "MERGED_AWAITING_PAGES_DEPLOY",
-      "note": "STAB-05 live corrective exact candidate 91607fdb... merged to production 287b4852... via PR #236. Exact 3-file content delta; candidate→production content diff 0. Supabase not run. Await Pages deploy + live human playback acceptance.",
+      "gateReadiness": "G8_CLEANUP_PENDING",
+      "note": "STAB-05 runtime release accepted live by owner. WAITING / G8_CLEANUP; integrationBranch null; liveRetestStatus PASS. Pages #129 exact production SHA PASS. Supabase not required/not run. STAB-06 not started.",
       "projectStage": "RELEASE",
       "candidateCommit": "91607fdbd02b815122ce25c7a8920691dda6320f",
       "releaseCandidateCommit": "91607fdbd02b815122ce25c7a8920691dda6320f",
@@ -1892,7 +1892,13 @@
       "validationConclusion": "SUCCESS",
       "exactDiffFileCount": 3,
       "productionCommit": "287b485293d68098dfd3c9302785369a735d42e2",
-      "productionMergeCommit": "287b485293d68098dfd3c9302785369a735d42e2"
+      "productionMergeCommit": "287b485293d68098dfd3c9302785369a735d42e2",
+      "productionPagesRunNumber": 129,
+      "productionPagesRunId": 35708869679,
+      "productionPagesConclusion": "SUCCESS",
+      "productionPagesExactShaVerified": true,
+      "liveRetestStatus": "PASS",
+      "liveEvidence": "operations/PROJECTS_PUBLIC_MEDIA_FALLBACK_LIVE_ACCEPTANCE_2026-09-22.md"
     }
   ],
   "referenceArtifacts": [
