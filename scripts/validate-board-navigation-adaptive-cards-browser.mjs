@@ -111,6 +111,7 @@ try{
   const semanticSnapshots={};
   for(const viewport of [{width:390,height:844,label:'390'},{width:360,height:800,label:'360'},{width:1440,height:900,label:'desktop'}]){
     const{ctx,page,errors}=await openBoard(browser,viewport);
+    await page.waitForTimeout(180);
     const initial=await boardState(page);
     expect(initial.view==='all'&&initial.active.length===1&&initial.active[0]==='all',`view-${viewport.label}: initial View is not exactly ВСЁ ${JSON.stringify(initial)}`);
     expect(JSON.stringify(initial.visible)===JSON.stringify(expected.all),`view-${viewport.label}: initial visible set drift ${JSON.stringify(initial.visible)}`);
