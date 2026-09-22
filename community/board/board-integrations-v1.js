@@ -1,12 +1,11 @@
 import {getClient,currentSession,esc} from '/community-runtime-v1.js';
-import {BOARD_FILTERS,BOARD_DETAIL_FILTERS,BOARD_SOURCE_MODES,artifactSubtypeLabel,boardProjectionThingRef,boardSourceTypeLabel,entityToBoardProjection,isProjectionVisible,matchesBoardFilter} from '/community/board/board-entity-model-v1.js';
+import {BOARD_FILTERS,BOARD_VIEW_FILTERS,BOARD_SOURCE_MODES,artifactSubtypeLabel,boardProjectionThingRef,boardSourceTypeLabel,boardViewLabel,entityToBoardProjection,isBoardView,isProjectionVisible,matchesBoardFilter} from '/community/board/board-entity-model-v1.js';
 import {getCurrentProgram} from '/current-program-v1.js';
 
 const boardHost=document.getElementById('boardHost');
 const filterHost=document.getElementById('boardFilters');
 let client=null;
-let activeFilter='all';
-let currentProgramOnly=false;
+let activeView='all';
 const currentProgramRefs=new Set(getCurrentProgram().map(item=>String(item.thingRef||'')).filter(Boolean));
 let projections=[];
 let rendering=false;
@@ -65,8 +64,14 @@ function markMemberCards(){
   });
 }
 
-function applyFilter({announce=true}={}){
+function visibleForView(card,item){
+  if(activeView==='current-program')return card.dataset.currentProgram==='1';
+  return matchesBoardFilter(item,activeView);
+}
+
+function applyView({announce=true}={}){
   markMemberCards();
+  let visibleCount=0;
   boardHost?.querySelectorAll('[data-board-source]').forEach(card=>{
     const item={
       sourceMode:card.dataset.sourceMode||null,
@@ -75,62 +80,86 @@ function applyFilter({announce=true}={}){
       sourceType:card.dataset.sourceType,
       isForming:card.dataset.forming==='1'
     };
-    const hidden=!matchesBoardFilter(item,activeFilter)||(currentProgramOnly&&card.dataset.currentProgram!=='1');
+    const hidden=!visibleForView(card,item);
+    if(!hidden)visibleCount+=1;
     card.hidden=hidden;
     card.classList.toggle('dc-board-filtered',hidden);
     card.setAttribute('aria-hidden',hidden?'true':'false');
   });
-  filterHost?.querySelectorAll('[data-board-filter]').forEach(button=>button.classList.toggle('active',button.dataset.boardFilter===activeFilter));
-  drawer?.querySelectorAll('[data-board-detail-filter]').forEach(button=>button.classList.toggle('active',button.dataset.boardDetailFilter===activeFilter));
-  const programButton=drawer?.querySelector('[data-board-program-filter]');
-  if(programButton){programButton.classList.toggle('active',currentProgramOnly);programButton.setAttribute('aria-pressed',currentProgramOnly?'true':'false')}
+  document.documentElement.dataset.boardView=activeView;
+  const viewControls=[
+    ...[...(filterHost?.querySelectorAll('[data-board-view]')||[])],
+    ...[...(drawer?.querySelectorAll('[data-board-view]')||[])]
+  ];
+  [...new Set(viewControls)].forEach(button=>{
+    const active=button.dataset.boardView===activeView;
+    button.classList.toggle('active',active);
+    button.setAttribute('aria-pressed',active?'true':'false');
+  });
   const filterButton=filterHost?.querySelector('[data-board-filter-drawer]');
-  if(filterButton)filterButton.classList.toggle('active',BOARD_DETAIL_FILTERS.some(([id])=>id===activeFilter)||currentProgramOnly);
-  if(announce){window.dispatchEvent(new CustomEvent('dc:board-filter-changed',{detail:{filter:activeFilter,currentProgram:currentProgramOnly}}));window.dispatchEvent(new CustomEvent('dc:board-layout-request'))}
+  if(filterButton){
+    const label=boardViewLabel(activeView);
+    filterButton.classList.toggle('active',activeView!=='all');
+    filterButton.textContent=activeView==='all'?'ВИД':`ВИД · ${label}`;
+    filterButton.setAttribute('aria-label',`Выбрать вид доски. Текущий: ${label}`);
+  }
+  if(announce){
+    const detail={view:activeView,filter:activeView,visibleCount};
+    window.dispatchEvent(new CustomEvent('dc:board-filter-changed',{detail}));
+    window.dispatchEvent(new CustomEvent('dc:board-view-changed',{detail}));
+    window.dispatchEvent(new CustomEvent('dc:board-layout-request'));
+  }
+}
+
+function setView(next,{announce=true,close=true}={}){
+  const view=String(next||'all');
+  if(!isBoardView(view))return false;
+  activeView=view;
+  applyView({announce});
+  if(close)closeDrawer();
+  return true;
 }
 
 function ensureProjections(){
   if(!boardHost||rendering||!projections.length)return;
   const existing=[...boardHost.querySelectorAll('[data-board-source="platform"]')];
-  if(existing.length===projections.length){applyFilter({announce:false});return}
+  if(existing.length===projections.length){applyView({announce:false});return}
   rendering=true;existing.forEach(node=>node.remove());
   boardHost.insertAdjacentHTML('beforeend',projections.map(renderProjection).join(''));
-  applyFilter({announce:false});rendering=false;
+  applyView({announce:false});rendering=false;
   window.dispatchEvent(new CustomEvent('dc:board-projections-updated'));window.dispatchEvent(new CustomEvent('dc:board-layout-request'));
 }
 
-function closeDrawer(){if(!drawer)return;drawer.hidden=true;filterHost?.querySelector('[data-board-filter-drawer]')?.setAttribute('aria-expanded','false')}
-function openDrawer(){if(!drawer)return;drawer.scrollTop=0;drawer.hidden=false;filterHost?.querySelector('[data-board-filter-drawer]')?.setAttribute('aria-expanded','true');drawer.querySelector('[data-board-detail-filter]')?.focus({preventScroll:true})}
+function closeDrawer({restoreFocus=false}={}){if(!drawer)return;const trigger=filterHost?.querySelector('[data-board-filter-drawer]');drawer.hidden=true;trigger?.setAttribute('aria-expanded','false');if(restoreFocus)trigger?.focus({preventScroll:true})}
+function openDrawer(){if(!drawer)return;drawer.scrollTop=0;drawer.hidden=false;filterHost?.querySelector('[data-board-filter-drawer]')?.setAttribute('aria-expanded','true');(drawer.querySelector('[data-board-view].active')||drawer.querySelector('[data-board-view]'))?.focus({preventScroll:true})}
 function ensureDrawer(){
   if(drawer)return drawer;
   drawer=document.createElement('div');drawer.className='dc-board-filter-drawer';drawer.hidden=true;
-  drawer.innerHTML=`<div class="dc-board-filter-drawer__head"><strong>ТИП ОБЪЕКТА</strong><button type="button" data-filter-close aria-label="Закрыть фильтры">×</button></div><div class="dc-board-filter-drawer__grid">${BOARD_DETAIL_FILTERS.map(([id,label])=>`<button class="dc-board-filter" type="button" data-board-detail-filter="${id}">${label}</button>`).join('')}</div><div class="dc-board-filter-drawer__section"><strong>ПРИНАДЛЕЖНОСТЬ</strong><button class="dc-board-filter" type="button" data-board-program-filter aria-pressed="false">ТЕКУЩАЯ ПРОГРАММА</button></div>`;
+  drawer.innerHTML=`<div class="dc-board-filter-drawer__head"><strong>ВИД ДОСКИ</strong><button type="button" data-filter-close aria-label="Закрыть выбор вида">×</button></div><div class="dc-board-filter-drawer__grid">${BOARD_VIEW_FILTERS.map(([id,label])=>`<button class="dc-board-filter" type="button" data-board-view="${id}" data-board-detail-filter="${id}"${id==='current-program'?' data-board-program-filter':''} aria-pressed="false">${label}</button>`).join('')}</div>`;
   (window.matchMedia('(max-width:900px)').matches?document.body:filterHost)?.appendChild(drawer);
-  drawer.querySelector('[data-filter-close]').onclick=closeDrawer;
+  drawer.querySelector('[data-filter-close]').onclick=()=>closeDrawer({restoreFocus:true});
   drawer.addEventListener('click',event=>{
-    const programButton=event.target.closest('[data-board-program-filter]');
-    if(programButton){currentProgramOnly=!currentProgramOnly;applyFilter();return}
-    const button=event.target.closest('[data-board-detail-filter]');if(!button)return;activeFilter=button.dataset.boardDetailFilter||'all';applyFilter();closeDrawer()
+    const button=event.target.closest('[data-board-view]');if(!button)return;
+    setView(button.dataset.boardView||'all',{close:false});closeDrawer({restoreFocus:true});
   });
   return drawer;
 }
 
 function installFilters(){
   if(!filterHost)return;
-  filterHost.innerHTML=BOARD_FILTERS.map(([id,label])=>`<button class="dc-board-filter${id==='all'?' active':''}" type="button" data-board-filter="${id}">${label}</button>`).join('')+`<button class="dc-board-filter" type="button" data-board-filter-drawer aria-expanded="false">ТИПЫ</button>`;
+  filterHost.innerHTML=BOARD_FILTERS.map(([id,label])=>`<button class="dc-board-filter${id==='all'?' active':''}" type="button" data-board-view="${id}" data-board-filter="${id}" aria-pressed="${id==='all'?'true':'false'}">${label}</button>`).join('')+`<button class="dc-board-filter" type="button" data-board-filter-drawer aria-expanded="false" aria-label="Выбрать вид доски. Текущий: ВСЁ">ВИД</button>`;
   ensureDrawer();
   filterHost.addEventListener('click',event=>{
     const drawerButton=event.target.closest('[data-board-filter-drawer]');if(drawerButton){drawer?.hidden?openDrawer():closeDrawer();return}
-    const button=event.target.closest('[data-board-filter]');if(!button)return;activeFilter=button.dataset.boardFilter||'all';if(activeFilter==='all')currentProgramOnly=false;applyFilter();closeDrawer();
+    const button=event.target.closest('[data-board-view]');if(!button)return;
+    setView(button.dataset.boardView||'all');
   });
 }
 
-function installOwnLocatorFilterBridge(){
-  document.addEventListener('click',event=>{
-    if(!event.target.closest?.('[data-mine]'))return;
-    if(activeFilter==='artifact'&&!currentProgramOnly)return;
-    activeFilter='artifact';currentProgramOnly=false;applyFilter();closeDrawer();
-  },true);
+function installViewRequests(){
+  window.addEventListener('dc:board-request-view',event=>{
+    setView(event.detail?.view||'all',{close:false});
+  });
 }
 
 async function loadPlatformProjections(){
@@ -148,9 +177,9 @@ async function loadPlatformProjections(){
 
 async function init(){
   installFilters();
-  installOwnLocatorFilterBridge();
+  installViewRequests();
   client=getClient();
   try{await loadPlatformProjections()}catch(error){console.error('[DC Board integrations]',error)}
-  if(boardHost){let timer=null;const observer=new MutationObserver(()=>{if(rendering)return;clearTimeout(timer);timer=setTimeout(()=>{markMemberCards();ensureProjections();applyFilter({announce:false});window.dispatchEvent(new CustomEvent('dc:board-layout-request'))},80)});observer.observe(boardHost,{childList:true})}
+  if(boardHost){let timer=null;const observer=new MutationObserver(()=>{if(rendering)return;clearTimeout(timer);timer=setTimeout(()=>{markMemberCards();ensureProjections();applyView({announce:false});window.dispatchEvent(new CustomEvent('dc:board-layout-request'))},80)});observer.observe(boardHost,{childList:true})}
 }
 init();

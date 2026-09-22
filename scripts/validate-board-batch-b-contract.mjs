@@ -41,8 +41,11 @@ const requiredFilterIds=['artifact','event','program','practice','project','cont
 for(const id of requiredFilterIds)expect(model.includes(`['${id}'`),`canonical Board object filter missing: ${id}`);
 expect(!model.includes("['forming'"),'ambiguous ФОРМИРУЕТСЯ global filter remains');
 expect(!model.includes("['member','ОТ ЛЮДЕЙ']")&&!model.includes("['platform','ОТ КЛУБА']"),'legacy source filter controls remain canonical');
-expect(integrations.includes("activeFilter='artifact';currentProgramOnly=false;applyFilter();closeDrawer()"),'own-card locator does not bridge to the Artifact/publications filter while clearing Program affiliation');
-expect(integrations.includes('ТИП ОБЪЕКТА'),'object-type filter drawer is not the canonical visible dimension');
+expect(integrations.includes("let activeView='all'"),'one-active Board View state is missing');
+expect(!integrations.includes('currentProgramOnly')&&!integrations.includes('activeFilter'),'legacy compound Board filter state remains');
+expect(integrations.includes('ВИД ДОСКИ'),'canonical Board View drawer is not exposed');
+expect(integrations.includes("data-board-view=\"${id}\""),'Board View controls are not owned by the existing drawer');
+expect(integrations.includes("window.addEventListener('dc:board-request-view'"),'МОЁ locator cannot request canonical ВСЁ View without creating a persistent mine filter');
 
 // No lifecycle filter or Content CMS is introduced by Batch B.
 expect(!/data-board-detail-filter=.*(expired|archived|active)/i.test(integrations),'Batch B introduces a lifecycle filter');

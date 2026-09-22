@@ -4,6 +4,8 @@ const boardHost=document.getElementById('boardHost');
 const client=getClient();
 const WORLD={w:12000,h:8000};
 const WORLD_CENTER={x:WORLD.w/2,y:WORLD.h/2};
+const CAMERA_MIN_SCALE=.03;
+const CAMERA_MAX_SCALE=1.6;
 let viewport=null;
 let extrasHost=null;
 let camera={x:0,y:0,scale:1};
@@ -23,7 +25,7 @@ function cardSizeClass(card,pos){if(pos?.size_class)return pos.size_class;if(car
 
 function updateStatus(){const el=viewport?.querySelector('.dc-spatial-status');if(el)el.textContent=`ZOOM ${Math.round(camera.scale*100)}% · X ${Math.round(-camera.x/camera.scale)} · Y ${Math.round(-camera.y/camera.scale)}`}
 function applyCamera(){if(boardHost)boardHost.style.transform=`translate(${camera.x}px,${camera.y}px) scale(${camera.scale})`;updateStatus()}
-function setCamera(next){camera={...camera,...next};camera.scale=clamp(camera.scale,.28,1.6);applyCamera()}
+function setCamera(next){camera={...camera,...next};camera.scale=clamp(camera.scale,CAMERA_MIN_SCALE,CAMERA_MAX_SCALE);applyCamera()}
 function visibleSpatialCards(){
   if(!boardHost)return[];
   return [...boardHost.querySelectorAll('.dc-notice[data-artifact],[data-board-source="platform"]')].filter(card=>{
@@ -52,13 +54,13 @@ function fitActiveContent({markManual=false}={}){
   const rect=viewport.getBoundingClientRect();
   const pad=Math.min(88,Math.max(36,rect.width*.065));
   const usableW=Math.max(160,rect.width-pad*2),usableH=Math.max(160,rect.height-pad*2);
-  const scale=clamp(Math.min(.96,usableW/width,usableH/height),.28,.96);
+  const scale=clamp(Math.min(.96,usableW/width,usableH/height),CAMERA_MIN_SCALE,.96);
   const centerX=(minX+maxX)/2,centerY=(minY+maxY)/2;
   setCamera({scale,x:rect.width/2-centerX*scale,y:rect.height/2-centerY*scale});
   if(markManual)cameraIntent='manual';
   return true;
 }
-function zoomAt(factor,cx,cy,{manual=true}={}){if(!viewport)return;const rect=viewport.getBoundingClientRect();const px=cx-rect.left,py=cy-rect.top;const wx=(px-camera.x)/camera.scale,wy=(py-camera.y)/camera.scale;const nextScale=clamp(camera.scale*factor,.28,1.6);setCamera({scale:nextScale,x:px-wx*nextScale,y:py-wy*nextScale});if(manual)cameraIntent='manual'}
+function zoomAt(factor,cx,cy,{manual=true}={}){if(!viewport)return;const rect=viewport.getBoundingClientRect();const px=cx-rect.left,py=cy-rect.top;const wx=(px-camera.x)/camera.scale,wy=(py-camera.y)/camera.scale;const nextScale=clamp(camera.scale*factor,CAMERA_MIN_SCALE,CAMERA_MAX_SCALE);setCamera({scale:nextScale,x:px-wx*nextScale,y:py-wy*nextScale});if(manual)cameraIntent='manual'}
 
 async function loadPositions(){
   const session=await currentSession(client);
@@ -152,6 +154,8 @@ function focusMine(){
   if(!viewport)return;
   const mine=boardHost?.querySelector('.dc-notice[data-artifact-owned="1"]')||boardHost?.querySelector('.dc-notice[data-artifact] [data-close-artifact]')?.closest('.dc-notice');
   if(mine){
+    if(mine.hidden||mine.classList.contains('dc-board-filtered'))window.dispatchEvent(new CustomEvent('dc:board-request-view',{detail:{view:'all',reason:'mine'}}));
+    if(mine.hidden||mine.classList.contains('dc-board-filtered'))return;
     const x=parseFloat(mine.style.left)||WORLD_CENTER.x,y=parseFloat(mine.style.top)||WORLD_CENTER.y;
     const width=Math.max(mine.offsetWidth||320,240),height=Math.max(mine.offsetHeight||220,160);
     const rect=viewport.getBoundingClientRect();const scale=clamp(Math.max(camera.scale,.82),.28,1.08);
@@ -205,7 +209,7 @@ function installPanZoom(){
     if(pts.length>=2){
       if(touchGesture?.mode!=='pinch')startPinch();
       const [a,b]=pts;const center=centerOf(a,b);const rect=viewport.getBoundingClientRect();const px=center.x-rect.left,py=center.y-rect.top;
-      const nextScale=clamp(touchGesture.startScale*(distance(a,b)/touchGesture.startDistance),.28,1.6);
+      const nextScale=clamp(touchGesture.startScale*(distance(a,b)/touchGesture.startDistance),CAMERA_MIN_SCALE,CAMERA_MAX_SCALE);
       touchGesture.moved=touchGesture.moved||Math.abs(nextScale-touchGesture.startScale)>.01||a.moved||b.moved;
       setCamera({scale:nextScale,x:px-touchGesture.worldX*nextScale,y:py-touchGesture.worldY*nextScale});
       event.preventDefault();return;
@@ -286,7 +290,9 @@ async function init(){
   if(boardHost){const observer=new MutationObserver(scheduleSpatialRefresh);observer.observe(boardHost,{childList:true})}
   window.addEventListener('dc:board-personal-state',scheduleSpatialRefresh);
   window.addEventListener('dc:board-projections-updated',()=>{placeCards();if(cameraIntent==='auto')requestAnimationFrame(()=>fitActiveContent())});
-  window.addEventListener('dc:board-filter-changed',()=>{placeCards();if(cameraIntent==='auto')requestAnimationFrame(()=>fitActiveContent())});
+  window.addEventListener('dc:board-filter-changed',()=>{placeCards()});
+  window.addEventListener('dc:board-view-changed',()=>{placeCards();requestAnimationFrame(()=>fitActiveContent())});
+  window.addEventListener('dc:board-fit-visible',()=>{placeCards();requestAnimationFrame(()=>fitActiveContent())});
   window.addEventListener('resize',()=>{placeCards();if(cameraIntent==='auto')fitActiveContent();else applyCamera()},{passive:true});
   window.dispatchEvent(new CustomEvent('dc:board-spatial-ready',{detail:{camera:'fit-active-content-v2'}}));
 }
