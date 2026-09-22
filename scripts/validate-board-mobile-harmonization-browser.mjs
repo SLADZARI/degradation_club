@@ -49,7 +49,7 @@ for(const width of [390,360]){
 
   const state=await page.evaluate(()=>{
     const box=selector=>{const el=document.querySelector(selector);if(!el)return null;const r=el.getBoundingClientRect();return{x:r.x,y:r.y,w:r.width,h:r.height,right:r.right,bottom:r.bottom,scrollWidth:el.scrollWidth,clientWidth:el.clientWidth}};
-    const boxes=selector=>[...document.querySelectorAll(selector)].filter(el=>!el.hidden&&getComputedStyle(el).display!=='none').map(el=>{const r=el.getBoundingClientRect();return{x:r.x,y:r.y,w:r.width,h:r.height,right:r.right,bottom:r.bottom,text:(el.textContent||'').trim()}});
+    const boxes=selector=>[...document.querySelectorAll(selector)].filter(el=>!el.hidden&&getComputedStyle(el).display!=='none'&&el.getClientRects().length>0).map(el=>{const r=el.getBoundingClientRect();return{x:r.x,y:r.y,w:r.width,h:r.height,right:r.right,bottom:r.bottom,text:(el.textContent||'').trim()}});
     return{
       docScrollWidth:document.documentElement.scrollWidth,
       innerWidth,
