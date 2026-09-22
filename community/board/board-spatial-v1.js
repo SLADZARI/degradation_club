@@ -152,6 +152,8 @@ function focusMine(){
   if(!viewport)return;
   const mine=boardHost?.querySelector('.dc-notice[data-artifact-owned="1"]')||boardHost?.querySelector('.dc-notice[data-artifact] [data-close-artifact]')?.closest('.dc-notice');
   if(mine){
+    if(mine.hidden||mine.classList.contains('dc-board-filtered'))window.dispatchEvent(new CustomEvent('dc:board-request-view',{detail:{view:'all',reason:'mine'}}));
+    if(mine.hidden||mine.classList.contains('dc-board-filtered'))return;
     const x=parseFloat(mine.style.left)||WORLD_CENTER.x,y=parseFloat(mine.style.top)||WORLD_CENTER.y;
     const width=Math.max(mine.offsetWidth||320,240),height=Math.max(mine.offsetHeight||220,160);
     const rect=viewport.getBoundingClientRect();const scale=clamp(Math.max(camera.scale,.82),.28,1.08);
@@ -286,7 +288,9 @@ async function init(){
   if(boardHost){const observer=new MutationObserver(scheduleSpatialRefresh);observer.observe(boardHost,{childList:true})}
   window.addEventListener('dc:board-personal-state',scheduleSpatialRefresh);
   window.addEventListener('dc:board-projections-updated',()=>{placeCards();if(cameraIntent==='auto')requestAnimationFrame(()=>fitActiveContent())});
-  window.addEventListener('dc:board-filter-changed',()=>{placeCards();if(cameraIntent==='auto')requestAnimationFrame(()=>fitActiveContent())});
+  window.addEventListener('dc:board-filter-changed',()=>{placeCards()});
+  window.addEventListener('dc:board-view-changed',()=>{placeCards();requestAnimationFrame(()=>fitActiveContent())});
+  window.addEventListener('dc:board-fit-visible',()=>{placeCards();requestAnimationFrame(()=>fitActiveContent())});
   window.addEventListener('resize',()=>{placeCards();if(cameraIntent==='auto')fitActiveContent();else applyCamera()},{passive:true});
   window.dispatchEvent(new CustomEvent('dc:board-spatial-ready',{detail:{camera:'fit-active-content-v2'}}));
 }
