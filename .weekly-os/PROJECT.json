@@ -5,14 +5,14 @@
     "project": "dementor-club",
     "documentType": "STANDARD",
     "projectStage": "BUILD",
-    "gate": "G5_BUILD",
+    "gate": "G7_RELEASE",
     "status": "APPROVED",
-    "version": "2.60",
+    "version": "2.61",
     "updated": "2026-09-22",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.59"
+    "supersedes": "2.60"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -21,7 +21,7 @@
   "defaultBranch": "main",
   "semanticSourceBranch": "dementor-club",
   "projectStage": "BUILD",
-  "gate": "G5_BUILD",
+  "gate": "G7_RELEASE",
   "readFirst": [
     ".weekly-os/PROJECT.json",
     ".weekly-os/ARTIFACT_INDEX.json",
@@ -167,7 +167,10 @@
     "operations/BOARD_MOBILE_INFORMATION_HIERARCHY_G7_PRODUCTION_PAGES_2026-09-22.md",
     "operations/BOARD_VIEW_MODEL_DECISION_V1.md",
     "operations/BOARD_VIEW_LIVE_QA_CORRECTIVE_2026-09-22.md",
-    ".weekly-os/results/board-mobile-information-hierarchy-v1.v0.4.md"
+    ".weekly-os/results/board-mobile-information-hierarchy-v1.v0.4.md",
+    ".weekly-os/results/board-mobile-information-hierarchy-v1.v0.5.md",
+    "operations/BOARD_VIEW_MODEL_CORRECTIVE_G6_2026-09-22.md",
+    "operations/BOARD_VIEW_MODEL_CORRECTIVE_G7_RELEASE_CANDIDATE_2026-09-22.md"
   ],
   "authority": {
     "mpDslCore": {
@@ -334,11 +337,11 @@
   },
   "currentResult": {
     "artifactId": "dementor-club.result.board-mobile-information-hierarchy-v1",
-    "version": "0.4",
+    "version": "0.5",
     "status": "REVIEW",
     "workStatus": "ACTIVE",
-    "path": ".weekly-os/results/board-mobile-information-hierarchy-v1.v0.4.md",
-    "gate": "G5_BUILD",
+    "path": ".weekly-os/results/board-mobile-information-hierarchy-v1.v0.5.md",
+    "gate": "G7_RELEASE",
     "parentIssue": 228,
     "scope": [
       "STAB-06",
@@ -355,8 +358,17 @@
     "productionMergeAuthorized": false,
     "productionDeployAuthorized": false,
     "blockingGate": null,
-    "gateReadiness": "CORRECTIVE_BUILD_AUTHORIZED",
-    "note": "Owner live QA found hidden compound View/filter state and camera ambiguity after the first STAB-06 deployment. Approved Board View Model v1 replaces user-facing activeFilter + currentProgramOnly composition with one canonical View at a time across mobile/desktop; mobile Program strip remains suppressed; badges/identity remain canonical. Same Result/branch; corrective starts from exact production d4d1e2f4...."
+    "gateReadiness": "READY_FOR_RELEASE_DECISION",
+    "note": "STAB-06 Board View corrective validated on exact production d4d1e2f4.... Candidate 15556578... / PR #239 DRAFT/UNMERGED. Site Integrity #1241 / 35773470724 SUCCESS. One-active View sequence passes on 390/360/desktop with exact Program identity, camera fit/pager/coordinate invariance, МОЁ locator and Relations-visible-set invariance. Exact diff 7 files. No merge/deploy/Supabase. STAB-07 not started.",
+    "candidateCommit": "155565786ac969c63a692006c145e4f4e266090d",
+    "releaseCandidateCommit": "155565786ac969c63a692006c145e4f4e266090d",
+    "integrationPullRequest": 239,
+    "validationRunNumber": 1241,
+    "validationRunId": 35773470724,
+    "validationConclusion": "SUCCESS",
+    "exactDiffFileCount": 7,
+    "g6Evidence": "operations/BOARD_VIEW_MODEL_CORRECTIVE_G6_2026-09-22.md",
+    "g7ReleaseCandidateEvidence": "operations/BOARD_VIEW_MODEL_CORRECTIVE_G7_RELEASE_CANDIDATE_2026-09-22.md"
   },
   "waitingResults": [
     {
