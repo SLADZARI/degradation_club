@@ -139,6 +139,17 @@ for(const width of widths){
         expect(detailTitleState.text==='ФУЭНХИРОЛА'&&detailTitleState.display!=='none'&&detailTitleState.visibility!=='hidden'&&detailTitleState.opacity>.01&&detailTitleBox&&detailTitleBox.width>80&&detailTitleBox.height>30,`${label}: Fuengirola H1 is not visibly rendered ${JSON.stringify({detailTitleState,detailTitleBox})}`);
         if(detailTitleBox&&detailHeroBox)expect(detailTitleBox.y+detailTitleBox.height>detailHeroBox.y&&detailTitleBox.y<detailHeroBox.y+detailHeroBox.height,`${label}: Fuengirola H1 escaped the hero ${JSON.stringify({detailTitleBox,detailHeroBox})}`);
       }
+      const detailMainText=await p.locator('main').innerText();
+      expect(detailMainText.includes('PLANNED'),`${label}: Fuengirola PLANNED truth missing`);
+      expect(detailMainText.includes('FUENGIROLA / ФУЭНХИРОЛА'),`${label}: Fuengirola confirmed city missing`);
+      expect(detailMainText.includes('ДО 7 ЧЕЛОВЕК'),`${label}: Fuengirola confirmed capacity missing`);
+      expect(detailMainText.includes('ГАБИЛЬ'),`${label}: Fuengirola Dementor relation truth missing`);
+      expect(detailMainText.includes('НЕ ОПУБЛИКОВАНА'),`${label}: Fuengirola unknown date/price state missing`);
+      expect(detailMainText.includes('Регистрация сейчас отключена.'),`${label}: Fuengirola disabled-registration truth missing`);
+      for(const marker of ['ACCESS / CLUB','DETAILS AFTER JOIN','ПОДРОБНОСТИ ПОСЛЕ','после вступления в Dementor Club']) expect(!detailMainText.includes(marker),`${label}: legacy Fuengirola Membership gate visible: ${marker}`);
+      expect(await p.locator('main a[href="/join/"]').count()===0,`${label}: Join Club still acts as Fuengirola Event CTA`);
+      const eventControls=await p.locator('main a,main button').allInnerTexts();
+      expect(!eventControls.some(text=>/(регистрац|запис|брон|waitlist|оплат)/i.test(text)),`${label}: fake Event registration/booking/payment control exposed ${JSON.stringify(eventControls)}`);
     }
 
     if(route==='/community/'){
@@ -160,6 +171,16 @@ for(const width of widths){
       const eventRow=p.locator('.dc-catalog-row[href="/events/fuengirola/"]');
       expect(await eventRow.count()===1,`${label}: Events Fuengirola row missing/duplicated`);
       if(await eventRow.count())expect(await eventRow.getAttribute('data-preview-src')==='/assets/ink/event-fuengirola-03.webp',`${label}: Events preview source is not canonical`);
+      if(await eventRow.count()){
+        const reclassify=await eventRow.getAttribute('data-reclassify-text');
+        expect(reclassify==='ГАБИЛЬ / ДО 7 / PLANNED',`${label}: Fuengirola listing reclassification is not PLANNED truth: ${reclassify}`);
+        expect(!/(JOIN|AFTER JOIN|ВСТУПЛ)/i.test(reclassify||''),`${label}: Fuengirola listing retains Membership funnel copy: ${reclassify}`);
+        if(width===1440){
+          await eventRow.focus();await p.waitForTimeout(80);
+          const status=await eventRow.locator('.dc-entity-row__status').innerText();
+          expect(status.includes('ГАБИЛЬ / ДО 7 / PLANNED'),`${label}: desktop focus does not expose corrected PLANNED reclassification: ${status}`);
+        }
+      }
       expect(await p.locator('.dc-programme-intro .dc-ink-trace-media').count()===0,`${label}: persistent INK programme media owner survived`);
       const eventsInkState=await p.evaluate(()=>{
         const intro=document.querySelector('.dc-programme-intro');
@@ -216,17 +237,22 @@ for(const width of widths){
   await c.close();
 }
 
-{
-  const c=await makeContext(390),p=await c.newPage();
+for(const width of [390,360]){
+  const c=await makeContext(width),p=await c.newPage();
   await p.goto(base+'/events/',{waitUntil:'domcontentloaded'});await p.waitForTimeout(180);
   const row=p.locator('.dc-catalog-row[href="/events/fuengirola/"]');
-  expect(await row.count()===1,'/events/@390: Fuengirola row missing');
+  expect(await row.count()===1,`/events/@${width}: Fuengirola row missing`);
   if(await row.count()){
     await row.click();
-    expect(await p.locator('.dc-catalog-mobile-preview').count()===1,'/events/@390: first tap did not expose mobile preview');
-    expect(await p.locator('.dc-catalog-mobile-preview img[src="/assets/ink/event-fuengirola-03.webp"]').count()===1,'/events/@390: mobile preview is not using canonical Fuengirola asset');
+    expect(await p.locator('.dc-catalog-mobile-preview').count()===1,`/events/@${width}: first tap did not expose mobile preview`);
+    expect(await p.locator('.dc-catalog-mobile-preview img[src="/assets/ink/event-fuengirola-03.webp"]').count()===1,`/events/@${width}: mobile preview is not using canonical Fuengirola asset`);
     await row.click();
-    try{await p.waitForURL(u=>new URL(u).pathname==='/events/fuengirola/',{timeout:2500})}catch{errors.push(`/events/@390: second tap did not open event; actual=${p.url()}`)}
+    try{await p.waitForURL(u=>new URL(u).pathname==='/events/fuengirola/',{timeout:2500})}catch{errors.push(`/events/@${width}: second tap did not open event; actual=${p.url()}`)}
+    if(new URL(p.url()).pathname==='/events/fuengirola/'){
+      const mainText=await p.locator('main').innerText();
+      expect(mainText.includes('Регистрация сейчас отключена.'),`/events/fuengirola/@${width}: disabled-registration truth missing after mobile navigation`);
+      expect(await p.locator('main a[href="/join/"]').count()===0,`/events/fuengirola/@${width}: Join Event CTA survived mobile path`);
+    }
   }
   await c.close();
 }

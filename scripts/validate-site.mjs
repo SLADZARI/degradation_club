@@ -262,6 +262,13 @@ function validatePublicInvariants(entities,config){
   if(merchCount===0&&config?.merch?.checkoutEnabled) fail('merch checkout cannot be enabled while registry has 0 merch entities');
   const event=byId.get('event-001-fuengirola');
   if(event?.status==='planned'&&config?.events?.registrationEnabled) fail('Fuengirola is planned; registration cannot be enabled before event source status changes');
+  if(exists('content/events/fuengirola.json')){
+    const mirror=json('content/events/fuengirola.json');
+    if(mirror.status!=='planned') fail('Fuengirola implementation mirror status must remain planned');
+    for(const key of ['dateTime','venue','price','registrationUrl']) if(mirror[key]!==null) fail(`Fuengirola implementation mirror ${key} must remain null while unconfirmed`);
+    if(Object.prototype.hasOwnProperty.call(mirror,'access')) fail('Fuengirola implementation mirror must not restore legacy access vocabulary');
+    if(Object.prototype.hasOwnProperty.call(mirror,'ctaLabel')) fail('Fuengirola implementation mirror must not restore legacy Event Join CTA label');
+  }
   if(config?.community?.membershipEnabled){
     const community=exists('community/index.html')?read('community/index.html'):'';
     if(/MEMBERSHIP FORMAT<\/span><strong>NOT APPROVED/i.test(community)) fail('membershipEnabled=true while Community still says MEMBERSHIP FORMAT NOT APPROVED');
