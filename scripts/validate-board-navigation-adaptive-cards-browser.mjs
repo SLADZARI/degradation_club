@@ -326,7 +326,7 @@ try{
     const dragAfter=await own.evaluate(el=>({left:el.style.left,top:el.style.top,justDragged:Number(el.dataset.boardJustDragged||0)}));
     expect(!!ownRect&&(dragAfter.left!==dragBefore.left||dragAfter.top!==dragBefore.top),`drag-${viewport.label}: own card did not move after pager navigation ${JSON.stringify({dragBefore,dragAfter})}`);
     expect(dragAfter.justDragged>Date.now()-2000,`drag-${viewport.label}: drag marker not recorded after move`);
-    expect(await page.locator('.dc-artifact-overlay').evaluate(el=>el.hidden),`drag-${viewport.label}: drag incorrectly opened Artifact overlay`);
+    expect(await page.evaluate(()=>{const overlay=document.querySelector('.dc-artifact-overlay');return !overlay||overlay.hidden}),`drag-${viewport.label}: drag incorrectly opened Artifact overlay`);
 
     if(viewport.label!=='desktop'){
       const nav=page.locator('.dc-board-filter-nav');expect(await nav.locator('[data-pos]').innerText()===`1 / ${expected.all.length}`,`pager-${viewport.label}: pager does not reflect restored visible set`);
