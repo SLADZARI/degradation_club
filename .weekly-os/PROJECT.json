@@ -5,14 +5,14 @@
     "project": "dementor-club",
     "documentType": "STANDARD",
     "projectStage": "BUILD",
-    "gate": "G5_BUILD",
+    "gate": "G7_RELEASE",
     "status": "APPROVED",
-    "version": "2.70",
+    "version": "2.71",
     "updated": "2026-09-23",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.69"
+    "supersedes": "2.70"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -21,7 +21,7 @@
   "defaultBranch": "main",
   "semanticSourceBranch": "dementor-club",
   "projectStage": "BUILD",
-  "gate": "G5_BUILD",
+  "gate": "G7_RELEASE",
   "readFirst": [
     ".weekly-os/PROJECT.json",
     ".weekly-os/ARTIFACT_INDEX.json",
@@ -198,7 +198,10 @@
     ".weekly-os/results/board-relations-visibility-toggle-v1.v1.0.md",
     "operations/ARTIFACT_SHARE_SOCIAL_PREVIEW_G8_2026-09-23.md",
     ".weekly-os/results/artifact-share-social-preview-v1.v1.0.md",
-    ".weekly-os/results/fuengirola-public-access-alignment-v1.v0.1.md"
+    ".weekly-os/results/fuengirola-public-access-alignment-v1.v0.1.md",
+    "operations/FUENGIROLA_PUBLIC_ACCESS_ALIGNMENT_G6_2026-09-23.md",
+    "operations/FUENGIROLA_PUBLIC_ACCESS_ALIGNMENT_G7_RELEASE_CANDIDATE_2026-09-23.md",
+    ".weekly-os/results/fuengirola-public-access-alignment-v1.v0.2.md"
   ],
   "authority": {
     "mpDslCore": {
@@ -365,11 +368,11 @@
   },
   "currentResult": {
     "artifactId": "dementor-club.result.fuengirola-public-access-alignment-v1",
-    "version": "0.1",
+    "version": "0.2",
     "status": "REVIEW",
     "workStatus": "ACTIVE",
-    "path": ".weekly-os/results/fuengirola-public-access-alignment-v1.v0.1.md",
-    "gate": "G5_BUILD",
+    "path": ".weekly-os/results/fuengirola-public-access-alignment-v1.v0.2.md",
+    "gate": "G7_RELEASE",
     "parentIssue": 228,
     "sourceDecisionIssue": 204,
     "scope": [
@@ -384,11 +387,20 @@
     "schemaMutationAuthorized": false,
     "semanticMutationRequired": false,
     "changeProposalRequired": false,
-    "productionMergeAuthorized": false,
-    "productionDeployAuthorized": false,
+    "productionMergeAuthorized": true,
+    "productionDeployAuthorized": true,
     "blockingGate": null,
-    "gateReadiness": "BUILD_AUTHORIZED",
-    "note": "STAB-06 and residual STAB-01..04 G8 housekeeping closed. Fuengirola BQA-10 alignment activated as the single current Result from exact production 7827a4d5.... Implements already-approved LEGACY_FUNNEL correction only; no Membership/Event schema/registration semantics change."
+    "gateReadiness": "READY_FOR_RELEASE",
+    "note": "Fuengirola BQA-10 exact 6-file candidate a63768c... passed Site Integrity #1258 and is ready for exact release. Owner instructed assistant to complete the remaining stabilization sequence. No Supabase/backend changes.",
+    "candidateCommit": "a63768c391eabd102c1dac1e9c123fc5c7b5b260",
+    "releaseCandidateCommit": "a63768c391eabd102c1dac1e9c123fc5c7b5b260",
+    "integrationPullRequest": 242,
+    "validationRunNumber": 1258,
+    "validationRunId": 35882072137,
+    "validationConclusion": "SUCCESS",
+    "exactDiffFileCount": 6,
+    "g6Evidence": "operations/FUENGIROLA_PUBLIC_ACCESS_ALIGNMENT_G6_2026-09-23.md",
+    "g7ReleaseCandidateEvidence": "operations/FUENGIROLA_PUBLIC_ACCESS_ALIGNMENT_G7_RELEASE_CANDIDATE_2026-09-23.md"
   },
   "waitingResults": [
     {
