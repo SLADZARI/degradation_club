@@ -107,6 +107,9 @@ must(communityCss.includes('minmax(0,.9fr) minmax(0,1.35fr) minmax(0,.9fr)'), 'C
 must((eventsIndex.match(/<div class="dc-programme__lane\b/g) || []).length === 1, 'Events must keep exactly one full programme lane for the real event');
 must((eventsIndex.match(/dc-programme__empty-state/g) || []).length === 0, 'Events empty lifecycle mechanics must stay out of public DOM');
 must(eventsIndex.includes('БЛИЖАЙШЕЕ СОБЫТИЕ'), 'Events visitor-facing current-event label missing');
+must(!eventsIndex.includes('DETAILS AFTER JOIN'), 'Fuengirola listing restored legacy DETAILS AFTER JOIN presentation');
+must(!eventsIndex.includes('ACCESS AFTER JOIN'), 'Fuengirola listing restored legacy ACCESS AFTER JOIN presentation');
+must(eventsIndex.includes('data-reclassify-text="ГАБИЛЬ / ДО 7 / PLANNED"'), 'Fuengirola listing reclassification must remain confirmed PLANNED truth');
 for (const marker of ['PROGRAMME / STATUS INDEX','STATE / 01','ARCHIVE RULE','NOTES / EVENTS','Пустое состояние — тоже данные','канонической записи события']) {
   must(!eventsIndex.includes(marker), `Events public mechanics returned: ${marker}`);
 }
@@ -118,6 +121,13 @@ must(!relations.includes("if(path==='/events/fuengirola/')"), 'Fuengirola route-
 must(!event.includes('dc-dementor-feature--gabil'), 'Fuengirola second dominant Gabil feature must stay removed');
 must(!event.includes('participant relation from entity record'), 'Fuengirola internal entity-record copy leaked into public UI');
 must(event.includes('ДЕМЕНТОР СОБЫТИЯ'), 'Fuengirola compact public relation label missing');
+for (const marker of ['ACCESS / CLUB','ПОДРОБНОСТИ ПОСЛЕ','после вступления в Dementor Club']) {
+  must(!event.includes(marker), `Fuengirola legacy Membership/Event gate returned: ${marker}`);
+}
+must(!/<main[\s\S]*?href=["']\/join\/["']/i.test(event), 'Fuengirola main must not own Join Club as Event CTA');
+must(event.includes('STATUS / PLANNED'), 'Fuengirola terminal status label missing');
+must(event.includes('СОБЫТИЕ<br><span class="dc-acid">ЗАПЛАНИРОВАНО.</span>'), 'Fuengirola planned terminal heading missing');
+must(event.includes('Регистрация сейчас отключена.'), 'Fuengirola disabled-registration truth missing');
 
 // Merch is one stable public entity set. Runtime enriches state; it must not delete static catalog entities.
 must(merch.includes('LIVE CATALOG'), 'Merch live-catalog framing missing');
