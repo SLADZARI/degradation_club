@@ -742,6 +742,18 @@ begin
 end;
 $function$;
 
+drop trigger if exists dc_artifact_board_position_on_publish_v1 on public.dc_artifacts;
+create trigger dc_artifact_board_position_on_publish_v1
+after insert or update of status,visibility,published_at,expires_at
+on public.dc_artifacts
+for each row
+when (
+  new.status='active'
+  and new.visibility in ('community','circle')
+  and new.published_at is not null
+)
+execute function public.dc_ensure_artifact_board_position_v1();
+
 -- Storage must no longer treat active Membership as bucket-wide media access.
 drop policy if exists dc_community_artifacts_storage_select_members on storage.objects;
 drop policy if exists dc_community_artifacts_storage_select_board_guests on storage.objects;
