@@ -7,12 +7,12 @@
     "projectStage": "BUILD",
     "gate": "G8_CLEANUP",
     "status": "APPROVED",
-    "version": "2.66",
+    "version": "2.67",
     "updated": "2026-09-23",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.65"
+    "supersedes": "2.66"
   },
   "currentArtifacts": [
     {
@@ -2404,7 +2404,7 @@
       "changeProposalRequired": false,
       "productionMergeAuthorized": true,
       "productionDeployAuthorized": true,
-      "gateReadiness": "MERGED_AWAITING_PAGES_DEPLOY",
+      "gateReadiness": "G8_CLOSED",
       "candidateCommit": "a63768c391eabd102c1dac1e9c123fc5c7b5b260",
       "releaseCandidateCommit": "a63768c391eabd102c1dac1e9c123fc5c7b5b260",
       "integrationPullRequest": 242,
@@ -2422,7 +2422,8 @@
       "productionPagesRunId": 35885907613,
       "productionPagesConclusion": "SUCCESS",
       "productionPagesExactShaVerified": true,
-      "note": "BQA-10 Fuengirola legacy Membership/Join funnel aligned to approved authority, deployed at exact production df8a24ec..., owner live PASS, G8 closed."
+      "note": "BQA-10 Fuengirola legacy Membership/Join funnel aligned to approved authority, deployed at exact production df8a24ec..., owner live PASS, G8 closed. No active implementation ownership.",
+      "releaseExecutionStatus": "LIVE_PASS"
     },
     {
       "artifactId": "dementor-club.operations.fuengirola-public-access-alignment-g6-2026-09-23",
