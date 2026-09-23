@@ -231,6 +231,17 @@ try{
     expect(pagerTotal>=3,`pager-${viewport.label}: fixture needs at least 3 visible cards, got ${pagerTotal}`);
     expect(pagerStart.pager===`1 / ${pagerTotal}`,`pager-${viewport.label}: expected start 1 / N, got ${pagerStart.pager}`);
     const pagerPositions=pagerStart.positions;
+    await page.evaluate(()=>{
+      globalThis.__DC_PAGER_QA_TRACE=[];
+      const push=(kind,detail=null)=>globalThis.__DC_PAGER_QA_TRACE.push({t:Math.round(performance.now()),kind,detail});
+      for(const name of ['dc:board-user-navigation','dc:board-filter-changed','dc:board-view-changed','dc:board-focus-target','dc:board-layout-request','dc:board-layout-updated','dc:board-projections-updated']){
+        window.addEventListener(name,event=>push(name,event.detail||null));
+      }
+      const pos=document.querySelector('.dc-board-filter-nav [data-pos]');
+      if(pos)new MutationObserver(()=>push('pager-text',pos.textContent?.trim()||'')).observe(pos,{childList:true,subtree:true,characterData:true});
+      const world=document.querySelector('.dc-spatial-world');
+      if(world)new MutationObserver(()=>push('camera-transform',world.style.transform||'')).observe(world,{attributes:true,attributeFilter:['style']});
+    });
 
     await nav.locator('[data-next]').click();await page.waitForTimeout(90);
     const pager2=await pagerSnapshot(page);
@@ -263,6 +274,8 @@ try{
     expect(pagerWrap1.pager===`1 / ${pagerTotal}`,`pager-${viewport.label}: N / N → did not wrap to 1 / N (${pagerWrap1.pager})`);
     expect(pagerWrap1.focused===pagerStart.order[0]&&pagerWrap1.centered,`pager-${viewport.label}: forward wrap did not focus/center first card`);
     expect(samePositions(pagerPositions,pagerWrap1.positions),`pager-${viewport.label}: pager navigation mutated persisted card coordinates`);
+    const pagerTrace=await page.evaluate(()=>globalThis.__DC_PAGER_QA_TRACE||[]);
+    console.log(`PAGER_QA_TRACE ${viewport.label} ${JSON.stringify(pagerTrace)}`);
 
     // View semantics must remain composable after pager camera navigation.
     const afterPagerProgram=await chooseView(page,'current-program');
