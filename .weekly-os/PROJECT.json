@@ -5,14 +5,14 @@
     "project": "dementor-club",
     "documentType": "STANDARD",
     "projectStage": "BUILD",
-    "gate": "G8_CLEANUP",
+    "gate": "G4_SEMANTIC_CONTRACT",
     "status": "APPROVED",
-    "version": "2.74",
+    "version": "2.75",
     "updated": "2026-09-23",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.73"
+    "supersedes": "2.74"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -21,7 +21,7 @@
   "defaultBranch": "main",
   "semanticSourceBranch": "dementor-club",
   "projectStage": "BUILD",
-  "gate": "G8_CLEANUP",
+  "gate": "G4_SEMANTIC_CONTRACT",
   "readFirst": [
     ".weekly-os/PROJECT.json",
     ".weekly-os/ARTIFACT_INDEX.json",
@@ -208,7 +208,9 @@
     "operations/FUENGIROLA_PUBLIC_ACCESS_ALIGNMENT_G8_2026-09-23.md",
     ".weekly-os/results/fuengirola-public-access-alignment-v1.v1.0.md",
     "operations/STABILIZATION_TECHNICAL_BASELINE_2026-09-23.md",
-    "operations/BEHAVIORAL_LIVE_ACCEPTANCE_PROTOCOL_2026-09-23.md"
+    "operations/BEHAVIORAL_LIVE_ACCEPTANCE_PROTOCOL_2026-09-23.md",
+    "operations/ARTIFACT_COLLABORATION_V1.md",
+    ".weekly-os/results/artifact-collaboration-v1.v0.1.md"
   ],
   "authority": {
     "mpDslCore": {
@@ -373,7 +375,32 @@
     "ARCHITECTURE": null,
     "DESIGN": null
   },
-  "currentResult": null,
+  "currentResult": {
+    "artifactId": "dementor-club.result.artifact-collaboration-v1",
+    "version": "0.1",
+    "status": "REVIEW",
+    "workStatus": "ACTIVE",
+    "path": ".weekly-os/results/artifact-collaboration-v1.v0.1.md",
+    "gate": "G4_SEMANTIC_CONTRACT",
+    "scope": [
+      "idea participation",
+      "invitation / join",
+      "circle visibility",
+      "explicit slot grants",
+      "participant-scoped RELATED_TO"
+    ],
+    "integrationBranch": "result/artifact-collaboration-v1",
+    "integrationBaseRef": "dementor-club-production",
+    "integrationBaseCommit": "df8a24eca2bcca25339f128c7da93982515cf442",
+    "productionBaseCommit": "df8a24eca2bcca25339f128c7da93982515cf442",
+    "implementationStartAuthorized": true,
+    "schemaMutationAuthorized": false,
+    "liveDatabaseMutationAuthorized": false,
+    "productionMergeAuthorized": false,
+    "productionDeployAuthorized": false,
+    "gateReadiness": "G4_INVENTORY_REQUIRED",
+    "note": "Artifact Collaboration v1 activated after owner approval. DEV1 owns backend/Supabase inventory and contract; DEV2 owns frontend/UX inventory. No live DB mutation until explicit gate."
+  },
   "waitingResults": [
     {
       "artifactId": "dementor-club.result.board-share-receive-ritual-v1",
