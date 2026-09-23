@@ -311,6 +311,23 @@ try{
     expect(pan.found,`pan-${viewport.label}: could not locate empty spatial background for pan regression`);
     expect(!pan.found||pan.after!==pan.before,`pan-${viewport.label}: pan did not move canonical camera after pager navigation`);
 
+    // Drag remains owned by spatial runtime and still works after pager camera navigation.
+    const own=page.locator('.dc-notice[data-artifact="qa-artifact-own"]');
+    expect(await own.evaluate(el=>el.classList.contains('is-own-movable')||el.classList.contains('is-admin-movable')),`drag-${viewport.label}: own card is not movable in QA fixture`);
+    const dragBefore=await own.evaluate(el=>({left:el.style.left,top:el.style.top}));
+    const ownRect=await own.boundingBox();
+    if(ownRect){
+      await page.mouse.move(ownRect.x+ownRect.width*.5,ownRect.y+Math.min(42,ownRect.height*.35));
+      await page.mouse.down();
+      await page.mouse.move(ownRect.x+ownRect.width*.5+36,ownRect.y+Math.min(42,ownRect.height*.35)+24,{steps:5});
+      await page.mouse.up();
+      await page.waitForTimeout(90);
+    }
+    const dragAfter=await own.evaluate(el=>({left:el.style.left,top:el.style.top,justDragged:Number(el.dataset.boardJustDragged||0)}));
+    expect(!!ownRect&&(dragAfter.left!==dragBefore.left||dragAfter.top!==dragBefore.top),`drag-${viewport.label}: own card did not move after pager navigation ${JSON.stringify({dragBefore,dragAfter})}`);
+    expect(dragAfter.justDragged>Date.now()-2000,`drag-${viewport.label}: drag marker not recorded after move`);
+    expect(await page.locator('.dc-artifact-overlay').evaluate(el=>el.hidden),`drag-${viewport.label}: drag incorrectly opened Artifact overlay`);
+
     if(viewport.label!=='desktop'){
       const nav=page.locator('.dc-board-filter-nav');expect(await nav.locator('[data-pos]').innerText()===`1 / ${expected.all.length}`,`pager-${viewport.label}: pager does not reflect restored visible set`);
     }
@@ -362,4 +379,4 @@ try{
 }finally{await browser.close();server.close()}
 
 if(failures.length){console.error(`Board navigation/adaptive cards acceptance failed (${failures.length})`);for(const failure of failures)console.error(`- ${failure}`);process.exit(1)}
-console.log('Board navigation/adaptive cards browser acceptance passed: real pager →/←/wrap on 390/360/desktop delegates to canonical spatial camera + one-active View + Program + zoom/pan + coordinate invariance + relations + stale-focus companion regression + adaptive media');
+console.log('Board navigation/adaptive cards browser acceptance passed: real pager →/←/wrap on 390/360/desktop delegates to canonical spatial camera + target centering/camera state + one-active View + Program + zoom/pan/drag + pager coordinate invariance + relations + stale-focus companion regression + adaptive media');
