@@ -327,8 +327,7 @@ begin
     coalesce(
       nullif(btrim(p.display_name),''),
       nullif(btrim(p.nickname),''),
-      nullif(btrim(p.full_name),''),
-      'Участник клуба'
+      'Пользователь ' || upper(left(p.id::text,8))
     ) as display_name,
     nullif(btrim(p.nickname),'') as nickname,
     p.avatar_url,
@@ -347,11 +346,11 @@ begin
       v_query in lower(
         coalesce(p.display_name,'') || ' ' ||
         coalesce(p.nickname,'') || ' ' ||
-        coalesce(p.full_name,'')
+        'user-' || left(p.id::text,8)
       )
     ) > 0
   order by
-    coalesce(nullif(btrim(p.display_name),''),nullif(btrim(p.nickname),''),nullif(btrim(p.full_name),''),p.id::text),
+    coalesce(nullif(btrim(p.display_name),''),nullif(btrim(p.nickname),''),'Пользователь ' || upper(left(p.id::text,8))),
     p.id
   limit v_limit;
 end;
@@ -400,8 +399,7 @@ begin
     coalesce(
       nullif(btrim(p.display_name),''),
       nullif(btrim(p.nickname),''),
-      nullif(btrim(p.full_name),''),
-      'Участник клуба'
+      'Пользователь ' || upper(left(p.id::text,8))
     ),
     nullif(btrim(p.nickname),''),
     p.avatar_url,
