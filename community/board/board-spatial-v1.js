@@ -41,10 +41,14 @@ function cardWorldBounds(card){
 }
 function focusSpatialTarget(card,{scale=.92}={}){
   if(!viewport||!card||card.hidden||card.classList.contains('dc-board-filtered'))return false;
-  const bounds=cardWorldBounds(card);
   const rect=viewport.getBoundingClientRect();
+  const cardRect=card.getBoundingClientRect();
+  const currentScale=Math.max(CAMERA_MIN_SCALE,camera.scale||1);
+  const screenCenterX=(cardRect.left+cardRect.right)/2-rect.left;
+  const screenCenterY=(cardRect.top+cardRect.bottom)/2-rect.top;
+  const centerX=(screenCenterX-camera.x)/currentScale;
+  const centerY=(screenCenterY-camera.y)/currentScale;
   const nextScale=clamp(scale,CAMERA_MIN_SCALE,CAMERA_MAX_SCALE);
-  const centerX=(bounds.left+bounds.right)/2,centerY=(bounds.top+bounds.bottom)/2;
   setCamera({scale:nextScale,x:rect.width/2-centerX*nextScale,y:rect.height/2-centerY*nextScale});
   cameraIntent='manual';
   const sequence=++focusSequence;
