@@ -7,12 +7,12 @@
     "projectStage": "BUILD",
     "gate": "G8_CLEANUP",
     "status": "APPROVED",
-    "version": "2.73",
+    "version": "2.74",
     "updated": "2026-09-23",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.72"
+    "supersedes": "2.73"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -207,7 +207,8 @@
     "operations/FUENGIROLA_PUBLIC_ACCESS_ALIGNMENT_LIVE_ACCEPTANCE_2026-09-23.md",
     "operations/FUENGIROLA_PUBLIC_ACCESS_ALIGNMENT_G8_2026-09-23.md",
     ".weekly-os/results/fuengirola-public-access-alignment-v1.v1.0.md",
-    "operations/STABILIZATION_TECHNICAL_BASELINE_2026-09-23.md"
+    "operations/STABILIZATION_TECHNICAL_BASELINE_2026-09-23.md",
+    "operations/BEHAVIORAL_LIVE_ACCEPTANCE_PROTOCOL_2026-09-23.md"
   ],
   "authority": {
     "mpDslCore": {
