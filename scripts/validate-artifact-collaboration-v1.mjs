@@ -56,6 +56,8 @@ expect(!/create table public\.[^;\n]*(slot|capacity|reward)/i.test(migration), '
 expect(migration.includes("visibility in ('community','circle')"), 'COMMUNITY/CIRCLE visibility allow-list missing');
 expect(migration.includes("visibility <> 'circle' or artifact_type = 'idea'"), 'CIRCLE=Idea DB invariant missing');
 expect(migration.includes('dc_set_artifact_visibility_v1'), 'draft visibility RPC missing');
+expect(migration.includes('create trigger dc_artifact_board_position_on_publish_v1'), 'canonical Board position trigger replacement missing');
+expect(migration.includes("new.visibility in ('community','circle')"), 'Board position trigger does not admit CIRCLE');
 
 // Invite target is existing profile, bounded and email-free.
 expect(Boolean(inviteCandidates), 'safe invite candidate RPC missing');
