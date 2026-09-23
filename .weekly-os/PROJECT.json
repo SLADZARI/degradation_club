@@ -5,14 +5,14 @@
     "project": "dementor-club",
     "documentType": "STANDARD",
     "projectStage": "BUILD",
-    "gate": "G4_SEMANTIC_CONTRACT",
+    "gate": "G5_BUILD",
     "status": "APPROVED",
-    "version": "2.75",
-    "updated": "2026-09-23",
+    "version": "2.76",
+    "updated": "2026-09-24",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.74"
+    "supersedes": "2.75"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -21,7 +21,7 @@
   "defaultBranch": "main",
   "semanticSourceBranch": "dementor-club",
   "projectStage": "BUILD",
-  "gate": "G4_SEMANTIC_CONTRACT",
+  "gate": "G5_BUILD",
   "readFirst": [
     ".weekly-os/PROJECT.json",
     ".weekly-os/ARTIFACT_INDEX.json",
@@ -210,7 +210,10 @@
     "operations/STABILIZATION_TECHNICAL_BASELINE_2026-09-23.md",
     "operations/BEHAVIORAL_LIVE_ACCEPTANCE_PROTOCOL_2026-09-23.md",
     "operations/ARTIFACT_COLLABORATION_V1.md",
-    ".weekly-os/results/artifact-collaboration-v1.v0.1.md"
+    ".weekly-os/results/artifact-collaboration-v1.v0.1.md",
+    ".weekly-os/results/artifact-collaboration-v1.v0.2.md",
+    "operations/ARTIFACT_COLLABORATION_BACKEND_G4_CONTRACT_2026-09-24.md",
+    "operations/ARTIFACT_COLLABORATION_BACKEND_G5_CHECKPOINT_2026-09-24.md"
   ],
   "authority": {
     "mpDslCore": {
@@ -377,11 +380,11 @@
   },
   "currentResult": {
     "artifactId": "dementor-club.result.artifact-collaboration-v1",
-    "version": "0.1",
+    "version": "0.2",
     "status": "REVIEW",
     "workStatus": "ACTIVE",
-    "path": ".weekly-os/results/artifact-collaboration-v1.v0.1.md",
-    "gate": "G4_SEMANTIC_CONTRACT",
+    "path": ".weekly-os/results/artifact-collaboration-v1.v0.2.md",
+    "gate": "G5_BUILD",
     "scope": [
       "idea participation",
       "invitation / join",
@@ -394,12 +397,18 @@
     "integrationBaseCommit": "df8a24eca2bcca25339f128c7da93982515cf442",
     "productionBaseCommit": "df8a24eca2bcca25339f128c7da93982515cf442",
     "implementationStartAuthorized": true,
-    "schemaMutationAuthorized": false,
+    "schemaMutationAuthorized": true,
     "liveDatabaseMutationAuthorized": false,
     "productionMergeAuthorized": false,
     "productionDeployAuthorized": false,
-    "gateReadiness": "G4_INVENTORY_REQUIRED",
-    "note": "Artifact Collaboration v1 activated after owner approval. DEV1 owns backend/Supabase inventory and contract; DEV2 owns frontend/UX inventory. No live DB mutation until explicit gate."
+    "g4BackendEvidence": "operations/ARTIFACT_COLLABORATION_BACKEND_G4_CONTRACT_2026-09-24.md",
+    "g4BackendStatus": "PASS",
+    "g5BackendEvidence": "operations/ARTIFACT_COLLABORATION_BACKEND_G5_CHECKPOINT_2026-09-24.md",
+    "g5BackendCandidateCommit": "2de0fa9bf6c505d4a1e20aa95edc2b51fdca9af0",
+    "g5BackendStaticStatus": "PASS",
+    "g5SqlExecutionStatus": "NOT_RUN",
+    "gateReadiness": "G5_SCHEMA_DRAFT_STATIC_PASS",
+    "note": "DEV1 exact owner inventory passed. Branch-only backend migration + static security validator exist. No live Supabase mutation or SQL execution validation has been performed."
   },
   "waitingResults": [
     {
