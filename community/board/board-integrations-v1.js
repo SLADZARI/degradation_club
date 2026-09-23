@@ -140,7 +140,7 @@ function ensureDrawer(){
   (window.matchMedia('(max-width:900px)').matches?document.body:filterHost)?.appendChild(drawer);
   drawer.querySelector('[data-filter-close]').onclick=()=>closeDrawer({restoreFocus:true});
   drawer.addEventListener('click',event=>{
-    const button=event.target.closest('[data-board-view]');if(!button)return;
+    const button=event.target.closest('button[data-board-view]');if(!button||!drawer.contains(button))return;
     setView(button.dataset.boardView||'all',{close:false});closeDrawer({restoreFocus:true});
   });
   return drawer;
@@ -151,8 +151,8 @@ function installFilters(){
   filterHost.innerHTML=BOARD_FILTERS.map(([id,label])=>`<button class="dc-board-filter${id==='all'?' active':''}" type="button" data-board-view="${id}" data-board-filter="${id}" aria-pressed="${id==='all'?'true':'false'}">${label}</button>`).join('')+`<button class="dc-board-filter" type="button" data-board-filter-drawer aria-expanded="false" aria-label="Выбрать вид доски. Текущий: ВСЁ">ВИД</button>`;
   ensureDrawer();
   filterHost.addEventListener('click',event=>{
-    const drawerButton=event.target.closest('[data-board-filter-drawer]');if(drawerButton){drawer?.hidden?openDrawer():closeDrawer();return}
-    const button=event.target.closest('[data-board-view]');if(!button)return;
+    const drawerButton=event.target.closest('button[data-board-filter-drawer]');if(drawerButton&&filterHost.contains(drawerButton)){drawer?.hidden?openDrawer():closeDrawer();return}
+    const button=event.target.closest('button[data-board-view]');if(!button||!filterHost.contains(button))return;
     setView(button.dataset.boardView||'all');
   });
 }
