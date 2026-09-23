@@ -31,7 +31,7 @@ productionDeployAuthorized: false
 g4BackendEvidence: operations/ARTIFACT_COLLABORATION_BACKEND_G4_CONTRACT_2026-09-24.md
 g4BackendStatus: PASS
 g5BackendEvidence: operations/ARTIFACT_COLLABORATION_BACKEND_G5_CHECKPOINT_2026-09-24.md
-g5BackendCandidateCommit: 2de0fa9bf6c505d4a1e20aa95edc2b51fdca9af0
+g5BackendCandidateCommit: 06ba2aa94c990a2e0bce4a6729a4f6963acb0e19
 g5BackendMigration: supabase/migrations/20260924002500_artifact_collaboration_v1.sql
 g5BackendValidator: scripts/validate-artifact-collaboration-v1.mjs
 g5BackendStaticStatus: PASS
@@ -132,7 +132,7 @@ CIRCLE is fail-closed.
 
 Exact backend candidate:
 
-result/artifact-collaboration-v1@2de0fa9bf6c505d4a1e20aa95edc2b51fdca9af0
+result/artifact-collaboration-v1@06ba2aa94c990a2e0bce4a6729a4f6963acb0e19
 
 Exact production baseline:
 
@@ -140,7 +140,7 @@ df8a24eca2bcca25339f128c7da93982515cf442
 
 At checkpoint:
 
-- ahead_by = 6;
+- ahead_by = 8;
 - behind_by = 0;
 - production remained exact baseline;
 - branch diff contained only the backend contract evidence, migration, validator and Site Integrity wiring.
