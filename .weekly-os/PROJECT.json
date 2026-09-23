@@ -5,14 +5,14 @@
     "project": "dementor-club",
     "documentType": "STANDARD",
     "projectStage": "BUILD",
-    "gate": "G7_RELEASE",
+    "gate": "G8_CLEANUP",
     "status": "APPROVED",
-    "version": "2.72",
+    "version": "2.73",
     "updated": "2026-09-23",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.71"
+    "supersedes": "2.72"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -21,7 +21,7 @@
   "defaultBranch": "main",
   "semanticSourceBranch": "dementor-club",
   "projectStage": "BUILD",
-  "gate": "G7_RELEASE",
+  "gate": "G8_CLEANUP",
   "readFirst": [
     ".weekly-os/PROJECT.json",
     ".weekly-os/ARTIFACT_INDEX.json",
@@ -203,7 +203,11 @@
     "operations/FUENGIROLA_PUBLIC_ACCESS_ALIGNMENT_G7_RELEASE_CANDIDATE_2026-09-23.md",
     ".weekly-os/results/fuengirola-public-access-alignment-v1.v0.2.md",
     "operations/FUENGIROLA_PUBLIC_ACCESS_ALIGNMENT_G7_MERGE_2026-09-23.md",
-    ".weekly-os/results/fuengirola-public-access-alignment-v1.v0.3.md"
+    ".weekly-os/results/fuengirola-public-access-alignment-v1.v0.3.md",
+    "operations/FUENGIROLA_PUBLIC_ACCESS_ALIGNMENT_LIVE_ACCEPTANCE_2026-09-23.md",
+    "operations/FUENGIROLA_PUBLIC_ACCESS_ALIGNMENT_G8_2026-09-23.md",
+    ".weekly-os/results/fuengirola-public-access-alignment-v1.v1.0.md",
+    "operations/STABILIZATION_TECHNICAL_BASELINE_2026-09-23.md"
   ],
   "authority": {
     "mpDslCore": {
@@ -368,46 +372,7 @@
     "ARCHITECTURE": null,
     "DESIGN": null
   },
-  "currentResult": {
-    "artifactId": "dementor-club.result.fuengirola-public-access-alignment-v1",
-    "version": "0.3",
-    "status": "REVIEW",
-    "workStatus": "ACTIVE",
-    "path": ".weekly-os/results/fuengirola-public-access-alignment-v1.v0.3.md",
-    "gate": "G7_RELEASE",
-    "parentIssue": 228,
-    "sourceDecisionIssue": 204,
-    "scope": [
-      "BQA-10",
-      "Fuengirola public access alignment"
-    ],
-    "integrationBranch": "result/fuengirola-public-access-alignment-v1",
-    "integrationBaseRef": "dementor-club-production",
-    "integrationBaseCommit": "7827a4d5e8bee21c142390a9e9ea78e4542e1ee9",
-    "productionBaseCommit": "7827a4d5e8bee21c142390a9e9ea78e4542e1ee9",
-    "implementationStartAuthorized": true,
-    "schemaMutationAuthorized": false,
-    "semanticMutationRequired": false,
-    "changeProposalRequired": false,
-    "productionMergeAuthorized": true,
-    "productionDeployAuthorized": true,
-    "blockingGate": null,
-    "gateReadiness": "MERGED_AWAITING_PAGES_DEPLOY",
-    "note": "Fuengirola BQA-10 exact validated candidate merged via PR #242 to production df8a24ec.... Candidate→production content diff = 0; exact 6-file delta. Supabase not required. Awaiting manual canonical Pages workflow dispatch because connected GitHub tool exposes no workflow_dispatch mutation.",
-    "candidateCommit": "a63768c391eabd102c1dac1e9c123fc5c7b5b260",
-    "releaseCandidateCommit": "a63768c391eabd102c1dac1e9c123fc5c7b5b260",
-    "integrationPullRequest": 242,
-    "validationRunNumber": 1258,
-    "validationRunId": 35882072137,
-    "validationConclusion": "SUCCESS",
-    "exactDiffFileCount": 6,
-    "g6Evidence": "operations/FUENGIROLA_PUBLIC_ACCESS_ALIGNMENT_G6_2026-09-23.md",
-    "g7ReleaseCandidateEvidence": "operations/FUENGIROLA_PUBLIC_ACCESS_ALIGNMENT_G7_RELEASE_CANDIDATE_2026-09-23.md",
-    "productionCommit": "df8a24eca2bcca25339f128c7da93982515cf442",
-    "productionMergeCommit": "df8a24eca2bcca25339f128c7da93982515cf442",
-    "liveRetestStatus": "MERGED_AWAITING_DEPLOY",
-    "mergeEvidence": "operations/FUENGIROLA_PUBLIC_ACCESS_ALIGNMENT_G7_MERGE_2026-09-23.md"
-  },
+  "currentResult": null,
   "waitingResults": [
     {
       "artifactId": "dementor-club.result.board-share-receive-ritual-v1",
@@ -807,5 +772,15 @@
     "activeBatch": "ARTIFACT_DETAIL_TERMINAL_STATE",
     "scopeFreeze": true,
     "nextAfterStable": "CONTRIBUTION_RECEIPT_RUNTIME_THEN_ISSUE_227"
+  },
+  "stabilizationTechnicalBaseline": {
+    "productionCommit": "df8a24eca2bcca25339f128c7da93982515cf442",
+    "pagesRunNumber": 134,
+    "pagesRunId": 35885907613,
+    "pagesConclusion": "SUCCESS",
+    "recordedAt": "2026-09-23",
+    "evidence": "operations/STABILIZATION_TECHNICAL_BASELINE_2026-09-23.md",
+    "parentIssue": 228,
+    "status": "TECHNICAL_BASELINE_RECORDED_BEHAVIORAL_ACCEPTANCE_REMAINS"
   }
 }
