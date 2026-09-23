@@ -74,11 +74,54 @@ async function boardState(page){
       positions,
       pager,
       transform:document.querySelector('.dc-spatial-world')?.style.transform||'',
+      cameraStatus:document.querySelector('.dc-spatial-status')?.textContent?.trim()||'',
       fit:!!viewport&&rects.every(r=>r.left>=viewport.left-14&&r.right<=viewport.right+14&&r.top>=viewport.top-14&&r.bottom<=viewport.bottom+14),
       overflow:document.documentElement.scrollWidth<=innerWidth+2,
       programStrip:document.querySelector('.dc-board-program')?getComputedStyle(document.querySelector('.dc-board-program')).display:null
     };
   });
+}
+
+async function pagerSnapshot(page){
+  return page.evaluate(()=>{
+    const normalize=node=>node?.dataset?.thingRef||node?.dataset?.artifact||node?.dataset?.sourceId||null;
+    const visible=[...document.querySelectorAll('[data-board-source]')].filter(node=>!node.hidden&&!node.classList.contains('dc-board-filtered')&&getComputedStyle(node).display!=='none');
+    const focused=visible.find(node=>node.classList.contains('dc-board-focus-step'))||null;
+    const viewport=document.querySelector('.dc-spatial-viewport')?.getBoundingClientRect();
+    const focusedRect=focused?.getBoundingClientRect();
+    const positions=Object.fromEntries(visible.map(node=>[normalize(node),{left:node.style.left,top:node.style.top}]));
+    return{
+      order:visible.map(normalize),
+      pager:document.querySelector('.dc-board-filter-nav [data-pos]')?.textContent?.trim()||'',
+      transform:document.querySelector('.dc-spatial-world')?.style.transform||'',
+      cameraStatus:document.querySelector('.dc-spatial-status')?.textContent?.trim()||'',
+      focused:normalize(focused),
+      centered:!!viewport&&!!focusedRect&&Math.abs((focusedRect.left+focusedRect.right)/2-(viewport.left+viewport.right)/2)<=3&&Math.abs((focusedRect.top+focusedRect.bottom)/2-(viewport.top+viewport.bottom)/2)<=3,
+      positions
+    };
+  });
+}
+
+async function panBoard(page){
+  const point=await page.evaluate(()=>{
+    const viewport=document.querySelector('.dc-spatial-viewport')?.getBoundingClientRect();if(!viewport)return null;
+    const blocked=node=>node?.closest?.('.dc-notice,.dc-projection,.dc-spatial-controls,.dc-board-filters-v2,.dc-board-program,a,button,input,textarea,dialog');
+    const xs=[.08,.15,.85,.92,.5],ys=[.3,.5,.7,.88];
+    for(const xf of xs)for(const yf of ys){
+      const x=viewport.left+viewport.width*xf,y=viewport.top+viewport.height*yf;
+      const node=document.elementFromPoint(x,y);if(node&&!blocked(node))return{x,y};
+    }
+    return null;
+  });
+  if(!point)return{found:false,before:'',after:''};
+  const before=await page.locator('.dc-spatial-world').evaluate(el=>el.style.transform);
+  await page.mouse.move(point.x,point.y);
+  await page.mouse.down();
+  await page.mouse.move(point.x+54,point.y+31,{steps:5});
+  await page.mouse.up();
+  await page.waitForTimeout(60);
+  const after=await page.locator('.dc-spatial-world').evaluate(el=>el.style.transform);
+  return{found:true,before,after};
 }
 
 async function chooseView(page,view){
@@ -181,6 +224,53 @@ try{
     expect(samePositions(persisted,allAgain.positions),`view-${viewport.label}: ВСЁ fit mutated persisted card coordinates`);
     expect(allAgain.overflow,`view-${viewport.label}: horizontal overflow introduced`);
 
+    // Live pager corrective: UI/index owner must delegate movement to canonical spatial camera owner.
+    const nav=page.locator('.dc-board-filter-nav');
+    const pagerStart=await pagerSnapshot(page);
+    const pagerTotal=pagerStart.order.length;
+    expect(pagerTotal>=3,`pager-${viewport.label}: fixture needs at least 3 visible cards, got ${pagerTotal}`);
+    expect(pagerStart.pager===`1 / ${pagerTotal}`,`pager-${viewport.label}: expected start 1 / N, got ${pagerStart.pager}`);
+    const pagerPositions=pagerStart.positions;
+
+    await nav.locator('[data-next]').click();await page.waitForTimeout(90);
+    const pager2=await pagerSnapshot(page);
+    expect(pager2.pager===`2 / ${pagerTotal}`,`pager-${viewport.label}: → did not advance counter to 2 / N (${pager2.pager})`);
+    expect(pager2.focused===pagerStart.order[1],`pager-${viewport.label}: → did not focus target #2 ${JSON.stringify({expected:pagerStart.order[1],actual:pager2.focused})}`);
+    expect(pager2.centered,`pager-${viewport.label}: target #2 is not centered by canonical camera`);
+    expect(pager2.transform!==pagerStart.transform&&pager2.cameraStatus!==pagerStart.cameraStatus,`pager-${viewport.label}: → changed pager index without canonical camera movement`);
+
+    await nav.locator('[data-next]').click();await page.waitForTimeout(90);
+    const pager3=await pagerSnapshot(page);
+    expect(pager3.pager===`3 / ${pagerTotal}`,`pager-${viewport.label}: second → did not advance to 3 / N (${pager3.pager})`);
+    expect(pager3.focused===pagerStart.order[2]&&pager3.centered,`pager-${viewport.label}: second → did not focus/center target #3 ${JSON.stringify({expected:pagerStart.order[2],actual:pager3.focused,centered:pager3.centered})}`);
+    expect(pager3.transform!==pager2.transform&&pager3.cameraStatus!==pager2.cameraStatus,`pager-${viewport.label}: target #3 did not move canonical camera`);
+
+    await nav.locator('[data-prev]').click();await page.waitForTimeout(90);
+    const pagerBack2=await pagerSnapshot(page);
+    expect(pagerBack2.pager===`2 / ${pagerTotal}`,`pager-${viewport.label}: ← did not return to 2 / N (${pagerBack2.pager})`);
+    expect(pagerBack2.focused===pagerStart.order[1]&&pagerBack2.centered,`pager-${viewport.label}: ← did not focus/center target #2`);
+
+    // 1/N → ← → N/N and N/N → → → 1/N.
+    await nav.locator('[data-prev]').click();await page.waitForTimeout(70);
+    const pager1=await pagerSnapshot(page);
+    expect(pager1.pager===`1 / ${pagerTotal}`&&pager1.focused===pagerStart.order[0],`pager-${viewport.label}: expected return to 1 / N before wrap ${JSON.stringify(pager1)}`);
+    await nav.locator('[data-prev]').click();await page.waitForTimeout(90);
+    const pagerWrapN=await pagerSnapshot(page);
+    expect(pagerWrapN.pager===`${pagerTotal} / ${pagerTotal}`,`pager-${viewport.label}: 1 / N ← did not wrap to N / N (${pagerWrapN.pager})`);
+    expect(pagerWrapN.focused===pagerStart.order[pagerTotal-1]&&pagerWrapN.centered,`pager-${viewport.label}: backward wrap did not focus/center last card`);
+    await nav.locator('[data-next]').click();await page.waitForTimeout(90);
+    const pagerWrap1=await pagerSnapshot(page);
+    expect(pagerWrap1.pager===`1 / ${pagerTotal}`,`pager-${viewport.label}: N / N → did not wrap to 1 / N (${pagerWrap1.pager})`);
+    expect(pagerWrap1.focused===pagerStart.order[0]&&pagerWrap1.centered,`pager-${viewport.label}: forward wrap did not focus/center first card`);
+    expect(samePositions(pagerPositions,pagerWrap1.positions),`pager-${viewport.label}: pager navigation mutated persisted card coordinates`);
+
+    // View semantics must remain composable after pager camera navigation.
+    const afterPagerProgram=await chooseView(page,'current-program');
+    expect(JSON.stringify(afterPagerProgram.visible)===JSON.stringify(expected['current-program']),`pager-${viewport.label}: Current Program View failed after pager navigation`);
+    const afterPagerAll=await chooseView(page,'all');
+    expect(JSON.stringify(afterPagerAll.visible)===JSON.stringify(expected.all)&&afterPagerAll.pager===`1 / ${pagerTotal}`,`pager-${viewport.label}: ВСЁ failed to restore Board/pager after pager navigation`);
+    expect(samePositions(persisted,afterPagerAll.positions),`pager-${viewport.label}: View switch after pager mutated persisted coordinates`);
+
     const badgeState=await page.evaluate(()=>({
       artifact:[...document.querySelectorAll('.dc-notice[data-artifact]')].map(x=>({subtype:x.dataset.artifactSubtype,badges:[...x.querySelectorAll(':scope > .dc-board-badges .dc-board-badge')].map(b=>b.textContent.trim()),program:x.dataset.currentProgram})),
       platform:[...document.querySelectorAll('[data-board-source="platform"]')].map(x=>({ref:x.dataset.thingRef,type:x.dataset.sourceType,badges:[...x.querySelectorAll(':scope > .dc-board-badges .dc-board-badge')].map(b=>b.textContent.trim()),program:x.dataset.currentProgram}))
@@ -215,8 +305,11 @@ try{
     const zoomBefore=(await boardState(page)).transform;
     await page.locator('[data-zoom-in]').click();await page.waitForTimeout(60);
     const zoomAfter=(await boardState(page)).transform;
-    expect(zoomAfter!==zoomBefore,`zoom-${viewport.label}: pan/zoom freedom did not resume after View fit`);
+    expect(zoomAfter!==zoomBefore,`zoom-${viewport.label}: zoom did not remain free after pager/View camera movement`);
     await page.locator('[data-zoom-out]').click();
+    const pan=await panBoard(page);
+    expect(pan.found,`pan-${viewport.label}: could not locate empty spatial background for pan regression`);
+    expect(!pan.found||pan.after!==pan.before,`pan-${viewport.label}: pan did not move canonical camera after pager navigation`);
 
     if(viewport.label!=='desktop'){
       const nav=page.locator('.dc-board-filter-nav');expect(await nav.locator('[data-pos]').innerText()===`1 / ${expected.all.length}`,`pager-${viewport.label}: pager does not reflect restored visible set`);
@@ -269,4 +362,4 @@ try{
 }finally{await browser.close();server.close()}
 
 if(failures.length){console.error(`Board navigation/adaptive cards acceptance failed (${failures.length})`);for(const failure of failures)console.error(`- ${failure}`);process.exit(1)}
-console.log('Board navigation/adaptive cards browser acceptance passed: one-active View sequence on 390/360/desktop + desktop drawer-over-Program composition + exact Program identity + camera fit/pager/coordinate invariance + canonical badges + МОЁ locator + relations-visible-set invariance + adaptive media');
+console.log('Board navigation/adaptive cards browser acceptance passed: real pager →/←/wrap on 390/360/desktop delegates to canonical spatial camera + one-active View + Program + zoom/pan + coordinate invariance + relations + stale-focus companion regression + adaptive media');
