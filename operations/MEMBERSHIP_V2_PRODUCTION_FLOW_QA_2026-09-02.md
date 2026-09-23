@@ -1640,3 +1640,56 @@ Requires authority + current owner inventory before implementation because chang
 **Authority conflict to resolve before implementation**
 Current approved Contribution Inbound & Editorial Workflow v1 says editorial/review authority is `OWNER_ADMIN ONLY` and explicitly states `GLOBAL DEMENTOR ≠ CONTRIBUTION REVIEWER`. Current Board authority also states Dementor role alone does not grant global moderation. Therefore any implementation where two Dementor approvals become authoritative must go through Change Control / Change Proposal rather than a silent BQA-22 UX fix.
 
+
+
+---
+
+## 2026-09-23 stabilization closure checkpoint
+
+Technical production baseline:
+
+`df8a24eca2bcca25339f128c7da93982515cf442`
+
+Pages:
+
+`Deploy Dementor Production #134 / 35885907613 · SUCCESS`
+
+### Closed technical findings
+
+- BQA-11 / BQA-12 / BQA-13 — STAB-01 Public Activity truth boundary — **PASS / G8 CLOSED**.
+- BQA-19 — STAB-02 Artifact terminal state — **PASS / G8 CLOSED**.
+- BQA-16 — STAB-03 Relations visibility — **PASS / G8 CLOSED**.
+- BQA-14 — STAB-04 Artifact share social preview — **PASS / G8 CLOSED**.
+- BQA-21 — STAB-05 Projects public media — **PASS / G8 CLOSED**.
+- BQA-18 — STAB-06 Board mobile information hierarchy / canonical pager camera — **PASS / G8 CLOSED**.
+- BQA-10 — Fuengirola Home/public Program → Event continuation — **PASS / G8 CLOSED**.
+
+BQA-10 live acceptance confirms the approved Fuengirola rule:
+
+```text
+confirmed Event information = public direct
+Membership/onboarding != Event eligibility
+Join Club != Event CTA
+registration = disabled
+unknown logistics remain unknown
+```
+
+Evidence:
+
+- `operations/FUENGIROLA_PUBLIC_ACCESS_ALIGNMENT_LIVE_ACCEPTANCE_2026-09-23.md`
+- `operations/FUENGIROLA_PUBLIC_ACCESS_ALIGNMENT_G8_2026-09-23.md`
+
+### Still not closed by technical CI
+
+The following remain behavioral/product work and must not be inferred PASS from the technical baseline:
+
+- BQA-01…06 — unassisted external-to-core human acceptance;
+- BQA-07 — known Contribution product/runtime gap;
+- BQA-08 — Guest / Applicant role/access human acceptance;
+- BQA-09 — meaningful return after 1–3 days;
+- BQA-15 — relation selector scale;
+- BQA-17 — relation visibility default decision;
+- BQA-20 — media normalization backlog;
+- BQA-22 — Course / Project creation authority/product decision.
+
+Parent stabilization #228 remains open.
