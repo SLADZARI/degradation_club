@@ -16,8 +16,6 @@
   },
   "publicDescription": "Камерная офлайн-сессия Dementor Club с Габилем. Вы приносите ситуацию, про которую уже успели сказать: «Там всё понятно». На встрече эту ясность аккуратно демонтируют и проверяют, спорили ли вы вообще об одном и том же.",
   "canonicalQuote": "ДЕМОНТИРОВАТЬ ПРЕЖДЕВРЕМЕННУЮ ЯСНОСТЬ",
-  "ctaLabel": "Я УЖЕ ВСЁ ПОНЯЛ",
-  "access": "details-after-join",
   "dateTime": null,
   "venue": null,
   "duration": null,
@@ -25,7 +23,9 @@
   "price": null,
   "participationTerms": null,
   "registrationUrl": null,
-  "organizers": ["DEMENTOR-004"],
+  "organizers": [
+    "DEMENTOR-004"
+  ],
   "participants": null,
   "relatedProjects": [],
   "provenance": {
@@ -34,5 +34,5 @@
     "role": "canonical-club-event-record"
   },
   "siteRole": "implementation-mirror",
-  "updatedAt": "2026-08-26"
+  "updatedAt": "2026-09-23"
 }
