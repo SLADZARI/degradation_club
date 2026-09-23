@@ -14,6 +14,7 @@ let activationState=null;
 let entryStatus=null;
 let renderTimer=null;
 let cameraIntent='auto';
+let focusSequence=0;
 
 function boardUserState(){return String(document.documentElement.dataset.dcBoardUserState||'')}
 function isOwnerAdmin(){return boardUserState()==='OWNER_ADMIN'}
@@ -46,10 +47,11 @@ function focusSpatialTarget(card,{scale=.92}={}){
   const centerX=(bounds.left+bounds.right)/2,centerY=(bounds.top+bounds.bottom)/2;
   setCamera({scale:nextScale,x:rect.width/2-centerX*nextScale,y:rect.height/2-centerY*nextScale});
   cameraIntent='manual';
-  card.classList.remove('dc-board-focus-step');
+  const sequence=++focusSequence;
+  boardHost?.querySelectorAll('.dc-board-focus-step').forEach(node=>node.classList.remove('dc-board-focus-step'));
   void card.offsetWidth;
   card.classList.add('dc-board-focus-step');
-  window.setTimeout(()=>card.classList.remove('dc-board-focus-step'),900);
+  window.setTimeout(()=>{if(sequence===focusSequence)card.classList.remove('dc-board-focus-step')},900);
   return true;
 }
 
