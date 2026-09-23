@@ -13,7 +13,7 @@ authorityType: EVIDENCE
 result: dementor-club.result.artifact-collaboration-v1
 productionBaseCommit: df8a24eca2bcca25339f128c7da93982515cf442
 candidateBranch: result/artifact-collaboration-v1
-candidateCommit: 2de0fa9bf6c505d4a1e20aa95edc2b51fdca9af0
+candidateCommit: 06ba2aa94c990a2e0bce4a6729a4f6963acb0e19
 liveDatabaseMutationAuthorized: false
 ---
 
@@ -43,11 +43,11 @@ Production baseline remains df8a24eca2bcca25339f128c7da93982515cf442.
 
 Production branch was rechecked after branch work and still resolved to that exact SHA.
 
-Backend candidate is result/artifact-collaboration-v1 at 2de0fa9bf6c505d4a1e20aa95edc2b51fdca9af0.
+Backend candidate is result/artifact-collaboration-v1 at 06ba2aa94c990a2e0bce4a6729a4f6963acb0e19.
 
 Compare against production:
 
-- ahead_by = 6;
+- ahead_by = 8;
 - behind_by = 0;
 - merge base = exact production baseline;
 - Result-owned diff = 4 files.
