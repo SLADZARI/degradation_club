@@ -1693,3 +1693,53 @@ The following remain behavioral/product work and must not be inferred PASS from 
 - BQA-22 — Course / Project creation authority/product decision.
 
 Parent stabilization #228 remains open.
+
+
+---
+
+## 2026-09-23 behavioral live acceptance protocol snapshot
+
+Executable protocol:
+
+`operations/BEHAVIORAL_LIVE_ACCEPTANCE_PROTOCOL_2026-09-23.md`
+
+Exact technical production baseline remains:
+
+`df8a24eca2bcca25339f128c7da93982515cf442`
+
+Pages:
+
+`Deploy Dementor Production #134 / 35885907613 · SUCCESS`
+
+### Current behavioral evidence matrix
+
+| BQA | Verdict | Closure |
+|---|---|---|
+| BQA-01 | ASSISTED PASS | NO |
+| BQA-02 | ASSISTED PASS | NO |
+| BQA-03 | ASSISTED PASS | NO |
+| BQA-04 | ASSISTED PASS | NO |
+| BQA-05 | ASSISTED PASS | NO |
+| BQA-06 | ASSISTED PASS | NO |
+| BQA-08 | ASSISTED PASS | NO |
+| BQA-09 | NOT EXERCISED / BEHAVIORAL VERDICT PENDING | NO |
+
+Controlling rules:
+
+```text
+technical PASS != behavioral PASS
+assisted completion != PASS
+ASSISTED PASS != closure
+NOT EXERCISED != FAIL != PRODUCT GAP
+```
+
+BQA-09 may be classified only after the real two-visit sequence:
+Visit 1 baseline now → return with the same legitimate identity after 24–72 hours → unassisted behavioral verdict.
+
+A negative Visit 2 result is recorded first as `FAIL`. Product-gap classification, if any, requires subsequent root-cause, authority and existing-equivalent inventory.
+
+Guest, Applicant, Membership states and roles must not be represented as one lifecycle progression. Preserve current authority distinctions, including:
+
+`AUTHENTICATION != DC9 COMPLETE != APPLICATION != MEMBERSHIP`.
+
+No WAITING Result is closed by this snapshot.
