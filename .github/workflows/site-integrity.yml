@@ -50,6 +50,8 @@ jobs:
         run: node scripts/validate-board-batch-b-contract.mjs
       - name: Validate Board Relations v1 schema contract
         run: node scripts/validate-board-relations-v1.mjs
+      - name: Validate Artifact Collaboration v1 backend contract
+        run: node scripts/validate-artifact-collaboration-v1.mjs
       - name: Validate Board Relations v1 runtime contract
         run: node scripts/validate-board-relations-runtime-v1.mjs
       - name: Validate Board Telegram Promotion v1 contract
