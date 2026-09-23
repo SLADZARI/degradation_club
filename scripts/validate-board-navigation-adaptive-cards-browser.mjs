@@ -234,9 +234,13 @@ try{
     await page.evaluate(()=>{
       globalThis.__DC_PAGER_QA_TRACE=[];
       const push=(kind,detail=null)=>globalThis.__DC_PAGER_QA_TRACE.push({t:Math.round(performance.now()),kind,detail});
-      for(const name of ['dc:board-user-navigation','dc:board-filter-changed','dc:board-view-changed','dc:board-focus-target','dc:board-layout-request','dc:board-layout-updated','dc:board-projections-updated']){
+      for(const name of ['dc:board-user-navigation','dc:board-request-view','dc:board-filter-changed','dc:board-view-changed','dc:board-focus-target','dc:board-layout-request','dc:board-layout-updated','dc:board-projections-updated']){
         window.addEventListener(name,event=>push(name,event.detail||null));
       }
+      document.addEventListener('click',event=>{
+        if(event.target?.closest?.('[data-mine]'))push('mine-click',{trusted:event.isTrusted,target:event.target?.outerHTML||''});
+        if(event.target?.closest?.('[data-prev],[data-next]'))push('pager-click',{trusted:event.isTrusted,target:event.target?.outerHTML||''});
+      },true);
       const pos=document.querySelector('.dc-board-filter-nav [data-pos]');
       if(pos)new MutationObserver(()=>push('pager-text',pos.textContent?.trim()||'')).observe(pos,{childList:true,subtree:true,characterData:true});
       const world=document.querySelector('.dc-spatial-world');
