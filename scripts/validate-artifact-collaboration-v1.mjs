@@ -65,6 +65,8 @@ expect(inviteCandidates.includes('public.profiles'), 'invite lookup does not com
 expect(inviteCandidates.includes('char_length(v_query) < 2'), 'invite lookup minimum query bound missing');
 expect(inviteCandidates.includes('least(coalesce(p_limit,12),20)'), 'invite lookup result cap missing');
 expect(!/\bemail\b/i.test(inviteCandidates), 'invite lookup exposes or references email');
+expect(!inviteCandidates.includes('full_name'), 'invite lookup exposes non-safe full_name field');
+expect(!extractFunction('dc_artifact_participants_read_v1').includes('full_name'), 'participant roster exposes non-safe full_name field');
 expect(appendParticipation.includes('public.profiles'), 'participation mutation does not verify registered profile existence');
 expect(appendParticipation.includes('ARTIFACT_AUTHOR_IS_NOT_PARTICIPANT'), 'author/participant distinction missing');
 
