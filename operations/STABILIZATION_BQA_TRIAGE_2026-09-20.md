@@ -344,3 +344,48 @@ First clean batch:
 `#229 STAB-01 · Public Activity truth boundary · BQA-11/12/13`
 
 No other Product expansion should pre-empt this sequence.
+
+
+---
+
+# 10. Closure checkpoint · 2026-09-23
+
+Technical baseline recorded at:
+
+`df8a24eca2bcca25339f128c7da93982515cf442`
+
+Pages:
+
+`#134 / 35885907613 · SUCCESS`
+
+Closed and G8-recorded:
+
+```text
+STAB-01  PASS
+STAB-02  PASS
+STAB-03  PASS
+STAB-04  PASS
+STAB-05  PASS
+STAB-06  PASS
+BQA-10   PASS
+```
+
+BQA-10 was closed through the bounded Fuengirola Result:
+`dementor-club.result.fuengirola-public-access-alignment-v1@1.0`.
+
+No active implementation Result remains after this checkpoint.
+
+This does **not** close the stabilization parent. Remaining stable-release work is now primarily behavioral/product acceptance:
+
+```text
+BQA-01..06  human / unassisted acceptance
+BQA-07      known Contribution product gap
+BQA-08      Guest / Applicant role/access acceptance
+BQA-09      1–3 day return verdict
+BQA-15      selector scale
+BQA-17      default relations presentation decision
+BQA-20      media pipeline backlog
+BQA-22      Course / Project creation authority decision
+```
+
+Do not restart Contribution/runtime expansion until the remaining behavioral acceptance verdicts needed for #228 are recorded.
