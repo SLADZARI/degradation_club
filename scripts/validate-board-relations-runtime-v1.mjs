@@ -51,8 +51,88 @@ expect(runtime.includes(".eq('role','dementor')"),'scoped assignment query is no
 expect(runtime.includes("row.provenance_status==='confirmed'"),'scoped assignment confirmed provenance mirror missing');
 expect(runtime.includes("systemDementor"),'system Dementor mirror missing');
 expect(!runtime.includes('dc_can_read_entity'),'read helper must not authorize relation mutation UX');
-expect(runtime.includes("choice.type==='RELATED_TO'")&&runtime.includes('canManageEndpoint(endpoint)||canManageEndpoint(target)'),'RELATED_TO manage-either mirror missing');
-expect(runtime.includes("canManageEndpoint(endpoint);"),'directional origin-only mirror missing');
+function functionBody(source,name){
+  const marker=`function ${name}(`;const start=source.indexOf(marker);
+  expect(start>=0,`${name} permission helper missing`);if(start<0)return'';
+  const brace=source.indexOf('{',start);if(brace<0){expect(false,`${name} body missing`);return''}
+  let depth=0;
+  for(let i=brace;i<source.length;i++){
+    if(source[i]==='{')depth++;
+    else if(source[i]==='}'){depth--;if(depth===0)return source.slice(brace+1,i)}
+  }
+  expect(false,`${name} body is unbalanced`);return'';
+}
+const compact=value=>String(value||'').replace(/\s+/g,'');
+const createChoiceBody=compact(functionBody(runtime,'canCreateChoice'));
+const joinedIdeaBody=compact(functionBody(runtime,'joinedIdeaEndpoint'));
+const candidateChoicesBody=compact(functionBody(runtime,'candidateChoices'));
+const createRelationBody=compact(functionBody(runtime,'createRelation'));
+const deleteRowBody=compact(functionBody(runtime,'canDeleteRow'));
+
+// Canonical permission semantics remain explicit inside one helper:
+// RELATED_TO is manage-either, every directional relation is origin-only.
+expect(
+  createChoiceBody.includes("constcanonical=type==='RELATED_TO'?canManageEndpoint(origin)||canManageEndpoint(target):canManageEndpoint(origin);"),
+  'canCreateChoice canonical branch no longer proves RELATED_TO manage-either + directional origin-only semantics'
+);
+expect(
+  createChoiceBody.includes('if(canonical)returntrue;'),
+  'canCreateChoice canonical authority must short-circuit before participant extension'
+);
+
+// Artifact Collaboration widens creation only for RELATED_TO and only through joinedIdeaEndpoint.
+expect(
+  createChoiceBody.includes("returntype==='RELATED_TO'&&(joinedIdeaEndpoint(origin)||joinedIdeaEndpoint(target));"),
+  'participant extension must be RELATED_TO-only and scoped to joinedIdeaEndpoint'
+);
+expect(
+  !createChoiceBody.includes("RESULT_OF")&&!createChoiceBody.includes("CONTINUES")&&!createChoiceBody.includes("ABOUT")&&!createChoiceBody.includes("REPORT_OF"),
+  'participant extension must not widen directional relation types'
+);
+expect(
+  joinedIdeaBody.includes("endpoint?.kind==='artifact'"),
+  'participant relation extension must require artifact endpoint'
+);
+expect(
+  joinedIdeaBody.includes("endpoint.card?.dataset.artifactSubtype==='idea'"),
+  'participant relation extension must require artifact_type=idea'
+);
+expect(
+  joinedIdeaBody.includes("endpoint.card?.dataset.collabMyState==='JOINED'"),
+  'participant relation extension must require JOINED state'
+);
+
+// Both chooser and mutation mirror must go through the same structural permission helper.
+expect(
+  candidateChoicesBody.includes('if(!canCreateChoice(type,endpoint,target))continue;'),
+  'candidateChoices must use canCreateChoice permission contract'
+);
+expect(
+  createRelationBody.includes('constmirrored=canCreateChoice(choice.type,endpoint,target);'),
+  'createRelation must re-check canCreateChoice before RPC'
+);
+
+// Delete presentation remains the pre-existing canonical authority mirror.
+// Do not infer participant-created relation ownership from JOINED state.
+expect(
+  deleteRowBody.includes("if(row.relation_type==='RELATED_TO')returncanManageEndpoint(origin)||canManageEndpoint(target);")
+  &&deleteRowBody.includes('returncanManageEndpoint(origin);'),
+  'relation delete mirror must preserve canonical manage-either/origin-only semantics'
+);
+expect(
+  !deleteRowBody.includes('joinedIdeaEndpoint')&&!deleteRowBody.includes('canCreateChoice'),
+  'participant creation extension must not leak into relation delete authority'
+);
+
+// Endpoint ontology remains closed and Person is not introduced.
+expect(
+  runtime.includes("const RELATION_KINDS=Object.freeze(['artifact','event','program'])"),
+  'relation endpoint ontology must remain artifact/event/program'
+);
+expect(
+  !/RELATION_KINDS[^\n]*person|relationKind[^\n]*person|relationSourceId[^\n]*person/i.test(runtime),
+  'Person relation endpoint detected'
+);
 
 // Fail-closed backend-unavailable behavior.
 expect(runtime.includes("document.documentElement.dataset.dcBoardRelations='unavailable'"),'RPC unavailable state marker missing');
