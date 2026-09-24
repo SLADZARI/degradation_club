@@ -7,12 +7,12 @@
     "projectStage": "BUILD",
     "gate": "G5_BUILD",
     "status": "APPROVED",
-    "version": "2.81",
+    "version": "2.82",
     "updated": "2026-09-24",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.80"
+    "supersedes": "2.81"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -218,7 +218,9 @@
     ".weekly-os/results/artifact-collaboration-v1.v0.3.md",
     "operations/ARTIFACT_COLLABORATION_BACKEND_G5_NONPROD_BLOCKER_2026-09-24.md",
     ".weekly-os/results/artifact-collaboration-v1.v0.4.md",
-    "operations/ARTIFACT_COLLABORATION_BACKEND_G5_LOCAL_STACK_BLOCKER_2026-09-24.md"
+    "operations/ARTIFACT_COLLABORATION_BACKEND_G5_LOCAL_STACK_BLOCKER_2026-09-24.md",
+    ".weekly-os/results/artifact-collaboration-v1.v0.5.md",
+    "operations/ARTIFACT_COLLABORATION_BACKEND_G5_MIGRATION_HISTORY_REPLAY_BLOCKER_2026-09-24.md"
   ],
   "authority": {
     "mpDslCore": {
@@ -385,10 +387,10 @@
   },
   "currentResult": {
     "artifactId": "dementor-club.result.artifact-collaboration-v1",
-    "version": "0.4",
+    "version": "0.5",
     "status": "REVIEW",
     "workStatus": "BLOCKED",
-    "path": ".weekly-os/results/artifact-collaboration-v1.v0.4.md",
+    "path": ".weekly-os/results/artifact-collaboration-v1.v0.5.md",
     "gate": "G5_BUILD",
     "scope": [
       "idea participation",
@@ -411,12 +413,15 @@
     "g5BackendEvidence": "operations/ARTIFACT_COLLABORATION_BACKEND_G5_CHECKPOINT_2026-09-24.md",
     "g5BackendCandidateCommit": "3522993d6796fe9dae81a0c7dbde1ddcc1aa350a",
     "g5BackendStaticStatus": "PASS",
-    "g5SqlExecutionStatus": "BLOCKED_LOCAL_SUPABASE_RUNTIME_UNAVAILABLE",
-    "gateReadiness": "G5_BACKEND_STATIC_READY_LOCAL_EXECUTION_BLOCKED",
-    "note": "DEV1 backend contract/migration/static security hardening is complete on the Result branch. Required free local Supabase CLI + Docker validation is blocked in the current runner because Docker/CLI/runtime are absent and outbound DNS is unavailable. Live Supabase, paid branches, merge and deploy remain unauthorized.",
+    "g5SqlExecutionStatus": "BLOCKED_HISTORICAL_MIGRATION_REPLAY",
+    "gateReadiness": "G5_BACKEND_STATIC_READY_BASELINE_REPLAY_BLOCKED",
+    "note": "Free local Supabase runtime works. DEV1 is now blocked earlier in the historical migration chain: clean replay fails at 20260827212614 because legacy_edu.profiles depends on pre-existing EDU schema not represented by repository migrations. Artifact Collaboration migration is not reached. Live Supabase/paid infra/merge/deploy remain unauthorized.",
     "implementationBrief": "operations/ARTIFACT_COLLABORATION_IMPLEMENTATION_BRIEF_V1.md",
     "g5BackendLocalBlockerEvidence": "operations/ARTIFACT_COLLABORATION_BACKEND_G5_LOCAL_STACK_BLOCKER_2026-09-24.md",
-    "costBoundary": "NO_PAID_INFRASTRUCTURE"
+    "costBoundary": "NO_PAID_INFRASTRUCTURE",
+    "integrationHeadTested": "b3410377c908db833a480c2425e7681100f6077d",
+    "backendCandidateCommit": "3522993d6796fe9dae81a0c7dbde1ddcc1aa350a",
+    "g5BackendReplayBlockerEvidence": "operations/ARTIFACT_COLLABORATION_BACKEND_G5_MIGRATION_HISTORY_REPLAY_BLOCKER_2026-09-24.md"
   },
   "waitingResults": [
     {
