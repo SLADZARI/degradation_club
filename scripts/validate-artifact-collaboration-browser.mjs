@@ -167,6 +167,29 @@ async function openBoard(browser,mode,viewport={width:1440,height:900}){
  await page.waitForFunction(()=>document.querySelectorAll('.dc-notice[data-artifact]').length>=2,{timeout:8000});
  return{ctx,page,errors};
 }
+async function openRelationsBlockAsUser(page,card,scope){
+ for(let attempt=1;attempt<=2;attempt++){
+   const block=card.locator('[data-relation-block]');
+   await block.waitFor({state:'attached',timeout:6000});
+   if(await block.evaluate(el=>el.open).catch(()=>false))return block;
+   const summary=block.locator('summary');
+   await summary.focus();
+   await summary.press('Enter');
+   try{
+     await card.locator('[data-relation-block][open]').waitFor({state:'attached',timeout:2500});
+     return card.locator('[data-relation-block][open]');
+   }catch{
+     if(attempt===2){
+       const diagnostic=await card.evaluate(node=>{
+         const current=node.querySelector('[data-relation-block]');
+         return{blockPresent:Boolean(current),open:Boolean(current?.open),summary:current?.querySelector('summary')?.textContent||null};
+       });
+       throw new Error(scope+' RELATION_BLOCK_OPEN_TIMEOUT '+JSON.stringify(diagnostic));
+     }
+   }
+ }
+ throw new Error(scope+' RELATION_BLOCK_OPEN_TIMEOUT');
+}
 
 const browser=await chromium.launch({headless:true});
 try{
@@ -291,12 +314,7 @@ try{
     await page.reload({waitUntil:'domcontentloaded'});
     await page.waitForFunction(()=>document.querySelectorAll('.dc-notice[data-artifact]').length>=2,{timeout:8000});
     const reloadedCard=page.locator('.dc-notice[data-artifact="'+A+'"]');
-    const relationBlock=reloadedCard.locator('[data-relation-block]');
-    await relationBlock.waitFor({state:'attached',timeout:6000});
-    const relationSummary=relationBlock.locator('summary');
-    await relationSummary.focus();
-    await relationSummary.press('Enter');
-    await page.locator('.dc-notice[data-artifact="'+A+'"] [data-relation-block][open]').waitFor({state:'attached',timeout:6000});
+    await openRelationsBlockAsUser(page,reloadedCard,'participant can_delete reload');
 
     // Re-query after opening: canonical presentation may refresh and replace relation DOM.
     const freshCard=page.locator('.dc-notice[data-artifact="'+A+'"]');
