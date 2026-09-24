@@ -69,6 +69,14 @@ expect(!inviteCandidates.includes('full_name'), 'invite lookup exposes non-safe 
 expect(!extractFunction('dc_artifact_participants_read_v1').includes('full_name'), 'participant roster exposes non-safe full_name field');
 expect(appendParticipation.includes('public.profiles'), 'participation mutation does not verify registered profile existence');
 expect(appendParticipation.includes('ARTIFACT_AUTHOR_IS_NOT_PARTICIPANT'), 'author/participant distinction missing');
+expect(!appendParticipation.includes('ARTIFACT_IDEA_NOT_AVAILABLE'), 'participant mutation exposes a distinct hidden Artifact existence error');
+expect(!appendParticipation.includes('PARTICIPATION_AUTHOR_OR_OWNER_ADMIN_REQUIRED'), 'participant mutation exposes author/admin denial as an Artifact oracle');
+expect(appendParticipation.includes("raise exception 'ARTIFACT_NOT_AVAILABLE'"), 'participant mutation generic no-oracle terminal state missing');
+const profileCheckPos = appendParticipation.indexOf('PARTICIPANT_PROFILE_NOT_FOUND');
+const artifactAuthPos = appendParticipation.indexOf("raise exception 'ARTIFACT_NOT_AVAILABLE'");
+expect(profileCheckPos > artifactAuthPos && artifactAuthPos >= 0, 'profile existence is checked before Artifact authorization and can become an oracle');
+expect(!inviteCandidates.includes('PARTICIPATION_AUTHOR_OR_OWNER_ADMIN_REQUIRED'), 'invite lookup exposes unauthorized hidden Artifact existence');
+expect(inviteCandidates.includes("raise exception 'ARTIFACT_NOT_AVAILABLE'"), 'invite lookup generic no-oracle terminal state missing');
 
 // Transition contract and re-invite.
 for (const fragment of [
@@ -144,6 +152,8 @@ expect(relationCreate.includes('v_participant_related'), 'participant RELATED_TO
 expect(relationCreate.includes('elsif not v_can_manage_origin then'), 'directional relation authorization drifted');
 expect(relationDelete.includes('v_relation.created_by=v_uid'), 'participant relation delete is not creator-scoped');
 expect(relationDelete.includes('v_participant_delete'), 'participant relation delete path missing');
+expect(!relationDelete.includes("raise exception 'RELATION_NOT_FOUND'"), 'relation delete leaks hidden relation existence');
+expect(relationDelete.includes("raise exception 'RELATION_NOT_AVAILABLE'"), 'relation delete generic no-oracle state missing');
 expect(!/origin_kind\s*=\s*'person'|target_kind\s*=\s*'person'/i.test(migration), 'Person relation endpoint detected');
 
 // Share remains transport-only; no invite/participant mutation in canonical share owner.
