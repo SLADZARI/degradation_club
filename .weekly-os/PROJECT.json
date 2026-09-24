@@ -7,12 +7,12 @@
     "projectStage": "BUILD",
     "gate": "G5_BUILD",
     "status": "APPROVED",
-    "version": "2.79",
+    "version": "2.80",
     "updated": "2026-09-24",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.78"
+    "supersedes": "2.79"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -216,7 +216,9 @@
     "operations/ARTIFACT_COLLABORATION_BACKEND_G5_CHECKPOINT_2026-09-24.md",
     "operations/ARTIFACT_COLLABORATION_IMPLEMENTATION_BRIEF_V1.md",
     ".weekly-os/results/artifact-collaboration-v1.v0.3.md",
-    "operations/ARTIFACT_COLLABORATION_BACKEND_G5_NONPROD_BLOCKER_2026-09-24.md"
+    "operations/ARTIFACT_COLLABORATION_BACKEND_G5_NONPROD_BLOCKER_2026-09-24.md",
+    ".weekly-os/results/artifact-collaboration-v1.v0.4.md",
+    "operations/ARTIFACT_COLLABORATION_BACKEND_G5_LOCAL_STACK_BLOCKER_2026-09-24.md"
   ],
   "authority": {
     "mpDslCore": {
@@ -383,10 +385,10 @@
   },
   "currentResult": {
     "artifactId": "dementor-club.result.artifact-collaboration-v1",
-    "version": "0.3",
+    "version": "0.4",
     "status": "REVIEW",
     "workStatus": "BLOCKED",
-    "path": ".weekly-os/results/artifact-collaboration-v1.v0.3.md",
+    "path": ".weekly-os/results/artifact-collaboration-v1.v0.4.md",
     "gate": "G5_BUILD",
     "scope": [
       "idea participation",
@@ -409,11 +411,13 @@
     "g5BackendEvidence": "operations/ARTIFACT_COLLABORATION_BACKEND_G5_CHECKPOINT_2026-09-24.md",
     "g5BackendCandidateCommit": "3522993d6796fe9dae81a0c7dbde1ddcc1aa350a",
     "g5BackendStaticStatus": "PASS",
-    "g5SqlExecutionStatus": "BLOCKED_NO_NONPROD_POSTGRES",
-    "gateReadiness": "G5_BACKEND_STATIC_READY_EXECUTION_BLOCKED",
-    "note": "DEV1 backend contract/migration/static security hardening is complete on the Result branch. PostgreSQL/RLS runtime validation is blocked because no authorized non-production Postgres exists; Supabase Branching requires Pro. Live Supabase/merge/deploy remain unauthorized.",
+    "g5SqlExecutionStatus": "BLOCKED_LOCAL_SUPABASE_RUNTIME_UNAVAILABLE",
+    "gateReadiness": "G5_BACKEND_STATIC_READY_LOCAL_EXECUTION_BLOCKED",
+    "note": "DEV1 backend contract/migration/static security hardening is complete on the Result branch. Required free local Supabase CLI + Docker validation is blocked in the current runner because Docker/CLI/runtime are absent and outbound DNS is unavailable. Live Supabase, paid branches, merge and deploy remain unauthorized.",
     "implementationBrief": "operations/ARTIFACT_COLLABORATION_IMPLEMENTATION_BRIEF_V1.md",
-    "g5BackendBlockerEvidence": "operations/ARTIFACT_COLLABORATION_BACKEND_G5_NONPROD_BLOCKER_2026-09-24.md"
+    "g5BackendBlockerEvidence": "operations/ARTIFACT_COLLABORATION_BACKEND_G5_NONPROD_BLOCKER_2026-09-24.md",
+    "g5BackendLocalBlockerEvidence": "operations/ARTIFACT_COLLABORATION_BACKEND_G5_LOCAL_STACK_BLOCKER_2026-09-24.md",
+    "costBoundary": "NO_PAID_INFRASTRUCTURE"
   },
   "waitingResults": [
     {
