@@ -268,9 +268,14 @@ try{
   {
     const{ctx,page,errors}=await openBoard(browser,'relations');
     const card=page.locator('.dc-notice[data-artifact="'+A+'"]');
-    await card.locator('[data-relation-block]').evaluate(el=>el.open=true);
-    await card.locator('[data-relation-add]').click();
-    const select=card.locator('[data-relation-choice]');
+    const initialSummary=card.locator('[data-relation-block] summary');
+    await initialSummary.click();
+    const initialBlock=card.locator('[data-relation-block][open]');
+    await initialBlock.waitFor({state:'attached',timeout:6000});
+    await initialBlock.locator('[data-relation-add]').click();
+    const initialForm=initialBlock.locator('[data-relation-form]');
+    await initialForm.waitFor({state:'visible',timeout:6000});
+    const select=initialForm.locator('[data-relation-choice]');
     const options=await select.locator('option').evaluateAll(nodes=>nodes.map(node=>({value:node.value,label:node.textContent||''})));
     const labels=options.map(option=>option.label);
     expect(labels.length>0,'participant relations: no choices');
@@ -278,18 +283,8 @@ try{
     const eventChoice=options.find(option=>option.label.includes('QA EVENT'));
     expect(Boolean(eventChoice),'participant relations: readable QA EVENT target missing');
     if(eventChoice){
-      await card.evaluate((node,value)=>{
-        const block=node.querySelector('[data-relation-block]');
-        if(!block)throw new Error('RELATION_BLOCK_MISSING');
-        block.open=true;
-        const form=block.querySelector('[data-relation-form]');
-        const choice=form?.querySelector('[data-relation-choice]');
-        const save=form?.querySelector('[data-relation-save]');
-        if(!form||!choice||!save)throw new Error('RELATION_FORM_MISSING');
-        form.hidden=false;
-        choice.value=value;
-        save.click();
-      },eventChoice.value);
+      await select.selectOption(eventChoice.value);
+      await initialForm.locator('[data-relation-save]').click();
       await page.waitForSelector('.dc-notice[data-artifact="'+A+'"] [data-relation-id="rel-created"]',{state:'attached'});
     }
 
