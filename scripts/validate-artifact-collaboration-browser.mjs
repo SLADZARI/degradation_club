@@ -296,17 +296,17 @@ try{
     // Real user click must open Relations, not the Artifact fullscreen card owner.
     await summary.click();
     await reloadedCard.locator('[data-relation-block][open]').waitFor({state:'attached',timeout:6000});
-    expect(await page.locator('.dc-artifact-overlay:not([hidden])').count()===0,'relation summary click opened Artifact fullscreen');
+    if(await page.locator('.dc-artifact-overlay:not([hidden])').count()!==0)throw new Error('RELATION_SUMMARY_CLICK_OPENED_ARTIFACT_FULLSCREEN');
 
     // Native keyboard activation is also interactive and must never fall through to card open.
     const openedSummary=reloadedCard.locator('[data-relation-block][open] summary');
     await openedSummary.focus();await openedSummary.press('Enter');
     await reloadedCard.locator('[data-relation-block]:not([open])').waitFor({state:'attached',timeout:6000});
-    expect(await page.locator('.dc-artifact-overlay:not([hidden])').count()===0,'relation summary Enter opened Artifact fullscreen');
+    if(await page.locator('.dc-artifact-overlay:not([hidden])').count()!==0)throw new Error('RELATION_SUMMARY_ENTER_OPENED_ARTIFACT_FULLSCREEN');
     const closedSummary=reloadedCard.locator('[data-relation-block]:not([open]) summary');
     await closedSummary.focus();await closedSummary.press(' ');
     await reloadedCard.locator('[data-relation-block][open]').waitFor({state:'attached',timeout:6000});
-    expect(await page.locator('.dc-artifact-overlay:not([hidden])').count()===0,'relation summary Space opened Artifact fullscreen');
+    if(await page.locator('.dc-artifact-overlay:not([hidden])').count()!==0)throw new Error('RELATION_SUMMARY_SPACE_OPENED_ARTIFACT_FULLSCREEN');
 
     // Re-query after opening: canonical presentation may refresh and replace relation DOM.
     const freshCard=page.locator('.dc-notice[data-artifact="'+A+'"]');
