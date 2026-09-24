@@ -193,7 +193,7 @@ function installPanZoom(){
   let touchGesture=null;
   let lastTap=null;
   let suppressClickUntil=0;
-  const blockedTarget=target=>target.closest('.dc-spatial-controls,a,button,input,textarea,dialog');
+  const blockedTarget=target=>target.closest('.dc-spatial-controls,a,button,input,textarea,summary,dialog');
   const touchPoints=()=>[...pointers.values()].filter(point=>point.type==='touch');
   const centerOf=(a,b)=>({x:(a.x+b.x)/2,y:(a.y+b.y)/2});
   const distance=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);

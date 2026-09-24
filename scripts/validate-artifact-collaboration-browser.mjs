@@ -145,8 +145,8 @@ export function createClient(){return{
  functions:{invoke:async()=>({data:{},error:null})}
 }};`;
 
-async function context(browser,mode,viewport){
- const ctx=await browser.newContext({viewport});
+async function context(browser,mode,viewport,options={}){
+ const ctx=await browser.newContext({viewport,hasTouch:options.hasTouch===true});
  await ctx.addInitScript(({mode})=>{globalThis.__QA_COLLAB_MODE__=mode;const ids={author:'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',invited:'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',joined:'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',outsider:'ffffffff-ffff-4fff-8fff-ffffffffffff',owner:'99999999-9999-4999-8999-999999999999',relations:'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb'};try{localStorage.setItem('dc:board:tutorial:v21:'+(ids[mode]||ids.author)+':member',JSON.stringify({done:true}));sessionStorage.setItem('dc_first_artifact_spotlight_dismissed_v1','1')}catch{}},{mode});
  await ctx.route('https://cdn.jsdelivr.net/**',route=>route.request().url().includes('@supabase/supabase-js')?route.fulfill({status:200,contentType:'text/javascript',body:stub()}):route.abort());
  return ctx;
@@ -161,36 +161,12 @@ async function openDetail(browser,mode,viewport={width:1440,height:900}){
  await page.waitForFunction(()=>document.getElementById('artifactState')?.textContent!=='LOADING',{timeout:7000});
  return{ctx,page,errors,requestFailures,badResponses,consoleErrors};
 }
-async function openBoard(browser,mode,viewport={width:1440,height:900}){
- const ctx=await context(browser,mode,viewport);const page=await ctx.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));
+async function openBoard(browser,mode,viewport={width:1440,height:900},options={}){
+ const ctx=await context(browser,mode,viewport,options);const page=await ctx.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));
  await page.goto(base+'/workspace/board/',{waitUntil:'domcontentloaded'});
  await page.waitForFunction(()=>document.querySelectorAll('.dc-notice[data-artifact]').length>=2,{timeout:8000});
  return{ctx,page,errors};
 }
-async function openRelationsBlockAsUser(page,card,scope){
- for(let attempt=1;attempt<=2;attempt++){
-   const block=card.locator('[data-relation-block]');
-   await block.waitFor({state:'attached',timeout:6000});
-   if(await block.evaluate(el=>el.open).catch(()=>false))return block;
-   const summary=block.locator('summary');
-   await summary.focus();
-   await summary.press('Enter');
-   try{
-     await card.locator('[data-relation-block][open]').waitFor({state:'attached',timeout:2500});
-     return card.locator('[data-relation-block][open]');
-   }catch{
-     if(attempt===2){
-       const diagnostic=await card.evaluate(node=>{
-         const current=node.querySelector('[data-relation-block]');
-         return{blockPresent:Boolean(current),open:Boolean(current?.open),summary:current?.querySelector('summary')?.textContent||null};
-       });
-       throw new Error(scope+' RELATION_BLOCK_OPEN_TIMEOUT '+JSON.stringify(diagnostic));
-     }
-   }
- }
- throw new Error(scope+' RELATION_BLOCK_OPEN_TIMEOUT');
-}
-
 const browser=await chromium.launch({headless:true});
 try{
   // COMMUNITY regression + IDEA-only composer visibility.
@@ -314,7 +290,23 @@ try{
     await page.reload({waitUntil:'domcontentloaded'});
     await page.waitForFunction(()=>document.querySelectorAll('.dc-notice[data-artifact]').length>=2,{timeout:8000});
     const reloadedCard=page.locator('.dc-notice[data-artifact="'+A+'"]');
-    await openRelationsBlockAsUser(page,reloadedCard,'participant can_delete reload');
+    const summary=reloadedCard.locator('[data-relation-block] summary');
+    await summary.waitFor({state:'visible',timeout:6000});
+
+    // Real user click must open Relations, not the Artifact fullscreen card owner.
+    await summary.click();
+    await reloadedCard.locator('[data-relation-block][open]').waitFor({state:'attached',timeout:6000});
+    expect(await page.locator('.dc-artifact-overlay:not([hidden])').count()===0,'relation summary click opened Artifact fullscreen');
+
+    // Native keyboard activation is also interactive and must never fall through to card open.
+    const openedSummary=reloadedCard.locator('[data-relation-block][open] summary');
+    await openedSummary.focus();await openedSummary.press('Enter');
+    await reloadedCard.locator('[data-relation-block]:not([open])').waitFor({state:'attached',timeout:6000});
+    expect(await page.locator('.dc-artifact-overlay:not([hidden])').count()===0,'relation summary Enter opened Artifact fullscreen');
+    const closedSummary=reloadedCard.locator('[data-relation-block]:not([open]) summary');
+    await closedSummary.focus();await closedSummary.press(' ');
+    await reloadedCard.locator('[data-relation-block][open]').waitFor({state:'attached',timeout:6000});
+    expect(await page.locator('.dc-artifact-overlay:not([hidden])').count()===0,'relation summary Space opened Artifact fullscreen');
 
     // Re-query after opening: canonical presentation may refresh and replace relation DOM.
     const freshCard=page.locator('.dc-notice[data-artifact="'+A+'"]');
@@ -334,13 +326,48 @@ try{
     expect(await directionalRow.count()===1,'negative directional fixture missing after reload/open/read');
     expect(await directionalRow.locator('[data-relation-delete]').count()===0,'can_delete=false directional relation must not expose delete control');
 
+    const deleteCallsBefore=(await rpcCalls(page,'dc_board_relation_delete_v1')).length;
     await createdDelete.click();
+    await page.waitForFunction(
+      before=>globalThis.__QA_COLLAB_CALLS__.filter(call=>call.name==='dc_board_relation_delete_v1').length>before,
+      deleteCallsBefore,
+      {timeout:6000}
+    );
     await page.waitForFunction(()=>!document.querySelector('.dc-notice[data-artifact="'+A+'"] [data-relation-id="rel-created"]'),null,{timeout:6000});
     expect(await page.locator('.dc-notice[data-artifact="'+A+'"] [data-relation-id="rel-created"]').count()===0,'server-authorized relation delete did not disappear');
     expect(!errors.length,'participant relations errors: '+errors.join(' | '));await ctx.close();
   }
 
+  // Existing card-body activation still opens the canonical Artifact fullscreen.
+  {
+    const{ctx,page,errors}=await openBoard(browser,'author');
+    const card=page.locator('.dc-notice[data-artifact="'+A+'"]');
+    await card.click({position:{x:12,y:12}});
+    await page.locator('.dc-artifact-overlay:not([hidden])').waitFor({state:'attached',timeout:6000});
+    expect(!errors.length,'card-body open errors: '+errors.join(' | '));await ctx.close();
+  }
+
   for(const width of [390,360]){
+    {
+      const{ctx,page,errors}=await openBoard(browser,'relations',{width,height:844},{hasTouch:true});
+      const card=page.locator('.dc-notice[data-artifact="'+A+'"]');
+      const summary=card.locator('[data-relation-block] summary');
+      await summary.waitFor({state:'visible',timeout:6000});
+      await page.evaluate(()=>{
+        const viewport=document.querySelector('.dc-spatial-viewport');
+        globalThis.__QA_RELATION_SUMMARY_STARTED_PAN__=false;
+        viewport?.addEventListener('pointerdown',event=>{
+          if(event.target.closest?.('[data-relation-block] summary')&&viewport.classList.contains('is-panning'))globalThis.__QA_RELATION_SUMMARY_STARTED_PAN__=true;
+        });
+      });
+      await summary.tap();
+      await card.locator('[data-relation-block][open]').waitFor({state:'attached',timeout:6000});
+      expect(await page.evaluate(()=>globalThis.__QA_RELATION_SUMMARY_STARTED_PAN__)===false,`mobile ${width}: relation summary initiated Board pan`);
+      expect(await page.locator('.dc-artifact-overlay:not([hidden])').count()===0,`mobile ${width}: relation summary opened Artifact fullscreen`);
+      expect(!errors.length,`mobile ${width}: relation summary errors: ${errors.join(' | ')}`);
+      await ctx.close();
+    }
+
     const{ctx,page,errors}=await openBoard(browser,'author',{width,height:844});
     const card=page.locator('.dc-notice[data-artifact="'+A+'"]');
     const cardOverflow=await card.evaluate(el=>el.scrollWidth>el.clientWidth+1);
@@ -362,5 +389,5 @@ if(failures.length){console.error('ARTIFACT COLLABORATION BROWSER BLOCKED');for(
 console.log('ARTIFACT COLLABORATION BROWSER ACCEPTANCE COMPLETE');
 console.log('✓ IDEA-only visibility presentation, independent rosters and canonical detail collaboration UI exercised');
 console.log('✓ invited/joined/declined/left/author/remove/no-oracle scenarios exercised');
-console.log('✓ participant Relations UI exposes RELATED_TO-only participant path');
+console.log('✓ participant Relations UI exposes RELATED_TO-only participant path + server can_delete create→reload→open→delete round-trip');
 console.log('✓ desktop, 390px and 360px overflow checks exercised');
