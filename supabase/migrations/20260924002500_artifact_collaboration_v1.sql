@@ -1668,7 +1668,9 @@ begin
   where r.id=p_relation_id and r.deleted_at is null
   for update;
 
-  if v_relation.id is null then raise exception 'RELATION_NOT_AVAILABLE'; end if;
+  if v_relation.id is null then
+    raise exception 'RELATION_NOT_AVAILABLE';
+  end if;
 
   v_owner_admin:=public.dc_is_owner_admin(v_uid);
 
@@ -1677,96 +1679,116 @@ begin
        or not public.dc_can_read_board_endpoint_v1(v_relation.target_kind,v_relation.target_source_id) then
       raise exception 'RELATION_NOT_AVAILABLE';
     end if;
-  end if;
 
-  if v_relation.origin_kind='artifact' then
-    v_origin_artifact_id:=v_relation.origin_source_id::uuid;
-    v_can_manage_origin:=public.dc_membership_active(v_uid)
-      and exists (
-        select 1 from public.dc_artifacts a
-        where a.id=v_origin_artifact_id and a.author_profile_id=v_uid
-      );
-  elsif v_relation.origin_kind='event' then
-    select e.id into v_origin_entity_id
-    from public.dc_entities e join public.dc_events ev on ev.entity_id=e.id
-    where e.entity_type='event' and e.slug=v_relation.origin_source_id and e.provenance_status='confirmed';
-    v_can_manage_origin:=v_origin_entity_id is not null
-      and public.dc_membership_active(v_uid)
-      and public.dc_has_role('dementor',v_uid)
-      and exists (
-        select 1 from public.dc_entity_assignments a
-        where a.profile_id=v_uid and a.entity_id=v_origin_entity_id
-          and a.role='dementor' and a.status='active'
-          and a.provenance_status='confirmed'
-          and a.valid_from<=now() and (a.valid_to is null or a.valid_to>now())
-      );
-  elsif v_relation.origin_kind='program' then
-    select e.id into v_origin_entity_id
-    from public.dc_entities e join public.dc_programs pr on pr.entity_id=e.id
-    where e.entity_type='program' and e.slug=v_relation.origin_source_id and e.provenance_status='confirmed';
-    v_can_manage_origin:=v_origin_entity_id is not null
-      and public.dc_membership_active(v_uid)
-      and public.dc_has_role('dementor',v_uid)
-      and exists (
-        select 1 from public.dc_entity_assignments a
-        where a.profile_id=v_uid and a.entity_id=v_origin_entity_id
-          and a.role='dementor' and a.status='active'
-          and a.provenance_status='confirmed'
-          and a.valid_from<=now() and (a.valid_to is null or a.valid_to>now())
-      );
-  end if;
-
-  if v_relation.relation_type='RELATED_TO' then
-    if v_relation.target_kind='artifact' then
-      v_target_artifact_id:=v_relation.target_source_id::uuid;
-      v_can_manage_target:=public.dc_membership_active(v_uid)
+    if v_relation.origin_kind='artifact' then
+      v_origin_artifact_id:=v_relation.origin_source_id::uuid;
+      v_can_manage_origin:=public.dc_membership_active(v_uid)
         and exists (
           select 1 from public.dc_artifacts a
-          where a.id=v_target_artifact_id and a.author_profile_id=v_uid
+          where a.id=v_origin_artifact_id and a.author_profile_id=v_uid
         );
-    elsif v_relation.target_kind='event' then
-      select e.id into v_target_entity_id
+    elsif v_relation.origin_kind='event' then
+      select e.id into v_origin_entity_id
       from public.dc_entities e join public.dc_events ev on ev.entity_id=e.id
-      where e.entity_type='event' and e.slug=v_relation.target_source_id and e.provenance_status='confirmed';
-      v_can_manage_target:=v_target_entity_id is not null
+      where e.entity_type='event'
+        and e.slug=v_relation.origin_source_id
+        and e.provenance_status='confirmed';
+      v_can_manage_origin:=v_origin_entity_id is not null
         and public.dc_membership_active(v_uid)
         and public.dc_has_role('dementor',v_uid)
         and exists (
           select 1 from public.dc_entity_assignments a
-          where a.profile_id=v_uid and a.entity_id=v_target_entity_id
-            and a.role='dementor' and a.status='active'
+          where a.profile_id=v_uid
+            and a.entity_id=v_origin_entity_id
+            and a.role='dementor'
+            and a.status='active'
             and a.provenance_status='confirmed'
-            and a.valid_from<=now() and (a.valid_to is null or a.valid_to>now())
+            and a.valid_from<=now()
+            and (a.valid_to is null or a.valid_to>now())
         );
-    elsif v_relation.target_kind='program' then
-      select e.id into v_target_entity_id
+    elsif v_relation.origin_kind='program' then
+      select e.id into v_origin_entity_id
       from public.dc_entities e join public.dc_programs pr on pr.entity_id=e.id
-      where e.entity_type='program' and e.slug=v_relation.target_source_id and e.provenance_status='confirmed';
-      v_can_manage_target:=v_target_entity_id is not null
+      where e.entity_type='program'
+        and e.slug=v_relation.origin_source_id
+        and e.provenance_status='confirmed';
+      v_can_manage_origin:=v_origin_entity_id is not null
         and public.dc_membership_active(v_uid)
         and public.dc_has_role('dementor',v_uid)
         and exists (
           select 1 from public.dc_entity_assignments a
-          where a.profile_id=v_uid and a.entity_id=v_target_entity_id
-            and a.role='dementor' and a.status='active'
+          where a.profile_id=v_uid
+            and a.entity_id=v_origin_entity_id
+            and a.role='dementor'
+            and a.status='active'
             and a.provenance_status='confirmed'
-            and a.valid_from<=now() and (a.valid_to is null or a.valid_to>now())
+            and a.valid_from<=now()
+            and (a.valid_to is null or a.valid_to>now())
         );
     end if;
 
-    v_participant_delete :=
-      v_relation.created_by=v_uid
-      and (
-        (v_relation.origin_kind='artifact' and public.dc_is_joined_idea_participant_v1(v_origin_artifact_id))
-        or
-        (v_relation.target_kind='artifact' and public.dc_is_joined_idea_participant_v1(v_target_artifact_id))
-      );
+    if v_relation.relation_type='RELATED_TO' then
+      if v_relation.target_kind='artifact' then
+        v_target_artifact_id:=v_relation.target_source_id::uuid;
+        v_can_manage_target:=public.dc_membership_active(v_uid)
+          and exists (
+            select 1 from public.dc_artifacts a
+            where a.id=v_target_artifact_id and a.author_profile_id=v_uid
+          );
+      elsif v_relation.target_kind='event' then
+        select e.id into v_target_entity_id
+        from public.dc_entities e join public.dc_events ev on ev.entity_id=e.id
+        where e.entity_type='event'
+          and e.slug=v_relation.target_source_id
+          and e.provenance_status='confirmed';
+        v_can_manage_target:=v_target_entity_id is not null
+          and public.dc_membership_active(v_uid)
+          and public.dc_has_role('dementor',v_uid)
+          and exists (
+            select 1 from public.dc_entity_assignments a
+            where a.profile_id=v_uid
+              and a.entity_id=v_target_entity_id
+              and a.role='dementor'
+              and a.status='active'
+              and a.provenance_status='confirmed'
+              and a.valid_from<=now()
+              and (a.valid_to is null or a.valid_to>now())
+          );
+      elsif v_relation.target_kind='program' then
+        select e.id into v_target_entity_id
+        from public.dc_entities e join public.dc_programs pr on pr.entity_id=e.id
+        where e.entity_type='program'
+          and e.slug=v_relation.target_source_id
+          and e.provenance_status='confirmed';
+        v_can_manage_target:=v_target_entity_id is not null
+          and public.dc_membership_active(v_uid)
+          and public.dc_has_role('dementor',v_uid)
+          and exists (
+            select 1 from public.dc_entity_assignments a
+            where a.profile_id=v_uid
+              and a.entity_id=v_target_entity_id
+              and a.role='dementor'
+              and a.status='active'
+              and a.provenance_status='confirmed'
+              and a.valid_from<=now()
+              and (a.valid_to is null or a.valid_to>now())
+          );
+      end if;
 
-    if not (v_can_manage_origin or v_can_manage_target or v_participant_delete) then
+      v_participant_delete :=
+        v_relation.created_by=v_uid
+        and (
+          (v_relation.origin_kind='artifact' and public.dc_is_joined_idea_participant_v1(v_origin_artifact_id))
+          or
+          (v_relation.target_kind='artifact' and public.dc_is_joined_idea_participant_v1(v_target_artifact_id))
+        );
+
+      if not (v_can_manage_origin or v_can_manage_target or v_participant_delete) then
+        raise exception 'RELATION_DELETE_FORBIDDEN' using errcode='42501';
+      end if;
+    elsif not v_can_manage_origin then
       raise exception 'RELATION_DELETE_FORBIDDEN' using errcode='42501';
     end if;
-  elsif not v_can_manage_origin then
-    raise exception 'RELATION_DELETE_FORBIDDEN' using errcode='42501';
   end if;
 
   update public.dc_board_relations
