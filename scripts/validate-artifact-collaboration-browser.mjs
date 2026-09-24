@@ -326,7 +326,7 @@ try{
     expect(await directionalRow.count()===1,'negative directional fixture missing after reload/open/read');
     expect(await directionalRow.locator('[data-relation-delete]').count()===0,'can_delete=false directional relation must not expose delete control');
 
-    const deleteCallsBefore=(await rpcCalls(page,'dc_board_relation_delete_v1')).length;
+    const deleteCallsBefore=await page.evaluate(()=>globalThis.__QA_COLLAB_CALLS__.filter(call=>call.name==='dc_board_relation_delete_v1').length);
     await createdDelete.click();
     await page.waitForFunction(
       before=>globalThis.__QA_COLLAB_CALLS__.filter(call=>call.name==='dc_board_relation_delete_v1').length>before,
