@@ -188,26 +188,14 @@ begin
     raise exception 'PARTICIPATION_STATE_INVALID';
   end if;
 
-  if not exists (select 1 from public.profiles p where p.id = p_profile_id) then
-    raise exception 'PARTICIPANT_PROFILE_NOT_FOUND';
+  v_owner_admin := public.dc_is_owner_admin(v_uid);
+
+  -- Self-actions validate actor identity before touching hidden Artifact state.
+  if v_state in ('JOINED','DECLINED','LEFT') and v_uid <> p_profile_id then
+    raise exception 'PARTICIPATION_SELF_ACTION_REQUIRED' using errcode = '42501';
   end if;
 
-  select * into v_artifact
-  from public.dc_artifacts a
-  where a.id = p_artifact_id
-  for update;
-
-  if v_artifact.id is null
-     or v_artifact.artifact_type <> 'idea'
-     or v_artifact.published_at is null
-     or v_artifact.status not in ('active','expired','archived') then
-    raise exception 'ARTIFACT_IDEA_NOT_AVAILABLE';
-  end if;
-
-  if p_profile_id = v_artifact.author_profile_id then
-    raise exception 'ARTIFACT_AUTHOR_IS_NOT_PARTICIPANT';
-  end if;
-
+  -- Serialize one profile's transition stream without exposing Artifact existence.
   perform pg_catalog.pg_advisory_xact_lock(
     pg_catalog.hashtextextended(p_artifact_id::text || ':' || p_profile_id::text, 0)
   );
@@ -220,33 +208,71 @@ begin
   order by e.transition_no desc
   limit 1;
 
-  v_owner_admin := public.dc_is_owner_admin(v_uid);
+  if v_state in ('INVITED','REMOVED') then
+    select * into v_artifact
+    from public.dc_artifacts a
+    where a.id = p_artifact_id
+      and a.artifact_type = 'idea'
+      and a.published_at is not null
+      and a.status in ('active','expired','archived')
+      and (
+        a.author_profile_id = v_uid
+        or v_owner_admin
+      )
+    for update;
+
+    if v_artifact.id is null then
+      raise exception 'ARTIFACT_NOT_AVAILABLE';
+    end if;
+  elsif v_state in ('JOINED','DECLINED') then
+    if v_current_state is distinct from 'INVITED' then
+      raise exception 'ARTIFACT_NOT_AVAILABLE';
+    end if;
+
+    select * into v_artifact
+    from public.dc_artifacts a
+    where a.id = p_artifact_id
+      and a.artifact_type = 'idea'
+      and a.published_at is not null
+      and a.status in ('active','expired','archived')
+    for update;
+
+    if v_artifact.id is null then
+      raise exception 'ARTIFACT_NOT_AVAILABLE';
+    end if;
+  elsif v_state = 'LEFT' then
+    if v_current_state is distinct from 'JOINED' then
+      raise exception 'ARTIFACT_NOT_AVAILABLE';
+    end if;
+
+    select * into v_artifact
+    from public.dc_artifacts a
+    where a.id = p_artifact_id
+      and a.artifact_type = 'idea'
+      and a.published_at is not null
+      and a.status in ('active','expired','archived')
+    for update;
+
+    if v_artifact.id is null then
+      raise exception 'ARTIFACT_NOT_AVAILABLE';
+    end if;
+  end if;
+
+  -- Target identity is checked only after caller is authorized for this Artifact,
+  -- so this RPC cannot be used as a registered-profile existence oracle.
+  if not exists (select 1 from public.profiles p where p.id = p_profile_id) then
+    raise exception 'PARTICIPANT_PROFILE_NOT_FOUND';
+  end if;
+
+  if p_profile_id = v_artifact.author_profile_id then
+    raise exception 'ARTIFACT_AUTHOR_IS_NOT_PARTICIPANT';
+  end if;
 
   if v_state = 'INVITED' then
-    if not (v_uid = v_artifact.author_profile_id or v_owner_admin) then
-      raise exception 'PARTICIPATION_AUTHOR_OR_OWNER_ADMIN_REQUIRED' using errcode = '42501';
-    end if;
     if v_current_state in ('INVITED','JOINED') then
       raise exception 'PARTICIPATION_ALREADY_CURRENT';
     end if;
-  elsif v_state in ('JOINED','DECLINED') then
-    if v_uid <> p_profile_id then
-      raise exception 'PARTICIPATION_SELF_ACTION_REQUIRED' using errcode = '42501';
-    end if;
-    if v_current_state is distinct from 'INVITED' then
-      raise exception 'PARTICIPATION_INVITE_REQUIRED';
-    end if;
-  elsif v_state = 'LEFT' then
-    if v_uid <> p_profile_id then
-      raise exception 'PARTICIPATION_SELF_ACTION_REQUIRED' using errcode = '42501';
-    end if;
-    if v_current_state is distinct from 'JOINED' then
-      raise exception 'PARTICIPATION_JOIN_REQUIRED';
-    end if;
   elsif v_state = 'REMOVED' then
-    if not (v_uid = v_artifact.author_profile_id or v_owner_admin) then
-      raise exception 'PARTICIPATION_AUTHOR_OR_OWNER_ADMIN_REQUIRED' using errcode = '42501';
-    end if;
     if v_current_state not in ('INVITED','JOINED') then
       raise exception 'PARTICIPATION_CURRENT_STATE_REQUIRED';
     end if;
@@ -308,17 +334,18 @@ begin
 
   select * into v_artifact
   from public.dc_artifacts a
-  where a.id = p_artifact_id;
+  where a.id = p_artifact_id
+    and a.artifact_type = 'idea'
+    and a.published_at is not null
+    and a.status in ('active','expired','archived')
+    and (
+      a.author_profile_id = v_uid
+      or public.dc_is_owner_admin(v_uid)
+    );
 
-  if v_artifact.id is null
-     or v_artifact.artifact_type <> 'idea'
-     or v_artifact.published_at is null
-     or v_artifact.status not in ('active','expired','archived') then
-    raise exception 'ARTIFACT_IDEA_NOT_AVAILABLE';
-  end if;
-
-  if not (v_artifact.author_profile_id = v_uid or public.dc_is_owner_admin(v_uid)) then
-    raise exception 'PARTICIPATION_AUTHOR_OR_OWNER_ADMIN_REQUIRED' using errcode = '42501';
+  -- Same terminal state for missing, hidden and unauthorized Artifacts.
+  if v_artifact.id is null then
+    raise exception 'ARTIFACT_NOT_AVAILABLE';
   end if;
 
   return query
@@ -1641,7 +1668,7 @@ begin
   where r.id=p_relation_id and r.deleted_at is null
   for update;
 
-  if v_relation.id is null then raise exception 'RELATION_NOT_FOUND'; end if;
+  if v_relation.id is null then raise exception 'RELATION_NOT_AVAILABLE'; end if;
 
   v_owner_admin:=public.dc_is_owner_admin(v_uid);
 
