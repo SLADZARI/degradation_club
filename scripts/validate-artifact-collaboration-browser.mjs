@@ -284,7 +284,7 @@ try{
         choice.value=value;
         save.click();
       },eventChoice.value);
-      await page.waitForSelector('.dc-notice[data-artifact="'+A+'"] [data-relation-id="rel-created"]');
+      await page.waitForSelector('.dc-notice[data-artifact="'+A+'"] [data-relation-id="rel-created"]',{state:'attached'});
     }
 
     // Simulated reload/read must reconstruct delete authority exclusively from row.can_delete.
