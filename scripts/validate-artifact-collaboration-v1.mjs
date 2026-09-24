@@ -36,6 +36,7 @@ const mediaObjectRead = extractFunction('dc_can_read_artifact_media_object_v1');
 const publishArtifact = extractFunction('dc_publish_artifact_v1');
 const adminGrant = extractFunction('dc_admin_grant_artifact_slots_v1');
 const relationRead = extractFunction('dc_board_relations_read_v1');
+const relationCanDelete = extractFunction('dc_can_delete_board_relation_v1');
 const relationCreate = extractFunction('dc_board_relation_create_v1');
 const relationDelete = extractFunction('dc_board_relation_delete_v1');
 const claimPending = extractFunction('dc_distribution_claim_pending_v1');
@@ -143,24 +144,42 @@ expect(publicActivity.includes('NO_RELEASED_GENERIC_EDITORIAL_ELIGIBILITY_OWNER'
 expect(publicActivity.includes('where false;'), 'public Activity is not fail-closed');
 expect(!migration.includes('create or replace function public.dc_public_activity_read_v1'), 'Artifact Collaboration migration reopens public Activity');
 
-// Relations: read both endpoints; participant write only RELATED_TO; participant delete own edge only.
-expect(Boolean(relationRead) && Boolean(relationCreate) && Boolean(relationDelete), 'relation RPC replacement incomplete');
+// Relations: canonical read projects server-authoritative can_delete from the same backend predicate as delete.
+expect(Boolean(relationRead) && Boolean(relationCanDelete) && Boolean(relationCreate) && Boolean(relationDelete), 'relation RPC/capability replacement incomplete');
+expect(relationRead.includes('can_delete boolean'), 'relation read projection lacks can_delete');
+expect(relationRead.includes('public.dc_can_delete_board_relation_v1(r.id)'), 'relation read does not use canonical delete capability');
+expect(!relationRead.includes('created_by'), 'relation read leaks private creator identity');
 expect(relationRead.includes('dc_can_read_board_endpoint_v1(r.origin_kind,r.origin_source_id)'), 'relation read lacks origin ACL');
 expect(relationRead.includes('dc_can_read_board_endpoint_v1(r.target_kind,r.target_source_id)'), 'relation read lacks target ACL');
+
+expect(relationCanDelete.includes('public.dc_is_owner_admin(v_uid)'), 'can_delete lacks Owner Admin authority');
+expect(relationCanDelete.includes('public.dc_can_read_board_endpoint_v1(v_relation.origin_kind,v_relation.origin_source_id)'), 'can_delete lacks origin endpoint ACL');
+expect(relationCanDelete.includes('public.dc_can_read_board_endpoint_v1(v_relation.target_kind,v_relation.target_source_id)'), 'can_delete lacks target endpoint ACL');
+expect(relationCanDelete.includes("v_relation.relation_type='RELATED_TO'"), 'participant can_delete is not RELATED_TO-only');
+expect(relationCanDelete.includes('v_relation.created_by=v_uid'), 'participant can_delete is not creator-scoped');
+expect(relationCanDelete.includes('public.dc_is_joined_idea_participant_v1'), 'participant can_delete is not JOINED-scoped');
+expect(relationCanDelete.includes('public.dc_membership_active(v_uid)'), 'existing Member manager relation authority regressed');
+expect(relationCanDelete.includes("public.dc_has_role('dementor',v_uid)") || relationCanDelete.includes("public.dc_has_role('dementor', v_uid)"), 'scoped Dementor manager authority regressed');
+expect(relationCanDelete.includes('public.dc_entity_assignments'), 'scoped entity manager authority regressed');
+expect(migration.includes('revoke all on function public.dc_can_delete_board_relation_v1(uuid)\n  from public, anon, authenticated, service_role;'), 'internal can_delete helper is exposed to clients');
+
 expect(relationCreate.includes("if v_relation_type='RELATED_TO' then"), 'RELATED_TO branch missing');
 expect(relationCreate.includes('v_participant_related'), 'participant RELATED_TO permission path missing');
 expect(relationCreate.includes('elsif not v_can_manage_origin then'), 'directional relation authorization drifted');
-expect(relationDelete.includes('v_relation.created_by=v_uid'), 'participant relation delete is not creator-scoped');
-expect(relationDelete.includes('v_participant_delete'), 'participant relation delete path missing');
+expect(relationCreate.includes('public.dc_is_owner_admin(v_uid)'), 'Owner Admin relation-create authority missing');
+expect(relationCreate.includes('public.dc_membership_active(v_uid)'), 'existing Member relation create authority regressed');
+expect(relationCreate.includes("public.dc_has_role('dementor',v_uid)") || relationCreate.includes("public.dc_has_role('dementor', v_uid)"), 'scoped Dementor relation create authority regressed');
+expect(relationCreate.includes('public.dc_entity_assignments'), 'scoped entity relation create authority regressed');
+
+expect(relationDelete.includes('public.dc_can_delete_board_relation_v1(v_relation.id)'), 'delete RPC does not consume canonical can_delete predicate');
 expect(!relationDelete.includes("raise exception 'RELATION_NOT_FOUND'"), 'relation delete leaks hidden relation existence');
 expect(relationDelete.includes("raise exception 'RELATION_NOT_AVAILABLE'"), 'relation delete generic no-oracle state missing');
 expect(relationDelete.includes('if not v_owner_admin then'), 'Owner Admin relation-delete bypass wrapper missing');
-expect(relationCreate.includes('public.dc_is_owner_admin(v_uid)'), 'Owner Admin relation-create authority missing');
-for (const fn of [relationCreate, relationDelete]) {
-  expect(fn.includes('public.dc_membership_active(v_uid)'), 'existing Member relation authority regressed');
-  expect(fn.includes("public.dc_has_role('dementor',v_uid)") || fn.includes("public.dc_has_role('dementor', v_uid)"), 'scoped Dementor relation authority regressed');
-  expect(fn.includes('public.dc_entity_assignments'), 'scoped entity relation authority regressed');
-}
+expect(relationDelete.includes('dc_can_read_board_endpoint_v1(v_relation.origin_kind,v_relation.origin_source_id)'), 'delete RPC lost origin no-oracle guard');
+expect(relationDelete.includes('dc_can_read_board_endpoint_v1(v_relation.target_kind,v_relation.target_source_id)'), 'delete RPC lost target no-oracle guard');
+
+expect(migration.includes('drop function public.dc_board_relations_read_v1();'), 'relation read return-contract replacement does not explicitly drop prior signature');
+expect(migration.includes('grant execute on function public.dc_board_relations_read_v1() to authenticated;'), 'relation read execute grant not restored after return-contract replacement');
 expect(!/origin_kind\s*=\s*'person'|target_kind\s*=\s*'person'/i.test(migration), 'Person relation endpoint detected');
 
 // Share remains transport-only; no invite/participant mutation in canonical share owner.

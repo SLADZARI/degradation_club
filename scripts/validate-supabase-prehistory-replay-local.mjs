@@ -11,6 +11,7 @@ const SOURCE_MIGRATIONS = path.join(SOURCE_SUPABASE, 'migrations');
 const FIXTURE_DIR = path.join(SOURCE_SUPABASE, 'bootstrap', 'prehistory');
 const OVERLAY_DIR = path.join(SOURCE_SUPABASE, 'bootstrap', 'production-compatibility');
 const G5_EVIDENCE_OUTPUT = path.join(ROOT, 'artifact-collaboration-g5-runtime-evidence.json');
+const RELATION_CAPABILITY_VALIDATOR = path.join(ROOT, 'scripts', 'validate-artifact-collaboration-relation-delete-capability-local.mjs');
 
 const BRANCH = 'result/artifact-collaboration-v1';
 const EPHEMERAL_NAME = '20260827212519_pre_dementor_replay_fixture.sql';
@@ -22,7 +23,7 @@ const EXPECTED_BLOBS = new Map([
   ['20260827212520_archive_edu_and_create_dementor_core.sql', 'ad1e8762167dc1a01f023b70247abdbff808bde7'],
   ['20260827212614_secure_legacy_edu_archive.sql', 'c69bbdfdb8e5e00f6a3b569e925349e15a5076ce'],
   ['20260828170411_dc_workspace_readonly_v01.sql', '6d313eda5d8fa23713e2186dac0f39317d4f28d1'],
-  [ARTIFACT_MIGRATION, 'b18b79b78643bd0509797ca1e621bf8f77edbdf3'],
+  [ARTIFACT_MIGRATION, 'b596500ed3145ec1f352464c8609c38e02efbc05'],
 ]);
 
 const FIXTURE_PARTS = [
@@ -119,6 +120,9 @@ function checkSourceBoundary() {
   }
   for (const part of OVERLAY_PARTS) {
     if (!fs.existsSync(path.join(OVERLAY_DIR, part))) fail(`missing production compatibility overlay part: ${part}`);
+  }
+  if (!fs.existsSync(RELATION_CAPABILITY_VALIDATOR)) {
+    fail('missing relation delete capability local validator');
   }
 
   const artifactSql = fs.readFileSync(path.join(SOURCE_MIGRATIONS, ARTIFACT_MIGRATION), 'utf8');
@@ -642,11 +646,11 @@ on conflict do nothing;
   matrix.storage_privacy = 'PASS';
 
   const idea2 = psqlAs(container, AUTHOR, `
-select public.dc_create_artifact_draft_v1('Runtime Circle Idea 2','Runtime Circle Idea 2',null,null,null);
+select public.dc_create_artifact_draft_v1('Runtime Community Idea 2','Runtime Community Idea 2',null,null,null);
 `).split(/\r?\n/).filter(Boolean).at(-1);
   if (!/^[0-9a-f-]{36}$/i.test(idea2)) fail(`invalid second runtime idea id: ${idea2}`);
   psqlAs(container, AUTHOR, `select public.dc_set_artifact_subtype_v1('${idea2}'::uuid,'idea');`);
-  psqlAs(container, AUTHOR, `select public.dc_set_artifact_visibility_v1('${idea2}'::uuid,'circle');`);
+  psqlAs(container, AUTHOR, `select public.dc_set_artifact_visibility_v1('${idea2}'::uuid,'community');`);
   expectError(container, AUTHOR,
     `select public.dc_publish_artifact_v1('${idea2}'::uuid);`,
     'NO_ARTIFACT_SLOT_AVAILABLE', 'slot capacity ceiling');
@@ -768,6 +772,9 @@ async function main() {
     phase = 'PHASE_5_G5_RUNTIME_MATRIX';
     console.log('[phase 5] Artifact Collaboration G5 runtime matrix');
     evidence.runtime_matrix = runtimeMatrix(container);
+    const relationCapabilityOutput = run('node', [RELATION_CAPABILITY_VALIDATOR, container], ROOT);
+    const relationCapabilityMatrix = JSON.parse(relationCapabilityOutput);
+    Object.assign(evidence.runtime_matrix, relationCapabilityMatrix);
     evidence.status = 'PASS';
 
     console.log('[PASS] observed-production-compatible replay + Artifact Collaboration G5 runtime');
