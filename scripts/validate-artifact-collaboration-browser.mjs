@@ -175,7 +175,17 @@ try{
   // Author detail: roster, visibility, safe selector, remove.
   {
     const{ctx,page,errors}=await openDetail(browser,'author');
-    const text=await page.locator('[data-artifact-collaboration]').innerText();
+    const collab=page.locator('[data-artifact-collaboration]');
+    if(await collab.count()===0){
+      const diagnostics=await page.evaluate(()=>({
+        artifactState:document.getElementById('artifactState')?.textContent||null,
+        hostText:document.getElementById('artifactHost')?.innerText||null,
+        hostHtml:document.getElementById('artifactHost')?.innerHTML||null
+      }));
+      await page.screenshot({path:path.join(outDir,'author-detail-debug.png'),fullPage:true});
+      throw new Error('AUTHOR_DETAIL_COLLABORATION_MISSING '+JSON.stringify({diagnostics,pageErrors:errors}));
+    }
+    const text=await collab.innerText();
     expect(text.includes('ИНИЦИАТОР')&&text.includes('В ДЕЛЕ')&&text.includes('ПОЗВАНЫ'),'author detail hierarchy missing');
     expect(text.includes('ВИДНО · СВОЙ КРУГ'),'author detail visibility missing');
     expect(await page.locator('[data-invite-toggle]').count()===1,'author detail +ПОЗВАТЬ missing');
