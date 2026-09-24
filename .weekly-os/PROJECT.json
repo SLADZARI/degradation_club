@@ -7,12 +7,12 @@
     "projectStage": "BUILD",
     "gate": "G5_BUILD",
     "status": "APPROVED",
-    "version": "2.82",
-    "updated": "2026-09-24",
+    "version": "2.83",
+    "updated": "2026-09-25",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.81"
+    "supersedes": "2.82"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -220,7 +220,9 @@
     ".weekly-os/results/artifact-collaboration-v1.v0.4.md",
     "operations/ARTIFACT_COLLABORATION_BACKEND_G5_LOCAL_STACK_BLOCKER_2026-09-24.md",
     ".weekly-os/results/artifact-collaboration-v1.v0.5.md",
-    "operations/ARTIFACT_COLLABORATION_BACKEND_G5_MIGRATION_HISTORY_REPLAY_BLOCKER_2026-09-24.md"
+    "operations/ARTIFACT_COLLABORATION_BACKEND_G5_MIGRATION_HISTORY_REPLAY_BLOCKER_2026-09-24.md",
+    "operations/ARTIFACT_COLLABORATION_BACKEND_G5_RUNTIME_2026-09-25.md",
+    ".weekly-os/results/artifact-collaboration-v1.v0.6.md"
   ],
   "authority": {
     "mpDslCore": {
@@ -387,10 +389,10 @@
   },
   "currentResult": {
     "artifactId": "dementor-club.result.artifact-collaboration-v1",
-    "version": "0.5",
+    "version": "0.6",
     "status": "REVIEW",
-    "workStatus": "BLOCKED",
-    "path": ".weekly-os/results/artifact-collaboration-v1.v0.5.md",
+    "workStatus": "ACTIVE",
+    "path": ".weekly-os/results/artifact-collaboration-v1.v0.6.md",
     "gate": "G5_BUILD",
     "scope": [
       "idea participation",
@@ -413,15 +415,22 @@
     "g5BackendEvidence": "operations/ARTIFACT_COLLABORATION_BACKEND_G5_CHECKPOINT_2026-09-24.md",
     "g5BackendCandidateCommit": "3522993d6796fe9dae81a0c7dbde1ddcc1aa350a",
     "g5BackendStaticStatus": "PASS",
-    "g5SqlExecutionStatus": "BLOCKED_HISTORICAL_MIGRATION_REPLAY",
-    "gateReadiness": "G5_BACKEND_STATIC_READY_BASELINE_REPLAY_BLOCKED",
-    "note": "Free local Supabase runtime works. DEV1 is now blocked earlier in the historical migration chain: clean replay fails at 20260827212614 because legacy_edu.profiles depends on pre-existing EDU schema not represented by repository migrations. Artifact Collaboration migration is not reached. Live Supabase/paid infra/merge/deploy remain unauthorized.",
+    "g5SqlExecutionStatus": "PASS_LOCAL_OBSERVED_PRODUCTION_COMPATIBLE_REPLAY",
+    "gateReadiness": "G5_BACKEND_RUNTIME_PASS_INTEGRATION_VALIDATION_PENDING",
+    "note": "DEV1 backend G5 runtime PASS on exact observed-production-compatible local baseline. Artifact migration, repeatability and backend runtime matrix PASS. Local Supabase CLI post-reset restart remains WARN_502 with direct DB proof. Overall Result stays G5_BUILD pending DEV2/integration/browser acceptance; G6 not entered.",
     "implementationBrief": "operations/ARTIFACT_COLLABORATION_IMPLEMENTATION_BRIEF_V1.md",
     "g5BackendLocalBlockerEvidence": "operations/ARTIFACT_COLLABORATION_BACKEND_G5_LOCAL_STACK_BLOCKER_2026-09-24.md",
     "costBoundary": "NO_PAID_INFRASTRUCTURE",
-    "integrationHeadTested": "b3410377c908db833a480c2425e7681100f6077d",
+    "integrationHeadTested": "47d1286379615962208ba43120bf409af00c5361",
     "backendCandidateCommit": "3522993d6796fe9dae81a0c7dbde1ddcc1aa350a",
-    "g5BackendReplayBlockerEvidence": "operations/ARTIFACT_COLLABORATION_BACKEND_G5_MIGRATION_HISTORY_REPLAY_BLOCKER_2026-09-24.md"
+    "g5BackendReplayBlockerEvidence": "operations/ARTIFACT_COLLABORATION_BACKEND_G5_MIGRATION_HISTORY_REPLAY_BLOCKER_2026-09-24.md",
+    "g5BackendRuntimeStatus": "PASS",
+    "g5RepeatabilityStatus": "PASS",
+    "g5LocalServiceHealthStatus": "WARN_POST_RESET_RESTART_502_DB_PROVEN",
+    "g5BackendRuntimeEvidence": "operations/ARTIFACT_COLLABORATION_BACKEND_G5_RUNTIME_2026-09-25.md",
+    "prehistoryFixtureCommit": "e58edb6a931c8536a7ed4cbe907d0b38c5ba4c9e",
+    "observedProductionOverlayCommit": "95b33bdb9e51376cd28b9eecac63a2fcfb7dfe75",
+    "artifactMigrationBlob": "b18b79b78643bd0509797ca1e621bf8f77edbdf3"
   },
   "waitingResults": [
     {
