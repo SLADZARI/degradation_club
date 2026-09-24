@@ -7,12 +7,12 @@
     "projectStage": "BUILD",
     "gate": "G4_SEMANTIC_CONTRACT",
     "status": "APPROVED",
-    "version": "2.71",
+    "version": "2.72",
     "updated": "2026-09-24",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.70"
+    "supersedes": "2.71"
   },
   "currentArtifacts": [
     {
@@ -2579,7 +2579,8 @@
       "g5BackendEvidence": "operations/ARTIFACT_COLLABORATION_BACKEND_G5_CHECKPOINT_2026-09-24.md",
       "g5BackendCandidateCommit": "06ba2aa94c990a2e0bce4a6729a4f6963acb0e19",
       "g5BackendStaticStatus": "PASS",
-      "g5SqlExecutionStatus": "NOT_RUN"
+      "g5SqlExecutionStatus": "NOT_RUN",
+      "implementationBrief": "operations/ARTIFACT_COLLABORATION_IMPLEMENTATION_BRIEF_V1.md"
     },
     {
       "artifactId": "dementor-club.evidence.artifact-collaboration-backend-g4-2026-09-24",
@@ -2620,6 +2621,23 @@
       "candidateCommit": "06ba2aa94c990a2e0bce4a6729a4f6963acb0e19",
       "liveDatabaseMutationAuthorized": false,
       "verdict": "STATIC_PASS_SQL_NOT_RUN"
+    },
+    {
+      "artifactId": "dementor-club.operations.artifact-collaboration-implementation-brief-v1",
+      "documentType": "IMPLEMENTATION_BRIEF",
+      "currentVersion": "1.0",
+      "version": "1.0",
+      "status": "APPROVED",
+      "relation": "CURRENT_IMPLEMENTATION_BRIEF",
+      "gate": "G5_BUILD",
+      "projectStage": "BUILD",
+      "path": "operations/ARTIFACT_COLLABORATION_IMPLEMENTATION_BRIEF_V1.md",
+      "location": "operations/ARTIFACT_COLLABORATION_IMPLEMENTATION_BRIEF_V1.md",
+      "sourceSystem": "GIT",
+      "authorityType": "IMPLEMENTATION_COORDINATION",
+      "updated": "2026-09-24",
+      "result": "dementor-club.result.artifact-collaboration-v1",
+      "note": "Two-developer execution brief for Artifact Collaboration v1: DEV1 backend/Supabase, DEV2 frontend/UX, one Result/one integration branch, explicit gate and stop boundaries."
     }
   ],
   "referenceArtifacts": [
