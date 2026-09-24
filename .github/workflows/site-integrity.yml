@@ -130,6 +130,16 @@ jobs:
         run: node scripts/validate-board-navigation-adaptive-cards-browser.mjs
       - name: Validate Board Relations v1 browser acceptance
         run: node scripts/validate-board-relations-runtime-browser.mjs
+      - name: Validate Artifact Collaboration v1 browser acceptance
+        run: node scripts/validate-artifact-collaboration-browser.mjs
+      - name: Upload Artifact Collaboration v1 references
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: artifact-collaboration-v1-references
+          path: .qa/artifact-collaboration-v1/*.png
+          if-no-files-found: warn
+          retention-days: 14
       - name: Upload Board Relations v1 references
         if: always()
         uses: actions/upload-artifact@v4

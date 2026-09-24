@@ -109,6 +109,20 @@ function canManageEndpoint(endpoint){
   if(!systemDementor)return false;
   return Boolean(endpoint.localSourceId&&scopedEntityIds.has(endpoint.localSourceId));
 }
+function joinedIdeaEndpoint(endpoint){
+  return Boolean(
+    endpoint?.kind==='artifact'
+    &&endpoint.card?.dataset.artifactSubtype==='idea'
+    &&endpoint.card?.dataset.collabMyState==='JOINED'
+  );
+}
+function canCreateChoice(type,origin,target){
+  const canonical=type==='RELATED_TO'
+    ?canManageEndpoint(origin)||canManageEndpoint(target)
+    :canManageEndpoint(origin);
+  if(canonical)return true;
+  return type==='RELATED_TO'&&(joinedIdeaEndpoint(origin)||joinedIdeaEndpoint(target));
+}
 function canDeleteRow(row,map=endpointMap()){
   const origin=map.get(endpointKey(row.origin_kind,row.origin_source_id))||endpointFromTuple(row.origin_kind,row.origin_source_id);
   const target=map.get(endpointKey(row.target_kind,row.target_source_id))||endpointFromTuple(row.target_kind,row.target_source_id);
@@ -147,10 +161,7 @@ function candidateChoices(endpoint){
     if(target.key===endpoint.key)continue;
     for(const type of RELATION_TYPES){
       if(!pairAllowed(type,endpoint.kind,target.kind))continue;
-      const allowed=type==='RELATED_TO'
-        ?canManageEndpoint(endpoint)||canManageEndpoint(target)
-        :canManageEndpoint(endpoint);
-      if(!allowed)continue;
+      if(!canCreateChoice(type,endpoint,target))continue;
       choices.push({type,target});
     }
   }
@@ -207,9 +218,7 @@ async function createRelation(card,endpoint,select,statusRoot=card){
   if(!target||!pairAllowed(choice.type,endpoint.kind,target.kind)){
     setRelationStatus(statusRoot,'ЭТА СВЯЗЬ НЕ ПОДДЕРЖИВАЕТСЯ','error');return;
   }
-  const mirrored=choice.type==='RELATED_TO'
-    ?canManageEndpoint(endpoint)||canManageEndpoint(target)
-    :canManageEndpoint(endpoint);
+  const mirrored=canCreateChoice(choice.type,endpoint,target);
   if(!mirrored){setRelationStatus(statusRoot,'НЕТ ПРАВ / UI MIRROR','error');return}
   setRelationStatus(statusRoot,'СОХРАНЯЕМ…','busy');
   const {error}=await client.rpc('dc_board_relation_create_v1',{
