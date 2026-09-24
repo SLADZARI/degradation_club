@@ -7,12 +7,12 @@
     "projectStage": "BUILD",
     "gate": "G4_SEMANTIC_CONTRACT",
     "status": "APPROVED",
-    "version": "2.73",
+    "version": "2.74",
     "updated": "2026-09-24",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.72"
+    "supersedes": "2.73"
   },
   "currentArtifacts": [
     {
@@ -2552,15 +2552,15 @@
     {
       "artifactId": "dementor-club.result.artifact-collaboration-v1",
       "documentType": "RESULT",
-      "currentVersion": "0.3",
-      "version": "0.3",
+      "currentVersion": "0.4",
+      "version": "0.4",
       "status": "REVIEW",
       "workStatus": "BLOCKED",
       "relation": "CURRENT_RESULT",
       "gate": "G5_BUILD",
       "projectStage": "BUILD",
-      "path": ".weekly-os/results/artifact-collaboration-v1.v0.3.md",
-      "location": ".weekly-os/results/artifact-collaboration-v1.v0.3.md",
+      "path": ".weekly-os/results/artifact-collaboration-v1.v0.4.md",
+      "location": ".weekly-os/results/artifact-collaboration-v1.v0.4.md",
       "sourceSystem": "GIT",
       "authorityType": "IMPLEMENTATION_AUTHORITY",
       "updated": "2026-09-24",
@@ -2573,15 +2573,17 @@
       "liveDatabaseMutationAuthorized": false,
       "productionMergeAuthorized": false,
       "productionDeployAuthorized": false,
-      "gateReadiness": "G5_BACKEND_STATIC_READY_EXECUTION_BLOCKED",
+      "gateReadiness": "G5_BACKEND_STATIC_READY_LOCAL_EXECUTION_BLOCKED",
       "g4BackendEvidence": "operations/ARTIFACT_COLLABORATION_BACKEND_G4_CONTRACT_2026-09-24.md",
       "g4BackendStatus": "PASS",
       "g5BackendEvidence": "operations/ARTIFACT_COLLABORATION_BACKEND_G5_CHECKPOINT_2026-09-24.md",
       "g5BackendCandidateCommit": "3522993d6796fe9dae81a0c7dbde1ddcc1aa350a",
       "g5BackendStaticStatus": "PASS",
-      "g5SqlExecutionStatus": "BLOCKED_NO_NONPROD_POSTGRES",
+      "g5SqlExecutionStatus": "BLOCKED_LOCAL_SUPABASE_RUNTIME_UNAVAILABLE",
       "implementationBrief": "operations/ARTIFACT_COLLABORATION_IMPLEMENTATION_BRIEF_V1.md",
-      "g5BackendBlockerEvidence": "operations/ARTIFACT_COLLABORATION_BACKEND_G5_NONPROD_BLOCKER_2026-09-24.md"
+      "g5BackendBlockerEvidence": "operations/ARTIFACT_COLLABORATION_BACKEND_G5_NONPROD_BLOCKER_2026-09-24.md",
+      "g5BackendLocalBlockerEvidence": "operations/ARTIFACT_COLLABORATION_BACKEND_G5_LOCAL_STACK_BLOCKER_2026-09-24.md",
+      "costBoundary": "NO_PAID_INFRASTRUCTURE"
     },
     {
       "artifactId": "dementor-club.evidence.artifact-collaboration-backend-g4-2026-09-24",
@@ -2661,6 +2663,29 @@
       "liveDatabaseMutationAuthorized": false,
       "verdict": "BLOCKED_NO_NONPROD_POSTGRES",
       "blocker": "Supabase Branching unavailable on current plan; Pro plan or above required."
+    },
+    {
+      "artifactId": "dementor-club.evidence.artifact-collaboration-backend-g5-local-stack-blocker-2026-09-24",
+      "documentType": "VALIDATION_EVIDENCE",
+      "currentVersion": "1.0",
+      "version": "1.0",
+      "status": "BLOCKED",
+      "relation": "G5_BLOCKER_EVIDENCE",
+      "gate": "G5_BUILD",
+      "projectStage": "BUILD",
+      "path": "operations/ARTIFACT_COLLABORATION_BACKEND_G5_LOCAL_STACK_BLOCKER_2026-09-24.md",
+      "location": "operations/ARTIFACT_COLLABORATION_BACKEND_G5_LOCAL_STACK_BLOCKER_2026-09-24.md",
+      "sourceSystem": "GIT",
+      "authorityType": "EVIDENCE",
+      "updated": "2026-09-24",
+      "result": "dementor-club.result.artifact-collaboration-v1",
+      "candidateBranch": "result/artifact-collaboration-v1",
+      "candidateCommit": "3522993d6796fe9dae81a0c7dbde1ddcc1aa350a",
+      "productionBaseCommit": "df8a24eca2bcca25339f128c7da93982515cf442",
+      "liveDatabaseMutationAuthorized": false,
+      "verdict": "BLOCKED_LOCAL_SUPABASE_RUNTIME_UNAVAILABLE",
+      "blocker": "Required free local Supabase CLI + Docker stack cannot run in current execution runner: binaries/runtime absent and outbound DNS unavailable.",
+      "supersedesEvidence": "operations/ARTIFACT_COLLABORATION_BACKEND_G5_NONPROD_BLOCKER_2026-09-24.md"
     }
   ],
   "referenceArtifacts": [
