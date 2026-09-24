@@ -291,21 +291,45 @@ try{
     await page.reload({waitUntil:'domcontentloaded'});
     await page.waitForFunction(()=>document.querySelectorAll('.dc-notice[data-artifact]').length>=2,{timeout:8000});
     const reloadedCard=page.locator('.dc-notice[data-artifact="'+A+'"]');
-    const createdRow=reloadedCard.locator('[data-relation-id="rel-created"]');
-    await createdRow.waitFor({state:'attached',timeout:6000});
-    expect(await createdRow.locator('[data-relation-delete]').count()===1,'can_delete=true relation must expose delete control after reload/read');
+    const relationBlock=reloadedCard.locator('[data-relation-block]');
+    await relationBlock.waitFor({state:'attached',timeout:6000});
+    await relationBlock.locator('summary').click();
+    await page.waitForFunction(
+      artifactId=>{
+        const card=document.querySelector('.dc-notice[data-artifact="'+artifactId+'"]');
+        const block=card?.querySelector('[data-relation-block]');
+        return Boolean(
+          block?.open
+          &&block.querySelector('[data-relation-id="rel-created"]')
+          &&block.querySelector('[data-relation-id="rel-other"]')
+          &&block.querySelector('[data-relation-id="rel-directional"]')
+        );
+      },
+      A,
+      {timeout:6000}
+    );
 
-    const otherRow=reloadedCard.locator('[data-relation-id="rel-other"]');
-    expect(await otherRow.count()===1,'negative RELATED_TO fixture missing after reload/read');
+    // Re-query after opening: canonical presentation may refresh and replace relation DOM.
+    const freshCard=page.locator('.dc-notice[data-artifact="'+A+'"]');
+    const freshBlock=freshCard.locator('[data-relation-block]');
+    const createdRow=freshBlock.locator('[data-relation-id="rel-created"]');
+    const otherRow=freshBlock.locator('[data-relation-id="rel-other"]');
+    const directionalRow=freshBlock.locator('[data-relation-id="rel-directional"]');
+
+    await createdRow.waitFor({state:'visible',timeout:6000});
+    const createdDelete=createdRow.locator('[data-relation-delete]');
+    await createdDelete.waitFor({state:'visible',timeout:6000});
+    expect(await createdDelete.count()===1,'can_delete=true relation must expose visible delete control after reload/open/read');
+
+    expect(await otherRow.count()===1,'negative RELATED_TO fixture missing after reload/open/read');
     expect(await otherRow.locator('[data-relation-delete]').count()===0,'can_delete=false RELATED_TO must not expose delete control');
 
-    const directionalRow=reloadedCard.locator('[data-relation-id="rel-directional"]');
-    expect(await directionalRow.count()===1,'negative directional fixture missing after reload/read');
+    expect(await directionalRow.count()===1,'negative directional fixture missing after reload/open/read');
     expect(await directionalRow.locator('[data-relation-delete]').count()===0,'can_delete=false directional relation must not expose delete control');
 
-    await createdRow.locator('[data-relation-delete]').click();
+    await createdDelete.click();
     await page.waitForFunction(()=>!document.querySelector('.dc-notice[data-artifact="'+A+'"] [data-relation-id="rel-created"]'),null,{timeout:6000});
-    expect(await reloadedCard.locator('[data-relation-id="rel-created"]').count()===0,'server-authorized relation delete did not disappear');
+    expect(await page.locator('.dc-notice[data-artifact="'+A+'"] [data-relation-id="rel-created"]').count()===0,'server-authorized relation delete did not disappear');
     expect(!errors.length,'participant relations errors: '+errors.join(' | '));await ctx.close();
   }
 
