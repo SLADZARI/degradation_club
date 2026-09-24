@@ -106,11 +106,11 @@ The approved implementation brief requires:
 
 Live production DB mutation is explicitly unauthorized.
 
-Supabase development branches were inventoried first:
+Supabase development branches were inventoried first. No non-default development branch existed.
 
-`branches = []`
+After the failed creation attempt, the branch inventory shows only the default `main` entry whose `project_ref` is the production project itself (`mmekfydwbvptbdatwitj`). It is not a non-production validation database.
 
-A Supabase branch is the canonical safe managed validation path because it starts from production migrations without production data.
+A Supabase development branch is the canonical safe managed validation path because it starts from production migrations without using the production database as the test target.
 
 Retrieved branch price for the current organization:
 
