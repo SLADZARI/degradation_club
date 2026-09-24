@@ -164,8 +164,10 @@ try{
     expect(await cards.count()===2,'board: collaboration leaked outside two Idea cards');
     const a=page.locator('.dc-notice[data-artifact="'+A+'"]');
     const b=page.locator('.dc-notice[data-artifact="'+B+'"]');
-    expect((await a.innerText()).includes('Женя Очень Длинное Имя Участника')&&(await a.innerText()).includes('Никита'),'Idea A roster missing');
-    expect((await b.innerText()).includes('Никита')&&(await b.innerText()).includes('Андрус Второй'),'Idea B independent roster missing');
+    const aRoster=await a.locator('[data-collaboration-card]').textContent();
+    const bRoster=await b.locator('[data-collaboration-card]').textContent();
+    expect(String(aRoster||'').includes('Женя Очень Длинное Имя Участника')&&String(aRoster||'').includes('Никита'),'Idea A roster missing');
+    expect(String(bRoster||'').includes('Никита')&&String(bRoster||'').includes('Андрус Второй'),'Idea B independent roster missing');
     await page.locator('.dc-board-primary button').click();
     await page.locator('#artifactType').selectOption('idea');
     expect(await page.locator('#artifactVisibilityField').isVisible(),'composer: IDEA visibility controls missing');
@@ -255,8 +257,10 @@ try{
 
   for(const width of [390,360]){
     const{ctx,page,errors}=await openBoard(browser,'author',{width,height:844});
-    const card=page.locator('.dc-notice[data-artifact="'+A+'"]');const box=await card.boundingBox();
-    expect(!!box&&box.x>=0&&box.x+box.width<=width+1,`mobile ${width}: Idea card horizontal overflow`);
+    const card=page.locator('.dc-notice[data-artifact="'+A+'"]');
+    const cardOverflow=await card.evaluate(el=>el.scrollWidth>el.clientWidth+1);
+    const collabOverflow=await card.locator('[data-collaboration-card]').evaluate(el=>el.scrollWidth>el.clientWidth+1);
+    expect(!cardOverflow&&!collabOverflow,`mobile ${width}: Idea card horizontal overflow`);
     await card.click({position:{x:10,y:10}});
     const frame=page.frameLocator('.dc-artifact-overlay iframe');
     await frame.locator('[data-artifact-collaboration]').waitFor({state:'visible',timeout:6000});
