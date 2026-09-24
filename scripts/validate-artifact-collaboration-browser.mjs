@@ -165,6 +165,13 @@ async function openBoard(browser,mode,viewport={width:1440,height:900},options={
  const ctx=await context(browser,mode,viewport,options);const page=await ctx.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));
  await page.goto(base+'/workspace/board/',{waitUntil:'domcontentloaded'});
  await page.waitForFunction(()=>document.querySelectorAll('.dc-notice[data-artifact]').length>=2,{timeout:8000});
+ if(mode==='relations'){
+   await page.waitForFunction(()=>Boolean(
+     document.documentElement.dataset.dcBoardRelations==='ready'
+     &&document.querySelector('[data-board-source="platform"][data-relation-source-id="qa-event"]')
+     &&document.querySelector('.dc-notice[data-artifact] [data-relation-block]')
+   ),{timeout:8000});
+ }
  return{ctx,page,errors};
 }
 const browser=await chromium.launch({headless:true});
@@ -288,7 +295,15 @@ try{
 
     // Simulated reload/read must reconstruct delete authority exclusively from row.can_delete.
     await page.reload({waitUntil:'domcontentloaded'});
-    await page.waitForFunction(()=>document.querySelectorAll('.dc-notice[data-artifact]').length>=2,{timeout:8000});
+    await page.waitForFunction(
+      artifactId=>Boolean(
+        document.documentElement.dataset.dcBoardRelations==='ready'
+        &&document.querySelector('[data-board-source="platform"][data-relation-source-id="qa-event"]')
+        &&document.querySelector('.dc-notice[data-artifact="'+artifactId+'"] [data-relation-id="rel-created"]')
+      ),
+      A,
+      {timeout:8000}
+    );
     const reloadedCard=page.locator('.dc-notice[data-artifact="'+A+'"]');
     const summary=reloadedCard.locator('[data-relation-block] summary');
     await summary.waitFor({state:'visible',timeout:6000});
@@ -364,45 +379,12 @@ try{
       await page.evaluate(()=>{
         const viewport=document.querySelector('.dc-spatial-viewport');
         globalThis.__QA_RELATION_SUMMARY_STARTED_PAN__=false;
-        globalThis.__QA_RELATION_SUMMARY_EVENTS__=[];
-        const record=event=>{
-          if(!event.target.closest?.('[data-relation-block] summary'))return;
-          globalThis.__QA_RELATION_SUMMARY_EVENTS__.push({
-            type:event.type,
-            defaultPrevented:event.defaultPrevented,
-            tag:event.target.tagName,
-            panning:Boolean(viewport?.classList.contains('is-panning')),
-            dragging:document.documentElement.dataset.boardDragging||null
-          });
-        };
-        document.addEventListener('pointerdown',record,true);
-        document.addEventListener('pointerup',record,true);
-        document.addEventListener('click',record,true);
-        document.addEventListener('toggle',record,true);
         viewport?.addEventListener('pointerdown',event=>{
           if(event.target.closest?.('[data-relation-block] summary')&&viewport.classList.contains('is-panning'))globalThis.__QA_RELATION_SUMMARY_STARTED_PAN__=true;
         });
       });
       await summary.tap();
-      try{
-        await card.locator('[data-relation-block][open]').waitFor({state:'attached',timeout:6000});
-      }catch{
-        const diagnostic=await page.evaluate(artifactId=>{
-          const card=document.querySelector('.dc-notice[data-artifact="'+artifactId+'"]');
-          const block=card?.querySelector('[data-relation-block]');
-          return{
-            events:globalThis.__QA_RELATION_SUMMARY_EVENTS__||[],
-            blockPresent:Boolean(block),
-            open:Boolean(block?.open),
-            cardClass:card?.className||null,
-            artifactOwned:card?.dataset.artifactOwned||null,
-            panning:Boolean(document.querySelector('.dc-spatial-viewport')?.classList.contains('is-panning')),
-            boardDragging:document.documentElement.dataset.boardDragging||null,
-            overlayOpen:Boolean(document.querySelector('.dc-artifact-overlay:not([hidden])'))
-          };
-        },A);
-        throw new Error(`mobile ${width}: RELATION_SUMMARY_TOUCH_OPEN_TIMEOUT ${JSON.stringify(diagnostic)}`);
-      }
+      await card.locator('[data-relation-block][open]').waitFor({state:'attached',timeout:6000});
       expect(await page.evaluate(()=>globalThis.__QA_RELATION_SUMMARY_STARTED_PAN__)===false,`mobile ${width}: relation summary initiated Board pan`);
       expect(await page.locator('.dc-artifact-overlay:not([hidden])').count()===0,`mobile ${width}: relation summary opened Artifact fullscreen`);
       expect(!errors.length,`mobile ${width}: relation summary errors: ${errors.join(' | ')}`);
