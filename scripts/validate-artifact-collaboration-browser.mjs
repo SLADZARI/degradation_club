@@ -137,10 +137,14 @@ async function context(browser,mode,viewport){
  return ctx;
 }
 async function openDetail(browser,mode,viewport={width:1440,height:900}){
- const ctx=await context(browser,mode,viewport);const page=await ctx.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));
+ const ctx=await context(browser,mode,viewport);const page=await ctx.newPage();const errors=[];const requestFailures=[];const badResponses=[];const consoleErrors=[];
+ page.on('pageerror',e=>errors.push(e.message));
+ page.on('requestfailed',request=>requestFailures.push({url:request.url(),error:request.failure()?.errorText||null}));
+ page.on('response',response=>{if(response.status()>=400)badResponses.push({url:response.url(),status:response.status()})});
+ page.on('console',message=>{if(message.type()==='error')consoleErrors.push(message.text())});
  await page.goto(base+'/community/artifact/11111111-1111-4111-8111-111111111111/',{waitUntil:'domcontentloaded'});
  await page.waitForFunction(()=>document.getElementById('artifactState')?.textContent!=='LOADING',{timeout:7000});
- return{ctx,page,errors};
+ return{ctx,page,errors,requestFailures,badResponses,consoleErrors};
 }
 async function openBoard(browser,mode,viewport={width:1440,height:900}){
  const ctx=await context(browser,mode,viewport);const page=await ctx.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));
@@ -174,7 +178,7 @@ try{
 
   // Author detail: roster, visibility, safe selector, remove.
   {
-    const{ctx,page,errors}=await openDetail(browser,'author');
+    const{ctx,page,errors,requestFailures,badResponses,consoleErrors}=await openDetail(browser,'author');
     const collab=page.locator('[data-artifact-collaboration]');
     if(await collab.count()===0){
       const diagnostics=await page.evaluate(()=>({
@@ -183,7 +187,7 @@ try{
         hostHtml:document.getElementById('artifactHost')?.innerHTML||null
       }));
       await page.screenshot({path:path.join(outDir,'author-detail-debug.png'),fullPage:true});
-      throw new Error('AUTHOR_DETAIL_COLLABORATION_MISSING '+JSON.stringify({diagnostics,pageErrors:errors}));
+      throw new Error('AUTHOR_DETAIL_COLLABORATION_MISSING '+JSON.stringify({diagnostics,pageErrors:errors,requestFailures,badResponses,consoleErrors}));
     }
     const text=await collab.innerText();
     expect(text.includes('ИНИЦИАТОР')&&text.includes('В ДЕЛЕ')&&text.includes('ПОЗВАНЫ'),'author detail hierarchy missing');
