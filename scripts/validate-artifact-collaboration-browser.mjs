@@ -293,7 +293,9 @@ try{
     const reloadedCard=page.locator('.dc-notice[data-artifact="'+A+'"]');
     const relationBlock=reloadedCard.locator('[data-relation-block]');
     await relationBlock.waitFor({state:'attached',timeout:6000});
-    await relationBlock.locator('summary').click();
+    const relationSummary=relationBlock.locator('summary');
+    await relationSummary.focus();
+    await relationSummary.press('Enter');
     await page.locator('.dc-notice[data-artifact="'+A+'"] [data-relation-block][open]').waitFor({state:'attached',timeout:6000});
 
     // Re-query after opening: canonical presentation may refresh and replace relation DOM.
