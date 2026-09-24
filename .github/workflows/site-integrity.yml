@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - dementor-club-site
+      - result/artifact-collaboration-v1
   pull_request:
     branches:
       - dementor-club-site
