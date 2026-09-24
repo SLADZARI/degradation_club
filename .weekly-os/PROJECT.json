@@ -7,12 +7,12 @@
     "projectStage": "BUILD",
     "gate": "G5_BUILD",
     "status": "APPROVED",
-    "version": "2.77",
+    "version": "2.78",
     "updated": "2026-09-24",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.76"
+    "supersedes": "2.77"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -213,7 +213,8 @@
     ".weekly-os/results/artifact-collaboration-v1.v0.1.md",
     ".weekly-os/results/artifact-collaboration-v1.v0.2.md",
     "operations/ARTIFACT_COLLABORATION_BACKEND_G4_CONTRACT_2026-09-24.md",
-    "operations/ARTIFACT_COLLABORATION_BACKEND_G5_CHECKPOINT_2026-09-24.md"
+    "operations/ARTIFACT_COLLABORATION_BACKEND_G5_CHECKPOINT_2026-09-24.md",
+    "operations/ARTIFACT_COLLABORATION_IMPLEMENTATION_BRIEF_V1.md"
   ],
   "authority": {
     "mpDslCore": {
@@ -408,7 +409,8 @@
     "g5BackendStaticStatus": "PASS",
     "g5SqlExecutionStatus": "NOT_RUN",
     "gateReadiness": "G5_SCHEMA_DRAFT_STATIC_PASS",
-    "note": "DEV1 exact owner inventory passed. Branch-only backend migration + static security validator exist. No live Supabase mutation or SQL execution validation has been performed."
+    "note": "Artifact Collaboration v1 is packaged for two-developer execution. DEV1 backend/Supabase lane and DEV2 frontend/UX lane share one Result/integration branch. G5 backend static PASS; non-production SQL execution remains next backend checkpoint. Live Supabase/merge/deploy remain unauthorized.",
+    "implementationBrief": "operations/ARTIFACT_COLLABORATION_IMPLEMENTATION_BRIEF_V1.md"
   },
   "waitingResults": [
     {
