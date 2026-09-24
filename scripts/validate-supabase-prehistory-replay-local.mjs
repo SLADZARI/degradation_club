@@ -9,9 +9,12 @@ const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..')
 const SOURCE_SUPABASE = path.join(ROOT, 'supabase');
 const SOURCE_MIGRATIONS = path.join(SOURCE_SUPABASE, 'migrations');
 const FIXTURE_DIR = path.join(SOURCE_SUPABASE, 'bootstrap', 'prehistory');
+const OVERLAY_DIR = path.join(SOURCE_SUPABASE, 'bootstrap', 'production-compatibility');
+const G5_EVIDENCE_OUTPUT = path.join(ROOT, 'artifact-collaboration-g5-runtime-evidence.json');
 
 const BRANCH = 'result/artifact-collaboration-v1';
 const EPHEMERAL_NAME = '20260827212519_pre_dementor_replay_fixture.sql';
+const OVERLAY_EPHEMERAL_NAME = '20260924002459_observed_production_compatibility_overlay.sql';
 const ARTIFACT_MIGRATION = '20260924002500_artifact_collaboration_v1.sql';
 const PROJECT_ID = `dc-prehistory-replay-v1-${process.pid}`;
 
@@ -28,8 +31,34 @@ const FIXTURE_PARTS = [
   '03_auth_trigger_binding.sql',
 ];
 
+const OVERLAY_PARTS = [
+  '01_observed_production_functions.sql',
+  '02_observed_production_policies.sql',
+];
+
+const PRE_OVERLAY_PARTS = 1292;
+const PRE_OVERLAY_MD5 = '55e1ea1b2484f4d4516f47c06313f27b';
 const PROD_BASELINE_PARTS = 1291;
 const PROD_BASELINE_MD5 = 'beb6fcdf35c889bfa37fd1d725507b7e';
+
+const PROD_FUNCTION_MD5 = new Map([
+  ['dc_admin_board_hide_artifact_v1', '6fc28f04c0eff2fa5e64bbda2ca5e4b4'],
+  ['dc_admin_promote_artifact_telegram_v1', '1f9a6d47a48c7c3484797512767b3be4'],
+  ['dc_admin_resolve_delivery_unknown_v1', '06539d44bfda8443233bdffc5c210f2b'],
+  ['dc_admin_suppress_artifact_telegram_v1', '4e01df82431ebeb3dc87deab0fbc8b1a'],
+  ['dc_distribution_claim_pending_v1', '12f9b77606024aeaca8be8e5dd8c27a3'],
+  ['dc_guest_board_interest_toggle_v1', 'c7f9ea81133f4247b8ddd397262ea0a6'],
+  ['dc_member_entry_status_v1', '5c1f6ccc545a78ffa417d3a7e08f0ede'],
+  ['dc_publish_artifact_v1', '493116fc98e49dc707ce8c95d5139289'],
+  ['dc_set_artifact_activity_v1', '48ca201a438f0d2cc238aa9f4ff91945'],
+  ['dc_submit_membership_application_v2', '65c6ebd469c61b01e69740450fad33a0'],
+]);
+
+const ARTIFACT_REPLACED_FUNCTION_MARKERS = new Map([
+  ['dc_distribution_claim_pending_v1', ['ARTIFACT_NOT_DISTRIBUTABLE', "a.visibility='community'"]],
+  ['dc_guest_board_interest_toggle_v1', ['dc_can_interact_artifact_v1']],
+  ['dc_publish_artifact_v1', ['CIRCLE_IDEA_REQUIRED', "'not_applicable'"]],
+]);
 
 const env = { ...process.env, SUPABASE_TELEMETRY_DISABLED: '1', DO_NOT_TRACK: '1' };
 for (const key of [
@@ -74,6 +103,9 @@ function checkSourceBoundary() {
   if (fs.existsSync(path.join(SOURCE_MIGRATIONS, EPHEMERAL_NAME))) {
     fail(`${EPHEMERAL_NAME} must never exist permanently in supabase/migrations`);
   }
+  if (fs.existsSync(path.join(SOURCE_MIGRATIONS, OVERLAY_EPHEMERAL_NAME))) {
+    fail(`${OVERLAY_EPHEMERAL_NAME} must never exist permanently in supabase/migrations`);
+  }
   for (const [name, expected] of EXPECTED_BLOBS) {
     const file = path.join(SOURCE_MIGRATIONS, name);
     if (!fs.existsSync(file)) fail(`missing migration: ${name}`);
@@ -84,6 +116,22 @@ function checkSourceBoundary() {
   }
   for (const part of FIXTURE_PARTS) {
     if (!fs.existsSync(path.join(FIXTURE_DIR, part))) fail(`missing fixture part: ${part}`);
+  }
+  for (const part of OVERLAY_PARTS) {
+    if (!fs.existsSync(path.join(OVERLAY_DIR, part))) fail(`missing production compatibility overlay part: ${part}`);
+  }
+
+  const artifactSql = fs.readFileSync(path.join(SOURCE_MIGRATIONS, ARTIFACT_MIGRATION), 'utf8');
+  for (const [name] of ARTIFACT_REPLACED_FUNCTION_MARKERS) {
+    if (!artifactSql.includes(`create or replace function public.${name}`)) {
+      fail(`Artifact Collaboration migration no longer owns expected replacement function: ${name}`);
+    }
+  }
+  for (const name of PROD_FUNCTION_MD5.keys()) {
+    if (!ARTIFACT_REPLACED_FUNCTION_MARKERS.has(name)
+        && artifactSql.includes(`create or replace function public.${name}`)) {
+      fail(`Artifact Collaboration unexpectedly mutates unrelated production-drift function: ${name}`);
+    }
   }
 
   const sourceLink = path.join(SOURCE_SUPABASE, '.temp', 'project-ref');
@@ -138,6 +186,12 @@ function materializeFixture(tempMigrations) {
     return `-- BEGIN ${part}\n${fs.readFileSync(path.join(FIXTURE_DIR, part), 'utf8').trim()}\n-- END ${part}\n`;
   }).join('\n');
   fs.writeFileSync(path.join(tempMigrations, EPHEMERAL_NAME), body + '\n');
+}
+
+function buildOverlaySql() {
+  return OVERLAY_PARTS.map((part) => {
+    return `-- BEGIN ${part}\n${fs.readFileSync(path.join(OVERLAY_DIR, part), 'utf8').trim()}\n-- END ${part}\n`;
+  }).join('\n') + '\n';
 }
 
 function findDbContainer() {
@@ -251,6 +305,80 @@ from supabase_migrations.schema_migrations
 where version='${version}';
 `);
   expect(value, '1', `migration ${version} applied`);
+}
+
+function functionDefinition(container, name) {
+  return psql(container, `
+select pg_get_functiondef(p.oid)
+from pg_proc p
+join pg_namespace n on n.oid=p.pronamespace
+where n.nspname='public' and p.proname='${name}'
+limit 1;
+`);
+}
+
+function functionDefinitionMd5(container, name) {
+  return psql(container, `
+select md5(pg_get_functiondef(p.oid))
+from pg_proc p
+join pg_namespace n on n.oid=p.pronamespace
+where n.nspname='public' and p.proname='${name}'
+limit 1;
+`);
+}
+
+function policyObjectDigest(container, tableName) {
+  return psql(container, `
+with parts as (
+  select 'POL|'||schemaname||'|'||tablename||'|'||policyname||'|'||cmd||'|'||
+         array_to_string(roles,',')||'|'||coalesce(qual,'')||'|'||coalesce(with_check,'') as s
+  from pg_policies
+  where schemaname='public' and tablename='${tableName}'
+)
+select count(*)::text||'|'||md5(string_agg(s,E'\\n' order by s))
+from parts;
+`);
+}
+
+function assertObservedProductionBaseline(container) {
+  for (const [name, expectedMd5] of PROD_FUNCTION_MD5) {
+    expect(functionDefinitionMd5(container, name), expectedMd5, `observed production function ${name}`);
+  }
+  expect(policyObjectDigest(container, 'dc_merch_items'), '2|f3cd3bec89b94242b9a172e2ce364675',
+    'observed production merch policies');
+  expect(policyObjectDigest(container, 'join_applications'), '2|95dc0ae12336dd59502be84b40c03869',
+    'observed production join_applications policies');
+  const insertPolicy = psql(container, `
+select count(*)::text from pg_policies
+where schemaname='public'
+  and tablename='join_applications'
+  and policyname='join_applications_auth_insert';
+`);
+  expect(insertPolicy, '0', 'join_applications_auth_insert absent in observed production compatibility state');
+}
+
+function assertPostArtifactProductionCompatibility(container) {
+  expect(policyObjectDigest(container, 'dc_merch_items'), '2|f3cd3bec89b94242b9a172e2ce364675',
+    'Artifact Collaboration leaves merch read policy production-compatible');
+  expect(policyObjectDigest(container, 'join_applications'), '2|95dc0ae12336dd59502be84b40c03869',
+    'Artifact Collaboration leaves join_applications policy state production-compatible');
+
+  for (const [name, expectedMd5] of PROD_FUNCTION_MD5) {
+    if (ARTIFACT_REPLACED_FUNCTION_MARKERS.has(name)) continue;
+    expect(functionDefinitionMd5(container, name), expectedMd5,
+      `Artifact Collaboration leaves unrelated observed-production function unchanged: ${name}`);
+  }
+
+  for (const [name, markers] of ARTIFACT_REPLACED_FUNCTION_MARKERS) {
+    const actualMd5 = functionDefinitionMd5(container, name);
+    if (actualMd5 === PROD_FUNCTION_MD5.get(name)) {
+      fail(`Artifact Collaboration failed to replace expected function: ${name}`);
+    }
+    const definition = functionDefinition(container, name);
+    for (const marker of markers) {
+      expectIncludes(definition, marker, `Artifact Collaboration function source ${name}`);
+    }
+  }
 }
 
 function installRuntimeUsers(container) {
@@ -426,6 +554,21 @@ on conflict do nothing;
   expect(adminStorage, '1', 'Owner Admin can read Circle object');
   matrix.storage_privacy = 'PASS';
 
+  const idea2 = psqlAs(container, AUTHOR, `
+select public.dc_create_artifact_draft_v1('Runtime Circle Idea 2','Runtime Circle Idea 2',null,null,null);
+`).split(/\r?\n/).filter(Boolean).at(-1);
+  if (!/^[0-9a-f-]{36}$/i.test(idea2)) fail(`invalid second runtime idea id: ${idea2}`);
+  psqlAs(container, AUTHOR, `select public.dc_set_artifact_subtype_v1('${idea2}'::uuid,'idea');`);
+  psqlAs(container, AUTHOR, `select public.dc_set_artifact_visibility_v1('${idea2}'::uuid,'circle');`);
+  expectError(container, AUTHOR,
+    `select public.dc_publish_artifact_v1('${idea2}'::uuid);`,
+    'NO_ARTIFACT_SLOT_AVAILABLE', 'slot capacity ceiling');
+  psqlAs(container, AUTHOR, `select public.dc_close_artifact_v1('${idea}'::uuid);`);
+  psqlAs(container, AUTHOR, `select public.dc_publish_artifact_v1('${idea2}'::uuid);`);
+  const idea2Status = psql(container, `select status from public.dc_artifacts where id='${idea2}'::uuid;`);
+  expect(idea2Status, 'active', 'slot release allows second Idea publish');
+  matrix.slot_capacity_ceiling_release = 'PASS';
+
   return matrix;
 }
 
@@ -444,7 +587,8 @@ async function main() {
     project_id: PROJECT_ID,
     temporary_workspace: tempRoot,
     historical_git_blob_hashes: Object.fromEntries(EXPECTED_BLOBS),
-    baseline: {},
+    pre_overlay: {},
+    post_overlay: {},
     full_replay: {},
     repeatability: {},
     runtime_matrix: {},
@@ -465,9 +609,11 @@ async function main() {
     const heldDir = path.join(tempRoot, 'held');
     fs.mkdirSync(heldDir);
     const heldArtifact = path.join(heldDir, ARTIFACT_MIGRATION);
+    const heldOverlay = path.join(heldDir, OVERLAY_EPHEMERAL_NAME);
     fs.renameSync(artifactPath, heldArtifact);
+    fs.writeFileSync(heldOverlay, buildOverlaySql());
 
-    console.log('[phase 1] clean baseline replay through production migration head');
+    console.log('[phase 1] clean tracked baseline replay with Artifact Collaboration and overlay withheld');
     run('supabase', ['start'], tempRoot, { capture: false });
     started = true;
     let container = findDbContainer();
@@ -475,40 +621,64 @@ async function main() {
     for (const version of ['20260827212520','20260827212614','20260828170411','20260921134959']) {
       assertMigrationApplied(container, version);
     }
-    const baselineFingerprint = psql(container, STRUCTURAL_FINGERPRINT_SQL);
-    expect(baselineFingerprint, `${PROD_BASELINE_PARTS}|${PROD_BASELINE_MD5}`, 'production structural baseline fingerprint');
-    evidence.baseline = {
+    const preOverlayFingerprint = psql(container, STRUCTURAL_FINGERPRINT_SQL);
+    expect(preOverlayFingerprint, `${PRE_OVERLAY_PARTS}|${PRE_OVERLAY_MD5}`, 'tracked pre-overlay structural fingerprint');
+    evidence.pre_overlay = {
       migrations: ['20260827212520','20260827212614','20260828170411','20260921134959'],
-      structural_parts: PROD_BASELINE_PARTS,
-      structural_md5: PROD_BASELINE_MD5,
+      structural_parts: PRE_OVERLAY_PARTS,
+      structural_md5: PRE_OVERLAY_MD5,
       status: 'PASS',
     };
 
+    console.log('[phase 2] apply observed production compatibility overlay locally');
+    psql(container, fs.readFileSync(heldOverlay, 'utf8'));
+    const postOverlayFingerprint = psql(container, STRUCTURAL_FINGERPRINT_SQL);
+    expect(postOverlayFingerprint, `${PROD_BASELINE_PARTS}|${PROD_BASELINE_MD5}`, 'observed production structural fingerprint after overlay');
+    assertObservedProductionBaseline(container);
+    evidence.post_overlay = {
+      structural_parts: PROD_BASELINE_PARTS,
+      structural_md5: PROD_BASELINE_MD5,
+      exact_observed_production_compatibility: 'PASS',
+      status: 'PASS',
+    };
+
+    fs.copyFileSync(heldOverlay, path.join(tempMigrations, OVERLAY_EPHEMERAL_NAME));
     fs.renameSync(heldArtifact, artifactPath);
 
-    console.log('[phase 2] full clean reset including Artifact Collaboration');
+    console.log('[phase 3] full clean reset including compatibility overlay + Artifact Collaboration');
     run('supabase', ['db', 'reset', '--local'], tempRoot, { capture: false });
     container = findDbContainer();
+    assertMigrationApplied(container, '20260924002459');
     assertMigrationApplied(container, '20260924002500');
     const participationTable = psql(container,
       `select to_regclass('public.dc_artifact_participation_events') is not null;`);
     expect(participationTable, 't', 'Artifact Collaboration participation table');
+    assertPostArtifactProductionCompatibility(container);
     evidence.full_replay = {
+      compatibility_overlay: '20260924002459',
       artifact_migration: '20260924002500',
+      post_artifact_unrelated_production_drift_surfaces: 'PASS',
       status: 'PASS',
     };
 
-    console.log('[phase 3] repeatability reset');
+    console.log('[phase 4] repeatability reset');
     run('supabase', ['db', 'reset', '--local'], tempRoot, { capture: false });
     container = findDbContainer();
+    assertMigrationApplied(container, '20260924002459');
     assertMigrationApplied(container, '20260924002500');
-    evidence.repeatability = { second_full_reset: 'PASS' };
+    assertPostArtifactProductionCompatibility(container);
+    evidence.repeatability = { second_full_reset: 'PASS', compatibility_overlay_replayed: 'PASS' };
 
-    console.log('[phase 4] Artifact Collaboration G5 runtime matrix');
+    console.log('[phase 5] Artifact Collaboration G5 runtime matrix');
     evidence.runtime_matrix = runtimeMatrix(container);
+    evidence.status = 'PASS';
 
-    console.log('[PASS] local prehistory replay + Artifact Collaboration G5 runtime');
+    console.log('[PASS] observed-production-compatible replay + Artifact Collaboration G5 runtime');
     console.log(JSON.stringify(evidence, null, 2));
+  } catch (error) {
+    evidence.status = 'FAIL';
+    evidence.error = error?.message || String(error);
+    throw error;
   } finally {
     try {
       if (started) run('supabase', ['stop', '--no-backup'], tempRoot, { capture: false });
@@ -517,7 +687,9 @@ async function main() {
     }
     fs.rmSync(tempRoot, { recursive: true, force: true });
     evidence.cleanup = 'TEMP_WORKSPACE_REMOVED';
+    fs.writeFileSync(G5_EVIDENCE_OUTPUT, JSON.stringify(evidence, null, 2) + '\n');
     console.log('[cleanup] temporary workspace removed');
+    console.log('[evidence] wrote ' + G5_EVIDENCE_OUTPUT);
   }
 }
 
