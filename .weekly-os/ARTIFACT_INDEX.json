@@ -7,12 +7,12 @@
     "projectStage": "BUILD",
     "gate": "G4_SEMANTIC_CONTRACT",
     "status": "APPROVED",
-    "version": "2.74",
+    "version": "2.75",
     "updated": "2026-09-24",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.73"
+    "supersedes": "2.74"
   },
   "currentArtifacts": [
     {
@@ -2581,7 +2581,6 @@
       "g5BackendStaticStatus": "PASS",
       "g5SqlExecutionStatus": "BLOCKED_LOCAL_SUPABASE_RUNTIME_UNAVAILABLE",
       "implementationBrief": "operations/ARTIFACT_COLLABORATION_IMPLEMENTATION_BRIEF_V1.md",
-      "g5BackendBlockerEvidence": "operations/ARTIFACT_COLLABORATION_BACKEND_G5_NONPROD_BLOCKER_2026-09-24.md",
       "g5BackendLocalBlockerEvidence": "operations/ARTIFACT_COLLABORATION_BACKEND_G5_LOCAL_STACK_BLOCKER_2026-09-24.md",
       "costBoundary": "NO_PAID_INFRASTRUCTURE"
     },
