@@ -298,16 +298,6 @@ try{
     await reloadedCard.locator('[data-relation-block][open]').waitFor({state:'attached',timeout:6000});
     if(await page.locator('.dc-artifact-overlay:not([hidden])').count()!==0)throw new Error('RELATION_SUMMARY_CLICK_OPENED_ARTIFACT_FULLSCREEN');
 
-    // Native keyboard activation is also interactive and must never fall through to card open.
-    const openedSummary=reloadedCard.locator('[data-relation-block][open] summary');
-    await openedSummary.focus();await openedSummary.press('Enter');
-    await reloadedCard.locator('[data-relation-block]:not([open])').waitFor({state:'attached',timeout:6000});
-    if(await page.locator('.dc-artifact-overlay:not([hidden])').count()!==0)throw new Error('RELATION_SUMMARY_ENTER_OPENED_ARTIFACT_FULLSCREEN');
-    const closedSummary=reloadedCard.locator('[data-relation-block]:not([open]) summary');
-    await closedSummary.focus();await closedSummary.press(' ');
-    await reloadedCard.locator('[data-relation-block][open]').waitFor({state:'attached',timeout:6000});
-    if(await page.locator('.dc-artifact-overlay:not([hidden])').count()!==0)throw new Error('RELATION_SUMMARY_SPACE_OPENED_ARTIFACT_FULLSCREEN');
-
     // Re-query after opening: canonical presentation may refresh and replace relation DOM.
     const freshCard=page.locator('.dc-notice[data-artifact="'+A+'"]');
     const freshBlock=freshCard.locator('[data-relation-block][open]');
@@ -340,6 +330,20 @@ try{
     );
     expect(await page.locator('.dc-notice[data-artifact="'+A+'"] [data-relation-id="rel-created"]').count()===0,'server-authorized relation delete did not disappear');
     expect(!errors.length,'participant relations errors: '+errors.join(' | '));await ctx.close();
+  }
+
+  // Native keyboard activation is interactive and must never fall through to card open.
+  for(const key of ['Enter',' ']){
+    const{ctx,page,errors}=await openBoard(browser,'relations');
+    const card=page.locator('.dc-notice[data-artifact="'+A+'"]');
+    const summary=card.locator('[data-relation-block] summary');
+    await summary.waitFor({state:'visible',timeout:6000});
+    await summary.focus();
+    await summary.press(key);
+    await card.locator('[data-relation-block][open]').waitFor({state:'attached',timeout:6000});
+    if(await page.locator('.dc-artifact-overlay:not([hidden])').count()!==0)throw new Error(key==='Enter'?'RELATION_SUMMARY_ENTER_OPENED_ARTIFACT_FULLSCREEN':'RELATION_SUMMARY_SPACE_OPENED_ARTIFACT_FULLSCREEN');
+    expect(!errors.length,`relation summary keyboard ${JSON.stringify(key)} errors: ${errors.join(' | ')}`);
+    await ctx.close();
   }
 
   // Existing card-body activation still opens the canonical Artifact fullscreen.
