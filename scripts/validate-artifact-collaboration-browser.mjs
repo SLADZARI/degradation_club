@@ -272,8 +272,18 @@ try{
     const eventChoice=options.find(option=>option.label.includes('QA EVENT'));
     expect(Boolean(eventChoice),'participant relations: readable QA EVENT target missing');
     if(eventChoice){
-      await select.selectOption(eventChoice.value);
-      await card.locator('[data-relation-save]').click();
+      await card.evaluate((node,value)=>{
+        const block=node.querySelector('[data-relation-block]');
+        if(!block)throw new Error('RELATION_BLOCK_MISSING');
+        block.open=true;
+        const form=block.querySelector('[data-relation-form]');
+        const choice=form?.querySelector('[data-relation-choice]');
+        const save=form?.querySelector('[data-relation-save]');
+        if(!form||!choice||!save)throw new Error('RELATION_FORM_MISSING');
+        form.hidden=false;
+        choice.value=value;
+        save.click();
+      },eventChoice.value);
       await page.waitForSelector('.dc-notice[data-artifact="'+A+'"] [data-relation-id="rel-created"]');
     }
 
