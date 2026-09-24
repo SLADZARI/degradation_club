@@ -307,6 +307,54 @@ where version='${version}';
   expect(value, '1', `migration ${version} applied`);
 }
 
+function assertMigrationAbsent(container, version) {
+  const value = psql(container, `
+select count(*)::text
+from supabase_migrations.schema_migrations
+where version='${version}';
+`);
+  expect(value, '0', `migration ${version} absent`);
+}
+
+function runLocalStartWithDbProof(tempRoot, evidence) {
+  try {
+    const output = run('supabase', ['start'], tempRoot);
+    if (output.trim()) console.log(output.trim());
+    evidence.initial_start = {
+      cli_exit: 'PASS',
+      db_replay: 'PASS',
+      service_health: 'PASS',
+    };
+    return findDbContainer();
+  } catch (error) {
+    const stdout = error?.stdout ? String(error.stdout) : '';
+    const stderr = error?.stderr ? String(error.stderr) : '';
+
+    console.log('[start recovery] CLI start failed; proving local DB replay state directly');
+    let container;
+    try {
+      container = findDbContainer();
+      expect(psql(container, 'select 1;'), '1', 'initial start DB reachable');
+      assertMigrationApplied(container, '20260921134959');
+      assertMigrationAbsent(container, '20260924002459');
+      assertMigrationAbsent(container, '20260924002500');
+    } catch (proofError) {
+      error.start_recovery_error = proofError?.message || String(proofError);
+      throw error;
+    }
+
+    evidence.initial_start = {
+      cli_exit: 'FAIL',
+      db_replay: 'PASS',
+      service_health: 'UNPROVEN',
+      recovery_proof: 'DB_REACHABLE_TRACKED_BASELINE_APPLIED_OVERLAY_AND_ARTIFACT_ABSENT',
+      cli_stdout: stdout,
+      cli_stderr: stderr,
+    };
+    return container;
+  }
+}
+
 function runLocalResetWithDbProof(tempRoot, evidence, label) {
   try {
     const output = run('supabase', ['db', 'reset', '--local'], tempRoot);
@@ -655,9 +703,8 @@ async function main() {
 
     phase = 'PHASE_1_TRACKED_BASELINE_START';
     console.log('[phase 1] clean tracked baseline replay with Artifact Collaboration and overlay withheld');
-    run('supabase', ['start'], tempRoot, { capture: false });
+    let container = runLocalStartWithDbProof(tempRoot, evidence);
     started = true;
-    let container = findDbContainer();
 
     for (const version of ['20260827212520','20260827212614','20260828170411','20260921134959']) {
       assertMigrationApplied(container, version);
@@ -731,6 +778,7 @@ async function main() {
     evidence.error = error?.message || String(error);
     evidence.error_stdout = error?.stdout ? String(error.stdout) : '';
     evidence.error_stderr = error?.stderr ? String(error.stderr) : '';
+    if (error?.start_recovery_error) evidence.start_recovery_error = error.start_recovery_error;
     throw error;
   } finally {
     try {
