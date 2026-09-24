@@ -294,24 +294,11 @@ try{
     const relationBlock=reloadedCard.locator('[data-relation-block]');
     await relationBlock.waitFor({state:'attached',timeout:6000});
     await relationBlock.locator('summary').click();
-    await page.waitForFunction(
-      artifactId=>{
-        const card=document.querySelector('.dc-notice[data-artifact="'+artifactId+'"]');
-        const block=card?.querySelector('[data-relation-block]');
-        return Boolean(
-          block?.open
-          &&block.querySelector('[data-relation-id="rel-created"]')
-          &&block.querySelector('[data-relation-id="rel-other"]')
-          &&block.querySelector('[data-relation-id="rel-directional"]')
-        );
-      },
-      A,
-      {timeout:6000}
-    );
+    await page.locator('.dc-notice[data-artifact="'+A+'"] [data-relation-block][open]').waitFor({state:'attached',timeout:6000});
 
     // Re-query after opening: canonical presentation may refresh and replace relation DOM.
     const freshCard=page.locator('.dc-notice[data-artifact="'+A+'"]');
-    const freshBlock=freshCard.locator('[data-relation-block]');
+    const freshBlock=freshCard.locator('[data-relation-block][open]');
     const createdRow=freshBlock.locator('[data-relation-id="rel-created"]');
     const otherRow=freshBlock.locator('[data-relation-id="rel-other"]');
     const directionalRow=freshBlock.locator('[data-relation-id="rel-directional"]');
