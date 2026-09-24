@@ -7,12 +7,12 @@
     "projectStage": "BUILD",
     "gate": "G5_BUILD",
     "status": "APPROVED",
-    "version": "2.80",
+    "version": "2.81",
     "updated": "2026-09-24",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.79"
+    "supersedes": "2.80"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -415,7 +415,6 @@
     "gateReadiness": "G5_BACKEND_STATIC_READY_LOCAL_EXECUTION_BLOCKED",
     "note": "DEV1 backend contract/migration/static security hardening is complete on the Result branch. Required free local Supabase CLI + Docker validation is blocked in the current runner because Docker/CLI/runtime are absent and outbound DNS is unavailable. Live Supabase, paid branches, merge and deploy remain unauthorized.",
     "implementationBrief": "operations/ARTIFACT_COLLABORATION_IMPLEMENTATION_BRIEF_V1.md",
-    "g5BackendBlockerEvidence": "operations/ARTIFACT_COLLABORATION_BACKEND_G5_NONPROD_BLOCKER_2026-09-24.md",
     "g5BackendLocalBlockerEvidence": "operations/ARTIFACT_COLLABORATION_BACKEND_G5_LOCAL_STACK_BLOCKER_2026-09-24.md",
     "costBoundary": "NO_PAID_INFRASTRUCTURE"
   },
