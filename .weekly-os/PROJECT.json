@@ -7,12 +7,12 @@
     "projectStage": "BUILD",
     "gate": "G5_BUILD",
     "status": "APPROVED",
-    "version": "2.78",
+    "version": "2.79",
     "updated": "2026-09-24",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.77"
+    "supersedes": "2.78"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -214,7 +214,9 @@
     ".weekly-os/results/artifact-collaboration-v1.v0.2.md",
     "operations/ARTIFACT_COLLABORATION_BACKEND_G4_CONTRACT_2026-09-24.md",
     "operations/ARTIFACT_COLLABORATION_BACKEND_G5_CHECKPOINT_2026-09-24.md",
-    "operations/ARTIFACT_COLLABORATION_IMPLEMENTATION_BRIEF_V1.md"
+    "operations/ARTIFACT_COLLABORATION_IMPLEMENTATION_BRIEF_V1.md",
+    ".weekly-os/results/artifact-collaboration-v1.v0.3.md",
+    "operations/ARTIFACT_COLLABORATION_BACKEND_G5_NONPROD_BLOCKER_2026-09-24.md"
   ],
   "authority": {
     "mpDslCore": {
@@ -381,10 +383,10 @@
   },
   "currentResult": {
     "artifactId": "dementor-club.result.artifact-collaboration-v1",
-    "version": "0.2",
+    "version": "0.3",
     "status": "REVIEW",
-    "workStatus": "ACTIVE",
-    "path": ".weekly-os/results/artifact-collaboration-v1.v0.2.md",
+    "workStatus": "BLOCKED",
+    "path": ".weekly-os/results/artifact-collaboration-v1.v0.3.md",
     "gate": "G5_BUILD",
     "scope": [
       "idea participation",
@@ -405,12 +407,13 @@
     "g4BackendEvidence": "operations/ARTIFACT_COLLABORATION_BACKEND_G4_CONTRACT_2026-09-24.md",
     "g4BackendStatus": "PASS",
     "g5BackendEvidence": "operations/ARTIFACT_COLLABORATION_BACKEND_G5_CHECKPOINT_2026-09-24.md",
-    "g5BackendCandidateCommit": "06ba2aa94c990a2e0bce4a6729a4f6963acb0e19",
+    "g5BackendCandidateCommit": "3522993d6796fe9dae81a0c7dbde1ddcc1aa350a",
     "g5BackendStaticStatus": "PASS",
-    "g5SqlExecutionStatus": "NOT_RUN",
-    "gateReadiness": "G5_SCHEMA_DRAFT_STATIC_PASS",
-    "note": "Artifact Collaboration v1 is packaged for two-developer execution. DEV1 backend/Supabase lane and DEV2 frontend/UX lane share one Result/integration branch. G5 backend static PASS; non-production SQL execution remains next backend checkpoint. Live Supabase/merge/deploy remain unauthorized.",
-    "implementationBrief": "operations/ARTIFACT_COLLABORATION_IMPLEMENTATION_BRIEF_V1.md"
+    "g5SqlExecutionStatus": "BLOCKED_NO_NONPROD_POSTGRES",
+    "gateReadiness": "G5_BACKEND_STATIC_READY_EXECUTION_BLOCKED",
+    "note": "DEV1 backend contract/migration/static security hardening is complete on the Result branch. PostgreSQL/RLS runtime validation is blocked because no authorized non-production Postgres exists; Supabase Branching requires Pro. Live Supabase/merge/deploy remain unauthorized.",
+    "implementationBrief": "operations/ARTIFACT_COLLABORATION_IMPLEMENTATION_BRIEF_V1.md",
+    "g5BackendBlockerEvidence": "operations/ARTIFACT_COLLABORATION_BACKEND_G5_NONPROD_BLOCKER_2026-09-24.md"
   },
   "waitingResults": [
     {
