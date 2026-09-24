@@ -307,6 +307,45 @@ where version='${version}';
   expect(value, '1', `migration ${version} applied`);
 }
 
+function runLocalResetWithDbProof(tempRoot, evidence, label) {
+  try {
+    const output = run('supabase', ['db', 'reset', '--local'], tempRoot);
+    if (output.trim()) console.log(output.trim());
+    evidence[label] = {
+      cli_exit: 'PASS',
+      db_replay: 'PASS',
+      post_reset_restart: 'PASS',
+    };
+    return findDbContainer();
+  } catch (error) {
+    const stdout = error?.stdout ? String(error.stdout) : '';
+    const stderr = error?.stderr ? String(error.stderr) : '';
+    const combined = `${stdout}\n${stderr}\n${error?.message || ''}`;
+
+    const exactPostReset502 =
+      combined.includes('Restarting containers...')
+      && combined.includes('Error status 502')
+      && combined.includes('Applying migration 20260924002459_observed_production_compatibility_overlay.sql...')
+      && combined.includes('Applying migration 20260924002500_artifact_collaboration_v1.sql...');
+
+    if (!exactPostReset502) throw error;
+
+    console.log('[reset recovery] CLI reported post-reset 502 after both target migrations; proving DB state directly');
+    const container = findDbContainer();
+    expect(psql(container, 'select 1;'), '1', `${label} DB reachable after post-reset 502`);
+    assertMigrationApplied(container, '20260924002459');
+    assertMigrationApplied(container, '20260924002500');
+
+    evidence[label] = {
+      cli_exit: 'POST_RESET_RESTART_502',
+      db_replay: 'PASS',
+      post_reset_restart: 'WARN_502',
+      recovery_proof: 'DB_REACHABLE_AND_TARGET_MIGRATIONS_APPLIED',
+    };
+    return container;
+  }
+}
+
 function functionDefinition(container, name) {
   return psql(container, `
 select pg_get_functiondef(p.oid)
@@ -650,9 +689,7 @@ async function main() {
 
     phase = 'PHASE_3_FULL_RESET_WITH_OVERLAY_AND_ARTIFACT';
     console.log('[phase 3] full clean reset including compatibility overlay + Artifact Collaboration');
-    const firstResetOutput = run('supabase', ['db', 'reset', '--local'], tempRoot);
-    if (firstResetOutput.trim()) console.log(firstResetOutput.trim());
-    container = findDbContainer();
+    container = runLocalResetWithDbProof(tempRoot, evidence, 'first_full_reset');
     assertMigrationApplied(container, '20260924002459');
     assertMigrationApplied(container, '20260924002500');
     const participationTable = psql(container,
@@ -662,19 +699,24 @@ async function main() {
     evidence.full_replay = {
       compatibility_overlay: '20260924002459',
       artifact_migration: '20260924002500',
+      db_replay_proven: 'PASS',
+      cli_post_reset_restart: evidence.first_full_reset?.post_reset_restart || 'UNKNOWN',
       post_artifact_unrelated_production_drift_surfaces: 'PASS',
       status: 'PASS',
     };
 
     phase = 'PHASE_4_REPEATABILITY_RESET';
     console.log('[phase 4] repeatability reset');
-    const secondResetOutput = run('supabase', ['db', 'reset', '--local'], tempRoot);
-    if (secondResetOutput.trim()) console.log(secondResetOutput.trim());
-    container = findDbContainer();
+    container = runLocalResetWithDbProof(tempRoot, evidence, 'second_full_reset');
     assertMigrationApplied(container, '20260924002459');
     assertMigrationApplied(container, '20260924002500');
     assertPostArtifactProductionCompatibility(container);
-    evidence.repeatability = { second_full_reset: 'PASS', compatibility_overlay_replayed: 'PASS' };
+    evidence.repeatability = {
+      second_full_reset: 'PASS',
+      compatibility_overlay_replayed: 'PASS',
+      db_replay_proven: 'PASS',
+      cli_post_reset_restart: evidence.second_full_reset?.post_reset_restart || 'UNKNOWN',
+    };
 
     phase = 'PHASE_5_G5_RUNTIME_MATRIX';
     console.log('[phase 5] Artifact Collaboration G5 runtime matrix');
