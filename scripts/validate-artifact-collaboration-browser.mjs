@@ -333,7 +333,11 @@ try{
       deleteCallsBefore,
       {timeout:6000}
     );
-    await page.waitForFunction(()=>!document.querySelector('.dc-notice[data-artifact="'+A+'"] [data-relation-id="rel-created"]'),null,{timeout:6000});
+    await page.waitForFunction(
+      artifactId=>!document.querySelector('.dc-notice[data-artifact="'+artifactId+'"] [data-relation-id="rel-created"]'),
+      A,
+      {timeout:6000}
+    );
     expect(await page.locator('.dc-notice[data-artifact="'+A+'"] [data-relation-id="rel-created"]').count()===0,'server-authorized relation delete did not disappear');
     expect(!errors.length,'participant relations errors: '+errors.join(' | '));await ctx.close();
   }
