@@ -581,6 +581,7 @@ async function main() {
   const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'dc-prehistory-replay-'));
   const tempSupabase = path.join(tempRoot, 'supabase');
   let started = false;
+  let phase = 'INITIALIZE';
   const evidence = {
     branch: BRANCH,
     source_head: git('rev-parse', 'HEAD'),
@@ -613,6 +614,7 @@ async function main() {
     fs.renameSync(artifactPath, heldArtifact);
     fs.writeFileSync(heldOverlay, buildOverlaySql());
 
+    phase = 'PHASE_1_TRACKED_BASELINE_START';
     console.log('[phase 1] clean tracked baseline replay with Artifact Collaboration and overlay withheld');
     run('supabase', ['start'], tempRoot, { capture: false });
     started = true;
@@ -630,6 +632,7 @@ async function main() {
       status: 'PASS',
     };
 
+    phase = 'PHASE_2_APPLY_COMPATIBILITY_OVERLAY';
     console.log('[phase 2] apply observed production compatibility overlay locally');
     psql(container, fs.readFileSync(heldOverlay, 'utf8'));
     const postOverlayFingerprint = psql(container, STRUCTURAL_FINGERPRINT_SQL);
@@ -645,8 +648,10 @@ async function main() {
     fs.copyFileSync(heldOverlay, path.join(tempMigrations, OVERLAY_EPHEMERAL_NAME));
     fs.renameSync(heldArtifact, artifactPath);
 
+    phase = 'PHASE_3_FULL_RESET_WITH_OVERLAY_AND_ARTIFACT';
     console.log('[phase 3] full clean reset including compatibility overlay + Artifact Collaboration');
-    run('supabase', ['db', 'reset', '--local'], tempRoot, { capture: false });
+    const firstResetOutput = run('supabase', ['db', 'reset', '--local'], tempRoot);
+    if (firstResetOutput.trim()) console.log(firstResetOutput.trim());
     container = findDbContainer();
     assertMigrationApplied(container, '20260924002459');
     assertMigrationApplied(container, '20260924002500');
@@ -661,14 +666,17 @@ async function main() {
       status: 'PASS',
     };
 
+    phase = 'PHASE_4_REPEATABILITY_RESET';
     console.log('[phase 4] repeatability reset');
-    run('supabase', ['db', 'reset', '--local'], tempRoot, { capture: false });
+    const secondResetOutput = run('supabase', ['db', 'reset', '--local'], tempRoot);
+    if (secondResetOutput.trim()) console.log(secondResetOutput.trim());
     container = findDbContainer();
     assertMigrationApplied(container, '20260924002459');
     assertMigrationApplied(container, '20260924002500');
     assertPostArtifactProductionCompatibility(container);
     evidence.repeatability = { second_full_reset: 'PASS', compatibility_overlay_replayed: 'PASS' };
 
+    phase = 'PHASE_5_G5_RUNTIME_MATRIX';
     console.log('[phase 5] Artifact Collaboration G5 runtime matrix');
     evidence.runtime_matrix = runtimeMatrix(container);
     evidence.status = 'PASS';
@@ -677,7 +685,10 @@ async function main() {
     console.log(JSON.stringify(evidence, null, 2));
   } catch (error) {
     evidence.status = 'FAIL';
+    evidence.failure_phase = phase;
     evidence.error = error?.message || String(error);
+    evidence.error_stdout = error?.stdout ? String(error.stdout) : '';
+    evidence.error_stderr = error?.stderr ? String(error.stderr) : '';
     throw error;
   } finally {
     try {
