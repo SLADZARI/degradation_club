@@ -63,6 +63,14 @@ const artifacts=[
 ];
 const positions=artifacts.map((a,i)=>({artifact_id:a.id,board_id:'community',x:1500+i*650,y:1400+i*250,rotation:0,size_class:i===0?'M':'S',position_version:1}));
 const projections=[{entity_id:'44444444-4444-4444-8444-444444444444',entity_type:'event',slug:'qa-event',title:'QA EVENT',status:'planned',summary:'Readable relation target.',source_system:'dementor-club',provenance_status:'confirmed',event_location:'QA',event_capacity:7,program_type:null,delivery_mode:null,content_summary:null}];
+const RELATION_KEY='qa:artifact-collab:relations:'+mode;
+const DEFAULT_RELATIONS=mode==='relations'?[
+ {relation_id:'rel-other',relation_type:'RELATED_TO',origin_kind:'artifact',origin_source_id:A,target_kind:'artifact',target_source_id:B,created_at:'2026-09-24T12:00:00Z',can_delete:false},
+ {relation_id:'rel-directional',relation_type:'ABOUT',origin_kind:'artifact',origin_source_id:A,target_kind:'event',target_source_id:'qa-event',created_at:'2026-09-24T12:01:00Z',can_delete:false}
+]:[];
+function loadRelationStore(){try{const raw=sessionStorage.getItem(RELATION_KEY);if(raw)return JSON.parse(raw)}catch{}return DEFAULT_RELATIONS.map(row=>({...row}))}
+function saveRelationStore(rows){globalThis.__QA_RELATIONS__=rows;try{sessionStorage.setItem(RELATION_KEY,JSON.stringify(rows))}catch{}}
+globalThis.__QA_RELATIONS__=loadRelationStore();
 const canReadArtifact=a=>{
  if(a.visibility==='community')return true;
  if(uid===AUTHOR||mode==='owner')return true;
@@ -106,7 +114,7 @@ export function createClient(){return{
    if(name==='dc_normalize_artifact_lifecycle_v1')return{data:0,error:null};
    if(name==='dc_board_promotion_state_read_v1'||name==='dc_artifact_publisher_scopes_v1')return{data:[],error:null};
    if(name==='dc_board_entity_projection_read_v1')return{data:projections,error:null};
-   if(name==='dc_board_relations_read_v1')return{data:[],error:null};
+   if(name==='dc_board_relations_read_v1')return{data:(globalThis.__QA_RELATIONS__||[]).map(row=>({...row})),error:null};
    if(name==='dc_artifact_participants_read_v1'){
      const art=artifactFromArg(args.p_artifact_id);if(!art)return{data:null,error:{message:'ARTIFACT_NOT_AVAILABLE'}};
      return{data:currentParticipants(args.p_artifact_id),error:null};
@@ -118,8 +126,15 @@ export function createClient(){return{
    if(name==='dc_artifact_remove_participant_v1'){globalThis.__QA_PARTICIPATION__[args.p_artifact_id][args.p_profile_id]='REMOVED';return{data:'event-removed',error:null}};
    if(name==='dc_guest_board_read_v1')return{data:artifacts.filter(canReadArtifact).map(a=>({...a,artifact_id:a.id,author_display_name:profiles[0].display_name,author_nickname:profiles[0].nickname,author_avatar_url:null,reaction_count:0,guest_interest_count:0,my_guest_interest:false})),error:null};
    if(name==='dc_guest_board_artifact_detail_read_v1'){const a=artifactFromArg(args.p_artifact_id);if(!a)return{data:null,error:{message:'ARTIFACT_NOT_AVAILABLE'}};return{data:{artifact:a,author:profiles[0],reaction_count:0,guest_interest_count:0,my_guest_interest:false,my_guest_response_submitted:false,participation_state:globalThis.__QA_PARTICIPATION__?.[a.id]?.[uid]||null,media:[]},error:null}};
-   if(name==='dc_board_relation_create_v1'){return{data:'rel-1',error:null}};
-   if(name==='dc_board_relation_delete_v1'){return{data:args.p_relation_id,error:null}};
+   if(name==='dc_board_relation_create_v1'){
+     const created={relation_id:'rel-created',relation_type:args.p_relation_type,origin_kind:args.p_origin_kind,origin_source_id:args.p_origin_source_id,target_kind:args.p_target_kind,target_source_id:args.p_target_source_id,created_at:'2026-09-24T12:02:00Z',can_delete:true};
+     saveRelationStore([...(globalThis.__QA_RELATIONS__||[]).filter(row=>row.relation_id!=='rel-created'),created]);
+     return{data:'rel-created',error:null}
+   };
+   if(name==='dc_board_relation_delete_v1'){
+     saveRelationStore((globalThis.__QA_RELATIONS__||[]).filter(row=>row.relation_id!==args.p_relation_id));
+     return{data:args.p_relation_id,error:null}
+   };
    if(name==='dc_set_artifact_visibility_v1'||name==='dc_set_artifact_subtype_v1'||name==='dc_set_artifact_activity_v1')return{data:args.p_artifact_id,error:null};
    if(name==='dc_create_artifact_draft_v1')return{data:'88888888-8888-4888-8888-888888888888',error:null};
    if(name==='dc_publish_artifact_v1')return{data:{artifact_id:args.p_artifact_id,status:'active'},error:null};
@@ -243,15 +258,44 @@ try{
     await ctx.close();
   }
 
-  // JOINED participant Relations UI exposes participant path as RELATED_TO only.
+  // JOINED participant creation stays RELATED_TO-only; delete authority comes only from server can_delete.
   {
     const{ctx,page,errors}=await openBoard(browser,'relations');
     const card=page.locator('.dc-notice[data-artifact="'+A+'"]');
     await card.locator('[data-relation-block]').evaluate(el=>el.open=true);
     await card.locator('[data-relation-add]').click();
-    const labels=await card.locator('[data-relation-choice] option').allTextContents();
+    const select=card.locator('[data-relation-choice]');
+    const options=await select.locator('option').evaluateAll(nodes=>nodes.map(node=>({value:node.value,label:node.textContent||''})));
+    const labels=options.map(option=>option.label);
     expect(labels.length>0,'participant relations: no choices');
     expect(labels.every(label=>label.startsWith('СВЯЗАНО С')),'participant relations exposed non-RELATED_TO: '+labels.join(' | '));
+    const eventChoice=options.find(option=>option.label.includes('QA EVENT'));
+    expect(Boolean(eventChoice),'participant relations: readable QA EVENT target missing');
+    if(eventChoice){
+      await select.selectOption(eventChoice.value);
+      await card.locator('[data-relation-save]').click();
+      await page.waitForSelector('.dc-notice[data-artifact="'+A+'"] [data-relation-id="rel-created"]');
+    }
+
+    // Simulated reload/read must reconstruct delete authority exclusively from row.can_delete.
+    await page.reload({waitUntil:'domcontentloaded'});
+    await page.waitForFunction(()=>document.querySelectorAll('.dc-notice[data-artifact]').length>=2,{timeout:8000});
+    const reloadedCard=page.locator('.dc-notice[data-artifact="'+A+'"]');
+    const createdRow=reloadedCard.locator('[data-relation-id="rel-created"]');
+    await createdRow.waitFor({state:'attached',timeout:6000});
+    expect(await createdRow.locator('[data-relation-delete]').count()===1,'can_delete=true relation must expose delete control after reload/read');
+
+    const otherRow=reloadedCard.locator('[data-relation-id="rel-other"]');
+    expect(await otherRow.count()===1,'negative RELATED_TO fixture missing after reload/read');
+    expect(await otherRow.locator('[data-relation-delete]').count()===0,'can_delete=false RELATED_TO must not expose delete control');
+
+    const directionalRow=reloadedCard.locator('[data-relation-id="rel-directional"]');
+    expect(await directionalRow.count()===1,'negative directional fixture missing after reload/read');
+    expect(await directionalRow.locator('[data-relation-delete]').count()===0,'can_delete=false directional relation must not expose delete control');
+
+    await createdRow.locator('[data-relation-delete]').click();
+    await page.waitForFunction(()=>!document.querySelector('.dc-notice[data-artifact="'+A+'"] [data-relation-id="rel-created"]'),null,{timeout:6000});
+    expect(await reloadedCard.locator('[data-relation-id="rel-created"]').count()===0,'server-authorized relation delete did not disappear');
     expect(!errors.length,'participant relations errors: '+errors.join(' | '));await ctx.close();
   }
 

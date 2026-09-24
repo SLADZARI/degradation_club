@@ -112,16 +112,26 @@ expect(
   'createRelation must re-check canCreateChoice before RPC'
 );
 
-// Delete presentation remains the pre-existing canonical authority mirror.
-// Do not infer participant-created relation ownership from JOINED state.
+// Delete presentation must consume only the server-authoritative capability
+// projected by dc_board_relations_read_v1().
 expect(
-  deleteRowBody.includes("if(row.relation_type==='RELATED_TO')returncanManageEndpoint(origin)||canManageEndpoint(target);")
-  &&deleteRowBody.includes('returncanManageEndpoint(origin);'),
-  'relation delete mirror must preserve canonical manage-either/origin-only semantics'
+  deleteRowBody.includes("returnrow?.can_delete===true;"),
+  'relation delete UI must require row.can_delete === true'
 );
 expect(
-  !deleteRowBody.includes('joinedIdeaEndpoint')&&!deleteRowBody.includes('canCreateChoice'),
-  'participant creation extension must not leak into relation delete authority'
+  !deleteRowBody.includes('canManageEndpoint')
+  &&!deleteRowBody.includes('joinedIdeaEndpoint')
+  &&!deleteRowBody.includes('canCreateChoice')
+  &&!deleteRowBody.includes('created_by'),
+  'relation delete UI must not infer permission from local ownership, JOINED state, creator or create authority'
+);
+expect(
+  runtime.includes('const canDelete=canDeleteRow(row);'),
+  'relation row rendering must consume canDeleteRow(row) without endpoint-manager fallback'
+);
+expect(
+  runtime.includes("if(!row||!canDeleteRow(row)){setRelationStatus(statusRoot,'НЕТ ПРАВ / UI MIRROR','error');return}"),
+  'delete mutation entry must fail closed unless current relation row has server-authoritative can_delete=true'
 );
 
 // Endpoint ontology remains closed and Person is not introduced.

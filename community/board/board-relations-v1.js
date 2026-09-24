@@ -123,11 +123,8 @@ function canCreateChoice(type,origin,target){
   if(canonical)return true;
   return type==='RELATED_TO'&&(joinedIdeaEndpoint(origin)||joinedIdeaEndpoint(target));
 }
-function canDeleteRow(row,map=endpointMap()){
-  const origin=map.get(endpointKey(row.origin_kind,row.origin_source_id))||endpointFromTuple(row.origin_kind,row.origin_source_id);
-  const target=map.get(endpointKey(row.target_kind,row.target_source_id))||endpointFromTuple(row.target_kind,row.target_source_id);
-  if(row.relation_type==='RELATED_TO')return canManageEndpoint(origin)||canManageEndpoint(target);
-  return canManageEndpoint(origin);
+function canDeleteRow(row){
+  return row?.can_delete===true;
 }
 function counterpart(row,endpoint){
   const originKey=endpointKey(row.origin_kind,row.origin_source_id);
@@ -191,7 +188,7 @@ function blockHtml(endpoint,{detail=false}={}){
   const relationRowsHtml=rows.length?rows.map(row=>{
     const other=counterpart(row,endpoint);
     const title=endpointTitle(other,map);
-    const canDelete=canDeleteRow(row,map);
+    const canDelete=canDeleteRow(row);
     return `<div class="dc-board-relation-row" data-relation-id="${esc(row.relation_id)}"><button type="button" class="dc-board-relation-link" data-relation-focus="${esc(other.key)}"><span>${esc(relationLabel(row,endpoint))}</span><strong>${esc(title)}</strong></button>${canDelete?`<button type="button" class="dc-board-relation-delete" data-relation-delete="${esc(row.relation_id)}" aria-label="Удалить связь">×</button>`:''}</div>`;
   }).join(''):'<div class="dc-board-relation-empty">СВЯЗЕЙ ПОКА НЕТ.</div>';
   const options=choices.map(choice=>`<option value="${escapeOption({type:choice.type,targetKey:choice.target.key})}">${esc(FORWARD_LABELS[choice.type]||choice.type)} · ${esc(choice.target.title||choice.target.sourceId)}</option>`).join('');

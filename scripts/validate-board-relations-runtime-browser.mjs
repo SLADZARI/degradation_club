@@ -50,9 +50,9 @@ const projections=[
  {entity_id:projectEntity,entity_type:'project',slug:'qa-project',title:'QA PROJECT',status:'active',summary:'Unsupported relation endpoint fixture.',source_system:'dementor-club',provenance_status:'confirmed',event_location:null,event_capacity:null,program_type:null,delivery_mode:null,content_summary:null}
 ];
 let relationRows=[
- {relation_id:'77777777-7777-4777-8777-777777777771',relation_type:'RELATED_TO',origin_kind:'artifact',origin_source_id:ownId,target_kind:'event',target_source_id:'qa-event',created_at:'2026-09-18T07:00:00Z'},
- {relation_id:'77777777-7777-4777-8777-777777777772',relation_type:'ABOUT',origin_kind:'artifact',origin_source_id:ownId,target_kind:'program',target_source_id:'qa-course',created_at:'2026-09-18T07:01:00Z'},
- {relation_id:'77777777-7777-4777-8777-777777777773',relation_type:'CONTINUES',origin_kind:'program',origin_source_id:'qa-course',target_kind:'program',target_source_id:'qa-practice',created_at:'2026-09-18T07:02:00Z'}
+ {relation_id:'77777777-7777-4777-8777-777777777771',relation_type:'RELATED_TO',origin_kind:'artifact',origin_source_id:ownId,target_kind:'event',target_source_id:'qa-event',created_at:'2026-09-18T07:00:00Z',can_delete:true},
+ {relation_id:'77777777-7777-4777-8777-777777777772',relation_type:'ABOUT',origin_kind:'artifact',origin_source_id:ownId,target_kind:'program',target_source_id:'qa-course',created_at:'2026-09-18T07:01:00Z',can_delete:true},
+ {relation_id:'77777777-7777-4777-8777-777777777773',relation_type:'CONTINUES',origin_kind:'program',origin_source_id:'qa-course',target_kind:'program',target_source_id:'qa-practice',created_at:'2026-09-18T07:02:00Z',can_delete:true}
 ];
 const roleRows=[{profile_id:user.id,role:'dementor',scope_type:'system',status:'active',valid_from:'2026-09-01T00:00:00Z',valid_to:null,provenance_status:'confirmed'}];
 const assignmentRows=[
@@ -108,7 +108,7 @@ export function createClient(){return{
   if(name==='dc_board_relation_create_v1'){
     if(globalThis.__QA_RELATION_REJECT__)return{data:null,error:{message:'RELATION_WRITE_FORBIDDEN',code:'42501'}};
     const id='88888888-8888-4888-8888-'+String(relationRows.length+1).padStart(12,'8');
-    relationRows.push({relation_id:id,relation_type:args.p_relation_type,origin_kind:args.p_origin_kind,origin_source_id:args.p_origin_source_id,target_kind:args.p_target_kind,target_source_id:args.p_target_source_id,created_at:new Date().toISOString()});
+    relationRows.push({relation_id:id,relation_type:args.p_relation_type,origin_kind:args.p_origin_kind,origin_source_id:args.p_origin_source_id,target_kind:args.p_target_kind,target_source_id:args.p_target_source_id,created_at:new Date().toISOString(),can_delete:true});
     return{data:id,error:null};
   }
   if(name==='dc_board_relation_delete_v1'){
