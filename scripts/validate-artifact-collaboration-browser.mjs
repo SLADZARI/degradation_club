@@ -364,12 +364,45 @@ try{
       await page.evaluate(()=>{
         const viewport=document.querySelector('.dc-spatial-viewport');
         globalThis.__QA_RELATION_SUMMARY_STARTED_PAN__=false;
+        globalThis.__QA_RELATION_SUMMARY_EVENTS__=[];
+        const record=event=>{
+          if(!event.target.closest?.('[data-relation-block] summary'))return;
+          globalThis.__QA_RELATION_SUMMARY_EVENTS__.push({
+            type:event.type,
+            defaultPrevented:event.defaultPrevented,
+            tag:event.target.tagName,
+            panning:Boolean(viewport?.classList.contains('is-panning')),
+            dragging:document.documentElement.dataset.boardDragging||null
+          });
+        };
+        document.addEventListener('pointerdown',record,true);
+        document.addEventListener('pointerup',record,true);
+        document.addEventListener('click',record,true);
+        document.addEventListener('toggle',record,true);
         viewport?.addEventListener('pointerdown',event=>{
           if(event.target.closest?.('[data-relation-block] summary')&&viewport.classList.contains('is-panning'))globalThis.__QA_RELATION_SUMMARY_STARTED_PAN__=true;
         });
       });
       await summary.tap();
-      await card.locator('[data-relation-block][open]').waitFor({state:'attached',timeout:6000});
+      try{
+        await card.locator('[data-relation-block][open]').waitFor({state:'attached',timeout:6000});
+      }catch{
+        const diagnostic=await page.evaluate(artifactId=>{
+          const card=document.querySelector('.dc-notice[data-artifact="'+artifactId+'"]');
+          const block=card?.querySelector('[data-relation-block]');
+          return{
+            events:globalThis.__QA_RELATION_SUMMARY_EVENTS__||[],
+            blockPresent:Boolean(block),
+            open:Boolean(block?.open),
+            cardClass:card?.className||null,
+            artifactOwned:card?.dataset.artifactOwned||null,
+            panning:Boolean(document.querySelector('.dc-spatial-viewport')?.classList.contains('is-panning')),
+            boardDragging:document.documentElement.dataset.boardDragging||null,
+            overlayOpen:Boolean(document.querySelector('.dc-artifact-overlay:not([hidden])'))
+          };
+        },A);
+        throw new Error(`mobile ${width}: RELATION_SUMMARY_TOUCH_OPEN_TIMEOUT ${JSON.stringify(diagnostic)}`);
+      }
       expect(await page.evaluate(()=>globalThis.__QA_RELATION_SUMMARY_STARTED_PAN__)===false,`mobile ${width}: relation summary initiated Board pan`);
       expect(await page.locator('.dc-artifact-overlay:not([hidden])').count()===0,`mobile ${width}: relation summary opened Artifact fullscreen`);
       expect(!errors.length,`mobile ${width}: relation summary errors: ${errors.join(' | ')}`);
