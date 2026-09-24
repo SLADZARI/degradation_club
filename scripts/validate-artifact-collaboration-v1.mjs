@@ -154,6 +154,13 @@ expect(relationDelete.includes('v_relation.created_by=v_uid'), 'participant rela
 expect(relationDelete.includes('v_participant_delete'), 'participant relation delete path missing');
 expect(!relationDelete.includes("raise exception 'RELATION_NOT_FOUND'"), 'relation delete leaks hidden relation existence');
 expect(relationDelete.includes("raise exception 'RELATION_NOT_AVAILABLE'"), 'relation delete generic no-oracle state missing');
+expect(relationDelete.includes('if not v_owner_admin then'), 'Owner Admin relation-delete bypass wrapper missing');
+expect(relationCreate.includes('public.dc_is_owner_admin(v_uid)'), 'Owner Admin relation-create authority missing');
+for (const fn of [relationCreate, relationDelete]) {
+  expect(fn.includes('public.dc_membership_active(v_uid)'), 'existing Member relation authority regressed');
+  expect(fn.includes("public.dc_has_role('dementor',v_uid)") || fn.includes("public.dc_has_role('dementor', v_uid)"), 'scoped Dementor relation authority regressed');
+  expect(fn.includes('public.dc_entity_assignments'), 'scoped entity relation authority regressed');
+}
 expect(!/origin_kind\s*=\s*'person'|target_kind\s*=\s*'person'/i.test(migration), 'Person relation endpoint detected');
 
 // Share remains transport-only; no invite/participant mutation in canonical share owner.
