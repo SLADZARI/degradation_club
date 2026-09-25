@@ -203,182 +203,6 @@ async function openBoard(browser,mode,viewport={width:1440,height:900},options={
  return{ctx,page,errors};
 }
 
-async function runTouchCompetitionControl(browser,kind){
-  const{ctx,page,errors}=await openBoard(browser,'relations',{width:390,height:844},{hasTouch:true});
-
-  if(kind==='B'){
-    await page.addStyleTag({content:'.dc-board-relations-block > summary{min-height:44px !important;}'});
-  }else if(kind==='C'){
-    await page.addStyleTag({content:'.dc-board-open-hint{pointer-events:none !important;}'});
-  }
-
-  try{
-    const ready=await page.waitForFunction(artifactId=>{
-      const card=document.querySelector('.dc-notice[data-artifact="'+artifactId+'"]');
-      const block=card?.querySelector('[data-relation-block]');
-      const summary=block?.querySelector('summary');
-      const hint=card?.querySelector('.dc-board-open-hint');
-      if(!card||!block||!summary||!hint||!summary.isConnected||!hint.isConnected)return false;
-      const sr=summary.getBoundingClientRect();
-      const hr=hint.getBoundingClientRect();
-      const cr=card.getBoundingClientRect();
-      if(!(sr.width>0&&sr.height>0&&hr.width>0&&hr.height>0&&cr.width>0&&cr.height>0))return false;
-      const x=sr.left+sr.width/2;
-      const y=sr.top+sr.height/2;
-      const hit=document.elementFromPoint(x,y);
-      if(!(hit&&(hit===summary||summary.contains(hit))))return false;
-
-      const gapX=Math.max(0,Math.max(sr.left,hr.left)-Math.min(sr.right,hr.right));
-      const gapY=Math.max(0,Math.max(sr.top,hr.top)-Math.min(sr.bottom,hr.bottom));
-      const overlapW=Math.max(0,Math.min(sr.right,hr.right)-Math.max(sr.left,hr.left));
-      const overlapH=Math.max(0,Math.min(sr.bottom,hr.bottom)-Math.max(sr.top,hr.top));
-      const ss=getComputedStyle(summary);
-      const hs=getComputedStyle(hint);
-      const vv=window.visualViewport;
-      globalThis.__QA_TOUCH_COMPETITION_PREP__={
-        center:{x,y},
-        summaryRect:{left:sr.left,top:sr.top,right:sr.right,bottom:sr.bottom,width:sr.width,height:sr.height},
-        hintRect:{left:hr.left,top:hr.top,right:hr.right,bottom:hr.bottom,width:hr.width,height:hr.height},
-        cardRect:{left:cr.left,top:cr.top,right:cr.right,bottom:cr.bottom,width:cr.width,height:cr.height},
-        distance:Math.hypot(gapX,gapY),
-        overlap:{width:overlapW,height:overlapH,area:overlapW*overlapH},
-        summaryMinHeight:ss.minHeight,
-        summaryPointerEvents:ss.pointerEvents,
-        hintPointerEvents:hs.pointerEvents,
-        summaryTouchAction:ss.touchAction,
-        hintTouchAction:hs.touchAction,
-        worldTransform:getComputedStyle(document.getElementById('boardHost')).transform,
-        devicePixelRatio:window.devicePixelRatio,
-        visualViewport:vv?{scale:vv.scale,offsetLeft:vv.offsetLeft,offsetTop:vv.offsetTop,width:vv.width,height:vv.height}:null,
-        elementsFromPoint:document.elementsFromPoint(x,y).slice(0,6).map(el=>({
-          tag:el.tagName,
-          className:typeof el.className==='string'?el.className:'',
-          id:el.id||'',
-          relationBlock:el.hasAttribute?.('data-relation-block')||false
-        })),
-        focus:new URL(location.href).searchParams.get('focus'),
-        overlay:Boolean(document.querySelector('.dc-artifact-overlay:not([hidden])'))
-      };
-      return true;
-    },A,{timeout:6000,polling:'raf'});
-    await ready.dispose();
-  }catch(error){
-    const diagnostic=await page.evaluate(()=>({
-      html:document.querySelector('.dc-notice[data-artifact]')?.outerHTML?.slice(0,1200)||null
-    }));
-    await ctx.close();
-    return{kind,ready:false,error:'RELATION_TOUCH_COMPETITION_PREP_TIMEOUT',diagnostic,errors};
-  }
-
-  const prep=await page.evaluate(()=>globalThis.__QA_TOUCH_COMPETITION_PREP__);
-
-  await page.evaluate(artifactId=>{
-    globalThis.__QA_TOUCH_COMPETITION_POINTERDOWN__=null;
-    document.addEventListener('pointerdown',event=>{
-      const card=document.querySelector('.dc-notice[data-artifact="'+artifactId+'"]');
-      const summary=card?.querySelector('[data-relation-block] summary');
-      const hint=card?.querySelector('.dc-board-open-hint');
-      const sr=summary?.getBoundingClientRect();
-      const hr=hint?.getBoundingClientRect();
-      const at=document.elementFromPoint(event.clientX,event.clientY);
-      globalThis.__QA_TOUCH_COMPETITION_POINTERDOWN__={
-        pointerType:event.pointerType||null,
-        clientX:event.clientX,
-        clientY:event.clientY,
-        target:event.target?.outerHTML?.slice(0,240)||null,
-        targetClass:typeof event.target?.className==='string'?event.target.className:'',
-        targetInsideCurrentSummary:Boolean(summary&&event.target&&(event.target===summary||summary.contains(event.target))),
-        elementFromPoint:at?.outerHTML?.slice(0,240)||null,
-        elementFromPointClass:typeof at?.className==='string'?at.className:'',
-        elementFromPointInsideCurrentSummary:Boolean(summary&&at&&(at===summary||summary.contains(at))),
-        elementsFromPoint:document.elementsFromPoint(event.clientX,event.clientY).slice(0,6).map(el=>({
-          tag:el.tagName,
-          className:typeof el.className==='string'?el.className:'',
-          id:el.id||'',
-          relationBlock:el.hasAttribute?.('data-relation-block')||false
-        })),
-        summaryRect:sr?{left:sr.left,top:sr.top,right:sr.right,bottom:sr.bottom,width:sr.width,height:sr.height}:null,
-        hintRect:hr?{left:hr.left,top:hr.top,right:hr.right,bottom:hr.bottom,width:hr.width,height:hr.height}:null,
-        focus:new URL(location.href).searchParams.get('focus'),
-        overlay:Boolean(document.querySelector('.dc-artifact-overlay:not([hidden])')),
-        viewportPanning:Boolean(document.querySelector('.dc-spatial-viewport')?.classList.contains('is-panning')),
-        boardDragging:document.documentElement.dataset.boardDragging||null,
-        positionWrites:Number(globalThis.__QA_POSITION_WRITES__||0)
-      };
-    },{capture:true,once:true});
-  },A);
-
-  await page.touchscreen.tap(prep.center.x,prep.center.y);
-
-  const pointerdown=await page.evaluate(()=>globalThis.__QA_TOUCH_COMPETITION_POINTERDOWN__);
-  const after=await page.evaluate(artifactId=>({
-    open:Boolean(document.querySelector('.dc-notice[data-artifact="'+artifactId+'"] [data-relation-block]')?.open),
-    focus:new URL(location.href).searchParams.get('focus'),
-    overlay:Boolean(document.querySelector('.dc-artifact-overlay:not([hidden])')),
-    viewportPanning:Boolean(document.querySelector('.dc-spatial-viewport')?.classList.contains('is-panning')),
-    boardDragging:document.documentElement.dataset.boardDragging||null,
-    positionWrites:Number(globalThis.__QA_POSITION_WRITES__||0)
-  }),A);
-
-  const result={kind,ready:true,prep,pointerdown,after,errors};
-  await ctx.close();
-  return result;
-}
-
-async function runHintParentActivationControl(browser){
-  const{ctx,page,errors}=await openBoard(browser,'relations',{width:390,height:844},{hasTouch:true});
-  await page.addStyleTag({content:'.dc-board-open-hint{pointer-events:none !important;}'});
-
-  const point=await page.evaluate(artifactId=>{
-    const card=document.querySelector('.dc-notice[data-artifact="'+artifactId+'"]');
-    const hint=card?.querySelector('.dc-board-open-hint');
-    const rect=hint?.getBoundingClientRect();
-    if(!card||!hint||!rect||!(rect.width>0&&rect.height>0))return null;
-    const x=rect.left+rect.width/2,y=rect.top+rect.height/2;
-    const hit=document.elementFromPoint(x,y);
-    return{x,y,hit:hit?.outerHTML?.slice(0,240)||null,hitInsideCard:Boolean(hit&&(hit===card||card.contains(hit)))};
-  },A);
-
-  if(!point){
-    await ctx.close();
-    return{passed:false,error:'HINT_CONTROL_NO_POINT',errors};
-  }
-
-  await page.touchscreen.tap(point.x,point.y);
-  let overlay=false;
-  try{
-    await page.locator('.dc-artifact-overlay:not([hidden])').waitFor({state:'attached',timeout:3000});
-    overlay=true;
-  }catch{}
-  const state=await page.evaluate(()=>({
-    focus:new URL(location.href).searchParams.get('focus'),
-    overlay:Boolean(document.querySelector('.dc-artifact-overlay:not([hidden])'))
-  }));
-  await ctx.close();
-  return{passed:overlay&&state.overlay,point,state,errors};
-}
-
-function classifyTouchCompetition(AControl,BControl,CControl){
-  const baselinePointer=AControl?.pointerdown;
-  const bFix=Boolean(BControl?.pointerdown?.targetInsideCurrentSummary&&BControl?.after?.open&&BControl?.after?.focus===null&&!BControl?.after?.overlay);
-  const cFix=Boolean(CControl?.pointerdown?.targetInsideCurrentSummary&&CControl?.after?.open&&CControl?.after?.focus===null&&!CControl?.after?.overlay);
-  const prepWasSummary=Boolean(AControl?.prep?.elementsFromPoint?.[0]&&(
-    String(AControl.prep.elementsFromPoint[0].tag).toUpperCase()==='SUMMARY'
-    ||String(AControl.prep.elementsFromPoint[0].className||'').includes('dc-board-relations')
-  ));
-  const pointerHitChanged=Boolean(
-    baselinePointer
-    &&prepWasSummary
-    &&baselinePointer.elementFromPointInsideCurrentSummary===false
-    &&String(baselinePointer.elementFromPointClass||'').includes('dc-board-open-hint')
-  );
-  if(pointerHitChanged)return'TTA-5';
-  if(bFix&&cFix)return'TTA-3';
-  if(bFix)return'TTA-1';
-  if(cFix)return'TTA-2';
-  return'TTA-4';
-}
-
 const browser=await chromium.launch({headless:true});
 try{
   // COMMUNITY regression + IDEA-only composer visibility.
@@ -602,18 +426,154 @@ try{
     expect(!errors.length,'card-body open errors: '+errors.join(' | '));await ctx.close();
   }
 
-  // Diagnostic-only touch-target competition controls on fresh 390px touch contexts.
-  const touchBaseline=await runTouchCompetitionControl(browser,'A');
-  const touch44=await runTouchCompetitionControl(browser,'B');
-  const touchHintNone=await runTouchCompetitionControl(browser,'C');
-  const hintParentActivation=await runHintParentActivationControl(browser);
-  throw new Error('RELATION_TOUCH_TARGET_COMPETITION_TRACE '+JSON.stringify({
-    classification:classifyTouchCompetition(touchBaseline,touch44,touchHintNone),
-    baseline:touchBaseline,
-    enlargedSummary44px:touch44,
-    hintPointerEventsNone:touchHintNone,
-    hintParentActivation
-  }));
+  // Mobile acceptance resolves canonical summary + geometry + browser hit-test atomically.
+  // locator.tap() is intentionally not used: it was proven to retarget to .dc-board-open-hint
+  // while coordinate browser hit-testing resolved the same visible point to Relations summary.
+  for(const [runIndex,width] of [390,390,390,360].entries()){
+    const{ctx,page,errors}=await openBoard(browser,'relations',{width,height:844},{hasTouch:true});
+
+    try{
+      const ready=await page.waitForFunction(artifactId=>{
+        const card=document.querySelector('.dc-notice[data-artifact="'+artifactId+'"]');
+        const block=card?.querySelector('[data-relation-block]');
+        const summary=block?.querySelector('summary');
+        if(!card||!block||!summary||!summary.isConnected)return false;
+        const rect=summary.getBoundingClientRect();
+        if(!(rect.width>0&&rect.height>0))return false;
+        const x=rect.left+rect.width/2;
+        const y=rect.top+rect.height/2;
+        const hit=document.elementFromPoint(x,y);
+        if(!(hit&&(hit===summary||summary.contains(hit))))return false;
+        globalThis.__QA_RELATION_MOBILE_CANONICAL_HIT__={
+          x,y,
+          focus:new URL(location.href).searchParams.get('focus'),
+          overlay:Boolean(document.querySelector('.dc-artifact-overlay:not([hidden])')),
+          viewportPanning:Boolean(document.querySelector('.dc-spatial-viewport')?.classList.contains('is-panning')),
+          boardDragging:document.documentElement.dataset.boardDragging||null,
+          positionWrites:Number(globalThis.__QA_POSITION_WRITES__||0)
+        };
+        return true;
+      },A,{timeout:6000,polling:'raf'});
+      await ready.dispose();
+    }catch(error){
+      throw new Error('RELATION_MOBILE_CANONICAL_HIT_TIMEOUT '+JSON.stringify({width,runIndex}));
+    }
+
+    const hit=await page.evaluate(()=>globalThis.__QA_RELATION_MOBILE_CANONICAL_HIT__);
+    const center={x:hit.x,y:hit.y};
+
+    await page.evaluate(artifactId=>{
+      const viewport=document.querySelector('.dc-spatial-viewport');
+      globalThis.__QA_RELATION_SUMMARY_STARTED_PAN__=false;
+      globalThis.__QA_RELATION_MOBILE_POINTERDOWN__=null;
+
+      document.addEventListener('pointerdown',event=>{
+        const card=document.querySelector('.dc-notice[data-artifact="'+artifactId+'"]');
+        const block=card?.querySelector('[data-relation-block]');
+        const summary=block?.querySelector('summary');
+        const targetInside=Boolean(summary&&event.target&&(event.target===summary||summary.contains(event.target)));
+        globalThis.__QA_RELATION_MOBILE_POINTERDOWN__={
+          pointerType:event.pointerType||null,
+          target:event.target?.outerHTML?.slice(0,240)||null,
+          targetInsideCurrentSummary:targetInside,
+          currentSummaryConnected:Boolean(summary?.isConnected),
+          focus:new URL(location.href).searchParams.get('focus'),
+          overlay:Boolean(document.querySelector('.dc-artifact-overlay:not([hidden])')),
+          viewportPanning:Boolean(viewport?.classList.contains('is-panning')),
+          boardDragging:document.documentElement.dataset.boardDragging||null,
+          positionWrites:Number(globalThis.__QA_POSITION_WRITES__||0)
+        };
+      },{capture:true,once:true});
+
+      viewport?.addEventListener('pointerdown',event=>{
+        if(event.target.closest?.('[data-relation-block] summary')&&viewport.classList.contains('is-panning'))globalThis.__QA_RELATION_SUMMARY_STARTED_PAN__=true;
+      },{once:true});
+    },A);
+
+    await page.touchscreen.tap(center.x,center.y);
+
+    const pointerdown=await page.evaluate(()=>globalThis.__QA_RELATION_MOBILE_POINTERDOWN__);
+    if(
+      !pointerdown
+      ||pointerdown.pointerType!=='touch'
+      ||pointerdown.targetInsideCurrentSummary!==true
+      ||pointerdown.currentSummaryConnected!==true
+    ){
+      throw new Error('RELATION_MOBILE_POINTER_TARGET_MISMATCH '+JSON.stringify({width,runIndex,center,pointerdown}));
+    }
+
+    await page.waitForFunction(artifactId=>{
+      const current=document.querySelector('.dc-notice[data-artifact="'+artifactId+'"] [data-relation-block]');
+      return Boolean(current&&current.isConnected&&current.open===true);
+    },A,{timeout:6000});
+
+    const after=await page.evaluate(artifactId=>({
+      open:Boolean(document.querySelector('.dc-notice[data-artifact="'+artifactId+'"] [data-relation-block]')?.open),
+      focus:new URL(location.href).searchParams.get('focus'),
+      overlay:Boolean(document.querySelector('.dc-artifact-overlay:not([hidden])')),
+      viewportPanning:Boolean(document.querySelector('.dc-spatial-viewport')?.classList.contains('is-panning')),
+      panStarted:Boolean(globalThis.__QA_RELATION_SUMMARY_STARTED_PAN__),
+      boardDragging:document.documentElement.dataset.boardDragging||null,
+      positionWrites:Number(globalThis.__QA_POSITION_WRITES__||0)
+    }),A);
+
+    expect(pointerdown.focus===null,`mobile ${width} run ${runIndex+1}: focus existed at pointerdown`);
+    expect(pointerdown.overlay===false,`mobile ${width} run ${runIndex+1}: Artifact overlay existed at pointerdown`);
+    expect(pointerdown.boardDragging===null,`mobile ${width} run ${runIndex+1}: pointerdown entered card drag owner`);
+    expect(pointerdown.positionWrites===hit.positionWrites,`mobile ${width} run ${runIndex+1}: position write occurred before pointerdown acceptance`);
+    expect(after.open===true,`mobile ${width} run ${runIndex+1}: current Relations block not open after coordinate touch`);
+    expect(after.focus===null,`mobile ${width} run ${runIndex+1}: coordinate touch wrote focus URL ${after.focus}`);
+    expect(after.overlay===false,`mobile ${width} run ${runIndex+1}: coordinate touch opened Artifact fullscreen`);
+    expect(after.panStarted===false&&!after.viewportPanning,`mobile ${width} run ${runIndex+1}: coordinate touch initiated Board pan`);
+    expect(after.boardDragging===null,`mobile ${width} run ${runIndex+1}: coordinate touch left card drag active`);
+    expect(after.positionWrites===hit.positionWrites,`mobile ${width} run ${runIndex+1}: coordinate touch caused board position write`);
+    expect(!errors.length,`mobile ${width} run ${runIndex+1}: coordinate touch errors: ${errors.join(' | ')}`);
+    await ctx.close();
+  }
+
+  // Companion regression: the decorative open hint remains an active Artifact/card affordance.
+  {
+    const{ctx,page,errors}=await openBoard(browser,'relations',{width:390,height:844},{hasTouch:true});
+    try{
+      const ready=await page.waitForFunction(artifactId=>{
+        const card=document.querySelector('.dc-notice[data-artifact="'+artifactId+'"]');
+        const hint=card?.querySelector('.dc-board-open-hint');
+        if(!card||!hint||!hint.isConnected)return false;
+        const rect=hint.getBoundingClientRect();
+        if(!(rect.width>0&&rect.height>0))return false;
+        const x=rect.left+rect.width/2,y=rect.top+rect.height/2;
+        const hit=document.elementFromPoint(x,y);
+        if(!(hit&&(hit===hint||hint.contains(hit))))return false;
+        globalThis.__QA_OPEN_HINT_TOUCH_POINT__={x,y};
+        return true;
+      },A,{timeout:6000,polling:'raf'});
+      await ready.dispose();
+    }catch(error){
+      throw new Error('OPEN_HINT_TOUCH_TARGET_TIMEOUT');
+    }
+    const point=await page.evaluate(()=>globalThis.__QA_OPEN_HINT_TOUCH_POINT__);
+    await page.evaluate(()=>{
+      globalThis.__QA_OPEN_HINT_POINTERDOWN__=null;
+      document.addEventListener('pointerdown',event=>{
+        globalThis.__QA_OPEN_HINT_POINTERDOWN__={
+          pointerType:event.pointerType||null,
+          target:event.target?.outerHTML?.slice(0,240)||null
+        };
+      },{capture:true,once:true});
+    });
+    await page.touchscreen.tap(point.x,point.y);
+    await page.waitForFunction(()=>Boolean(document.querySelector('.dc-artifact-overlay:not([hidden])')),{timeout:6000});
+    const state=await page.evaluate(()=>({
+      focus:new URL(location.href).searchParams.get('focus'),
+      overlay:Boolean(document.querySelector('.dc-artifact-overlay:not([hidden])')),
+      pointerdown:globalThis.__QA_OPEN_HINT_POINTERDOWN__
+    }));
+    expect(state.pointerdown?.pointerType==='touch','open-hint regression: pointerdown was not touch');
+    expect(state.overlay===true,'open-hint regression: Artifact fullscreen did not open');
+    expect(state.focus==='artifact:'+A,'open-hint regression: canonical Artifact focus was not written');
+    expect(!errors.length,'open-hint regression errors: '+errors.join(' | '));
+    await ctx.close();
+  }
 
   // Existing 390/360 layout + Artifact detail mobile proof.
   for(const width of [390,360]){
