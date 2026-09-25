@@ -220,7 +220,21 @@ try{
 
     const ownBlock=page.locator('.dc-notice[data-artifact-owned="1"] [data-relation-block]');
     await ownBlock.waitFor({state:'attached',timeout:3000});
-    await ownBlock.evaluate(el=>el.open=true);
+
+    // Regression: a real disclosure open must survive the canonical Relations
+    // presentation rebuild triggered by the existing projections owner.
+    await ownBlock.locator('summary').click();
+    await page.locator('.dc-notice[data-artifact-owned="1"] [data-relation-block][open]').waitFor({state:'attached',timeout:3000});
+    await page.evaluate(()=>{
+      globalThis.__QA_RELATION_OPEN_BLOCK__=document.querySelector('.dc-notice[data-artifact-owned="1"] [data-relation-block]');
+      window.dispatchEvent(new CustomEvent('dc:board-projections-updated'));
+    });
+    await page.waitForFunction(()=>{
+      const current=document.querySelector('.dc-notice[data-artifact-owned="1"] [data-relation-block]');
+      return Boolean(current&&current!==globalThis.__QA_RELATION_OPEN_BLOCK__&&current.open===true);
+    },null,{timeout:3000});
+    expect(await ownBlock.evaluate(el=>el.open===true),'desktop disclosure: open state lost across canonical Relations presentation rebuild');
+
     const ownText=(await ownBlock.innerText()).replace(/\s+/g,' ');
     expect(ownText.includes('СВЯЗАНО С')&&ownText.includes('QA EVENT'),`desktop detail: RELATED_TO missing ${ownText}`);
     expect(ownText.includes('О')&&ownText.includes('QA COURSE'),`desktop detail: ABOUT forward presentation missing ${ownText}`);

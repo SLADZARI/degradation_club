@@ -263,14 +263,18 @@ function renderCardBlocks(){
   rendering=true;
   try{
     for(const card of supportedCards()){
-      card.querySelector(':scope > [data-relation-block]')?.remove();
+      const existingBlock=card.querySelector(':scope > [data-relation-block]');
+      const previousOpen=existingBlock?.open===true;
+      existingBlock?.remove();
       const endpoint=endpointFromCard(card);
       const html=blockHtml(endpoint);
       if(!html)continue;
       const actions=card.querySelector(':scope > .dc-notice__actions');
       if(actions)actions.insertAdjacentHTML('beforebegin',html);
       else card.insertAdjacentHTML('beforeend',html);
-      wireBlock(card.querySelector(':scope > [data-relation-block]'),endpoint,card);
+      const replacement=card.querySelector(':scope > [data-relation-block]');
+      if(replacement)replacement.open=previousOpen;
+      wireBlock(replacement,endpoint,card);
     }
   }finally{rendering=false}
 }
