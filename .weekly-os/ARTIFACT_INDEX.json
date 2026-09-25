@@ -7,18 +7,18 @@
     "projectStage": "RELEASE",
     "gate": "G7_RELEASE",
     "status": "APPROVED",
-    "version": "2.81",
+    "version": "2.82",
     "updated": "2026-09-26",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.80"
+    "supersedes": "2.81"
   },
   "currentArtifacts": [
     {
       "artifactId": "dementor-club.kernel.project",
       "documentType": "STANDARD",
-      "currentVersion": "2.87",
+      "currentVersion": "2.88",
       "status": "APPROVED",
       "location": ".weekly-os/PROJECT.json",
       "sourceSystem": "GIT",
@@ -32,7 +32,7 @@
     {
       "artifactId": "dementor-club.kernel.artifact-index",
       "documentType": "STANDARD",
-      "currentVersion": "2.81",
+      "currentVersion": "2.82",
       "status": "APPROVED",
       "location": ".weekly-os/ARTIFACT_INDEX.json",
       "sourceSystem": "GIT",
@@ -2552,15 +2552,15 @@
     {
       "artifactId": "dementor-club.result.artifact-collaboration-v1",
       "documentType": "RESULT",
-      "currentVersion": "1.0",
-      "version": "1.0",
+      "currentVersion": "1.1",
+      "version": "1.1",
       "status": "ACTIVE",
       "workStatus": "ACTIVE",
       "relation": "CURRENT_RESULT",
       "gate": "G7_RELEASE",
       "projectStage": "RELEASE",
-      "path": ".weekly-os/results/artifact-collaboration-v1.v1.0.md",
-      "location": ".weekly-os/results/artifact-collaboration-v1.v1.0.md",
+      "path": ".weekly-os/results/artifact-collaboration-v1.v1.1.md",
+      "location": ".weekly-os/results/artifact-collaboration-v1.v1.1.md",
       "sourceSystem": "GIT",
       "authorityType": "IMPLEMENTATION_AUTHORITY",
       "updated": "2026-09-26",
@@ -2573,7 +2573,7 @@
       "liveDatabaseMutationAuthorized": false,
       "productionMergeAuthorized": false,
       "productionDeployAuthorized": false,
-      "gateReadiness": "CLEAN_RC_VALIDATION_IN_PROGRESS",
+      "gateReadiness": "G7_RC_VALIDATION_BLOCKED",
       "g4BackendEvidence": "operations/ARTIFACT_COLLABORATION_BACKEND_G4_CONTRACT_2026-09-24.md",
       "g4BackendStatus": "PASS",
       "g5BackendEvidence": "operations/ARTIFACT_COLLABORATION_BACKEND_G5_CHECKPOINT_2026-09-24.md",
@@ -2593,7 +2593,7 @@
       "prehistoryFixtureCommit": "e58edb6a931c8536a7ed4cbe907d0b38c5ba4c9e",
       "observedProductionOverlayCommit": "95b33bdb9e51376cd28b9eecac63a2fcfb7dfe75",
       "artifactMigrationBlob": "b596500ed3145ec1f352464c8609c38e02efbc05",
-      "note": "G7 clean RC 030d7fec... is one commit from production, 31 reviewed paths, exact tree match to G6 candidate; draft PR #243; Site Integrity #1308 in progress.",
+      "note": "G7 RC clean topology PASS, exact-head Site Integrity #1308 attempt 2 FAILURE on mobile 390 insertBefore page error after a distinct attempt-1 keyboard failure. Deploy not ready.",
       "g5RelationDeleteCapabilityStatus": "PASS",
       "siteIntegrityRun": 1306,
       "siteIntegrityRunId": 36183292073,
@@ -2616,11 +2616,14 @@
       "releaseBranch": "release/artifact-collaboration-v1",
       "releaseCandidateCommit": "030d7fece9dee1b8502bde6ac89bef95dbdfeda7",
       "releasePullRequest": 243,
-      "g7CleanRcStatus": "IN_PROGRESS",
+      "g7CleanRcStatus": "BLOCKED",
       "g7ValidationRun": 1308,
       "g7ValidationRunId": 36198771555,
-      "g7ValidationStatus": "IN_PROGRESS",
-      "g7CleanRcPreparationAuthorized": true
+      "g7ValidationStatus": "FAILURE",
+      "g7CleanRcPreparationAuthorized": true,
+      "g7ValidationAttempt": 2,
+      "g7ValidationConclusion": "FAILURE",
+      "g7BlockerEvidence": "operations/ARTIFACT_COLLABORATION_G7_RC_BLOCKER_2026-09-26.md"
     },
     {
       "artifactId": "dementor-club.evidence.artifact-collaboration-backend-g5-relation-delete-capability-2026-09-25",
@@ -2830,6 +2833,29 @@
       "validationRunId": 36183292073,
       "validationConclusion": "SUCCESS",
       "exactDiffFileCount": 31,
+      "referencedBy": [
+        "dementor-club.result.artifact-collaboration-v1"
+      ]
+    },
+    {
+      "artifactId": "dementor-club.operations.artifact-collaboration-g7-rc-blocker-2026-09-26",
+      "documentType": "VALIDATION_EVIDENCE",
+      "currentVersion": "1.0",
+      "status": "BLOCKED",
+      "location": "operations/ARTIFACT_COLLABORATION_G7_RC_BLOCKER_2026-09-26.md",
+      "sourceSystem": "GIT",
+      "authorityType": "VALIDATION_EVIDENCE",
+      "updated": "2026-09-26",
+      "canonicalProject": "dementor-club",
+      "canonicalLocation": "operations/ARTIFACT_COLLABORATION_G7_RC_BLOCKER_2026-09-26.md",
+      "relation": "G7_BLOCKER_EVIDENCE",
+      "result": "dementor-club.result.artifact-collaboration-v1",
+      "releaseCandidateCommit": "030d7fece9dee1b8502bde6ac89bef95dbdfeda7",
+      "releasePullRequest": 243,
+      "validationRun": 1308,
+      "validationRunId": 36198771555,
+      "validationAttempt": 2,
+      "validationConclusion": "FAILURE",
       "referencedBy": [
         "dementor-club.result.artifact-collaboration-v1"
       ]

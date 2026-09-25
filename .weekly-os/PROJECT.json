@@ -7,12 +7,12 @@
     "projectStage": "RELEASE",
     "gate": "G7_RELEASE",
     "status": "APPROVED",
-    "version": "2.87",
+    "version": "2.88",
     "updated": "2026-09-26",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.86"
+    "supersedes": "2.87"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -229,7 +229,9 @@
     ".weekly-os/results/artifact-collaboration-v1.v0.8.md",
     "operations/ARTIFACT_COLLABORATION_G6_2026-09-25.md",
     ".weekly-os/results/artifact-collaboration-v1.v0.9.md",
-    ".weekly-os/results/artifact-collaboration-v1.v1.0.md"
+    ".weekly-os/results/artifact-collaboration-v1.v1.0.md",
+    "operations/ARTIFACT_COLLABORATION_G7_RC_BLOCKER_2026-09-26.md",
+    ".weekly-os/results/artifact-collaboration-v1.v1.1.md"
   ],
   "authority": {
     "mpDslCore": {
@@ -396,10 +398,10 @@
   },
   "currentResult": {
     "artifactId": "dementor-club.result.artifact-collaboration-v1",
-    "version": "1.0",
+    "version": "1.1",
     "status": "ACTIVE",
     "workStatus": "ACTIVE",
-    "path": ".weekly-os/results/artifact-collaboration-v1.v1.0.md",
+    "path": ".weekly-os/results/artifact-collaboration-v1.v1.1.md",
     "gate": "G7_RELEASE",
     "scope": [
       "idea participation",
@@ -423,8 +425,8 @@
     "g5BackendCandidateCommit": "3522993d6796fe9dae81a0c7dbde1ddcc1aa350a",
     "g5BackendStaticStatus": "PASS",
     "g5SqlExecutionStatus": "PASS_LOCAL_OBSERVED_PRODUCTION_COMPATIBLE_REPLAY",
-    "gateReadiness": "CLEAN_RC_VALIDATION_IN_PROGRESS",
-    "note": "G7 clean RC created directly from production df8a24ec... as one commit 030d7fec... with exactly 31 reviewed paths. RC tree matches G6 candidate tree. Draft PR #243. Site Integrity #1308 currently in progress. No production merge/deploy or live Supabase apply authorized.",
+    "gateReadiness": "G7_RC_VALIDATION_BLOCKED",
+    "note": "G7 clean RC 030d7fec... remains structurally clean but Site Integrity #1308 failed on attempts 1 and 2. Attempt 1: desktop Space keydown target mismatch. Attempt 2: mobile 390 page error \"Cannot read properties of null (reading insertBefore)\". Deploy not ready.",
     "implementationBrief": "operations/ARTIFACT_COLLABORATION_IMPLEMENTATION_BRIEF_V1.md",
     "g5BackendLocalBlockerEvidence": "operations/ARTIFACT_COLLABORATION_BACKEND_G5_LOCAL_STACK_BLOCKER_2026-09-24.md",
     "costBoundary": "NO_PAID_INFRASTRUCTURE",
@@ -460,11 +462,14 @@
     "releaseBranch": "release/artifact-collaboration-v1",
     "releaseCandidateCommit": "030d7fece9dee1b8502bde6ac89bef95dbdfeda7",
     "releasePullRequest": 243,
-    "g7CleanRcStatus": "IN_PROGRESS",
+    "g7CleanRcStatus": "BLOCKED",
     "g7ValidationRun": 1308,
     "g7ValidationRunId": 36198771555,
-    "g7ValidationStatus": "IN_PROGRESS",
-    "g7CleanRcPreparationAuthorized": true
+    "g7ValidationStatus": "FAILURE",
+    "g7CleanRcPreparationAuthorized": true,
+    "g7ValidationAttempt": 2,
+    "g7ValidationConclusion": "FAILURE",
+    "g7BlockerEvidence": "operations/ARTIFACT_COLLABORATION_G7_RC_BLOCKER_2026-09-26.md"
   },
   "waitingResults": [
     {
