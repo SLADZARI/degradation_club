@@ -203,235 +203,6 @@ async function openBoard(browser,mode,viewport={width:1440,height:900},options={
  return{ctx,page,errors};
 }
 
-async function installRelationKeyboardTrace(page,artifactId=A){
-  return page.evaluate(artifactId=>{
-    const cardSelector='.dc-notice[data-artifact="'+artifactId+'"]';
-    const blockSelector=cardSelector+' [data-relation-block]';
-    const summarySelector=blockSelector+' summary';
-    const trace=[];
-    const ids=new WeakMap();
-    let seq=0;
-    const id=node=>{
-      if(!node||typeof node!=='object')return null;
-      if(!ids.has(node))ids.set(node,'n'+(++seq));
-      return ids.get(node);
-    };
-    const describe=node=>{
-      if(!node||node.nodeType!==1)return String(node?.nodeName||node||'');
-      const el=node;
-      const out=[el.tagName.toLowerCase()];
-      if(el.id)out.push('#'+el.id);
-      if(el.classList?.length)out.push('.'+[...el.classList].slice(0,4).join('.'));
-      if(el.hasAttribute?.('data-artifact'))out.push('[data-artifact="'+el.getAttribute('data-artifact')+'"]');
-      if(el.hasAttribute?.('data-relation-block'))out.push('[data-relation-block]');
-      return out.join('');
-    };
-    const card=()=>document.querySelector(cardSelector);
-    const block=()=>document.querySelector(blockSelector);
-    const summary=()=>document.querySelector(summarySelector);
-    const focusParam=()=>new URL(location.href).searchParams.get('focus');
-    const overlayOpen=()=>Boolean(document.querySelector('.dc-artifact-overlay:not([hidden])'));
-    const snapshot=()=>({
-      activeElement:describe(document.activeElement),
-      activeElementId:id(document.activeElement),
-      activeIsCurrentSummary:document.activeElement===summary(),
-      blockId:id(block()),
-      summaryId:id(summary()),
-      blockOpen:Boolean(block()?.open),
-      focus:focusParam(),
-      overlayOpen:overlayOpen()
-    });
-    const push=(kind,data={})=>{
-      trace.push({
-        order:trace.length+1,
-        t:Math.round(performance.now()*1000)/1000,
-        kind,
-        ...snapshot(),
-        ...data
-      });
-      if(trace.length>180)trace.splice(0,trace.length-180);
-    };
-
-    const initialBlock=block();
-    const initialSummary=summary();
-    const eventRecord=(event,phase)=>push('event',{
-      phase,
-      type:event.type,
-      key:event.key||null,
-      target:describe(event.target),
-      targetId:id(event.target),
-      targetIsCurrentSummary:event.target===summary(),
-      targetIsInitialSummary:event.target===initialSummary,
-      defaultPrevented:event.defaultPrevented,
-      cancelBubble:event.cancelBubble
-    });
-
-    for(const type of ['keydown','keyup','click','toggle','focus','blur']){
-      document.addEventListener(type,event=>eventRecord(event,'capture'),true);
-      document.addEventListener(type,event=>eventRecord(event,'bubble'),false);
-    }
-
-    let lastBlock=initialBlock;
-    let lastSummary=initialSummary;
-    const observer=new MutationObserver(records=>{
-      for(const record of records){
-        if(record.type==='attributes'&&record.attributeName==='open'&&record.target.tagName==='DETAILS'){
-          push('mutation',{
-            mutation:'open',
-            target:describe(record.target),
-            targetId:id(record.target),
-            oldOpen:record.oldValue!==null,
-            newOpen:Boolean(record.target.open)
-          });
-        }
-      }
-      const nextBlock=block();
-      const nextSummary=summary();
-      if(nextBlock!==lastBlock){
-        push('mutation',{
-          mutation:'block-replaced',
-          oldBlockId:id(lastBlock),
-          newBlockId:id(nextBlock),
-          oldWasInitial:lastBlock===initialBlock,
-          newOpen:Boolean(nextBlock?.open)
-        });
-        lastBlock=nextBlock;
-      }
-      if(nextSummary!==lastSummary){
-        push('mutation',{
-          mutation:'summary-replaced',
-          oldSummaryId:id(lastSummary),
-          newSummaryId:id(nextSummary),
-          oldWasInitial:lastSummary===initialSummary
-        });
-        lastSummary=nextSummary;
-      }
-    });
-    const cardNode=card();
-    if(cardNode)observer.observe(cardNode,{subtree:true,childList:true,attributes:true,attributeOldValue:true,attributeFilter:['open']});
-
-    push('trace-start',{
-      initialBlockId:id(initialBlock),
-      initialSummaryId:id(initialSummary),
-      initialOpen:Boolean(initialBlock?.open)
-    });
-
-    globalThis.__QA_RELATION_KEYBOARD_TRACE__={
-      trace,
-      initialBlock,
-      initialSummary,
-      snapshot,
-      read:()=>({
-        before:{
-          activeElementIsInitialSummary:document.activeElement===initialSummary,
-          initialBlockId:id(initialBlock),
-          initialSummaryId:id(initialSummary),
-          ...snapshot()
-        },
-        trace:trace.slice(),
-        final:{
-          initialBlockConnected:Boolean(initialBlock?.isConnected),
-          initialSummaryConnected:Boolean(initialSummary?.isConnected),
-          ...snapshot()
-        }
-      })
-    };
-    return globalThis.__QA_RELATION_KEYBOARD_TRACE__.read();
-  },artifactId);
-}
-
-async function settleRelationKeyboardTrace(page){
-  await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
-}
-
-async function readRelationKeyboardTrace(page){
-  return page.evaluate(()=>globalThis.__QA_RELATION_KEYBOARD_TRACE__?.read?.()||null);
-}
-
-async function runRelationKeyboardDiagnostic(browser,key,method){
-  const{ctx,page,errors}=await openBoard(browser,'relations');
-  const card=page.locator('.dc-notice[data-artifact="'+A+'"]');
-  const summary=card.locator('[data-relation-block] summary');
-  await summary.waitFor({state:'visible',timeout:6000});
-  await summary.focus();
-  const focusProof=await page.evaluate(artifactId=>{
-    const currentSummary=document.querySelector('.dc-notice[data-artifact="'+artifactId+'"] [data-relation-block] summary');
-    const currentBlock=document.querySelector('.dc-notice[data-artifact="'+artifactId+'"] [data-relation-block]');
-    return{
-      activeIsCurrentSummary:document.activeElement===currentSummary,
-      activeTag:document.activeElement?.tagName||null,
-      blockOpen:Boolean(currentBlock?.open),
-      focus:new URL(location.href).searchParams.get('focus'),
-      overlay:Boolean(document.querySelector('.dc-artifact-overlay:not([hidden])'))
-    };
-  },A);
-  if(!focusProof.activeIsCurrentSummary)throw new Error('RELATION_KEYBOARD_FOCUS_PRECONDITION_FAILED '+JSON.stringify({key,method,focusProof}));
-
-  const before=await installRelationKeyboardTrace(page,A);
-  let actionError=null;
-  try{
-    if(method==='locator.press')await summary.press(key);
-    else if(method==='page.keyboard.press')await page.keyboard.press(key);
-    else throw new Error('UNKNOWN_KEYBOARD_METHOD '+method);
-  }catch(error){
-    actionError=String(error?.message||error);
-  }
-  await settleRelationKeyboardTrace(page);
-  const after=await readRelationKeyboardTrace(page);
-  const result={
-    key,
-    method,
-    actionError,
-    focusProof,
-    before,
-    after,
-    passed:Boolean(after?.final?.blockOpen)&&after?.final?.focus===null&&!after?.final?.overlayOpen,
-    errors
-  };
-  await ctx.close();
-  return result;
-}
-
-function classifyKeyboardControl(control){
-  const trace=control?.after?.trace||[];
-  const firstKeydown=trace.find(item=>item.kind==='event'&&item.type==='keydown'&&item.phase==='capture');
-  const firstKeyup=trace.find(item=>item.kind==='event'&&item.type==='keyup'&&item.phase==='capture');
-  const openTrue=trace.find(item=>item.kind==='mutation'&&item.mutation==='open'&&item.newOpen===true);
-  const replacementClosed=trace.find(item=>item.kind==='mutation'&&item.mutation==='block-replaced'&&item.newOpen===false);
-  const focusOrOverlay=trace.find(item=>item.focus||item.overlayOpen);
-  if(!firstKeydown||firstKeydown.activeIsCurrentSummary===false||firstKeydown.targetIsCurrentSummary===false)return 'K1';
-  if(focusOrOverlay)return 'K4';
-  if(openTrue&&replacementClosed&&replacementClosed.order>openTrue.order)return 'K2';
-  if(firstKeydown?.targetIsCurrentSummary&&firstKeyup?.targetIsCurrentSummary&&!openTrue&&!control?.after?.final?.blockOpen)return 'K3';
-  return control?.passed?'PASS':'UNCLASSIFIED';
-}
-
-function summarizeKeyboardDiagnostic(results){
-  const byKey={};
-  for(const key of ['Enter',' ']){
-    const locator=results.find(item=>item.key===key&&item.method==='locator.press');
-    const direct=results.find(item=>item.key===key&&item.method==='page.keyboard.press');
-    let classification;
-    if(locator?.passed&&direct?.passed)classification='K6';
-    else if(!locator?.passed&&direct?.passed)classification='K5';
-    else{
-      const lc=classifyKeyboardControl(locator);
-      const dc=classifyKeyboardControl(direct);
-      classification=lc!=='PASS'?lc:dc;
-    }
-    byKey[key===' '?'Space':'Enter']={classification,locator,direct};
-  }
-  const classes=Object.values(byKey).map(item=>item.classification);
-  const overall=classes.every(c=>c==='K6')?'K6'
-    :classes.includes('K4')?'K4'
-    :classes.includes('K2')?'K2'
-    :classes.includes('K1')?'K1'
-    :classes.includes('K3')?'K3'
-    :classes.includes('K5')?'K5'
-    :classes.join('+');
-  return{overall,byKey};
-}
-
 const browser=await chromium.launch({headless:true});
 try{
   // COMMUNITY regression + IDEA-only composer visibility.
@@ -600,13 +371,51 @@ try{
     expect(!errors.length,'participant relations errors: '+errors.join(' | '));await ctx.close();
   }
 
-  // Diagnostic-only keyboard activation matrix: fresh context per key and input method.
-  const keyboardResults=[];
+  // Durable native keyboard acceptance: prove current focus ownership immediately
+  // before one browser keyboard delivery, then assert the current canonical block stays open.
   for(const key of ['Enter',' ']){
-    keyboardResults.push(await runRelationKeyboardDiagnostic(browser,key,'locator.press'));
-    keyboardResults.push(await runRelationKeyboardDiagnostic(browser,key,'page.keyboard.press'));
+    const{ctx,page,errors}=await openBoard(browser,'relations');
+    const card=page.locator('.dc-notice[data-artifact="'+A+'"]');
+    const summary=card.locator('[data-relation-block] summary');
+    await summary.waitFor({state:'visible',timeout:6000});
+    await summary.focus();
+
+    const focusProof=await page.evaluate(artifactId=>{
+      const currentSummary=document.querySelector('.dc-notice[data-artifact="'+artifactId+'"] [data-relation-block] summary');
+      const active=document.activeElement;
+      return{
+        activeIsCurrentSummary:Boolean(currentSummary&&active===currentSummary),
+        currentSummaryConnected:Boolean(currentSummary?.isConnected),
+        activeConnected:Boolean(active?.isConnected),
+        canonicalIdentity:Boolean(currentSummary&&active===currentSummary&&currentSummary===document.querySelector('.dc-notice[data-artifact="'+artifactId+'"] [data-relation-block] summary')),
+        focus:new URL(location.href).searchParams.get('focus'),
+        overlay:Boolean(document.querySelector('.dc-artifact-overlay:not([hidden])'))
+      };
+    },A);
+
+    if(!focusProof.activeIsCurrentSummary||!focusProof.currentSummaryConnected||!focusProof.activeConnected||!focusProof.canonicalIdentity){
+      throw new Error('RELATION_KEYBOARD_FOCUS_TARGET_MISMATCH '+JSON.stringify({key,focusProof}));
+    }
+
+    await page.keyboard.press(key);
+
+    await page.waitForFunction(artifactId=>{
+      const current=document.querySelector('.dc-notice[data-artifact="'+artifactId+'"] [data-relation-block]');
+      return Boolean(current&&current.isConnected&&current.open===true);
+    },A,{timeout:6000});
+
+    const after=await page.evaluate(artifactId=>({
+      open:Boolean(document.querySelector('.dc-notice[data-artifact="'+artifactId+'"] [data-relation-block]')?.open),
+      focus:new URL(location.href).searchParams.get('focus'),
+      overlay:Boolean(document.querySelector('.dc-artifact-overlay:not([hidden])'))
+    }),A);
+
+    expect(after.open===true,`relation summary keyboard ${JSON.stringify(key)} did not leave current canonical Relations open`);
+    expect(after.focus===null,`relation summary keyboard ${JSON.stringify(key)} wrote focus URL ${after.focus}`);
+    expect(after.overlay===false,`relation summary keyboard ${JSON.stringify(key)} opened Artifact fullscreen`);
+    expect(!errors.length,`relation summary keyboard ${JSON.stringify(key)} errors: ${errors.join(' | ')}`);
+    await ctx.close();
   }
-  throw new Error('RELATION_KEYBOARD_ACTIVATION_TRACE '+JSON.stringify(summarizeKeyboardDiagnostic(keyboardResults)));
 
   // Existing card-body activation still opens the canonical Artifact fullscreen.
   {
