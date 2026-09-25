@@ -531,201 +531,155 @@ try{
     await ctx.close();
   }
 
-  // Diagnostic-only mobile semantics for the visible decorative open-hint area.
-  const openHintTrace={};
-  {
-    const{ctx,page,errors}=await openBoard(browser,'relations',{width:390,height:844},{hasTouch:true});
-    const geometry=await page.evaluate(artifactId=>{
-      const card=document.querySelector('.dc-notice[data-artifact="'+artifactId+'"]');
-      const hint=card?.querySelector('.dc-board-open-hint');
-      const summary=card?.querySelector('[data-relation-block] summary');
-      const viewport=document.querySelector('.dc-spatial-viewport');
-      const rect=node=>{
-        const r=node?.getBoundingClientRect();
-        return r?{left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height}:null;
-      };
-      const intersect=(...rects)=>{
-        if(rects.some(r=>!r))return null;
-        const left=Math.max(...rects.map(r=>r.left));
-        const top=Math.max(...rects.map(r=>r.top));
-        const right=Math.min(...rects.map(r=>r.right));
-        const bottom=Math.min(...rects.map(r=>r.bottom));
-        const width=Math.max(0,right-left),height=Math.max(0,bottom-top);
-        return{left,top,right,bottom,width,height,area:width*height};
-      };
-      const hintRect=rect(hint),cardRect=rect(card),summaryRect=rect(summary),viewportRect=rect(viewport);
-      const style=hint?getComputedStyle(hint):null;
-      const center=hintRect?{x:hintRect.left+hintRect.width/2,y:hintRect.top+hintRect.height/2}:null;
-      const hit=center?document.elementFromPoint(center.x,center.y):null;
-      return{
-        hintRect,cardRect,summaryRect,viewportRect,
-        hintDisplay:style?.display||null,
-        hintVisibility:style?.visibility||null,
-        hintOpacity:style?.opacity||null,
-        hintPointerEvents:style?.pointerEvents||null,
-        hintCardIntersection:intersect(hintRect,cardRect),
-        hintViewportIntersection:intersect(hintRect,viewportRect),
-        hintVisibleIntersection:intersect(hintRect,cardRect,viewportRect),
-        cardClientHeight:card?.clientHeight??null,
-        cardScrollHeight:card?.scrollHeight??null,
-        cardOverflow:card?getComputedStyle(card).overflow:null,
-        cardOverflowX:card?getComputedStyle(card).overflowX:null,
-        cardOverflowY:card?getComputedStyle(card).overflowY:null,
-        center,
-        elementFromPoint:center?(hit?.outerHTML?.slice(0,260)||null):null,
-        elementsFromPoint:center?document.elementsFromPoint(center.x,center.y).slice(0,6).map(el=>({
-          tag:el.tagName,
-          className:typeof el.className==='string'?el.className:'',
-          id:el.id||''
-        })):[],
-        focus:new URL(location.href).searchParams.get('focus'),
-        overlay:Boolean(document.querySelector('.dc-artifact-overlay:not([hidden])')),
-        relationsOpen:Boolean(card?.querySelector('[data-relation-block]')?.open)
-      };
-    },A);
+  // Phase A: validator-only proof for the narrow-mobile relation-card composition.
+  const candidateCss={
+    M1:`@media(max-width:520px){
+      .dc-board-fullscreen-v21 .dc-board-grid .dc-notice[data-artifact]:has(> .dc-board-relations-block:not([open])){
+        max-height:360px!important;
+      }
+    }`,
+    M2:`@media(max-width:520px){
+      .dc-board-fullscreen-v21 .dc-board-grid .dc-notice[data-artifact]:has(> .dc-board-relations-block:not([open])){
+        max-height:360px!important;
+      }
+      .dc-board-fullscreen-v21 .dc-board-grid .dc-notice[data-artifact]:has(> .dc-board-relations-block) > .dc-board-open-hint{
+        min-height:44px!important;
+      }
+    }`
+  };
 
-    let hintTouch=null;
-    const visiblyAvailable=Boolean(
-      geometry.hintRect
-      &&geometry.hintRect.width>0
-      &&geometry.hintRect.height>0
-      &&geometry.hintDisplay!=='none'
-      &&geometry.hintVisibility!=='hidden'
-      &&Number(geometry.hintOpacity||0)>0
-      &&geometry.hintVisibleIntersection?.area>0
-    );
+  const runCandidate=async candidate=>{
+    const results=[];
+    for(const width of [390,360]){
+      // Hint-area product semantics: fully visible hint center must activate Artifact, not Relations.
+      {
+        const{ctx,page,errors}=await openBoard(browser,'relations',{width,height:844},{hasTouch:true});
+        await page.addStyleTag({content:candidateCss[candidate]});
+        const geometry=await page.evaluate(artifactId=>{
+          const card=document.querySelector('.dc-notice[data-artifact="'+artifactId+'"]');
+          const hint=card?.querySelector('.dc-board-open-hint');
+          const summary=card?.querySelector('[data-relation-block] summary');
+          const rect=node=>{
+            const r=node?.getBoundingClientRect();
+            return r?{left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height}:null;
+          };
+          const cardRect=rect(card),hintRect=rect(hint),summaryRect=rect(summary);
+          const center=hintRect?{x:hintRect.left+hintRect.width/2,y:hintRect.top+hintRect.height/2}:null;
+          return{
+            cardRect,hintRect,summaryRect,center,
+            hintFullyInsideCard:Boolean(cardRect&&hintRect&&hintRect.left>=cardRect.left-.5&&hintRect.right<=cardRect.right+.5&&hintRect.top>=cardRect.top-.5&&hintRect.bottom<=cardRect.bottom+.5),
+            hintPositive:Boolean(hintRect&&hintRect.width>0&&hintRect.height>0),
+            scrollFits:Boolean(card&&card.scrollHeight<=card.clientHeight+1),
+            cardClientHeight:card?.clientHeight??null,
+            cardScrollHeight:card?.scrollHeight??null,
+            elementFromPoint:center?(document.elementFromPoint(center.x,center.y)?.outerHTML?.slice(0,220)||null):null
+          };
+        },A);
 
-    if(visiblyAvailable&&geometry.center){
-      await page.evaluate(artifactId=>{
-        globalThis.__QA_OPEN_HINT_SEMANTICS_EVENTS__={pointerdown:null,click:null};
-        const snapshot=(event)=>({
-          type:event.type,
-          pointerType:event.pointerType||null,
-          clientX:Number.isFinite(event.clientX)?event.clientX:null,
-          clientY:Number.isFinite(event.clientY)?event.clientY:null,
-          target:event.target?.outerHTML?.slice(0,260)||null,
+        await page.evaluate(artifactId=>{
+          globalThis.__QA_CANDIDATE_HINT_POINTERDOWN__=null;
+          document.addEventListener('pointerdown',event=>{
+            globalThis.__QA_CANDIDATE_HINT_POINTERDOWN__={
+              pointerType:event.pointerType||null,
+              target:event.target?.outerHTML?.slice(0,240)||null,
+              insideRelations:Boolean(event.target?.closest?.('.dc-board-relations-block')),
+              focus:new URL(location.href).searchParams.get('focus'),
+              overlay:Boolean(document.querySelector('.dc-artifact-overlay:not([hidden])'))
+            };
+          },{capture:true,once:true});
+        },A);
+
+        if(geometry.center)await page.touchscreen.tap(geometry.center.x,geometry.center.y);
+        await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+        const outcome=await page.evaluate(artifactId=>({
+          pointerdown:globalThis.__QA_CANDIDATE_HINT_POINTERDOWN__,
           focus:new URL(location.href).searchParams.get('focus'),
           overlay:Boolean(document.querySelector('.dc-artifact-overlay:not([hidden])')),
-          relationsOpen:Boolean(document.querySelector('.dc-notice[data-artifact="'+artifactId+'"] [data-relation-block]')?.open),
-          viewportPanning:Boolean(document.querySelector('.dc-spatial-viewport')?.classList.contains('is-panning')),
-          boardDragging:document.documentElement.dataset.boardDragging||null
+          relationsOpen:Boolean(document.querySelector('.dc-notice[data-artifact="'+artifactId+'"] [data-relation-block]')?.open)
+        }),A);
+
+        const pass=Boolean(
+          geometry.hintPositive
+          &&geometry.hintFullyInsideCard
+          &&geometry.scrollFits
+          &&outcome.pointerdown?.pointerType==='touch'
+          &&outcome.pointerdown?.insideRelations===false
+          &&outcome.overlay===true
+          &&outcome.focus==='artifact:'+A
+          &&outcome.relationsOpen===false
+          &&errors.length===0
+        );
+        results.push({candidate,width,control:'hint',pass,geometry,outcome,errors});
+        await ctx.close();
+      }
+
+      // Relations semantics: current summary center must activate Relations only.
+      {
+        const{ctx,page,errors}=await openBoard(browser,'relations',{width,height:844},{hasTouch:true});
+        await page.addStyleTag({content:candidateCss[candidate]});
+        try{
+          const ready=await page.waitForFunction(artifactId=>{
+            const card=document.querySelector('.dc-notice[data-artifact="'+artifactId+'"]');
+            const block=card?.querySelector('[data-relation-block]');
+            const summary=block?.querySelector('summary');
+            if(!card||!block||!summary||!summary.isConnected)return false;
+            const rect=summary.getBoundingClientRect();
+            if(!(rect.width>0&&rect.height>0))return false;
+            const x=rect.left+rect.width/2,y=rect.top+rect.height/2;
+            const hit=document.elementFromPoint(x,y);
+            if(!(hit&&(hit===summary||summary.contains(hit))))return false;
+            globalThis.__QA_CANDIDATE_RELATION_POINT__={x,y};
+            return true;
+          },A,{timeout:6000,polling:'raf'});
+          await ready.dispose();
+        }catch(error){
+          results.push({candidate,width,control:'relations',pass:false,error:'RELATION_POINT_TIMEOUT',errors});
+          await ctx.close();
+          continue;
+        }
+
+        const point=await page.evaluate(()=>globalThis.__QA_CANDIDATE_RELATION_POINT__);
+        await page.evaluate(()=>{
+          globalThis.__QA_CANDIDATE_RELATION_POINTERDOWN__=null;
+          document.addEventListener('pointerdown',event=>{
+            const currentSummary=document.querySelector('.dc-notice[data-artifact] [data-relation-block] summary');
+            globalThis.__QA_CANDIDATE_RELATION_POINTERDOWN__={
+              pointerType:event.pointerType||null,
+              target:event.target?.outerHTML?.slice(0,240)||null,
+              insideCurrentSummary:Boolean(currentSummary&&event.target&&(event.target===currentSummary||currentSummary.contains(event.target)))
+            };
+          },{capture:true,once:true});
         });
-        document.addEventListener('pointerdown',event=>{
-          globalThis.__QA_OPEN_HINT_SEMANTICS_EVENTS__.pointerdown=snapshot(event);
-        },{capture:true,once:true});
-        document.addEventListener('click',event=>{
-          globalThis.__QA_OPEN_HINT_SEMANTICS_EVENTS__.click=snapshot(event);
-        },{capture:true,once:true});
-      },A);
 
-      await page.touchscreen.tap(geometry.center.x,geometry.center.y);
-      await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
-      hintTouch=await page.evaluate(artifactId=>({
-        events:globalThis.__QA_OPEN_HINT_SEMANTICS_EVENTS__,
-        focus:new URL(location.href).searchParams.get('focus'),
-        overlay:Boolean(document.querySelector('.dc-artifact-overlay:not([hidden])')),
-        relationsOpen:Boolean(document.querySelector('.dc-notice[data-artifact="'+artifactId+'"] [data-relation-block]')?.open),
-        viewportPanning:Boolean(document.querySelector('.dc-spatial-viewport')?.classList.contains('is-panning')),
-        boardDragging:document.documentElement.dataset.boardDragging||null
-      }),A);
+        await page.touchscreen.tap(point.x,point.y);
+        await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+        const outcome=await page.evaluate(artifactId=>({
+          pointerdown:globalThis.__QA_CANDIDATE_RELATION_POINTERDOWN__,
+          open:Boolean(document.querySelector('.dc-notice[data-artifact="'+artifactId+'"] [data-relation-block]')?.open),
+          focus:new URL(location.href).searchParams.get('focus'),
+          overlay:Boolean(document.querySelector('.dc-artifact-overlay:not([hidden])'))
+        }),A);
+        const pass=Boolean(
+          outcome.pointerdown?.pointerType==='touch'
+          &&outcome.pointerdown?.insideCurrentSummary===true
+          &&outcome.open===true
+          &&outcome.focus===null
+          &&outcome.overlay===false
+          &&errors.length===0
+        );
+        results.push({candidate,width,control:'relations',pass,outcome,errors});
+        await ctx.close();
+      }
     }
+    return{candidate,pass:results.length===4&&results.every(item=>item.pass),results};
+  };
 
-    openHintTrace.hint={geometry,visiblyAvailable,touch:hintTouch,errors};
-    await ctx.close();
+  const m1=await runCandidate('M1');
+  if(m1.pass){
+    throw new Error('RELATION_MOBILE_LAYOUT_CANDIDATE_TRACE '+JSON.stringify({winner:'M1',m1,m2:'NOT_RUN'}));
   }
-
-  // Separate canonical parent-card activation control on a proven non-interactive point.
-  {
-    const{ctx,page,errors}=await openBoard(browser,'relations',{width:390,height:844},{hasTouch:true});
-    try{
-      const ready=await page.waitForFunction(artifactId=>{
-        const card=document.querySelector('.dc-notice[data-artifact="'+artifactId+'"]');
-        if(!card||!card.isConnected)return false;
-        const blocked='a,button,input,textarea,select,label,summary,dialog,[contenteditable="true"],[data-relation-block],.dc-board-open-hint';
-        const cardRect=card.getBoundingClientRect();
-        const candidates=[...card.querySelectorAll('h3,.dc-notice__body,.dc-notice__meta,p')];
-        const points=[];
-        for(const node of candidates){
-          const r=node.getBoundingClientRect();
-          if(r.width>0&&r.height>0)points.push({x:r.left+r.width/2,y:r.top+r.height/2,source:node.tagName+'.'+node.className});
-        }
-        for(const fy of [0.22,0.35,0.5,0.65]){
-          for(const fx of [0.22,0.5,0.78]){
-            points.push({x:cardRect.left+cardRect.width*fx,y:cardRect.top+cardRect.height*fy,source:'card-grid'});
-          }
-        }
-        for(const point of points){
-          const hit=document.elementFromPoint(point.x,point.y);
-          if(!hit||!(hit===card||card.contains(hit)))continue;
-          if(hit.closest?.(blocked))continue;
-          globalThis.__QA_CARD_BODY_TOUCH_POINT__={
-            x:point.x,y:point.y,source:point.source,
-            hit:hit.outerHTML?.slice(0,260)||null,
-            elementsFromPoint:document.elementsFromPoint(point.x,point.y).slice(0,6).map(el=>({
-              tag:el.tagName,
-              className:typeof el.className==='string'?el.className:'',
-              id:el.id||''
-            }))
-          };
-          return true;
-        }
-        return false;
-      },A,{timeout:6000,polling:'raf'});
-      await ready.dispose();
-    }catch(error){
-      openHintTrace.cardBody={ready:false,error:'CARD_BODY_TOUCH_POINT_TIMEOUT',errors};
-      await ctx.close();
-      throw new Error('OPEN_HINT_MOBILE_SEMANTICS_TRACE '+JSON.stringify({classification:'H5',...openHintTrace}));
-    }
-
-    const point=await page.evaluate(()=>globalThis.__QA_CARD_BODY_TOUCH_POINT__);
-    await page.evaluate(artifactId=>{
-      globalThis.__QA_CARD_BODY_SEMANTICS_EVENTS__={pointerdown:null,click:null};
-      const snapshot=(event)=>({
-        type:event.type,
-        pointerType:event.pointerType||null,
-        clientX:Number.isFinite(event.clientX)?event.clientX:null,
-        clientY:Number.isFinite(event.clientY)?event.clientY:null,
-        target:event.target?.outerHTML?.slice(0,260)||null,
-        focus:new URL(location.href).searchParams.get('focus'),
-        overlay:Boolean(document.querySelector('.dc-artifact-overlay:not([hidden])')),
-        relationsOpen:Boolean(document.querySelector('.dc-notice[data-artifact="'+artifactId+'"] [data-relation-block]')?.open)
-      });
-      document.addEventListener('pointerdown',event=>{
-        globalThis.__QA_CARD_BODY_SEMANTICS_EVENTS__.pointerdown=snapshot(event);
-      },{capture:true,once:true});
-      document.addEventListener('click',event=>{
-        globalThis.__QA_CARD_BODY_SEMANTICS_EVENTS__.click=snapshot(event);
-      },{capture:true,once:true});
-    },A);
-
-    await page.touchscreen.tap(point.x,point.y);
-    await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
-    const outcome=await page.evaluate(artifactId=>({
-      events:globalThis.__QA_CARD_BODY_SEMANTICS_EVENTS__,
-      focus:new URL(location.href).searchParams.get('focus'),
-      overlay:Boolean(document.querySelector('.dc-artifact-overlay:not([hidden])')),
-      relationsOpen:Boolean(document.querySelector('.dc-notice[data-artifact="'+artifactId+'"] [data-relation-block]')?.open)
-    }),A);
-    openHintTrace.cardBody={ready:true,point,outcome,errors};
-    await ctx.close();
-  }
-
-  {
-    const hint=openHintTrace.hint;
-    const body=openHintTrace.cardBody;
-    const hintFullscreen=Boolean(hint?.touch?.overlay&&hint?.touch?.focus==='artifact:'+A);
-    const hintRelations=Boolean(hint?.touch?.relationsOpen&&!hint?.touch?.overlay);
-    const hintNoAction=Boolean(hint?.visiblyAvailable&&hint?.touch&&!hint.touch.overlay&&!hint.touch.relationsOpen&&hint.touch.focus===null);
-    const bodyFullscreen=Boolean(body?.outcome?.overlay&&body?.outcome?.focus==='artifact:'+A);
-    let classification;
-    if(!hint?.visiblyAvailable)classification='H3';
-    else if(hintFullscreen&&bodyFullscreen)classification='H1';
-    else if(hintRelations&&bodyFullscreen)classification='H2';
-    else if(hintNoAction&&bodyFullscreen)classification='H4';
-    else classification='H5';
-    throw new Error('OPEN_HINT_MOBILE_SEMANTICS_TRACE '+JSON.stringify({classification,...openHintTrace}));
-  }
+  const m2=await runCandidate('M2');
+  throw new Error('RELATION_MOBILE_LAYOUT_CANDIDATE_TRACE '+JSON.stringify({winner:m2.pass?'M2':'NONE',m1,m2}));
 
   // Existing 390/360 layout + Artifact detail mobile proof.
   for(const width of [390,360]){
