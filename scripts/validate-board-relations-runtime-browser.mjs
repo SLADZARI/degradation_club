@@ -221,13 +221,17 @@ try{
 
     const ownBlock=page.locator('.dc-notice[data-artifact-owned="1"] [data-relation-block]');
     await ownBlock.waitFor({state:'attached',timeout:3000});
+    expect(await page.evaluate(()=>new URL(location.href).searchParams.get('focus')===null),'desktop disclosure: initial URL unexpectedly has focus');
+    expect(!(await page.locator('.dc-artifact-overlay').isVisible()),'desktop disclosure: Artifact overlay unexpectedly visible before summary click');
 
     // Regression: real Relations controls inside a movable Artifact remain outside
-    // the spatial drag boundary, and native disclosure state survives canonical rebuild.
+    // drag + deeplink card-body ownership, and native disclosure survives rebuild.
     const positionWritesBeforeSummary=await positionWriteCount(page);
     await ownBlock.locator('summary').click();
     await page.locator('.dc-notice[data-artifact-owned="1"] [data-relation-block][open]').waitFor({state:'attached',timeout:3000});
     expect((await positionWriteCount(page))===positionWritesBeforeSummary,'desktop disclosure: summary pointer entered movable-card drag owner');
+    expect(await page.evaluate(()=>new URL(location.href).searchParams.get('focus')===null),'desktop disclosure: summary click created Artifact focus deeplink');
+    expect(!(await page.locator('.dc-artifact-overlay').isVisible()),'desktop disclosure: summary click opened Artifact overlay');
     await page.evaluate(()=>{
       globalThis.__QA_RELATION_OPEN_BLOCK__=document.querySelector('.dc-notice[data-artifact-owned="1"] [data-relation-block]');
       window.dispatchEvent(new CustomEvent('dc:board-projections-updated'));
@@ -237,6 +241,8 @@ try{
       return Boolean(current&&current!==globalThis.__QA_RELATION_OPEN_BLOCK__&&current.open===true);
     },null,{timeout:3000});
     expect(await ownBlock.evaluate(el=>el.open===true),'desktop disclosure: open state lost across canonical Relations presentation rebuild');
+    expect(await page.evaluate(()=>new URL(location.href).searchParams.get('focus')===null),'desktop disclosure: canonical rebuild created Artifact focus deeplink');
+    expect(!(await page.locator('.dc-artifact-overlay').isVisible()),'desktop disclosure: canonical rebuild opened Artifact overlay');
 
     const rebuiltOwnBlock=page.locator('.dc-notice[data-artifact-owned="1"] [data-relation-block]');
     const positionWritesBeforeAdd=await positionWriteCount(page);
@@ -248,6 +254,25 @@ try{
     await boundarySelect.click();
     expect((await positionWriteCount(page))===positionWritesBeforeSelect,'desktop controls: select pointer entered movable-card drag owner');
     await rebuiltOwnBlock.locator('[data-relation-cancel]').click();
+
+    // Canonical card-body behavior remains unchanged: ordinary body click writes
+    // Artifact focus and the existing fullscreen owner opens the Artifact overlay.
+    const ownCardForFocus=page.locator('.dc-notice[data-artifact-owned="1"]');
+    const cardBodyPoint=await ownCardForFocus.evaluate(card=>{
+      const candidates=[...card.querySelectorAll('p,h1,h2,h3,.dc-notice__body,.dc-notice__content')];
+      const node=candidates.find(candidate=>!candidate.closest('a,button,input,textarea,select,label,summary,dialog,[contenteditable="true"]'));
+      return node?{selector:null,text:(node.textContent||'').trim().slice(0,80)}:null;
+    });
+    const ordinaryTarget=cardBodyPoint?.text
+      ? ownCardForFocus.getByText(cardBodyPoint.text,{exact:false}).first()
+      : ownCardForFocus;
+    await ordinaryTarget.click({position:cardBodyPoint?.text?undefined:{x:24,y:24}});
+    await page.waitForFunction(()=>new URL(location.href).searchParams.get('focus')==='artifact:11111111-1111-4111-8111-111111111111',{timeout:2500});
+    const bodyOverlay=page.locator('.dc-artifact-overlay');
+    await bodyOverlay.waitFor({state:'visible',timeout:3000});
+    await bodyOverlay.locator('.dc-artifact-overlay__close').click();
+    await bodyOverlay.waitFor({state:'hidden',timeout:2500});
+    await page.waitForFunction(()=>new URL(location.href).searchParams.get('focus')===null,{timeout:2500});
 
     const ownText=(await ownBlock.innerText()).replace(/\s+/g,' ');
     expect(ownText.includes('СВЯЗАНО С')&&ownText.includes('QA EVENT'),`desktop detail: RELATED_TO missing ${ownText}`);
