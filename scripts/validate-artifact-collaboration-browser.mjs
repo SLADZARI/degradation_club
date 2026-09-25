@@ -203,8 +203,380 @@ async function openBoard(browser,mode,viewport={width:1440,height:900},options={
  return{ctx,page,errors};
 }
 
+function classifyInsertBeforeTrace(payload){
+  const stack=String(payload?.pageError?.stack||payload?.browserError?.stack||'');
+  if(!stack)return 'I3';
+  if(stack.includes('board-relations-v1.js')&&stack.includes('ensureLayer')){
+    const state=payload?.browserError?.snapshot||payload?.errorSnapshot||{};
+    return state.initialHostConnected===false||state.initialHostIsCanonical===false?'I1':'I2';
+  }
+  if(/board-deeplink-auth-return|board-fullscreen|community\/artifact|artifact-detail|artifact-v/i.test(stack))return'I4';
+  if(/community\/board\//.test(stack))return'I3';
+  return'I3';
+}
+
+async function openInsertBeforeDiagnostic(browser,runIndex){
+  const ctx=await context(browser,'relations',{width:390,height:844},{hasTouch:true});
+  await ctx.addInitScript(()=>{
+    const trace=[];
+    const errors=[];
+    const ids=new WeakMap();
+    let seq=0;
+    let initialHost=null;
+    let lastCanonical=null;
+    let lastInitialConnected=null;
+    let lastLayerCount=-1;
+    let lastWorldCount=-1;
+    let lastOverlay=false;
+    let lastDetailCount=-1;
+
+    const nodeId=node=>{
+      if(!node||typeof node!=='object')return null;
+      if(!ids.has(node))ids.set(node,'n'+(++seq));
+      return ids.get(node);
+    };
+    const describe=node=>{
+      if(!node||node.nodeType!==1)return null;
+      const out=[node.tagName.toLowerCase()];
+      if(node.id)out.push('#'+node.id);
+      if(node.classList?.length)out.push('.'+[...node.classList].slice(0,5).join('.'));
+      return out.join('');
+    };
+    const focus=()=>{
+      try{return new URL(location.href).searchParams.get('focus')}catch{return null}
+    };
+    const snapshot=()=>{
+      const canonical=document.querySelector('#boardHost');
+      if(!initialHost&&canonical)initialHost=canonical;
+      return{
+        url:location.href,
+        focus:focus(),
+        readyState:document.readyState,
+        initialHostId:nodeId(initialHost),
+        canonicalHostId:nodeId(canonical),
+        initialHostIsCanonical:Boolean(initialHost&&canonical&&initialHost===canonical),
+        initialHostConnected:Boolean(initialHost?.isConnected),
+        canonicalHostConnected:Boolean(canonical?.isConnected),
+        initialHostParent:describe(initialHost?.parentElement),
+        canonicalHostParent:describe(canonical?.parentElement),
+        initialHostFirstChildExists:Boolean(initialHost?.firstChild),
+        canonicalHostFirstChildExists:Boolean(canonical?.firstChild),
+        initialHostRelationLayerCount:initialHost?.querySelectorAll?.(':scope > .dc-board-relations-layer')?.length||0,
+        canonicalRelationLayerCount:canonical?.querySelectorAll?.(':scope > .dc-board-relations-layer')?.length||0,
+        relationLayerCount:document.querySelectorAll('.dc-board-relations-layer').length,
+        spatialWorldCount:document.querySelectorAll('.dc-spatial-world').length,
+        overlayOpen:Boolean(document.querySelector('.dc-artifact-overlay:not([hidden])')),
+        detailHostCount:document.querySelectorAll('.dc-board-relation-detail-host').length
+      };
+    };
+    const record=(kind,detail={})=>{
+      trace.push({t:Math.round(performance.now()*1000)/1000,kind,...snapshot(),detail});
+      if(trace.length>500)trace.splice(0,trace.length-500);
+    };
+    const scanLifecycle=source=>{
+      const canonical=document.querySelector('#boardHost');
+      if(!initialHost&&canonical){
+        initialHost=canonical;
+        record('boardHost-discovered',{source});
+      }
+      const connected=Boolean(initialHost?.isConnected);
+      if(lastInitialConnected!==null&&connected!==lastInitialConnected){
+        record(connected?'boardHost-reattached':'boardHost-removed',{source});
+      }
+      lastInitialConnected=connected;
+      if(canonical!==lastCanonical){
+        if(lastCanonical&&canonical)record('boardHost-replaced',{source,oldId:nodeId(lastCanonical),newId:nodeId(canonical)});
+        else if(canonical)record('boardHost-canonical-attached',{source,newId:nodeId(canonical)});
+        else if(lastCanonical)record('boardHost-canonical-missing',{source,oldId:nodeId(lastCanonical)});
+        lastCanonical=canonical;
+      }
+      const layerCount=document.querySelectorAll('.dc-board-relations-layer').length;
+      if(lastLayerCount>=0&&layerCount!==lastLayerCount)record(layerCount>lastLayerCount?'relation-layer-created':'relation-layer-removed',{source,from:lastLayerCount,to:layerCount});
+      lastLayerCount=layerCount;
+      const worldCount=document.querySelectorAll('.dc-spatial-world').length;
+      if(lastWorldCount>=0&&worldCount!==lastWorldCount)record('spatial-world-count-changed',{source,from:lastWorldCount,to:worldCount});
+      lastWorldCount=worldCount;
+      const overlay=Boolean(document.querySelector('.dc-artifact-overlay:not([hidden])'));
+      if(overlay!==lastOverlay)record(overlay?'artifact-overlay-open':'artifact-overlay-closed',{source});
+      lastOverlay=overlay;
+      const detailCount=document.querySelectorAll('.dc-board-relation-detail-host').length;
+      if(lastDetailCount>=0&&detailCount!==lastDetailCount)record(detailCount>lastDetailCount?'detail-injection':'detail-host-removed',{source,from:lastDetailCount,to:detailCount});
+      lastDetailCount=detailCount;
+    };
+
+    globalThis.__QA_INSERT_TRACE_MARK=(kind,detail={})=>record(kind,detail);
+    globalThis.__QA_INSERT_TRACE_READ=()=>({trace:trace.slice(),errors:errors.slice(),snapshot:snapshot()});
+
+    window.addEventListener('error',event=>{
+      const browserError={
+        name:event.error?.name||'Error',
+        message:event.error?.message||event.message||'',
+        stack:String(event.error?.stack||''),
+        filename:event.filename||null,
+        lineno:event.lineno||null,
+        colno:event.colno||null,
+        snapshot:snapshot()
+      };
+      errors.push(browserError);
+      record('window-error',browserError);
+    },true);
+
+    for(const name of ['dc:board-projections-updated','dc:board-layout-updated','dc:board-layout-request','dc:board-filter-changed','dc:board-spatial-ready','dc:board-artifact-closed']){
+      window.addEventListener(name,event=>{
+        record('relation-presentation-trigger',{event:name});
+        requestAnimationFrame(()=>record('relation-presentation-next-raf',{event:name}));
+      },true);
+    }
+    window.addEventListener('resize',()=>{
+      record('relation-presentation-trigger',{event:'resize'});
+      requestAnimationFrame(()=>record('relation-presentation-next-raf',{event:'resize'}));
+    },true);
+
+    const observer=new MutationObserver(mutations=>{
+      let relevant=false;
+      for(const mutation of mutations){
+        if(mutation.type!=='childList')continue;
+        const touched=[...mutation.addedNodes,...mutation.removedNodes].some(node=>
+          node?.nodeType===1&&(
+            node.id==='boardHost'
+            ||node.matches?.('.dc-board-relations-layer,.dc-spatial-world,.dc-artifact-overlay,.dc-board-relation-detail-host,[data-relation-block]')
+            ||node.querySelector?.('#boardHost,.dc-board-relations-layer,.dc-spatial-world,.dc-artifact-overlay,.dc-board-relation-detail-host,[data-relation-block]')
+          )
+        );
+        if(touched){relevant=true;break}
+      }
+      if(relevant){
+        scanLifecycle('mutation');
+        record('relation-presentation-dom-effect',{mutationCount:mutations.length});
+      }
+    });
+    observer.observe(document,{childList:true,subtree:true});
+
+    document.addEventListener('DOMContentLoaded',()=>{
+      scanLifecycle('DOMContentLoaded');
+      record('dom-content-loaded');
+    },{once:true});
+    queueMicrotask(()=>{
+      scanLifecycle('init-microtask');
+      record('trace-init');
+    });
+  });
+
+  const page=await ctx.newPage();
+  const pageErrors=[];
+  const consoleEvents=[];
+  page.on('pageerror',error=>{
+    pageErrors.push({
+      name:error?.name||'Error',
+      message:error?.message||String(error),
+      stack:String(error?.stack||''),
+      url:page.url()
+    });
+  });
+  page.on('console',message=>{
+    consoleEvents.push({
+      type:message.type(),
+      text:message.text(),
+      location:message.location()
+    });
+    if(consoleEvents.length>120)consoleEvents.shift();
+  });
+
+  const mark=async(kind,detail={})=>{
+    try{await page.evaluate(({kind,detail})=>globalThis.__QA_INSERT_TRACE_MARK?.(kind,detail),{kind,detail})}catch{}
+  };
+  const read=async()=>{
+    try{return await page.evaluate(()=>globalThis.__QA_INSERT_TRACE_READ?.()||null)}catch{return null}
+  };
+
+  let flowError=null;
+  try{
+    await page.goto(base+'/workspace/board/',{waitUntil:'domcontentloaded'});
+    await page.waitForFunction(()=>document.querySelectorAll('.dc-notice[data-artifact]').length>=2,{timeout:8000});
+    await page.waitForFunction(()=>Boolean(
+      document.documentElement.dataset.dcBoardRelations==='ready'
+      &&document.querySelector('[data-board-source="platform"][data-relation-source-id="qa-event"]')
+      &&document.querySelector('.dc-notice[data-artifact] [data-relation-block]')
+    ),{timeout:8000});
+    await mark('flow-board-ready',{runIndex});
+
+    try{
+      const stable=await page.waitForFunction(artifactId=>{
+        const selector='.dc-notice[data-artifact="'+artifactId+'"] [data-relation-block]';
+        const current=document.querySelector(selector);
+        if(!current){
+          globalThis.__QA_RELATION_PRESENTATION_STABILITY__=null;
+          return false;
+        }
+        const state=globalThis.__QA_RELATION_PRESENTATION_STABILITY__;
+        if(!state||state.node!==current||!current.isConnected){
+          globalThis.__QA_RELATION_PRESENTATION_STABILITY__={node:current,stableFrames:0};
+          return false;
+        }
+        state.stableFrames+=1;
+        const canonical=document.querySelector(selector);
+        if(state.node!==canonical||!state.node.isConnected){
+          globalThis.__QA_RELATION_PRESENTATION_STABILITY__={node:canonical,stableFrames:0};
+          return false;
+        }
+        if(state.stableFrames<2)return false;
+        globalThis.__QA_RELATION_PRESENTATION_STABILITY_READY__={node:state.node,stableFrames:state.stableFrames};
+        return true;
+      },A,{timeout:8000,polling:'raf'});
+      await stable.dispose();
+    }catch(error){
+      throw new Error('RELATION_PRESENTATION_STABILITY_TIMEOUT');
+    }
+    await mark('flow-relations-stable');
+
+    const inlineHidden=await page.evaluate(artifactId=>{
+      const block=document.querySelector('.dc-spatial-world>.dc-notice[data-artifact="'+artifactId+'"][data-artifact-subtype="idea"]>[data-relation-block]');
+      if(!block)return false;
+      const style=getComputedStyle(block);
+      return style.display==='none'&&block.getClientRects().length===0;
+    },A);
+    await mark('flow-inline-hidden-check',{inlineHidden});
+
+    const bodyPoint=await page.evaluate(artifactId=>{
+      const card=document.querySelector('.dc-notice[data-artifact="'+artifactId+'"]');
+      if(!card||!card.isConnected)return null;
+      const blocked='a,button,input,textarea,select,label,summary,dialog,[contenteditable="true"],[data-relation-block],.dc-board-open-hint';
+      const candidates=[...card.querySelectorAll('h3,.dc-notice__body,.dc-notice__meta,p')];
+      for(const node of candidates){
+        const r=node.getBoundingClientRect();
+        if(!(r.width>0&&r.height>0))continue;
+        const x=r.left+r.width/2,y=r.top+r.height/2;
+        const hit=document.elementFromPoint(x,y);
+        if(!hit||!(hit===card||card.contains(hit))||hit.closest?.(blocked))continue;
+        return{x,y,target:hit.outerHTML?.slice(0,220)||null};
+      }
+      return null;
+    },A);
+    if(!bodyPoint)throw new Error('DIAG_CARD_BODY_POINT_MISSING');
+    await mark('flow-before-card-touch',{bodyPoint});
+    await page.touchscreen.tap(bodyPoint.x,bodyPoint.y);
+    await page.waitForFunction(artifactId=>(
+      new URL(location.href).searchParams.get('focus')==='artifact:'+artifactId
+      &&Boolean(document.querySelector('.dc-artifact-overlay:not([hidden])'))
+    ),A,{timeout:6000});
+    await mark('flow-overlay-open');
+
+    await page.waitForSelector('.dc-board-relation-detail-host [data-relation-block][data-relation-detail="1"][open]',{state:'visible',timeout:6000});
+    await mark('flow-detail-host-ready');
+
+    const addPoint=await page.evaluate(()=>{
+      const node=document.querySelector('.dc-board-relation-detail-host [data-relation-add]');
+      const r=node?.getBoundingClientRect();
+      return node&&r&&r.width>0&&r.height>0?{x:r.left+r.width/2,y:r.top+r.height/2}:null;
+    });
+    if(!addPoint)throw new Error('DIAG_RELATION_ADD_POINT_MISSING');
+    await mark('flow-before-add-touch',{addPoint});
+    await page.touchscreen.tap(addPoint.x,addPoint.y);
+    await page.waitForSelector('.dc-board-relation-detail-host [data-relation-form]',{state:'visible',timeout:3000});
+    await mark('flow-relation-form-visible');
+
+    const options=await page.locator('.dc-board-relation-detail-host [data-relation-choice] option').evaluateAll(nodes=>nodes.map(node=>({value:node.value,label:node.textContent||''})));
+    const eventChoice=options.find(option=>option.label.includes('QA EVENT'));
+    if(!eventChoice)throw new Error('DIAG_QA_EVENT_CHOICE_MISSING');
+    await page.locator('.dc-board-relation-detail-host [data-relation-choice]').selectOption(eventChoice.value);
+    const savePoint=await page.evaluate(()=>{
+      const node=document.querySelector('.dc-board-relation-detail-host [data-relation-save]');
+      const r=node?.getBoundingClientRect();
+      return node&&r&&r.width>0&&r.height>0?{x:r.left+r.width/2,y:r.top+r.height/2}:null;
+    });
+    if(!savePoint)throw new Error('DIAG_RELATION_SAVE_POINT_MISSING');
+    await mark('flow-before-save-touch',{savePoint});
+    await page.touchscreen.tap(savePoint.x,savePoint.y);
+    await page.waitForFunction(()=>Boolean(document.querySelector('.dc-board-relation-detail-host [data-relation-id="rel-created"]')),{timeout:6000});
+    await mark('flow-created-visible');
+
+    const authority=await page.evaluate(()=>({
+      createdDelete:document.querySelectorAll('.dc-board-relation-detail-host [data-relation-id="rel-created"] [data-relation-delete]').length,
+      otherDelete:document.querySelectorAll('.dc-board-relation-detail-host [data-relation-id="rel-other"] [data-relation-delete]').length,
+      directionalDelete:document.querySelectorAll('.dc-board-relation-detail-host [data-relation-id="rel-directional"] [data-relation-delete]').length
+    }));
+    await mark('flow-delete-authority',authority);
+
+    const deletePoint=await page.evaluate(()=>{
+      const node=document.querySelector('.dc-board-relation-detail-host [data-relation-id="rel-created"] [data-relation-delete]');
+      const r=node?.getBoundingClientRect();
+      return node&&r&&r.width>0&&r.height>0?{x:r.left+r.width/2,y:r.top+r.height/2}:null;
+    });
+    if(!deletePoint)throw new Error('DIAG_RELATION_DELETE_POINT_MISSING');
+    await mark('flow-before-delete-touch',{deletePoint});
+    await page.touchscreen.tap(deletePoint.x,deletePoint.y);
+    await page.waitForFunction(()=>!document.querySelector('.dc-board-relation-detail-host [data-relation-id="rel-created"]'),{timeout:6000});
+    await mark('flow-delete-complete');
+
+    await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(resolve)));
+    await mark('flow-final-raf');
+  }catch(error){
+    flowError={name:error?.name||'Error',message:error?.message||String(error),stack:String(error?.stack||'')};
+    await mark('flow-error',flowError);
+  }
+
+  const browserState=await read();
+  return{ctx,page,pageErrors,consoleEvents,browserState,flowError,runIndex};
+}
+
+function buildInsertBeforeEvidence(run){
+  const browserErrors=run?.browserState?.errors||[];
+  const pageError=run?.pageErrors?.[0]||null;
+  const browserError=browserErrors[0]||null;
+  const errorT=(run?.browserState?.trace||[]).find(item=>item.kind==='window-error')?.t??null;
+  const aroundError=errorT==null
+    ?[]
+    :(run.browserState.trace||[]).filter(item=>item.t>=errorT-100&&item.t<=errorT+100);
+  const errorSnapshot=browserError?.snapshot||run?.browserState?.snapshot||null;
+  const lastTrigger=[...(run?.browserState?.trace||[])].reverse().find(item=>item.kind==='relation-presentation-trigger'&&(errorT==null||item.t<=errorT))||null;
+  const hostChanges=(run?.browserState?.trace||[]).filter(item=>['boardHost-removed','boardHost-reattached','boardHost-replaced','boardHost-canonical-missing','boardHost-canonical-attached'].includes(item.kind));
+  const hostChangeBetweenTriggerAndError=Boolean(lastTrigger&&errorT!=null&&hostChanges.some(item=>item.t>=lastTrigger.t&&item.t<=errorT));
+  const payload={
+    pageError,browserError,errorSnapshot,
+    flowError:run?.flowError||null,
+    lastPresentationTrigger:lastTrigger,
+    hostChangeBetweenTriggerAndError,
+    aroundError,
+    timeline:run?.browserState?.trace||[],
+    consoleEvents:run?.consoleEvents||[]
+  };
+  return{...payload,classification:classifyInsertBeforeTrace(payload)};
+}
+
 const browser=await chromium.launch({headless:true});
 try{
+  // G7 diagnostic-only: reproduce the 390px mobile ownership/detail flow up to three fresh contexts.
+  const insertBeforeRuns=[];
+  for(let runIndex=1;runIndex<=3;runIndex++){
+    const run=await openInsertBeforeDiagnostic(browser,runIndex);
+    const evidence=buildInsertBeforeEvidence(run);
+    insertBeforeRuns.push({runIndex,evidence});
+    const reproduced=Boolean(run.pageErrors.length||run.browserState?.errors?.length);
+    await run.ctx.close();
+    if(reproduced){
+      throw new Error('MOBILE_390_INSERTBEFORE_ROOT_CAUSE_TRACE '+JSON.stringify({
+        classification:evidence.classification,
+        reproduced:true,
+        runIndex,
+        pageError:evidence.pageError,
+        browserError:evidence.browserError,
+        errorSnapshot:evidence.errorSnapshot,
+        lastPresentationTrigger:evidence.lastPresentationTrigger,
+        hostChangeBetweenTriggerAndError:evidence.hostChangeBetweenTriggerAndError,
+        aroundError:evidence.aroundError,
+        timeline:evidence.timeline,
+        consoleEvents:evidence.consoleEvents,
+        flowError:evidence.flowError
+      }));
+    }
+  }
+  throw new Error('MOBILE_390_INSERTBEFORE_ROOT_CAUSE_TRACE '+JSON.stringify({
+    classification:'I5',
+    reproduced:false,
+    status:'NOT_REPRODUCED',
+    runs:insertBeforeRuns
+  }));
+
   // COMMUNITY regression + IDEA-only composer visibility.
   {
     const{ctx,page,errors}=await openBoard(browser,'author');
