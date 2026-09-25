@@ -59,14 +59,28 @@ function personalCardMarkup(state){
 }
 function publishPersonalCard(state){const html=personalCardMarkup(state);const payload={state:state.key,html};window.DEMENTOR_BOARD_PERSONAL_CARD=payload;window.dispatchEvent(new CustomEvent('dc:board-personal-state',{detail:payload}))}
 function avatar(row){if(row.author_avatar_url)return `<img class="dc-notice__avatar" src="${esc(row.author_avatar_url)}" alt="">`;const letter=String(row.author_display_name||'?').trim().charAt(0).toUpperCase()||'?';return `<span class="dc-notice__avatar dc-notice__avatar--empty">${esc(letter)}</span>`}
+function collaborationAvatar(row){if(row?.avatar_url)return `<img class="dc-collab-avatar" src="${esc(row.avatar_url)}" alt="">`;const letter=String(row?.display_name||'?').trim().charAt(0).toUpperCase()||'?';return `<span class="dc-collab-avatar dc-collab-avatar--empty" aria-hidden="true">${esc(letter)}</span>`}
+function collaborationPeople(rows,max=3){const list=(rows||[]).slice(0,max);const rest=Math.max(0,(rows||[]).length-list.length);return list.length?`${list.map(row=>`<span class="dc-collab-person">${collaborationAvatar(row)}<span>${esc(row.display_name||'УЧАСТНИК')}</span></span>`).join('')}${rest?`<span class="dc-collab-more">+${rest}</span>`:''}`:'<span class="dc-collab-empty">—</span>'}
+function guestCollaborationMarkup(row,participants=[]){
+  if(String(row?.artifact_type||'').toLowerCase()!=='idea')return'';
+  const joined=participants.filter(item=>item.participation_state==='JOINED');
+  const invited=participants.filter(item=>item.participation_state==='INVITED');
+  const mine=participants.find(item=>item.profile_id===stateSessionUserId())?.participation_state||'';
+  const author={display_name:row.author_display_name||'MEMBER',avatar_url:row.author_avatar_url||null};
+  return `<section class="dc-idea-collab" data-collaboration-card data-my-participation="${esc(mine)}"><div class="dc-idea-collab__row"><span class="dc-idea-collab__label">ИНИЦИАТОР</span><span class="dc-collab-person">${collaborationAvatar(author)}<span>${esc(author.display_name)}</span></span></div><div class="dc-idea-collab__row"><span class="dc-idea-collab__label">В ДЕЛЕ</span><span class="dc-idea-collab__people">${collaborationPeople(joined)}</span></div><div class="dc-idea-collab__row"><span class="dc-idea-collab__label">ПОЗВАНЫ</span><span class="dc-idea-collab__people">${collaborationPeople(invited)}</span></div>${mine==='INVITED'?'<div class="dc-idea-collab__signal">ВАС ЗОВУТ · ОТКРОЙТЕ ИДЕЮ</div>':mine==='JOINED'?'<div class="dc-idea-collab__signal">ВЫ В ДЕЛЕ</div>':''}</section>`;
+}
+function stateSessionUserId(){return document.documentElement.dataset.dcBoardSessionUser||''}
 function guestInterestTotal(row){return Math.max(0,Number(row.reaction_count||0))+Math.max(0,Number(row.guest_interest_count||0))}
 function guestInterestButton(active,total){return `<button class="dc-board-action small${active?' active':''}" type="button" data-guest-interest aria-pressed="${active?'true':'false'}"><span data-guest-interest-label>${active?'✓':'☆'} ИНТЕРЕСНО ·</span> <span data-guest-interest-count>${total}</span></button>`}
-function guestNotice(row,index,promotion){
-  const active=row.my_guest_interest===true;const total=guestInterestTotal(row);const historical=isHistoricalStatus(row.status);const subtype=String(row.artifact_type||'announcement').toLowerCase();
-  const activity=promotion?.activity_at?`<div class="dc-notice__expiry">КОГДА · ${esc(formatActivityDate(promotion.activity_at))}</div>`:'';
-  const telegram=promotionLabel(promotion);const telegramState=telegram?`<span class="dc-board-state">${esc(telegram)}</span>`:'';
-  return `<article class="dc-notice dc-notice--guest${historical?' is-history':''}" data-artifact="${esc(row.artifact_id)}" data-artifact-status="${esc(row.status||'active')}" data-artifact-subtype="${esc(subtype)}" data-source-type="artifact" data-guest-read="1" data-member-reaction-count="${Math.max(0,Number(row.reaction_count||0))}"><div class="dc-notice__meta"><span>${esc(artifactSubtypeLabel(subtype))} / ${String(index+1).padStart(3,'0')}</span><span>${formatDate(row.published_at)}</span></div><div class="dc-notice__author">${avatar(row)}<div><strong>${esc(row.author_display_name||'MEMBER')}</strong>${row.author_nickname?`<div>@${esc(String(row.author_nickname).replace(/^@/,''))}</div>`:''}</div></div>${row.title?`<h3>${esc(row.title)}</h3>`:''}<p class="dc-notice__body">${esc(row.body||'')}</p>${row.external_url?`<p><a class="dc-notice__link" href="${esc(row.external_url)}" target="_blank" rel="noopener noreferrer">ССЫЛКА ↗</a></p>`:''}${activity}<div class="dc-notice__expiry">${historical?artifactStatusLabel(row):(row.expires_at?`ДЕЙСТВУЕТ ДО ${formatDate(row.expires_at)}`:'БЕЗ СРОКА')} · COMMUNITY</div><div class="dc-notice__actions">${guestInterestButton(active,total)}<span class="dc-board-state">${historical?'HISTORY / REACTIONS OPEN':'GUEST / LIGHT INTERACTION'}</span>${telegramState}</div></article>`;
+function guestNotice(row,index,promotion,participants=[]){
+  const active=row.my_guest_interest===true;const total=guestInterestTotal(row);const historical=isHistoricalStatus(row.status);const subtype=String(row.artifact_type||'announcement').toLowerCase();const isIdea=subtype==='idea';const mine=participants.find(item=>item.profile_id===stateSessionUserId())?.participation_state||'';
+  const activity=promotion?.activity_at?`<div class="dc-notice__expiry">КОГДА · ${esc(formatActivityDate(promotion.activity_at))}</div>`:'';const telegram=promotionLabel(promotion);const telegramState=telegram?`<span class="dc-board-state">${esc(telegram)}</span>`:'';
+  const authorHtml=isIdea?'':`<div class="dc-notice__author">${avatar(row)}<div><strong>${esc(row.author_display_name||'MEMBER')}</strong>${row.author_nickname?`<div>@${esc(String(row.author_nickname).replace(/^@/,''))}</div>`:''}</div></div>`;
+  const collab=guestCollaborationMarkup(row,participants);
+  const interaction=mine==='INVITED'?'<span class="dc-board-state">ВАС ЗОВУТ · ОТКРОЙТЕ ИДЕЮ</span>':`${guestInterestButton(active,total)}<span class="dc-board-state">${historical?'HISTORY / REACTIONS OPEN':'GUEST / LIGHT INTERACTION'}</span>`;
+  return `<article class="dc-notice dc-notice--guest${historical?' is-history':''}" data-artifact="${esc(row.artifact_id)}" data-artifact-status="${esc(row.status||'active')}" data-artifact-subtype="${esc(subtype)}" data-collab-my-state="${esc(mine)}" data-source-type="artifact" data-guest-read="1" data-member-reaction-count="${Math.max(0,Number(row.reaction_count||0))}"><div class="dc-notice__meta"><span>${esc(artifactSubtypeLabel(subtype))} / ${String(index+1).padStart(3,'0')}</span><span>${formatDate(row.published_at)}</span></div>${authorHtml}${row.title?`<h3>${esc(row.title)}</h3>`:''}<p class="dc-notice__body">${esc(row.body||'')}</p>${collab}${row.external_url?`<p><a class="dc-notice__link" href="${esc(row.external_url)}" target="_blank" rel="noopener noreferrer">ССЫЛКА ↗</a></p>`:''}${activity}<div class="dc-notice__expiry">${historical?artifactStatusLabel(row):(row.expires_at?`ДЕЙСТВУЕТ ДО ${formatDate(row.expires_at)}`:'БЕЗ СРОКА')}</div><div class="dc-notice__actions">${interaction}${telegramState}</div></article>`;
 }
+
 
 async function toggleGuestInterest(button){
   if(guestInterestBusy||!button)return;const card=button.closest('[data-artifact]');const artifactId=card?.dataset.artifact;if(!artifactId)return;guestInterestBusy=true;button.disabled=true;
@@ -74,11 +88,13 @@ async function toggleGuestInterest(button){
 }
 
 async function renderGuestBoard(state){
-  boardStatus.textContent='GUEST / BOARD HISTORY READ';memberBadge.textContent=state.session?.user?.email||'ACCOUNT';if(entrySection)entrySection.hidden=true;if(entryHost)entryHost.replaceChildren();publishPersonalCard(state);
+  boardStatus.textContent='GUEST / BOARD HISTORY READ';memberBadge.textContent=state.session?.user?.email||'ACCOUNT';document.documentElement.dataset.dcBoardSessionUser=state.session?.user?.id||'';if(entrySection)entrySection.hidden=true;if(entryHost)entryHost.replaceChildren();publishPersonalCard(state);
   const [readResult,promotionResult]=await Promise.all([client.rpc('dc_guest_board_read_v1'),client.rpc('dc_board_promotion_state_read_v1')]);
   if(readResult.error)throw readResult.error;if(promotionResult.error)throw promotionResult.error;
   const rows=readResult.data||[];const promotions=new Map((promotionResult.data||[]).map(row=>[row.artifact_id,row]));artifactCount.textContent=String(rows.length).padStart(2,'0');
-  boardHost.innerHTML=rows.length?rows.map((row,index)=>guestNotice(row,index,promotions.get(row.artifact_id))).join(''):'<div class="dc-board-empty"><h3>НА ДОСКЕ<br>ПОКА НЕТ ИСТОРИИ.</h3><p>Здесь появятся текущие и прошедшие Community Artifacts.</p></div>';
+  const ideaIds=rows.filter(row=>String(row.artifact_type||'').toLowerCase()==='idea').map(row=>row.artifact_id);
+  const participantEntries=await Promise.all(ideaIds.map(async id=>{const result=await client.rpc('dc_artifact_participants_read_v1',{p_artifact_id:id});if(result.error)throw result.error;return[id,result.data||[]]}));const participantsByArtifact=new Map(participantEntries);
+  boardHost.innerHTML=rows.length?rows.map((row,index)=>guestNotice(row,index,promotions.get(row.artifact_id),participantsByArtifact.get(row.artifact_id)||[])).join(''):'<div class="dc-board-empty"><h3>НА ДОСКЕ<br>ПОКА НЕТ ИСТОРИИ.</h3><p>Здесь появятся текущие и прошедшие Community Artifacts.</p></div>';
   boardHost.dataset.guestRead='1';window.dispatchEvent(new CustomEvent('dc:board-guest-read-ready',{detail:{state:state.key,count:rows.length}}));
 }
 boardHost?.addEventListener('click',event=>{const button=event.target.closest?.('[data-guest-interest]');if(!button)return;event.preventDefault();toggleGuestInterest(button)});

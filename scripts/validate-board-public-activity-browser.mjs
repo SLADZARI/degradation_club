@@ -77,8 +77,25 @@ async function waitForArtifactPresentation(page,errors,network){
   }
 }
 async function assertFailClosed(page,scope){
-  const evidence=await page.evaluate(()=>globalThis.__qaActivityFixture||null);
-  expect(Boolean(evidence),`${scope}: runtime fixture evidence missing`);
+  try{
+    await page.waitForFunction(
+      ()=>Boolean(
+        globalThis.__qaActivityFixture
+        &&Array.isArray(globalThis.__qaActivityFixture.sourceIds)
+        &&Array.isArray(globalThis.__qaActivityFixture.eligibleIds)
+      ),
+      undefined,
+      {timeout:4000}
+    );
+  }catch{
+    const diagnostic=await page.evaluate(()=>({
+      fixturePresent:Boolean(globalThis.__qaActivityFixture),
+      sourceIdsIsArray:Array.isArray(globalThis.__qaActivityFixture?.sourceIds),
+      eligibleIdsIsArray:Array.isArray(globalThis.__qaActivityFixture?.eligibleIds)
+    }));
+    throw new Error(`${scope}: ACTIVITY_FIXTURE_READINESS_TIMEOUT ${JSON.stringify(diagnostic)}`);
+  }
+  const evidence=await page.evaluate(()=>globalThis.__qaActivityFixture);
   for(const id of [VIDEO_ID,PROFILE_TEXT_ID,CLUB_ID,PRIVATE_IMAGE_ID,QA_ID]){
     expect(evidence?.sourceIds?.includes(id)===true,`${scope}: source fixture ${id} missing`);
     expect(evidence?.eligibleIds?.includes(id)===false,`${scope}: generic Board Artifact became public eligible`);
