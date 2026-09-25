@@ -7,12 +7,12 @@
     "projectStage": "BUILD",
     "gate": "G5_BUILD",
     "status": "APPROVED",
-    "version": "2.84",
+    "version": "2.85",
     "updated": "2026-09-25",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.83"
+    "supersedes": "2.84"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -224,7 +224,9 @@
     "operations/ARTIFACT_COLLABORATION_BACKEND_G5_RUNTIME_2026-09-25.md",
     ".weekly-os/results/artifact-collaboration-v1.v0.6.md",
     "operations/ARTIFACT_COLLABORATION_BACKEND_G5_RELATION_DELETE_CAPABILITY_2026-09-25.md",
-    ".weekly-os/results/artifact-collaboration-v1.v0.7.md"
+    ".weekly-os/results/artifact-collaboration-v1.v0.7.md",
+    "operations/ARTIFACT_COLLABORATION_G5_FINAL_VALIDATION_2026-09-25.md",
+    ".weekly-os/results/artifact-collaboration-v1.v0.8.md"
   ],
   "authority": {
     "mpDslCore": {
@@ -391,10 +393,10 @@
   },
   "currentResult": {
     "artifactId": "dementor-club.result.artifact-collaboration-v1",
-    "version": "0.7",
+    "version": "0.8",
     "status": "REVIEW",
     "workStatus": "ACTIVE",
-    "path": ".weekly-os/results/artifact-collaboration-v1.v0.7.md",
+    "path": ".weekly-os/results/artifact-collaboration-v1.v0.8.md",
     "gate": "G5_BUILD",
     "scope": [
       "idea participation",
@@ -418,12 +420,12 @@
     "g5BackendCandidateCommit": "3522993d6796fe9dae81a0c7dbde1ddcc1aa350a",
     "g5BackendStaticStatus": "PASS",
     "g5SqlExecutionStatus": "PASS_LOCAL_OBSERVED_PRODUCTION_COMPATIBLE_REPLAY",
-    "gateReadiness": "G5_BACKEND_FINAL_PASS_COORDINATOR_HANDOFF",
-    "note": "DEV1 backend G5 final PASS on exact head 0d968f7b... / migration blob b596500e.... Final relation can_delete capability reconciliation PASS, exact production-compatible replay and repeatability PASS, full runtime matrix PASS. G6 not entered.",
+    "gateReadiness": "G5_COMPLETE_READY_FOR_G6_ENTRY",
+    "note": "G5 evidence complete on exact head 5769fb10... / Site Integrity #1306 SUCCESS. DEV1 final backend freeze PASS with unchanged Supabase subtree f6c63692... and migration blob b596500e.... Mobile IDEA uses existing Artifact-detail Relations owner; desktop keeps inline Relations. G6 not entered.",
     "implementationBrief": "operations/ARTIFACT_COLLABORATION_IMPLEMENTATION_BRIEF_V1.md",
     "g5BackendLocalBlockerEvidence": "operations/ARTIFACT_COLLABORATION_BACKEND_G5_LOCAL_STACK_BLOCKER_2026-09-24.md",
     "costBoundary": "NO_PAID_INFRASTRUCTURE",
-    "integrationHeadTested": "0d968f7b9d468c87ca95e1f8d1413ea66b383b8c",
+    "integrationHeadTested": "5769fb10a19fbc2fe492d0b706f07d35df5e8be6",
     "backendCandidateCommit": "3522993d6796fe9dae81a0c7dbde1ddcc1aa350a",
     "g5BackendReplayBlockerEvidence": "operations/ARTIFACT_COLLABORATION_BACKEND_G5_MIGRATION_HISTORY_REPLAY_BLOCKER_2026-09-24.md",
     "g5BackendRuntimeStatus": "PASS",
@@ -434,9 +436,16 @@
     "observedProductionOverlayCommit": "95b33bdb9e51376cd28b9eecac63a2fcfb7dfe75",
     "artifactMigrationBlob": "b596500ed3145ec1f352464c8609c38e02efbc05",
     "g5RelationDeleteCapabilityStatus": "PASS",
-    "siteIntegrityRun": 1271,
-    "siteIntegrityRunId": 36066783890,
-    "siteIntegrityConclusion": "SUCCESS"
+    "siteIntegrityRun": 1306,
+    "siteIntegrityRunId": 36183292073,
+    "siteIntegrityConclusion": "SUCCESS",
+    "g5FinalStatus": "PASS",
+    "g5FrontendBrowserStatus": "PASS",
+    "g5BackendFreezeStatus": "PASS",
+    "g5FinalEvidence": "operations/ARTIFACT_COLLABORATION_G5_FINAL_VALIDATION_2026-09-25.md",
+    "backendFreezeBaseCommit": "0d968f7b9d468c87ca95e1f8d1413ea66b383b8c",
+    "backendFreezeFinalCommit": "5769fb10a19fbc2fe492d0b706f07d35df5e8be6",
+    "backendFreezeSupabaseTree": "f6c63692673c93443de7a13698d51f44dc3394d8"
   },
   "waitingResults": [
     {
