@@ -145,6 +145,7 @@ async function openBoard(browser,mode,viewport){
   return{ctx,page,errors};
 }
 async function rpcCalls(page,name){return page.evaluate(name=>(globalThis.__QA_RPC_CALLS__||[]).filter(call=>call.name===name),name)}
+async function positionWriteCount(page){return page.evaluate(()=>(globalThis.__QA_DB_WRITES__||[]).filter(write=>write.op==='update'&&write.table==='dc_artifact_board_positions').length)}
 async function lineCoords(page,id){return page.locator(`.dc-board-relation-line[data-relation-id="${id}"]`).evaluate(line=>({x1:Number(line.getAttribute('x1')),y1:Number(line.getAttribute('y1')),x2:Number(line.getAttribute('x2')),y2:Number(line.getAttribute('y2'))}))}
 
 const browser=await chromium.launch({headless:true});
@@ -221,10 +222,12 @@ try{
     const ownBlock=page.locator('.dc-notice[data-artifact-owned="1"] [data-relation-block]');
     await ownBlock.waitFor({state:'attached',timeout:3000});
 
-    // Regression: a real disclosure open must survive the canonical Relations
-    // presentation rebuild triggered by the existing projections owner.
+    // Regression: real Relations controls inside a movable Artifact remain outside
+    // the spatial drag boundary, and native disclosure state survives canonical rebuild.
+    const positionWritesBeforeSummary=await positionWriteCount(page);
     await ownBlock.locator('summary').click();
     await page.locator('.dc-notice[data-artifact-owned="1"] [data-relation-block][open]').waitFor({state:'attached',timeout:3000});
+    expect((await positionWriteCount(page))===positionWritesBeforeSummary,'desktop disclosure: summary pointer entered movable-card drag owner');
     await page.evaluate(()=>{
       globalThis.__QA_RELATION_OPEN_BLOCK__=document.querySelector('.dc-notice[data-artifact-owned="1"] [data-relation-block]');
       window.dispatchEvent(new CustomEvent('dc:board-projections-updated'));
@@ -234,6 +237,17 @@ try{
       return Boolean(current&&current!==globalThis.__QA_RELATION_OPEN_BLOCK__&&current.open===true);
     },null,{timeout:3000});
     expect(await ownBlock.evaluate(el=>el.open===true),'desktop disclosure: open state lost across canonical Relations presentation rebuild');
+
+    const rebuiltOwnBlock=page.locator('.dc-notice[data-artifact-owned="1"] [data-relation-block]');
+    const positionWritesBeforeAdd=await positionWriteCount(page);
+    await rebuiltOwnBlock.locator('[data-relation-add]').click();
+    await rebuiltOwnBlock.locator('[data-relation-form]').waitFor({state:'visible',timeout:2000});
+    expect((await positionWriteCount(page))===positionWritesBeforeAdd,'desktop controls: ＋ СВЯЗЬ pointer entered movable-card drag owner');
+    const boundarySelect=rebuiltOwnBlock.locator('[data-relation-choice]');
+    const positionWritesBeforeSelect=await positionWriteCount(page);
+    await boundarySelect.click();
+    expect((await positionWriteCount(page))===positionWritesBeforeSelect,'desktop controls: select pointer entered movable-card drag owner');
+    await rebuiltOwnBlock.locator('[data-relation-cancel]').click();
 
     const ownText=(await ownBlock.innerText()).replace(/\s+/g,' ');
     expect(ownText.includes('СВЯЗАНО С')&&ownText.includes('QA EVENT'),`desktop detail: RELATED_TO missing ${ownText}`);
@@ -327,15 +341,22 @@ try{
     });
     await page.waitForTimeout(180);
     await ownBlock.evaluate(el=>el.open=true);
+    const positionWritesBeforeCreateAdd=await positionWriteCount(page);
     await ownBlock.locator('[data-relation-add]').click();
+    expect((await positionWriteCount(page))===positionWritesBeforeCreateAdd,'desktop create: ＋ СВЯЗЬ started movable-card drag');
     const select=ownBlock.locator('[data-relation-choice]');
     const option=await select.locator('option').evaluateAll(options=>options.map(o=>({value:o.value,text:o.textContent||''})).find(o=>o.text.includes('ОТЧЁТ ПО')&&o.text.includes('QA EVENT')));
     expect(Boolean(option),'desktop create: REPORT_OF target option missing');
     if(option){
+      const positionWritesBeforeCreateSelect=await positionWriteCount(page);
+      await select.click();
+      expect((await positionWriteCount(page))===positionWritesBeforeCreateSelect,'desktop create: select started movable-card drag');
       await select.selectOption(option.value);
+      const positionWritesBeforeSave=await positionWriteCount(page);
       await ownBlock.locator('[data-relation-save]').click();
       await page.waitForFunction(()=>globalThis.__QA_RPC_CALLS__.some(call=>call.name==='dc_board_relation_create_v1'),{timeout:2500});
       await page.waitForFunction(()=>document.querySelectorAll('.dc-board-relation-line:not([hidden])').length===4,{timeout:3000});
+      expect((await positionWriteCount(page))===positionWritesBeforeSave,'desktop create: СОХРАНИТЬ started movable-card drag');
     }
 
     // Server permission reject must fail closed and preserve canonical index.
@@ -360,9 +381,11 @@ try{
 
     // Delete is explicit logical-delete RPC; presentation re-reads canonical truth.
     const aboutDelete=page.locator('.dc-notice[data-artifact-owned="1"] [data-relation-id="77777777-7777-4777-8777-777777777772"] [data-relation-delete]');
+    const positionWritesBeforeDelete=await positionWriteCount(page);
     await aboutDelete.click();
     await page.waitForFunction(()=>globalThis.__QA_RPC_CALLS__.some(call=>call.name==='dc_board_relation_delete_v1'&&call.args?.p_relation_id==='77777777-7777-4777-8777-777777777772'),{timeout:2500});
     await page.waitForFunction(()=>!document.querySelector('.dc-board-relation-line[data-relation-id="77777777-7777-4777-8777-777777777772"]'),{timeout:2500});
+    expect((await positionWriteCount(page))===positionWritesBeforeDelete,'desktop delete: delete control started movable-card drag');
 
     expect(!errors.length,`desktop page errors: ${errors.join(' | ')}`);
     await page.screenshot({path:path.join(outDir,'desktop.png'),fullPage:false});

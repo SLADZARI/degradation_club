@@ -6,6 +6,7 @@ const WORLD={w:12000,h:8000};
 const WORLD_CENTER={x:WORLD.w/2,y:WORLD.h/2};
 const CAMERA_MIN_SCALE=.03;
 const CAMERA_MAX_SCALE=1.6;
+const INTERACTIVE_CONTROL_SELECTOR='button,a,input,textarea,select,label,summary,dialog';
 let viewport=null;
 let extrasHost=null;
 let camera={x:0,y:0,scale:1};
@@ -193,7 +194,7 @@ function installPanZoom(){
   let touchGesture=null;
   let lastTap=null;
   let suppressClickUntil=0;
-  const blockedTarget=target=>target.closest('.dc-spatial-controls,a,button,input,textarea,summary,dialog');
+  const blockedTarget=target=>target.closest(`.dc-spatial-controls,${INTERACTIVE_CONTROL_SELECTOR}`);
   const touchPoints=()=>[...pointers.values()].filter(point=>point.type==='touch');
   const centerOf=(a,b)=>({x:(a.x+b.x)/2,y:(a.y+b.y)/2});
   const distance=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
@@ -207,7 +208,7 @@ function installPanZoom(){
   viewport.addEventListener('wheel',event=>{event.preventDefault();zoomAt(event.deltaY<0?1.1:.9,event.clientX,event.clientY)},{passive:false});
   viewport.addEventListener('pointerdown',event=>{
     if(event.pointerType==='mouse'){
-      if(event.button!==0||event.target.closest('.dc-notice,.dc-projection,.dc-spatial-controls,a,button,input,textarea,dialog'))return;
+      if(event.button!==0||event.target.closest(`.dc-notice,.dc-projection,.dc-spatial-controls,${INTERACTIVE_CONTROL_SELECTOR}`))return;
       mousePan={id:event.pointerId,x:event.clientX,y:event.clientY,cx:camera.x,cy:camera.y};cameraIntent='manual';viewport.setPointerCapture(event.pointerId);viewport.classList.add('is-panning');return;
     }
     if(event.pointerType!=='touch'||blockedTarget(event.target))return;
@@ -285,7 +286,7 @@ function installArtifactDrag(){
   let drag=null;
   boardHost.addEventListener('pointerdown',event=>{
     const card=event.target.closest('.dc-notice.is-own-movable,.dc-notice.is-admin-movable');
-    if(!card||event.target.closest('button,a,textarea,input,dialog'))return;
+    if(!card||event.target.closest(INTERACTIVE_CONTROL_SELECTOR))return;
     event.stopPropagation();cameraIntent='manual';
     const x=parseFloat(card.style.left)||0,y=parseFloat(card.style.top)||0;
     drag={card,id:event.pointerId,startX:event.clientX,startY:event.clientY,x,y,moved:false};
