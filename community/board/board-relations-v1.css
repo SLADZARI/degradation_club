@@ -163,6 +163,7 @@
   .dc-board-relation-detail-host{left:10px;right:58px;bottom:10px;max-height:38vh;padding:8px}
   .dc-board-relations-block{font-size:8px}
   .dc-board-relations-block>summary{min-height:44px}
+  .dc-spatial-world>.dc-notice[data-artifact-subtype="idea"]>.dc-board-relations-block{display:none}
   .dc-board-relation-form{grid-template-columns:1fr 1fr}
   .dc-board-relation-form select{grid-column:1/-1;min-height:38px}
   .dc-board-relation-form button{min-height:38px}

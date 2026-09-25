@@ -371,7 +371,7 @@ try{
     expect(!errors.length,'participant relations errors: '+errors.join(' | '));await ctx.close();
   }
 
-  // Diagnostic-only proof of the existing Artifact-detail Relations owner on mobile.
+  // Durable proof of the existing Artifact-detail Relations owner on mobile.
   const detailTrace={};
 
   const rectInfo=async(page,width)=>{
@@ -480,11 +480,21 @@ try{
     return true;
   };
 
+  const inlineIdeaRelationsHidden=async page=>page.evaluate(artifactId=>{
+    const block=document.querySelector('.dc-spatial-world>.dc-notice[data-artifact="'+artifactId+'"][data-artifact-subtype="idea"]>[data-relation-block]');
+    if(!block)return false;
+    const style=getComputedStyle(block);
+    return style.display==='none'&&block.getClientRects().length===0;
+  },A);
+
+
   // 390px: full JOINED participant detail create/delete proof.
   {
     const width=390;
     const{ctx,page,errors}=await openBoard(browser,'relations',{width,height:844},{hasTouch:true});
-    const record={width,errors,opened:null,geometry:null,create:null,delete:null,capability:null,overflow:null};
+    const record={width,errors,opened:null,geometry:null,create:null,delete:null,capability:null,overflow:null,inlineHidden:null};
+    record.inlineHidden=await inlineIdeaRelationsHidden(page);
+    expect(record.inlineHidden,'mobile 390 detail owner: inline IDEA Relations remains visibly rendered');
     const opened=await openArtifactDetail(page,width);
     record.opened=opened;
     if(!opened.opened){
@@ -500,7 +510,8 @@ try{
         record.geometry=await rectInfo(page,width);
         record.overflow=record.geometry.horizontalOverflow;
         const geometryPass=record.geometry.hostVisible&&record.geometry.blockVisible&&record.geometry.summaryVisible&&record.geometry.addVisible
-          &&record.geometry.summaryInsidePanel&&record.geometry.addInsidePanel&&!record.geometry.horizontalOverflow;
+          &&record.geometry.summaryInsidePanel&&record.geometry.addInsidePanel
+          &&record.geometry.summaryRect?.height>=43.5&&!record.geometry.horizontalOverflow;
         if(!geometryPass){
           record.classification='D2';
         }else{
@@ -608,7 +619,9 @@ try{
   {
     const width=360;
     const{ctx,page,errors}=await openBoard(browser,'relations',{width,height:844},{hasTouch:true});
-    const record={width,errors,opened:null,geometry:null,add:null};
+    const record={width,errors,opened:null,geometry:null,add:null,inlineHidden:null};
+    record.inlineHidden=await inlineIdeaRelationsHidden(page);
+    expect(record.inlineHidden,'mobile 360 detail owner: inline IDEA Relations remains visibly rendered');
     const opened=await openArtifactDetail(page,width);
     record.opened=opened;
     if(!opened.opened){
@@ -623,7 +636,8 @@ try{
       }else{
         record.geometry=await rectInfo(page,width);
         const geometryPass=record.geometry.hostVisible&&record.geometry.blockVisible&&record.geometry.summaryVisible&&record.geometry.addVisible
-          &&record.geometry.summaryInsidePanel&&record.geometry.addInsidePanel&&!record.geometry.horizontalOverflow;
+          &&record.geometry.summaryInsidePanel&&record.geometry.addInsidePanel
+          &&record.geometry.summaryRect?.height>=43.5&&!record.geometry.horizontalOverflow;
         if(!geometryPass){
           record.classification='D2';
         }else{
@@ -655,7 +669,7 @@ try{
     if(classes.includes('D3'))classification='D3';
     else if(classes.includes('D4'))classification='D4';
     else if(classes.includes('D2'))classification='D2';
-    throw new Error('MOBILE_RELATIONS_DETAIL_OWNER_TRACE '+JSON.stringify({classification,...detailTrace}));
+    expect(classification==='D1','mobile Artifact-detail Relations owner regression '+JSON.stringify({classification,...detailTrace}));
   }
 
   // Durable native keyboard acceptance: prove current focus ownership immediately
@@ -713,108 +727,42 @@ try{
     expect(!errors.length,'card-body open errors: '+errors.join(' | '));await ctx.close();
   }
 
-  // Mobile acceptance resolves canonical summary + geometry + browser hit-test atomically.
-  // locator.tap() is intentionally not used: it was proven to retarget to .dc-board-open-hint
-  // while coordinate browser hit-testing resolved the same visible point to Relations summary.
-  for(const [runIndex,width] of [390,390,390,360].entries()){
+  // Mobile ownership repetition: the first full 390 proof above is run 1;
+  // these are fresh 390 runs 2-3. The full 360 proof above is the required 360 run.
+  for(const runIndex of [2,3]){
+    const width=390;
     const{ctx,page,errors}=await openBoard(browser,'relations',{width,height:844},{hasTouch:true});
-
-    try{
-      const ready=await page.waitForFunction(artifactId=>{
-        const card=document.querySelector('.dc-notice[data-artifact="'+artifactId+'"]');
-        const block=card?.querySelector('[data-relation-block]');
-        const summary=block?.querySelector('summary');
-        if(!card||!block||!summary||!summary.isConnected)return false;
-        const rect=summary.getBoundingClientRect();
-        if(!(rect.width>0&&rect.height>0))return false;
-        const x=rect.left+rect.width/2;
-        const y=rect.top+rect.height/2;
-        const hit=document.elementFromPoint(x,y);
-        if(!(hit&&(hit===summary||summary.contains(hit))))return false;
-        globalThis.__QA_RELATION_MOBILE_CANONICAL_HIT__={
-          x,y,
-          focus:new URL(location.href).searchParams.get('focus'),
-          overlay:Boolean(document.querySelector('.dc-artifact-overlay:not([hidden])')),
-          viewportPanning:Boolean(document.querySelector('.dc-spatial-viewport')?.classList.contains('is-panning')),
-          boardDragging:document.documentElement.dataset.boardDragging||null,
-          positionWrites:Number(globalThis.__QA_POSITION_WRITES__||0)
-        };
-        return true;
-      },A,{timeout:6000,polling:'raf'});
-      await ready.dispose();
-    }catch(error){
-      throw new Error('RELATION_MOBILE_CANONICAL_HIT_TIMEOUT '+JSON.stringify({width,runIndex}));
+    const inlineHidden=await inlineIdeaRelationsHidden(page);
+    expect(inlineHidden,`mobile 390 run ${runIndex}: inline IDEA Relations remains visibly rendered`);
+    const before=await page.evaluate(()=>({
+      writes:Number(globalThis.__QA_POSITION_WRITES__||0),
+      pan:Boolean(document.querySelector('.dc-spatial-viewport')?.classList.contains('is-panning')),
+      dragging:document.documentElement.dataset.boardDragging||null
+    }));
+    const opened=await openArtifactDetail(page,width);
+    expect(opened.opened===true,`mobile 390 run ${runIndex}: card body did not open Artifact detail ${JSON.stringify(opened)}`);
+    if(opened.opened){
+      await page.waitForSelector('.dc-board-relation-detail-host [data-relation-block][data-relation-detail="1"][open]',{state:'visible',timeout:6000});
+      const geometry=await rectInfo(page,width);
+      expect(geometry.hostVisible&&geometry.blockVisible&&geometry.summaryVisible&&geometry.addVisible,`mobile 390 run ${runIndex}: detail controls not visible ${JSON.stringify(geometry)}`);
+      expect((geometry.summaryRect?.height||0)>=43.5,`mobile 390 run ${runIndex}: detail summary below 44px geometry ${JSON.stringify(geometry.summaryRect)}`);
+      expect(!geometry.horizontalOverflow,`mobile 390 run ${runIndex}: detail Relations horizontal overflow`);
+      const addTapped=await tapCenter(page,'.dc-board-relation-detail-host [data-relation-add]');
+      expect(addTapped,`mobile 390 run ${runIndex}: +СВЯЗЬ has no tappable geometry`);
+      if(addTapped)await page.waitForSelector('.dc-board-relation-detail-host [data-relation-form]',{state:'visible',timeout:3000});
+      const after=await page.evaluate(artifactId=>({
+        focus:new URL(location.href).searchParams.get('focus'),
+        overlay:Boolean(document.querySelector('.dc-artifact-overlay:not([hidden])')),
+        pan:Boolean(document.querySelector('.dc-spatial-viewport')?.classList.contains('is-panning')),
+        dragging:document.documentElement.dataset.boardDragging||null,
+        writes:Number(globalThis.__QA_POSITION_WRITES__||0),
+        inlineOpen:Boolean(document.querySelector('.dc-spatial-world>.dc-notice[data-artifact="'+artifactId+'"][data-artifact-subtype="idea"]>[data-relation-block]')?.open)
+      }),A);
+      expect(after.focus==='artifact:'+A&&after.overlay===true,`mobile 390 run ${runIndex}: detail owner lost Artifact focus/fullscreen ${JSON.stringify(after)}`);
+      expect(after.inlineOpen===false,`mobile 390 run ${runIndex}: hidden inline Relations activated`);
+      expect(!after.pan&&after.dragging===null&&after.writes===before.writes,`mobile 390 run ${runIndex}: detail interaction entered pan/drag/position write ${JSON.stringify({before,after})}`);
     }
-
-    const hit=await page.evaluate(()=>globalThis.__QA_RELATION_MOBILE_CANONICAL_HIT__);
-    const center={x:hit.x,y:hit.y};
-
-    await page.evaluate(artifactId=>{
-      const viewport=document.querySelector('.dc-spatial-viewport');
-      globalThis.__QA_RELATION_SUMMARY_STARTED_PAN__=false;
-      globalThis.__QA_RELATION_MOBILE_POINTERDOWN__=null;
-
-      document.addEventListener('pointerdown',event=>{
-        const card=document.querySelector('.dc-notice[data-artifact="'+artifactId+'"]');
-        const block=card?.querySelector('[data-relation-block]');
-        const summary=block?.querySelector('summary');
-        const targetInside=Boolean(summary&&event.target&&(event.target===summary||summary.contains(event.target)));
-        globalThis.__QA_RELATION_MOBILE_POINTERDOWN__={
-          pointerType:event.pointerType||null,
-          target:event.target?.outerHTML?.slice(0,240)||null,
-          targetInsideCurrentSummary:targetInside,
-          currentSummaryConnected:Boolean(summary?.isConnected),
-          focus:new URL(location.href).searchParams.get('focus'),
-          overlay:Boolean(document.querySelector('.dc-artifact-overlay:not([hidden])')),
-          viewportPanning:Boolean(viewport?.classList.contains('is-panning')),
-          boardDragging:document.documentElement.dataset.boardDragging||null,
-          positionWrites:Number(globalThis.__QA_POSITION_WRITES__||0)
-        };
-      },{capture:true,once:true});
-
-      viewport?.addEventListener('pointerdown',event=>{
-        if(event.target.closest?.('[data-relation-block] summary')&&viewport.classList.contains('is-panning'))globalThis.__QA_RELATION_SUMMARY_STARTED_PAN__=true;
-      },{once:true});
-    },A);
-
-    await page.touchscreen.tap(center.x,center.y);
-
-    const pointerdown=await page.evaluate(()=>globalThis.__QA_RELATION_MOBILE_POINTERDOWN__);
-    if(
-      !pointerdown
-      ||pointerdown.pointerType!=='touch'
-      ||pointerdown.targetInsideCurrentSummary!==true
-      ||pointerdown.currentSummaryConnected!==true
-    ){
-      throw new Error('RELATION_MOBILE_POINTER_TARGET_MISMATCH '+JSON.stringify({width,runIndex,center,pointerdown}));
-    }
-
-    await page.waitForFunction(artifactId=>{
-      const current=document.querySelector('.dc-notice[data-artifact="'+artifactId+'"] [data-relation-block]');
-      return Boolean(current&&current.isConnected&&current.open===true);
-    },A,{timeout:6000});
-
-    const after=await page.evaluate(artifactId=>({
-      open:Boolean(document.querySelector('.dc-notice[data-artifact="'+artifactId+'"] [data-relation-block]')?.open),
-      focus:new URL(location.href).searchParams.get('focus'),
-      overlay:Boolean(document.querySelector('.dc-artifact-overlay:not([hidden])')),
-      viewportPanning:Boolean(document.querySelector('.dc-spatial-viewport')?.classList.contains('is-panning')),
-      panStarted:Boolean(globalThis.__QA_RELATION_SUMMARY_STARTED_PAN__),
-      boardDragging:document.documentElement.dataset.boardDragging||null,
-      positionWrites:Number(globalThis.__QA_POSITION_WRITES__||0)
-    }),A);
-
-    expect(pointerdown.focus===null,`mobile ${width} run ${runIndex+1}: focus existed at pointerdown`);
-    expect(pointerdown.overlay===false,`mobile ${width} run ${runIndex+1}: Artifact overlay existed at pointerdown`);
-    expect(pointerdown.boardDragging===null,`mobile ${width} run ${runIndex+1}: pointerdown entered card drag owner`);
-    expect(pointerdown.positionWrites===hit.positionWrites,`mobile ${width} run ${runIndex+1}: position write occurred before pointerdown acceptance`);
-    expect(after.open===true,`mobile ${width} run ${runIndex+1}: current Relations block not open after coordinate touch`);
-    expect(after.focus===null,`mobile ${width} run ${runIndex+1}: coordinate touch wrote focus URL ${after.focus}`);
-    expect(after.overlay===false,`mobile ${width} run ${runIndex+1}: coordinate touch opened Artifact fullscreen`);
-    expect(after.panStarted===false&&!after.viewportPanning,`mobile ${width} run ${runIndex+1}: coordinate touch initiated Board pan`);
-    expect(after.boardDragging===null,`mobile ${width} run ${runIndex+1}: coordinate touch left card drag active`);
-    expect(after.positionWrites===hit.positionWrites,`mobile ${width} run ${runIndex+1}: coordinate touch caused board position write`);
-    expect(!errors.length,`mobile ${width} run ${runIndex+1}: coordinate touch errors: ${errors.join(' | ')}`);
+    expect(!errors.length,`mobile 390 run ${runIndex}: page errors: ${errors.join(' | ')}`);
     await ctx.close();
   }
 
