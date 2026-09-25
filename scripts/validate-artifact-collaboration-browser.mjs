@@ -371,156 +371,292 @@ try{
     expect(!errors.length,'participant relations errors: '+errors.join(' | '));await ctx.close();
   }
 
-  // Phase A: validator-only proof for the narrow-mobile relation-card composition.
-  const candidateCss={
-    M1:`@media(max-width:520px){
-      .dc-board-fullscreen-v21 .dc-board-grid .dc-notice[data-artifact]:has(> .dc-board-relations-block:not([open])){
-        max-height:360px!important;
-      }
-    }`,
-    M2:`@media(max-width:520px){
-      .dc-board-fullscreen-v21 .dc-board-grid .dc-notice[data-artifact]:has(> .dc-board-relations-block:not([open])){
-        max-height:360px!important;
-      }
-      .dc-board-fullscreen-v21 .dc-board-grid .dc-notice[data-artifact]:has(> .dc-board-relations-block) > .dc-board-open-hint{
-        min-height:44px!important;
-      }
-    }`
+  // Diagnostic-only proof of the existing Artifact-detail Relations owner on mobile.
+  const detailTrace={};
+
+  const rectInfo=async(page,width)=>{
+    return page.evaluate(width=>{
+      const host=document.querySelector('.dc-board-relation-detail-host');
+      const block=host?.querySelector('[data-relation-block][data-relation-detail="1"]');
+      const summary=block?.querySelector('summary');
+      const add=block?.querySelector('[data-relation-add]');
+      const overlay=document.querySelector('.dc-artifact-overlay:not([hidden])');
+      const panel=overlay?.querySelector('.dc-artifact-overlay__panel');
+      const rect=node=>{
+        const r=node?.getBoundingClientRect();
+        return r?{left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height}:null;
+      };
+      const visible=(node,r)=>{
+        if(!node||!r||!(r.width>0&&r.height>0))return false;
+        const s=getComputedStyle(node);
+        return s.display!=='none'&&s.visibility!=='hidden'&&Number(s.opacity||1)>0
+          &&r.right>0&&r.bottom>0&&r.left<innerWidth&&r.top<innerHeight;
+      };
+      const hostRect=rect(host),blockRect=rect(block),summaryRect=rect(summary),addRect=rect(add),panelRect=rect(panel);
+      const style=node=>node?{
+        display:getComputedStyle(node).display,
+        visibility:getComputedStyle(node).visibility,
+        opacity:getComputedStyle(node).opacity,
+        pointerEvents:getComputedStyle(node).pointerEvents,
+        overflow:getComputedStyle(node).overflow,
+        overflowX:getComputedStyle(node).overflowX,
+        overflowY:getComputedStyle(node).overflowY
+      }:null;
+      return{
+        width,
+        viewportRect:{left:0,top:0,right:innerWidth,bottom:innerHeight,width:innerWidth,height:innerHeight},
+        visualViewport:visualViewport?{width:visualViewport.width,height:visualViewport.height,scale:visualViewport.scale,offsetLeft:visualViewport.offsetLeft,offsetTop:visualViewport.offsetTop}:null,
+        panelRect,
+        hostRect,blockRect,summaryRect,addRect,
+        hostStyle:style(host),blockStyle:style(block),summaryStyle:style(summary),addStyle:style(add),
+        hostVisible:visible(host,hostRect),
+        blockVisible:visible(block,blockRect),
+        summaryVisible:visible(summary,summaryRect),
+        addVisible:visible(add,addRect),
+        blockOpen:Boolean(block?.open),
+        hostInsideViewport:Boolean(hostRect&&hostRect.left>=-1&&hostRect.top>=-1&&hostRect.right<=innerWidth+1&&hostRect.bottom<=innerHeight+1),
+        summaryInsidePanel:Boolean(summaryRect&&panelRect&&summaryRect.left>=panelRect.left-1&&summaryRect.right<=panelRect.right+1&&summaryRect.top>=panelRect.top-1&&summaryRect.bottom<=panelRect.bottom+1),
+        addInsidePanel:Boolean(addRect&&panelRect&&addRect.left>=panelRect.left-1&&addRect.right<=panelRect.right+1&&addRect.top>=panelRect.top-1&&addRect.bottom<=panelRect.bottom+1),
+        horizontalOverflow:Boolean(host&&host.scrollWidth>host.clientWidth+1)||Boolean(block&&block.scrollWidth>block.clientWidth+1),
+        hostClientWidth:host?.clientWidth??null,
+        hostScrollWidth:host?.scrollWidth??null,
+        blockClientWidth:block?.clientWidth??null,
+        blockScrollWidth:block?.scrollWidth??null
+      };
+    },width);
   };
 
-  const runCandidate=async candidate=>{
-    const results=[];
-    for(const width of [390,360]){
-      // Hint-area product semantics: fully visible hint center must activate Artifact, not Relations.
-      {
-        const{ctx,page,errors}=await openBoard(browser,'relations',{width,height:844},{hasTouch:true});
-        await page.addStyleTag({content:candidateCss[candidate]});
-        const geometry=await page.evaluate(artifactId=>{
-          const card=document.querySelector('.dc-notice[data-artifact="'+artifactId+'"]');
-          const hint=card?.querySelector('.dc-board-open-hint');
-          const summary=card?.querySelector('[data-relation-block] summary');
-          const rect=node=>{
-            const r=node?.getBoundingClientRect();
-            return r?{left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height}:null;
-          };
-          const cardRect=rect(card),hintRect=rect(hint),summaryRect=rect(summary);
-          const center=hintRect?{x:hintRect.left+hintRect.width/2,y:hintRect.top+hintRect.height/2}:null;
-          return{
-            cardRect,hintRect,summaryRect,center,
-            hintFullyInsideCard:Boolean(cardRect&&hintRect&&hintRect.left>=cardRect.left-.5&&hintRect.right<=cardRect.right+.5&&hintRect.top>=cardRect.top-.5&&hintRect.bottom<=cardRect.bottom+.5),
-            hintPositive:Boolean(hintRect&&hintRect.width>0&&hintRect.height>0),
-            scrollFits:Boolean(card&&card.scrollHeight<=card.clientHeight+1),
-            cardClientHeight:card?.clientHeight??null,
-            cardScrollHeight:card?.scrollHeight??null,
-            elementFromPoint:center?(document.elementFromPoint(center.x,center.y)?.outerHTML?.slice(0,220)||null):null
-          };
-        },A);
-
-        await page.evaluate(artifactId=>{
-          globalThis.__QA_CANDIDATE_HINT_POINTERDOWN__=null;
-          document.addEventListener('pointerdown',event=>{
-            globalThis.__QA_CANDIDATE_HINT_POINTERDOWN__={
-              pointerType:event.pointerType||null,
-              target:event.target?.outerHTML?.slice(0,240)||null,
-              insideRelations:Boolean(event.target?.closest?.('.dc-board-relations-block')),
-              focus:new URL(location.href).searchParams.get('focus'),
-              overlay:Boolean(document.querySelector('.dc-artifact-overlay:not([hidden])'))
-            };
-          },{capture:true,once:true});
-        },A);
-
-        if(geometry.center)await page.touchscreen.tap(geometry.center.x,geometry.center.y);
-        await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
-        const outcome=await page.evaluate(artifactId=>({
-          pointerdown:globalThis.__QA_CANDIDATE_HINT_POINTERDOWN__,
-          focus:new URL(location.href).searchParams.get('focus'),
-          overlay:Boolean(document.querySelector('.dc-artifact-overlay:not([hidden])')),
-          relationsOpen:Boolean(document.querySelector('.dc-notice[data-artifact="'+artifactId+'"] [data-relation-block]')?.open)
-        }),A);
-
-        const pass=Boolean(
-          geometry.hintPositive
-          &&geometry.hintFullyInsideCard
-          &&geometry.scrollFits
-          &&outcome.pointerdown?.pointerType==='touch'
-          &&outcome.pointerdown?.insideRelations===false
-          &&outcome.overlay===true
-          &&outcome.focus==='artifact:'+A
-          &&outcome.relationsOpen===false
-          &&errors.length===0
-        );
-        results.push({candidate,width,control:'hint',pass,geometry,outcome,errors});
-        await ctx.close();
-      }
-
-      // Relations semantics: current summary center must activate Relations only.
-      {
-        const{ctx,page,errors}=await openBoard(browser,'relations',{width,height:844},{hasTouch:true});
-        await page.addStyleTag({content:candidateCss[candidate]});
-        try{
-          const ready=await page.waitForFunction(artifactId=>{
-            const card=document.querySelector('.dc-notice[data-artifact="'+artifactId+'"]');
-            const block=card?.querySelector('[data-relation-block]');
-            const summary=block?.querySelector('summary');
-            if(!card||!block||!summary||!summary.isConnected)return false;
-            const rect=summary.getBoundingClientRect();
-            if(!(rect.width>0&&rect.height>0))return false;
-            const x=rect.left+rect.width/2,y=rect.top+rect.height/2;
-            const hit=document.elementFromPoint(x,y);
-            if(!(hit&&(hit===summary||summary.contains(hit))))return false;
-            globalThis.__QA_CANDIDATE_RELATION_POINT__={x,y};
-            return true;
-          },A,{timeout:6000,polling:'raf'});
-          await ready.dispose();
-        }catch(error){
-          results.push({candidate,width,control:'relations',pass:false,error:'RELATION_POINT_TIMEOUT',errors});
-          await ctx.close();
-          continue;
+  const openArtifactDetail=async(page,width)=>{
+    try{
+      const ready=await page.waitForFunction(artifactId=>{
+        const card=document.querySelector('.dc-notice[data-artifact="'+artifactId+'"]');
+        if(!card||!card.isConnected)return false;
+        const blocked='a,button,input,textarea,select,label,summary,dialog,[contenteditable="true"],[data-relation-block],.dc-board-open-hint';
+        const candidates=[...card.querySelectorAll('h3,.dc-notice__body,.dc-notice__meta,p')];
+        for(const node of candidates){
+          const r=node.getBoundingClientRect();
+          if(!(r.width>0&&r.height>0))continue;
+          const x=r.left+r.width/2,y=r.top+r.height/2;
+          const hit=document.elementFromPoint(x,y);
+          if(!hit||!(hit===card||card.contains(hit))||hit.closest?.(blocked))continue;
+          globalThis.__QA_DETAIL_CARD_BODY_POINT__={x,y,target:hit.outerHTML?.slice(0,220)||null};
+          return true;
         }
+        return false;
+      },A,{timeout:6000,polling:'raf'});
+      await ready.dispose();
+    }catch(error){
+      return{opened:false,reason:'CARD_BODY_POINT_TIMEOUT'};
+    }
+    const point=await page.evaluate(()=>globalThis.__QA_DETAIL_CARD_BODY_POINT__);
+    await page.touchscreen.tap(point.x,point.y);
+    try{
+      await page.waitForFunction(artifactId=>(
+        new URL(location.href).searchParams.get('focus')==='artifact:'+artifactId
+        &&Boolean(document.querySelector('.dc-artifact-overlay:not([hidden])'))
+      ),A,{timeout:6000});
+    }catch(error){
+      const state=await page.evaluate(()=>({
+        focus:new URL(location.href).searchParams.get('focus'),
+        overlay:Boolean(document.querySelector('.dc-artifact-overlay:not([hidden])'))
+      }));
+      return{opened:false,reason:'ARTIFACT_OVERLAY_TIMEOUT',point,state};
+    }
+    return{opened:true,point,state:await page.evaluate(()=>({
+      focus:new URL(location.href).searchParams.get('focus'),
+      overlay:Boolean(document.querySelector('.dc-artifact-overlay:not([hidden])'))
+    }))};
+  };
 
-        const point=await page.evaluate(()=>globalThis.__QA_CANDIDATE_RELATION_POINT__);
-        await page.evaluate(()=>{
-          globalThis.__QA_CANDIDATE_RELATION_POINTERDOWN__=null;
-          document.addEventListener('pointerdown',event=>{
-            const currentSummary=document.querySelector('.dc-notice[data-artifact] [data-relation-block] summary');
-            globalThis.__QA_CANDIDATE_RELATION_POINTERDOWN__={
-              pointerType:event.pointerType||null,
-              target:event.target?.outerHTML?.slice(0,240)||null,
-              insideCurrentSummary:Boolean(currentSummary&&event.target&&(event.target===currentSummary||currentSummary.contains(event.target)))
-            };
-          },{capture:true,once:true});
-        });
+  const tapCenter=async(page,selector)=>{
+    const point=await page.evaluate(selector=>{
+      const node=document.querySelector(selector);
+      const r=node?.getBoundingClientRect();
+      if(!node||!r||!(r.width>0&&r.height>0))return null;
+      return{x:r.left+r.width/2,y:r.top+r.height/2};
+    },selector);
+    if(!point)return false;
+    await page.touchscreen.tap(point.x,point.y);
+    return true;
+  };
 
-        await page.touchscreen.tap(point.x,point.y);
-        await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
-        const outcome=await page.evaluate(artifactId=>({
-          pointerdown:globalThis.__QA_CANDIDATE_RELATION_POINTERDOWN__,
-          open:Boolean(document.querySelector('.dc-notice[data-artifact="'+artifactId+'"] [data-relation-block]')?.open),
-          focus:new URL(location.href).searchParams.get('focus'),
-          overlay:Boolean(document.querySelector('.dc-artifact-overlay:not([hidden])'))
-        }),A);
-        const pass=Boolean(
-          outcome.pointerdown?.pointerType==='touch'
-          &&outcome.pointerdown?.insideCurrentSummary===true
-          &&outcome.open===true
-          &&outcome.focus===null
-          &&outcome.overlay===false
-          &&errors.length===0
-        );
-        results.push({candidate,width,control:'relations',pass,outcome,errors});
-        await ctx.close();
+  // 390px: full JOINED participant detail create/delete proof.
+  {
+    const width=390;
+    const{ctx,page,errors}=await openBoard(browser,'relations',{width,height:844},{hasTouch:true});
+    const record={width,errors,opened:null,geometry:null,create:null,delete:null,capability:null,overflow:null};
+    const opened=await openArtifactDetail(page,width);
+    record.opened=opened;
+    if(!opened.opened){
+      record.classification='D2';
+    }else{
+      let hostPresent=true;
+      try{
+        await page.waitForSelector('.dc-board-relation-detail-host [data-relation-block][data-relation-detail="1"][open]',{state:'visible',timeout:6000});
+      }catch(error){hostPresent=false}
+      if(!hostPresent){
+        record.classification='D3';
+      }else{
+        record.geometry=await rectInfo(page,width);
+        record.overflow=record.geometry.horizontalOverflow;
+        const geometryPass=record.geometry.hostVisible&&record.geometry.blockVisible&&record.geometry.summaryVisible&&record.geometry.addVisible
+          &&record.geometry.summaryInsidePanel&&record.geometry.addInsidePanel&&!record.geometry.horizontalOverflow;
+        if(!geometryPass){
+          record.classification='D2';
+        }else{
+          const baseline=await page.evaluate(()=>({
+            focus:new URL(location.href).searchParams.get('focus'),
+            overlay:Boolean(document.querySelector('.dc-artifact-overlay:not([hidden])')),
+            pan:Boolean(document.querySelector('.dc-spatial-viewport')?.classList.contains('is-panning')),
+            dragging:document.documentElement.dataset.boardDragging||null,
+            writes:Number(globalThis.__QA_POSITION_WRITES__||0),
+            createCalls:globalThis.__QA_COLLAB_CALLS__.filter(call=>call.name==='dc_board_relation_create_v1').length,
+            deleteCalls:globalThis.__QA_COLLAB_CALLS__.filter(call=>call.name==='dc_board_relation_delete_v1').length
+          }));
+          const addTapped=await tapCenter(page,'.dc-board-relation-detail-host [data-relation-add]');
+          let formVisible=false;
+          if(addTapped){
+            try{
+              await page.waitForSelector('.dc-board-relation-detail-host [data-relation-form]',{state:'visible',timeout:3000});
+              formVisible=true;
+            }catch{}
+          }
+          const options=formVisible?await page.locator('.dc-board-relation-detail-host [data-relation-choice] option').evaluateAll(nodes=>nodes.map(node=>({value:node.value,label:node.textContent||''}))):[];
+          const labels=options.map(option=>option.label);
+          const eventChoice=options.find(option=>option.label.includes('QA EVENT'));
+          const relatedOnly=labels.length>0&&labels.every(label=>label.startsWith('СВЯЗАНО С'));
+          record.capability={addTapped,formVisible,labels,relatedOnly,qaEventAvailable:Boolean(eventChoice)};
+          if(!addTapped||!formVisible||!relatedOnly||!eventChoice){
+            record.classification='D4';
+          }else{
+            await page.locator('.dc-board-relation-detail-host [data-relation-choice]').selectOption(eventChoice.value);
+            const saveTapped=await tapCenter(page,'.dc-board-relation-detail-host [data-relation-save]');
+            let createdVisible=false;
+            if(saveTapped){
+              try{
+                await page.waitForFunction(({artifactId,before})=>(
+                  globalThis.__QA_COLLAB_CALLS__.filter(call=>call.name==='dc_board_relation_create_v1').length>before
+                  &&Boolean(document.querySelector('.dc-board-relation-detail-host [data-relation-id="rel-created"]'))
+                  &&new URL(location.href).searchParams.get('focus')==='artifact:'+artifactId
+                  &&Boolean(document.querySelector('.dc-artifact-overlay:not([hidden])'))
+                ),{artifactId:A,before:baseline.createCalls},{timeout:6000});
+                createdVisible=true;
+              }catch{}
+            }
+            const afterCreate=await page.evaluate(()=>({
+              focus:new URL(location.href).searchParams.get('focus'),
+              overlay:Boolean(document.querySelector('.dc-artifact-overlay:not([hidden])')),
+              pan:Boolean(document.querySelector('.dc-spatial-viewport')?.classList.contains('is-panning')),
+              dragging:document.documentElement.dataset.boardDragging||null,
+              writes:Number(globalThis.__QA_POSITION_WRITES__||0),
+              createCalls:globalThis.__QA_COLLAB_CALLS__.filter(call=>call.name==='dc_board_relation_create_v1').length
+            }));
+            record.create={saveTapped,createdVisible,baseline,afterCreate};
+            if(!saveTapped||!createdVisible||afterCreate.createCalls<=baseline.createCalls||afterCreate.focus!=='artifact:'+A||!afterCreate.overlay||afterCreate.pan||afterCreate.dragging!==null||afterCreate.writes!==baseline.writes){
+              record.classification='D2';
+            }else{
+              const createdRow=page.locator('.dc-board-relation-detail-host [data-relation-id="rel-created"]');
+              const otherRow=page.locator('.dc-board-relation-detail-host [data-relation-id="rel-other"]');
+              const directionalRow=page.locator('.dc-board-relation-detail-host [data-relation-id="rel-directional"]');
+              const createdDelete=createdRow.locator('[data-relation-delete]');
+              const authority={
+                createdDelete:await createdDelete.count(),
+                otherRow:await otherRow.count(),
+                otherDelete:await otherRow.locator('[data-relation-delete]').count(),
+                directionalRow:await directionalRow.count(),
+                directionalDelete:await directionalRow.locator('[data-relation-delete]').count()
+              };
+              const authorityPass=authority.createdDelete===1&&authority.otherRow===1&&authority.otherDelete===0&&authority.directionalRow===1&&authority.directionalDelete===0;
+              if(!authorityPass){
+                record.delete={authority};
+                record.classification='D4';
+              }else{
+                const deleteTapped=await tapCenter(page,'.dc-board-relation-detail-host [data-relation-id="rel-created"] [data-relation-delete]');
+                let deleted=false;
+                if(deleteTapped){
+                  try{
+                    await page.waitForFunction(({before})=>(
+                      globalThis.__QA_COLLAB_CALLS__.filter(call=>call.name==='dc_board_relation_delete_v1').length>before
+                      &&!document.querySelector('.dc-board-relation-detail-host [data-relation-id="rel-created"]')
+                    ),{before:baseline.deleteCalls},{timeout:6000});
+                    deleted=true;
+                  }catch{}
+                }
+                const afterDelete=await page.evaluate(()=>({
+                  focus:new URL(location.href).searchParams.get('focus'),
+                  overlay:Boolean(document.querySelector('.dc-artifact-overlay:not([hidden])')),
+                  pan:Boolean(document.querySelector('.dc-spatial-viewport')?.classList.contains('is-panning')),
+                  dragging:document.documentElement.dataset.boardDragging||null,
+                  writes:Number(globalThis.__QA_POSITION_WRITES__||0),
+                  deleteCalls:globalThis.__QA_COLLAB_CALLS__.filter(call=>call.name==='dc_board_relation_delete_v1').length
+                }));
+                record.delete={authority,deleteTapped,deleted,afterDelete};
+                if(!deleteTapped||!deleted||afterDelete.deleteCalls<=baseline.deleteCalls||afterDelete.focus!=='artifact:'+A||!afterDelete.overlay||afterDelete.pan||afterDelete.dragging!==null||afterDelete.writes!==baseline.writes){
+                  record.classification='D2';
+                }else record.classification='D1';
+              }
+            }
+          }
+        }
       }
     }
-    return{candidate,pass:results.length===4&&results.every(item=>item.pass),results};
-  };
-
-  const m1=await runCandidate('M1');
-  if(m1.pass){
-    throw new Error('RELATION_MOBILE_LAYOUT_CANDIDATE_TRACE '+JSON.stringify({winner:'M1',m1,m2:'NOT_RUN'}));
+    detailTrace.mobile390=record;
+    await ctx.close();
   }
-  const m2=await runCandidate('M2');
-  throw new Error('RELATION_MOBILE_LAYOUT_CANDIDATE_TRACE '+JSON.stringify({winner:m2.pass?'M2':'NONE',m1,m2}));
 
+  // 360px: existing detail host must remain open, visible, tappable and overflow-safe.
+  {
+    const width=360;
+    const{ctx,page,errors}=await openBoard(browser,'relations',{width,height:844},{hasTouch:true});
+    const record={width,errors,opened:null,geometry:null,add:null};
+    const opened=await openArtifactDetail(page,width);
+    record.opened=opened;
+    if(!opened.opened){
+      record.classification='D2';
+    }else{
+      let hostPresent=true;
+      try{
+        await page.waitForSelector('.dc-board-relation-detail-host [data-relation-block][data-relation-detail="1"][open]',{state:'visible',timeout:6000});
+      }catch(error){hostPresent=false}
+      if(!hostPresent){
+        record.classification='D3';
+      }else{
+        record.geometry=await rectInfo(page,width);
+        const geometryPass=record.geometry.hostVisible&&record.geometry.blockVisible&&record.geometry.summaryVisible&&record.geometry.addVisible
+          &&record.geometry.summaryInsidePanel&&record.geometry.addInsidePanel&&!record.geometry.horizontalOverflow;
+        if(!geometryPass){
+          record.classification='D2';
+        }else{
+          const tapped=await tapCenter(page,'.dc-board-relation-detail-host [data-relation-add]');
+          let formVisible=false;
+          if(tapped){
+            try{
+              await page.waitForSelector('.dc-board-relation-detail-host [data-relation-form]',{state:'visible',timeout:3000});
+              formVisible=true;
+            }catch{}
+          }
+          const state=await page.evaluate(()=>({
+            focus:new URL(location.href).searchParams.get('focus'),
+            overlay:Boolean(document.querySelector('.dc-artifact-overlay:not([hidden])')),
+            horizontalOverflow:Boolean(document.querySelector('.dc-board-relation-detail-host')?.scrollWidth>document.querySelector('.dc-board-relation-detail-host')?.clientWidth+1)
+          }));
+          record.add={tapped,formVisible,state};
+          record.classification=tapped&&formVisible&&state.focus==='artifact:'+A&&state.overlay&&!state.horizontalOverflow?'D1':'D2';
+        }
+      }
+    }
+    detailTrace.mobile360=record;
+    await ctx.close();
+  }
+
+  {
+    const classes=[detailTrace.mobile390?.classification,detailTrace.mobile360?.classification];
+    let classification='D1';
+    if(classes.includes('D3'))classification='D3';
+    else if(classes.includes('D4'))classification='D4';
+    else if(classes.includes('D2'))classification='D2';
+    throw new Error('MOBILE_RELATIONS_DETAIL_OWNER_TRACE '+JSON.stringify({classification,...detailTrace}));
+  }
 
   // Durable native keyboard acceptance: prove current focus ownership immediately
   // before one browser keyboard delivery, then assert the current canonical block stays open.
