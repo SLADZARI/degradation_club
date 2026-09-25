@@ -4,15 +4,15 @@
     "artifactId": "dementor-club.kernel.project",
     "project": "dementor-club",
     "documentType": "STANDARD",
-    "projectStage": "VALIDATION",
-    "gate": "G6_VALIDATION",
+    "projectStage": "RELEASE",
+    "gate": "G7_RELEASE",
     "status": "APPROVED",
-    "version": "2.86",
-    "updated": "2026-09-25",
+    "version": "2.87",
+    "updated": "2026-09-26",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.85"
+    "supersedes": "2.86"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -228,7 +228,8 @@
     "operations/ARTIFACT_COLLABORATION_G5_FINAL_VALIDATION_2026-09-25.md",
     ".weekly-os/results/artifact-collaboration-v1.v0.8.md",
     "operations/ARTIFACT_COLLABORATION_G6_2026-09-25.md",
-    ".weekly-os/results/artifact-collaboration-v1.v0.9.md"
+    ".weekly-os/results/artifact-collaboration-v1.v0.9.md",
+    ".weekly-os/results/artifact-collaboration-v1.v1.0.md"
   ],
   "authority": {
     "mpDslCore": {
@@ -395,11 +396,11 @@
   },
   "currentResult": {
     "artifactId": "dementor-club.result.artifact-collaboration-v1",
-    "version": "0.9",
+    "version": "1.0",
     "status": "ACTIVE",
     "workStatus": "ACTIVE",
-    "path": ".weekly-os/results/artifact-collaboration-v1.v0.9.md",
-    "gate": "G6_VALIDATION",
+    "path": ".weekly-os/results/artifact-collaboration-v1.v1.0.md",
+    "gate": "G7_RELEASE",
     "scope": [
       "idea participation",
       "invitation / join",
@@ -422,8 +423,8 @@
     "g5BackendCandidateCommit": "3522993d6796fe9dae81a0c7dbde1ddcc1aa350a",
     "g5BackendStaticStatus": "PASS",
     "g5SqlExecutionStatus": "PASS_LOCAL_OBSERVED_PRODUCTION_COMPATIBLE_REPLAY",
-    "gateReadiness": "READY_FOR_CLEAN_G7_RELEASE_CANDIDATE_PREPARATION",
-    "note": "G6 PASS on exact candidate 5769fb10... using Site Integrity #1306 SUCCESS plus final backend replay/runtime/freeze evidence. Production baseline remains df8a24ec...; 31-path diff has no inherited staging divergence. G7 not entered.",
+    "gateReadiness": "CLEAN_RC_VALIDATION_IN_PROGRESS",
+    "note": "G7 clean RC created directly from production df8a24ec... as one commit 030d7fec... with exactly 31 reviewed paths. RC tree matches G6 candidate tree. Draft PR #243. Site Integrity #1308 currently in progress. No production merge/deploy or live Supabase apply authorized.",
     "implementationBrief": "operations/ARTIFACT_COLLABORATION_IMPLEMENTATION_BRIEF_V1.md",
     "g5BackendLocalBlockerEvidence": "operations/ARTIFACT_COLLABORATION_BACKEND_G5_LOCAL_STACK_BLOCKER_2026-09-24.md",
     "costBoundary": "NO_PAID_INFRASTRUCTURE",
@@ -455,7 +456,15 @@
     "g6ValidationRunId": 36183292073,
     "g6ValidationConclusion": "SUCCESS",
     "g6DiffFileCount": 31,
-    "g7ReleaseAuthorized": false
+    "g7ReleaseAuthorized": false,
+    "releaseBranch": "release/artifact-collaboration-v1",
+    "releaseCandidateCommit": "030d7fece9dee1b8502bde6ac89bef95dbdfeda7",
+    "releasePullRequest": 243,
+    "g7CleanRcStatus": "IN_PROGRESS",
+    "g7ValidationRun": 1308,
+    "g7ValidationRunId": 36198771555,
+    "g7ValidationStatus": "IN_PROGRESS",
+    "g7CleanRcPreparationAuthorized": true
   },
   "waitingResults": [
     {
