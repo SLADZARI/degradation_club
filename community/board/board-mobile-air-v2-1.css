@@ -97,3 +97,11 @@
   .dc-board-fullscreen-v21 .dc-board-filter-nav span{min-width:48px!important;font-size:9px!important}
   .dc-board-fullscreen-v21 .dc-board-filter-drawer{bottom:calc(126px + env(safe-area-inset-bottom,0px))!important;max-height:min(62dvh,calc(100dvh - 215px))!important}
 }
+/* Artifact Collaboration v1: compact IDEA roster on narrow Board cards. */
+@media(max-width:520px){
+  .dc-board-fullscreen-v21 .dc-board-grid .dc-idea-collab{gap:6px;margin:8px 0;padding:8px 0}
+  .dc-board-fullscreen-v21 .dc-board-grid .dc-idea-collab__row{grid-template-columns:62px minmax(0,1fr);gap:6px}
+  .dc-board-fullscreen-v21 .dc-board-grid .dc-collab-person{max-width:132px;font-size:8px}
+  .dc-board-fullscreen-v21 .dc-board-grid .dc-collab-avatar{width:22px;height:22px;flex-basis:22px}
+  .dc-board-fullscreen-v21 .dc-board-grid .dc-idea-collab__people{flex-wrap:nowrap;overflow:hidden}
+}

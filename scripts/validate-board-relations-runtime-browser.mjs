@@ -50,9 +50,9 @@ const projections=[
  {entity_id:projectEntity,entity_type:'project',slug:'qa-project',title:'QA PROJECT',status:'active',summary:'Unsupported relation endpoint fixture.',source_system:'dementor-club',provenance_status:'confirmed',event_location:null,event_capacity:null,program_type:null,delivery_mode:null,content_summary:null}
 ];
 let relationRows=[
- {relation_id:'77777777-7777-4777-8777-777777777771',relation_type:'RELATED_TO',origin_kind:'artifact',origin_source_id:ownId,target_kind:'event',target_source_id:'qa-event',created_at:'2026-09-18T07:00:00Z'},
- {relation_id:'77777777-7777-4777-8777-777777777772',relation_type:'ABOUT',origin_kind:'artifact',origin_source_id:ownId,target_kind:'program',target_source_id:'qa-course',created_at:'2026-09-18T07:01:00Z'},
- {relation_id:'77777777-7777-4777-8777-777777777773',relation_type:'CONTINUES',origin_kind:'program',origin_source_id:'qa-course',target_kind:'program',target_source_id:'qa-practice',created_at:'2026-09-18T07:02:00Z'}
+ {relation_id:'77777777-7777-4777-8777-777777777771',relation_type:'RELATED_TO',origin_kind:'artifact',origin_source_id:ownId,target_kind:'event',target_source_id:'qa-event',created_at:'2026-09-18T07:00:00Z',can_delete:true},
+ {relation_id:'77777777-7777-4777-8777-777777777772',relation_type:'ABOUT',origin_kind:'artifact',origin_source_id:ownId,target_kind:'program',target_source_id:'qa-course',created_at:'2026-09-18T07:01:00Z',can_delete:true},
+ {relation_id:'77777777-7777-4777-8777-777777777773',relation_type:'CONTINUES',origin_kind:'program',origin_source_id:'qa-course',target_kind:'program',target_source_id:'qa-practice',created_at:'2026-09-18T07:02:00Z',can_delete:true}
 ];
 const roleRows=[{profile_id:user.id,role:'dementor',scope_type:'system',status:'active',valid_from:'2026-09-01T00:00:00Z',valid_to:null,provenance_status:'confirmed'}];
 const assignmentRows=[
@@ -108,7 +108,7 @@ export function createClient(){return{
   if(name==='dc_board_relation_create_v1'){
     if(globalThis.__QA_RELATION_REJECT__)return{data:null,error:{message:'RELATION_WRITE_FORBIDDEN',code:'42501'}};
     const id='88888888-8888-4888-8888-'+String(relationRows.length+1).padStart(12,'8');
-    relationRows.push({relation_id:id,relation_type:args.p_relation_type,origin_kind:args.p_origin_kind,origin_source_id:args.p_origin_source_id,target_kind:args.p_target_kind,target_source_id:args.p_target_source_id,created_at:new Date().toISOString()});
+    relationRows.push({relation_id:id,relation_type:args.p_relation_type,origin_kind:args.p_origin_kind,origin_source_id:args.p_origin_source_id,target_kind:args.p_target_kind,target_source_id:args.p_target_source_id,created_at:new Date().toISOString(),can_delete:true});
     return{data:id,error:null};
   }
   if(name==='dc_board_relation_delete_v1'){
@@ -145,6 +145,7 @@ async function openBoard(browser,mode,viewport){
   return{ctx,page,errors};
 }
 async function rpcCalls(page,name){return page.evaluate(name=>(globalThis.__QA_RPC_CALLS__||[]).filter(call=>call.name===name),name)}
+async function positionWriteCount(page){return page.evaluate(()=>(globalThis.__QA_DB_WRITES__||[]).filter(write=>write.op==='update'&&write.table==='dc_artifact_board_positions').length)}
 async function lineCoords(page,id){return page.locator(`.dc-board-relation-line[data-relation-id="${id}"]`).evaluate(line=>({x1:Number(line.getAttribute('x1')),y1:Number(line.getAttribute('y1')),x2:Number(line.getAttribute('x2')),y2:Number(line.getAttribute('y2'))}))}
 
 const browser=await chromium.launch({headless:true});
@@ -220,7 +221,59 @@ try{
 
     const ownBlock=page.locator('.dc-notice[data-artifact-owned="1"] [data-relation-block]');
     await ownBlock.waitFor({state:'attached',timeout:3000});
-    await ownBlock.evaluate(el=>el.open=true);
+    expect(await page.evaluate(()=>new URL(location.href).searchParams.get('focus')===null),'desktop disclosure: initial URL unexpectedly has focus');
+    expect(!(await page.locator('.dc-artifact-overlay').isVisible()),'desktop disclosure: Artifact overlay unexpectedly visible before summary click');
+
+    // Regression: real Relations controls inside a movable Artifact remain outside
+    // drag + deeplink card-body ownership, and native disclosure survives rebuild.
+    const positionWritesBeforeSummary=await positionWriteCount(page);
+    await ownBlock.locator('summary').click();
+    await page.locator('.dc-notice[data-artifact-owned="1"] [data-relation-block][open]').waitFor({state:'attached',timeout:3000});
+    expect((await positionWriteCount(page))===positionWritesBeforeSummary,'desktop disclosure: summary pointer entered movable-card drag owner');
+    expect(await page.evaluate(()=>new URL(location.href).searchParams.get('focus')===null),'desktop disclosure: summary click created Artifact focus deeplink');
+    expect(!(await page.locator('.dc-artifact-overlay').isVisible()),'desktop disclosure: summary click opened Artifact overlay');
+    await page.evaluate(()=>{
+      globalThis.__QA_RELATION_OPEN_BLOCK__=document.querySelector('.dc-notice[data-artifact-owned="1"] [data-relation-block]');
+      window.dispatchEvent(new CustomEvent('dc:board-projections-updated'));
+    });
+    await page.waitForFunction(()=>{
+      const current=document.querySelector('.dc-notice[data-artifact-owned="1"] [data-relation-block]');
+      return Boolean(current&&current!==globalThis.__QA_RELATION_OPEN_BLOCK__&&current.open===true);
+    },null,{timeout:3000});
+    expect(await ownBlock.evaluate(el=>el.open===true),'desktop disclosure: open state lost across canonical Relations presentation rebuild');
+    expect(await page.evaluate(()=>new URL(location.href).searchParams.get('focus')===null),'desktop disclosure: canonical rebuild created Artifact focus deeplink');
+    expect(!(await page.locator('.dc-artifact-overlay').isVisible()),'desktop disclosure: canonical rebuild opened Artifact overlay');
+
+    const rebuiltOwnBlock=page.locator('.dc-notice[data-artifact-owned="1"] [data-relation-block]');
+    const positionWritesBeforeAdd=await positionWriteCount(page);
+    await rebuiltOwnBlock.locator('[data-relation-add]').click();
+    await rebuiltOwnBlock.locator('[data-relation-form]').waitFor({state:'visible',timeout:2000});
+    expect((await positionWriteCount(page))===positionWritesBeforeAdd,'desktop controls: ＋ СВЯЗЬ pointer entered movable-card drag owner');
+    const boundarySelect=rebuiltOwnBlock.locator('[data-relation-choice]');
+    const positionWritesBeforeSelect=await positionWriteCount(page);
+    await boundarySelect.click();
+    expect((await positionWriteCount(page))===positionWritesBeforeSelect,'desktop controls: select pointer entered movable-card drag owner');
+    await rebuiltOwnBlock.locator('[data-relation-cancel]').click();
+
+    // Canonical card-body behavior remains unchanged: ordinary body click writes
+    // Artifact focus and the existing fullscreen owner opens the Artifact overlay.
+    const ownCardForFocus=page.locator('.dc-notice[data-artifact-owned="1"]');
+    const cardBodyPoint=await ownCardForFocus.evaluate(card=>{
+      const candidates=[...card.querySelectorAll('p,h1,h2,h3,.dc-notice__body,.dc-notice__content')];
+      const node=candidates.find(candidate=>!candidate.closest('a,button,input,textarea,select,label,summary,dialog,[contenteditable="true"]'));
+      return node?{selector:null,text:(node.textContent||'').trim().slice(0,80)}:null;
+    });
+    const ordinaryTarget=cardBodyPoint?.text
+      ? ownCardForFocus.getByText(cardBodyPoint.text,{exact:false}).first()
+      : ownCardForFocus;
+    await ordinaryTarget.click({position:cardBodyPoint?.text?undefined:{x:24,y:24}});
+    await page.waitForFunction(()=>new URL(location.href).searchParams.get('focus')==='artifact:11111111-1111-4111-8111-111111111111',{timeout:2500});
+    const bodyOverlay=page.locator('.dc-artifact-overlay');
+    await bodyOverlay.waitFor({state:'visible',timeout:3000});
+    await bodyOverlay.locator('.dc-artifact-overlay__close').click();
+    await bodyOverlay.waitFor({state:'hidden',timeout:2500});
+    await page.waitForFunction(()=>new URL(location.href).searchParams.get('focus')===null,{timeout:2500});
+
     const ownText=(await ownBlock.innerText()).replace(/\s+/g,' ');
     expect(ownText.includes('СВЯЗАНО С')&&ownText.includes('QA EVENT'),`desktop detail: RELATED_TO missing ${ownText}`);
     expect(ownText.includes('О')&&ownText.includes('QA COURSE'),`desktop detail: ABOUT forward presentation missing ${ownText}`);
@@ -313,15 +366,22 @@ try{
     });
     await page.waitForTimeout(180);
     await ownBlock.evaluate(el=>el.open=true);
+    const positionWritesBeforeCreateAdd=await positionWriteCount(page);
     await ownBlock.locator('[data-relation-add]').click();
+    expect((await positionWriteCount(page))===positionWritesBeforeCreateAdd,'desktop create: ＋ СВЯЗЬ started movable-card drag');
     const select=ownBlock.locator('[data-relation-choice]');
     const option=await select.locator('option').evaluateAll(options=>options.map(o=>({value:o.value,text:o.textContent||''})).find(o=>o.text.includes('ОТЧЁТ ПО')&&o.text.includes('QA EVENT')));
     expect(Boolean(option),'desktop create: REPORT_OF target option missing');
     if(option){
+      const positionWritesBeforeCreateSelect=await positionWriteCount(page);
+      await select.click();
+      expect((await positionWriteCount(page))===positionWritesBeforeCreateSelect,'desktop create: select started movable-card drag');
       await select.selectOption(option.value);
+      const positionWritesBeforeSave=await positionWriteCount(page);
       await ownBlock.locator('[data-relation-save]').click();
       await page.waitForFunction(()=>globalThis.__QA_RPC_CALLS__.some(call=>call.name==='dc_board_relation_create_v1'),{timeout:2500});
       await page.waitForFunction(()=>document.querySelectorAll('.dc-board-relation-line:not([hidden])').length===4,{timeout:3000});
+      expect((await positionWriteCount(page))===positionWritesBeforeSave,'desktop create: СОХРАНИТЬ started movable-card drag');
     }
 
     // Server permission reject must fail closed and preserve canonical index.
@@ -346,9 +406,11 @@ try{
 
     // Delete is explicit logical-delete RPC; presentation re-reads canonical truth.
     const aboutDelete=page.locator('.dc-notice[data-artifact-owned="1"] [data-relation-id="77777777-7777-4777-8777-777777777772"] [data-relation-delete]');
+    const positionWritesBeforeDelete=await positionWriteCount(page);
     await aboutDelete.click();
     await page.waitForFunction(()=>globalThis.__QA_RPC_CALLS__.some(call=>call.name==='dc_board_relation_delete_v1'&&call.args?.p_relation_id==='77777777-7777-4777-8777-777777777772'),{timeout:2500});
     await page.waitForFunction(()=>!document.querySelector('.dc-board-relation-line[data-relation-id="77777777-7777-4777-8777-777777777772"]'),{timeout:2500});
+    expect((await positionWriteCount(page))===positionWritesBeforeDelete,'desktop delete: delete control started movable-card drag');
 
     expect(!errors.length,`desktop page errors: ${errors.join(' | ')}`);
     await page.screenshot({path:path.join(outDir,'desktop.png'),fullPage:false});
