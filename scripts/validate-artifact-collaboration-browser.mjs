@@ -672,8 +672,7 @@ try{
     expect(classification==='D1','mobile Artifact-detail Relations owner regression '+JSON.stringify({classification,...detailTrace}));
   }
 
-  // Durable native keyboard acceptance: prove current focus ownership immediately
-  // before one browser keyboard delivery, then assert the current canonical block stays open.
+  // Durable native keyboard acceptance: event truth is captured at the real keydown.
   for(const key of ['Enter',' ']){
     const{ctx,page,errors}=await openBoard(browser,'relations');
     const card=page.locator('.dc-notice[data-artifact="'+A+'"]');
@@ -681,24 +680,36 @@ try{
     await summary.waitFor({state:'visible',timeout:6000});
     await summary.focus();
 
-    const focusProof=await page.evaluate(artifactId=>{
-      const currentSummary=document.querySelector('.dc-notice[data-artifact="'+artifactId+'"] [data-relation-block] summary');
-      const active=document.activeElement;
-      return{
-        activeIsCurrentSummary:Boolean(currentSummary&&active===currentSummary),
-        currentSummaryConnected:Boolean(currentSummary?.isConnected),
-        activeConnected:Boolean(active?.isConnected),
-        canonicalIdentity:Boolean(currentSummary&&active===currentSummary&&currentSummary===document.querySelector('.dc-notice[data-artifact="'+artifactId+'"] [data-relation-block] summary')),
-        focus:new URL(location.href).searchParams.get('focus'),
-        overlay:Boolean(document.querySelector('.dc-artifact-overlay:not([hidden])'))
-      };
+    await page.evaluate(artifactId=>{
+      globalThis.__QA_RELATION_KEYDOWN__=null;
+      document.addEventListener('keydown',event=>{
+        const currentSummary=document.querySelector('.dc-notice[data-artifact="'+artifactId+'"] [data-relation-block] summary');
+        const active=document.activeElement;
+        globalThis.__QA_RELATION_KEYDOWN__={
+          key:event.key,
+          target:event.target?.outerHTML?.slice(0,240)||null,
+          active:active?.outerHTML?.slice(0,240)||null,
+          targetIsCurrentSummary:Boolean(currentSummary&&event.target===currentSummary),
+          activeIsEventTarget:Boolean(active&&active===event.target),
+          currentSummaryConnected:Boolean(currentSummary?.isConnected),
+          focus:new URL(location.href).searchParams.get('focus'),
+          overlay:Boolean(document.querySelector('.dc-artifact-overlay:not([hidden])')),
+          blockOpen:Boolean(document.querySelector('.dc-notice[data-artifact="'+artifactId+'"] [data-relation-block]')?.open)
+        };
+      },{capture:true,once:true});
     },A);
 
-    if(!focusProof.activeIsCurrentSummary||!focusProof.currentSummaryConnected||!focusProof.activeConnected||!focusProof.canonicalIdentity){
-      throw new Error('RELATION_KEYBOARD_FOCUS_TARGET_MISMATCH '+JSON.stringify({key,focusProof}));
-    }
-
     await page.keyboard.press(key);
+
+    const keydown=await page.evaluate(()=>globalThis.__QA_RELATION_KEYDOWN__);
+    if(
+      !keydown
+      ||keydown.key!==key
+      ||keydown.targetIsCurrentSummary!==true
+      ||keydown.currentSummaryConnected!==true
+    ){
+      throw new Error('RELATION_KEYBOARD_EVENT_TARGET_MISMATCH '+JSON.stringify({key,keydown}));
+    }
 
     await page.waitForFunction(artifactId=>{
       const current=document.querySelector('.dc-notice[data-artifact="'+artifactId+'"] [data-relation-block]');
