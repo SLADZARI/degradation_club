@@ -202,6 +202,265 @@ async function openBoard(browser,mode,viewport={width:1440,height:900},options={
  return{ctx,page,errors};
 }
 
+async function installRelationTargetRetargetTrace(page,artifactId=A){
+  return page.evaluate(artifactId=>{
+    const cardSelector='.dc-notice[data-artifact="'+artifactId+'"]';
+    const blockSelector=cardSelector+' [data-relation-block]';
+    const summarySelector=blockSelector+' summary';
+    const trace=[];
+    const ids=new WeakMap();
+    let seq=0;
+    const id=node=>{
+      if(!node||typeof node!=='object')return null;
+      if(!ids.has(node))ids.set(node,'n'+(++seq));
+      return ids.get(node);
+    };
+    const describe=node=>{
+      if(!node||node.nodeType!==1)return String(node?.nodeName||node||'');
+      const el=node;
+      const out=[el.tagName.toLowerCase()];
+      if(el.id)out.push('#'+el.id);
+      if(el.classList?.length)out.push('.'+[...el.classList].slice(0,4).join('.'));
+      if(el.hasAttribute?.('data-artifact'))out.push('[data-artifact="'+el.getAttribute('data-artifact')+'"]');
+      if(el.hasAttribute?.('data-relation-block'))out.push('[data-relation-block]');
+      return out.join('');
+    };
+    const currentCard=()=>document.querySelector(cardSelector);
+    const currentBlock=()=>document.querySelector(blockSelector);
+    const currentSummary=()=>document.querySelector(summarySelector);
+    const overlayOpen=()=>Boolean(document.querySelector('.dc-artifact-overlay:not([hidden])'));
+    const focus=()=>new URL(location.href).searchParams.get('focus');
+    const stack=()=>String(new Error().stack||'').split('\n').slice(2,8).join(' <- ');
+    const initialBlock=currentBlock();
+    const initialSummary=currentSummary();
+    const push=(kind,data={})=>{
+      const entry={
+        order:trace.length+1,
+        t:Math.round(performance.now()*1000)/1000,
+        kind,
+        focus:focus(),
+        overlayOpen:overlayOpen(),
+        currentBlockId:id(currentBlock()),
+        currentSummaryId:id(currentSummary()),
+        ...data
+      };
+      trace.push(entry);
+      if(trace.length>160)trace.splice(0,trace.length-160);
+      return entry;
+    };
+    const eventData=event=>({
+      type:event.type,
+      eventPhase:event.eventPhase,
+      pointerType:event.pointerType||((event.touches||event.changedTouches)?'touch':null),
+      isTrusted:event.isTrusted,
+      defaultPrevented:event.defaultPrevented,
+      cancelBubble:event.cancelBubble,
+      target:describe(event.target),
+      targetId:id(event.target),
+      targetIsInitialSummary:event.target===initialSummary,
+      targetIsCurrentSummary:event.target===currentSummary(),
+      closestCardId:id(event.target?.closest?.(cardSelector)),
+      clientX:Number.isFinite(event.clientX)?event.clientX:null,
+      clientY:Number.isFinite(event.clientY)?event.clientY:null,
+      pointTarget:(Number.isFinite(event.clientX)&&Number.isFinite(event.clientY))?describe(document.elementFromPoint(event.clientX,event.clientY)):null,
+      pointTargetId:(Number.isFinite(event.clientX)&&Number.isFinite(event.clientY))?id(document.elementFromPoint(event.clientX,event.clientY)):null
+    });
+
+    for(const type of ['pointerdown','pointerup','pointercancel','touchstart','touchend','click']){
+      document.addEventListener(type,event=>{
+        const path=event.composedPath?.()||[];
+        if(path.includes(initialSummary)||path.includes(initialBlock)||path.includes(currentSummary())||path.includes(currentBlock())||path.includes(currentCard())){
+          push('event-capture',eventData(event));
+        }
+      },true);
+      document.addEventListener(type,event=>{
+        const path=event.composedPath?.()||[];
+        if(path.includes(initialSummary)||path.includes(initialBlock)||path.includes(currentSummary())||path.includes(currentBlock())||path.includes(currentCard())){
+          push('event-bubble',eventData(event));
+        }
+      },false);
+    }
+
+    document.addEventListener('dc:board-focus-target',event=>{
+      const node=event.detail?.node||null;
+      push('board-focus-target',{
+        open:event.detail?.open??null,
+        source:event.detail?.source||null,
+        node:describe(node),
+        nodeId:id(node),
+        stack:stack()
+      });
+    },true);
+
+    const originalPushState=History.prototype.pushState;
+    const originalReplaceState=History.prototype.replaceState;
+    History.prototype.pushState=function(...args){
+      const before=location.href;
+      const result=originalPushState.apply(this,args);
+      push('history.pushState',{before,after:location.href,stack:stack()});
+      return result;
+    };
+    History.prototype.replaceState=function(...args){
+      const before=location.href;
+      const result=originalReplaceState.apply(this,args);
+      push('history.replaceState',{before,after:location.href,stack:stack()});
+      return result;
+    };
+
+    const originalRemove=Element.prototype.remove;
+    Element.prototype.remove=function(...args){
+      const isRelation=this===currentBlock()||this===initialBlock||this.matches?.(blockSelector);
+      if(isRelation)push('relation-remove-call',{node:describe(this),nodeId:id(this),wasCurrent:this===currentBlock(),stack:stack()});
+      return originalRemove.apply(this,args);
+    };
+    const originalInsertAdjacentHTML=Element.prototype.insertAdjacentHTML;
+    Element.prototype.insertAdjacentHTML=function(position,html){
+      const relevant=typeof html==='string'&&html.includes('data-relation-block')&&(this.closest?.(cardSelector)||this.matches?.(cardSelector));
+      if(relevant)push('relation-insert-call',{host:describe(this),hostId:id(this),position,stack:stack()});
+      const result=originalInsertAdjacentHTML.call(this,position,html);
+      if(relevant)push('relation-insert-complete',{newBlock:describe(currentBlock()),newBlockId:id(currentBlock()),newSummaryId:id(currentSummary())});
+      return result;
+    };
+
+    const card=currentCard();
+    if(card){
+      let lastBlock=currentBlock();
+      const observer=new MutationObserver(()=>{
+        const next=currentBlock();
+        if(next!==lastBlock){
+          push('relation-block-replaced',{
+            oldBlockId:id(lastBlock),
+            newBlockId:id(next),
+            oldWasInitial:lastBlock===initialBlock,
+            newOpen:Boolean(next?.open)
+          });
+          lastBlock=next;
+        }
+      });
+      observer.observe(card,{subtree:true,childList:true});
+    }
+
+    const overlayObserver=new MutationObserver(()=>{
+      push('overlay-mutation',{
+        overlay:describe(document.querySelector('.dc-artifact-overlay')),
+        overlayId:id(document.querySelector('.dc-artifact-overlay'))
+      });
+    });
+    overlayObserver.observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['hidden','class']});
+
+    push('trace-start',{
+      initialBlockId:id(initialBlock),
+      initialSummaryId:id(initialSummary),
+      initialBlockOpen:Boolean(initialBlock?.open),
+      stabilityFrames:Number(globalThis.__QA_RELATION_PRESENTATION_STABILITY_READY__?.stableFrames||0),
+      stabilityNodeMatches:Boolean(globalThis.__QA_RELATION_PRESENTATION_STABILITY_READY__?.node===initialBlock)
+    });
+
+    globalThis.__QA_RELATION_RETARGET_TRACE__={
+      trace,
+      initialBlock,
+      initialSummary,
+      read:()=>({
+        trace:trace.slice(),
+        final:{
+          focus:focus(),
+          overlayOpen:overlayOpen(),
+          currentBlockId:id(currentBlock()),
+          currentSummaryId:id(currentSummary()),
+          currentOpen:Boolean(currentBlock()?.open),
+          initialBlockConnected:Boolean(initialBlock?.isConnected),
+          initialSummaryConnected:Boolean(initialSummary?.isConnected)
+        }
+      })
+    };
+    return globalThis.__QA_RELATION_RETARGET_TRACE__.read();
+  },artifactId);
+}
+
+async function readRelationTargetRetargetTrace(page){
+  return page.evaluate(()=>globalThis.__QA_RELATION_RETARGET_TRACE__?.read?.()||null);
+}
+
+async function settleRelationTargetRetargetTrace(page){
+  await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+}
+
+async function runRelationTargetRetargetDiagnostic(browser,method){
+  const{ctx,page,errors}=await openBoard(browser,'relations',{width:390,height:844},{hasTouch:true});
+  const card=page.locator('.dc-notice[data-artifact="'+A+'"]');
+  const summary=card.locator('[data-relation-block] summary');
+  await summary.waitFor({state:'visible',timeout:6000});
+  const box=await summary.boundingBox();
+  if(!box)throw new Error('RELATION_TARGET_RETARGET_NO_SUMMARY_BOX');
+  const point={x:box.x+box.width/2,y:box.y+box.height/2};
+  const before=await installRelationTargetRetargetTrace(page,A);
+  if(method==='locator.tap'){
+    await summary.tap();
+  }else if(method==='touchscreen.tap'){
+    await page.touchscreen.tap(point.x,point.y);
+  }else throw new Error('RELATION_TARGET_RETARGET_UNKNOWN_METHOD '+method);
+  await settleRelationTargetRetargetTrace(page);
+  const after=await readRelationTargetRetargetTrace(page);
+  await ctx.close();
+  return{method,point,before,after,errors};
+}
+
+function summarizeRelationTargetRetarget(diag){
+  const trace=diag?.after?.trace||[];
+  const first=(predicate)=>trace.find(predicate)||null;
+  const pointerdown=first(item=>item.kind==='event-capture'&&item.type==='pointerdown');
+  const click=first(item=>item.kind==='event-capture'&&item.type==='click');
+  const remove=first(item=>item.kind==='relation-remove-call');
+  const insert=first(item=>item.kind==='relation-insert-complete');
+  const replaced=first(item=>item.kind==='relation-block-replaced');
+  const focusWrite=first(item=>(item.kind==='history.pushState'||item.kind==='history.replaceState')&&String(item.after||'').includes('focus=artifact%3A'));
+  const focusEvent=first(item=>item.kind==='board-focus-target'&&item.open===true);
+  const fullscreen=first(item=>item.kind==='overlay-mutation'&&item.overlayOpen===true);
+  const ordered=[pointerdown,remove,insert,replaced,click,focusWrite,focusEvent,fullscreen].filter(Boolean).map(item=>({
+    order:item.order,
+    kind:item.kind,
+    type:item.type||null,
+    target:item.target||null,
+    targetId:item.targetId||null,
+    targetIsInitialSummary:item.targetIsInitialSummary??null,
+    targetIsCurrentSummary:item.targetIsCurrentSummary??null,
+    focus:item.focus,
+    overlayOpen:item.overlayOpen,
+    currentBlockId:item.currentBlockId,
+    currentSummaryId:item.currentSummaryId
+  }));
+  let variant='UNRESOLVED';
+  if(click){
+    if(click.targetIsInitialSummary||click.targetIsCurrentSummary)variant='CLICK_STILL_ON_SUMMARY';
+    else variant='CLICK_RETARGETED_AWAY_FROM_SUMMARY';
+  }
+  return{
+    method:diag.method,
+    point:diag.point,
+    variant,
+    pointerdown:pointerdown?{
+      order:pointerdown.order,target:pointerdown.target,targetId:pointerdown.targetId,
+      targetIsInitialSummary:pointerdown.targetIsInitialSummary,targetIsCurrentSummary:pointerdown.targetIsCurrentSummary,
+      pointTarget:pointerdown.pointTarget,pointTargetId:pointerdown.pointTargetId
+    }:null,
+    click:click?{
+      order:click.order,target:click.target,targetId:click.targetId,
+      targetIsInitialSummary:click.targetIsInitialSummary,targetIsCurrentSummary:click.targetIsCurrentSummary,
+      pointTarget:click.pointTarget,pointTargetId:click.pointTargetId
+    }:null,
+    relationRemove:remove?{order:remove.order,nodeId:remove.nodeId,wasCurrent:remove.wasCurrent,stack:remove.stack}:null,
+    relationInsert:insert?{order:insert.order,newBlockId:insert.newBlockId,newSummaryId:insert.newSummaryId}:null,
+    relationReplacement:replaced?{order:replaced.order,oldBlockId:replaced.oldBlockId,newBlockId:replaced.newBlockId,newOpen:replaced.newOpen}:null,
+    focusWrite:focusWrite?{order:focusWrite.order,kind:focusWrite.kind,before:focusWrite.before,after:focusWrite.after,stack:focusWrite.stack}:null,
+    focusEvent:focusEvent?{order:focusEvent.order,node:focusEvent.node,nodeId:focusEvent.nodeId,source:focusEvent.source,stack:focusEvent.stack}:null,
+    fullscreen:fullscreen?{order:fullscreen.order,focus:fullscreen.focus,overlayOpen:fullscreen.overlayOpen}:null,
+    ordered,
+    final:diag.after?.final||null,
+    errors:diag.errors||[],
+    trace
+  };
+}
+
 const browser=await chromium.launch({headless:true});
 try{
   // COMMUNITY regression + IDEA-only composer visibility.
@@ -393,82 +652,13 @@ try{
     expect(!errors.length,'card-body open errors: '+errors.join(' | '));await ctx.close();
   }
 
-  // Mobile Relations acceptance starts only after canonical presentation stability.
-  const touchRuns=[390,390,390,360];
-  for(let runIndex=0;runIndex<touchRuns.length;runIndex++){
-    const width=touchRuns[runIndex];
-    const{ctx,page,errors}=await openBoard(browser,'relations',{width,height:844},{hasTouch:true});
-    const card=page.locator('.dc-notice[data-artifact="'+A+'"]');
-    const summary=card.locator('[data-relation-block] summary');
-    await summary.waitFor({state:'visible',timeout:6000});
-
-    const stableReady=await page.evaluate(artifactId=>{
-      const current=document.querySelector('.dc-notice[data-artifact="'+artifactId+'"] [data-relation-block]');
-      const state=globalThis.__QA_RELATION_PRESENTATION_STABILITY_READY__;
-      return{
-        same:Boolean(state?.node&&state.node===current&&current?.isConnected),
-        stableFrames:Number(state?.stableFrames||0),
-        open:Boolean(current?.open),
-        focus:new URL(location.href).searchParams.get('focus'),
-        overlay:Boolean(document.querySelector('.dc-artifact-overlay:not([hidden])')),
-        boardJustDragged:document.querySelector('.dc-notice[data-artifact="'+artifactId+'"]')?.dataset.boardJustDragged||null,
-        viewportPanning:Boolean(document.querySelector('.dc-spatial-viewport')?.classList.contains('is-panning'))
-      };
-    },A);
-    if(!stableReady.same||stableReady.stableFrames<2)throw new Error('RELATION_PRESENTATION_STABILITY_LOST_BEFORE_TAP '+JSON.stringify({width,runIndex,stableReady}));
-
-    await page.evaluate(()=>{
-      const viewport=document.querySelector('.dc-spatial-viewport');
-      globalThis.__QA_RELATION_SUMMARY_STARTED_PAN__=false;
-      viewport?.addEventListener('pointerdown',event=>{
-        if(event.target.closest?.('[data-relation-block] summary')&&viewport.classList.contains('is-panning'))globalThis.__QA_RELATION_SUMMARY_STARTED_PAN__=true;
-      },{once:true});
-    });
-
-    const before=await page.evaluate(artifactId=>({
-      focus:new URL(location.href).searchParams.get('focus'),
-      overlay:Boolean(document.querySelector('.dc-artifact-overlay:not([hidden])')),
-      boardJustDragged:document.querySelector('.dc-notice[data-artifact="'+artifactId+'"]')?.dataset.boardJustDragged||null,
-      viewportPanning:Boolean(document.querySelector('.dc-spatial-viewport')?.classList.contains('is-panning'))
-    }),A);
-
-    await summary.tap();
-    try{
-      await card.locator('[data-relation-block][open]').waitFor({state:'attached',timeout:6000});
-    }catch(error){
-      const afterFailure=await page.evaluate(artifactId=>({
-        currentOpen:Boolean(document.querySelector('.dc-notice[data-artifact="'+artifactId+'"] [data-relation-block]')?.open),
-        focus:new URL(location.href).searchParams.get('focus'),
-        overlay:Boolean(document.querySelector('.dc-artifact-overlay:not([hidden])')),
-        boardJustDragged:document.querySelector('.dc-notice[data-artifact="'+artifactId+'"]')?.dataset.boardJustDragged||null,
-        viewportPanning:Boolean(document.querySelector('.dc-spatial-viewport')?.classList.contains('is-panning')),
-        panStarted:Boolean(globalThis.__QA_RELATION_SUMMARY_STARTED_PAN__),
-        stabilityFrames:Number(globalThis.__QA_RELATION_PRESENTATION_STABILITY_READY__?.stableFrames||0),
-        stabilityNodeStillCurrent:Boolean(
-          globalThis.__QA_RELATION_PRESENTATION_STABILITY_READY__?.node
-          &&globalThis.__QA_RELATION_PRESENTATION_STABILITY_READY__.node===document.querySelector('.dc-notice[data-artifact="'+artifactId+'"] [data-relation-block]')
-        )
-      }),A);
-      throw new Error('RELATION_MOBILE_TAP_AFTER_STABLE_READINESS '+JSON.stringify({width,runIndex,before,afterFailure}));
-    }
-
-    const after=await page.evaluate(artifactId=>({
-      currentOpen:Boolean(document.querySelector('.dc-notice[data-artifact="'+artifactId+'"] [data-relation-block]')?.open),
-      focus:new URL(location.href).searchParams.get('focus'),
-      overlay:Boolean(document.querySelector('.dc-artifact-overlay:not([hidden])')),
-      boardJustDragged:document.querySelector('.dc-notice[data-artifact="'+artifactId+'"]')?.dataset.boardJustDragged||null,
-      viewportPanning:Boolean(document.querySelector('.dc-spatial-viewport')?.classList.contains('is-panning')),
-      panStarted:Boolean(globalThis.__QA_RELATION_SUMMARY_STARTED_PAN__)
-    }),A);
-
-    expect(after.currentOpen===true,`mobile ${width} run ${runIndex+1}: relation summary tap did not leave canonical details open`);
-    expect(after.panStarted===false&&!after.viewportPanning,`mobile ${width} run ${runIndex+1}: relation summary initiated Board pan`);
-    expect(after.boardJustDragged===before.boardJustDragged,`mobile ${width} run ${runIndex+1}: relation summary entered card drag owner`);
-    expect(after.focus===null,`mobile ${width} run ${runIndex+1}: relation summary wrote focus URL ${after.focus}`);
-    expect(after.overlay===false,`mobile ${width} run ${runIndex+1}: relation summary opened Artifact fullscreen`);
-    expect(!errors.length,`mobile ${width} run ${runIndex+1}: relation summary errors: ${errors.join(' | ')}`);
-    await ctx.close();
-  }
+  // Diagnostic-only target/retarget sequence on one stable 390px touch viewport.
+  const locatorTapDiag=await runRelationTargetRetargetDiagnostic(browser,'locator.tap');
+  const touchscreenTapDiag=await runRelationTargetRetargetDiagnostic(browser,'touchscreen.tap');
+  throw new Error('RELATION_TARGET_RETARGET_SEQUENCE '+JSON.stringify({
+    locatorTap:summarizeRelationTargetRetarget(locatorTapDiag),
+    touchscreenTap:summarizeRelationTargetRetarget(touchscreenTapDiag)
+  }));
 
   // Existing 390/360 layout + Artifact detail mobile proof.
   for(const width of [390,360]){
