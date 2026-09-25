@@ -426,61 +426,106 @@ try{
     expect(!errors.length,'card-body open errors: '+errors.join(' | '));await ctx.close();
   }
 
-  // Mobile acceptance uses coordinate touchscreen input because locator.tap()
-  // was proven to retarget to .dc-board-open-hint while browser hit-testing
-  // resolved the same visible point to the current Relations summary.
+  // Mobile acceptance resolves canonical summary + geometry + browser hit-test atomically.
+  // locator.tap() is intentionally not used: it was proven to retarget to .dc-board-open-hint
+  // while coordinate browser hit-testing resolved the same visible point to Relations summary.
   for(const [runIndex,width] of [390,390,390,360].entries()){
     const{ctx,page,errors}=await openBoard(browser,'relations',{width,height:844},{hasTouch:true});
-    const card=page.locator('.dc-notice[data-artifact="'+A+'"]');
-    const summary=card.locator('[data-relation-block] summary');
-    await summary.waitFor({state:'visible',timeout:6000});
 
-    const box=await summary.boundingBox();
-    if(!box)throw new Error('RELATION_MOBILE_HIT_TARGET_MISMATCH '+JSON.stringify({width,runIndex,reason:'NO_BOUNDING_BOX'}));
-    const center={x:box.x+box.width/2,y:box.y+box.height/2};
+    try{
+      const ready=await page.waitForFunction(artifactId=>{
+        const card=document.querySelector('.dc-notice[data-artifact="'+artifactId+'"]');
+        const block=card?.querySelector('[data-relation-block]');
+        const summary=block?.querySelector('summary');
+        if(!card||!block||!summary||!summary.isConnected)return false;
+        const rect=summary.getBoundingClientRect();
+        if(!(rect.width>0&&rect.height>0))return false;
+        const x=rect.left+rect.width/2;
+        const y=rect.top+rect.height/2;
+        const hit=document.elementFromPoint(x,y);
+        if(!(hit&&(hit===summary||summary.contains(hit))))return false;
+        globalThis.__QA_RELATION_MOBILE_CANONICAL_HIT__={
+          x,y,
+          focus:new URL(location.href).searchParams.get('focus'),
+          overlay:Boolean(document.querySelector('.dc-artifact-overlay:not([hidden])')),
+          viewportPanning:Boolean(document.querySelector('.dc-spatial-viewport')?.classList.contains('is-panning')),
+          boardDragging:document.documentElement.dataset.boardDragging||null,
+          positionWrites:Number(globalThis.__QA_POSITION_WRITES__||0)
+        };
+        return true;
+      },A,{timeout:6000,polling:'raf'});
+      await ready.dispose();
+    }catch(error){
+      throw new Error('RELATION_MOBILE_CANONICAL_HIT_TIMEOUT '+JSON.stringify({width,runIndex}));
+    }
 
-    const hit=await page.evaluate(({artifactId,x,y})=>{
-      const currentSummary=document.querySelector('.dc-notice[data-artifact="'+artifactId+'"] [data-relation-block] summary');
-      const target=document.elementFromPoint(x,y);
-      return{
-        ok:Boolean(currentSummary&&target&&(target===currentSummary||currentSummary.contains(target))),
-        target:target?.outerHTML?.slice(0,240)||null,
-        summary:currentSummary?.outerHTML?.slice(0,240)||null,
-        focus:new URL(location.href).searchParams.get('focus'),
-        overlay:Boolean(document.querySelector('.dc-artifact-overlay:not([hidden])')),
-        boardJustDragged:document.querySelector('.dc-notice[data-artifact="'+artifactId+'"]')?.dataset.boardJustDragged||null,
-        viewportPanning:Boolean(document.querySelector('.dc-spatial-viewport')?.classList.contains('is-panning')),
-        positionWrites:Number(globalThis.__QA_POSITION_WRITES__||0)
-      };
-    },{artifactId:A,x:center.x,y:center.y});
-    if(!hit.ok)throw new Error('RELATION_MOBILE_HIT_TARGET_MISMATCH '+JSON.stringify({width,runIndex,center,hit}));
+    const hit=await page.evaluate(()=>globalThis.__QA_RELATION_MOBILE_CANONICAL_HIT__);
+    const center={x:hit.x,y:hit.y};
 
-    await page.evaluate(()=>{
+    await page.evaluate(artifactId=>{
       const viewport=document.querySelector('.dc-spatial-viewport');
       globalThis.__QA_RELATION_SUMMARY_STARTED_PAN__=false;
+      globalThis.__QA_RELATION_MOBILE_POINTERDOWN__=null;
+
+      document.addEventListener('pointerdown',event=>{
+        const card=document.querySelector('.dc-notice[data-artifact="'+artifactId+'"]');
+        const block=card?.querySelector('[data-relation-block]');
+        const summary=block?.querySelector('summary');
+        const targetInside=Boolean(summary&&event.target&&(event.target===summary||summary.contains(event.target)));
+        globalThis.__QA_RELATION_MOBILE_POINTERDOWN__={
+          pointerType:event.pointerType||null,
+          target:event.target?.outerHTML?.slice(0,240)||null,
+          targetInsideCurrentSummary:targetInside,
+          currentSummaryConnected:Boolean(summary?.isConnected),
+          focus:new URL(location.href).searchParams.get('focus'),
+          overlay:Boolean(document.querySelector('.dc-artifact-overlay:not([hidden])')),
+          viewportPanning:Boolean(viewport?.classList.contains('is-panning')),
+          boardDragging:document.documentElement.dataset.boardDragging||null,
+          positionWrites:Number(globalThis.__QA_POSITION_WRITES__||0)
+        };
+      },{capture:true,once:true});
+
       viewport?.addEventListener('pointerdown',event=>{
         if(event.target.closest?.('[data-relation-block] summary')&&viewport.classList.contains('is-panning'))globalThis.__QA_RELATION_SUMMARY_STARTED_PAN__=true;
       },{once:true});
-    });
+    },A);
 
     await page.touchscreen.tap(center.x,center.y);
-    await card.locator('[data-relation-block][open]').waitFor({state:'attached',timeout:6000});
+
+    const pointerdown=await page.evaluate(()=>globalThis.__QA_RELATION_MOBILE_POINTERDOWN__);
+    if(
+      !pointerdown
+      ||pointerdown.pointerType!=='touch'
+      ||pointerdown.targetInsideCurrentSummary!==true
+      ||pointerdown.currentSummaryConnected!==true
+    ){
+      throw new Error('RELATION_MOBILE_POINTER_TARGET_MISMATCH '+JSON.stringify({width,runIndex,center,pointerdown}));
+    }
+
+    await page.waitForFunction(artifactId=>{
+      const current=document.querySelector('.dc-notice[data-artifact="'+artifactId+'"] [data-relation-block]');
+      return Boolean(current&&current.isConnected&&current.open===true);
+    },A,{timeout:6000});
 
     const after=await page.evaluate(artifactId=>({
       open:Boolean(document.querySelector('.dc-notice[data-artifact="'+artifactId+'"] [data-relation-block]')?.open),
       focus:new URL(location.href).searchParams.get('focus'),
       overlay:Boolean(document.querySelector('.dc-artifact-overlay:not([hidden])')),
-      boardJustDragged:document.querySelector('.dc-notice[data-artifact="'+artifactId+'"]')?.dataset.boardJustDragged||null,
       viewportPanning:Boolean(document.querySelector('.dc-spatial-viewport')?.classList.contains('is-panning')),
       panStarted:Boolean(globalThis.__QA_RELATION_SUMMARY_STARTED_PAN__),
+      boardDragging:document.documentElement.dataset.boardDragging||null,
       positionWrites:Number(globalThis.__QA_POSITION_WRITES__||0)
     }),A);
 
+    expect(pointerdown.focus===null,`mobile ${width} run ${runIndex+1}: focus existed at pointerdown`);
+    expect(pointerdown.overlay===false,`mobile ${width} run ${runIndex+1}: Artifact overlay existed at pointerdown`);
+    expect(pointerdown.boardDragging===null,`mobile ${width} run ${runIndex+1}: pointerdown entered card drag owner`);
+    expect(pointerdown.positionWrites===hit.positionWrites,`mobile ${width} run ${runIndex+1}: position write occurred before pointerdown acceptance`);
     expect(after.open===true,`mobile ${width} run ${runIndex+1}: current Relations block not open after coordinate touch`);
     expect(after.focus===null,`mobile ${width} run ${runIndex+1}: coordinate touch wrote focus URL ${after.focus}`);
     expect(after.overlay===false,`mobile ${width} run ${runIndex+1}: coordinate touch opened Artifact fullscreen`);
     expect(after.panStarted===false&&!after.viewportPanning,`mobile ${width} run ${runIndex+1}: coordinate touch initiated Board pan`);
-    expect(after.boardJustDragged===hit.boardJustDragged,`mobile ${width} run ${runIndex+1}: coordinate touch entered card drag owner`);
+    expect(after.boardDragging===null,`mobile ${width} run ${runIndex+1}: coordinate touch left card drag active`);
     expect(after.positionWrites===hit.positionWrites,`mobile ${width} run ${runIndex+1}: coordinate touch caused board position write`);
     expect(!errors.length,`mobile ${width} run ${runIndex+1}: coordinate touch errors: ${errors.join(' | ')}`);
     await ctx.close();
