@@ -171,232 +171,37 @@ async function openBoard(browser,mode,viewport={width:1440,height:900},options={
      &&document.querySelector('[data-board-source="platform"][data-relation-source-id="qa-event"]')
      &&document.querySelector('.dc-notice[data-artifact] [data-relation-block]')
    ),{timeout:8000});
+   try{
+     const stable=await page.waitForFunction(artifactId=>{
+       const selector='.dc-notice[data-artifact="'+artifactId+'"] [data-relation-block]';
+       const current=document.querySelector(selector);
+       if(!current){
+         globalThis.__QA_RELATION_PRESENTATION_STABILITY__=null;
+         return false;
+       }
+       const state=globalThis.__QA_RELATION_PRESENTATION_STABILITY__;
+       if(!state||state.node!==current||!current.isConnected){
+         globalThis.__QA_RELATION_PRESENTATION_STABILITY__={node:current,stableFrames:0};
+         return false;
+       }
+       state.stableFrames+=1;
+       const canonical=document.querySelector(selector);
+       if(state.node!==canonical||!state.node.isConnected){
+         globalThis.__QA_RELATION_PRESENTATION_STABILITY__={node:canonical,stableFrames:0};
+         return false;
+       }
+       if(state.stableFrames<2)return false;
+       globalThis.__QA_RELATION_PRESENTATION_STABILITY_READY__={node:state.node,stableFrames:state.stableFrames};
+       return true;
+     },A,{timeout:8000,polling:'raf'});
+     await stable.dispose();
+   }catch(error){
+     throw new Error('RELATION_PRESENTATION_STABILITY_TIMEOUT');
+   }
  }
  return{ctx,page,errors};
 }
 
-async function installRelationMobileTapTrace(page,{artifactId=A,plain=false}={}){
-  return page.evaluate(({artifactId,plain})=>{
-    if(plain&&!document.getElementById('qa-native-details')){
-      const fixture=document.createElement('details');
-      fixture.id='qa-native-details';
-      fixture.innerHTML='<summary>QA NATIVE SUMMARY</summary><div>QA NATIVE BODY</div>';
-      document.body.appendChild(fixture);
-    }
-    const trace=[];
-    const stacks=[];
-    const ids=new WeakMap();
-    let seq=0;
-    let activeEvent=null;
-    const rootSelector=plain?'#qa-native-details':'.dc-notice[data-artifact="'+artifactId+'"] [data-relation-block]';
-    const summarySelector=plain?'#qa-native-details summary':'.dc-notice[data-artifact="'+artifactId+'"] [data-relation-block] summary';
-    const cardSelector=plain?'#qa-native-details':'.dc-notice[data-artifact="'+artifactId+'"]';
-    const nodeId=node=>{
-      if(!node||typeof node!=='object')return null;
-      if(!ids.has(node))ids.set(node,'node-'+(++seq));
-      return ids.get(node);
-    };
-    const describe=node=>{
-      if(!node||node.nodeType!==1)return String(node?.nodeName||node||'');
-      const el=node;
-      const bits=[el.tagName.toLowerCase()];
-      if(el.id)bits.push('#'+el.id);
-      if(el.classList?.length)bits.push('.'+[...el.classList].slice(0,3).join('.'));
-      for(const attr of ['data-relation-block','data-artifact','data-relation-add']){
-        if(el.hasAttribute?.(attr))bits.push('['+attr+(el.getAttribute(attr)?'="'+el.getAttribute(attr)+'"':'')+']');
-      }
-      return bits.join('');
-    };
-    const currentRoot=()=>document.querySelector(rootSelector);
-    const currentSummary=()=>document.querySelector(summarySelector);
-    const currentDetails=()=>plain?document.querySelector('#qa-native-details'):currentRoot();
-    const viewport=()=>document.querySelector('.dc-spatial-viewport');
-    const overlayOpen=()=>Boolean(document.querySelector('.dc-artifact-overlay:not([hidden])'));
-    const focus=()=>new URL(location.href).searchParams.get('focus');
-    const snapshot=()=>({
-      detailsOpen:Boolean(currentDetails()?.open),
-      url:location.href,
-      focus:focus(),
-      overlayOpen:overlayOpen(),
-      boardDragging:document.documentElement.dataset.boardDragging||null,
-      viewportPanning:Boolean(viewport()?.classList.contains('is-panning')),
-      blockId:nodeId(currentRoot()),
-      detailsId:nodeId(currentDetails())
-    });
-    const pathContainsTarget=event=>{
-      let path=[];try{path=event.composedPath?.()||[]}catch{}
-      const root=currentRoot(),summary=currentSummary();
-      return path.includes(root)||path.includes(summary)||path.some(node=>node?.nodeType===1&&(node.matches?.(rootSelector)||node.matches?.(summarySelector)));
-    };
-    const push=(entry)=>{
-      trace.push({...entry,t:Math.round(performance.now()*10)/10});
-      if(trace.length>180)trace.splice(0,trace.length-180);
-    };
-    const eventRecord=(event,where)=>{
-      if(!pathContainsTarget(event))return;
-      activeEvent=event;
-      queueMicrotask(()=>{if(activeEvent===event)activeEvent=null});
-      push({
-        kind:'event',
-        where,
-        type:event.type,
-        pointerType:event.pointerType||((event.touches||event.changedTouches)?'touch':null),
-        isTrusted:event.isTrusted,
-        eventPhase:event.eventPhase,
-        target:describe(event.target),
-        targetId:nodeId(event.target),
-        defaultPrevented:event.defaultPrevented,
-        cancelBubble:event.cancelBubble,
-        detailsOpen:Boolean(currentDetails()?.open),
-        blockId:nodeId(currentRoot()),
-        focus:focus(),
-        overlayOpen:overlayOpen(),
-        boardDragging:document.documentElement.dataset.boardDragging||null,
-        viewportPanning:Boolean(viewport()?.classList.contains('is-panning'))
-      });
-    };
-    for(const type of ['pointerdown','pointerup','pointercancel','touchstart','touchend','click','toggle']){
-      document.addEventListener(type,event=>eventRecord(event,'capture'),{capture:true,passive:true});
-      document.addEventListener(type,event=>eventRecord(event,'bubble'),{capture:false,passive:true});
-    }
-
-    const originals={
-      preventDefault:Event.prototype.preventDefault,
-      stopPropagation:Event.prototype.stopPropagation,
-      stopImmediatePropagation:Event.prototype.stopImmediatePropagation,
-      setPointerCapture:Element.prototype.setPointerCapture
-    };
-    const methodStack=(method,event)=>{
-      const stack=String(new Error().stack||'').split('\n').slice(2,9).join(' <- ');
-      const item={
-        kind:'method',
-        method,
-        eventType:event?.type||null,
-        target:describe(event?.target),
-        blockId:nodeId(currentRoot()),
-        detailsOpen:Boolean(currentDetails()?.open),
-        focus:focus(),
-        overlayOpen:overlayOpen(),
-        boardDragging:document.documentElement.dataset.boardDragging||null,
-        viewportPanning:Boolean(viewport()?.classList.contains('is-panning')),
-        stack
-      };
-      stacks.push(item);if(stacks.length>48)stacks.shift();push(item);
-    };
-    Event.prototype.preventDefault=function(...args){
-      const relevant=pathContainsTarget(this);
-      const result=originals.preventDefault.apply(this,args);
-      if(relevant)methodStack('preventDefault',this);
-      return result;
-    };
-    Event.prototype.stopPropagation=function(...args){
-      const relevant=pathContainsTarget(this);
-      const result=originals.stopPropagation.apply(this,args);
-      if(relevant)methodStack('stopPropagation',this);
-      return result;
-    };
-    Event.prototype.stopImmediatePropagation=function(...args){
-      const relevant=pathContainsTarget(this);
-      const result=originals.stopImmediatePropagation.apply(this,args);
-      if(relevant)methodStack('stopImmediatePropagation',this);
-      return result;
-    };
-    if(typeof originals.setPointerCapture==='function'){
-      Element.prototype.setPointerCapture=function(...args){
-        const relevant=activeEvent&&pathContainsTarget(activeEvent);
-        const result=originals.setPointerCapture.apply(this,args);
-        if(relevant)methodStack('setPointerCapture',activeEvent);
-        return result;
-      };
-    }
-
-    const card=document.querySelector(cardSelector);
-    let lastRoot=currentRoot();
-    let lastRootId=nodeId(lastRoot);
-    if(card){
-      const observer=new MutationObserver(records=>{
-        for(const record of records){
-          if(record.type==='attributes'&&record.attributeName==='open'&&record.target.tagName==='DETAILS'){
-            push({
-              kind:'mutation',
-              mutation:'open',
-              target:describe(record.target),
-              targetId:nodeId(record.target),
-              oldOpen:record.oldValue!==null,
-              newOpen:Boolean(record.target.open),
-              blockId:nodeId(currentRoot()),
-              focus:focus(),
-              overlayOpen:overlayOpen(),
-              boardDragging:document.documentElement.dataset.boardDragging||null,
-              viewportPanning:Boolean(viewport()?.classList.contains('is-panning'))
-            });
-          }
-        }
-        const nextRoot=currentRoot();
-        const nextId=nodeId(nextRoot);
-        if(nextRoot!==lastRoot){
-          push({
-            kind:'mutation',
-            mutation:'relation-block-replaced',
-            oldBlockId:lastRootId,
-            newBlockId:nextId,
-            newOpen:Boolean(currentDetails()?.open),
-            focus:focus(),
-            overlayOpen:overlayOpen(),
-            boardDragging:document.documentElement.dataset.boardDragging||null,
-            viewportPanning:Boolean(viewport()?.classList.contains('is-panning'))
-          });
-          lastRoot=nextRoot;lastRootId=nextId;
-        }
-      });
-      observer.observe(card,{subtree:true,childList:true,attributes:true,attributeOldValue:true,attributeFilter:['open']});
-    }
-
-    globalThis.__QA_RELATION_MOBILE_TAP_DIAG__={
-      trace,stacks,originals,
-      snapshot,
-      read:()=>({
-        snapshot:snapshot(),
-        trace:trace.slice(-180),
-        stacks:stacks.slice(-48),
-        shareDebug:Array.isArray(globalThis.__DC_SHARE_DEBUG_TRACE)?globalThis.__DC_SHARE_DEBUG_TRACE.slice(-60):null
-      })
-    };
-    return snapshot();
-  },{artifactId,plain});
-}
-
-async function flushRelationTapTrace(page){
-  await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>queueMicrotask(resolve))));
-}
-
-async function readRelationTapTrace(page){
-  return page.evaluate(()=>globalThis.__QA_RELATION_MOBILE_TAP_DIAG__?.read?.()||null);
-}
-
-function classifyRelationMobileTap(diag){
-  const trace=diag?.trace||[];
-  const events=trace.filter(item=>item.kind==='event');
-  const clicks=events.filter(item=>item.type==='click');
-  const toggles=events.filter(item=>item.type==='toggle');
-  const mutations=trace.filter(item=>item.kind==='mutation');
-  const methods=trace.filter(item=>item.kind==='method');
-  const hadPointerOrTouch=events.some(item=>['pointerdown','pointerup','pointercancel','touchstart','touchend'].includes(item.type));
-  const unexpected=trace.some(item=>item.focus||item.overlayOpen||item.boardDragging||item.viewportPanning);
-  const opened=mutations.some(item=>item.mutation==='open'&&item.newOpen===true)||toggles.some(item=>item.detailsOpen===true);
-  const replacementClosed=opened&&mutations.some(item=>item.mutation==='relation-block-replaced'&&item.newOpen===false);
-  const closedAfterOpen=opened&&(
-    mutations.some(item=>item.mutation==='open'&&item.newOpen===false)
-    ||toggles.some((item,index)=>item.detailsOpen===false&&toggles.slice(0,index).some(prev=>prev.detailsOpen===true))
-  );
-  if(unexpected)return 'F';
-  if(!clicks.length&&hadPointerOrTouch)return 'A';
-  if(clicks.some(item=>item.defaultPrevented)||methods.some(item=>item.method==='preventDefault'&&item.eventType==='click'))return 'B';
-  if(replacementClosed)return 'E';
-  if(closedAfterOpen)return 'D';
-  if(clicks.length&&!opened)return 'C';
-  return 'UNCLASSIFIED';
-}
 const browser=await chromium.launch({headless:true});
 try{
   // COMMUNITY regression + IDEA-only composer visibility.
@@ -588,83 +393,99 @@ try{
     expect(!errors.length,'card-body open errors: '+errors.join(' | '));await ctx.close();
   }
 
-  // Diagnostic-only 390px / hasTouch event-path isolation.
-  const mobileDiag={};
-
-  // Control 1: real summary.click() in the same touch-capable viewport.
-  {
-    const{ctx,page,errors}=await openBoard(browser,'relations',{width:390,height:844},{hasTouch:true});
+  // Mobile Relations acceptance starts only after canonical presentation stability.
+  const touchRuns=[390,390,390,360];
+  for(let runIndex=0;runIndex<touchRuns.length;runIndex++){
+    const width=touchRuns[runIndex];
+    const{ctx,page,errors}=await openBoard(browser,'relations',{width,height:844},{hasTouch:true});
     const card=page.locator('.dc-notice[data-artifact="'+A+'"]');
     const summary=card.locator('[data-relation-block] summary');
     await summary.waitFor({state:'visible',timeout:6000});
-    const before=await installRelationMobileTapTrace(page,{artifactId:A});
-    await summary.click();
-    await flushRelationTapTrace(page);
-    const after=await readRelationTapTrace(page);
-    mobileDiag.click={before,after,open:await card.locator('[data-relation-block]').evaluate(el=>el.open===true),errors};
+
+    const stableReady=await page.evaluate(artifactId=>{
+      const current=document.querySelector('.dc-notice[data-artifact="'+artifactId+'"] [data-relation-block]');
+      const state=globalThis.__QA_RELATION_PRESENTATION_STABILITY_READY__;
+      return{
+        same:Boolean(state?.node&&state.node===current&&current?.isConnected),
+        stableFrames:Number(state?.stableFrames||0),
+        open:Boolean(current?.open),
+        focus:new URL(location.href).searchParams.get('focus'),
+        overlay:Boolean(document.querySelector('.dc-artifact-overlay:not([hidden])')),
+        boardJustDragged:document.querySelector('.dc-notice[data-artifact="'+artifactId+'"]')?.dataset.boardJustDragged||null,
+        viewportPanning:Boolean(document.querySelector('.dc-spatial-viewport')?.classList.contains('is-panning'))
+      };
+    },A);
+    if(!stableReady.same||stableReady.stableFrames<2)throw new Error('RELATION_PRESENTATION_STABILITY_LOST_BEFORE_TAP '+JSON.stringify({width,runIndex,stableReady}));
+
+    await page.evaluate(()=>{
+      const viewport=document.querySelector('.dc-spatial-viewport');
+      globalThis.__QA_RELATION_SUMMARY_STARTED_PAN__=false;
+      viewport?.addEventListener('pointerdown',event=>{
+        if(event.target.closest?.('[data-relation-block] summary')&&viewport.classList.contains('is-panning'))globalThis.__QA_RELATION_SUMMARY_STARTED_PAN__=true;
+      },{once:true});
+    });
+
+    const before=await page.evaluate(artifactId=>({
+      focus:new URL(location.href).searchParams.get('focus'),
+      overlay:Boolean(document.querySelector('.dc-artifact-overlay:not([hidden])')),
+      boardJustDragged:document.querySelector('.dc-notice[data-artifact="'+artifactId+'"]')?.dataset.boardJustDragged||null,
+      viewportPanning:Boolean(document.querySelector('.dc-spatial-viewport')?.classList.contains('is-panning'))
+    }),A);
+
+    await summary.tap();
+    try{
+      await card.locator('[data-relation-block][open]').waitFor({state:'attached',timeout:6000});
+    }catch(error){
+      const afterFailure=await page.evaluate(artifactId=>({
+        currentOpen:Boolean(document.querySelector('.dc-notice[data-artifact="'+artifactId+'"] [data-relation-block]')?.open),
+        focus:new URL(location.href).searchParams.get('focus'),
+        overlay:Boolean(document.querySelector('.dc-artifact-overlay:not([hidden])')),
+        boardJustDragged:document.querySelector('.dc-notice[data-artifact="'+artifactId+'"]')?.dataset.boardJustDragged||null,
+        viewportPanning:Boolean(document.querySelector('.dc-spatial-viewport')?.classList.contains('is-panning')),
+        panStarted:Boolean(globalThis.__QA_RELATION_SUMMARY_STARTED_PAN__),
+        stabilityFrames:Number(globalThis.__QA_RELATION_PRESENTATION_STABILITY_READY__?.stableFrames||0),
+        stabilityNodeStillCurrent:Boolean(
+          globalThis.__QA_RELATION_PRESENTATION_STABILITY_READY__?.node
+          &&globalThis.__QA_RELATION_PRESENTATION_STABILITY_READY__.node===document.querySelector('.dc-notice[data-artifact="'+artifactId+'"] [data-relation-block]')
+        )
+      }),A);
+      throw new Error('RELATION_MOBILE_TAP_AFTER_STABLE_READINESS '+JSON.stringify({width,runIndex,before,afterFailure}));
+    }
+
+    const after=await page.evaluate(artifactId=>({
+      currentOpen:Boolean(document.querySelector('.dc-notice[data-artifact="'+artifactId+'"] [data-relation-block]')?.open),
+      focus:new URL(location.href).searchParams.get('focus'),
+      overlay:Boolean(document.querySelector('.dc-artifact-overlay:not([hidden])')),
+      boardJustDragged:document.querySelector('.dc-notice[data-artifact="'+artifactId+'"]')?.dataset.boardJustDragged||null,
+      viewportPanning:Boolean(document.querySelector('.dc-spatial-viewport')?.classList.contains('is-panning')),
+      panStarted:Boolean(globalThis.__QA_RELATION_SUMMARY_STARTED_PAN__)
+    }),A);
+
+    expect(after.currentOpen===true,`mobile ${width} run ${runIndex+1}: relation summary tap did not leave canonical details open`);
+    expect(after.panStarted===false&&!after.viewportPanning,`mobile ${width} run ${runIndex+1}: relation summary initiated Board pan`);
+    expect(after.boardJustDragged===before.boardJustDragged,`mobile ${width} run ${runIndex+1}: relation summary entered card drag owner`);
+    expect(after.focus===null,`mobile ${width} run ${runIndex+1}: relation summary wrote focus URL ${after.focus}`);
+    expect(after.overlay===false,`mobile ${width} run ${runIndex+1}: relation summary opened Artifact fullscreen`);
+    expect(!errors.length,`mobile ${width} run ${runIndex+1}: relation summary errors: ${errors.join(' | ')}`);
     await ctx.close();
   }
 
-  // Control 2: current failing real touch path.
-  {
-    const{ctx,page,errors}=await openBoard(browser,'relations',{width:390,height:844},{hasTouch:true});
+  // Existing 390/360 layout + Artifact detail mobile proof.
+  for(const width of [390,360]){
+    const{ctx,page,errors}=await openBoard(browser,'author',{width,height:844});
     const card=page.locator('.dc-notice[data-artifact="'+A+'"]');
-    const summary=card.locator('[data-relation-block] summary');
-    await summary.waitFor({state:'visible',timeout:6000});
-    const before=await installRelationMobileTapTrace(page,{artifactId:A});
-    await summary.tap();
-    await flushRelationTapTrace(page);
-    const after=await readRelationTapTrace(page);
-    mobileDiag.tap={
-      before,
-      after,
-      open:await card.locator('[data-relation-block]').evaluate(el=>el.open===true),
-      classification:classifyRelationMobileTap(after),
-      errors
-    };
-    await page.screenshot({path:path.join(outDir,'mobile-390-tap-diagnostic.png'),fullPage:true});
+    const cardOverflow=await card.evaluate(el=>el.scrollWidth>el.clientWidth+1);
+    const collabOverflow=await card.locator('[data-collaboration-card]').evaluate(el=>el.scrollWidth>el.clientWidth+1);
+    expect(!cardOverflow&&!collabOverflow,`mobile ${width}: Idea card horizontal overflow`);
+    await card.click({position:{x:10,y:10}});
+    const frame=page.frameLocator('.dc-artifact-overlay iframe');
+    await frame.locator('[data-artifact-collaboration]').waitFor({state:'visible',timeout:6000});
+    const detailOverflow=await frame.locator('body').evaluate(()=>document.documentElement.scrollWidth>document.documentElement.clientWidth+1);
+    expect(!detailOverflow,`mobile ${width}: Artifact detail horizontal overflow`);
+    expect(!errors.length,`mobile ${width}: page errors: ${errors.join(' | ')}`);
+    await page.screenshot({path:path.join(outDir,`mobile-${width}.png`),fullPage:true});
     await ctx.close();
   }
-
-  // Control 3: validator-only plain native details fixture in a fresh touch context.
-  {
-    const{ctx,page,errors}=await openBoard(browser,'relations',{width:390,height:844},{hasTouch:true});
-    const before=await installRelationMobileTapTrace(page,{plain:true});
-    const summary=page.locator('#qa-native-details summary');
-    await summary.tap();
-    await flushRelationTapTrace(page);
-    const after=await readRelationTapTrace(page);
-    mobileDiag.native={
-      before,
-      after,
-      open:await page.locator('#qa-native-details').evaluate(el=>el.open===true),
-      classification:classifyRelationMobileTap(after),
-      errors
-    };
-    await ctx.close();
-  }
-
-  const clickControlPass=mobileDiag.click.open===true;
-  const nativeTapPass=mobileDiag.native.open===true;
-  if(!mobileDiag.tap.open){
-    throw new Error('RELATION_MOBILE_TAP_EVENT_PATH '+JSON.stringify({
-      classification:mobileDiag.tap.classification,
-      plainNativeTapSucceeds:nativeTapPass,
-      summaryClickSucceeds:clickControlPass,
-      click:mobileDiag.click,
-      tap:mobileDiag.tap,
-      native:mobileDiag.native
-    }));
-  }
-  throw new Error('RELATION_MOBILE_TAP_EVENT_PATH '+JSON.stringify({
-    classification:'UNCLASSIFIED',
-    note:'previously failing summary.tap() opened during diagnostic run',
-    plainNativeTapSucceeds:nativeTapPass,
-    summaryClickSucceeds:clickControlPass,
-    click:mobileDiag.click,
-    tap:mobileDiag.tap,
-    native:mobileDiag.native
-  }));
 }finally{
   await browser.close();
   await new Promise(resolve=>server.close(resolve));
