@@ -523,22 +523,51 @@ function buildInsertBeforeEvidence(run){
   const browserErrors=run?.browserState?.errors||[];
   const pageError=run?.pageErrors?.[0]||null;
   const browserError=browserErrors[0]||null;
-  const errorT=(run?.browserState?.trace||[]).find(item=>item.kind==='window-error')?.t??null;
-  const aroundError=errorT==null
-    ?[]
-    :(run.browserState.trace||[]).filter(item=>item.t>=errorT-100&&item.t<=errorT+100);
+  const trace=run?.browserState?.trace||[];
+  const errorT=trace.find(item=>item.kind==='window-error')?.t??null;
+  const aroundError=errorT==null?[]:trace.filter(item=>item.t>=errorT-100&&item.t<=errorT+100);
   const errorSnapshot=browserError?.snapshot||run?.browserState?.snapshot||null;
-  const lastTrigger=[...(run?.browserState?.trace||[])].reverse().find(item=>item.kind==='relation-presentation-trigger'&&(errorT==null||item.t<=errorT))||null;
-  const hostChanges=(run?.browserState?.trace||[]).filter(item=>['boardHost-removed','boardHost-reattached','boardHost-replaced','boardHost-canonical-missing','boardHost-canonical-attached'].includes(item.kind));
+  const lastTrigger=[...trace].reverse().find(item=>item.kind==='relation-presentation-trigger'&&(errorT==null||item.t<=errorT))||null;
+  const hostChanges=trace.filter(item=>['boardHost-removed','boardHost-reattached','boardHost-replaced','boardHost-canonical-missing','boardHost-canonical-attached'].includes(item.kind));
   const hostChangeBetweenTriggerAndError=Boolean(lastTrigger&&errorT!=null&&hostChanges.some(item=>item.t>=lastTrigger.t&&item.t<=errorT));
+  const durableKinds=new Set([
+    'boardHost-discovered','boardHost-removed','boardHost-reattached','boardHost-replaced',
+    'boardHost-canonical-attached','boardHost-canonical-missing',
+    'relation-layer-created','relation-layer-removed',
+    'artifact-overlay-open','artifact-overlay-closed',
+    'detail-injection','detail-host-removed',
+    'relation-presentation-trigger','relation-presentation-next-raf',
+    'flow-board-ready','flow-relations-stable','flow-inline-hidden-check',
+    'flow-before-card-touch','flow-overlay-open','flow-detail-host-ready',
+    'flow-before-add-touch','flow-relation-form-visible','flow-before-save-touch',
+    'flow-created-visible','flow-delete-authority','flow-before-delete-touch',
+    'flow-delete-complete','flow-final-raf','window-error','flow-error'
+  ]);
+  const compact=item=>({
+    t:item.t,
+    kind:item.kind,
+    initialHostId:item.initialHostId,
+    canonicalHostId:item.canonicalHostId,
+    initialHostIsCanonical:item.initialHostIsCanonical,
+    initialHostConnected:item.initialHostConnected,
+    canonicalHostConnected:item.canonicalHostConnected,
+    initialHostFirstChildExists:item.initialHostFirstChildExists,
+    relationLayerCount:item.relationLayerCount,
+    spatialWorldCount:item.spatialWorldCount,
+    overlayOpen:item.overlayOpen,
+    detailHostCount:item.detailHostCount,
+    focus:item.focus,
+    detail:item.detail
+  });
+  const compactTimeline=trace.filter(item=>durableKinds.has(item.kind)).map(compact);
   const payload={
     pageError,browserError,errorSnapshot,
     flowError:run?.flowError||null,
     lastPresentationTrigger:lastTrigger,
     hostChangeBetweenTriggerAndError,
-    aroundError,
-    timeline:run?.browserState?.trace||[],
-    consoleEvents:run?.consoleEvents||[]
+    aroundError:aroundError.map(compact),
+    compactTimeline,
+    consoleEvents:(run?.consoleEvents||[]).slice(-20)
   };
   return{...payload,classification:classifyInsertBeforeTrace(payload)};
 }
@@ -550,23 +579,46 @@ try{
   for(let runIndex=1;runIndex<=3;runIndex++){
     const run=await openInsertBeforeDiagnostic(browser,runIndex);
     const evidence=buildInsertBeforeEvidence(run);
-    insertBeforeRuns.push({runIndex,evidence});
+    const runSummary={
+      runIndex,
+      classification:evidence.classification,
+      pageError:evidence.pageError,
+      browserError:evidence.browserError,
+      errorSnapshot:evidence.errorSnapshot,
+      flowError:evidence.flowError,
+      lastPresentationTrigger:evidence.lastPresentationTrigger&&{
+        t:evidence.lastPresentationTrigger.t,
+        detail:evidence.lastPresentationTrigger.detail,
+        initialHostId:evidence.lastPresentationTrigger.initialHostId,
+        canonicalHostId:evidence.lastPresentationTrigger.canonicalHostId,
+        initialHostIsCanonical:evidence.lastPresentationTrigger.initialHostIsCanonical,
+        initialHostConnected:evidence.lastPresentationTrigger.initialHostConnected,
+        canonicalHostConnected:evidence.lastPresentationTrigger.canonicalHostConnected,
+        initialHostFirstChildExists:evidence.lastPresentationTrigger.initialHostFirstChildExists,
+        relationLayerCount:evidence.lastPresentationTrigger.relationLayerCount,
+        overlayOpen:evidence.lastPresentationTrigger.overlayOpen,
+        detailHostCount:evidence.lastPresentationTrigger.detailHostCount,
+        focus:evidence.lastPresentationTrigger.focus
+      },
+      hostChangeBetweenTriggerAndError:evidence.hostChangeBetweenTriggerAndError,
+      aroundError:evidence.aroundError,
+      timeline:evidence.compactTimeline,
+      consoleEvents:evidence.consoleEvents
+    };
+    console.error('MOBILE_390_INSERTBEFORE_RUN_TRACE '+JSON.stringify(runSummary));
+    insertBeforeRuns.push({
+      runIndex,
+      finalState:evidence.errorSnapshot,
+      flowError:evidence.flowError,
+      timeline:evidence.compactTimeline
+    });
     const reproduced=Boolean(run.pageErrors.length||run.browserState?.errors?.length);
     await run.ctx.close();
     if(reproduced){
       throw new Error('MOBILE_390_INSERTBEFORE_ROOT_CAUSE_TRACE '+JSON.stringify({
         classification:evidence.classification,
         reproduced:true,
-        runIndex,
-        pageError:evidence.pageError,
-        browserError:evidence.browserError,
-        errorSnapshot:evidence.errorSnapshot,
-        lastPresentationTrigger:evidence.lastPresentationTrigger,
-        hostChangeBetweenTriggerAndError:evidence.hostChangeBetweenTriggerAndError,
-        aroundError:evidence.aroundError,
-        timeline:evidence.timeline,
-        consoleEvents:evidence.consoleEvents,
-        flowError:evidence.flowError
+        ...runSummary
       }));
     }
   }
@@ -574,7 +626,11 @@ try{
     classification:'I5',
     reproduced:false,
     status:'NOT_REPRODUCED',
-    runs:insertBeforeRuns
+    runs:insertBeforeRuns.map(run=>({
+      runIndex:run.runIndex,
+      finalState:run.finalState,
+      flowError:run.flowError
+    }))
   }));
 
   // COMMUNITY regression + IDEA-only composer visibility.
