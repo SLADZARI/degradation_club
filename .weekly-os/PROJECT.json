@@ -4,15 +4,15 @@
     "artifactId": "dementor-club.kernel.project",
     "project": "dementor-club",
     "documentType": "STANDARD",
-    "projectStage": "VALIDATION",
-    "gate": "G6_VALIDATION",
+    "projectStage": "RELEASE",
+    "gate": "G7_RELEASE",
     "status": "APPROVED",
-    "version": "2.89",
+    "version": "2.90",
     "updated": "2026-09-28",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.88"
+    "supersedes": "2.89"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -233,7 +233,9 @@
     "operations/ARTIFACT_COLLABORATION_G7_RC_BLOCKER_2026-09-26.md",
     ".weekly-os/results/artifact-collaboration-v1.v1.1.md",
     "operations/ARTIFACT_COLLABORATION_G6_CORRECTIVE_VALIDATION_2026-09-28.md",
-    ".weekly-os/results/artifact-collaboration-v1.v1.2.md"
+    ".weekly-os/results/artifact-collaboration-v1.v1.2.md",
+    "operations/ARTIFACT_COLLABORATION_G7_RELEASE_CANDIDATE_R2_2026-09-28.md",
+    ".weekly-os/results/artifact-collaboration-v1.v1.3.md"
   ],
   "authority": {
     "mpDslCore": {
@@ -400,11 +402,11 @@
   },
   "currentResult": {
     "artifactId": "dementor-club.result.artifact-collaboration-v1",
-    "version": "1.2",
+    "version": "1.3",
     "status": "ACTIVE",
     "workStatus": "ACTIVE",
-    "path": ".weekly-os/results/artifact-collaboration-v1.v1.2.md",
-    "gate": "G6_VALIDATION",
+    "path": ".weekly-os/results/artifact-collaboration-v1.v1.3.md",
+    "gate": "G7_RELEASE",
     "scope": [
       "idea participation",
       "invitation / join",
@@ -427,8 +429,8 @@
     "g5BackendCandidateCommit": "3522993d6796fe9dae81a0c7dbde1ddcc1aa350a",
     "g5BackendStaticStatus": "PASS",
     "g5SqlExecutionStatus": "PASS_LOCAL_OBSERVED_PRODUCTION_COMPATIBLE_REPLAY",
-    "gateReadiness": "READY_FOR_NEW_CLEAN_G7_RELEASE_CANDIDATE_PREPARATION",
-    "note": "Corrected exact candidate bee577a9... passes Site Integrity #1312. Net corrective vs prior G6 candidate is exactly 2 frontend/validator files; backend unchanged. Previous RC 030d7fec... / PR #243 remains blocked history and unmodified.",
+    "gateReadiness": "CLEAN_RC_VALIDATION_IN_PROGRESS",
+    "note": "Fresh clean RC r2 f3078ceb... created directly from production df8a24ec... as one commit with 31 Result paths. Tree matches corrected G6 candidate bee577a9.... Draft PR #244. Exact-head Site Integrity #1313 is in progress. No merge/deploy/live DB apply authorized.",
     "implementationBrief": "operations/ARTIFACT_COLLABORATION_IMPLEMENTATION_BRIEF_V1.md",
     "g5BackendLocalBlockerEvidence": "operations/ARTIFACT_COLLABORATION_BACKEND_G5_LOCAL_STACK_BLOCKER_2026-09-24.md",
     "costBoundary": "NO_PAID_INFRASTRUCTURE",
@@ -461,14 +463,20 @@
     "g6ValidationConclusion": "SUCCESS",
     "g6DiffFileCount": 31,
     "g7ReleaseAuthorized": false,
-    "releaseBranch": "release/artifact-collaboration-v1",
-    "g7CleanRcStatus": "PREVIOUS_RC_BLOCKED",
-    "g7ValidationStatus": "PREVIOUS_RC_FAILURE",
+    "releaseBranch": "release/artifact-collaboration-v1-r2",
+    "g7CleanRcStatus": "IN_PROGRESS",
+    "g7ValidationStatus": "IN_PROGRESS",
     "g7CleanRcPreparationAuthorized": true,
     "g7BlockerEvidence": "operations/ARTIFACT_COLLABORATION_G7_RC_BLOCKER_2026-09-26.md",
     "g6CorrectiveStatus": "PASS",
     "previousBlockedReleaseCandidateCommit": "030d7fece9dee1b8502bde6ac89bef95dbdfeda7",
-    "previousBlockedReleasePullRequest": 243
+    "previousBlockedReleasePullRequest": 243,
+    "releaseCandidateCommit": "f3078ceb227a0221b99b4e286f783986a33aea6f",
+    "releasePullRequest": 244,
+    "g7Evidence": "operations/ARTIFACT_COLLABORATION_G7_RELEASE_CANDIDATE_R2_2026-09-28.md",
+    "g7ValidationRun": 1313,
+    "g7ValidationRunId": 36429691568,
+    "g7ValidationConclusion": "IN_PROGRESS"
   },
   "waitingResults": [
     {
