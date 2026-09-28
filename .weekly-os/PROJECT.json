@@ -7,12 +7,12 @@
     "projectStage": "RELEASE",
     "gate": "G7_RELEASE",
     "status": "APPROVED",
-    "version": "2.93",
+    "version": "2.94",
     "updated": "2026-09-28",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.92"
+    "supersedes": "2.93"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -240,7 +240,9 @@
     "operations/ARTIFACT_COLLABORATION_G7_RELEASE_AUTHORIZATION_2026-09-28.md",
     ".weekly-os/results/artifact-collaboration-v1.v1.5.md",
     "operations/ARTIFACT_COLLABORATION_PRODUCTION_RELEASE_CHECKPOINT_2026-09-28.md",
-    ".weekly-os/results/artifact-collaboration-v1.v1.6.md"
+    ".weekly-os/results/artifact-collaboration-v1.v1.6.md",
+    "operations/ARTIFACT_COLLABORATION_PRODUCTION_DEPLOY_2026-09-28.md",
+    ".weekly-os/results/artifact-collaboration-v1.v1.7.md"
   ],
   "authority": {
     "mpDslCore": {
@@ -407,10 +409,10 @@
   },
   "currentResult": {
     "artifactId": "dementor-club.result.artifact-collaboration-v1",
-    "version": "1.6",
+    "version": "1.7",
     "status": "ACTIVE",
     "workStatus": "ACTIVE",
-    "path": ".weekly-os/results/artifact-collaboration-v1.v1.6.md",
+    "path": ".weekly-os/results/artifact-collaboration-v1.v1.7.md",
     "gate": "G7_RELEASE",
     "scope": [
       "idea participation",
@@ -434,8 +436,8 @@
     "g5BackendCandidateCommit": "3522993d6796fe9dae81a0c7dbde1ddcc1aa350a",
     "g5BackendStaticStatus": "PASS",
     "g5SqlExecutionStatus": "PASS_LOCAL_OBSERVED_PRODUCTION_COMPATIBLE_REPLAY",
-    "gateReadiness": "PRODUCTION_MERGED_DEPLOY_PENDING",
-    "note": "PR #244 merged exact validated RC to production 260c5fe9.... Supabase read-only preflight: exactly one pending tracked migration 20260924002500_artifact_collaboration_v1, no extra live drift. Canonical backend/Pages workflow dispatch not started because interactive dispatch authorization was not completed.",
+    "gateReadiness": "LIVE_ACCEPTANCE_PENDING",
+    "note": "Exact production 260c5fe9... deployed successfully. Supabase run #8 applied 20260924002500_artifact_collaboration_v1; post-apply ledger clean. Pages run #135 deployed exact production SHA successfully. Telegram worker unchanged. Live authenticated acceptance remains pending before G8.",
     "implementationBrief": "operations/ARTIFACT_COLLABORATION_IMPLEMENTATION_BRIEF_V1.md",
     "g5BackendLocalBlockerEvidence": "operations/ARTIFACT_COLLABORATION_BACKEND_G5_LOCAL_STACK_BLOCKER_2026-09-24.md",
     "costBoundary": "NO_PAID_INFRASTRUCTURE",
@@ -488,10 +490,16 @@
     "releaseAuthorizationEvidence": "operations/ARTIFACT_COLLABORATION_G7_RELEASE_AUTHORIZATION_2026-09-28.md",
     "productionCommit": "260c5fe911fb0cad9902ad2db5d76060f47c18cc",
     "productionMergeStatus": "COMPLETE",
-    "backendDeployStatus": "NOT_STARTED",
-    "pagesDeployStatus": "NOT_STARTED",
-    "liveDatabaseMutationStatus": "NOT_APPLIED",
-    "releaseCheckpointEvidence": "operations/ARTIFACT_COLLABORATION_PRODUCTION_RELEASE_CHECKPOINT_2026-09-28.md"
+    "backendDeployStatus": "SUCCESS",
+    "pagesDeployStatus": "SUCCESS",
+    "liveDatabaseMutationStatus": "APPLIED",
+    "releaseCheckpointEvidence": "operations/ARTIFACT_COLLABORATION_PRODUCTION_RELEASE_CHECKPOINT_2026-09-28.md",
+    "backendDeployRun": 8,
+    "backendDeployRunId": 36432607713,
+    "pagesDeployRun": 135,
+    "pagesDeployRunId": 36432865028,
+    "liveAcceptanceStatus": "PENDING",
+    "productionDeployEvidence": "operations/ARTIFACT_COLLABORATION_PRODUCTION_DEPLOY_2026-09-28.md"
   },
   "waitingResults": [
     {
