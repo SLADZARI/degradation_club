@@ -244,7 +244,9 @@
     "operations/ARTIFACT_COLLABORATION_PRODUCTION_DEPLOY_2026-09-28.md",
     ".weekly-os/results/artifact-collaboration-v1.v1.7.md",
     "operations/QA_RECONCILIATION_2026-09-28.md",
-    ".weekly-os/results/artifact-collaboration-v1.v1.8.md"
+    ".weekly-os/results/artifact-collaboration-v1.v1.8.md",
+    "operations/ARTIFACT_COLLABORATION_LIVE_CORRECTIVE_DEV1_2026-09-28.md",
+    "operations/ARTIFACT_COLLABORATION_LIVE_CORRECTIVE_DEV2_2026-09-28.md"
   ],
   "authority": {
     "mpDslCore": {
