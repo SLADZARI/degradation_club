@@ -2069,6 +2069,127 @@ Mobile and desktop required.
 **OPEN / LIVE STATE-FRESHNESS DEFECT CONFIRMED.**
 
 
+#### BQA-29 — Idea/Artifact lacks a richer brief that can transmit intent, challenge and references
+Severity: **P1 / CONTENT MODEL + CREATIVE HANDOFF**
+
+**LIVE PRODUCT FEEDBACK — 2026-09-28**
+
+Current Artifact composer/detail is effectively built around:
+- title;
+- one body/description field;
+- optional external URL;
+- one attached media item.
+
+Production authority confirms:
+- `dc_artifacts.title` exists;
+- `dc_artifacts.body` exists and is currently bounded to 1…4000 characters;
+- `dc_artifact_media` is canonical media owner;
+- current attach RPC enforces **one media item per Artifact** through `MEDIA_LIMIT_REACHED`.
+
+For an Idea intended to recruit a collaborator/creator, this is not expressive enough. The initiator needs to transmit not only “what this is”, but enough energy/context that another person understands why it is interesting and wants to pick it up.
+
+**User need**
+
+An Idea should be able to carry a compact but meaningful creative brief / challenge, for example:
+- what is happening / context;
+- why this matters now;
+- what is unresolved;
+- what kind of contribution is wanted;
+- what would make the result exciting;
+- visual/reference material;
+- optional code / technical fragment / external reference where relevant.
+
+The target is not a long specification. It should feel like a **challenge worth taking**, not a dry task ticket.
+
+**Candidate content hierarchy**
+
+Do not introduce duplicate text fields blindly. First reconcile the existing `body` owner.
+
+Preferred product direction to validate:
+
+```text
+TITLE
+SHORT CARD DESCRIPTION / LEAD
+FULL IDEA BRIEF / CHALLENGE  (candidate max ≈ 1400 characters)
+REFERENCES / SCREENSHOTS
+OPTIONAL LINK / CODE CONTEXT
+```
+
+The Board card should remain compact. The richer brief belongs primarily to the opened Artifact detail. If the existing `body` can canonically become the 1400-character brief and the Board can derive/clamp a short teaser from it, prefer that over creating a parallel long-description field.
+
+If a separate short summary is required, that is a content-model change and must be named/owned explicitly before schema mutation.
+
+**Writing UX requirement**
+
+The composer should prompt for a useful handoff rather than a generic “Текст”.
+
+Candidate guidance:
+
+```text
+РАСКРОЙТЕ ИДЕЮ
+Что здесь хочется сделать?
+Почему это интересно?
+Что уже есть?
+Что нужно придумать / собрать / проверить?
+Как понять, что получилось?
+```
+
+The author should be able to write approximately **up to 1400 characters** for the challenge/brief. Exact limit requires product decision before implementation because current canonical `body` allows 4000.
+
+**References / media**
+
+Live feedback explicitly asks for multiple screenshots/references.
+
+Current contract supports only one attached media record per Artifact. Therefore “add several screenshots” is **not a presentation-only fix**; it changes the current media-capacity contract.
+
+Before implementation:
+- preserve `dc_artifact_media` as the one canonical media owner;
+- do not create a second gallery/media table;
+- decide a bounded multi-media limit for Idea references;
+- reconcile with BQA-20 image normalization/performance work;
+- thumbnails/lazy loading must be part of the same performance-safe design;
+- CIRCLE access rules must remain identical for every attached reference.
+
+**Code / technical material**
+
+Do not create a generic code-hosting subsystem.
+
+Candidate options, in order:
+1. small text/code fragment inside the brief where formatting is enough;
+2. existing external URL for GitHub/Figma/etc.;
+3. canonical `dc_artifact_media` file attachment only if/when file media is deliberately enabled in the UI.
+
+**Example tone / handoff pattern**
+
+The brief should help the initiator pass energy to the next person. Example pattern, not canonical copy:
+
+> XXI век. Искусственный интеллект умеет собирать интерфейс быстрее, чем мы успеваем договориться, каким он должен быть. Но большинство рабочих систем всё ещё выглядят так, будто человеку за них нужно извиняться. Здесь есть реальные экраны, реальные процессы и одна задача: превратить это в интерфейс, в который хочется зайти второй раз. Не “нарисовать красивее”, а найти язык продукта — строгий, быстрый, взрослый. Посмотрите на приложенные экраны. Что в них мешает почувствовать контроль? Где система выглядит как таблица, а должна ощущаться как инструмент? Нужна не косметика, а новый уровень ясности. Если вам хочется доказать, что серьёзный рабочий продукт может быть одновременно понятным и красивым — это именно тот случай.
+
+This illustrates the requested “challenge” energy; final product copy remains authored per Idea.
+
+**Required QA**
+
+- Board card remains scannable even when full brief is ~1400 chars;
+- detail shows the full brief without overwhelming primary participation CTA;
+- mobile typography/spacing;
+- multiple references do not block Board first paint;
+- reference ordering is stable;
+- remove/reorder/upload failure paths;
+- private/CIRCLE media ACL remains correct;
+- no duplicate text/media owner;
+- existing Artifacts without the richer structure remain backward compatible.
+
+**Change-control boundary**
+
+A pure presentation change (for example clamping Board text and using existing `body` as the richer detail brief) may be handled as stabilization.
+
+Adding a new canonical text field or changing one-media → multi-media capacity changes the Artifact content/data contract and requires an explicit implementation decision / migration plan before build.
+
+**Status**
+
+**OPEN / LIVE CONTENT-MODEL GAP CONFIRMED.**
+
+
 
 ---
 
