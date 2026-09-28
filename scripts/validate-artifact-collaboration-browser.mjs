@@ -149,13 +149,143 @@ export function createClient(){return{
 
 async function context(browser,mode,viewport,options={}){
  const ctx=await browser.newContext({viewport,hasTouch:options.hasTouch===true});
- await ctx.addInitScript(({mode})=>{globalThis.__QA_COLLAB_MODE__=mode;const ids={author:'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',invited:'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',multiinvited:'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',joined:'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',outsider:'ffffffff-ffff-4fff-8fff-ffffffffffff',owner:'99999999-9999-4999-8999-999999999999',relations:'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb'};try{localStorage.setItem('dc:board:tutorial:v21:'+(ids[mode]||ids.author)+':member',JSON.stringify({done:true}));sessionStorage.setItem('dc_first_artifact_spotlight_dismissed_v1','1')}catch{}},{mode});
+ await ctx.addInitScript(({mode})=>{
+   globalThis.__QA_COLLAB_MODE__=mode;
+   const ids={author:'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',invited:'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',multiinvited:'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',joined:'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',outsider:'ffffffff-ffff-4fff-8fff-ffffffffffff',owner:'99999999-9999-4999-8999-999999999999',relations:'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb'};
+   try{localStorage.setItem('dc:board:tutorial:v21:'+(ids[mode]||ids.author)+':member',JSON.stringify({done:true}));sessionStorage.setItem('dc_first_artifact_spotlight_dismissed_v1','1')}catch{}
+
+   const diagnostic={
+     mode,
+     installedAt:new Date().toISOString(),
+     windowErrors:[],
+     unhandledRejections:[],
+     insertBeforeCalls:[],
+     insertBeforeThrows:[],
+     events:[]
+   };
+   globalThis.__QA_INSERT_BEFORE_DIAGNOSTIC__=diagnostic;
+
+   const identity=node=>{
+     if(node==null)return null;
+     try{
+       return{
+         nodeType:node.nodeType??null,
+         nodeName:node.nodeName??null,
+         tag:node.tagName??null,
+         id:node.id||null,
+         className:typeof node.className==='string'?node.className:(node.getAttribute?.('class')||null),
+         connected:Boolean(node.isConnected),
+         text:typeof node.textContent==='string'?node.textContent.trim().slice(0,120):null
+       };
+     }catch(error){
+       return{identityError:String(error?.message||error)};
+     }
+   };
+   const domSnapshot=()=>({
+     documentElement:identity(document.documentElement),
+     body:identity(document.body),
+     spatialWorld:identity(document.querySelector('.dc-spatial-world')),
+     boardHost:identity(document.querySelector('.dc-spatial-world')||document.querySelector('[data-board-host]')||document.querySelector('.dc-board')),
+     relationsSvg:identity(document.querySelector('svg[data-board-relations],.dc-board-relations-layer')),
+     detailHost:identity(document.querySelector('.dc-board-relation-detail-host')),
+     overlay:identity(document.querySelector('.dc-artifact-overlay:not([hidden])')),
+     composerForm:identity(document.querySelector('#artifactComposer form,[data-artifact-composer] form,.dc-composer form')),
+     composerActions:identity(document.querySelector('.dc-composer-actions')),
+     composerError:identity(document.querySelector('.dc-composer-error,[data-composer-error]'))
+   });
+   const pushEvent=(type,event)=>{
+     try{
+       diagnostic.events.push({
+         timestamp:new Date().toISOString(),
+         type,
+         target:identity(event?.target||null),
+         currentUrl:location.href
+       });
+       if(diagnostic.events.length>40)diagnostic.events.splice(0,diagnostic.events.length-40);
+     }catch{}
+   };
+   for(const type of ['pointerdown','pointerup','touchstart','touchend','click','keydown']){
+     document.addEventListener(type,event=>pushEvent(type,event),true);
+   }
+   for(const type of ['pageshow','popstate','dc:board-projections-updated','dc:artifact-collaboration-changed','dc:board-artifact-closed','dc:board-close-artifact']){
+     globalThis.addEventListener(type,event=>pushEvent(type,event),true);
+   }
+
+   globalThis.addEventListener('error',event=>{
+     const error=event.error;
+     diagnostic.windowErrors.push({
+       timestamp:new Date().toISOString(),
+       message:event.message||error?.message||'',
+       filename:event.filename||null,
+       lineno:event.lineno||null,
+       colno:event.colno||null,
+       error:{
+         name:error?.name||null,
+         message:error?.message||null,
+         stack:error?.stack||null
+       },
+       currentUrl:location.href,
+       dom:domSnapshot(),
+       recentEvents:diagnostic.events.slice(-12)
+     });
+   },true);
+
+   globalThis.addEventListener('unhandledrejection',event=>{
+     const reason=event.reason;
+     diagnostic.unhandledRejections.push({
+       timestamp:new Date().toISOString(),
+       reason:{
+         name:reason?.name||null,
+         message:reason?.message||String(reason||''),
+         stack:reason?.stack||null
+       },
+       currentUrl:location.href,
+       dom:domSnapshot(),
+       recentEvents:diagnostic.events.slice(-12)
+     });
+   });
+
+   const nativeInsertBefore=Node.prototype.insertBefore;
+   Node.prototype.insertBefore=function(newNode,referenceNode){
+     const record={
+       timestamp:new Date().toISOString(),
+       kind:'INSERT_BEFORE_CALL',
+       receiver:identity(this),
+       receiverConnected:Boolean(this?.isConnected),
+       newNode:identity(newNode),
+       referenceNode:identity(referenceNode),
+       referenceParentMatches:Boolean(referenceNode?.parentNode===this),
+       documentContainsReceiver:Boolean(document.contains(this)),
+       currentUrl:location.href,
+       stack:new Error('INSERT_BEFORE_CALLSITE').stack||null
+     };
+     diagnostic.insertBeforeCalls.push(record);
+     if(diagnostic.insertBeforeCalls.length>120)diagnostic.insertBeforeCalls.splice(0,diagnostic.insertBeforeCalls.length-120);
+     try{
+       return Reflect.apply(nativeInsertBefore,this,[newNode,referenceNode]);
+     }catch(error){
+       const thrown={
+         ...record,
+         kind:'INSERT_BEFORE_THROW',
+         error:{
+           name:error?.name||null,
+           message:error?.message||String(error||''),
+           stack:error?.stack||null
+         },
+         dom:domSnapshot(),
+         recentEvents:diagnostic.events.slice(-12)
+       };
+       diagnostic.insertBeforeThrows.push(thrown);
+       throw error;
+     }
+   };
+ },{mode});
  await ctx.route('https://cdn.jsdelivr.net/**',route=>route.request().url().includes('@supabase/supabase-js')?route.fulfill({status:200,contentType:'text/javascript',body:stub()}):route.abort());
  return ctx;
 }
 async function openDetail(browser,mode,viewport={width:1440,height:900}){
  const ctx=await context(browser,mode,viewport);const page=await ctx.newPage();const errors=[];const requestFailures=[];const badResponses=[];const consoleErrors=[];
- page.on('pageerror',e=>errors.push(e.message));
+ page.on('pageerror',e=>errors.push(JSON.stringify({message:e.message,name:e.name,stack:e.stack})));
  page.on('requestfailed',request=>requestFailures.push({url:request.url(),error:request.failure()?.errorText||null}));
  page.on('response',response=>{if(response.status()>=400)badResponses.push({url:response.url(),status:response.status()})});
  page.on('console',message=>{if(message.type()==='error')consoleErrors.push(message.text())});
@@ -164,7 +294,7 @@ async function openDetail(browser,mode,viewport={width:1440,height:900}){
  return{ctx,page,errors,requestFailures,badResponses,consoleErrors};
 }
 async function openBoard(browser,mode,viewport={width:1440,height:900},options={}){
- const ctx=await context(browser,mode,viewport,options);const page=await ctx.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));
+ const ctx=await context(browser,mode,viewport,options);const page=await ctx.newPage();const errors=[];page.on('pageerror',e=>errors.push(JSON.stringify({message:e.message,name:e.name,stack:e.stack})));
  await page.goto(base+'/workspace/board/',{waitUntil:'domcontentloaded'});
  await page.waitForFunction(()=>document.querySelectorAll('.dc-notice[data-artifact]').length>=2,{timeout:8000});
  if(mode==='relations'){
@@ -843,6 +973,28 @@ try{
       }
     }
     detailTrace.mobile390=record;
+    if(errors.some(error=>String(error).includes('insertBefore'))){
+      const diagnostic=await page.evaluate(()=>globalThis.__QA_INSERT_BEFORE_DIAGNOSTIC__||null);
+      const assertionStatus={
+        BQA24:!failures.some(message=>String(message).startsWith('BQA-24')),
+        BQA25:!failures.some(message=>String(message).startsWith('BQA-25')),
+        BQA26:!failures.some(message=>String(message).startsWith('BQA-26')),
+        BQA28:!failures.some(message=>String(message).startsWith('BQA-28'))
+      };
+      console.error('INSERTBEFORE_OWNER_TRACE '+JSON.stringify({
+        reproduction:'mobile-390-artifact-collaboration-relations',
+        assertionStatus,
+        pageErrors:errors,
+        windowErrors:diagnostic?.windowErrors||[],
+        unhandledRejections:diagnostic?.unhandledRejections||[],
+        insertBeforeThrows:diagnostic?.insertBeforeThrows||[],
+        recentInsertBeforeCalls:(diagnostic?.insertBeforeCalls||[]).slice(-20),
+        recentEvents:(diagnostic?.events||[]).slice(-20)
+      }));
+      await page.screenshot({path:path.join(outDir,'insertbefore-owner-trace-mobile-390.png'),fullPage:true});
+      await ctx.close();
+      throw new Error('INSERTBEFORE_OWNER_TRACE_REPRODUCED');
+    }
     await ctx.close();
   }
 
