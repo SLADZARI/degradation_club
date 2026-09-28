@@ -3,7 +3,7 @@
 Status: **ACTIVE / MEMBERSHIP V2 CORE PASS / DC-9 SEMANTIC INTEGRITY QA-MEM-035…042 CLOSED / G8 COMPLETE / BOARD RESULT WAITING**  
 Date opened: **2026-09-02**  
 Last live regression pass: **2026-09-08**  
-Operating update: **2026-09-08**  
+Operating update: **2026-09-28**  
 Behavioral QA extension: **2026-09-20**  
 Environment: **PRODUCTION / https://dementor.club**  
 Source of truth: `dementor-club`  
@@ -1639,6 +1639,143 @@ Requires authority + current owner inventory before implementation because chang
 
 **Authority conflict to resolve before implementation**
 Current approved Contribution Inbound & Editorial Workflow v1 says editorial/review authority is `OWNER_ADMIN ONLY` and explicitly states `GLOBAL DEMENTOR ≠ CONTRIBUTION REVIEWER`. Current Board authority also states Dementor role alone does not grant global moderation. Therefore any implementation where two Dementor approvals become authoritative must go through Change Control / Change Proposal rather than a silent BQA-22 UX fix.
+
+
+#### BQA-23 — Owner Admin operational controls exist in backend but have no canonical operations UI
+Severity: **P1 / OPERATIONS UX + GOVERNANCE**
+
+**LIVE FACT — 2026-09-28**
+
+During Artifact Collaboration v1 live acceptance, Owner Admin needed to grant additional Artifact capacity to a Member. The approved production RPC worked successfully:
+
+`dc_admin_grant_artifact_slots_v1`
+
+Live evidence:
+
+```text
+profile          Gabil Tagiev
+before           1 granted slot
+owner grant      +3
+after            4 granted slots
+grant provenance owner-admin/manual/2026-09-28
+result           PASS
+```
+
+The operation had to be executed manually from browser DevTools because the existing Owner Admin surface does not expose this approved operation.
+
+Current canonical Owner Admin surface already exists:
+
+`/workspace/admin/` → **SYSTEM TOOLS**
+
+It currently contains design/test/auth/data diagnostic tools, but no bounded operations panel for approved Community / Artifact administration.
+
+**Problem**
+
+Owner Admin capabilities already exist in backend contracts, but operationally important actions are scattered across:
+- Artifact detail controls;
+- hidden/backend-only RPCs;
+- DevTools/manual RPC calls;
+- ad-hoc knowledge of profile ids.
+
+This creates avoidable operational risk:
+- wrong profile id / wrong amount / wrong target;
+- no human-readable preflight before a privileged mutation;
+- dependence on developer tooling for routine club operations;
+- poor discoverability of already-approved admin capabilities;
+- harder QA/audit because the intended owner path is not visible in product UI.
+
+**Existing-before-new rule**
+
+Do **not** create a second admin shell, second Workspace, or parallel permission system.
+
+Extend the existing canonical Owner Admin surface:
+
+`/workspace/admin/`
+
+with one bounded **Community Ops / Artifact Admin** tool.
+
+This UI must call existing canonical RPCs/owners and must not introduce new authority merely because a button exists.
+
+**Initial bounded scope**
+
+Only expose actions whose authority is already approved and implemented:
+
+1. **Artifact slot grants**
+   - search/select a registered profile safely;
+   - show current granted / consuming / available capacity;
+   - grant additional slots through `dc_admin_grant_artifact_slots_v1`;
+   - require amount + reason + provenance/source ref;
+   - show post-mutation total and durable grant history.
+
+2. **Idea collaboration operations**
+   - inspect current author / INVITED / JOINED roster for an Idea;
+   - invite a registered profile where Owner Admin is already authorized;
+   - remove an INVITED/JOINED participant where Owner Admin is already authorized;
+   - never convert invite/join into Membership or ownership;
+   - never expose private account email as the primary identity selector.
+
+3. **Artifact operational actions already owned by current backend**
+   - identify/inspect active Artifact ownership and visibility;
+   - close/archive only through the existing canonical close owner;
+   - no direct table edit UI.
+
+**Explicit non-goals / change-control boundary**
+
+This QA item does **not** approve:
+- new roles or permissions;
+- generic user management;
+- manual Membership activation;
+- bypass of DC-9 / Application / Membership review;
+- arbitrary SQL/table editing;
+- new invite-by-email semantics;
+- new slot economy/reward rules;
+- generic ACL/friends/group management;
+- a second admin shell.
+
+If an operational request requires authority not already present in approved backend contracts, STOP and open Change Control rather than adding another admin button.
+
+**UX requirement**
+
+The Owner Admin tool should work in human terms, not UUIDs:
+
+```text
+find person / artifact
+→ show current canonical state
+→ show exact permitted action
+→ require reason/provenance when mutation is privileged
+→ confirm
+→ execute canonical RPC
+→ show resulting canonical state
+→ preserve audit evidence
+```
+
+For profile search, use safe registered-profile identity projection (display name / nickname / safe platform identifier). Do not require the admin to know raw profile UUIDs.
+
+**Required QA**
+
+- Owner Admin positive path;
+- ordinary Member negative access;
+- direct route access negative for non-owner;
+- desktop + mobile;
+- profile ambiguity / same-name handling;
+- wrong/invalid amount;
+- duplicate grant prevention/audit behavior;
+- invite already INVITED/JOINED;
+- remove only current INVITED/JOINED;
+- CIRCLE no-oracle/privacy preservation;
+- operation refreshes affected Board/detail state without manual reload;
+- no duplicate Workspace Header/Sidebar/System Tools owner;
+- all mutations map to canonical RPCs and leave durable provenance.
+
+**Acceptance candidate**
+
+Owner Admin can perform routine, already-authorized Community/Artifact operations from one existing canonical System Tools surface without DevTools, raw UUIDs, direct SQL, or parallel state ownership.
+
+**Status**
+
+**OPEN / LIVE OPERATIONAL GAP CONFIRMED.**
+
+Implementation should be handled as a bounded stabilization / operations Result after current Artifact Collaboration live acceptance, unless the current Result explicitly absorbs only the minimal UI needed for its own acceptance.
 
 
 
