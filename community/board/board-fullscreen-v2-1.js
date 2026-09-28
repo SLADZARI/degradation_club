@@ -6,7 +6,7 @@ const programHost=document.getElementById('boardProgramHost');
 let viewport=null,entryStatus=null,activeIndex=0,cameraSnapshot=null;
 function boardUserState(){return String(document.documentElement.dataset.dcBoardUserState||'')}
 function isOwnerAdmin(){return boardUserState()==='OWNER_ADMIN'}
-function interactiveTarget(target){return target.closest?.('a,button,input,textarea,select,label,dialog')}
+function interactiveTarget(target){return target.closest?.('a,button,input,textarea,select,label,summary,dialog')}
 function visibleCards(){return [...(boardHost?.querySelectorAll('.dc-notice[data-artifact],[data-board-source="platform"]')||[])].filter(card=>!card.hidden&&!card.classList.contains('dc-board-filtered'))}
 function stripBoardActions(){boardHost?.querySelectorAll('.dc-notice[data-artifact]').forEach(card=>{card.classList.remove('is-dragging');card.setAttribute('tabindex','0');card.setAttribute('role','button');card.setAttribute('aria-label',`${(card.querySelector('h3')?.textContent||'Объявление').trim()}. Открыть`);card.querySelectorAll('img').forEach(img=>img.draggable=false);if(!card.querySelector('.dc-board-open-hint')){const hint=document.createElement('div');hint.className='dc-board-open-hint';hint.textContent='ОТКРЫТЬ →';card.appendChild(hint)}})}
 function cardHref(card){if(card.dataset.artifact)return route(`/community/artifact/${card.dataset.artifact}/`);return null}

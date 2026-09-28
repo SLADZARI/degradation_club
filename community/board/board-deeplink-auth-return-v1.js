@@ -2,6 +2,7 @@ import {getClient,currentSession,loginWithGoogle,route} from '/community-runtime
 
 const boardHost=document.getElementById('boardHost');
 const FOCUS_RE=/^(artifact|entity):([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$/i;
+const INTERACTIVE_CONTROL_SELECTOR='a,button,input,textarea,select,label,summary,dialog,[contenteditable="true"]';
 let session=null;
 let resolving=false;
 let popHandling=false;
@@ -319,7 +320,7 @@ function onArtifactClosed(){
 }
 function installHistoryBridge(){
   document.addEventListener('click',event=>{
-    const interactive=event.target.closest?.('a,button,input,textarea,select,label,dialog');if(interactive)return;
+    const interactive=event.target.closest?.(INTERACTIVE_CONTROL_SELECTOR);if(interactive)return;
     const card=event.target.closest?.('.dc-notice[data-artifact]');if(!card||card.hidden||card.classList.contains('dc-board-filtered'))return;
     if(Number(card.dataset.boardJustDragged||0)>Date.now()-650)return;
     const id=card.dataset.artifact;if(id&&!sameFocus('artifact',id))setFocus('artifact',id,{pushed:true});

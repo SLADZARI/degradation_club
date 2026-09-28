@@ -22,6 +22,15 @@ function minLocalDateTime(){return localDateInput(new Date(Date.now()+60*1000).t
 function iso(value){return value?new Date(value).toISOString():null}
 function formatActivityDate(value){if(!value)return'';const d=new Date(value);if(Number.isNaN(d.getTime()))return'';return new Intl.DateTimeFormat('ru-RU',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}).format(d).replace(',',' ·').toUpperCase()}
 function avatar(profile){if(profile?.avatar_url)return `<img class="dc-notice__avatar" src="${esc(profile.avatar_url)}" alt="">`;const letter=String(profile?.display_name||'?').trim().charAt(0).toUpperCase()||'?';return `<span class="dc-notice__avatar dc-notice__avatar--empty">${esc(letter)}</span>`}
+function collaborationAvatar(profile){if(profile?.avatar_url)return `<img class="dc-collab-avatar" src="${esc(profile.avatar_url)}" alt="">`;const letter=String(profile?.display_name||'?').trim().charAt(0).toUpperCase()||'?';return `<span class="dc-collab-avatar dc-collab-avatar--empty" aria-hidden="true">${esc(letter)}</span>`}
+function collaborationPeople(rows,max=3){const list=(rows||[]).slice(0,max);const rest=Math.max(0,(rows||[]).length-list.length);return list.length?`${list.map(row=>`<span class="dc-collab-person">${collaborationAvatar(row)}<span>${esc(row.display_name||'УЧАСТНИК')}</span></span>`).join('')}${rest?`<span class="dc-collab-more">+${rest}</span>`:''}`:'<span class="dc-collab-empty">—</span>'}
+function collaborationCardMarkup(artifact,profile,participants=[]){
+  if(String(artifact?.artifact_type||'').toLowerCase()!=='idea')return'';
+  const joined=participants.filter(row=>row.participation_state==='JOINED');
+  const invited=participants.filter(row=>row.participation_state==='INVITED');
+  const mine=participants.find(row=>row.profile_id===session?.user?.id)?.participation_state||'';
+  return `<section class="dc-idea-collab" data-collaboration-card data-my-participation="${esc(mine)}"><div class="dc-idea-collab__row"><span class="dc-idea-collab__label">ИНИЦИАТОР</span><span class="dc-collab-person">${collaborationAvatar(profile)}<span>${esc(profile?.display_name||'MEMBER')}</span></span></div><div class="dc-idea-collab__row"><span class="dc-idea-collab__label">В ДЕЛЕ</span><span class="dc-idea-collab__people">${collaborationPeople(joined)}</span></div><div class="dc-idea-collab__row"><span class="dc-idea-collab__label">ПОЗВАНЫ</span><span class="dc-idea-collab__people">${collaborationPeople(invited)}</span></div>${mine==='INVITED'?'<div class="dc-idea-collab__signal">ВАС ЗОВУТ · ОТКРОЙТЕ ИДЕЮ</div>':mine==='JOINED'?'<div class="dc-idea-collab__signal">ВЫ В ДЕЛЕ</div>':''}</section>`;
+}
 function artifactSubtypeOptions(selected='announcement'){const current=artifactSubtypeIds.has(String(selected))?String(selected):'announcement';return ARTIFACT_SUBTYPES.map(([id,label])=>`<option value="${id}" ${id===current?'selected':''}>${label}</option>`).join('')}
 function normalizeExternalUrl(value){
   const raw=String(value||'').trim();if(!raw)return null;
@@ -66,7 +75,7 @@ function promotionLabel(row){
 }
 
 async function loadOwnDraft(){
-  const {data,error}=await client.from('dc_artifacts').select('id,artifact_type,title,body,external_url,status,starts_at,activity_at,expires_at,created_at').eq('author_profile_id',session.user.id).eq('status','draft').order('created_at',{ascending:false}).limit(1).maybeSingle();
+  const {data,error}=await client.from('dc_artifacts').select('id,artifact_type,title,body,external_url,status,visibility,starts_at,activity_at,expires_at,created_at').eq('author_profile_id',session.user.id).eq('status','draft').order('created_at',{ascending:false}).limit(1).maybeSingle();
   if(error)throw error;ownDraft=data||null;ownDraftMedia=[];
   if(ownDraft){const media=await client.from('dc_artifact_media').select('id,media_type,storage_path,metadata').eq('artifact_id',ownDraft.id);if(media.error)throw media.error;ownDraftMedia=media.data||[]}
 }
@@ -110,6 +119,7 @@ function renderComposer(draft){
   const media=ownDraftMedia[0]||null;
   entryHost.innerHTML=`<div class="dc-composer"><div class="dc-composer-head"><span>ARTIFACT / PUBLICATION<br>${draft?'DRAFT / SAVED':isOwnerAdmin()?'OWNER ADMIN / READY':'SLOT / READY'}</span><div><h2>ЕСЛИ БЫ ВЫ БЫЛИ ДЕМЕНТОРОМ —<br>ЧТО БЫ ВЫ ПРЕДЛОЖИЛИ ДРУГИМ?</h2><button class="dc-inline-help" type="button" id="openDementorExplainer">ЧТО ЭТО ЗНАЧИТ? →</button></div></div><form class="dc-composer-form" id="artifactForm" novalidate>
     <div class="dc-composer-field"><label for="artifactType">Тип публикации *</label><select id="artifactType" name="artifact_type" required>${artifactSubtypeOptions(draft?.artifact_type)}</select><small>Тип описывает смысл публикации и не меняет ваши права, slot или роль.</small></div>
+    <div class="dc-composer-field dc-composer-visibility" id="artifactVisibilityField" ${String(draft?.artifact_type||'announcement')==='idea'?'':'hidden'}><span class="dc-composer-label">Видно</span><div class="dc-composer-visibility__options" role="radiogroup" aria-label="Видимость идеи"><label><input type="radio" name="visibility" value="community" ${String(draft?.visibility||'community')!=='circle'?'checked':''}> ВЕСЬ КЛУБ</label><label><input type="radio" name="visibility" value="circle" ${String(draft?.visibility||'community')==='circle'?'checked':''}> СВОЙ КРУГ</label></div><small>Только для ИДЕИ. СВОЙ КРУГ не делает ссылку приглашением и не меняет Membership.</small></div>
     <div class="dc-composer-field"><label for="artifactTitle">Заголовок</label><input id="artifactTitle" name="title" maxlength="160" value="${esc(draft?.title||'')}" placeholder="Можно без него"><small>Опционально. Не превращайте это в рекламный слоган.</small></div>
     <div class="dc-composer-field"><label for="artifactBody">Текст *</label><textarea id="artifactBody" name="body" maxlength="4000" required placeholder="Что именно вы предлагаете?">${esc(draft?.body||'')}</textarea><small>Текст обязателен. Artifact не становится автоматически событием, курсом или проектом.</small></div>
     <div class="dc-composer-field"><label for="artifactUrl">Ссылка</label><input id="artifactUrl" name="external_url" maxlength="1000" inputmode="url" value="${esc(draft?.external_url||'')}" placeholder="https://…"><small>Опциональная внешняя ссылка. Если вставить адрес без протокола, попробуем безопасно добавить https://.</small></div>
@@ -125,11 +135,14 @@ function renderComposer(draft){
   document.getElementById('openDementorExplainer')?.addEventListener('click',()=>dialog?.showModal());
   document.getElementById('closeDementorExplainer')?.addEventListener('click',()=>dialog?.close());
   dialog?.addEventListener('click',event=>{if(event.target===dialog)dialog.close()});
+  const typeSelect=document.getElementById('artifactType');const visibilityField=document.getElementById('artifactVisibilityField');
+  const syncVisibility=()=>{const idea=typeSelect?.value==='idea';if(visibilityField)visibilityField.hidden=!idea;if(!idea)document.querySelector('input[name="visibility"][value="community"]')?.click()};
+  typeSelect?.addEventListener('change',syncVisibility);syncVisibility();
 }
 
 async function publishFromForm(event){
   event.preventDefault();const form=event.currentTarget;const submit=form.querySelector('button[type=submit]');const state=document.getElementById('composerState');const fd=new FormData(form);clearComposerError();
-  const artifactType=String(fd.get('artifact_type')||'').trim().toLowerCase();const body=String(fd.get('body')||'').trim();const title=String(fd.get('title')||'').trim()||null;const externalRaw=String(fd.get('external_url')||'').trim();const activityRaw=String(fd.get('activity_at')||'').trim();const expiresRaw=String(fd.get('expires_at')||'').trim();const file=form.querySelector('#artifactFile')?.files?.[0]||null;
+  const artifactType=String(fd.get('artifact_type')||'').trim().toLowerCase();const visibility=artifactType==='idea'&&String(fd.get('visibility')||'community').toLowerCase()==='circle'?'circle':'community';const body=String(fd.get('body')||'').trim();const title=String(fd.get('title')||'').trim()||null;const externalRaw=String(fd.get('external_url')||'').trim();const activityRaw=String(fd.get('activity_at')||'').trim();const expiresRaw=String(fd.get('expires_at')||'').trim();const file=form.querySelector('#artifactFile')?.files?.[0]||null;
   if(!artifactSubtypeIds.has(artifactType)){showComposerError('Выберите тип публикации.','artifactType');return}
   if(!body){showComposerError('Введите текст публикации.','artifactBody');return}
   let externalUrl=null;
@@ -146,11 +159,17 @@ async function publishFromForm(event){
       ownDraft={...ownDraft,title,body,external_url:externalUrl,expires_at:expiresAt};
     }else{
       const created=await client.rpc('dc_create_artifact_draft_v1',{p_body:body,p_title:title,p_external_url:externalUrl,p_starts_at:null,p_expires_at:expiresAt});if(created.error)throw created.error;artifactId=created.data;
-      ownDraft={id:artifactId,artifact_type:'announcement',title,body,external_url:externalUrl,activity_at:null,expires_at:expiresAt,status:'draft'};
+      ownDraft={id:artifactId,artifact_type:'announcement',title,body,external_url:externalUrl,visibility:'community',activity_at:null,expires_at:expiresAt,status:'draft'};
+    }
+    if(artifactType!=='idea'){
+      const resetVisibility=await client.rpc('dc_set_artifact_visibility_v1',{p_artifact_id:artifactId,p_visibility:'community'});if(resetVisibility.error)throw resetVisibility.error;
     }
     const subtype=await client.rpc('dc_set_artifact_subtype_v1',{p_artifact_id:artifactId,p_artifact_type:artifactType});if(subtype.error)throw subtype.error;
+    if(artifactType==='idea'){
+      const visibilitySet=await client.rpc('dc_set_artifact_visibility_v1',{p_artifact_id:artifactId,p_visibility:visibility});if(visibilitySet.error)throw visibilitySet.error;
+    }
     const activity=await client.rpc('dc_set_artifact_activity_v1',{p_artifact_id:artifactId,p_activity_at:activityAt});if(activity.error)throw activity.error;
-    ownDraft={...ownDraft,artifact_type:artifactType,activity_at:activityAt};
+    ownDraft={...ownDraft,artifact_type:artifactType,visibility,activity_at:activityAt};
     if(file&&!ownDraftMedia.length){
       state.textContent='ЗАГРУЖАЕМ ИЗОБРАЖЕНИЕ';const path=`${session.user.id}/${artifactId}/${Date.now()}-${safeFileName(file.name)}`;const uploaded=await client.storage.from(DC_ARTIFACT_BUCKET).upload(path,file,{upsert:false,contentType:file.type});if(uploaded.error)throw uploaded.error;uploadedPath=path;
       const metadata={name:file.name,size:file.size,mime:file.type};const attached=await client.rpc('dc_attach_artifact_media_v1',{p_artifact_id:artifactId,p_storage_path:path,p_media_type:'image',p_metadata:metadata});if(attached.error){await client.storage.from(DC_ARTIFACT_BUCKET).remove([path]).catch(()=>{});throw attached.error}ownDraftMedia=[{storage_path:path,media_type:'image',metadata}];uploadedPath=null;
@@ -199,7 +218,7 @@ async function resolveUnknownDelivery(outboxId,resolution){
 async function loadBoard(){
   const normalized=await client.rpc('dc_normalize_artifact_lifecycle_v1');if(normalized.error)throw normalized.error;
   const [artifactsResult,promotionResult]=await Promise.all([
-    client.from('dc_artifacts').select('id,author_profile_id,artifact_type,title,body,external_url,status,starts_at,activity_at,expires_at,published_at,closed_at,created_at').eq('visibility','community').in('status',['active','expired','archived']).is('board_hidden_at',null).order('published_at',{ascending:false}),
+    client.from('dc_artifacts').select('id,author_profile_id,artifact_type,title,body,external_url,status,visibility,starts_at,activity_at,expires_at,published_at,closed_at,created_at').in('status',['active','expired','archived']).is('board_hidden_at',null).order('published_at',{ascending:false}),
     client.rpc('dc_board_promotion_state_read_v1')
   ]);
   if(artifactsResult.error)throw artifactsResult.error;if(promotionResult.error)throw promotionResult.error;
@@ -215,8 +234,11 @@ async function loadBoard(){
   ]);
   for(const result of [profilesResult,reactionsResult,mediaResult,responsesResult])if(result.error)throw result.error;
   const profiles=new Map((profilesResult.data||[]).map(p=>[p.profile_id,p]));const reactions=reactionsResult.data||[];const media=mediaResult.data||[];const responses=responsesResult.data||[];
+  const ideaIds=artifacts.filter(row=>String(row.artifact_type||'').toLowerCase()==='idea').map(row=>row.id);
+  const participantEntries=await Promise.all(ideaIds.map(async id=>{const result=await client.rpc('dc_artifact_participants_read_v1',{p_artifact_id:id});if(result.error)throw result.error;return[id,result.data||[]]}));
+  const participantsByArtifact=new Map(participantEntries);
   const mediaUrls=new Map();await Promise.all(media.map(async item=>{try{mediaUrls.set(item.id,await signedMediaUrl(client,item.storage_path))}catch{mediaUrls.set(item.id,null)}}));
-  boardHost.innerHTML=artifacts.map((artifact,index)=>renderNotice(artifact,index,profiles.get(artifact.author_profile_id),reactions.filter(r=>r.artifact_id===artifact.id),media.filter(m=>m.artifact_id===artifact.id).map(m=>({...m,signedUrl:mediaUrls.get(m.id)})),responses.filter(r=>r.artifact_id===artifact.id),promotionState.get(artifact.id))).join('');
+  boardHost.innerHTML=artifacts.map((artifact,index)=>renderNotice(artifact,index,profiles.get(artifact.author_profile_id),reactions.filter(r=>r.artifact_id===artifact.id),media.filter(m=>m.artifact_id===artifact.id).map(m=>({...m,signedUrl:mediaUrls.get(m.id)})),responses.filter(r=>r.artifact_id===artifact.id),promotionState.get(artifact.id),participantsByArtifact.get(artifact.id)||[])).join('');
   installNoticeActions();
 }
 
@@ -235,16 +257,18 @@ function promotionControls(artifact,row,{ownerAdmin=false,historical=false}={}){
   return parts.join('');
 }
 
-function renderNotice(artifact,index,profile,reactions,media,responses,promotion){
+function renderNotice(artifact,index,profile,reactions,media,responses,promotion,participants=[]){
   const mine=artifact.author_profile_id===session.user.id;const ownerAdmin=isOwnerAdmin();const historical=isHistoricalStatus(artifact.status);const myReaction=reactions.some(r=>r.profile_id===session.user.id);const myResponse=responses.find(r=>r.responder_profile_id===session.user.id&&r.status==='submitted');const incoming=mine?responses.filter(r=>r.status==='submitted').length:0;const item=media[0];let mediaHtml='';
-  const subtype=String(artifact.artifact_type||'announcement').toLowerCase();
+  const subtype=String(artifact.artifact_type||'announcement').toLowerCase();const isIdea=subtype==='idea';const myParticipation=participants.find(row=>row.profile_id===session.user.id)?.participation_state||'';const circleInviteReadOnly=isIdea&&artifact.visibility==='circle'&&myParticipation==='INVITED';
   if(item?.signedUrl){mediaHtml=item.media_type==='image'?`<div class="dc-notice__media"><img src="${esc(item.signedUrl)}" alt="Прикреплённое изображение"></div>`:''}
   const activityLink=myResponse||myReaction?`<a class="dc-board-action small" href="${route('/workspace/#activity')}">МОЯ АКТИВНОСТЬ</a>`:'';
   const adminControl=ownerAdmin&&!mine&&artifact.status!=='archived'?`<button class="dc-board-admin-close" type="button" data-admin-close-artifact="${artifact.id}" aria-label="Owner Admin: убрать Artifact с доски">ADMIN ×</button>`:'';
   const responseControl=mine?(historical?'':`<button class="dc-board-action small" type="button" data-close-artifact="${artifact.id}">УБРАТЬ</button>`):(historical?'<span class="dc-board-state">ОТКЛИКИ ЗАКРЫТЫ</span>':`<button class="dc-board-action small${myResponse?' primary':''}" type="button" data-response="${artifact.id}" ${myResponse?'disabled':''}>${myResponse?'ОТКЛИК ОТПРАВЛЕН':'ОТКЛИКНУТЬСЯ'}</button>`);
   const statusLine=historical?(artifact.status==='expired'?'ПРОШЛО / EXPIRED':'АРХИВ / CLOSED'):(artifact.expires_at?`ДЕЙСТВУЕТ ДО ${formatDate(artifact.expires_at)}`:'БЕЗ СРОКА');
   const activityLine=artifact.activity_at?`<div class="dc-notice__expiry">КОГДА · ${esc(formatActivityDate(artifact.activity_at))}</div>`:'';
-  return `<article class="dc-notice${historical?' is-history':''}" data-artifact="${artifact.id}" data-artifact-status="${esc(artifact.status)}" data-artifact-subtype="${esc(subtype)}" data-source-type="artifact" data-artifact-owned="${mine?'1':'0'}">${adminControl}<div class="dc-notice__meta"><span>${esc(artifactSubtypeLabel(subtype))} / ${String(index+1).padStart(3,'0')}</span><span>${formatDate(artifact.published_at)}</span></div><div class="dc-notice__author">${avatar(profile)}<div><strong>${esc(profile?.display_name||'MEMBER')}</strong>${profile?.nickname?`<div>@${esc(profile.nickname.replace(/^@/,''))}</div>`:''}</div></div>${artifact.title?`<h3>${esc(artifact.title)}</h3>`:''}<p class="dc-notice__body">${esc(artifact.body)}</p>${mediaHtml}${artifact.external_url?`<p><a class="dc-notice__link" href="${esc(artifact.external_url)}" target="_blank" rel="noopener noreferrer">ССЫЛКА ↗</a></p>`:''}${activityLine}<div class="dc-notice__expiry">${statusLine} · COMMUNITY</div><div class="dc-notice__actions"><span class="dc-notice__activity">ИНТЕРЕСНО: ${reactions.length}${mine?` · ОТКЛИКОВ: ${incoming}`:''}</span><button class="dc-board-action small${myReaction?' primary':''}" type="button" data-reaction="${artifact.id}" data-active="${myReaction?'1':'0'}">${myReaction?'✓ ИНТЕРЕСНО':'МНЕ ЭТО НАДО'}</button>${responseControl}${activityLink}<a class="dc-board-action small" href="${route(`/community/artifact/${artifact.id}/`)}">ОТКРЫТЬ</a>${promotionControls(artifact,promotion,{ownerAdmin,historical})}</div></article>`;
+  const collab=collaborationCardMarkup(artifact,profile,participants);const authorHtml=isIdea?'':`<div class="dc-notice__author">${avatar(profile)}<div><strong>${esc(profile?.display_name||'MEMBER')}</strong>${profile?.nickname?`<div>@${esc(profile.nickname.replace(/^@/,''))}</div>`:''}</div></div>`;
+  const actionControls=circleInviteReadOnly?'<span class="dc-board-state">ВАС ЗОВУТ · ОТКРОЙТЕ ИДЕЮ</span>':`<span class="dc-notice__activity">ИНТЕРЕСНО: ${reactions.length}${mine?` · ОТКЛИКОВ: ${incoming}`:''}</span><button class="dc-board-action small${myReaction?' primary':''}" type="button" data-reaction="${artifact.id}" data-active="${myReaction?'1':'0'}">${myReaction?'✓ ИНТЕРЕСНО':'МНЕ ЭТО НАДО'}</button>${responseControl}${activityLink}`;
+  return `<article class="dc-notice${historical?' is-history':''}" data-artifact="${artifact.id}" data-artifact-status="${esc(artifact.status)}" data-artifact-subtype="${esc(subtype)}" data-artifact-visibility="${esc(artifact.visibility||'community')}" data-collab-my-state="${esc(myParticipation)}" data-source-type="artifact" data-artifact-owned="${mine?'1':'0'}">${adminControl}<div class="dc-notice__meta"><span>${esc(artifactSubtypeLabel(subtype))} / ${String(index+1).padStart(3,'0')}</span><span>${formatDate(artifact.published_at)}</span></div>${authorHtml}${artifact.title?`<h3>${esc(artifact.title)}</h3>`:''}<p class="dc-notice__body">${esc(artifact.body)}</p>${collab}${mediaHtml}${artifact.external_url?`<p><a class="dc-notice__link" href="${esc(artifact.external_url)}" target="_blank" rel="noopener noreferrer">ССЫЛКА ↗</a></p>`:''}${activityLine}<div class="dc-notice__expiry">${statusLine} · ${artifact.visibility==='circle'?'СВОЙ КРУГ':'COMMUNITY'}</div><div class="dc-notice__actions">${actionControls}<a class="dc-board-action small" href="${route(`/community/artifact/${artifact.id}/`)}">ОТКРЫТЬ</a>${promotionControls(artifact,promotion,{ownerAdmin,historical})}</div></article>`;
 }
 
 function installNoticeActions(){
