@@ -428,7 +428,7 @@
     "integrationBranch": "result/artifact-collaboration-v1-live-ux-corrective",
     "integrationBaseRef": "dementor-club-production",
     "integrationBaseCommit": "260c5fe911fb0cad9902ad2db5d76060f47c18cc",
-    "productionBaseCommit": "df8a24eca2bcca25339f128c7da93982515cf442",
+    "productionBaseCommit": "260c5fe911fb0cad9902ad2db5d76060f47c18cc",
     "implementationStartAuthorized": true,
     "schemaMutationAuthorized": true,
     "liveDatabaseMutationAuthorized": true,
