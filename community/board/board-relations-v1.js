@@ -226,6 +226,8 @@ async function createRelation(card,endpoint,select,statusRoot=card){
     p_target_source_id:target.sourceId
   });
   if(error){setRelationStatus(statusRoot,humanRelationError(error),'error');return}
+  const form=statusRoot?.querySelector?.('[data-relation-form]');
+  if(form)form.hidden=true;
   setRelationStatus(statusRoot,'СВЯЗЬ СОХРАНЕНА','success');
   await refreshAfterMutation();
 }
@@ -248,7 +250,13 @@ function wireBlock(block,endpoint,card){
     const add=event.target.closest?.('[data-relation-add]');
     if(add){event.preventDefault();const form=block.querySelector('[data-relation-form]');if(form)form.hidden=false;return}
     const cancel=event.target.closest?.('[data-relation-cancel]');
-    if(cancel){event.preventDefault();const form=block.querySelector('[data-relation-form]');if(form)form.hidden=true;return}
+    if(cancel){
+      event.preventDefault();
+      const form=block.querySelector('[data-relation-form]');
+      if(form)form.hidden=true;
+      if(block.dataset.relationDetail==='1')schedulePresentation({details:true});
+      return;
+    }
     const save=event.target.closest?.('[data-relation-save]');
     if(save){event.preventDefault();createRelation(card,endpoint,block.querySelector('[data-relation-choice]'),block).catch(error=>setRelationStatus(block,humanRelationError(error),'error'));return}
     const remove=event.target.closest?.('[data-relation-delete]');
@@ -409,23 +417,27 @@ function clearArtifactDetail(){
   document.querySelector('.dc-artifact-overlay__panel > [data-relation-detail-host]')?.remove();
 }
 function injectArtifactDetail(){
-  clearArtifactDetail();
-  if(!backendAvailable||!relationRows)return;
+  if(!backendAvailable||!relationRows){clearArtifactDetail();return}
   const overlay=document.querySelector('.dc-artifact-overlay:not([hidden])');
   const frame=overlay?.querySelector('iframe');
   const panel=overlay?.querySelector('.dc-artifact-overlay__panel');
-  if(!frame||!panel||frame.src==='about:blank')return;
+  if(!frame||!panel||frame.src==='about:blank'){clearArtifactDetail();return}
   let path='';
-  try{path=new URL(frame.src,location.href).pathname}catch{return}
+  try{path=new URL(frame.src,location.href).pathname}catch{clearArtifactDetail();return}
   const match=path.match(/^\/community\/artifact\/([^/]+)\/?$/);
-  if(!match)return;
+  if(!match){clearArtifactDetail();return}
   const card=supportedCards().find(node=>node.dataset.relationKind==='artifact'&&node.dataset.relationSourceId===match[1]);
-  if(!card)return;
+  if(!card){clearArtifactDetail();return}
   const endpoint=endpointFromCard(card);
+  const existing=panel.querySelector(':scope > [data-relation-detail-host]');
+  const activeForm=existing?.querySelector('[data-relation-form]:not([hidden])');
+  if(existing?.dataset.relationDetailKey===endpoint.key&&activeForm)return;
+  existing?.remove();
   const html=blockHtml(endpoint,{detail:true});if(!html)return;
   const host=document.createElement('section');
   host.className='dc-board-relation-detail-host';
   host.dataset.relationDetailHost='1';
+  host.dataset.relationDetailKey=endpoint.key;
   host.setAttribute('aria-label','Связи Artifact');
   host.innerHTML=html;
   panel.appendChild(host);

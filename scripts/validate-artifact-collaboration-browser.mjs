@@ -203,422 +203,8 @@ async function openBoard(browser,mode,viewport={width:1440,height:900},options={
  return{ctx,page,errors};
 }
 
-function classifySaveFailure(evidence){
-  const before=evidence?.snapshots?.beforeSelect||{};
-  const after=evidence?.snapshots?.afterSelect||{};
-  const pre=evidence?.snapshots?.preAction||{};
-  const events=evidence?.events||[];
-  const pointer=events.find(item=>item.phase==='capture'&&item.type==='pointerdown')||null;
-  const clickCapture=events.find(item=>item.phase==='capture'&&item.type==='click')||null;
-  const clickBubble=events.find(item=>item.phase==='bubble'&&item.type==='click')||null;
-  const specificClick=(evidence?.specificEvents||[]).find(item=>item.type==='click')||null;
-  const replacement=Boolean(
-    evidence?.replacement?.saveReplaced
-    ||evidence?.replacement?.formReplaced
-    ||evidence?.replacement?.blockReplaced
-    ||evidence?.replacement?.detailHostReplaced
-    ||before.saveConnected===false
-    ||after.saveConnected===false
-    ||pre.saveConnected===false
-  );
-  if(replacement)return'S2';
-  if(
-    (pointer&&pointer.targetIsCurrentSave===false)
-    ||(clickCapture&&clickCapture.targetIsCurrentSave===false)
-  )return'S1';
-  if(
-    clickCapture?.targetIsCurrentSave===true
-    &&clickCapture?.currentSaveConnected===true
-    &&clickCapture?.currentSaveCanonical===true
-  ){
-    const handlerEntered=Boolean(clickBubble?.defaultPrevented||evidence?.statusBusySeen);
-    if(!handlerEntered)return'S3';
-    return'S4';
-  }
-  if(!specificClick&&!clickCapture)return'S5';
-  return'S5';
-}
-
-async function runMobileSaveDiagnostic(browser,runIndex){
-  const{ctx,page,errors}=await openBoard(browser,'relations',{width:390,height:844},{hasTouch:true});
-  const pageErrors=[];
-  const consoleEvents=[];
-  page.on('pageerror',error=>pageErrors.push({
-    name:error?.name||'Error',
-    message:error?.message||String(error),
-    stack:String(error?.stack||''),
-    url:page.url()
-  }));
-  page.on('console',message=>{
-    consoleEvents.push({type:message.type(),text:message.text(),location:message.location()});
-    if(consoleEvents.length>40)consoleEvents.shift();
-  });
-
-  const finish=async(flowError=null)=>{
-    let evidence=null;
-    try{evidence=await page.evaluate(()=>globalThis.__QA_SAVE_TRACE_READ?.()||null)}catch{}
-    return{ctx,page,errors,pageErrors,consoleEvents,flowError,evidence,runIndex};
-  };
-
-  try{
-    const bodyReady=await page.waitForFunction(artifactId=>{
-      const card=document.querySelector('.dc-notice[data-artifact="'+artifactId+'"]');
-      if(!card||!card.isConnected)return false;
-      const blocked='a,button,input,textarea,select,label,summary,dialog,[contenteditable="true"],[data-relation-block],.dc-board-open-hint';
-      for(const node of card.querySelectorAll('h3,.dc-notice__body,.dc-notice__meta,p')){
-        const r=node.getBoundingClientRect();
-        if(!(r.width>0&&r.height>0))continue;
-        const x=r.left+r.width/2,y=r.top+r.height/2;
-        const hit=document.elementFromPoint(x,y);
-        if(!hit||!(hit===card||card.contains(hit))||hit.closest?.(blocked))continue;
-        globalThis.__QA_SAVE_CARD_POINT__={x,y,target:hit.outerHTML?.slice(0,220)||null};
-        return true;
-      }
-      return false;
-    },A,{timeout:6000,polling:'raf'});
-    await bodyReady.dispose();
-    const bodyPoint=await page.evaluate(()=>globalThis.__QA_SAVE_CARD_POINT__);
-    await page.touchscreen.tap(bodyPoint.x,bodyPoint.y);
-    await page.waitForFunction(artifactId=>(
-      new URL(location.href).searchParams.get('focus')==='artifact:'+artifactId
-      &&Boolean(document.querySelector('.dc-artifact-overlay:not([hidden])'))
-    ),A,{timeout:6000});
-    await page.waitForSelector('.dc-board-relation-detail-host [data-relation-block][data-relation-detail="1"][open]',{state:'visible',timeout:6000});
-
-    const addPoint=await page.evaluate(()=>{
-      const node=document.querySelector('.dc-board-relation-detail-host [data-relation-add]');
-      const r=node?.getBoundingClientRect();
-      if(!node||!r||!(r.width>0&&r.height>0))return null;
-      const x=r.left+r.width/2,y=r.top+r.height/2;
-      const hit=document.elementFromPoint(x,y);
-      if(!(hit&&(hit===node||node.contains(hit))))return null;
-      return{x,y};
-    });
-    if(!addPoint)throw new Error('SAVE_DIAG_ADD_HIT_MISSING');
-    await page.touchscreen.tap(addPoint.x,addPoint.y);
-    await page.waitForSelector('.dc-board-relation-detail-host [data-relation-form]',{state:'visible',timeout:3000});
-
-    await page.evaluate(()=>{
-      const ids=new WeakMap();let seq=0;
-      const nodeId=node=>{if(!node)return null;if(!ids.has(node))ids.set(node,'n'+(++seq));return ids.get(node)};
-      const describe=node=>{
-        if(!node||node.nodeType!==1)return null;
-        const tag=node.tagName.toLowerCase();
-        const id=node.id?'#'+node.id:'';
-        const cls=node.classList?.length?'.'+[...node.classList].slice(0,5).join('.'):'';
-        return tag+id+cls;
-      };
-      const canonical=()=>({
-        host:document.querySelector('.dc-board-relation-detail-host'),
-        block:document.querySelector('.dc-board-relation-detail-host [data-relation-block][data-relation-detail="1"]'),
-        form:document.querySelector('.dc-board-relation-detail-host [data-relation-form]'),
-        save:document.querySelector('.dc-board-relation-detail-host [data-relation-save]')
-      });
-      const state=(label)=>{
-        const c=canonical(),r=c.save?.getBoundingClientRect();
-        const center=r&&r.width>0&&r.height>0?{x:r.left+r.width/2,y:r.top+r.height/2}:null;
-        const hit=center?document.elementFromPoint(center.x,center.y):null;
-        return{
-          t:Math.round(performance.now()*1000)/1000,label,
-          detailHostId:nodeId(c.host),blockId:nodeId(c.block),formId:nodeId(c.form),saveId:nodeId(c.save),
-          detailHostConnected:Boolean(c.host?.isConnected),
-          blockConnected:Boolean(c.block?.isConnected),
-          formConnected:Boolean(c.form?.isConnected),
-          saveConnected:Boolean(c.save?.isConnected),
-          saveCanonical:Boolean(c.save&&c.save===canonical().save),
-          saveOuterHTML:c.save?.outerHTML?.slice(0,300)||null,
-          saveRect:r?{left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height}:null,
-          center,
-          elementFromPoint:describe(hit),
-          hitIsSave:Boolean(c.save&&hit&&(hit===c.save||c.save.contains(hit))),
-          focus:new URL(location.href).searchParams.get('focus'),
-          overlay:Boolean(document.querySelector('.dc-artifact-overlay:not([hidden])')),
-          pan:Boolean(document.querySelector('.dc-spatial-viewport')?.classList.contains('is-panning')),
-          dragging:document.documentElement.dataset.boardDragging||null,
-          positionWrites:Number(globalThis.__QA_POSITION_WRITES__||0),
-          createCalls:(globalThis.__QA_COLLAB_CALLS__||[]).filter(call=>call.name==='dc_board_relation_create_v1').length,
-          rpcArgs:(globalThis.__QA_COLLAB_CALLS__||[]).filter(call=>call.name==='dc_board_relation_create_v1').map(call=>call.args),
-          relationStore:Array.isArray(globalThis.__QA_RELATIONS__)?globalThis.__QA_RELATIONS__.map(row=>({...row})):null,
-          createdDom:Boolean(document.querySelector('.dc-board-relation-detail-host [data-relation-id="rel-created"]')),
-          statusText:document.querySelector('.dc-board-relation-detail-host [data-relation-status]')?.textContent||null
-        };
-      };
-      const trace={
-        snapshots:{},
-        events:[],
-        specificEvents:[],
-        mutations:[],
-        statusBusySeen:false,
-        statusTimeline:[],
-        refs:{},
-        actionT:null
-      };
-      const initial=canonical();
-      trace.refs.beforeSelect={
-        host:initial.host,block:initial.block,form:initial.form,save:initial.save,
-        hostId:nodeId(initial.host),blockId:nodeId(initial.block),formId:nodeId(initial.form),saveId:nodeId(initial.save)
-      };
-      trace.snapshots.beforeSelect=state('beforeSelect');
-
-      const eventPoint=event=>{
-        const touch=event.touches?.[0]||event.changedTouches?.[0]||null;
-        return{
-          clientX:Number.isFinite(event.clientX)?event.clientX:(touch?.clientX??null),
-          clientY:Number.isFinite(event.clientY)?event.clientY:(touch?.clientY??null)
-        };
-      };
-      const eventRecord=(event,phase)=>{
-        const c=canonical();
-        const point=eventPoint(event);
-        const path=event.composedPath?.().slice(0,6).map(describe)||[];
-        trace.events.push({
-          t:Math.round(performance.now()*1000)/1000,
-          type:event.type,phase,
-          target:describe(event.target),
-          path,
-          ...point,
-          defaultPrevented:event.defaultPrevented,
-          cancelBubble:event.cancelBubble,
-          targetIsCurrentSave:Boolean(c.save&&event.target===c.save),
-          currentSaveId:nodeId(c.save),
-          currentSaveConnected:Boolean(c.save?.isConnected),
-          currentSaveCanonical:Boolean(c.save&&c.save===canonical().save)
-        });
-      };
-      for(const type of ['pointerdown','pointerup','touchstart','touchend','click']){
-        document.addEventListener(type,event=>eventRecord(event,'capture'),true);
-      }
-      document.addEventListener('click',event=>eventRecord(event,'bubble'),false);
-
-      if(initial.save){
-        for(const type of ['pointerdown','click']){
-          initial.save.addEventListener(type,event=>{
-            trace.specificEvents.push({
-              t:Math.round(performance.now()*1000)/1000,
-              type,
-              target:describe(event.target),
-              currentSaveId:nodeId(canonical().save),
-              specificSaveId:nodeId(initial.save),
-              specificSaveConnected:Boolean(initial.save.isConnected),
-              specificSaveCanonical:Boolean(initial.save===canonical().save),
-              defaultPrevented:event.defaultPrevented
-            });
-          });
-        }
-      }
-
-      const relevant=node=>node?.nodeType===1&&(
-        node.matches?.('.dc-board-relation-detail-host,[data-relation-block],[data-relation-form],[data-relation-save],[data-relation-status]')
-        ||node.querySelector?.('.dc-board-relation-detail-host,[data-relation-block],[data-relation-form],[data-relation-save],[data-relation-status]')
-      );
-      const observer=new MutationObserver(mutations=>{
-        const c=canonical();
-        for(const mutation of mutations){
-          const added=[...mutation.addedNodes].filter(relevant).map(describe);
-          const removed=[...mutation.removedNodes].filter(relevant).map(describe);
-          if(added.length||removed.length){
-            trace.mutations.push({
-              t:Math.round(performance.now()*1000)/1000,
-              type:mutation.type,added,removed,
-              detailHostId:nodeId(c.host),blockId:nodeId(c.block),formId:nodeId(c.form),saveId:nodeId(c.save),
-              beforeSaveConnected:Boolean(trace.refs.beforeSelect.save?.isConnected)
-            });
-          }
-        }
-        const status=c.block?.querySelector('[data-relation-status]');
-        const statusText=status?.textContent||'';
-        if(statusText){
-          trace.statusTimeline.push({t:Math.round(performance.now()*1000)/1000,text:statusText,hidden:Boolean(status?.hidden)});
-          if(statusText.includes('СОХРАНЯЕМ'))trace.statusBusySeen=true;
-        }
-      });
-      observer.observe(document,{childList:true,subtree:true,characterData:true,attributes:true,attributeFilter:['hidden']});
-
-      globalThis.__QA_SAVE_TRACE__=trace;
-      globalThis.__QA_SAVE_TRACE_STATE__=state;
-      globalThis.__QA_SAVE_TRACE_NODE_ID__=nodeId;
-      globalThis.__QA_SAVE_TRACE_CANONICAL__=canonical;
-      globalThis.__QA_SAVE_TRACE_READ=()=>{
-        const current=canonical();
-        const before=trace.refs.beforeSelect;
-        return{
-          snapshots:trace.snapshots,
-          events:trace.events.slice(),
-          specificEvents:trace.specificEvents.slice(),
-          mutations:trace.mutations.slice(),
-          statusBusySeen:trace.statusBusySeen,
-          statusTimeline:trace.statusTimeline.slice(),
-          actionT:trace.actionT,
-          replacement:{
-            detailHostReplaced:Boolean(before.host&&current.host&&before.host!==current.host),
-            blockReplaced:Boolean(before.block&&current.block&&before.block!==current.block),
-            formReplaced:Boolean(before.form&&current.form&&before.form!==current.form),
-            saveReplaced:Boolean(before.save&&current.save&&before.save!==current.save),
-            beforeSaveConnected:Boolean(before.save?.isConnected),
-            currentSaveConnected:Boolean(current.save?.isConnected)
-          },
-          final:state('final')
-        };
-      };
-    });
-
-    const beforeCreate=await page.evaluate(()=>({
-      createCalls:(globalThis.__QA_COLLAB_CALLS__||[]).filter(call=>call.name==='dc_board_relation_create_v1').length
-    }));
-
-    const options=await page.locator('.dc-board-relation-detail-host [data-relation-choice] option').evaluateAll(nodes=>nodes.map(node=>({value:node.value,label:node.textContent||''})));
-    const eventChoice=options.find(option=>option.label.includes('QA EVENT'));
-    if(!eventChoice)throw new Error('SAVE_DIAG_QA_EVENT_CHOICE_MISSING');
-
-    try{
-      await page.locator('.dc-board-relation-detail-host [data-relation-choice]').selectOption(eventChoice.value,{timeout:4000});
-    }catch(error){
-      await page.evaluate(error=>{
-        globalThis.__QA_SAVE_TRACE__.selectError={name:error.name,message:error.message,stack:error.stack};
-      },{name:error?.name||'Error',message:error?.message||String(error),stack:String(error?.stack||'')});
-      throw error;
-    }
-
-    await page.evaluate(()=>{
-      const trace=globalThis.__QA_SAVE_TRACE__;
-      const state=globalThis.__QA_SAVE_TRACE_STATE__;
-      const canonical=globalThis.__QA_SAVE_TRACE_CANONICAL__;
-      const nodeId=globalThis.__QA_SAVE_TRACE_NODE_ID__;
-      trace.snapshots.afterSelect=state('afterSelect');
-      const c=canonical();
-      trace.refs.afterSelect={host:c.host,block:c.block,form:c.form,save:c.save,saveId:nodeId(c.save)};
-    });
-
-    const preAction=await page.evaluate(()=>{
-      const trace=globalThis.__QA_SAVE_TRACE__;
-      const state=globalThis.__QA_SAVE_TRACE_STATE__;
-      const canonical=globalThis.__QA_SAVE_TRACE_CANONICAL__;
-      const nodeId=globalThis.__QA_SAVE_TRACE_NODE_ID__;
-      const snapshot=state('preAction');
-      trace.snapshots.preAction=snapshot;
-      const c=canonical();
-      trace.refs.preAction={host:c.host,block:c.block,form:c.form,save:c.save,saveId:nodeId(c.save)};
-      return snapshot;
-    });
-
-    if(!preAction.saveConnected||!preAction.saveCanonical){
-      const evidence=await page.evaluate(()=>globalThis.__QA_SAVE_TRACE_READ());
-      return{ctx,page,errors,pageErrors,consoleEvents,flowError:null,evidence,runIndex,preActionGuard:'SAVE_NOT_CONNECTED_OR_CANONICAL'};
-    }
-
-    if(!preAction.center||!preAction.hitIsSave){
-      const evidence=await page.evaluate(()=>globalThis.__QA_SAVE_TRACE_READ());
-      return{ctx,page,errors,pageErrors,consoleEvents,flowError:null,evidence,runIndex,preActionGuard:'SAVE_HIT_TARGET_MISMATCH'};
-    }
-
-    await page.evaluate(()=>{
-      globalThis.__QA_SAVE_TRACE__.actionT=Math.round(performance.now()*1000)/1000;
-    });
-    await page.touchscreen.tap(preAction.center.x,preAction.center.y);
-    await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
-
-    const after=await page.evaluate(before=>({
-      beforeCreate:before,
-      createCalls:(globalThis.__QA_COLLAB_CALLS__||[]).filter(call=>call.name==='dc_board_relation_create_v1').length,
-      rpcArgs:(globalThis.__QA_COLLAB_CALLS__||[]).filter(call=>call.name==='dc_board_relation_create_v1').map(call=>call.args),
-      relationStore:Array.isArray(globalThis.__QA_RELATIONS__)?globalThis.__QA_RELATIONS__.map(row=>({...row})):null,
-      createdDom:Boolean(document.querySelector('.dc-board-relation-detail-host [data-relation-id="rel-created"]')),
-      focus:new URL(location.href).searchParams.get('focus'),
-      overlay:Boolean(document.querySelector('.dc-artifact-overlay:not([hidden])')),
-      pan:Boolean(document.querySelector('.dc-spatial-viewport')?.classList.contains('is-panning')),
-      dragging:document.documentElement.dataset.boardDragging||null,
-      positionWrites:Number(globalThis.__QA_POSITION_WRITES__||0)
-    }),beforeCreate.createCalls);
-
-    const evidence=await page.evaluate(()=>globalThis.__QA_SAVE_TRACE_READ());
-    evidence.after=after;
-    evidence.beforeCreate=beforeCreate.createCalls;
-    evidence.preActionGuard='PASS';
-    return{ctx,page,errors,pageErrors,consoleEvents,flowError:null,evidence,runIndex,preActionGuard:'PASS'};
-  }catch(error){
-    const flowError={name:error?.name||'Error',message:error?.message||String(error),stack:String(error?.stack||'')};
-    let evidence=null;
-    try{
-      evidence=await page.evaluate(()=>globalThis.__QA_SAVE_TRACE_READ?.()||null);
-      if(evidence)evidence.selectError=await page.evaluate(()=>globalThis.__QA_SAVE_TRACE__?.selectError||null);
-    }catch{}
-    return{ctx,page,errors,pageErrors,consoleEvents,flowError,evidence,runIndex};
-  }
-}
-
-function compactSaveEvidence(run){
-  const e=run.evidence||{};
-  const actionT=e.actionT??null;
-  const around=(items)=>actionT==null?(items||[]):(items||[]).filter(item=>item.t>=actionT-100&&item.t<=actionT+100);
-  return{
-    runIndex:run.runIndex,
-    preActionGuard:run.preActionGuard||e.preActionGuard||null,
-    flowError:run.flowError,
-    pageErrors:run.pageErrors,
-    snapshots:e.snapshots||null,
-    replacement:e.replacement||null,
-    events:around(e.events),
-    specificEvents:around(e.specificEvents),
-    mutations:around(e.mutations),
-    statusBusySeen:Boolean(e.statusBusySeen),
-    statusTimeline:around(e.statusTimeline),
-    beforeCreate:e.beforeCreate??null,
-    after:e.after||null,
-    selectError:e.selectError||null,
-    consoleEvents:(run.consoleEvents||[]).slice(-20)
-  };
-}
-
 const browser=await chromium.launch({headless:true});
 try{
-  // G7 diagnostic-only: trace the real 390px save action up to three fresh contexts.
-  const saveRuns=[];
-  for(let runIndex=1;runIndex<=3;runIndex++){
-    const run=await runMobileSaveDiagnostic(browser,runIndex);
-    const evidence=compactSaveEvidence(run);
-    const after=evidence.after||{};
-    const created=Boolean(
-      after.createCalls>Number(evidence.beforeCreate||0)
-      ||after.createdDom===true
-    );
-    const setupFailure=Boolean(run.flowError&&!run.evidence);
-    console.error('MOBILE_390_SAVE_RUN_TRACE '+JSON.stringify(evidence));
-    await run.ctx.close();
-
-    if(setupFailure){
-      saveRuns.push({runIndex,outcome:'SETUP_FLOW_ERROR',evidence});
-      continue;
-    }
-
-    if(!created){
-      const classification=classifySaveFailure(run.evidence||{});
-      throw new Error('MOBILE_390_SAVE_ACTION_ROOT_CAUSE_TRACE '+JSON.stringify({
-        classification,
-        reproduced:true,
-        ...evidence
-      }));
-    }
-    saveRuns.push({
-      runIndex,
-      outcome:'CREATE_REPRODUCED',
-      createCallsBefore:evidence.beforeCreate,
-      createCallsAfter:after.createCalls,
-      rpcArgs:after.rpcArgs,
-      createdDom:after.createdDom,
-      focus:after.focus,
-      overlay:after.overlay,
-      pan:after.pan,
-      dragging:after.dragging,
-      positionWrites:after.positionWrites
-    });
-  }
-  throw new Error('MOBILE_390_SAVE_ACTION_ROOT_CAUSE_TRACE '+JSON.stringify({
-    classification:'S6',
-    reproduced:false,
-    status:'NOT_REPRODUCED',
-    runs:saveRuns
-  }));
-
   // COMMUNITY regression + IDEA-only composer visibility.
   {
     const{ctx,page,errors}=await openBoard(browser,'author');
@@ -954,7 +540,58 @@ try{
           if(!addTapped||!formVisible||!relatedOnly||!eventChoice){
             record.classification='D4';
           }else{
-            await page.locator('.dc-board-relation-detail-host [data-relation-choice]').selectOption(eventChoice.value);
+            const choice=page.locator('.dc-board-relation-detail-host [data-relation-choice]');
+            await choice.selectOption(eventChoice.value);
+            const s2Before=await page.evaluate(artifactId=>{
+              const host=document.querySelector('.dc-board-relation-detail-host');
+              const block=host?.querySelector('[data-relation-block][data-relation-detail="1"]');
+              const form=block?.querySelector('[data-relation-form]');
+              const select=block?.querySelector('[data-relation-choice]');
+              const save=block?.querySelector('[data-relation-save]');
+              globalThis.__QA_S2_DETAIL_IDENTITY__={host,block,form,select,save,selectedValue:select?.value||null};
+              return{
+                endpointKey:host?.dataset.relationDetailKey||null,
+                expectedEndpointKey:'artifact:'+artifactId,
+                hostConnected:Boolean(host?.isConnected),
+                blockConnected:Boolean(block?.isConnected),
+                formConnected:Boolean(form?.isConnected),
+                saveConnected:Boolean(save?.isConnected),
+                selectedValue:select?.value||null
+              };
+            },A);
+            await page.evaluate(()=>window.dispatchEvent(new CustomEvent('dc:board-projections-updated')));
+            await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+            const s2After=await page.evaluate(()=>{
+              const before=globalThis.__QA_S2_DETAIL_IDENTITY__;
+              const host=document.querySelector('.dc-board-relation-detail-host');
+              const block=host?.querySelector('[data-relation-block][data-relation-detail="1"]');
+              const form=block?.querySelector('[data-relation-form]');
+              const select=block?.querySelector('[data-relation-choice]');
+              const save=block?.querySelector('[data-relation-save]');
+              return{
+                sameHost:Boolean(before?.host&&before.host===host),
+                sameBlock:Boolean(before?.block&&before.block===block),
+                sameForm:Boolean(before?.form&&before.form===form),
+                sameSelect:Boolean(before?.select&&before.select===select),
+                sameSave:Boolean(before?.save&&before.save===save),
+                hostConnected:Boolean(before?.host?.isConnected),
+                blockConnected:Boolean(before?.block?.isConnected),
+                formConnected:Boolean(before?.form?.isConnected),
+                saveConnected:Boolean(before?.save?.isConnected),
+                formOpen:Boolean(form&&!form.hidden),
+                selectedValue:select?.value||null,
+                selectedPreserved:Boolean(before?.selectedValue&&select?.value===before.selectedValue)
+              };
+            });
+            const s2Pass=Boolean(
+              s2Before.endpointKey===s2Before.expectedEndpointKey
+              &&s2Before.hostConnected&&s2Before.blockConnected&&s2Before.formConnected&&s2Before.saveConnected
+              &&s2After.sameHost&&s2After.sameBlock&&s2After.sameForm&&s2After.sameSelect&&s2After.sameSave
+              &&s2After.hostConnected&&s2After.blockConnected&&s2After.formConnected&&s2After.saveConnected
+              &&s2After.formOpen&&s2After.selectedPreserved
+            );
+            record.s2={before:s2Before,after:s2After,pass:s2Pass};
+            expect(s2Pass,'S2 detail interaction identity was replaced by canonical presentation refresh '+JSON.stringify(record.s2));
             const saveTapped=await tapCenter(page,'.dc-board-relation-detail-host [data-relation-save]');
             let createdVisible=false;
             if(saveTapped){
@@ -976,8 +613,17 @@ try{
               writes:Number(globalThis.__QA_POSITION_WRITES__||0),
               createCalls:globalThis.__QA_COLLAB_CALLS__.filter(call=>call.name==='dc_board_relation_create_v1').length
             }));
-            record.create={saveTapped,createdVisible,baseline,afterCreate};
-            if(!saveTapped||!createdVisible||afterCreate.createCalls<=baseline.createCalls||afterCreate.focus!=='artifact:'+A||!afterCreate.overlay||afterCreate.pan||afterCreate.dragging!==null||afterCreate.writes!==baseline.writes){
+            const rebuild=await page.evaluate(()=>{
+              const before=globalThis.__QA_S2_DETAIL_IDENTITY__;
+              const current=document.querySelector('.dc-board-relation-detail-host');
+              return{
+                rebuilt:Boolean(before?.host&&current&&before.host!==current),
+                oldHostConnected:Boolean(before?.host?.isConnected),
+                currentEndpointKey:current?.dataset.relationDetailKey||null
+              };
+            });
+            record.create={saveTapped,createdVisible,baseline,afterCreate,rebuild};
+            if(!s2Pass||!saveTapped||!createdVisible||afterCreate.createCalls<=baseline.createCalls||afterCreate.focus!=='artifact:'+A||!afterCreate.overlay||afterCreate.pan||afterCreate.dragging!==null||afterCreate.writes!==baseline.writes||!rebuild.rebuilt||rebuild.oldHostConnected||rebuild.currentEndpointKey!=='artifact:'+A){
               record.classification='D2';
             }else{
               const createdRow=page.locator('.dc-board-relation-detail-host [data-relation-id="rel-created"]');
