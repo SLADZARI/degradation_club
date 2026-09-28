@@ -1775,7 +1775,298 @@ Owner Admin can perform routine, already-authorized Community/Artifact operation
 
 **OPEN / LIVE OPERATIONAL GAP CONFIRMED.**
 
+**Live UX extension — 2026-09-28**
+
+Artifact detail currently mixes Owner Admin-only controls such as Telegram suppression and Board hiding with ordinary user actions. These privileged controls should not compete with the participant's primary task. Candidate presentation: one collapsed `OWNER ADMIN / SETTINGS` group on the canonical Artifact detail, or a clear handoff to the existing `/workspace/admin/` System Tools surface. The grouping must not create new permissions or duplicate the underlying RPC owners.
+
 Implementation should be handled as a bounded stabilization / operations Result after current Artifact Collaboration live acceptance, unless the current Result explicitly absorbs only the minimal UI needed for its own acceptance.
+
+
+#### BQA-24 — Invitation is technically present but not discoverable without guidance
+Severity: **P1 / PARTICIPATION DISCOVERABILITY + MOBILE**
+
+**LIVE FACT — 2026-09-28**
+
+A real invited Member (Nikita Lobushkin) signed into his own account after being invited to the Idea `ЛОГИСТИКА. СЕГОДНЯ`.
+
+Without being told which Board card to open, he did not understand:
+- that he had an invitation;
+- where on the Board it lived;
+- which card required his action;
+- how to reach the join decision.
+
+The current Board card can render a local invite signal:
+
+`ВАС ЗОВУТ · ОТКРОЙТЕ ИДЕЮ`
+
+but there is no strong cross-Board notification/attention state.
+
+**User impact**
+
+The invitation backend works, but the human task does not complete unassisted. A real invitation that cannot be found behaves like a missing notification.
+
+**Existing-before-new boundary**
+
+Do not introduce a parallel generic notification product before inventorying existing Workspace/Board activity and identity surfaces.
+
+For Artifact Collaboration v1, the invitation state already exists canonically as `INVITED` in `dc_artifact_participation_events`. First preference is to project that existing state into the current Workspace/Board UI.
+
+**Candidate UX**
+
+At minimum:
+- visually distinguish an invited card from ordinary cards;
+- provide one compact Board/Workspace invitation indicator, especially on mobile;
+- indicator count/state must derive from canonical `INVITED`, not a second notification table;
+- tapping the indicator should focus/open the exact invited Artifact;
+- card copy should remain explicit: `ВАС ЗОВУТ`.
+
+Possible surfaces to evaluate:
+- badge/counter on `COMMUNITY BOARD`;
+- compact mobile banner/toast-like persistent strip;
+- invited-card outline/marker;
+- optional `МОИ ПРИГЛАШЕНИЯ` derived filter/view only if it extends an existing Board filter owner rather than creating a second inbox.
+
+**Required QA**
+
+- invited Member enters Workspace without external guidance;
+- desktop and mobile;
+- one invitation / multiple invitations;
+- CIRCLE invite must remain discoverable only to the invited profile;
+- accepting/declining removes the pending invitation signal immediately;
+- no stale badge after mutation/reload;
+- no new privacy oracle exposing hidden CIRCLE Ideas.
+
+**Acceptance candidate**
+
+An invited Member can enter the club, notice that action is required, and reach the correct Idea without another person telling them which card to find.
+
+**Status**
+
+**OPEN / REAL USER DISCOVERABILITY FAIL.**
+
+
+#### BQA-25 — Artifact detail action hierarchy does not reflect the user's current job
+Severity: **P1 / MOBILE UX + ACTION HIERARCHY**
+
+**LIVE FACT — 2026-09-28**
+
+On the full Artifact detail surface, collaboration, general actions and privileged/admin operations compete in one long page.
+
+For an invited user, the primary task is to decide whether to join. Current implementation marks `ПРИСОЕДИНИТЬСЯ` as `.primary`, but the canonical primary style is acid yellow. In the real mobile page this CTA does not dominate enough.
+
+For an already joined participant, the `ВЫЙТИ` action is shown prominently inside the central collaboration block, even though leaving is a secondary/destructive action.
+
+**Owner direction captured as UX feedback, not yet implementation authority**
+
+- `ПРИСОЕДИНИТЬСЯ` should be the strongest visible action;
+- candidate visual: black button / white text;
+- owner/admin/settings actions should not compete with participant actions;
+- full detail should be divided into logical blocks/sections;
+- secondary blocks should be collapsible so the main user task stays visually dominant;
+- when participant state is `JOINED`, exit should move to the lowest/least-prominent destructive area rather than the center of the page.
+
+**Candidate information architecture**
+
+One canonical Artifact detail owner, with role-aware sections such as:
+
+```text
+PRIMARY ACTION / CURRENT USER STATE
+CONTENT / MEDIA
+COLLABORATION / PEOPLE
+RELATIONS
+OWNER CONTROLS            (author only, collapsed)
+OWNER ADMIN / SETTINGS    (owner_admin only, collapsed)
+LEAVE / DESTRUCTIVE       (participant self-action, bottom)
+```
+
+Names/ordering are candidate presentation only. No second detail page/modal owner.
+
+**Required QA**
+
+- invited Member sees join decision above secondary settings;
+- join CTA is visually dominant on mobile and desktop;
+- joined participant sees `ВЫ В ДЕЛЕ` as state, not a large invitation-like panel;
+- leave action remains reachable but not promoted;
+- author controls appear only for author;
+- Owner Admin controls appear only for Owner Admin;
+- section collapse does not lose state or trigger duplicate RPCs;
+- deep-link/open/close/back behavior remains canonical;
+- Relations remain under their existing owner.
+
+**Acceptance candidate**
+
+The first visible action on Artifact detail matches the viewer's actual job, while owner/admin/destructive controls remain available without taking over the page.
+
+**Status**
+
+**OPEN / LIVE INFORMATION-HIERARCHY PROBLEM CONFIRMED.**
+
+
+#### BQA-26 — LEFT and REMOVED are semantically different but presentation can look like duplicate self-removal
+Severity: **P1 / ACTION OWNERSHIP + DESTRUCTIVE UX**
+
+**FACT / CURRENT CONTRACT**
+
+Artifact Collaboration v1 intentionally distinguishes:
+
+```text
+LEFT    = participant leaves by self-action
+REMOVED = author / Owner Admin removes participant
+```
+
+Current detail presentation can show:
+- participant roster rows with `×` for author/Owner Admin management;
+- a separate `ВЫЙТИ` control for a viewer whose own state is JOINED.
+
+These are not the same backend transition and must not be collapsed semantically.
+
+**Live UX feedback**
+
+The current presentation makes removal/exit feel duplicated and too easy/prominent.
+
+**Required presentation rule**
+
+Preserve one action per actor responsibility:
+- participant: one self action, `ВЫЙТИ ИЗ ИДЕИ`, in a low-priority destructive section;
+- author/Owner Admin: participant-row removal action, clearly meaning `УБРАТЬ ИЗ ИДЕИ`, not `leave`;
+- author/admin remove control must not masquerade as the participant's own self-action.
+
+**Destructive confirmation candidate**
+
+User feedback requested a deliberate delay/confirmation before self-removal. Candidate interaction to validate:
+
+```text
+tap "ВЫЙТИ ИЗ ИДЕИ"
+→ destructive confirmation state
+→ visible countdown / delayed enable
+→ final confirm
+```
+
+Three seconds was considered too easy/short and ten seconds too long in the live discussion. Exact duration remains a UX decision; do not hard-code a new semantic rule from this note.
+
+**Required QA**
+
+- JOINED participant cannot accidentally trigger REMOVED;
+- author/admin cannot generate LEFT for another person;
+- double-click/repeat is idempotently handled by existing state guards;
+- mobile accidental-tap resistance;
+- cancel leaves JOINED state untouched;
+- successful leave updates detail/card/invitation indicators immediately.
+
+**Status**
+
+**OPEN / PRESENTATION DUPLICATION + DESTRUCTIVE-ACTION RISK.**
+
+
+#### BQA-27 — Board initial render blocks on non-critical media/participant work
+Severity: **P1 / PERFORMANCE + FIRST-PAINT**
+
+**LIVE FACT — 2026-09-28**
+
+User reports that the Board loads noticeably slowly, especially with media-heavy cards.
+
+Production code inventory confirms the current Board loader waits before first render for:
+- Artifact list;
+- profiles;
+- reactions;
+- all Artifact media rows;
+- responses;
+- one `dc_artifact_participants_read_v1` RPC per Idea;
+- signed URL generation for every media item.
+
+Only after these complete does it assign `boardHost.innerHTML`.
+
+Card images are currently rendered from signed original media with a plain `<img src=...>`, without `loading="lazy"` or `decoding="async"`.
+
+The composer accepts images up to 4 MB, so original-image decode/network cost can be material.
+
+**Root problem**
+
+Critical Board text/layout and non-critical media are coupled into one blocking first-render path.
+
+**Existing owner to extend**
+
+Canonical Board runtime:
+`community/board/board.js`
+
+Related existing media-hardening backlog:
+`BQA-20`.
+
+Do not create a second Board renderer or media service.
+
+**Candidate target**
+
+```text
+fast structural Board render
+→ visible text/cards immediately
+→ collaboration/media enrichment progressively
+→ signed media only where/when needed
+→ lazy decode/load
+```
+
+Also evaluate replacing per-Idea participant N+1 reads with one bounded canonical batch/projection read rather than parallel client loops.
+
+**Required measurements**
+
+Before/after on mobile and desktop:
+- time to first meaningful Board cards;
+- time to interactive Board controls;
+- number of initial Supabase requests;
+- number of signed URL requests before first viewport;
+- transferred media bytes before first viewport;
+- long image decode tasks;
+- no regression in CIRCLE media authorization.
+
+**Status**
+
+**OPEN / LIVE PERFORMANCE PROBLEM + CODE-PATH EVIDENCE CONFIRMED.**
+
+
+#### BQA-28 — Collaboration mutation does not refresh Board roster projection immediately
+Severity: **P1 / STATE FRESHNESS**
+
+**LIVE FACT — 2026-09-28**
+
+Owner invited Nikita Lobushkin and Gabil Tagiev successfully. Production DB recorded both `INVITED` states immediately and Artifact detail showed them.
+
+The Board card continued to show empty `ПОЗВАНЫ` until the page was manually reloaded. After reload, both invitees appeared correctly.
+
+**Root boundary**
+
+This is not an invitation-write failure. It is stale client projection after a successful canonical mutation.
+
+**Expected behavior**
+
+Any collaboration mutation affecting the visible roster should refresh the existing Board projection without full page reload:
+
+- INVITED;
+- JOINED;
+- DECLINED;
+- LEFT;
+- REMOVED.
+
+Do not solve with a second participant cache owner.
+
+**Required QA**
+
+```text
+detail mutation succeeds
+→ canonical participants reread
+→ Board card projection updates
+→ no full reload
+→ no duplicate event/listener
+→ focused Artifact/detail state remains stable
+```
+
+Validate both directions:
+- owner invites/removes;
+- invitee joins/declines/leaves.
+
+Mobile and desktop required.
+
+**Status**
+
+**OPEN / LIVE STATE-FRESHNESS DEFECT CONFIRMED.**
 
 
 
