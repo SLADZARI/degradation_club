@@ -4,15 +4,15 @@
     "artifactId": "dementor-club.kernel.project",
     "project": "dementor-club",
     "documentType": "STANDARD",
-    "projectStage": "RELEASE",
-    "gate": "G7_RELEASE",
+    "projectStage": "BUILD",
+    "gate": "G5_BUILD",
     "status": "APPROVED",
-    "version": "2.94",
+    "version": "2.95",
     "updated": "2026-09-28",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.93"
+    "supersedes": "2.94"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -242,7 +242,9 @@
     "operations/ARTIFACT_COLLABORATION_PRODUCTION_RELEASE_CHECKPOINT_2026-09-28.md",
     ".weekly-os/results/artifact-collaboration-v1.v1.6.md",
     "operations/ARTIFACT_COLLABORATION_PRODUCTION_DEPLOY_2026-09-28.md",
-    ".weekly-os/results/artifact-collaboration-v1.v1.7.md"
+    ".weekly-os/results/artifact-collaboration-v1.v1.7.md",
+    "operations/QA_RECONCILIATION_2026-09-28.md",
+    ".weekly-os/results/artifact-collaboration-v1.v1.8.md"
   ],
   "authority": {
     "mpDslCore": {
@@ -409,11 +411,11 @@
   },
   "currentResult": {
     "artifactId": "dementor-club.result.artifact-collaboration-v1",
-    "version": "1.7",
+    "version": "1.8",
     "status": "ACTIVE",
     "workStatus": "ACTIVE",
-    "path": ".weekly-os/results/artifact-collaboration-v1.v1.7.md",
-    "gate": "G7_RELEASE",
+    "path": ".weekly-os/results/artifact-collaboration-v1.v1.8.md",
+    "gate": "G5_BUILD",
     "scope": [
       "idea participation",
       "invitation / join",
@@ -421,9 +423,9 @@
       "explicit slot grants",
       "participant-scoped RELATED_TO"
     ],
-    "integrationBranch": "result/artifact-collaboration-v1",
+    "integrationBranch": "result/artifact-collaboration-v1-live-ux-corrective",
     "integrationBaseRef": "dementor-club-production",
-    "integrationBaseCommit": "df8a24eca2bcca25339f128c7da93982515cf442",
+    "integrationBaseCommit": "260c5fe911fb0cad9902ad2db5d76060f47c18cc",
     "productionBaseCommit": "df8a24eca2bcca25339f128c7da93982515cf442",
     "implementationStartAuthorized": true,
     "schemaMutationAuthorized": true,
@@ -436,8 +438,8 @@
     "g5BackendCandidateCommit": "3522993d6796fe9dae81a0c7dbde1ddcc1aa350a",
     "g5BackendStaticStatus": "PASS",
     "g5SqlExecutionStatus": "PASS_LOCAL_OBSERVED_PRODUCTION_COMPATIBLE_REPLAY",
-    "gateReadiness": "LIVE_ACCEPTANCE_PENDING",
-    "note": "Exact production 260c5fe9... deployed successfully. Supabase run #8 applied 20260924002500_artifact_collaboration_v1; post-apply ledger clean. Pages run #135 deployed exact production SHA successfully. Telegram worker unchanged. Live authenticated acceptance remains pending before G8.",
+    "gateReadiness": "LIVE_ACCEPTANCE_CORRECTIVE_REQUIRED",
+    "note": "Real-user live acceptance exposed invitation discoverability, detail action hierarchy, destructive-action presentation and stale roster projection defects. Current Result returned to G5_BUILD on a fresh production-based corrective branch; semantics unchanged; G8 not authorized.",
     "implementationBrief": "operations/ARTIFACT_COLLABORATION_IMPLEMENTATION_BRIEF_V1.md",
     "g5BackendLocalBlockerEvidence": "operations/ARTIFACT_COLLABORATION_BACKEND_G5_LOCAL_STACK_BLOCKER_2026-09-24.md",
     "costBoundary": "NO_PAID_INFRASTRUCTURE",
@@ -498,8 +500,18 @@
     "backendDeployRunId": 36432607713,
     "pagesDeployRun": 135,
     "pagesDeployRunId": 36432865028,
-    "liveAcceptanceStatus": "PENDING",
-    "productionDeployEvidence": "operations/ARTIFACT_COLLABORATION_PRODUCTION_DEPLOY_2026-09-28.md"
+    "liveAcceptanceStatus": "FAIL_CORRECTIVE_REQUIRED",
+    "productionDeployEvidence": "operations/ARTIFACT_COLLABORATION_PRODUCTION_DEPLOY_2026-09-28.md",
+    "correctiveBaseCommit": "260c5fe911fb0cad9902ad2db5d76060f47c18cc",
+    "previousIntegrationBranch": "result/artifact-collaboration-v1",
+    "liveAcceptanceVerdict": "FAIL_CORRECTIVE_REQUIRED",
+    "correctiveQa": [
+      "BQA-24",
+      "BQA-25",
+      "BQA-26",
+      "BQA-28"
+    ],
+    "qaReconciliation": "operations/QA_RECONCILIATION_2026-09-28.md"
   },
   "waitingResults": [
     {
