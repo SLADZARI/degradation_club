@@ -7,18 +7,18 @@
     "projectStage": "RELEASE",
     "gate": "G7_RELEASE",
     "status": "APPROVED",
-    "version": "2.86",
+    "version": "2.87",
     "updated": "2026-09-28",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.85"
+    "supersedes": "2.86"
   },
   "currentArtifacts": [
     {
       "artifactId": "dementor-club.kernel.project",
       "documentType": "STANDARD",
-      "currentVersion": "2.92",
+      "currentVersion": "2.93",
       "status": "APPROVED",
       "location": ".weekly-os/PROJECT.json",
       "sourceSystem": "GIT",
@@ -32,7 +32,7 @@
     {
       "artifactId": "dementor-club.kernel.artifact-index",
       "documentType": "STANDARD",
-      "currentVersion": "2.86",
+      "currentVersion": "2.87",
       "status": "APPROVED",
       "location": ".weekly-os/ARTIFACT_INDEX.json",
       "sourceSystem": "GIT",
@@ -2552,15 +2552,15 @@
     {
       "artifactId": "dementor-club.result.artifact-collaboration-v1",
       "documentType": "RESULT",
-      "currentVersion": "1.5",
-      "version": "1.5",
+      "currentVersion": "1.6",
+      "version": "1.6",
       "status": "ACTIVE",
       "workStatus": "ACTIVE",
       "relation": "CURRENT_RESULT",
       "gate": "G7_RELEASE",
       "projectStage": "RELEASE",
-      "path": ".weekly-os/results/artifact-collaboration-v1.v1.5.md",
-      "location": ".weekly-os/results/artifact-collaboration-v1.v1.5.md",
+      "path": ".weekly-os/results/artifact-collaboration-v1.v1.6.md",
+      "location": ".weekly-os/results/artifact-collaboration-v1.v1.6.md",
       "sourceSystem": "GIT",
       "authorityType": "IMPLEMENTATION_AUTHORITY",
       "updated": "2026-09-28",
@@ -2573,7 +2573,7 @@
       "liveDatabaseMutationAuthorized": true,
       "productionMergeAuthorized": true,
       "productionDeployAuthorized": true,
-      "gateReadiness": "PRODUCTION_RELEASE_AUTHORIZED",
+      "gateReadiness": "PRODUCTION_MERGED_DEPLOY_PENDING",
       "g4BackendEvidence": "operations/ARTIFACT_COLLABORATION_BACKEND_G4_CONTRACT_2026-09-24.md",
       "g4BackendStatus": "PASS",
       "g5BackendEvidence": "operations/ARTIFACT_COLLABORATION_BACKEND_G5_CHECKPOINT_2026-09-24.md",
@@ -2593,7 +2593,7 @@
       "prehistoryFixtureCommit": "e58edb6a931c8536a7ed4cbe907d0b38c5ba4c9e",
       "observedProductionOverlayCommit": "95b33bdb9e51376cd28b9eecac63a2fcfb7dfe75",
       "artifactMigrationBlob": "b596500ed3145ec1f352464c8609c38e02efbc05",
-      "note": "Owner authorized production release for exact RC f3078ceb... / PR #244; canonical release execution in progress.",
+      "note": "PR #244 merged to production 260c5fe9...; one pending tracked Supabase migration; canonical deploy workflows not yet dispatched.",
       "g5RelationDeleteCapabilityStatus": "PASS",
       "siteIntegrityRun": 1306,
       "siteIntegrityRunId": 36183292073,
@@ -2630,7 +2630,13 @@
       "backendProductionDeployAuthorized": true,
       "pagesProductionDeployAuthorized": true,
       "telegramWorkerDeployAuthorized": false,
-      "releaseAuthorizationEvidence": "operations/ARTIFACT_COLLABORATION_G7_RELEASE_AUTHORIZATION_2026-09-28.md"
+      "releaseAuthorizationEvidence": "operations/ARTIFACT_COLLABORATION_G7_RELEASE_AUTHORIZATION_2026-09-28.md",
+      "productionCommit": "260c5fe911fb0cad9902ad2db5d76060f47c18cc",
+      "productionMergeStatus": "COMPLETE",
+      "backendDeployStatus": "NOT_STARTED",
+      "pagesDeployStatus": "NOT_STARTED",
+      "liveDatabaseMutationStatus": "NOT_APPLIED",
+      "releaseCheckpointEvidence": "operations/ARTIFACT_COLLABORATION_PRODUCTION_RELEASE_CHECKPOINT_2026-09-28.md"
     },
     {
       "artifactId": "dementor-club.evidence.artifact-collaboration-backend-g5-relation-delete-capability-2026-09-25",
@@ -2929,6 +2935,26 @@
       "result": "dementor-club.result.artifact-collaboration-v1",
       "releaseCandidateCommit": "f3078ceb227a0221b99b4e286f783986a33aea6f",
       "releasePullRequest": 244,
+      "referencedBy": [
+        "dementor-club.result.artifact-collaboration-v1"
+      ]
+    },
+    {
+      "artifactId": "dementor-club.operations.artifact-collaboration-production-release-checkpoint-2026-09-28",
+      "documentType": "RELEASE_EVIDENCE",
+      "currentVersion": "1.0",
+      "status": "PARTIAL",
+      "location": "operations/ARTIFACT_COLLABORATION_PRODUCTION_RELEASE_CHECKPOINT_2026-09-28.md",
+      "sourceSystem": "GIT",
+      "authorityType": "RELEASE_EVIDENCE",
+      "updated": "2026-09-28",
+      "canonicalProject": "dementor-club",
+      "canonicalLocation": "operations/ARTIFACT_COLLABORATION_PRODUCTION_RELEASE_CHECKPOINT_2026-09-28.md",
+      "relation": "PRODUCTION_RELEASE_CHECKPOINT",
+      "result": "dementor-club.result.artifact-collaboration-v1",
+      "releaseCandidateCommit": "f3078ceb227a0221b99b4e286f783986a33aea6f",
+      "releasePullRequest": 244,
+      "productionCommit": "260c5fe911fb0cad9902ad2db5d76060f47c18cc",
       "referencedBy": [
         "dementor-club.result.artifact-collaboration-v1"
       ]

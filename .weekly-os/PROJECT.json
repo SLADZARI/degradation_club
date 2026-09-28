@@ -7,12 +7,12 @@
     "projectStage": "RELEASE",
     "gate": "G7_RELEASE",
     "status": "APPROVED",
-    "version": "2.92",
+    "version": "2.93",
     "updated": "2026-09-28",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.91"
+    "supersedes": "2.92"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -238,7 +238,9 @@
     ".weekly-os/results/artifact-collaboration-v1.v1.3.md",
     ".weekly-os/results/artifact-collaboration-v1.v1.4.md",
     "operations/ARTIFACT_COLLABORATION_G7_RELEASE_AUTHORIZATION_2026-09-28.md",
-    ".weekly-os/results/artifact-collaboration-v1.v1.5.md"
+    ".weekly-os/results/artifact-collaboration-v1.v1.5.md",
+    "operations/ARTIFACT_COLLABORATION_PRODUCTION_RELEASE_CHECKPOINT_2026-09-28.md",
+    ".weekly-os/results/artifact-collaboration-v1.v1.6.md"
   ],
   "authority": {
     "mpDslCore": {
@@ -405,10 +407,10 @@
   },
   "currentResult": {
     "artifactId": "dementor-club.result.artifact-collaboration-v1",
-    "version": "1.5",
+    "version": "1.6",
     "status": "ACTIVE",
     "workStatus": "ACTIVE",
-    "path": ".weekly-os/results/artifact-collaboration-v1.v1.5.md",
+    "path": ".weekly-os/results/artifact-collaboration-v1.v1.6.md",
     "gate": "G7_RELEASE",
     "scope": [
       "idea participation",
@@ -432,8 +434,8 @@
     "g5BackendCandidateCommit": "3522993d6796fe9dae81a0c7dbde1ddcc1aa350a",
     "g5BackendStaticStatus": "PASS",
     "g5SqlExecutionStatus": "PASS_LOCAL_OBSERVED_PRODUCTION_COMPATIBLE_REPLAY",
-    "gateReadiness": "PRODUCTION_RELEASE_AUTHORIZED",
-    "note": "Owner authorized production release for exact RC f3078ceb... / PR #244. Canonical merge, live migration apply and Pages production deploy authorized. Telegram Worker deploy remains unauthorized.",
+    "gateReadiness": "PRODUCTION_MERGED_DEPLOY_PENDING",
+    "note": "PR #244 merged exact validated RC to production 260c5fe9.... Supabase read-only preflight: exactly one pending tracked migration 20260924002500_artifact_collaboration_v1, no extra live drift. Canonical backend/Pages workflow dispatch not started because interactive dispatch authorization was not completed.",
     "implementationBrief": "operations/ARTIFACT_COLLABORATION_IMPLEMENTATION_BRIEF_V1.md",
     "g5BackendLocalBlockerEvidence": "operations/ARTIFACT_COLLABORATION_BACKEND_G5_LOCAL_STACK_BLOCKER_2026-09-24.md",
     "costBoundary": "NO_PAID_INFRASTRUCTURE",
@@ -483,7 +485,13 @@
     "backendProductionDeployAuthorized": true,
     "pagesProductionDeployAuthorized": true,
     "telegramWorkerDeployAuthorized": false,
-    "releaseAuthorizationEvidence": "operations/ARTIFACT_COLLABORATION_G7_RELEASE_AUTHORIZATION_2026-09-28.md"
+    "releaseAuthorizationEvidence": "operations/ARTIFACT_COLLABORATION_G7_RELEASE_AUTHORIZATION_2026-09-28.md",
+    "productionCommit": "260c5fe911fb0cad9902ad2db5d76060f47c18cc",
+    "productionMergeStatus": "COMPLETE",
+    "backendDeployStatus": "NOT_STARTED",
+    "pagesDeployStatus": "NOT_STARTED",
+    "liveDatabaseMutationStatus": "NOT_APPLIED",
+    "releaseCheckpointEvidence": "operations/ARTIFACT_COLLABORATION_PRODUCTION_RELEASE_CHECKPOINT_2026-09-28.md"
   },
   "waitingResults": [
     {
