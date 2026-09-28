@@ -35,7 +35,7 @@ const JOINED2='cccccccc-cccc-4ccc-8ccc-cccccccccccc';
 const NIKITA='dddddddd-dddd-4ddd-8ddd-dddddddddddd';
 const ANDRUS='eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee';
 const mode=globalThis.__QA_COLLAB_MODE__||'author';
-const ids={author:AUTHOR,invited:INVITED,joined:INVITED,outsider:'ffffffff-ffff-4fff-8fff-ffffffffffff',owner:'99999999-9999-4999-8999-999999999999',relations:INVITED};
+const ids={author:AUTHOR,invited:INVITED,multiinvited:INVITED,joined:INVITED,outsider:'ffffffff-ffff-4fff-8fff-ffffffffffff',owner:'99999999-9999-4999-8999-999999999999',relations:INVITED};
 const uid=ids[mode]||AUTHOR;
 const user={id:uid,email:'private-'+uid.slice(0,4)+'@invalid',user_metadata:{full_name:mode.toUpperCase()}};
 const session={user};
@@ -48,10 +48,11 @@ globalThis.__QA_PARTICIPATION__=globalThis.__QA_PARTICIPATION__||{
    [NIKITA]:'INVITED',
    [ANDRUS]:'JOINED'
  },
- [B]:{[NIKITA]:'JOINED',[ANDRUS]:'INVITED'}
+ [B]:{[NIKITA]:'JOINED',[ANDRUS]:'INVITED',...(mode==='multiinvited'?{[INVITED]:'INVITED'}:{})}
 };
 const profiles=[
  {profile_id:AUTHOR,display_name:'Габиль Очень Длинное Имя Инициатора',nickname:'gabil',avatar_url:null,member_since:'2026-09-01'},
+ {profile_id:'77777777-7777-4777-8777-777777777777',display_name:'Новый Зарегистрированный Профиль',nickname:'newperson',avatar_url:null,member_since:'2026-09-01'},
  {profile_id:INVITED,display_name:'Женя Очень Длинное Имя Участника',nickname:'zhenya',avatar_url:null,member_since:'2026-09-01'},
  {profile_id:JOINED2,display_name:'Андрус',nickname:'andrus',avatar_url:null,member_since:'2026-09-01'},
  {profile_id:NIKITA,display_name:'Никита',nickname:'nikita',avatar_url:null,member_since:'2026-09-01'},
@@ -148,7 +149,7 @@ export function createClient(){return{
 
 async function context(browser,mode,viewport,options={}){
  const ctx=await browser.newContext({viewport,hasTouch:options.hasTouch===true});
- await ctx.addInitScript(({mode})=>{globalThis.__QA_COLLAB_MODE__=mode;const ids={author:'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',invited:'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',joined:'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',outsider:'ffffffff-ffff-4fff-8fff-ffffffffffff',owner:'99999999-9999-4999-8999-999999999999',relations:'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb'};try{localStorage.setItem('dc:board:tutorial:v21:'+(ids[mode]||ids.author)+':member',JSON.stringify({done:true}));sessionStorage.setItem('dc_first_artifact_spotlight_dismissed_v1','1')}catch{}},{mode});
+ await ctx.addInitScript(({mode})=>{globalThis.__QA_COLLAB_MODE__=mode;const ids={author:'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',invited:'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',multiinvited:'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',joined:'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',outsider:'ffffffff-ffff-4fff-8fff-ffffffffffff',owner:'99999999-9999-4999-8999-999999999999',relations:'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb'};try{localStorage.setItem('dc:board:tutorial:v21:'+(ids[mode]||ids.author)+':member',JSON.stringify({done:true}));sessionStorage.setItem('dc_first_artifact_spotlight_dismissed_v1','1')}catch{}},{mode});
  await ctx.route('https://cdn.jsdelivr.net/**',route=>route.request().url().includes('@supabase/supabase-js')?route.fulfill({status:200,contentType:'text/javascript',body:stub()}):route.abort());
  return ctx;
 }
@@ -226,6 +227,115 @@ try{
     expect(!(await page.locator('#artifactVisibilityField').isVisible()),'composer: CIRCLE leaked to non-IDEA subtype');
     expect(!errors.length,'board author page errors: '+errors.join(' | '));
     await page.screenshot({path:path.join(outDir,'desktop-board.png'),fullPage:true});await ctx.close();
+  }
+
+  // BQA-24: invited Member sees a compact indicator + highlighted card on desktop/390/360.
+  for(const width of [1440,390,360]){
+    const mobile=width<500;
+    const viewport={width,height:mobile?844:900};
+    const{ctx,page,errors}=await openBoard(browser,'invited',viewport,{hasTouch:mobile});
+    const indicator=page.locator('[data-board-invitation-indicator]');
+    await indicator.waitFor({state:'visible',timeout:6000});
+    expect((await indicator.innerText()).trim()==='ПРИГЛАШЕНИЯ · 1',`BQA-24 ${width}: single invitation indicator mismatch`);
+    const invitedCard=page.locator('.dc-notice[data-artifact="'+A+'"][data-collab-my-state="INVITED"]');
+    expect(await invitedCard.count()===1,`BQA-24 ${width}: invited Circle Idea missing`);
+    expect(await invitedCard.evaluate(el=>el.classList.contains('is-invited-to-me')),`BQA-24 ${width}: invited card not visually marked`);
+    expect((await invitedCard.locator('[data-collaboration-card]').innerText()).includes('ВАС ЗОВУТ'),`BQA-24 ${width}: invited card lacks explicit signal`);
+    const rect=await indicator.boundingBox();
+    expect(Boolean(rect&&rect.left>=0&&rect.right<=width+1&&rect.width>0&&rect.height>=35),`BQA-24 ${width}: indicator outside/tiny ${JSON.stringify(rect)}`);
+    if(mobile)await indicator.tap();else await indicator.click();
+    await page.waitForFunction(artifactId=>new URL(location.href).searchParams.get('focus')==='artifact:'+artifactId,A,{timeout:6000});
+    await page.locator('.dc-artifact-overlay:not([hidden])').waitFor({state:'attached',timeout:6000});
+    const src=await page.locator('.dc-artifact-overlay iframe').getAttribute('src');
+    expect(String(src||'').includes(A),`BQA-24 ${width}: indicator did not open exact invited Idea`);
+    expect(!errors.length,`BQA-24 ${width}: page errors: ${errors.join(' | ')}`);
+    await ctx.close();
+  }
+
+  // BQA-24: multiple invitations remain reachable without an inbox; canonical Board view is restored before opening.
+  for(const width of [1440,390,360]){
+    const mobile=width<500;
+    const viewport={width,height:mobile?844:900};
+    const{ctx,page,errors}=await openBoard(browser,'multiinvited',viewport,{hasTouch:mobile});
+    const indicator=page.locator('[data-board-invitation-indicator]');
+    await indicator.waitFor({state:'visible',timeout:6000});
+    expect((await indicator.innerText()).trim()==='ПРИГЛАШЕНИЯ · 2',`BQA-24 multi ${width}: count mismatch`);
+    await page.evaluate(()=>window.dispatchEvent(new CustomEvent('dc:board-request-view',{detail:{view:'current-program'}})));
+    await page.waitForFunction(()=>document.documentElement.dataset.boardView==='current-program');
+    if(mobile)await indicator.tap();else await indicator.click();
+    await page.waitForFunction(artifactId=>new URL(location.href).searchParams.get('focus')==='artifact:'+artifactId,A,{timeout:6000});
+    expect(await page.evaluate(()=>document.documentElement.dataset.boardView)==='all',`BQA-24 multi ${width}: invitation did not restore canonical ALL view`);
+    await page.locator('.dc-artifact-overlay__close').click();
+    await page.waitForFunction(()=>new URL(location.href).searchParams.get('focus')===null,{timeout:6000});
+    await page.locator('.dc-artifact-overlay').waitFor({state:'hidden',timeout:6000});
+    await indicator.waitFor({state:'visible',timeout:6000});
+    if(mobile)await indicator.tap();else await indicator.click();
+    await page.waitForFunction(artifactId=>new URL(location.href).searchParams.get('focus')==='artifact:'+artifactId,B,{timeout:6000});
+    const src=await page.locator('.dc-artifact-overlay iframe').getAttribute('src');
+    expect(String(src||'').includes(B),`BQA-24 multi ${width}: second invitation unreachable`);
+    expect(!errors.length,`BQA-24 multi ${width}: page errors: ${errors.join(' | ')}`);
+    await ctx.close();
+  }
+
+  // BQA-24 CIRCLE negative: outsider receives neither hidden Idea nor invitation signal.
+  {
+    const{ctx,page,errors}=await openBoard(browser,'outsider');
+    expect(await page.locator('.dc-notice[data-artifact="'+A+'"]').count()===0,'BQA-24 CIRCLE negative: hidden Idea leaked');
+    expect(await page.locator('[data-board-invitation-indicator]').count()===0,'BQA-24 CIRCLE negative: invitation indicator leaked');
+    expect(!(await page.locator('body').innerText()).includes('ВАС ЗОВУТ'),'BQA-24 CIRCLE negative: invitation copy leaked');
+    expect(!errors.length,'BQA-24 CIRCLE negative page errors: '+errors.join(' | '));
+    await ctx.close();
+  }
+
+  // BQA-28: canonical participant state is re-read on return/BFCache without manual reload.
+  {
+    const{ctx,page,errors}=await openBoard(browser,'author');
+    const candidate='77777777-7777-4777-8777-777777777777';
+    await page.evaluate(({artifactId,candidate})=>{
+      globalThis.__QA_PARTICIPATION__[artifactId][candidate]='INVITED';
+      window.dispatchEvent(new CustomEvent('dc:board-artifact-closed'));
+    },{artifactId:A,candidate});
+    await page.waitForFunction(artifactId=>document.querySelector('.dc-notice[data-artifact="'+artifactId+'"] [data-collaboration-card]')?.textContent?.includes('Новый Зарегистрированный Профиль'),A,{timeout:6000});
+    await page.evaluate(({artifactId,candidate})=>{
+      globalThis.__QA_PARTICIPATION__[artifactId][candidate]='REMOVED';
+      window.dispatchEvent(new CustomEvent('dc:board-close-artifact'));
+    },{artifactId:A,candidate});
+    await page.waitForFunction(artifactId=>!document.querySelector('.dc-notice[data-artifact="'+artifactId+'"] [data-collaboration-card]')?.textContent?.includes('Новый Зарегистрированный Профиль'),A,{timeout:6000});
+    expect(!errors.length,'BQA-28 author INVITED/REMOVED refresh errors: '+errors.join(' | '));
+    await ctx.close();
+  }
+  {
+    const{ctx,page,errors}=await openBoard(browser,'invited');
+    await page.evaluate(({artifactId,userId})=>{
+      globalThis.__QA_PARTICIPATION__[artifactId][userId]='JOINED';
+      const event=new Event('pageshow');Object.defineProperty(event,'persisted',{value:true});window.dispatchEvent(event);
+    },{artifactId:A,userId:'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb'});
+    await page.waitForFunction(artifactId=>document.querySelector('.dc-notice[data-artifact="'+artifactId+'"]')?.dataset.collabMyState==='JOINED',A,{timeout:6000});
+    expect(await page.locator('[data-board-invitation-indicator]').count()===0,'BQA-28 JOINED: stale invitation indicator remained');
+    expect((await page.locator('.dc-notice[data-artifact="'+A+'"] [data-collaboration-card]').innerText()).includes('ВЫ В ДЕЛЕ'),'BQA-28 JOINED: roster/card state stale');
+    expect(!errors.length,'BQA-28 JOINED BFCache refresh errors: '+errors.join(' | '));
+    await ctx.close();
+  }
+  {
+    const{ctx,page,errors}=await openBoard(browser,'invited');
+    await page.evaluate(({artifactId,userId})=>{
+      globalThis.__QA_PARTICIPATION__[artifactId][userId]='DECLINED';
+      window.dispatchEvent(new CustomEvent('dc:board-artifact-closed'));
+    },{artifactId:A,userId:'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb'});
+    await page.waitForFunction(artifactId=>!document.querySelector('.dc-notice[data-artifact="'+artifactId+'"]'),A,{timeout:6000});
+    expect(await page.locator('[data-board-invitation-indicator]').count()===0,'BQA-28 DECLINED: stale invitation indicator remained');
+    expect(!errors.length,'BQA-28 DECLINED refresh errors: '+errors.join(' | '));
+    await ctx.close();
+  }
+  {
+    const{ctx,page,errors}=await openBoard(browser,'joined');
+    await page.evaluate(({artifactId,userId})=>{
+      globalThis.__QA_PARTICIPATION__[artifactId][userId]='LEFT';
+      window.dispatchEvent(new CustomEvent('dc:board-close-artifact'));
+    },{artifactId:A,userId:'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb'});
+    await page.waitForFunction(artifactId=>!document.querySelector('.dc-notice[data-artifact="'+artifactId+'"]'),A,{timeout:6000});
+    expect(!errors.length,'BQA-28 LEFT refresh errors: '+errors.join(' | '));
+    await ctx.close();
   }
 
   // Author detail: roster, visibility, safe selector, remove.
@@ -861,5 +971,7 @@ if(failures.length){console.error('ARTIFACT COLLABORATION BROWSER BLOCKED');for(
 console.log('ARTIFACT COLLABORATION BROWSER ACCEPTANCE COMPLETE');
 console.log('✓ IDEA-only visibility presentation, independent rosters and canonical detail collaboration UI exercised');
 console.log('✓ invited/joined/declined/left/author/remove/no-oracle scenarios exercised');
+console.log('✓ BQA-24 invitation indicator/highlight + one/multiple exact-Idea navigation exercised on desktop/390/360');
+console.log('✓ BQA-28 Board participant freshness exercised through artifact-close/history-close/BFCache lifecycle without reload');
 console.log('✓ participant Relations UI exposes RELATED_TO-only participant path + server can_delete create→reload→open→delete round-trip');
 console.log('✓ desktop, 390px and 360px overflow checks exercised');

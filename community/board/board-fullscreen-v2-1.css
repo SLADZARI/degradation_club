@@ -10,3 +10,45 @@ html,body{width:100%;height:100%;margin:0;overflow:hidden;background:#f2f0e8}.dc
 .dc-collab-avatar--empty{display:grid;place-items:center;font:900 9px/1 ui-monospace,SFMono-Regular,Menlo,monospace}
 .dc-collab-more,.dc-collab-empty{font:900 9px/1 ui-monospace,SFMono-Regular,Menlo,monospace}
 .dc-idea-collab__signal{padding:6px 8px;border:1px solid #111;background:#d8ff3e;font:900 8px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace;text-transform:uppercase}
+
+
+/* Artifact Collaboration live corrective · BQA-24 invitation discoverability. */
+.dc-board-fullscreen-v21 .dc-spatial-world>.dc-notice.is-invited-to-me{
+  outline:5px solid #d8ff3e!important;
+  outline-offset:6px!important;
+  box-shadow:10px 10px 0 #111,0 0 0 10px rgba(216,255,62,.34)!important;
+}
+.dc-board-invitation-indicator{
+  position:fixed;
+  z-index:180;
+  left:14px;
+  top:112px;
+  min-height:38px;
+  padding:0 12px;
+  border:1px solid #111;
+  border-radius:0;
+  background:#d8ff3e;
+  color:#111;
+  box-shadow:3px 3px 0 #111;
+  font:900 9px/1 ui-monospace,SFMono-Regular,Menlo,monospace;
+  letter-spacing:.05em;
+  text-transform:uppercase;
+  cursor:pointer;
+}
+.dc-board-invitation-indicator:focus-visible{outline:3px solid #111;outline-offset:3px}
+html[data-board-artifact-open="1"] .dc-board-invitation-indicator{display:none}
+@media(max-width:900px){
+  .dc-board-invitation-indicator{
+    left:8px;
+    top:96px;
+    min-height:36px;
+    padding:0 9px;
+    font-size:8px;
+    box-shadow:2px 2px 0 #111;
+    max-width:calc(100vw - 16px);
+  }
+  .dc-board-fullscreen-v21 .dc-spatial-world>.dc-notice.is-invited-to-me{
+    outline-width:4px!important;
+    outline-offset:4px!important;
+  }
+}

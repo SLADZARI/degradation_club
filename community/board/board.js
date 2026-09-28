@@ -8,6 +8,9 @@ const memberBadge=document.getElementById('memberBadge');
 const artifactCount=document.getElementById('artifactCount');
 let client=null,session=null,entryStatus=null,ownDraft=null,ownDraftMedia=[];
 let promotionState=new Map();
+let invitationCursor=0;
+let boardReady=false;
+let boardProjectionRefreshPromise=null;
 
 const allowedTypes=new Set(['image/jpeg','image/png','image/webp']);
 const maxFileSize=4*1024*1024;
@@ -30,6 +33,49 @@ function collaborationCardMarkup(artifact,profile,participants=[]){
   const invited=participants.filter(row=>row.participation_state==='INVITED');
   const mine=participants.find(row=>row.profile_id===session?.user?.id)?.participation_state||'';
   return `<section class="dc-idea-collab" data-collaboration-card data-my-participation="${esc(mine)}"><div class="dc-idea-collab__row"><span class="dc-idea-collab__label">ИНИЦИАТОР</span><span class="dc-collab-person">${collaborationAvatar(profile)}<span>${esc(profile?.display_name||'MEMBER')}</span></span></div><div class="dc-idea-collab__row"><span class="dc-idea-collab__label">В ДЕЛЕ</span><span class="dc-idea-collab__people">${collaborationPeople(joined)}</span></div><div class="dc-idea-collab__row"><span class="dc-idea-collab__label">ПОЗВАНЫ</span><span class="dc-idea-collab__people">${collaborationPeople(invited)}</span></div>${mine==='INVITED'?'<div class="dc-idea-collab__signal">ВАС ЗОВУТ · ОТКРОЙТЕ ИДЕЮ</div>':mine==='JOINED'?'<div class="dc-idea-collab__signal">ВЫ В ДЕЛЕ</div>':''}</section>`;
+}
+
+function invitationCards(){
+  return [...boardHost.querySelectorAll('.dc-notice[data-collab-my-state="INVITED"]')];
+}
+function updateInvitationIndicatorLabel(button,count){
+  if(!button||count<1)return;
+  invitationCursor=((invitationCursor%count)+count)%count;
+  button.textContent=`ПРИГЛАШЕНИЯ · ${count}`;
+  button.setAttribute('aria-label',count===1?'Открыть приглашённую Idea':`Открыть приглашение ${invitationCursor+1} из ${count}. Следующий клик откроет следующее приглашение.`);
+}
+function openNextInvitation(){
+  const cards=invitationCards();
+  if(!cards.length){syncInvitationPresentation();return}
+  invitationCursor=((invitationCursor%cards.length)+cards.length)%cards.length;
+  const artifactId=cards[invitationCursor]?.dataset.artifact||'';
+  invitationCursor=(invitationCursor+1)%cards.length;
+  const button=document.querySelector('[data-board-invitation-indicator]');
+  updateInvitationIndicatorLabel(button,cards.length);
+  if(!artifactId)return;
+  window.dispatchEvent(new CustomEvent('dc:board-request-view',{detail:{view:'all',source:'invitation'}}));
+  requestAnimationFrame(()=>{
+    const card=boardHost.querySelector(`.dc-notice[data-artifact="${artifactId}"]`);
+    if(card)card.click();
+  });
+}
+function syncInvitationPresentation(){
+  const cards=invitationCards();
+  let button=document.querySelector('[data-board-invitation-indicator]');
+  if(!cards.length){
+    invitationCursor=0;
+    button?.remove();
+    return;
+  }
+  if(!button){
+    button=document.createElement('button');
+    button.type='button';
+    button.className='dc-board-invitation-indicator';
+    button.dataset.boardInvitationIndicator='1';
+    button.addEventListener('click',openNextInvitation);
+    document.body.appendChild(button);
+  }
+  updateInvitationIndicatorLabel(button,cards.length);
 }
 function artifactSubtypeOptions(selected='announcement'){const current=artifactSubtypeIds.has(String(selected))?String(selected):'announcement';return ARTIFACT_SUBTYPES.map(([id,label])=>`<option value="${id}" ${id===current?'selected':''}>${label}</option>`).join('')}
 function normalizeExternalUrl(value){
@@ -224,7 +270,7 @@ async function loadBoard(){
   if(artifactsResult.error)throw artifactsResult.error;if(promotionResult.error)throw promotionResult.error;
   promotionState=new Map((promotionResult.data||[]).map(row=>[row.artifact_id,row]));
   const artifacts=(artifactsResult.data||[]).filter(artifact=>Boolean(artifact.published_at));artifactCount.textContent=String(artifacts.length).padStart(2,'0');
-  if(!artifacts.length){boardHost.innerHTML='<div class="dc-board-empty"><h3>НА ДОСКЕ<br>ПОКА НЕТ ИСТОРИИ.</h3><p>Здесь появятся текущие и прошедшие Community Artifacts.</p></div>';return}
+  if(!artifacts.length){boardHost.innerHTML='<div class="dc-board-empty"><h3>НА ДОСКЕ<br>ПОКА НЕТ ИСТОРИИ.</h3><p>Здесь появятся текущие и прошедшие Community Artifacts.</p></div>';syncInvitationPresentation();return}
   const ids=artifacts.map(a=>a.id);const authors=[...new Set(artifacts.map(a=>a.author_profile_id))];
   const [profilesResult,reactionsResult,mediaResult,responsesResult]=await Promise.all([
     client.from('dc_member_public_profiles').select('profile_id,display_name,nickname,avatar_url,member_since').in('profile_id',authors),
@@ -240,6 +286,7 @@ async function loadBoard(){
   const mediaUrls=new Map();await Promise.all(media.map(async item=>{try{mediaUrls.set(item.id,await signedMediaUrl(client,item.storage_path))}catch{mediaUrls.set(item.id,null)}}));
   boardHost.innerHTML=artifacts.map((artifact,index)=>renderNotice(artifact,index,profiles.get(artifact.author_profile_id),reactions.filter(r=>r.artifact_id===artifact.id),media.filter(m=>m.artifact_id===artifact.id).map(m=>({...m,signedUrl:mediaUrls.get(m.id)})),responses.filter(r=>r.artifact_id===artifact.id),promotionState.get(artifact.id),participantsByArtifact.get(artifact.id)||[])).join('');
   installNoticeActions();
+  syncInvitationPresentation();
 }
 
 function promotionControls(artifact,row,{ownerAdmin=false,historical=false}={}){
@@ -268,7 +315,7 @@ function renderNotice(artifact,index,profile,reactions,media,responses,promotion
   const activityLine=artifact.activity_at?`<div class="dc-notice__expiry">КОГДА · ${esc(formatActivityDate(artifact.activity_at))}</div>`:'';
   const collab=collaborationCardMarkup(artifact,profile,participants);const authorHtml=isIdea?'':`<div class="dc-notice__author">${avatar(profile)}<div><strong>${esc(profile?.display_name||'MEMBER')}</strong>${profile?.nickname?`<div>@${esc(profile.nickname.replace(/^@/,''))}</div>`:''}</div></div>`;
   const actionControls=circleInviteReadOnly?'<span class="dc-board-state">ВАС ЗОВУТ · ОТКРОЙТЕ ИДЕЮ</span>':`<span class="dc-notice__activity">ИНТЕРЕСНО: ${reactions.length}${mine?` · ОТКЛИКОВ: ${incoming}`:''}</span><button class="dc-board-action small${myReaction?' primary':''}" type="button" data-reaction="${artifact.id}" data-active="${myReaction?'1':'0'}">${myReaction?'✓ ИНТЕРЕСНО':'МНЕ ЭТО НАДО'}</button>${responseControl}${activityLink}`;
-  return `<article class="dc-notice${historical?' is-history':''}" data-artifact="${artifact.id}" data-artifact-status="${esc(artifact.status)}" data-artifact-subtype="${esc(subtype)}" data-artifact-visibility="${esc(artifact.visibility||'community')}" data-collab-my-state="${esc(myParticipation)}" data-source-type="artifact" data-artifact-owned="${mine?'1':'0'}">${adminControl}<div class="dc-notice__meta"><span>${esc(artifactSubtypeLabel(subtype))} / ${String(index+1).padStart(3,'0')}</span><span>${formatDate(artifact.published_at)}</span></div>${authorHtml}${artifact.title?`<h3>${esc(artifact.title)}</h3>`:''}<p class="dc-notice__body">${esc(artifact.body)}</p>${collab}${mediaHtml}${artifact.external_url?`<p><a class="dc-notice__link" href="${esc(artifact.external_url)}" target="_blank" rel="noopener noreferrer">ССЫЛКА ↗</a></p>`:''}${activityLine}<div class="dc-notice__expiry">${statusLine} · ${artifact.visibility==='circle'?'СВОЙ КРУГ':'COMMUNITY'}</div><div class="dc-notice__actions">${actionControls}<a class="dc-board-action small" href="${route(`/community/artifact/${artifact.id}/`)}">ОТКРЫТЬ</a>${promotionControls(artifact,promotion,{ownerAdmin,historical})}</div></article>`;
+  return `<article class="dc-notice${historical?' is-history':''}${myParticipation==='INVITED'?' is-invited-to-me':''}" data-artifact="${artifact.id}" data-artifact-status="${esc(artifact.status)}" data-artifact-subtype="${esc(subtype)}" data-artifact-visibility="${esc(artifact.visibility||'community')}" data-collab-my-state="${esc(myParticipation)}" data-source-type="artifact" data-artifact-owned="${mine?'1':'0'}">${adminControl}<div class="dc-notice__meta"><span>${esc(artifactSubtypeLabel(subtype))} / ${String(index+1).padStart(3,'0')}</span><span>${formatDate(artifact.published_at)}</span></div>${authorHtml}${artifact.title?`<h3>${esc(artifact.title)}</h3>`:''}<p class="dc-notice__body">${esc(artifact.body)}</p>${collab}${mediaHtml}${artifact.external_url?`<p><a class="dc-notice__link" href="${esc(artifact.external_url)}" target="_blank" rel="noopener noreferrer">ССЫЛКА ↗</a></p>`:''}${activityLine}<div class="dc-notice__expiry">${statusLine} · ${artifact.visibility==='circle'?'СВОЙ КРУГ':'COMMUNITY'}</div><div class="dc-notice__actions">${actionControls}<a class="dc-board-action small" href="${route(`/community/artifact/${artifact.id}/`)}">ОТКРЫТЬ</a>${promotionControls(artifact,promotion,{ownerAdmin,historical})}</div></article>`;
 }
 
 function installNoticeActions(){
@@ -305,6 +352,25 @@ async function sendResponse(artifactId,box){
 
 async function refreshAll(){entryStatus=await getEntryStatus(client);boardStatus.textContent=isOwnerAdmin()?'OWNER ADMIN / BOARD':`MEMBER / ACTIVE · SLOTS ${entryStatus.artifact_slots_available??0}`;await Promise.all([renderEntry(),loadBoard()])}
 
+function requestBoardProjectionRefresh(source){
+  if(!boardReady||!client||!session)return Promise.resolve();
+  if(boardProjectionRefreshPromise)return boardProjectionRefreshPromise;
+  boardProjectionRefreshPromise=loadBoard()
+    .catch(error=>console.warn('[DC Board] projection refresh failed',source,error))
+    .finally(()=>{boardProjectionRefreshPromise=null});
+  return boardProjectionRefreshPromise;
+}
+function installBoardFreshnessLifecycle(){
+  window.addEventListener('dc:board-artifact-closed',()=>{
+    setTimeout(()=>{
+      const focus=new URL(location.href).searchParams.get('focus');
+      if(!focus)requestBoardProjectionRefresh('artifact-closed');
+    },0);
+  });
+  window.addEventListener('dc:board-close-artifact',()=>requestBoardProjectionRefresh('history-close'));
+  window.addEventListener('pageshow',event=>{if(event.persisted)requestBoardProjectionRefresh('pageshow-bfcache')});
+}
+
 async function boot(){
   client=getClient();session=await currentSession(client);
   if(!session){
@@ -316,7 +382,9 @@ async function boot(){
   }
   const own=await client.from('dc_member_public_profiles').select('display_name,nickname,avatar_url').eq('profile_id',session.user.id).maybeSingle();
   memberBadge.textContent=own.data?.display_name?`${own.data.display_name}${own.data.nickname?` / @${own.data.nickname.replace(/^@/,'')}`:''}`:(session.user.user_metadata?.full_name||session.user.email||(isOwnerAdmin()?'OWNER ADMIN':'MEMBER'));
+  boardReady=true;
   await refreshAll();
 }
 
+installBoardFreshnessLifecycle();
 boot().catch(error=>{boardStatus.textContent='ERROR';boardError(error);boardError(error,boardHost)});
