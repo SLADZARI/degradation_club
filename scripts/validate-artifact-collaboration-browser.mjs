@@ -242,7 +242,7 @@ try{
     expect(await invitedCard.evaluate(el=>el.classList.contains('is-invited-to-me')),`BQA-24 ${width}: invited card not visually marked`);
     expect((await invitedCard.locator('[data-collaboration-card]').innerText()).includes('ВАС ЗОВУТ'),`BQA-24 ${width}: invited card lacks explicit signal`);
     const rect=await indicator.boundingBox();
-    expect(Boolean(rect&&rect.left>=0&&rect.right<=width+1&&rect.width>0&&rect.height>=35),`BQA-24 ${width}: indicator outside/tiny ${JSON.stringify(rect)}`);
+    expect(Boolean(rect&&rect.x>=0&&rect.x+rect.width<=width+1&&rect.width>0&&rect.height>=35),`BQA-24 ${width}: indicator outside/tiny ${JSON.stringify(rect)}`);
     if(mobile)await indicator.tap();else await indicator.click();
     await page.waitForFunction(artifactId=>new URL(location.href).searchParams.get('focus')==='artifact:'+artifactId,A,{timeout:6000});
     await page.locator('.dc-artifact-overlay:not([hidden])').waitFor({state:'attached',timeout:6000});
