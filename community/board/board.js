@@ -11,6 +11,7 @@ let promotionState=new Map();
 let invitationCursor=0;
 let boardReady=false;
 let boardProjectionRefreshPromise=null;
+let collaborationProjectionDirty=false;
 
 const allowedTypes=new Set(['image/jpeg','image/png','image/webp']);
 const maxFileSize=4*1024*1024;
@@ -360,15 +361,32 @@ function requestBoardProjectionRefresh(source){
     .finally(()=>{boardProjectionRefreshPromise=null});
   return boardProjectionRefreshPromise;
 }
+function refreshDirtyCollaborationProjection(source){
+  if(!collaborationProjectionDirty)return Promise.resolve();
+  collaborationProjectionDirty=false;
+  return requestBoardProjectionRefresh(source).catch(error=>{
+    collaborationProjectionDirty=true;
+    throw error;
+  });
+}
 function installBoardFreshnessLifecycle(){
+  window.addEventListener('dc:artifact-collaboration-changed',event=>{
+    const artifactId=String(event.detail?.artifactId||'');
+    if(artifactId)collaborationProjectionDirty=true;
+  });
   window.addEventListener('dc:board-artifact-closed',()=>{
     setTimeout(()=>{
       const focus=new URL(location.href).searchParams.get('focus');
-      if(!focus)requestBoardProjectionRefresh('artifact-closed');
+      if(!focus)refreshDirtyCollaborationProjection('artifact-closed');
     },0);
   });
-  window.addEventListener('dc:board-close-artifact',()=>requestBoardProjectionRefresh('history-close'));
-  window.addEventListener('pageshow',event=>{if(event.persisted)requestBoardProjectionRefresh('pageshow-bfcache')});
+  window.addEventListener('dc:board-close-artifact',()=>refreshDirtyCollaborationProjection('history-close'));
+  window.addEventListener('pageshow',event=>{
+    if(event.persisted){
+      collaborationProjectionDirty=false;
+      requestBoardProjectionRefresh('pageshow-bfcache');
+    }
+  });
 }
 
 async function boot(){

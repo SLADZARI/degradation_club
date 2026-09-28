@@ -141,6 +141,15 @@ function collaborationStatus(message,state=''){
   const el=host.querySelector('[data-collab-status]');if(!el)return;el.textContent=message||'';el.dataset.state=state;el.hidden=!message;
 }
 async function refreshCollaboration(){await load()}
+function notifyBoardCollaborationChanged(){
+  if(!artifact?.id)return;
+  try{
+    if(window.parent&&window.parent!==window&&window.parent.location.origin===location.origin){
+      const EventCtor=window.parent.CustomEvent;
+      window.parent.dispatchEvent(new EventCtor('dc:artifact-collaboration-changed',{detail:{artifactId:artifact.id}}));
+    }
+  }catch{}
+}
 async function searchInviteCandidates(){
   const input=host.querySelector('#artifactInviteSearch');const results=host.querySelector('[data-invite-results]');const query=String(input?.value||'').trim();
   if(!results)return;if(query.length<2){results.innerHTML='<p>Введите минимум 2 символа.</p>';return}
@@ -150,10 +159,10 @@ async function searchInviteCandidates(){
   const rows=Array.isArray(result.data)?result.data:[];
   results.innerHTML=rows.length?rows.map(row=>`<button class="dc-artifact-invite__candidate" type="button" data-invite-profile="${esc(row.profile_id)}">${collabAvatar(row)}<span><strong>${esc(row.display_name||'УЧАСТНИК')}</strong>${row.nickname?`<small>@${esc(String(row.nickname).replace(/^@/,''))}</small>`:''}${row.current_state?`<small>${esc(row.current_state)}</small>`:''}</span></button>`).join(''):'<p>ПОДХОДЯЩИХ ПРОФИЛЕЙ НЕТ.</p>';
 }
-async function inviteProfile(profileId){collaborationStatus('ПРИГЛАШАЕМ…','busy');const result=await client.rpc('dc_artifact_invite_v1',{p_artifact_id:artifact.id,p_profile_id:profileId});if(result.error){collaborationStatus(errorMessage(result.error),'error');return}await refreshCollaboration()}
-async function respondInvitation(decision){collaborationStatus('СОХРАНЯЕМ…','busy');const result=await client.rpc('dc_artifact_invitation_respond_v1',{p_artifact_id:artifact.id,p_decision:decision});if(result.error){collaborationStatus(errorMessage(result.error),'error');return}if(decision==='DECLINED'&&artifact.visibility==='circle'){fail(new Error('ARTIFACT_NOT_AVAILABLE'));return}await refreshCollaboration()}
-async function leaveIdea(){collaborationStatus('ВЫХОДИМ…','busy');const result=await client.rpc('dc_artifact_leave_v1',{p_artifact_id:artifact.id});if(result.error){collaborationStatus(errorMessage(result.error),'error');return}if(artifact.visibility==='circle'){fail(new Error('ARTIFACT_NOT_AVAILABLE'));return}await refreshCollaboration()}
-async function removeParticipant(profileId){collaborationStatus('УБИРАЕМ…','busy');const result=await client.rpc('dc_artifact_remove_participant_v1',{p_artifact_id:artifact.id,p_profile_id:profileId});if(result.error){collaborationStatus(errorMessage(result.error),'error');return}await refreshCollaboration()}
+async function inviteProfile(profileId){collaborationStatus('ПРИГЛАШАЕМ…','busy');const result=await client.rpc('dc_artifact_invite_v1',{p_artifact_id:artifact.id,p_profile_id:profileId});if(result.error){collaborationStatus(errorMessage(result.error),'error');return}notifyBoardCollaborationChanged();await refreshCollaboration()}
+async function respondInvitation(decision){collaborationStatus('СОХРАНЯЕМ…','busy');const result=await client.rpc('dc_artifact_invitation_respond_v1',{p_artifact_id:artifact.id,p_decision:decision});if(result.error){collaborationStatus(errorMessage(result.error),'error');return}notifyBoardCollaborationChanged();if(decision==='DECLINED'&&artifact.visibility==='circle'){fail(new Error('ARTIFACT_NOT_AVAILABLE'));return}await refreshCollaboration()}
+async function leaveIdea(){collaborationStatus('ВЫХОДИМ…','busy');const result=await client.rpc('dc_artifact_leave_v1',{p_artifact_id:artifact.id});if(result.error){collaborationStatus(errorMessage(result.error),'error');return}notifyBoardCollaborationChanged();if(artifact.visibility==='circle'){fail(new Error('ARTIFACT_NOT_AVAILABLE'));return}await refreshCollaboration()}
+async function removeParticipant(profileId){collaborationStatus('УБИРАЕМ…','busy');const result=await client.rpc('dc_artifact_remove_participant_v1',{p_artifact_id:artifact.id,p_profile_id:profileId});if(result.error){collaborationStatus(errorMessage(result.error),'error');return}notifyBoardCollaborationChanged();await refreshCollaboration()}
 function bindDetailActions(){
   bindBoardReturn();
   document.getElementById('detailPromotionSupport')?.addEventListener('click',supportPromotion);

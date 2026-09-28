@@ -293,11 +293,13 @@ try{
     const candidate='77777777-7777-4777-8777-777777777777';
     await page.evaluate(({artifactId,candidate})=>{
       globalThis.__QA_PARTICIPATION__[artifactId][candidate]='INVITED';
+      window.dispatchEvent(new CustomEvent('dc:artifact-collaboration-changed',{detail:{artifactId}}));
       window.dispatchEvent(new CustomEvent('dc:board-artifact-closed'));
     },{artifactId:A,candidate});
     await page.waitForFunction(artifactId=>document.querySelector('.dc-notice[data-artifact="'+artifactId+'"] [data-collaboration-card]')?.textContent?.includes('Новый Зарегистрированный Профиль'),A,{timeout:6000});
     await page.evaluate(({artifactId,candidate})=>{
       globalThis.__QA_PARTICIPATION__[artifactId][candidate]='REMOVED';
+      window.dispatchEvent(new CustomEvent('dc:artifact-collaboration-changed',{detail:{artifactId}}));
       window.dispatchEvent(new CustomEvent('dc:board-close-artifact'));
     },{artifactId:A,candidate});
     await page.waitForFunction(artifactId=>!document.querySelector('.dc-notice[data-artifact="'+artifactId+'"] [data-collaboration-card]')?.textContent?.includes('Новый Зарегистрированный Профиль'),A,{timeout:6000});
@@ -320,6 +322,7 @@ try{
     const{ctx,page,errors}=await openBoard(browser,'invited');
     await page.evaluate(({artifactId,userId})=>{
       globalThis.__QA_PARTICIPATION__[artifactId][userId]='DECLINED';
+      window.dispatchEvent(new CustomEvent('dc:artifact-collaboration-changed',{detail:{artifactId}}));
       window.dispatchEvent(new CustomEvent('dc:board-artifact-closed'));
     },{artifactId:A,userId:'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb'});
     await page.waitForFunction(artifactId=>!document.querySelector('.dc-notice[data-artifact="'+artifactId+'"]'),A,{timeout:6000});
@@ -331,6 +334,7 @@ try{
     const{ctx,page,errors}=await openBoard(browser,'joined');
     await page.evaluate(({artifactId,userId})=>{
       globalThis.__QA_PARTICIPATION__[artifactId][userId]='LEFT';
+      window.dispatchEvent(new CustomEvent('dc:artifact-collaboration-changed',{detail:{artifactId}}));
       window.dispatchEvent(new CustomEvent('dc:board-close-artifact'));
     },{artifactId:A,userId:'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb'});
     await page.waitForFunction(artifactId=>!document.querySelector('.dc-notice[data-artifact="'+artifactId+'"]'),A,{timeout:6000});
