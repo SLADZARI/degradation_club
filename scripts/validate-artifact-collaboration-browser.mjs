@@ -363,18 +363,65 @@ try{
     await page.waitForSelector('[data-invite-profile]');
     const resultText=await page.locator('[data-invite-results]').innerText();
     expect(!/@invalid|private-/i.test(resultText),'selector leaked private email');
-    await page.locator('[data-remove-participant]').first().click();
+    const removeControls=page.locator('[data-remove-participant]');
+    expect(await removeControls.count()>0,'BQA-26 author removal control missing');
+    const removeLabels=await removeControls.evaluateAll(nodes=>nodes.map(node=>({text:(node.textContent||'').trim(),aria:node.getAttribute('aria-label')||''})));
+    expect(removeLabels.every(item=>item.text==='УБРАТЬ ИЗ ИДЕИ'&&/Убрать .* из идеи/i.test(item.aria)),'BQA-26 author removal meaning is ambiguous '+JSON.stringify(removeLabels));
+    await removeControls.first().click();
     await page.waitForFunction(()=>document.querySelectorAll('[data-remove-participant]').length<4);
     expect(!errors.length,'author detail errors: '+errors.join(' | '));await ctx.close();
   }
 
-  // INVITED -> JOINED.
+  // BQA-25 desktop: INVITED primary hierarchy -> JOINED compact state.
   {
     const{ctx,page}=await openDetail(browser,'invited');
     expect((await page.locator('[data-artifact-collaboration]').innerText()).includes('ЗОВЁТ ВАС В ЭТУ ИДЕЮ'),'invited copy missing');
+    const hierarchy=await page.evaluate(()=>{
+      const primary=document.querySelector('[data-primary-viewer-action]');
+      const content=document.querySelector('[data-artifact-content]');
+      const cta=document.querySelector('[data-invite-decision="JOINED"]');
+      const style=cta?getComputedStyle(cta):null;
+      return{
+        primaryBeforeContent:Boolean(primary&&content&&(primary.compareDocumentPosition(content)&Node.DOCUMENT_POSITION_FOLLOWING)),
+        ctaBackground:style?.backgroundColor||null,
+        ctaColor:style?.color||null,
+        ctaHeight:cta?.getBoundingClientRect().height||0
+      };
+    });
+    expect(hierarchy.primaryBeforeContent,'BQA-25 invited primary action is not before content '+JSON.stringify(hierarchy));
+    expect(hierarchy.ctaBackground==='rgb(17, 17, 17)'&&hierarchy.ctaColor==='rgb(255, 255, 255)'&&hierarchy.ctaHeight>=55,'BQA-25 invited CTA visual hierarchy mismatch '+JSON.stringify(hierarchy));
+    expect(await page.getByRole('button',{name:'НЕ СЕЙЧАС'}).count()===1,'BQA-25 invited secondary action missing');
     await page.getByRole('button',{name:'ПРИСОЕДИНИТЬСЯ'}).click();
     await page.waitForSelector('[data-invite-state="JOINED"]');
     expect((await page.locator('[data-invite-state="JOINED"]').innerText()).includes('ВЫ В ДЕЛЕ'),'join state missing');
+    expect(await page.locator('[data-invite-state="JOINED"] button').count()===0,'BQA-25 joined state is not compact');
+    expect(await page.locator('[data-destructive-leave] [data-leave-idea]').count()===1,'BQA-26 joined leave is not isolated at bottom');
+    await ctx.close();
+  }
+
+  // BQA-25/26 detail hierarchy on 390/360.
+  for(const width of [390,360]){
+    const{ctx,page}=await openDetail(browser,'invited',{width,height:844});
+    await page.waitForSelector('[data-invite-state="INVITED"]');
+    const mobile=await page.evaluate(()=>{
+      const cta=document.querySelector('[data-invite-decision="JOINED"]');
+      const primary=document.querySelector('[data-primary-viewer-action]');
+      const content=document.querySelector('[data-artifact-content]');
+      const style=cta?getComputedStyle(cta):null;
+      return{
+        overflow:document.documentElement.scrollWidth>document.documentElement.clientWidth+1,
+        primaryBeforeContent:Boolean(primary&&content&&(primary.compareDocumentPosition(content)&Node.DOCUMENT_POSITION_FOLLOWING)),
+        ctaBackground:style?.backgroundColor||null,
+        ctaColor:style?.color||null
+      };
+    });
+    expect(!mobile.overflow&&mobile.primaryBeforeContent,'BQA-25 mobile '+width+' invited hierarchy/overflow '+JSON.stringify(mobile));
+    expect(mobile.ctaBackground==='rgb(17, 17, 17)'&&mobile.ctaColor==='rgb(255, 255, 255)','BQA-25 mobile '+width+' CTA visual mismatch '+JSON.stringify(mobile));
+    await page.getByRole('button',{name:'ПРИСОЕДИНИТЬСЯ'}).click();
+    await page.waitForSelector('[data-invite-state="JOINED"]');
+    expect(await page.locator('[data-invite-state="JOINED"] button').count()===0,'BQA-25 mobile '+width+' joined state is not compact');
+    expect(await page.locator('[data-destructive-leave] [data-leave-idea]').count()===1,'BQA-26 mobile '+width+' leave not isolated at bottom');
+    expect(!(await page.evaluate(()=>document.documentElement.scrollWidth>document.documentElement.clientWidth+1)),'BQA-25/26 mobile '+width+' horizontal overflow');
     await ctx.close();
   }
 
@@ -389,11 +436,21 @@ try{
     await ctx.close();
   }
 
-  // JOINED -> LEFT.
+  // BQA-26 JOINED -> deliberate two-step LEFT; cancel preserves state.
   {
     const{ctx,page}=await openDetail(browser,'joined');
-    await page.getByRole('button',{name:'ВЫЙТИ'}).click();
+    const before=await page.evaluate(()=>globalThis.__QA_COLLAB_CALLS__.filter(call=>call.name==='dc_artifact_leave_v1').length);
+    await page.getByRole('button',{name:'ВЫЙТИ ИЗ ИДЕИ'}).click();
+    await page.locator('[data-leave-confirmation]').waitFor({state:'visible'});
+    expect(await page.evaluate(()=>globalThis.__QA_COLLAB_CALLS__.filter(call=>call.name==='dc_artifact_leave_v1').length)===before,'BQA-26 first activation called leave RPC');
+    await page.getByRole('button',{name:'ОСТАТЬСЯ'}).click();
+    expect(await page.locator('[data-invite-state="JOINED"]').count()===1,'BQA-26 cancel lost JOINED state');
+    expect(await page.evaluate(()=>globalThis.__QA_COLLAB_CALLS__.filter(call=>call.name==='dc_artifact_leave_v1').length)===before,'BQA-26 cancel called leave RPC');
+    await page.getByRole('button',{name:'ВЫЙТИ ИЗ ИДЕИ'}).click();
+    await page.getByRole('button',{name:'ПОДТВЕРДИТЬ ВЫХОД'}).click();
     await page.waitForFunction(()=>document.getElementById('artifactState')?.textContent==='NOT FOUND');
+    const after=await page.evaluate(()=>globalThis.__QA_COLLAB_CALLS__.filter(call=>call.name==='dc_artifact_leave_v1').length);
+    expect(after===before+1,'BQA-26 confirmed leave did not produce exactly one canonical RPC '+JSON.stringify({before,after}));
     expect(!(await page.locator('#artifactHost').innerText()).includes('IDEA A'),'left: Circle detail remained visible');
     await ctx.close();
   }
