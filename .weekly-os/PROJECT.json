@@ -7,12 +7,12 @@
     "projectStage": "RELEASE",
     "gate": "G7_RELEASE",
     "status": "APPROVED",
-    "version": "2.91",
+    "version": "2.92",
     "updated": "2026-09-28",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.90"
+    "supersedes": "2.91"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -236,7 +236,9 @@
     ".weekly-os/results/artifact-collaboration-v1.v1.2.md",
     "operations/ARTIFACT_COLLABORATION_G7_RELEASE_CANDIDATE_R2_2026-09-28.md",
     ".weekly-os/results/artifact-collaboration-v1.v1.3.md",
-    ".weekly-os/results/artifact-collaboration-v1.v1.4.md"
+    ".weekly-os/results/artifact-collaboration-v1.v1.4.md",
+    "operations/ARTIFACT_COLLABORATION_G7_RELEASE_AUTHORIZATION_2026-09-28.md",
+    ".weekly-os/results/artifact-collaboration-v1.v1.5.md"
   ],
   "authority": {
     "mpDslCore": {
@@ -403,10 +405,10 @@
   },
   "currentResult": {
     "artifactId": "dementor-club.result.artifact-collaboration-v1",
-    "version": "1.4",
+    "version": "1.5",
     "status": "ACTIVE",
     "workStatus": "ACTIVE",
-    "path": ".weekly-os/results/artifact-collaboration-v1.v1.4.md",
+    "path": ".weekly-os/results/artifact-collaboration-v1.v1.5.md",
     "gate": "G7_RELEASE",
     "scope": [
       "idea participation",
@@ -421,17 +423,17 @@
     "productionBaseCommit": "df8a24eca2bcca25339f128c7da93982515cf442",
     "implementationStartAuthorized": true,
     "schemaMutationAuthorized": true,
-    "liveDatabaseMutationAuthorized": false,
-    "productionMergeAuthorized": false,
-    "productionDeployAuthorized": false,
+    "liveDatabaseMutationAuthorized": true,
+    "productionMergeAuthorized": true,
+    "productionDeployAuthorized": true,
     "g4BackendEvidence": "operations/ARTIFACT_COLLABORATION_BACKEND_G4_CONTRACT_2026-09-24.md",
     "g4BackendStatus": "PASS",
     "g5BackendEvidence": "operations/ARTIFACT_COLLABORATION_BACKEND_G5_CHECKPOINT_2026-09-24.md",
     "g5BackendCandidateCommit": "3522993d6796fe9dae81a0c7dbde1ddcc1aa350a",
     "g5BackendStaticStatus": "PASS",
     "g5SqlExecutionStatus": "PASS_LOCAL_OBSERVED_PRODUCTION_COMPATIBLE_REPLAY",
-    "gateReadiness": "READY_FOR_RELEASE_DECISION",
-    "note": "G7 clean RC f3078ceb... on release/artifact-collaboration-v1-r2 passed exact-head Site Integrity #1313. Draft PR #244 remains unmerged. Ready for explicit release decision; production merge/deploy and live Supabase apply remain unauthorized.",
+    "gateReadiness": "PRODUCTION_RELEASE_AUTHORIZED",
+    "note": "Owner authorized production release for exact RC f3078ceb... / PR #244. Canonical merge, live migration apply and Pages production deploy authorized. Telegram Worker deploy remains unauthorized.",
     "implementationBrief": "operations/ARTIFACT_COLLABORATION_IMPLEMENTATION_BRIEF_V1.md",
     "g5BackendLocalBlockerEvidence": "operations/ARTIFACT_COLLABORATION_BACKEND_G5_LOCAL_STACK_BLOCKER_2026-09-24.md",
     "costBoundary": "NO_PAID_INFRASTRUCTURE",
@@ -463,7 +465,7 @@
     "g6ValidationRunId": 36421497144,
     "g6ValidationConclusion": "SUCCESS",
     "g6DiffFileCount": 31,
-    "g7ReleaseAuthorized": false,
+    "g7ReleaseAuthorized": true,
     "releaseBranch": "release/artifact-collaboration-v1-r2",
     "g7CleanRcStatus": "PASS",
     "g7ValidationStatus": "PASS",
@@ -477,7 +479,11 @@
     "g7Evidence": "operations/ARTIFACT_COLLABORATION_G7_RELEASE_CANDIDATE_R2_2026-09-28.md",
     "g7ValidationRun": 1313,
     "g7ValidationRunId": 36429691568,
-    "g7ValidationConclusion": "SUCCESS"
+    "g7ValidationConclusion": "SUCCESS",
+    "backendProductionDeployAuthorized": true,
+    "pagesProductionDeployAuthorized": true,
+    "telegramWorkerDeployAuthorized": false,
+    "releaseAuthorizationEvidence": "operations/ARTIFACT_COLLABORATION_G7_RELEASE_AUTHORIZATION_2026-09-28.md"
   },
   "waitingResults": [
     {
