@@ -48,7 +48,10 @@ function isAuthor(){return Boolean(session?.user&&artifact?.author_profile_id===
 function visibilityLabel(){return artifact?.visibility==='circle'?'СВОЙ КРУГ':'ВЕСЬ КЛУБ'}
 function participantPeople(rows,{remove=false}={}){
   if(!rows.length)return'<span class="dc-collab-empty">—</span>';
-  return rows.map(row=>`<span class="dc-artifact-collab-person">${collabAvatar(row)}<span><strong>${esc(row.display_name||'УЧАСТНИК')}</strong>${row.nickname?`<small>@${esc(String(row.nickname).replace(/^@/,''))}</small>`:''}</span>${remove?`<button class="dc-artifact-collab-remove" type="button" data-remove-participant="${esc(row.profile_id)}" aria-label="Убрать ${esc(row.display_name||'участника')}">×</button>`:''}</span>`).join('');
+  return rows.map(row=>{
+    const canRemove=remove&&row.profile_id!==session?.user?.id;
+    return `<span class="dc-artifact-collab-person">${collabAvatar(row)}<span><strong>${esc(row.display_name||'УЧАСТНИК')}</strong>${row.nickname?`<small>@${esc(String(row.nickname).replace(/^@/,''))}</small>`:''}</span>${canRemove?`<button class="dc-artifact-collab-remove" type="button" data-remove-participant="${esc(row.profile_id)}" aria-label="Убрать ${esc(row.display_name||'участника')} из идеи">УБРАТЬ ИЗ ИДЕИ</button>`:''}</span>`;
+  }).join('');
 }
 function cameFromBoard(){try{if(!document.referrer)return false;const ref=new URL(document.referrer),board=new URL(BOARD_PATH,location.origin);const normalize=value=>value.replace(/\/+$/,'/');return ref.origin===location.origin&&normalize(ref.pathname)===normalize(board.pathname)}catch{return false}}
 function returnToBoard(event){event?.preventDefault();if(cameFromBoard()&&history.length>1){history.back();return}location.assign(BOARD_PATH)}
@@ -114,28 +117,64 @@ async function loadGuest(){
 async function load(){return guestMode?loadGuest():loadMember()}
 
 function promotionControls(){
-  if(!promotion)return'';const count=Math.max(0,Number(promotion.support_count||0));const threshold=Math.max(0,Number(promotion.promotion_threshold||0));const status=String(promotion.delivery_status||'');const parts=[];const label=promotionLabel(promotion);if(label)parts.push(`<span class="dc-artifact-action" aria-disabled="true">${esc(label)}</span>`);
-  if(!isHistorical()&&promotion.can_support===true&&promotion.my_support!==true&&count<threshold)parts.push(`<button class="dc-artifact-action" type="button" id="detailPromotionSupport">ПОДДЕРЖАТЬ · ${count}/${threshold}</button>`);else if(promotion.my_support===true&&threshold>0)parts.push(`<span class="dc-artifact-action" aria-disabled="true">✓ ПОДДЕРЖАНО · ${count}/${threshold}</span>`);
-  if(isOwnerAdmin()){
-    if(status==='held'||status==='pending')parts.push('<button class="dc-artifact-action" type="button" id="detailAdminSuppress">НЕ ПУБЛИКОВАТЬ В TELEGRAM</button>');
-    if(status==='delivery_unknown'&&promotion.outbox_id){parts.push('<button class="dc-artifact-action" type="button" id="detailResolveSent">ПОДТВЕРДИТЬ SENT</button>');parts.push('<button class="dc-artifact-action" type="button" id="detailResolveRetry">CONTROLLED RETRY</button>');parts.push('<button class="dc-artifact-action" type="button" id="detailResolveCancel">ОТМЕНИТЬ</button>')}
-    parts.push('<button class="dc-artifact-action" type="button" id="detailAdminHide">СКРЫТЬ С ДОСКИ</button>');
-  }
+  if(!promotion)return'';
+  const count=Math.max(0,Number(promotion.support_count||0));
+  const threshold=Math.max(0,Number(promotion.promotion_threshold||0));
+  const parts=[];
+  const label=promotionLabel(promotion);
+  if(label)parts.push(`<span class="dc-artifact-action" aria-disabled="true">${esc(label)}</span>`);
+  if(!isHistorical()&&promotion.can_support===true&&promotion.my_support!==true&&count<threshold)parts.push(`<button class="dc-artifact-action" type="button" id="detailPromotionSupport">ПОДДЕРЖАТЬ · ${count}/${threshold}</button>`);
+  else if(promotion.my_support===true&&threshold>0)parts.push(`<span class="dc-artifact-action" aria-disabled="true">✓ ПОДДЕРЖАНО · ${count}/${threshold}</span>`);
   return parts.join('');
 }
-
+function ownerAdminPromotionControls(){
+  if(!promotion||!isOwnerAdmin())return'';
+  const status=String(promotion.delivery_status||'');
+  const parts=[];
+  if(status==='held'||status==='pending')parts.push('<button class="dc-artifact-action" type="button" id="detailAdminSuppress">НЕ ПУБЛИКОВАТЬ В TELEGRAM</button>');
+  if(status==='delivery_unknown'&&promotion.outbox_id){
+    parts.push('<button class="dc-artifact-action" type="button" id="detailResolveSent">ПОДТВЕРДИТЬ SENT</button>');
+    parts.push('<button class="dc-artifact-action" type="button" id="detailResolveRetry">CONTROLLED RETRY</button>');
+    parts.push('<button class="dc-artifact-action" type="button" id="detailResolveCancel">ОТМЕНИТЬ</button>');
+  }
+  parts.push('<button class="dc-artifact-action" type="button" id="detailAdminHide">СКРЫТЬ С ДОСКИ</button>');
+  return parts.join('');
+}
+function inviteControls(){
+  return `<div class="dc-artifact-invite"><button class="dc-artifact-action" type="button" data-invite-toggle>+ ПОЗВАТЬ</button><div class="dc-artifact-invite__panel" data-invite-panel hidden><label for="artifactInviteSearch">Найти зарегистрированный профиль</label><div class="dc-artifact-invite__search"><input id="artifactInviteSearch" type="search" minlength="2" maxlength="80" autocomplete="off" placeholder="Имя или ник"><button class="dc-artifact-action" type="button" data-invite-search>НАЙТИ</button></div><div class="dc-artifact-invite__results" data-invite-results aria-live="polite"></div></div></div>`;
+}
+function primaryViewerState(){
+  if(!isIdea())return'';
+  const state=currentParticipation();
+  if(state==='INVITED'){
+    const authorName=authorProfile?.display_name||'ИНИЦИАТОР';
+    return `<section class="dc-artifact-primary-state dc-artifact-primary-state--invited dc-artifact-collab__viewer" data-invite-state="INVITED" data-primary-viewer-action><strong>${esc(authorName.toUpperCase())} ЗОВЁТ ВАС В ЭТУ ИДЕЮ</strong><div class="dc-artifact-collab__viewer-actions"><button class="dc-artifact-action dc-artifact-collab-primary-cta" type="button" data-invite-decision="JOINED">ПРИСОЕДИНИТЬСЯ</button><button class="dc-artifact-action" type="button" data-invite-decision="DECLINED">НЕ СЕЙЧАС</button></div></section>`;
+  }
+  if(state==='JOINED')return '<section class="dc-artifact-primary-state dc-artifact-primary-state--joined dc-artifact-collab__viewer" data-invite-state="JOINED" data-primary-viewer-state><strong>ВЫ В ДЕЛЕ</strong></section>';
+  return'';
+}
 function collaborationDetail(){
   if(!isIdea())return'';
   const joined=participants.filter(row=>row.participation_state==='JOINED');
   const invited=participants.filter(row=>row.participation_state==='INVITED');
-  const state=currentParticipation();const manage=isAuthor()||isOwnerAdmin();const authorName=authorProfile?.display_name||'ИНИЦИАТОР';
-  const viewer=state==='INVITED'
-    ?`<div class="dc-artifact-collab__viewer" data-invite-state="INVITED"><strong>${esc(authorName.toUpperCase())} ЗОВЁТ ВАС В ЭТУ ИДЕЮ</strong><div class="dc-artifact-collab__viewer-actions"><button class="dc-artifact-action primary" type="button" data-invite-decision="JOINED">ПРИСОЕДИНИТЬСЯ</button><button class="dc-artifact-action" type="button" data-invite-decision="DECLINED">НЕ СЕЙЧАС</button></div></div>`
-    :state==='JOINED'
-      ?'<div class="dc-artifact-collab__viewer" data-invite-state="JOINED"><strong>ВЫ В ДЕЛЕ</strong><div class="dc-artifact-collab__viewer-actions"><button class="dc-artifact-action" type="button" data-leave-idea>ВЫЙТИ</button></div></div>'
-      :'';
-  const invite=manage?`<div class="dc-artifact-invite"><button class="dc-artifact-action" type="button" data-invite-toggle>+ ПОЗВАТЬ</button><div class="dc-artifact-invite__panel" data-invite-panel hidden><label for="artifactInviteSearch">Найти зарегистрированный профиль</label><div class="dc-artifact-invite__search"><input id="artifactInviteSearch" type="search" minlength="2" maxlength="80" autocomplete="off" placeholder="Имя или ник"><button class="dc-artifact-action" type="button" data-invite-search>НАЙТИ</button></div><div class="dc-artifact-invite__results" data-invite-results aria-live="polite"></div></div></div>`:'';
-  return `<section class="dc-artifact-collab" data-artifact-collaboration data-my-participation="${esc(state)}"><div class="dc-artifact-collab__head"><span>ИДЕЯ / COLLABORATION</span><strong>ВИДНО · ${esc(visibilityLabel())}</strong></div><div class="dc-artifact-collab__group"><span>ИНИЦИАТОР</span><div class="dc-artifact-collab__people"><span class="dc-artifact-collab-person">${collabAvatar(authorProfile)}<span><strong>${esc(authorName)}</strong>${authorProfile?.nickname?`<small>@${esc(String(authorProfile.nickname).replace(/^@/,''))}</small>`:''}</span></span></div></div><div class="dc-artifact-collab__group"><span>В ДЕЛЕ</span><div class="dc-artifact-collab__people">${participantPeople(joined,{remove:manage})}</div></div><div class="dc-artifact-collab__group"><span>ПОЗВАНЫ</span><div class="dc-artifact-collab__people">${participantPeople(invited,{remove:manage})}</div></div>${viewer}${invite}<div class="dc-artifact-collab__status" data-collab-status hidden aria-live="polite"></div></section>`;
+  const manage=isAuthor()||isOwnerAdmin();
+  const authorName=authorProfile?.display_name||'ИНИЦИАТОР';
+  const invite=manage?inviteControls():'';
+  return `<section class="dc-artifact-collab dc-artifact-collab--people"><div class="dc-artifact-collab__head"><span>ИДЕЯ / COLLABORATION</span><strong>ВИДНО · ${esc(visibilityLabel())}</strong></div><div class="dc-artifact-collab__group"><span>ИНИЦИАТОР</span><div class="dc-artifact-collab__people"><span class="dc-artifact-collab-person">${collabAvatar(authorProfile)}<span><strong>${esc(authorName)}</strong>${authorProfile?.nickname?`<small>@${esc(String(authorProfile.nickname).replace(/^@/,''))}</small>`:''}</span></span></div></div><div class="dc-artifact-collab__group"><span>В ДЕЛЕ</span><div class="dc-artifact-collab__people">${participantPeople(joined,{remove:manage})}</div></div><div class="dc-artifact-collab__group"><span>ПОЗВАНЫ</span><div class="dc-artifact-collab__people">${participantPeople(invited,{remove:manage})}</div></div>${invite}<div class="dc-artifact-collab__status" data-collab-status hidden aria-live="polite"></div></section>`;
+}
+function authorControls(){
+  if(!isAuthor()||artifact?.status!=='active')return'';
+  return '<details class="dc-artifact-control-group dc-artifact-control-group--author" data-author-controls><summary>АВТОР / УПРАВЛЕНИЕ</summary><div class="dc-artifact-control-group__body"><button class="dc-artifact-action" type="button" id="detailClose">УБРАТЬ С ДОСКИ</button></div></details>';
+}
+function ownerAdminControls(){
+  if(!isOwnerAdmin())return'';
+  const controls=ownerAdminPromotionControls();
+  if(!controls)return'';
+  return `<details class="dc-artifact-control-group dc-artifact-control-group--admin" data-owner-admin-controls><summary>OWNER ADMIN / НАСТРОЙКИ</summary><div class="dc-artifact-control-group__body dc-artifact-actions">${controls}</div></details>`;
+}
+function destructiveDetail(){
+  if(!isIdea()||currentParticipation()!=='JOINED')return'';
+  return '<section class="dc-artifact-destructive" data-destructive-leave><div class="dc-artifact-destructive__head"><span>УЧАСТИЕ</span><strong>ВЫХОД ИЗ ИДЕИ</strong></div><button class="dc-artifact-action dc-artifact-leave-trigger" type="button" data-leave-idea aria-expanded="false" aria-controls="artifactLeaveConfirm">ВЫЙТИ ИЗ ИДЕИ</button><div class="dc-artifact-leave-confirmation" id="artifactLeaveConfirm" data-leave-confirmation role="group" aria-label="Подтверждение выхода из идеи" hidden><p>ПОДТВЕРДИТЕ, ЧТО ХОТИТЕ ВЫЙТИ ИЗ ИДЕИ.</p><div class="dc-artifact-leave-confirmation__actions"><button class="dc-artifact-action dc-artifact-action--destructive" type="button" data-leave-confirm>ПОДТВЕРДИТЬ ВЫХОД</button><button class="dc-artifact-action" type="button" data-leave-cancel>ОСТАТЬСЯ</button></div></div></section>';
 }
 function collaborationStatus(message,state=''){
   const el=host.querySelector('[data-collab-status]');if(!el)return;el.textContent=message||'';el.dataset.state=state;el.hidden=!message;
@@ -161,7 +200,58 @@ async function searchInviteCandidates(){
 }
 async function inviteProfile(profileId){collaborationStatus('ПРИГЛАШАЕМ…','busy');const result=await client.rpc('dc_artifact_invite_v1',{p_artifact_id:artifact.id,p_profile_id:profileId});if(result.error){collaborationStatus(errorMessage(result.error),'error');return}notifyBoardCollaborationChanged();await refreshCollaboration()}
 async function respondInvitation(decision){collaborationStatus('СОХРАНЯЕМ…','busy');const result=await client.rpc('dc_artifact_invitation_respond_v1',{p_artifact_id:artifact.id,p_decision:decision});if(result.error){collaborationStatus(errorMessage(result.error),'error');return}notifyBoardCollaborationChanged();if(decision==='DECLINED'&&artifact.visibility==='circle'){fail(new Error('ARTIFACT_NOT_AVAILABLE'));return}await refreshCollaboration()}
-async function leaveIdea(){collaborationStatus('ВЫХОДИМ…','busy');const result=await client.rpc('dc_artifact_leave_v1',{p_artifact_id:artifact.id});if(result.error){collaborationStatus(errorMessage(result.error),'error');return}notifyBoardCollaborationChanged();if(artifact.visibility==='circle'){fail(new Error('ARTIFACT_NOT_AVAILABLE'));return}await refreshCollaboration()}
+let leaveMutationPending=false;
+function setLeaveConfirmationDisabled(disabled){
+  host.querySelectorAll('[data-leave-confirm],[data-leave-cancel]').forEach(button=>{button.disabled=disabled});
+}
+function openLeaveConfirmation(event){
+  if(leaveMutationPending)return;
+  const trigger=event.currentTarget;
+  const panel=host.querySelector('[data-leave-confirmation]');
+  if(!panel)return;
+  trigger.hidden=true;
+  trigger.setAttribute('aria-expanded','true');
+  panel.hidden=false;
+  panel.querySelector('[data-leave-confirm]')?.focus();
+}
+function cancelLeaveConfirmation(){
+  if(leaveMutationPending)return;
+  const trigger=host.querySelector('[data-leave-idea]');
+  const panel=host.querySelector('[data-leave-confirmation]');
+  if(panel)panel.hidden=true;
+  if(trigger){
+    trigger.hidden=false;
+    trigger.setAttribute('aria-expanded','false');
+    trigger.focus();
+  }
+}
+async function leaveIdea(){
+  if(leaveMutationPending)return;
+  leaveMutationPending=true;
+  setLeaveConfirmationDisabled(true);
+  collaborationStatus('ВЫХОДИМ…','busy');
+  try{
+    const result=await client.rpc('dc_artifact_leave_v1',{p_artifact_id:artifact.id});
+    if(result.error){
+      collaborationStatus(errorMessage(result.error),'error');
+      leaveMutationPending=false;
+      setLeaveConfirmationDisabled(false);
+      return;
+    }
+    notifyBoardCollaborationChanged();
+    if(artifact.visibility==='circle'){
+      leaveMutationPending=false;
+      fail(new Error('ARTIFACT_NOT_AVAILABLE'));
+      return;
+    }
+    await refreshCollaboration();
+    leaveMutationPending=false;
+  }catch(error){
+    leaveMutationPending=false;
+    setLeaveConfirmationDisabled(false);
+    throw error;
+  }
+}
 async function removeParticipant(profileId){collaborationStatus('УБИРАЕМ…','busy');const result=await client.rpc('dc_artifact_remove_participant_v1',{p_artifact_id:artifact.id,p_profile_id:profileId});if(result.error){collaborationStatus(errorMessage(result.error),'error');return}notifyBoardCollaborationChanged();await refreshCollaboration()}
 function bindDetailActions(){
   bindBoardReturn();
@@ -179,20 +269,45 @@ function bindDetailActions(){
   host.querySelector('#artifactInviteSearch')?.addEventListener('keydown',event=>{if(event.key==='Enter'){event.preventDefault();searchInviteCandidates().catch(error=>collaborationStatus(errorMessage(error),'error'))}});
   host.querySelector('[data-invite-results]')?.addEventListener('click',event=>{const button=event.target.closest?.('[data-invite-profile]');if(button)inviteProfile(button.dataset.inviteProfile).catch(error=>collaborationStatus(errorMessage(error),'error'))});
   host.querySelectorAll('[data-invite-decision]').forEach(button=>button.addEventListener('click',()=>respondInvitation(button.dataset.inviteDecision).catch(error=>collaborationStatus(errorMessage(error),'error'))));
-  host.querySelector('[data-leave-idea]')?.addEventListener('click',()=>leaveIdea().catch(error=>collaborationStatus(errorMessage(error),'error')));
+  host.querySelector('[data-leave-idea]')?.addEventListener('click',openLeaveConfirmation);
+  host.querySelector('[data-leave-cancel]')?.addEventListener('click',cancelLeaveConfirmation);
+  host.querySelector('[data-leave-confirm]')?.addEventListener('click',()=>leaveIdea().catch(error=>collaborationStatus(errorMessage(error),'error')));
   host.querySelectorAll('[data-remove-participant]').forEach(button=>button.addEventListener('click',()=>removeParticipant(button.dataset.removeParticipant).catch(error=>collaborationStatus(errorMessage(error),'error'))));
 }
 function render(profile,media){
   authorProfile=profile||authorProfile;
-  const mine=!guestMode&&artifact.author_profile_id===session.user.id;const myReaction=guestMode?guestInterest:reactions.some(r=>r.profile_id===session.user.id);const myResponse=guestMode?(guestResponseSubmitted?{status:'submitted'}:null):responses.find(r=>r.responder_profile_id===session.user.id&&r.status==='submitted');const incoming=mine?responses.filter(r=>r.status==='submitted').length:0;const historical=isHistorical();const participation=currentParticipation();const inviteReadOnly=isIdea()&&artifact.visibility==='circle'&&participation==='INVITED';
-  const item=media[0];let mediaHtml='';if(item?.url)mediaHtml=item.media_type==='image'?`<div class="dc-artifact-media"><img src="${esc(item.url)}" alt="Прикреплённое изображение"></div>`:`<div class="dc-artifact-media"><a class="dc-artifact-file" href="${esc(item.url)}" target="_blank" rel="noopener">ФАЙЛ / ${esc(item.metadata?.name||'ОТКРЫТЬ')} ↗</a></div>`;
+  const mine=!guestMode&&artifact.author_profile_id===session.user.id;
+  const myReaction=guestMode?guestInterest:reactions.some(r=>r.profile_id===session.user.id);
+  const myResponse=guestMode?(guestResponseSubmitted?{status:'submitted'}:null):responses.find(r=>r.responder_profile_id===session.user.id&&r.status==='submitted');
+  const incoming=mine?responses.filter(r=>r.status==='submitted').length:0;
+  const historical=isHistorical();
+  const participation=currentParticipation();
+  const inviteReadOnly=isIdea()&&artifact.visibility==='circle'&&participation==='INVITED';
+  const item=media[0];
+  let mediaHtml='';
+  if(item?.url)mediaHtml=item.media_type==='image'
+    ?`<div class="dc-artifact-media"><img src="${esc(item.url)}" alt="Прикреплённое изображение"></div>`
+    :`<div class="dc-artifact-media"><a class="dc-artifact-file" href="${esc(item.url)}" target="_blank" rel="noopener">ФАЙЛ / ${esc(item.metadata?.name||'ОТКРЫТЬ')} ↗</a></div>`;
   stateEl.textContent=`ARTIFACT / ${artifact.status.toUpperCase()}`;
-  const responseControl=historical?'<span class="dc-artifact-action" aria-disabled="true">ОТКЛИКИ ЗАКРЫТЫ / HISTORY</span>':mine?`<span class="dc-artifact-action" aria-disabled="true">ОТКЛИКОВ / ${incoming}</span>`:`<button class="dc-artifact-action${myResponse?' primary':''}" type="button" id="detailResponse" ${myResponse?'disabled':''}>${myResponse?'ОТКЛИК ОТПРАВЛЕН':'ОТКЛИКНУТЬСЯ'}</button>`;
-  const interactionControls=inviteReadOnly?'<span class="dc-artifact-action" aria-disabled="true">INVITED / READ ONLY</span>':enrichmentState==='ready'
-    ?`<span class="dc-artifact-action" aria-disabled="true">ИНТЕРЕСНО / ${reactionTotal()}</span><button class="dc-artifact-action${myReaction?' primary':''}" type="button" id="detailReaction">${myReaction?'✓ ИНТЕРЕСНО':'МНЕ ЭТО НАДО'}</button>${responseControl}${promotionControls()}`
-    :`<span class="dc-artifact-action" aria-disabled="true">${enrichmentState==='pending'?'ДОГРУЖАЕМ ДЕЙСТВИЯ…':'ДЕЙСТВИЯ ВРЕМЕННО НЕДОСТУПНЫ'}</span>`;
-  const activity=artifact.activity_at?`<div class="dc-artifact-meta"><span>КОГДА / ${esc(formatActivityDate(artifact.activity_at))}</span></div>`:'';const type=artifactSubtypeLabel(String(artifact.artifact_type||'announcement').toLowerCase());
-  host.innerHTML=`<article class="dc-artifact-record${historical?' is-history':''}" data-artifact-status="${esc(artifact.status)}" data-artifact-subtype="${esc(String(artifact.artifact_type||''))}" data-artifact-visibility="${esc(artifact.visibility||'community')}" data-collab-my-state="${esc(participation)}"><div class="dc-artifact-meta"><span>ID / ${esc(artifact.id.slice(0,8).toUpperCase())}</span><span>TYPE / ${esc(type)}</span><span>STATUS / ${esc(artifact.status.toUpperCase())}</span><span>${artifact.expires_at?`EXPIRES / ${formatDate(artifact.expires_at)}`:'PERSISTENT'}</span></div>${activity}<div class="dc-artifact-author">${avatar(authorProfile)}<div><strong>${esc(authorProfile?.display_name||'MEMBER')}</strong>${authorProfile?.nickname?`<span>@${esc(authorProfile.nickname.replace(/^@/,''))}</span>`:''}</div></div>${artifact.title?`<h1>${esc(artifact.title)}</h1>`:'<h1>ARTIFACT.</h1>'}<div class="dc-artifact-body">${renderArtifactBody(artifact.body)}</div>${collaborationDetail()}${mediaHtml}${artifact.external_url?`<p><a class="dc-artifact-link" href="${esc(artifact.external_url)}" target="_blank" rel="noopener">ВНЕШНЯЯ ССЫЛКА ↗</a></p>`:''}<div class="dc-artifact-actions">${interactionControls}${mine&&artifact.status==='active'?'<button class="dc-artifact-action" type="button" id="detailClose">УБРАТЬ С ДОСКИ</button>':''}<a class="dc-artifact-action" href="${BOARD_PATH}" id="detailBack">← BOARD</a></div><div id="responseHost"></div></article>`;
+  const responseControl=historical
+    ?'<span class="dc-artifact-action" aria-disabled="true">ОТКЛИКИ ЗАКРЫТЫ / HISTORY</span>'
+    :mine
+      ?`<span class="dc-artifact-action" aria-disabled="true">ОТКЛИКОВ / ${incoming}</span>`
+      :`<button class="dc-artifact-action${myResponse?' primary':''}" type="button" id="detailResponse" ${myResponse?'disabled':''}>${myResponse?'ОТКЛИК ОТПРАВЛЕН':'ОТКЛИКНУТЬСЯ'}</button>`;
+  const interactionControls=inviteReadOnly
+    ?'<span class="dc-artifact-action" aria-disabled="true">INVITED / READ ONLY</span>'
+    :enrichmentState==='ready'
+      ?`<span class="dc-artifact-action" aria-disabled="true">ИНТЕРЕСНО / ${reactionTotal()}</span><button class="dc-artifact-action${myReaction?' primary':''}" type="button" id="detailReaction">${myReaction?'✓ ИНТЕРЕСНО':'МНЕ ЭТО НАДО'}</button>${responseControl}${promotionControls()}`
+      :`<span class="dc-artifact-action" aria-disabled="true">${enrichmentState==='pending'?'ДОГРУЖАЕМ ДЕЙСТВИЯ…':'ДЕЙСТВИЯ ВРЕМЕННО НЕДОСТУПНЫ'}</span>`;
+  const activity=artifact.activity_at?`<div class="dc-artifact-meta"><span>КОГДА / ${esc(formatActivityDate(artifact.activity_at))}</span></div>`:'';
+  const type=artifactSubtypeLabel(String(artifact.artifact_type||'announcement').toLowerCase());
+  const externalHtml=artifact.external_url?`<p><a class="dc-artifact-link" href="${esc(artifact.external_url)}" target="_blank" rel="noopener">ВНЕШНЯЯ ССЫЛКА ↗</a></p>`:'';
+  const contentHtml=`<section class="dc-artifact-content" data-artifact-content><div class="dc-artifact-body">${renderArtifactBody(artifact.body)}</div>${mediaHtml}${externalHtml}</section>`;
+  const secondaryActions=`<div class="dc-artifact-actions dc-artifact-actions--secondary">${interactionControls}<a class="dc-artifact-action" href="${BOARD_PATH}" id="detailBack">← BOARD</a></div>`;
+  const flow=isIdea()
+    ?`<div class="dc-artifact-detail-flow" data-artifact-collaboration data-my-participation="${esc(participation)}">${primaryViewerState()}${contentHtml}${collaborationDetail()}${secondaryActions}${authorControls()}${ownerAdminControls()}<div id="responseHost"></div>${destructiveDetail()}</div>`
+    :`<div class="dc-artifact-detail-flow">${contentHtml}${secondaryActions}${authorControls()}${ownerAdminControls()}<div id="responseHost"></div></div>`;
+  host.innerHTML=`<article class="dc-artifact-record${historical?' is-history':''}" data-artifact-status="${esc(artifact.status)}" data-artifact-subtype="${esc(String(artifact.artifact_type||''))}" data-artifact-visibility="${esc(artifact.visibility||'community')}" data-collab-my-state="${esc(participation)}"><div class="dc-artifact-meta"><span>ID / ${esc(artifact.id.slice(0,8).toUpperCase())}</span><span>TYPE / ${esc(type)}</span><span>STATUS / ${esc(artifact.status.toUpperCase())}</span><span>${artifact.expires_at?`EXPIRES / ${formatDate(artifact.expires_at)}`:'PERSISTENT'}</span></div>${activity}<div class="dc-artifact-author">${avatar(authorProfile)}<div><strong>${esc(authorProfile?.display_name||'MEMBER')}</strong>${authorProfile?.nickname?`<span>@${esc(authorProfile.nickname.replace(/^@/,''))}</span>`:''}</div></div>${artifact.title?`<h1>${esc(artifact.title)}</h1>`:'<h1>ARTIFACT.</h1>'}${flow}</article>`;
   bindDetailActions();
 }
 
