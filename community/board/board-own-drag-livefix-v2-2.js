@@ -5,6 +5,7 @@ const client=getClient();
 const WORLD={w:12000,h:8000};
 const CENTER={x:WORLD.w/2,y:WORLD.h/2};
 const DISPLAY_MARGIN=900;
+const INTERACTIVE_CONTROL_SELECTOR='button,a,input,textarea,select,label,summary,dialog,[contenteditable="true"]';
 let drag=null;
 let boardOffset={x:0,y:0};
 let offsetReady=false;
@@ -68,7 +69,7 @@ async function persist(card){
 
 function start(event){
   const card=event.target.closest?.('.dc-notice.is-own-movable');
-  if(!card||event.button!==0||event.target.closest?.('button,a,input,textarea,select,label,dialog,[contenteditable="true"]'))return;
+  if(!card||event.button!==0||event.target.closest?.(INTERACTIVE_CONTROL_SELECTOR))return;
   event.preventDefault();event.stopPropagation();
   ensureCenteredCloud();
   const x=parseFloat(card.style.left)||0,y=parseFloat(card.style.top)||0;

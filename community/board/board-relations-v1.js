@@ -109,11 +109,22 @@ function canManageEndpoint(endpoint){
   if(!systemDementor)return false;
   return Boolean(endpoint.localSourceId&&scopedEntityIds.has(endpoint.localSourceId));
 }
-function canDeleteRow(row,map=endpointMap()){
-  const origin=map.get(endpointKey(row.origin_kind,row.origin_source_id))||endpointFromTuple(row.origin_kind,row.origin_source_id);
-  const target=map.get(endpointKey(row.target_kind,row.target_source_id))||endpointFromTuple(row.target_kind,row.target_source_id);
-  if(row.relation_type==='RELATED_TO')return canManageEndpoint(origin)||canManageEndpoint(target);
-  return canManageEndpoint(origin);
+function joinedIdeaEndpoint(endpoint){
+  return Boolean(
+    endpoint?.kind==='artifact'
+    &&endpoint.card?.dataset.artifactSubtype==='idea'
+    &&endpoint.card?.dataset.collabMyState==='JOINED'
+  );
+}
+function canCreateChoice(type,origin,target){
+  const canonical=type==='RELATED_TO'
+    ?canManageEndpoint(origin)||canManageEndpoint(target)
+    :canManageEndpoint(origin);
+  if(canonical)return true;
+  return type==='RELATED_TO'&&(joinedIdeaEndpoint(origin)||joinedIdeaEndpoint(target));
+}
+function canDeleteRow(row){
+  return row?.can_delete===true;
 }
 function counterpart(row,endpoint){
   const originKey=endpointKey(row.origin_kind,row.origin_source_id);
@@ -147,10 +158,7 @@ function candidateChoices(endpoint){
     if(target.key===endpoint.key)continue;
     for(const type of RELATION_TYPES){
       if(!pairAllowed(type,endpoint.kind,target.kind))continue;
-      const allowed=type==='RELATED_TO'
-        ?canManageEndpoint(endpoint)||canManageEndpoint(target)
-        :canManageEndpoint(endpoint);
-      if(!allowed)continue;
+      if(!canCreateChoice(type,endpoint,target))continue;
       choices.push({type,target});
     }
   }
@@ -180,7 +188,7 @@ function blockHtml(endpoint,{detail=false}={}){
   const relationRowsHtml=rows.length?rows.map(row=>{
     const other=counterpart(row,endpoint);
     const title=endpointTitle(other,map);
-    const canDelete=canDeleteRow(row,map);
+    const canDelete=canDeleteRow(row);
     return `<div class="dc-board-relation-row" data-relation-id="${esc(row.relation_id)}"><button type="button" class="dc-board-relation-link" data-relation-focus="${esc(other.key)}"><span>${esc(relationLabel(row,endpoint))}</span><strong>${esc(title)}</strong></button>${canDelete?`<button type="button" class="dc-board-relation-delete" data-relation-delete="${esc(row.relation_id)}" aria-label="Удалить связь">×</button>`:''}</div>`;
   }).join(''):'<div class="dc-board-relation-empty">СВЯЗЕЙ ПОКА НЕТ.</div>';
   const options=choices.map(choice=>`<option value="${escapeOption({type:choice.type,targetKey:choice.target.key})}">${esc(FORWARD_LABELS[choice.type]||choice.type)} · ${esc(choice.target.title||choice.target.sourceId)}</option>`).join('');
@@ -207,9 +215,7 @@ async function createRelation(card,endpoint,select,statusRoot=card){
   if(!target||!pairAllowed(choice.type,endpoint.kind,target.kind)){
     setRelationStatus(statusRoot,'ЭТА СВЯЗЬ НЕ ПОДДЕРЖИВАЕТСЯ','error');return;
   }
-  const mirrored=choice.type==='RELATED_TO'
-    ?canManageEndpoint(endpoint)||canManageEndpoint(target)
-    :canManageEndpoint(endpoint);
+  const mirrored=canCreateChoice(choice.type,endpoint,target);
   if(!mirrored){setRelationStatus(statusRoot,'НЕТ ПРАВ / UI MIRROR','error');return}
   setRelationStatus(statusRoot,'СОХРАНЯЕМ…','busy');
   const {error}=await client.rpc('dc_board_relation_create_v1',{
@@ -220,6 +226,8 @@ async function createRelation(card,endpoint,select,statusRoot=card){
     p_target_source_id:target.sourceId
   });
   if(error){setRelationStatus(statusRoot,humanRelationError(error),'error');return}
+  const form=statusRoot?.querySelector?.('[data-relation-form]');
+  if(form)form.hidden=true;
   setRelationStatus(statusRoot,'СВЯЗЬ СОХРАНЕНА','success');
   await refreshAfterMutation();
 }
@@ -242,7 +250,13 @@ function wireBlock(block,endpoint,card){
     const add=event.target.closest?.('[data-relation-add]');
     if(add){event.preventDefault();const form=block.querySelector('[data-relation-form]');if(form)form.hidden=false;return}
     const cancel=event.target.closest?.('[data-relation-cancel]');
-    if(cancel){event.preventDefault();const form=block.querySelector('[data-relation-form]');if(form)form.hidden=true;return}
+    if(cancel){
+      event.preventDefault();
+      const form=block.querySelector('[data-relation-form]');
+      if(form)form.hidden=true;
+      if(block.dataset.relationDetail==='1')schedulePresentation({details:true});
+      return;
+    }
     const save=event.target.closest?.('[data-relation-save]');
     if(save){event.preventDefault();createRelation(card,endpoint,block.querySelector('[data-relation-choice]'),block).catch(error=>setRelationStatus(block,humanRelationError(error),'error'));return}
     const remove=event.target.closest?.('[data-relation-delete]');
@@ -257,14 +271,18 @@ function renderCardBlocks(){
   rendering=true;
   try{
     for(const card of supportedCards()){
-      card.querySelector(':scope > [data-relation-block]')?.remove();
+      const existingBlock=card.querySelector(':scope > [data-relation-block]');
+      const previousOpen=existingBlock?.open===true;
+      existingBlock?.remove();
       const endpoint=endpointFromCard(card);
       const html=blockHtml(endpoint);
       if(!html)continue;
       const actions=card.querySelector(':scope > .dc-notice__actions');
       if(actions)actions.insertAdjacentHTML('beforebegin',html);
       else card.insertAdjacentHTML('beforeend',html);
-      wireBlock(card.querySelector(':scope > [data-relation-block]'),endpoint,card);
+      const replacement=card.querySelector(':scope > [data-relation-block]');
+      if(replacement)replacement.open=previousOpen;
+      wireBlock(replacement,endpoint,card);
     }
   }finally{rendering=false}
 }
@@ -399,23 +417,27 @@ function clearArtifactDetail(){
   document.querySelector('.dc-artifact-overlay__panel > [data-relation-detail-host]')?.remove();
 }
 function injectArtifactDetail(){
-  clearArtifactDetail();
-  if(!backendAvailable||!relationRows)return;
+  if(!backendAvailable||!relationRows){clearArtifactDetail();return}
   const overlay=document.querySelector('.dc-artifact-overlay:not([hidden])');
   const frame=overlay?.querySelector('iframe');
   const panel=overlay?.querySelector('.dc-artifact-overlay__panel');
-  if(!frame||!panel||frame.src==='about:blank')return;
+  if(!frame||!panel||frame.src==='about:blank'){clearArtifactDetail();return}
   let path='';
-  try{path=new URL(frame.src,location.href).pathname}catch{return}
+  try{path=new URL(frame.src,location.href).pathname}catch{clearArtifactDetail();return}
   const match=path.match(/^\/community\/artifact\/([^/]+)\/?$/);
-  if(!match)return;
+  if(!match){clearArtifactDetail();return}
   const card=supportedCards().find(node=>node.dataset.relationKind==='artifact'&&node.dataset.relationSourceId===match[1]);
-  if(!card)return;
+  if(!card){clearArtifactDetail();return}
   const endpoint=endpointFromCard(card);
+  const existing=panel.querySelector(':scope > [data-relation-detail-host]');
+  const activeForm=existing?.querySelector('[data-relation-form]:not([hidden])');
+  if(existing?.dataset.relationDetailKey===endpoint.key&&activeForm)return;
+  existing?.remove();
   const html=blockHtml(endpoint,{detail:true});if(!html)return;
   const host=document.createElement('section');
   host.className='dc-board-relation-detail-host';
   host.dataset.relationDetailHost='1';
+  host.dataset.relationDetailKey=endpoint.key;
   host.setAttribute('aria-label','Связи Artifact');
   host.innerHTML=html;
   panel.appendChild(host);
