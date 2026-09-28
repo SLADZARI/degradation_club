@@ -4,7 +4,7 @@ project: dementor-club
 documentType: RELEASE_EVIDENCE
 projectStage: RELEASE
 gate: G7_RELEASE
-status: IN_PROGRESS
+status: PASS_CLEAN_RC_VALIDATED
 version: 1.0
 updated: 2026-09-28
 owner: Modern Pilgrims
@@ -18,7 +18,7 @@ releaseCandidateCommit: f3078ceb227a0221b99b4e286f783986a33aea6f
 pullRequest: 244
 validationRun: 1313
 validationRunId: 36429691568
-validationConclusion: IN_PROGRESS
+validationConclusion: SUCCESS
 liveDatabaseMutation: false
 productionMergeAuthorized: false
 productionDeployAuthorized: false
@@ -28,7 +28,9 @@ productionDeployAuthorized: false
 
 ## Current state
 
-**G7 CLEAN RC VALIDATION IN PROGRESS**
+**G7 CLEAN RC PASS**
+
+**READY FOR RELEASE DECISION**
 
 Production baseline:
 
@@ -93,10 +95,10 @@ Current run:
 ```text
 #1313 / 36429691568
 head SHA = f3078ceb227a0221b99b4e286f783986a33aea6f
-status = IN_PROGRESS
+result = SUCCESS
 ```
 
-No G7 PASS is claimed until this exact-head run completes successfully.
+Exact-head validation completed successfully. This evidence still does not authorize live Supabase apply, production merge or production deploy.
 
 ## Boundary
 
