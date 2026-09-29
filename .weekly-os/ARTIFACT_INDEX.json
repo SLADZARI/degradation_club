@@ -7,12 +7,12 @@
     "projectStage": "BUILD",
     "gate": "G7_RELEASE",
     "status": "APPROVED",
-    "version": "3.02",
+    "version": "3.03",
     "updated": "2026-09-29",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "3.01"
+    "supersedes": "3.02"
   },
   "currentArtifacts": [
     {
@@ -32,7 +32,7 @@
     {
       "artifactId": "dementor-club.kernel.artifact-index",
       "documentType": "STANDARD",
-      "currentVersion": "3.02",
+      "currentVersion": "3.03",
       "status": "APPROVED",
       "location": ".weekly-os/ARTIFACT_INDEX.json",
       "sourceSystem": "GIT",
@@ -3351,6 +3351,25 @@
       "baseCommit": "a24f8d900cc29e5ae922a9a62b751cc02e88f8d9",
       "candidateCommit": "834bb9776c4e99bb73556c4776c49f270fe70a6c",
       "runtimeValidation": "PENDING",
+      "productionMutation": false
+    },
+    {
+      "artifactId": "dementor-club.operations.board-media-performance-production-baseline-2026-09-29",
+      "documentType": "QA_EVIDENCE",
+      "currentVersion": "1.0",
+      "status": "PASS_MEASURED",
+      "location": "operations/BOARD_MEDIA_PERFORMANCE_PRODUCTION_BASELINE_2026-09-29.md",
+      "sourceSystem": "GIT",
+      "authorityType": "QA_EVIDENCE",
+      "updated": "2026-09-29",
+      "canonicalProject": "dementor-club",
+      "canonicalLocation": "operations/BOARD_MEDIA_PERFORMANCE_PRODUCTION_BASELINE_2026-09-29.md",
+      "relation": "NEXT_RESULT_BASELINE_EVIDENCE",
+      "parentQa": [
+        "BQA-20",
+        "BQA-27"
+      ],
+      "productionCommit": "a24f8d900cc29e5ae922a9a62b751cc02e88f8d9",
       "productionMutation": false
     }
   ],
