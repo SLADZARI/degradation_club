@@ -35,7 +35,7 @@ const JOINED2='cccccccc-cccc-4ccc-8ccc-cccccccccccc';
 const NIKITA='dddddddd-dddd-4ddd-8ddd-dddddddddddd';
 const ANDRUS='eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee';
 const mode=globalThis.__QA_COLLAB_MODE__||'author';
-const ids={author:AUTHOR,invited:INVITED,joined:INVITED,outsider:'ffffffff-ffff-4fff-8fff-ffffffffffff',owner:'99999999-9999-4999-8999-999999999999',relations:INVITED};
+const ids={author:AUTHOR,invited:INVITED,multiinvited:INVITED,joined:INVITED,outsider:'ffffffff-ffff-4fff-8fff-ffffffffffff',owner:'99999999-9999-4999-8999-999999999999',relations:INVITED};
 const uid=ids[mode]||AUTHOR;
 const user={id:uid,email:'private-'+uid.slice(0,4)+'@invalid',user_metadata:{full_name:mode.toUpperCase()}};
 const session={user};
@@ -48,10 +48,11 @@ globalThis.__QA_PARTICIPATION__=globalThis.__QA_PARTICIPATION__||{
    [NIKITA]:'INVITED',
    [ANDRUS]:'JOINED'
  },
- [B]:{[NIKITA]:'JOINED',[ANDRUS]:'INVITED'}
+ [B]:{[NIKITA]:'JOINED',[ANDRUS]:'INVITED',...(mode==='multiinvited'?{[INVITED]:'INVITED'}:{})}
 };
 const profiles=[
  {profile_id:AUTHOR,display_name:'Габиль Очень Длинное Имя Инициатора',nickname:'gabil',avatar_url:null,member_since:'2026-09-01'},
+ {profile_id:'77777777-7777-4777-8777-777777777777',display_name:'Новый Зарегистрированный Профиль',nickname:'newperson',avatar_url:null,member_since:'2026-09-01'},
  {profile_id:INVITED,display_name:'Женя Очень Длинное Имя Участника',nickname:'zhenya',avatar_url:null,member_since:'2026-09-01'},
  {profile_id:JOINED2,display_name:'Андрус',nickname:'andrus',avatar_url:null,member_since:'2026-09-01'},
  {profile_id:NIKITA,display_name:'Никита',nickname:'nikita',avatar_url:null,member_since:'2026-09-01'},
@@ -148,13 +149,143 @@ export function createClient(){return{
 
 async function context(browser,mode,viewport,options={}){
  const ctx=await browser.newContext({viewport,hasTouch:options.hasTouch===true});
- await ctx.addInitScript(({mode})=>{globalThis.__QA_COLLAB_MODE__=mode;const ids={author:'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',invited:'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',joined:'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',outsider:'ffffffff-ffff-4fff-8fff-ffffffffffff',owner:'99999999-9999-4999-8999-999999999999',relations:'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb'};try{localStorage.setItem('dc:board:tutorial:v21:'+(ids[mode]||ids.author)+':member',JSON.stringify({done:true}));sessionStorage.setItem('dc_first_artifact_spotlight_dismissed_v1','1')}catch{}},{mode});
+ await ctx.addInitScript(({mode})=>{
+   globalThis.__QA_COLLAB_MODE__=mode;
+   const ids={author:'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',invited:'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',multiinvited:'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',joined:'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',outsider:'ffffffff-ffff-4fff-8fff-ffffffffffff',owner:'99999999-9999-4999-8999-999999999999',relations:'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb'};
+   try{localStorage.setItem('dc:board:tutorial:v21:'+(ids[mode]||ids.author)+':member',JSON.stringify({done:true}));sessionStorage.setItem('dc_first_artifact_spotlight_dismissed_v1','1')}catch{}
+
+   const diagnostic={
+     mode,
+     installedAt:new Date().toISOString(),
+     windowErrors:[],
+     unhandledRejections:[],
+     insertBeforeCalls:[],
+     insertBeforeThrows:[],
+     events:[]
+   };
+   globalThis.__QA_INSERT_BEFORE_DIAGNOSTIC__=diagnostic;
+
+   const identity=node=>{
+     if(node==null)return null;
+     try{
+       return{
+         nodeType:node.nodeType??null,
+         nodeName:node.nodeName??null,
+         tag:node.tagName??null,
+         id:node.id||null,
+         className:typeof node.className==='string'?node.className:(node.getAttribute?.('class')||null),
+         connected:Boolean(node.isConnected),
+         text:typeof node.textContent==='string'?node.textContent.trim().slice(0,120):null
+       };
+     }catch(error){
+       return{identityError:String(error?.message||error)};
+     }
+   };
+   const domSnapshot=()=>({
+     documentElement:identity(document.documentElement),
+     body:identity(document.body),
+     spatialWorld:identity(document.querySelector('.dc-spatial-world')),
+     boardHost:identity(document.querySelector('.dc-spatial-world')||document.querySelector('[data-board-host]')||document.querySelector('.dc-board')),
+     relationsSvg:identity(document.querySelector('svg[data-board-relations],.dc-board-relations-layer')),
+     detailHost:identity(document.querySelector('.dc-board-relation-detail-host')),
+     overlay:identity(document.querySelector('.dc-artifact-overlay:not([hidden])')),
+     composerForm:identity(document.querySelector('#artifactComposer form,[data-artifact-composer] form,.dc-composer form')),
+     composerActions:identity(document.querySelector('.dc-composer-actions')),
+     composerError:identity(document.querySelector('.dc-composer-error,[data-composer-error]'))
+   });
+   const pushEvent=(type,event)=>{
+     try{
+       diagnostic.events.push({
+         timestamp:new Date().toISOString(),
+         type,
+         target:identity(event?.target||null),
+         currentUrl:location.href
+       });
+       if(diagnostic.events.length>40)diagnostic.events.splice(0,diagnostic.events.length-40);
+     }catch{}
+   };
+   for(const type of ['pointerdown','pointerup','touchstart','touchend','click','keydown']){
+     document.addEventListener(type,event=>pushEvent(type,event),true);
+   }
+   for(const type of ['pageshow','popstate','dc:board-projections-updated','dc:artifact-collaboration-changed','dc:board-artifact-closed','dc:board-close-artifact']){
+     globalThis.addEventListener(type,event=>pushEvent(type,event),true);
+   }
+
+   globalThis.addEventListener('error',event=>{
+     const error=event.error;
+     diagnostic.windowErrors.push({
+       timestamp:new Date().toISOString(),
+       message:event.message||error?.message||'',
+       filename:event.filename||null,
+       lineno:event.lineno||null,
+       colno:event.colno||null,
+       error:{
+         name:error?.name||null,
+         message:error?.message||null,
+         stack:error?.stack||null
+       },
+       currentUrl:location.href,
+       dom:domSnapshot(),
+       recentEvents:diagnostic.events.slice(-12)
+     });
+   },true);
+
+   globalThis.addEventListener('unhandledrejection',event=>{
+     const reason=event.reason;
+     diagnostic.unhandledRejections.push({
+       timestamp:new Date().toISOString(),
+       reason:{
+         name:reason?.name||null,
+         message:reason?.message||String(reason||''),
+         stack:reason?.stack||null
+       },
+       currentUrl:location.href,
+       dom:domSnapshot(),
+       recentEvents:diagnostic.events.slice(-12)
+     });
+   });
+
+   const nativeInsertBefore=Node.prototype.insertBefore;
+   Node.prototype.insertBefore=function(newNode,referenceNode){
+     const record={
+       timestamp:new Date().toISOString(),
+       kind:'INSERT_BEFORE_CALL',
+       receiver:identity(this),
+       receiverConnected:Boolean(this?.isConnected),
+       newNode:identity(newNode),
+       referenceNode:identity(referenceNode),
+       referenceParentMatches:Boolean(referenceNode?.parentNode===this),
+       documentContainsReceiver:Boolean(document.contains(this)),
+       currentUrl:location.href,
+       stack:new Error('INSERT_BEFORE_CALLSITE').stack||null
+     };
+     diagnostic.insertBeforeCalls.push(record);
+     if(diagnostic.insertBeforeCalls.length>120)diagnostic.insertBeforeCalls.splice(0,diagnostic.insertBeforeCalls.length-120);
+     try{
+       return Reflect.apply(nativeInsertBefore,this,[newNode,referenceNode]);
+     }catch(error){
+       const thrown={
+         ...record,
+         kind:'INSERT_BEFORE_THROW',
+         error:{
+           name:error?.name||null,
+           message:error?.message||String(error||''),
+           stack:error?.stack||null
+         },
+         dom:domSnapshot(),
+         recentEvents:diagnostic.events.slice(-12)
+       };
+       diagnostic.insertBeforeThrows.push(thrown);
+       throw error;
+     }
+   };
+ },{mode});
  await ctx.route('https://cdn.jsdelivr.net/**',route=>route.request().url().includes('@supabase/supabase-js')?route.fulfill({status:200,contentType:'text/javascript',body:stub()}):route.abort());
  return ctx;
 }
 async function openDetail(browser,mode,viewport={width:1440,height:900}){
  const ctx=await context(browser,mode,viewport);const page=await ctx.newPage();const errors=[];const requestFailures=[];const badResponses=[];const consoleErrors=[];
- page.on('pageerror',e=>errors.push(e.message));
+ page.on('pageerror',e=>errors.push(JSON.stringify({message:e.message,name:e.name,stack:e.stack})));
  page.on('requestfailed',request=>requestFailures.push({url:request.url(),error:request.failure()?.errorText||null}));
  page.on('response',response=>{if(response.status()>=400)badResponses.push({url:response.url(),status:response.status()})});
  page.on('console',message=>{if(message.type()==='error')consoleErrors.push(message.text())});
@@ -163,7 +294,7 @@ async function openDetail(browser,mode,viewport={width:1440,height:900}){
  return{ctx,page,errors,requestFailures,badResponses,consoleErrors};
 }
 async function openBoard(browser,mode,viewport={width:1440,height:900},options={}){
- const ctx=await context(browser,mode,viewport,options);const page=await ctx.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));
+ const ctx=await context(browser,mode,viewport,options);const page=await ctx.newPage();const errors=[];page.on('pageerror',e=>errors.push(JSON.stringify({message:e.message,name:e.name,stack:e.stack})));
  await page.goto(base+'/workspace/board/',{waitUntil:'domcontentloaded'});
  await page.waitForFunction(()=>document.querySelectorAll('.dc-notice[data-artifact]').length>=2,{timeout:8000});
  if(mode==='relations'){
@@ -228,6 +359,119 @@ try{
     await page.screenshot({path:path.join(outDir,'desktop-board.png'),fullPage:true});await ctx.close();
   }
 
+  // BQA-24: invited Member sees a compact indicator + highlighted card on desktop/390/360.
+  for(const width of [1440,390,360]){
+    const mobile=width<500;
+    const viewport={width,height:mobile?844:900};
+    const{ctx,page,errors}=await openBoard(browser,'invited',viewport,{hasTouch:mobile});
+    const indicator=page.locator('[data-board-invitation-indicator]');
+    await indicator.waitFor({state:'visible',timeout:6000});
+    expect((await indicator.innerText()).trim()==='ПРИГЛАШЕНИЯ · 1',`BQA-24 ${width}: single invitation indicator mismatch`);
+    const invitedCard=page.locator('.dc-notice[data-artifact="'+A+'"][data-collab-my-state="INVITED"]');
+    expect(await invitedCard.count()===1,`BQA-24 ${width}: invited Circle Idea missing`);
+    expect(await invitedCard.evaluate(el=>el.classList.contains('is-invited-to-me')),`BQA-24 ${width}: invited card not visually marked`);
+    expect((await invitedCard.locator('[data-collaboration-card]').innerText()).includes('ВАС ЗОВУТ'),`BQA-24 ${width}: invited card lacks explicit signal`);
+    const rect=await indicator.boundingBox();
+    expect(Boolean(rect&&rect.x>=0&&rect.x+rect.width<=width+1&&rect.width>0&&rect.height>=35),`BQA-24 ${width}: indicator outside/tiny ${JSON.stringify(rect)}`);
+    if(mobile)await indicator.tap();else await indicator.click();
+    await page.waitForFunction(artifactId=>new URL(location.href).searchParams.get('focus')==='artifact:'+artifactId,A,{timeout:6000});
+    await page.locator('.dc-artifact-overlay:not([hidden])').waitFor({state:'attached',timeout:6000});
+    const src=await page.locator('.dc-artifact-overlay iframe').getAttribute('src');
+    expect(String(src||'').includes(A),`BQA-24 ${width}: indicator did not open exact invited Idea`);
+    expect(!errors.length,`BQA-24 ${width}: page errors: ${errors.join(' | ')}`);
+    await ctx.close();
+  }
+
+  // BQA-24: multiple invitations remain reachable without an inbox; canonical Board view is restored before opening.
+  for(const width of [1440,390,360]){
+    const mobile=width<500;
+    const viewport={width,height:mobile?844:900};
+    const{ctx,page,errors}=await openBoard(browser,'multiinvited',viewport,{hasTouch:mobile});
+    const indicator=page.locator('[data-board-invitation-indicator]');
+    await indicator.waitFor({state:'visible',timeout:6000});
+    expect((await indicator.innerText()).trim()==='ПРИГЛАШЕНИЯ · 2',`BQA-24 multi ${width}: count mismatch`);
+    await page.evaluate(()=>window.dispatchEvent(new CustomEvent('dc:board-request-view',{detail:{view:'current-program'}})));
+    await page.waitForFunction(()=>document.documentElement.dataset.boardView==='current-program');
+    if(mobile)await indicator.tap();else await indicator.click();
+    await page.waitForFunction(artifactId=>new URL(location.href).searchParams.get('focus')==='artifact:'+artifactId,A,{timeout:6000});
+    expect(await page.evaluate(()=>document.documentElement.dataset.boardView)==='all',`BQA-24 multi ${width}: invitation did not restore canonical ALL view`);
+    await page.locator('.dc-artifact-overlay__close').click();
+    await page.waitForFunction(()=>new URL(location.href).searchParams.get('focus')===null,{timeout:6000});
+    await page.locator('.dc-artifact-overlay').waitFor({state:'hidden',timeout:6000});
+    await indicator.waitFor({state:'visible',timeout:6000});
+    if(mobile)await indicator.tap();else await indicator.click();
+    await page.waitForFunction(artifactId=>new URL(location.href).searchParams.get('focus')==='artifact:'+artifactId,B,{timeout:6000});
+    const src=await page.locator('.dc-artifact-overlay iframe').getAttribute('src');
+    expect(String(src||'').includes(B),`BQA-24 multi ${width}: second invitation unreachable`);
+    expect(!errors.length,`BQA-24 multi ${width}: page errors: ${errors.join(' | ')}`);
+    await ctx.close();
+  }
+
+  // BQA-24 CIRCLE negative: outsider receives neither hidden Idea nor invitation signal.
+  {
+    const{ctx,page,errors}=await openBoard(browser,'outsider');
+    expect(await page.locator('.dc-notice[data-artifact="'+A+'"]').count()===0,'BQA-24 CIRCLE negative: hidden Idea leaked');
+    expect(await page.locator('[data-board-invitation-indicator]').count()===0,'BQA-24 CIRCLE negative: invitation indicator leaked');
+    expect(!(await page.locator('body').innerText()).includes('ВАС ЗОВУТ'),'BQA-24 CIRCLE negative: invitation copy leaked');
+    expect(!errors.length,'BQA-24 CIRCLE negative page errors: '+errors.join(' | '));
+    await ctx.close();
+  }
+
+  // BQA-28: canonical participant state is re-read on return/BFCache without manual reload.
+  {
+    const{ctx,page,errors}=await openBoard(browser,'author');
+    const candidate='77777777-7777-4777-8777-777777777777';
+    await page.evaluate(({artifactId,candidate})=>{
+      globalThis.__QA_PARTICIPATION__[artifactId][candidate]='INVITED';
+      window.dispatchEvent(new CustomEvent('dc:artifact-collaboration-changed',{detail:{artifactId}}));
+      window.dispatchEvent(new CustomEvent('dc:board-artifact-closed'));
+    },{artifactId:A,candidate});
+    await page.waitForFunction(artifactId=>document.querySelector('.dc-notice[data-artifact="'+artifactId+'"] [data-collaboration-card]')?.textContent?.includes('Новый Зарегистрированный Профиль'),A,{timeout:6000});
+    await page.evaluate(({artifactId,candidate})=>{
+      globalThis.__QA_PARTICIPATION__[artifactId][candidate]='REMOVED';
+      window.dispatchEvent(new CustomEvent('dc:artifact-collaboration-changed',{detail:{artifactId}}));
+      window.dispatchEvent(new CustomEvent('dc:board-close-artifact'));
+    },{artifactId:A,candidate});
+    await page.waitForFunction(artifactId=>!document.querySelector('.dc-notice[data-artifact="'+artifactId+'"] [data-collaboration-card]')?.textContent?.includes('Новый Зарегистрированный Профиль'),A,{timeout:6000});
+    expect(!errors.length,'BQA-28 author INVITED/REMOVED refresh errors: '+errors.join(' | '));
+    await ctx.close();
+  }
+  {
+    const{ctx,page,errors}=await openBoard(browser,'invited');
+    await page.evaluate(({artifactId,userId})=>{
+      globalThis.__QA_PARTICIPATION__[artifactId][userId]='JOINED';
+      const event=new Event('pageshow');Object.defineProperty(event,'persisted',{value:true});window.dispatchEvent(event);
+    },{artifactId:A,userId:'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb'});
+    await page.waitForFunction(artifactId=>document.querySelector('.dc-notice[data-artifact="'+artifactId+'"]')?.dataset.collabMyState==='JOINED',A,{timeout:6000});
+    expect(await page.locator('[data-board-invitation-indicator]').count()===0,'BQA-28 JOINED: stale invitation indicator remained');
+    expect((await page.locator('.dc-notice[data-artifact="'+A+'"] [data-collaboration-card]').innerText()).includes('ВЫ В ДЕЛЕ'),'BQA-28 JOINED: roster/card state stale');
+    expect(!errors.length,'BQA-28 JOINED BFCache refresh errors: '+errors.join(' | '));
+    await ctx.close();
+  }
+  {
+    const{ctx,page,errors}=await openBoard(browser,'invited');
+    await page.evaluate(({artifactId,userId})=>{
+      globalThis.__QA_PARTICIPATION__[artifactId][userId]='DECLINED';
+      window.dispatchEvent(new CustomEvent('dc:artifact-collaboration-changed',{detail:{artifactId}}));
+      window.dispatchEvent(new CustomEvent('dc:board-artifact-closed'));
+    },{artifactId:A,userId:'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb'});
+    await page.waitForFunction(artifactId=>!document.querySelector('.dc-notice[data-artifact="'+artifactId+'"]'),A,{timeout:6000});
+    expect(await page.locator('[data-board-invitation-indicator]').count()===0,'BQA-28 DECLINED: stale invitation indicator remained');
+    expect(!errors.length,'BQA-28 DECLINED refresh errors: '+errors.join(' | '));
+    await ctx.close();
+  }
+  {
+    const{ctx,page,errors}=await openBoard(browser,'joined');
+    await page.evaluate(({artifactId,userId})=>{
+      globalThis.__QA_PARTICIPATION__[artifactId][userId]='LEFT';
+      window.dispatchEvent(new CustomEvent('dc:artifact-collaboration-changed',{detail:{artifactId}}));
+      window.dispatchEvent(new CustomEvent('dc:board-close-artifact'));
+    },{artifactId:A,userId:'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb'});
+    await page.waitForFunction(artifactId=>!document.querySelector('.dc-notice[data-artifact="'+artifactId+'"]'),A,{timeout:6000});
+    expect(!errors.length,'BQA-28 LEFT refresh errors: '+errors.join(' | '));
+    await ctx.close();
+  }
+
   // Author detail: roster, visibility, safe selector, remove.
   {
     const{ctx,page,errors,requestFailures,badResponses,consoleErrors}=await openDetail(browser,'author');
@@ -249,18 +493,65 @@ try{
     await page.waitForSelector('[data-invite-profile]');
     const resultText=await page.locator('[data-invite-results]').innerText();
     expect(!/@invalid|private-/i.test(resultText),'selector leaked private email');
-    await page.locator('[data-remove-participant]').first().click();
+    const removeControls=page.locator('[data-remove-participant]');
+    expect(await removeControls.count()>0,'BQA-26 author removal control missing');
+    const removeLabels=await removeControls.evaluateAll(nodes=>nodes.map(node=>({text:(node.textContent||'').trim(),aria:node.getAttribute('aria-label')||''})));
+    expect(removeLabels.every(item=>item.text==='УБРАТЬ ИЗ ИДЕИ'&&/Убрать .* из идеи/i.test(item.aria)),'BQA-26 author removal meaning is ambiguous '+JSON.stringify(removeLabels));
+    await removeControls.first().click();
     await page.waitForFunction(()=>document.querySelectorAll('[data-remove-participant]').length<4);
     expect(!errors.length,'author detail errors: '+errors.join(' | '));await ctx.close();
   }
 
-  // INVITED -> JOINED.
+  // BQA-25 desktop: INVITED primary hierarchy -> JOINED compact state.
   {
     const{ctx,page}=await openDetail(browser,'invited');
     expect((await page.locator('[data-artifact-collaboration]').innerText()).includes('ЗОВЁТ ВАС В ЭТУ ИДЕЮ'),'invited copy missing');
+    const hierarchy=await page.evaluate(()=>{
+      const primary=document.querySelector('[data-primary-viewer-action]');
+      const content=document.querySelector('[data-artifact-content]');
+      const cta=document.querySelector('[data-invite-decision="JOINED"]');
+      const style=cta?getComputedStyle(cta):null;
+      return{
+        primaryBeforeContent:Boolean(primary&&content&&(primary.compareDocumentPosition(content)&Node.DOCUMENT_POSITION_FOLLOWING)),
+        ctaBackground:style?.backgroundColor||null,
+        ctaColor:style?.color||null,
+        ctaHeight:cta?.getBoundingClientRect().height||0
+      };
+    });
+    expect(hierarchy.primaryBeforeContent,'BQA-25 invited primary action is not before content '+JSON.stringify(hierarchy));
+    expect(hierarchy.ctaBackground==='rgb(17, 17, 17)'&&hierarchy.ctaColor==='rgb(255, 255, 255)'&&hierarchy.ctaHeight>=55,'BQA-25 invited CTA visual hierarchy mismatch '+JSON.stringify(hierarchy));
+    expect(await page.getByRole('button',{name:'НЕ СЕЙЧАС'}).count()===1,'BQA-25 invited secondary action missing');
     await page.getByRole('button',{name:'ПРИСОЕДИНИТЬСЯ'}).click();
     await page.waitForSelector('[data-invite-state="JOINED"]');
     expect((await page.locator('[data-invite-state="JOINED"]').innerText()).includes('ВЫ В ДЕЛЕ'),'join state missing');
+    expect(await page.locator('[data-invite-state="JOINED"] button').count()===0,'BQA-25 joined state is not compact');
+    expect(await page.locator('[data-destructive-leave] [data-leave-idea]').count()===1,'BQA-26 joined leave is not isolated at bottom');
+    await ctx.close();
+  }
+
+  // BQA-25/26 detail hierarchy on 390/360.
+  for(const width of [390,360]){
+    const{ctx,page}=await openDetail(browser,'invited',{width,height:844});
+    await page.waitForSelector('[data-invite-state="INVITED"]');
+    const mobile=await page.evaluate(()=>{
+      const cta=document.querySelector('[data-invite-decision="JOINED"]');
+      const primary=document.querySelector('[data-primary-viewer-action]');
+      const content=document.querySelector('[data-artifact-content]');
+      const style=cta?getComputedStyle(cta):null;
+      return{
+        overflow:document.documentElement.scrollWidth>document.documentElement.clientWidth+1,
+        primaryBeforeContent:Boolean(primary&&content&&(primary.compareDocumentPosition(content)&Node.DOCUMENT_POSITION_FOLLOWING)),
+        ctaBackground:style?.backgroundColor||null,
+        ctaColor:style?.color||null
+      };
+    });
+    expect(!mobile.overflow&&mobile.primaryBeforeContent,'BQA-25 mobile '+width+' invited hierarchy/overflow '+JSON.stringify(mobile));
+    expect(mobile.ctaBackground==='rgb(17, 17, 17)'&&mobile.ctaColor==='rgb(255, 255, 255)','BQA-25 mobile '+width+' CTA visual mismatch '+JSON.stringify(mobile));
+    await page.getByRole('button',{name:'ПРИСОЕДИНИТЬСЯ'}).click();
+    await page.waitForSelector('[data-invite-state="JOINED"]');
+    expect(await page.locator('[data-invite-state="JOINED"] button').count()===0,'BQA-25 mobile '+width+' joined state is not compact');
+    expect(await page.locator('[data-destructive-leave] [data-leave-idea]').count()===1,'BQA-26 mobile '+width+' leave not isolated at bottom');
+    expect(!(await page.evaluate(()=>document.documentElement.scrollWidth>document.documentElement.clientWidth+1)),'BQA-25/26 mobile '+width+' horizontal overflow');
     await ctx.close();
   }
 
@@ -275,11 +566,21 @@ try{
     await ctx.close();
   }
 
-  // JOINED -> LEFT.
+  // BQA-26 JOINED -> deliberate two-step LEFT; cancel preserves state.
   {
     const{ctx,page}=await openDetail(browser,'joined');
-    await page.getByRole('button',{name:'ВЫЙТИ'}).click();
+    const before=await page.evaluate(()=>globalThis.__QA_COLLAB_CALLS__.filter(call=>call.name==='dc_artifact_leave_v1').length);
+    await page.getByRole('button',{name:'ВЫЙТИ ИЗ ИДЕИ'}).click();
+    await page.locator('[data-leave-confirmation]').waitFor({state:'visible'});
+    expect(await page.evaluate(()=>globalThis.__QA_COLLAB_CALLS__.filter(call=>call.name==='dc_artifact_leave_v1').length)===before,'BQA-26 first activation called leave RPC');
+    await page.getByRole('button',{name:'ОСТАТЬСЯ'}).click();
+    expect(await page.locator('[data-invite-state="JOINED"]').count()===1,'BQA-26 cancel lost JOINED state');
+    expect(await page.evaluate(()=>globalThis.__QA_COLLAB_CALLS__.filter(call=>call.name==='dc_artifact_leave_v1').length)===before,'BQA-26 cancel called leave RPC');
+    await page.getByRole('button',{name:'ВЫЙТИ ИЗ ИДЕИ'}).click();
+    await page.getByRole('button',{name:'ПОДТВЕРДИТЬ ВЫХОД'}).click();
     await page.waitForFunction(()=>document.getElementById('artifactState')?.textContent==='NOT FOUND');
+    const after=await page.evaluate(()=>globalThis.__QA_COLLAB_CALLS__.filter(call=>call.name==='dc_artifact_leave_v1').length);
+    expect(after===before+1,'BQA-26 confirmed leave did not produce exactly one canonical RPC '+JSON.stringify({before,after}));
     expect(!(await page.locator('#artifactHost').innerText()).includes('IDEA A'),'left: Circle detail remained visible');
     await ctx.close();
   }
@@ -672,6 +973,28 @@ try{
       }
     }
     detailTrace.mobile390=record;
+    if(errors.some(error=>String(error).includes('insertBefore'))){
+      const diagnostic=await page.evaluate(()=>globalThis.__QA_INSERT_BEFORE_DIAGNOSTIC__||null);
+      const assertionStatus={
+        BQA24:!failures.some(message=>String(message).startsWith('BQA-24')),
+        BQA25:!failures.some(message=>String(message).startsWith('BQA-25')),
+        BQA26:!failures.some(message=>String(message).startsWith('BQA-26')),
+        BQA28:!failures.some(message=>String(message).startsWith('BQA-28'))
+      };
+      console.error('INSERTBEFORE_OWNER_TRACE '+JSON.stringify({
+        reproduction:'mobile-390-artifact-collaboration-relations',
+        assertionStatus,
+        pageErrors:errors,
+        windowErrors:diagnostic?.windowErrors||[],
+        unhandledRejections:diagnostic?.unhandledRejections||[],
+        insertBeforeThrows:diagnostic?.insertBeforeThrows||[],
+        recentInsertBeforeCalls:(diagnostic?.insertBeforeCalls||[]).slice(-20),
+        recentEvents:(diagnostic?.events||[]).slice(-20)
+      }));
+      await page.screenshot({path:path.join(outDir,'insertbefore-owner-trace-mobile-390.png'),fullPage:true});
+      await ctx.close();
+      throw new Error('INSERTBEFORE_OWNER_TRACE_REPRODUCED');
+    }
     await ctx.close();
   }
 
@@ -861,5 +1184,7 @@ if(failures.length){console.error('ARTIFACT COLLABORATION BROWSER BLOCKED');for(
 console.log('ARTIFACT COLLABORATION BROWSER ACCEPTANCE COMPLETE');
 console.log('✓ IDEA-only visibility presentation, independent rosters and canonical detail collaboration UI exercised');
 console.log('✓ invited/joined/declined/left/author/remove/no-oracle scenarios exercised');
+console.log('✓ BQA-24 invitation indicator/highlight + one/multiple exact-Idea navigation exercised on desktop/390/360');
+console.log('✓ BQA-28 Board participant freshness exercised through artifact-close/history-close/BFCache lifecycle without reload');
 console.log('✓ participant Relations UI exposes RELATED_TO-only participant path + server can_delete create→reload→open→delete round-trip');
 console.log('✓ desktop, 390px and 360px overflow checks exercised');
