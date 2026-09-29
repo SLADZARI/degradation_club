@@ -266,17 +266,17 @@ try{
 
   await page.waitForFunction(()=>document.querySelector('[data-board-invitation-indicator]')?.textContent?.includes('1'),{timeout:2500});
   await page.waitForFunction(()=>document.querySelectorAll('.dc-notice__media img').length===2,{timeout:3000});
-  const enriched=await page.evaluate(()=>({
+  const enriched=await page.evaluate(id=>({
     participantRpcCount:globalThis.__QA.participantRpcCount,signedUrlCount:globalThis.__QA.signedUrlCount,mediaCount:globalThis.__QA.mediaCount,
     participantFirstStartedAt:globalThis.__QA.participantFirstStartedAt,mediaReadStartedAt:globalThis.__QA.mediaReadStartedAt,signedFirstStartedAt:globalThis.__QA.signedFirstStartedAt,
     firstRender:globalThis.__QA.firstRender,start:globalThis.__QA.start,
     invitation:document.querySelector('[data-board-invitation-indicator]')?.textContent?.trim()||null,
-    invitedState:document.querySelector('.dc-notice[data-artifact="${A}"]')?.dataset.collabMyState||null,
-    invitedClass:document.querySelector('.dc-notice[data-artifact="${A}"]')?.classList.contains('is-invited-to-me')||false,
+    invitedState:document.querySelector('.dc-notice[data-artifact="'+id+'"]')?.dataset.collabMyState||null,
+    invitedClass:document.querySelector('.dc-notice[data-artifact="'+id+'"]')?.classList.contains('is-invited-to-me')||false,
     imageAttrs:[...document.querySelectorAll('.dc-notice__media img')].map(img=>({loading:img.getAttribute('loading'),decoding:img.getAttribute('decoding')})),
     sameCardNodes:Array.isArray(globalThis.__QA.firstCardNodes)&&globalThis.__QA.firstCardNodes.every((node,index)=>node===document.querySelectorAll('.dc-notice[data-artifact]')[index]),
     projectionUpdates:Number(globalThis.__QA.projectionUpdates||0)
-  }));
+  }),A);
   after={...after,participantRpcCount:enriched.participantRpcCount,signedUrlCount:enriched.signedUrlCount,mediaCount:enriched.mediaCount,enrichmentCompleteMs:Math.max(enriched.signedFirstStartedAt||0,enriched.participantFirstStartedAt||0)-enriched.start+delays.signed};
   expect(enriched.participantRpcCount===2,'after: participant RPC count changed unexpectedly '+JSON.stringify(enriched));
   expect(enriched.signedUrlCount===2&&enriched.mediaCount===2,'after: media/signed enrichment count mismatch '+JSON.stringify(enriched));
@@ -289,7 +289,7 @@ try{
   expect(enriched.imageAttrs.every(row=>row.loading==='lazy'&&row.decoding==='async'),'media lazy/async attributes missing '+JSON.stringify(enriched.imageAttrs));
   await page.locator('[data-board-invitation-indicator]').click();await page.waitForTimeout(40);
   const nav=await page.evaluate(()=>({view:globalThis.__QA.viewRequest,opened:globalThis.__QA.invitationOpen}));
-  expect(nav.view?.view==='all'&&nav.opened==='${A}','BQA-24 invitation exact Idea activation changed '+JSON.stringify(nav));
+  expect(nav.view?.view==='all'&&nav.opened===A,'BQA-24 invitation exact Idea activation changed '+JSON.stringify(nav));
 
   await page.evaluate(id=>{globalThis.__QA.participation[id]='JOINED';window.dispatchEvent(new CustomEvent('dc:artifact-collaboration-changed',{detail:{artifactId:id}}));window.dispatchEvent(new CustomEvent('dc:board-artifact-closed'))},A);
   await page.waitForFunction(id=>document.querySelector('.dc-notice[data-artifact="'+id+'"]')?.dataset.collabMyState==='JOINED',A,{timeout:2500});
