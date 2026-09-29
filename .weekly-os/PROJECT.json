@@ -7,12 +7,12 @@
     "projectStage": "RELEASE",
     "gate": "G7_RELEASE",
     "status": "APPROVED",
-    "version": "3.04",
+    "version": "3.05",
     "updated": "2026-09-29",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "3.03"
+    "supersedes": "3.04"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -267,7 +267,9 @@
     "operations/ARTIFACT_COLLABORATION_LIVE_UX_CORRECTIVE_R2_G7_RELEASE_CANDIDATE_2026-09-29.md",
     ".weekly-os/results/artifact-collaboration-v1.v1.12.md",
     "operations/ARTIFACT_COLLABORATION_LIVE_UX_CORRECTIVE_R2_PRODUCTION_RELEASE_CHECKPOINT_2026-09-29.md",
-    ".weekly-os/results/artifact-collaboration-v1.v1.13.md"
+    ".weekly-os/results/artifact-collaboration-v1.v1.13.md",
+    "operations/ARTIFACT_COLLABORATION_LIVE_UX_CORRECTIVE_R2_PRODUCTION_DEPLOY_2026-09-29.md",
+    ".weekly-os/results/artifact-collaboration-v1.v1.14.md"
   ],
   "authority": {
     "mpDslCore": {
@@ -434,10 +436,10 @@
   },
   "currentResult": {
     "artifactId": "dementor-club.result.artifact-collaboration-v1",
-    "version": "1.13",
+    "version": "1.14",
     "status": "ACTIVE",
     "workStatus": "ACTIVE",
-    "path": ".weekly-os/results/artifact-collaboration-v1.v1.13.md",
+    "path": ".weekly-os/results/artifact-collaboration-v1.v1.14.md",
     "gate": "G7_RELEASE",
     "scope": [
       "BQA-24 invitation discoverability",
@@ -454,8 +456,8 @@
     "liveDatabaseMutationAuthorized": false,
     "productionMergeAuthorized": true,
     "productionDeployAuthorized": true,
-    "gateReadiness": "PRODUCTION_MERGED_DEPLOY_PENDING",
-    "note": "PR #249 exact RC merged. Production a24f8d9 tree matches validated RC and exact 5-file Artifact Collaboration delta. Canonical Pages workflow_dispatch is pending; backend/Supabase deploy not required.",
+    "gateReadiness": "LIVE_ACCEPTANCE_PENDING",
+    "note": "Artifact Collaboration corrective deployed on exact production a24f8d9 via Pages #137 SUCCESS. Exact artifact recorded. Live CJM/JTBD acceptance BQA-24/25/26/28 pending before G8.",
     "correctiveQa": [
       "BQA-24",
       "BQA-25",
@@ -493,9 +495,15 @@
     "productionCommit": "a24f8d900cc29e5ae922a9a62b751cc02e88f8d9",
     "productionTree": "c525d2467247253a48ac0b3dbe14d8f9382278c4",
     "productionMergeStatus": "COMPLETE",
-    "pagesDeployStatus": "NOT_STARTED",
+    "pagesDeployStatus": "PASS",
     "backendDeployStatus": "NOT_REQUIRED",
-    "releaseCheckpointEvidence": "operations/ARTIFACT_COLLABORATION_LIVE_UX_CORRECTIVE_R2_PRODUCTION_RELEASE_CHECKPOINT_2026-09-29.md"
+    "releaseCheckpointEvidence": "operations/ARTIFACT_COLLABORATION_LIVE_UX_CORRECTIVE_R2_PRODUCTION_RELEASE_CHECKPOINT_2026-09-29.md",
+    "pagesDeployRun": 137,
+    "pagesDeployRunId": 36598659696,
+    "pagesArtifactId": 11047841976,
+    "pagesArtifactDigest": "sha256:bdeca55650b9dcd1b6254b7d363433494cb8679cceb5fd8c7903c1f432cb5376",
+    "liveAcceptanceStatus": "PENDING",
+    "productionDeployEvidence": "operations/ARTIFACT_COLLABORATION_LIVE_UX_CORRECTIVE_R2_PRODUCTION_DEPLOY_2026-09-29.md"
   },
   "waitingResults": [
     {
