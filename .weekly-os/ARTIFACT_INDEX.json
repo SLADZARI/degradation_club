@@ -7,12 +7,12 @@
     "projectStage": "BUILD",
     "gate": "G7_RELEASE",
     "status": "APPROVED",
-    "version": "2.94",
+    "version": "2.95",
     "updated": "2026-09-29",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.93"
+    "supersedes": "2.94"
   },
   "currentArtifacts": [
     {
@@ -32,7 +32,7 @@
     {
       "artifactId": "dementor-club.kernel.artifact-index",
       "documentType": "STANDARD",
-      "currentVersion": "2.94",
+      "currentVersion": "2.95",
       "status": "APPROVED",
       "location": ".weekly-os/ARTIFACT_INDEX.json",
       "sourceSystem": "GIT",
@@ -3042,15 +3042,15 @@
     {
       "artifactId": "dementor-club.result.global-header-bootstrap-stability-v1",
       "documentType": "RESULT",
-      "currentVersion": "0.4",
-      "version": "0.4",
+      "currentVersion": "0.5",
+      "version": "0.5",
       "status": "ACTIVE",
       "workStatus": "ACTIVE",
       "relation": "CURRENT_RESULT",
       "gate": "G7_RELEASE",
       "projectStage": "RELEASE",
-      "path": ".weekly-os/results/global-header-bootstrap-stability-v1.v0.4.md",
-      "location": ".weekly-os/results/global-header-bootstrap-stability-v1.v0.4.md",
+      "path": ".weekly-os/results/global-header-bootstrap-stability-v1.v0.5.md",
+      "location": ".weekly-os/results/global-header-bootstrap-stability-v1.v0.5.md",
       "sourceSystem": "GIT",
       "authorityType": "IMPLEMENTATION_AUTHORITY",
       "updated": "2026-09-29",
@@ -3063,7 +3063,7 @@
       "liveDatabaseMutationAuthorized": false,
       "productionMergeAuthorized": true,
       "productionDeployAuthorized": true,
-      "gateReadiness": "PRODUCTION_MERGED_DEPLOY_PENDING",
+      "gateReadiness": "LIVE_DOMAIN_ACCEPTANCE_PENDING",
       "blockedResult": "dementor-club.result.artifact-collaboration-v1",
       "candidateCommit": "b0d9be502de1533c42530af55cde2b4dd692abf4",
       "g6Status": "PASS",
@@ -3072,7 +3072,7 @@
       "g6ValidationRunId1": 36565735746,
       "g6ValidationRun2": 1323,
       "g6ValidationRunId2": 36566203814,
-      "note": "Exact PR #247 merged. Production fd184be3 keeps the validated tree and exact 3-file delta. Canonical Pages workflow_dispatch is pending; backend/Supabase deploy is not required.",
+      "note": "Exact production fd184be3 deployed by canonical Pages run #136 SUCCESS. Exact deployed artifact browser matrix PASS desktop/390/360 + controlled identity. External live-domain observation pending; G8 not authorized.",
       "releaseBranch": "release/global-header-bootstrap-stability-v1",
       "releaseCandidateCommit": "cdd6c4aa962f95f560d9fd9936944d623d005fca",
       "releaseCandidateTree": "7c9c4a749a80c6ecb69f314565cf36300af868d0",
@@ -3087,10 +3087,17 @@
       "productionCommit": "fd184be3306911c4ddb6acbcb77acdd977ea84f8",
       "productionTree": "7c9c4a749a80c6ecb69f314565cf36300af868d0",
       "productionMergeStatus": "COMPLETE",
-      "pagesDeployStatus": "NOT_STARTED",
+      "pagesDeployStatus": "PASS",
       "backendDeployStatus": "NOT_REQUIRED",
       "liveSmokeStatus": "NOT_STARTED",
-      "releaseCheckpointEvidence": "operations/GLOBAL_HEADER_BOOTSTRAP_STABILITY_PRODUCTION_RELEASE_CHECKPOINT_2026-09-29.md"
+      "releaseCheckpointEvidence": "operations/GLOBAL_HEADER_BOOTSTRAP_STABILITY_PRODUCTION_RELEASE_CHECKPOINT_2026-09-29.md",
+      "pagesDeployRun": 136,
+      "pagesDeployRunId": 36580299418,
+      "pagesArtifactId": 11039012286,
+      "pagesArtifactDigest": "sha256:de2d2db18a9c32f32d545f48c49f48bf4a827751782a89440c41bba05e4cd656",
+      "deployedArtifactBrowserSmokeStatus": "PASS",
+      "liveDomainSmokeStatus": "PENDING_EXTERNAL_OBSERVATION",
+      "productionDeployEvidence": "operations/GLOBAL_HEADER_BOOTSTRAP_STABILITY_PRODUCTION_DEPLOY_2026-09-29.md"
     },
     {
       "artifactId": "dementor-club.operations.global-header-bootstrap-stability-g6-2026-09-29",
@@ -3138,6 +3145,23 @@
       "canonicalProject": "dementor-club",
       "canonicalLocation": "operations/GLOBAL_HEADER_BOOTSTRAP_STABILITY_PRODUCTION_RELEASE_CHECKPOINT_2026-09-29.md",
       "relation": "PRODUCTION_RELEASE_CHECKPOINT",
+      "result": "dementor-club.result.global-header-bootstrap-stability-v1",
+      "referencedBy": [
+        "dementor-club.result.global-header-bootstrap-stability-v1"
+      ]
+    },
+    {
+      "artifactId": "dementor-club.operations.global-header-bootstrap-stability-production-deploy-2026-09-29",
+      "documentType": "RELEASE_EVIDENCE",
+      "currentVersion": "1.0",
+      "status": "PASS_DEPLOYED",
+      "location": "operations/GLOBAL_HEADER_BOOTSTRAP_STABILITY_PRODUCTION_DEPLOY_2026-09-29.md",
+      "sourceSystem": "GIT",
+      "authorityType": "RELEASE_EVIDENCE",
+      "updated": "2026-09-29",
+      "canonicalProject": "dementor-club",
+      "canonicalLocation": "operations/GLOBAL_HEADER_BOOTSTRAP_STABILITY_PRODUCTION_DEPLOY_2026-09-29.md",
+      "relation": "PRODUCTION_DEPLOY_EVIDENCE",
       "result": "dementor-club.result.global-header-bootstrap-stability-v1",
       "referencedBy": [
         "dementor-club.result.global-header-bootstrap-stability-v1"
