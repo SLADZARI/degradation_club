@@ -4,15 +4,15 @@
     "artifactId": "dementor-club.kernel.project",
     "project": "dementor-club",
     "documentType": "STANDARD",
-    "projectStage": "VALIDATION",
-    "gate": "G6_VALIDATION",
+    "projectStage": "BUILD",
+    "gate": "G7_RELEASE",
     "status": "APPROVED",
-    "version": "2.98",
+    "version": "2.99",
     "updated": "2026-09-29",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.97"
+    "supersedes": "2.98"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -252,7 +252,9 @@
     ".weekly-os/results/global-header-bootstrap-stability-v1.v0.1.md",
     ".weekly-os/results/artifact-collaboration-v1.v1.10.md",
     "operations/GLOBAL_HEADER_BOOTSTRAP_STABILITY_G6_2026-09-29.md",
-    ".weekly-os/results/global-header-bootstrap-stability-v1.v0.2.md"
+    ".weekly-os/results/global-header-bootstrap-stability-v1.v0.2.md",
+    "operations/GLOBAL_HEADER_BOOTSTRAP_STABILITY_G7_RELEASE_CANDIDATE_2026-09-29.md",
+    ".weekly-os/results/global-header-bootstrap-stability-v1.v0.3.md"
   ],
   "authority": {
     "mpDslCore": {
@@ -419,11 +421,11 @@
   },
   "currentResult": {
     "artifactId": "dementor-club.result.global-header-bootstrap-stability-v1",
-    "version": "0.2",
-    "status": "ACTIVE",
+    "version": "0.3",
+    "status": "REVIEW",
     "workStatus": "ACTIVE",
-    "path": ".weekly-os/results/global-header-bootstrap-stability-v1.v0.2.md",
-    "gate": "G6_VALIDATION",
+    "path": ".weekly-os/results/global-header-bootstrap-stability-v1.v0.3.md",
+    "gate": "G7_RELEASE",
     "scope": [
       "canonical Global Header bootstrap body-ready guard",
       "idempotent boot",
@@ -439,17 +441,26 @@
     "liveDatabaseMutationAuthorized": false,
     "productionMergeAuthorized": false,
     "productionDeployAuthorized": false,
-    "gateReadiness": "READY_FOR_CLEAN_RELEASE_DECISION",
+    "gateReadiness": "READY_FOR_RELEASE_DECISION",
     "blockerEvidence": "operations/ARTIFACT_COLLABORATION_LIVE_CORRECTIVE_G5_BLOCKER_2026-09-29.md",
     "blockedResult": "dementor-club.result.artifact-collaboration-v1",
-    "note": "Canonical Header body-null boot race fixed on exact candidate b0d9be5; targeted early-body regression plus two consecutive full Site Integrity runs (#1322/#1323) passed on the same SHA. G6 PASS; release not authorized.",
+    "note": "Clean RC cdd6c4a is one commit ahead of current production with exact 3-file delta and tree-identical to validated G6 candidate. Site Integrity #1324 SUCCESS. G7 PASS; awaiting explicit release authorization.",
     "candidateCommit": "b0d9be502de1533c42530af55cde2b4dd692abf4",
     "g6Status": "PASS",
     "g6Evidence": "operations/GLOBAL_HEADER_BOOTSTRAP_STABILITY_G6_2026-09-29.md",
     "g6ValidationRun1": 1322,
     "g6ValidationRunId1": 36565735746,
     "g6ValidationRun2": 1323,
-    "g6ValidationRunId2": 36566203814
+    "g6ValidationRunId2": 36566203814,
+    "releaseBranch": "release/global-header-bootstrap-stability-v1",
+    "releaseCandidateCommit": "cdd6c4aa962f95f560d9fd9936944d623d005fca",
+    "releaseCandidateTree": "7c9c4a749a80c6ecb69f314565cf36300af868d0",
+    "releasePullRequest": 247,
+    "g7Status": "PASS",
+    "g7Evidence": "operations/GLOBAL_HEADER_BOOTSTRAP_STABILITY_G7_RELEASE_CANDIDATE_2026-09-29.md",
+    "g7ValidationRun": 1324,
+    "g7ValidationRunId": 36572884226,
+    "g7ValidationConclusion": "SUCCESS"
   },
   "waitingResults": [
     {
