@@ -4,15 +4,15 @@
     "artifactId": "dementor-club.kernel.project",
     "project": "dementor-club",
     "documentType": "STANDARD",
-    "projectStage": "BUILD",
-    "gate": "G5_BUILD",
+    "projectStage": "VALIDATION",
+    "gate": "G6_VALIDATION",
     "status": "APPROVED",
-    "version": "2.97",
+    "version": "2.98",
     "updated": "2026-09-29",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.96"
+    "supersedes": "2.97"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -250,7 +250,9 @@
     "operations/ARTIFACT_COLLABORATION_LIVE_CORRECTIVE_G5_BLOCKER_2026-09-29.md",
     ".weekly-os/results/artifact-collaboration-v1.v1.9.md",
     ".weekly-os/results/global-header-bootstrap-stability-v1.v0.1.md",
-    ".weekly-os/results/artifact-collaboration-v1.v1.10.md"
+    ".weekly-os/results/artifact-collaboration-v1.v1.10.md",
+    "operations/GLOBAL_HEADER_BOOTSTRAP_STABILITY_G6_2026-09-29.md",
+    ".weekly-os/results/global-header-bootstrap-stability-v1.v0.2.md"
   ],
   "authority": {
     "mpDslCore": {
@@ -417,11 +419,11 @@
   },
   "currentResult": {
     "artifactId": "dementor-club.result.global-header-bootstrap-stability-v1",
-    "version": "0.1",
+    "version": "0.2",
     "status": "ACTIVE",
     "workStatus": "ACTIVE",
-    "path": ".weekly-os/results/global-header-bootstrap-stability-v1.v0.1.md",
-    "gate": "G5_BUILD",
+    "path": ".weekly-os/results/global-header-bootstrap-stability-v1.v0.2.md",
+    "gate": "G6_VALIDATION",
     "scope": [
       "canonical Global Header bootstrap body-ready guard",
       "idempotent boot",
@@ -437,10 +439,17 @@
     "liveDatabaseMutationAuthorized": false,
     "productionMergeAuthorized": false,
     "productionDeployAuthorized": false,
-    "gateReadiness": "G5_IMPLEMENTATION",
+    "gateReadiness": "READY_FOR_CLEAN_RELEASE_DECISION",
     "blockerEvidence": "operations/ARTIFACT_COLLABORATION_LIVE_CORRECTIVE_G5_BLOCKER_2026-09-29.md",
     "blockedResult": "dementor-club.result.artifact-collaboration-v1",
-    "note": "Separate canonical Global Header owner corrective. Artifact Collaboration is WAITING and must resume from the post-Header production baseline; do not mix Header fix into the Artifact branch."
+    "note": "Canonical Header body-null boot race fixed on exact candidate b0d9be5; targeted early-body regression plus two consecutive full Site Integrity runs (#1322/#1323) passed on the same SHA. G6 PASS; release not authorized.",
+    "candidateCommit": "b0d9be502de1533c42530af55cde2b4dd692abf4",
+    "g6Status": "PASS",
+    "g6Evidence": "operations/GLOBAL_HEADER_BOOTSTRAP_STABILITY_G6_2026-09-29.md",
+    "g6ValidationRun1": 1322,
+    "g6ValidationRunId1": 36565735746,
+    "g6ValidationRun2": 1323,
+    "g6ValidationRunId2": 36566203814
   },
   "waitingResults": [
     {
