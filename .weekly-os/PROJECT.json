@@ -7,12 +7,12 @@
     "projectStage": "BUILD",
     "gate": "G7_RELEASE",
     "status": "APPROVED",
-    "version": "3.00",
+    "version": "3.01",
     "updated": "2026-09-29",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.99"
+    "supersedes": "3.00"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -256,7 +256,9 @@
     "operations/GLOBAL_HEADER_BOOTSTRAP_STABILITY_G7_RELEASE_CANDIDATE_2026-09-29.md",
     ".weekly-os/results/global-header-bootstrap-stability-v1.v0.3.md",
     "operations/GLOBAL_HEADER_BOOTSTRAP_STABILITY_PRODUCTION_RELEASE_CHECKPOINT_2026-09-29.md",
-    ".weekly-os/results/global-header-bootstrap-stability-v1.v0.4.md"
+    ".weekly-os/results/global-header-bootstrap-stability-v1.v0.4.md",
+    "operations/GLOBAL_HEADER_BOOTSTRAP_STABILITY_PRODUCTION_DEPLOY_2026-09-29.md",
+    ".weekly-os/results/global-header-bootstrap-stability-v1.v0.5.md"
   ],
   "authority": {
     "mpDslCore": {
@@ -423,10 +425,10 @@
   },
   "currentResult": {
     "artifactId": "dementor-club.result.global-header-bootstrap-stability-v1",
-    "version": "0.4",
+    "version": "0.5",
     "status": "ACTIVE",
     "workStatus": "ACTIVE",
-    "path": ".weekly-os/results/global-header-bootstrap-stability-v1.v0.4.md",
+    "path": ".weekly-os/results/global-header-bootstrap-stability-v1.v0.5.md",
     "gate": "G7_RELEASE",
     "scope": [
       "canonical Global Header bootstrap body-ready guard",
@@ -443,10 +445,10 @@
     "liveDatabaseMutationAuthorized": false,
     "productionMergeAuthorized": true,
     "productionDeployAuthorized": true,
-    "gateReadiness": "PRODUCTION_MERGED_DEPLOY_PENDING",
+    "gateReadiness": "LIVE_DOMAIN_ACCEPTANCE_PENDING",
     "blockerEvidence": "operations/ARTIFACT_COLLABORATION_LIVE_CORRECTIVE_G5_BLOCKER_2026-09-29.md",
     "blockedResult": "dementor-club.result.artifact-collaboration-v1",
-    "note": "PR #247 merged at exact validated RC. Production SHA fd184be3 has the validated tree and exact 3-file delta. Canonical Pages workflow is manual workflow_dispatch and has not yet been dispatched; backend/Supabase deploy is not required.",
+    "note": "Exact production SHA fd184be3 deployed successfully by canonical Pages run #136. Exact deployed artifact browser matrix PASS on desktop/390/360 and controlled identity. External live-domain observation remains pending because available tool network cannot open dementor.club; G8 is not authorized.",
     "candidateCommit": "b0d9be502de1533c42530af55cde2b4dd692abf4",
     "g6Status": "PASS",
     "g6Evidence": "operations/GLOBAL_HEADER_BOOTSTRAP_STABILITY_G6_2026-09-29.md",
@@ -468,10 +470,17 @@
     "productionCommit": "fd184be3306911c4ddb6acbcb77acdd977ea84f8",
     "productionTree": "7c9c4a749a80c6ecb69f314565cf36300af868d0",
     "productionMergeStatus": "COMPLETE",
-    "pagesDeployStatus": "NOT_STARTED",
+    "pagesDeployStatus": "PASS",
     "backendDeployStatus": "NOT_REQUIRED",
     "liveSmokeStatus": "NOT_STARTED",
-    "releaseCheckpointEvidence": "operations/GLOBAL_HEADER_BOOTSTRAP_STABILITY_PRODUCTION_RELEASE_CHECKPOINT_2026-09-29.md"
+    "releaseCheckpointEvidence": "operations/GLOBAL_HEADER_BOOTSTRAP_STABILITY_PRODUCTION_RELEASE_CHECKPOINT_2026-09-29.md",
+    "pagesDeployRun": 136,
+    "pagesDeployRunId": 36580299418,
+    "pagesArtifactId": 11039012286,
+    "pagesArtifactDigest": "sha256:de2d2db18a9c32f32d545f48c49f48bf4a827751782a89440c41bba05e4cd656",
+    "deployedArtifactBrowserSmokeStatus": "PASS",
+    "liveDomainSmokeStatus": "PENDING_EXTERNAL_OBSERVATION",
+    "productionDeployEvidence": "operations/GLOBAL_HEADER_BOOTSTRAP_STABILITY_PRODUCTION_DEPLOY_2026-09-29.md"
   },
   "waitingResults": [
     {
