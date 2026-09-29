@@ -4,15 +4,15 @@
     "artifactId": "dementor-club.kernel.project",
     "project": "dementor-club",
     "documentType": "STANDARD",
-    "projectStage": "BUILD",
-    "gate": "G5_BUILD",
+    "projectStage": "RELEASE",
+    "gate": "G7_RELEASE",
     "status": "APPROVED",
-    "version": "3.02",
+    "version": "3.03",
     "updated": "2026-09-29",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "3.01"
+    "supersedes": "3.02"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -262,7 +262,10 @@
     "operations/GLOBAL_HEADER_BOOTSTRAP_STABILITY_LIVE_ACCEPTANCE_2026-09-29.md",
     "operations/GLOBAL_HEADER_BOOTSTRAP_STABILITY_G8_2026-09-29.md",
     ".weekly-os/results/global-header-bootstrap-stability-v1.v1.0.md",
-    ".weekly-os/results/artifact-collaboration-v1.v1.11.md"
+    ".weekly-os/results/artifact-collaboration-v1.v1.11.md",
+    "operations/ARTIFACT_COLLABORATION_LIVE_UX_CORRECTIVE_R2_G6_2026-09-29.md",
+    "operations/ARTIFACT_COLLABORATION_LIVE_UX_CORRECTIVE_R2_G7_RELEASE_CANDIDATE_2026-09-29.md",
+    ".weekly-os/results/artifact-collaboration-v1.v1.12.md"
   ],
   "authority": {
     "mpDslCore": {
@@ -429,11 +432,11 @@
   },
   "currentResult": {
     "artifactId": "dementor-club.result.artifact-collaboration-v1",
-    "version": "1.11",
-    "status": "ACTIVE",
+    "version": "1.12",
+    "status": "REVIEW",
     "workStatus": "ACTIVE",
-    "path": ".weekly-os/results/artifact-collaboration-v1.v1.11.md",
-    "gate": "G5_BUILD",
+    "path": ".weekly-os/results/artifact-collaboration-v1.v1.12.md",
+    "gate": "G7_RELEASE",
     "scope": [
       "BQA-24 invitation discoverability",
       "BQA-25 Artifact detail action hierarchy",
@@ -449,8 +452,8 @@
     "liveDatabaseMutationAuthorized": false,
     "productionMergeAuthorized": false,
     "productionDeployAuthorized": false,
-    "gateReadiness": "G5_VALIDATION_IN_PROGRESS",
-    "note": "Header blocker closed G8. Artifact corrective rebuilt from exact post-Header production baseline with exactly 5 intended files. Draft PR #248 triggers canonical Site Integrity #1325; no release authorization.",
+    "gateReadiness": "READY_FOR_RELEASE_DECISION",
+    "note": "Artifact Collaboration live UX corrective G6 #1325 SUCCESS; fresh one-commit clean RC 49a545c from exact production fd184be3; PR #249 OPEN/DRAFT/UNMERGED; G7 #1326 SUCCESS; exact 5-file diff; no backend changes; release authorization pending.",
     "correctiveQa": [
       "BQA-24",
       "BQA-25",
@@ -466,7 +469,24 @@
     "g5CorrectiveRunId": 36585332043,
     "blockingResult": "dementor-club.result.global-header-bootstrap-stability-v1",
     "blockingResultStatus": "CLOSED_G8",
-    "qaReconciliation": "operations/QA_RECONCILIATION_2026-09-28.md"
+    "qaReconciliation": "operations/QA_RECONCILIATION_2026-09-28.md",
+    "validatedCandidate": "c402783924b5393cba5c9ab572576ca29bb4b0c0",
+    "g6Status": "PASS",
+    "g6Evidence": "operations/ARTIFACT_COLLABORATION_LIVE_UX_CORRECTIVE_R2_G6_2026-09-29.md",
+    "g6ValidationRun": 1325,
+    "g6ValidationRunId": 36585332043,
+    "g6ValidationConclusion": "SUCCESS",
+    "releaseBranch": "release/artifact-collaboration-v1-live-ux-corrective-r2",
+    "releaseCandidateCommit": "49a545c68f63248c60b0591176a016f07e559e76",
+    "releaseCandidateTree": "c525d2467247253a48ac0b3dbe14d8f9382278c4",
+    "releasePullRequest": 249,
+    "g7Status": "PASS",
+    "g7Evidence": "operations/ARTIFACT_COLLABORATION_LIVE_UX_CORRECTIVE_R2_G7_RELEASE_CANDIDATE_2026-09-29.md",
+    "g7ValidationRun": 1326,
+    "g7ValidationRunId": 36586121661,
+    "g7ValidationConclusion": "SUCCESS",
+    "historicalValidationPullRequest": 248,
+    "historicalValidationPullRequestState": "CLOSED_UNMERGED"
   },
   "waitingResults": [
     {
