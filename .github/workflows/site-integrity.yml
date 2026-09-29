@@ -85,6 +85,8 @@ jobs:
         run: |
           npm install --no-save --no-package-lock playwright@1.55.0 pngjs@7.0.0
           npx playwright install --with-deps chromium webkit
+      - name: Validate Global Header bootstrap body-ready regression
+        run: node scripts/validate-global-header-bootstrap-browser.mjs
       - name: Validate sustained Club publisher stability
         run: node scripts/validate-club-publisher-stability-browser.mjs
       - name: Validate OWNER_ADMIN Telegram opt-in browser acceptance
