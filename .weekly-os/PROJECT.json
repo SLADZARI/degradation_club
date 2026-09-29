@@ -7,12 +7,12 @@
     "projectStage": "RELEASE",
     "gate": "G7_RELEASE",
     "status": "APPROVED",
-    "version": "3.03",
+    "version": "3.04",
     "updated": "2026-09-29",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "3.02"
+    "supersedes": "3.03"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -265,7 +265,9 @@
     ".weekly-os/results/artifact-collaboration-v1.v1.11.md",
     "operations/ARTIFACT_COLLABORATION_LIVE_UX_CORRECTIVE_R2_G6_2026-09-29.md",
     "operations/ARTIFACT_COLLABORATION_LIVE_UX_CORRECTIVE_R2_G7_RELEASE_CANDIDATE_2026-09-29.md",
-    ".weekly-os/results/artifact-collaboration-v1.v1.12.md"
+    ".weekly-os/results/artifact-collaboration-v1.v1.12.md",
+    "operations/ARTIFACT_COLLABORATION_LIVE_UX_CORRECTIVE_R2_PRODUCTION_RELEASE_CHECKPOINT_2026-09-29.md",
+    ".weekly-os/results/artifact-collaboration-v1.v1.13.md"
   ],
   "authority": {
     "mpDslCore": {
@@ -432,10 +434,10 @@
   },
   "currentResult": {
     "artifactId": "dementor-club.result.artifact-collaboration-v1",
-    "version": "1.12",
-    "status": "REVIEW",
+    "version": "1.13",
+    "status": "ACTIVE",
     "workStatus": "ACTIVE",
-    "path": ".weekly-os/results/artifact-collaboration-v1.v1.12.md",
+    "path": ".weekly-os/results/artifact-collaboration-v1.v1.13.md",
     "gate": "G7_RELEASE",
     "scope": [
       "BQA-24 invitation discoverability",
@@ -450,10 +452,10 @@
     "implementationStartAuthorized": true,
     "schemaMutationAuthorized": false,
     "liveDatabaseMutationAuthorized": false,
-    "productionMergeAuthorized": false,
-    "productionDeployAuthorized": false,
-    "gateReadiness": "READY_FOR_RELEASE_DECISION",
-    "note": "Artifact Collaboration live UX corrective G6 #1325 SUCCESS; fresh one-commit clean RC 49a545c from exact production fd184be3; PR #249 OPEN/DRAFT/UNMERGED; G7 #1326 SUCCESS; exact 5-file diff; no backend changes; release authorization pending.",
+    "productionMergeAuthorized": true,
+    "productionDeployAuthorized": true,
+    "gateReadiness": "PRODUCTION_MERGED_DEPLOY_PENDING",
+    "note": "PR #249 exact RC merged. Production a24f8d9 tree matches validated RC and exact 5-file Artifact Collaboration delta. Canonical Pages workflow_dispatch is pending; backend/Supabase deploy not required.",
     "correctiveQa": [
       "BQA-24",
       "BQA-25",
@@ -486,7 +488,14 @@
     "g7ValidationRunId": 36586121661,
     "g7ValidationConclusion": "SUCCESS",
     "historicalValidationPullRequest": 248,
-    "historicalValidationPullRequestState": "CLOSED_UNMERGED"
+    "historicalValidationPullRequestState": "CLOSED_UNMERGED",
+    "pagesProductionDeployAuthorized": true,
+    "productionCommit": "a24f8d900cc29e5ae922a9a62b751cc02e88f8d9",
+    "productionTree": "c525d2467247253a48ac0b3dbe14d8f9382278c4",
+    "productionMergeStatus": "COMPLETE",
+    "pagesDeployStatus": "NOT_STARTED",
+    "backendDeployStatus": "NOT_REQUIRED",
+    "releaseCheckpointEvidence": "operations/ARTIFACT_COLLABORATION_LIVE_UX_CORRECTIVE_R2_PRODUCTION_RELEASE_CHECKPOINT_2026-09-29.md"
   },
   "waitingResults": [
     {
