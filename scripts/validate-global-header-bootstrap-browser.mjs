@@ -33,6 +33,7 @@ const earlyHtml=`<!doctype html>
 <head>
 <meta charset="utf-8">
 <title>GlobalHeader early body QA</title>
+<link rel="stylesheet" href="/global-header.css">
 ${authStub}
 <script>
 window.__QA_GLOBAL_HEADER_STAGES__=[];
