@@ -7,12 +7,12 @@
     "projectStage": "BUILD",
     "gate": "G7_RELEASE",
     "status": "APPROVED",
-    "version": "3.05",
+    "version": "3.06",
     "updated": "2026-09-29",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "3.04"
+    "supersedes": "3.05"
   },
   "currentArtifacts": [
     {
@@ -32,7 +32,7 @@
     {
       "artifactId": "dementor-club.kernel.artifact-index",
       "documentType": "STANDARD",
-      "currentVersion": "3.05",
+      "currentVersion": "3.06",
       "status": "APPROVED",
       "location": ".weekly-os/ARTIFACT_INDEX.json",
       "sourceSystem": "GIT",
@@ -3417,6 +3417,27 @@
       "runtimeCandidateStatus": "PASS",
       "committedValidatorStatus": "FAIL_FIXTURE_DEFECT",
       "runtimeFilesFrozen": true
+    },
+    {
+      "artifactId": "dementor-club.operations.board-media-performance-dev2-validator-corrective-2-2026-09-29",
+      "documentType": "VALIDATION_EVIDENCE",
+      "currentVersion": "1.0",
+      "status": "VALIDATOR_ONLY_CORRECTIVE_AUTHORIZED",
+      "location": "operations/BOARD_MEDIA_PERFORMANCE_DEV2_VALIDATOR_CORRECTIVE_2_2026-09-29.md",
+      "sourceSystem": "GIT",
+      "authorityType": "QA_EVIDENCE",
+      "updated": "2026-09-29",
+      "canonicalProject": "dementor-club",
+      "canonicalLocation": "operations/BOARD_MEDIA_PERFORMANCE_DEV2_VALIDATOR_CORRECTIVE_2_2026-09-29.md",
+      "relation": "NEXT_RESULT_WORKER_EVIDENCE",
+      "parentQa": [
+        "BQA-20",
+        "BQA-27"
+      ],
+      "workerLane": "DEV2_FRONTEND",
+      "workerBranch": "worker/board-media-performance-v1-dev2-frontend",
+      "currentHead": "bbc9709ca20f28fdbf465f241fa0c628fff32039",
+      "runtimeFrozen": true
     }
   ],
   "referenceArtifacts": [
