@@ -160,5 +160,27 @@
     }
   };
 
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
+  let bodyReadyWait=null;
+  const requestBoot=()=>{
+    if(document.body){boot();return}
+    if(bodyReadyWait)return;
+    const root=document.documentElement;
+    if(!root)return;
+
+    let observer=null;
+    const finish=()=>{
+      if(!document.body)return;
+      observer?.disconnect();
+      document.removeEventListener('DOMContentLoaded',finish);
+      bodyReadyWait=null;
+      boot();
+    };
+
+    observer=new MutationObserver(finish);
+    observer.observe(root,{childList:true});
+    document.addEventListener('DOMContentLoaded',finish,{once:true});
+    bodyReadyWait={observer,finish};
+  };
+
+  requestBoot();
 })();
