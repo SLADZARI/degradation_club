@@ -275,7 +275,7 @@ try{
   expect(enriched.mediaReadStartedAt>=enriched.firstRender,'after: media enrichment began before structural render '+JSON.stringify(enriched));
   expect(enriched.signedFirstStartedAt>enriched.firstRender,'after: signed URL generation began before structural render '+JSON.stringify(enriched));
   expect(enriched.invitation==='ПРИГЛАШЕНИЯ · 1'&&enriched.invitedState==='INVITED'&&enriched.invitedClass,'BQA-24 delayed invitation presentation failed '+JSON.stringify(enriched));
-  expect(enriched.imageAttrs>every(row=>row.loading==='lazy'&&row.decoding==='async'),'media lazy/async attributes missing '+JSON.stringify(enriched.imageAttrs));
+  expect(enriched.imageAttrs.every(row=>row.loading==='lazy'&&row.decoding==='async'),'media lazy/async attributes missing '+JSON.stringify(enriched.imageAttrs));
   await page.locator('[data-board-invitation-indicator]').click();await page.waitForTimeout(40);
   const nav=await page.evaluate(()=>({view:globalThis.__QA.viewRequest,opened:globalThis.__QA.invitationOpen}));
   expect(nav.view?.view==='all'&&nav.opened==='${A}','BQA-24 invitation exact Idea activation changed '+JSON.stringify(nav));
