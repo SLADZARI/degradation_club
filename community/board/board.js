@@ -279,6 +279,9 @@ async function resolveUnknownDelivery(outboxId,resolution){
 }
 
 function boardLoadCurrent(generation){return generation===boardLoadGeneration}
+function notifyBoardProjection(source){
+  window.dispatchEvent(new CustomEvent('dc:board-projections-updated',{detail:{source}}));
+}
 
 function authorMarkup(profile){
   return `<div class="dc-notice__author">${avatar(profile)}<div><strong>${esc(profile?.display_name||'MEMBER')}</strong>${profile?.nickname?`<div>@${esc(profile.nickname.replace(/^@/,''))}</div>`:''}</div></div>`;
@@ -362,9 +365,13 @@ async function enrichBoard(artifacts,generation){
   ));
   installNoticeActions();
   syncInvitationPresentation();
+  notifyBoardProjection('artifact-secondary-enrichment');
   try{
     const mediaResult=await mediaPromise;if(mediaResult.error)throw mediaResult.error;
-    if(boardLoadCurrent(generation))await hydrateBoardMedia(mediaResult.data||[],generation);
+    if(boardLoadCurrent(generation)){
+      await hydrateBoardMedia(mediaResult.data||[],generation);
+      notifyBoardProjection('artifact-media-enrichment');
+    }
   }catch(error){console.warn('[DC Board] media enrichment failed',error)}
 }
 

@@ -45,6 +45,7 @@ expect(mediaSource.includes("imageOrientation:'from-image'")||mediaSource.includ
 expect(mediaSource.includes('BOARD_IMAGE_LONG_EDGE=1800'),'source: canonical image edge is not 1800');
 expect(mediaSource.includes('BOARD_IMAGE_WEBP_QUALITY=0.82'),'source: canonical WebP quality is not 0.82');
 expect(!boardSource.includes('mediaUrls=new Map'),'source: persistent/eager signed-url map returned');
+expect(boardSource.includes("notifyBoardProjection('artifact-secondary-enrichment')")&&boardSource.includes("notifyBoardProjection('artifact-media-enrichment')"),'source: progressive enrichment does not notify canonical Board owners');
 
 const runtimeModule=()=>`
 const A='${A}',B='${B}',C='${C}',UID='${UID}',AUTHOR='${AUTHOR}';
@@ -56,7 +57,7 @@ globalThis.__QA=globalThis.__QA||{};
 Object.assign(globalThis.__QA,{
   participantRpcCount:0,signedUrlCount:0,mediaCount:0,uploads:[],removes:[],attachCalls:[],publishCalls:0,
   participantFirstStartedAt:null,mediaReadStartedAt:null,signedFirstStartedAt:null,attachFail:false,
-  participation:{[A]:'INVITED'},invitationOpen:null,viewRequest:null
+  participation:{[A]:'INVITED'},invitationOpen:null,viewRequest:null,projectionUpdates:0
 });
 const artifacts=[
  {id:A,author_profile_id:AUTHOR,artifact_type:'idea',title:'CIRCLE IDEA',body:'Delayed participant fixture.',external_url:null,status:'active',visibility:'circle',starts_at:null,activity_at:null,expires_at:null,published_at:'2026-09-29T10:00:00Z',closed_at:null,created_at:'2026-09-29T09:00:00Z',board_hidden_at:null},
@@ -143,9 +144,13 @@ const observe=new MutationObserver(()=>{
     globalThis.__QA.participantAtFirstRender=Number(globalThis.__QA.participantRpcCount||0);
     const usable=cards.every(card=>card.querySelector('.dc-notice__body')&&card.querySelector('a[href*="/community/artifact/"]'));
     if(usable)globalThis.__QA.interactive=now;
+    globalThis.__QA.firstCardNodes=cards;
+    const circle=cards.find(card=>card.dataset.artifact==='11111111-1111-4111-8111-111111111111');
+    globalThis.__QA.circleSafeAtFirstRender=Boolean(circle&&circle.querySelector('a[href*="/community/artifact/"]')&&!circle.querySelector('[data-reaction]')&&!circle.querySelector('[data-response]'));
   }
 });
 observe.observe(document.documentElement,{subtree:true,childList:true});
+addEventListener('dc:board-projections-updated',()=>{globalThis.__QA.projectionUpdates=Number(globalThis.__QA.projectionUpdates||0)+1});
 addEventListener('dc:board-request-view',event=>{globalThis.__QA.viewRequest=event.detail||null});
 addEventListener('click',event=>{const card=event.target?.closest?.('.dc-notice[data-artifact]');if(card)globalThis.__QA.invitationOpen=card.dataset.artifact||null},true);
 </script>
@@ -255,6 +260,8 @@ try{
   expect(after.structuralMs<delays.participant,'after: structural cards still wait for participant reads '+JSON.stringify(after));
   expect(after.structuralMs<delays.mediaRead,'after: structural cards still wait for media read '+JSON.stringify(after));
   expect(after.signedUrlCountBeforeFirstRender===0,'after: signed URLs started before first render '+JSON.stringify(after));
+  expect(after.participantRpcCountBeforeFirstRender===0,'after: participant reads started before first render '+JSON.stringify(after));
+  expect(first.circleSafeAtFirstRender===true,'after: CIRCLE structural card exposed enrichment-dependent actions '+JSON.stringify(first));
   expect(Number.isFinite(after.interactiveMs)&&after.interactiveMs<delays.mediaRead,'after: Board not usable before enrichment '+JSON.stringify(after));
 
   await page.waitForFunction(()=>document.querySelector('[data-board-invitation-indicator]')?.textContent?.includes('1'),{timeout:2500});
@@ -266,7 +273,9 @@ try{
     invitation:document.querySelector('[data-board-invitation-indicator]')?.textContent?.trim()||null,
     invitedState:document.querySelector('.dc-notice[data-artifact="${A}"]')?.dataset.collabMyState||null,
     invitedClass:document.querySelector('.dc-notice[data-artifact="${A}"]')?.classList.contains('is-invited-to-me')||false,
-    imageAttrs:[...document.querySelectorAll('.dc-notice__media img')].map(img=>({loading:img.getAttribute('loading'),decoding:img.getAttribute('decoding')}))
+    imageAttrs:[...document.querySelectorAll('.dc-notice__media img')].map(img=>({loading:img.getAttribute('loading'),decoding:img.getAttribute('decoding')})),
+    sameCardNodes:Array.isArray(globalThis.__QA.firstCardNodes)&&globalThis.__QA.firstCardNodes.every((node,index)=>node===document.querySelectorAll('.dc-notice[data-artifact]')[index]),
+    projectionUpdates:Number(globalThis.__QA.projectionUpdates||0)
   }));
   after={...after,participantRpcCount:enriched.participantRpcCount,signedUrlCount:enriched.signedUrlCount,mediaCount:enriched.mediaCount,enrichmentCompleteMs:Math.max(enriched.signedFirstStartedAt||0,enriched.participantFirstStartedAt||0)-enriched.start+delays.signed};
   expect(enriched.participantRpcCount===2,'after: participant RPC count changed unexpectedly '+JSON.stringify(enriched));
@@ -275,6 +284,8 @@ try{
   expect(enriched.mediaReadStartedAt>=enriched.firstRender,'after: media enrichment began before structural render '+JSON.stringify(enriched));
   expect(enriched.signedFirstStartedAt>enriched.firstRender,'after: signed URL generation began before structural render '+JSON.stringify(enriched));
   expect(enriched.invitation==='ПРИГЛАШЕНИЯ · 1'&&enriched.invitedState==='INVITED'&&enriched.invitedClass,'BQA-24 delayed invitation presentation failed '+JSON.stringify(enriched));
+  expect(enriched.sameCardNodes===true,'progressive enrichment replaced canonical card nodes '+JSON.stringify(enriched));
+  expect(enriched.projectionUpdates>=2,'secondary/media enrichment did not notify canonical Board presentation owners '+JSON.stringify(enriched));
   expect(enriched.imageAttrs.every(row=>row.loading==='lazy'&&row.decoding==='async'),'media lazy/async attributes missing '+JSON.stringify(enriched.imageAttrs));
   await page.locator('[data-board-invitation-indicator]').click();await page.waitForTimeout(40);
   const nav=await page.evaluate(()=>({view:globalThis.__QA.viewRequest,opened:globalThis.__QA.invitationOpen}));
