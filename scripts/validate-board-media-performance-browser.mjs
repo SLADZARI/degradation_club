@@ -291,10 +291,10 @@ try{
   const nav=await page.evaluate(()=>({view:globalThis.__QA.viewRequest,opened:globalThis.__QA.invitationOpen}));
   expect(nav.view?.view==='all'&&nav.opened==='${A}','BQA-24 invitation exact Idea activation changed '+JSON.stringify(nav));
 
-  await page.evaluate(()=>{globalThis.__QA.participation['${A}']='JOINED';window.dispatchEvent(new CustomEvent('dc:artifact-collaboration-changed',{detail:{artifactId:'${A}'}}));window.dispatchEvent(new CustomEvent('dc:board-artifact-closed'))});
+  await page.evaluate(id=>{globalThis.__QA.participation[id]='JOINED';window.dispatchEvent(new CustomEvent('dc:artifact-collaboration-changed',{detail:{artifactId:id}}));window.dispatchEvent(new CustomEvent('dc:board-artifact-closed'))},A);
   await page.waitForFunction(id=>document.querySelector('.dc-notice[data-artifact="'+id+'"]')?.dataset.collabMyState==='JOINED',A,{timeout:2500});
   expect(await page.locator('[data-board-invitation-indicator]').count()===0,'BQA-28 JOINED left stale invitation indicator');
-  await page.evaluate(()=>{globalThis.__QA.participation['${A}']='DECLINED';window.dispatchEvent(new CustomEvent('dc:artifact-collaboration-changed',{detail:{artifactId:'${A}'}}));window.dispatchEvent(new CustomEvent('dc:board-close-artifact'))});
+  await page.evaluate(id=>{globalThis.__QA.participation[id]='DECLINED';window.dispatchEvent(new CustomEvent('dc:artifact-collaboration-changed',{detail:{artifactId:id}}));window.dispatchEvent(new CustomEvent('dc:board-close-artifact'))},A);
   await page.waitForFunction(id=>!document.querySelector('.dc-notice[data-artifact="'+id+'"]'),A,{timeout:1800});
   expect(await page.locator('[data-board-invitation-indicator]').count()===0,'BQA-28/CIRCLE DECLINED kept stale invitation');
 
