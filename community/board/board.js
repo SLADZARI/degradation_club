@@ -1,5 +1,6 @@
 import {getClient,currentSession,loginWithGoogle,getEntryStatus,DC_ARTIFACT_BUCKET,esc,formatDate,safeFileName,mediaType,signedMediaUrl,errorMessage,route} from '/community-runtime-v1.js';
 import {ARTIFACT_SUBTYPES,artifactSubtypeLabel} from '/community/board/board-entity-model-v1.js';
+import {normalizeArtifactImage} from '/community/board/board-media-v1.js';
 
 const entryHost=document.getElementById('entryHost');
 const boardHost=document.getElementById('boardHost');
@@ -12,6 +13,7 @@ let invitationCursor=0;
 let boardReady=false;
 let boardProjectionRefreshPromise=null;
 let collaborationProjectionDirty=false;
+let boardLoadGeneration=0;
 
 const allowedTypes=new Set(['image/jpeg','image/png','image/webp']);
 const maxFileSize=4*1024*1024;
@@ -105,6 +107,8 @@ function humanArtifactError(error){
   if(message.includes('dc_artifacts_external_url_check'))return 'Ссылка не прошла проверку. Используйте обычный http:// или https:// адрес.';
   if(/expired|expires|expiry/i.test(message))return 'Срок действия должен быть в будущем.';
   if(/slot/i.test(message))return 'Свободного места для новой публикации сейчас нет.';
+  if(message.includes('MEDIA_DECODE_FAILED'))return 'Не удалось прочитать изображение. Выберите исправный JPG, PNG или WebP и попробуйте ещё раз.';
+  if(message.includes('MEDIA_CANVAS_UNAVAILABLE'))return 'Браузер не смог подготовить изображение. Исходный файл не опубликован — попробуйте ещё раз или выберите другое изображение.';
   return 'Не удалось опубликовать. Данные формы сохранены — проверьте поля и попробуйте ещё раз.';
 }
 function promotionLabel(row){
@@ -218,8 +222,20 @@ async function publishFromForm(event){
     const activity=await client.rpc('dc_set_artifact_activity_v1',{p_artifact_id:artifactId,p_activity_at:activityAt});if(activity.error)throw activity.error;
     ownDraft={...ownDraft,artifact_type:artifactType,visibility,activity_at:activityAt};
     if(file&&!ownDraftMedia.length){
-      state.textContent='ЗАГРУЖАЕМ ИЗОБРАЖЕНИЕ';const path=`${session.user.id}/${artifactId}/${Date.now()}-${safeFileName(file.name)}`;const uploaded=await client.storage.from(DC_ARTIFACT_BUCKET).upload(path,file,{upsert:false,contentType:file.type});if(uploaded.error)throw uploaded.error;uploadedPath=path;
-      const metadata={name:file.name,size:file.size,mime:file.type};const attached=await client.rpc('dc_attach_artifact_media_v1',{p_artifact_id:artifactId,p_storage_path:path,p_media_type:'image',p_metadata:metadata});if(attached.error){await client.storage.from(DC_ARTIFACT_BUCKET).remove([path]).catch(()=>{});throw attached.error}ownDraftMedia=[{storage_path:path,media_type:'image',metadata}];uploadedPath=null;
+      state.textContent='ГОТОВИМ ИЗОБРАЖЕНИЕ';
+      const prepared=await normalizeArtifactImage(file);
+      const uploadFile=prepared.file;
+      state.textContent='ЗАГРУЖАЕМ ИЗОБРАЖЕНИЕ';
+      const path=`${session.user.id}/${artifactId}/${Date.now()}-${safeFileName(prepared.uploadName||file.name)}`;
+      const uploaded=await client.storage.from(DC_ARTIFACT_BUCKET).upload(path,uploadFile,{upsert:false,contentType:uploadFile.type||file.type});if(uploaded.error)throw uploaded.error;uploadedPath=path;
+      const metadata={
+        name:file.name,size:file.size,mime:file.type,
+        width:prepared.original.width,height:prepared.original.height,
+        original_name:prepared.original.name,original_mime:prepared.original.mime,original_bytes:prepared.original.bytes,original_width:prepared.original.width,original_height:prepared.original.height,
+        normalized_mime:prepared.normalized.mime,normalized_bytes:prepared.normalized.bytes,normalized_width:prepared.normalized.width,normalized_height:prepared.normalized.height,
+        normalization_applied:prepared.usedNormalized,normalization_decoder:prepared.decoder
+      };
+      const attached=await client.rpc('dc_attach_artifact_media_v1',{p_artifact_id:artifactId,p_storage_path:path,p_media_type:'image',p_metadata:metadata});if(attached.error){await client.storage.from(DC_ARTIFACT_BUCKET).remove([path]).catch(()=>{});throw attached.error}ownDraftMedia=[{storage_path:path,media_type:'image',metadata}];uploadedPath=null;
     }
     state.textContent='ПРИКАЛЫВАЕМ К ДОСКЕ';const published=await client.rpc('dc_publish_artifact_v1',{p_artifact_id:artifactId});if(published.error)throw published.error;
     window.dispatchEvent(new CustomEvent('dc:board:artifact-published',{detail:{artifactId}}));
@@ -262,32 +278,106 @@ async function resolveUnknownDelivery(outboxId,resolution){
   const {error}=await client.rpc('dc_admin_resolve_delivery_unknown_v1',{p_outbox_id:outboxId,p_resolution:resolution,p_external_ref:externalRef});if(error){boardError(error,boardHost);return}await loadBoard();
 }
 
-async function loadBoard(){
-  const normalized=await client.rpc('dc_normalize_artifact_lifecycle_v1');if(normalized.error)throw normalized.error;
-  const [artifactsResult,promotionResult]=await Promise.all([
-    client.from('dc_artifacts').select('id,author_profile_id,artifact_type,title,body,external_url,status,visibility,starts_at,activity_at,expires_at,published_at,closed_at,created_at').in('status',['active','expired','archived']).is('board_hidden_at',null).order('published_at',{ascending:false}),
-    client.rpc('dc_board_promotion_state_read_v1')
-  ]);
-  if(artifactsResult.error)throw artifactsResult.error;if(promotionResult.error)throw promotionResult.error;
-  promotionState=new Map((promotionResult.data||[]).map(row=>[row.artifact_id,row]));
-  const artifacts=(artifactsResult.data||[]).filter(artifact=>Boolean(artifact.published_at));artifactCount.textContent=String(artifacts.length).padStart(2,'0');
-  if(!artifacts.length){boardHost.innerHTML='<div class="dc-board-empty"><h3>НА ДОСКЕ<br>ПОКА НЕТ ИСТОРИИ.</h3><p>Здесь появятся текущие и прошедшие Community Artifacts.</p></div>';syncInvitationPresentation();return}
+function boardLoadCurrent(generation){return generation===boardLoadGeneration}
+
+function authorMarkup(profile){
+  return `<div class="dc-notice__author">${avatar(profile)}<div><strong>${esc(profile?.display_name||'MEMBER')}</strong>${profile?.nickname?`<div>@${esc(profile.nickname.replace(/^@/,''))}</div>`:''}</div></div>`;
+}
+
+function noticeActionControls(artifact,reactions=[],responses=[],participants=[]){
+  const mine=artifact.author_profile_id===session.user.id;
+  const historical=isHistoricalStatus(artifact.status);
+  const myReaction=reactions.some(r=>r.profile_id===session.user.id);
+  const myResponse=responses.find(r=>r.responder_profile_id===session.user.id&&r.status==='submitted');
+  const incoming=mine?responses.filter(r=>r.status==='submitted').length:0;
+  const subtype=String(artifact.artifact_type||'announcement').toLowerCase();
+  const myParticipation=participants.find(row=>row.profile_id===session.user.id)?.participation_state||'';
+  const circleInviteReadOnly=subtype==='idea'&&artifact.visibility==='circle'&&myParticipation==='INVITED';
+  if(circleInviteReadOnly)return '<span class="dc-board-state">ВАС ЗОВУТ · ОТКРОЙТЕ ИДЕЮ</span>';
+  const activityLink=myResponse||myReaction?`<a class="dc-board-action small" href="${route('/workspace/#activity')}">МОЯ АКТИВНОСТЬ</a>`:'';
+  const responseControl=mine?(historical?'':`<button class="dc-board-action small" type="button" data-close-artifact="${artifact.id}">УБРАТЬ</button>`):(historical?'<span class="dc-board-state">ОТКЛИКИ ЗАКРЫТЫ</span>':`<button class="dc-board-action small${myResponse?' primary':''}" type="button" data-response="${artifact.id}" ${myResponse?'disabled':''}>${myResponse?'ОТКЛИК ОТПРАВЛЕН':'ОТКЛИКНУТЬСЯ'}</button>`);
+  return `<span class="dc-notice__activity">ИНТЕРЕСНО: ${reactions.length}${mine?` · ОТКЛИКОВ: ${incoming}`:''}</span><button class="dc-board-action small${myReaction?' primary':''}" type="button" data-reaction="${artifact.id}" data-active="${myReaction?'1':'0'}">${myReaction?'✓ ИНТЕРЕСНО':'МНЕ ЭТО НАДО'}</button>${responseControl}${activityLink}`;
+}
+
+function applyBoardEnrichment(artifact,profile,reactions,responses,promotion,participants,participantsReady,generation){
+  if(!boardLoadCurrent(generation))return;
+  const card=boardHost.querySelector(`.dc-notice[data-artifact="${artifact.id}"]`);if(!card)return;
+  const subtype=String(artifact.artifact_type||'announcement').toLowerCase();
+  const isIdea=subtype==='idea';
+  const authorSlot=card.querySelector('[data-author-slot]');
+  if(authorSlot&&!isIdea)authorSlot.innerHTML=authorMarkup(profile);
+  const collaborationSlot=card.querySelector('[data-collaboration-slot]');
+  if(isIdea&&participantsReady&&collaborationSlot){
+    collaborationSlot.innerHTML=collaborationCardMarkup(artifact,profile,participants);
+    const myParticipation=participants.find(row=>row.profile_id===session.user.id)?.participation_state||'';
+    card.dataset.collabMyState=myParticipation;
+    card.classList.toggle('is-invited-to-me',myParticipation==='INVITED');
+  }
+  const actionsSlot=card.querySelector('[data-actions-slot]');
+  if(actionsSlot&&(!isIdea||participantsReady)){
+    actionsSlot.innerHTML=`${noticeActionControls(artifact,reactions,responses,participants)}<a class="dc-board-action small" href="${route(`/community/artifact/${artifact.id}/`)}">ОТКРЫТЬ</a>${promotionControls(artifact,promotion,{ownerAdmin:isOwnerAdmin(),historical:isHistoricalStatus(artifact.status)})}`;
+    card.removeAttribute('data-enrichment-pending');
+  }
+}
+
+async function hydrateBoardMedia(media,generation){
+  await Promise.all((media||[]).map(async item=>{
+    if(item.media_type!=='image'||!boardLoadCurrent(generation))return;
+    let url=null;try{url=await signedMediaUrl(client,item.storage_path)}catch{}
+    if(!url||!boardLoadCurrent(generation))return;
+    const slot=boardHost.querySelector(`.dc-notice[data-artifact="${item.artifact_id}"] [data-media-slot]`);
+    if(slot&&!slot.firstElementChild)slot.innerHTML=`<div class="dc-notice__media"><img src="${esc(url)}" alt="Прикреплённое изображение" loading="lazy" decoding="async"></div>`;
+  }));
+}
+
+async function enrichBoard(artifacts,generation){
   const ids=artifacts.map(a=>a.id);const authors=[...new Set(artifacts.map(a=>a.author_profile_id))];
-  const [profilesResult,reactionsResult,mediaResult,responsesResult]=await Promise.all([
-    client.from('dc_member_public_profiles').select('profile_id,display_name,nickname,avatar_url,member_since').in('profile_id',authors),
-    client.from('dc_artifact_reactions').select('id,artifact_id,profile_id,reaction_type').in('artifact_id',ids),
-    client.from('dc_artifact_media').select('id,artifact_id,media_type,storage_path,metadata').in('artifact_id',ids),
-    client.from('dc_artifact_responses').select('id,artifact_id,responder_profile_id,message,status,created_at').in('artifact_id',ids)
-  ]);
-  for(const result of [profilesResult,reactionsResult,mediaResult,responsesResult])if(result.error)throw result.error;
-  const profiles=new Map((profilesResult.data||[]).map(p=>[p.profile_id,p]));const reactions=reactionsResult.data||[];const media=mediaResult.data||[];const responses=responsesResult.data||[];
+  const profilesPromise=client.from('dc_member_public_profiles').select('profile_id,display_name,nickname,avatar_url,member_since').in('profile_id',authors);
+  const reactionsPromise=client.from('dc_artifact_reactions').select('id,artifact_id,profile_id,reaction_type').in('artifact_id',ids);
+  const responsesPromise=client.from('dc_artifact_responses').select('id,artifact_id,responder_profile_id,message,status,created_at').in('artifact_id',ids);
+  const promotionPromise=client.rpc('dc_board_promotion_state_read_v1');
+  const mediaPromise=client.from('dc_artifact_media').select('id,artifact_id,media_type,storage_path,metadata').in('artifact_id',ids);
   const ideaIds=artifacts.filter(row=>String(row.artifact_type||'').toLowerCase()==='idea').map(row=>row.id);
-  const participantEntries=await Promise.all(ideaIds.map(async id=>{const result=await client.rpc('dc_artifact_participants_read_v1',{p_artifact_id:id});if(result.error)throw result.error;return[id,result.data||[]]}));
-  const participantsByArtifact=new Map(participantEntries);
-  const mediaUrls=new Map();await Promise.all(media.map(async item=>{try{mediaUrls.set(item.id,await signedMediaUrl(client,item.storage_path))}catch{mediaUrls.set(item.id,null)}}));
-  boardHost.innerHTML=artifacts.map((artifact,index)=>renderNotice(artifact,index,profiles.get(artifact.author_profile_id),reactions.filter(r=>r.artifact_id===artifact.id),media.filter(m=>m.artifact_id===artifact.id).map(m=>({...m,signedUrl:mediaUrls.get(m.id)})),responses.filter(r=>r.artifact_id===artifact.id),promotionState.get(artifact.id),participantsByArtifact.get(artifact.id)||[])).join('');
+  const participantPromise=Promise.all(ideaIds.map(async id=>{
+    try{const result=await client.rpc('dc_artifact_participants_read_v1',{p_artifact_id:id});if(result.error)throw result.error;return[id,result.data||[],true]}
+    catch(error){console.warn('[DC Board] participant enrichment failed',id,error);return[id,[],false]}
+  }));
+  const [profilesResult,reactionsResult,responsesResult,promotionResult,participantEntries]=await Promise.all([profilesPromise,reactionsPromise,responsesPromise,promotionPromise,participantPromise]);
+  if(!boardLoadCurrent(generation))return;
+  for(const result of [profilesResult,reactionsResult,responsesResult,promotionResult])if(result.error)throw result.error;
+  const profiles=new Map((profilesResult.data||[]).map(p=>[p.profile_id,p]));
+  const reactions=reactionsResult.data||[],responses=responsesResult.data||[];
+  promotionState=new Map((promotionResult.data||[]).map(row=>[row.artifact_id,row]));
+  const participantsByArtifact=new Map(participantEntries.map(([id,rows])=>[id,rows]));
+  const participantReady=new Map(participantEntries.map(([id,,ready])=>[id,ready]));
+  artifacts.forEach(artifact=>applyBoardEnrichment(
+    artifact,
+    profiles.get(artifact.author_profile_id),
+    reactions.filter(r=>r.artifact_id===artifact.id),
+    responses.filter(r=>r.artifact_id===artifact.id),
+    promotionState.get(artifact.id),
+    participantsByArtifact.get(artifact.id)||[],
+    String(artifact.artifact_type||'').toLowerCase()!=='idea'||participantReady.get(artifact.id)===true,
+    generation
+  ));
   installNoticeActions();
   syncInvitationPresentation();
+  try{
+    const mediaResult=await mediaPromise;if(mediaResult.error)throw mediaResult.error;
+    if(boardLoadCurrent(generation))await hydrateBoardMedia(mediaResult.data||[],generation);
+  }catch(error){console.warn('[DC Board] media enrichment failed',error)}
+}
+
+async function loadBoard(){
+  const generation=++boardLoadGeneration;
+  const normalized=await client.rpc('dc_normalize_artifact_lifecycle_v1');if(normalized.error)throw normalized.error;
+  const artifactsResult=await client.from('dc_artifacts').select('id,author_profile_id,artifact_type,title,body,external_url,status,visibility,starts_at,activity_at,expires_at,published_at,closed_at,created_at').in('status',['active','expired','archived']).is('board_hidden_at',null).order('published_at',{ascending:false});
+  if(artifactsResult.error)throw artifactsResult.error;if(!boardLoadCurrent(generation))return;
+  const artifacts=(artifactsResult.data||[]).filter(artifact=>Boolean(artifact.published_at));artifactCount.textContent=String(artifacts.length).padStart(2,'0');
+  if(!artifacts.length){boardHost.innerHTML='<div class="dc-board-empty"><h3>НА ДОСКЕ<br>ПОКА НЕТ ИСТОРИИ.</h3><p>Здесь появятся текущие и прошедшие Community Artifacts.</p></div>';syncInvitationPresentation();return}
+  boardHost.innerHTML=artifacts.map((artifact,index)=>renderNotice(artifact,index,null,[],[],[],null,[],{enrichmentPending:true})).join('');
+  syncInvitationPresentation();
+  setTimeout(()=>{if(boardLoadCurrent(generation))enrichBoard(artifacts,generation).catch(error=>console.warn('[DC Board] enrichment failed',error))},0);
 }
 
 function promotionControls(artifact,row,{ownerAdmin=false,historical=false}={}){
@@ -305,18 +395,17 @@ function promotionControls(artifact,row,{ownerAdmin=false,historical=false}={}){
   return parts.join('');
 }
 
-function renderNotice(artifact,index,profile,reactions,media,responses,promotion,participants=[]){
-  const mine=artifact.author_profile_id===session.user.id;const ownerAdmin=isOwnerAdmin();const historical=isHistoricalStatus(artifact.status);const myReaction=reactions.some(r=>r.profile_id===session.user.id);const myResponse=responses.find(r=>r.responder_profile_id===session.user.id&&r.status==='submitted');const incoming=mine?responses.filter(r=>r.status==='submitted').length:0;const item=media[0];let mediaHtml='';
-  const subtype=String(artifact.artifact_type||'announcement').toLowerCase();const isIdea=subtype==='idea';const myParticipation=participants.find(row=>row.profile_id===session.user.id)?.participation_state||'';const circleInviteReadOnly=isIdea&&artifact.visibility==='circle'&&myParticipation==='INVITED';
-  if(item?.signedUrl){mediaHtml=item.media_type==='image'?`<div class="dc-notice__media"><img src="${esc(item.signedUrl)}" alt="Прикреплённое изображение"></div>`:''}
-  const activityLink=myResponse||myReaction?`<a class="dc-board-action small" href="${route('/workspace/#activity')}">МОЯ АКТИВНОСТЬ</a>`:'';
+function renderNotice(artifact,index,profile,reactions,media,responses,promotion,participants=[],{enrichmentPending=false}={}){
+  const mine=artifact.author_profile_id===session.user.id;const ownerAdmin=isOwnerAdmin();const historical=isHistoricalStatus(artifact.status);
+  const subtype=String(artifact.artifact_type||'announcement').toLowerCase();const isIdea=subtype==='idea';
+  const myParticipation=enrichmentPending&&isIdea?'':participants.find(row=>row.profile_id===session.user.id)?.participation_state||'';
   const adminControl=ownerAdmin&&!mine&&artifact.status!=='archived'?`<button class="dc-board-admin-close" type="button" data-admin-close-artifact="${artifact.id}" aria-label="Owner Admin: убрать Artifact с доски">ADMIN ×</button>`:'';
-  const responseControl=mine?(historical?'':`<button class="dc-board-action small" type="button" data-close-artifact="${artifact.id}">УБРАТЬ</button>`):(historical?'<span class="dc-board-state">ОТКЛИКИ ЗАКРЫТЫ</span>':`<button class="dc-board-action small${myResponse?' primary':''}" type="button" data-response="${artifact.id}" ${myResponse?'disabled':''}>${myResponse?'ОТКЛИК ОТПРАВЛЕН':'ОТКЛИКНУТЬСЯ'}</button>`);
   const statusLine=historical?(artifact.status==='expired'?'ПРОШЛО / EXPIRED':'АРХИВ / CLOSED'):(artifact.expires_at?`ДЕЙСТВУЕТ ДО ${formatDate(artifact.expires_at)}`:'БЕЗ СРОКА');
   const activityLine=artifact.activity_at?`<div class="dc-notice__expiry">КОГДА · ${esc(formatActivityDate(artifact.activity_at))}</div>`:'';
-  const collab=collaborationCardMarkup(artifact,profile,participants);const authorHtml=isIdea?'':`<div class="dc-notice__author">${avatar(profile)}<div><strong>${esc(profile?.display_name||'MEMBER')}</strong>${profile?.nickname?`<div>@${esc(profile.nickname.replace(/^@/,''))}</div>`:''}</div></div>`;
-  const actionControls=circleInviteReadOnly?'<span class="dc-board-state">ВАС ЗОВУТ · ОТКРОЙТЕ ИДЕЮ</span>':`<span class="dc-notice__activity">ИНТЕРЕСНО: ${reactions.length}${mine?` · ОТКЛИКОВ: ${incoming}`:''}</span><button class="dc-board-action small${myReaction?' primary':''}" type="button" data-reaction="${artifact.id}" data-active="${myReaction?'1':'0'}">${myReaction?'✓ ИНТЕРЕСНО':'МНЕ ЭТО НАДО'}</button>${responseControl}${activityLink}`;
-  return `<article class="dc-notice${historical?' is-history':''}${myParticipation==='INVITED'?' is-invited-to-me':''}" data-artifact="${artifact.id}" data-artifact-status="${esc(artifact.status)}" data-artifact-subtype="${esc(subtype)}" data-artifact-visibility="${esc(artifact.visibility||'community')}" data-collab-my-state="${esc(myParticipation)}" data-source-type="artifact" data-artifact-owned="${mine?'1':'0'}">${adminControl}<div class="dc-notice__meta"><span>${esc(artifactSubtypeLabel(subtype))} / ${String(index+1).padStart(3,'0')}</span><span>${formatDate(artifact.published_at)}</span></div>${authorHtml}${artifact.title?`<h3>${esc(artifact.title)}</h3>`:''}<p class="dc-notice__body">${esc(artifact.body)}</p>${collab}${mediaHtml}${artifact.external_url?`<p><a class="dc-notice__link" href="${esc(artifact.external_url)}" target="_blank" rel="noopener noreferrer">ССЫЛКА ↗</a></p>`:''}${activityLine}<div class="dc-notice__expiry">${statusLine} · ${artifact.visibility==='circle'?'СВОЙ КРУГ':'COMMUNITY'}</div><div class="dc-notice__actions">${actionControls}<a class="dc-board-action small" href="${route(`/community/artifact/${artifact.id}/`)}">ОТКРЫТЬ</a>${promotionControls(artifact,promotion,{ownerAdmin,historical})}</div></article>`;
+  const collaborationHtml=isIdea?`<div data-collaboration-slot>${enrichmentPending?'<span class="dc-board-state">СОСТАВ УТОЧНЯЕТСЯ…</span>':collaborationCardMarkup(artifact,profile,participants)}</div>`:'';
+  const authorHtml=isIdea?'':`<div data-author-slot>${authorMarkup(profile)}</div>`;
+  const actionControls=enrichmentPending?'<span class="dc-board-state" data-board-enrichment-state>ДАННЫЕ УТОЧНЯЮТСЯ…</span>':noticeActionControls(artifact,reactions,responses,participants);
+  return `<article class="dc-notice${historical?' is-history':''}${myParticipation==='INVITED'?' is-invited-to-me':''}" data-artifact="${artifact.id}" data-artifact-status="${esc(artifact.status)}" data-artifact-subtype="${esc(subtype)}" data-artifact-visibility="${esc(artifact.visibility||'community')}" data-collab-my-state="${esc(myParticipation)}" data-source-type="artifact" data-artifact-owned="${mine?'1':'0'}" ${enrichmentPending?'data-enrichment-pending="1"':''}>${adminControl}<div class="dc-notice__meta"><span>${esc(artifactSubtypeLabel(subtype))} / ${String(index+1).padStart(3,'0')}</span><span>${formatDate(artifact.published_at)}</span></div>${authorHtml}${artifact.title?`<h3>${esc(artifact.title)}</h3>`:''}<p class="dc-notice__body">${esc(artifact.body)}</p>${collaborationHtml}<div data-media-slot></div>${artifact.external_url?`<p><a class="dc-notice__link" href="${esc(artifact.external_url)}" target="_blank" rel="noopener noreferrer">ССЫЛКА ↗</a></p>`:''}${activityLine}<div class="dc-notice__expiry">${statusLine} · ${artifact.visibility==='circle'?'СВОЙ КРУГ':'COMMUNITY'}</div><div class="dc-notice__actions" data-actions-slot>${actionControls}<a class="dc-board-action small" href="${route(`/community/artifact/${artifact.id}/`)}">ОТКРЫТЬ</a>${enrichmentPending?'':promotionControls(artifact,promotion,{ownerAdmin,historical})}</div></article>`;
 }
 
 function installNoticeActions(){
