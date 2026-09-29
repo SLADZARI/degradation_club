@@ -7,12 +7,12 @@
     "projectStage": "BUILD",
     "gate": "G7_RELEASE",
     "status": "APPROVED",
-    "version": "2.99",
+    "version": "3.00",
     "updated": "2026-09-29",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "2.98"
+    "supersedes": "2.99"
   },
   "currentArtifacts": [
     {
@@ -32,7 +32,7 @@
     {
       "artifactId": "dementor-club.kernel.artifact-index",
       "documentType": "STANDARD",
-      "currentVersion": "2.99",
+      "currentVersion": "3.00",
       "status": "APPROVED",
       "location": ".weekly-os/ARTIFACT_INDEX.json",
       "sourceSystem": "GIT",
@@ -3285,6 +3285,25 @@
       "referencedBy": [
         "dementor-club.result.artifact-collaboration-v1"
       ]
+    },
+    {
+      "artifactId": "dementor-club.operations.board-media-performance-preflight-2026-09-29",
+      "documentType": "IMPLEMENTATION_BRIEF",
+      "currentVersion": "1.0",
+      "status": "READY_AFTER_CURRENT_G8",
+      "location": "operations/BOARD_MEDIA_PERFORMANCE_PREFLIGHT_2026-09-29.md",
+      "sourceSystem": "GIT",
+      "authorityType": "QA_EVIDENCE",
+      "updated": "2026-09-29",
+      "canonicalProject": "dementor-club",
+      "canonicalLocation": "operations/BOARD_MEDIA_PERFORMANCE_PREFLIGHT_2026-09-29.md",
+      "relation": "NEXT_RESULT_PREFLIGHT",
+      "parentQa": [
+        "BQA-20",
+        "BQA-27"
+      ],
+      "activeResult": "dementor-club.result.artifact-collaboration-v1",
+      "implementationAuthorized": false
     }
   ],
   "referenceArtifacts": [
