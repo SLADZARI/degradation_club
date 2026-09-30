@@ -7,12 +7,12 @@
     "projectStage": "BUILD",
     "gate": "G7_RELEASE",
     "status": "APPROVED",
-    "version": "3.12",
+    "version": "3.13",
     "updated": "2026-09-30",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "3.11"
+    "supersedes": "3.12"
   },
   "currentArtifacts": [
     {
@@ -32,7 +32,7 @@
     {
       "artifactId": "dementor-club.kernel.artifact-index",
       "documentType": "STANDARD",
-      "currentVersion": "3.12",
+      "currentVersion": "3.13",
       "status": "APPROVED",
       "location": ".weekly-os/ARTIFACT_INDEX.json",
       "sourceSystem": "GIT",
@@ -3512,12 +3512,12 @@
     {
       "artifactId": "dementor-club.result.board-media-performance-v1",
       "documentType": "RESULT",
-      "currentVersion": "0.5",
-      "version": "0.5",
+      "currentVersion": "0.6",
+      "version": "0.6",
       "status": "ACTIVE",
       "workStatus": "ACTIVE",
-      "location": ".weekly-os/results/board-media-performance-v1.v0.5.md",
-      "path": ".weekly-os/results/board-media-performance-v1.v0.5.md",
+      "location": ".weekly-os/results/board-media-performance-v1.v0.6.md",
+      "path": ".weekly-os/results/board-media-performance-v1.v0.6.md",
       "sourceSystem": "GIT",
       "authorityType": "IMPLEMENTATION_AUTHORITY",
       "updated": "2026-09-30",
@@ -3536,17 +3536,17 @@
       "frontendWorkerCandidate": "09b33b731610258f7049aa1a4b9576db393176a1",
       "frontendWorkerStatus": "CLEAN_GREEN_FROZEN",
       "backendWorkerCandidate": "834bb9776c4e99bb73556c4776c49f270fe70a6c",
-      "backendWorkerStatus": "STATIC_PASS_RUNTIME_PENDING",
+      "backendWorkerStatus": "RUNTIME_PASS_INTEGRATED",
       "liveDatabaseMutationAuthorized": false,
       "productionMergeAuthorized": false,
       "productionDeployAuthorized": false,
-      "gateReadiness": "BACKEND_RUNTIME_PROOF_REQUIRED",
+      "gateReadiness": "BOARD_BATCH_ADAPTER_REQUIRED",
       "integrationPullRequest": 250,
       "g5FrontendRun": 1328,
       "g5FrontendRunId": 36702910236,
       "g5FrontendStatus": "PASS",
       "g5BlockerEvidence": "operations/BOARD_MEDIA_PERFORMANCE_G5_OWNER_DRAG_BLOCKER_2026-09-30.md",
-      "note": "Frontend/performance half green on exact integration candidate c4fd5c8; Site Integrity #1328 SUCCESS. Remaining G5 blocker is DEV1 disposable/local DB runtime proof before backend integration.",
+      "note": "DEV1 exact candidate passed disposable local Supabase runtime validation and its migration/validator are integrated byte-for-byte. One bounded board.js batch adapter remains before full exact-head G5.",
       "g5Attempt1Status": "FAIL_OWNER_ADMIN_DRAG_INTERMITTENT",
       "g5Attempt2Status": "FAIL_WORLD_COORDINATE_DRIFT",
       "g5OwnerDragCurrentVerdict": "NOT_PROVEN_DETERMINISTIC",
@@ -3555,7 +3555,9 @@
       "g5CorrectiveAuthorized": true,
       "g5CorrectiveScope": "community/board/board-own-drag-livefix-v2-2.js",
       "g5RootCauseEvidence": "operations/BOARD_MEDIA_PERFORMANCE_G5_COORDINATE_DRIFT_ROOT_CAUSE_2026-09-30.md",
-      "g5FrontendEvidence": "operations/BOARD_MEDIA_PERFORMANCE_G5_FRONTEND_PASS_2026-09-30.md"
+      "g5FrontendEvidence": "operations/BOARD_MEDIA_PERFORMANCE_G5_FRONTEND_PASS_2026-09-30.md",
+      "backendRuntimeEvidence": "operations/BOARD_MEDIA_PERFORMANCE_DEV1_RUNTIME_PASS_2026-09-30.md",
+      "backendIntegrationCommit": "a282f39099da3ba4ab410924817c3564943ecaf4"
     },
     {
       "artifactId": "dementor-club.operations.board-media-performance-g5-owner-drag-blocker-2026-09-30",
@@ -3621,6 +3623,22 @@
       "result": "dementor-club.result.board-media-performance-v1",
       "candidateCommit": "c4fd5c8d7f5246b3bd533dc28d31d9d8bdbcccbb",
       "siteIntegrityRunId": 36702910236
+    },
+    {
+      "artifactId": "dementor-club.operations.board-media-performance-dev1-runtime-pass-2026-09-30",
+      "documentType": "VALIDATION_EVIDENCE",
+      "currentVersion": "1.0",
+      "status": "PASS",
+      "location": "operations/BOARD_MEDIA_PERFORMANCE_DEV1_RUNTIME_PASS_2026-09-30.md",
+      "sourceSystem": "GIT",
+      "authorityType": "QA_EVIDENCE",
+      "updated": "2026-09-30",
+      "canonicalProject": "dementor-club",
+      "canonicalLocation": "operations/BOARD_MEDIA_PERFORMANCE_DEV1_RUNTIME_PASS_2026-09-30.md",
+      "relation": "G5_BACKEND_RUNTIME_EVIDENCE",
+      "result": "dementor-club.result.board-media-performance-v1",
+      "workerCandidate": "834bb9776c4e99bb73556c4776c49f270fe70a6c",
+      "runtimeValidation": "PASS_LOCAL_SUPABASE"
     }
   ],
   "referenceArtifacts": [
