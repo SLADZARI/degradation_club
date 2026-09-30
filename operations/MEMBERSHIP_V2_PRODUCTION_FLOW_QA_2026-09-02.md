@@ -1516,15 +1516,24 @@ Those remain separate projection/transport/access findings.
 Ordinary user images are normalized in-browser to a bounded WebP representation before the existing canonical Storage upload, with no new media owner and no regression in Board/detail/share projection contracts.
 
 **Status**
-**G6 PASS / RELEASE PENDING 2026-09-30.**
+**CLOSED / LIVE PASS 2026-09-30.**
 
-Implemented in Board / Media Performance v1 on validated candidate `91a05166a46ad108f7f2aed3b66c5c1464b2863d`.
+Production: `cde332779ab0e256dd1e498660d6fa651e91846e`.
+
+Owner live acceptance completed on `QA MEDIA 30-09`.
+
+Production proof:
+- original PNG: 3,446,542 bytes / 4096×2560;
+- normalized and stored WebP: 75,736 bytes / 1800×1125;
+- `normalization_applied=true`;
+- stored MIME/size exactly match normalized metadata;
+- canonical bucket remains `dc-community-artifacts`.
 
 Evidence:
-- `operations/BOARD_MEDIA_PERFORMANCE_G5_FINAL_PASS_2026-09-30.md`
-- `operations/BOARD_MEDIA_PERFORMANCE_G6_2026-09-30.md`
+- `operations/BOARD_MEDIA_PERFORMANCE_LIVE_ACCEPTANCE_2026-09-30.md`
+- `operations/BOARD_MEDIA_PERFORMANCE_G8_2026-09-30.md`.
 
-The canonical Board composer remains the media owner; no second bucket/table/upload service was introduced. Live/production closure is pending G7 release and post-deploy retest.
+No second bucket, media table or upload owner was introduced.
 
 
 #### BQA-21 — Project video fragment does not render on public Projects page
@@ -2029,17 +2038,25 @@ Before/after on mobile and desktop:
 
 **Status**
 
-**G6 PASS / RELEASE PENDING 2026-09-30.**
+**CLOSED / LIVE PASS 2026-09-30.**
 
-Validated candidate `91a05166a46ad108f7f2aed3b66c5c1464b2863d` renders the structural Board before participant/media/signed-URL enrichment and replaces per-Idea participant N+1 reads with one bounded batch RPC.
+Production: `cde332779ab0e256dd1e498660d6fa651e91846e`.
+
+Pre-release request-count proof remains PASS:
+- 1 Idea → 1 batch RPC;
+- 5 Ideas → 1 batch RPC;
+- 20 Ideas → 1 batch RPC;
+- structural Board renders before participant/media/signed-URL enrichment.
+
+During owner live acceptance, production Supabase logs recorded authenticated:
+
+`POST /rest/v1/rpc/dc_artifact_participants_batch_read_v1 → 200`.
 
 Evidence:
-- Site Integrity `#1331 / 36728660995` = SUCCESS;
-- `operations/BOARD_MEDIA_PERFORMANCE_G5_FINAL_PASS_2026-09-30.md`;
-- `operations/BOARD_MEDIA_PERFORMANCE_G6_2026-09-30.md`;
-- standalone Board/media performance validator exit code 0.
+- `operations/BOARD_MEDIA_PERFORMANCE_LIVE_ACCEPTANCE_2026-09-30.md`;
+- `operations/BOARD_MEDIA_PERFORMANCE_G8_2026-09-30.md`.
 
-Request-count proof: 1 / 5 / 20 Ideas each issue one participant batch RPC. Live/production closure is pending G7 release and post-deploy retest.
+The Board runtime contains no per-Idea single-read fallback or second participant projection owner.
 
 
 #### BQA-28 — Collaboration mutation does not refresh Board roster projection immediately

@@ -4,15 +4,15 @@
     "artifactId": "dementor-club.kernel.project",
     "project": "dementor-club",
     "documentType": "STANDARD",
-    "projectStage": "RELEASE",
-    "gate": "G7_RELEASE",
+    "projectStage": "BUILD",
+    "gate": "G8_CLEANUP",
     "status": "APPROVED",
-    "version": "3.20",
+    "version": "3.21",
     "updated": "2026-09-30",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "3.19"
+    "supersedes": "3.20"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -303,7 +303,10 @@
     "operations/BOARD_MEDIA_PERFORMANCE_G7_MERGE_2026-09-30.md",
     ".weekly-os/results/board-media-performance-v1.v0.12.md",
     "operations/BOARD_MEDIA_PERFORMANCE_PRODUCTION_DEPLOY_2026-09-30.md",
-    ".weekly-os/results/board-media-performance-v1.v0.13.md"
+    ".weekly-os/results/board-media-performance-v1.v0.13.md",
+    "operations/BOARD_MEDIA_PERFORMANCE_LIVE_ACCEPTANCE_2026-09-30.md",
+    "operations/BOARD_MEDIA_PERFORMANCE_G8_2026-09-30.md",
+    ".weekly-os/results/board-media-performance-v1.v1.0.md"
   ],
   "authority": {
     "mpDslCore": {
@@ -470,16 +473,16 @@
   },
   "currentResult": {
     "artifactId": "dementor-club.result.board-media-performance-v1",
-    "version": "0.13",
-    "status": "ACTIVE",
-    "workStatus": "LIVE_RETEST",
-    "path": ".weekly-os/results/board-media-performance-v1.v0.13.md",
-    "gate": "G7_RELEASE",
+    "version": "1.0",
+    "status": "APPROVED",
+    "workStatus": "CLOSED",
+    "path": ".weekly-os/results/board-media-performance-v1.v1.0.md",
+    "gate": "G8_CLEANUP",
     "scope": [
       "BQA-20 image normalization/media pipeline",
       "BQA-27 Board first-render performance"
     ],
-    "integrationBranch": "result/board-media-performance-v1",
+    "integrationBranch": null,
     "integrationBaseRef": "dementor-club-production",
     "integrationBaseCommit": "a24f8d900cc29e5ae922a9a62b751cc02e88f8d9",
     "productionBaseCommit": "a24f8d900cc29e5ae922a9a62b751cc02e88f8d9",
@@ -494,7 +497,7 @@
     "backendWorkerStatus": "RUNTIME_PASS_INTEGRATED",
     "frontendIntegrationCommit": "c4fd5c8d7f5246b3bd533dc28d31d9d8bdbcccbb",
     "qaReconciliation": "operations/QA_RECONCILIATION_2026-09-30.md",
-    "gateReadiness": "LIVE_OWNER_ACCEPTANCE_REQUIRED",
+    "gateReadiness": "CLOSED",
     "integrationPullRequest": 250,
     "g5FrontendRun": 1328,
     "g5FrontendRunId": 36702910236,
@@ -550,7 +553,11 @@
     "pagesRunId": 36742651703,
     "deploymentEvidence": "operations/BOARD_MEDIA_PERFORMANCE_PRODUCTION_DEPLOY_2026-09-30.md",
     "publicLiveSmoke": "PASS",
-    "authenticatedLiveAcceptance": "REQUIRED"
+    "authenticatedLiveAcceptance": "REQUIRED",
+    "liveAcceptanceStatus": "PASS",
+    "liveAcceptanceEvidence": "operations/BOARD_MEDIA_PERFORMANCE_LIVE_ACCEPTANCE_2026-09-30.md",
+    "g8Status": "CLOSED",
+    "g8Evidence": "operations/BOARD_MEDIA_PERFORMANCE_G8_2026-09-30.md"
   },
   "waitingResults": [
     {

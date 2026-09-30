@@ -7,12 +7,12 @@
     "projectStage": "BUILD",
     "gate": "G7_RELEASE",
     "status": "APPROVED",
-    "version": "3.21",
+    "version": "3.22",
     "updated": "2026-09-30",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "3.20"
+    "supersedes": "3.21"
   },
   "currentArtifacts": [
     {
@@ -32,7 +32,7 @@
     {
       "artifactId": "dementor-club.kernel.artifact-index",
       "documentType": "STANDARD",
-      "currentVersion": "3.21",
+      "currentVersion": "3.22",
       "status": "APPROVED",
       "location": ".weekly-os/ARTIFACT_INDEX.json",
       "sourceSystem": "GIT",
@@ -3512,25 +3512,25 @@
     {
       "artifactId": "dementor-club.result.board-media-performance-v1",
       "documentType": "RESULT",
-      "currentVersion": "0.13",
-      "version": "0.13",
-      "status": "ACTIVE",
-      "workStatus": "LIVE_RETEST",
-      "location": ".weekly-os/results/board-media-performance-v1.v0.13.md",
-      "path": ".weekly-os/results/board-media-performance-v1.v0.13.md",
+      "currentVersion": "1.0",
+      "version": "1.0",
+      "status": "APPROVED",
+      "workStatus": "CLOSED",
+      "location": ".weekly-os/results/board-media-performance-v1.v1.0.md",
+      "path": ".weekly-os/results/board-media-performance-v1.v1.0.md",
       "sourceSystem": "GIT",
       "authorityType": "IMPLEMENTATION_AUTHORITY",
       "updated": "2026-09-30",
       "canonicalProject": "dementor-club",
       "canonicalLocation": ".weekly-os/results/board-media-performance-v1.v0.1.md",
       "relation": "CURRENT_RESULT",
-      "gate": "G7_RELEASE",
+      "gate": "G8_CLEANUP",
       "projectStage": "BUILD",
       "parentQa": [
         "BQA-20",
         "BQA-27"
       ],
-      "integrationBranch": "result/board-media-performance-v1",
+      "integrationBranch": null,
       "integrationBaseCommit": "a24f8d900cc29e5ae922a9a62b751cc02e88f8d9",
       "frontendIntegrationCommit": "c4fd5c8d7f5246b3bd533dc28d31d9d8bdbcccbb",
       "frontendWorkerCandidate": "09b33b731610258f7049aa1a4b9576db393176a1",
@@ -3540,13 +3540,13 @@
       "liveDatabaseMutationAuthorized": true,
       "productionMergeAuthorized": false,
       "productionDeployAuthorized": true,
-      "gateReadiness": "LIVE_OWNER_ACCEPTANCE_REQUIRED",
+      "gateReadiness": "CLOSED",
       "integrationPullRequest": 250,
       "g5FrontendRun": 1328,
       "g5FrontendRunId": 36702910236,
       "g5FrontendStatus": "PASS",
       "g5BlockerEvidence": "operations/BOARD_MEDIA_PERFORMANCE_G5_OWNER_DRAG_BLOCKER_2026-09-30.md",
-      "note": "Production deploy confirmed on exact SHA cde33277…; Supabase migration 20260929175000 aligned and Pages deploy #138 successful. Public live smoke PASS. Awaiting authenticated owner live acceptance before G8.",
+      "note": "Board / Media Performance v1 is APPROVED and G8 CLOSED on production cde33277…. BQA-20/BQA-27 are CLOSED / LIVE PASS. Historical result/release/worker branches own no active work.",
       "g5Attempt1Status": "FAIL_OWNER_ADMIN_DRAG_INTERMITTENT",
       "g5Attempt2Status": "FAIL_WORLD_COORDINATE_DRIFT",
       "g5OwnerDragCurrentVerdict": "NOT_PROVEN_DETERMINISTIC",
@@ -3592,7 +3592,11 @@
       "pagesRunId": 36742651703,
       "deploymentEvidence": "operations/BOARD_MEDIA_PERFORMANCE_PRODUCTION_DEPLOY_2026-09-30.md",
       "publicLiveSmoke": "PASS",
-      "authenticatedLiveAcceptance": "REQUIRED"
+      "authenticatedLiveAcceptance": "REQUIRED",
+      "liveAcceptanceStatus": "PASS",
+      "liveAcceptanceEvidence": "operations/BOARD_MEDIA_PERFORMANCE_LIVE_ACCEPTANCE_2026-09-30.md",
+      "g8Status": "CLOSED",
+      "g8Evidence": "operations/BOARD_MEDIA_PERFORMANCE_G8_2026-09-30.md"
     },
     {
       "artifactId": "dementor-club.operations.board-media-performance-g5-owner-drag-blocker-2026-09-30",
@@ -3789,6 +3793,36 @@
       "productionCommit": "cde332779ab0e256dd1e498660d6fa651e91846e",
       "supabaseRunId": 36742339436,
       "pagesRunId": 36742651703
+    },
+    {
+      "artifactId": "dementor-club.operations.board-media-performance-live-acceptance-2026-09-30",
+      "documentType": "VALIDATION_EVIDENCE",
+      "currentVersion": "1.0",
+      "status": "PASS",
+      "location": "operations/BOARD_MEDIA_PERFORMANCE_LIVE_ACCEPTANCE_2026-09-30.md",
+      "sourceSystem": "GIT",
+      "authorityType": "EVIDENCE",
+      "updated": "2026-09-30",
+      "canonicalProject": "dementor-club",
+      "canonicalLocation": "operations/BOARD_MEDIA_PERFORMANCE_LIVE_ACCEPTANCE_2026-09-30.md",
+      "relation": "LIVE_ACCEPTANCE_EVIDENCE",
+      "result": "dementor-club.result.board-media-performance-v1",
+      "productionCommit": "cde332779ab0e256dd1e498660d6fa651e91846e"
+    },
+    {
+      "artifactId": "dementor-club.operations.board-media-performance-g8-2026-09-30",
+      "documentType": "REPORT",
+      "currentVersion": "1.0",
+      "status": "APPROVED",
+      "location": "operations/BOARD_MEDIA_PERFORMANCE_G8_2026-09-30.md",
+      "sourceSystem": "GIT",
+      "authorityType": "EVIDENCE",
+      "updated": "2026-09-30",
+      "canonicalProject": "dementor-club",
+      "canonicalLocation": "operations/BOARD_MEDIA_PERFORMANCE_G8_2026-09-30.md",
+      "relation": "G8_CLEANUP_EVIDENCE",
+      "result": "dementor-club.result.board-media-performance-v1",
+      "productionCommit": "cde332779ab0e256dd1e498660d6fa651e91846e"
     }
   ],
   "referenceArtifacts": [
