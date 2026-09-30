@@ -37,6 +37,8 @@ expect(loadBoardSource.includes('enrichmentPending:true'),'source: loadBoard doe
 expect(loadBoardSource.includes('enrichBoard(artifacts,generation)'),'source: loadBoard does not defer canonical enrichment');
 expect(!loadBoardSource.includes('signedMediaUrl'),'source: signed media still blocks loadBoard');
 expect(!loadBoardSource.includes('dc_artifact_participants_read_v1'),'source: participant RPC still blocks loadBoard');
+expect(boardSource.includes("dc_artifact_participants_batch_read_v1"),'source: batch participant RPC missing');
+expect(!boardSource.includes("dc_artifact_participants_read_v1"),'source: single participant RPC fallback remains');
 expect(!loadBoardSource.includes("from('dc_artifact_media')"),'source: media read still blocks loadBoard');
 expect(boardSource.includes('loading="lazy"')&&boardSource.includes('decoding="async"'),'source: lazy/async image attributes missing');
 expect(boardSource.includes('original_mime')&&boardSource.includes('original_bytes')&&boardSource.includes('original_width')&&boardSource.includes('original_height'),'source: original media metadata missing');
@@ -59,11 +61,18 @@ Object.assign(globalThis.__QA,{
   participantFirstStartedAt:null,mediaReadStartedAt:null,signedFirstStartedAt:null,attachFail:false,
   participation:{[A]:'INVITED'},invitationOpen:null,viewRequest:null,projectionUpdates:0
 });
-const artifacts=[
+const baseArtifacts=[
  {id:A,author_profile_id:AUTHOR,artifact_type:'idea',title:'CIRCLE IDEA',body:'Delayed participant fixture.',external_url:null,status:'active',visibility:'circle',starts_at:null,activity_at:null,expires_at:null,published_at:'2026-09-29T10:00:00Z',closed_at:null,created_at:'2026-09-29T09:00:00Z',board_hidden_at:null},
  {id:B,author_profile_id:AUTHOR,artifact_type:'idea',title:'COMMUNITY IDEA',body:'Second delayed participant fixture.',external_url:null,status:'active',visibility:'community',starts_at:null,activity_at:null,expires_at:null,published_at:'2026-09-29T09:00:00Z',closed_at:null,created_at:'2026-09-29T08:00:00Z',board_hidden_at:null},
  {id:C,author_profile_id:AUTHOR,artifact_type:'announcement',title:'MEDIA CARD',body:'Delayed media fixture.',external_url:null,status:'active',visibility:'community',starts_at:null,activity_at:null,expires_at:null,published_at:'2026-09-29T08:00:00Z',closed_at:null,created_at:'2026-09-29T07:00:00Z',board_hidden_at:null}
 ];
+const requestedIdeaCount=Math.max(0,Number(new URL(location.href).searchParams.get('qaIdeas')||0));
+const artifacts=requestedIdeaCount?Array.from({length:requestedIdeaCount},(_,index)=>({
+  id:'90000000-0000-4000-8000-'+String(index+1).padStart(12,'0'),
+  author_profile_id:AUTHOR,artifact_type:'idea',title:'BATCH IDEA '+String(index+1),body:'Batch request-count fixture.',
+  external_url:null,status:'active',visibility:'community',starts_at:null,activity_at:null,expires_at:null,
+  published_at:'2026-09-29T09:00:00Z',closed_at:null,created_at:'2026-09-29T08:00:00Z',board_hidden_at:null
+})):baseArtifacts;
 const profiles=[
  {profile_id:AUTHOR,display_name:'QA AUTHOR',nickname:'author',avatar_url:null,member_since:'2026-09-01'},
  {profile_id:UID,display_name:'QA MEMBER',nickname:'member',avatar_url:null,member_since:'2026-09-01'},
@@ -101,9 +110,11 @@ const client={
  rpc:async(name,args={})=>{
    if(name==='dc_normalize_artifact_lifecycle_v1'){await wait(delays.normalize);return{data:0,error:null}}
    if(name==='dc_board_promotion_state_read_v1'){await wait(delays.secondary);return{data:[],error:null}}
-   if(name==='dc_artifact_participants_read_v1'){
+   if(name==='dc_artifact_participants_batch_read_v1'){
      globalThis.__QA.participantRpcCount+=1;if(globalThis.__QA.participantFirstStartedAt==null)globalThis.__QA.participantFirstStartedAt=performance.now();
-     await wait(delays.participant);return{data:participantRows(args.p_artifact_id),error:null};
+     await wait(delays.participant);
+     const ids=Array.isArray(args.p_artifact_ids)?args.p_artifact_ids:[];
+     return{data:ids.flatMap(id=>participantRows(id).map(row=>({artifact_id:id,...row}))),error:null};
    }
    if(name==='dc_create_artifact_draft_v1')return{data:'88888888-8888-4888-8888-888888888888',error:null};
    if(name==='dc_update_artifact_draft_v1'||name==='dc_set_artifact_visibility_v1'||name==='dc_set_artifact_subtype_v1'||name==='dc_set_artifact_activity_v1')return{data:args.p_artifact_id||true,error:null};
@@ -240,9 +251,29 @@ async function assignGeneratedFile(page,selector,{name='upload.jpg',type='image/
   },{name,type,width,height,broken});
 }
 
+async function participantRequestCountProbe(browser,ideaCount){
+  const context=await browser.newContext({viewport:{width:390,height:844}});
+  const page=await context.newPage();const errors=[];page.on('pageerror',error=>errors.push(error.message));
+  try{
+    await page.goto(base+'/qa-board.html?qaIdeas='+ideaCount,{waitUntil:'domcontentloaded'});
+    await page.waitForFunction(count=>document.querySelectorAll('.dc-notice[data-artifact]').length===count,ideaCount,{timeout:3000});
+    await page.waitForFunction(()=>Number(globalThis.__QA?.participantRpcCount)===1,{timeout:2500});
+    await page.waitForTimeout(delays.participant+80);
+    const result=await page.evaluate(()=>({participantRpcCount:Number(globalThis.__QA.participantRpcCount||0),participantFirstStartedAt:globalThis.__QA.participantFirstStartedAt,firstRender:globalThis.__QA.firstRender}));
+    return{ideas:ideaCount,...result,pageErrors:errors};
+  }finally{await context.close()}
+}
+
 const browser=await chromium.launch({headless:true});
-let baseline=null,after=null,imageFixtures=null;
+let baseline=null,after=null,imageFixtures=null,participantRequestCounts=null;
 try{
+  participantRequestCounts=[];
+  for(const ideas of [1,5,20]){
+    const probe=await participantRequestCountProbe(browser,ideas);
+    participantRequestCounts.push(probe);
+    expect(probe.participantRpcCount===1,'batch request count '+ideas+' Ideas expected 1 RPC '+JSON.stringify(probe));
+    expect(probe.pageErrors.length===0,'batch request count '+ideas+' Ideas page errors '+JSON.stringify(probe));
+  }
   baseline=await baselineProbe(browser);
   expect(baseline.firstRender>=1400,'baseline: delayed enrichment did not block first render '+JSON.stringify(baseline));
   expect(baseline.signedUrlCountBeforeFirstRender===2,'baseline: signed URLs were not all generated before first render '+JSON.stringify(baseline));
@@ -278,7 +309,7 @@ try{
     projectionUpdates:Number(globalThis.__QA.projectionUpdates||0)
   }),A);
   after={...after,participantRpcCount:enriched.participantRpcCount,signedUrlCount:enriched.signedUrlCount,mediaCount:enriched.mediaCount,enrichmentCompleteMs:Math.max(enriched.signedFirstStartedAt||0,enriched.participantFirstStartedAt||0)-enriched.start+delays.signed};
-  expect(enriched.participantRpcCount===2,'after: participant RPC count changed unexpectedly '+JSON.stringify(enriched));
+  expect(enriched.participantRpcCount===1,'after: participant batch RPC count expected one request '+JSON.stringify(enriched));
   expect(enriched.signedUrlCount===2&&enriched.mediaCount===2,'after: media/signed enrichment count mismatch '+JSON.stringify(enriched));
   expect(enriched.participantFirstStartedAt>=enriched.firstRender,'after: participant enrichment began before structural render '+JSON.stringify(enriched));
   expect(enriched.mediaReadStartedAt>=enriched.firstRender,'after: media enrichment began before structural render '+JSON.stringify(enriched));
@@ -341,6 +372,7 @@ try{
 
 console.log('BOARD_MEDIA_BASELINE '+JSON.stringify(baseline));
 console.log('BOARD_MEDIA_AFTER '+JSON.stringify(after));
+console.log('BOARD_PARTICIPANT_BATCH_REQUEST_COUNT '+JSON.stringify(participantRequestCounts));
 console.log('BOARD_MEDIA_FIXTURES '+JSON.stringify(imageFixtures?.rows||[]));
 if(failures.length){console.error('BOARD / MEDIA PERFORMANCE BROWSER QA BLOCKED');for(const failure of failures)console.error('- '+failure);process.exit(1)}
 console.log('BOARD / MEDIA PERFORMANCE BROWSER QA PASS');

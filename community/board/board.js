@@ -341,18 +341,31 @@ async function enrichBoard(artifacts,generation){
   const promotionPromise=client.rpc('dc_board_promotion_state_read_v1');
   const mediaPromise=client.from('dc_artifact_media').select('id,artifact_id,media_type,storage_path,metadata').in('artifact_id',ids);
   const ideaIds=artifacts.filter(row=>String(row.artifact_type||'').toLowerCase()==='idea').map(row=>row.id);
-  const participantPromise=Promise.all(ideaIds.map(async id=>{
-    try{const result=await client.rpc('dc_artifact_participants_read_v1',{p_artifact_id:id});if(result.error)throw result.error;return[id,result.data||[],true]}
-    catch(error){console.warn('[DC Board] participant enrichment failed',id,error);return[id,[],false]}
-  }));
-  const [profilesResult,reactionsResult,responsesResult,promotionResult,participantEntries]=await Promise.all([profilesPromise,reactionsPromise,responsesPromise,promotionPromise,participantPromise]);
+  const participantPromise=(async()=>{
+    if(!ideaIds.length)return{rows:[],ready:true};
+    try{
+      const result=await client.rpc('dc_artifact_participants_batch_read_v1',{p_artifact_ids:ideaIds});
+      if(result.error)throw result.error;
+      return{rows:result.data||[],ready:true};
+    }catch(error){
+      console.warn('[DC Board] participant enrichment failed',ideaIds,error);
+      return{rows:[],ready:false};
+    }
+  })();
+  const [profilesResult,reactionsResult,responsesResult,promotionResult,participantResult]=await Promise.all([profilesPromise,reactionsPromise,responsesPromise,promotionPromise,participantPromise]);
   if(!boardLoadCurrent(generation))return;
   for(const result of [profilesResult,reactionsResult,responsesResult,promotionResult])if(result.error)throw result.error;
   const profiles=new Map((profilesResult.data||[]).map(p=>[p.profile_id,p]));
   const reactions=reactionsResult.data||[],responses=responsesResult.data||[];
   promotionState=new Map((promotionResult.data||[]).map(row=>[row.artifact_id,row]));
-  const participantsByArtifact=new Map(participantEntries.map(([id,rows])=>[id,rows]));
-  const participantReady=new Map(participantEntries.map(([id,,ready])=>[id,ready]));
+  const participantsByArtifact=new Map(ideaIds.map(id=>[id,[]]));
+  for(const row of participantResult.rows||[]){
+    const artifactId=String(row?.artifact_id||'');
+    if(!participantsByArtifact.has(artifactId))continue;
+    const {artifact_id,...participant}=row;
+    participantsByArtifact.get(artifactId).push(participant);
+  }
+  const participantReady=new Map(ideaIds.map(id=>[id,participantResult.ready]));
   artifacts.forEach(artifact=>applyBoardEnrichment(
     artifact,
     profiles.get(artifact.author_profile_id),
