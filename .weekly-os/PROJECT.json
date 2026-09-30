@@ -7,12 +7,12 @@
     "projectStage": "BUILD",
     "gate": "G5_BUILD",
     "status": "APPROVED",
-    "version": "3.07",
+    "version": "3.08",
     "updated": "2026-09-30",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "3.06"
+    "supersedes": "3.07"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -281,7 +281,9 @@
     "operations/BOARD_MEDIA_PERFORMANCE_DEV1_BACKEND_CANDIDATE_2026-09-29.md",
     "operations/BOARD_MEDIA_PERFORMANCE_DEV2_CLEAN_GREEN_2026-09-29.md",
     "operations/BOARD_MEDIA_PERFORMANCE_G5_OWNER_DRAG_BLOCKER_2026-09-30.md",
-    ".weekly-os/results/board-media-performance-v1.v0.2.md"
+    ".weekly-os/results/board-media-performance-v1.v0.2.md",
+    "operations/BOARD_MEDIA_PERFORMANCE_G5_COORDINATE_DRIFT_BLOCKER_2026-09-30.md",
+    ".weekly-os/results/board-media-performance-v1.v0.3.md"
   ],
   "authority": {
     "mpDslCore": {
@@ -448,10 +450,10 @@
   },
   "currentResult": {
     "artifactId": "dementor-club.result.board-media-performance-v1",
-    "version": "0.2",
+    "version": "0.3",
     "status": "ACTIVE",
     "workStatus": "ACTIVE",
-    "path": ".weekly-os/results/board-media-performance-v1.v0.2.md",
+    "path": ".weekly-os/results/board-media-performance-v1.v0.3.md",
     "gate": "G5_BUILD",
     "scope": [
       "BQA-20 image normalization/media pipeline",
@@ -472,12 +474,16 @@
     "backendWorkerStatus": "STATIC_PASS_RUNTIME_PENDING",
     "frontendIntegrationCommit": "0eac2c9b00bc6a493ec331780948693e16c2a654",
     "qaReconciliation": "operations/QA_RECONCILIATION_2026-09-30.md",
-    "gateReadiness": "ROOT_CAUSE_REQUIRED",
+    "gateReadiness": "COORDINATE_DRIFT_ROOT_CAUSE_REQUIRED",
     "integrationPullRequest": 250,
     "g5FrontendRun": 1327,
     "g5FrontendRunId": 36691834625,
-    "g5FrontendStatus": "BLOCKED_OWNER_ADMIN_DRAG",
-    "g5BlockerEvidence": "operations/BOARD_MEDIA_PERFORMANCE_G5_OWNER_DRAG_BLOCKER_2026-09-30.md"
+    "g5FrontendStatus": "BLOCKED_WORLD_COORDINATE_DRIFT",
+    "g5BlockerEvidence": "operations/BOARD_MEDIA_PERFORMANCE_G5_OWNER_DRAG_BLOCKER_2026-09-30.md",
+    "g5Attempt1Status": "FAIL_OWNER_ADMIN_DRAG_INTERMITTENT",
+    "g5Attempt2Status": "FAIL_WORLD_COORDINATE_DRIFT",
+    "g5OwnerDragCurrentVerdict": "NOT_PROVEN_DETERMINISTIC",
+    "g5CurrentBlockerEvidence": "operations/BOARD_MEDIA_PERFORMANCE_G5_COORDINATE_DRIFT_BLOCKER_2026-09-30.md"
   },
   "waitingResults": [
     {
