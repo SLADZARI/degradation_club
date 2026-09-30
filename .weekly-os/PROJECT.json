@@ -4,15 +4,15 @@
     "artifactId": "dementor-club.kernel.project",
     "project": "dementor-club",
     "documentType": "STANDARD",
-    "projectStage": "VALIDATION",
-    "gate": "G6_VALIDATION",
+    "projectStage": "RELEASE",
+    "gate": "G7_RELEASE",
     "status": "APPROVED",
-    "version": "3.15",
+    "version": "3.16",
     "updated": "2026-09-30",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "3.14"
+    "supersedes": "3.15"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -295,7 +295,9 @@
     "operations/BOARD_MEDIA_PERFORMANCE_G5_EXACT_HEAD_CI_PASS_2026-09-30.md",
     ".weekly-os/results/board-media-performance-v1.v0.8.md",
     "operations/BOARD_MEDIA_PERFORMANCE_G5_FINAL_PASS_2026-09-30.md",
-    ".weekly-os/results/board-media-performance-v1.v0.9.md"
+    ".weekly-os/results/board-media-performance-v1.v0.9.md",
+    "operations/BOARD_MEDIA_PERFORMANCE_G6_2026-09-30.md",
+    ".weekly-os/results/board-media-performance-v1.v0.10.md"
   ],
   "authority": {
     "mpDslCore": {
@@ -462,11 +464,11 @@
   },
   "currentResult": {
     "artifactId": "dementor-club.result.board-media-performance-v1",
-    "version": "0.9",
+    "version": "0.10",
     "status": "ACTIVE",
-    "workStatus": "ACTIVE",
-    "path": ".weekly-os/results/board-media-performance-v1.v0.9.md",
-    "gate": "G6_VALIDATION",
+    "workStatus": "PREPARING_RELEASE_CANDIDATE",
+    "path": ".weekly-os/results/board-media-performance-v1.v0.10.md",
+    "gate": "G7_RELEASE",
     "scope": [
       "BQA-20 image normalization/media pipeline",
       "BQA-27 Board first-render performance"
@@ -486,7 +488,7 @@
     "backendWorkerStatus": "RUNTIME_PASS_INTEGRATED",
     "frontendIntegrationCommit": "c4fd5c8d7f5246b3bd533dc28d31d9d8bdbcccbb",
     "qaReconciliation": "operations/QA_RECONCILIATION_2026-09-30.md",
-    "gateReadiness": "G6_VALIDATION_ACTIVE",
+    "gateReadiness": "CLEAN_RELEASE_CANDIDATE_REQUIRED",
     "integrationPullRequest": 250,
     "g5FrontendRun": 1328,
     "g5FrontendRunId": 36702910236,
@@ -517,7 +519,9 @@
     "g5ExactHeadStatus": "PASS",
     "g5ExactHeadEvidence": "operations/BOARD_MEDIA_PERFORMANCE_G5_EXACT_HEAD_CI_PASS_2026-09-30.md",
     "g5Status": "PASS",
-    "g5FinalEvidence": "operations/BOARD_MEDIA_PERFORMANCE_G5_FINAL_PASS_2026-09-30.md"
+    "g5FinalEvidence": "operations/BOARD_MEDIA_PERFORMANCE_G5_FINAL_PASS_2026-09-30.md",
+    "g6Status": "PASS",
+    "g6Evidence": "operations/BOARD_MEDIA_PERFORMANCE_G6_2026-09-30.md"
   },
   "waitingResults": [
     {

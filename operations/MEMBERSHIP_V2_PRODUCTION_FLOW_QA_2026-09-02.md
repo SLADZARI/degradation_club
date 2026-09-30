@@ -1516,8 +1516,15 @@ Those remain separate projection/transport/access findings.
 Ordinary user images are normalized in-browser to a bounded WebP representation before the existing canonical Storage upload, with no new media owner and no regression in Board/detail/share projection contracts.
 
 **Status**
-BACKLOG / MEDIA PIPELINE HARDENING.
-Implementation should be grouped with the current media Result only after owner inventory and exact BQA-11/BQA-14 root causes are known.
+**G6 PASS / RELEASE PENDING 2026-09-30.**
+
+Implemented in Board / Media Performance v1 on validated candidate `91a05166a46ad108f7f2aed3b66c5c1464b2863d`.
+
+Evidence:
+- `operations/BOARD_MEDIA_PERFORMANCE_G5_FINAL_PASS_2026-09-30.md`
+- `operations/BOARD_MEDIA_PERFORMANCE_G6_2026-09-30.md`
+
+The canonical Board composer remains the media owner; no second bucket/table/upload service was introduced. Live/production closure is pending G7 release and post-deploy retest.
 
 
 #### BQA-21 — Project video fragment does not render on public Projects page
@@ -2022,7 +2029,17 @@ Before/after on mobile and desktop:
 
 **Status**
 
-**OPEN / LIVE PERFORMANCE PROBLEM + CODE-PATH EVIDENCE CONFIRMED.**
+**G6 PASS / RELEASE PENDING 2026-09-30.**
+
+Validated candidate `91a05166a46ad108f7f2aed3b66c5c1464b2863d` renders the structural Board before participant/media/signed-URL enrichment and replaces per-Idea participant N+1 reads with one bounded batch RPC.
+
+Evidence:
+- Site Integrity `#1331 / 36728660995` = SUCCESS;
+- `operations/BOARD_MEDIA_PERFORMANCE_G5_FINAL_PASS_2026-09-30.md`;
+- `operations/BOARD_MEDIA_PERFORMANCE_G6_2026-09-30.md`;
+- standalone Board/media performance validator exit code 0.
+
+Request-count proof: 1 / 5 / 20 Ideas each issue one participant batch RPC. Live/production closure is pending G7 release and post-deploy retest.
 
 
 #### BQA-28 — Collaboration mutation does not refresh Board roster projection immediately
