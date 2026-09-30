@@ -121,6 +121,10 @@ export function createClient(){return{
      const art=artifactFromArg(args.p_artifact_id);if(!art)return{data:null,error:{message:'ARTIFACT_NOT_AVAILABLE'}};
      return{data:currentParticipants(args.p_artifact_id),error:null};
    }
+   if(name==='dc_artifact_participants_batch_read_v1'){
+     const ids=Array.isArray(args.p_artifact_ids)?args.p_artifact_ids:[];
+     return{data:ids.flatMap(id=>artifactFromArg(id)?currentParticipants(id).map(row=>({artifact_id:id,...row})):[]),error:null};
+   }
    if(name==='dc_artifact_invite_candidates_v1')return{data:[{profile_id:'77777777-7777-4777-8777-777777777777',display_name:'Новый Зарегистрированный Профиль',nickname:'newperson',avatar_url:null,current_state:null}],error:null};
    if(name==='dc_artifact_invite_v1'){globalThis.__QA_PARTICIPATION__[args.p_artifact_id][args.p_profile_id]='INVITED';return{data:'event-invite',error:null}};
    if(name==='dc_artifact_invitation_respond_v1'){globalThis.__QA_PARTICIPATION__[A][uid]=args.p_decision;return{data:'event-response',error:null}};
