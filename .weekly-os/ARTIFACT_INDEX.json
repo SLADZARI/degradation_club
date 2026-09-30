@@ -5,14 +5,14 @@
     "project": "dementor-club",
     "documentType": "STANDARD",
     "projectStage": "BUILD",
-    "gate": "G8_CLEANUP",
+    "gate": "G5_BUILD",
     "status": "APPROVED",
-    "version": "3.23",
+    "version": "3.24",
     "updated": "2026-09-30",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "3.22"
+    "supersedes": "3.23"
   },
   "currentArtifacts": [
     {
@@ -32,7 +32,7 @@
     {
       "artifactId": "dementor-club.kernel.artifact-index",
       "documentType": "STANDARD",
-      "currentVersion": "3.23",
+      "currentVersion": "3.24",
       "status": "APPROVED",
       "location": ".weekly-os/ARTIFACT_INDEX.json",
       "sourceSystem": "GIT",
@@ -3523,7 +3523,7 @@
       "updated": "2026-09-30",
       "canonicalProject": "dementor-club",
       "canonicalLocation": ".weekly-os/results/board-media-performance-v1.v1.0.md",
-      "relation": "CURRENT_RESULT",
+      "relation": "CLOSED_RESULT",
       "gate": "G8_CLEANUP",
       "projectStage": "BUILD",
       "parentQa": [
@@ -3772,6 +3772,55 @@
       "relation": "G8_CLEANUP_EVIDENCE",
       "result": "dementor-club.result.board-media-performance-v1",
       "productionCommit": "cde332779ab0e256dd1e498660d6fa651e91846e"
+    },
+    {
+      "artifactId": "dementor-club.result.owner-admin-community-ops-v1",
+      "documentType": "RESULT",
+      "currentVersion": "0.1",
+      "version": "0.1",
+      "status": "ACTIVE",
+      "workStatus": "ACTIVE",
+      "location": ".weekly-os/results/owner-admin-community-ops-v1.v0.1.md",
+      "path": ".weekly-os/results/owner-admin-community-ops-v1.v0.1.md",
+      "sourceSystem": "GIT",
+      "authorityType": "IMPLEMENTATION_AUTHORITY",
+      "updated": "2026-09-30",
+      "canonicalProject": "dementor-club",
+      "canonicalLocation": ".weekly-os/results/owner-admin-community-ops-v1.v0.1.md",
+      "relation": "CURRENT_RESULT",
+      "gate": "G5_BUILD",
+      "projectStage": "BUILD",
+      "parentQa": [
+        "BQA-23"
+      ],
+      "integrationBranch": "result/owner-admin-community-ops-v1",
+      "integrationBaseCommit": "cde332779ab0e256dd1e498660d6fa651e91846e",
+      "productionBaseCommit": "cde332779ab0e256dd1e498660d6fa651e91846e",
+      "implementationStartAuthorized": true,
+      "schemaChangeImplementationAuthorized": true,
+      "schemaChangeBoundary": "READ_ONLY_OWNER_ADMIN_PROJECTION_ONLY",
+      "liveDatabaseMutationAuthorized": false,
+      "productionMergeAuthorized": false,
+      "productionDeployAuthorized": false,
+      "g4Status": "PASS",
+      "g4Evidence": "operations/OWNER_ADMIN_COMMUNITY_OPS_G4_2026-09-30.md",
+      "gateReadiness": "G5_BUILD_ACTIVE",
+      "note": "BQA-23 current Result. Extends existing /workspace/admin/ only; existing mutation owners reused; at most bounded Owner Admin read projections may be added."
+    },
+    {
+      "artifactId": "dementor-club.operations.owner-admin-community-ops-g4-2026-09-30",
+      "documentType": "VALIDATION_EVIDENCE",
+      "currentVersion": "1.0",
+      "status": "PASS",
+      "location": "operations/OWNER_ADMIN_COMMUNITY_OPS_G4_2026-09-30.md",
+      "sourceSystem": "GIT",
+      "authorityType": "VALIDATION_EVIDENCE",
+      "updated": "2026-09-30",
+      "canonicalProject": "dementor-club",
+      "canonicalLocation": "operations/OWNER_ADMIN_COMMUNITY_OPS_G4_2026-09-30.md",
+      "relation": "G4_CONTRACT_EVIDENCE",
+      "result": "dementor-club.result.owner-admin-community-ops-v1",
+      "productionBaseline": "cde332779ab0e256dd1e498660d6fa651e91846e"
     }
   ],
   "referenceArtifacts": [

@@ -5,14 +5,14 @@
     "project": "dementor-club",
     "documentType": "STANDARD",
     "projectStage": "BUILD",
-    "gate": "G8_CLEANUP",
+    "gate": "G5_BUILD",
     "status": "APPROVED",
-    "version": "3.22",
+    "version": "3.23",
     "updated": "2026-09-30",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "3.21"
+    "supersedes": "3.22"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -306,7 +306,9 @@
     ".weekly-os/results/board-media-performance-v1.v0.13.md",
     "operations/BOARD_MEDIA_PERFORMANCE_LIVE_ACCEPTANCE_2026-09-30.md",
     "operations/BOARD_MEDIA_PERFORMANCE_G8_2026-09-30.md",
-    ".weekly-os/results/board-media-performance-v1.v1.0.md"
+    ".weekly-os/results/board-media-performance-v1.v1.0.md",
+    "operations/OWNER_ADMIN_COMMUNITY_OPS_G4_2026-09-30.md",
+    ".weekly-os/results/owner-admin-community-ops-v1.v0.1.md"
   ],
   "authority": {
     "mpDslCore": {
@@ -472,33 +474,29 @@
     "DESIGN": null
   },
   "currentResult": {
-    "artifactId": "dementor-club.result.board-media-performance-v1",
-    "version": "1.0",
-    "status": "APPROVED",
-    "workStatus": "CLOSED",
-    "path": ".weekly-os/results/board-media-performance-v1.v1.0.md",
-    "gate": "G8_CLEANUP",
+    "artifactId": "dementor-club.result.owner-admin-community-ops-v1",
+    "version": "0.1",
+    "status": "ACTIVE",
+    "workStatus": "ACTIVE",
+    "path": ".weekly-os/results/owner-admin-community-ops-v1.v0.1.md",
+    "gate": "G5_BUILD",
     "scope": [
-      "BQA-20 image normalization/media pipeline",
-      "BQA-27 Board first-render performance"
+      "BQA-23 Owner Admin Community/Artifact operations UI"
     ],
-    "integrationBranch": null,
-    "productionCommit": "cde332779ab0e256dd1e498660d6fa651e91846e",
-    "productionMergeExecuted": true,
-    "productionDeployExecuted": true,
-    "liveDatabaseMutationExecuted": true,
-    "supabaseRun": 9,
-    "supabaseRunId": 36742339436,
-    "pagesRun": 138,
-    "pagesRunId": 36742651703,
-    "g5Status": "PASS",
-    "g6Status": "PASS",
-    "g7Status": "PASS",
-    "liveAcceptanceStatus": "PASS",
-    "g8Status": "CLOSED",
-    "liveAcceptanceEvidence": "operations/BOARD_MEDIA_PERFORMANCE_LIVE_ACCEPTANCE_2026-09-30.md",
-    "g8Evidence": "operations/BOARD_MEDIA_PERFORMANCE_G8_2026-09-30.md",
-    "gateReadiness": "CLOSED"
+    "integrationBranch": "result/owner-admin-community-ops-v1",
+    "integrationBaseRef": "dementor-club-production",
+    "integrationBaseCommit": "cde332779ab0e256dd1e498660d6fa651e91846e",
+    "productionBaseCommit": "cde332779ab0e256dd1e498660d6fa651e91846e",
+    "implementationStartAuthorized": true,
+    "schemaChangeImplementationAuthorized": true,
+    "schemaChangeBoundary": "READ_ONLY_OWNER_ADMIN_PROJECTION_ONLY",
+    "liveDatabaseMutationAuthorized": false,
+    "productionMergeAuthorized": false,
+    "productionDeployAuthorized": false,
+    "changeControlRequired": false,
+    "g4Status": "PASS",
+    "g4Evidence": "operations/OWNER_ADMIN_COMMUNITY_OPS_G4_2026-09-30.md",
+    "gateReadiness": "G5_BUILD_ACTIVE"
   },
   "waitingResults": [
     {

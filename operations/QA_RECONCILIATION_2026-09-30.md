@@ -5,13 +5,13 @@ documentType: QA_PLAN
 projectStage: BUILD
 gate: G5_BUILD
 status: APPROVED_TRIAGE
-version: 1.0
+version: 1.1
 updated: 2026-09-30
 owner: Modern Pilgrims
 sourceSystem: GIT
 authorityType: QA_EVIDENCE
 canonicalLedger: operations/MEMBERSHIP_V2_PRODUCTION_FLOW_QA_2026-09-02.md
-currentResult: dementor-club.result.board-media-performance-v1
+currentResult: dementor-club.result.owner-admin-community-ops-v1
 supersedes: dementor-club.operations.qa-reconciliation-2026-09-28
 ---
 
@@ -37,17 +37,17 @@ BQA-28
 Current formal totals:
 
 ```text
-31 CLOSED
-40 OPEN
+33 CLOSED
+38 OPEN
 ```
 
 Open work remains classified as:
 
 ```text
 RETEST ONLY        31
-REAL WORK           5
+REAL WORK           3
 DECISION REQUIRED   4
-TOTAL OPEN          40
+TOTAL OPEN          38
 ```
 
 ## RETEST ONLY — 31
@@ -100,49 +100,41 @@ BQA-09  1–3 day return
 ```text
 BQA-07  Contribution/raw idea/material runtime
 BQA-15  relation selector scale
-BQA-20  image normalization/media pipeline
 BQA-23  Owner Admin Community/Artifact operations UI
-BQA-27  Board first-render performance
 ```
 
 ### Current Result
 
 ```text
-BQA-20 + BQA-27
-→ Board / Media Performance v1
+BQA-23
+→ Owner Admin Community Ops v1
 ```
 
-Reason for grouping:
+Reason for activation:
 
-- same canonical Board/media ownership;
-- production baseline confirms media path is the dominant current volume;
-- progressive Board render and media normalization must be validated together;
-- participant batch-read remains an optimization inside the existing Artifact Collaboration participation owner.
-
-Prepared worker evidence:
-
-- DEV2 frontend candidate = CLEAN GREEN / FROZEN;
-- DEV1 backend batch-read candidate = STATIC PASS / DB RUNTIME PENDING.
+- BQA-20 and BQA-27 are CLOSED / LIVE PASS;
+- BQA-23 is the next approved REAL WORK item in the existing sequence;
+- the canonical /workspace/admin/ shell already exists;
+- required mutations already exist in approved backend contracts;
+- no semantic Change Proposal is required for the bounded operations UI.
 
 Current integration rule:
 
 ```text
-production baseline
-→ clean DEV2 frontend integration
+production baseline cde332779ab0e256dd1e498660d6fa651e91846e
+→ existing-owner inventory
+→ bounded Owner Admin read projection only where necessary
+→ Community Ops UI inside canonical admin shell
 → exact browser/full CI
-→ DEV1 DB runtime proof
-→ backend batch integration
-→ minimal adapter
-→ full G6
+→ G6
 ```
 
 ### Work after current Result
 
 Preferred sequence, subject to fresh authority check:
 
-1. BQA-23 Owner Admin Community/Artifact operations UI;
-2. BQA-15 relation selector scale;
-3. BQA-07 Contribution/raw idea/material runtime.
+1. BQA-15 relation selector scale;
+2. BQA-07 Contribution/raw idea/material runtime.
 
 ## DECISION REQUIRED — 4
 
