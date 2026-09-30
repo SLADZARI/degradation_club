@@ -93,6 +93,8 @@ jobs:
         run: node scripts/validate-club-publisher-stability-browser.mjs
       - name: Validate OWNER_ADMIN Telegram opt-in browser acceptance
         run: node scripts/validate-board-admin-telegram-optin-browser.mjs
+      - name: Validate Owner Admin Community Ops browser acceptance
+        run: node scripts/validate-owner-admin-community-ops-browser.mjs
       - name: Validate Board public activity browser acceptance
         run: node scripts/validate-board-public-activity-browser.mjs
       - name: Validate Evidence Hygiene browser acceptance
