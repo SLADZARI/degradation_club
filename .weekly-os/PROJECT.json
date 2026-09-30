@@ -7,12 +7,12 @@
     "projectStage": "BUILD",
     "gate": "G5_BUILD",
     "status": "APPROVED",
-    "version": "3.06",
+    "version": "3.07",
     "updated": "2026-09-30",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "3.05"
+    "supersedes": "3.06"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -279,7 +279,9 @@
     "operations/BOARD_MEDIA_PERFORMANCE_PRODUCTION_BASELINE_2026-09-29.md",
     "operations/BOARD_MEDIA_PERFORMANCE_DEV_LANES_2026-09-29.md",
     "operations/BOARD_MEDIA_PERFORMANCE_DEV1_BACKEND_CANDIDATE_2026-09-29.md",
-    "operations/BOARD_MEDIA_PERFORMANCE_DEV2_CLEAN_GREEN_2026-09-29.md"
+    "operations/BOARD_MEDIA_PERFORMANCE_DEV2_CLEAN_GREEN_2026-09-29.md",
+    "operations/BOARD_MEDIA_PERFORMANCE_G5_OWNER_DRAG_BLOCKER_2026-09-30.md",
+    ".weekly-os/results/board-media-performance-v1.v0.2.md"
   ],
   "authority": {
     "mpDslCore": {
@@ -446,10 +448,10 @@
   },
   "currentResult": {
     "artifactId": "dementor-club.result.board-media-performance-v1",
-    "version": "0.1",
+    "version": "0.2",
     "status": "ACTIVE",
     "workStatus": "ACTIVE",
-    "path": ".weekly-os/results/board-media-performance-v1.v0.1.md",
+    "path": ".weekly-os/results/board-media-performance-v1.v0.2.md",
     "gate": "G5_BUILD",
     "scope": [
       "BQA-20 image normalization/media pipeline",
@@ -470,7 +472,12 @@
     "backendWorkerStatus": "STATIC_PASS_RUNTIME_PENDING",
     "frontendIntegrationCommit": "0eac2c9b00bc6a493ec331780948693e16c2a654",
     "qaReconciliation": "operations/QA_RECONCILIATION_2026-09-30.md",
-    "gateReadiness": "FRONTEND_INTEGRATED_EXACT_CI_PENDING"
+    "gateReadiness": "ROOT_CAUSE_REQUIRED",
+    "integrationPullRequest": 250,
+    "g5FrontendRun": 1327,
+    "g5FrontendRunId": 36691834625,
+    "g5FrontendStatus": "BLOCKED_OWNER_ADMIN_DRAG",
+    "g5BlockerEvidence": "operations/BOARD_MEDIA_PERFORMANCE_G5_OWNER_DRAG_BLOCKER_2026-09-30.md"
   },
   "waitingResults": [
     {
