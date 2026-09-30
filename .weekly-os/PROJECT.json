@@ -7,12 +7,12 @@
     "projectStage": "BUILD",
     "gate": "G5_BUILD",
     "status": "APPROVED",
-    "version": "3.08",
+    "version": "3.09",
     "updated": "2026-09-30",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "3.07"
+    "supersedes": "3.08"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -283,7 +283,9 @@
     "operations/BOARD_MEDIA_PERFORMANCE_G5_OWNER_DRAG_BLOCKER_2026-09-30.md",
     ".weekly-os/results/board-media-performance-v1.v0.2.md",
     "operations/BOARD_MEDIA_PERFORMANCE_G5_COORDINATE_DRIFT_BLOCKER_2026-09-30.md",
-    ".weekly-os/results/board-media-performance-v1.v0.3.md"
+    ".weekly-os/results/board-media-performance-v1.v0.3.md",
+    "operations/BOARD_MEDIA_PERFORMANCE_G5_COORDINATE_DRIFT_ROOT_CAUSE_2026-09-30.md",
+    ".weekly-os/results/board-media-performance-v1.v0.4.md"
   ],
   "authority": {
     "mpDslCore": {
@@ -450,10 +452,10 @@
   },
   "currentResult": {
     "artifactId": "dementor-club.result.board-media-performance-v1",
-    "version": "0.3",
+    "version": "0.4",
     "status": "ACTIVE",
     "workStatus": "ACTIVE",
-    "path": ".weekly-os/results/board-media-performance-v1.v0.3.md",
+    "path": ".weekly-os/results/board-media-performance-v1.v0.4.md",
     "gate": "G5_BUILD",
     "scope": [
       "BQA-20 image normalization/media pipeline",
@@ -474,7 +476,7 @@
     "backendWorkerStatus": "STATIC_PASS_RUNTIME_PENDING",
     "frontendIntegrationCommit": "0eac2c9b00bc6a493ec331780948693e16c2a654",
     "qaReconciliation": "operations/QA_RECONCILIATION_2026-09-30.md",
-    "gateReadiness": "COORDINATE_DRIFT_ROOT_CAUSE_REQUIRED",
+    "gateReadiness": "CORRECTIVE_AUTHORIZED_EXACT_VALIDATION_REQUIRED",
     "integrationPullRequest": 250,
     "g5FrontendRun": 1327,
     "g5FrontendRunId": 36691834625,
@@ -483,7 +485,11 @@
     "g5Attempt1Status": "FAIL_OWNER_ADMIN_DRAG_INTERMITTENT",
     "g5Attempt2Status": "FAIL_WORLD_COORDINATE_DRIFT",
     "g5OwnerDragCurrentVerdict": "NOT_PROVEN_DETERMINISTIC",
-    "g5CurrentBlockerEvidence": "operations/BOARD_MEDIA_PERFORMANCE_G5_COORDINATE_DRIFT_BLOCKER_2026-09-30.md"
+    "g5CurrentBlockerEvidence": "operations/BOARD_MEDIA_PERFORMANCE_G5_COORDINATE_DRIFT_BLOCKER_2026-09-30.md",
+    "g5CoordinateDriftRootCause": "CONFIRMED",
+    "g5CorrectiveAuthorized": true,
+    "g5CorrectiveScope": "community/board/board-own-drag-livefix-v2-2.js",
+    "g5RootCauseEvidence": "operations/BOARD_MEDIA_PERFORMANCE_G5_COORDINATE_DRIFT_ROOT_CAUSE_2026-09-30.md"
   },
   "waitingResults": [
     {
