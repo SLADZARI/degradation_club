@@ -7,12 +7,12 @@
     "projectStage": "BUILD",
     "gate": "G7_RELEASE",
     "status": "APPROVED",
-    "version": "3.17",
+    "version": "3.18",
     "updated": "2026-09-30",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "3.16"
+    "supersedes": "3.17"
   },
   "currentArtifacts": [
     {
@@ -32,7 +32,7 @@
     {
       "artifactId": "dementor-club.kernel.artifact-index",
       "documentType": "STANDARD",
-      "currentVersion": "3.17",
+      "currentVersion": "3.18",
       "status": "APPROVED",
       "location": ".weekly-os/ARTIFACT_INDEX.json",
       "sourceSystem": "GIT",
@@ -3512,12 +3512,12 @@
     {
       "artifactId": "dementor-club.result.board-media-performance-v1",
       "documentType": "RESULT",
-      "currentVersion": "0.10",
-      "version": "0.10",
+      "currentVersion": "0.11",
+      "version": "0.11",
       "status": "ACTIVE",
-      "workStatus": "PREPARING_RELEASE_CANDIDATE",
-      "location": ".weekly-os/results/board-media-performance-v1.v0.10.md",
-      "path": ".weekly-os/results/board-media-performance-v1.v0.10.md",
+      "workStatus": "WAITING_RELEASE_AUTHORIZATION",
+      "location": ".weekly-os/results/board-media-performance-v1.v0.11.md",
+      "path": ".weekly-os/results/board-media-performance-v1.v0.11.md",
       "sourceSystem": "GIT",
       "authorityType": "IMPLEMENTATION_AUTHORITY",
       "updated": "2026-09-30",
@@ -3540,13 +3540,13 @@
       "liveDatabaseMutationAuthorized": false,
       "productionMergeAuthorized": false,
       "productionDeployAuthorized": false,
-      "gateReadiness": "CLEAN_RELEASE_CANDIDATE_REQUIRED",
+      "gateReadiness": "RELEASE_DECISION_REQUIRED",
       "integrationPullRequest": 250,
       "g5FrontendRun": 1328,
       "g5FrontendRunId": 36702910236,
       "g5FrontendStatus": "PASS",
       "g5BlockerEvidence": "operations/BOARD_MEDIA_PERFORMANCE_G5_OWNER_DRAG_BLOCKER_2026-09-30.md",
-      "note": "G6 PASS on exact candidate 91a05166…; BQA-20/BQA-27 reconciled to release pending. Clean G7 RC from exact production baseline required.",
+      "note": "Clean one-commit RC from exact current production has tree equality with G6 candidate and exact-head Site Integrity #1332 SUCCESS. Awaiting explicit merge/deploy authorization.",
       "g5Attempt1Status": "FAIL_OWNER_ADMIN_DRAG_INTERMITTENT",
       "g5Attempt2Status": "FAIL_WORLD_COORDINATE_DRIFT",
       "g5OwnerDragCurrentVerdict": "NOT_PROVEN_DETERMINISTIC",
@@ -3572,7 +3572,13 @@
       "g5Status": "PASS",
       "g5FinalEvidence": "operations/BOARD_MEDIA_PERFORMANCE_G5_FINAL_PASS_2026-09-30.md",
       "g6Status": "PASS",
-      "g6Evidence": "operations/BOARD_MEDIA_PERFORMANCE_G6_2026-09-30.md"
+      "g6Evidence": "operations/BOARD_MEDIA_PERFORMANCE_G6_2026-09-30.md",
+      "releaseBranch": "release/board-media-performance-v1",
+      "releaseCandidateCommit": "52ec2966048e16347d8a918ce358d26dff3f803e",
+      "releasePullRequest": 251,
+      "g7RcStatus": "PASS_CLEAN_RC_VALIDATED",
+      "g7RcEvidence": "operations/BOARD_MEDIA_PERFORMANCE_G7_RELEASE_CANDIDATE_2026-09-30.md",
+      "g7ValidationRunId": 36736574913
     },
     {
       "artifactId": "dementor-club.operations.board-media-performance-g5-owner-drag-blocker-2026-09-30",
@@ -3719,6 +3725,23 @@
       "result": "dementor-club.result.board-media-performance-v1",
       "candidateCommit": "91a05166a46ad108f7f2aed3b66c5c1464b2863d",
       "validationRunId": 36728660995
+    },
+    {
+      "artifactId": "dementor-club.operations.board-media-performance-g7-release-candidate-2026-09-30",
+      "documentType": "RELEASE_EVIDENCE",
+      "currentVersion": "1.0",
+      "status": "PASS_CLEAN_RC_VALIDATED",
+      "location": "operations/BOARD_MEDIA_PERFORMANCE_G7_RELEASE_CANDIDATE_2026-09-30.md",
+      "sourceSystem": "GIT",
+      "authorityType": "RELEASE_EVIDENCE",
+      "updated": "2026-09-30",
+      "canonicalProject": "dementor-club",
+      "canonicalLocation": "operations/BOARD_MEDIA_PERFORMANCE_G7_RELEASE_CANDIDATE_2026-09-30.md",
+      "relation": "G7_RELEASE_CANDIDATE_EVIDENCE",
+      "result": "dementor-club.result.board-media-performance-v1",
+      "releaseCandidateCommit": "52ec2966048e16347d8a918ce358d26dff3f803e",
+      "releasePullRequest": 251,
+      "validationRunId": 36736574913
     }
   ],
   "referenceArtifacts": [
