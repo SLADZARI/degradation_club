@@ -7,12 +7,12 @@
     "projectStage": "BUILD",
     "gate": "G5_BUILD",
     "status": "APPROVED",
-    "version": "3.10",
+    "version": "3.11",
     "updated": "2026-09-30",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "3.09"
+    "supersedes": "3.10"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -287,7 +287,9 @@
     "operations/BOARD_MEDIA_PERFORMANCE_G5_COORDINATE_DRIFT_ROOT_CAUSE_2026-09-30.md",
     ".weekly-os/results/board-media-performance-v1.v0.4.md",
     "operations/BOARD_MEDIA_PERFORMANCE_G5_FRONTEND_PASS_2026-09-30.md",
-    ".weekly-os/results/board-media-performance-v1.v0.5.md"
+    ".weekly-os/results/board-media-performance-v1.v0.5.md",
+    "operations/BOARD_MEDIA_PERFORMANCE_DEV1_RUNTIME_PASS_2026-09-30.md",
+    ".weekly-os/results/board-media-performance-v1.v0.6.md"
   ],
   "authority": {
     "mpDslCore": {
@@ -454,10 +456,10 @@
   },
   "currentResult": {
     "artifactId": "dementor-club.result.board-media-performance-v1",
-    "version": "0.5",
+    "version": "0.6",
     "status": "ACTIVE",
     "workStatus": "ACTIVE",
-    "path": ".weekly-os/results/board-media-performance-v1.v0.5.md",
+    "path": ".weekly-os/results/board-media-performance-v1.v0.6.md",
     "gate": "G5_BUILD",
     "scope": [
       "BQA-20 image normalization/media pipeline",
@@ -475,10 +477,10 @@
     "frontendWorkerCandidate": "09b33b731610258f7049aa1a4b9576db393176a1",
     "frontendWorkerStatus": "CLEAN_GREEN_FROZEN",
     "backendWorkerCandidate": "834bb9776c4e99bb73556c4776c49f270fe70a6c",
-    "backendWorkerStatus": "STATIC_PASS_RUNTIME_PENDING",
+    "backendWorkerStatus": "RUNTIME_PASS_INTEGRATED",
     "frontendIntegrationCommit": "c4fd5c8d7f5246b3bd533dc28d31d9d8bdbcccbb",
     "qaReconciliation": "operations/QA_RECONCILIATION_2026-09-30.md",
-    "gateReadiness": "BACKEND_RUNTIME_PROOF_REQUIRED",
+    "gateReadiness": "BOARD_BATCH_ADAPTER_REQUIRED",
     "integrationPullRequest": 250,
     "g5FrontendRun": 1328,
     "g5FrontendRunId": 36702910236,
@@ -492,7 +494,9 @@
     "g5CorrectiveAuthorized": true,
     "g5CorrectiveScope": "community/board/board-own-drag-livefix-v2-2.js",
     "g5RootCauseEvidence": "operations/BOARD_MEDIA_PERFORMANCE_G5_COORDINATE_DRIFT_ROOT_CAUSE_2026-09-30.md",
-    "g5FrontendEvidence": "operations/BOARD_MEDIA_PERFORMANCE_G5_FRONTEND_PASS_2026-09-30.md"
+    "g5FrontendEvidence": "operations/BOARD_MEDIA_PERFORMANCE_G5_FRONTEND_PASS_2026-09-30.md",
+    "backendRuntimeEvidence": "operations/BOARD_MEDIA_PERFORMANCE_DEV1_RUNTIME_PASS_2026-09-30.md",
+    "backendIntegrationCommit": "a282f39099da3ba4ab410924817c3564943ecaf4"
   },
   "waitingResults": [
     {
