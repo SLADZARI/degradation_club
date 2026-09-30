@@ -7,12 +7,12 @@
     "projectStage": "BUILD",
     "gate": "G5_BUILD",
     "status": "APPROVED",
-    "version": "3.11",
+    "version": "3.12",
     "updated": "2026-09-30",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "3.10"
+    "supersedes": "3.11"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -289,7 +289,9 @@
     "operations/BOARD_MEDIA_PERFORMANCE_G5_FRONTEND_PASS_2026-09-30.md",
     ".weekly-os/results/board-media-performance-v1.v0.5.md",
     "operations/BOARD_MEDIA_PERFORMANCE_DEV1_RUNTIME_PASS_2026-09-30.md",
-    ".weekly-os/results/board-media-performance-v1.v0.6.md"
+    ".weekly-os/results/board-media-performance-v1.v0.6.md",
+    "operations/BOARD_MEDIA_PERFORMANCE_G5_VALIDATOR_CONTRACT_CORRECTIVE_2026-09-30.md",
+    ".weekly-os/results/board-media-performance-v1.v0.7.md"
   ],
   "authority": {
     "mpDslCore": {
@@ -456,10 +458,10 @@
   },
   "currentResult": {
     "artifactId": "dementor-club.result.board-media-performance-v1",
-    "version": "0.6",
+    "version": "0.7",
     "status": "ACTIVE",
-    "workStatus": "ACTIVE",
-    "path": ".weekly-os/results/board-media-performance-v1.v0.6.md",
+    "workStatus": "WAITING_VALIDATION",
+    "path": ".weekly-os/results/board-media-performance-v1.v0.7.md",
     "gate": "G5_BUILD",
     "scope": [
       "BQA-20 image normalization/media pipeline",
@@ -480,7 +482,7 @@
     "backendWorkerStatus": "RUNTIME_PASS_INTEGRATED",
     "frontendIntegrationCommit": "c4fd5c8d7f5246b3bd533dc28d31d9d8bdbcccbb",
     "qaReconciliation": "operations/QA_RECONCILIATION_2026-09-30.md",
-    "gateReadiness": "BOARD_BATCH_ADAPTER_REQUIRED",
+    "gateReadiness": "EXACT_HEAD_CI_IN_PROGRESS",
     "integrationPullRequest": 250,
     "g5FrontendRun": 1328,
     "g5FrontendRunId": 36702910236,
@@ -496,7 +498,15 @@
     "g5RootCauseEvidence": "operations/BOARD_MEDIA_PERFORMANCE_G5_COORDINATE_DRIFT_ROOT_CAUSE_2026-09-30.md",
     "g5FrontendEvidence": "operations/BOARD_MEDIA_PERFORMANCE_G5_FRONTEND_PASS_2026-09-30.md",
     "backendRuntimeEvidence": "operations/BOARD_MEDIA_PERFORMANCE_DEV1_RUNTIME_PASS_2026-09-30.md",
-    "backendIntegrationCommit": "a282f39099da3ba4ab410924817c3564943ecaf4"
+    "backendIntegrationCommit": "a282f39099da3ba4ab410924817c3564943ecaf4",
+    "finalAdapterCandidate": "dde55b15a03ced436de95e274c5160c94a94c9b6",
+    "finalAdapterRun": 1330,
+    "finalAdapterRunStatus": "FAIL_STALE_COLLAB_VALIDATOR",
+    "validatorCorrectiveCandidate": "91a05166a46ad108f7f2aed3b66c5c1464b2863d",
+    "validatorCorrectiveRun": 1331,
+    "validatorCorrectiveRunId": 36728660995,
+    "validatorCorrectiveStatus": "IN_PROGRESS",
+    "validatorCorrectiveEvidence": "operations/BOARD_MEDIA_PERFORMANCE_G5_VALIDATOR_CONTRACT_CORRECTIVE_2026-09-30.md"
   },
   "waitingResults": [
     {
