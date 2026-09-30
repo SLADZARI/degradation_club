@@ -7,12 +7,12 @@
     "projectStage": "RELEASE",
     "gate": "G7_RELEASE",
     "status": "APPROVED",
-    "version": "3.19",
+    "version": "3.20",
     "updated": "2026-09-30",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "3.18"
+    "supersedes": "3.19"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -301,7 +301,9 @@
     "operations/BOARD_MEDIA_PERFORMANCE_G7_RELEASE_CANDIDATE_2026-09-30.md",
     ".weekly-os/results/board-media-performance-v1.v0.11.md",
     "operations/BOARD_MEDIA_PERFORMANCE_G7_MERGE_2026-09-30.md",
-    ".weekly-os/results/board-media-performance-v1.v0.12.md"
+    ".weekly-os/results/board-media-performance-v1.v0.12.md",
+    "operations/BOARD_MEDIA_PERFORMANCE_PRODUCTION_DEPLOY_2026-09-30.md",
+    ".weekly-os/results/board-media-performance-v1.v0.13.md"
   ],
   "authority": {
     "mpDslCore": {
@@ -468,10 +470,10 @@
   },
   "currentResult": {
     "artifactId": "dementor-club.result.board-media-performance-v1",
-    "version": "0.12",
+    "version": "0.13",
     "status": "ACTIVE",
-    "workStatus": "WAITING_MANUAL_DEPLOY",
-    "path": ".weekly-os/results/board-media-performance-v1.v0.12.md",
+    "workStatus": "LIVE_RETEST",
+    "path": ".weekly-os/results/board-media-performance-v1.v0.13.md",
     "gate": "G7_RELEASE",
     "scope": [
       "BQA-20 image normalization/media pipeline",
@@ -492,7 +494,7 @@
     "backendWorkerStatus": "RUNTIME_PASS_INTEGRATED",
     "frontendIntegrationCommit": "c4fd5c8d7f5246b3bd533dc28d31d9d8bdbcccbb",
     "qaReconciliation": "operations/QA_RECONCILIATION_2026-09-30.md",
-    "gateReadiness": "MANUAL_SUPABASE_THEN_PAGES_DEPLOY_REQUIRED",
+    "gateReadiness": "LIVE_OWNER_ACCEPTANCE_REQUIRED",
     "integrationPullRequest": 250,
     "g5FrontendRun": 1328,
     "g5FrontendRunId": 36702910236,
@@ -538,9 +540,17 @@
     "productionMergeCommit": "cde332779ab0e256dd1e498660d6fa651e91846e",
     "g7MergeEvidence": "operations/BOARD_MEDIA_PERFORMANCE_G7_MERGE_2026-09-30.md",
     "productionMergeExecuted": true,
-    "productionDeployExecuted": false,
-    "liveDatabaseMutationExecuted": false,
-    "deployExecutor": "OWNER_MANUAL_GITHUB_ACTION"
+    "productionDeployExecuted": true,
+    "liveDatabaseMutationExecuted": true,
+    "deployExecutor": "OWNER_MANUAL_GITHUB_ACTION",
+    "productionCommit": "cde332779ab0e256dd1e498660d6fa651e91846e",
+    "supabaseRun": 9,
+    "supabaseRunId": 36742339436,
+    "pagesRun": 138,
+    "pagesRunId": 36742651703,
+    "deploymentEvidence": "operations/BOARD_MEDIA_PERFORMANCE_PRODUCTION_DEPLOY_2026-09-30.md",
+    "publicLiveSmoke": "PASS",
+    "authenticatedLiveAcceptance": "REQUIRED"
   },
   "waitingResults": [
     {
