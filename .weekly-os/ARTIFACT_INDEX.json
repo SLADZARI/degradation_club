@@ -7,12 +7,12 @@
     "projectStage": "BUILD",
     "gate": "G7_RELEASE",
     "status": "APPROVED",
-    "version": "3.09",
+    "version": "3.10",
     "updated": "2026-09-30",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "3.08"
+    "supersedes": "3.09"
   },
   "currentArtifacts": [
     {
@@ -32,7 +32,7 @@
     {
       "artifactId": "dementor-club.kernel.artifact-index",
       "documentType": "STANDARD",
-      "currentVersion": "3.09",
+      "currentVersion": "3.10",
       "status": "APPROVED",
       "location": ".weekly-os/ARTIFACT_INDEX.json",
       "sourceSystem": "GIT",
@@ -3512,12 +3512,12 @@
     {
       "artifactId": "dementor-club.result.board-media-performance-v1",
       "documentType": "RESULT",
-      "currentVersion": "0.2",
-      "version": "0.2",
+      "currentVersion": "0.3",
+      "version": "0.3",
       "status": "ACTIVE",
       "workStatus": "ACTIVE",
-      "location": ".weekly-os/results/board-media-performance-v1.v0.2.md",
-      "path": ".weekly-os/results/board-media-performance-v1.v0.2.md",
+      "location": ".weekly-os/results/board-media-performance-v1.v0.3.md",
+      "path": ".weekly-os/results/board-media-performance-v1.v0.3.md",
       "sourceSystem": "GIT",
       "authorityType": "IMPLEMENTATION_AUTHORITY",
       "updated": "2026-09-30",
@@ -3540,13 +3540,17 @@
       "liveDatabaseMutationAuthorized": false,
       "productionMergeAuthorized": false,
       "productionDeployAuthorized": false,
-      "gateReadiness": "ROOT_CAUSE_REQUIRED",
+      "gateReadiness": "COORDINATE_DRIFT_ROOT_CAUSE_REQUIRED",
       "integrationPullRequest": 250,
       "g5FrontendRun": 1327,
       "g5FrontendRunId": 36691834625,
-      "g5FrontendStatus": "BLOCKED_OWNER_ADMIN_DRAG",
+      "g5FrontendStatus": "BLOCKED_WORLD_COORDINATE_DRIFT",
       "g5BlockerEvidence": "operations/BOARD_MEDIA_PERFORMANCE_G5_OWNER_DRAG_BLOCKER_2026-09-30.md",
-      "note": "Clean DEV2 frontend integration exposed existing Board v2.1 OWNER_ADMIN drag persistence regression in exact full-repo G5. Backend integration held pending root cause."
+      "note": "Attempt 1 owner-admin drag failure did not reproduce on unchanged attempt 2. Attempt 2 exposes consistent Board world-coordinate drift across 390/360/desktop after View restore. Root cause required before patch.",
+      "g5Attempt1Status": "FAIL_OWNER_ADMIN_DRAG_INTERMITTENT",
+      "g5Attempt2Status": "FAIL_WORLD_COORDINATE_DRIFT",
+      "g5OwnerDragCurrentVerdict": "NOT_PROVEN_DETERMINISTIC",
+      "g5CurrentBlockerEvidence": "operations/BOARD_MEDIA_PERFORMANCE_G5_COORDINATE_DRIFT_BLOCKER_2026-09-30.md"
     },
     {
       "artifactId": "dementor-club.operations.board-media-performance-g5-owner-drag-blocker-2026-09-30",
@@ -3563,6 +3567,23 @@
       "result": "dementor-club.result.board-media-performance-v1",
       "candidateCommit": "0eac2c9b00bc6a493ec331780948693e16c2a654",
       "siteIntegrityRunId": 36691834625
+    },
+    {
+      "artifactId": "dementor-club.operations.board-media-performance-g5-coordinate-drift-blocker-2026-09-30",
+      "documentType": "VALIDATION_EVIDENCE",
+      "currentVersion": "1.0",
+      "status": "BLOCKED",
+      "location": "operations/BOARD_MEDIA_PERFORMANCE_G5_COORDINATE_DRIFT_BLOCKER_2026-09-30.md",
+      "sourceSystem": "GIT",
+      "authorityType": "QA_EVIDENCE",
+      "updated": "2026-09-30",
+      "canonicalProject": "dementor-club",
+      "canonicalLocation": "operations/BOARD_MEDIA_PERFORMANCE_G5_COORDINATE_DRIFT_BLOCKER_2026-09-30.md",
+      "relation": "G5_BLOCKER_EVIDENCE",
+      "result": "dementor-club.result.board-media-performance-v1",
+      "candidateCommit": "0eac2c9b00bc6a493ec331780948693e16c2a654",
+      "siteIntegrityRunId": 36691834625,
+      "attempt": 2
     }
   ],
   "referenceArtifacts": [
