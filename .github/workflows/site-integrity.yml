@@ -59,6 +59,10 @@ jobs:
         run: node scripts/validate-board-telegram-promotion-contract.mjs
       - name: Validate OWNER_ADMIN Telegram opt-in contract
         run: node scripts/validate-board-admin-telegram-optin-contract.mjs
+      - name: Validate Owner Admin Community Ops contract
+        run: node scripts/validate-owner-admin-community-ops-contract.mjs
+      - name: Validate Owner Admin Community Ops backend static contract
+        run: node scripts/validate-owner-admin-community-ops-local.mjs --static
       - name: Validate Board G8 cleanup ownership contract
         run: node scripts/validate-board-g8-cleanup-contract.mjs
       - name: Validate Board deep-link auth-return contract
@@ -91,6 +95,8 @@ jobs:
         run: node scripts/validate-club-publisher-stability-browser.mjs
       - name: Validate OWNER_ADMIN Telegram opt-in browser acceptance
         run: node scripts/validate-board-admin-telegram-optin-browser.mjs
+      - name: Validate Owner Admin Community Ops browser acceptance
+        run: node scripts/validate-owner-admin-community-ops-browser.mjs
       - name: Validate Board public activity browser acceptance
         run: node scripts/validate-board-public-activity-browser.mjs
       - name: Validate Evidence Hygiene browser acceptance
