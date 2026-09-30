@@ -1842,8 +1842,9 @@ An invited Member can enter the club, notice that action is required, and reach 
 
 **Status**
 
-**OPEN / REAL USER DISCOVERABILITY FAIL.**
+**CLOSED / LIVE PASS 2026-09-30.**
 
+Live owner acceptance: invitation indicator and `ВАС ЗОВУТ` are discoverable; the exact invited Idea opens; CIRCLE invitation remains private to authorized identities. Evidence: `operations/ARTIFACT_COLLABORATION_LIVE_ACCEPTANCE_2026-09-30.md`.
 
 #### BQA-25 — Artifact detail action hierarchy does not reflect the user's current job
 Severity: **P1 / MOBILE UX + ACTION HIERARCHY**
@@ -1899,8 +1900,9 @@ The first visible action on Artifact detail matches the viewer's actual job, whi
 
 **Status**
 
-**OPEN / LIVE INFORMATION-HIERARCHY PROBLEM CONFIRMED.**
+**CLOSED / LIVE PASS 2026-09-30.**
 
+Live owner acceptance: invited viewer receives dominant `ПРИСОЕДИНИТЬСЯ`, secondary `НЕ СЕЙЧАС`, and joined state becomes `ВЫ В ДЕЛЕ` without the invitation CTA competing. Evidence: `operations/ARTIFACT_COLLABORATION_LIVE_ACCEPTANCE_2026-09-30.md`.
 
 #### BQA-26 — LEFT and REMOVED are semantically different but presentation can look like duplicate self-removal
 Severity: **P1 / ACTION OWNERSHIP + DESTRUCTIVE UX**
@@ -1955,8 +1957,9 @@ Three seconds was considered too easy/short and ten seconds too long in the live
 
 **Status**
 
-**OPEN / PRESENTATION DUPLICATION + DESTRUCTIVE-ACTION RISK.**
+**CLOSED / LIVE PASS 2026-09-30.**
 
+Live owner acceptance: participant self-exit is explicit `ВЫЙТИ ИЗ ИДЕИ` with deliberate confirmation, while author-side removal remains a distinct responsibility. LEFT and REMOVED are not presented as the same action. Evidence: `operations/ARTIFACT_COLLABORATION_LIVE_ACCEPTANCE_2026-09-30.md`.
 
 #### BQA-27 — Board initial render blocks on non-critical media/participant work
 Severity: **P1 / PERFORMANCE + FIRST-PAINT**
@@ -2066,8 +2069,9 @@ Mobile and desktop required.
 
 **Status**
 
-**OPEN / LIVE STATE-FRESHNESS DEFECT CONFIRMED.**
+**CLOSED / LIVE PASS 2026-09-30.**
 
+Live owner acceptance: invite/join/leave/remove collaboration changes refresh Board/detail state without manual page reload and converge on canonical participation truth. Evidence: `operations/ARTIFACT_COLLABORATION_LIVE_ACCEPTANCE_2026-09-30.md`.
 
 #### BQA-29 — Idea/Artifact lacks a richer brief that can transmit intent, challenge and references
 Severity: **P1 / CONTENT MODEL + CREATIVE HANDOFF**
