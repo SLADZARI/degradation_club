@@ -7,12 +7,12 @@
     "projectStage": "BUILD",
     "gate": "G7_RELEASE",
     "status": "APPROVED",
-    "version": "3.10",
+    "version": "3.11",
     "updated": "2026-09-30",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "3.09"
+    "supersedes": "3.10"
   },
   "currentArtifacts": [
     {
@@ -32,7 +32,7 @@
     {
       "artifactId": "dementor-club.kernel.artifact-index",
       "documentType": "STANDARD",
-      "currentVersion": "3.10",
+      "currentVersion": "3.11",
       "status": "APPROVED",
       "location": ".weekly-os/ARTIFACT_INDEX.json",
       "sourceSystem": "GIT",
@@ -3512,12 +3512,12 @@
     {
       "artifactId": "dementor-club.result.board-media-performance-v1",
       "documentType": "RESULT",
-      "currentVersion": "0.3",
-      "version": "0.3",
+      "currentVersion": "0.4",
+      "version": "0.4",
       "status": "ACTIVE",
       "workStatus": "ACTIVE",
-      "location": ".weekly-os/results/board-media-performance-v1.v0.3.md",
-      "path": ".weekly-os/results/board-media-performance-v1.v0.3.md",
+      "location": ".weekly-os/results/board-media-performance-v1.v0.4.md",
+      "path": ".weekly-os/results/board-media-performance-v1.v0.4.md",
       "sourceSystem": "GIT",
       "authorityType": "IMPLEMENTATION_AUTHORITY",
       "updated": "2026-09-30",
@@ -3540,17 +3540,21 @@
       "liveDatabaseMutationAuthorized": false,
       "productionMergeAuthorized": false,
       "productionDeployAuthorized": false,
-      "gateReadiness": "COORDINATE_DRIFT_ROOT_CAUSE_REQUIRED",
+      "gateReadiness": "CORRECTIVE_AUTHORIZED_EXACT_VALIDATION_REQUIRED",
       "integrationPullRequest": 250,
       "g5FrontendRun": 1327,
       "g5FrontendRunId": 36691834625,
       "g5FrontendStatus": "BLOCKED_WORLD_COORDINATE_DRIFT",
       "g5BlockerEvidence": "operations/BOARD_MEDIA_PERFORMANCE_G5_OWNER_DRAG_BLOCKER_2026-09-30.md",
-      "note": "Attempt 1 owner-admin drag failure did not reproduce on unchanged attempt 2. Attempt 2 exposes consistent Board world-coordinate drift across 390/360/desktop after View restore. Root cause required before patch.",
+      "note": "Root cause confirmed: legacy own-card drag livefix reapplies non-zero boardOffset after canonical spatial placeCards on View restore. DB truth intact. One-file corrective authorized.",
       "g5Attempt1Status": "FAIL_OWNER_ADMIN_DRAG_INTERMITTENT",
       "g5Attempt2Status": "FAIL_WORLD_COORDINATE_DRIFT",
       "g5OwnerDragCurrentVerdict": "NOT_PROVEN_DETERMINISTIC",
-      "g5CurrentBlockerEvidence": "operations/BOARD_MEDIA_PERFORMANCE_G5_COORDINATE_DRIFT_BLOCKER_2026-09-30.md"
+      "g5CurrentBlockerEvidence": "operations/BOARD_MEDIA_PERFORMANCE_G5_COORDINATE_DRIFT_BLOCKER_2026-09-30.md",
+      "g5CoordinateDriftRootCause": "CONFIRMED",
+      "g5CorrectiveAuthorized": true,
+      "g5CorrectiveScope": "community/board/board-own-drag-livefix-v2-2.js",
+      "g5RootCauseEvidence": "operations/BOARD_MEDIA_PERFORMANCE_G5_COORDINATE_DRIFT_ROOT_CAUSE_2026-09-30.md"
     },
     {
       "artifactId": "dementor-club.operations.board-media-performance-g5-owner-drag-blocker-2026-09-30",
@@ -3584,6 +3588,22 @@
       "candidateCommit": "0eac2c9b00bc6a493ec331780948693e16c2a654",
       "siteIntegrityRunId": 36691834625,
       "attempt": 2
+    },
+    {
+      "artifactId": "dementor-club.operations.board-media-performance-g5-coordinate-drift-root-cause-2026-09-30",
+      "documentType": "VALIDATION_EVIDENCE",
+      "currentVersion": "1.0",
+      "status": "ROOT_CAUSE_CONFIRMED_CORRECTIVE_AUTHORIZED",
+      "location": "operations/BOARD_MEDIA_PERFORMANCE_G5_COORDINATE_DRIFT_ROOT_CAUSE_2026-09-30.md",
+      "sourceSystem": "GIT",
+      "authorityType": "QA_EVIDENCE",
+      "updated": "2026-09-30",
+      "canonicalProject": "dementor-club",
+      "canonicalLocation": "operations/BOARD_MEDIA_PERFORMANCE_G5_COORDINATE_DRIFT_ROOT_CAUSE_2026-09-30.md",
+      "relation": "G5_ROOT_CAUSE_EVIDENCE",
+      "result": "dementor-club.result.board-media-performance-v1",
+      "candidateCommit": "0eac2c9b00bc6a493ec331780948693e16c2a654",
+      "correctiveScope": "community/board/board-own-drag-livefix-v2-2.js"
     }
   ],
   "referenceArtifacts": [
