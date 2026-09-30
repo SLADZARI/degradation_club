@@ -7,12 +7,12 @@
     "projectStage": "BUILD",
     "gate": "G7_RELEASE",
     "status": "APPROVED",
-    "version": "3.18",
+    "version": "3.19",
     "updated": "2026-09-30",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "3.17"
+    "supersedes": "3.18"
   },
   "currentArtifacts": [
     {
@@ -32,7 +32,7 @@
     {
       "artifactId": "dementor-club.kernel.artifact-index",
       "documentType": "STANDARD",
-      "currentVersion": "3.18",
+      "currentVersion": "3.19",
       "status": "APPROVED",
       "location": ".weekly-os/ARTIFACT_INDEX.json",
       "sourceSystem": "GIT",
@@ -3540,13 +3540,13 @@
       "liveDatabaseMutationAuthorized": false,
       "productionMergeAuthorized": false,
       "productionDeployAuthorized": false,
-      "gateReadiness": "RELEASE_DECISION_REQUIRED",
+      "gateReadiness": "RELEASE_AUTHORIZATION_REQUIRED",
       "integrationPullRequest": 250,
       "g5FrontendRun": 1328,
       "g5FrontendRunId": 36702910236,
       "g5FrontendStatus": "PASS",
       "g5BlockerEvidence": "operations/BOARD_MEDIA_PERFORMANCE_G5_OWNER_DRAG_BLOCKER_2026-09-30.md",
-      "note": "Clean one-commit RC from exact current production has tree equality with G6 candidate and exact-head Site Integrity #1332 SUCCESS. Awaiting explicit merge/deploy authorization.",
+      "note": "Clean RC PR #251 is exact-head green and ready for review. Old integration PR #250 is closed unmerged. Awaiting explicit owner authorization for production merge/deploy.",
       "g5Attempt1Status": "FAIL_OWNER_ADMIN_DRAG_INTERMITTENT",
       "g5Attempt2Status": "FAIL_WORLD_COORDINATE_DRIFT",
       "g5OwnerDragCurrentVerdict": "NOT_PROVEN_DETERMINISTIC",
@@ -3578,7 +3578,9 @@
       "releasePullRequest": 251,
       "g7RcStatus": "PASS_CLEAN_RC_VALIDATED",
       "g7RcEvidence": "operations/BOARD_MEDIA_PERFORMANCE_G7_RELEASE_CANDIDATE_2026-09-30.md",
-      "g7ValidationRunId": 36736574913
+      "g7ValidationRunId": 36736574913,
+      "integrationPullRequestStatus": "CLOSED_SUPERSEDED_UNMERGED",
+      "releasePullRequestStatus": "READY_FOR_REVIEW"
     },
     {
       "artifactId": "dementor-club.operations.board-media-performance-g5-owner-drag-blocker-2026-09-30",
