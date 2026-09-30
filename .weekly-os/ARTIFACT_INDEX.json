@@ -3546,7 +3546,7 @@
       "g5FrontendRunId": 36702910236,
       "g5FrontendStatus": "PASS",
       "g5BlockerEvidence": "operations/BOARD_MEDIA_PERFORMANCE_G5_OWNER_DRAG_BLOCKER_2026-09-30.md",
-      "note": "G5 closed on exact candidate 91a05166… after Site Integrity #1331 SUCCESS and standalone Board/media performance PASS. G6 validation is now active; no merge/deploy authorization.",
+      "note": "G5 closed on exact candidate 91a05166… after Site Integrity #1331 SUCCESS and standalone Board/media performance PASS. G6 validation active; no merge/deploy authorization.",
       "g5Attempt1Status": "FAIL_OWNER_ADMIN_DRAG_INTERMITTENT",
       "g5Attempt2Status": "FAIL_WORLD_COORDINATE_DRIFT",
       "g5OwnerDragCurrentVerdict": "NOT_PROVEN_DETERMINISTIC",
