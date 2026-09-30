@@ -7,12 +7,12 @@
     "projectStage": "RELEASE",
     "gate": "G7_RELEASE",
     "status": "APPROVED",
-    "version": "3.16",
+    "version": "3.17",
     "updated": "2026-09-30",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "3.15"
+    "supersedes": "3.16"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -297,7 +297,9 @@
     "operations/BOARD_MEDIA_PERFORMANCE_G5_FINAL_PASS_2026-09-30.md",
     ".weekly-os/results/board-media-performance-v1.v0.9.md",
     "operations/BOARD_MEDIA_PERFORMANCE_G6_2026-09-30.md",
-    ".weekly-os/results/board-media-performance-v1.v0.10.md"
+    ".weekly-os/results/board-media-performance-v1.v0.10.md",
+    "operations/BOARD_MEDIA_PERFORMANCE_G7_RELEASE_CANDIDATE_2026-09-30.md",
+    ".weekly-os/results/board-media-performance-v1.v0.11.md"
   ],
   "authority": {
     "mpDslCore": {
@@ -464,10 +466,10 @@
   },
   "currentResult": {
     "artifactId": "dementor-club.result.board-media-performance-v1",
-    "version": "0.10",
+    "version": "0.11",
     "status": "ACTIVE",
-    "workStatus": "PREPARING_RELEASE_CANDIDATE",
-    "path": ".weekly-os/results/board-media-performance-v1.v0.10.md",
+    "workStatus": "WAITING_RELEASE_AUTHORIZATION",
+    "path": ".weekly-os/results/board-media-performance-v1.v0.11.md",
     "gate": "G7_RELEASE",
     "scope": [
       "BQA-20 image normalization/media pipeline",
@@ -488,7 +490,7 @@
     "backendWorkerStatus": "RUNTIME_PASS_INTEGRATED",
     "frontendIntegrationCommit": "c4fd5c8d7f5246b3bd533dc28d31d9d8bdbcccbb",
     "qaReconciliation": "operations/QA_RECONCILIATION_2026-09-30.md",
-    "gateReadiness": "CLEAN_RELEASE_CANDIDATE_REQUIRED",
+    "gateReadiness": "RELEASE_DECISION_REQUIRED",
     "integrationPullRequest": 250,
     "g5FrontendRun": 1328,
     "g5FrontendRunId": 36702910236,
@@ -521,7 +523,14 @@
     "g5Status": "PASS",
     "g5FinalEvidence": "operations/BOARD_MEDIA_PERFORMANCE_G5_FINAL_PASS_2026-09-30.md",
     "g6Status": "PASS",
-    "g6Evidence": "operations/BOARD_MEDIA_PERFORMANCE_G6_2026-09-30.md"
+    "g6Evidence": "operations/BOARD_MEDIA_PERFORMANCE_G6_2026-09-30.md",
+    "releaseBranch": "release/board-media-performance-v1",
+    "releaseCandidateCommit": "52ec2966048e16347d8a918ce358d26dff3f803e",
+    "releasePullRequest": 251,
+    "g7RcStatus": "PASS_CLEAN_RC_VALIDATED",
+    "g7RcEvidence": "operations/BOARD_MEDIA_PERFORMANCE_G7_RELEASE_CANDIDATE_2026-09-30.md",
+    "g7ValidationRun": 1332,
+    "g7ValidationRunId": 36736574913
   },
   "waitingResults": [
     {
