@@ -7,12 +7,12 @@
     "projectStage": "BUILD",
     "gate": "G5_BUILD",
     "status": "APPROVED",
-    "version": "3.12",
+    "version": "3.13",
     "updated": "2026-09-30",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "3.11"
+    "supersedes": "3.12"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -291,7 +291,9 @@
     "operations/BOARD_MEDIA_PERFORMANCE_DEV1_RUNTIME_PASS_2026-09-30.md",
     ".weekly-os/results/board-media-performance-v1.v0.6.md",
     "operations/BOARD_MEDIA_PERFORMANCE_G5_VALIDATOR_CONTRACT_CORRECTIVE_2026-09-30.md",
-    ".weekly-os/results/board-media-performance-v1.v0.7.md"
+    ".weekly-os/results/board-media-performance-v1.v0.7.md",
+    "operations/BOARD_MEDIA_PERFORMANCE_G5_EXACT_HEAD_CI_PASS_2026-09-30.md",
+    ".weekly-os/results/board-media-performance-v1.v0.8.md"
   ],
   "authority": {
     "mpDslCore": {
@@ -458,10 +460,10 @@
   },
   "currentResult": {
     "artifactId": "dementor-club.result.board-media-performance-v1",
-    "version": "0.7",
+    "version": "0.8",
     "status": "ACTIVE",
-    "workStatus": "WAITING_VALIDATION",
-    "path": ".weekly-os/results/board-media-performance-v1.v0.7.md",
+    "workStatus": "ACTIVE",
+    "path": ".weekly-os/results/board-media-performance-v1.v0.8.md",
     "gate": "G5_BUILD",
     "scope": [
       "BQA-20 image normalization/media pipeline",
@@ -482,7 +484,7 @@
     "backendWorkerStatus": "RUNTIME_PASS_INTEGRATED",
     "frontendIntegrationCommit": "c4fd5c8d7f5246b3bd533dc28d31d9d8bdbcccbb",
     "qaReconciliation": "operations/QA_RECONCILIATION_2026-09-30.md",
-    "gateReadiness": "EXACT_HEAD_CI_IN_PROGRESS",
+    "gateReadiness": "PERFORMANCE_VALIDATOR_EXECUTION_REQUIRED",
     "integrationPullRequest": 250,
     "g5FrontendRun": 1328,
     "g5FrontendRunId": 36702910236,
@@ -506,7 +508,12 @@
     "validatorCorrectiveRun": 1331,
     "validatorCorrectiveRunId": 36728660995,
     "validatorCorrectiveStatus": "IN_PROGRESS",
-    "validatorCorrectiveEvidence": "operations/BOARD_MEDIA_PERFORMANCE_G5_VALIDATOR_CONTRACT_CORRECTIVE_2026-09-30.md"
+    "validatorCorrectiveEvidence": "operations/BOARD_MEDIA_PERFORMANCE_G5_VALIDATOR_CONTRACT_CORRECTIVE_2026-09-30.md",
+    "finalCandidate": "91a05166a46ad108f7f2aed3b66c5c1464b2863d",
+    "g5ExactHeadRun": 1331,
+    "g5ExactHeadRunId": 36728660995,
+    "g5ExactHeadStatus": "PASS",
+    "g5ExactHeadEvidence": "operations/BOARD_MEDIA_PERFORMANCE_G5_EXACT_HEAD_CI_PASS_2026-09-30.md"
   },
   "waitingResults": [
     {
