@@ -7,12 +7,12 @@
     "projectStage": "BUILD",
     "gate": "G7_RELEASE",
     "status": "APPROVED",
-    "version": "3.13",
+    "version": "3.14",
     "updated": "2026-09-30",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "3.12"
+    "supersedes": "3.13"
   },
   "currentArtifacts": [
     {
@@ -32,7 +32,7 @@
     {
       "artifactId": "dementor-club.kernel.artifact-index",
       "documentType": "STANDARD",
-      "currentVersion": "3.13",
+      "currentVersion": "3.14",
       "status": "APPROVED",
       "location": ".weekly-os/ARTIFACT_INDEX.json",
       "sourceSystem": "GIT",
@@ -3512,12 +3512,12 @@
     {
       "artifactId": "dementor-club.result.board-media-performance-v1",
       "documentType": "RESULT",
-      "currentVersion": "0.6",
-      "version": "0.6",
+      "currentVersion": "0.7",
+      "version": "0.7",
       "status": "ACTIVE",
-      "workStatus": "ACTIVE",
-      "location": ".weekly-os/results/board-media-performance-v1.v0.6.md",
-      "path": ".weekly-os/results/board-media-performance-v1.v0.6.md",
+      "workStatus": "WAITING_VALIDATION",
+      "location": ".weekly-os/results/board-media-performance-v1.v0.7.md",
+      "path": ".weekly-os/results/board-media-performance-v1.v0.7.md",
       "sourceSystem": "GIT",
       "authorityType": "IMPLEMENTATION_AUTHORITY",
       "updated": "2026-09-30",
@@ -3540,13 +3540,13 @@
       "liveDatabaseMutationAuthorized": false,
       "productionMergeAuthorized": false,
       "productionDeployAuthorized": false,
-      "gateReadiness": "BOARD_BATCH_ADAPTER_REQUIRED",
+      "gateReadiness": "EXACT_HEAD_CI_IN_PROGRESS",
       "integrationPullRequest": 250,
       "g5FrontendRun": 1328,
       "g5FrontendRunId": 36702910236,
       "g5FrontendStatus": "PASS",
       "g5BlockerEvidence": "operations/BOARD_MEDIA_PERFORMANCE_G5_OWNER_DRAG_BLOCKER_2026-09-30.md",
-      "note": "DEV1 exact candidate passed disposable local Supabase runtime validation and its migration/validator are integrated byte-for-byte. One bounded board.js batch adapter remains before full exact-head G5.",
+      "note": "Final batch adapter implemented. #1330 failed only because Artifact Collaboration QA fixture lacked the new batch RPC mock. Validator-only +4 line corrective applied; #1331 exact-head CI running.",
       "g5Attempt1Status": "FAIL_OWNER_ADMIN_DRAG_INTERMITTENT",
       "g5Attempt2Status": "FAIL_WORLD_COORDINATE_DRIFT",
       "g5OwnerDragCurrentVerdict": "NOT_PROVEN_DETERMINISTIC",
@@ -3557,7 +3557,13 @@
       "g5RootCauseEvidence": "operations/BOARD_MEDIA_PERFORMANCE_G5_COORDINATE_DRIFT_ROOT_CAUSE_2026-09-30.md",
       "g5FrontendEvidence": "operations/BOARD_MEDIA_PERFORMANCE_G5_FRONTEND_PASS_2026-09-30.md",
       "backendRuntimeEvidence": "operations/BOARD_MEDIA_PERFORMANCE_DEV1_RUNTIME_PASS_2026-09-30.md",
-      "backendIntegrationCommit": "a282f39099da3ba4ab410924817c3564943ecaf4"
+      "backendIntegrationCommit": "a282f39099da3ba4ab410924817c3564943ecaf4",
+      "finalAdapterCandidate": "dde55b15a03ced436de95e274c5160c94a94c9b6",
+      "validatorCorrectiveCandidate": "91a05166a46ad108f7f2aed3b66c5c1464b2863d",
+      "validatorCorrectiveRun": 1331,
+      "validatorCorrectiveRunId": 36728660995,
+      "validatorCorrectiveStatus": "IN_PROGRESS",
+      "validatorCorrectiveEvidence": "operations/BOARD_MEDIA_PERFORMANCE_G5_VALIDATOR_CONTRACT_CORRECTIVE_2026-09-30.md"
     },
     {
       "artifactId": "dementor-club.operations.board-media-performance-g5-owner-drag-blocker-2026-09-30",
@@ -3639,6 +3645,22 @@
       "result": "dementor-club.result.board-media-performance-v1",
       "workerCandidate": "834bb9776c4e99bb73556c4776c49f270fe70a6c",
       "runtimeValidation": "PASS_LOCAL_SUPABASE"
+    },
+    {
+      "artifactId": "dementor-club.operations.board-media-performance-g5-validator-contract-corrective-2026-09-30",
+      "documentType": "VALIDATION_EVIDENCE",
+      "currentVersion": "1.0",
+      "status": "VALIDATION_RUNNING",
+      "location": "operations/BOARD_MEDIA_PERFORMANCE_G5_VALIDATOR_CONTRACT_CORRECTIVE_2026-09-30.md",
+      "sourceSystem": "GIT",
+      "authorityType": "QA_EVIDENCE",
+      "updated": "2026-09-30",
+      "canonicalProject": "dementor-club",
+      "canonicalLocation": "operations/BOARD_MEDIA_PERFORMANCE_G5_VALIDATOR_CONTRACT_CORRECTIVE_2026-09-30.md",
+      "relation": "G5_VALIDATOR_CORRECTIVE",
+      "result": "dementor-club.result.board-media-performance-v1",
+      "correctiveCandidate": "91a05166a46ad108f7f2aed3b66c5c1464b2863d",
+      "siteIntegrityRunId": 36728660995
     }
   ],
   "referenceArtifacts": [
