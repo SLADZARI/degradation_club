@@ -11,6 +11,9 @@ else{
     const {data:roles,error:roleError}=await client.from('dc_role_assignments').select('role,status,valid_from,valid_to').eq('profile_id',session.user.id).eq('role','owner_admin');
     const now=Date.now();const active=r=>r?.status==='active'&&(!r.valid_from||Date.parse(r.valid_from)<=now)&&(!r.valid_to||Date.parse(r.valid_to)>now);
     if(roleError||!(roles||[]).some(active))location.replace(fallback);
-    else document.documentElement.dataset.dcOwnerAdmin='1';
+    else{
+      document.documentElement.dataset.dcOwnerAdmin='1';
+      window.dispatchEvent(new CustomEvent('dc:owner-admin-ready'));
+    }
   }
 }
