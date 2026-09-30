@@ -7,12 +7,12 @@
     "projectStage": "BUILD",
     "gate": "G7_RELEASE",
     "status": "APPROVED",
-    "version": "3.19",
+    "version": "3.20",
     "updated": "2026-09-30",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "3.18"
+    "supersedes": "3.19"
   },
   "currentArtifacts": [
     {
@@ -32,7 +32,7 @@
     {
       "artifactId": "dementor-club.kernel.artifact-index",
       "documentType": "STANDARD",
-      "currentVersion": "3.19",
+      "currentVersion": "3.20",
       "status": "APPROVED",
       "location": ".weekly-os/ARTIFACT_INDEX.json",
       "sourceSystem": "GIT",
@@ -3512,12 +3512,12 @@
     {
       "artifactId": "dementor-club.result.board-media-performance-v1",
       "documentType": "RESULT",
-      "currentVersion": "0.11",
-      "version": "0.11",
+      "currentVersion": "0.12",
+      "version": "0.12",
       "status": "ACTIVE",
-      "workStatus": "WAITING_RELEASE_AUTHORIZATION",
-      "location": ".weekly-os/results/board-media-performance-v1.v0.11.md",
-      "path": ".weekly-os/results/board-media-performance-v1.v0.11.md",
+      "workStatus": "WAITING_MANUAL_DEPLOY",
+      "location": ".weekly-os/results/board-media-performance-v1.v0.12.md",
+      "path": ".weekly-os/results/board-media-performance-v1.v0.12.md",
       "sourceSystem": "GIT",
       "authorityType": "IMPLEMENTATION_AUTHORITY",
       "updated": "2026-09-30",
@@ -3537,16 +3537,16 @@
       "frontendWorkerStatus": "CLEAN_GREEN_FROZEN",
       "backendWorkerCandidate": "834bb9776c4e99bb73556c4776c49f270fe70a6c",
       "backendWorkerStatus": "RUNTIME_PASS_INTEGRATED",
-      "liveDatabaseMutationAuthorized": false,
+      "liveDatabaseMutationAuthorized": true,
       "productionMergeAuthorized": false,
-      "productionDeployAuthorized": false,
-      "gateReadiness": "RELEASE_AUTHORIZATION_REQUIRED",
+      "productionDeployAuthorized": true,
+      "gateReadiness": "MANUAL_SUPABASE_THEN_PAGES_DEPLOY_REQUIRED",
       "integrationPullRequest": 250,
       "g5FrontendRun": 1328,
       "g5FrontendRunId": 36702910236,
       "g5FrontendStatus": "PASS",
       "g5BlockerEvidence": "operations/BOARD_MEDIA_PERFORMANCE_G5_OWNER_DRAG_BLOCKER_2026-09-30.md",
-      "note": "Clean RC PR #251 is exact-head green and ready for review. Old integration PR #250 is closed unmerged. Awaiting explicit owner authorization for production merge/deploy.",
+      "note": "PR #251 merged into production. Production tree equals clean RC tree. Owner will manually run Supabase then Pages deploy workflows; live retest and G8 wait for those runs.",
       "g5Attempt1Status": "FAIL_OWNER_ADMIN_DRAG_INTERMITTENT",
       "g5Attempt2Status": "FAIL_WORLD_COORDINATE_DRIFT",
       "g5OwnerDragCurrentVerdict": "NOT_PROVEN_DETERMINISTIC",
@@ -3580,7 +3580,13 @@
       "g7RcEvidence": "operations/BOARD_MEDIA_PERFORMANCE_G7_RELEASE_CANDIDATE_2026-09-30.md",
       "g7ValidationRunId": 36736574913,
       "integrationPullRequestStatus": "CLOSED_SUPERSEDED_UNMERGED",
-      "releasePullRequestStatus": "READY_FOR_REVIEW"
+      "releasePullRequestStatus": "READY_FOR_REVIEW",
+      "productionMergeCommit": "cde332779ab0e256dd1e498660d6fa651e91846e",
+      "g7MergeEvidence": "operations/BOARD_MEDIA_PERFORMANCE_G7_MERGE_2026-09-30.md",
+      "productionMergeExecuted": true,
+      "productionDeployExecuted": false,
+      "liveDatabaseMutationExecuted": false,
+      "deployExecutor": "OWNER_MANUAL_GITHUB_ACTION"
     },
     {
       "artifactId": "dementor-club.operations.board-media-performance-g5-owner-drag-blocker-2026-09-30",
@@ -3744,6 +3750,22 @@
       "releaseCandidateCommit": "52ec2966048e16347d8a918ce358d26dff3f803e",
       "releasePullRequest": 251,
       "validationRunId": 36736574913
+    },
+    {
+      "artifactId": "dementor-club.operations.board-media-performance-g7-merge-2026-09-30",
+      "documentType": "RELEASE_EVIDENCE",
+      "currentVersion": "1.0",
+      "status": "MERGED_WAITING_MANUAL_DEPLOY",
+      "location": "operations/BOARD_MEDIA_PERFORMANCE_G7_MERGE_2026-09-30.md",
+      "sourceSystem": "GIT",
+      "authorityType": "RELEASE_EVIDENCE",
+      "updated": "2026-09-30",
+      "canonicalProject": "dementor-club",
+      "canonicalLocation": "operations/BOARD_MEDIA_PERFORMANCE_G7_MERGE_2026-09-30.md",
+      "relation": "G7_PRODUCTION_MERGE_EVIDENCE",
+      "result": "dementor-club.result.board-media-performance-v1",
+      "productionMergeCommit": "cde332779ab0e256dd1e498660d6fa651e91846e",
+      "releasePullRequest": 251
     }
   ],
   "referenceArtifacts": [
