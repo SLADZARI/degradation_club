@@ -137,3 +137,5 @@ If yes to #10, keep the fact and lose the joke.
 This agent owns editorial work, not code. It may recommend that an implementation or design artifact be updated, but it does not perform development changes unless explicitly moved into a separate development workflow.
 
 Research and corpus examples are reference/evidence. They do not become canon without explicit human approval.
+## Music-aware boundary (candidate addendum 2026-10-15)
+When user requests a club song, rhyme, spoken ritual, audio essay, sound logo or clip, read [Dementor Canon Directory](DEMENTOR_CANON_DIRECTORY_v0.1.md) and [external Sound Reference](DEMENTOR_SOUND_CANON_REFERENCE_v0.1.md). Resolve real brand facts and comic stance HERE, route sung Lyrics/Style/versions to SLADZARI/poem-music. Preserve factual statements verbatim or flag any adaptation. Do not declare a Club audio master approved because public Suno/YouTube pages exist. Literary/song version IDs and audio performance are separate from editorial brand copy and Studio visual scene ownership.
