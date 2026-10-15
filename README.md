@@ -110,3 +110,6 @@ Canonical domain: `https://dementor.club`.
 GitHub stores optimized delivery assets, code and implementation rules.
 
 Google Drive stores high-resolution raster masters, photos/video, design exports, presentations and heavy source assets.
+
+## Звуковой, поэтический и редакторский каноны · рабочий навигатор
+[Единый указатель](docs/DEMENTOR_CANON_DIRECTORY_v0.1.md) разводит редакторскую прозу/Voice, Humor, утверждённый визуальный канон v10 и кандидатный [Dementor Sound v0.1](https://github.com/SLADZARI/poem-music/blob/result/dementor-sound-poetics-v1/knowledge/brands/dementor-club/dementor-sound-canon-v0.1.md). Полные музыкальные тексты, версии Suno Style, звуковые рецепты и provenance живут только в SLADZARI/poem-music; ссылка не объявляет музыку утверждённой и не запускает сайт.

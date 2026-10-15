@@ -191,3 +191,11 @@ When reviewing existing copy, separate:
 - `POLICY CONFLICT`
 
 The editor's role is to protect meaning and voice, not maximize joke count.
+## 11. Music / Poetry / Spoken Voice routing (2026-10-15 candidate addendum)
+For SOUND, SONG LYRICS, POETIC RECITATIVE, SPOKEN SCRIPT, MUSIC VIDEO, JINGLE or GAME SOUND, read [Canon Directory](DEMENTOR_CANON_DIRECTORY_v0.1.md) and [Sound Reference](DEMENTOR_SOUND_CANON_REFERENCE_v0.1.md).
+
+1. Brand and factual statements stay in the responsible approved Dementor page/entity sources. Editorial Voice & Language and Humor candidates inform posture; do not upgrade their authority.
+2. Song/poem lyrics, exact translated versions, Suno Style and generation/audition evidence are produced and versioned in SLADZARI/poem-music, never copied as a mutable second original here.
+3. Spoken prose is not automatic poetry: editorial script facts belong here; performance delivery/voice renders belong in music repo; final published recording gets its own Placement with proof.
+4. Visual composition continues to obey Design Canon CURRENT v10; Studio owns its scene graph. Neither receives a new AUDIO port merely because we link the sound proposal.
+5. New editorial modes MUSIC_BRIEF and SPOKEN_PERFORMANCE are **routing labels only**, not new governance authority or permission to publish. Explicit club sound selection requires listening, rights and owner approval.
