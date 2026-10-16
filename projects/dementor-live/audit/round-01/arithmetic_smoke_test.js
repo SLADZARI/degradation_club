@@ -46,8 +46,6 @@ function runSmokeTest() {
   check("AR-031",4*20/4*8,160,"4 trees converted to sheets");
   check("AR-032",4*12+(4*20/4)*10,248,"4 trees irrigation+paper water litres");
   check("AR-033",Math.ceil(36/10)*2,8,"FLAX water purchase block integer PAPER");
-  check("AR-034",24*8-24*6/8,174,"dummy check never use");
-  checks.pop(); // Remove non-design dummy, no expectation to mask a failure in product math.
   check("AR-034",32-18,14,"Generic fiber alternative water saving for 24 sheets");
   check("AR-035",Math.floor(1440/45)*24,768,"HEMP 24h idealized output");
   check("AR-036",Math.floor(1440/45)*40,1280,"HEMP 24h idealized water");
