@@ -1,0 +1,157 @@
+{
+  "kind": "SYNTHETIC_DESIGN_MODEL",
+  "date": "2026-10-17",
+  "executed": 21,
+  "passed": 21,
+  "failed": [],
+  "cases": [
+    {
+      "id": "RPL-HEMP-ONLINE-OFFLINE",
+      "pass": true,
+      "observed": "{\"stocks\":{\"water_ml\":0,\"seeds\":0,\"hemp\":0,\"flax\":0,\"wood\":0,\"fiber\":0,\"sheets\":24},\"events\":[\"HEMP-1\",\"HEMP-10\",\"HEMP-11\",\"HEMP-12\",\"HEMP-13\",\"HEMP-14\",\"HEMP-15\",\"HEMP-2\",\"HEMP-3\",\"HEMP-4\",\"HEMP-5\",\"HEMP-6\",\"HEMP-7\",\"HEMP-8\",\"HEMP-9\"]}",
+      "expected": "{\"stocks\":{\"water_ml\":0,\"seeds\":0,\"hemp\":0,\"flax\":0,\"wood\":0,\"fiber\":0,\"sheets\":24},\"events\":[\"HEMP-1\",\"HEMP-10\",\"HEMP-11\",\"HEMP-12\",\"HEMP-13\",\"HEMP-14\",\"HEMP-15\",\"HEMP-2\",\"HEMP-3\",\"HEMP-4\",\"HEMP-5\",\"HEMP-6\",\"HEMP-7\",\"HEMP-8\",\"HEMP-9\"]}",
+      "detail": "Equal state and event IDs"
+    },
+    {
+      "id": "RPL-HEMP-CHUNKED",
+      "pass": true,
+      "observed": "{\"stocks\":{\"water_ml\":0,\"seeds\":0,\"hemp\":0,\"flax\":0,\"wood\":0,\"fiber\":0,\"sheets\":24},\"events\":[\"HEMP-1\",\"HEMP-10\",\"HEMP-11\",\"HEMP-12\",\"HEMP-13\",\"HEMP-14\",\"HEMP-15\",\"HEMP-2\",\"HEMP-3\",\"HEMP-4\",\"HEMP-5\",\"HEMP-6\",\"HEMP-7\",\"HEMP-8\",\"HEMP-9\"]}",
+      "expected": "{\"stocks\":{\"water_ml\":0,\"seeds\":0,\"hemp\":0,\"flax\":0,\"wood\":0,\"fiber\":0,\"sheets\":24},\"events\":[\"HEMP-1\",\"HEMP-10\",\"HEMP-11\",\"HEMP-12\",\"HEMP-13\",\"HEMP-14\",\"HEMP-15\",\"HEMP-2\",\"HEMP-3\",\"HEMP-4\",\"HEMP-5\",\"HEMP-6\",\"HEMP-7\",\"HEMP-8\",\"HEMP-9\"]}",
+      "detail": "Checkpointing must not change result"
+    },
+    {
+      "id": "RPL-HEMP-IDEMPOTENT",
+      "pass": true,
+      "observed": "{\"stocks\":{\"water_ml\":0,\"seeds\":0,\"hemp\":0,\"flax\":0,\"wood\":0,\"fiber\":0,\"sheets\":24},\"events\":[\"HEMP-1\",\"HEMP-10\",\"HEMP-11\",\"HEMP-12\",\"HEMP-13\",\"HEMP-14\",\"HEMP-15\",\"HEMP-2\",\"HEMP-3\",\"HEMP-4\",\"HEMP-5\",\"HEMP-6\",\"HEMP-7\",\"HEMP-8\",\"HEMP-9\"]}",
+      "expected": "{\"stocks\":{\"water_ml\":0,\"seeds\":0,\"hemp\":0,\"flax\":0,\"wood\":0,\"fiber\":0,\"sheets\":24},\"events\":[\"HEMP-1\",\"HEMP-10\",\"HEMP-11\",\"HEMP-12\",\"HEMP-13\",\"HEMP-14\",\"HEMP-15\",\"HEMP-2\",\"HEMP-3\",\"HEMP-4\",\"HEMP-5\",\"HEMP-6\",\"HEMP-7\",\"HEMP-8\",\"HEMP-9\"]}",
+      "detail": "Duplicate replay must do nothing"
+    },
+    {
+      "id": "RPL-HEMP-SHEETS",
+      "pass": true,
+      "observed": 24,
+      "expected": 24,
+      "detail": "Paper output from expected recipe"
+    },
+    {
+      "id": "RPL-HEMP-WATER-LEFT",
+      "pass": true,
+      "observed": 0,
+      "expected": 0,
+      "detail": "Conserved water under test fixture"
+    },
+    {
+      "id": "RPL-FLAX-ONLINE-OFFLINE",
+      "pass": true,
+      "observed": "{\"stocks\":{\"water_ml\":4000,\"seeds\":0,\"hemp\":0,\"flax\":0,\"wood\":0,\"fiber\":0,\"sheets\":32},\"events\":[\"FLAX-1\",\"FLAX-10\",\"FLAX-11\",\"FLAX-12\",\"FLAX-13\",\"FLAX-14\",\"FLAX-15\",\"FLAX-16\",\"FLAX-2\",\"FLAX-3\",\"FLAX-4\",\"FLAX-5\",\"FLAX-6\",\"FLAX-7\",\"FLAX-8\",\"FLAX-9\"]}",
+      "expected": "{\"stocks\":{\"water_ml\":4000,\"seeds\":0,\"hemp\":0,\"flax\":0,\"wood\":0,\"fiber\":0,\"sheets\":32},\"events\":[\"FLAX-1\",\"FLAX-10\",\"FLAX-11\",\"FLAX-12\",\"FLAX-13\",\"FLAX-14\",\"FLAX-15\",\"FLAX-16\",\"FLAX-2\",\"FLAX-3\",\"FLAX-4\",\"FLAX-5\",\"FLAX-6\",\"FLAX-7\",\"FLAX-8\",\"FLAX-9\"]}",
+      "detail": "Equal state and event IDs"
+    },
+    {
+      "id": "RPL-FLAX-CHUNKED",
+      "pass": true,
+      "observed": "{\"stocks\":{\"water_ml\":4000,\"seeds\":0,\"hemp\":0,\"flax\":0,\"wood\":0,\"fiber\":0,\"sheets\":32},\"events\":[\"FLAX-1\",\"FLAX-10\",\"FLAX-11\",\"FLAX-12\",\"FLAX-13\",\"FLAX-14\",\"FLAX-15\",\"FLAX-16\",\"FLAX-2\",\"FLAX-3\",\"FLAX-4\",\"FLAX-5\",\"FLAX-6\",\"FLAX-7\",\"FLAX-8\",\"FLAX-9\"]}",
+      "expected": "{\"stocks\":{\"water_ml\":4000,\"seeds\":0,\"hemp\":0,\"flax\":0,\"wood\":0,\"fiber\":0,\"sheets\":32},\"events\":[\"FLAX-1\",\"FLAX-10\",\"FLAX-11\",\"FLAX-12\",\"FLAX-13\",\"FLAX-14\",\"FLAX-15\",\"FLAX-16\",\"FLAX-2\",\"FLAX-3\",\"FLAX-4\",\"FLAX-5\",\"FLAX-6\",\"FLAX-7\",\"FLAX-8\",\"FLAX-9\"]}",
+      "detail": "Checkpointing must not change result"
+    },
+    {
+      "id": "RPL-FLAX-IDEMPOTENT",
+      "pass": true,
+      "observed": "{\"stocks\":{\"water_ml\":4000,\"seeds\":0,\"hemp\":0,\"flax\":0,\"wood\":0,\"fiber\":0,\"sheets\":32},\"events\":[\"FLAX-1\",\"FLAX-10\",\"FLAX-11\",\"FLAX-12\",\"FLAX-13\",\"FLAX-14\",\"FLAX-15\",\"FLAX-16\",\"FLAX-2\",\"FLAX-3\",\"FLAX-4\",\"FLAX-5\",\"FLAX-6\",\"FLAX-7\",\"FLAX-8\",\"FLAX-9\"]}",
+      "expected": "{\"stocks\":{\"water_ml\":4000,\"seeds\":0,\"hemp\":0,\"flax\":0,\"wood\":0,\"fiber\":0,\"sheets\":32},\"events\":[\"FLAX-1\",\"FLAX-10\",\"FLAX-11\",\"FLAX-12\",\"FLAX-13\",\"FLAX-14\",\"FLAX-15\",\"FLAX-16\",\"FLAX-2\",\"FLAX-3\",\"FLAX-4\",\"FLAX-5\",\"FLAX-6\",\"FLAX-7\",\"FLAX-8\",\"FLAX-9\"]}",
+      "detail": "Duplicate replay must do nothing"
+    },
+    {
+      "id": "RPL-FLAX-SHEETS",
+      "pass": true,
+      "observed": 32,
+      "expected": 32,
+      "detail": "Paper output from expected recipe"
+    },
+    {
+      "id": "RPL-FLAX-WATER-LEFT",
+      "pass": true,
+      "observed": 4000,
+      "expected": 4000,
+      "detail": "Conserved water under test fixture"
+    },
+    {
+      "id": "CONCURRENT-WATER-FIRST",
+      "pass": true,
+      "observed": true,
+      "expected": true,
+      "detail": "First wins priority"
+    },
+    {
+      "id": "CONCURRENT-WATER-SECOND",
+      "pass": true,
+      "observed": false,
+      "expected": false,
+      "detail": "Second waits"
+    },
+    {
+      "id": "CONCURRENT-WATER-REPLAY",
+      "pass": true,
+      "observed": 2000,
+      "expected": 2000,
+      "detail": "No second debit on retry"
+    },
+    {
+      "id": "PARCEL-FIRST",
+      "pass": true,
+      "observed": true,
+      "expected": true,
+      "detail": "First purchase commits"
+    },
+    {
+      "id": "PARCEL-SECOND",
+      "pass": true,
+      "observed": false,
+      "expected": false,
+      "detail": "Second cannot own same plot"
+    },
+    {
+      "id": "PARCEL-B-WALLET",
+      "pass": true,
+      "observed": 1000,
+      "expected": 1000,
+      "detail": "Failed buyer wallet untouched"
+    },
+    {
+      "id": "PARCEL-CONSERVATION",
+      "pass": true,
+      "observed": 2000,
+      "expected": 2000,
+      "detail": "Treasury+wallet transfer conserves PAPER"
+    },
+    {
+      "id": "ESCROW-REPLAY",
+      "pass": true,
+      "observed": false,
+      "expected": false,
+      "detail": "Cannot settle twice"
+    },
+    {
+      "id": "ESCROW-REFUND-AFTER-SETTLE",
+      "pass": true,
+      "observed": false,
+      "expected": false,
+      "detail": "Cannot refund after settlement"
+    },
+    {
+      "id": "ESCROW-SUPPLY",
+      "pass": true,
+      "observed": 100,
+      "expected": 100,
+      "detail": "No PAPER created by escrow"
+    },
+    {
+      "id": "ESCROW-COUNT",
+      "pass": true,
+      "observed": 1,
+      "expected": 1,
+      "detail": "Exactly once settlement in fixture"
+    }
+  ],
+  "note": "No game server, concurrency primitives, database or real transactions were executed. This model documents required behavior."
+}
