@@ -1,0 +1,317 @@
+{
+  "audit": "GA-01",
+  "date": "2026-10-17",
+  "scope": "PURE TEST ASSUMPTION ARITHMETIC ONLY",
+  "assertions": 40,
+  "passed": 40,
+  "failed": [],
+  "checks": [
+    {
+      "id": "AR-001",
+      "actual": 440,
+      "expected": 440,
+      "pass": true,
+      "scope": "Onboarding 4 tutorial deliveries"
+    },
+    {
+      "id": "AR-002",
+      "actual": 20,
+      "expected": 20,
+      "pass": true,
+      "scope": "After starter land and cabin cash"
+    },
+    {
+      "id": "AR-003",
+      "actual": 38,
+      "expected": 38,
+      "pass": true,
+      "scope": "WOODS and PAPER_SHEET city acquisition"
+    },
+    {
+      "id": "AR-004",
+      "actual": -18,
+      "expected": -18,
+      "pass": true,
+      "scope": "Starter deficit"
+    },
+    {
+      "id": "AR-005",
+      "actual": 257.14285714285717,
+      "expected": 257.142857,
+      "pass": true,
+      "scope": "Courier lower hourly earnings"
+    },
+    {
+      "id": "AR-006",
+      "actual": 360,
+      "expected": 360,
+      "pass": true,
+      "scope": "Courier upper hourly earnings"
+    },
+    {
+      "id": "AR-007",
+      "actual": 360,
+      "expected": 360,
+      "pass": true,
+      "scope": "HOMESTEAD land"
+    },
+    {
+      "id": "AR-008",
+      "actual": 1024,
+      "expected": 1024,
+      "pass": true,
+      "scope": "RESIDENTIAL land"
+    },
+    {
+      "id": "AR-009",
+      "actual": 1728,
+      "expected": 1728,
+      "pass": true,
+      "scope": "AGRICULTURAL land"
+    },
+    {
+      "id": "AR-010",
+      "actual": 2016,
+      "expected": 2016,
+      "pass": true,
+      "scope": "FORESTRY land"
+    },
+    {
+      "id": "AR-011",
+      "actual": 2048,
+      "expected": 2048,
+      "pass": true,
+      "scope": "COMMERCIAL land"
+    },
+    {
+      "id": "AR-012",
+      "actual": 6144,
+      "expected": 6144,
+      "pass": true,
+      "scope": "INDUSTRIAL land"
+    },
+    {
+      "id": "AR-013",
+      "actual": 55,
+      "expected": 55,
+      "pass": true,
+      "scope": "Sum of footprints not accessibility"
+    },
+    {
+      "id": "AR-014",
+      "actual": 89,
+      "expected": 89,
+      "pass": true,
+      "scope": "Remaining raw area of 12x12 plot"
+    },
+    {
+      "id": "AR-015",
+      "actual": 24,
+      "expected": 24,
+      "pass": true,
+      "scope": "HEMP sheet output"
+    },
+    {
+      "id": "AR-016",
+      "actual": 40,
+      "expected": 40,
+      "pass": true,
+      "scope": "HEMP water total"
+    },
+    {
+      "id": "AR-017",
+      "actual": 69,
+      "expected": 69,
+      "pass": true,
+      "scope": "HEMP serial duration minutes"
+    },
+    {
+      "id": "AR-018",
+      "actual": 32,
+      "expected": 32,
+      "pass": true,
+      "scope": "FLAX sheet output"
+    },
+    {
+      "id": "AR-019",
+      "actual": 36,
+      "expected": 36,
+      "pass": true,
+      "scope": "FLAX water total"
+    },
+    {
+      "id": "AR-020",
+      "actual": 107,
+      "expected": 107,
+      "pass": true,
+      "scope": "FLAX serial duration minutes"
+    },
+    {
+      "id": "AR-021",
+      "actual": 32,
+      "expected": 32,
+      "pass": true,
+      "scope": "HEMP steady upper sheets/h"
+    },
+    {
+      "id": "AR-022",
+      "actual": 53.333333333333336,
+      "expected": 53.333333,
+      "pass": true,
+      "scope": "HEMP steady water demand L/h"
+    },
+    {
+      "id": "AR-023",
+      "actual": 25.6,
+      "expected": 25.6,
+      "pass": true,
+      "scope": "FLAX steady upper sheets/h"
+    },
+    {
+      "id": "AR-024",
+      "actual": 28.8,
+      "expected": 28.8,
+      "pass": true,
+      "scope": "FLAX steady water demand L/h"
+    },
+    {
+      "id": "AR-025",
+      "actual": 23.333333333333336,
+      "expected": 23.333333,
+      "pass": true,
+      "scope": "River pump HEMP water shortfall L/h"
+    },
+    {
+      "id": "AR-026",
+      "actual": 106.66666666666667,
+      "expected": 106.666667,
+      "pass": true,
+      "scope": "Two HEMP farms vs city120 L/h"
+    },
+    {
+      "id": "AR-027",
+      "actual": 160,
+      "expected": 160,
+      "pass": true,
+      "scope": "Three HEMP farms exceeds city120 L/h"
+    },
+    {
+      "id": "AR-028",
+      "actual": 8,
+      "expected": 8,
+      "pass": true,
+      "scope": "WOOD-paper profit gross from city wood TEST"
+    },
+    {
+      "id": "AR-029",
+      "actual": 4,
+      "expected": 4,
+      "pass": true,
+      "scope": "Paper batches before output buffer32 full"
+    },
+    {
+      "id": "AR-030",
+      "actual": 16,
+      "expected": 16,
+      "pass": true,
+      "scope": "WOOD consumed before output buffer32 full"
+    },
+    {
+      "id": "AR-031",
+      "actual": 160,
+      "expected": 160,
+      "pass": true,
+      "scope": "4 trees converted to sheets"
+    },
+    {
+      "id": "AR-032",
+      "actual": 248,
+      "expected": 248,
+      "pass": true,
+      "scope": "4 trees irrigation+paper water litres"
+    },
+    {
+      "id": "AR-033",
+      "actual": 8,
+      "expected": 8,
+      "pass": true,
+      "scope": "FLAX water purchase block integer PAPER"
+    },
+    {
+      "id": "AR-034",
+      "actual": 14,
+      "expected": 14,
+      "pass": true,
+      "scope": "Generic fiber alternative water saving for 24 sheets"
+    },
+    {
+      "id": "AR-035",
+      "actual": 768,
+      "expected": 768,
+      "pass": true,
+      "scope": "HEMP 24h idealized output"
+    },
+    {
+      "id": "AR-036",
+      "actual": 1280,
+      "expected": 1280,
+      "pass": true,
+      "scope": "HEMP 24h idealized water"
+    },
+    {
+      "id": "AR-037",
+      "actual": 608,
+      "expected": 608,
+      "pass": true,
+      "scope": "FLAX 24h idealized output"
+    },
+    {
+      "id": "AR-038",
+      "actual": 684,
+      "expected": 684,
+      "pass": true,
+      "scope": "FLAX 24h idealized water"
+    },
+    {
+      "id": "AR-039",
+      "actual": 7200,
+      "expected": 7200,
+      "pass": true,
+      "scope": "20 new players training wage exposure"
+    },
+    {
+      "id": "AR-040",
+      "actual": 36000,
+      "expected": 36000,
+      "pass": true,
+      "scope": "100 new players training wage exposure"
+    }
+  ],
+  "designFailures": [
+    {
+      "id": "DESIGN-001",
+      "issue": "Starter budget shortfall -18 PAPER if city materials purchased",
+      "cc": "CC-029"
+    },
+    {
+      "id": "DESIGN-002",
+      "issue": "Generic PLANT_FIBER allows cross-source recipe water advantage",
+      "cc": "CC-028"
+    },
+    {
+      "id": "DESIGN-003",
+      "issue": "No city treasury emission/stock policy for repeated payments",
+      "cc": "CC-005/006/037"
+    },
+    {
+      "id": "DESIGN-004",
+      "issue": "30L/h pump cannot sustain steady four HEMP farm+paper processing",
+      "cc": "CC-030"
+    },
+    {
+      "id": "DESIGN-005",
+      "issue": "Offline shared-resource concurrency has no actual game runtime implementation/test",
+      "cc": "CC-007/036"
+    }
+  ]
+}
