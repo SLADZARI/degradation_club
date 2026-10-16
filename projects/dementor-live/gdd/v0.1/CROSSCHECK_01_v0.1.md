@@ -1,0 +1,45 @@
+# DEMENTOR LIVE — CROSSCHECK 01
+Первая независимая кросс-проверка GDD v0.1, 2026-10-17. Статус REVIEW: обнаружены конфликты, подтвердить исправления до APPROVED/IMPLEMENTED.
+Метод: сравнение глав Master GDD и фактических документов Drive Character Contract v0.1 / Visual Style Lock v0.2 / Sprite Registry v0.3 / START HERE. Не является исполняемым QA. Термины: BLOCKER (мешает честному утверждению следующего gate), HIGH (нужен до соответствующей подсистемы), MEDIUM (до масштаба/публикации).
+
+## BLOCKER
+CC-001 [BLOCKER | CHARACTER/VISUAL] В Drive SVG Contract v0.1 авторинговые 4 ортографических вида (FRONT/BACK/LEFT/RIGHT), тогда как более поздний Style Lock v0.2 требует 8 runtime направлений под ОДНОЙ выбранной высокой 3/4 камерой, а третий board TOP/CAMERA — исследование камеры, НЕ направления. Нельзя объявить 4 вида полноценным 8-view hero. Решение: авторинговый intermediate 4 вида допустим, выходной контракт 8 directional views под locked camera; два разных gate, единый rig/identity. Owner VISUAL. Status OPEN.
+CC-002 [BLOCKER | CHARACTER/ART] Sprite Registry v0.3 подтверждает только FRONT_RIGHT PNG каждого из 4 NPC (256×320, anchor 128/285); 7 направлений, editable SVG master, skeleton и анимация НЕ PASS. Референс пользователя утверждён для стиля, не ассет. Gate до gameplay: нарисовать одного SVG master, добиться pixel/shape fidelity, создать 8 runtime views и анимационный QA. Owner VISUAL. Status OPEN.
+CC-003 [BLOCKER | ART/GEOMETRY] Visual v0.2 board art draw scale=2.15 выходит за границы reserved artwork; Sprite v0.3 correction требует 2.0×, anchor board (630,985), sprite placed (374,415). Принять более позднюю геометрическую коррекцию для PNG registration; её нельзя трактовать как утверждение SVG-риг/ракурсов. Owner VISUAL. Status CONFIRMED CORRECTION in v0.3, pending GDD propagation.
+CC-004 [BLOCKER | ROADMAP] Drive START HERE: «СНАЧАЛА персонаж, затем графическая система мира; пока не строить игровой прототип и не выбирать движок заранее». Выпуск GDD предлагает G0 scale/камера и ранний движок. Коррекция: совместный Character G0 масштаба на QA-сцене БЕЗ выбора engine, затем G1 SVG hero, только затем выбирать runtime и мультиплеер. Owner RELEASE/TECH. Status REQUIRES GATE CHANGE.
+CC-005 [BLOCKER | ECONOMY] PAPER как валюта и «произведённая бумага» смешивались в исходной идее; GDD предлагает PAPER vs PAPER_SHEET, но нет пользовательского принятия. Без lock производство может стать денежной эмиссией. Решение: явно принять 2 сущности или альтернативный обеспеченный валютный режим, затем обновить все рецепты/сделки/балансы. Owner ECONOMY. OPEN.
+CC-006 [BLOCKER | ECONOMY/WORK] Город одновременно предлагает гарантированные бесконечные задания с оплатой 30 PAPER и ограниченный treasury без утверждённой эмиссии/пополнения. Такая экономика не гарантирует платежеспособность. Решение: реальный бюджет онбординга + политика источника/повторного пополнения, временный симуляционный faucet как отдельный явно учтённый ledger action. Owner ECONOMY. OPEN.
+CC-007 [BLOCKER | TIME/WATER/PRODUCTION/FARM] Offline расчёт «прошло N минут → произвести N циклов» конфликтует с общим резервуаром, водоподачей 30/120 л/час, реакцией на дефицит, складами. Без сериализованной очереди событий возможен double use. Решение: транзакционный ledger + последовательный event engine + общий tested replay, корректная компенсация/резервы. Owner TECH/TIME. OPEN.
+CC-008 [BLOCKER | GDD CAPTURE] 27 глав GDD были развернуты в чате; сохранённый MASTER_GDD_v0.1 — консолидированный индекс, НЕ дословный экспорт глав. До статуса exact archived transcript нужен source bundle/выгрузка первичного обсуждения с разделами и связью source IDs. Owner GOVERNANCE. OPEN.
+
+## HIGH
+CC-009 [HIGH | LAND] LAND mixed parcel states OWNED and DEVELOPED as mutual-exclusive, хотя они независимы. Решение: territory_state, ownership_state, development_state, availability_state; миграция схемы before implementation. Owner LAND. OPEN.
+CC-010 [HIGH | WORLD/LAND/MARKET] PRIVATE only invitation vs публичный магазин. Решение: stand-alone streetfront kiosk или explicit public commercial access segment, не переносить право на private storage/home. Owner LAND/SOCIAL. PROPOSED.
+CC-011 [HIGH | ECONOMY/PRODUCTION] TEST WOOD 4 + WATER10l → PAPER_SHEET 8 за 5мин; городской buy 3/лист vs WOOD buy2, воды2/10л и обслуживания2; выручка24, условная себестоимость12; при городском city sell WOOD3 стоимость сырья12 и полная себестоимость16; ограничение budget/stock обязательно, иначе повторяемый выгодный цикл, денежное опустошение казны. Перед балансировкой проверить paper demand, сырьё, комиссии/отгрузки, роль труда. Owner ECONOMY. OPEN.
+CC-012 [HIGH | FARM/WATER/TIME] Water для hemp 2 л/45мин, flax 3л/75мин, tree 12л/24ч; расход по фиксированным стадиям роста и downtime должен сохраняться при рестарте. Не допускается частичный прогресс за воду, уже зарезервированную другим объектом. Owner WATER/TIME. OPEN.
+CC-013 [HIGH | RESOURCE/TRANSPORT] Склад измеряет условные единицы материала, транспорт — грузовые единицы, коэффициенты занимания места ещё не утверждены. Решение: единый resource item volume/weight factor + capacity policy, проверка split stack. Owner RESOURCE. OPEN.
+CC-014 [HIGH | MARKET/WORK/ECONOMY] Нужно формализовать ownership vs custodian товара, escrow оплаты и процедуру timeout/disconnect/refund. Исключить параллельный payout продавцу и refund покупателю. Owner MARKET. OPEN.
+CC-015 [HIGH | WORLD/COMBAT/LAND] Cooperative instanced expedition допускается в общем мире, но первое освобождение участка = одно мировое событие и не grants ownership; повторные прохождения не изменяют WORLD/LAND снова. Owner COMBAT. OPEN.
+CC-016 [HIGH | BUILD/ECONOMY] Бытовка TEST 6 WOOD+4 PAPER_SHEET и позднее картон как основной конструкционный материал; не менять рецепт задним числом. Решение: оставлять startup paper/wood, carton как advanced или утверждать другой recipe с первой поставкой. Owner BUILD. OPEN.
+CC-017 [HIGH | VISUAL/UNITS] Нет утверждения физической шкалы World Unit:Build Cell и точной камеры при 256×320 PNG и 128×160 test SVG. Нельзя трактовать пиксели как мирные метры. Решение: тестовый scene board/one character anchor + building/tree/bike, затем lock. Owner UNITS. OPEN.
+CC-018 [HIGH | SECURITY/RELEASE] Возможный клиентский Supabase anon SDK не должен делать authority действия (DDL, balances, inventory, property, rewards). Auth+RLS, server checks and admin-only migrations. Owner TECH. OPEN.
+CC-019 [HIGH | SOCIAL/RELEASE] Возрастная политика, moderation, block, chat retention не определены; обязательны до публичной многопользовательской версии. Owner SOCIAL. OPEN.
+CC-020 [HIGH | PROJECT/REPO] Отдельный GitHub repo Dementor Live не найден. Текущий docs-only baseline в отдельной docs ветке родительского degradation_club/projects/dementor-live; исходники игры и окружение должны иметь отдельный определённый repo до реализации. Owner GOVERNANCE/TECH. OPEN.
+
+## MEDIUM
+CC-021 [MEDIUM | WORK/ECONOMY] TEST 30 PAPER за 5–7 мин ≈257–360 PAPER/час без накладных, против S участка360 и заводского цикла с маржой12/5мин; роль работы/автофабрик требует теста 24 часа.
+CC-022 [MEDIUM | LAND/WORLD] Никогда не перекрывать дороги/мосты/реки частной стройкой/транспортом; проверять связность графа общественного прохода.
+CC-023 [MEDIUM | COMBAT/SOCIAL] Команда 2 обязательная для первой кооперативной экспедиции vs игровой solo доступ; обязателен непредвзятый fallback или доступный небоевой прогресс при low online.
+CC-024 [MEDIUM | NPC/VISUAL] БЕТОН/ИСКРА/ШМЫГ/МОХ в нескольких системах указаны как наставники и профессиональные роли; визуал source style принят, но 4 crop не полноценные rigged characters.
+CC-025 [MEDIUM | ENGINE] Ясно не выбран игровой движок; тестировать только после Character Gate и худож. соглашения, исключить 3D Battle.
+CC-026 [MEDIUM | MONETIZATION] F2P + cosmetics это proposal, а не утверждённая финансовая модель; не продавать ускорение валюты до экономического lock.
+CC-027 [MEDIUM | TESTING] Не перепутать DRAFT GDD с IMPLEMENTED и VERIFIED. Все acceptance lists пока тест-планы, не пройденные тесты.
+
+## Минимальный маршрут Crosscheck 02
+1. Approval session P0: CHAR runtime 8 views vs four-source authoring; PAPER currency vs sheet; Character Gate precedence.
+2. Разработать G0 sprite/scene scale QA и 8-view SOURCE asset без gameplay.
+3. Economy mini-sim 24h: active courier, city budget, water/plant/production pipeline, inventory space, city demand, self-dealing exploits.
+4. Data contract review: multi-axis LandParcel, inventory ledger, water allocator, transaction and job escrows.
+5. Заполнить release gate evidence в QA, изменения только через отдельную rev с changelog.
+
+Источники: Drive START HERE 13egjMzmrOQCjew7V-DL2M15jnX7tyJoASTVdJF86Huw; SVG Character Contract 1PptWItZEFiUrDh__gnzTbLCKbGjoHO_bXvfE3t_HGf4; Visual Style v0.2 1tDEk16c0UQ2cXljXMSzwB7wlIPCNzV0LqO2LuhE9Oro; PNG Sprite v0.3 1FNHJmC9f6g-wpPi8jG1nWEyRt1TiV9oLFUj18wKkB1g; текущий GDD и Decision Register.
