@@ -132,7 +132,9 @@ function runCity(args={}){
     p.cash-=c.paperMaint;city.cash+=c.paperMaint;lg.cashFlows.maintenance+=c.paperMaint;
     p.workUntil=t+c.paperMin;machinesBusy++;
   }
-  if(p.warehouse>=c.shipMin&&p.cargo===null&&p.cash>=c.shipPrice){
+  // Do not route a first-time seller to ordinary shipping while a funded first-sale contract is held.
+  if(p.warehouse>=c.shipMin&&p.cargo===null&&p.cash>=c.shipPrice&&
+     !(c.firstSaleMode==="FUNDED_6"&&p.firstOffer==="HELD"&&p.sold===0)){
     const qty=Math.min(p.warehouse,c.shipMax,city.buyQty,
       Math.floor(city.buyBudget/c.buyPrice),Math.floor(city.cash/c.buyPrice),
       c.cityWarehouseCap-city.stock-city.pending);
