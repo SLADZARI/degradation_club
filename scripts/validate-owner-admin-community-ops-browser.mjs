@@ -69,6 +69,16 @@ async function assertUnauthorizedDirectRoute(scenario){
   // Exercise the exact shipped access guard + Community Ops runtime on the real
   // built route. Mock only session/roles (no production identities or RPC writes).
   const page=await browser.newPage({viewport:{width:390,height:844}});
+  const diagnostics={pageErrors:[],relevantRequests:[],responses:[]};
+  page.on('pageerror',error=>diagnostics.pageErrors.push(String(error.message)));
+  page.on('requestfailed',request=>{
+    if(/supabase|site-config|community-ops|owner-admin/.test(request.url()))
+      diagnostics.relevantRequests.push(request.url()+' '+String(request.failure()?.errorText||''));
+  });
+  page.on('response',response=>{
+    if(/site-config|community-ops|owner-admin|jsdelivr/.test(response.url()))
+      diagnostics.responses.push(response.status()+' '+response.url());
+  });
   let forbiddenRpcCalls=0;
   await page.exposeFunction('__dcoForbiddenRpc',()=>{forbiddenRpcCalls++;});
   await page.route('**/site-config.js',route=>route.fulfill({
@@ -81,11 +91,13 @@ async function assertUnauthorizedDirectRoute(scenario){
     body:"export function createClient(){throw new Error('QA_PREPROVIDED_CLIENT_REQUIRED');}"
   }));
   await page.addInitScript(kind=>{
+    window.__dcoGuardProbe={authCalls:0,roleQueries:0};
     const user={id:'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa'};
     const session=kind==='guest'?null:{user};
     window.DEMENTOR_SUPABASE_CLIENT={
-      auth:{getSession:async()=>({data:{session},error:null})},
+      auth:{getSession:async()=>{window.__dcoGuardProbe.authCalls++;return{data:{session},error:null}}},
       from:()=>{
+        window.__dcoGuardProbe.roleQueries++;
         const q={
           select(){return this},
           eq(){return this},
@@ -100,8 +112,21 @@ async function assertUnauthorizedDirectRoute(scenario){
     };
   },scenario);
   try{
-    await page.goto(base+'/workspace/admin/community-ops/index.html',{waitUntil:'domcontentloaded'});
-    await page.waitForURL(base+'/workspace/',{timeout:8000});
+    const initial=await page.goto(base+'/workspace/admin/community-ops/index.html',{waitUntil:'domcontentloaded'});
+    try{await page.waitForURL(base+'/workspace/',{timeout:8000,waitUntil:'domcontentloaded'});}
+    catch(error){
+      const snapshot=await page.evaluate(()=>({
+        href:location.href,
+        configured:window.DEMENTOR_SITE_CONFIG?.supabase?.enabled,
+        guardFlag:document.documentElement.dataset.dcOwnerAdmin||null,
+        probe:window.__dcoGuardProbe||null
+      })).catch(e=>({snapshotError:String(e.message)}));
+      throw new Error(scenario+' direct-route redirect not observed: '+String(error.message)+
+        ' initialHTTP='+initial?.status()+' current='+JSON.stringify(snapshot)+
+        ' responses='+JSON.stringify(diagnostics.responses.slice(-10))+
+        ' failedRequests='+JSON.stringify(diagnostics.relevantRequests.slice(-10))+
+        ' pageErrors='+JSON.stringify(diagnostics.pageErrors.slice(-10)));
+    }
     expect(forbiddenRpcCalls===0,scenario+' made '+forbiddenRpcCalls+' unauthorized RPC calls before redirect');
   }finally{
     await page.close();
