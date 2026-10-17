@@ -7,9 +7,12 @@ Google Drive: https://drive.google.com/drive/folders/11EJ6s_x6WN6zqYTM72Baq7cQR7
 Project boundary: own 2D Dementor Live life sandbox, NOT Dementor Battle / Robo Games. Frozen v0.1 remains unchanged. A new test model is not approved new GDD or functional game code.
 
 
-## New design artifact — City Projects v0.1 (2026-10-17)
-- [CITY_PROJECTS_v0.1.md — Городские проекты](https://github.com/SLADZARI/degradation_club/blob/docs/dementor-live-global-audit-05/projects/dementor-live/design/CITY_PROJECTS_v0.1.md) — [К] chosen early economy direction for a small community; [П] community paper workshop as the first scenario. City projects have finite tasks and physical construction stages, pre-funded accepted contributions, immediate payment for accepted work, solo-friendly progression and a fixed project scope. Budgets, recipe, materials, capacities, professional actions and supply origins remain [О] OPEN; no rule change to frozen GDD v0.1.
-- This is documentation only, not a code change, simulated balance fix or new approved numerical GDD canon.
+## Current design artifact — City Projects v0.2 (2026-10-17)
+
+- [CITY_PROJECTS_v0.2.md — Городские проекты и собственное место в городе](https://github.com/SLADZARI/degradation_club/blob/docs/dementor-live-global-audit-05/projects/dementor-live/design/CITY_PROJECTS_v0.2.md) — актуальная концептуальная редакция. [К] Пустое поле, размеченные площадки и временное представительство мэра; первый проект — городская площадь. Город / государство оплачивает принятый вклад в одобренные проекты; заработанное открывает покупку своего участка и личное развитие. Авторское здание проходит изображения → согласие большинства → игровой макет от платформы / разработчиков → финансируемую городом поэтапную стройку. Образ мэра, правила голосования, бюджет, ресурсы и баланс остаются [О].
+- [П] Предварительное резервирование денег и приёмки, защита от повторного учёта — предлагаемый контракт, не проверенная реализация. Сохраняются малое население, возможность завершить небольшой проект одному, оплата принятой части и фиксированный объём проекта.
+- [CITY_PROJECTS_v0.1.md — предыдущая редакция](../../design/CITY_PROJECTS_v0.1.md) сохранена для истории. Мастерская больше не первый проект; возможна как последующий рабочий пример без установленной очередности.
+- Это документация концепции после GA05, не его тестовый результат и не утверждённый числовой баланс. Frozen Master GDD v0.1 сохранён.
 
 ## Read in order
 1. Round05 full audit: https://docs.google.com/document/d/18fF9JAUKQI9FiCb9FmC9LnKsM7eN-H-Bsjd9TmOanbg/edit
