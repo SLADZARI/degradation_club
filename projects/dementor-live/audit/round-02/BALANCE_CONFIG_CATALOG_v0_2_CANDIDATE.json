@@ -1,0 +1,360 @@
+{
+  "catalog_id": "DL-GA02-BALANCE-CATALOG",
+  "schemaVersion": "0.2-candidate",
+  "date": "2026-10-17",
+  "status": "TEST_ONLY",
+  "notes": [
+    "No values in this catalog are approved new rules; GDD v0.1 legacy TEST + GA02 explicit assumptions",
+    "Config distinction: REAL_TIME vs WORLD_TIME; all rates here REAL_TIME",
+    "Milk millilitres tracked as integer ml, PAPER balances integer; sale and fee ledgers zero-sum in simulation"
+  ],
+  "entries": [
+    {
+      "id": "GA02.cityMoney",
+      "value": 10000,
+      "unit": "PAPER",
+      "source": "GA-02 simulator explicit scenario assumption",
+      "status": "TEST",
+      "notes": "GA-02 arbitrary city treasury fixture; not agreed monetary emission"
+    },
+    {
+      "id": "GA02.farmMoney",
+      "value": 500,
+      "unit": "PAPER",
+      "source": "GA-02 simulator explicit scenario assumption",
+      "status": "TEST",
+      "notes": "GA-02 arbitrary mature-farm working capital; not first-time player grant"
+    },
+    {
+      "id": "GA02.farmStartingSeeds",
+      "value": 4,
+      "unit": "seed",
+      "source": "GA-02 simulator explicit scenario assumption",
+      "status": "TEST",
+      "notes": ""
+    },
+    {
+      "id": "GA02.farmStartingWaterML",
+      "value": 40000,
+      "unit": "ml",
+      "source": "GA-02 simulator explicit scenario assumption",
+      "status": "TEST",
+      "notes": ""
+    },
+    {
+      "id": "GA02.citySeedStock",
+      "value": 64,
+      "unit": "seed",
+      "source": "GA-02 simulator explicit scenario assumption",
+      "status": "TEST",
+      "notes": ""
+    },
+    {
+      "id": "GA02.seedRestockPerRealDay",
+      "value": 32,
+      "unit": "seed/real_day",
+      "source": "GA-02 simulator explicit scenario assumption",
+      "status": "TEST",
+      "notes": "Finite input scarcity stress lever; NOT actual ecology of city supplies"
+    },
+    {
+      "id": "GA02.seedPricePAPER",
+      "value": 4,
+      "unit": "PAPER/seed",
+      "source": "GDD v0.1 TEST value or derivative",
+      "status": "TEST",
+      "notes": ""
+    },
+    {
+      "id": "GA02.paperCityBuyPAPER",
+      "value": 3,
+      "unit": "PAPER/PAPER_SHEET",
+      "source": "GDD v0.1 TEST value or derivative",
+      "status": "TEST",
+      "notes": ""
+    },
+    {
+      "id": "GA02.cityPaperDemandPerRealDay",
+      "value": 64,
+      "unit": "PAPER_SHEET/real_day",
+      "source": "GA-02 simulator explicit scenario assumption",
+      "status": "TEST",
+      "notes": "Finite city demand stress lever; NOT accepted quota"
+    },
+    {
+      "id": "GA02.cityPaperSpendCapPerRealDay",
+      "value": 300,
+      "unit": "PAPER/real_day",
+      "source": "GA-02 simulator explicit scenario assumption",
+      "status": "TEST",
+      "notes": "Global city purchase order allowance for testing"
+    },
+    {
+      "id": "GA02.cityPaperStorageCapacity",
+      "value": 128,
+      "unit": "PAPER_SHEET",
+      "source": "GA-02 simulator explicit scenario assumption",
+      "status": "TEST",
+      "notes": ""
+    },
+    {
+      "id": "GA02.cityPaperConsumePerRealDay",
+      "value": 64,
+      "unit": "PAPER_SHEET/real_day",
+      "source": "GA-02 simulator explicit scenario assumption",
+      "status": "TEST",
+      "notes": ""
+    },
+    {
+      "id": "GA02.cityWaterPackML",
+      "value": 10000,
+      "unit": "ml",
+      "source": "GDD v0.1 TEST value or derivative",
+      "status": "TEST",
+      "notes": ""
+    },
+    {
+      "id": "GA02.cityWaterPackPAPER",
+      "value": 2,
+      "unit": "PAPER/pack",
+      "source": "GDD v0.1 TEST value or derivative",
+      "status": "TEST",
+      "notes": ""
+    },
+    {
+      "id": "GA02.cityWaterPackEveryMinutes",
+      "value": 5,
+      "unit": "real_min/pack",
+      "source": "GDD v0.1 TEST value or derivative",
+      "status": "TEST",
+      "notes": "120L/h cap equivalent for a dedicated service connection; shared trunk NOT modeled"
+    },
+    {
+      "id": "GA02.riverMLPerMinute",
+      "value": 500,
+      "unit": "ml/real_min",
+      "source": "GDD v0.1 TEST value or derivative",
+      "status": "TEST",
+      "notes": "30L/h simple river pump from GDD TEST"
+    },
+    {
+      "id": "GA02.tankCapacityML",
+      "value": 40000,
+      "unit": "ml",
+      "source": "GDD v0.1 TEST value or derivative",
+      "status": "TEST",
+      "notes": "40L storage TEST"
+    },
+    {
+      "id": "GA02.factoryOutputBuffer",
+      "value": 32,
+      "unit": "PAPER_SHEET",
+      "source": "GDD v0.1 TEST value or derivative",
+      "status": "TEST",
+      "notes": "32 sheet buffer from production TEST"
+    },
+    {
+      "id": "GA02.warehouseCapacity",
+      "value": 128,
+      "unit": "PAPER_SHEET",
+      "source": "GA-02 simulator explicit scenario assumption",
+      "status": "TEST",
+      "notes": ""
+    },
+    {
+      "id": "GA02.deliveryIntervalMinutes",
+      "value": 60,
+      "unit": "real_min",
+      "source": "GA-02 simulator explicit scenario assumption",
+      "status": "TEST",
+      "notes": ""
+    },
+    {
+      "id": "GA02.deliveryTripMinutes",
+      "value": 15,
+      "unit": "real_min",
+      "source": "GA-02 simulator explicit scenario assumption",
+      "status": "TEST",
+      "notes": ""
+    },
+    {
+      "id": "GA02.deliveryBatchMax",
+      "value": 32,
+      "unit": "PAPER_SHEET",
+      "source": "GA-02 simulator explicit scenario assumption",
+      "status": "TEST",
+      "notes": ""
+    },
+    {
+      "id": "GA02.deliveryMinLoad",
+      "value": 16,
+      "unit": "PAPER_SHEET",
+      "source": "GA-02 simulator explicit scenario assumption",
+      "status": "TEST",
+      "notes": ""
+    },
+    {
+      "id": "GA02.deliveryFeePAPER",
+      "value": 5,
+      "unit": "PAPER/shipment",
+      "source": "GA-02 simulator explicit scenario assumption",
+      "status": "TEST",
+      "notes": "Toy municipal courier cost; not an approved salary"
+    },
+    {
+      "id": "GA02.maintenancePerPaperBatchPAPER",
+      "value": 2,
+      "unit": "PAPER/paper_batch",
+      "source": "GDD v0.1 TEST value or derivative",
+      "status": "TEST",
+      "notes": ""
+    },
+    {
+      "id": "GA02.CROP.HEMP.growthMin",
+      "value": 45,
+      "unit": "real_min",
+      "source": "GDD v0.1 recipe TEST",
+      "status": "TEST"
+    },
+    {
+      "id": "GA02.CROP.HEMP.seedWaterML",
+      "value": 2000,
+      "unit": "ml/plant",
+      "source": "GDD v0.1 recipe TEST",
+      "status": "TEST"
+    },
+    {
+      "id": "GA02.CROP.HEMP.yield",
+      "value": 3,
+      "unit": "raw_units/plant",
+      "source": "GDD v0.1 recipe TEST",
+      "status": "TEST"
+    },
+    {
+      "id": "GA02.CROP.HEMP.input",
+      "value": 3,
+      "unit": "raw_units/paper_batch",
+      "source": "GDD v0.1 recipe TEST",
+      "status": "TEST"
+    },
+    {
+      "id": "GA02.CROP.HEMP.preTime",
+      "value": 2,
+      "unit": "real_min",
+      "source": "GDD v0.1 recipe TEST",
+      "status": "TEST"
+    },
+    {
+      "id": "GA02.CROP.HEMP.paperTime",
+      "value": 4,
+      "unit": "real_min",
+      "source": "GDD v0.1 recipe TEST",
+      "status": "TEST"
+    },
+    {
+      "id": "GA02.CROP.HEMP.paperOut",
+      "value": 6,
+      "unit": "PAPER_SHEET/paper_batch",
+      "source": "GDD v0.1 recipe TEST",
+      "status": "TEST"
+    },
+    {
+      "id": "GA02.CROP.HEMP.paperWaterML",
+      "value": 8000,
+      "unit": "ml/paper_batch",
+      "source": "GDD v0.1 recipe TEST",
+      "status": "TEST"
+    },
+    {
+      "id": "GA02.CROP.HEMP.fiberId",
+      "value": "HEMP_FIBER",
+      "unit": "SKU",
+      "source": "GA-01 proposed provenance fix CC-028",
+      "status": "PROPOSED"
+    },
+    {
+      "id": "GA02.CROP.FLAX.growthMin",
+      "value": 75,
+      "unit": "real_min",
+      "source": "GDD v0.1 recipe TEST",
+      "status": "TEST"
+    },
+    {
+      "id": "GA02.CROP.FLAX.seedWaterML",
+      "value": 3000,
+      "unit": "ml/plant",
+      "source": "GDD v0.1 recipe TEST",
+      "status": "TEST"
+    },
+    {
+      "id": "GA02.CROP.FLAX.yield",
+      "value": 4,
+      "unit": "raw_units/plant",
+      "source": "GDD v0.1 recipe TEST",
+      "status": "TEST"
+    },
+    {
+      "id": "GA02.CROP.FLAX.input",
+      "value": 4,
+      "unit": "raw_units/paper_batch",
+      "source": "GDD v0.1 recipe TEST",
+      "status": "TEST"
+    },
+    {
+      "id": "GA02.CROP.FLAX.preTime",
+      "value": 3,
+      "unit": "real_min",
+      "source": "GDD v0.1 recipe TEST",
+      "status": "TEST"
+    },
+    {
+      "id": "GA02.CROP.FLAX.paperTime",
+      "value": 5,
+      "unit": "real_min",
+      "source": "GDD v0.1 recipe TEST",
+      "status": "TEST"
+    },
+    {
+      "id": "GA02.CROP.FLAX.paperOut",
+      "value": 8,
+      "unit": "PAPER_SHEET/paper_batch",
+      "source": "GDD v0.1 recipe TEST",
+      "status": "TEST"
+    },
+    {
+      "id": "GA02.CROP.FLAX.paperWaterML",
+      "value": 6000,
+      "unit": "ml/paper_batch",
+      "source": "GDD v0.1 recipe TEST",
+      "status": "TEST"
+    },
+    {
+      "id": "GA02.CROP.FLAX.fiberId",
+      "value": "FLAX_FIBER",
+      "unit": "SKU",
+      "source": "GA-01 proposed provenance fix CC-028",
+      "status": "PROPOSED"
+    },
+    {
+      "id": "GA02.AUTOMATION.minimumWorkingCapitalPAPER",
+      "value": 60,
+      "unit": "PAPER",
+      "source": "GA-02 proposed safety backpressure fixture",
+      "status": "PROPOSED_TEST"
+    },
+    {
+      "id": "GA02.AUTOMATION.maxRawInputBeforePause",
+      "value": 24,
+      "unit": "raw_units",
+      "source": "GA-02 proposed safety backpressure fixture",
+      "status": "PROPOSED_TEST"
+    },
+    {
+      "id": "GA02.AUTOMATION.maxFinishedStockBeforePause",
+      "value": 96,
+      "unit": "PAPER_SHEET",
+      "source": "GA-02 proposed safety backpressure fixture",
+      "status": "PROPOSED_TEST"
+    }
+  ]
+}
