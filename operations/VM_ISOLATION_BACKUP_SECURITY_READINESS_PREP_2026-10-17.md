@@ -21,6 +21,108 @@ semanticMutationAuthorized: false
 **Verdict: PREP REPORT / LEAD-ACCEPTED AS DRAFT PLANNING INPUT; INFRASTRUCTURE UNVERIFIED.**  
 **Production effect: NONE.** This report is not a Decision, Result, Gate, host approval or deploy authorization. It proposes no immediate change to existing services. Parent [#237](https://github.com/SLADZARI/degradation_club/issues/237) remains **BACKLOG/DEFERRED**; [#228](https://github.com/SLADZARI/degradation_club/issues/228) does not yet provide an accepted current stable migration baseline.
 
+## Lead wave 9: **Public frontend hosting cutover PREP ONLY** (2026-10-17, ~17:18 UTC)
+
+**New owner scope/sequence:** [#237 owner Stage 1→Stage 2 decision](https://github.com/SLADZARI/degradation_club/issues/237#issuecomment-6237372766) and [Lead assignment #255](https://github.com/SLADZARI/degradation_club/issues/255#issuecomment-6237292833). **Stage 1:** move the actual public frontend hostname \`https://dementor.club\` from GitHub Pages to existing Kirill VM; keep current Supabase Cloud Auth/RLS/Storage/Edge workers and all semantics. **Stage 2:** backend migration only after Stage 1 acceptance, with *separate* approved Result/Gate, backup/restore and QA. This is **scope/order approval, NOT permission for any production Nginx, certificate, DNS or host change**. Stage A private preview [Draft PR #258](https://github.com/SLADZARI/degradation_club/pull/258) is NOT a public release Gate and carries a recorded pre-Gate execution deviation. Existing architectural Draft PR #257 stays REFERENCE/DRAFT only. Parent #228 stable QA = NO-GO.
+
+### W9-1. DNS / current public TLS: actual external read-only observations
+
+**Collection source:** read-only shell \`dig\`, \`curl -I\`, and \`openssl s_client\` on connected Mac \`Macbooks-MacBook-Pro.local\`, UTC \`2026-10-17T17:18:16Z\` through ~17:19Z. This probes **the public domain only** (not the Kirill VM, its ports or credentials). Authoritative A/CNAME checks used \`@ns75.domaincontrol.com\`; nonauthoritative resolver results agreed. Public HTTPS HEAD succeeded, and certificate metadata was inspected without writing state.
+
+| Property | Observed | Cutover / owner implication |
+| --- | --- | --- |
+| Current apex \`dementor.club\` A | \`185.199.108.153\`, \`185.199.109.153\`, \`185.199.110.153\`, \`185.199.111.153\`, **authoritative TTL 600 seconds** | **GitHub Pages** IPv4 quartet; do not change until G7 approval |
+| Current apex AAAA | **No AAAA answer** from resolver and authoritative NS at collection | Do **not** add VM AAAA until the VM IPv6 address, Nginx IPv6 TLS listener and firewall reachability are verified under host owner |
+| Apex CNAME | None returned | Apex A is cutover record type; planned change below requires domain owner credentials (not held by this report) |
+| \`www.dementor.club\` CNAME | \`sladzari.github.io.\`, **TTL 3600 seconds** at authoritative NS | Existing www route follows Pages today; separate explicit choice to keep Pages-managed www→apex redirect temporarily **or** migrate www TLS/redirect under separately approved config. Do not break this by removing Pages prematurely |
+| Nameservers | \`ns75.domaincontrol.com\`, \`ns76.domaincontrol.com\` | DNS service appears DomainControl/GoDaddy nameservers; **registrar/account/editor/controller not yet established**. No DNS credentials used |
+| Public apex response | \`HTTP/2 200\`, \`server: GitHub.com\`, \`x-github-request-id\` and \`via: varnish\` | Confirms GitHub is serving the public domain at test time, not VM |
+| Public www response | \`HTTP/2 301\` → \`https://dementor.club/\` with GitHub.com server | Preserve canonical www→apex behavior when/if www changes hosts |
+| Public apex certificate | Subject CN \`dementor.club\`; issuer **Let's Encrypt YR2**; validity \`2026-08-29 08:38:58 UTC\` → \`2026-11-27 08:38:57 UTC\` | **CURRENT PAGES certificate**, not proof of a certificate/key on the VM. A new or separately authorized **VM-readable valid** cert/chain must be prepared before any live cutover, with automated renewal owner documented |
+
+**Host baseline already supplied, but not independently SSH-verified by Architect:** [#255 operator BEFORE snapshot at 15:33:37 UTC](https://github.com/SLADZARI/degradation_club/issues/255#issuecomment-6235861662) proves *from submitted output* \`/srv/dementor\` root:root/0755; 75G disk / 43G available, 7.6 GiB RAM / 6.8 GiB available at one moment, 4 vCPU; nginx, docker, gitlab-runner active; \`db-dev\` on 32778. [Stage A private launch evidence](https://github.com/SLADZARI/degradation_club/issues/237#issuecomment-6236459364) reports files at \`/srv/dementor/stage-a/releases/cde332779ab0e256dd1e498660d6fa651e91846e\` and \`nobody\` on \`127.0.0.1:18080\`, **NOT verified by current SSH session**. [Architect independent AFTER attempt](https://github.com/SLADZARI/degradation_club/issues/255#issuecomment-6237112145) failed before login on an untrusted ED25519 host identity for this connected Mac. Do not override host-key checking or equate a different Mac's trust failure with server outage.
+
+### W9-2. Existing Nginx ownership and certificate control: **MISSING HOST-OWNER PROOF**
+
+| Item | What is known | Exact read-only Kirill/operator evidence still needed |
+| --- | --- | --- |
+| Nginx 80/443 owner, default/wildcard overlap | Historical host nginx active; multiple protected MDAO vhosts | Dated redacted list of active vhost *symlink/file paths*, \`server_name\` **name-only map**, \`listen\` address:port summary and owner/controller, whether default/\`dementor.club\` name collision exists; don't publish private upstreams or full configs |
+| Certificate management on VM | **UNKNOWN**. Public GitHub certificate ≠ VM certificate | TLS/ACME/Certbot or other renewal **mechanism and responsible host admin**, current public name ownership, allowed DNS-01 vs other authorized challenge method, prospective separate cert file **paths only after consent**, renewal/rollback owner. Never copy GH Pages private keys or assume certificate availability |
+| Existing staging artifact/root | Operator reports exact immutable release directory and private Python listener | Dated \`ls\`/\`stat\` proof that \`index.html\` and required static files are **direct children of that path** (or identify correct \`_site\` subpath), actual uid/modes, \`SHA256(index.html)\`, no symlink escape; Nginx read rights and static root owner review |
+| IPv6 / external ingress | VM IPv6 historically reported; exact host nginx dual-stack config not supplied | Kirill-approved IPv4+IPv6 listener/TLS/firewall and upstream/public-reachability plan; default no new AAAA until checked |
+| Owner rights and protected services | MDAO /data, nginx, docker, runner, db-dev existing and protected | Kirill's explicit vhost file owner and approved *future* site-only change path; signed/sanitized BEFORE and AFTER service snapshot. **No edits** to current configs or \`/data/*\` |
+| DNS registrar/account and TTL control | Authoritative DNS points to DomainControl/GoDaddy nameservers | Actual domain management account/DNS editor, ability to replace four apex A with approved VM IPv4, live TTL/rollback plan and propagation window owner |
+
+**Provenance limits:** no current \`nginx -T\`, Certbot configuration, host \`sites-enabled\` map or VM TLS keys have been read. Do not claim that a file under \`/etc/nginx/sites-available\` is already included or that host has a working \`dementor.club\` certificate. Need Kirill's sanitized paths/owner acknowledgement before converting template to exact executable diff.
+
+### W9-3. Minimal **separate** virtual-host proposal (NOT A CONFIG DEPLOYED)
+
+The following is the **intended isolated added server block**, to be instantiated *only after* Kirill has confirmed active includes, name/port collisions, actual static root/read permissions, VM certificate paths, IPv6 policy and rollback owner. It must be reviewed as an **exact config diff in its own approved frontend-hosting Result/G6/G7**. The proposed new site file path is **candidate only**: \`/etc/nginx/sites-available/dementor.club.conf\`, activated by whatever host-specific include/symlink mechanism Kirill approves; do **not** overwrite an existing site.
+
+\`\`\`nginx
+# PROPOSAL ONLY — NEVER paste onto VM until separate owner/Kirill G6/G7 authorization.
+# New server block; no changes to default site or any MDAO vhost.
+server {
+    listen 443 ssl;
+    # listen [::]:443 ssl;  # ONLY after approved host dual-stack and DNS AAAA plan
+    server_name dementor.club;
+
+    # Verify that index.html actually lives directly here; never point to /data.
+    root /srv/dementor/stage-a/releases/cde332779ab0e256dd1e498660d6fa651e91846e;
+    index index.html;
+
+    # Paths must come from host-approved separate certificate issuance/renewal owner.
+    ssl_certificate     <VM_CERT_FULLCHAIN_PATH_APPROVED_BY_KIRILL>;
+    ssl_certificate_key <VM_CERT_PRIVATE_KEY_PATH_APPROVED_BY_KIRILL>;
+
+    # Multi-page static build: /projects/, /workspace/board/, /join/, /auth/callback/.
+    # No SPA catch-all to '/' (avoids accidental 200 for missing/private routes).
+    location / {
+        try_files $uri $uri/ =404;
+    }
+
+    # Never serve dotfiles, private repositories or deployment metadata.
+    location ~ (^|/)\. {
+        return 404;
+    }
+
+    # Site files are pinned to a SHA; do not set blanket immutable cache on HTML/JS.
+}
+# Optional apex HTTP→HTTPS redirect ONLY after conflict-free host 80 inventory.
+# Separate www certificate/redirect decision required; do not steal existing MDAO names.
+\`\`\`
+
+**Not literal deployable config yet:** angle-bracket certificate placeholders make it a **planning template**, not an \`nginx -t\`-ready file. At exact-config approval replace placeholders with real admin-controlled VM cert paths, inspect actual root and \`try_files\` directory/index behavior, and examine existing host \`listen\`/server_name patterns; if existing MDAO default \`443\` must change or access requires modifying another owner block, **STOP/Change Proposal**, not blind edits. Dedicated \`dementor.club\` vhost HTTPS is distinct from the running private Python static server; the latter does **not** by itself supply public TLS or nginx configuration.
+
+**Routing checks for approved RC:** \`/\`, \`/projects/\`, \`/workspace/\`, \`/workspace/board/\`, \`/join/\`, \`/join/apply/\`, \`/auth/callback/\`, \`/robots.txt\`, \`/sitemap.xml\`, \`/site-config.js\`, \`/assets/...\` return correct 200/asset type; non-existent asset and forbidden dot path must return 404; trailing-slash/direct refresh and index behavior must match Pages. Validate mobile 360/390/414/430 and 1440, real share/canonical/OG/meta and relative paths; **existing** Board anonymous CTA and mobile H1 clipping remain documented P1 until independently fixed in their own approved Web/UI Result. Same-origin public HTTP→HTTPS/www redirects must not alter Auth callback, Supabase URL or API policies.
+
+### W9-4. Proposed DNS + certificate + QA **cutover and rollback**; all changes future-gated
+
+**Frozen input:** only \`dementor-club-production@cde332779ab0e256dd1e498660d6fa651e91846e\` and its already-built static artifact, without modified auth/media config. The existing \`_site/CNAME=dementor.club\` is Pages-origin metadata, **not** a DNS instruction or a new nginx CNAME handler. [Live current workflow](https://github.com/SLADZARI/degradation_club/blob/dementor-club-production/.github/workflows/deploy-pages.yml) builds using Node 22 and requires \`release_confirmation=APPROVED\`; it retains GitHub Pages until explicit release approval. Source \`site-config.js\` has canonicalOrigin \`https://dementor.club\` and the **same** Supabase Cloud endpoint with Google login/PKCE. The site-host move should not require a new OAuth redirect if canonical origin remains unchanged, but **callback/PKCE actual browser test is required**.
+
+| Gate / order | Planned exact decision/test, NOT run now | Authority and rollback |
+| --- | --- | --- |
+| G0 host/no-interference | Kirill supplies dated nginx MDAO vhost/listener/cert ownership inventory, correct static root/read ACLs, disk reserve and **BEFORE I1–I8**. Do not disturb MDAO. | Kirill/MDAO; no host mutation in #255 |
+| G1 certificate BEFORE DNS | Select Kirill-approved issuance method (e.g. DNS-01, or another authorized method that does not hijack MDAO vhosts). Prepare valid apex certificate with renewal owner and test hostname/SNI; public Pages cert **cannot** be presumed copied | Kirill + DNS/cert owner, planned separate Gate; do not request issuance now |
+| G2 isolated exact RC | Once separately authorized, add **only** new server block and new site-specific enabling link (if host uses it), review literal diff and perform \`nginx -t\` then Kirill-approved reload. Before DNS change validate intended HTTPS via verified IP/SNI e.g. \`curl --resolve dementor.club:443:<VM_IPV4> https://dementor.club/\` for 200/redirect/route/asset/cert chain; validate no impact on existing MDAO. | Kirill + Club owner + Q-01; **all commands are future steps** |
+| G3 QA release delta | Anonymous/public: direct-refresh/routes/status/SEO/OG/canonical/mobile; with approved safe actor fixtures: Auth callback/PKCE/session, Guest/Applicant/Member/Dementor/Owner, CIRCLE/Storage RLS negatives; distinguish already-known P1 UX and #228 parent NO-GO. Do not mutate LIVE Cloud data to "test" staging. | Q-01 independent with Lead/owner disposition |
+| G4 explicit production approval | Exact site-specific Result/G6 and clean G7 RC, authorized config diff, cert+AAAA choice, restored fallback, owner+Kirill public-DNS/cutover approval. **PR #258 Stage A private proposal is NOT this Gate.** | Owner + Kirill + Lead, NOT authorized now |
+| G5 DNS transition | After approval, **replace apex four GitHub Pages A records** with approved VM IPv4 (\`138.199.144.94\` is historical host address; reverify immediately before use); authoritative TTL currently 600s. **Apex AAAA currently absent: do not invent it**. Decide www separately, preserving HTTPS \`www→apex\` or migrating it to owned VM vhost after its own cert plan. | Domain/DNS owner, record exact before/after values and time; no update now |
+| G6 live G8 | Verify DNS resolving VM, valid cert both chosen hostnames, HTTP redirect to HTTPS, content/Workspace/Board, same Cloud backend/auth/Storage, mobile/SEO/404, error logs **sanitized**, I1–I8 MDAO invariants, and runtime resource headroom; record accepted SHA/release time and owner signoff. | QA+DevOps+Lead+owner; only then RELEASED |
+| G7 rollback if fail | Domain owner restores **exact original GitHub Pages A quartet** at apex; original Pages custom domain and manual workflow must remain functional during window, no premature Pages decommission. Reverse only site-specific new nginx activation **by Kirill under approved plan**, keep MDAO untouched. Validate HTTPS after DNS propagation for both apex/www; DNS cache/TLL can delay reversion, require agreed write freeze/recovery window and monitor. | Kirill for host changes, DNS owner for records, owner/Lead for rollback decision |
+
+**Important DNS TTL:** authoritative \`600\` seconds describes published record TTL, **not** a guaranteed global cutover time; recursive caching, resolvers and TLS/ACME propagation vary. \`www\` CNAME TTL is \`3600\` seconds, so plan www redirects deliberately. Do **not** remove Pages custom-domain mapping/credentials or publish a new AAAA before rollback viability is tested.
+
+**STOP conditions:** any required edit to existing MDAO vhost/listeners, unexpected 80/443 conflict, no valid VM certificate/private key management, stale/incorrect static root, wrong production SHA, loss of existing Cloud callback/privacy behavior, missing DNS owner/IPv6 decision, absent repeatable Pages fallback, or independent QA negative failure → NO-GO; no production DNS switching.
+
+### W9-5. Acceptance/evidence classification & next exact owner
+
+**VERIFIED BY THIS AUTHOR (external only):** authoritative A/AAAA/CNAME/TTL/NS values above; GitHub Pages server HTTP 200 / www→apex 301 and live cert issuer/validity; exact GitHub source Pages workflow and \`site-config.js\`; previous operator-documented VM root/resources/private smoke and QA-declared limits from cited GitHub evidence.
+
+**OWNER/OPERATOR-REPORTED, NOT INDEPENDENTLY CHECKED HERE:** on-VM static files/loopback listener, unchanged legacy services after original launch; live SSH existence on the operator's *different* Mac. **MISSING/NOT VERIFIED:** actual nginx vhost/cert file paths & current protected MDAO vhost contents/owner mapping; VM TLS certificate readiness; safe public nginx diff after host inventory; authoritative DNS account control; full I1–I8 AFTER snapshot; genuine authenticated negative fixtures; exact RC/G6/G7/G8; owner release authorization.
+
+**NEXT / Architect–DevOps:** await **one sanitized Kirill host vhost/listener/cert-owner/static-root inventory** through the previously trusted operator or Kirill-approved channel (never bypass strict SSH host identity); reconcile this template to a proposed literal *new-file-only* config diff in the **same PR #257** for Lead/Q-01 review. **NEXT / Lead/owner:** establish DNS administrator and later open/approve a **separate site-hosting Result/Gate** (not Stage A #258 or Backend #237); obtain release and Kirill approval only after QA. **PRODUCTION/VM EFFECT: NONE from this document update.**
+
 ## LEAD WAVE 2 — READ-ONLY STAGE A SAFETY & HOST INVENTORY (2026-10-17)
 
 **Permission:** [Lead #255](https://github.com/SLADZARI/degradation_club/issues/255#issuecomment-6235077290) and [owner prep direction #237](https://github.com/SLADZARI/degradation_club/issues/237#issuecomment-6235076956) allow architecture/reporting and Kirill-authorized read-only snapshots ONLY. [Q-01](https://github.com/SLADZARI/degradation_club/issues/228#issuecomment-6235143113) explicitly says Stage A READ-ONLY PREP MAY PROCEED; public/authenticated VM staging and parent #228 stable-baseline remain NO-GO. No staging Result/Gate is approved; no VM write is authorized.
