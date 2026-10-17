@@ -65,7 +65,52 @@ async function open(width=1280,height=900){
   return{page,errors};
 }
 
+async function assertUnauthorizedDirectRoute(scenario){
+  // Exercise the exact shipped access guard + Community Ops runtime on the real
+  // built route. Mock only session/roles (no production identities or RPC writes).
+  const page=await browser.newPage({viewport:{width:390,height:844}});
+  let forbiddenRpcCalls=0;
+  await page.exposeFunction('__dcoForbiddenRpc',()=>{forbiddenRpcCalls++;});
+  await page.route('**/site-config.js',route=>route.fulfill({
+    status:200,contentType:'application/javascript',
+    body:"window.DEMENTOR_SITE_CONFIG={supabase:{enabled:true,url:'https://invalid.example',publishableKey:'local-qa'}};"
+  }));
+  await page.route('**/npm/@supabase/supabase-js@2.112.4/+esm',route=>route.fulfill({
+    status:200,contentType:'application/javascript',
+    headers:{'access-control-allow-origin':'*'},
+    body:"export function createClient(){throw new Error('QA_PREPROVIDED_CLIENT_REQUIRED');}"
+  }));
+  await page.addInitScript(kind=>{
+    const user={id:'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa'};
+    const session=kind==='guest'?null:{user};
+    window.DEMENTOR_SUPABASE_CLIENT={
+      auth:{getSession:async()=>({data:{session},error:null})},
+      from:()=>{
+        const q={
+          select(){return this},
+          eq(){return this},
+          then(resolve,reject){return Promise.resolve({
+            data:[{role:'club_member',status:'active',valid_from:null,valid_to:null}],
+            error:null
+          }).then(resolve,reject)}
+        };
+        return q;
+      },
+      rpc:async()=>{await window.__dcoForbiddenRpc();throw new Error('UNAUTHORIZED_RPC_CALLED')}
+    };
+  },scenario);
+  try{
+    await page.goto(base+'/workspace/admin/community-ops/index.html',{waitUntil:'domcontentloaded'});
+    await page.waitForURL(base+'/workspace/',{timeout:8000});
+    expect(forbiddenRpcCalls===0,scenario+' made '+forbiddenRpcCalls+' unauthorized RPC calls before redirect');
+  }finally{
+    await page.close();
+  }
+}
+
 try{
+  await assertUnauthorizedDirectRoute('guest');
+  await assertUnauthorizedDirectRoute('member');
   const run=await open();
   const page=run.page;
 
@@ -133,4 +178,4 @@ if(failures.length){
   failures.forEach(f=>console.error('- '+f));
   process.exit(1);
 }
-console.log('Owner Admin Community Ops browser acceptance PASS: safe ambiguity, slot grant dedupe+reread, Idea invite/remove, canonical archive, desktop/390/360.');
+console.log('Owner Admin Community Ops browser acceptance PASS: guest/member direct-route redirect without RPCs; safe ambiguity, slot grant dedupe+reread, Idea invite/remove, canonical archive, desktop/390/360.');
