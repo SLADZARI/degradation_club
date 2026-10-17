@@ -6,6 +6,11 @@ Google Drive: https://drive.google.com/drive/folders/11EJ6s_x6WN6zqYTM72Baq7cQR7
 
 Project boundary: own 2D Dementor Live life sandbox, NOT Dementor Battle / Robo Games. Frozen v0.1 remains unchanged. A new test model is not approved new GDD or functional game code.
 
+
+## New design artifact — City Projects v0.1 (2026-10-17)
+- [CITY_PROJECTS_v0.1.md — Городские проекты](https://github.com/SLADZARI/degradation_club/blob/docs/dementor-live-global-audit-05/projects/dementor-live/design/CITY_PROJECTS_v0.1.md) — [К] chosen early economy direction for a small community; [П] community paper workshop as the first scenario. City projects have finite tasks and physical construction stages, pre-funded accepted contributions, immediate payment for accepted work, solo-friendly progression and a fixed project scope. Budgets, recipe, materials, capacities, professional actions and supply origins remain [О] OPEN; no rule change to frozen GDD v0.1.
+- This is documentation only, not a code change, simulated balance fix or new approved numerical GDD canon.
+
 ## Read in order
 1. Round05 full audit: https://docs.google.com/document/d/18fF9JAUKQI9FiCb9FmC9LnKsM7eN-H-Bsjd9TmOanbg/edit
 2. Core GDD v0.2 (draft) for MONEY, RESOURCE, WORK, QUEST, LAND, BUILD, FARM, PRODUCTION, WATER, TIME, MARKET, TRANSPORT, AUTOMATION, TECH, RELEASE: https://docs.google.com/document/d/1UOEPzp5qAI-TDzGEgVl_k8Sdj8b4LosKUmjz9S8UGGc/edit
