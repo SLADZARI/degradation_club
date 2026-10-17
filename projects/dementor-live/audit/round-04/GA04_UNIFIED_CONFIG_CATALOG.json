@@ -1,0 +1,411 @@
+{
+  "schema": "DEMENTOR_LIVE_GA04_TEST_PARAMETER_CATALOG_V0.1",
+  "unapproved": true,
+  "generated_at": "2026-10-17",
+  "system_key": "Dementor Live 2D independent",
+  "currency": "PAPER (proposed money ledger)",
+  "physical_paper": "PAPER_SHEET (proposed inventory)",
+  "governance": "Do not use as approved canonical production balance. Separate 27 domain ownerships.",
+  "entries": [
+    {
+      "id": "GA04.n",
+      "value": 20,
+      "domain": "cohort",
+      "unit": "players",
+      "source": "GA04 stress cohort",
+      "status": "TEST_NOT_APPROVED"
+    },
+    {
+      "id": "GA04.days",
+      "value": 7,
+      "domain": "TIME",
+      "unit": "real_day",
+      "source": "GA04 horizon",
+      "status": "TEST_NOT_APPROVED"
+    },
+    {
+      "id": "GA04.treasury",
+      "value": 50000,
+      "domain": "ECONOMY",
+      "unit": "PAPER",
+      "source": "GA04 city funding fixture",
+      "status": "TEST_NOT_APPROVED"
+    },
+    {
+      "id": "GA04.arrivalEvery",
+      "value": 0,
+      "domain": "WORK",
+      "unit": "real_min/player",
+      "source": "GA04 stagger",
+      "status": "TEST_NOT_APPROVED"
+    },
+    {
+      "id": "GA04.cityWood",
+      "value": 600,
+      "domain": "RESOURCE",
+      "unit": "WOOD",
+      "source": "GA04 starter stock",
+      "status": "TEST_NOT_APPROVED"
+    },
+    {
+      "id": "GA04.citySheets",
+      "value": 400,
+      "domain": "RESOURCE",
+      "unit": "PAPER_SHEET",
+      "source": "GA04 starter sheet stock",
+      "status": "TEST_NOT_APPROVED"
+    },
+    {
+      "id": "GA04.citySeeds",
+      "value": 600,
+      "domain": "RESOURCE",
+      "unit": "SEED_HEMP",
+      "source": "GA04 stock",
+      "status": "TEST_NOT_APPROVED"
+    },
+    {
+      "id": "GA04.plots",
+      "value": 200,
+      "domain": "LAND",
+      "unit": "plots",
+      "source": "GA04 test",
+      "status": "TEST_NOT_APPROVED"
+    },
+    {
+      "id": "GA04.seedRestockDay",
+      "value": 100,
+      "domain": "RESOURCE",
+      "unit": "SEED_HEMP/real_day",
+      "source": "GA04 synthetic restocking",
+      "status": "TEST_NOT_APPROVED"
+    },
+    {
+      "id": "GA04.tutorialGrant",
+      "value": 80,
+      "domain": "ECONOMY",
+      "unit": "PAPER/player",
+      "source": "GDD v0.1 TEST",
+      "status": "TEST_NOT_APPROVED"
+    },
+    {
+      "id": "GA04.trainingJobs",
+      "value": 4,
+      "domain": "WORK",
+      "unit": "jobs/player",
+      "source": "GDD v0.1 TEST",
+      "status": "TEST_NOT_APPROVED"
+    },
+    {
+      "id": "GA04.tutorialWage",
+      "value": 90,
+      "domain": "WORK",
+      "unit": "PAPER/job",
+      "source": "GDD v0.1 TEST",
+      "status": "TEST_NOT_APPROVED"
+    },
+    {
+      "id": "GA04.trainingMin",
+      "value": 7,
+      "domain": "WORK",
+      "unit": "real_min/job",
+      "source": "GDD v0.1 TEST range 5–7",
+      "status": "TEST_NOT_APPROVED"
+    },
+    {
+      "id": "GA04.landPrice",
+      "value": 360,
+      "domain": "LAND",
+      "unit": "PAPER/plot",
+      "source": "GDD v0.1 TEST",
+      "status": "TEST_NOT_APPROVED"
+    },
+    {
+      "id": "GA04.cabinFee",
+      "value": 60,
+      "domain": "BUILD",
+      "unit": "PAPER/cabin",
+      "source": "GDD v0.1 TEST",
+      "status": "TEST_NOT_APPROVED"
+    },
+    {
+      "id": "GA04.cabinWood",
+      "value": 6,
+      "domain": "BUILD",
+      "unit": "WOOD/cabin",
+      "source": "GDD v0.1 TEST",
+      "status": "TEST_NOT_APPROVED"
+    },
+    {
+      "id": "GA04.cabinSheets",
+      "value": 4,
+      "domain": "BUILD",
+      "unit": "PAPER_SHEET/cabin",
+      "source": "GDD v0.1 TEST",
+      "status": "TEST_NOT_APPROVED"
+    },
+    {
+      "id": "GA04.buildMin",
+      "value": 10,
+      "domain": "BUILD",
+      "unit": "real_min",
+      "source": "GA04 fixture",
+      "status": "TEST_NOT_APPROVED"
+    },
+    {
+      "id": "GA04.extraWage",
+      "value": 30,
+      "domain": "WORK",
+      "unit": "PAPER/job",
+      "source": "GDD v0.1 ordinary courier TEST",
+      "status": "TEST_NOT_APPROVED"
+    },
+    {
+      "id": "GA04.extraWorkMin",
+      "value": 7,
+      "domain": "WORK",
+      "unit": "real_min/job",
+      "source": "GA04 test",
+      "status": "TEST_NOT_APPROVED"
+    },
+    {
+      "id": "GA04.maxExtraWork",
+      "value": 12,
+      "domain": "WORK",
+      "unit": "jobs/player",
+      "source": "GA04 fixture",
+      "status": "TEST_NOT_APPROVED"
+    },
+    {
+      "id": "GA04.startCashNeed",
+      "value": 37,
+      "domain": "ECONOMY",
+      "unit": "PAPER",
+      "source": "GA03 test first input costs",
+      "status": "TEST_NOT_APPROVED"
+    },
+    {
+      "id": "GA04.equipmentCAPEX",
+      "value": 0,
+      "domain": "BUILD",
+      "unit": "PAPER/player",
+      "source": "GA04 sensitivity",
+      "status": "TEST_NOT_APPROVED"
+    },
+    {
+      "id": "GA04.workshopSlots",
+      "value": 4,
+      "domain": "PRODUCTION",
+      "unit": "concurrent slots",
+      "source": "GA04 communal-workbench fixture",
+      "status": "TEST_NOT_APPROVED"
+    },
+    {
+      "id": "GA04.sourceMLperMin",
+      "value": 2000,
+      "domain": "WATER",
+      "unit": "mL/real_min/district",
+      "source": "GA03 proposed shared 120L/h",
+      "status": "TEST_NOT_APPROVED"
+    },
+    {
+      "id": "GA04.tankMaxML",
+      "value": 40000,
+      "domain": "WATER",
+      "unit": "mL/plot",
+      "source": "GDD TEST 40 L",
+      "status": "TEST_NOT_APPROVED"
+    },
+    {
+      "id": "GA04.waterPacketML",
+      "value": 10000,
+      "domain": "WATER",
+      "unit": "mL/packet",
+      "source": "GA01 city tariff TEST",
+      "status": "TEST_NOT_APPROVED"
+    },
+    {
+      "id": "GA04.waterPrice",
+      "value": 2,
+      "domain": "WATER",
+      "unit": "PAPER/packet",
+      "source": "GA01 city tariff TEST",
+      "status": "TEST_NOT_APPROVED"
+    },
+    {
+      "id": "GA04.seedQty",
+      "value": 4,
+      "domain": "FARM",
+      "unit": "seeds/harvest",
+      "source": "GDD TEST 4 plants",
+      "status": "TEST_NOT_APPROVED"
+    },
+    {
+      "id": "GA04.seedPrice",
+      "value": 4,
+      "domain": "ECONOMY",
+      "unit": "PAPER/seed",
+      "source": "GDD TEST",
+      "status": "TEST_NOT_APPROVED"
+    },
+    {
+      "id": "GA04.growthMin",
+      "value": 45,
+      "domain": "FARM",
+      "unit": "real_min/harvest",
+      "source": "GDD TEST",
+      "status": "TEST_NOT_APPROVED"
+    },
+    {
+      "id": "GA04.growthWaterML",
+      "value": 8000,
+      "domain": "WATER",
+      "unit": "mL/harvest",
+      "source": "GDD TEST",
+      "status": "TEST_NOT_APPROVED"
+    },
+    {
+      "id": "GA04.harvestRaw",
+      "value": 12,
+      "domain": "FARM",
+      "unit": "HEMP/harvest",
+      "source": "GDD TEST",
+      "status": "TEST_NOT_APPROVED"
+    },
+    {
+      "id": "GA04.paperRaw",
+      "value": 3,
+      "domain": "PRODUCTION",
+      "unit": "HEMP/paper batch",
+      "source": "GDD TEST",
+      "status": "TEST_NOT_APPROVED"
+    },
+    {
+      "id": "GA04.paperOut",
+      "value": 6,
+      "domain": "PRODUCTION",
+      "unit": "PAPER_SHEET/batch",
+      "source": "GDD TEST",
+      "status": "TEST_NOT_APPROVED"
+    },
+    {
+      "id": "GA04.paperWaterML",
+      "value": 8000,
+      "domain": "WATER",
+      "unit": "mL/batch",
+      "source": "GDD TEST",
+      "status": "TEST_NOT_APPROVED"
+    },
+    {
+      "id": "GA04.paperMin",
+      "value": 6,
+      "domain": "PRODUCTION",
+      "unit": "real_min/batch",
+      "source": "GDD TEST 2+4",
+      "status": "TEST_NOT_APPROVED"
+    },
+    {
+      "id": "GA04.paperMaint",
+      "value": 2,
+      "domain": "ECONOMY",
+      "unit": "PAPER/batch",
+      "source": "GA01 extended comparative TEST",
+      "status": "TEST_NOT_APPROVED"
+    },
+    {
+      "id": "GA04.playerStorage",
+      "value": 32,
+      "domain": "RESOURCE",
+      "unit": "PAPER_SHEET/plot",
+      "source": "GA04 fixture",
+      "status": "TEST_NOT_APPROVED"
+    },
+    {
+      "id": "GA04.maxRawForReplant",
+      "value": 12,
+      "domain": "AUTOMATION",
+      "unit": "HEMP",
+      "source": "GA04 stock control fixture",
+      "status": "TEST_NOT_APPROVED"
+    },
+    {
+      "id": "GA04.cityDailyBuy",
+      "value": 64,
+      "domain": "MARKET",
+      "unit": "PAPER_SHEET/real_day",
+      "source": "GA02 finite demand TEST",
+      "status": "TEST_NOT_APPROVED"
+    },
+    {
+      "id": "GA04.cityDailyBudget",
+      "value": 300,
+      "domain": "ECONOMY",
+      "unit": "PAPER/real_day",
+      "source": "GA02 finite city buy budget fixture",
+      "status": "TEST_NOT_APPROVED"
+    },
+    {
+      "id": "GA04.cityWarehouseCap",
+      "value": 128,
+      "domain": "MARKET",
+      "unit": "PAPER_SHEET",
+      "source": "GA02 city receiving cap",
+      "status": "TEST_NOT_APPROVED"
+    },
+    {
+      "id": "GA04.cityDailyConsume",
+      "value": 64,
+      "domain": "MARKET",
+      "unit": "PAPER_SHEET/real_day",
+      "source": "GA02 city consumption fixture",
+      "status": "TEST_NOT_APPROVED"
+    },
+    {
+      "id": "GA04.buyPrice",
+      "value": 3,
+      "domain": "ECONOMY",
+      "unit": "PAPER/PAPER_SHEET",
+      "source": "GDD v0.1 TEST",
+      "status": "TEST_NOT_APPROVED"
+    },
+    {
+      "id": "GA04.shipPrice",
+      "value": 5,
+      "domain": "TRANSPORT",
+      "unit": "PAPER/shipment",
+      "source": "GA02 fee fixture",
+      "status": "TEST_NOT_APPROVED"
+    },
+    {
+      "id": "GA04.shipMin",
+      "value": 16,
+      "domain": "TRANSPORT",
+      "unit": "PAPER_SHEET/shipment",
+      "source": "GA02 minimum fixture",
+      "status": "TEST_NOT_APPROVED"
+    },
+    {
+      "id": "GA04.shipMax",
+      "value": 32,
+      "domain": "TRANSPORT",
+      "unit": "PAPER_SHEET/shipment",
+      "source": "GA02 capacity fixture",
+      "status": "TEST_NOT_APPROVED"
+    },
+    {
+      "id": "GA04.shipMinTravel",
+      "value": 15,
+      "domain": "TRANSPORT",
+      "unit": "real_min/shipment",
+      "source": "GA02 fixture",
+      "status": "TEST_NOT_APPROVED"
+    },
+    {
+      "id": "GA04.cashFloor",
+      "value": 10,
+      "domain": "AUTOMATION",
+      "unit": "PAPER",
+      "source": "GA04 default safety TEST",
+      "status": "TEST_NOT_APPROVED"
+    }
+  ]
+}
