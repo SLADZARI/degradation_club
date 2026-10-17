@@ -7,14 +7,22 @@ Google Drive: https://drive.google.com/drive/folders/11EJ6s_x6WN6zqYTM72Baq7cQR7
 Project boundary: own 2D Dementor Live life sandbox, NOT Dementor Battle / Robo Games. Frozen v0.1 remains unchanged. A new test model is not approved new GDD or functional game code.
 
 
-## Current design artifact — City Projects v0.2 (2026-10-17)
+## Главный вход — ядро игры и первый этап (2026-10-17)
 
-- [CITY_PROJECTS_v0.2.md — Городские проекты и собственное место в городе](https://github.com/SLADZARI/degradation_club/blob/docs/dementor-live-global-audit-05/projects/dementor-live/design/CITY_PROJECTS_v0.2.md) — актуальная концептуальная редакция. [К] Пустое поле, размеченные площадки и временное представительство мэра; первый проект — городская площадь. Город / государство оплачивает принятый вклад в одобренные проекты; заработанное открывает покупку своего участка и личное развитие. Авторское здание проходит изображения → согласие большинства → игровой макет от платформы / разработчиков → финансируемую городом поэтапную стройку. Образ мэра, правила голосования, бюджет, ресурсы и баланс остаются [О].
+[CORE_AND_FIRST_LEVEL_v0.1.md — Ядро игры и первый этап](https://github.com/SLADZARI/degradation_club/blob/docs/dementor-live-global-audit-05/projects/dementor-live/CORE_AND_FIRST_LEVEL_v0.1.md) — **читать первым для актуального замысла**. Один краткий основной документ: смысл игры, главные механики и стартовая цепочка от пустого поля и городской площади к своему участку.
+
+Это позднейшее выбранное пользователем направление после CITY_PROJECTS v0.2: только игровая валюта, бесплатные изнашиваемые стандартные инструменты от мэрии, общественная кузница, поэтапная стройка с отдельным обустройством, река и мост, голод во время игры и состояние духа с обязательным самостоятельным восстановлением. Открытия постоянной мэрии — рабочее предложение; баланс, снабжение, восстановление ресурсов и следующие проекты ещё определяются.
+
+**Согласование старых глав ещё предстоит:** прежний SURVIVAL исключал обязательный голод, а прежний Character-first gate не учитывал последующее разрешение механической проверки на клеточном поле с геометрическими персонажами. Готовая графика не является условием этой проверки. **Сейчас код и прототип не начинаются: сначала фиксируется основа.** Этот документ не означает обновление всех 27 глав и не подтверждён тестами GA05. Замороженный Master GDD не переписан. Следующие разделы описывают тематические документы и историю аудита.
+
+## Тематический документ — City Projects v0.2 (2026-10-17)
+
+- [CITY_PROJECTS_v0.2.md — Городские проекты и собственное место в городе](https://github.com/SLADZARI/degradation_club/blob/docs/dementor-live-global-audit-05/projects/dementor-live/design/CITY_PROJECTS_v0.2.md) — более узкая редакция о городских проектах, предшествующая текущему краткому ядру. [К] Пустое поле, размеченные площадки и временное представительство мэра; первый проект — городская площадь. Город / государство оплачивает принятый вклад в одобренные проекты; заработанное открывает покупку своего участка и личное развитие. Авторское здание проходит изображения → согласие большинства → игровой макет от платформы / разработчиков → финансируемую городом поэтапную стройку. Образ мэра, правила голосования, бюджет, ресурсы и баланс остаются [О].
 - [П] Предварительное резервирование денег и приёмки, защита от повторного учёта — предлагаемый контракт, не проверенная реализация. Сохраняются малое население, возможность завершить небольшой проект одному, оплата принятой части и фиксированный объём проекта.
 - [CITY_PROJECTS_v0.1.md — предыдущая редакция](../../design/CITY_PROJECTS_v0.1.md) сохранена для истории. Мастерская больше не первый проект; возможна как последующий рабочий пример без установленной очередности.
 - Это документация концепции после GA05, не его тестовый результат и не утверждённый числовой баланс. Frozen Master GDD v0.1 сохранён.
 
-## Read in order
+## Read in order — GA05 audit archive
 1. Round05 full audit: https://docs.google.com/document/d/18fF9JAUKQI9FiCb9FmC9LnKsM7eN-H-Bsjd9TmOanbg/edit
 2. Core GDD v0.2 (draft) for MONEY, RESOURCE, WORK, QUEST, LAND, BUILD, FARM, PRODUCTION, WATER, TIME, MARKET, TRANSPORT, AUTOMATION, TECH, RELEASE: https://docs.google.com/document/d/1UOEPzp5qAI-TDzGEgVl_k8Sdj8b4LosKUmjz9S8UGGc/edit
 3. GA05 decision review (not approved): https://docs.google.com/document/d/1fyg0s2ezq1XFDoz8yimzZ4EoaOKmFK7DYCN6T5_gE_s/edit
@@ -41,5 +49,5 @@ Project boundary: own 2D Dementor Live life sandbox, NOT Dementor Battle / Robo 
 ## Review and next
 Issue count is 67 *review items* across GA01..GA05, not confirmed 67 bugs.
 27/27 chapters have an editorial traceability row and inherited source baseline, but **0/27 full long-form GDD v0.2 chapters are yet approved**. Source long-form chat export still pending.
-No real PostgreSQL/RLS/durable checkpoint test or final SVG character rig tested in GA05. Character-first gate remains before engine/runtime.
+No real PostgreSQL/RLS/durable checkpoint test or final SVG character rig tested in GA05. Historical GA05 Character-first gate; the later current core permits mechanical checks with geometric placeholders, while implementation is currently deferred until after documenting the core.
 Next GA06 should prioritize an enjoyable FIRST 30/60/90 REAL minute narrative/interaction proof, source artifact completion for all27, and user acceptance of decision choices D01–D11; then bridge to actual game implementation when art/architecture gate is ready.
