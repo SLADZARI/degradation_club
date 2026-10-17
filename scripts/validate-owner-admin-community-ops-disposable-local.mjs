@@ -60,18 +60,29 @@ function portFree(port){
     const sock=net.createServer();
     sock.unref();
     sock.once('error',()=>resolve(false));
-    sock.listen({host:'127.0.0.1',port},()=>sock.close(()=>resolve(true)));
+    // Docker Desktop publishes on 0.0.0.0, not necessarily 127.0.0.1.
+    sock.listen({host:'0.0.0.0',port},()=>sock.close(()=>resolve(true)));
   });
 }
-async function assertPortsFree(){
-  const blocked=[];
-  for(let port=54320;port<=54329;port++) if(!(await portFree(port))) blocked.push(port);
-  if(blocked.length) fail('Other local Supabase ports in use ('+blocked.join(',')+'); will not interrupt another project');
+async function allocateIsolatedPorts(){
+  // Docker Desktop's internal port allocator may reserve a published port even
+  // when the macOS socket probe reports it as free.
+  const published=run('docker',['ps','-a','--format','{{.Ports}}']);
+  const dockerPorts=new Set([...published.matchAll(/:(\d+)->/g)].map(match=>Number(match[1])));
+  for(let attempt=0;attempt<80;attempt++){
+    const base=30000+crypto.randomInt(0,1700)*10;
+    const ports=Array.from({length:10},(_,offset)=>base+offset);
+    if(ports.some(port=>dockerPorts.has(port))) continue;
+    if((await Promise.all(ports.map(portFree))).every(Boolean)){
+      return {base,api:base+1,db:base+2,studio:base+3,inbucket:base+4};
+    }
+  }
+  fail('No available isolated 10-port range; leave other Supabase stacks running and inspect Docker port allocations');
 }
 function materialize(parts,folder){
   return parts.map(name=>'-- '+name+'\n'+fs.readFileSync(path.join(folder,name),'utf8').trim()+'\n').join('\n')+'\n';
 }
-function prepare(tempRoot){
+function prepare(tempRoot,ports){
   const dst=path.join(tempRoot,'supabase');
   fs.cpSync(SOURCE_SUPABASE,dst,{
     recursive:true,
@@ -80,7 +91,16 @@ function prepare(tempRoot){
   const conf=path.join(dst,'config.toml');
   const old=fs.readFileSync(conf,'utf8');
   if(!/^project_id\s*=\s*"[^"]+"/m.test(old)) fail('Supabase project_id missing');
-  fs.writeFileSync(conf,old.replace(/^project_id\s*=\s*"[^"]+"/m,'project_id = "'+PROJECT_ID+'"'));
+  // Only the ephemeral copy gets custom ports. Source config and other stacks stay untouched.
+  const overrides=[
+    '[api]', 'port = '+ports.api,
+    '[db]', 'port = '+ports.db, 'shadow_port = '+ports.base,
+    '[db.pooler]', 'port = '+(ports.base+9),
+    '[studio]', 'port = '+ports.studio,
+    '[inbucket]', 'port = '+ports.inbucket, 'smtp_port = '+(ports.base+5), 'pop3_port = '+(ports.base+6),
+    '[analytics]', 'port = '+(ports.base+7), 'vector_port = '+(ports.base+8)
+  ].join('\n');
+  fs.writeFileSync(conf,old.replace(/^project_id\s*=\s*"[^"]+"/m,'project_id = "'+PROJECT_ID+'"')+'\n'+overrides+'\n');
   const tempMigrations=path.join(dst,'migrations');
   fs.writeFileSync(path.join(tempMigrations,PREHISTORY_NAME),
     materialize(FIXTURE_FILES,path.join(SOURCE_SUPABASE,'bootstrap','prehistory')));
@@ -116,17 +136,17 @@ function runtimeMatrix(container){
 }
 async function main(){
   checkSource();
-  await assertPortsFree();
   const dockerVersion=run('docker',['version','--format','{{.Server.Version}}']);
+  const ports=await allocateIsolatedPorts();
   const cliVersion=run('supabase',['--version']);
   const sourceHead=git('rev-parse','HEAD');
   const tempRoot=fs.mkdtempSync(path.join(os.tmpdir(),'dc-bqa23-proof-'));
   let startAttempted=false,stopOk=false;
   const result={source_head:sourceHead,branch:'result/owner-admin-community-ops-v1',
     local_project_id:PROJECT_ID,docker_version:dockerVersion,supabase_cli:cliVersion,
-    local_only:true,phase:'PREPARE',first_runtime:null,second_runtime:null,reset_warning:null};
+    local_only:true,host_ports:ports,phase:'PREPARE',first_runtime:null,second_runtime:null,reset_warning:null};
   try{
-    prepare(tempRoot);
+    prepare(tempRoot,ports);
     result.phase='START_DISPOSABLE_SUPABASE';
     startAttempted=true;
     try{run('supabase',['start'],tempRoot);}
