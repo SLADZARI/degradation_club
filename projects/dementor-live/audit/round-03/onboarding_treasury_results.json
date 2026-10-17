@@ -1,0 +1,291 @@
+{
+  "type": "SYNTHETIC_NOT_RUNTIME",
+  "date": "2026-10-17",
+  "fixtures": {
+    "grant": 80,
+    "jobs": 4,
+    "wage": 90,
+    "plot": 360,
+    "cabin": 60,
+    "wood": 6,
+    "sheets": 4
+  },
+  "count": 8,
+  "assertions": 56,
+  "scenarios": [
+    {
+      "n": 1,
+      "cash": 10000,
+      "wood": 6,
+      "sheets": 4,
+      "policy": "ROUND_ROBIN",
+      "completed": 1,
+      "cityCash": 9980,
+      "playerCash": 20,
+      "cityWood": 0,
+      "citySheets": 0,
+      "flow": {
+        "grant": 80,
+        "wage": 360,
+        "plots": 360,
+        "cabins": 60
+      },
+      "blocked": {
+        "funding": 0,
+        "materials": 0
+      },
+      "stages": {
+        "8": 1
+      },
+      "checks": {
+        "moneyConserved": true,
+        "unchangedAfterValidRetries": true,
+        "noNegative": true,
+        "materialConserved": true,
+        "allCompletedOwnStarterKit": true,
+        "flowLedgerMatches": true,
+        "validRetryCount": true
+      }
+    },
+    {
+      "n": 20,
+      "cash": 10000,
+      "wood": 120,
+      "sheets": 80,
+      "policy": "ROUND_ROBIN",
+      "completed": 20,
+      "cityCash": 9600,
+      "playerCash": 400,
+      "cityWood": 0,
+      "citySheets": 0,
+      "flow": {
+        "grant": 1600,
+        "wage": 7200,
+        "plots": 7200,
+        "cabins": 1200
+      },
+      "blocked": {
+        "funding": 0,
+        "materials": 0
+      },
+      "stages": {
+        "8": 20
+      },
+      "checks": {
+        "moneyConserved": true,
+        "unchangedAfterValidRetries": true,
+        "noNegative": true,
+        "materialConserved": true,
+        "allCompletedOwnStarterKit": true,
+        "flowLedgerMatches": true,
+        "validRetryCount": true
+      }
+    },
+    {
+      "n": 100,
+      "cash": 10000,
+      "wood": 600,
+      "sheets": 400,
+      "policy": "ROUND_ROBIN",
+      "completed": 0,
+      "cityCash": 20,
+      "playerCash": 9980,
+      "cityWood": 600,
+      "citySheets": 400,
+      "flow": {
+        "grant": 8000,
+        "wage": 1980,
+        "plots": 0,
+        "cabins": 0
+      },
+      "blocked": {
+        "funding": 100,
+        "materials": 0
+      },
+      "stages": {
+        "1": 78,
+        "2": 22
+      },
+      "checks": {
+        "moneyConserved": true,
+        "unchangedAfterValidRetries": true,
+        "noNegative": true,
+        "materialConserved": true,
+        "allCompletedOwnStarterKit": true,
+        "flowLedgerMatches": true,
+        "validRetryCount": true
+      }
+    },
+    {
+      "n": 100,
+      "cash": 50000,
+      "wood": 600,
+      "sheets": 400,
+      "policy": "ROUND_ROBIN",
+      "completed": 100,
+      "cityCash": 48000,
+      "playerCash": 2000,
+      "cityWood": 0,
+      "citySheets": 0,
+      "flow": {
+        "grant": 8000,
+        "wage": 36000,
+        "plots": 36000,
+        "cabins": 6000
+      },
+      "blocked": {
+        "funding": 0,
+        "materials": 0
+      },
+      "stages": {
+        "8": 100
+      },
+      "checks": {
+        "moneyConserved": true,
+        "unchangedAfterValidRetries": true,
+        "noNegative": true,
+        "materialConserved": true,
+        "allCompletedOwnStarterKit": true,
+        "flowLedgerMatches": true,
+        "validRetryCount": true
+      }
+    },
+    {
+      "n": 100,
+      "cash": 10000,
+      "wood": 600,
+      "sheets": 400,
+      "policy": "SEQUENTIAL",
+      "completed": 100,
+      "cityCash": 8000,
+      "playerCash": 2000,
+      "cityWood": 0,
+      "citySheets": 0,
+      "flow": {
+        "grant": 8000,
+        "wage": 36000,
+        "plots": 36000,
+        "cabins": 6000
+      },
+      "blocked": {
+        "funding": 0,
+        "materials": 0
+      },
+      "stages": {
+        "8": 100
+      },
+      "checks": {
+        "moneyConserved": true,
+        "unchangedAfterValidRetries": true,
+        "noNegative": true,
+        "materialConserved": true,
+        "allCompletedOwnStarterKit": true,
+        "flowLedgerMatches": true,
+        "validRetryCount": true
+      }
+    },
+    {
+      "n": 100,
+      "cash": 50000,
+      "wood": 120,
+      "sheets": 80,
+      "policy": "ROUND_ROBIN",
+      "completed": 20,
+      "cityCash": 48000,
+      "playerCash": 2000,
+      "cityWood": 0,
+      "citySheets": 0,
+      "flow": {
+        "grant": 8000,
+        "wage": 36000,
+        "plots": 36000,
+        "cabins": 6000
+      },
+      "blocked": {
+        "funding": 0,
+        "materials": 80
+      },
+      "stages": {
+        "7": 80,
+        "8": 20
+      },
+      "checks": {
+        "moneyConserved": true,
+        "unchangedAfterValidRetries": true,
+        "noNegative": true,
+        "materialConserved": true,
+        "allCompletedOwnStarterKit": true,
+        "flowLedgerMatches": true,
+        "validRetryCount": true
+      }
+    },
+    {
+      "n": 20,
+      "cash": 50000,
+      "wood": 0,
+      "sheets": 0,
+      "policy": "ROUND_ROBIN",
+      "completed": 0,
+      "cityCash": 49600,
+      "playerCash": 400,
+      "cityWood": 0,
+      "citySheets": 0,
+      "flow": {
+        "grant": 1600,
+        "wage": 7200,
+        "plots": 7200,
+        "cabins": 1200
+      },
+      "blocked": {
+        "funding": 0,
+        "materials": 20
+      },
+      "stages": {
+        "7": 20
+      },
+      "checks": {
+        "moneyConserved": true,
+        "unchangedAfterValidRetries": true,
+        "noNegative": true,
+        "materialConserved": true,
+        "allCompletedOwnStarterKit": true,
+        "flowLedgerMatches": true,
+        "validRetryCount": true
+      }
+    },
+    {
+      "n": 20,
+      "cash": 0,
+      "wood": 120,
+      "sheets": 80,
+      "policy": "ROUND_ROBIN",
+      "completed": 0,
+      "cityCash": 0,
+      "playerCash": 0,
+      "cityWood": 120,
+      "citySheets": 80,
+      "flow": {
+        "grant": 0,
+        "wage": 0,
+        "plots": 0,
+        "cabins": 0
+      },
+      "blocked": {
+        "funding": 20,
+        "materials": 0
+      },
+      "stages": {
+        "0": 20
+      },
+      "checks": {
+        "moneyConserved": true,
+        "unchangedAfterValidRetries": true,
+        "noNegative": true,
+        "materialConserved": true,
+        "allCompletedOwnStarterKit": true,
+        "flowLedgerMatches": true,
+        "validRetryCount": true
+      }
+    }
+  ]
+}
