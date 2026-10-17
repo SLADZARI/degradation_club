@@ -1,14 +1,14 @@
 {
-  "type": "GA05_INTEGRATED_FIRST_SALE_STRESS",
+  "type": "GA05_SYNTHETIC_FIRST_SALE_COMPARISON",
   "date": "2026-10-17",
-  "status": "SYNTHETIC_NOT_GAME_RUNTIME",
-  "scenarioCount": 31,
-  "assertions": 496,
-  "cityBudgetCaveat": "100 funded contracts require 1800 PAPER and 600 physical sheets to be absorbed by dedicated hub; both are TEST policy assumptions, not automatically available permanent municipal demand",
-  "baseline16FromGA04": 16,
+  "status": "TEST_ONLY_NOT_GAME_RUNTIME",
+  "cases": 31,
+  "checks": 496,
+  "regressionGA04": 16,
+  "specialPolicy": "Six PAPER_SHEET one-time physical city offer, quote is provisioned with 18 PAPER held from city cash at home purchase; buyer hub separately finite, warehouse turns over by 32 sheets/hour; no automatic mint",
   "results": [
     {
-      "label": "1P_1D_OFF",
+      "label": "1_1_OFF",
       "config": {
         "n": 1,
         "days": 1,
@@ -126,7 +126,7 @@
       "checks": 16
     },
     {
-      "label": "1P_1D_FUNDED_6",
+      "label": "1_1_FUNDED_6",
       "config": {
         "n": 1,
         "days": 1,
@@ -244,7 +244,7 @@
       "checks": 16
     },
     {
-      "label": "1P_7D_OFF",
+      "label": "1_7_OFF",
       "config": {
         "n": 1,
         "days": 7,
@@ -362,7 +362,7 @@
       "checks": 16
     },
     {
-      "label": "1P_7D_FUNDED_6",
+      "label": "1_7_FUNDED_6",
       "config": {
         "n": 1,
         "days": 7,
@@ -480,7 +480,7 @@
       "checks": 16
     },
     {
-      "label": "1P_30D_OFF",
+      "label": "1_30_OFF",
       "config": {
         "n": 1,
         "days": 30,
@@ -598,7 +598,7 @@
       "checks": 16
     },
     {
-      "label": "1P_30D_FUNDED_6",
+      "label": "1_30_FUNDED_6",
       "config": {
         "n": 1,
         "days": 30,
@@ -716,7 +716,7 @@
       "checks": 16
     },
     {
-      "label": "20P_1D_OFF",
+      "label": "20_1_OFF",
       "config": {
         "n": 20,
         "days": 1,
@@ -834,7 +834,7 @@
       "checks": 16
     },
     {
-      "label": "20P_1D_FUNDED_6",
+      "label": "20_1_FUNDED_6",
       "config": {
         "n": 20,
         "days": 1,
@@ -952,7 +952,7 @@
       "checks": 16
     },
     {
-      "label": "20P_7D_OFF",
+      "label": "20_7_OFF",
       "config": {
         "n": 20,
         "days": 7,
@@ -1070,7 +1070,7 @@
       "checks": 16
     },
     {
-      "label": "20P_7D_FUNDED_6",
+      "label": "20_7_FUNDED_6",
       "config": {
         "n": 20,
         "days": 7,
@@ -1188,7 +1188,7 @@
       "checks": 16
     },
     {
-      "label": "20P_30D_OFF",
+      "label": "20_30_OFF",
       "config": {
         "n": 20,
         "days": 30,
@@ -1306,7 +1306,7 @@
       "checks": 16
     },
     {
-      "label": "20P_30D_FUNDED_6",
+      "label": "20_30_FUNDED_6",
       "config": {
         "n": 20,
         "days": 30,
@@ -1424,7 +1424,7 @@
       "checks": 16
     },
     {
-      "label": "100P_1D_OFF",
+      "label": "100_1_OFF",
       "config": {
         "n": 100,
         "days": 1,
@@ -1542,7 +1542,7 @@
       "checks": 16
     },
     {
-      "label": "100P_1D_FUNDED_6",
+      "label": "100_1_FUNDED_6",
       "config": {
         "n": 100,
         "days": 1,
@@ -1660,7 +1660,7 @@
       "checks": 16
     },
     {
-      "label": "100P_7D_OFF",
+      "label": "100_7_OFF",
       "config": {
         "n": 100,
         "days": 7,
@@ -1778,7 +1778,7 @@
       "checks": 16
     },
     {
-      "label": "100P_7D_FUNDED_6",
+      "label": "100_7_FUNDED_6",
       "config": {
         "n": 100,
         "days": 7,
@@ -1896,7 +1896,7 @@
       "checks": 16
     },
     {
-      "label": "100P_30D_OFF",
+      "label": "100_30_OFF",
       "config": {
         "n": 100,
         "days": 30,
@@ -2014,7 +2014,7 @@
       "checks": 16
     },
     {
-      "label": "100P_30D_FUNDED_6",
+      "label": "100_30_FUNDED_6",
       "config": {
         "n": 100,
         "days": 30,
@@ -2132,7 +2132,7 @@
       "checks": 16
     },
     {
-      "label": "100_1D_BUDGET_900",
+      "label": "100_1D_BUDGET900",
       "config": {
         "n": 100,
         "days": 1,
@@ -2250,7 +2250,7 @@
       "checks": 16
     },
     {
-      "label": "100_7D_BUDGET_900",
+      "label": "100_7D_BUDGET900",
       "config": {
         "n": 100,
         "days": 7,
@@ -2368,7 +2368,7 @@
       "checks": 16
     },
     {
-      "label": "100_7D_BUDGET_0",
+      "label": "100_7D_BUDGET0",
       "config": {
         "n": 100,
         "days": 7,
@@ -2486,7 +2486,7 @@
       "checks": 16
     },
     {
-      "label": "100_7D_HUB_32",
+      "label": "100_7D_HUB32",
       "config": {
         "n": 100,
         "days": 7,
@@ -2626,24 +2626,24 @@
         "started": 100,
         "jobs": 400,
         "extraJobs": 100,
-        "cityCash": 47534,
+        "cityCash": 47546,
         "escrow": 0,
-        "firstHeldFunds": 54,
+        "firstHeldFunds": 0,
         "firstPending": 0,
         "firstHubStock": 0,
-        "firstHubConsumed": 582,
+        "firstHubConsumed": 600,
         "firstOffers": 100,
         "firstExpired": 0,
-        "firstSpecialSales": 97,
+        "firstSpecialSales": 100,
         "playersWithAnySale": 100,
-        "medianFirstSaleRealMin": 1755,
-        "playersCash": 2412,
+        "medianFirstSaleRealMin": 1875,
+        "playersCash": 2454,
         "cityMin": 6000,
         "cityWood": 0,
         "starterSheets": 0,
         "citySeeds": 500,
-        "paperMade": 3354,
-        "paperSold": 940,
+        "paperMade": 3372,
+        "paperSold": 958,
         "farmersWhoProduced": 100,
         "farmersCraftedAtLeast6": 100,
         "craftedButZeroSales": 0,
@@ -2655,15 +2655,15 @@
         "paperConsumed": 298,
         "playerPaperStock": 2414,
         "cargoPaper": 0,
-        "waterDeliveredL": 7100,
-        "waterConsumedL": 5872,
-        "waterStoredL": 1228,
+        "waterDeliveredL": 7130,
+        "waterConsumedL": 5896,
+        "waterStoredL": 1234,
         "harvests": 175,
         "seedsUsed": 700,
-        "shipments": 111,
-        "waitingForWaterMin": 174908,
-        "waitingForMoneyMin": 477897,
-        "waitingForBuyerMin": 798016
+        "shipments": 114,
+        "waitingForWaterMin": 172067,
+        "waitingForMoneyMin": 470729,
+        "waitingForBuyerMin": 743441
       },
       "accounting": {
         "mint": 0,
@@ -2672,22 +2672,22 @@
         "sheetsBuilding": 400,
         "seedsRestocked": 600,
         "seedsUsed": 700,
-        "waterInML": 7100000,
-        "waterSpentML": 5872000,
-        "sheetsMade": 3354,
+        "waterInML": 7130000,
+        "waterSpentML": 5896000,
+        "sheetsMade": 3372,
         "sheetsCityConsumed": 298,
-        "sheetsSold": 940,
+        "sheetsSold": 958,
         "started": 100,
         "homes": 100,
         "jobs": 400,
         "extraJobs": 100,
-        "shipments": 111,
+        "shipments": 114,
         "minCityCash": 6000,
         "firstOfferAllocated": 100,
         "firstOfferExpired": 0,
-        "firstSaleCommitted": 97,
-        "firstSaleSettled": 97,
-        "firstSaleSunkSheets": 582,
+        "firstSaleCommitted": 100,
+        "firstSaleSettled": 100,
+        "firstSaleSunkSheets": 600,
         "cashFlows": {
           "grant": 8000,
           "wage": 36000,
@@ -2695,10 +2695,10 @@
           "landAndBuild": 42000,
           "equipment": 0,
           "seeds": 2800,
-          "water": 1420,
-          "maintenance": 1118,
+          "water": 1426,
+          "maintenance": 1124,
           "shipping": 70,
-          "sales": 2820
+          "sales": 2874
         }
       },
       "invariants": {
@@ -2722,7 +2722,7 @@
       "checks": 16
     },
     {
-      "label": "100_7D_WATER_30LPH",
+      "label": "100_7D_WATER30",
       "config": {
         "n": 100,
         "days": 7,
@@ -2840,7 +2840,7 @@
       "checks": 16
     },
     {
-      "label": "100_7D_WATER_600LPH",
+      "label": "100_7D_WATER600",
       "config": {
         "n": 100,
         "days": 7,
@@ -2862,24 +2862,24 @@
         "started": 100,
         "jobs": 400,
         "extraJobs": 100,
-        "cityCash": 47386,
+        "cityCash": 47408,
         "escrow": 0,
-        "firstHeldFunds": 54,
+        "firstHeldFunds": 0,
         "firstPending": 0,
         "firstHubStock": 0,
-        "firstHubConsumed": 582,
+        "firstHubConsumed": 600,
         "firstOffers": 100,
         "firstExpired": 0,
-        "firstSpecialSales": 97,
+        "firstSpecialSales": 100,
         "playersWithAnySale": 100,
-        "medianFirstSaleRealMin": 459,
-        "playersCash": 2560,
+        "medianFirstSaleRealMin": 495,
+        "playersCash": 2592,
         "cityMin": 6000,
         "cityWood": 0,
         "starterSheets": 0,
-        "citySeeds": 504,
+        "citySeeds": 500,
         "paperMade": 3426,
-        "paperSold": 1000,
+        "paperSold": 1018,
         "farmersWhoProduced": 100,
         "farmersCraftedAtLeast6": 100,
         "craftedButZeroSales": 0,
@@ -2889,17 +2889,17 @@
         "minSellerQty": 6,
         "cityPaperStock": 60,
         "paperConsumed": 358,
-        "playerPaperStock": 2426,
+        "playerPaperStock": 2408,
         "cargoPaper": 0,
-        "waterDeliveredL": 7170,
-        "waterConsumedL": 5960,
-        "waterStoredL": 1210,
-        "harvests": 174,
-        "seedsUsed": 696,
-        "shipments": 113,
-        "waitingForWaterMin": 58564,
-        "waitingForMoneyMin": 488018,
-        "waitingForBuyerMin": 943917
+        "waterDeliveredL": 7200,
+        "waterConsumedL": 5968,
+        "waterStoredL": 1232,
+        "harvests": 175,
+        "seedsUsed": 700,
+        "shipments": 116,
+        "waitingForWaterMin": 53591,
+        "waitingForMoneyMin": 494278,
+        "waitingForBuyerMin": 931113
       },
       "accounting": {
         "mint": 0,
@@ -2907,34 +2907,34 @@
         "woodBuilding": 600,
         "sheetsBuilding": 400,
         "seedsRestocked": 600,
-        "seedsUsed": 696,
-        "waterInML": 7170000,
-        "waterSpentML": 5960000,
+        "seedsUsed": 700,
+        "waterInML": 7200000,
+        "waterSpentML": 5968000,
         "sheetsMade": 3426,
         "sheetsCityConsumed": 358,
-        "sheetsSold": 1000,
+        "sheetsSold": 1018,
         "started": 100,
         "homes": 100,
         "jobs": 400,
         "extraJobs": 100,
-        "shipments": 113,
+        "shipments": 116,
         "minCityCash": 6000,
         "firstOfferAllocated": 100,
         "firstOfferExpired": 0,
-        "firstSaleCommitted": 97,
-        "firstSaleSettled": 97,
-        "firstSaleSunkSheets": 582,
+        "firstSaleCommitted": 100,
+        "firstSaleSettled": 100,
+        "firstSaleSunkSheets": 600,
         "cashFlows": {
           "grant": 8000,
           "wage": 36000,
           "extra": 3000,
           "landAndBuild": 42000,
           "equipment": 0,
-          "seeds": 2784,
-          "water": 1434,
+          "seeds": 2800,
+          "water": 1440,
           "maintenance": 1142,
           "shipping": 80,
-          "sales": 3000
+          "sales": 3054
         }
       },
       "invariants": {
@@ -2958,7 +2958,7 @@
       "checks": 16
     },
     {
-      "label": "100_7D_TREASURY_10K",
+      "label": "100_7D_TREASURY10K",
       "config": {
         "n": 100,
         "days": 7,
@@ -3076,7 +3076,7 @@
       "checks": 16
     },
     {
-      "label": "100_7D_STAGGER_10K",
+      "label": "100_7D_STAGGER10K",
       "config": {
         "n": 100,
         "days": 7,
@@ -3194,7 +3194,7 @@
       "checks": 16
     },
     {
-      "label": "100_7D_KITS_20",
+      "label": "100_7D_KIT20",
       "config": {
         "n": 100,
         "days": 7,
@@ -3313,7 +3313,7 @@
       "checks": 16
     },
     {
-      "label": "100_7D_TTL_60",
+      "label": "100_7D_TTL60",
       "config": {
         "n": 100,
         "days": 7,
@@ -3431,7 +3431,7 @@
       "checks": 16
     },
     {
-      "label": "100_7D_HUB_CONSUME_0",
+      "label": "100_7D_HUB_CONSUME0",
       "config": {
         "n": 100,
         "days": 7,
@@ -3453,7 +3453,7 @@
         "started": 100,
         "jobs": 400,
         "extraJobs": 100,
-        "cityCash": 46810,
+        "cityCash": 46499,
         "escrow": 0,
         "firstHeldFunds": 1422,
         "firstPending": 0,
@@ -3462,35 +3462,35 @@
         "firstOffers": 100,
         "firstExpired": 0,
         "firstSpecialSales": 21,
-        "playersWithAnySale": 33,
-        "medianFirstSaleRealMin": 648,
-        "playersCash": 1768,
+        "playersWithAnySale": 21,
+        "medianFirstSaleRealMin": 618,
+        "playersCash": 2079,
         "cityMin": 6000,
         "cityWood": 0,
         "starterSheets": 0,
-        "citySeeds": 592,
-        "paperMade": 3096,
-        "paperSold": 492,
+        "citySeeds": 648,
+        "paperMade": 3006,
+        "paperSold": 480,
         "farmersWhoProduced": 100,
         "farmersCraftedAtLeast6": 100,
-        "craftedButZeroSales": 67,
-        "sellersWithSales": 33,
-        "activeWithZeroSales": 67,
-        "maxSellerQty": 48,
+        "craftedButZeroSales": 79,
+        "sellersWithSales": 21,
+        "activeWithZeroSales": 79,
+        "maxSellerQty": 174,
         "minSellerQty": 0,
-        "cityPaperStock": 64,
-        "paperConsumed": 302,
-        "playerPaperStock": 2604,
+        "cityPaperStock": 60,
+        "paperConsumed": 294,
+        "playerPaperStock": 2526,
         "cargoPaper": 0,
-        "waterDeliveredL": 5820,
-        "waterConsumedL": 5344,
-        "waterStoredL": 476,
-        "harvests": 152,
-        "seedsUsed": 608,
-        "shipments": 37,
-        "waitingForWaterMin": 164475,
-        "waitingForMoneyMin": 128753,
-        "waitingForBuyerMin": 813673
+        "waterDeliveredL": 5430,
+        "waterConsumedL": 5112,
+        "waterStoredL": 318,
+        "harvests": 138,
+        "seedsUsed": 552,
+        "shipments": 34,
+        "waitingForWaterMin": 162279,
+        "waitingForMoneyMin": 127986,
+        "waitingForBuyerMin": 166250
       },
       "accounting": {
         "mint": 0,
@@ -3498,17 +3498,17 @@
         "woodBuilding": 600,
         "sheetsBuilding": 400,
         "seedsRestocked": 600,
-        "seedsUsed": 608,
-        "waterInML": 5820000,
-        "waterSpentML": 5344000,
-        "sheetsMade": 3096,
-        "sheetsCityConsumed": 302,
-        "sheetsSold": 492,
+        "seedsUsed": 552,
+        "waterInML": 5430000,
+        "waterSpentML": 5112000,
+        "sheetsMade": 3006,
+        "sheetsCityConsumed": 294,
+        "sheetsSold": 480,
         "started": 100,
         "homes": 100,
         "jobs": 400,
         "extraJobs": 100,
-        "shipments": 37,
+        "shipments": 34,
         "minCityCash": 6000,
         "firstOfferAllocated": 100,
         "firstOfferExpired": 0,
@@ -3521,11 +3521,11 @@
           "extra": 3000,
           "landAndBuild": 42000,
           "equipment": 0,
-          "seeds": 2432,
-          "water": 1164,
-          "maintenance": 1032,
-          "shipping": 80,
-          "sales": 1476
+          "seeds": 2208,
+          "water": 1086,
+          "maintenance": 1002,
+          "shipping": 65,
+          "sales": 1440
         }
       },
       "invariants": {
@@ -3549,7 +3549,7 @@
       "checks": 16
     },
     {
-      "label": "20_1D_BUYER_MAIN_ZERO",
+      "label": "20_1D_NORMAL_BUYERS0",
       "config": {
         "n": 20,
         "days": 1,
