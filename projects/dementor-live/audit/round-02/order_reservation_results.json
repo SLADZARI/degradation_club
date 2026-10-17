@@ -1,0 +1,63 @@
+{
+  "type": "SYNTHETIC_TEST_ONLY",
+  "date": "2026-10-17",
+  "count": 10,
+  "passed": 10,
+  "failed": [],
+  "escrowExample": {
+    "money": 96,
+    "pendingSheets": 32
+  },
+  "tests": [
+    {
+      "id": "RES-001",
+      "pass": true,
+      "why": "A pending late courier shipment has reserved money and city capacity"
+    },
+    {
+      "id": "RES-002",
+      "pass": true,
+      "why": "City + player + escrow money conserved during pending shipment"
+    },
+    {
+      "id": "RES-003",
+      "pass": true,
+      "why": "Seller + in-transit + city sheet counts conserved"
+    },
+    {
+      "id": "RES-004",
+      "pass": true,
+      "why": "No funded buy order if cityPaperDemandPerRealDay=0"
+    },
+    {
+      "id": "RES-005",
+      "pass": true,
+      "why": "No funded buy order if cityPaperSpendCapPerRealDay=0"
+    },
+    {
+      "id": "RES-006",
+      "pass": true,
+      "why": "No funded buy order if cityPaperStorageCapacity=0"
+    },
+    {
+      "id": "RES-007",
+      "pass": true,
+      "why": "Booking and rotation reduce zero-sales participants"
+    },
+    {
+      "id": "RES-008",
+      "pass": true,
+      "why": "Global city demand cap and money conserved"
+    },
+    {
+      "id": "RES-009",
+      "pass": true,
+      "why": "Booking and rotation reduce zero-sales participants"
+    },
+    {
+      "id": "RES-010",
+      "pass": true,
+      "why": "Global city demand cap and money conserved"
+    }
+  ]
+}
