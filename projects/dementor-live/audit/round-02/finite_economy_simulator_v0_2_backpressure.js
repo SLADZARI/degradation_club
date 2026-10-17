@@ -56,8 +56,7 @@ function runFiniteScenario(overrides={}) {
     // Optional inventory/cash policy (PROPOSED not user-approved)
     if(cfg.backpressure===true&&(f.money<cfg.minimumWorkingCapitalPAPER
        ||f.raw>=cfg.maxRawInputBeforePause
-       ||f.output+f.warehouse+f.returnSpaceReserved+
-          (f.shipment?f.shipment.quantity:0)>=cfg.maxFinishedStockBeforePause))return;
+       ||f.output+f.warehouse+f.returnSpaceReserved>=cfg.maxFinishedStockBeforePause))return;
     if(cfg.autoReplant===false&&f.planted>=4)return;
     for(let i=0;i<4;i++){
       if(f.plants[i]!==null)continue;
