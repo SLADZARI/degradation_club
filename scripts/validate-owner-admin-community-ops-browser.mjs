@@ -99,12 +99,14 @@ async function assertUnauthorizedDirectRoute(scenario){
       from:()=>{
         window.__dcoGuardProbe.roleQueries++;
         const q={
+          predicates:[],
           select(){return this},
-          eq(){return this},
-          then(resolve,reject){return Promise.resolve({
-            data:[{role:'club_member',status:'active',valid_from:null,valid_to:null}],
-            error:null
-          }).then(resolve,reject)}
+          eq(field,value){this.predicates.push(row=>row[field]===value);return this},
+          then(resolve,reject){
+            const seed=[{profile_id:user.id,role:'club_member',status:'active',valid_from:null,valid_to:null}];
+            const data=seed.filter(row=>this.predicates.every(match=>match(row)));
+            return Promise.resolve({data,error:null}).then(resolve,reject);
+          }
         };
         return q;
       },
