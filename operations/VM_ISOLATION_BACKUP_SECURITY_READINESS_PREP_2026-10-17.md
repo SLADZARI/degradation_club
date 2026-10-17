@@ -189,6 +189,26 @@ This certificate will not be renewed automatically.
 
 **STATUS:** `CERT_ISSUED_OPERATOR_REPORTED / NGINX_SITE_NOT_INSTALLED / DNS_CUTOVER_NOT_AUTHORIZED / AUTO_RENEWAL_UNRESOLVED`.
 
+### W9-9. Existing VM certificate X.509 SAN and validity verified — read-only owner evidence (2026-10-17)
+
+**New actual owner terminal:** existing Mac→VM SSH ran read-only `openssl x509 -in /etc/letsencrypt/live/dementor.club/fullchain.pem -noout -subject -dates -ext subjectAltName`, no private key reading, no host mutation.
+
+```text
+subject=CN = dementor.club
+notBefore=Oct 17 17:14:07 2026 GMT
+notAfter=Jan 15 17:14:06 2027 GMT
+X509v3 Subject Alternative Name:
+    DNS:dementor.club, DNS:www.dementor.club
+```
+
+**PASS (observed operator evidence):** real X.509 certificate is readable on the VM at the expected `fullchain.pem` path, CN matches apex, explicit SAN includes both apex and `www`, and the certificate's stated validity window covers the issuance date and ends 2027-01-15 17:14:06 UTC. No more repetitive cert subject/SAN/expiry checks are necessary.
+
+**NOT VERIFIED / next Gate:** chain validation against client's browser trust store, VM Nginx server-block binding, complete static pages/critical routes with `curl --resolve`, auth/Cloud positive-negative QA, and unchanged legacy vhosts after future config. `certbot.timer` remains **insufficient** for renewal of the confirmed manual DNS-01 lineage; need actually validated renewal path before release.
+
+**Next unblocked work:** exact `dementor.club`-only Nginx config proposal scoped to `/srv/dementor/stage-a/releases/cde332779ab0e256dd1e498660d6fa651e91846e` and the now-verified `fullchain.pem` / `privkey.pem` paths; code/review it in existing Draft PR #257. Installation/reload and public DNS A/CNAME changes still depend on the appropriate scoped owner release authorization, G6/G7 controls, baseline #228 QA and rollback evidence. **Do not claim public VM HTTPS or Stage1 released.**
+
+`STATUS: VM TLS SAN+WINDOW VERIFIED / NGINX TLS VHOST NOT INSTALLED / PUBLIC DNS STILL GITHUB PAGES / RENEWAL AUTOMATION PENDING`
+
 ## LEAD WAVE 2 — READ-ONLY STAGE A SAFETY & HOST INVENTORY (2026-10-17)
 
 **Permission:** [Lead #255](https://github.com/SLADZARI/degradation_club/issues/255#issuecomment-6235077290) and [owner prep direction #237](https://github.com/SLADZARI/degradation_club/issues/237#issuecomment-6235076956) allow architecture/reporting and Kirill-authorized read-only snapshots ONLY. [Q-01](https://github.com/SLADZARI/degradation_club/issues/228#issuecomment-6235143113) explicitly says Stage A READ-ONLY PREP MAY PROCEED; public/authenticated VM staging and parent #228 stable-baseline remain NO-GO. No staging Result/Gate is approved; no VM write is authorized.
