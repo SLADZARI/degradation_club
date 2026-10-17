@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <title>Community Ops — Dementor Club</title>
+  <link rel="stylesheet" href="../../../design-system/design-system.css">
+  <link rel="stylesheet" href="../../../design-system/dementor-workspace/workspace.css">
+  <link rel="stylesheet" href="../../workspace.css">
+  <link rel="stylesheet" href="./community-ops-v1.css">
+  <script src="../../../site-config.js"></script>
+</head>
+<body class="dc-system-page dcw-body">
+  <div class="dcw-live-banner">DEMENTOR CLUB · PERSONAL WORKSPACE · OWNER ADMIN</div>
+  <div class="dcw-app">
+    <aside class="dcw-sidebar" data-workspace-sidebar></aside>
+    <main class="dcw-main">
+      <header class="dcw-topbar">
+        <div><span class="dcw-kicker">SYSTEM TOOLS / COMMUNITY OPS</span><strong>ARTIFACT ADMIN</strong></div>
+        <div class="dcw-top-meta"><span>OWNER_ADMIN</span><span class="dcw-dot"></span><span>CANONICAL RPC ONLY</span></div>
+      </header>
+      <div class="dcw-view">
+        <div class="dcw-page-head dco-page-head">
+          <div><div class="dcw-kicker">INTERNAL / BOUNDED OPERATIONS</div><h1>COMMUNITY<br>OPS.</h1></div>
+          <p>Рутинные операции с уже утверждёнными правами: Artifact slots, участники идеи и архивирование. Без SQL, raw UUID workflow и новых permissions.</p>
+        </div>
+
+        <section class="dco-section" aria-labelledby="peopleOpsTitle">
+          <div class="dco-section__head">
+            <div><span>01 / PEOPLE + SLOTS</span><h2 id="peopleOpsTitle">НАЙТИ УЧАСТНИКА.</h2></div>
+            <p>Поиск использует безопасную Owner Admin projection. Email не является primary identity.</p>
+          </div>
+          <form class="dco-search" id="profileSearchForm">
+            <label for="profileSearch">Имя / ник / USER-ref</label>
+            <div class="dco-search__row">
+              <input id="profileSearch" name="profile_search" autocomplete="off" minlength="2" maxlength="80" placeholder="Например: Gabil">
+              <button class="dco-action" type="submit">НАЙТИ →</button>
+            </div>
+          </form>
+          <div class="dco-results" id="profileResults" aria-live="polite"></div>
+          <div id="slotPanel"></div>
+        </section>
+
+        <section class="dco-section" aria-labelledby="artifactOpsTitle">
+          <div class="dco-section__head">
+            <div><span>02 / ARTIFACT OPERATIONS</span><h2 id="artifactOpsTitle">НАЙТИ ARTIFACT.</h2></div>
+            <p>Состояние читается из canonical Artifact owner. Закрытие — только через <code>dc_close_artifact_v1</code>.</p>
+          </div>
+          <form class="dco-search" id="artifactSearchForm">
+            <label for="artifactSearch">Заголовок / текст</label>
+            <div class="dco-search__row">
+              <input id="artifactSearch" name="artifact_search" autocomplete="off" minlength="2" maxlength="120" placeholder="Минимум 2 символа">
+              <button class="dco-action" type="submit">НАЙТИ →</button>
+            </div>
+          </form>
+          <div class="dco-results" id="artifactResults" aria-live="polite"></div>
+          <div id="artifactPanel"></div>
+        </section>
+
+        <p class="dco-footnote"><a href="../">← SYSTEM TOOLS</a> · UI visibility ≠ authorization. Все mutation-права остаются в canonical RPC/RLS.</p>
+      </div>
+    </main>
+  </div>
+  <script src="../../workspace-shell-v1.js"></script>
+  <script type="module" src="../owner-admin-access-v1.js"></script>
+  <script type="module" src="./community-ops-v1.js"></script>
+</body>
+</html>

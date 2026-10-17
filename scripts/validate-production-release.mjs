@@ -47,6 +47,7 @@ const technicalRouteAllowlist = new Set([
   '/workspace/admin/tests/',
   '/workspace/admin/auth-test/',
   '/workspace/admin/sync-test/',
+  '/workspace/admin/community-ops/',
 ]);
 const publicTextExtensions = new Set(['.html', '.xml', '.txt', '.webmanifest', '.json', '.js', '.css']);
 const errors = [];
