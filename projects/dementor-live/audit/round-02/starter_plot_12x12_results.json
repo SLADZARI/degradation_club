@@ -1,0 +1,140 @@
+{
+  "type": "SYNTHETIC_12X12_GRID",
+  "date": "2026-10-17",
+  "gate": [
+    5,
+    11
+  ],
+  "objects": [
+    {
+      "id": "CABIN",
+      "x": 1,
+      "y": 1,
+      "w": 4,
+      "h": 4,
+      "door": [
+        3,
+        5
+      ]
+    },
+    {
+      "id": "WORKSHOP",
+      "x": 6,
+      "y": 1,
+      "w": 5,
+      "h": 5,
+      "door": [
+        8,
+        6
+      ]
+    },
+    {
+      "id": "STORAGE",
+      "x": 1,
+      "y": 7,
+      "w": 2,
+      "h": 3,
+      "door": [
+        2,
+        10
+      ]
+    },
+    {
+      "id": "WATER_TANK",
+      "x": 4,
+      "y": 8,
+      "w": 2,
+      "h": 2,
+      "door": [
+        5,
+        7
+      ]
+    },
+    {
+      "id": "GARDEN_BED",
+      "x": 8,
+      "y": 8,
+      "w": 2,
+      "h": 2,
+      "door": [
+        8,
+        7
+      ]
+    }
+  ],
+  "footprintCells": 55,
+  "freeCells": 89,
+  "walkableFromGate": 89,
+  "doorChecks": [
+    {
+      "id": "CABIN",
+      "door": [
+        3,
+        5
+      ],
+      "doorOnFreeCell": true,
+      "reachable": true
+    },
+    {
+      "id": "WORKSHOP",
+      "door": [
+        8,
+        6
+      ],
+      "doorOnFreeCell": true,
+      "reachable": true
+    },
+    {
+      "id": "STORAGE",
+      "door": [
+        2,
+        10
+      ],
+      "doorOnFreeCell": true,
+      "reachable": true
+    },
+    {
+      "id": "WATER_TANK",
+      "door": [
+        5,
+        7
+      ],
+      "doorOnFreeCell": true,
+      "reachable": true
+    },
+    {
+      "id": "GARDEN_BED",
+      "door": [
+        8,
+        7
+      ],
+      "doorOnFreeCell": true,
+      "reachable": true
+    }
+  ],
+  "perimeterClear": true,
+  "perObjectMarginal": [
+    {
+      "id": "CABIN",
+      "hasOneCellBoundaryMargin": true
+    },
+    {
+      "id": "WORKSHOP",
+      "hasOneCellBoundaryMargin": true
+    },
+    {
+      "id": "STORAGE",
+      "hasOneCellBoundaryMargin": true
+    },
+    {
+      "id": "WATER_TANK",
+      "hasOneCellBoundaryMargin": true
+    },
+    {
+      "id": "GARDEN_BED",
+      "hasOneCellBoundaryMargin": true
+    }
+  ],
+  "findings": [],
+  "passed": true
+}
