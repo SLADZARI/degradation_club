@@ -99,6 +99,7 @@ try{
     "insert into public.dc_role_assignments(profile_id,role,scope_type,status,source_system,source_ref,provenance_status) values",
     "('"+OWNER+"','owner_admin','system','active','local-validator','owner-admin-community-ops','confirmed');",
     "insert into public.dc_system_memberships(profile_id,status,source_system,source_ref,provenance_status) values",
+    "('"+OWNER+"','active','local-validator','owner-admin-community-ops','confirmed'),",
     "('"+MEMBER+"','active','local-validator','owner-admin-community-ops','confirmed')",
     "on conflict(profile_id) do update set status=excluded.status;",
     "insert into public.dc_artifact_slot_grants(profile_id,amount,grant_key,reason,source_system,source_ref,provenance_status,granted_by_profile_id) values",
@@ -108,6 +109,10 @@ try{
     "('"+ACTIVE_ART+"','"+MEMBER+"','idea','Ops active','body','active','community',now(),'local-validator','confirmed'),",
     "('"+ARCHIVED_ART+"','"+MEMBER+"','idea','Ops archived','body','archived','community',now()-interval '1 day','local-validator','confirmed');"
   ].join('\n'));
+
+  // Canonical dc_is_owner_admin requires both an active role and active membership.
+  if(asUser(OWNER,"select public.dc_is_owner_admin();")!=='t')throw new Error('Owner Admin fixture authority check failed');
+  if(asUser(MEMBER,"select public.dc_is_owner_admin();")!=='f')throw new Error('Normal Member unexpectedly has Owner Admin authority');
 
   const search=json(OWNER,"select coalesce(json_agg(row_to_json(q)),'[]'::json)::text from public.dc_admin_profile_search_v1('Alex',12) q;");
   if(search.length!==2)throw new Error('same-name search expected 2 rows, got '+search.length);
