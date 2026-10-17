@@ -149,7 +149,9 @@ async function main(){
     prepare(tempRoot,ports);
     result.phase='START_DISPOSABLE_SUPABASE';
     startAttempted=true;
-    try{run('supabase',['start'],tempRoot);}
+    // BQA-23 exercises PostgreSQL/RPC, not Logflare analytics, Vector, or Studio.
+    // --exclude names are CLI service IDs (logflare, not analytics).
+    try{run('supabase',['start','--exclude','logflare,vector,studio'],tempRoot);}
     catch(error){fail('Supabase start failed (disposable): '+String(error.stderr||error.message).slice(-3000));}
     let container=findOwnedDatabase();
     verifyMigrations(container);
