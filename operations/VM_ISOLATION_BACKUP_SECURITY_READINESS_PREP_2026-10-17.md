@@ -81,7 +81,7 @@ semanticMutationAuthorized: false
 | **K5: backups** | Existing location unknown; can organize | **BACKUP EXISTENCE/LOCATION AND RESTORE NOT VERIFIED**. Off-VM encrypted backup destination, custody, retention and test remain to be selected/approved |
 | **K6: available capacity** | 40 gigabytes | **~40 GB FREE DISK REPORTED** based on question context; NOT 40 GB RAM. No dated `df -h`, memory or CPU pressure evidence |
 
-**Action requested now of Kirill and the legacy MDAO database owner (independently of Deferred #237):** confirm whether the reported internet-accessible DB port is intentionally required, verify exact allowed source networks and active client dependencies, PostgreSQL authentication/TLS/log posture, then approve **least-disruptive exposure restriction** (source-IP allow-list, private/VPN access, or internal-only bind where compatible) and validate existing MDAO clients after any owner-controlled change. If unintentional, prioritize containment through the *legacy owner's* incident/change process. **Do not shut down db-dev, alter firewall/docker/nginx/credentials or touch /data as part of #255.** No unsolicited internet scanning and no claims of compromise. Avoid public GitHub disclosure of credentials, access-control internals, user data or network secrets.
+**Historical 32778 request superseded:** Later operator clarification to Lead says the port question is okay ([#255 Lead correction](https://github.com/SLADZARI/degradation_club/issues/255#issuecomment-6235026856)). Record **OWNER-REPORTED RESOLVED / NOT VERIFIED BY INDEPENDENT SECURITY AUDIT**. No renewed demand, scans, firewall/Docker changes, legacy DB queries, or claim of compromise under this issue; preserve old note as provenance only.
 
 **Approval boundaries unchanged:** #228 stable parent remains NO-GO, #237 migration BACKLOG/DEFERRED, Draft #257 documentation only. Kirill's Yes on SSH/Nginx is an acknowledgement of feasibility, not staging authorization. Backups are not ready without a successful isolated off-VM restore.
 
@@ -89,7 +89,7 @@ semanticMutationAuthorized: false
 
 - [Lead review in #255](https://github.com/SLADZARI/degradation_club/issues/255#issuecomment-6234150832) and [Q-01 independent review of PR #257](https://github.com/SLADZARI/degradation_club/pull/257#issuecomment-6234226553) accepted this **as a planning DRAFT only**, **not** host-ready, architecture APPROVED, migration-GO or release approval. Their factual corrections are applied in this revision.
 - **Namespace evidence:** prior `ls -ld` did not establish `/srv/dementor`; Kirill **now reports it exists**, but on-host existence/ACLs remain **NOT INDEPENDENTLY VERIFIED** until a new dated command. See sections 2 and 6A/K1.
-- **New security input:** historical `0.0.0.0:32778` host binding alone was not reachability proof; Kirill **now reports external reachability**, not independently scanned. No compromise asserted. Kirill/MDAO owner should promptly verify and decide mitigation in their own change process. See R1 and K4.
+- **Historical K4 report and latest decision:** earlier Kirill-reported external access was not independently tested; [later owner clarification](https://github.com/SLADZARI/degradation_club/issues/255#issuecomment-6235026856) states the matter was resolved. **OWNER-REPORTED RESOLVED**, not security audit PASS, and no longer an active staging blocker. No repeated escalation absent new evidence.
 - **Latest independently reported production identity:** [#228 Q-01 report](https://github.com/SLADZARI/degradation_club/issues/228#issuecomment-6234059093) confirms branch HEAD + Pages #138 + Supabase #9 on `cde332779ab0e256dd1e498660d6fa651e91846e`; parent **#228 remains NO-GO** for full behavioral/role acceptance.
 - **Dev2 #256 source handoff received:** [inventory](https://github.com/SLADZARI/degradation_club/issues/256#issuecomment-6234046431) distinguishes static Club portal from *unverified* Battle, Robo and Lab runtimes. It does not authorize new routes, containers, hosting or merge. Dev1 exact Compose/clean-run evidence still missing.
 - **Approval checklist added** in section 6A for Kirill/MDAO/Club owner and sanitized evidence; zero host/VM writes or production effects.
@@ -229,7 +229,7 @@ This is a non-invasive architectural threat review, **not** an external penetrat
 | **Club release owner** | Approves Result/Gate, published domain/callback, data migration plan and cutover | Explicit owner decision + baseline evidence | Treating this report/PR as authorization |
 | **Backup custodian** | Future off-VM encrypted backup write and **isolated restore** read, separately scoped key access | Kirill + data owner + compliance/security | Storing backup secrets in GitHub, relying solely on same-VM copies |
 
-Required explicit decisions for Kirill + owner: (D1) exact host/legacy owner map and shared-resource budget; (D2) 32778 exposure review/mitigation responsibility; (D3) host namespace/UID/SSH/deploy credential policy; (D4) staging private ingress/new vhost/certificate/DNS ownership; (D5) independent encrypted backup target/custodian, permitted data classes, retention and restore environment; (D6) runner isolation and Docker privilege; (D7) who may execute incident rollback. None are deemed approved by silence.
+Required explicit decisions for Kirill + owner: (D1) host/legacy owner map and resource budget; (D2) 32778 inquiry **owner-reported resolved, not active**; (D3) namespace/UID/SSH/deploy credentials; (D4) staging private ingress/vhost/certificate ownership; (D5) independent encrypted backup custodian and restore; (D6) runner isolation and Docker privilege; (D7) rollback decision-maker. Neither feasibility nor silence authorizes implementation.
 
 ## 6A. Kirill decision checklist — ready for explicit approvals (NO grants/change yet)
 
@@ -272,7 +272,7 @@ For a future authorized diagnostic session, request **redacted output** of:
 - `docker ps --format` with image/name/status/ports/mounts (selective inspect fields; **do not** dump `docker inspect` full `Env` or credentials), Docker networks and volumes, legacy container restart/backup owners and known service dependencies.
 - `systemctl is-active nginx`, `systemctl is-active gitlab-runner`; runner executor/security model (no runner tokens). Key and account **grants**, not credential material.
 - Existing backup schedule/provider/retention & date of *last successful restore*, exact owner/contact, resource alarms, authorized /srv ACL details.
-- For 32778: Kirill-coordinated reachability determination from authorized network vantage points **only**; no unsolicited internet scans. Validate private consumers before any mitigation to prevent MDAO outage.
+- For historical 32778: **OWNER-REPORTED RESOLVED**; no new probing or escalation without new evidence or express legacy owner request. Ordinary read-only host inventory may record nonsecret listening-port metadata.
 
 Submit sanitized evidence links/checksum plus capture date and operator attribution to #255 or linked owner request. Do not run actions that write state, restart services, disclose secrets or touch protected data.
 
