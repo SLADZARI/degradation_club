@@ -1,0 +1,267 @@
+{
+  "description": "GA-03 sensitivity only. Equipment prices are arbitrary scenario parameters, not proposed approved prices.",
+  "firstHouse": {
+    "starterPAPER": 80,
+    "trainingJobs": 360,
+    "land": 360,
+    "cabin": 60,
+    "cashAfterHouse": 20,
+    "firstBatchInputCash": 37,
+    "cashGapToFirstBatch": 17
+  },
+  "farmBatch": {
+    "seeds": 16,
+    "water": 8,
+    "maintenance": 8,
+    "delivery": 5,
+    "paperCityRevenue": 72,
+    "operatingExpense": 37,
+    "conditionalOperatingMargin": 35
+  },
+  "trends": [
+    {
+      "day": 1,
+      "netPaper": -58,
+      "sold": 64,
+      "stocks": 128,
+      "cityCash": 10058
+    },
+    {
+      "day": 2,
+      "netPaper": 28,
+      "sold": 128,
+      "stocks": 136,
+      "cityCash": 9972
+    },
+    {
+      "day": 3,
+      "netPaper": 146,
+      "sold": 192,
+      "stocks": 120,
+      "cityCash": 9854
+    },
+    {
+      "day": 4,
+      "netPaper": 232,
+      "sold": 256,
+      "stocks": 128,
+      "cityCash": 9768
+    },
+    {
+      "day": 5,
+      "netPaper": 318,
+      "sold": 320,
+      "stocks": 136,
+      "cityCash": 9682
+    },
+    {
+      "day": 6,
+      "netPaper": 436,
+      "sold": 384,
+      "stocks": 120,
+      "cityCash": 9564
+    },
+    {
+      "day": 7,
+      "netPaper": 522,
+      "sold": 448,
+      "stocks": 128,
+      "cityCash": 9478
+    },
+    {
+      "day": 8,
+      "netPaper": 608,
+      "sold": 512,
+      "stocks": 136,
+      "cityCash": 9392
+    },
+    {
+      "day": 9,
+      "netPaper": 726,
+      "sold": 576,
+      "stocks": 120,
+      "cityCash": 9274
+    },
+    {
+      "day": 10,
+      "netPaper": 812,
+      "sold": 640,
+      "stocks": 128,
+      "cityCash": 9188
+    },
+    {
+      "day": 11,
+      "netPaper": 898,
+      "sold": 704,
+      "stocks": 136,
+      "cityCash": 9102
+    },
+    {
+      "day": 12,
+      "netPaper": 1016,
+      "sold": 768,
+      "stocks": 120,
+      "cityCash": 8984
+    },
+    {
+      "day": 13,
+      "netPaper": 1102,
+      "sold": 832,
+      "stocks": 128,
+      "cityCash": 8898
+    },
+    {
+      "day": 14,
+      "netPaper": 1188,
+      "sold": 896,
+      "stocks": 136,
+      "cityCash": 8812
+    },
+    {
+      "day": 15,
+      "netPaper": 1306,
+      "sold": 960,
+      "stocks": 120,
+      "cityCash": 8694
+    },
+    {
+      "day": 16,
+      "netPaper": 1392,
+      "sold": 1024,
+      "stocks": 128,
+      "cityCash": 8608
+    },
+    {
+      "day": 17,
+      "netPaper": 1478,
+      "sold": 1088,
+      "stocks": 136,
+      "cityCash": 8522
+    },
+    {
+      "day": 18,
+      "netPaper": 1596,
+      "sold": 1152,
+      "stocks": 120,
+      "cityCash": 8404
+    },
+    {
+      "day": 19,
+      "netPaper": 1682,
+      "sold": 1216,
+      "stocks": 128,
+      "cityCash": 8318
+    },
+    {
+      "day": 20,
+      "netPaper": 1768,
+      "sold": 1280,
+      "stocks": 136,
+      "cityCash": 8232
+    },
+    {
+      "day": 21,
+      "netPaper": 1886,
+      "sold": 1344,
+      "stocks": 120,
+      "cityCash": 8114
+    },
+    {
+      "day": 22,
+      "netPaper": 1972,
+      "sold": 1408,
+      "stocks": 128,
+      "cityCash": 8028
+    },
+    {
+      "day": 23,
+      "netPaper": 2058,
+      "sold": 1472,
+      "stocks": 136,
+      "cityCash": 7942
+    },
+    {
+      "day": 24,
+      "netPaper": 2176,
+      "sold": 1536,
+      "stocks": 120,
+      "cityCash": 7824
+    },
+    {
+      "day": 25,
+      "netPaper": 2262,
+      "sold": 1600,
+      "stocks": 128,
+      "cityCash": 7738
+    },
+    {
+      "day": 26,
+      "netPaper": 2348,
+      "sold": 1664,
+      "stocks": 136,
+      "cityCash": 7652
+    },
+    {
+      "day": 27,
+      "netPaper": 2466,
+      "sold": 1728,
+      "stocks": 120,
+      "cityCash": 7534
+    },
+    {
+      "day": 28,
+      "netPaper": 2552,
+      "sold": 1792,
+      "stocks": 128,
+      "cityCash": 7448
+    },
+    {
+      "day": 29,
+      "netPaper": 2638,
+      "sold": 1856,
+      "stocks": 136,
+      "cityCash": 7362
+    },
+    {
+      "day": 30,
+      "netPaper": 2756,
+      "sold": 1920,
+      "stocks": 120,
+      "cityCash": 7244
+    }
+  ],
+  "breakEven": [
+    {
+      "equipmentCapexPAPER": 0,
+      "firstDayPayback": 2,
+      "netAfter30d": 2756
+    },
+    {
+      "equipmentCapexPAPER": 120,
+      "firstDayPayback": 3,
+      "netAfter30d": 2636
+    },
+    {
+      "equipmentCapexPAPER": 300,
+      "firstDayPayback": 5,
+      "netAfter30d": 2456
+    },
+    {
+      "equipmentCapexPAPER": 600,
+      "firstDayPayback": 8,
+      "netAfter30d": 2156
+    },
+    {
+      "equipmentCapexPAPER": 1000,
+      "firstDayPayback": 12,
+      "netAfter30d": 1756
+    }
+  ],
+  "limitations": [
+    "100% assumed finite city demand fixture, not real market",
+    "Costs of land, cabin, physical materials, factory, water infrastructure, warehouse, bike and labor omitted in runFiniteScenario; shown separately as candidate capex sensitivity",
+    "The 500 PAPER starting farm wallet comes from a test fixture and is not the 20 PAPER left after tutorial house",
+    "Equipment prices 0,120,300,600,1000 only sensitivity levers",
+    "Payback uses test-model cumulative net cash gain, not EBITDA, tax profit, ROI or real forecast"
+  ]
+}
