@@ -9,11 +9,11 @@ Project boundary: own 2D Dementor Live life sandbox, NOT Dementor Battle / Robo 
 
 ## Главный вход — ядро игры и первый этап (2026-10-17)
 
-[CORE_AND_FIRST_LEVEL_v0.1.md — Ядро игры и первый этап](https://github.com/SLADZARI/degradation_club/blob/docs/dementor-live-global-audit-05/projects/dementor-live/CORE_AND_FIRST_LEVEL_v0.1.md) — **читать первым для актуального замысла**. Один краткий основной документ: смысл игры, главные механики и стартовая цепочка от пустого поля и городской площади к своему участку.
+[CORE_AND_FIRST_LEVEL_v0.1.md — Ядро игры и первый этап](https://github.com/SLADZARI/degradation_club/blob/docs/dementor-live-global-audit-05/projects/dementor-live/CORE_AND_FIRST_LEVEL_v0.1.md) — **читать первым для актуального замысла**. Один краткий основной документ только с согласованными решениями: смысл игры, главные механики и стартовая цепочка от пустого поля и городской площади к своему участку. Раздел открытых вопросов и предлагаемые детали из основного текста исключены.
 
-Это позднейшее выбранное пользователем направление после CITY_PROJECTS v0.2: только игровая валюта, бесплатные изнашиваемые стандартные инструменты от мэрии, общественная кузница, поэтапная стройка с отдельным обустройством, река и мост, голод во время игры и состояние духа с обязательным самостоятельным восстановлением. Открытия постоянной мэрии — рабочее предложение; баланс, снабжение, восстановление ресурсов и следующие проекты ещё определяются.
+Это позднейшее выбранное пользователем направление после CITY_PROJECTS v0.2: только игровая валюта, бесплатные изнашиваемые стандартные инструменты от мэрии, общественная кузница, поэтапная стройка с отдельным обустройством, река и мост, голод во время игры и состояние духа с обязательным самостоятельным восстановлением.
 
-**Согласование старых глав ещё предстоит:** прежний SURVIVAL исключал обязательный голод, а прежний Character-first gate не учитывал последующее разрешение механической проверки на клеточном поле с геометрическими персонажами. Готовая графика не является условием этой проверки. **Сейчас код и прототип не начинаются: сначала фиксируется основа.** Этот документ не означает обновление всех 27 глав и не подтверждён тестами GA05. Замороженный Master GDD не переписан. Следующие разделы описывают тематические документы и историю аудита.
+**Согласование старых глав ещё предстоит:** прежний SURVIVAL исключал обязательный голод, а прежний Character-first gate не учитывал последующее разрешение механической проверки на простом клеточном поле. Персонажи сохраняют вид из трёх сгенерированных блоковых изображений; окружение и графика мира ещё примитивнее. Готовая графика не является условием этой проверки. **Сейчас код и прототип не начинаются: сначала фиксируется основа.** Этот документ не означает обновление всех 27 глав и не подтверждён тестами GA05. Замороженный Master GDD не переписан. Следующие разделы описывают тематические документы и историю аудита.
 
 ## Тематический документ — City Projects v0.2 (2026-10-17)
 
@@ -49,5 +49,5 @@ Project boundary: own 2D Dementor Live life sandbox, NOT Dementor Battle / Robo 
 ## Review and next
 Issue count is 67 *review items* across GA01..GA05, not confirmed 67 bugs.
 27/27 chapters have an editorial traceability row and inherited source baseline, but **0/27 full long-form GDD v0.2 chapters are yet approved**. Source long-form chat export still pending.
-No real PostgreSQL/RLS/durable checkpoint test or final SVG character rig tested in GA05. Historical GA05 Character-first gate; the later current core permits mechanical checks with geometric placeholders, while implementation is currently deferred until after documenting the core.
+No real PostgreSQL/RLS/durable checkpoint test or final SVG character rig tested in GA05. Historical GA05 Character-first gate; the later current core permits mechanical checks using the three generated block character images and a more primitive environment, while implementation is currently deferred until after documenting the core.
 Next GA06 should prioritize an enjoyable FIRST 30/60/90 REAL minute narrative/interaction proof, source artifact completion for all27, and user acceptance of decision choices D01–D11; then bridge to actual game implementation when art/architecture gate is ready.
