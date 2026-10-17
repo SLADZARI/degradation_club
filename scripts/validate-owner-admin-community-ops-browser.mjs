@@ -20,7 +20,7 @@ function qaHtml(){
     "document.documentElement.dataset.dcOwnerAdmin='1';",
     'window.confirm=()=>true;',
     "const ids={g:'11111111-1111-4111-8111-111111111111',n:'22222222-2222-4222-8222-222222222222',m:'33333333-3333-4333-8333-333333333333',a1:'44444444-4444-4444-8444-444444444444',a2:'55555555-5555-4555-8555-555555555555',idea:'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa'};",
-    "const qa=globalThis.__QA_STATE__={grantCalls:0,inviteCalls:0,removeCalls:0,closeCalls:0,granted:1,profiles:[",
+    "const qa=globalThis.__QA_STATE__={grantCalls:0,deniedGrantCalls:0,denyNextGrant:false,inviteCalls:0,removeCalls:0,closeCalls:0,deniedCloseCalls:0,denyNextClose:false,granted:1,profiles:[",
     "{profile_id:ids.g,profile_ref:'USER-11111111',display_name:'Gabil Tagiev',nickname:'gabil',membership_status:'active'},",
     "{profile_id:ids.n,profile_ref:'USER-22222222',display_name:'Alex Same',nickname:'alex-one',membership_status:'active'},",
     "{profile_id:ids.m,profile_ref:'USER-33333333',display_name:'Maria QA',nickname:'maria',membership_status:'active'},",
@@ -32,12 +32,12 @@ function qaHtml(){
     'window.DEMENTOR_SUPABASE_CLIENT={from:t=>new Query(t),rpc:async(n,a={})=>{',
     "if(n==='dc_admin_profile_search_v1'){const q=String(a.p_query||'').toLowerCase();return{data:qa.profiles.filter(p=>(p.display_name+' '+p.nickname+' '+p.profile_ref).toLowerCase().includes(q)),error:null}}",
     "if(n==='dc_admin_artifact_slot_status_v1'){const p=qa.profiles.find(x=>x.profile_id===a.p_profile_id);return{data:{profile:p,artifact_slots_granted:qa.granted,artifact_slots_consuming:1,artifact_slots_available:Math.max(qa.granted-1,0),published_artifact_count:2,grant_history:[]},error:null}}",
-    "if(n==='dc_admin_grant_artifact_slots_v1'){qa.grantCalls++;await new Promise(r=>setTimeout(r,80));qa.granted+=Number(a.p_amount||0);return{data:{total_granted:qa.granted},error:null}}",
+    "if(n==='dc_admin_grant_artifact_slots_v1'){if(qa.denyNextGrant){qa.denyNextGrant=false;qa.deniedGrantCalls++;return{data:null,error:{message:'SLOT_GRANT_AMOUNT_INVALID'}}}qa.grantCalls++;await new Promise(r=>setTimeout(r,80));qa.granted+=Number(a.p_amount||0);return{data:{total_granted:qa.granted},error:null}}",
     "if(n==='dc_artifact_participants_read_v1')return{data:qa.participants,error:null};",
     "if(n==='dc_artifact_invite_candidates_v1')return{data:[{...qa.profiles.find(p=>p.profile_id===ids.m),current_state:null}],error:null};",
     "if(n==='dc_artifact_invite_v1'){qa.inviteCalls++;const p=qa.profiles.find(x=>x.profile_id===a.p_profile_id);qa.participants=qa.participants.filter(x=>x.profile_id!==a.p_profile_id);qa.participants.push({profile_id:p.profile_id,display_name:p.display_name,nickname:p.nickname,participation_state:'INVITED'});return{data:'invite',error:null}}",
     "if(n==='dc_artifact_remove_participant_v1'){qa.removeCalls++;qa.participants=qa.participants.filter(x=>x.profile_id!==a.p_profile_id);return{data:'remove',error:null}}",
-    "if(n==='dc_close_artifact_v1'){qa.closeCalls++;qa.artifacts[0].status='archived';return{data:{status:'archived'},error:null}}",
+    "if(n==='dc_close_artifact_v1'){if(qa.denyNextClose){qa.denyNextClose=false;qa.deniedCloseCalls++;return{data:null,error:{message:'QA_ARCHIVE_REJECTED'}}}qa.closeCalls++;qa.artifacts[0].status='archived';return{data:{status:'archived'},error:null}}",
     "return{data:null,error:{message:'UNEXPECTED_RPC '+n}}}};",
     '</script><script type="module" src="/workspace/admin/community-ops/community-ops-v1.js"></script></body></html>'
   ].join('');
@@ -165,6 +165,23 @@ try{
   expect((await page.evaluate(()=>globalThis.__QA_STATE__.grantCalls))===1,'duplicate slot grant submitted');
   await page.waitForFunction(()=>document.querySelector('.dco-metrics')?.textContent.includes('4'));
 
+  // An RPC reject must preserve server-owned slot truth, unlock the form and permit retry.
+  await page.evaluate(()=>{globalThis.__QA_STATE__.denyNextGrant=true});
+  await page.locator('#slotAmount').fill('2');
+  await page.locator('#slotReason').fill('QA denied grant');
+  await page.locator('#slotSource').fill('qa/community-ops/reject');
+  await page.locator('#slotGrantForm button').click();
+  await page.waitForFunction(()=>globalThis.__QA_STATE__.deniedGrantCalls===1);
+  await page.waitForFunction(()=>document.querySelector('#slotGrantForm [data-slot-status]')?.dataset.state==='error'
+    && !document.querySelector('#slotGrantForm button')?.disabled);
+  expect((await page.evaluate(()=>globalThis.__QA_STATE__.granted))===4,'failed grant changed server-owned capacity');
+  expect((await page.evaluate(()=>globalThis.__QA_STATE__.grantCalls))===1,'failed grant counted as successful mutation');
+  expect((await page.locator('.dco-metrics').innerText()).includes('4'),'failed grant changed displayed snapshot');
+
+  await page.locator('#slotGrantForm button').click();
+  await page.waitForFunction(()=>globalThis.__QA_STATE__.grantCalls===2&&globalThis.__QA_STATE__.granted===6);
+  await page.waitForFunction(()=>document.querySelector('.dco-metrics')?.textContent.includes('6'));
+
   await page.locator('#artifactSearch').fill('Idea');
   await page.locator('#artifactSearchForm button').click();
   await page.locator('#artifactResults [data-artifact-id]').first().click();
@@ -181,6 +198,18 @@ try{
   await maria.locator('[data-remove-profile]').click();
   await page.waitForFunction(()=>globalThis.__QA_STATE__.removeCalls===1);
   expect(!(await page.locator('#artifactPanel').innerText()).includes('Maria QA'),'removed participant remained');
+
+  // Rejected close must leave the Artifact active; the same canonical action can retry.
+  await page.evaluate(()=>{globalThis.__QA_STATE__.denyNextClose=true});
+  await page.locator('[data-close-artifact]').click();
+  await page.waitForFunction(()=>globalThis.__QA_STATE__.deniedCloseCalls===1);
+  await page.waitForFunction(()=>document.querySelector('[data-artifact-status]')?.dataset.state==='error');
+  expect((await page.evaluate(()=>globalThis.__QA_STATE__.artifacts[0].status))==='active',
+    'rejected close mutated Artifact status');
+  expect((await page.evaluate(()=>globalThis.__QA_STATE__.closeCalls))===0,
+    'rejected close counted as successful mutation');
+  expect((await page.locator('[data-close-artifact]').count())===1,
+    'rejected close removed retry action');
 
   await page.locator('[data-close-artifact]').click();
   await page.waitForFunction(()=>globalThis.__QA_STATE__.closeCalls===1&&globalThis.__QA_STATE__.artifacts[0].status==='archived');
@@ -205,4 +234,4 @@ if(failures.length){
   failures.forEach(f=>console.error('- '+f));
   process.exit(1);
 }
-console.log('Owner Admin Community Ops browser acceptance PASS: guest/member direct-route redirect without RPCs; safe ambiguity, slot grant dedupe+reread, Idea invite/remove, canonical archive, desktop/390/360.');
+console.log('Owner Admin Community Ops browser acceptance PASS: guest/member direct-route denial; safe ambiguity; grant dedupe/reject/retry+reread; Idea invite/remove; canonical archive reject/retry; desktop/390/360.');
