@@ -144,6 +144,26 @@ server {
 
 **Evidence tier:** `OPERATOR_ON_HOST_READ_ONLY_OUTPUT` / `DRAFT_SITE_HOSTING_PLAN` — **not** independent I1–I8 PASS, public-auth/Cloud security PASS or a release Gate.
 
+### W9-7. Nginx site-root traversal and certificate renew timer: owner-operated read-only PASS (2026-10-17)
+
+**NEW OPERATOR TERMINAL EVIDENCE**, separate from DevOps independent SSH: Mac owner used the existing trusted SSH identity to execute `ps`, `namei -l`, `runuser` read-only `test -r`, and `systemctl list-timers` on the VM; no write/reload/deploy occurred.
+
+| Target | Exact evidence | Verdict |
+| --- | --- | --- |
+| Nginx worker identity | `ps -eo user,args` shows two `www-data nginx: worker process` lines | **PASS** for observed worker user |
+| Directory walk | `namei -l /srv/dementor/stage-a/releases/cde332779ab0e256dd1e498660d6fa651e91846e/index.html`: all ancestors root:root **drwxr-xr-x**; index root:root **-rw-r--r--** | **PASS** ancestor traversal at snapshot |
+| Actual worker read access | `runuser -u "$WORKER" -- test -r "$SITE/index.html"` printed `PASS: Nginx worker can read the site` | **PASS** file readability, with actual worker identity; no need for `chown/chmod` |
+| Certbot renewal timer | `certbot.timer` in `systemctl list-timers --all`, next scheduled run shown 2026-10-17 17:51:53 UTC | **PASS** renewal *scheduler is present*; **DOES NOT prove auto-renewability of a new manually DNS-validated certificate** |
+
+**Narrowed next implementation boundary:** Frontend static-root path/worker read checks are now resolved as *operator evidence*; existing `nginx -t` baseline PASS, existing `certbot` installed, but **no `dementor.club` VM certificate has yet been observed or issued**. Do not repeat these owner terminal checks.
+
+**TLS approach:** With apex A records still pointing to GitHub Pages, choose a pre-cutover domain authorization method:
+- `DNS-01` via TXT record under **owner-operated GoDaddy DNS** can issue an apex+www cert while Pages remains live. `certbot certonly --manual --preferred-challenges dns -d dementor.club -d www.dementor.club` is a **proposed FUTURE command ONLY, not executed**, and manual validation does **not** get unattended renewal from `certbot.timer`. Either approve a vetted DNS API automation mechanism under a future Gate or transition renewal to validated HTTP-01/webroot after site cutover (port 80 routing/ACME/AAAA and www name checks).
+- A valid cert + testable exact Nginx site-only config must precede any public DNS cutover; the chosen issuance/renewal plan, rollback, Stage-1 Result/G6/G7 and explicit owner release approval remain pending.
+- Do not use `certbot --nginx` or live HTTP-01 challenge now by accident, as the domain is still on Pages and the host's existing MDAO Nginx sites must not be altered. Any cert file creation or Nginx reload is a VM mutation that requires scoped permission.
+
+**No SSH/DNS controller question remains:** User is already the operator of existing Mac→VM SSH and editor of domain DNS; do not repeatedly request Kirill, additional keys or a second VM for this routine step. This evidence is **not** a full independent I1–I8 host baseline, authenticated Cloud/RLS/CIRCLE/Storage security PASS, or site-release approval.
+
 ## LEAD WAVE 2 — READ-ONLY STAGE A SAFETY & HOST INVENTORY (2026-10-17)
 
 **Permission:** [Lead #255](https://github.com/SLADZARI/degradation_club/issues/255#issuecomment-6235077290) and [owner prep direction #237](https://github.com/SLADZARI/degradation_club/issues/237#issuecomment-6235076956) allow architecture/reporting and Kirill-authorized read-only snapshots ONLY. [Q-01](https://github.com/SLADZARI/degradation_club/issues/228#issuecomment-6235143113) explicitly says Stage A READ-ONLY PREP MAY PROCEED; public/authenticated VM staging and parent #228 stable-baseline remain NO-GO. No staging Result/Gate is approved; no VM write is authorized.
