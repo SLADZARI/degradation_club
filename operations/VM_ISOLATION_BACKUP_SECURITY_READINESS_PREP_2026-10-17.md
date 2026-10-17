@@ -164,6 +164,31 @@ server {
 
 **No SSH/DNS controller question remains:** User is already the operator of existing Mac→VM SSH and editor of domain DNS; do not repeatedly request Kirill, additional keys or a second VM for this routine step. This evidence is **not** a full independent I1–I8 host baseline, authenticated Cloud/RLS/CIRCLE/Storage security PASS, or site-release approval.
 
+### W9-8. Let's Encrypt apex+www manual DNS-01 issuance successful — owner terminal evidence (2026-10-17)
+
+**NEW OWNER-OPERATED HOST CHANGE WITH EXPLICIT USER CONSENT:** Following the earlier successful read-only Nginx/file ACL tests, the Club owner explicitly requested issuance of a **free HTTPS certificate** and personally executed the existing VM's Certbot over their established Mac SSH. This is **a narrowly approved certificate-only VM write**, not approval to modify Nginx, site DNS A/AAAA/CNAME, Supabase Cloud or production hosting.
+
+**Exact operator terminal outcome (not independently executed by Lead/Q-01):**
+```text
+certbot certonly --manual --preferred-challenges dns --cert-name dementor.club -d dementor.club -d www.dementor.club
+Successfully received certificate.
+Certificate is saved at: /etc/letsencrypt/live/dementor.club/fullchain.pem
+Key is saved at:         /etc/letsencrypt/live/dementor.club/privkey.pem
+This certificate expires on 2027-01-15.
+This certificate will not be renewed automatically.
+```
+
+**Validation provenance:** two separate TXT DNS-01 challenges for `_acme-challenge.dementor.club` and `_acme-challenge.www.dementor.club` were published by the owner in their existing GoDaddy DNS account and Certbot returned success. No challenge tokens copied into project ledger. The issuer's success message is operator evidence of issuance for the requested two domains; **certificate's SAN, chain, on-disk read permissions and precise clock validity were not independently parsed** in this GitHub update.
+
+**Current completed/blocked boundaries:**
+- **PASS (operator-reported):** free cert issued via DNS-01, `fullchain.pem` + `privkey.pem` stored on VM, expiry 2027-01-15. Certbot timer previously observed enabled.
+- **NOT DONE:** certificate configured in an isolated `dementor.club` Nginx server block; `nginx -t` after any new vhost; independent pre-DNS SNI `curl --resolve` check; external DNS switch/public VM serving and live Auth/CIRCLE/Storage negative QA. **GitHub Pages remains current public origin until an actual controlled cutover.**
+- **CRITICAL RENEWAL BLOCKER:** Certbot explicitly said **manual DNS certificate WILL NOT renew automatically** without a `--manual-auth-hook`. The previously observed `certbot.timer` cannot solve this. Before public site G7/GO, record an actually viable renewal policy (approved GoDaddy DNS API automation with scope/credential custody, or after site cutover replace the manual lineage with separately tested HTTP-01/webroot using an isolated ACME path and renewal simulation). Do not assume a GoDaddy API integration is available without verifying current account prerequisites. No HSTS/forced-HTTPS before a tested rollback.
+- **NEXT SAFE READ-ONLY STEP:** with existing owner SSH, run `certbot certificates` plus `openssl x509 -in /etc/letsencrypt/live/dementor.club/fullchain.pem -noout -subject -dates -ext subjectAltName`. **Never print/copy `privkey.pem`**, challenge tokens, Cloud secrets or private vhost/upstream configuration.
+- **NEXT SEPARATELY GATED IMPLEMENTATION:** prepare exact isolated `dementor.club` + optionally `www` static vhost to be validated with SNI `curl --resolve` before changing public DNS, and harden no-regression checks for protected legacy MDAO vhosts. No SSH/backend expansion or host-owner escalation is needed for routine steps when the Club owner is already the authorized VM and DNS operator.
+
+**STATUS:** `CERT_ISSUED_OPERATOR_REPORTED / NGINX_SITE_NOT_INSTALLED / DNS_CUTOVER_NOT_AUTHORIZED / AUTO_RENEWAL_UNRESOLVED`.
+
 ## LEAD WAVE 2 — READ-ONLY STAGE A SAFETY & HOST INVENTORY (2026-10-17)
 
 **Permission:** [Lead #255](https://github.com/SLADZARI/degradation_club/issues/255#issuecomment-6235077290) and [owner prep direction #237](https://github.com/SLADZARI/degradation_club/issues/237#issuecomment-6235076956) allow architecture/reporting and Kirill-authorized read-only snapshots ONLY. [Q-01](https://github.com/SLADZARI/degradation_club/issues/228#issuecomment-6235143113) explicitly says Stage A READ-ONLY PREP MAY PROCEED; public/authenticated VM staging and parent #228 stable-baseline remain NO-GO. No staging Result/Gate is approved; no VM write is authorized.
