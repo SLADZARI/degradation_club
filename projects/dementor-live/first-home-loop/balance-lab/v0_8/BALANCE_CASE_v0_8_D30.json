@@ -1,0 +1,53 @@
+{
+  "schema": "DL_BALANCE_CASE/0.8",
+  "modelVersion": "v0.8 DEMAND LAB",
+  "status": "TEST_MODEL_NOT_SERVER",
+  "scenario": "normal",
+  "count": 3,
+  "minutes": 43200,
+  "paper": {
+    "total": 3600,
+    "city": 2301,
+    "players": 1299,
+    "escrow": 0
+  },
+  "city": {
+    "projectsDone": 3,
+    "plotsBought": 3,
+    "tents": 3,
+    "chests": 3,
+    "beds": 3,
+    "jobsDone": 80
+  },
+  "demand": {
+    "orders": 6,
+    "fulfilledItems": 15,
+    "spentPAPER": 99,
+    "hempProcessed": 36,
+    "paperCreated": 6,
+    "paperConsumed": 6
+  },
+  "food": {
+    "carrotsCreated": 120,
+    "eatenByPlayers": 90,
+    "eatenByCity": 9,
+    "spoiled": 21,
+    "unmetNeed": 1
+  },
+  "trade": {
+    "deals": 64
+  },
+  "health": {
+    "blocked": 38
+  },
+  "qa": {
+    "passed": 52,
+    "failed": 0,
+    "invariants": 41,
+    "stressRuns": 36
+  },
+  "source": "Conversation package: Dementor_Live_World_Organism_v0_8_Package.zip",
+  "canonicalGddChanged": false,
+  "productionServerChanged": false,
+  "priceAndRecipesCanonical": false
+}
