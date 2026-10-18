@@ -9,6 +9,7 @@ on:
     types: [opened, synchronize, reopened, edited]
     branches:
       - deploy/dementor-live-isolated-2026-10-18
+      - feature/dementor-live-economy-seeds-cities-2026-10-18
     paths:
       - ".github/workflows/dementor-live-qa.yml"
       - "projects/dementor-live/runtime/**"
