@@ -1,0 +1,404 @@
+{
+  "note": "B3 civic crates experiment failed balance quality (bag stable but farm input deficits)",
+  "run": 39175821797,
+  "commit": "604ea7d0e83354e9d2b686028bf39c72db104146",
+  "normal3": [
+    {
+      "policy": "static",
+      "normalThreeAgents": [
+        {
+          "day": 60,
+          "newBuildings": [],
+          "orders": 0,
+          "fulfilled": 0,
+          "expired": 0,
+          "unfunded": 0,
+          "cityPAPER": 2301,
+          "escrow": 0,
+          "foodGrown": 81,
+          "foodSpoiled": 54,
+          "foodUnmet": 63,
+          "paperMade": 0,
+          "paperUsed": 0,
+          "blocked": 0
+        },
+        {
+          "day": 90,
+          "newBuildings": [],
+          "orders": 0,
+          "fulfilled": 0,
+          "expired": 0,
+          "unfunded": 0,
+          "cityPAPER": 2301,
+          "escrow": 0,
+          "foodGrown": 171,
+          "foodSpoiled": 114,
+          "foodUnmet": 123,
+          "paperMade": 0,
+          "paperUsed": 0,
+          "blocked": 0
+        },
+        {
+          "day": 120,
+          "newBuildings": [],
+          "orders": 0,
+          "fulfilled": 0,
+          "expired": 0,
+          "unfunded": 0,
+          "cityPAPER": 2301,
+          "escrow": 0,
+          "foodGrown": 261,
+          "foodSpoiled": 174,
+          "foodUnmet": 183,
+          "paperMade": 0,
+          "paperUsed": 0,
+          "blocked": 0
+        }
+      ]
+    },
+    {
+      "policy": "upkeep",
+      "normalThreeAgents": [
+        {
+          "day": 60,
+          "newBuildings": [],
+          "orders": 30,
+          "fulfilled": 24,
+          "expired": 0,
+          "unfunded": 0,
+          "cityPAPER": 2076,
+          "escrow": 45,
+          "foodGrown": 90,
+          "foodSpoiled": 52,
+          "foodUnmet": 64,
+          "paperMade": 12,
+          "paperUsed": 12,
+          "blocked": 4
+        },
+        {
+          "day": 90,
+          "newBuildings": [],
+          "orders": 54,
+          "fulfilled": 52,
+          "expired": 0,
+          "unfunded": 0,
+          "cityPAPER": 1896,
+          "escrow": 24,
+          "foodGrown": 192,
+          "foodSpoiled": 108,
+          "foodUnmet": 125,
+          "paperMade": 25,
+          "paperUsed": 25,
+          "blocked": 4
+        },
+        {
+          "day": 120,
+          "newBuildings": [],
+          "orders": 78,
+          "fulfilled": 76,
+          "expired": 0,
+          "unfunded": 0,
+          "cityPAPER": 1716,
+          "escrow": 24,
+          "foodGrown": 288,
+          "foodSpoiled": 166,
+          "foodUnmet": 187,
+          "paperMade": 37,
+          "paperUsed": 37,
+          "blocked": 4
+        }
+      ]
+    },
+    {
+      "policy": "needs-growth",
+      "normalThreeAgents": [
+        {
+          "day": 60,
+          "newBuildings": [
+            "pantry"
+          ],
+          "orders": 34,
+          "fulfilled": 25,
+          "expired": 0,
+          "unfunded": 0,
+          "cityPAPER": 1996,
+          "escrow": 72,
+          "foodGrown": 90,
+          "foodSpoiled": 24,
+          "foodUnmet": 37,
+          "paperMade": 12,
+          "paperUsed": 12,
+          "blocked": 8
+        },
+        {
+          "day": 90,
+          "newBuildings": [
+            "pantry",
+            "irrigation"
+          ],
+          "orders": 74,
+          "fulfilled": 62,
+          "expired": 3,
+          "unfunded": 0,
+          "cityPAPER": 1672,
+          "escrow": 108,
+          "foodGrown": 174,
+          "foodSpoiled": 29,
+          "foodUnmet": 75,
+          "paperMade": 25,
+          "paperUsed": 25,
+          "blocked": 10
+        },
+        {
+          "day": 120,
+          "newBuildings": [
+            "pantry",
+            "irrigation"
+          ],
+          "orders": 114,
+          "fulfilled": 96,
+          "expired": 11,
+          "unfunded": 0,
+          "cityPAPER": 1468,
+          "escrow": 84,
+          "foodGrown": 246,
+          "foodSpoiled": 33,
+          "foodUnmet": 115,
+          "paperMade": 39,
+          "paperUsed": 39,
+          "blocked": 10
+        }
+      ]
+    }
+  ],
+  "stress90": [
+    {
+      "environment": "normal",
+      "agents": [
+        {
+          "count": 3,
+          "cityPAPER": 1468,
+          "orders": 114,
+          "filled": 96,
+          "expired": 11,
+          "unfunded": 0,
+          "foodUnmet": 115,
+          "spoilage": 33,
+          "buildings": [
+            "pantry",
+            "irrigation"
+          ],
+          "waitingResource": 10,
+          "blocked": 10,
+          "wood": 70,
+          "stone": 40
+        },
+        {
+          "count": 4,
+          "cityPAPER": 1360,
+          "orders": 114,
+          "filled": 106,
+          "expired": 2,
+          "unfunded": 0,
+          "foodUnmet": 126,
+          "spoilage": 41,
+          "buildings": [
+            "pantry",
+            "irrigation"
+          ],
+          "waitingResource": 11,
+          "blocked": 11,
+          "wood": 70,
+          "stone": 40
+        },
+        {
+          "count": 5,
+          "cityPAPER": 1336,
+          "orders": 114,
+          "filled": 113,
+          "expired": 0,
+          "unfunded": 0,
+          "foodUnmet": 137,
+          "spoilage": 49,
+          "buildings": [
+            "pantry",
+            "irrigation"
+          ],
+          "waitingResource": 12,
+          "blocked": 12,
+          "wood": 70,
+          "stone": 40
+        }
+      ]
+    },
+    {
+      "environment": "forest",
+      "agents": [
+        {
+          "count": 3,
+          "cityPAPER": 1468,
+          "orders": 114,
+          "filled": 96,
+          "expired": 11,
+          "unfunded": 0,
+          "foodUnmet": 115,
+          "spoilage": 33,
+          "buildings": [
+            "pantry",
+            "irrigation"
+          ],
+          "waitingResource": 10,
+          "blocked": 10,
+          "wood": 170,
+          "stone": 70
+        },
+        {
+          "count": 4,
+          "cityPAPER": 1360,
+          "orders": 114,
+          "filled": 106,
+          "expired": 2,
+          "unfunded": 0,
+          "foodUnmet": 126,
+          "spoilage": 41,
+          "buildings": [
+            "pantry",
+            "irrigation"
+          ],
+          "waitingResource": 11,
+          "blocked": 11,
+          "wood": 170,
+          "stone": 70
+        },
+        {
+          "count": 5,
+          "cityPAPER": 1336,
+          "orders": 114,
+          "filled": 113,
+          "expired": 0,
+          "unfunded": 0,
+          "foodUnmet": 137,
+          "spoilage": 49,
+          "buildings": [
+            "pantry",
+            "irrigation"
+          ],
+          "waitingResource": 12,
+          "blocked": 12,
+          "wood": 170,
+          "stone": 70
+        }
+      ]
+    },
+    {
+      "environment": "dry",
+      "agents": [
+        {
+          "count": 3,
+          "cityPAPER": 1855,
+          "orders": 108,
+          "filled": 30,
+          "expired": 59,
+          "unfunded": 0,
+          "foodUnmet": 262,
+          "spoilage": 10,
+          "buildings": [
+            "irrigation",
+            "pantry"
+          ],
+          "waitingResource": 31,
+          "blocked": 31,
+          "wood": 70,
+          "stone": 40
+        },
+        {
+          "count": 4,
+          "cityPAPER": 1750,
+          "orders": 108,
+          "filled": 63,
+          "expired": 33,
+          "unfunded": 0,
+          "foodUnmet": 334,
+          "spoilage": 10,
+          "buildings": [
+            "irrigation",
+            "pantry"
+          ],
+          "waitingResource": 41,
+          "blocked": 41,
+          "wood": 70,
+          "stone": 40
+        },
+        {
+          "count": 5,
+          "cityPAPER": 1738,
+          "orders": 108,
+          "filled": 65,
+          "expired": 32,
+          "unfunded": 0,
+          "foodUnmet": 412,
+          "spoilage": 10,
+          "buildings": [
+            "irrigation",
+            "pantry"
+          ],
+          "waitingResource": 53,
+          "blocked": 53,
+          "wood": 70,
+          "stone": 40
+        }
+      ]
+    },
+    {
+      "environment": "treasury",
+      "agents": [
+        {
+          "count": 3,
+          "cityPAPER": 2,
+          "orders": 5,
+          "filled": 5,
+          "expired": 0,
+          "unfunded": 73,
+          "foodUnmet": 183,
+          "spoilage": 174,
+          "buildings": [],
+          "waitingResource": 1,
+          "blocked": 1,
+          "wood": 120,
+          "stone": 70
+        },
+        {
+          "count": 4,
+          "cityPAPER": 2,
+          "orders": 5,
+          "filled": 5,
+          "expired": 0,
+          "unfunded": 73,
+          "foodUnmet": 244,
+          "spoilage": 232,
+          "buildings": [],
+          "waitingResource": 1,
+          "blocked": 1,
+          "wood": 120,
+          "stone": 70
+        },
+        {
+          "count": 5,
+          "cityPAPER": 2,
+          "orders": 5,
+          "filled": 5,
+          "expired": 0,
+          "unfunded": 73,
+          "foodUnmet": 305,
+          "spoilage": 290,
+          "buildings": [],
+          "waitingResource": 1,
+          "blocked": 1,
+          "wood": 120,
+          "stone": 70
+        }
+      ]
+    }
+  ],
+  "passed": 146
+}
