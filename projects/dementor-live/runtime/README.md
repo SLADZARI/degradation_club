@@ -11,3 +11,8 @@
 `npm run doctor` — среда. `npm run check` — синтаксис/модель. `npm run test:integration` — HTTP/SSE. `npm run test:expansion`, `test:quests`, `test:compact-panels`, `test:perimeter` — браузерные сценарии во временных мирах; отдельно нужны Chrome/Playwright. `npm run pack` — переносной ZIP с MANIFEST.json.
 
 Реальный мир в data/world.json; не удалять/не публиковать. Сохранения, backups и секреты исключены из архива. Набор для отдельного Docker-запуска на своей VM: [deploy/README.md](deploy/README.md). Установка на VM не заявлена, пока не пройдена проверка SSH-узла и не выполнен первый запуск. Городская валюта только игровая, числовые параметры — прототип.
+
+
+## 0.3.0-rc.1 — кандидат обновления (не production)
+
+[Отчёт и процедура миграции](docs/RELEASE_0.3.0_RC1.md). Доступны отдельная семенная лавка, городской опытный огород и реестр новых городов. Сводная ведомость `materials` показывает дерево и камень на всех этапах. `npm run test:persistence` проверяет реальный перезапуск с одним `world.json`, `npm run test:cities-browser` проверяет переход двух живых браузерных сессий. Перед обновлением VM обязателен отдельный backup `dementor-live-world`; в текущем кандидате используется новая `dementor-cities-v1` схема сохранения. ZIP собирается командой `npm run pack` или в GitHub Actions PR #261 после PASS.
