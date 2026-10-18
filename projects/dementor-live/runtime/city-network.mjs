@@ -28,7 +28,7 @@ export class CityNetwork{
   snapshot(p){const r=this.findId(p.id);if(!r)throw Error('Житель не найден');return {...r.g.snapshot(p),cityNetwork:{current:r.cityId,cities:this.list()}};}
   assertRegistry(p,g){
     if((p.scene||'city')!=='city')throw Error('Реестр городов находится на площади');
-    if(p.spirit||p.job||p.delivery?.picked)throw Error('Закончи работу или доставь городской груз');
+    if(p.spirit||p.job||p.delivery)throw Error('Закончи работу или курьерский заказ перед переходом в другой город');
     g.near(p,g.target('city-registry'));
   }
   move(p,destination){
@@ -40,7 +40,7 @@ export class CityNetwork{
     if(online)g.disconnect(p);
     delete g.state.players[p.id];g.changed();
     p.cityId=destination;p.scene='city';p.plotId=null;p.cityReturn=null;p.job=null;p.delivery=null;
-    p.x=8;p.y=8;p.stamina=Math.max(p.stamina,20);
+    p.x=8;p.y=8;
     target.state.players[p.id]=p;
     if(online)target.connect(p);
     target.changed();this.directoryDirty=true;
