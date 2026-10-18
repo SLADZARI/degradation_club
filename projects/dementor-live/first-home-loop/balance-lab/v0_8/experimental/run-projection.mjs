@@ -2,15 +2,16 @@ import {mkdirSync,writeFileSync} from 'node:fs';
 import {SETTINGS,MODEL_ID,simulate,metrics} from './shadow-model.mjs';
 const outputDir=process.argv[2]||'./reports';
 const records=[];
-for(const policy of SETTINGS.experiments)
- for(const environment of SETTINGS.environments)
+for(const activity of SETTINGS.activityProfiles)
+ for(const policy of SETTINGS.experiments)
+  for(const environment of SETTINGS.environments)
   for(const agents of [3,4,5])
    for(const days of [30,60,90]){
-     const record=metrics(simulate({policy,environment,agents,days}));
+     const record=metrics(simulate({policy,environment,agents,days,activity}));
      records.push(record);
    }
 const combinations=SETTINGS.experiments.map(policy=>{
-  const data=records.filter(r=>r.policy===policy&&r.environment==='normal'&&r.agents===3);
+  const data=records.filter(r=>r.policy===policy&&r.environment==='normal'&&r.agents===3&&r.activity==='daily');
   return {policy,normalThreeAgents:data.map(r=>({
     day:r.day,newBuildings:r.buildings.new,orders:r.demand.posted,
     fulfilled:r.demand.filled,expired:r.demand.expired,unfunded:r.demand.unfunded,
@@ -21,7 +22,7 @@ const combinations=SETTINGS.experiments.map(policy=>{
   }))};
 });
 const stress=SETTINGS.environments.map(environment=>{
- const data=records.filter(r=>r.environment===environment&&r.policy==='needs-growth'&&r.projectionDays===90);
+ const data=records.filter(r=>r.environment===environment&&r.policy==='needs-growth'&&r.projectionDays===90&&r.activity==='daily');
  return {environment,agents:data.map(r=>({
    count:r.agents,cityPAPER:r.money.city,orders:r.demand.posted,
    filled:r.demand.filled,expired:r.demand.expired,unfunded:r.demand.unfunded,
@@ -29,6 +30,10 @@ const stress=SETTINGS.environments.map(environment=>{
    buildings:r.buildings.new,waitingResource:r.block.waitingResource,
    blocked:r.block.unique,wood:r.finiteMaterials.wood,stone:r.finiteMaterials.stone
  }))};
+});
+const activityContrast=SETTINGS.activityProfiles.map(activity=>{
+  const m=records.find(r=>r.policy==='needs-growth'&&r.environment==='normal'&&r.agents===3&&r.projectionDays===90&&r.activity===activity);
+  return {activity,mealNeeds:m.food.mealNeeds,unmet:m.food.unmet,eaten:m.food.eaten,cityOrders:m.demand.posted,cityOrdersFilled:m.demand.filled};
 });
 const result={
  schema:'WORLD_ORGANISM_SHADOW_PROJECTION/0.8.1',
@@ -47,13 +52,14 @@ const result={
   carrots:'TEST 3 carrots/seedbed harvest, each player eats one/day, unsold produce lasts one day unless pantry has been built.',
   activeSession:'All synthetic agents active daily. A real game must only apply hunger during actual online sessions.',
  },
- sample:combinations,stress,records
+ sample:combinations,stress,activityContrast,records
 };
 mkdirSync(outputDir,{recursive:true});
-writeFileSync(outputDir+'/v08-shadow-projection-108.json',JSON.stringify(result,null,2)+'\n');
+writeFileSync(outputDir+'/v08-shadow-projection-216.json',JSON.stringify(result,null,2)+'\n');
 writeFileSync(outputDir+'/v08-shadow-summary.json',JSON.stringify({...result,records:undefined},null,2)+'\n');
 console.log('RUN_COUNT',records.length);
 console.log('PROVENANCE',result.status);
 console.log('NORMAL_3_AGENTS',JSON.stringify(combinations));
 console.log('STRESS_90_DAYS',JSON.stringify(stress));
-console.log('ARTIFACT',outputDir+'/v08-shadow-projection-108.json');
+console.log('ACTIVITY_COMPARISON',JSON.stringify(activityContrast));
+console.log('ARTIFACT',outputDir+'/v08-shadow-projection-216.json');
