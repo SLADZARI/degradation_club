@@ -39,8 +39,10 @@ function initialState({agents=3,environment='normal',policy='upkeep'}={}){
     hemp:i===0?SETTINGS.hempAtCheckpoint:0,sheets:0,
     seedCarrot:3,seedHemp:3,carrotBatches:[],plotBeds:{
       food:{kind:'food',ready:0,seedSpent:false},
+      civicFood:{kind:'civicFood',ready:0,seedSpent:false},
       seed:{kind:'seed',ready:0,seedSpent:false},
-      hemp:{kind:'hemp',ready:0,seedSpent:false}
+      hemp:{kind:'hemp',ready:0,seedSpent:false},
+      hempSeed:{kind:'hempSeed',ready:0,seedSpent:false}
     },lastTrade:null,
   }));
   return {
@@ -126,7 +128,15 @@ function plant(s,p,bed){
   if(bed.kind==='hemp'&&!hasDemand(s,'PAPER_SHEET'))return;
   if(bed.kind==='food'&&carrotUnits(p)>=3)return;
   if(bed.kind==='seed'&&p.seedCarrot>=3)return;
-  const seedKind=bed.kind==='hemp'?'seedHemp':'seedCarrot';
+  if(bed.kind==='hempSeed'&&p.seedHemp>=2)return; // explicit biological propagation; no free seed rebate on hemp harvest
+  if(bed.kind==='civicFood'){
+    if(!hasDemand(s,'CARROT'))return;
+    // Reserve two household meals per grower; plant additional finite crop only for unfunded physical shortage.
+    const storedSurplus=s.players.reduce((n,x)=>n+Math.max(0,carrotUnits(x)-2),0);
+    const alreadyPlanted=s.players.reduce((n,x)=>n+(x.plotBeds.civicFood.ready?SETTINGS.carrotYield:0),0);
+    if(demandQty(s,'CARROT')<=storedSurplus+alreadyPlanted)return;
+  }
+  const seedKind=['hemp','hempSeed'].includes(bed.kind)?'seedHemp':'seedCarrot';
   const usedKey=seedKind==='seedHemp'?'SEED_HEMP':'SEED_CARROT';
   const waterNeed=SETTINGS.cropWater+(s.environment==='dry'?1:0);
   if(p[seedKind]<1||s.well<waterNeed){
@@ -137,23 +147,24 @@ function plant(s,p,bed){
   }
   p[seedKind]--;s.used[usedKey]++;
   s.well-=waterNeed;s.waterConsumed+=waterNeed;
-  const normal=bed.kind==='seed'?SETTINGS.seedGrowthDays:bed.kind==='food'?SETTINGS.carrotGrowthDays:SETTINGS.hempGrowthDays;
+  const normal=['seed','hempSeed'].includes(bed.kind)?SETTINGS.seedGrowthDays:['food','civicFood'].includes(bed.kind)?SETTINGS.carrotGrowthDays:SETTINGS.hempGrowthDays;
   bed.ready=s.day+normal*scenarios[s.environment].growthMultiplier;
   bed.seedSpent=true;s.ledgerEvents++;
 }
 function collect(s,p,bed){
   if(!bed.ready||bed.ready>s.day)return;
   const type=bed.kind;
-  const n=type==='seed'?SETTINGS.carrotSeedYield:type==='food'?SETTINGS.carrotYield:SETTINGS.hempYield;
-  const extraWeight=type==='food'?n:type==='hemp'?n:n*0.1;
-  const hempSeedReturn=type==='hemp'?0.1:0;
+  const n=['seed','hempSeed'].includes(type)?SETTINGS.carrotSeedYield:['food','civicFood'].includes(type)?SETTINGS.carrotYield:SETTINGS.hempYield;
+  const extraWeight=['food','civicFood','hemp'].includes(type)?n:n*0.1;
+  const hempSeedReturn=0;
   if(capacityLeft(p)+1e-9<extraWeight+hempSeedReturn){
     const key=p.id+':'+type+':storage';
     if(!s.waitingStorage.includes(key)){s.waitingStorage.push(key);s.blocked++;}
     return;
   }
   if(type==='seed'){p.seedCarrot+=n;s.produced.SEED_CARROT+=n;}
-  if(type==='food'){p.carrotBatches.push({qty:n,at:s.day});s.produced.CARROT+=n;}
+  if(type==='hempSeed'){p.seedHemp+=n;s.produced.SEED_HEMP+=n;}
+  if(['food','civicFood'].includes(type)){p.carrotBatches.push({qty:n,at:s.day});s.produced.CARROT+=n;}
   if(type==='hemp'){p.hemp+=n;s.produced.HEMP+=n;}
   bed.ready=0;bed.seedSpent=false;s.ledgerEvents++;
 }
@@ -207,7 +218,7 @@ function createPaper(s,p){
 function settleDemand(s){
   for(const o of s.orders.filter(o=>o.status==='OPEN')){
     while(o.remaining>0){
-      const supplier=s.players.find(p=>o.asset==='PAPER_SHEET'?p.sheets>=1:carrotUnits(p)>=1);
+      const supplier=s.players.find(p=>o.asset==='PAPER_SHEET'?p.sheets>=1:carrotUnits(p)>2); // protect 2 household meals before commercial sale
       if(!supplier)break;
       if(o.asset==='PAPER_SHEET'){supplier.sheets--;s.used.PAPER_SHEET_CITY++;}
       else required(consumeOneCarrot(s,supplier,'city'),'physical carrot absent at settlement');
