@@ -130,7 +130,8 @@ export class Game {
   }
   action(p,cmd){const {type,target}=cmd,c=this.configFor(target),s=this.state,project=this.projectFor(target);
     const publicResult=plazaAction(this,p,cmd);if(publicResult)return publicResult;
-    const equipmentResult=equipmentAction(p,cmd,this.c);if(equipmentResult)return equipmentResult;
+    const discarded=cmd.type==='discardTool'?p.toolItems?.find(t=>t.id===target)?.ingredients:null;
+    const equipmentResult=equipmentAction(p,cmd,this.c);if(equipmentResult){if(discarded){s.materialScrap||={wood:0,stone:0};for(const [kind,quantity]of Object.entries(discarded)){s.materialScrap[kind]+=quantity;recordMaterial(this,'tool-discard',kind,quantity,'tool','scrap',p.id);}}return equipmentResult;}
     const livingResult=lifeAction(this,p,cmd);if(livingResult)return livingResult;
     const expansionResult=cityExpansionAction(this,p,cmd);if(expansionResult)return expansionResult;
     if(scene(p)!=='city'&&!['chat','eat','give','equip','cancel','drop','pickup'].includes(type))throw Error('Это действие доступно в городе');
