@@ -15,7 +15,7 @@ const combinations=SETTINGS.experiments.map(policy=>{
     day:r.day,newBuildings:r.buildings.new,orders:r.demand.posted,
     fulfilled:r.demand.filled,expired:r.demand.expired,unfunded:r.demand.unfunded,
     cityPAPER:r.money.city,escrow:r.money.escrow,foodGrown:r.food.grown,
-    foodSpoiled:r.food.spoiled,foodUnmet:r.food.unmet,
+    foodSpoiled:r.food.spoiled,foodUnmet:r.food.unmet,unmetReasons:r.food.unmetReasons,
     paperMade:r.sheets.made,paperUsed:r.sheets.used,
     blocked:r.block.unique
   }))};
@@ -25,7 +25,7 @@ const stress=SETTINGS.environments.map(environment=>{
  return {environment,agents:data.map(r=>({
    count:r.agents,cityPAPER:r.money.city,orders:r.demand.posted,
    filled:r.demand.filled,expired:r.demand.expired,unfunded:r.demand.unfunded,
-   foodUnmet:r.food.unmet,spoilage:r.food.spoiled,
+   foodUnmet:r.food.unmet,unmetReasons:r.food.unmetReasons,spoilage:r.food.spoiled,
    buildings:r.buildings.new,waitingResource:r.block.waitingResource,
    blocked:r.block.unique,wood:r.finiteMaterials.wood,stone:r.finiteMaterials.stone
  }))};
