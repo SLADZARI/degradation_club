@@ -174,11 +174,38 @@ function findPath(dest){const step=.5,start={x:Math.round(me.x/step),y:Math.roun
   for(let i=0;i<queue.length&&i<20000;i++){const p=queue[i];if(p.x===goal.x&&p.y===goal.y){found=p;break;}for(const[dx,dy]of [[1,0],[-1,0],[0,1],[0,-1]]){const q={x:p.x+dx,y:p.y+dy};if(!seen.has(key(q))&&!blocked(q.x*step,q.y*step)){seen.set(key(q),p);queue.push(q);}}}
   if(!found)return null;const out=[];for(let p=found;p;p=seen.get(key(p)))out.push({x:p.x*step,y:p.y*step});return out.reverse().slice(1);
 }
-canvas.addEventListener('pointerdown',e=>{if(e.button===2)return;if(!me||$('welcome').open)return;canvas.focus();const r=canvas.getBoundingClientRect(),w=worldPoint(e.clientX-r.left,e.clientY-r.top);const targets=allTargets().sort((a,b)=>Math.hypot(a.x-w.x,a.y-w.y)-Math.hypot(b.x-w.x,b.y-w.y));const pile=targets.find(t=>t.type==='pickup'&&Math.hypot(t.x-w.x,t.y-w.y)<.7);const plot=pile||state.scene!=='city'?null:state.plots.find(p=>w.x>=p.x&&w.x<=p.x+p.w&&w.y>=p.y&&w.y<=p.y+p.h);let t=pile||(plot?targets.find(t=>t.id===plot.id):targets[0]);const insideSquare=state.scene==='city'&&w.x>=14&&w.x<=24&&w.y>=10&&w.y<=18;if(!plot&&insideSquare&&Math.hypot(t.x-w.x,t.y-w.y)>=1.3)t=targets.find(t=>t.id==='build');
+function selectWorldTarget(e){if(e.button===2)return;if(!me||$('welcome').open)return;canvas.focus();const r=canvas.getBoundingClientRect(),w=worldPoint(e.clientX-r.left,e.clientY-r.top);const targets=allTargets().sort((a,b)=>Math.hypot(a.x-w.x,a.y-w.y)-Math.hypot(b.x-w.x,b.y-w.y));const pile=targets.find(t=>t.type==='pickup'&&Math.hypot(t.x-w.x,t.y-w.y)<.7);const plot=pile||state.scene!=='city'?null:state.plots.find(p=>w.x>=p.x&&w.x<=p.x+p.w&&w.y>=p.y&&w.y<=p.y+p.h);let t=pile||(plot?targets.find(t=>t.id===plot.id):targets[0]);const insideSquare=state.scene==='city'&&w.x>=14&&w.x<=24&&w.y>=10&&w.y<=18;if(!plot&&insideSquare&&Math.hypot(t.x-w.x,t.y-w.y)>=1.3)t=targets.find(t=>t.id==='build');
   if(t&&(plot||insideSquare||Math.hypot(t.x-w.x,t.y-w.y)<1.3)){selected=t.id;if(Math.hypot(t.x-me.x,t.y-me.y)<=state.config.actionRange){updateContext();return;}
     let candidates=[];for(const[dx,dy]of [[0,1.4],[-1.4,0],[1.4,0],[0,-1.4]]){let dest={x:t.x+dx,y:t.y+dy};const path=findPath(dest);if(path)candidates.push(path);}candidates.sort((a,b)=>a.length-b.length);if(candidates[0])route=candidates[0];else toast('Пока нет доступного пути');
   }else{selected=null;const path=findPath(w);if(path)route=path;else toast(w.x>=state.config.river.x&&!bridgeOpen()?'Здесь нужна переправа. Сначала достройте мост.':'Не получается пройти — выбери свободное место.');}
+}
+
+const activeTouches=new Map();
+let pinchDistance=0,gestureActive=false,tapStart=null;
+canvas.addEventListener('pointerdown',e=>{
+  if(e.button!==0||!me||$('welcome').open)return;
+  if(e.pointerType!=='touch'){selectWorldTarget(e);return;}
+  activeTouches.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  try{canvas.setPointerCapture(e.pointerId);}catch{}
+  if(activeTouches.size===1){tapStart={x:e.clientX,y:e.clientY,at:performance.now()};gestureActive=false;}
+  if(activeTouches.size>=2){gestureActive=true;tapStart=null;const [a,b]=[...activeTouches.values()];pinchDistance=Math.hypot(a.x-b.x,a.y-b.y);}
 });
+canvas.addEventListener('pointermove',e=>{
+  if(!activeTouches.has(e.pointerId))return;
+  activeTouches.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  if(activeTouches.size>=2){const [a,b]=[...activeTouches.values()],distance=Math.hypot(a.x-b.x,a.y-b.y);if(pinchDistance>0&&distance>0)zoom(distance/pinchDistance);pinchDistance=distance;gestureActive=true;}
+  else if(tapStart&&Math.hypot(e.clientX-tapStart.x,e.clientY-tapStart.y)>12)gestureActive=true;
+});
+function endTouch(e,cancelled=false){
+  if(!activeTouches.has(e.pointerId))return;
+  const tap=!cancelled&&!gestureActive&&activeTouches.size===1&&tapStart&&performance.now()-tapStart.at<600&&Math.hypot(e.clientX-tapStart.x,e.clientY-tapStart.y)<12;
+  activeTouches.delete(e.pointerId);pinchDistance=0;
+  if(tap)selectWorldTarget(e);
+  if(!activeTouches.size){gestureActive=false;tapStart=null;}
+}
+canvas.addEventListener('pointerup',e=>endTouch(e));
+canvas.addEventListener('pointercancel',e=>endTouch(e,true));
+
 function zoom(value){view.zoom=Math.max(.8,Math.min(2.2,view.zoom*value));resize();}
 $('zoomIn').onclick=()=>zoom(1.2);$('zoomOut').onclick=()=>zoom(1/1.2);$('centerButton').onclick=()=>{if(me)openCityPanel('places');};
 canvas.addEventListener('wheel',e=>{e.preventDefault();zoom(e.deltaY<0?1.08:1/1.08);},{passive:false});
