@@ -23,6 +23,8 @@ test('Warehouse wood and stone balances survive reload, courier pickup, delivery
  const {g,p}=setup();p.bag.stone=5;p.bag.wood=4;near(g,p,'warehouse');const initial=totals(g);
  const first=cmd(g,p,'warehouseSell','warehouse',{kind:'stone'});
  assert.equal(first.ok,true);assert.equal(g.state.warehouse.stock.stone,5);assert.equal(p.bag.stone,0);
+ assert.equal(cmd(g,p,'warehouseSell','warehouse',{kind:'wood'}).ok,true);
+ assert.equal(g.state.warehouse.stock.wood,4);
  assert.deepEqual(totals(g),initial,'Depositing must conserve both material totals');
  const repeat=g.command(p,{type:'warehouseSell',target:'warehouse',kind:'stone',requestId:'economy-'+seq});assert.equal(repeat.ok,true);
  assert.equal(g.state.warehouse.stock.stone,5);
