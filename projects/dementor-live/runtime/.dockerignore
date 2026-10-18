@@ -1,0 +1,15 @@
+# No game state, keys or local test artifacts in container images.
+data/
+backups/
+*.zip
+*.tar
+*.tar.gz
+.git
+.env
+.env.*
+!.env.example
+node_modules/
+playwright-report/
+test-results/
+.DS_Store
+*.log
