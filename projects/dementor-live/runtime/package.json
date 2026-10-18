@@ -12,6 +12,7 @@
     "test": "node --test test/model.test.mjs test/life.test.mjs test/plaza.test.mjs",
     "test:integration": "node test/integration.mjs",
     "test:browser": "node test/browser.cjs",
+    "test:mobile": "node test/mobile.cjs",
     "test:lan": "node test/lan.cjs",
     "test:city": "node test/city.cjs",
     "test:tools": "node test/tools.cjs",
