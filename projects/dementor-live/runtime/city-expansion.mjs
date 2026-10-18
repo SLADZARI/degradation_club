@@ -5,9 +5,9 @@ export const CITY_BUILDINGS={
   'seed-shop-drop':{id:'seed-shop-drop',type:'project',x:22,y:9},
   'seed-shop-build':{id:'seed-shop-build',type:'build',x:23,y:7},
   'seed-shop':{id:'seed-shop',type:'seed-market',x:23,y:7},
-  'public-garden-drop':{id:'public-garden-drop',type:'project',x:27,y:18},
-  'public-garden-build':{id:'public-garden-build',type:'build',x:29,y:18},
-  'public-garden':{id:'public-garden',type:'city-garden',x:29,y:18},
+  'public-garden-drop':{id:'public-garden-drop',type:'project',x:26,y:9},
+  'public-garden-build':{id:'public-garden-build',type:'build',x:28,y:9},
+  'public-garden':{id:'public-garden',type:'city-garden',x:28,y:9},
   'city-registry':{id:'city-registry',type:'city-registry',x:19,y:6}
 };
 export const newConstruction=()=>({stage:0,work:0,accepted:{wood:0,stone:0},stock:{wood:0,stone:0},consumed:{wood:0,stone:0},spent:0});
@@ -16,6 +16,7 @@ export function initialiseCityExpansion(g){
   s.seedMarket ||=newConstruction();
   s.gardenProject ||=newConstruction();
   s.publicGarden ||= {beds:[0,1,2].map(i=>({id:'public-bed-'+i,crop:null,watered:false,readyAt:0})),harvests:0};
+  s.publicGarden.waterSource ||= {left:20,at:g.now};
   s.materialEvents ||= [];
   s.materialEmbodied ||= {wood:0,stone:0};
 }
@@ -51,11 +52,20 @@ export function cityMaterialReport(g){
 }
 export function cityExpansionAction(g,p,cmd){
   const s=g.state,c=g.c,market=s.seedMarket,garden=s.gardenProject;
-  if(cmd.type==='publicSow'||cmd.type==='publicWater'||cmd.type==='publicHarvest'){
+  if(['publicSow','publicWater','publicHarvest','publicDrawWater'].includes(cmd.type)){
     if((p.scene||'city')!=='city')throw Error('Вернись в город');
     if(garden.stage<c.cityGarden.stages.length)throw Error('Городской огород ещё строится');
     if(p.spirit||p.job)throw Error('Сначала восстанови силы');
     g.near(p,CITY_BUILDINGS['public-garden']);
+    if(cmd.type==='publicDrawWater'){
+      const spring=s.publicGarden.waterSource,elapsed=Math.max(0,Math.floor((g.now-spring.at)/60000));
+      if(elapsed){spring.left=Math.min(20,spring.left+elapsed);spring.at+=elapsed*60000;}
+      if(p.bag.water>=4)throw Error('Можно носить не более 4 л воды');
+      if(Object.entries(p.bag).reduce((sum,[k,v])=>sum+v*c.weights[k],0)+c.weights.water>c.capacity)throw Error('Нет места в рюкзаке');
+      if(spring.left<1)throw Error('Городской источник пополняется: 1 л/мин');
+      spring.left--;p.bag.water++;
+      return {message:'Получен 1 л воды из городского источника'};
+    }
     const bed=s.publicGarden.beds.find(b=>b.id===cmd.target);if(!bed)throw Error('Нет такой грядки');
     if(cmd.type==='publicSow'){
       if(bed.crop)throw Error('Грядка уже занята');
