@@ -2,6 +2,10 @@
 
 This Compose project owns only `dementor-live`, host port `14173`, and volume `dementor-live-world`. It does not attach to shared networks or edit Nginx, `/srv/dementor/stage-a`, `/data/*`, other Compose projects, or other applications.
 
+## Current VM deployment (2026-10-18)
+
+Version 0.2.1 is running at `/srv/dementor-live/app`. The world and music are in the `dementor-live-world` volume; the first-transfer backup is under `/srv/dementor-live/backups/initial-2026-10-18`. The container is healthy and the VM-local health endpoint returns `ok: true`. External access to TCP 14173 timed out from the deployment workstation; check from another network and inspect the hosting provider's inbound rules if needed. No firewall or shared server settings were changed. See `../docs/DEPLOYMENT_2026-10-18.md` before continuing.
+
 ## First installation
 
 1. Run `probe-readonly.sh` over SSH and inspect available Docker/Compose, free port, disk, and whether `/srv/dementor-live` already exists. Stop if that directory or Compose names belong to another project. Do not install packages, edit firewall rules or change Nginx.
