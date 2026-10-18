@@ -1,9 +1,15 @@
-# Separate Dementor Live game service, Node.js 22+, no npm install needed.
 FROM node:22-bookworm-slim
-ENV NODE_ENV=production
+
+ENV NODE_ENV=production \
+    DEMENTOR_HOST=0.0.0.0 \
+    DEMENTOR_PORT=4173 \
+    DEMENTOR_STATE=/app/data/world.json
+
 WORKDIR /app
-COPY --chown=node:node . /app/
-RUN mkdir -p /app/data && chown -R node:node /app/data
+COPY --chown=node:node . .
+RUN npm run doctor && npm run check && install -d -o node -g node /app/data
+
 USER node
-EXPOSE 14173
-CMD ["node","server.mjs"]
+EXPOSE 4173
+VOLUME ["/app/data"]
+CMD ["node", "server.mjs"]

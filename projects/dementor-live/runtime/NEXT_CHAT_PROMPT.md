@@ -1,4 +1,6 @@
-Продолжай Dementor Live 0.2.0 поверх существующего кода. Сначала AGENTS.md, START_HERE.md, CURRENT_STATE.md, docs/RELEASE_0.2.0.md. Не начинай заново и не сбрасывай data/world.json.
+Продолжай Dementor Live 0.2.1 поверх существующего кода. Сначала AGENTS.md, START_HERE.md, CURRENT_STATE.md, docs/RELEASE_0.2.1.md. Не начинай заново и не сбрасывай data/world.json.
+
+Отдельный VM-набор лежит в deploy/ (Compose service `dementor-live`, port 14173, volume `dementor-live-world`). Текущий удалённый сервер ещё не проверен/не изменён: SSH strict host-key check остановился на неизвестном ED25519 ключе. Не отключать StrictHostKeyChecking; продолжить после подтверждения fingerprint владельцем. Не трогать Dementor Club/Lab, `/data/*`, `/srv/dementor/stage-a` или общий Nginx. Local docker отсутствует. Текущий городской сейв и custom music при первом запуске нужно перенести отдельно в named volume с датированным backup.
 
 Есть CITY 64×40, восемь участков, PLOT/INTERIOR и общая EXPEDITION 16×16. Вход на юге (31,35), расчистка 8 дерева+6 камня открывает plot-7/8; выход (8,14). Участки восточнее реки требуют мост. Одна конечная миссия, не процедурный мир. Home/торговля/склад/пожертвования/музыка уже реализованы.
 

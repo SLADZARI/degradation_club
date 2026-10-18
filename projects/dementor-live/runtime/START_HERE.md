@@ -1,6 +1,6 @@
-# Dementor Live 0.2.0 — продолжить отсюда
+# Dementor Live 0.2.1 — продолжить отсюда
 
-Работающий локальный проект. Сначала прочитать CURRENT_STATE.md и AGENTS.md; последние правила — docs/RELEASE_0.2.0.md. История и согласованное ядро: docs/CORE_AND_FIRST_LEVEL_v0.1.md, docs/REQUIREMENTS.md.
+Работающий локальный проект; набор отдельного серверного запуска подготовлен, установка на VM пока не выполнена. Сначала прочитать CURRENT_STATE.md и AGENTS.md; последние правила — docs/RELEASE_0.2.1.md. История и согласованное ядро: docs/CORE_AND_FIRST_LEVEL_v0.1.md, docs/REQUIREMENTS.md.
 
 ## Запуск и игра вдвоём
 
@@ -17,6 +17,10 @@ WASD/стрелки — движение; E — действие, удержан
 data/world.json — реальные игроки и мир, не удалять и не публиковать. Перед рестартом сохранить закрытый backup. ZIP содержит исходники, документацию, тесты и референсы, без data/backups/.env/.git/node_modules. `npm run pack` обновляет архив и MANIFEST.json.
 
 `npm run test:expansion`, `test:quests`, `test:compact-panels`, `test:perimeter`, `test:integration` — отдельные временные миры; для браузерных тестов нужны установленный Chrome и Playwright (для игры не нужны). Check не заменяет браузерную проверку. Подробный статус — CURRENT_STATE.md, reports.
+
+## Отдельный запуск на VM
+
+Подготовлен самостоятельный Docker Compose для `/srv/dementor-live`, порта `14173` и своего тома `dementor-live-world`: см. [deploy/README.md](deploy/README.md). Он не подключён к сервисам Dementor Club. До публикации адреса нужно завершить проверку SSH-отпечатка и запустить первую сборку на VM. Локальное реальное сохранение не переносится автоматически.
 
 GitHub: https://github.com/SLADZARI/degradation_club/tree/docs/dementor-live-city-ownership-and-wilderness-01/projects/dementor-live/runtime
 Google Drive START HERE: https://docs.google.com/document/d/13egjMzmrOQCjew7V-DL2M15jnX7tyJoASTVdJF86Huw/edit

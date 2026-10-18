@@ -1,44 +1,29 @@
-# STAGING ONLY: accessible through local SSH tunnel; no public port.
-# The Compose project is isolated: own network, container, persistent volume.
 name: dementor-live
+
 services:
   game:
     build:
       context: ..
       dockerfile: deploy/Dockerfile
-    image: dementor-live:0.2.0-isolated
+    image: dementor-live:local
     restart: unless-stopped
     init: true
     environment:
-      NODE_ENV: production
       DEMENTOR_HOST: 0.0.0.0
-      DEMENTOR_PORT: "14173"
+      DEMENTOR_PORT: "4173"
       DEMENTOR_STATE: /app/data/world.json
+      DEMENTOR_PUBLIC_URL: ${DEMENTOR_PUBLIC_URL:?Set DEMENTOR_PUBLIC_URL in deploy/.env}
     ports:
-      - "127.0.0.1:14173:14173"
+      - "${DEMENTOR_BIND_ADDRESS:-0.0.0.0}:${DEMENTOR_BIND_PORT:-14173}:4173"
     volumes:
-      - world_data:/app/data
-    read_only: true
-    tmpfs:
-      - /tmp:rw,noexec,nosuid,size=16m
-    cap_drop:
-      - ALL
-    security_opt:
-      - no-new-privileges:true
-    pids_limit: 128
-    mem_limit: 1g
-    cpus: 1.0
-    stop_grace_period: 20s
+      - dementor_live_world:/app/data
     healthcheck:
-      test:
-        - CMD
-        - node
-        - -e
-        - "const h=require('node:http');const r=h.get('http://127.0.0.1:14173/api/health',x=>process.exit(x.statusCode===200?0:1));r.on('error',()=>process.exit(1));r.setTimeout(2500,()=>process.exit(1));"
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:4173/api/health').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
       interval: 30s
       timeout: 5s
       retries: 3
-      start_period: 15s
+      start_period: 10s
+
 volumes:
-  world_data:
-    # Docker Compose manages this volume independently of the code checkout.
+  dementor_live_world:
+    name: dementor-live-world

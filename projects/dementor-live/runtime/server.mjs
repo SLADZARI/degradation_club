@@ -9,11 +9,19 @@ import {createHash} from 'node:crypto';
 import { CONFIG } from './config.mjs';
 
 const root=path.dirname(fileURLToPath(import.meta.url));
+const version=JSON.parse(fs.readFileSync(path.join(root,'package.json'),'utf8')).version;
 const testMode=process.argv.includes('--test');
 const port=Number(process.env.DEMENTOR_PORT||4173);
 const host=testMode?'127.0.0.1':(process.env.DEMENTOR_HOST||'0.0.0.0');
 const addresses=Object.values(os.networkInterfaces()).flat().filter(a=>a.family==='IPv4'&&!a.internal).map(a=>a.address);
 const allowedHosts=new Set(['127.0.0.1','localhost',...(testMode?[]:addresses)].map(a=>`${a}:${port}`));
+let publicOrigin='';
+if(!testMode&&process.env.DEMENTOR_PUBLIC_URL){
+  const publicUrl=new URL(process.env.DEMENTOR_PUBLIC_URL);
+  if(!['http:','https:'].includes(publicUrl.protocol)||publicUrl.username||publicUrl.password||publicUrl.pathname!=='/'||publicUrl.search||publicUrl.hash)throw new Error('DEMENTOR_PUBLIC_URL должен быть корневым http(s) URL без логина, пути и параметров');
+  publicOrigin=publicUrl.origin;
+  allowedHosts.add(publicUrl.host);
+}
 const stateFile=process.env.DEMENTOR_STATE||path.join(root,'data','world.json');
 fs.mkdirSync(path.dirname(stateFile),{recursive:true});
 const state=fs.existsSync(stateFile)?JSON.parse(fs.readFileSync(stateFile,'utf8')):createWorld();
@@ -30,10 +38,10 @@ async function body(req){let text='';for await(const chunk of req){text+=chunk;i
 const server=http.createServer(async(req,res)=>{
   try{
     const url=new URL(req.url,`http://127.0.0.1:${port}`);
-    if(!allowedHosts.has(req.headers.host)|| (req.headers.origin&&req.headers.origin!==`http://${req.headers.host}`)){json(res,403,{ok:false,message:'Открой игру по адресу этого сервера'});return;}
+    if(!allowedHosts.has(req.headers.host)|| (req.headers.origin&&req.headers.origin!==`http://${req.headers.host}`&&req.headers.origin!==publicOrigin)){json(res,403,{ok:false,message:'Открой игру по адресу этого сервера'});return;}
     res.setHeader('X-Content-Type-Options','nosniff');
     if(url.pathname==='/favicon.ico'){res.writeHead(204);res.end();return;}
-    if(url.pathname==='/api/health'){json(res,200,{ok:true,version:'0.2.0',testMode});return;}
+    if(url.pathname==='/api/health'){json(res,200,{ok:true,version,testMode});return;}
     if(testMode&&url.pathname==='/__test'&&req.method==='POST'){
       if(req.headers['x-test-key']!=='local-integration-tests'){json(res,403,{ok:false});return;}
       const data=await body(req);

@@ -1,11 +1,11 @@
 {
   "project": "Dementor Live local workspace",
-  "createdAt": "2026-10-18T12:02:27.305Z",
+  "createdAt": "2026-10-18T13:18:10.594Z",
   "checks": {
-    "createdAt": "2026-10-18T12:01:49.268Z",
+    "createdAt": "2026-10-18T13:13:55.529Z",
     "scope": "this command runs syntax + model; HTTP/browser evidence comes from separately recorded matching-runtime runs",
     "node": "v22.14.0",
-    "runtimeHash": "57167374ea9828cf7c7977dda1afa36823392e7acd6acb857c788a1fc07bc248",
+    "runtimeHash": "2950c7534ac217fd82fd1a04852a05b20237c4f1f62f25194d107e7c8045453a",
     "steps": [
       {
         "kind": "syntax",
@@ -169,6 +169,11 @@
   },
   "files": [
     {
+      "path": ".dockerignore",
+      "bytes": 80,
+      "sha256": "8523a0a393cab3ec1a364ec0883b9b83bd2d22434f892419b1cd038a4a4cd3e8"
+    },
+    {
       "path": ".gitignore",
       "bytes": 80,
       "sha256": "55dbdf44334f1e9751a327c3b83166d00bf36db18620a7c9e062445b1aaa448c"
@@ -185,8 +190,8 @@
     },
     {
       "path": "CURRENT_STATE.md",
-      "bytes": 74949,
-      "sha256": "239f2857d4b746227d36a6e98e8b59ff936a254b42ee63214583378b17a265c7"
+      "bytes": 77252,
+      "sha256": "8bae9d094662d7d09007fcbf4641d2d7775938bd7fcd38c0b7cd71341e26a57b"
     },
     {
       "path": "HANDOFF.md",
@@ -195,13 +200,13 @@
     },
     {
       "path": "NEXT_CHAT_PROMPT.md",
-      "bytes": 2233,
-      "sha256": "a4dd418459c086c499a93658354346c1b4eea9d1f80476c38a7ad917968ab154"
+      "bytes": 3029,
+      "sha256": "e474d0140365b70a95a353cced0b1d3253859abe0a5fabf62a7a4a9a192e3c05"
     },
     {
       "path": "README.md",
-      "bytes": 2259,
-      "sha256": "6b2b94445f2d6419114a195b8eac74209c83991012b9c7b38ac45163b81f6b8b"
+      "bytes": 2429,
+      "sha256": "30dc1a84823b20230c30419b77e7746ba2799ef775609108acf01642e53cda5e"
     },
     {
       "path": "START.command",
@@ -210,13 +215,38 @@
     },
     {
       "path": "START_HERE.md",
-      "bytes": 3660,
-      "sha256": "2164127e0b9bb41febc8c09009fa01ea559a3f6e0ccfe4ead45f9844b73408b4"
+      "bytes": 4410,
+      "sha256": "c6ca81fd90867ce228d125cea8683dfc1e851e64c07e54e96ff307a8369ee9c0"
     },
     {
       "path": "config.mjs",
       "bytes": 1721,
       "sha256": "e243c1bfa969d949eeef520e1e7232b4b9eeb53a225e938874a7993d6ceed372"
+    },
+    {
+      "path": "deploy/Dockerfile",
+      "bytes": 335,
+      "sha256": "68b7b5bcc2a8d67e2149b1a49833688a9633f1a505a97c90217a62641fcb2aba"
+    },
+    {
+      "path": "deploy/README.md",
+      "bytes": 2601,
+      "sha256": "4692fda21d0bef6088632b486dece914baec606ff7d6da72172fc124f42204d8"
+    },
+    {
+      "path": "deploy/compose.yaml",
+      "bytes": 830,
+      "sha256": "55af144a5b541c3393fa6df4e9f6cf1e6439d4e5ead9032397208d6b9b632fdd"
+    },
+    {
+      "path": "deploy/env.example",
+      "bytes": 103,
+      "sha256": "7b973728273161d04e3e61728240f858e08a426d31392f2286005e56c4325e36"
+    },
+    {
+      "path": "deploy/probe-readonly.sh",
+      "bytes": 1688,
+      "sha256": "57a0b89ec6125b503106a83d987b049afa2417102e06b82cdc64fdc7f382886c"
     },
     {
       "path": "docs/ARCHIVE_DECISION_REGISTER_v0.1.md",
@@ -279,6 +309,11 @@
       "sha256": "6b3d0b62af2320fbff7ea8ec9ef3770551782d58d457d4e67a1b8ca4f6fb11a2"
     },
     {
+      "path": "docs/RELEASE_0.2.1.md",
+      "bytes": 2709,
+      "sha256": "ecb39967f94aef05311ae1ee0dfcda97e4ecfe8d71ceddfba431552afe7065e9"
+    },
+    {
       "path": "docs/RELEASE_2026-10-18_DONATIONS.md",
       "bytes": 4463,
       "sha256": "e68582237332c02e5487c56c7406ea2cab4817c3b3cb326e56e43ff749cd1d01"
@@ -295,8 +330,8 @@
     },
     {
       "path": "docs/TOOLS_AND_SOURCES.md",
-      "bytes": 4680,
-      "sha256": "b05a0d949ea2ac7058ba2a9616d732555c886a3bd400d62da536b3f6b8071664"
+      "bytes": 4814,
+      "sha256": "c80b5dc52b47675a9bbb36cdcd510f1dad0fa68eefa1194f95cada1d90835037"
     },
     {
       "path": "docs/verification/completed-square.png",
@@ -531,7 +566,7 @@
     {
       "path": "package.json",
       "bytes": 1201,
-      "sha256": "aae3540dcf64640c883ca9aba0d7bcc98e9c8b664b1fed35a059644696746b94"
+      "sha256": "8249b7432f00d040c0ec065cdfe241f8dc06719ea898ae370dc09d49289edb7d"
     },
     {
       "path": "plaza.mjs",
@@ -606,12 +641,12 @@
     {
       "path": "reports/check.json",
       "bytes": 3117,
-      "sha256": "63749156b42a4ff26731935cc2f7939a30a1a49b0e5a62cf54ac278e1b786f75"
+      "sha256": "b96f72379e5c5bbc8acb222b7eb749561d0fb58fb7a8b6be1c7e40832f23cfef"
     },
     {
       "path": "reports/check.log",
-      "bytes": 11604,
-      "sha256": "45a5b4568b04c76bcee9288a50de668afcf4af5c615e9e08e5056e26517b2b08"
+      "bytes": 11614,
+      "sha256": "fd2c883da305c874f3fce38007ec794bf3958c41dbdf3d6cd9f90c1c513f0117"
     },
     {
       "path": "reports/city.json",
@@ -730,8 +765,8 @@
     },
     {
       "path": "server.mjs",
-      "bytes": 9260,
-      "sha256": "dc340403b171441f4ece5e68791d53a515a796b9c76297a361a62f675c844232"
+      "bytes": 9876,
+      "sha256": "5ddd2dc37fee8b82bdfab7ade7908c20642e3a2bab7dd1e2f54d8f1e286af555"
     },
     {
       "path": "test/axonometry.cjs",
