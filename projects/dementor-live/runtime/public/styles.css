@@ -31,3 +31,14 @@ dialog:not(#welcome){position:fixed;inset:220px 24px auto auto;margin:0;transfor
 @media(max-width:760px){.quest.collapsed{width:160px;padding:12px}.quest-toggle{font-size:11px}#cityPanel[open]{max-height:calc(100dvh - 360px)}#cityPanel .panel-header{padding:12px 31px 10px 11px}#cityPanel .panel-header h2{font-size:17px}#cityPanel .panel-header .eyebrow{font-size:7px}#cityPanel .panel-body{padding:0 10px 10px}#cityPanel[data-mode=places] .place-row{grid-template-columns:30px minmax(0,1fr) 25px;column-gap:5px;padding:7px 0}#cityPanel[data-mode=places] .place-row h3{font-size:10px}#cityPanel[data-mode=places] .place-row p{font-size:9px}#cityPanel[data-mode=places] .place-row .city-actions button{width:25px;font-size:15px}.place-thumbnail{width:30px;height:36px}#cityPanel[data-mode=social]{max-height:40dvh}}
 #cityPanel[data-mode=places] .place-services{padding:8px 0}#cityPanel[data-mode=places] .place-services h3,#cityPanel[data-mode=places] .place-services p{display:none}#cityPanel[data-mode=places] .place-services .city-actions{display:flex;flex-wrap:wrap;gap:5px}#cityPanel[data-mode=places] .place-services button{font-size:10px;padding:5px 7px}
 #toast.visible{transform:none}
+
+/* QA/mobile navigation: visible map scale, large touch targets, clear position over canvas. */
+.map-tools{z-index:5;align-items:center;border:1px solid #c2c5b3;box-shadow:0 3px 14px #32372a22}
+.map-tools .zoom-level{display:inline-grid;place-items:center;min-width:43px;font-size:11px;font-weight:650;color:#52684a;white-space:nowrap}
+@media(max-width:760px){
+  .map-tools{left:12px;bottom:196px;top:auto;gap:3px;padding:4px}
+  .map-tools button{min-width:38px;min-height:38px;font-size:21px}
+  .map-tools .zoom-level{min-width:40px;font-size:10px}
+  .quest.collapsed{width:147px}
+  .touch-controls button{min-width:34px;min-height:34px}
+}
