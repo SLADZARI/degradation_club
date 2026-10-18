@@ -86,3 +86,6 @@
 Добавлена папка [balance-lab/](balance-lab/README.md). Два новых пользовательских экспорта имеют формат **World Organism v0.7.1 P0 LAB**, несмотря на имена `v06`. См. [детальный аудит D36/D42](balance-lab/BALANCE_AUDIT_v0_7_1_D36_D42.md) и [Backlog v0.7.2](balance-lab/BALANCE_BACKLOG_v0_7_2_CANDIDATE.md).
 
 Факты: деньги 3600 PAPER и 29/29 инвариантов соблюдены; оба сценария завершили 3 проекта и 3 дома, но все 3 сундука заполнены 144/144 HEMP. D36: 0 сделок при 13 изменениях профиля; D42: 213 сделок, но HEMP не перерабатывался. Приоритеты следующего model gate: TRADE-MATCH, TRADE-AUDIT, WAITING_STORAGE, GOAL-TRACE, далее конечный спрос и использование еды. **Не перенесено в сервер rc.2 и не является правкой Master GDD.**
+
+## 9. WORLD ORGANISM v0.8 — Demand Lab (19.10.2026)
+В разделе [BALANCE LAB / v0.8](balance-lab/v0_8/README.md) зафиксирована новая автономная экономическая модель спроса: реальная конечная потребность → обеспеченный заказ → доставка → оплата из escrow → потребление товара. Продукты и TEST PAPER_SHEET имеют конечные sink, новый контролируемый посев и P2P consent до transfer. 52/52 тестов, 3–5 test agents, 36 stress. [Условия GDD / открытые решения](balance-lab/v0_8/DECISIONS_FOR_INTEGRATION_v0_8.md). Реальный сервер и MASTER GDD не менялись.
