@@ -119,3 +119,6 @@
 - **OBSERVED:** файл v0.6 D37 P3, числовые остатки и логи.
 - **PROPOSED:** goal planner, project registry, demand engine, hydrology, storage caps, seed recipes, alert thresholds.
 - **NOT IMPLEMENTED:** весь этот changeset, пока нет runtime-PR с тестами и переходом из модели в 0.3.0-rc.2. Нет основания заявлять, что действующий игровой сервер прошёл стресс-тест 37 дней.
+
+## Данные пост-проверки P0 от 18.10.2026
+У двух новых прогонов лаборатории v0.7.1 [D36/D42](balance-lab/BALANCE_AUDIT_v0_7_1_D36_D42.md) 29/29 инвариантов PASS и PAPER 3600, но обнаружены 97% отказов из-за ёмкости при 3×144/144 сундуках; D36 имеет 0 P2P сделок после 13 команд, D42 — 213 сделок без конечного расхода 512 HEMP и 87.1% испорченной моркови. Дальнейшая настройка: [BALANCE BACKLOG v0.7.2](balance-lab/BALANCE_BACKLOG_v0_7_2_CANDIDATE.md), [машинные метрики](balance-lab/BALANCE_CASES_v0_7_1.json). Это не новая правка GDD и не обновление сервера.
