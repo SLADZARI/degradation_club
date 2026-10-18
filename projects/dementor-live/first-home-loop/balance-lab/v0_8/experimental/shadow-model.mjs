@@ -16,6 +16,7 @@ export const SETTINGS={
   irrigation:{WOOD:20,STONE:10,payout:60,minUnmet:20,earliestDay:65},
   experiments:['static','upkeep','needs-growth'],
   environments:['normal','forest','dry','treasury'],
+  activityProfiles:['daily','weekends'],
 };
 const required=(condition,message)=>{if(!condition)throw Error(message);};
 const empty=()=>({});
@@ -26,10 +27,11 @@ const scenarios={
   dry:{water:8,waterRecharge:1,wood:120,stone:70,growthMultiplier:2,treasury:2301},
   treasury:{water:48,waterRecharge:9,wood:120,stone:70,growthMultiplier:1,treasury:35},
 };
-function initialState({agents=3,environment='normal',policy='upkeep'}={}){
+function initialState({agents=3,environment='normal',policy='upkeep',activity='daily'}={}){
   required(Number.isInteger(agents)&&agents>=2&&agents<=10,'agents must be in [2,10]');
   required(scenarios[environment],'unknown scenario');
   required(SETTINGS.experiments.includes(policy),'unknown policy');
+  required(SETTINGS.activityProfiles.includes(activity),'unknown activity profile');
   const env=scenarios[environment];
   // Treasury-stress experiment moves the original city PAPER to players.
   // This does not create or destroy currency, but is NOT the reported historical distribution.
@@ -48,7 +50,7 @@ function initialState({agents=3,environment='normal',policy='upkeep'}={}){
   }));
   return {
     schema:MODEL_ID,source:'D30 aggregate + synthetic forward projection; not actual D30 state',
-    day:SETTINGS.checkpointDay, agents,environment,policy,well:env.water,
+    day:SETTINGS.checkpointDay, agents,environment,policy,activity,well:env.water,
     recharge:env.waterRecharge,waterInitial:env.water,waterAdded:0,waterConsumed:0,
     woodInitial:env.wood,stoneInitial:env.stone,wood:env.wood,stone:env.stone,
     embodied:{WOOD:0,STONE:0},city:cityPAPER,players:p,
@@ -68,6 +70,7 @@ const civicUnits=p=>p.civicBatches.reduce((n,b)=>n+b.qty,0);
 const bagWeight=p=>carrotUnits(p)+p.hemp+p.sheets+0.1*(p.seedCarrot+p.seedHemp);
 const capacityLeft=p=>SETTINGS.capacity-bagWeight(p);
 const escrowTotal=s=>s.orders.reduce((n,o)=>n+o.escrow,0);
+const isActive=(s,p)=>s.activity==='daily'||s.day%7<2; // TEST fixed weekend sessions, no online behavior inferred
 export function balance(s){
   const balances={
     PAPER:s.city+s.players.reduce((n,p)=>n+p.wallet,0)+escrowTotal(s),
@@ -235,7 +238,7 @@ function createPaper(s,p){
 function settleDemand(s){
   for(const o of s.orders.filter(o=>o.status==='OPEN')){
     while(o.remaining>0){
-      const supplier=s.players.find(p=>o.asset==='PAPER_SHEET'?p.sheets>=1:civicUnits(p)>=1);
+      const supplier=s.players.find(p=>isActive(s,p)&&(o.asset==='PAPER_SHEET'?p.sheets>=1:civicUnits(p)>=1));
       if(!supplier)break;
       if(o.asset==='PAPER_SHEET'){supplier.sheets--;s.used.PAPER_SHEET_CITY++;}
       else required(consumeOneCarrot(s,supplier,'city','civic'),'owner-linked civic carrot absent at settlement');
@@ -258,7 +261,8 @@ function balancePressure(s){
     s.wood-=spec.WOOD;s.stone-=spec.STONE;
     s.embodied.WOOD+=spec.WOOD;s.embodied.STONE+=spec.STONE;
     s.city-=spec.payout;s.buildPaid+=spec.payout;
-    const worker=s.players[s.projects.length%s.players.length];
+    const worker=s.players.find(p=>isActive(s,p));
+    if(!worker)throw Error('building worker missing despite accepted funded project');
     worker.wallet+=spec.payout;s.projects.push(id);s.cityProjectsDone++;s.ledgerEvents++;
     if(id==='irrigation')s.recharge+=4;
   }
@@ -280,6 +284,7 @@ export function tradeHemp(s,{offerId,buyer,seller,quantity,pricePerUnit=1,accept
 }
 function householdNeeds(s){
   for(const p of s.players){
+    if(!isActive(s,p))continue; // no hunger penalty while offline
     if(!consumeOneCarrot(s,p,'player')){
       s.unmetFood++;
       const bed=p.plotBeds.food;
@@ -296,13 +301,13 @@ export function step(s){
   s.well+=s.recharge;s.waterAdded+=s.recharge;
   refundOverdue(s);
   postWeeklyEvents(s);
-  for(const p of s.players)for(const bed of Object.values(p.plotBeds))collect(s,p,bed);
+  for(const p of s.players.filter(p=>isActive(s,p)))for(const bed of Object.values(p.plotBeds))collect(s,p,bed);
   householdNeeds(s);
   // City demand and on-hand food get first claim before new sowing, no duplicate deliveries.
-  for(const p of s.players)createPaper(s,p);
+  for(const p of s.players.filter(p=>isActive(s,p)))createPaper(s,p);
   settleDemand(s);
-  balancePressure(s);
-  for(const p of s.players)for(const bed of Object.values(p.plotBeds))plant(s,p,bed);
+  if(s.players.some(p=>isActive(s,p)))balancePressure(s);
+  for(const p of s.players.filter(p=>isActive(s,p)))for(const bed of Object.values(p.plotBeds))plant(s,p,bed);
   check(s);return s;
 }
 export function simulate(options={}){
@@ -319,7 +324,7 @@ export function metrics(s){
   const open=s.orders.filter(o=>o.status==='OPEN').length;
   return {
     model:MODEL_ID,sourceStatus:'EXPERIMENTAL_SHADOW_NOT_ORIGINAL_NOT_SERVER',
-    day:s.day,projectionDays:s.day-30,agents:s.agents,environment:s.environment,policy:s.policy,
+    day:s.day,projectionDays:s.day-30,agents:s.agents,environment:s.environment,policy:s.policy,activity:s.activity,
     money:{total:SETTINGS.initialPAPER,city:s.city,players:s.players.reduce((n,p)=>n+p.wallet,0),escrow:escrowTotal(s)},
     buildings:{original:3,new:s.projects,completed:s.cityProjectsDone,embodied:s.embodied},
     demand:{posted:s.orders.length,filled,expired,open,unfunded:s.unfunded,paid:s.paperPaid,refunded:s.refunds},
