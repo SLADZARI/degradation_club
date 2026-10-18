@@ -26,6 +26,8 @@ if(!testMode&&process.env.DEMENTOR_PUBLIC_URL){
 const stateFile=process.env.DEMENTOR_STATE||path.join(root,'data','world.json');
 fs.mkdirSync(path.dirname(stateFile),{recursive:true});
 const state=fs.existsSync(stateFile)?JSON.parse(fs.readFileSync(stateFile,'utf8')):createWorld();
+const legacySaveRequiresBackup=fs.existsSync(stateFile)&&state?.schema!=='dementor-cities-v1';
+let legacyBackupDone=false;
 const network=new CityNetwork(state);
 const game=network.origin;
 const musicDir=path.join(root,'data','music');fs.mkdirSync(musicDir,{recursive:true});
@@ -33,7 +35,17 @@ function refreshMusic(){network.setMusic(scanMusic([[path.join(root,'public','mu
 refreshMusic();
 const streams=new Map();
 let lastBroadcast=0;
-function save(){if(!network.needsSave())return;fs.writeFileSync(stateFile+'.tmp',JSON.stringify(network.serialize()));fs.renameSync(stateFile+'.tmp',stateFile);network.markSaved();}
+function save(){
+  if(!network.needsSave())return;
+  if(legacySaveRequiresBackup&&!legacyBackupDone){
+    const original=stateFile+'.before-city-upgrade-'+new Date().toISOString().replace(/[:.]/g,'-')+'.json';
+    fs.copyFileSync(stateFile,original,fs.constants.COPYFILE_EXCL);
+    legacyBackupDone=true;
+  }
+  fs.writeFileSync(stateFile+'.tmp',JSON.stringify(network.serialize()));
+  fs.renameSync(stateFile+'.tmp',stateFile);
+  network.markSaved();
+}
 function broadcast(){for(const[id,set]of streams){const p=network.findId(id)?.p;if(!p)continue;const msg=`data: ${JSON.stringify(network.snapshot(p))}\n\n`;for(const res of set)res.write(msg);}}
 function json(res,status,data){res.writeHead(status,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'});res.end(JSON.stringify(data));}
 async function body(req){let text='';for await(const chunk of req){text+=chunk;if(text.length>4096)throw Error('Слишком большой запрос');}return JSON.parse(text||'{}');}
