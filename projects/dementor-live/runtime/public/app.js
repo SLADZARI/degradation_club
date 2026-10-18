@@ -1,8 +1,10 @@
 const $=id=>document.getElementById(id),canvas=$('world'),ctx=canvas.getContext('2d');
 let lastScene=null;
 let state=null,me=null,token=sessionStorage.getItem('dementor-token'),stream=null,connected=false;
-let keys=new Set(),route=[],selected=null,context=null,lastAction=0,requestPending=false,holdAction=false,touchMove=null;
-let view={w:innerWidth,h:innerHeight,s:28,cx:innerWidth<760?10:16,cy:innerWidth<760?12:16,zoom:1},toastTimer;
+let keys=new Set(),route=[],selected=null,context=null,lastAction=0,requestPending=false,holdAction=false,touchMove=null,inputPending=false;
+let routeActivity={x:0,y:0,at:0};
+function setRoute(path){route=path;routeActivity={x:me?.x||0,y:me?.y||0,at:performance.now()};}
+let view={w:innerWidth,h:innerHeight,s:28,cx:innerWidth<760?10:16,cy:innerWidth<760?12:16,zoom:innerWidth<760?1.15:1},toastTimer;
 const motionFrames=[];
 let lastWallet=null,lastChatSignature='';
 const colors=['#a97059','#6e8971','#65858f'];
@@ -85,8 +87,8 @@ function nearby(id){const t=allTargets().find(t=>t.id===id);return t&&Math.hypot
 function navigateTo(id){
   const t=allTargets().find(t=>t.id===id);if(!t)return;selected=id;keys.clear();holdAction=false;$('cityPanel').close();canvas.focus();
   if(nearby(id)){updateContext();return;}
-  const paths=[[0,1.4],[-1.4,0],[1.4,0],[0,-1.4]].map(([dx,dy])=>findPath({x:t.x+dx,y:t.y+dy})).filter(Boolean).sort((a,b)=>a.length-b.length);
-  if(paths.length)route=paths[0];else toast('Путь недоступен — подойди самостоятельно');
+  const paths=[[0,1.4],[-1.4,0],[1.4,0],[0,-1.4]].map(([dx,dy])=>findPath({x:t.x+dx,y:t.y+dy})).filter(Boolean).sort((a,b)=>pathDistance(a)-pathDistance(b));
+  if(paths.length)setRoute(paths[0]);else toast('Путь недоступен — подойди самостоятельно');
 }
 function openCityPanel(mode){$('cityPanel').style.left='';$('cityPanel').style.top='';cityPanelMode=mode;cityPanelSignature='';keys.clear();holdAction=false;route=[];touchMove=null;api('input',{dx:0,dy:0}).catch(()=>{});updateCityPanels(true);$('cityPanel').dataset.mode=mode;if(!$('cityPanel').open)$('cityPanel').show();}
 function updateCityPanels(force=false){
@@ -155,12 +157,20 @@ window.addEventListener('keydown',e=>{
   if(e.code==='KeyE'){holdAction=true;doContext();}if(e.repeat)return;if(/^Digit[1-6]$/.test(e.code))selectQuick(Number(e.code.slice(-1))-1);if(e.code==='KeyQ')placeQuick();if(e.code==='KeyF')act(me.bag.food?'eat':'eatCarrot');if(e.code==='Enter'){$('chatInput').focus();keys.clear();}if(e.code==='Escape'){document.querySelectorAll('dialog[open]').forEach(d=>d.close());route=[];selected=null;act('cancel');}
 });
 window.addEventListener('keyup',e=>{keys.delete(e.code);if(e.code==='KeyE')holdAction=false;});window.addEventListener('blur',()=>{keys.clear();holdAction=false;touchMove=null;route=[];if(token)api('input',{dx:0,dy:0}).catch(()=>{});});
-document.querySelectorAll('[data-move]').forEach(b=>{b.addEventListener('pointerdown',e=>{b.setPointerCapture(e.pointerId);touchMove=b.dataset.move.split(',').map(Number);route=[];});b.addEventListener('pointerup',()=>touchMove=null);b.addEventListener('pointercancel',()=>touchMove=null);});
+document.querySelectorAll('[data-move]').forEach(b=>{b.addEventListener('pointerdown',e=>{b.setPointerCapture(e.pointerId);touchMove=b.dataset.move.split(',').map(Number);route=[];});b.addEventListener('pointerup',()=>touchMove=null);b.addEventListener('pointercancel',()=>touchMove=null);b.addEventListener('lostpointercapture',()=>touchMove=null);});
 setInterval(()=>{if(!connected||!me)return;let dx=0,dy=0;if(!$('welcome').open&&!['INPUT','TEXTAREA','SELECT'].includes(document.activeElement?.tagName)){
   dx=Number(keys.has('KeyD')||keys.has('ArrowRight'))-Number(keys.has('KeyA')||keys.has('ArrowLeft'));dy=Number(keys.has('KeyS')||keys.has('ArrowDown'))-Number(keys.has('KeyW')||keys.has('ArrowUp'));if(touchMove)[dx,dy]=touchMove;
-  if(!dx&&!dy&&route.length){while(route.length&&Math.hypot(route[0].x-me.x,route[0].y-me.y)<.35)route.shift();if(route.length){dx=route[0].x-me.x;dy=route[0].y-me.y;const n=Math.hypot(dx,dy);dx/=n;dy/=n;}}
+  if(!dx&&!dy&&route.length){
+     while(route.length&&Math.hypot(route[0].x-me.x,route[0].y-me.y)<.32)route.shift();
+     if(route.length){
+       const now=performance.now();
+       if(Math.hypot(me.x-routeActivity.x,me.y-routeActivity.y)>.16)routeActivity={x:me.x,y:me.y,at:now};
+       if(now-routeActivity.at>2500){route=[];selected=null;toast('Путь заблокирован. Нажми на свободную точку.');}
+       else {dx=route[0].x-me.x;dy=route[0].y-me.y;const n=Math.hypot(dx,dy);if(n){const throttle=Math.min(1,n/.85);dx=dx/n*throttle;dy=dy/n*throttle;}}
+     }
+   }
   if(holdAction)doContext();
-  }api('input',{dx,dy,sprint:keys.has('ShiftLeft')||keys.has('ShiftRight')}).catch(()=>{});
+  }if(!inputPending){inputPending=true;api('input',{dx,dy,sprint:keys.has('ShiftLeft')||keys.has('ShiftRight')}).catch(()=>{}).finally(()=>{inputPending=false;});}
 },80);
 
 function screen(x,y){return {x:view.w/2+(x-view.cx)*view.s,y:view.h/2+(y-view.cy)*view.s*.76};}
@@ -168,18 +178,52 @@ function worldPoint(x,y){return {x:(x-view.w/2)/view.s+view.cx,y:(y-view.h/2)/(v
 function blocked(x,y){const c=state.config,r=.35;if(state.scene!=='city'){return x<r||y<r||x>16-r||y>16-r||(['plot','expedition'].includes(state.scene)&&state.home.nodes.some(n=>n.left&&Math.hypot(x-n.x,y-n.y)<.63));}if(x<r||y<r||x>c.width-r||y>c.height-r)return true;if(x+r>c.river.x&&x-r<c.river.x+c.river.w&&!(bridgeOpen()&&y-r>=c.bridge.y&&y+r<=c.bridge.y+c.bridge.h))return true;
   if(x+r>4&&x-r<8&&y+r>4&&y-r<7)return true;return state.resources.some(o=>o.stock>0&&o.type!=='food'&&Math.hypot(x-o.x,y-o.y)<.63);
 }
+function pathDistance(path){return path.reduce((distance,p,i)=>distance+Math.hypot(p.x-(i?path[i-1].x:me.x),p.y-(i?path[i-1].y:me.y)),0);}
 function findPath(dest){const step=.5,start={x:Math.round(me.x/step),y:Math.round(me.y/step)},goal={x:Math.round(dest.x/step),y:Math.round(dest.y/step)};const key=p=>p.x+','+p.y;
   if(blocked(goal.x*step,goal.y*step))return null;
   const queue=[start],seen=new Map([[key(start),null]]);let found=null;
   for(let i=0;i<queue.length&&i<20000;i++){const p=queue[i];if(p.x===goal.x&&p.y===goal.y){found=p;break;}for(const[dx,dy]of [[1,0],[-1,0],[0,1],[0,-1]]){const q={x:p.x+dx,y:p.y+dy};if(!seen.has(key(q))&&!blocked(q.x*step,q.y*step)){seen.set(key(q),p);queue.push(q);}}}
-  if(!found)return null;const out=[];for(let p=found;p;p=seen.get(key(p)))out.push({x:p.x*step,y:p.y*step});return out.reverse().slice(1);
+  if(!found)return null;
+   const out=[];for(let p=found;p;p=seen.get(key(p)))out.push({x:p.x*step,y:p.y*step});
+   const path=out.reverse();
+   return path.slice(1).filter((point,i)=>{
+     const previous=path[i],next=path[i+2];
+     return !next||(point.x-previous.x)*(next.y-point.y)!==(point.y-previous.y)*(next.x-point.x);
+   });
 }
-canvas.addEventListener('pointerdown',e=>{if(e.button===2)return;if(!me||$('welcome').open)return;canvas.focus();const r=canvas.getBoundingClientRect(),w=worldPoint(e.clientX-r.left,e.clientY-r.top);const targets=allTargets().sort((a,b)=>Math.hypot(a.x-w.x,a.y-w.y)-Math.hypot(b.x-w.x,b.y-w.y));const pile=targets.find(t=>t.type==='pickup'&&Math.hypot(t.x-w.x,t.y-w.y)<.7);const plot=pile||state.scene!=='city'?null:state.plots.find(p=>w.x>=p.x&&w.x<=p.x+p.w&&w.y>=p.y&&w.y<=p.y+p.h);let t=pile||(plot?targets.find(t=>t.id===plot.id):targets[0]);const insideSquare=state.scene==='city'&&w.x>=14&&w.x<=24&&w.y>=10&&w.y<=18;if(!plot&&insideSquare&&Math.hypot(t.x-w.x,t.y-w.y)>=1.3)t=targets.find(t=>t.id==='build');
+function selectWorldTarget(e){if(e.button===2)return;if(!me||$('welcome').open)return;canvas.focus();const r=canvas.getBoundingClientRect(),w=worldPoint(e.clientX-r.left,e.clientY-r.top);const targets=allTargets().sort((a,b)=>Math.hypot(a.x-w.x,a.y-w.y)-Math.hypot(b.x-w.x,b.y-w.y));const pile=targets.find(t=>t.type==='pickup'&&Math.hypot(t.x-w.x,t.y-w.y)<.7);const plot=pile||state.scene!=='city'?null:state.plots.find(p=>w.x>=p.x&&w.x<=p.x+p.w&&w.y>=p.y&&w.y<=p.y+p.h);let t=pile||(plot?targets.find(t=>t.id===plot.id):targets[0]);const insideSquare=state.scene==='city'&&w.x>=14&&w.x<=24&&w.y>=10&&w.y<=18;if(!plot&&insideSquare&&Math.hypot(t.x-w.x,t.y-w.y)>=1.3)t=targets.find(t=>t.id==='build');
   if(t&&(plot||insideSquare||Math.hypot(t.x-w.x,t.y-w.y)<1.3)){selected=t.id;if(Math.hypot(t.x-me.x,t.y-me.y)<=state.config.actionRange){updateContext();return;}
-    let candidates=[];for(const[dx,dy]of [[0,1.4],[-1.4,0],[1.4,0],[0,-1.4]]){let dest={x:t.x+dx,y:t.y+dy};const path=findPath(dest);if(path)candidates.push(path);}candidates.sort((a,b)=>a.length-b.length);if(candidates[0])route=candidates[0];else toast('Пока нет доступного пути');
-  }else{selected=null;const path=findPath(w);if(path)route=path;else toast(w.x>=state.config.river.x&&!bridgeOpen()?'Здесь нужна переправа. Сначала достройте мост.':'Не получается пройти — выбери свободное место.');}
+    let candidates=[];for(const[dx,dy]of [[0,1.4],[-1.4,0],[1.4,0],[0,-1.4]]){let dest={x:t.x+dx,y:t.y+dy};const path=findPath(dest);if(path)candidates.push(path);}candidates.sort((a,b)=>pathDistance(a)-pathDistance(b));if(candidates[0])setRoute(candidates[0]);else toast('Пока нет доступного пути');
+  }else{selected=null;const path=findPath(w);if(path)setRoute(path);else toast(w.x>=state.config.river.x&&!bridgeOpen()?'Здесь нужна переправа. Сначала достройте мост.':'Не получается пройти — выбери свободное место.');}
+}
+
+const activeTouches=new Map();
+let pinchDistance=0,gestureActive=false,tapStart=null;
+canvas.addEventListener('pointerdown',e=>{
+  if(e.button!==0||!me||$('welcome').open)return;
+  if(e.pointerType!=='touch'){selectWorldTarget(e);return;}
+  activeTouches.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  try{canvas.setPointerCapture(e.pointerId);}catch{}
+  if(activeTouches.size===1){tapStart={x:e.clientX,y:e.clientY,at:performance.now()};gestureActive=false;}
+  if(activeTouches.size>=2){gestureActive=true;tapStart=null;const [a,b]=[...activeTouches.values()];pinchDistance=Math.hypot(a.x-b.x,a.y-b.y);}
 });
-function zoom(value){view.zoom=Math.max(.8,Math.min(2.2,view.zoom*value));resize();}
+canvas.addEventListener('pointermove',e=>{
+  if(!activeTouches.has(e.pointerId))return;
+  activeTouches.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  if(activeTouches.size>=2){const [a,b]=[...activeTouches.values()],distance=Math.hypot(a.x-b.x,a.y-b.y);if(pinchDistance>0&&distance>0)zoom(distance/pinchDistance);pinchDistance=distance;gestureActive=true;}
+  else if(tapStart&&Math.hypot(e.clientX-tapStart.x,e.clientY-tapStart.y)>12)gestureActive=true;
+});
+function endTouch(e,cancelled=false){
+  if(!activeTouches.has(e.pointerId))return;
+  const tap=!cancelled&&!gestureActive&&activeTouches.size===1&&tapStart&&performance.now()-tapStart.at<600&&Math.hypot(e.clientX-tapStart.x,e.clientY-tapStart.y)<12;
+  activeTouches.delete(e.pointerId);pinchDistance=0;
+  if(tap)selectWorldTarget(e);
+  if(!activeTouches.size){gestureActive=false;tapStart=null;}
+}
+canvas.addEventListener('pointerup',e=>endTouch(e));
+canvas.addEventListener('pointercancel',e=>endTouch(e,true));
+
+function zoom(value){if(!Number.isFinite(value)||value<=0)return;view.zoom=Math.max(.65,Math.min(2.5,view.zoom*value));resize();}
 $('zoomIn').onclick=()=>zoom(1.2);$('zoomOut').onclick=()=>zoom(1/1.2);$('centerButton').onclick=()=>{if(me)openCityPanel('places');};
 canvas.addEventListener('wheel',e=>{e.preventDefault();zoom(e.deltaY<0?1.08:1/1.08);},{passive:false});
 function resize(){const dpr=devicePixelRatio||1;view.w=innerWidth;view.h=innerHeight;canvas.width=view.w*dpr;canvas.height=view.h*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);view.s=Math.max(view.w<760?20:12,Math.min((view.w-50)/48,(view.h-80)/(32*.76)))*view.zoom*(state?.scene&&state.scene!=='city'?1.8:1);}
@@ -339,14 +383,18 @@ function selectQuick(index){if(!me)return;quickIndex=index;saveQuick();const k=q
 function placeQuick(){const k=heldResource();if(k&&me.bag[k])act('drop',null,{kind:k,quantity:1});else toast('Выбери ресурс в нижней панели');}
 function renderQuick(){if(!me)return;if(quickOwner!==me.id){quickOwner=me.id;try{const saved=JSON.parse(localStorage.getItem('dementor-quick-'+me.id));if(saved&&Array.isArray(saved.slots)&&saved.slots.length===6){quickSlots=saved.slots.map(k=>typeof k==='string'?k:null);quickIndex=Number.isInteger(saved.index)&&saved.index>=0&&saved.index<6?saved.index:0;}}catch{}}
 const signature=JSON.stringify([quickSlots,quickIndex,me.bag,me.toolItems,me.tools]);if(signature===quickSignature)return;quickSignature=signature;quick.replaceChildren();quickSlots.forEach((k,i)=>{const t=me.toolItems.find(t=>t.id===k),kind=t?.kind||k,b=document.createElement('button');b.className='quick-slot'+(i===quickIndex?' selected':'');b.title=(names[k]||toolNames[k]||toolNames[t?.kind]||'Пустая ячейка')+' · '+(i+1);b.setAttribute('aria-label',b.title);const n=document.createElement('kbd'),g=document.createElement('span'),count=document.createElement('small');n.textContent=i+1;g.textContent=itemEmoji[kind]||'·';count.textContent=t?t.durability+'/'+t.max:state.items[k]?me.bag[k]||0:['axe','pick'].includes(k)?me.tools[k]||0:'';b.append(n,g,count);b.onclick=()=>selectQuick(i);quick.append(b);});place.disabled=!heldResource()||!me.bag[heldResource()];}
-function positionWindows(){if(!me)return;const dock=$('actionDock');dock.hidden=!context;const target=context&&(visualPlayers.get(context.id)||context);if(target){const q=screen(target.x,target.y);dock.style.left=Math.max(8,Math.min(innerWidth-Math.min(300,innerWidth-16)-8,q.x-140))+'px';dock.style.top=Math.max(70,Math.min(innerHeight-200,q.y-115))+'px';}
+function positionWindows(){if(!me)return;const dock=$('actionDock');dock.hidden=!context;const target=context&&(visualPlayers.get(context.id)||context);if(innerWidth<760){dock.style.left='';dock.style.top='';}else if(target){const q=screen(target.x,target.y);dock.style.left=Math.max(8,Math.min(innerWidth-Math.min(300,innerWidth-16)-8,q.x-140))+'px';dock.style.top=Math.max(70,Math.min(innerHeight-200,q.y-115))+'px';}
 const panel=$('cityPanel');if(panel.open&&cityPanelMode==='resident'){const p=state.players.find(p=>p.id===selected);if(p){const q=screen(p.x,p.y),w=panel.offsetWidth;panel.style.left=Math.max(8,Math.min(innerWidth-w-8,q.x+35+w<innerWidth?q.x+35:q.x-w-35))+'px';panel.style.top=Math.max(70,Math.min(innerHeight-panel.offsetHeight-100,q.y-95))+'px';}}else {panel.style.left='';panel.style.top='';}}
 canvas.addEventListener('contextmenu',e=>{e.preventDefault();placeQuick();});
 
 // Sidebar preference is independent of game progress.
-function setQuestCollapsed(collapsed){$('quest').classList.toggle('collapsed',collapsed);$('questToggle').setAttribute('aria-expanded',String(!collapsed));$('questChevron').textContent=collapsed?'▸':'▾';try{localStorage.setItem('dementor-quests-collapsed',String(collapsed));}catch{}}
+function setQuestCollapsed(collapsed){$('quest').classList.toggle('collapsed',collapsed);$('questToggle').setAttribute('aria-expanded',String(!collapsed));$('questChevron').textContent=collapsed?'▸':'▾';try{localStorage.setItem(innerWidth<760?'dementor-mobile-quest-collapsed':'dementor-quests-collapsed',String(collapsed));}catch{}}
 $('questToggle').onclick=()=>setQuestCollapsed(!$('quest').classList.contains('collapsed'));
-try{setQuestCollapsed(localStorage.getItem('dementor-quests-collapsed')==='true');}catch{}
+try{
+  const mobile=matchMedia('(max-width:760px)').matches;
+  const saved=localStorage.getItem(mobile?'dementor-mobile-quest-collapsed':'dementor-quests-collapsed');
+  setQuestCollapsed(saved===null?mobile:saved==='true');
+}catch{setQuestCollapsed(innerWidth<760);}
 function placeThumbnail(t){
  const frame=document.createElement('span');frame.className='place-thumbnail';frame.setAttribute('aria-hidden','true');
  const stroke='#7f856c',roof='#c9b995',wall='#d7ceb3',side='#a69d80';let shape='';

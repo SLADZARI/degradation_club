@@ -1,0 +1,221 @@
+name: Dementor Live QA
+
+on:
+  push:
+    branches:
+      - qa/dementor-live-chat-2026-10-18
+  pull_request:
+    types: [opened, synchronize, reopened, edited]
+    branches:
+      - deploy/dementor-live-isolated-2026-10-18
+    paths:
+      - ".github/workflows/dementor-live-qa.yml"
+      - "projects/dementor-live/runtime/**"
+  workflow_dispatch:
+    inputs:
+      suite:
+        description: "Test depth: smoke or full"
+        required: true
+        type: choice
+        default: smoke
+        options:
+          - smoke
+          - full
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dementor-live-qa-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+    working-directory: projects/dementor-live/runtime
+
+jobs:
+  model-and-integration:
+    name: Model + isolated HTTP/SSE
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Syntax, models, regression
+        run: npm run check
+      - name: HTTP/SSE with temporary world
+        run: npm run test:integration
+      - name: Upload model reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dementor-model-reports
+          path: projects/dementor-live/runtime/reports/
+          if-no-files-found: warn
+          retention-days: 14
+
+  browser:
+    name: Browser gameplay / isolated world
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install Playwright QA dependency (not production)
+        run: npm install --no-save --no-package-lock playwright@1.56.1
+      - name: Install Chrome and Linux dependencies
+        run: npx playwright install --with-deps chrome
+      - name: Panels and mobile layout
+        id: panels
+        continue-on-error: true
+        run: timeout 12m npm run test:compact-panels
+      - name: Mobile HUD, zoom and click-to-move
+        id: mobile
+        continue-on-error: true
+        run: timeout 8m npm run test:mobile
+      - name: Inventory, trade, actions and mobile
+        id: perimeter
+        continue-on-error: true
+        run: timeout 15m npm run test:perimeter
+      - name: Quest progression and home
+        id: quests
+        continue-on-error: true
+        run: timeout 15m npm run test:quests
+      - name: Two players and cooperative expedition
+        id: expansion
+        continue-on-error: true
+        run: timeout 15m npm run test:expansion
+      - name: Complete initial city and forge (full)
+        id: browserfull
+        if: (github.event_name == 'workflow_dispatch' && inputs.suite == 'full') || (github.event_name == 'pull_request' && contains(github.event.pull_request.body, '[run-full-qa]'))
+        continue-on-error: true
+        run: timeout 20m npm run test:browser
+      - name: Donations (full)
+        id: donations
+        if: (github.event_name == 'workflow_dispatch' && inputs.suite == 'full') || (github.event_name == 'pull_request' && contains(github.event.pull_request.body, '[run-full-qa]'))
+        continue-on-error: true
+        run: timeout 12m npm run test:donations
+      - name: 2D scene graphics (full)
+        id: axonometry
+        if: (github.event_name == 'workflow_dispatch' && inputs.suite == 'full') || (github.event_name == 'pull_request' && contains(github.event.pull_request.body, '[run-full-qa]'))
+        continue-on-error: true
+        run: timeout 10m npm run test:axonometry
+      - name: Town warehouse and courier (full)
+        id: city
+        if: (github.event_name == 'workflow_dispatch' && inputs.suite == 'full') || (github.event_name == 'pull_request' && contains(github.event.pull_request.body, '[run-full-qa]'))
+        continue-on-error: true
+        run: timeout 12m npm run test:city
+      - name: Tools and camera (full)
+        id: tools
+        if: (github.event_name == 'workflow_dispatch' && inputs.suite == 'full') || (github.event_name == 'pull_request' && contains(github.event.pull_request.body, '[run-full-qa]'))
+        continue-on-error: true
+        run: timeout 12m npm run test:tools
+      - name: Home and social interaction (full)
+        id: life
+        if: (github.event_name == 'workflow_dispatch' && inputs.suite == 'full') || (github.event_name == 'pull_request' && contains(github.event.pull_request.body, '[run-full-qa]'))
+        continue-on-error: true
+        run: timeout 12m npm run test:life
+      - name: Bag, store and save (full)
+        id: inventory
+        if: (github.event_name == 'workflow_dispatch' && inputs.suite == 'full') || (github.event_name == 'pull_request' && contains(github.event.pull_request.body, '[run-full-qa]'))
+        continue-on-error: true
+        run: timeout 12m npm run test:inventory
+      - name: Town square and music (full)
+        id: plaza
+        if: (github.event_name == 'workflow_dispatch' && inputs.suite == 'full') || (github.event_name == 'pull_request' && contains(github.event.pull_request.body, '[run-full-qa]'))
+        continue-on-error: true
+        run: timeout 12m npm run test:plaza
+      - name: Bridge construction and east bank (full)
+        id: bridge
+        if: (github.event_name == 'workflow_dispatch' && inputs.suite == 'full') || (github.event_name == 'pull_request' && contains(github.event.pull_request.body, '[run-full-qa]'))
+        continue-on-error: true
+        run: timeout 12m npm run test:bridge
+      - name: Two-browser LAN host/origin (full)
+        id: lan
+        if: (github.event_name == 'workflow_dispatch' && inputs.suite == 'full') || (github.event_name == 'pull_request' && contains(github.event.pull_request.body, '[run-full-qa]'))
+        continue-on-error: true
+        run: timeout 12m npm run test:lan
+      - name: Camera / rendering performance (full)
+        id: performance
+        if: (github.event_name == 'workflow_dispatch' && inputs.suite == 'full') || (github.event_name == 'pull_request' && contains(github.event.pull_request.body, '[run-full-qa]'))
+        continue-on-error: true
+        run: timeout 12m npm run test:performance
+      - name: Browser outcome summary
+        if: always()
+        env:
+          PANELS: ${{ steps.panels.outcome }}
+          MOBILE: ${{ steps.mobile.outcome }}
+          PERIMETER: ${{ steps.perimeter.outcome }}
+          QUESTS: ${{ steps.quests.outcome }}
+          EXPANSION: ${{ steps.expansion.outcome }}
+          BROWSER_FULL: ${{ steps.browserfull.outcome }}
+          DONATIONS: ${{ steps.donations.outcome }}
+          AXONOMETRY: ${{ steps.axonometry.outcome }}
+          CITY: ${{ steps.city.outcome }}
+          TOOLS: ${{ steps.tools.outcome }}
+          LIFE: ${{ steps.life.outcome }}
+          INVENTORY: ${{ steps.inventory.outcome }}
+          PLAZA: ${{ steps.plaza.outcome }}
+          BRIDGE: ${{ steps.bridge.outcome }}
+          LAN: ${{ steps.lan.outcome }}
+          PERFORMANCE: ${{ steps.performance.outcome }}
+          FULL: ${{ (github.event_name == 'workflow_dispatch' && inputs.suite == 'full') || (github.event_name == 'pull_request' && contains(github.event.pull_request.body, '[run-full-qa]')) }}
+        run: |
+          echo "## Dementor Live browser QA" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Suite | Outcome |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|---|---|" >> "$GITHUB_STEP_SUMMARY"
+          failed=0
+          for label in PANELS MOBILE PERIMETER QUESTS EXPANSION; do
+            status="${!label}"
+            echo "| $label | $status |" >> "$GITHUB_STEP_SUMMARY"
+            if [[ "$status" != "success" ]]; then failed=1; fi
+          done
+          if [[ "$FULL" == "true" ]]; then
+            for label in BROWSER_FULL DONATIONS AXONOMETRY CITY TOOLS LIFE INVENTORY PLAZA BRIDGE LAN PERFORMANCE; do
+              status="${!label}"
+              echo "| $label | $status |" >> "$GITHUB_STEP_SUMMARY"
+              if [[ "$status" != "success" ]]; then failed=1; fi
+            done
+          fi
+          exit "$failed"
+      - name: Upload browser reports and screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dementor-gameplay-browser
+          path: |
+            projects/dementor-live/runtime/reports/
+            projects/dementor-live/dementor-live-*.png
+          if-no-files-found: warn
+          retention-days: 14
+
+  production-read-only:
+    name: Production (read only)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install Playwright
+        run: npm install --no-save --no-package-lock playwright@1.56.1
+      - name: Install Chrome
+        run: npx playwright install --with-deps chrome
+      - name: Public health and desktop/mobile welcome screens
+        env:
+          DEMENTOR_PUBLIC_URL: http://138.199.144.94/
+        run: node test/public-smoke.cjs
+      - name: Upload live-site report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dementor-production-read-only
+          path: projects/dementor-live/runtime/reports/public-smoke.*
+          if-no-files-found: warn
+          retention-days: 14
