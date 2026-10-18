@@ -5,6 +5,12 @@ export const CONFIG = {
     {title:'Настил переправы',works:3,wood:24,stone:0},
     {title:'Перила и открытие',works:2,wood:0,stone:0}
   ] },
+  seedMarket: {need:{wood:8,stone:6},stages:[
+    {title:'Стены и стойка лавки',works:2,wood:8,stone:6}
+  ]},
+  cityGarden: {need:{wood:6,stone:4},stages:[
+    {title:'Огород и дорожки',works:2,wood:6,stone:4}
+  ]},
   toolMaking: { durability:48, recipe:{wood:2,stone:2} },
   toolShop: { durability:160, price:180 },
   warehouse: { capacity:80, pay:{wood:1,stone:1}, mayorNeed:{wood:12,stone:12}, courierBatch:6, courierPay:2, reservationMs:300000 },

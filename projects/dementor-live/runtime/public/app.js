@@ -1,8 +1,10 @@
 const $=id=>document.getElementById(id),canvas=$('world'),ctx=canvas.getContext('2d');
 let lastScene=null;
 let state=null,me=null,token=sessionStorage.getItem('dementor-token'),stream=null,connected=false;
-let keys=new Set(),route=[],selected=null,context=null,lastAction=0,requestPending=false,holdAction=false,touchMove=null;
-let view={w:innerWidth,h:innerHeight,s:28,cx:innerWidth<760?10:16,cy:innerWidth<760?12:16,zoom:1},toastTimer;
+let keys=new Set(),route=[],selected=null,context=null,lastAction=0,requestPending=false,holdAction=false,touchMove=null,inputPending=false;
+let routeActivity={x:0,y:0,at:0};
+function setRoute(path){route=path;routeActivity={x:me?.x||0,y:me?.y||0,at:performance.now()};}
+let view={w:innerWidth,h:innerHeight,s:28,cx:innerWidth<760?10:16,cy:innerWidth<760?12:16,zoom:innerWidth<760?1.15:1},toastTimer;
 const motionFrames=[];
 let lastWallet=null,lastChatSignature='';
 const colors=['#a97059','#6e8971','#65858f'];
@@ -13,7 +15,7 @@ if(new URL(location).searchParams.has('new')){token=null;sessionStorage.removeIt
 function toast(text){$('toast').textContent=text;$('toast').classList.add('visible');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').classList.remove('visible'),2600);}
 async function api(endpoint,data){const res=await fetch('/api/'+endpoint,{method:data?'POST':'GET',headers:{'Content-Type':'application/json',...(token?{Authorization:'Bearer '+token}:{})},...(data?{body:JSON.stringify(data)}:{})});const result=await res.json();if(res.status===401){token=null;sessionStorage.removeItem('dementor-token');stream?.close();$('welcome').showModal();}return result;}
 async function act(type,target,extra={}){if(!connected||requestPending)return;requestPending=true;try{const result=await api('action',{type,target,requestId:Array.from(crypto.getRandomValues(new Uint8Array(16)),b=>b.toString(16).padStart(2,'0')).join(''),...extra});if(result.message&&(!result.started||!holdAction))toast(result.message);return result;}catch{toast('Нет связи с миром. Переподключаемся…');}finally{requestPending=false;}}
-function connect(){stream?.close();motionFrames.length=0;stream=new EventSource('/api/events?token='+encodeURIComponent(token));stream.onmessage=e=>{state=JSON.parse(e.data);me=state.players.find(p=>p.id===state.me);if(lastScene!==state.scene+me.plotId){lastScene=state.scene+me.plotId;resize();motionFrames.length=0;route=[];selected=null;context=null;if($('cityPanel').open)$('cityPanel').close();}motionFrames.push({at:performance.now(),players:new Map(state.players.map(p=>[p.id,{x:p.x,y:p.y,spirit:p.spirit}]))});if(motionFrames.length>20)motionFrames.shift();connected=true;updateUI();};stream.onerror=()=>{connected=false;$('connection').classList.add('offline');$('connection').lastChild.textContent='Нет связи';};}
+function connect(){stream?.close();motionFrames.length=0;stream=new EventSource('/api/events?token='+encodeURIComponent(token));stream.onmessage=e=>{state=JSON.parse(e.data);me=state.players.find(p=>p.id===state.me);if(lastScene!==state.scene+me.plotId+(state.cityNetwork?.current||'origin')){lastScene=state.scene+me.plotId+(state.cityNetwork?.current||'origin');resize();motionFrames.length=0;route=[];selected=null;context=null;if($('cityPanel').open)$('cityPanel').close();}motionFrames.push({at:performance.now(),players:new Map(state.players.map(p=>[p.id,{x:p.x,y:p.y,spirit:p.spirit}]))});if(motionFrames.length>20)motionFrames.shift();connected=true;updateUI();};stream.onerror=()=>{connected=false;$('connection').classList.add('offline');$('connection').lastChild.textContent='Нет связи';};}
 $('joinForm').onsubmit=async e=>{e.preventDefault();const button=e.target.querySelector('button');button.disabled=true;try{const result=await api('join',{name:$('nameInput').value});if(!result.ok){$('joinError').textContent=result.message;return;}token=result.token;sessionStorage.setItem('dementor-token',token);$('welcome').close();connect();canvas.focus();}catch{$('joinError').textContent='Сервер недоступен. Проверь локальный запуск.';}finally{button.disabled=false;}};
 if(token)api('state').then(r=>{if(r.me)connect();else if(!$('welcome').open)$('welcome').showModal();}).catch(()=>$('welcome').showModal());else $('welcome').showModal();
 
@@ -27,9 +29,12 @@ function currentConfig(){return bridgeActive()?{...state.config,...state.config.
 function projectReady(p=currentProject(),c=currentConfig()){if(!state)return false;const s=c.stages[p.stage];return s&&p.stock.wood>=s.wood&&p.stock.stone>=s.stone;}
 function cargo(){return me?Object.entries(me.bag).reduce((n,[k,v])=>n+v*state.config.weights[k],0)+(me.delivery?.picked?me.delivery.quantity*state.config.weights[me.delivery.kind]:0):0;}
 function allTargets(){if(!state||!me)return [];if(state.scene!=='city')return livingTargets();
-  return [state.config.expedition.gate,...(bridgeOpen()?[{id:'east-bank',type:'explore',x:40,y:13.5}]:[]),...(bridgeActive()?[{id:'bridge-drop',type:'project',x:32.5,y:12.3},{id:'bridge-build',type:'build',x:32,y:13.5}]:[]),{id:'tool-shop',type:'shop',x:24,y:3},...(state.forge.stage>=state.config.forge.stages.length?[{id:'forge-use',type:'forge',x:27,y:29.5}]:[]),{id:'warehouse',type:'warehouse',x:12,y:24},{id:'board',type:'board',x:3.2,y:8},{id:'mayor',type:'mayor',x:9,y:3},{id:'tools',type:'tools',x:9,y:6},{id:'project',type:'project',x:15,y:11},{id:'build',type:'build',x:18,y:14},...(forgeActive()?[{id:'forge-drop',type:'project',x:24.5,y:24},{id:'forge-build',type:'build',x:27,y:26}]:[]),...(state.drops||[]),...state.resources,...(state.plaza?.config.objects||[]),...state.plots.map(p=>({...p,type:'plot',x:p.x+p.w/2,y:p.y-1})),...state.players.filter(p=>p.id!==me.id&&p.online&&sameScene(p)).map(p=>({...p,type:'social'}))];
+  return [state.config.expedition.gate,...(bridgeOpen()?[{id:'east-bank',type:'explore',x:40,y:13.5}]:[]),...(bridgeActive()?[{id:'bridge-drop',type:'project',x:32.5,y:12.3},{id:'bridge-build',type:'build',x:32,y:13.5}]:[]),{id:'tool-shop',type:'shop',x:24,y:3},...(state.forge.stage>=state.config.forge.stages.length?[{id:'forge-use',type:'forge',x:27,y:29.5}]:[]),{id:'warehouse',type:'warehouse',x:12,y:24},...(state.seedMarket.stage>=state.config.seedMarket.stages.length?[{id:'seed-shop',type:'seed-market',x:23,y:7}]:[{id:'seed-shop-build',type:'build',x:23,y:7}]),{id:'seed-shop-drop',type:'project',x:22,y:9},...(state.gardenProject.stage>=state.config.cityGarden.stages.length?[{id:'public-garden',type:'city-garden',x:28,y:9}]:[{id:'public-garden-build',type:'build',x:28,y:9}]),{id:'public-garden-drop',type:'project',x:26,y:9},{id:'city-registry',type:'city-registry',x:19,y:6},{id:'board',type:'board',x:3.2,y:8},{id:'mayor',type:'mayor',x:9,y:3},{id:'tools',type:'tools',x:9,y:6},{id:'project',type:'project',x:15,y:11},{id:'build',type:'build',x:18,y:14},...(forgeActive()?[{id:'forge-drop',type:'project',x:24.5,y:24},{id:'forge-build',type:'build',x:27,y:26}]:[]),...(state.drops||[]),...state.resources,...(state.plaza?.config.objects||[]),...state.plots.map(p=>({...p,type:'plot',x:p.x+p.w/2,y:p.y-1})),...state.players.filter(p=>p.id!==me.id&&p.online&&sameScene(p)).map(p=>({...p,type:'social'}))];
 }
-function interaction(t){if(!t)return null;const type=t.type,isForge=t.id.startsWith('forge-'),isBridge=t.id.startsWith('bridge-'),p=isBridge?state.bridge:isForge?state.forge:state.project,c=isBridge?{...state.config,...state.config.bridge}:isForge?{...state.config,...state.config.forge}:state.config;
+function interaction(t){if(!t)return null;const type=t.type,isForge=t.id.startsWith('forge-'),isBridge=t.id.startsWith('bridge-'),isMarket=t.id.startsWith('seed-shop-'),isGarden=t.id.startsWith('public-garden-'),p=isMarket?state.seedMarket:isGarden?state.gardenProject:isBridge?state.bridge:isForge?state.forge:state.project,c=isMarket?{...state.config,...state.config.seedMarket}:isGarden?{...state.config,...state.config.cityGarden}:isBridge?{...state.config,...state.config.bridge}:isForge?{...state.config,...state.config.forge}:state.config;
+  if(type==='seed-market')return {type:'seeds',title:'Семенная лавка',hint:state.seedMarket.stage<state.config.seedMarket.stages.length?'Сначала достройте лавку':'Купить семена для огорода',enabled:true};
+  if(type==='city-garden')return {type:'public-garden',title:'Общий городской огород',hint:state.gardenProject.stage<state.config.cityGarden.stages.length?'Нужно построить городской огород':'Посади, полей и собери урожай',enabled:true};
+  if(type==='city-registry')return {type:'city-registry',title:'Городской реестр',hint:'Создать город или перейти в другой город',enabled:true};
   if(type==='mission')return {type:'missionEnter',title:'Выйти на миссию расчистки',hint:state.expedition.completedAt?'Зона открыта · можно вернуться за ресурсами':`Расчистите новую территорию · осталось ${state.expedition.remaining}`,enabled:!me.job&&!me.delivery?.picked};
   if(type==='plot'&&t.locked)return {type:'buy',title:'Участок ещё не открыт',hint:'Завершите общую миссию расчистки на юге города',enabled:false};
   if(type==='home'&&t.id==='mission-exit')return {type:'homeUse',title:t.title,hint:'Вернуться с добычей · прогресс сохранится',enabled:true};
@@ -50,7 +55,7 @@ function interaction(t){if(!t)return null;const type=t.type,isForge=t.id.startsW
   if(type==='wood'||type==='stone'){const tool=type==='wood'?'axe':'pick';return {type:'mine',title:type==='wood'?'Заготовить древесину':'Добыть камень',hint:!t.stock?'Запас исчерпан':me.spirit?'Духу нужна еда':me.equipped!==tool?`Выбери ${tool==='axe'?'топор · 1':'кирку · 2'}`:!me.tools[tool]?'Нужна замена в мэрии':cargo()+c.weights[type]>c.capacity?'Рюкзак полон · склад или кнопка «Рюкзак»':`Осталось ${t.stock} · удерживай E`,enabled:!me.spirit&&t.stock>0};}
   if(type==='food')return {type:'gather',title:me.spirit?'Восстановиться ягодами':'Собрать еду',hint:t.stock?me.spirit?'Еда вернёт тело · бесплатно':'Съесть — F · можно помочь соседу':'Ягоды созревают · скоро снова доступны',enabled:t.stock>0};
   if(type==='project'){const wood=Math.min(me.bag.wood,Math.max(0,c.need.wood-p.accepted.wood-(p.reserved?.wood||0))),stone=Math.min(me.bag.stone,Math.max(0,c.need.stone-p.accepted.stone-(p.reserved?.stone||0)));return {type:'deliver',title:'Сдать материалы',hint:wood+stone?`${wood} древесины · ${stone} камня · +${wood*c.pay.wood+stone*c.pay.stone} PAPER`:`Нужно ещё: ${c.need.wood-p.accepted.wood} древесины · ${c.need.stone-p.accepted.stone} камня`,enabled:!me.spirit&&wood+stone>0};}
-  if(type==='build')return {type:'build',title:p.stage===c.stages.length?(isBridge?'Мост открыт':isForge?'Кузница построена':'Площадь открыта'):c.stages[p.stage].title,hint:p.stage===c.stages.length?'Общее дело стало частью города':projectReady(p,c)?`Короткая работа · +${c.pay.work} PAPER`:'Сначала доставьте материалы этапа',enabled:!me.spirit&&!!projectReady(p,c)};
+  if(type==='build')return {type:'build',title:p.stage===c.stages.length?(isBridge?'Мост открыт':isForge?'Кузница построена':isMarket?'Семенная лавка построена':isGarden?'Городской огород готов':'Площадь открыта'):c.stages[p.stage].title,hint:p.stage===c.stages.length?'Общее дело стало частью города':projectReady(p,c)?`Короткая работа · +${c.pay.work} PAPER`:'Сначала доставьте материалы этапа',enabled:!me.spirit&&!!projectReady(p,c)};
   if(type==='plot'){const owner=state.players.find(p=>p.id===t.owner);return {type:t.owner?'enterPlot':'buy',title:t.owner?`Участок · ${owner?.name||'житель'}`:'Купить свой участок',hint:t.owner===me.id?'Твоё место в городе':t.owner?'Здесь уже есть хозяин':`${c.plotPrice} PAPER · на заработанное`,enabled:!me.spirit&&(!!t.owner||!state.plots.some(p=>p.owner===me.id))};}
   if(type==='give')return {type:'give',title:`Угостить · ${t.name}`,hint:t.spirit?'Вернуть соседу тело':'Передать порцию еды',enabled:!me.spirit&&me.bag.food>0};return null;
 }
@@ -85,22 +90,23 @@ function nearby(id){const t=allTargets().find(t=>t.id===id);return t&&Math.hypot
 function navigateTo(id){
   const t=allTargets().find(t=>t.id===id);if(!t)return;selected=id;keys.clear();holdAction=false;$('cityPanel').close();canvas.focus();
   if(nearby(id)){updateContext();return;}
-  const paths=[[0,1.4],[-1.4,0],[1.4,0],[0,-1.4]].map(([dx,dy])=>findPath({x:t.x+dx,y:t.y+dy})).filter(Boolean).sort((a,b)=>a.length-b.length);
-  if(paths.length)route=paths[0];else toast('Путь недоступен — подойди самостоятельно');
+  const paths=[[0,1.4],[-1.4,0],[1.4,0],[0,-1.4]].map(([dx,dy])=>findPath({x:t.x+dx,y:t.y+dy})).filter(Boolean).sort((a,b)=>pathDistance(a)-pathDistance(b));
+  if(paths.length)setRoute(paths[0]);else toast('Путь недоступен — подойди самостоятельно');
 }
 function openCityPanel(mode){$('cityPanel').style.left='';$('cityPanel').style.top='';cityPanelMode=mode;cityPanelSignature='';keys.clear();holdAction=false;route=[];touchMove=null;api('input',{dx:0,dy:0}).catch(()=>{});updateCityPanels(true);$('cityPanel').dataset.mode=mode;if(!$('cityPanel').open)$('cityPanel').show();}
 function updateCityPanels(force=false){
   if(!me||!cityPanelMode||(!force&&!$('cityPanel').open))return;
-  const sig=cityPanelMode==='bag'?JSON.stringify([me.bag,me.toolItems,me.activeTools,me.delivery,me.spirit,!!me.job]):JSON.stringify([cityPanelMode,me.tools,me.toolInfo,me.wallet,me.bag,me.delivery,me.spirit,!!me.job,state.warehouse,state.courierOffers,state.project,state.forge,state.bridge,state.plaza,me.toolItems,me.activeTools,state.scene,state.home,state.trades,state.seedShop,state.thefts,state.players.map(p=>[p.id,p.name,p.online,sameScene(p),Math.hypot(p.x-me.x,p.y-me.y)<=state.config.actionRange]),Math.floor(state.now/1000)*(cityPanelMode==='home'?1:0),nearby('warehouse'),nearby('board'),nearby('forge-use'),nearby('tool-shop')]);
+  const sig=cityPanelMode==='bag'?JSON.stringify([me.bag,me.toolItems,me.activeTools,me.delivery,me.spirit,!!me.job]):JSON.stringify([cityPanelMode,me.tools,me.toolInfo,me.wallet,me.bag,me.delivery,me.spirit,!!me.job,state.warehouse,state.courierOffers,state.project,state.forge,state.bridge,state.plaza,me.toolItems,me.activeTools,state.scene,state.home,state.trades,state.seedShop,state.seedMarket,state.gardenProject,state.publicGarden,state.materials,state.cityNetwork,state.thefts,state.players.map(p=>[p.id,p.name,p.online,sameScene(p),Math.hypot(p.x-me.x,p.y-me.y)<=state.config.actionRange]),Math.floor(state.now/1000)*(cityPanelMode==='home'?1:0),nearby('warehouse'),nearby('board'),nearby('forge-use'),nearby('tool-shop')]);
   if(!force&&$('cityPanel').contains(document.activeElement)&&['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName))return;if(!force&&sig===cityPanelSignature)return;cityPanelSignature=sig;
   $('cityPanel').classList.toggle('compact-bag',cityPanelMode==='bag');$('cityPanel').querySelector('.eyebrow').textContent=cityPanelMode==='bag'?'СНАРЯЖЕНИЕ':cityPanelMode==='social'?'ЖИТЕЛИ И СДЕЛКИ':'МИР И ХОЗЯЙСТВО';const rows=$('cityPanelRows');rows.replaceChildren();
   function row(title,description,buttons=[]){const el=document.createElement('section');el.className='city-row';const h=document.createElement('h3'),p=document.createElement('p');h.textContent=title;p.textContent=description;el.append(h,p);const actions=document.createElement('div');actions.className='city-actions';for(const b of buttons){const button=document.createElement('button');button.textContent=b.text;button.disabled=!!b.disabled;if(b.id)button.id=b.id;button.onclick=b.click;actions.append(button);}el.append(actions);rows.append(el);return el;}
   const canAct=!me.spirit&&!me.job,w=state.warehouse,c=state.config;
   if(typeof plazaPanel==='function'&&plazaPanel(cityPanelMode,rows,row,canAct))return;if(lifePanel(cityPanelMode,rows,row,canAct))return;
+  if(['public-garden','city-registry'].includes(cityPanelMode)&&typeof civicPanel==='function'&&civicPanel(cityPanelMode,rows,row,canAct))return;
   if(cityPanelMode==='places'){
-    $('cityPanelTitle').textContent='Места города';$('cityPanelIntro').textContent='Камера всегда следует за тобой. Выбери место — герой пойдёт туда сам.';const services=row('Городские службы','Семена и записи города — отдельно от рюкзака.',[{text:'Семенная лавка',click:()=>openCityPanel('seeds')},{text:'Доска воров',click:()=>openCityPanel('thefts')}]);services.classList.add('place-services');
+    $('cityPanelTitle').textContent='Места города';$('cityPanelIntro').textContent='Камера всегда следует за тобой. Выбери место — герой пойдёт туда сам.';const services=row('Городские службы','Городские здания и материалы', [{text:'Семенная лавка',click:()=>openCityPanel('seeds')},{text:'Общий огород',click:()=>openCityPanel('public-garden')},{text:'Реестр городов',click:()=>openCityPanel('city-registry')},{text:'Доска воров',click:()=>openCityPanel('thefts')}]);services.classList.add('place-services');
     for(const t of allTargets()){
-      const title=({mission:'Выход · миссия расчистки',shop:'Магазин инструмента',forge:'Кузница · изготовление',warehouse:'Городской склад',board:'Доска работ',mayor:'Доставка в мэрию',tools:'Бесплатные инструменты',explore:'Другой берег',project:t.id==='bridge-drop'?'Приёмка моста':t.id==='project'?'Приёмка площади':'Приёмка кузницы',build:t.id==='bridge-build'?'Стройка моста':t.id==='build'?'Стройка площади':'Стройка кузницы',wood:'Дерево',stone:'Камень',food:'Ягоды',plot:'Участок',pickup:'Вещи на земле',give:t.name,social:t.name})[t.type];
+      const title=({mission:'Выход · миссия расчистки',shop:'Магазин инструмента',forge:'Кузница · изготовление',warehouse:'Городской склад', 'seed-market':'Семенная лавка', 'city-garden':'Общий огород', 'city-registry':'Реестр городов',board:'Доска работ',mayor:'Доставка в мэрию',tools:'Бесплатные инструменты',explore:'Другой берег',project:t.id==='bridge-drop'?'Приёмка моста':t.id==='project'?'Приёмка площади':'Приёмка кузницы',build:t.id==='bridge-build'?'Стройка моста':t.id==='build'?'Стройка площади':'Стройка кузницы',wood:'Дерево',stone:'Камень',food:'Ягоды',plot:'Участок',pickup:'Вещи на земле',give:t.name,social:t.name})[t.type];
       const placeTitle=t.title||title||'Место города';const placeRow=row(placeTitle,t.stock!==undefined?`${t.x>state.config.river.x?'Другой берег':'Стартовый берег'} · запас: ${t.stock}`:'Выбери место для движения',[{id:'goto-'+t.id,text:t.x>=state.config.river.x&&!bridgeOpen()?'Нужен мост':'➤',disabled:t.x>=state.config.river.x&&!bridgeOpen(),click:()=>navigateTo(t.id)}]);placeRow.classList.add('place-row');placeRow.prepend(placeThumbnail(t));const go=placeRow.querySelector('button');go.setAttribute('aria-label','Идти: '+placeTitle);go.title='Идти: '+placeTitle;
     }
     $('cityPanelNote').textContent='Масштаб меняется кнопками + и − или колесом мыши; привязка камеры сохраняется.';
@@ -122,19 +128,20 @@ function updateCityPanels(force=false){
     $('cityPanelTitle').textContent='Городской склад';$('cityPanelIntro').textContent='Сдай лишние материалы за небольшую плату. После приёмки они принадлежат городу. Оплата на стройке выше.';
     for(const kind of ['wood','stone']){
       const price=c.warehouse.pay[kind],quantity=Math.min(me.bag[kind],w.free[kind],Math.floor(w.funds/price));
-      row(names[kind],`На складе: ${w.stock[kind]}. Свободно: ${w.free[kind]}. У тебя: ${me.bag[kind]}. Приёмка: ${price} PAPER за единицу.`,[{id:'sell-'+kind,text:`Сдать ${quantity} · +${quantity*price} PAPER`,disabled:!canAct||!nearby('warehouse')||quantity<=0,click:()=>act('warehouseSell','warehouse',{kind})}]);
+      row(names[kind],`Свободный склад: ${w.stock[kind]}; мэрия: ${w.municipal[kind]}; в пути: ${state.materials[kind].inTransit}; стройки: ${state.materials[kind].onConstruction}; уже в зданиях: ${state.materials[kind].inStructures}; у тебя: ${me.bag[kind]}; общий баланс: ${state.materials[kind].total}. Приёмка: ${price} PAPER/шт.`,[{id:'sell-'+kind,text:`Сдать ${quantity} · +${quantity*price} PAPER`,disabled:!canAct||!nearby('warehouse')||quantity<=0,click:()=>act('warehouseSell','warehouse',{kind})}]);
     }
     if(me.delivery){const d=me.delivery;row('Твой курьерский заказ',`${d.quantity} · ${names[d.kind]} → ${deliveryLabel(d)}. Награда ${d.reward} PAPER после доставки.`,[{id:'courier-pickup',text:d.picked?'Груз уже у тебя':'Забрать городской груз',disabled:!canAct||!nearby('warehouse')||d.picked||cargo()+d.quantity*c.weights[d.kind]>c.capacity,click:()=>act('courierPickup','warehouse')},{id:'courier-cancel',text:d.picked?'Вернуть груз и отменить':'Отменить заказ',disabled:!canAct||(d.picked&&!nearby('warehouse')),click:()=>act('courierCancel','warehouse')}]);}
     else row('Курьерские работы','Заказ берётся на доске у мэрии. Городской груз переносится на выбранное место назначения.',[{text:'Идти к доске',click:()=>navigateTo('board')}]);
     $('cityPanelNote').textContent=`В запасе мэрии: ${w.municipal.wood} древесины, ${w.municipal.stone} камня. Свободный бюджет склада: ${w.funds} PAPER. Бюджет незавершённых строек защищён. Слоты груза в пути сохраняются для его возврата.`;
   }else{
     $('cityPanelTitle').textContent='Доска работ мэрии';$('cityPanelIntro').textContent='Актуальные работы города. Оплата за принятые материалы и выполненную работу — сразу; за курьерский заказ — после доставки.';
-    for(const [project,pc,label,drop,build]of [[state.project,c,'Площадь','project','build'],...(forgeActive()?[[state.forge,{...c,...c.forge},'Кузница','forge-drop','forge-build']]:[]),...(bridgeActive()?[[state.bridge,{...c,...c.bridge},'Мост','bridge-drop','bridge-build']]:[])]){
+    for(const [project,pc,label,drop,build]of [[state.project,c,'Площадь','project','build'],...(forgeActive()?[[state.forge,{...c,...c.forge},'Кузница','forge-drop','forge-build']]:[]),...(bridgeActive()?[[state.bridge,{...c,...c.bridge},'Мост','bridge-drop','bridge-build']]:[]),[state.seedMarket,{...c,...c.seedMarket},'Семенная лавка','seed-shop-drop','seed-shop-build'],[state.gardenProject,{...c,...c.cityGarden},'Общий огород','public-garden-drop','public-garden-build']]){
       const missing=['wood','stone'].filter(k=>pc.need[k]>project.accepted[k]);
       if(missing.length)row(`${label} · поставка материалов`,missing.map(k=>`${names[k]}: ещё ${pc.need[k]-project.accepted[k]} · ${pc.pay[k]} PAPER/шт.`).join(' / '),[{text:'Идти к приёмке',click:()=>navigateTo(drop)}]);
       if(project.stage<pc.stages.length)row(`${label} · ${pc.stages[project.stage].title}`,`${project.work} / ${pc.stages[project.stage].works} работ. Награда ${pc.pay.work} PAPER за работу. ${projectReady(project,pc)?'Материалы готовы.':'Сначала доставьте материалы этапа.'}`,[{text:'Идти на стройку',click:()=>navigateTo(build)}]);
     }
     row('Склад · приёмка лишних ресурсов',`Древесина ${c.warehouse.pay.wood}, камень ${c.warehouse.pay.stone} PAPER/шт. Приёмка зависит от места и свободного бюджета.`,[{text:'Идти на склад',click:()=>navigateTo('warehouse')}]);
+    row('Баланс материалов',`🪵 ${state.materials.wood.total} · 🪨 ${state.materials.stone.total}. Склад, мэрия, строения и грузы учитываются отдельно.`,[{text:'Открыть склад',click:()=>openCityPanel('warehouse')}]);
     if(me.delivery){const d=me.delivery;row('Твой курьерский заказ',`${d.quantity} · ${names[d.kind]}. ${d.picked?'Доставь: '+deliveryLabel(d)+'.':'Забери на складе до истечения 5 минут с принятия.'} Награда ${d.reward} PAPER.`,[{text:d.picked?'Доставить груз':'Идти на склад',click:()=>navigateTo(d.picked?deliveryTarget(d):'warehouse')},{text:d.picked?'Вернуть груз на склад':'Отменить заказ',disabled:!canAct,click:()=>d.picked?navigateTo('warehouse'):act('courierCancel','board')}]);}
     else for(const offer of state.courierOffers)row(`Курьер · ${names[offer.kind]} со склада → ${deliveryLabel(offer)}`,`${offer.quantity} шт. · вес ${offer.quantity*c.weights[offer.kind]} · награда ${offer.reward} PAPER. Груз городской; повторно продать его нельзя.`,[{id:(offer.destination==='bridge'?'accept-bridge-':'accept-')+offer.kind,text:'Взять заказ',disabled:!canAct||!nearby('board'),click:()=>act('courierAccept','board',{kind:offer.kind,destination:offer.destination})}]);
     if(!me.delivery&&!state.courierOffers.length)row('Курьерских заказов сейчас нет','Они появятся при наличии материалов, потребности мэрии или моста и свободного бюджета.');
@@ -142,7 +149,7 @@ function updateCityPanels(force=false){
   }
 }
 $('bagButton').onclick=()=>{if(me)openCityPanel('bag');};
-function doContext(){if(!context||!context.enabled||me?.job||performance.now()-lastAction<(context.type==='homeClear'?570:180))return;lastAction=performance.now();if(['mine','homeClear'].includes(context.type)&&heldResource()&&['wood','stone'].includes(state.home?.nodes.find(n=>n.id===context.id)?.kind||allTargets().find(t=>t.id===context.id)?.type)){holdAction=false;toast('Возьми топор или кирку в быстрой панели');return;}if(['board','warehouse','forge','shop','home','social','monument','jukebox','thefts','donation-box','donation-board'].includes(context.type)){holdAction=false;if(context.type==='social')selected=context.id;openCityPanel(context.type==='social'?'resident':context.type);return;}act(context.type,context.id);}
+function doContext(){if(!context||!context.enabled||me?.job||performance.now()-lastAction<(context.type==='homeClear'?570:180))return;lastAction=performance.now();if(['mine','homeClear'].includes(context.type)&&heldResource()&&['wood','stone'].includes(state.home?.nodes.find(n=>n.id===context.id)?.kind||allTargets().find(t=>t.id===context.id)?.type)){holdAction=false;toast('Возьми топор или кирку в быстрой панели');return;}if(['board','warehouse','forge','shop','home','social','monument','jukebox','thefts','donation-box','donation-board','seeds','public-garden','city-registry'].includes(context.type)){holdAction=false;if(context.type==='social')selected=context.id;openCityPanel(context.type==='social'?'resident':context.type);return;}act(context.type,context.id);}
 $('actionButton').onclick=doContext;$('axeButton').onclick=()=>act('equip','axe');$('pickButton').onclick=()=>act('equip','pick');$('eatButton').onclick=()=>act(me.bag.food?'eat':'eatCarrot');
 $('detailsButton').onclick=()=>{$('details').show();updateUI();};$('helpButton').onclick=()=>$('help').show();document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>$(b.dataset.close).close());
 $('secondPlayer').onclick=()=>window.open('/?new=1','_blank','noopener');
@@ -155,12 +162,20 @@ window.addEventListener('keydown',e=>{
   if(e.code==='KeyE'){holdAction=true;doContext();}if(e.repeat)return;if(/^Digit[1-6]$/.test(e.code))selectQuick(Number(e.code.slice(-1))-1);if(e.code==='KeyQ')placeQuick();if(e.code==='KeyF')act(me.bag.food?'eat':'eatCarrot');if(e.code==='Enter'){$('chatInput').focus();keys.clear();}if(e.code==='Escape'){document.querySelectorAll('dialog[open]').forEach(d=>d.close());route=[];selected=null;act('cancel');}
 });
 window.addEventListener('keyup',e=>{keys.delete(e.code);if(e.code==='KeyE')holdAction=false;});window.addEventListener('blur',()=>{keys.clear();holdAction=false;touchMove=null;route=[];if(token)api('input',{dx:0,dy:0}).catch(()=>{});});
-document.querySelectorAll('[data-move]').forEach(b=>{b.addEventListener('pointerdown',e=>{b.setPointerCapture(e.pointerId);touchMove=b.dataset.move.split(',').map(Number);route=[];});b.addEventListener('pointerup',()=>touchMove=null);b.addEventListener('pointercancel',()=>touchMove=null);});
+document.querySelectorAll('[data-move]').forEach(b=>{b.addEventListener('pointerdown',e=>{b.setPointerCapture(e.pointerId);touchMove=b.dataset.move.split(',').map(Number);route=[];});b.addEventListener('pointerup',()=>touchMove=null);b.addEventListener('pointercancel',()=>touchMove=null);b.addEventListener('lostpointercapture',()=>touchMove=null);});
 setInterval(()=>{if(!connected||!me)return;let dx=0,dy=0;if(!$('welcome').open&&!['INPUT','TEXTAREA','SELECT'].includes(document.activeElement?.tagName)){
   dx=Number(keys.has('KeyD')||keys.has('ArrowRight'))-Number(keys.has('KeyA')||keys.has('ArrowLeft'));dy=Number(keys.has('KeyS')||keys.has('ArrowDown'))-Number(keys.has('KeyW')||keys.has('ArrowUp'));if(touchMove)[dx,dy]=touchMove;
-  if(!dx&&!dy&&route.length){while(route.length&&Math.hypot(route[0].x-me.x,route[0].y-me.y)<.35)route.shift();if(route.length){dx=route[0].x-me.x;dy=route[0].y-me.y;const n=Math.hypot(dx,dy);dx/=n;dy/=n;}}
+  if(!dx&&!dy&&route.length){
+     while(route.length&&Math.hypot(route[0].x-me.x,route[0].y-me.y)<.32)route.shift();
+     if(route.length){
+       const now=performance.now();
+       if(Math.hypot(me.x-routeActivity.x,me.y-routeActivity.y)>.16)routeActivity={x:me.x,y:me.y,at:now};
+       if(now-routeActivity.at>2500){route=[];selected=null;toast('Путь заблокирован. Нажми на свободную точку.');}
+       else {dx=route[0].x-me.x;dy=route[0].y-me.y;const n=Math.hypot(dx,dy);if(n){const throttle=Math.min(1,n/.85);dx=dx/n*throttle;dy=dy/n*throttle;}}
+     }
+   }
   if(holdAction)doContext();
-  }api('input',{dx,dy,sprint:keys.has('ShiftLeft')||keys.has('ShiftRight')}).catch(()=>{});
+  }if(!inputPending){inputPending=true;api('input',{dx,dy,sprint:keys.has('ShiftLeft')||keys.has('ShiftRight')}).catch(()=>{}).finally(()=>{inputPending=false;});}
 },80);
 
 function screen(x,y){return {x:view.w/2+(x-view.cx)*view.s,y:view.h/2+(y-view.cy)*view.s*.76};}
@@ -168,18 +183,52 @@ function worldPoint(x,y){return {x:(x-view.w/2)/view.s+view.cx,y:(y-view.h/2)/(v
 function blocked(x,y){const c=state.config,r=.35;if(state.scene!=='city'){return x<r||y<r||x>16-r||y>16-r||(['plot','expedition'].includes(state.scene)&&state.home.nodes.some(n=>n.left&&Math.hypot(x-n.x,y-n.y)<.63));}if(x<r||y<r||x>c.width-r||y>c.height-r)return true;if(x+r>c.river.x&&x-r<c.river.x+c.river.w&&!(bridgeOpen()&&y-r>=c.bridge.y&&y+r<=c.bridge.y+c.bridge.h))return true;
   if(x+r>4&&x-r<8&&y+r>4&&y-r<7)return true;return state.resources.some(o=>o.stock>0&&o.type!=='food'&&Math.hypot(x-o.x,y-o.y)<.63);
 }
+function pathDistance(path){return path.reduce((distance,p,i)=>distance+Math.hypot(p.x-(i?path[i-1].x:me.x),p.y-(i?path[i-1].y:me.y)),0);}
 function findPath(dest){const step=.5,start={x:Math.round(me.x/step),y:Math.round(me.y/step)},goal={x:Math.round(dest.x/step),y:Math.round(dest.y/step)};const key=p=>p.x+','+p.y;
   if(blocked(goal.x*step,goal.y*step))return null;
   const queue=[start],seen=new Map([[key(start),null]]);let found=null;
   for(let i=0;i<queue.length&&i<20000;i++){const p=queue[i];if(p.x===goal.x&&p.y===goal.y){found=p;break;}for(const[dx,dy]of [[1,0],[-1,0],[0,1],[0,-1]]){const q={x:p.x+dx,y:p.y+dy};if(!seen.has(key(q))&&!blocked(q.x*step,q.y*step)){seen.set(key(q),p);queue.push(q);}}}
-  if(!found)return null;const out=[];for(let p=found;p;p=seen.get(key(p)))out.push({x:p.x*step,y:p.y*step});return out.reverse().slice(1);
+  if(!found)return null;
+   const out=[];for(let p=found;p;p=seen.get(key(p)))out.push({x:p.x*step,y:p.y*step});
+   const path=out.reverse();
+   return path.slice(1).filter((point,i)=>{
+     const previous=path[i],next=path[i+2];
+     return !next||(point.x-previous.x)*(next.y-point.y)!==(point.y-previous.y)*(next.x-point.x);
+   });
 }
-canvas.addEventListener('pointerdown',e=>{if(e.button===2)return;if(!me||$('welcome').open)return;canvas.focus();const r=canvas.getBoundingClientRect(),w=worldPoint(e.clientX-r.left,e.clientY-r.top);const targets=allTargets().sort((a,b)=>Math.hypot(a.x-w.x,a.y-w.y)-Math.hypot(b.x-w.x,b.y-w.y));const pile=targets.find(t=>t.type==='pickup'&&Math.hypot(t.x-w.x,t.y-w.y)<.7);const plot=pile||state.scene!=='city'?null:state.plots.find(p=>w.x>=p.x&&w.x<=p.x+p.w&&w.y>=p.y&&w.y<=p.y+p.h);let t=pile||(plot?targets.find(t=>t.id===plot.id):targets[0]);const insideSquare=state.scene==='city'&&w.x>=14&&w.x<=24&&w.y>=10&&w.y<=18;if(!plot&&insideSquare&&Math.hypot(t.x-w.x,t.y-w.y)>=1.3)t=targets.find(t=>t.id==='build');
+function selectWorldTarget(e){if(e.button===2)return;if(!me||$('welcome').open)return;canvas.focus();const r=canvas.getBoundingClientRect(),w=worldPoint(e.clientX-r.left,e.clientY-r.top);const targets=allTargets().sort((a,b)=>Math.hypot(a.x-w.x,a.y-w.y)-Math.hypot(b.x-w.x,b.y-w.y));const pile=targets.find(t=>t.type==='pickup'&&Math.hypot(t.x-w.x,t.y-w.y)<.7);const plot=pile||state.scene!=='city'?null:state.plots.find(p=>w.x>=p.x&&w.x<=p.x+p.w&&w.y>=p.y&&w.y<=p.y+p.h);let t=pile||(plot?targets.find(t=>t.id===plot.id):targets[0]);const insideSquare=state.scene==='city'&&w.x>=14&&w.x<=24&&w.y>=10&&w.y<=18;if(!plot&&insideSquare&&Math.hypot(t.x-w.x,t.y-w.y)>=1.3)t=targets.find(t=>t.id==='build');
   if(t&&(plot||insideSquare||Math.hypot(t.x-w.x,t.y-w.y)<1.3)){selected=t.id;if(Math.hypot(t.x-me.x,t.y-me.y)<=state.config.actionRange){updateContext();return;}
-    let candidates=[];for(const[dx,dy]of [[0,1.4],[-1.4,0],[1.4,0],[0,-1.4]]){let dest={x:t.x+dx,y:t.y+dy};const path=findPath(dest);if(path)candidates.push(path);}candidates.sort((a,b)=>a.length-b.length);if(candidates[0])route=candidates[0];else toast('Пока нет доступного пути');
-  }else{selected=null;const path=findPath(w);if(path)route=path;else toast(w.x>=state.config.river.x&&!bridgeOpen()?'Здесь нужна переправа. Сначала достройте мост.':'Не получается пройти — выбери свободное место.');}
+    let candidates=[];for(const[dx,dy]of [[0,1.4],[-1.4,0],[1.4,0],[0,-1.4]]){let dest={x:t.x+dx,y:t.y+dy};const path=findPath(dest);if(path)candidates.push(path);}candidates.sort((a,b)=>pathDistance(a)-pathDistance(b));if(candidates[0])setRoute(candidates[0]);else toast('Пока нет доступного пути');
+  }else{selected=null;const path=findPath(w);if(path)setRoute(path);else toast(w.x>=state.config.river.x&&!bridgeOpen()?'Здесь нужна переправа. Сначала достройте мост.':'Не получается пройти — выбери свободное место.');}
+}
+
+const activeTouches=new Map();
+let pinchDistance=0,gestureActive=false,tapStart=null;
+canvas.addEventListener('pointerdown',e=>{
+  if(e.button!==0||!me||$('welcome').open)return;
+  if(e.pointerType!=='touch'){selectWorldTarget(e);return;}
+  activeTouches.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  try{canvas.setPointerCapture(e.pointerId);}catch{}
+  if(activeTouches.size===1){tapStart={x:e.clientX,y:e.clientY,at:performance.now()};gestureActive=false;}
+  if(activeTouches.size>=2){gestureActive=true;tapStart=null;const [a,b]=[...activeTouches.values()];pinchDistance=Math.hypot(a.x-b.x,a.y-b.y);}
 });
-function zoom(value){view.zoom=Math.max(.8,Math.min(2.2,view.zoom*value));resize();}
+canvas.addEventListener('pointermove',e=>{
+  if(!activeTouches.has(e.pointerId))return;
+  activeTouches.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  if(activeTouches.size>=2){const [a,b]=[...activeTouches.values()],distance=Math.hypot(a.x-b.x,a.y-b.y);if(pinchDistance>0&&distance>0)zoom(distance/pinchDistance);pinchDistance=distance;gestureActive=true;}
+  else if(tapStart&&Math.hypot(e.clientX-tapStart.x,e.clientY-tapStart.y)>12)gestureActive=true;
+});
+function endTouch(e,cancelled=false){
+  if(!activeTouches.has(e.pointerId))return;
+  const tap=!cancelled&&!gestureActive&&activeTouches.size===1&&tapStart&&performance.now()-tapStart.at<600&&Math.hypot(e.clientX-tapStart.x,e.clientY-tapStart.y)<12;
+  activeTouches.delete(e.pointerId);pinchDistance=0;
+  if(tap)selectWorldTarget(e);
+  if(!activeTouches.size){gestureActive=false;tapStart=null;}
+}
+canvas.addEventListener('pointerup',e=>endTouch(e));
+canvas.addEventListener('pointercancel',e=>endTouch(e,true));
+
+function zoom(value){if(!Number.isFinite(value)||value<=0)return;view.zoom=Math.max(.65,Math.min(2.5,view.zoom*value));resize();}
 $('zoomIn').onclick=()=>zoom(1.2);$('zoomOut').onclick=()=>zoom(1/1.2);$('centerButton').onclick=()=>{if(me)openCityPanel('places');};
 canvas.addEventListener('wheel',e=>{e.preventDefault();zoom(e.deltaY<0?1.08:1/1.08);},{passive:false});
 function resize(){const dpr=devicePixelRatio||1;view.w=innerWidth;view.h=innerHeight;canvas.width=view.w*dpr;canvas.height=view.h*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);view.s=Math.max(view.w<760?20:12,Math.min((view.w-50)/48,(view.h-80)/(32*.76)))*view.zoom*(state?.scene&&state.scene!=='city'?1.8:1);}
@@ -315,6 +364,9 @@ function render(time){positionWindows();ctx.clearRect(0,0,view.w,view.h);ctx.fil
   if(state){for(const plot of state.plots)drawPlot(plot);}else for(const o of [{x:4,y:15,w:6,h:6},{x:4,y:23,w:6,h:6},{x:14,y:23,w:6,h:6}])drawPlot(o);
   drawForge();
   paperHouse({x:22.7,y:1,w:2.6,h:2},'shop');label('Магазин инструмента',24,.3,true);
+  if(state?.seedMarket){paperHouse({x:21.8,y:5.3,w:2.5,h:2},state.seedMarket.stage>=state.config.seedMarket.stages.length?'shop':'warehouse');label(state.seedMarket.stage>=state.config.seedMarket.stages.length?'Семенная лавка':'Стройка лавки',23,4.9,true);}
+  if(state?.gardenProject){const built=state.gardenProject.stage>=state.config.cityGarden.stages.length;groundRect({x:25.5,y:8.4,w:5.6,h:2.5},built?'#e0dfc6':'#eae5d7','#a7ad89',!built);label(built?'Городской огород':'Стройка огорода',28,8,true);if(built)for(const bed of state.publicGarden.beds){const x=26+(Number(bed.id.split('-').at(-1))%3)*1.6,y=9;groundRect({x,y,w:1.2,h:1},bed.crop?'#98a981':'#c4b49b','#8d956f');}}
+  paperBoard(19,6,'Реестр городов');
   paperHouse({x:10.7,y:25,w:2.6,h:3},'warehouse');label('Городской склад',12,29,true);
   for(const pile of state?.drops||[]){const q=screen(pile.x,pile.y);rounded(q.x-8,q.y-5,16,9,2,pile.kind==='wood'?'#ae9673':pile.kind==='stone'?'#a3aaa0':'#b17b68','#818970');label(`${names[pile.kind]} · ${pile.quantity}`,pile.x,pile.y+.8,true);}
   const resources=state?.resources||[];const entities=[{y:7,draw:drawTent},...resources.map(o=>({y:o.y,draw:()=>o.type==='wood'?drawTree(o):o.type==='stone'?drawStone(o):drawFood(o)})),...(state?.players||[]).filter(p=>(p.online||p.id===me?.id)&&sameScene(p)).map(p=>({y:p.y,draw:()=>drawPlayer(p,time)}))];entities.sort((a,b)=>a.y-b.y);for(const e of entities)e.draw();
@@ -339,14 +391,18 @@ function selectQuick(index){if(!me)return;quickIndex=index;saveQuick();const k=q
 function placeQuick(){const k=heldResource();if(k&&me.bag[k])act('drop',null,{kind:k,quantity:1});else toast('Выбери ресурс в нижней панели');}
 function renderQuick(){if(!me)return;if(quickOwner!==me.id){quickOwner=me.id;try{const saved=JSON.parse(localStorage.getItem('dementor-quick-'+me.id));if(saved&&Array.isArray(saved.slots)&&saved.slots.length===6){quickSlots=saved.slots.map(k=>typeof k==='string'?k:null);quickIndex=Number.isInteger(saved.index)&&saved.index>=0&&saved.index<6?saved.index:0;}}catch{}}
 const signature=JSON.stringify([quickSlots,quickIndex,me.bag,me.toolItems,me.tools]);if(signature===quickSignature)return;quickSignature=signature;quick.replaceChildren();quickSlots.forEach((k,i)=>{const t=me.toolItems.find(t=>t.id===k),kind=t?.kind||k,b=document.createElement('button');b.className='quick-slot'+(i===quickIndex?' selected':'');b.title=(names[k]||toolNames[k]||toolNames[t?.kind]||'Пустая ячейка')+' · '+(i+1);b.setAttribute('aria-label',b.title);const n=document.createElement('kbd'),g=document.createElement('span'),count=document.createElement('small');n.textContent=i+1;g.textContent=itemEmoji[kind]||'·';count.textContent=t?t.durability+'/'+t.max:state.items[k]?me.bag[k]||0:['axe','pick'].includes(k)?me.tools[k]||0:'';b.append(n,g,count);b.onclick=()=>selectQuick(i);quick.append(b);});place.disabled=!heldResource()||!me.bag[heldResource()];}
-function positionWindows(){if(!me)return;const dock=$('actionDock');dock.hidden=!context;const target=context&&(visualPlayers.get(context.id)||context);if(target){const q=screen(target.x,target.y);dock.style.left=Math.max(8,Math.min(innerWidth-Math.min(300,innerWidth-16)-8,q.x-140))+'px';dock.style.top=Math.max(70,Math.min(innerHeight-200,q.y-115))+'px';}
+function positionWindows(){if(!me)return;const dock=$('actionDock');dock.hidden=!context;const target=context&&(visualPlayers.get(context.id)||context);if(innerWidth<760){dock.style.left='';dock.style.top='';}else if(target){const q=screen(target.x,target.y);dock.style.left=Math.max(8,Math.min(innerWidth-Math.min(300,innerWidth-16)-8,q.x-140))+'px';dock.style.top=Math.max(70,Math.min(innerHeight-200,q.y-115))+'px';}
 const panel=$('cityPanel');if(panel.open&&cityPanelMode==='resident'){const p=state.players.find(p=>p.id===selected);if(p){const q=screen(p.x,p.y),w=panel.offsetWidth;panel.style.left=Math.max(8,Math.min(innerWidth-w-8,q.x+35+w<innerWidth?q.x+35:q.x-w-35))+'px';panel.style.top=Math.max(70,Math.min(innerHeight-panel.offsetHeight-100,q.y-95))+'px';}}else {panel.style.left='';panel.style.top='';}}
 canvas.addEventListener('contextmenu',e=>{e.preventDefault();placeQuick();});
 
 // Sidebar preference is independent of game progress.
-function setQuestCollapsed(collapsed){$('quest').classList.toggle('collapsed',collapsed);$('questToggle').setAttribute('aria-expanded',String(!collapsed));$('questChevron').textContent=collapsed?'▸':'▾';try{localStorage.setItem('dementor-quests-collapsed',String(collapsed));}catch{}}
+function setQuestCollapsed(collapsed){$('quest').classList.toggle('collapsed',collapsed);$('questToggle').setAttribute('aria-expanded',String(!collapsed));$('questChevron').textContent=collapsed?'▸':'▾';try{localStorage.setItem(innerWidth<760?'dementor-mobile-quest-collapsed':'dementor-quests-collapsed',String(collapsed));}catch{}}
 $('questToggle').onclick=()=>setQuestCollapsed(!$('quest').classList.contains('collapsed'));
-try{setQuestCollapsed(localStorage.getItem('dementor-quests-collapsed')==='true');}catch{}
+try{
+  const mobile=matchMedia('(max-width:760px)').matches;
+  const saved=localStorage.getItem(mobile?'dementor-mobile-quest-collapsed':'dementor-quests-collapsed');
+  setQuestCollapsed(saved===null?mobile:saved==='true');
+}catch{setQuestCollapsed(innerWidth<760);}
 function placeThumbnail(t){
  const frame=document.createElement('span');frame.className='place-thumbnail';frame.setAttribute('aria-hidden','true');
  const stroke='#7f856c',roof='#c9b995',wall='#d7ceb3',side='#a69d80';let shape='';

@@ -1,6 +1,6 @@
 {
   "name": "dementor-live-local-slice",
-  "version": "0.2.1",
+  "version": "0.3.0-rc.1",
   "private": true,
   "type": "module",
   "scripts": {
@@ -9,9 +9,12 @@
     "check": "node tools/workspace.mjs check",
     "context": "node tools/workspace.mjs context",
     "pack": "node tools/pack.mjs",
-    "test": "node --test test/model.test.mjs test/life.test.mjs test/plaza.test.mjs",
+    "test": "node --test test/model.test.mjs test/life.test.mjs test/plaza.test.mjs test/city-economy.test.mjs",
     "test:integration": "node test/integration.mjs",
     "test:browser": "node test/browser.cjs",
+    "test:mobile": "node test/mobile.cjs",
+    "test:cities-browser": "node test/cities-browser.cjs",
+    "test:persistence": "node test/persistence.cjs",
     "test:lan": "node test/lan.cjs",
     "test:city": "node test/city.cjs",
     "test:tools": "node test/tools.cjs",

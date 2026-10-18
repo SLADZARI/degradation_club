@@ -31,3 +31,46 @@ dialog:not(#welcome){position:fixed;inset:220px 24px auto auto;margin:0;transfor
 @media(max-width:760px){.quest.collapsed{width:160px;padding:12px}.quest-toggle{font-size:11px}#cityPanel[open]{max-height:calc(100dvh - 360px)}#cityPanel .panel-header{padding:12px 31px 10px 11px}#cityPanel .panel-header h2{font-size:17px}#cityPanel .panel-header .eyebrow{font-size:7px}#cityPanel .panel-body{padding:0 10px 10px}#cityPanel[data-mode=places] .place-row{grid-template-columns:30px minmax(0,1fr) 25px;column-gap:5px;padding:7px 0}#cityPanel[data-mode=places] .place-row h3{font-size:10px}#cityPanel[data-mode=places] .place-row p{font-size:9px}#cityPanel[data-mode=places] .place-row .city-actions button{width:25px;font-size:15px}.place-thumbnail{width:30px;height:36px}#cityPanel[data-mode=social]{max-height:40dvh}}
 #cityPanel[data-mode=places] .place-services{padding:8px 0}#cityPanel[data-mode=places] .place-services h3,#cityPanel[data-mode=places] .place-services p{display:none}#cityPanel[data-mode=places] .place-services .city-actions{display:flex;flex-wrap:wrap;gap:5px}#cityPanel[data-mode=places] .place-services button{font-size:10px;padding:5px 7px}
 #toast.visible{transform:none}
+
+/* Mobile world-first HUD: minimise overlap, keep zoom visible. */
+@media(max-width:760px){
+  #game{min-height:0;height:100dvh}
+  .topbar{inset:8px 8px auto;justify-content:center;pointer-events:none}
+  .brand{display:none}
+  .top-right{position:absolute;left:50%;transform:translateX(-50%);top:0}
+  .connection{display:none}
+  #helpButton{width:32px;height:32px;background:#f4f0e5d9}
+  .quest{left:8px;top:52px;width:min(280px,calc(100vw - 16px));max-height:calc(100dvh - 255px);z-index:6}
+  .quest.collapsed{left:8px;top:52px;width:149px;padding:12px 13px;max-height:42px}
+  .quest-toggle{font-size:12px}
+  .quest-list{max-height:30dvh}
+  .vitals{right:8px;top:52px;width:147px;padding:10px 11px;z-index:4}
+  .identity{gap:5px}.identity b{font-size:10px;max-width:65px}
+  .identity strong{font-size:14px}
+  .vital-grid{gap:5px;margin-top:8px}
+  .vital-grid label{font-size:7px;margin-bottom:3px}
+  .map-tools{position:fixed;right:8px;left:auto;top:166px;bottom:auto;display:flex;flex-direction:column;align-items:center;padding:4px;gap:3px;z-index:5}
+  .map-tools button{width:42px;height:42px;font-size:24px;border-radius:10px;touch-action:manipulation}
+  .city-sound{position:fixed;right:8px;top:318px;bottom:auto;width:50px;height:42px;padding:0;font-size:0;z-index:5}
+  .city-sound::after{content:'♫';font-size:20px}
+  .inventory{position:fixed;left:50%;bottom:max(5px,env(safe-area-inset-bottom));width:calc(100vw - 12px);max-width:500px;padding:6px 7px;z-index:6}
+  .quickbar{width:100%;grid-template-columns:repeat(6,minmax(0,1fr));gap:3px}
+  .quick-slot{width:auto;min-width:0;height:42px}
+  .inventory .bag{gap:5px}
+  .chat-area{left:8px;bottom:132px;width:min(48vw,195px);z-index:4}
+  .touch-controls{right:8px;bottom:131px;grid-template-columns:repeat(3,40px);grid-template-rows:repeat(2,40px);gap:3px;z-index:5}
+  .touch-controls button{font-size:22px}
+  .action-dock:not([hidden]){position:fixed;top:auto!important;left:8px!important;right:auto;bottom:238px;width:min(270px,calc(100vw - 76px));max-width:none;min-width:0;transform:none;padding:7px 9px;z-index:6}
+  .action-dock b{font-size:11px}
+  .action-dock small{max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .action-dock button{padding:8px;font-size:11px}
+  .toast{position:fixed;top:auto;bottom:285px;left:8px;max-width:min(250px,calc(100vw - 80px));z-index:7}
+  dialog:not(#welcome),.city-panel.compact-bag{top:112px;right:8px}
+}
+@media(max-width:420px){
+  .quest.collapsed{width:142px}
+  .vitals{width:136px}
+  .map-tools{top:155px}
+  .city-sound{top:307px}
+  .action-dock:not([hidden]){bottom:225px}
+}
