@@ -1,0 +1,14 @@
+{
+  "scope": "two clients: real donation form coin and resource transfers, public donor board, reload and restart; fixture wallet and positions",
+  "checks": [
+    "coins debit, city stock increase without reward",
+    "board shared with second independent client",
+    "save reload and actual restart"
+  ],
+  "consoleErrors": [],
+  "networkErrors": [],
+  "screenshots": [
+    "dementor-live-donations.png"
+  ],
+  "pass": true
+}

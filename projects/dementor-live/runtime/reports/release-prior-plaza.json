@@ -1,0 +1,19 @@
+{
+  "createdAt": "2026-10-18T09:47:40.687Z",
+  "runtimeHash": "6574480ccbd18fcd033484b789bfd01d6104d9045e2cb1d48d28647c8f269796",
+  "model": 37,
+  "httpSse": true,
+  "browser": true,
+  "scope": "compact inventory, distinct tool instances and FIRST HOME focused regressions; not audit of promised but not yet attached playtest audio",
+  "evidence": {
+    "inventory": "reports/inventory.json",
+    "life": "reports/life.json",
+    "http": "reports/integration.json"
+  },
+  "notRerun": [
+    "complete city/forge/bridge construction",
+    "full warehouse regression",
+    "performance frame benchmark"
+  ],
+  "prior": "reports/release-prior-inventory.json"
+}

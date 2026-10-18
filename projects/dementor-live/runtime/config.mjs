@@ -1,0 +1,30 @@
+// Mutable PROTOTYPE parameters. These values do not amend the agreed GDD.
+export const CONFIG = {
+  bridge: { y:12,h:3,need:{wood:24,stone:16},stages:[
+    {title:'Опоры моста',works:2,wood:0,stone:16},
+    {title:'Настил переправы',works:3,wood:24,stone:0},
+    {title:'Перила и открытие',works:2,wood:0,stone:0}
+  ] },
+  toolMaking: { durability:48, recipe:{wood:2,stone:2} },
+  toolShop: { durability:160, price:180 },
+  warehouse: { capacity:80, pay:{wood:1,stone:1}, mayorNeed:{wood:12,stone:12}, courierBatch:6, courierPay:2, reservationMs:300000 },
+  width: 48, height: 32, river: { x: 34, w: 4 },
+  treasury: 1000, plotPrice: 120, capacity: 12,
+  weights: { wood: 1, stone: 2, food: 1, seed_hemp:.1, seed_carrot:.1, hemp:1, carrot:1, water:1 },
+  need: { wood: 40, stone: 40 }, pay: { wood: 2, stone: 3, work: 10 },
+  stages: [
+    { title: 'Подготовка', works: 2, wood: 0, stone: 0 },
+    { title: 'Основание и покрытие', works: 4, wood: 0, stone: 40 },
+    { title: 'Завершение', works: 2, wood: 40, stone: 0 }
+  ],
+  forge: { need: {wood:24,stone:24}, stages: [
+    {title:'Фундамент кузницы',works:2,wood:0,stone:24},
+    {title:'Стены и крыша',works:3,wood:24,stone:0},
+    {title:'Обустройство горна',works:2,wood:0,stone:0}
+  ] },
+  toolDurability: 16, mineMs: 550, buildMs: 1100, gatherMs: 350,
+  speed: 4, slowSpeed: 2.8, hungerPerSecond: 0.14, slowBelow: 25,
+  foodRestore: 65, berryRegrowMs: 8000, foodStock: 6,
+  actionRange: 2.25, chatRange: 18,
+  staminaDrain: 18, staminaRegen: 15, sprintMultiplier: 1.5
+};

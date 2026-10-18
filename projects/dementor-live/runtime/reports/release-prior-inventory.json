@@ -1,0 +1,16 @@
+{
+  "createdAt": "2026-10-17T22:25:42.713Z",
+  "runtimeHash": "25f5a2f750c4e901e08fe298eba5b0752f8e41f4ee8349545c9e36bc22299a4b",
+  "model": 35,
+  "httpSse": true,
+  "browser": true,
+  "scope": "First home focus: three Chrome contexts with money/material fixtures, finite seed clearing, scenes/tent/chest/garden/trade/theft/restart; city warehouse and camera regressions. Not full three-player earned-income acceptance. Actual second device not verified.",
+  "evidence": {
+    "life": "reports/life.json",
+    "city": "reports/city.json",
+    "http": "reports/integration.json",
+    "performance": "reports/performance-after.json"
+  },
+  "tools": "5 tool groups passed during implementation before final home-only zoom and cargo-label polish; not presented as a separate final-hash full regression",
+  "priorFullCityAndBridge": "reports/release-prior-first-home.json; long complete city/forge/bridge build not rerun in this change"
+}

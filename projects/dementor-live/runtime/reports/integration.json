@@ -1,0 +1,6 @@
+{
+  "createdAt": "2026-10-18T11:29:17.477Z",
+  "scope": "real HTTP and independent SSE connections; intensive cases use isolated server fixtures; not browser UI verification",
+  "pass": true,
+  "passed": 12
+}

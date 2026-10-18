@@ -1,0 +1,11 @@
+{
+  "frames": 66,
+  "frameP95Ms": 33.40000000000009,
+  "stationaryCameraPercent": 0,
+  "cameraStepP95": 0.13507107106301142,
+  "heroOffsetP95Px": 0,
+  "domMutations": 832,
+  "longTasks": [],
+  "detailsDialog": true,
+  "pass": true
+}

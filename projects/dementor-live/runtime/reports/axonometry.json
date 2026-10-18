@@ -1,0 +1,18 @@
+{
+  "scope": "visual scene fixtures for completed city and tent; real movement to physical theft board and existing record UI, desktop/mobile",
+  "checks": [
+    "completed public buildings and benches render; physical board reached through places menu, E opens real theft list",
+    "paper home tent, water, chest and bed render in real plot and interior scenes with explicit visual fixtures",
+    "390px city and physical board interaction without overflow"
+  ],
+  "consoleErrors": [],
+  "networkErrors": [],
+  "screenshots": [
+    "dementor-live-axonometric-city.png",
+    "dementor-live-theft-board.png",
+    "dementor-live-axonometric-plot.png",
+    "dementor-live-axonometric-interior.png",
+    "dementor-live-axonometric-mobile.png"
+  ],
+  "pass": true
+}

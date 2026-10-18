@@ -1,0 +1,23 @@
+{
+  "createdAt": "2026-10-17T21:10:28.437Z",
+  "runtimeHash": "c3c7710900c9d28f7bbccf5d4270d0a0b516088bb1a803ad1913bed2ac04938a",
+  "modelTests": 23,
+  "browser": true,
+  "browserCheckGroups": 10,
+  "httpSse": true,
+  "httpScenarios": 12,
+  "city": true,
+  "cityBrowserCheckGroups": 5,
+  "tools": true,
+  "toolsBrowserCheckGroups": 5,
+  "performance": true,
+  "performanceReport": "reports/performance-after.json",
+  "fullConstructionRegression": {
+    "status": "NOT RERUN for this frontend interpolation/UI optimization",
+    "previousRuntimeHash": "6dfaebda129bec1a311e48502f2769f468b3528b5a8687095dcf7c6a711aecf2",
+    "previousCheckGroups": 14
+  },
+  "consoleErrors": 0,
+  "networkErrors": 0,
+  "scope": "focused real browser camera/forge/shop and LAN warehouse/courier regressions, detail dialog and measured camera interpolation; prior full construction proof retained separately"
+}

@@ -1,0 +1,18 @@
+{
+  "scope": "focused tool and camera UI test; isolated completed-building seed and player materials/money fixtures, not an earned-income proof",
+  "checks": [
+    "camera stays centered during movement and zoom; places navigation preserves follow",
+    "completed forge UI crafts axe and pick, consumes exact personal recipe, shows correct maximum durability",
+    "shop charges 180 per premium tool, gives 160 uses, disables unaffordable purchase; independent wallets",
+    "premium tool mines normally, loses one durability, follows camera and survives browser reload",
+    "mobile 390px shop and navigation; actual process restart preserves premium tool condition"
+  ],
+  "consoleErrors": [],
+  "networkErrors": [],
+  "screenshots": [
+    "dementor-live-forge-tools.png",
+    "dementor-live-tool-shop.png",
+    "dementor-live-tool-shop-mobile.png"
+  ],
+  "pass": true
+}

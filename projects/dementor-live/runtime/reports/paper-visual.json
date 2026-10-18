@@ -1,0 +1,11 @@
+{
+  "pass": true,
+  "scope": "visual-only isolated fresh world with explicit camera-position fixture; no real save mutation",
+  "checks": [
+    "paper city geometry visible",
+    "no pictographic emoji emitted by world canvas",
+    "distinct seed emoji in inventory",
+    "390px viewport without overflow"
+  ],
+  "consoleErrors": []
+}

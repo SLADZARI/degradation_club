@@ -1,0 +1,113 @@
+{
+  "project": "Dementor Live local prototype handoff",
+  "status": "incomplete; stopped for handoff at user request",
+  "checks": {
+    "model_tests": "16/16 PASS",
+    "syntax": "PASS",
+    "browser": "NOT RUN",
+    "http_sse": "NOT RUN",
+    "server": "started then stopped"
+  },
+  "files": [
+    {
+      "path": ".gitignore",
+      "sha256": "ee0b41f2c0630c644d9ed12e2764fde4c27dfa64d4beb448c355a7a165bef953",
+      "bytes": 36
+    },
+    {
+      "path": "HANDOFF.md",
+      "sha256": "63fa1a7fc6cc1448c8aa6b5c93afa485edd339941678b3f5543e509ce227115e",
+      "bytes": 17568
+    },
+    {
+      "path": "README.md",
+      "sha256": "88210d5c7131dc36c600cf20000ad17bae3a4351574c36a2369a5e909a0e7a49",
+      "bytes": 8928
+    },
+    {
+      "path": "config.mjs",
+      "sha256": "97b6c018967f81ad873ab6ccc1878739dbb0812b4677143cf059d96145e10b0c",
+      "bytes": 834
+    },
+    {
+      "path": "docs/ARCHIVE_DECISION_REGISTER_v0.1.md",
+      "sha256": "eb78a18d34479bbefed3e7252393fcd0d94bdda62d9c51427780c959d5ab4557",
+      "bytes": 8301
+    },
+    {
+      "path": "docs/ARCHIVE_MASTER_GDD_v0.1.md",
+      "sha256": "349635c6e87d0d439e3c8d0b477e631f24df30a56943e6d03d2605c5c4efdcdb",
+      "bytes": 24402
+    },
+    {
+      "path": "docs/CITY_PROJECTS_v0.2.md",
+      "sha256": "7e2c83b28f954c7bc72bdc5bef7bdc28d813f5482a3ac2f7380b4443b12692e4",
+      "bytes": 8537
+    },
+    {
+      "path": "docs/CORE_AND_FIRST_LEVEL_v0.1.md",
+      "sha256": "66506dcba39329e8be5b369f713f9973b8d36ed58f42b00f2b11b219c1c733cc",
+      "bytes": 8497
+    },
+    {
+      "path": "docs/REQUIREMENTS.md",
+      "sha256": "bff88eb218c25065be28fa4aacb98cf1389578553c986ee4fe828999e99f569b",
+      "bytes": 12983
+    },
+    {
+      "path": "package.json",
+      "sha256": "fa2afaaf5ebb62cc71359dbf797960173a318634d9311877d41db8dca21fe2b7",
+      "bytes": 273
+    },
+    {
+      "path": "public/app.js",
+      "sha256": "4160e177b85319eba686855d83710fbed0b30846e55dd2b4111db37d9669213a",
+      "bytes": 28392
+    },
+    {
+      "path": "public/index.html",
+      "sha256": "5cc2d6c0751f3fdbaccf8c3f9f8878a29eda9c5e80bb26cc7d083cb85a4415c6",
+      "bytes": 7658
+    },
+    {
+      "path": "public/styles.css",
+      "sha256": "6aaf219be697aea5bc0b0264a6b3673f3ea2b963350879f046bc93adfd275e1e",
+      "bytes": 12022
+    },
+    {
+      "path": "references/01-first-scene.png",
+      "sha256": "16f1c5a8896757eb9945c420102bab0c075164a0ab75b45010b6bfecea0b3070",
+      "bytes": 2729647
+    },
+    {
+      "path": "references/02-gathering.png",
+      "sha256": "bbf189453094631627a338477ffb93b17f3f76ab0d4a11de7292299919e9b433",
+      "bytes": 2612576
+    },
+    {
+      "path": "references/03-building.png",
+      "sha256": "91cb7ee60df6564ef3e97bee2288b9ea3dd87682b949a34292e3275048bdd34a",
+      "bytes": 2527968
+    },
+    {
+      "path": "server.mjs",
+      "sha256": "21fa9269068edea52d5b7958946597246e9d10446971c04dd8854f12c1926b9b",
+      "bytes": 5394
+    },
+    {
+      "path": "test/integration.mjs",
+      "sha256": "0a73370a99ce7fb7d9869fb485bdff6acf98d3c8dd67e0cce107b8fa3ff94896",
+      "bytes": 6211
+    },
+    {
+      "path": "test/model.test.mjs",
+      "sha256": "d48be1512073519b6ffcf5de765327448bb4f2c4fe20a1f8c216cce2c94288ec",
+      "bytes": 8854
+    },
+    {
+      "path": "world.mjs",
+      "sha256": "65c9ab557347aa0862fa64898f7c2452fc9f1a47957b90ae0ee5cc694ba4df62",
+      "bytes": 13023
+    }
+  ]
+}

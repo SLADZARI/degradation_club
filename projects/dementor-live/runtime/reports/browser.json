@@ -1,0 +1,28 @@
+{
+  "scope": "two independent Chrome contexts; full resource/plot flow through UI; isolated fixtures only for focused hunger/race tests",
+  "checks": [
+    "two independent browser clients, distinct identities, shared visible positions",
+    "real UI movement, free tools, wood/stone extraction, changing durability/replacement, cargo, physical delivery and individual immediate pay",
+    "simultaneous final work: one payment and one stage completion",
+    "square completed, all materials consumed, two earned plot purchases, conserved money",
+    "local chat between real browser clients",
+    "actual browser reload retains identity, wallet and owned plot",
+    "both residents build forge through full UI resource chain; stages, consumed materials and single final payout",
+    "online hunger creates spirit; work rejected; self-recovery via actual bush UI",
+    "actual UI food assistance from other player",
+    "real client disconnect pauses hunger; reconnect resumes same identity",
+    "concurrent last physical resource across browser identities: no duplication (isolated fixture)",
+    "real keyboard movement cannot cross river at planned bridge",
+    "390px mobile UI renders and tool action works",
+    "actual server process restart retains completed project and both plot owners"
+  ],
+  "consoleErrors": [],
+  "networkErrors": [],
+  "screenshots": [
+    "dementor-live-ui.png",
+    "dementor-live-completed.png",
+    "dementor-live-forge.png",
+    "dementor-live-mobile.png"
+  ],
+  "pass": true
+}

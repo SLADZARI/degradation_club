@@ -1,0 +1,18 @@
+{
+  "scope": "two actual Chrome contexts, normal UI movement, funded reward and music; no wallet or teleport fixtures; isolated server upload and actual restart",
+  "checks": [
+    "both real residents walk to pedestal, submit ideas and receive 50 each from finite treasury; public answers visible",
+    "real non-silent MP3 decodes and plays in both browsers, same playback ID and position within 1.5s; second purchase disabled while busy",
+    "paid request visible to both; actual MP3 file upload persists in local catalog; byte-range streaming and unknown-path rejection",
+    "reload and actual server restart retain rewards, prevent repeat payout and preserve requests and uploaded MP3"
+  ],
+  "consoleErrors": [],
+  "networkErrors": [],
+  "screenshots": [
+    "dementor-live-monument.png",
+    "dementor-live-monument-mobile.png",
+    "dementor-live-jukebox.png",
+    "dementor-live-jukebox-mobile.png"
+  ],
+  "pass": true
+}

@@ -1,0 +1,12 @@
+{
+  "createdAt": "2026-10-18T10:51:12.238Z",
+  "runtimeHash": "8769a32aa70e8cf47d996135a83ff73366b3fddb4742fccee00727aa5dff6ae4",
+  "model": 44,
+  "httpSse": false,
+  "browser": true,
+  "scope": "visual-only paper-world restoration and distinct inventory seed icons; isolated camera-position fixture, desktop/mobile and console smoke. Backend unchanged; no full game or HTTP replay.",
+  "evidence": {
+    "visual": "reports/paper-visual.json"
+  },
+  "prior": "reports/release-prior-paper.json"
+}

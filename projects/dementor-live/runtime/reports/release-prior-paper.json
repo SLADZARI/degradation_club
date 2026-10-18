@@ -1,0 +1,20 @@
+{
+  "createdAt": "2026-10-18T10:00:02.125Z",
+  "runtimeHash": "69ef692333fdc9b1bfb04feb69e1c8b7d0fb1e4fb2d7583315ad05f18a306c98",
+  "hashScheme": "path + SHA256 per file, includes two original MP3 assets",
+  "model": 44,
+  "httpSse": true,
+  "browser": true,
+  "scope": "two independent Chrome contexts: funded monument answer, shared decoded MP3, request, actual upload and actual restart. No teleport or wallet fixtures. Not full regression of all previously built features.",
+  "evidence": {
+    "plaza": "reports/plaza.json",
+    "http": "reports/integration.json"
+  },
+  "notRerun": [
+    "full home loop",
+    "full inventory and city construction/warehouse regression",
+    "performance benchmark",
+    "two physical devices and speakers"
+  ],
+  "prior": "reports/release-prior-plaza.json"
+}

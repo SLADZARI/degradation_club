@@ -1,0 +1,21 @@
+{
+  "scope": "three real browser clients; plot ownership, money and initial materials seeded explicitly, not an earned-income proof; actual UI trade, farm and storage actions",
+  "checks": [
+    "three independent clients; sale UI, recipient consent and conserved money/items",
+    "gift and barter through UI including mobile recipient",
+    "city→plot→tent interior→plot via physical routes; three-stage tent and chest transfer UI",
+    "finite wild seed clearing, soil, sowing, physical water collection and use, real-clock growth (test clock advanced), harvest UI",
+    "three players share plot; unauthorized harvest posts one visible theft record; mobile 390px board",
+    "reload and actual server restart preserve scene, ownership, tent, harvest and theft"
+  ],
+  "consoleErrors": [],
+  "networkErrors": [],
+  "screenshots": [
+    "dementor-live-social-mobile.png",
+    "dementor-live-chest.png",
+    "dementor-live-garden.png",
+    "dementor-live-plot.png",
+    "dementor-live-thefts-mobile.png"
+  ],
+  "pass": true
+}

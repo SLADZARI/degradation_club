@@ -1,0 +1,17 @@
+{
+  "scope": "two browser clients; explicit initial wallet fixture for purchase test, real inventory/shop/movement/mining UI and server restart",
+  "checks": [
+    "compact emoji grid with separate functional navigation; selected resource actions",
+    "two purchased axes coexist, both charged once",
+    "switch, mine, independent wear, reload and actual restart",
+    "390px compact inventory without overflow"
+  ],
+  "consoleErrors": [],
+  "networkErrors": [],
+  "screenshots": [
+    "dementor-live-inventory.png",
+    "dementor-live-multiple-tools.png",
+    "dementor-live-inventory-mobile.png"
+  ],
+  "pass": true
+}

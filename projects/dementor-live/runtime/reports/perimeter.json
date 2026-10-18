@@ -1,0 +1,17 @@
+{
+  "scope": "two independent clients, fixture balances; actual trade/quickbar/private E actions and mobile layout",
+  "checks": [
+    "E mines private plot rock and gathers berries directly without dialog",
+    "nonmodal 294px backpack right under vitals",
+    "six slots assignment reload and Q physical drop",
+    "two clients consent and atomic item/money exchange",
+    "390px no overflow"
+  ],
+  "consoleErrors": [],
+  "networkErrors": [],
+  "screenshots": [
+    "dementor-live-perimeter-trade.png",
+    "dementor-live-perimeter-mobile.png"
+  ],
+  "pass": true
+}

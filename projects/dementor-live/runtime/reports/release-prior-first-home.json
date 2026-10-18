@@ -1,0 +1,28 @@
+{
+  "createdAt": "2026-10-17T21:31:44.416Z",
+  "runtimeHash": "464c18f0cde9783095560442843956a5849d1511a834310aa2a8ca4d2f29521f",
+  "modelTests": 26,
+  "browser": true,
+  "browserCheckGroups": 16,
+  "bridge": true,
+  "bridgeBrowserCheckGroups": 6,
+  "bridgeScope": "two browser clients build bridge, courier city stock and explore east bank via UI; initial seed completes only previous square/forge, no action fixtures",
+  "city": true,
+  "cityBrowserCheckGroups": 5,
+  "tools": true,
+  "toolsBrowserCheckGroups": 5,
+  "httpSse": true,
+  "httpScenarios": 12,
+  "performance": true,
+  "fullConstructionRegression": {
+    "status": "previous square/forge UI proof retained; bridge cycle seeded only those prior completed buildings",
+    "previousEvidence": {
+      "status": "NOT RERUN for this frontend interpolation/UI optimization",
+      "previousRuntimeHash": "6dfaebda129bec1a311e48502f2769f468b3528b5a8687095dcf7c6a711aecf2",
+      "previousCheckGroups": 14
+    }
+  },
+  "consoleErrors": 0,
+  "networkErrors": 0,
+  "scope": "full bridge UI cycle with two clients, courier supply, new-bank harvesting, return and restart; city/tools regressions, HTTP and smooth camera"
+}

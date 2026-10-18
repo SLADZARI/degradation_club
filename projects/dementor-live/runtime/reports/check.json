@@ -1,0 +1,151 @@
+{
+  "createdAt": "2026-10-18T11:30:46.947Z",
+  "scope": "this command runs syntax + model; HTTP/browser evidence comes from separately recorded matching-runtime runs",
+  "node": "v22.14.0",
+  "runtimeHash": "b57dd745dded9055d724ea906945ae30cb1388cf9528c8811e5f5ad2e5711211",
+  "steps": [
+    {
+      "kind": "syntax",
+      "file": "config.mjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "equipment.mjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "life.mjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "plaza.mjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "public/app.js",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "public/life-ui.js",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "public/plaza-ui.js",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "server.mjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "test/axonometry.cjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "test/bridge.cjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "test/browser.cjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "test/city.cjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "test/donations.cjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "test/integration.mjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "test/inventory.cjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "test/lan.cjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "test/life.cjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "test/life.test.mjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "test/model.test.mjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "test/performance.cjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "test/perimeter.cjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "test/plaza.cjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "test/plaza.test.mjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "test/tools.cjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "tools/pack.mjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "tools/workspace.mjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "world.mjs",
+      "pass": true
+    },
+    {
+      "kind": "model",
+      "pass": true
+    }
+  ],
+  "browser": "STALE",
+  "httpSse": "STALE",
+  "releaseEvidence": null,
+  "pass": true
+}

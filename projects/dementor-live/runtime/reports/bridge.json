@@ -1,0 +1,19 @@
+{
+  "scope": "two browser clients build bridge, courier city stock and explore east bank via UI; initial seed completes only previous square/forge, no action fixtures",
+  "checks": [
+    "unfinished bridge blocks actual keyboard crossing; project visible after forge",
+    "wood harvested and sold to city, reserved at board, physically carried from warehouse to bridge, paid only transport",
+    "both residents mine/deliver materials and complete three construction stages; concurrent final payment once, physical stock consumed",
+    "actual route crosses completed bridge for both clients; east wood, stone and renewable food are usable",
+    "new-bank resource physically carried back across bridge and sold; money conserved",
+    "390px crossing/navigation and real server restart preserve bridge and new-bank depletion"
+  ],
+  "consoleErrors": [],
+  "networkErrors": [],
+  "screenshots": [
+    "dementor-live-bridge-building.png",
+    "dementor-live-bridge-open.png",
+    "dementor-live-bridge-mobile.png"
+  ],
+  "pass": true
+}

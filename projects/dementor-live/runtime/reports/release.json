@@ -1,0 +1,18 @@
+{
+  "createdAt": "2026-10-18T11:09:36.412Z",
+  "runtimeHash": "f0305f0d28f318181d8e4ff6f98978b2c4459fe82902b0f0860dbb4d4d1c412f",
+  "model": 44,
+  "httpSse": true,
+  "browser": true,
+  "scope": "paper axonometry visual fixtures, physical theft-board navigation; focused real-browser plaza HTTP/SSE reward/MP3/upload/request/restart regression. Not full gameplay replay.",
+  "evidence": {
+    "axonometry": "reports/axonometry.json",
+    "plaza": "reports/plaza.json"
+  },
+  "notRerun": [
+    "separate twelve-case HTTP/SSE suite",
+    "full home/inventory/construction/warehouse regression",
+    "FPS benchmark"
+  ],
+  "prior": "reports/release-prior-axonometry.json"
+}

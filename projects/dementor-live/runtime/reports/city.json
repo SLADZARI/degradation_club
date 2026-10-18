@@ -1,0 +1,18 @@
+{
+  "scope": "warehouse, public drops, board and courier via two real LAN browser clients; normal server, no fixtures",
+  "checks": [
+    "wood harvested via UI, dropped inside a plot from backpack, picked up by other resident with conserved quantity",
+    "physical warehouse sale frees bag, pays lower price and creates shared city stock",
+    "board claim, warehouse collection, distinct city cargo survives reload, physical mayor delivery pays once",
+    "stone cargo occupies full 12 weight, cannot be discarded as personal stock, cancellation returns exact city materials without pay",
+    "real server restart retains warehouse, delivered city reserve and conserved treasury; 390px backpack UI"
+  ],
+  "consoleErrors": [],
+  "networkErrors": [],
+  "screenshots": [
+    "dementor-live-warehouse.png",
+    "dementor-live-jobs.png",
+    "dementor-live-backpack-mobile.png"
+  ],
+  "pass": true
+}

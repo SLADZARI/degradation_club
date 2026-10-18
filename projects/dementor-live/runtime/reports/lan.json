@@ -1,0 +1,12 @@
+{
+  "scope": "two browser contexts through real LAN IPv4 over plain HTTP; normal server, no fixtures",
+  "checks": [
+    "two distinct residents connected via LAN IPv4 in insecure HTTP browser context",
+    "both residents move, obtain tools, contribute construction work, mine and deliver materials; shared stage and chat",
+    "test endpoint unavailable and foreign origin rejected"
+  ],
+  "consoleErrors": [],
+  "networkErrors": [],
+  "screenshots": [],
+  "pass": true
+}

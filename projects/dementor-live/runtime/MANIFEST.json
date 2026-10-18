@@ -1,0 +1,757 @@
+{
+  "project": "Dementor Live local workspace",
+  "createdAt": "2026-10-18T11:30:54.279Z",
+  "checks": {
+    "createdAt": "2026-10-18T11:30:46.947Z",
+    "scope": "this command runs syntax + model; HTTP/browser evidence comes from separately recorded matching-runtime runs",
+    "node": "v22.14.0",
+    "runtimeHash": "b57dd745dded9055d724ea906945ae30cb1388cf9528c8811e5f5ad2e5711211",
+    "steps": [
+      {
+        "kind": "syntax",
+        "file": "config.mjs",
+        "pass": true
+      },
+      {
+        "kind": "syntax",
+        "file": "equipment.mjs",
+        "pass": true
+      },
+      {
+        "kind": "syntax",
+        "file": "life.mjs",
+        "pass": true
+      },
+      {
+        "kind": "syntax",
+        "file": "plaza.mjs",
+        "pass": true
+      },
+      {
+        "kind": "syntax",
+        "file": "public/app.js",
+        "pass": true
+      },
+      {
+        "kind": "syntax",
+        "file": "public/life-ui.js",
+        "pass": true
+      },
+      {
+        "kind": "syntax",
+        "file": "public/plaza-ui.js",
+        "pass": true
+      },
+      {
+        "kind": "syntax",
+        "file": "server.mjs",
+        "pass": true
+      },
+      {
+        "kind": "syntax",
+        "file": "test/axonometry.cjs",
+        "pass": true
+      },
+      {
+        "kind": "syntax",
+        "file": "test/bridge.cjs",
+        "pass": true
+      },
+      {
+        "kind": "syntax",
+        "file": "test/browser.cjs",
+        "pass": true
+      },
+      {
+        "kind": "syntax",
+        "file": "test/city.cjs",
+        "pass": true
+      },
+      {
+        "kind": "syntax",
+        "file": "test/donations.cjs",
+        "pass": true
+      },
+      {
+        "kind": "syntax",
+        "file": "test/integration.mjs",
+        "pass": true
+      },
+      {
+        "kind": "syntax",
+        "file": "test/inventory.cjs",
+        "pass": true
+      },
+      {
+        "kind": "syntax",
+        "file": "test/lan.cjs",
+        "pass": true
+      },
+      {
+        "kind": "syntax",
+        "file": "test/life.cjs",
+        "pass": true
+      },
+      {
+        "kind": "syntax",
+        "file": "test/life.test.mjs",
+        "pass": true
+      },
+      {
+        "kind": "syntax",
+        "file": "test/model.test.mjs",
+        "pass": true
+      },
+      {
+        "kind": "syntax",
+        "file": "test/performance.cjs",
+        "pass": true
+      },
+      {
+        "kind": "syntax",
+        "file": "test/perimeter.cjs",
+        "pass": true
+      },
+      {
+        "kind": "syntax",
+        "file": "test/plaza.cjs",
+        "pass": true
+      },
+      {
+        "kind": "syntax",
+        "file": "test/plaza.test.mjs",
+        "pass": true
+      },
+      {
+        "kind": "syntax",
+        "file": "test/tools.cjs",
+        "pass": true
+      },
+      {
+        "kind": "syntax",
+        "file": "tools/pack.mjs",
+        "pass": true
+      },
+      {
+        "kind": "syntax",
+        "file": "tools/workspace.mjs",
+        "pass": true
+      },
+      {
+        "kind": "syntax",
+        "file": "world.mjs",
+        "pass": true
+      },
+      {
+        "kind": "model",
+        "pass": true
+      }
+    ],
+    "browser": "STALE",
+    "httpSse": "STALE",
+    "releaseEvidence": null,
+    "pass": true
+  },
+  "files": [
+    {
+      "path": ".gitignore",
+      "bytes": 80,
+      "sha256": "55dbdf44334f1e9751a327c3b83166d00bf36db18620a7c9e062445b1aaa448c"
+    },
+    {
+      "path": "AGENTS.md",
+      "bytes": 5588,
+      "sha256": "038b4ea8a1457757cf589f4acc006e5ceeaea9c6c2894e5d80e399cda933717c"
+    },
+    {
+      "path": "CHECK.command",
+      "bytes": 288,
+      "sha256": "1495ca93b1846144c93414aa71474510079be8c3706f0b74eec4bc17196aa613"
+    },
+    {
+      "path": "CURRENT_STATE.md",
+      "bytes": 62962,
+      "sha256": "de13c4dd7d2209d3857571315ba01fa9f716d7e51a9bf577bfd4554f13c4b4d0"
+    },
+    {
+      "path": "HANDOFF.md",
+      "bytes": 17568,
+      "sha256": "63fa1a7fc6cc1448c8aa6b5c93afa485edd339941678b3f5543e509ce227115e"
+    },
+    {
+      "path": "NEXT_CHAT_PROMPT.md",
+      "bytes": 8250,
+      "sha256": "4b1842b46aa39b6dcff60e55667c7e82f8989178d6d41ac301d8ec1f3bb1f2ce"
+    },
+    {
+      "path": "README.md",
+      "bytes": 17724,
+      "sha256": "aa96623640b268a1c3a96c5442f42de827749768c592a385252d99bba212c9e3"
+    },
+    {
+      "path": "START.command",
+      "bytes": 322,
+      "sha256": "d17d79e189769706e63e2f1d7b66f04581101904662acc3617317d7f234af31f"
+    },
+    {
+      "path": "START_HERE.md",
+      "bytes": 18484,
+      "sha256": "fc5cf27938f7dadbdaa4e28f5419ad26d8e5ddb6b6b0c77daebbba3626e1ad92"
+    },
+    {
+      "path": "config.mjs",
+      "bytes": 1653,
+      "sha256": "30c84181c2365d6cd5bc0d55668eaa2602bcfb253ab4dcb4178025108905ea18"
+    },
+    {
+      "path": "docs/ARCHIVE_DECISION_REGISTER_v0.1.md",
+      "bytes": 8301,
+      "sha256": "eb78a18d34479bbefed3e7252393fcd0d94bdda62d9c51427780c959d5ab4557"
+    },
+    {
+      "path": "docs/ARCHIVE_MASTER_GDD_v0.1.md",
+      "bytes": 24402,
+      "sha256": "349635c6e87d0d439e3c8d0b477e631f24df30a56943e6d03d2605c5c4efdcdb"
+    },
+    {
+      "path": "docs/BRIDGE_AND_EXPLORATION.md",
+      "bytes": 6652,
+      "sha256": "c22a900dcc7c602d6a46e3108ad58f6bc769ed39478224fe043acbac065f8a2e"
+    },
+    {
+      "path": "docs/CITY_PROJECTS_v0.2.md",
+      "bytes": 8537,
+      "sha256": "7e2c83b28f954c7bc72bdc5bef7bdc28d813f5482a3ac2f7380b4443b12692e4"
+    },
+    {
+      "path": "docs/CITY_WAREHOUSE.md",
+      "bytes": 6008,
+      "sha256": "54ad28bf8f9d3ca20112757e18cbac0e53462118f191f1d96e721c0a6c68dd10"
+    },
+    {
+      "path": "docs/CORE_AND_FIRST_LEVEL_v0.1.md",
+      "bytes": 8497,
+      "sha256": "66506dcba39329e8be5b369f713f9973b8d36ed58f42b00f2b11b219c1c733cc"
+    },
+    {
+      "path": "docs/FIRST_HOME_PLAYABLE.md",
+      "bytes": 9461,
+      "sha256": "aee484c26ca58e450aed8bc37889be8a0a98a9bfaeb9c92a7ddf6bfa4fb4084c"
+    },
+    {
+      "path": "docs/HANDOFF_MANIFEST_2026-10-17.json",
+      "bytes": 3398,
+      "sha256": "8a7fa62dfb567aee897cfcdbdb1e032662745423e39abbec5ebce76edf81feee"
+    },
+    {
+      "path": "docs/PENDING_REMOTE_UPDATE.md",
+      "bytes": 5782,
+      "sha256": "2ace980562d7e3b969a8b2e7cec82ad228062e5fe75783310a1d5c0805db5dff"
+    },
+    {
+      "path": "docs/PERFORMANCE.md",
+      "bytes": 4881,
+      "sha256": "c00a9ae28481e544d35c21d5ef4c1095b2f049a154bacc2b79b836dfad8aeff1"
+    },
+    {
+      "path": "docs/PLAZA_OBJECTS.md",
+      "bytes": 6285,
+      "sha256": "ae559d5fa10a1fdb4339f6b8608f386c87a186953d6a6ec1cdb9d4d64ec906c0"
+    },
+    {
+      "path": "docs/RELEASE_2026-10-18_DONATIONS.md",
+      "bytes": 4463,
+      "sha256": "e68582237332c02e5487c56c7406ea2cab4817c3b3cb326e56e43ff749cd1d01"
+    },
+    {
+      "path": "docs/REQUIREMENTS.md",
+      "bytes": 13286,
+      "sha256": "0fedfaec66faf06531f3e30b044d0afdb2a3add4b410f00c8c16b69d4b4aaf4d"
+    },
+    {
+      "path": "docs/TOOLS_AND_CAMERA.md",
+      "bytes": 7418,
+      "sha256": "27a54858c23bef03ef23c2e71a32d36e4057be94acfd85e60c5bcb8ac6e1b63a"
+    },
+    {
+      "path": "docs/TOOLS_AND_SOURCES.md",
+      "bytes": 4680,
+      "sha256": "b05a0d949ea2ac7058ba2a9616d732555c886a3bd400d62da536b3f6b8071664"
+    },
+    {
+      "path": "docs/verification/completed-square.png",
+      "bytes": 111095,
+      "sha256": "b5e36378f145a02c81a1995e578c2940ea4d2fde0fb6e2e51966188c33b6179c"
+    },
+    {
+      "path": "docs/verification/dementor-live-axonometric-city.png",
+      "bytes": 152502,
+      "sha256": "e20ebc122602f31a408cb719a98fd98be48e927953a22a24100923e70bff001a"
+    },
+    {
+      "path": "docs/verification/dementor-live-axonometric-interior.png",
+      "bytes": 89113,
+      "sha256": "18a41638e2392ba553e5c85c471d08d8c7ea52af07ce6768fbe8ca57fd45f054"
+    },
+    {
+      "path": "docs/verification/dementor-live-axonometric-mobile.png",
+      "bytes": 84990,
+      "sha256": "a2e8ef60147c50c9f5a9a6f7b0fffaf2a8d58fe291e75e72f19d73e416b86517"
+    },
+    {
+      "path": "docs/verification/dementor-live-axonometric-plot.png",
+      "bytes": 111189,
+      "sha256": "731b87b6f44b681ce3771138122347036709c53985826e2add3831de54968fb1"
+    },
+    {
+      "path": "docs/verification/dementor-live-backpack-mobile.png",
+      "bytes": 74121,
+      "sha256": "a5e3af3402d3e7a05088c6479e6dcd2f423fcb2b75314d1b69ca8f19b6c18416"
+    },
+    {
+      "path": "docs/verification/dementor-live-bridge-building.png",
+      "bytes": 128042,
+      "sha256": "26d6085901cc5e22b3bb3cda72ddcac441631d370d401055576a162696776c01"
+    },
+    {
+      "path": "docs/verification/dementor-live-bridge-mobile.png",
+      "bytes": 65761,
+      "sha256": "7d7754bc0a660a86e006cea0104a42e441d44d2c2215fb609f77e94d7ab5db43"
+    },
+    {
+      "path": "docs/verification/dementor-live-bridge-open.png",
+      "bytes": 114956,
+      "sha256": "1b2d6ccef17227de76cc4b5104958774693a4e099501996bf5a58afb5ccdff3b"
+    },
+    {
+      "path": "docs/verification/dementor-live-chest.png",
+      "bytes": 129854,
+      "sha256": "244c7a22bd2e4582d261459f2dc5a374516f01ac4d3908bdca1467d924c6cbaa"
+    },
+    {
+      "path": "docs/verification/dementor-live-completed.png",
+      "bytes": 113322,
+      "sha256": "6177b22c1bb7723f21f13f86467cf004aa7724788a65c9562905b9178a184cb2"
+    },
+    {
+      "path": "docs/verification/dementor-live-forge-tools.png",
+      "bytes": 177319,
+      "sha256": "a31f2b2f932e7da8442b6f2eff57e8d772c57df0ac1fbef96965bf579182c7cd"
+    },
+    {
+      "path": "docs/verification/dementor-live-forge.png",
+      "bytes": 116602,
+      "sha256": "6b19c9ac6f6a0a206e95db151e06ea83af2c968328f117c45d30311dd9ccfa48"
+    },
+    {
+      "path": "docs/verification/dementor-live-garden.png",
+      "bytes": 130346,
+      "sha256": "f22a8ec19d3df0698dd6273c09f9413b3c64051ad61ec03a50ce09f13958dd45"
+    },
+    {
+      "path": "docs/verification/dementor-live-inventory-mobile.png",
+      "bytes": 84432,
+      "sha256": "1db19d908956e72834205bb09163845343756ede7f27368900461384810c855b"
+    },
+    {
+      "path": "docs/verification/dementor-live-inventory.png",
+      "bytes": 178487,
+      "sha256": "2b58f7ea37bb2b0417e797d2e1bcd7b84199b8a4606361daeb0b7a95bdc74ba6"
+    },
+    {
+      "path": "docs/verification/dementor-live-jobs.png",
+      "bytes": 177309,
+      "sha256": "d84068fde0114326675613bcecb226d9ffc0e9659f0ab5a776b109a99fe32c2b"
+    },
+    {
+      "path": "docs/verification/dementor-live-jukebox-mobile.png",
+      "bytes": 80380,
+      "sha256": "84ef63151b7a5361cb913a8c5bcd84ec611391d415007390175ba4c56c3555e9"
+    },
+    {
+      "path": "docs/verification/dementor-live-jukebox.png",
+      "bytes": 186544,
+      "sha256": "5e71594fadacc5e011b2a7dcffd8f05f6642108ff8fc39dc07d9c9b60eb0273f"
+    },
+    {
+      "path": "docs/verification/dementor-live-mobile.png",
+      "bytes": 72101,
+      "sha256": "5dd67d6c054e342336b9c9c8015a71b841eec65ddca71ca29118990495edb039"
+    },
+    {
+      "path": "docs/verification/dementor-live-monument-mobile.png",
+      "bytes": 90242,
+      "sha256": "efdf93380bb90fdfba524c9c358dc04d0ec1cb91346ff760f9f641a41e5dcd65"
+    },
+    {
+      "path": "docs/verification/dementor-live-monument.png",
+      "bytes": 165911,
+      "sha256": "deba03d4f757d1bc18cb42072367415186023e8ce736293c713cd1c073739835"
+    },
+    {
+      "path": "docs/verification/dementor-live-multiple-tools.png",
+      "bytes": 175407,
+      "sha256": "ac8a760f6f3573aea7519ea08c22242d0e2b00e508e07391ce973a50f57ce75a"
+    },
+    {
+      "path": "docs/verification/dementor-live-paper-inventory.png",
+      "bytes": 176276,
+      "sha256": "39205458493a368b9c1e77075254c71d77c9b160805cf852a5bd992cd3fa661a"
+    },
+    {
+      "path": "docs/verification/dementor-live-paper-world-mobile.png",
+      "bytes": 74846,
+      "sha256": "b078595ae69b6051e8f537d94742468186696d4e3b6573a949443f398585b4bf"
+    },
+    {
+      "path": "docs/verification/dementor-live-paper-world.png",
+      "bytes": 133226,
+      "sha256": "a618a5a67e13aca92398b6c582fd1cacb05226c4675d39483db1aac30256108b"
+    },
+    {
+      "path": "docs/verification/dementor-live-plot.png",
+      "bytes": 96595,
+      "sha256": "d4abe67976214223bf2f092530c3e1e55449c9b4a0c7dfb11c7adb8df5f0b0b2"
+    },
+    {
+      "path": "docs/verification/dementor-live-social-mobile.png",
+      "bytes": 58713,
+      "sha256": "39f0cbe89a25447f1f3031986f8125f7d0356f15d5835a5b607ae9bf4bc81c59"
+    },
+    {
+      "path": "docs/verification/dementor-live-theft-board.png",
+      "bytes": 201502,
+      "sha256": "6964931dc47217b0292df6392869aa7f60262933e9e8fa364e84b78477aa91bc"
+    },
+    {
+      "path": "docs/verification/dementor-live-thefts-mobile.png",
+      "bytes": 90197,
+      "sha256": "e3308442691db494fe9b73f47d773cb22a385ea16f092e93a33492c5059f3f2d"
+    },
+    {
+      "path": "docs/verification/dementor-live-tool-shop-mobile.png",
+      "bytes": 89536,
+      "sha256": "650e44c576e152562d3eb90371e43fd70bf103e72f07cac3c08401cad3b80f1f"
+    },
+    {
+      "path": "docs/verification/dementor-live-tool-shop.png",
+      "bytes": 198501,
+      "sha256": "025eb38de0cff78cdb4a10e0bfa317a9ccfebf94bf31480e2e4e57d5e071730b"
+    },
+    {
+      "path": "docs/verification/dementor-live-ui.png",
+      "bytes": 111060,
+      "sha256": "36129cf3b957ffa7896a3203b4db50792b34872b3ab275109731f178570a5037"
+    },
+    {
+      "path": "docs/verification/dementor-live-warehouse.png",
+      "bytes": 178758,
+      "sha256": "08e2c2c15e973f7d50a9dad7166261e50932fb51f8f898d13cf7ce2806cb2045"
+    },
+    {
+      "path": "docs/verification/first-scene.png",
+      "bytes": 110665,
+      "sha256": "ffcc01c782cd9d652a2c1df3cb3edee2158277b23c32357714914d197d886ea3"
+    },
+    {
+      "path": "docs/verification/mobile.png",
+      "bytes": 66889,
+      "sha256": "afbf6ed2cc01e1b846e5d1baa9406ef6fde23ef63e05e6687bf9693bc484bc2b"
+    },
+    {
+      "path": "equipment.mjs",
+      "bytes": 1829,
+      "sha256": "4e26bb335c07c906559030f77bfbbcb581d253555f25469dac8495e57cb9344d"
+    },
+    {
+      "path": "life.mjs",
+      "bytes": 15363,
+      "sha256": "d12f82ce065898b08c3e9759e8aa51ba52e134017b020bb2f7f0055e299731b7"
+    },
+    {
+      "path": "package.json",
+      "bytes": 1050,
+      "sha256": "2376966b590b156bea731beac744f3b9ae4e72c71d3e9c62f6c59cb523f5986b"
+    },
+    {
+      "path": "plaza.mjs",
+      "bytes": 7861,
+      "sha256": "156c1442fca0c6ad133061f55722a3979212ed613cea144878b823b6e94ce3e2"
+    },
+    {
+      "path": "public/app.js",
+      "bytes": 61607,
+      "sha256": "b12111a28c98d057f2ba2a33487cd6d6fa360883feb0faea474992d76d140bad"
+    },
+    {
+      "path": "public/index.html",
+      "bytes": 9740,
+      "sha256": "1d7459342869802efc812f6668c2d3a406cb95e71eaf785191170b2096a7150b"
+    },
+    {
+      "path": "public/life-ui.js",
+      "bytes": 21198,
+      "sha256": "c63858300468419e6f475fb59d4c0a919c4b4c17a46d981e1fdf6cd8ec44ca98"
+    },
+    {
+      "path": "public/music/paper-morning.mp3",
+      "bytes": 192470,
+      "sha256": "ab440899f5cba6e1d6bc3e4ca4d1de051b6f35544c78cb6e1b083fa20ffba3b0"
+    },
+    {
+      "path": "public/music/town-evening.mp3",
+      "bytes": 192470,
+      "sha256": "65729e48c6cab418b67c8aa3ecc037478577a23d9e986ea18e2524ed79fa857f"
+    },
+    {
+      "path": "public/plaza-ui.js",
+      "bytes": 10332,
+      "sha256": "2d8fb7a5548c8b9e1d3f2d8dc3f3114c239d43a493bcce343e23fbf7c2f9b76a"
+    },
+    {
+      "path": "public/styles.css",
+      "bytes": 20807,
+      "sha256": "0d1a79943122a5a4f7c6faf5b75c5a1159d88f5b088f276782447fd6ab228c32"
+    },
+    {
+      "path": "references/01-first-scene.png",
+      "bytes": 2729647,
+      "sha256": "16f1c5a8896757eb9945c420102bab0c075164a0ab75b45010b6bfecea0b3070"
+    },
+    {
+      "path": "references/02-gathering.png",
+      "bytes": 2612576,
+      "sha256": "bbf189453094631627a338477ffb93b17f3f76ab0d4a11de7292299919e9b433"
+    },
+    {
+      "path": "references/03-building.png",
+      "bytes": 2527968,
+      "sha256": "91cb7ee60df6564ef3e97bee2288b9ea3dd87682b949a34292e3275048bdd34a"
+    },
+    {
+      "path": "reports/axonometry.json",
+      "bytes": 762,
+      "sha256": "0fcbad9c8032cd8a5f3dcedbc0c2dde21c968abefe45121bec695c2272ac65f7"
+    },
+    {
+      "path": "reports/bridge.json",
+      "bytes": 1035,
+      "sha256": "834edbcf2feecc4355c60f4ce39bec4efe037e517a10ae6f59d05c3efa6ba71b"
+    },
+    {
+      "path": "reports/browser.json",
+      "bytes": 1514,
+      "sha256": "96818b736c5e16c62da8bc794b826d24523dd5a76ed4d39ac3776cc10c8da2ee"
+    },
+    {
+      "path": "reports/check.json",
+      "bytes": 2839,
+      "sha256": "22d7a955f80c993c2dae834059ce31049ae45be9fca0dc1ffdcd0594af345008"
+    },
+    {
+      "path": "reports/check.log",
+      "bytes": 10778,
+      "sha256": "873f79427c706663ffe702a08f02b3ece09737d14b8fc00176ea76dfabef043c"
+    },
+    {
+      "path": "reports/city.json",
+      "bytes": 899,
+      "sha256": "b33e19ff7be1387a702be764191ac56136d78c1fc511ad72c90a6c1fc183d211"
+    },
+    {
+      "path": "reports/donations.json",
+      "bytes": 428,
+      "sha256": "7f5d4cb63f54c840bef2b843fea51eb10e9c0f9ee742ab9f838c5f3548a27e67"
+    },
+    {
+      "path": "reports/integration.json",
+      "bytes": 209,
+      "sha256": "3182239b069acb6b94f35e08615eae2e1f82ed22355c64da386a2abd373ed4d8"
+    },
+    {
+      "path": "reports/inventory.json",
+      "bytes": 622,
+      "sha256": "58234d52a3abd3715828b7c0f4e47ca84d3c972b79ebb05201a9387a5ccf9147"
+    },
+    {
+      "path": "reports/lan.json",
+      "bytes": 474,
+      "sha256": "f1df8225731dd475e3ce3fbb636c6341116d8688e54a559d485aaa306ee09d78"
+    },
+    {
+      "path": "reports/life.json",
+      "bytes": 1033,
+      "sha256": "1e6272c743a52eade5620b0818c6a75f39aa65b6eed0857184dc9da2fe362e59"
+    },
+    {
+      "path": "reports/paper-visual.json",
+      "bytes": 335,
+      "sha256": "a0438bc61d35ea8692cdf6e37bd707449495182f7097e0756a1b42877ab4e35f"
+    },
+    {
+      "path": "reports/performance-after.json",
+      "bytes": 232,
+      "sha256": "7516bfb2089a210a4feaa51a3de234a84a8a139c3ea56ec65b0c419e9b4f7fc9"
+    },
+    {
+      "path": "reports/performance-before.json",
+      "bytes": 224,
+      "sha256": "e1185295ebec693c5b6fbc5e58ed7584b4b86173c4a1ac6c97368578a21d48a8"
+    },
+    {
+      "path": "reports/perimeter.json",
+      "bytes": 568,
+      "sha256": "62bcff55733a953fd8774d86c3b5df3106a22443c9d4b931230f1b0a4db8da38"
+    },
+    {
+      "path": "reports/plaza.json",
+      "bytes": 932,
+      "sha256": "bc3ba7124ff982044d99d236380c0537b85365657885f063d20e7e743b136314"
+    },
+    {
+      "path": "reports/release-prior-axonometry.json",
+      "bytes": 496,
+      "sha256": "b2438c2b13ab442e552302659a9beb95b7454db9290b1afd054ee8afe6e16a9f"
+    },
+    {
+      "path": "reports/release-prior-bridge.json",
+      "bytes": 890,
+      "sha256": "6d6c083a30319c846dd3f259e3e58e622aa69b97c946555a9949c4e9f64f59bd"
+    },
+    {
+      "path": "reports/release-prior-first-home.json",
+      "bytes": 1176,
+      "sha256": "f8d44d0a6676a14db49786c90936db466dc5c72c63d8950f6379380fa476b38f"
+    },
+    {
+      "path": "reports/release-prior-inventory.json",
+      "bytes": 934,
+      "sha256": "17e61fe832e13ca20d316457aef9aa34bb417be6d65164838f56558f05e233bf"
+    },
+    {
+      "path": "reports/release-prior-paper.json",
+      "bytes": 799,
+      "sha256": "63c384e5df5cd2c89222550ace351d333650d83f11306a181803fa6e6d55408c"
+    },
+    {
+      "path": "reports/release-prior-performance.json",
+      "bytes": 607,
+      "sha256": "da2234509b359c7f7891dcb6444f410ae162dc0d4b03ccb1321641bf61cc6160"
+    },
+    {
+      "path": "reports/release-prior-plaza.json",
+      "bytes": 657,
+      "sha256": "b4b0776653e3866b17fd7f88a775c80394f5f393006faf444dd1837bcac7eb80"
+    },
+    {
+      "path": "reports/release.json",
+      "bytes": 670,
+      "sha256": "cfd96a33ce479207a2e8a2503de7de5e0ac408ca9b59da73a7686ed98a383899"
+    },
+    {
+      "path": "reports/tools.json",
+      "bytes": 874,
+      "sha256": "e6b1fc426c987ffcf0191a96fbc0872d97eb67c1279d47b2331c97bc050446bc"
+    },
+    {
+      "path": "server.mjs",
+      "bytes": 9260,
+      "sha256": "b4b861cf4dc831f7364a4e9e2731e22fbf9bb34059c1a63753402347613d07b3"
+    },
+    {
+      "path": "test/axonometry.cjs",
+      "bytes": 8940,
+      "sha256": "c5ebbc4f55da5c7fa9d95e96ad94b9f37f81b3e3fb0311468c86059cbb8b7c06"
+    },
+    {
+      "path": "test/bridge.cjs",
+      "bytes": 11270,
+      "sha256": "5b3fcd5a4d68bc397ef80d9bb22d308ee8ac9d11a360a7f5fa9fb04206bd2a97"
+    },
+    {
+      "path": "test/browser.cjs",
+      "bytes": 12241,
+      "sha256": "56e702acc3eddd14a081525923f62e7a250d6121a2420acbbbc2628761875d4d"
+    },
+    {
+      "path": "test/city.cjs",
+      "bytes": 10269,
+      "sha256": "4bdf1308852182dc2f99dcb662a611849a58735a8b3512f69deab094eec714ce"
+    },
+    {
+      "path": "test/donations.cjs",
+      "bytes": 8118,
+      "sha256": "2100ff7ad4dcfa71491697934ba0c07dd63d734dbd5cf733532a59e4d21e73b5"
+    },
+    {
+      "path": "test/integration.mjs",
+      "bytes": 8695,
+      "sha256": "1a7d456d43cef5305f93144a5b5b776445b2d29f9f5aaae47a7acee095c60ca7"
+    },
+    {
+      "path": "test/inventory.cjs",
+      "bytes": 9334,
+      "sha256": "37264d6d75df024466a258cfe21ef2fb2c1dabd55759178218fdc52e98a8ac4f"
+    },
+    {
+      "path": "test/lan.cjs",
+      "bytes": 7244,
+      "sha256": "768ebc617763e8f2040e81725a000d313c14b1b2a65617efe15a7c67ad3467d6"
+    },
+    {
+      "path": "test/life.cjs",
+      "bytes": 13714,
+      "sha256": "29ccc363065eebe71271c46a538ae3a4b6517bb762eb1e6cdf08ea754bf8c977"
+    },
+    {
+      "path": "test/life.test.mjs",
+      "bytes": 8503,
+      "sha256": "49aa81874236b68b3eeb2376635a60bc5b05654d88c930459620c44aa44422af"
+    },
+    {
+      "path": "test/model.test.mjs",
+      "bytes": 20876,
+      "sha256": "82b92338d049af22ee9f4aaa10d8643a0cab0764356375707d53f8e71a356c9f"
+    },
+    {
+      "path": "test/performance.cjs",
+      "bytes": 8304,
+      "sha256": "113019082c5207641d1ab8326794052541cb933330402b5cc8588d1f09bb0121"
+    },
+    {
+      "path": "test/perimeter.cjs",
+      "bytes": 10068,
+      "sha256": "34913d0114950121d378ad4124245c368f86717122c676816794bcb627a9e454"
+    },
+    {
+      "path": "test/plaza.cjs",
+      "bytes": 11720,
+      "sha256": "826f66c2d644db2b5de5165a1e708649fb0dba493788d2c501caa4708ba7fd85"
+    },
+    {
+      "path": "test/plaza.test.mjs",
+      "bytes": 5588,
+      "sha256": "df43ceb180230a5e6c568ec2abfebf7bce2011c2919d3936ea456872284cfc40"
+    },
+    {
+      "path": "test/tools.cjs",
+      "bytes": 9104,
+      "sha256": "7db62f6fccf86c0168d8bd6cb0fdbd462f6ece601495ffc12f53eaa0fc82cbdb"
+    },
+    {
+      "path": "tools/pack.mjs",
+      "bytes": 3465,
+      "sha256": "4680a7559df03b09c1e0609a40344e002479d927993d83905a6a97c69b87e0af"
+    },
+    {
+      "path": "tools/workspace.mjs",
+      "bytes": 4665,
+      "sha256": "6fe2f262df27cef71a3c88227b648e6105a29a7d0b982e31ad74a71c1938359d"
+    },
+    {
+      "path": "world.mjs",
+      "bytes": 26178,
+      "sha256": "25b641ef60e6de99e06ec85170a10ddc09646fce025061f7ea3172470dbfe970"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "createdAt": "2026-10-17T21:03:03.909Z",
+  "runtimeHash": "6dfaebda129bec1a311e48502f2769f468b3528b5a8687095dcf7c6a711aecf2",
+  "modelTests": 23,
+  "browser": true,
+  "browserCheckGroups": 14,
+  "httpSse": true,
+  "httpScenarios": 12,
+  "lan": true,
+  "lanCheckGroups": 3,
+  "city": true,
+  "cityBrowserCheckGroups": 5,
+  "tools": true,
+  "toolsBrowserCheckGroups": 5,
+  "consoleErrors": 0,
+  "networkErrors": 0,
+  "scope": "full construction regression with permanent follow and places navigation; LAN warehouse/courier; focused fixture-backed tool manufacturing, premium purchase, wear and restart"
+}
