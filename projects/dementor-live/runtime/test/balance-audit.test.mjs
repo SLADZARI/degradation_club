@@ -156,11 +156,18 @@ test('P0: a crafted tool carries its mineral recipe into tools and scrap without
 
 test('P0: seed shop delivery, completed works and payouts conserve both materials and PAPER',()=>{
   const g=new Game(createWorld()),p=g.join('Строитель');g.connect(p);
-  p.bag.wood=8;p.bag.stone=6;
-  const startingMaterials=totals(g),startingMoney=g.state.treasury+p.wallet;
+  p.bag.wood=8;p.bag.stone=0; // cargo 8/12; no impossible initial fixture
+  const startingMoney=g.state.treasury+p.wallet;
   at(g,p,'seed-shop-drop');
-  const supply=issue(g,p,'deliver','seed-shop-drop',{},'seed-supply');
-  assert.equal(supply.ok,true,JSON.stringify(supply));
+  const woodBefore=totals(g);
+  const wood=issue(g,p,'deliver','seed-shop-drop',{},'seed-wood-supply');
+  assert.equal(wood.ok,true,JSON.stringify(wood));
+  assert.deepEqual(totals(g),woodBefore);
+  assert.equal(g.state.treasury+p.wallet,startingMoney);
+  p.bag.stone=6; // second legitimate trip: cargo 12/12
+  const startingMaterials=totals(g);
+  const stone=issue(g,p,'deliver','seed-shop-drop',{},'seed-stone-supply');
+  assert.equal(stone.ok,true,JSON.stringify(stone));
   assert.deepEqual(totals(g),startingMaterials);
   assert.equal(g.state.treasury+p.wallet,startingMoney);
   at(g,p,'seed-shop-build');
