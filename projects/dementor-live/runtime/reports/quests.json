@@ -1,0 +1,17 @@
+{
+  "scope": "actual quest list and home action progression with isolated position/material fixtures and accelerated growth clock",
+  "checks": [
+    "city/plot/interior context and next objective persists across SSE",
+    "clear/tent/interior/chest/garden/sow/water/grow/harvest UI statuses",
+    "one-time milestones survive harvest reset, reload and actual restart",
+    "390px list no horizontal overflow"
+  ],
+  "consoleErrors": [],
+  "networkErrors": [],
+  "screenshots": [
+    "dementor-live-quests-plot.png",
+    "dementor-live-quests-growing.png",
+    "dementor-live-quests-mobile.png"
+  ],
+  "pass": true
+}

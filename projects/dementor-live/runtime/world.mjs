@@ -37,7 +37,7 @@ export class Game {
   connect(p){this.online.add(p.id);this.inputs.set(p.id,{dx:0,dy:0,sprint:false,at:this.now});this.changed();}
   disconnect(p){this.online.delete(p.id);this.inputs.delete(p.id);p.job=null;this.changed();}
   rects(){return [{x:4,y:4,w:4,h:3}];}
-  walkable(x,y,p=null){if(p&&scene(p)!=='city'){if(x<.5||y<.5||x>15.5||y>15.5)return false;const h=this.state.plots.find(l=>l.id===p.plotId)?.home;if(scene(p)==='plot'&&h?.nodes.some(n=>n.left>0&&Math.hypot(x-n.x,y-n.y)<.58))return false;return true;}const r=.3,c=this.c;if(x<r||y<r||x>c.width-r||y>c.height-r)return false;
+  walkable(x,y,p=null){if(p&&scene(p)!=='city'){if(x<.5||y<.5||x>15.5||y>15.5)return false;const h=scene(p)==='expedition'?this.state.expedition.home:this.state.plots.find(l=>l.id===p.plotId)?.home;if(['plot','expedition'].includes(scene(p))&&h?.nodes.some(n=>n.left>0&&Math.hypot(x-n.x,y-n.y)<.58))return false;return true;}const r=.3,c=this.c;if(x<r||y<r||x>c.width-r||y>c.height-r)return false;
     if(x+r>c.river.x&&x-r<c.river.x+c.river.w&&!(this.state.bridge.stage>=c.bridge.stages.length&&y-r>=c.bridge.y&&y+r<=c.bridge.y+c.bridge.h))return false;
     if(this.rects().some(o=>x+r>o.x&&x-r<o.x+o.w&&y+r>o.y&&y-r<o.y+o.h))return false;
     return !this.state.resources.some(o=>o.stock>0&&o.type!=='food'&&Math.hypot(x-o.x,y-o.y)<.58);
@@ -111,7 +111,7 @@ export class Game {
     p.delivery=null;return {message:'Заказ отменён. Городской груз остаётся на складе.'};
   }
   configFor(target){return target?.startsWith('bridge-')?{...this.c,...this.c.bridge}:target?.startsWith('forge-')?{...this.c,...this.c.forge}:this.c;}
-  target(id){const po=PLAZA.objects.find(o=>o.id===id);if(po)return po;const s=this.state;if(id==='bridge-drop')return {id,x:32.5,y:12.3,type:'project'};if(id==='bridge-build')return {id,x:32,y:13.5,type:'build'};if(id==='east-bank')return {id,x:40,y:13.5,type:'explore'};if(id==='forge-drop')return {id,x:24.5,y:24,type:'project'};if(id==='forge-build')return {id,x:27,y:26,type:'build'};if(id==='tools')return {id,x:9,y:6,type:'tools'};if(id==='project')return {id,x:15,y:11,type:'project'};if(id==='build')return {id,x:18,y:14,type:'build'};
+  target(id){if(id==='frontier-gate')return this.c.expedition.gate;const po=PLAZA.objects.find(o=>o.id===id);if(po)return po;const s=this.state;if(id==='bridge-drop')return {id,x:32.5,y:12.3,type:'project'};if(id==='bridge-build')return {id,x:32,y:13.5,type:'build'};if(id==='east-bank')return {id,x:40,y:13.5,type:'explore'};if(id==='forge-drop')return {id,x:24.5,y:24,type:'project'};if(id==='forge-build')return {id,x:27,y:26,type:'build'};if(id==='tools')return {id,x:9,y:6,type:'tools'};if(id==='project')return {id,x:15,y:11,type:'project'};if(id==='build')return {id,x:18,y:14,type:'build'};
     if(id==='forge-use')return {id,type:'forge',x:27,y:29.5};if(id==='tool-shop')return {id,type:'shop',x:24,y:3};
     if(id==='warehouse')return {id,type:'warehouse',x:12,y:24};if(id==='board')return {id,type:'board',x:3.2,y:8};if(id==='mayor')return {id,type:'mayor',x:9,y:3};
     const pile=s.drops.find(d=>d.id===id);if(pile)return pile;
@@ -181,7 +181,7 @@ export class Game {
       if(t.type!=='build')throw Error('Подойди к месту строительных работ');this.canBuild(target);if(s.treasury<c.pay.work)throw Error('Нет резерва оплаты');return this.start(p,'build',target,c.buildMs);
     }
     if(type==='buy'){
-      if(t.type!=='plot')throw Error('Это не участок');const plot=s.plots.find(x=>x.id===target);if(plot.owner)throw Error('Участок уже куплен');if(s.plots.some(x=>x.owner===p.id))throw Error('В первой сцене можно купить один участок');if(p.wallet<c.plotPrice)throw Error(`Участок стоит ${c.plotPrice} PAPER`);
+      if(t.type!=='plot')throw Error('Это не участок');const plot=s.plots.find(x=>x.id===target);if(plot.locked)throw Error('Завершите миссию расчистки, чтобы открыть этот участок');if(plot.owner)throw Error('Участок уже куплен');if(s.plots.some(x=>x.owner===p.id))throw Error('В первой сцене можно купить один участок');if(p.wallet<c.plotPrice)throw Error(`Участок стоит ${c.plotPrice} PAPER`);
       p.wallet-=c.plotPrice;s.treasury+=c.plotPrice;plot.owner=p.id;s.transactions.push({id:randomUUID(),player:p.id,amount:-c.plotPrice,reason:'plot',time:this.now});return {message:'Твоё место в городе. Участок куплен!'};
     }
     throw Error('Неизвестное действие');

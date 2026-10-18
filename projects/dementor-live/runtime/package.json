@@ -1,6 +1,6 @@
 {
   "name": "dementor-live-local-slice",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -20,6 +20,9 @@
     "test:life": "node test/life.cjs",
     "test:inventory": "node test/inventory.cjs",
     "test:plaza": "node test/plaza.cjs",
+    "test:expansion": "node test/expansion.cjs",
+    "test:compact-panels": "node test/compact-panels.cjs",
+    "test:quests": "node test/quests.cjs",
     "test:donations": "node test/donations.cjs",
     "test:perimeter": "node test/perimeter.cjs",
     "test:axonometry": "node test/axonometry.cjs"

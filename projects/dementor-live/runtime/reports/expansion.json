@@ -1,0 +1,17 @@
+{
+  "scope": "two independent clients: shared expedition through actual E controls, fixture tools/positions, finite materials, unlock and real restart",
+  "checks": [
+    "64x40 town, 8 plots including two locked frontier plots",
+    "both clients enter same mission through gate E",
+    "cooperative finite clearing and shared plot unlock",
+    "return retains materials and restart retains cleared zone/unlocked plots"
+  ],
+  "consoleErrors": [],
+  "networkErrors": [],
+  "screenshots": [
+    "dementor-live-expedition-start.png",
+    "dementor-live-expedition-complete.png",
+    "dementor-live-expanded-town.png"
+  ],
+  "pass": true
+}

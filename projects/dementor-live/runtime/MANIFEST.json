@@ -1,11 +1,11 @@
 {
   "project": "Dementor Live local workspace",
-  "createdAt": "2026-10-18T11:30:54.279Z",
+  "createdAt": "2026-10-18T12:02:27.305Z",
   "checks": {
-    "createdAt": "2026-10-18T11:30:46.947Z",
+    "createdAt": "2026-10-18T12:01:49.268Z",
     "scope": "this command runs syntax + model; HTTP/browser evidence comes from separately recorded matching-runtime runs",
     "node": "v22.14.0",
-    "runtimeHash": "b57dd745dded9055d724ea906945ae30cb1388cf9528c8811e5f5ad2e5711211",
+    "runtimeHash": "57167374ea9828cf7c7977dda1afa36823392e7acd6acb857c788a1fc07bc248",
     "steps": [
       {
         "kind": "syntax",
@@ -69,7 +69,17 @@
       },
       {
         "kind": "syntax",
+        "file": "test/compact-panels.cjs",
+        "pass": true
+      },
+      {
+        "kind": "syntax",
         "file": "test/donations.cjs",
+        "pass": true
+      },
+      {
+        "kind": "syntax",
+        "file": "test/expansion.cjs",
         "pass": true
       },
       {
@@ -124,6 +134,11 @@
       },
       {
         "kind": "syntax",
+        "file": "test/quests.cjs",
+        "pass": true
+      },
+      {
+        "kind": "syntax",
         "file": "test/tools.cjs",
         "pass": true
       },
@@ -170,8 +185,8 @@
     },
     {
       "path": "CURRENT_STATE.md",
-      "bytes": 62962,
-      "sha256": "de13c4dd7d2209d3857571315ba01fa9f716d7e51a9bf577bfd4554f13c4b4d0"
+      "bytes": 74949,
+      "sha256": "239f2857d4b746227d36a6e98e8b59ff936a254b42ee63214583378b17a265c7"
     },
     {
       "path": "HANDOFF.md",
@@ -180,13 +195,13 @@
     },
     {
       "path": "NEXT_CHAT_PROMPT.md",
-      "bytes": 8250,
-      "sha256": "4b1842b46aa39b6dcff60e55667c7e82f8989178d6d41ac301d8ec1f3bb1f2ce"
+      "bytes": 2233,
+      "sha256": "a4dd418459c086c499a93658354346c1b4eea9d1f80476c38a7ad917968ab154"
     },
     {
       "path": "README.md",
-      "bytes": 17724,
-      "sha256": "aa96623640b268a1c3a96c5442f42de827749768c592a385252d99bba212c9e3"
+      "bytes": 2259,
+      "sha256": "6b2b94445f2d6419114a195b8eac74209c83991012b9c7b38ac45163b81f6b8b"
     },
     {
       "path": "START.command",
@@ -195,13 +210,13 @@
     },
     {
       "path": "START_HERE.md",
-      "bytes": 18484,
-      "sha256": "fc5cf27938f7dadbdaa4e28f5419ad26d8e5ddb6b6b0c77daebbba3626e1ad92"
+      "bytes": 3660,
+      "sha256": "2164127e0b9bb41febc8c09009fa01ea559a3f6e0ccfe4ead45f9844b73408b4"
     },
     {
       "path": "config.mjs",
-      "bytes": 1653,
-      "sha256": "30c84181c2365d6cd5bc0d55668eaa2602bcfb253ab4dcb4178025108905ea18"
+      "bytes": 1721,
+      "sha256": "e243c1bfa969d949eeef520e1e7232b4b9eeb53a225e938874a7993d6ceed372"
     },
     {
       "path": "docs/ARCHIVE_DECISION_REGISTER_v0.1.md",
@@ -259,14 +274,19 @@
       "sha256": "ae559d5fa10a1fdb4339f6b8608f386c87a186953d6a6ec1cdb9d4d64ec906c0"
     },
     {
+      "path": "docs/RELEASE_0.2.0.md",
+      "bytes": 7157,
+      "sha256": "6b3d0b62af2320fbff7ea8ec9ef3770551782d58d457d4e67a1b8ca4f6fb11a2"
+    },
+    {
       "path": "docs/RELEASE_2026-10-18_DONATIONS.md",
       "bytes": 4463,
       "sha256": "e68582237332c02e5487c56c7406ea2cab4817c3b3cb326e56e43ff749cd1d01"
     },
     {
       "path": "docs/REQUIREMENTS.md",
-      "bytes": 13286,
-      "sha256": "0fedfaec66faf06531f3e30b044d0afdb2a3add4b410f00c8c16b69d4b4aaf4d"
+      "bytes": 13519,
+      "sha256": "3fac973d896aa197e3602878f7658085cb632ee8acc96a5795d2cb078093c34f"
     },
     {
       "path": "docs/TOOLS_AND_CAMERA.md",
@@ -329,9 +349,34 @@
       "sha256": "244c7a22bd2e4582d261459f2dc5a374516f01ac4d3908bdca1467d924c6cbaa"
     },
     {
+      "path": "docs/verification/dementor-live-compact-places-mobile.png",
+      "bytes": 96896,
+      "sha256": "4016648a6982b0b1e82ea05328094324b2ce325cc07ce872f1bde23146a1ab71"
+    },
+    {
+      "path": "docs/verification/dementor-live-compact-places.png",
+      "bytes": 165456,
+      "sha256": "e5f1509a1f7fa9c192ffbb8426fc15899d0292cf398e0a5064875cfb18f76ef5"
+    },
+    {
       "path": "docs/verification/dementor-live-completed.png",
       "bytes": 113322,
       "sha256": "6177b22c1bb7723f21f13f86467cf004aa7724788a65c9562905b9178a184cb2"
+    },
+    {
+      "path": "docs/verification/dementor-live-expanded-town.png",
+      "bytes": 154374,
+      "sha256": "1d5397967f8c10dba103c26840159490b7c829523412e364c4e699c07d441dcd"
+    },
+    {
+      "path": "docs/verification/dementor-live-expedition-complete.png",
+      "bytes": 109021,
+      "sha256": "5fdb36840f9208db6ae1584e5dcc87bde2581d16c4d3072833bcf83b68be9063"
+    },
+    {
+      "path": "docs/verification/dementor-live-expedition-start.png",
+      "bytes": 123038,
+      "sha256": "f48bf63f95aec08177f6a46051b0250ca622c12a99484d7e422d726b0677b446"
     },
     {
       "path": "docs/verification/dementor-live-forge-tools.png",
@@ -414,6 +459,21 @@
       "sha256": "d4abe67976214223bf2f092530c3e1e55449c9b4a0c7dfb11c7adb8df5f0b0b2"
     },
     {
+      "path": "docs/verification/dementor-live-quests-growing.png",
+      "bytes": 134011,
+      "sha256": "30c317f579ab28416205bf03f191a4f7a6550e50404596b33713d7602dc47d82"
+    },
+    {
+      "path": "docs/verification/dementor-live-quests-mobile.png",
+      "bytes": 93756,
+      "sha256": "befa3b676c8cfa1b64064681f2a34540e8c405b0cb2b3acb8357c0ed81c19f15"
+    },
+    {
+      "path": "docs/verification/dementor-live-quests-plot.png",
+      "bytes": 133735,
+      "sha256": "e2a6b7d15f62f9cba893a51176e3f4f416a676cb3c3cf051df9ff9649e4fc397"
+    },
+    {
       "path": "docs/verification/dementor-live-social-mobile.png",
       "bytes": 58713,
       "sha256": "39f0cbe89a25447f1f3031986f8125f7d0356f15d5835a5b607ae9bf4bc81c59"
@@ -465,13 +525,13 @@
     },
     {
       "path": "life.mjs",
-      "bytes": 15363,
-      "sha256": "d12f82ce065898b08c3e9759e8aa51ba52e134017b020bb2f7f0055e299731b7"
+      "bytes": 17978,
+      "sha256": "0ca9d3895261f24d5246c806fbe3f6ca8696160efc9baaa4e61d797f08921540"
     },
     {
       "path": "package.json",
-      "bytes": 1050,
-      "sha256": "2376966b590b156bea731beac744f3b9ae4e72c71d3e9c62f6c59cb523f5986b"
+      "bytes": 1201,
+      "sha256": "aae3540dcf64640c883ca9aba0d7bcc98e9c8b664b1fed35a059644696746b94"
     },
     {
       "path": "plaza.mjs",
@@ -480,18 +540,18 @@
     },
     {
       "path": "public/app.js",
-      "bytes": 61607,
-      "sha256": "b12111a28c98d057f2ba2a33487cd6d6fa360883feb0faea474992d76d140bad"
+      "bytes": 68661,
+      "sha256": "fa613bbd485b9c55efbd9a36d1502fb6ff56fcdb44e36174f00c85af7b32198c"
     },
     {
       "path": "public/index.html",
-      "bytes": 9740,
-      "sha256": "1d7459342869802efc812f6668c2d3a406cb95e71eaf785191170b2096a7150b"
+      "bytes": 10134,
+      "sha256": "c398d2b66887b6ace96c7228a2905ab7971b856a0c48c81a7e53e725416c1e5e"
     },
     {
       "path": "public/life-ui.js",
-      "bytes": 21198,
-      "sha256": "c63858300468419e6f475fb59d4c0a919c4b4c17a46d981e1fdf6cd8ec44ca98"
+      "bytes": 31938,
+      "sha256": "6822af31e2a768753a502457fe39e93254b526ec2ccb427f333e77d05d580146"
     },
     {
       "path": "public/music/paper-morning.mp3",
@@ -510,8 +570,8 @@
     },
     {
       "path": "public/styles.css",
-      "bytes": 20807,
-      "sha256": "0d1a79943122a5a4f7c6faf5b75c5a1159d88f5b088f276782447fd6ab228c32"
+      "bytes": 25705,
+      "sha256": "7c14dc76a97455c25386343b23b90d7eb6981788838f9e7cf8997c988eacb097"
     },
     {
       "path": "references/01-first-scene.png",
@@ -545,13 +605,13 @@
     },
     {
       "path": "reports/check.json",
-      "bytes": 2839,
-      "sha256": "22d7a955f80c993c2dae834059ce31049ae45be9fca0dc1ffdcd0594af345008"
+      "bytes": 3117,
+      "sha256": "63749156b42a4ff26731935cc2f7939a30a1a49b0e5a62cf54ac278e1b786f75"
     },
     {
       "path": "reports/check.log",
-      "bytes": 10778,
-      "sha256": "873f79427c706663ffe702a08f02b3ece09737d14b8fc00176ea76dfabef043c"
+      "bytes": 11604,
+      "sha256": "45a5b4568b04c76bcee9288a50de668afcf4af5c615e9e08e5056e26517b2b08"
     },
     {
       "path": "reports/city.json",
@@ -559,14 +619,24 @@
       "sha256": "b33e19ff7be1387a702be764191ac56136d78c1fc511ad72c90a6c1fc183d211"
     },
     {
+      "path": "reports/compact-panels.json",
+      "bytes": 489,
+      "sha256": "0e550f1aad15fc0575b57eef1954f035e4d06cbceaa111518ceaa56d2ae3cd91"
+    },
+    {
       "path": "reports/donations.json",
       "bytes": 428,
       "sha256": "7f5d4cb63f54c840bef2b843fea51eb10e9c0f9ee742ab9f838c5f3548a27e67"
     },
     {
+      "path": "reports/expansion.json",
+      "bytes": 637,
+      "sha256": "a01423c7cd069c6608826ce63b155d459b35c771113a5457d2a29ef4a7a52bed"
+    },
+    {
       "path": "reports/integration.json",
       "bytes": 209,
-      "sha256": "3182239b069acb6b94f35e08615eae2e1f82ed22355c64da386a2abd373ed4d8"
+      "sha256": "3da7740eefc89c840116f3409d4ef809d2eaf638c7d9c6a25654eb3dc31e8282"
     },
     {
       "path": "reports/inventory.json",
@@ -607,6 +677,11 @@
       "path": "reports/plaza.json",
       "bytes": 932,
       "sha256": "bc3ba7124ff982044d99d236380c0537b85365657885f063d20e7e743b136314"
+    },
+    {
+      "path": "reports/quests.json",
+      "bytes": 616,
+      "sha256": "5b6d7dc07e74b60108162d159292c387fc1e3e1bfcd8fc4ef2e3fb5930a40191"
     },
     {
       "path": "reports/release-prior-axonometry.json",
@@ -656,7 +731,7 @@
     {
       "path": "server.mjs",
       "bytes": 9260,
-      "sha256": "b4b861cf4dc831f7364a4e9e2731e22fbf9bb34059c1a63753402347613d07b3"
+      "sha256": "dc340403b171441f4ece5e68791d53a515a796b9c76297a361a62f675c844232"
     },
     {
       "path": "test/axonometry.cjs",
@@ -679,9 +754,19 @@
       "sha256": "4bdf1308852182dc2f99dcb662a611849a58735a8b3512f69deab094eec714ce"
     },
     {
+      "path": "test/compact-panels.cjs",
+      "bytes": 8805,
+      "sha256": "9c045d0d6dadb74d8d13ff0884566ba34e7765e0bc5f3ae97f08a3e109720660"
+    },
+    {
       "path": "test/donations.cjs",
       "bytes": 8118,
       "sha256": "2100ff7ad4dcfa71491697934ba0c07dd63d734dbd5cf733532a59e4d21e73b5"
+    },
+    {
+      "path": "test/expansion.cjs",
+      "bytes": 8989,
+      "sha256": "ddf70da5cccaa766adb693695091880220c4fc04f55be025a5bfc7c9e8324f07"
     },
     {
       "path": "test/integration.mjs",
@@ -705,8 +790,8 @@
     },
     {
       "path": "test/life.test.mjs",
-      "bytes": 8503,
-      "sha256": "49aa81874236b68b3eeb2376635a60bc5b05654d88c930459620c44aa44422af"
+      "bytes": 11863,
+      "sha256": "0492fdcc3e087fc4c493757a5b450d24f650dcdaa5ea914079cfa5cf1dac5e0a"
     },
     {
       "path": "test/model.test.mjs",
@@ -720,8 +805,8 @@
     },
     {
       "path": "test/perimeter.cjs",
-      "bytes": 10068,
-      "sha256": "34913d0114950121d378ad4124245c368f86717122c676816794bcb627a9e454"
+      "bytes": 10093,
+      "sha256": "c012fd6c6d6543439cc77a61d15e09edf18a26dc59106209a4b5bf624beb793e"
     },
     {
       "path": "test/plaza.cjs",
@@ -732,6 +817,11 @@
       "path": "test/plaza.test.mjs",
       "bytes": 5588,
       "sha256": "df43ceb180230a5e6c568ec2abfebf7bce2011c2919d3936ea456872284cfc40"
+    },
+    {
+      "path": "test/quests.cjs",
+      "bytes": 9781,
+      "sha256": "9d99a14efee844786d4ead6eb3eaeda539d4ee8e2e02038033b915b772146b5b"
     },
     {
       "path": "test/tools.cjs",
@@ -750,8 +840,8 @@
     },
     {
       "path": "world.mjs",
-      "bytes": 26178,
-      "sha256": "25b641ef60e6de99e06ec85170a10ddc09646fce025061f7ea3172470dbfe970"
+      "bytes": 26438,
+      "sha256": "71f411c666c6084ce8e7d664ede215de3da4ac055dedcb3b6ad493fd00a8dfb4"
     }
   ]
 }

@@ -1,0 +1,16 @@
+{
+  "scope": "desktop/mobile real compact quest and places UI",
+  "checks": [
+    "quest toggle and saved collapse after reload",
+    "right-aligned arrow route buttons and paper object thumbnails",
+    "fixed title and close during body scroll, close operable",
+    "390px no page or panel horizontal overflow"
+  ],
+  "consoleErrors": [],
+  "networkErrors": [],
+  "screenshots": [
+    "dementor-live-compact-places.png",
+    "dementor-live-compact-places-mobile.png"
+  ],
+  "pass": true
+}

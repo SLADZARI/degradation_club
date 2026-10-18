@@ -71,15 +71,64 @@ function lifePanel(mode,rows,row,canAct){
 function drawHome(time){
  const h=state.home;groundRect({x:0,y:0,w:16,h:16},state.scene==='interior'?'#e2d5b9':'#e4e7cf','#929c7b');
  for(let x=0;x<=16;x++){const a=screen(x,0),b=screen(x,16);line(a.x,a.y,b.x,b.y,'#a1a58630');}for(let y=0;y<=16;y++){const a=screen(0,y),b=screen(16,y);line(a.x,a.y,b.x,b.y,'#a1a58630');}
- if(state.scene==='plot'){
-  label('Участок · '+(state.players.find(p=>p.id===h.owner)?.name||'житель'),8,1);
+ if(['plot','expedition'].includes(state.scene)){
+  label(state.scene==='expedition'?'Общая миссия · расчистка':'Участок · '+(state.players.find(p=>p.id===h.owner)?.name||'житель'),8,1);
   for(const n of h.nodes){if(!n.left&&!['wood','stone'].includes(n.kind))continue;const o={...n,stock:n.left};if(n.kind==='wood')drawTree(o);else if(n.kind==='stone')drawStone(o);else {drawFood(o);label(n.kind==='food'?'Дикие ягоды':names[n.kind],n.x,n.y+1,true);}}
   if(h.tent)paperTent({x:6,y:5,w:4,h:3},h.tent);
-  const water=screen(14,3);paperBox(water.x-view.s*.28,water.y-view.s*.45,view.s*.55,view.s*.45,view.s*.25,-view.s*.16,'#b9aa88','#948566','#d9ceb0');poly([[water.x-view.s*.18,water.y-view.s*.42],[water.x+view.s*.2,water.y-view.s*.42],[water.x+view.s*.4,water.y-view.s*.55],[water.x,water.y-view.s*.55]],'#9fb7ad','#7c9489');
+  if(state.scene!=='expedition'){const water=screen(14,3);paperBox(water.x-view.s*.28,water.y-view.s*.45,view.s*.55,view.s*.45,view.s*.25,-view.s*.16,'#b9aa88','#948566','#d9ceb0');poly([[water.x-view.s*.18,water.y-view.s*.42],[water.x+view.s*.2,water.y-view.s*.42],[water.x+view.s*.4,water.y-view.s*.55],[water.x,water.y-view.s*.55]],'#9fb7ad','#7c9489');}
   for(const b of h.beds){groundRect({x:b.x-.6,y:b.y-.6,w:1.2,h:1.2},'#b7a083','#8f8066');if(b.crop){const q=screen(b.x,b.y),ripe=b.watered&&state.now>=b.readyAt;const k=view.s*(ripe?.25:.13);if(b.crop==='carrot'){poly([[q.x-k*.5,q.y-k],[q.x+k*.5,q.y-k],[q.x,q.y+k]],'#c89362','#9a7857');poly([[q.x,q.y-k],[q.x-k,q.y-k*2],[q.x,q.y-k*1.7],[q.x+k,q.y-k*2]],'#8fa476','#73886a');}else{for(const side of [-1,1]){poly([[q.x,q.y],[q.x+side*k,q.y-k],[q.x+side*k*.9,q.y-k*1.7],[q.x,q.y-k*.8]],side<0?'#8ba678':'#a4b58c','#708966');}line(q.x,q.y,q.x,q.y-k*2,'#718466',1.5);}}label(b.crop?b.seedPlant?'На семена':b.watered?(state.now>=b.readyAt?'Созрело':'Растёт'):'Полей':'Грядка',b.x,b.y+1,true);}
  }else {const s=view.s,c=screen(3,5.5),b=screen(9,6);paperBox(c.x,c.y-s*.7,s*1.65,s*.7,s*.35,-s*.24,'#b29a75','#907d60','#d2bd96');line(c.x+s*.8,c.y-s*.7,c.x+s*.8,c.y,'#81765e',2);paperBox(b.x,b.y-s*.35,s*1.7,s*.35,s*.55,-s*.38,'#d1c7b1','#a99e86','#eee6d2');paperBox(b.x+s*.13,b.y-s*.5,s*.7,s*.15,s*.25,-s*.17,'#eee9d8','#bdb59e','#faf3df');label('Сундук',4,6,true);label('Кровать',10,7,true);}
- for(const t of state.homeTargets.filter(t=>['plot-exit','home-exit','tent','well','garden'].includes(t.id)))label(t.title,t.x,t.y,true);
+ for(const t of state.homeTargets.filter(t=>['mission-exit','plot-exit','home-exit','tent','well','garden'].includes(t.id)))label(t.title,t.x,t.y,true);
  for(const d of state.drops)label(`${names[d.kind]} × ${d.quantity}`,d.x,d.y,true);
  for(const p of state.players.filter(p=>(p.online||p.id===me.id)&&sameScene(p)))drawPlayer(p,time);
  if(context){const q=screen(context.x,context.y);ctx.beginPath();ctx.ellipse(q.x,q.y+4,view.s*.7,view.s*.25,0,0,Math.PI*2);ctx.strokeStyle='#829569';ctx.stroke();}
+}
+
+let questListSignature='';
+function questObjectives(){
+ const tasks=[],add=(id,title,done,hint,target,extra={})=>tasks.push({id,title,done:!!done,hint,target,...extra});
+ const ownPlot=state.plots.find(p=>p.owner===me.id),h=state.home,home=state.scene!=='city',mine=home&&h?.owner===me.id;
+ if(me.spirit)add('recover','Вернуть тело',false,'Подойди к ягодам или попроси соседа накормить',home?(state.scene==='expedition'?'mission-exit':state.scene==='interior'?'home-exit':'plot-exit'):state.resources.find(r=>r.type==='food'&&r.stock)?.id,{priority:true});
+ else if(me.hunger<state.config.slowBelow)add('food','Поесть',false,me.bag.food||me.bag.carrot?'F — съесть еду из рюкзака':'Найди куст с ягодами',home?(state.scene==='interior'?'home-exit':h.nodes.find(n=>n.kind==='food'&&n.left)?.id):state.resources.find(r=>r.type==='food'&&r.stock)?.id,{priority:true});
+ if(state.scene==='expedition'){for(const n of h.nodes.filter(n=>['wood','stone'].includes(n.kind)))add(n.id,(n.kind==='wood'?'Расчистить дерево':'Расчистить камень'),n.left===0,`${n.initial-n.left}/${n.initial} собрано · нужен ${n.kind==='wood'?'топор':'кирка'}`,n.id);add('return','Вернуться в город',false,state.expedition.completedAt?'Два новых участка открыты':'Можно вернуться, разгрузиться и продолжить','mission-exit',{optional:!state.expedition.completedAt});return {title:state.expedition.completedAt?'Новая территория открыта':'Расчистка новой земли',category:'ОБЩАЯ МИССИЯ',tasks};}
+ if(home&&!mine){add('guest','В гостях',false,'Чужой урожай — только с разрешения хозяина',state.scene==='interior'?'home-exit':'plot-exit');return {title:'Гостевой участок',category:'ГОСТИ',tasks};}
+ if(mine){
+  const m=h.progress||{},harvested=!!m.harvested||h.log.some(e=>e.actor===me.id&&!e.theft),sown=harvested||m.sown||h.beds.some(b=>b.crop),watered=harvested||m.watered||h.beds.some(b=>b.watered),ripe=h.beds.find(b=>b.crop&&b.watered&&state.now>=b.readyAt),growing=h.beds.find(b=>b.crop&&b.watered),bed=h.beds.find(b=>!b.crop),dry=h.beds.find(b=>b.crop&&!b.watered),planted=h.beds.some(b=>b.crop);
+  const via=id=>state.homeTargets.some(t=>t.id===id)?id:state.scene==='interior'?'home-exit':id==='chest'?'tent':id;
+  const obstacle=h.nodes.find(n=>n.left&&Math.hypot(n.x-6,n.y-10)<1.5),source=obstacle||h.nodes.find(n=>n.left&&['wood','stone'].includes(n.kind)),hasTools=me.toolItems.some(t=>t.durability>0);
+  add('tools','Подготовить инструмент',hasTools,'Топор — дерево, кирка — камень',via('plot-exit'));
+  add('clear','Начать расчистку участка',m.cleared||h.tent>0||h.beds.length>0||h.nodes.some(n=>n.left<({wood:12,stone:8,food:6}[n.kind]||4)),'Подойди к ресурсу · E — добыть',via(source?.id||'garden'));
+  add('tent-stock','Собрать материалы палатки',h.tent>0,`🪵 ${Math.min(6,me.bag.wood)}/6 · 🪨 ${Math.min(2,me.bag.stone)}/2`,via(h.nodes.find(n=>n.left&&n.kind===(me.bag.wood<6?'wood':'stone'))?.id||'tent'),{ready:me.bag.wood>=6&&me.bag.stone>=2});
+  if(h.tent===0&&me.bag.wood>=6&&me.bag.stone>=2)tasks.at(-1).done=true;
+  add('tent','Построить палатку',h.tent>=3,`${h.tent}/3 · каркас → крыша → закрепить`,via('tent'));
+  add('interior','Зайти в свой дом',m.entered||state.scene==='interior', 'Вход в готовую палатку · E',via('tent'));
+  add('garden','Подготовить первую грядку',h.beds.length>0,obstacle?'Сначала расчисти место первой грядки':'Огород · подготовить грядку',via(obstacle?.id||'garden'));
+  add('sow','Посеять первую культуру',sown,me.bag.seed_carrot||me.bag.seed_hemp?'Выбери морковь или коноплю на пустой грядке':'Собери дикие семена на участке',via(me.bag.seed_carrot||me.bag.seed_hemp?bed?.id||'garden':h.nodes.find(n=>n.kind.startsWith('seed_')&&n.left)?.id||'plot-exit'));
+  add('water','Полить посев',watered,me.bag.water>=2?'Полей посев · нужно 2 л':`Набери воду: ${Math.min(2,me.bag.water)}/2 л`,via(me.bag.water>=2?dry?.id||'garden':'well'));
+  const remaining=growing?Math.max(0,Math.ceil((growing.readyAt-state.now)/1000)):0;
+  add('grow','Дождаться урожая',harvested||!!ripe,growing?remaining?`Растёт · ещё ${Math.floor(remaining/60)}:${String(remaining%60).padStart(2,'0')}`:'Урожай созрел':'Рост начнётся после посева и полива',via(growing?.id||'garden'),{waiting:!!growing&&!ripe&&!harvested});
+  add('harvest','Собрать первый урожай',harvested,ripe?'Урожай готов — подойди к грядке':'Собери созревшую культуру',via(ripe?.id||'garden'));
+  add('store','Убрать вещи в сундук',m.stored||Object.values(h.chest||{}).some(n=>n>0),'Личный сундук внутри палатки',via('chest'),{optional:true});
+  return {title:tasks.filter(t=>!t.optional&&!t.priority).every(t=>t.done)?'Участок обустроен':'Первый дом и огород',category:'ТВОЙ УЧАСТОК',tasks};
+ }
+ if(me.delivery){const d=me.delivery;add('delivery','Твой курьерский заказ',false,d.picked?`Доставь ${d.quantity} · ${names[d.kind]} → ${deliveryLabel(d)}`:`Забери ${d.quantity} · ${names[d.kind]} на складе`,d.picked?deliveryTarget(d):'warehouse',{priority:true});}
+ add('tools','Получить инструменты',me.toolItems.length>0,'Бесплатный топор и кирка у мэрии','tools');
+ for(const [id,title,project,c,drop,build,available]of [['square','Городская площадь',state.project,state.config,'project','build',true],['forge','Общественная кузница',state.forge,{...state.config,...state.config.forge},'forge-drop','forge-build',forgeActive()],['bridge','Мост на другой берег',state.bridge,{...state.config,...state.config.bridge},'bridge-drop','bridge-build',bridgeActive()]]){
+  if(!available)continue;const complete=project.stage>=c.stages.length;
+  add(id+'-wood',title+' · древесина',project.accepted.wood>=c.need.wood,`🪵 ${project.accepted.wood}/${c.need.wood} принято`,me.bag.wood?drop:state.resources.find(r=>r.type==='wood'&&r.stock)?.id,{ready:!complete&&c.stages[project.stage].wood>project.stock.wood});
+  add(id+'-stone',title+' · камень',project.accepted.stone>=c.need.stone,`🪨 ${project.accepted.stone}/${c.need.stone} принято`,me.bag.stone?drop:state.resources.find(r=>r.type==='stone'&&r.stock)?.id,{ready:!complete&&c.stages[project.stage].stone>project.stock.stone});
+  add(id+'-build',title+' · строительство',complete,complete?'Готово для жителей':`${c.stages[project.stage].title}: ${project.work}/${c.stages[project.stage].works} работ`,build,{ready:!complete&&projectReady(project,c)});
+ }
+ add('land','Свой участок',!!ownPlot,ownPlot?'Участок куплен':`${me.wallet}/${state.config.plotPrice} PAPER · заработай на городских работах`,ownPlot?.id||state.plots.find(p=>!p.owner&&!p.locked)?.id);
+ if(ownPlot)add('home','Обустроить свой участок',false,'Зайди на участок — там расчистка, палатка и огород',ownPlot.id,{priority:true});
+ if(!me.delivery)for(const offer of state.courierOffers)add('courier-'+offer.kind+'-'+offer.destination,'Курьерская доставка',false,`${offer.quantity} · ${names[offer.kind]} → ${deliveryLabel(offer)} · +${offer.reward} PAPER`,'board',{optional:true});
+ add('frontier','Открыть новую территорию',!!state.expedition.completedAt,`${state.expedition.total-state.expedition.remaining}/${state.expedition.total} · выход на юге города`,'frontier-gate',{optional:true});
+ add('work-board','Другие работы мэрии',false,'Все текущие предложения и условия','board',{optional:true});
+ return {title:'Общий город и свой дом',category:'ТВОИ ЗАДАНИЯ',tasks};
+}
+function updateQuestTracker(){
+ const data=questObjectives(),tasks=data.tasks,active=tasks.find(t=>!t.done&&t.priority)||tasks.find(t=>t.id==='tools'&&!t.done)||tasks.find(t=>!t.done&&!t.optional&&t.ready)||tasks.find(t=>!t.done&&!t.optional),core=tasks.filter(t=>!t.optional&&!t.priority),done=core.filter(t=>t.done).length;
+ const signature=JSON.stringify([data,active?.id]);
+ $('questCategory').textContent=data.category;document.querySelector('#quest h1').textContent=data.title;$('task').textContent=active?'→ '+active.title+' · '+active.hint:'Основные этапы выполнены. Развивай участок и помогай городу.';$('projectPercent').textContent=`${done}/${core.length}`;$('projectBar').style.width=(core.length?done/core.length*100:0)+'%';$('stageTitle').textContent='✓ Выполнено · → Сейчас · ○ Дальше';
+ if(signature===questListSignature)return;questListSignature=signature;const list=$('questList');list.replaceChildren();const visible=[...(active?[active]:[]),...tasks.filter(t=>t!==active&&!t.done),...tasks.filter(t=>t.done)];for(const t of visible){const li=document.createElement('li'),button=document.createElement('button'),title=document.createElement('b'),hint=document.createElement('small');li.dataset.quest=t.id;li.className=(t.done?'done':t.id===active?.id?'active':t.optional?'optional':'pending');title.textContent=(t.done?'✓ ':t.id===active?.id?'→ ':'○ ')+t.title;hint.textContent=t.done?'Выполнено':t.waiting?t.hint:t.optional?'Дополнительно · '+t.hint:t.id===active?.id?'Сейчас · '+t.hint:t.hint;button.append(title,hint);button.disabled=!t.target||t.done;button.onclick=()=>{if(t.target)navigateTo(t.target);};button.title=t.done?'Выполнено':'Показать путь к заданию';if(t.id===active?.id)button.setAttribute('aria-current','step');li.append(button);list.append(li);}
 }

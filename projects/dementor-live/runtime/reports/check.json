@@ -1,8 +1,8 @@
 {
-  "createdAt": "2026-10-18T11:30:46.947Z",
+  "createdAt": "2026-10-18T12:01:49.268Z",
   "scope": "this command runs syntax + model; HTTP/browser evidence comes from separately recorded matching-runtime runs",
   "node": "v22.14.0",
-  "runtimeHash": "b57dd745dded9055d724ea906945ae30cb1388cf9528c8811e5f5ad2e5711211",
+  "runtimeHash": "57167374ea9828cf7c7977dda1afa36823392e7acd6acb857c788a1fc07bc248",
   "steps": [
     {
       "kind": "syntax",
@@ -66,7 +66,17 @@
     },
     {
       "kind": "syntax",
+      "file": "test/compact-panels.cjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
       "file": "test/donations.cjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "test/expansion.cjs",
       "pass": true
     },
     {
@@ -117,6 +127,11 @@
     {
       "kind": "syntax",
       "file": "test/plaza.test.mjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "test/quests.cjs",
       "pass": true
     },
     {

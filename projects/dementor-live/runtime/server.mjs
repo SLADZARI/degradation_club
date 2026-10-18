@@ -33,7 +33,7 @@ const server=http.createServer(async(req,res)=>{
     if(!allowedHosts.has(req.headers.host)|| (req.headers.origin&&req.headers.origin!==`http://${req.headers.host}`)){json(res,403,{ok:false,message:'Открой игру по адресу этого сервера'});return;}
     res.setHeader('X-Content-Type-Options','nosniff');
     if(url.pathname==='/favicon.ico'){res.writeHead(204);res.end();return;}
-    if(url.pathname==='/api/health'){json(res,200,{ok:true,version:'0.1.0',testMode});return;}
+    if(url.pathname==='/api/health'){json(res,200,{ok:true,version:'0.2.0',testMode});return;}
     if(testMode&&url.pathname==='/__test'&&req.method==='POST'){
       if(req.headers['x-test-key']!=='local-integration-tests'){json(res,403,{ok:false});return;}
       const data=await body(req);
