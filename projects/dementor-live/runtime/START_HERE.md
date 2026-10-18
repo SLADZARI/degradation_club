@@ -1,6 +1,6 @@
 # Dementor Live 0.2.1 — продолжить отсюда
 
-Работающий локальный проект; набор отдельного серверного запуска подготовлен, установка на VM пока не выполнена. Сначала прочитать CURRENT_STATE.md и AGENTS.md; последние правила — docs/RELEASE_0.2.1.md. История и согласованное ядро: docs/CORE_AND_FIRST_LEVEL_v0.1.md, docs/REQUIREMENTS.md.
+Рабочий локальный проект и отдельная серверная версия 0.2.1. Перед продолжением прочитать CURRENT_STATE.md, AGENTS.md и docs/DEPLOYMENT_2026-10-18.md; последние правила — docs/RELEASE_0.2.1.md. История и согласованное ядро: docs/CORE_AND_FIRST_LEVEL_v0.1.md, docs/REQUIREMENTS.md.
 
 ## Запуск и игра вдвоём
 
