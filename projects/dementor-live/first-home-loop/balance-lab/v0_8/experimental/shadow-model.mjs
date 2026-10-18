@@ -314,7 +314,7 @@ export function step(s){
 }
 export function simulate(options={}){
   const {days=30,...rest}=options;
-  required(Number.isInteger(days)&&days>=1&&days<=180,'projection days must be 1..180');
+  required(Number.isInteger(days)&&days>=1&&days<=365,'projection days must be 1..365');
   const s=initialState(rest);
   check(s);
   for(let i=0;i<days;i++)step(s);
