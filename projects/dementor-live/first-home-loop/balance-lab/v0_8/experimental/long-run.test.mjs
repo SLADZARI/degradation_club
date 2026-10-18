@@ -20,7 +20,7 @@ for(const policy of ['upkeep','needs-growth'])
       assert.ok(m.money.city>=0,'municipality has taken unbacked debt');
     });
    }
-test('yearly policy stress: city's 90-day financing cannot be extrapolated indefinitely',()=>{
+test("yearly policy stress: city's 90-day financing cannot be extrapolated indefinitely",()=>{
   const q=metrics(simulate({policy:'needs-growth',environment:'normal',agents:3,days:360}));
   const early=metrics(simulate({policy:'needs-growth',environment:'normal',agents:3,days:90}));
   assert.ok(q.money.city<early.money.city,'finite municipal treasury should trend downward with paid recurring events');
