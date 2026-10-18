@@ -35,6 +35,21 @@ const activityContrast=SETTINGS.activityProfiles.map(activity=>{
   const m=records.find(r=>r.policy==='needs-growth'&&r.environment==='normal'&&r.agents===3&&r.projectionDays===90&&r.activity===activity);
   return {activity,mealNeeds:m.food.mealNeeds,unmet:m.food.unmet,eaten:m.food.eaten,cityOrders:m.demand.posted,cityOrdersFilled:m.demand.filled};
 });
+const longTerm=[];
+for(const policy of ['upkeep','needs-growth'])
+ for(const environment of ['normal','dry','treasury'])
+  for(const agents of [3,5])
+   for(const days of [180,360]){
+     const m=metrics(simulate({policy,environment,agents,days,activity:'daily'}));
+     longTerm.push({
+       policy,environment,agents,days,finalDay:m.day,
+       treasury:m.money.city,PAPER_Total:m.money.total,escrow:m.money.escrow,
+       newBuildings:m.buildings.new,orders:m.demand.posted,
+       ordersFilled:m.demand.filled,ordersExpired:m.demand.expired,
+       unfundedOrders:m.demand.unfunded,foodUnmet:m.food.unmet,
+       sheetsUsed:m.sheets.used,wood:m.finiteMaterials.wood,stone:m.finiteMaterials.stone
+     });
+   }
 const result={
  schema:'WORLD_ORGANISM_SHADOW_PROJECTION/0.8.1',
  status:'EXPERIMENTAL_NOT_ORIGINAL_V08_NOT_SERVER',
@@ -52,7 +67,7 @@ const result={
   carrots:'TEST 3 carrots/seedbed harvest, each player eats one/day, unsold produce lasts one day unless pantry has been built.',
   activeSession:'All synthetic agents active daily. A real game must only apply hunger during actual online sessions.',
  },
- sample:combinations,stress,activityContrast,records
+ sample:combinations,stress,activityContrast,longTerm,records
 };
 mkdirSync(outputDir,{recursive:true});
 writeFileSync(outputDir+'/v08-shadow-projection-216.json',JSON.stringify(result,null,2)+'\n');
@@ -62,4 +77,5 @@ console.log('PROVENANCE',result.status);
 console.log('NORMAL_3_AGENTS',JSON.stringify(combinations));
 console.log('STRESS_90_DAYS',JSON.stringify(stress));
 console.log('ACTIVITY_COMPARISON',JSON.stringify(activityContrast));
+console.log('LONG_TERM',JSON.stringify(longTerm));
 console.log('ARTIFACT',outputDir+'/v08-shadow-projection-216.json');
