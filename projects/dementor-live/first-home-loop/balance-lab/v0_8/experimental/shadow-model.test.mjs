@@ -146,12 +146,13 @@ test('15. model assumptions are clearly TEST and not a game rule',()=>{
   assert.equal(SETTINGS.oldProjects,3);
   assert.deepEqual(SETTINGS.experiments,['static','upkeep','needs-growth']);
 });
-for(const policy of SETTINGS.experiments){
+for(const activity of SETTINGS.activityProfiles){
+ for(const policy of SETTINGS.experiments){
  for(const environment of SETTINGS.environments){
   for(const agents of [3,4,5]){
    for(const days of [30,60,90]){
-    test(`PROJECTION ${policy} / ${environment} / ${agents} agents / +${days} days`,()=>{
-      const s=simulate({policy,environment,agents,days});
+    test(`PROJECTION ${activity} / ${policy} / ${environment} / ${agents} agents / +${days} days`,()=>{
+      const s=simulate({policy,environment,agents,days,activity});
       check(s);
       const m=metrics(s);
       assert.equal(m.day,30+days);
@@ -164,4 +165,19 @@ for(const policy of SETTINGS.experiments){
    }
   }
  }
-}
+}}
+
+test('16. hunger needs exist only during active synthetic sessions',()=>{
+ const daily=metrics(simulate({agents:3,environment:'normal',policy:'needs-growth',days:90,activity:'daily'}));
+ const weekend=metrics(simulate({agents:3,environment:'normal',policy:'needs-growth',days:90,activity:'weekends'}));
+ assert.equal(daily.food.mealNeeds,270);
+ assert.ok(weekend.food.mealNeeds<daily.food.mealNeeds);
+ assert.equal(weekend.food.mealNeeds,weekend.food.eaten+weekend.food.unmet);
+ assert.equal(daily.food.mealNeeds,daily.food.eaten+daily.food.unmet);
+});
+test('17. normal 90-day progression still has no money or carrot losses after off-hours',()=>{
+ const s=simulate({agents:3,environment:'normal',policy:'needs-growth',days:90,activity:'weekends'});
+ check(s);
+ assert.equal(metrics(s).money.total,3600);
+ assert.ok(s.projects.length<=2);
+});
