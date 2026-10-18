@@ -79,6 +79,8 @@ test('Independent city worlds can be created, joined and revisited by separate p
  const id=made.id;
  const savedBefore=JSON.stringify(net.serialize()),restored=new CityNetwork(JSON.parse(savedBefore));
  const p2=restored.findToken(p.token).p,friend2=restored.findToken(friend.token).p;
+ assert.equal(restored.list()[0].online,0,'Restart must not preserve stale online connections');
+ restored.gameFor(p2).connect(p2);restored.gameFor(friend2).connect(friend2);
  assert.equal(restored.list()[1].id,id);
  assert.equal(restored.command(p2,{type:'travelCity',requestId:'travel-1',cityId:id}).ok,true);
  assert.equal(restored.findToken(p.token).cityId,id);
