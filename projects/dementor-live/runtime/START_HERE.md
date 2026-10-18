@@ -20,7 +20,7 @@ data/world.json — реальные игроки и мир, не удалять
 
 ## Отдельный запуск на VM
 
-Подготовлен самостоятельный Docker Compose для `/srv/dementor-live`, порта `14173` и своего тома `dementor-live-world`: см. [deploy/README.md](deploy/README.md). Он не подключён к сервисам Dementor Club. До публикации адреса нужно завершить проверку SSH-отпечатка и запустить первую сборку на VM. Локальное реальное сохранение не переносится автоматически.
+Версия 0.2.1 уже работает отдельным Docker Compose в `/srv/dementor-live/app`, порт `14173`, том `dementor-live-world`. Мир и музыка перенесены и сохранены в датированной резервной копии. Проверка внутри VM проходит; внешний запрос из рабочей сети пока истекает по времени. См. [отчёт о первом запуске](docs/DEPLOYMENT_2026-10-18.md) и [инструкцию обновления](deploy/README.md). Исходники опубликованы в [изолированной ветке GitHub](https://github.com/SLADZARI/degradation_club/tree/deploy/dementor-live-isolated-2026-10-18/projects/dementor-live/runtime).
 
 GitHub: https://github.com/SLADZARI/degradation_club/tree/docs/dementor-live-city-ownership-and-wilderness-01/projects/dementor-live/runtime
 Google Drive START HERE: https://docs.google.com/document/d/13egjMzmrOQCjew7V-DL2M15jnX7tyJoASTVdJF86Huw/edit
