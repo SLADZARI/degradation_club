@@ -6,7 +6,7 @@ export const MODEL_ID='WORLD-ORGANISM/0.8.1-shadow-sustainability';
 export const SETTINGS={
   checkpointDay:30, initialPAPER:3600, cityPAPER:2301, playerPAPER:1299,
   oldProjects:3, hempAtCheckpoint:4,
-  capacity:12, civicCrateCapacity:12, carrotYield:3, hempYield:3, carrotSeedYield:4,
+  capacity:12, civicCrateCapacity:12, carrotYield:3, hempYield:3, carrotSeedYield:6,
   carrotGrowthDays:3, hempGrowthDays:3, seedGrowthDays:4,
   cropWater:2, carrotShelfDays:1, pantryShelfDays:3,
   maintenanceIntervalDays:7, orderTtlDays:14,
