@@ -14,6 +14,10 @@ function civicPanel(mode,rows,row,canAct){
      return true;
    }
    const close=nearby('public-garden')&&canAct;
+   const source=state.publicGarden.waterSource;
+   row('Общий источник воды',`Остаток: ${source.left} / 20 л. У тебя: ${me.bag.water} / 4 л. Источник пополняется со временем.`,[
+     button('Набрать 1 л',()=>act('publicDrawWater','public-garden'),!close||me.bag.water>=4||source.left<1),
+     button('Идти к источнику',()=>navigateTo('public-garden'))]);
    for(const bed of state.publicGarden.beds){
      const ripe=bed.crop&&bed.watered&&bed.readyAt<=state.now;
      const crop=bed.crop?(bed.crop==='carrot'?'Морковь':'Конопля'):'Свободна';
