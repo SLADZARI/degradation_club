@@ -48,6 +48,8 @@ jobs:
         run: npm run check
       - name: HTTP/SSE with temporary world
         run: npm run test:integration
+      - name: Durable wood and stone after server restart
+        run: timeout 3m npm run test:persistence
       - name: Create candidate update ZIP (excludes saves/secrets)
         run: npm run pack
       - name: Upload update package
