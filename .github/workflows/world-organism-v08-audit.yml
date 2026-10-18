@@ -1,0 +1,46 @@
+name: WORLD ORGANISM v0.8 — published snapshot audit
+
+on:
+  push:
+    branches:
+      - qa/world-organism-v0-8-contract-2026-10-19
+    paths:
+      - ".github/workflows/world-organism-v08-audit.yml"
+      - "projects/dementor-live/first-home-loop/balance-lab/v0_8/**"
+  pull_request:
+    branches:
+      - docs/dementor-live-global-audit-05
+    paths:
+      - ".github/workflows/world-organism-v08-audit.yml"
+      - "projects/dementor-live/first-home-loop/balance-lab/v0_8/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: world-organism-v08-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  snapshot-contract:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Run independent D30 accounting and negative-control checks
+        working-directory: projects/dementor-live/first-home-loop/balance-lab/v0_8
+        run: node --test tests/snapshot-contract.test.mjs
+      - name: Boundary of these tests
+        if: always()
+        run: |
+          echo "## What this validates" >> "$GITHUB_STEP_SUMMARY"
+          echo "Re-checks consistency of the published WORLD ORGANISM v0.8 aggregate D30 JSON and its docs, including tamper controls." >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "## What this does NOT validate" >> "$GITHUB_STEP_SUMMARY"
+          echo "No runnable v0.8 simulator or test agent code is present in this repository/Drive folder." >> "$GITHUB_STEP_SUMMARY"
+          echo "The reported historical 52/52, 36 stress runs, 41 invariants, browser screenshots, real order-level escrows and P2P commits are NOT rerun by this job." >> "$GITHUB_STEP_SUMMARY"
+          echo "Live Dementor game runtime and persistent world are not touched." >> "$GITHUB_STEP_SUMMARY"
