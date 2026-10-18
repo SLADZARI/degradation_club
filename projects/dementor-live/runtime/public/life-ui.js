@@ -9,7 +9,7 @@ function lifePanel(mode,rows,row,canAct){
  const nearbyPeople=state.players.filter(p=>p.id!==me.id&&p.online&&sameScene(p)&&Math.hypot(p.x-me.x,p.y-me.y)<=state.config.actionRange);
  const select=(label,options)=>{const wrap=document.createElement('label');wrap.textContent=label;const input=document.createElement('select');for(const[value,text]of options){const option=document.createElement('option');option.value=value;option.textContent=text;input.append(option);}wrap.append(input);return wrap;};
  const num=(label,value=0)=>{const wrap=document.createElement('label');wrap.textContent=label;const input=document.createElement('input');input.type='number';input.min=0;input.max=10000;input.step=1;input.value=value;wrap.append(input);return wrap;};
- const nav=()=>row('Твои дела','Всё для жизни в общем мире',[button('Рюкзак',()=>openCityPanel('bag')),button('Жители и сделки',()=>openCityPanel('social')),button('Семена',()=>openCityPanel('seeds')),button('Доска воров',()=>openCityPanel('thefts'))]);
+ const nav=()=>row('Твои дела','Всё для жизни в общем мире',[button('Рюкзак',()=>openCityPanel('bag')),button('Жители и сделки',()=>openCityPanel('social')),button('Семена',()=>openCityPanel('seeds')),button('Общий огород',()=>openCityPanel('public-garden')),button('Города',()=>openCityPanel('city-registry')),button('Доска воров',()=>openCityPanel('thefts'))]);
  if(mode==='bag'){
   title.textContent='🎒 Рюкзак';intro.textContent=`Вес ${cargo().toFixed(1)} / ${state.config.capacity} · инструменты ${me.toolItems.length} / 12`;note.textContent='Выбери ячейку. Торговля — в «Жителях», семена — у городской лавки.';
   const emoji={wood:'🪵',stone:'🪨',food:'🫐',seed_hemp:'🌰',seed_carrot:'🫘',hemp:'🌿',carrot:'🥕',water:'💧'};
@@ -26,8 +26,8 @@ function lifePanel(mode,rows,row,canAct){
   return true;
  }
  if(mode==='seeds'){
-  title.textContent='Семена для первого огорода';intro.textContent='Конечный запас лавки у бесплатных инструментов. Семена также встречаются при расчистке своего участка.';
-  for(const kind of ['seed_hemp','seed_carrot'])row((kind==='seed_hemp'?'🌰 ':'🫘 ')+itemName(kind),`В лавке ${state.seedShop[kind]} · у тебя ${me.bag[kind]}. Цена 2 PAPER/шт.`,[button('Купить 1',action('buySeeds',null,{kind,quantity:1}),!canAct||state.scene!=='city'||!nearby('tools')||!state.seedShop[kind]||me.wallet<2),button('Идти к лавке',()=>navigateTo('tools'),state.scene!=='city')]);
+  title.textContent='Семенная лавка';intro.textContent=state.seedMarket.stage<state.config.seedMarket.stages.length?'Отдельное здание строится за счёт городской казны. Сдай материалы на стройке лавки.':'Лавка построена. Покупай семена у прилавка, а затем используй их в личном или городском огороде.';
+  for(const kind of ['seed_hemp','seed_carrot'])row((kind==='seed_hemp'?'🌰 ':'🫘 ')+itemName(kind),`В лавке ${state.seedShop[kind]} · у тебя ${me.bag[kind]}. Цена 2 PAPER/шт.`,[button('Купить 1',action('buySeeds',null,{kind,quantity:1}),!canAct||state.scene!=='city'||state.seedMarket.stage<state.config.seedMarket.stages.length||!nearby('seed-shop')||!state.seedShop[kind]||me.wallet<2),button('Идти к лавке',()=>navigateTo('seed-shop'),state.scene!=='city')]);
   return true;
  }
  if(mode==='resident'){
