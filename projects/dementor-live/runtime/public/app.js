@@ -386,7 +386,7 @@ canvas.addEventListener('contextmenu',e=>{e.preventDefault();placeQuick();});
 // Sidebar preference is independent of game progress.
 function setQuestCollapsed(collapsed){$('quest').classList.toggle('collapsed',collapsed);$('questToggle').setAttribute('aria-expanded',String(!collapsed));$('questChevron').textContent=collapsed?'▸':'▾';try{localStorage.setItem('dementor-quests-collapsed',String(collapsed));}catch{}}
 $('questToggle').onclick=()=>setQuestCollapsed(!$('quest').classList.contains('collapsed'));
-try{setQuestCollapsed(localStorage.getItem('dementor-quests-collapsed')==='true');}catch{}
+try{const savedCollapse=localStorage.getItem('dementor-quests-collapsed');setQuestCollapsed(savedCollapse===null?innerWidth<=760:savedCollapse==='true');}catch{setQuestCollapsed(innerWidth<=760);}
 function placeThumbnail(t){
  const frame=document.createElement('span');frame.className='place-thumbnail';frame.setAttribute('aria-hidden','true');
  const stroke='#7f856c',roof='#c9b995',wall='#d7ceb3',side='#a69d80';let shape='';
