@@ -4,7 +4,7 @@ This Compose project owns only `dementor-live`, loopback port `127.0.0.1:14173`,
 
 ## Current VM deployment (2026-10-18)
 
-Version 0.2.1 is running at `/srv/dementor-live/app` and is publicly reachable at `http://138.199.144.94/` through the existing Nginx listener on port 80. Nginx proxies only this IP host to `127.0.0.1:14173`; the game container is bound to loopback. The world and music remain in the `dementor-live-world` volume; the first-transfer backup is under `/srv/dementor-live/backups/initial-2026-10-18`. The app health endpoint returns `ok: true`. Nginx uses one added, dedicated virtual-host file; existing site files were not edited. See `../docs/DEPLOYMENT_2026-10-18.md` before continuing.
+Version 0.2.1 is running at `/srv/dementor-live/app` and is publicly reachable at `http://138.199.144.94/` through the existing Nginx listener on port 80. Nginx proxies only this IP host to `127.0.0.1:14173`; the game container is bound to loopback. The world and music remain in the `dementor-live-world` volume; the first-transfer backup is under `/srv/dementor-live/backups/initial-2026-10-18`. The app health endpoint returns `ok: true`. Nginx uses one added, dedicated virtual-host file, versioned at `deploy/nginx/dementor-live.conf`; existing site files were not edited. See `../docs/DEPLOYMENT_2026-10-18.md` before continuing.
 
 ## First installation
 
