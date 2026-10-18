@@ -137,3 +137,7 @@ Drive Style v0.2: https://docs.google.com/document/d/1tDEk16c0UQ2cXljXMSzwB7wlIP
 Drive PNG Registry v0.3: https://docs.google.com/document/d/1FNHJmC9f6g-wpPi8jG1nWEyRt1TiV9oLFUj18wKkB1g/edit
 
 Дальнейшие источники истины: DECISION_REGISTER.md, OPEN_QUESTIONS.md, CROSSCHECK_01.md, DEPENDENCIES.md, CHANGELOG.md в той же версии.
+
+## ДОПОЛНЕНИЕ / PROPOSED · 2026-10-18 · COMBAT-01
+
+Первый отдельный тип боя — кооперативная 2D real-time PvE-экспедиция с независимыми движением и прицеливанием, стрельбой, рывком, ограниченными группами NPC, заданиями, спасением товарищей и проверяемой добычей. Подробная спецификация: [COMBAT-01 · COOP TWIN-STICK PvE](../../combat/COMBAT_01_COOP_TWINSTICK_PVE_v0_1_CANDIDATE.md). Статус **CANDIDATE / PROPOSED**, НЕ IMPLEMENTED, НЕ VERIFIED. Базовая глава 13 COMBAT и ее утверждённые границы сохранены; PvP/розыск относятся к будущему отдельно согласуемому пакету.
