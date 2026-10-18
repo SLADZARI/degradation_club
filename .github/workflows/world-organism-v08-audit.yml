@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - qa/world-organism-v0-8-contract-2026-10-19
+      - qa/world-organism-v0-8-sustainability-2026-10-19
     paths:
       - ".github/workflows/world-organism-v08-audit.yml"
       - "projects/dementor-live/first-home-loop/balance-lab/v0_8/**"
@@ -25,7 +26,7 @@ concurrency:
 jobs:
   snapshot-contract:
     runs-on: ubuntu-24.04
-    timeout-minutes: 5
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -34,6 +35,20 @@ jobs:
       - name: Run independent D30 accounting and negative-control checks
         working-directory: projects/dementor-live/first-home-loop/balance-lab/v0_8
         run: node --test tests/snapshot-contract.test.mjs
+      - name: Forward simulator reproducibility (216 combinations; stepwise invariants)
+        working-directory: projects/dementor-live/first-home-loop/balance-lab/v0_8/experimental
+        run: node --test shadow-model.test.mjs quality-gates.test.mjs long-run.test.mjs
+      - name: Export deterministic projections / D60-D90-D120 and +180/+360 day horizons
+        working-directory: projects/dementor-live/first-home-loop/balance-lab/v0_8/experimental
+        run: node run-projection.mjs reports
+      - name: Attach complete per-scenario data and short report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: world-organism-v08-shadow-216-plus-24-long-term-report
+          path: projects/dementor-live/first-home-loop/balance-lab/v0_8/experimental/reports/
+          if-no-files-found: warn
+          retention-days: 30
       - name: Boundary of these tests
         if: always()
         run: |
@@ -41,6 +56,6 @@ jobs:
           echo "Re-checks consistency of the published WORLD ORGANISM v0.8 aggregate D30 JSON and its docs, including tamper controls." >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "## What this does NOT validate" >> "$GITHUB_STEP_SUMMARY"
-          echo "No runnable v0.8 simulator or test agent code is present in this repository/Drive folder." >> "$GITHUB_STEP_SUMMARY"
-          echo "The reported historical 52/52, 36 stress runs, 41 invariants, browser screenshots, real order-level escrows and P2P commits are NOT rerun by this job." >> "$GITHUB_STEP_SUMMARY"
+          echo "No ORIGINAL runnable v0.8 simulator or original agent code is present. An explicitly experimental shadow projection is run separately." >> "$GITHUB_STEP_SUMMARY"
+          echo "Original 52/52, original 36 stress runs, original 41 invariants, and original browser UI remain unverified. New shadow model and tests are NOT a replay of original v0.8." >> "$GITHUB_STEP_SUMMARY"
           echo "Live Dementor game runtime and persistent world are not touched." >> "$GITHUB_STEP_SUMMARY"
