@@ -35,9 +35,9 @@ jobs:
       - name: Run independent D30 accounting and negative-control checks
         working-directory: projects/dementor-live/first-home-loop/balance-lab/v0_8
         run: node --test tests/snapshot-contract.test.mjs
-      - name: Forward simulator reproducibility (108 combinations; stepwise invariants)
+      - name: Forward simulator reproducibility (216 combinations; stepwise invariants)
         working-directory: projects/dementor-live/first-home-loop/balance-lab/v0_8/experimental
-        run: node --test shadow-model.test.mjs
+        run: node --test shadow-model.test.mjs quality-gates.test.mjs
       - name: Export deterministic projection data / D60-D90-D120
         working-directory: projects/dementor-live/first-home-loop/balance-lab/v0_8/experimental
         run: node run-projection.mjs reports
@@ -45,7 +45,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: world-organism-v08-shadow-108-scenario-report
+          name: world-organism-v08-shadow-216-scenario-report
           path: projects/dementor-live/first-home-loop/balance-lab/v0_8/experimental/reports/
           if-no-files-found: warn
           retention-days: 30
