@@ -20,6 +20,15 @@ let browser;
     assert.equal(health.testMode, false, 'public server must not be in test mode');
     assert.ok(typeof health.version === 'string' && health.version.length > 0, 'missing server version');
     report.version = health.version;
+    report.candidateVersion = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'package.json'), 'utf8')).version;
+    report.versionMatchesCandidate = report.version === report.candidateVersion;
+    report.sourceCommitVerified = false; // /api/health currently does not expose a verified build SHA.
+    report.warnings = [];
+    if (!report.versionMatchesCandidate) {
+      const warning = 'VERSION DRIFT: public=' + report.version + ' / tested source=' + report.candidateVersion;
+      report.warnings.push(warning);
+      console.warn(warning);
+    }
     report.checks.push('Health: HTTP 200, ok=true, testMode=false, version=' + health.version);
 
     browser = await chromium.launch({ channel: 'chrome', headless: true });
