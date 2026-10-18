@@ -122,7 +122,8 @@ test('P0: the private tent converts six wood and two stone into embodied structu
   p.wallet=CONFIG.plotPrice;at(g,p,'plot-1');
   assert.equal(issue(g,p,'buy','plot-1',{},'buy-plot').ok,true);
   assert.equal(issue(g,p,'enterPlot','plot-1',{},'enter-plot').ok,true);
-  p.bag.wood=6;p.bag.stone=2;at(g,p,'tent');
+  p.bag.wood=6;p.bag.stone=2;
+  assert.equal(p.scene,'plot');p.x=8;p.y=8; // tent is a plot-scene target, not a city map target
   const before=cityMaterialReport(g),currency=g.state.treasury+p.wallet;
   assert.equal(issue(g,p,'homeUse','tent',{},'tent-foundation').ok,true);
   const after=cityMaterialReport(g);
