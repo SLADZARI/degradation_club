@@ -5,6 +5,7 @@ on:
     branches:
       - qa/dementor-live-chat-2026-10-18
   pull_request:
+    types: [opened, synchronize, reopened, edited]
     branches:
       - deploy/dementor-live-isolated-2026-10-18
     paths:
@@ -87,19 +88,59 @@ jobs:
         run: timeout 15m npm run test:expansion
       - name: Complete initial city and forge (full)
         id: browserfull
-        if: github.event_name == 'workflow_dispatch' && inputs.suite == 'full'
+        if: (github.event_name == 'workflow_dispatch' && inputs.suite == 'full') || (github.event_name == 'pull_request' && contains(github.event.pull_request.body, '[run-full-qa]'))
         continue-on-error: true
         run: timeout 20m npm run test:browser
       - name: Donations (full)
         id: donations
-        if: github.event_name == 'workflow_dispatch' && inputs.suite == 'full'
+        if: (github.event_name == 'workflow_dispatch' && inputs.suite == 'full') || (github.event_name == 'pull_request' && contains(github.event.pull_request.body, '[run-full-qa]'))
         continue-on-error: true
         run: timeout 12m npm run test:donations
       - name: 2D scene graphics (full)
         id: axonometry
-        if: github.event_name == 'workflow_dispatch' && inputs.suite == 'full'
+        if: (github.event_name == 'workflow_dispatch' && inputs.suite == 'full') || (github.event_name == 'pull_request' && contains(github.event.pull_request.body, '[run-full-qa]'))
         continue-on-error: true
         run: timeout 10m npm run test:axonometry
+      - name: Town warehouse and courier (full)
+        id: city
+        if: (github.event_name == 'workflow_dispatch' && inputs.suite == 'full') || (github.event_name == 'pull_request' && contains(github.event.pull_request.body, '[run-full-qa]'))
+        continue-on-error: true
+        run: timeout 12m npm run test:city
+      - name: Tools and camera (full)
+        id: tools
+        if: (github.event_name == 'workflow_dispatch' && inputs.suite == 'full') || (github.event_name == 'pull_request' && contains(github.event.pull_request.body, '[run-full-qa]'))
+        continue-on-error: true
+        run: timeout 12m npm run test:tools
+      - name: Home and social interaction (full)
+        id: life
+        if: (github.event_name == 'workflow_dispatch' && inputs.suite == 'full') || (github.event_name == 'pull_request' && contains(github.event.pull_request.body, '[run-full-qa]'))
+        continue-on-error: true
+        run: timeout 12m npm run test:life
+      - name: Bag, store and save (full)
+        id: inventory
+        if: (github.event_name == 'workflow_dispatch' && inputs.suite == 'full') || (github.event_name == 'pull_request' && contains(github.event.pull_request.body, '[run-full-qa]'))
+        continue-on-error: true
+        run: timeout 12m npm run test:inventory
+      - name: Town square and music (full)
+        id: plaza
+        if: (github.event_name == 'workflow_dispatch' && inputs.suite == 'full') || (github.event_name == 'pull_request' && contains(github.event.pull_request.body, '[run-full-qa]'))
+        continue-on-error: true
+        run: timeout 12m npm run test:plaza
+      - name: Bridge construction and east bank (full)
+        id: bridge
+        if: (github.event_name == 'workflow_dispatch' && inputs.suite == 'full') || (github.event_name == 'pull_request' && contains(github.event.pull_request.body, '[run-full-qa]'))
+        continue-on-error: true
+        run: timeout 12m npm run test:bridge
+      - name: Two-browser LAN host/origin (full)
+        id: lan
+        if: (github.event_name == 'workflow_dispatch' && inputs.suite == 'full') || (github.event_name == 'pull_request' && contains(github.event.pull_request.body, '[run-full-qa]'))
+        continue-on-error: true
+        run: timeout 12m npm run test:lan
+      - name: Camera / rendering performance (full)
+        id: performance
+        if: (github.event_name == 'workflow_dispatch' && inputs.suite == 'full') || (github.event_name == 'pull_request' && contains(github.event.pull_request.body, '[run-full-qa]'))
+        continue-on-error: true
+        run: timeout 12m npm run test:performance
       - name: Browser outcome summary
         if: always()
         env:
@@ -110,7 +151,15 @@ jobs:
           BROWSER_FULL: ${{ steps.browserfull.outcome }}
           DONATIONS: ${{ steps.donations.outcome }}
           AXONOMETRY: ${{ steps.axonometry.outcome }}
-          FULL: ${{ github.event_name == 'workflow_dispatch' && inputs.suite == 'full' }}
+          CITY: ${{ steps.city.outcome }}
+          TOOLS: ${{ steps.tools.outcome }}
+          LIFE: ${{ steps.life.outcome }}
+          INVENTORY: ${{ steps.inventory.outcome }}
+          PLAZA: ${{ steps.plaza.outcome }}
+          BRIDGE: ${{ steps.bridge.outcome }}
+          LAN: ${{ steps.lan.outcome }}
+          PERFORMANCE: ${{ steps.performance.outcome }}
+          FULL: ${{ (github.event_name == 'workflow_dispatch' && inputs.suite == 'full') || (github.event_name == 'pull_request' && contains(github.event.pull_request.body, '[run-full-qa]')) }}
         run: |
           echo "## Dementor Live browser QA" >> "$GITHUB_STEP_SUMMARY"
           echo "| Suite | Outcome |" >> "$GITHUB_STEP_SUMMARY"
@@ -122,7 +171,7 @@ jobs:
             if [[ "$status" != "success" ]]; then failed=1; fi
           done
           if [[ "$FULL" == "true" ]]; then
-            for label in BROWSER_FULL DONATIONS AXONOMETRY; do
+            for label in BROWSER_FULL DONATIONS AXONOMETRY CITY TOOLS LIFE INVENTORY PLAZA BRIDGE LAN PERFORMANCE; do
               status="${!label}"
               echo "| $label | $status |" >> "$GITHUB_STEP_SUMMARY"
               if [[ "$status" != "success" ]]; then failed=1; fi
