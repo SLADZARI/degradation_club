@@ -14,6 +14,7 @@
     "test:browser": "node test/browser.cjs",
     "test:mobile": "node test/mobile.cjs",
     "test:cities-browser": "node test/cities-browser.cjs",
+    "test:persistence": "node test/persistence.cjs",
     "test:lan": "node test/lan.cjs",
     "test:city": "node test/city.cjs",
     "test:tools": "node test/tools.cjs",
