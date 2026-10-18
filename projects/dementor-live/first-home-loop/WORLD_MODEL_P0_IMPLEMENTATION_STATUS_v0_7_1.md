@@ -36,3 +36,6 @@ Next gate: obtain source code and latest contracts of 0.3.0-rc.2; preserve imple
 - Test summary: `Dementor_Live_World_Organism_v0_7_1_P0_QA.json`
 - Example data: `Dementor_Live_World_Organism_v0_7_1_P0_D30_P3.json`
 - README + technical report in package. These are chat artifacts, not hosted GitHub files. Do not pretend standalone code has been checked into the game runtime repository.
+
+## Follow-up evidence D36/D42 (18.10.2026)
+Загружены два независимых exports лаборатории v0.7.1 и проведён независимый ledger audit. 29/29 invariants PASS в каждом, но конечная экономика всё ещё блокируется 100% заполнением сундуков; алгоритм предложения товара может игнорировать существующий спрос, а в журнале P2P_SALE записывается до OFFER_ACCEPTED. **P0 Implementation PASS ≠ P1 Sustainable Economy PASS**. Подробности: [balance lab D36/D42](balance-lab/BALANCE_AUDIT_v0_7_1_D36_D42.md), [backlog v0.7.2](balance-lab/BALANCE_BACKLOG_v0_7_2_CANDIDATE.md). Исходный вывод 47 тестов P0 не отменён, основной Master GDD и production сервер не менялись.
