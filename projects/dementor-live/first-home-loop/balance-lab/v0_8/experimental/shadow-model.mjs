@@ -60,7 +60,7 @@ function initialState({agents=3,environment='normal',policy='upkeep',activity='d
     used:{CARROT_PLAYER:0,CARROT_CITY:0,CARROT_SPOILED:0,HEMP_CRAFT:0,PAPER_SHEET_CITY:0,
       SEED_CARROT:0,SEED_HEMP:0},
     initial:{HEMP:SETTINGS.hempAtCheckpoint,SEED_CARROT:3*agents,SEED_HEMP:3*agents},
-    unmetFood:0,unmetReasons:{},waitingStorage:[],waitingResource:[],blocked:0,unfunded:0,
+    mealNeedsPosted:0,unmetFood:0,unmetReasons:{},waitingStorage:[],waitingResource:[],blocked:0,unfunded:0,
     refunds:0,paperPaid:0,buildPaid:0,tradePaid:0,cityProjectsDone:0,
     diagnostics:[],ledgerEvents:0,
   };
@@ -102,6 +102,7 @@ export function check(s){
     required(o.remaining>=0&&o.remaining<=o.quantity,'invalid order remaining '+o.id);
     required(o.status==='OPEN'||o.remaining===0||o.escrow===0,'bad finite-order status');
   }
+  required(s.mealNeedsPosted===s.used.CARROT_PLAYER+s.unmetFood,'active-session food ledger mismatch');
   required(s.ledgerEvents>=0,'invalid event count');
   required(s.orders.length<=s.postedEvents.length*2+1,'duplicate demand amplification');
   required(s.tradeIds.length===s.trades.length,'trade idempotency tally');
@@ -285,6 +286,7 @@ export function tradeHemp(s,{offerId,buyer,seller,quantity,pricePerUnit=1,accept
 function householdNeeds(s){
   for(const p of s.players){
     if(!isActive(s,p))continue; // no hunger penalty while offline
+    s.mealNeedsPosted++;
     if(!consumeOneCarrot(s,p,'player')){
       s.unmetFood++;
       const bed=p.plotBeds.food;
@@ -328,7 +330,7 @@ export function metrics(s){
     money:{total:SETTINGS.initialPAPER,city:s.city,players:s.players.reduce((n,p)=>n+p.wallet,0),escrow:escrowTotal(s)},
     buildings:{original:3,new:s.projects,completed:s.cityProjectsDone,embodied:s.embodied},
     demand:{posted:s.orders.length,filled,expired,open,unfunded:s.unfunded,paid:s.paperPaid,refunded:s.refunds},
-    food:{grown:s.produced.CARROT,eaten:s.used.CARROT_PLAYER,cityConsumed:s.used.CARROT_CITY,spoiled:s.used.CARROT_SPOILED,carried:s.players.reduce((n,p)=>n+carrotUnits(p),0),civicCrate:s.players.reduce((n,p)=>n+civicUnits(p),0),unmet:s.unmetFood,unmetReasons:s.unmetReasons},
+    food:{grown:s.produced.CARROT,eaten:s.used.CARROT_PLAYER,cityConsumed:s.used.CARROT_CITY,spoiled:s.used.CARROT_SPOILED,carried:s.players.reduce((n,p)=>n+carrotUnits(p),0),civicCrate:s.players.reduce((n,p)=>n+civicUnits(p),0),mealNeeds:s.mealNeedsPosted,unmet:s.unmetFood,unmetReasons:s.unmetReasons},
     hemp:{grown:s.produced.HEMP,crafted:s.used.HEMP_CRAFT,stock:s.players.reduce((n,p)=>n+p.hemp,0)},
     sheets:{made:s.produced.PAPER_SHEET,used:s.used.PAPER_SHEET_CITY,stock:s.players.reduce((n,p)=>n+p.sheets,0)},
     finiteMaterials:{wood:s.wood,stone:s.stone},water:{available:s.well,used:s.waterConsumed,added:s.waterAdded},
