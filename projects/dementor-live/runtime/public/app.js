@@ -2,6 +2,7 @@ const $=id=>document.getElementById(id),canvas=$('world'),ctx=canvas.getContext(
 let lastScene=null;
 let state=null,me=null,token=sessionStorage.getItem('dementor-token'),stream=null,connected=false;
 let keys=new Set(),route=[],selected=null,context=null,lastAction=0,requestPending=false,holdAction=false,touchMove=null;
+let routeWatch=null; // Tracks waypoint progress to avoid circling or moving forever against an obstacle.
 let view={w:innerWidth,h:innerHeight,s:28,cx:innerWidth<760?10:16,cy:innerWidth<760?12:16,zoom:1},toastTimer;
 const motionFrames=[];
 let lastWallet=null,lastChatSignature='';
@@ -158,11 +159,26 @@ window.addEventListener('keyup',e=>{keys.delete(e.code);if(e.code==='KeyE')holdA
 document.querySelectorAll('[data-move]').forEach(b=>{b.addEventListener('pointerdown',e=>{b.setPointerCapture(e.pointerId);touchMove=b.dataset.move.split(',').map(Number);route=[];});b.addEventListener('pointerup',()=>touchMove=null);b.addEventListener('pointercancel',()=>touchMove=null);});
 setInterval(()=>{if(!connected||!me)return;let dx=0,dy=0;if(!$('welcome').open&&!['INPUT','TEXTAREA','SELECT'].includes(document.activeElement?.tagName)){
   dx=Number(keys.has('KeyD')||keys.has('ArrowRight'))-Number(keys.has('KeyA')||keys.has('ArrowLeft'));dy=Number(keys.has('KeyS')||keys.has('ArrowDown'))-Number(keys.has('KeyW')||keys.has('ArrowUp'));if(touchMove)[dx,dy]=touchMove;
-  if(!dx&&!dy&&route.length){while(route.length&&Math.hypot(route[0].x-me.x,route[0].y-me.y)<.35)route.shift();if(route.length){dx=route[0].x-me.x;dy=route[0].y-me.y;const n=Math.hypot(dx,dy);dx/=n;dy/=n;}}
+  if(!dx&&!dy&&route.length){const direction=steerRoute();if(direction){dx=direction.dx;dy=direction.dy;}}
   if(holdAction)doContext();
   }api('input',{dx,dy,sprint:keys.has('ShiftLeft')||keys.has('ShiftRight')}).catch(()=>{});
 },80);
 
+function steerRoute(){
+  const now=performance.now();
+  while(route.length){
+    const waypoint=route[0],dist=Math.hypot(waypoint.x-me.x,waypoint.y-me.y);
+    // A server tick may carry us just past a 0.5-cell waypoint; don't steer backwards into a loop.
+    if(dist<.39||(routeWatch?.point===waypoint&&routeWatch.closest<.65&&dist>routeWatch.closest+.10)){
+      route.shift();routeWatch=null;continue;
+    }
+    if(routeWatch?.point!==waypoint)routeWatch={point:waypoint,closest:dist,progressAt:now};
+    else if(dist<routeWatch.closest-.025){routeWatch.closest=dist;routeWatch.progressAt=now;}
+    if(now-routeWatch.progressAt>2400){route=[];routeWatch=null;toast('Путь остановился. Выбери другую точку.');return null;}
+    return {dx:(waypoint.x-me.x)/dist,dy:(waypoint.y-me.y)/dist};
+  }
+  routeWatch=null;return null;
+}
 function screen(x,y){return {x:view.w/2+(x-view.cx)*view.s,y:view.h/2+(y-view.cy)*view.s*.76};}
 function worldPoint(x,y){return {x:(x-view.w/2)/view.s+view.cx,y:(y-view.h/2)/(view.s*.76)+view.cy};}
 function blocked(x,y){const c=state.config,r=.35;if(state.scene!=='city'){return x<r||y<r||x>16-r||y>16-r||(['plot','expedition'].includes(state.scene)&&state.home.nodes.some(n=>n.left&&Math.hypot(x-n.x,y-n.y)<.63));}if(x<r||y<r||x>c.width-r||y>c.height-r)return true;if(x+r>c.river.x&&x-r<c.river.x+c.river.w&&!(bridgeOpen()&&y-r>=c.bridge.y&&y+r<=c.bridge.y+c.bridge.h))return true;
@@ -174,12 +190,36 @@ function findPath(dest){const step=.5,start={x:Math.round(me.x/step),y:Math.roun
   for(let i=0;i<queue.length&&i<20000;i++){const p=queue[i];if(p.x===goal.x&&p.y===goal.y){found=p;break;}for(const[dx,dy]of [[1,0],[-1,0],[0,1],[0,-1]]){const q={x:p.x+dx,y:p.y+dy};if(!seen.has(key(q))&&!blocked(q.x*step,q.y*step)){seen.set(key(q),p);queue.push(q);}}}
   if(!found)return null;const out=[];for(let p=found;p;p=seen.get(key(p)))out.push({x:p.x*step,y:p.y*step});return out.reverse().slice(1);
 }
-canvas.addEventListener('pointerdown',e=>{if(e.button===2)return;if(!me||$('welcome').open)return;canvas.focus();const r=canvas.getBoundingClientRect(),w=worldPoint(e.clientX-r.left,e.clientY-r.top);const targets=allTargets().sort((a,b)=>Math.hypot(a.x-w.x,a.y-w.y)-Math.hypot(b.x-w.x,b.y-w.y));const pile=targets.find(t=>t.type==='pickup'&&Math.hypot(t.x-w.x,t.y-w.y)<.7);const plot=pile||state.scene!=='city'?null:state.plots.find(p=>w.x>=p.x&&w.x<=p.x+p.w&&w.y>=p.y&&w.y<=p.y+p.h);let t=pile||(plot?targets.find(t=>t.id===plot.id):targets[0]);const insideSquare=state.scene==='city'&&w.x>=14&&w.x<=24&&w.y>=10&&w.y<=18;if(!plot&&insideSquare&&Math.hypot(t.x-w.x,t.y-w.y)>=1.3)t=targets.find(t=>t.id==='build');
+const activeMapPointers=new Map();let pinchDistance=0,pinchUsed=false;
+function canvasTap(e){if(!me||$('welcome').open)return;canvas.focus();const r=canvas.getBoundingClientRect(),w=worldPoint(e.clientX-r.left,e.clientY-r.top);const targets=allTargets().sort((a,b)=>Math.hypot(a.x-w.x,a.y-w.y)-Math.hypot(b.x-w.x,b.y-w.y));const pile=targets.find(t=>t.type==='pickup'&&Math.hypot(t.x-w.x,t.y-w.y)<.7);const plot=pile||state.scene!=='city'?null:state.plots.find(p=>w.x>=p.x&&w.x<=p.x+p.w&&w.y>=p.y&&w.y<=p.y+p.h);let t=pile||(plot?targets.find(t=>t.id===plot.id):targets[0]);const insideSquare=state.scene==='city'&&w.x>=14&&w.x<=24&&w.y>=10&&w.y<=18;if(!plot&&insideSquare&&Math.hypot(t.x-w.x,t.y-w.y)>=1.3)t=targets.find(t=>t.id==='build');
   if(t&&(plot||insideSquare||Math.hypot(t.x-w.x,t.y-w.y)<1.3)){selected=t.id;if(Math.hypot(t.x-me.x,t.y-me.y)<=state.config.actionRange){updateContext();return;}
     let candidates=[];for(const[dx,dy]of [[0,1.4],[-1.4,0],[1.4,0],[0,-1.4]]){let dest={x:t.x+dx,y:t.y+dy};const path=findPath(dest);if(path)candidates.push(path);}candidates.sort((a,b)=>a.length-b.length);if(candidates[0])route=candidates[0];else toast('Пока нет доступного пути');
   }else{selected=null;const path=findPath(w);if(path)route=path;else toast(w.x>=state.config.river.x&&!bridgeOpen()?'Здесь нужна переправа. Сначала достройте мост.':'Не получается пройти — выбери свободное место.');}
+  routeWatch=null;
+}
+function pointerDistance(){const [a,b]=[...activeMapPointers.values()];return Math.hypot(a.x-b.x,a.y-b.y);}
+canvas.addEventListener('pointerdown',e=>{
+  if(e.button===2||!me||$('welcome').open)return;
+  if(e.pointerType!=='touch'){canvasTap(e);return;}
+  activeMapPointers.set(e.pointerId,{x:e.clientX,y:e.clientY,startX:e.clientX,startY:e.clientY});
+  if(activeMapPointers.size===2){pinchUsed=true;pinchDistance=pointerDistance();route=[];routeWatch=null;}
 });
-function zoom(value){view.zoom=Math.max(.8,Math.min(2.2,view.zoom*value));resize();}
+canvas.addEventListener('pointermove',e=>{
+  if(!activeMapPointers.has(e.pointerId))return;
+  const p=activeMapPointers.get(e.pointerId);p.x=e.clientX;p.y=e.clientY;
+  if(activeMapPointers.size===2){const distance=pointerDistance();if(pinchDistance>0&&distance>0)zoom(distance/pinchDistance);pinchDistance=distance;}
+});
+function finishMapPointer(e,cancelled=false){
+  const p=activeMapPointers.get(e.pointerId);if(!p)return;
+  const tap=!cancelled&&!pinchUsed&&activeMapPointers.size===1&&Math.hypot(e.clientX-p.startX,e.clientY-p.startY)<12;
+  activeMapPointers.delete(e.pointerId);
+  if(activeMapPointers.size<2)pinchDistance=0;
+  if(activeMapPointers.size===0)pinchUsed=false;
+  if(tap)canvasTap(e);
+}
+canvas.addEventListener('pointerup',e=>finishMapPointer(e));
+canvas.addEventListener('pointercancel',e=>finishMapPointer(e,true));
+function zoom(value){view.zoom=Math.max(.8,Math.min(2.2,view.zoom*value));resize();const indicator=$('zoomLevel');if(indicator)indicator.textContent=Math.round(view.zoom*100)+'%';}
 $('zoomIn').onclick=()=>zoom(1.2);$('zoomOut').onclick=()=>zoom(1/1.2);$('centerButton').onclick=()=>{if(me)openCityPanel('places');};
 canvas.addEventListener('wheel',e=>{e.preventDefault();zoom(e.deltaY<0?1.08:1/1.08);},{passive:false});
 function resize(){const dpr=devicePixelRatio||1;view.w=innerWidth;view.h=innerHeight;canvas.width=view.w*dpr;canvas.height=view.h*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);view.s=Math.max(view.w<760?20:12,Math.min((view.w-50)/48,(view.h-80)/(32*.76)))*view.zoom*(state?.scene&&state.scene!=='city'?1.8:1);}
