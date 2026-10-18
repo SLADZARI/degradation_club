@@ -87,6 +87,10 @@ jobs:
         id: mobile
         continue-on-error: true
         run: timeout 8m npm run test:mobile
+      - name: New city creation and two-player travel
+        id: cities
+        continue-on-error: true
+        run: timeout 8m npm run test:cities-browser
       - name: Inventory, trade, actions and mobile
         id: perimeter
         continue-on-error: true
@@ -159,6 +163,7 @@ jobs:
         env:
           PANELS: ${{ steps.panels.outcome }}
           MOBILE: ${{ steps.mobile.outcome }}
+          CITIES: ${{ steps.cities.outcome }}
           PERIMETER: ${{ steps.perimeter.outcome }}
           QUESTS: ${{ steps.quests.outcome }}
           EXPANSION: ${{ steps.expansion.outcome }}
@@ -179,7 +184,7 @@ jobs:
           echo "| Suite | Outcome |" >> "$GITHUB_STEP_SUMMARY"
           echo "|---|---|" >> "$GITHUB_STEP_SUMMARY"
           failed=0
-          for label in PANELS MOBILE PERIMETER QUESTS EXPANSION; do
+          for label in PANELS MOBILE CITIES PERIMETER QUESTS EXPANSION; do
             status="${!label}"
             echo "| $label | $status |" >> "$GITHUB_STEP_SUMMARY"
             if [[ "$status" != "success" ]]; then failed=1; fi
