@@ -59,7 +59,7 @@ test('Seed shop is independent city construction and public garden supports crop
  near(g,p,'public-garden');
  const before=totals(g);
  assert.equal(cmd(g,p,'publicSow','public-bed-0',{crop:'carrot'}).ok,true);
- p.bag.water=2;assert.equal(cmd(g,p,'publicWater','public-bed-0').ok,true);
+ assert.equal(cmd(g,p,'publicDrawWater','public-garden').ok,true);assert.equal(cmd(g,p,'publicDrawWater','public-garden').ok,true);assert.equal(p.bag.water,2);assert.equal(cmd(g,p,'publicWater','public-bed-0').ok,true);
  assert.equal(cmd(g,p,'publicHarvest','public-bed-0').ok,false);
  g.tick(120001);
  assert.equal(cmd(g,p,'publicHarvest','public-bed-0').ok,true);
