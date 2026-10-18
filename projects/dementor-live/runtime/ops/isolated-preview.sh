@@ -42,6 +42,11 @@ install(){
   git clone --depth 1 --filter=blob:none --sparse --single-branch -b "$REF" "$REPO" "$CODE" \
     || die "GitHub clone failed: check repository read access; no other services affected"
   git -C "$CODE" sparse-checkout set projects/dementor-live/runtime
+  # Lock GAME CODE to the verified release commit, not the newer documentation tip.
+  git -C "$CODE" fetch --depth 1 origin "$COMMIT" \
+    || die "Pinned release commit is not reachable; no server launched"
+  git -C "$CODE" checkout --detach "$COMMIT" \
+    || die "Could not check out the pinned release"
   actual="$(git -C "$CODE" rev-parse HEAD)"
   [[ "$actual" == "$COMMIT" ]] || die "Git commit changed: $actual, expected $COMMIT. Review before upgrading."
   [[ -f "$RUNTIME/server.mjs" && -f "$RUNTIME/package.json" && -d "$RUNTIME/public" ]] \
