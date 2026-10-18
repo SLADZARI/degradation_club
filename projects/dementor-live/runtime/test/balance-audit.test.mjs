@@ -116,3 +116,63 @@ test('Balance diagnostic: limited mineral deposits and seed-stock are not replen
     recommendation:'Add explicit replenishment/regrowth/supply policies and tests before perpetual construction.',
   }));
 });
+
+test('P0: the private tent converts six wood and two stone into embodied structure, not deletion',()=>{
+  const g=new Game(createWorld()),p=g.join('Хозяин');g.connect(p);
+  p.wallet=CONFIG.plotPrice;at(g,p,'plot-1');
+  assert.equal(issue(g,p,'buy','plot-1',{},'buy-plot').ok,true);
+  assert.equal(issue(g,p,'enterPlot','plot-1',{},'enter-plot').ok,true);
+  p.bag.wood=6;p.bag.stone=2;at(g,p,'tent');
+  const before=cityMaterialReport(g),currency=g.state.treasury+p.wallet;
+  assert.equal(issue(g,p,'homeUse','tent',{},'tent-foundation').ok,true);
+  const after=cityMaterialReport(g);
+  for(const kind of ['wood','stone'])assert.equal(after[kind].total,before[kind].total,'Tent destroyed '+kind);
+  assert.equal(after.wood.inStructures-before.wood.inStructures,6);
+  assert.equal(after.stone.inStructures-before.stone.inStructures,2);
+  assert.equal(g.state.treasury+p.wallet,currency);
+  assert.deepEqual(Object.fromEntries(['wood','stone'].map(kind=>[kind,g.state.plots[0].home.materialEmbodied[kind]])),{wood:6,stone:2});
+});
+
+test('P0: a crafted tool carries its mineral recipe into tools and scrap without loss',()=>{
+  const g=new Game(createWorld()),p=g.join('Кузнец');g.connect(p);
+  g.state.project.stage=CONFIG.stages.length;g.state.forge.stage=CONFIG.forge.stages.length;
+  p.bag.wood=2;p.bag.stone=2;
+  at(g,p,'forge-use');
+  const before=cityMaterialReport(g);
+  const result=issue(g,p,'craftTool','forge-use',{tool:'axe'},'crafted-tool');
+  assert.equal(result.ok,true,JSON.stringify(result));
+  let after=cityMaterialReport(g);
+  for(const kind of ['wood','stone'])assert.equal(after[kind].total,before[kind].total);
+  assert.equal(after.wood.inTools-before.wood.inTools,2);
+  assert.equal(after.stone.inTools-before.stone.inTools,2);
+  const item=p.toolItems.find(t=>t.tier==='crafted'&&t.kind==='axe');assert.ok(item);
+  const removed=issue(g,p,'discardTool',item.id,{},'discard-crafted-tool');
+  assert.equal(removed.ok,true,JSON.stringify(removed));
+  after=cityMaterialReport(g);
+  for(const kind of ['wood','stone'])assert.equal(after[kind].total,before[kind].total);
+  assert.equal(after.wood.inScrap,2);
+  assert.equal(after.stone.inScrap,2);
+});
+
+test('P0: seed shop delivery, completed works and payouts conserve both materials and PAPER',()=>{
+  const g=new Game(createWorld()),p=g.join('Строитель');g.connect(p);
+  p.bag.wood=8;p.bag.stone=6;
+  const startingMaterials=totals(g),startingMoney=g.state.treasury+p.wallet;
+  at(g,p,'seed-shop-drop');
+  const supply=issue(g,p,'deliver','seed-shop-drop',{},'seed-supply');
+  assert.equal(supply.ok,true,JSON.stringify(supply));
+  assert.deepEqual(totals(g),startingMaterials);
+  assert.equal(g.state.treasury+p.wallet,startingMoney);
+  at(g,p,'seed-shop-build');
+  for(let i=0;i<2;i++){
+    const work=issue(g,p,'build','seed-shop-build',{},'seed-work-'+i);
+    assert.equal(work.ok,true,JSON.stringify(work));
+    g.tick(CONFIG.buildMs+1);
+    assert.deepEqual(totals(g),startingMaterials);
+    assert.equal(g.state.treasury+p.wallet,startingMoney);
+  }
+  assert.equal(g.state.seedMarket.stage,CONFIG.seedMarket.stages.length);
+  assert.equal(g.state.seedMarket.consumed.wood,8);
+  assert.equal(g.state.seedMarket.consumed.stone,6);
+  assert.equal(g.state.seedMarket.spent,budgets.seedShop);
+});
