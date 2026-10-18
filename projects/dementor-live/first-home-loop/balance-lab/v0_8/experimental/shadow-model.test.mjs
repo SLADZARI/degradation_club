@@ -124,7 +124,6 @@ test('12. shortage triggers only explicitly registered finite projects, never fa
 });
 test('13. orders are finite and refunds preserve total PAPER',()=>{
   const s=projection({days:60,environment:'dry',policy:'upkeep'});
-  assert.ok(s.orders.every(o=>o.remaining===o.quantity-o.quantity+o.remaining)); // well-formed integer check below
   assert.ok(s.orders.every(o=>Number.isSafeInteger(o.remaining)&&Number.isSafeInteger(o.escrow)));
   assert.ok(s.orders.some(o=>o.status==='EXPIRED'),'dry scenario should leave at least one expired order');
   assert.equal(metrics(s).money.total,3600);
