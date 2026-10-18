@@ -48,6 +48,15 @@ jobs:
         run: npm run check
       - name: HTTP/SSE with temporary world
         run: npm run test:integration
+      - name: Create candidate update ZIP (excludes saves/secrets)
+        run: npm run pack
+      - name: Upload update package
+        uses: actions/upload-artifact@v4
+        with:
+          name: dementor-live-0_3_0-candidate-update
+          path: projects/dementor-live/dementor-live-workspace.zip
+          if-no-files-found: error
+          retention-days: 14
       - name: Upload model reports
         if: always()
         uses: actions/upload-artifact@v4
