@@ -30,7 +30,23 @@ async function closePanel(p){await p.page.locator('[data-close="cityPanel"]').cl
  await go(a,'tool-shop');await action(a);await a.page.locator('#buy-axe').click();await a.page.waitForFunction(()=>me.tools.axe===160&&me.wallet===180);await a.page.locator('#buy-pick').click();await a.page.waitForFunction(()=>me.tools.pick===160&&me.wallet===0);await screenshot(a,'dementor-live-tool-shop.png');await closePanel(a);
  await go(b,'tool-shop');await action(b);assert.equal(await b.page.locator('#buy-axe').isEnabled(),false);await closePanel(b);report.checks.push('shop charges 180 per premium tool, gives 160 uses, disables unaffordable purchase; independent wallets');
  await go(a,'wood-1');await action(a);await a.page.waitForFunction(()=>me.bag.wood===1&&me.tools.axe===159);await camera(a);await a.page.reload();await a.page.waitForFunction(()=>me&&connected&&me.tools.axe===159);await camera(a);report.checks.push('premium tool mines normally, loses one durability, follows camera and survives browser reload');
- const mobile=await player('Мобильный',true);await camera(mobile);await go(mobile,'tool-shop');await action(mobile);assert.equal(await mobile.page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);await screenshot(mobile,'dementor-live-tool-shop-mobile.png');await mobile.context.close();
+ const mobile=await player('Мобильный',true);await camera(mobile);await go(mobile,'tool-shop');await action(mobile);assert.equal(await mobile.page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);await screenshot(mobile,'dementor-live-tool-shop-mobile.png');
+  const zoomStart=await mobile.page.evaluate(()=>view.zoom);
+  await mobile.page.locator('#zoomIn').click();
+  assert.ok(await mobile.page.evaluate(z=>view.zoom>z,zoomStart),'mobile zoom + must change camera scale');
+  assert.equal(await mobile.page.locator('#zoomLevel').textContent(),'120%');
+  await mobile.page.locator('#zoomOut').click();
+  assert.ok(Math.abs((await mobile.page.evaluate(()=>view.zoom))-zoomStart)<.01,'mobile zoom - must restore scale');
+  await mobile.page.evaluate(()=>{
+    const el=document.querySelector('#world');
+    const send=(type,id,x,y)=>el.dispatchEvent(new PointerEvent(type,{bubbles:true,pointerType:'touch',pointerId:id,button:0,clientX:x,clientY:y}));
+    send('pointerdown',41,92,400);send('pointerdown',42,180,400);send('pointermove',42,260,400);
+    send('pointerup',42,260,400);send('pointerup',41,92,400);
+  });
+  assert.ok(await mobile.page.evaluate(z=>view.zoom>z+.15,zoomStart),'two-finger pinch must zoom without tapping a destination');
+  assert.equal(await mobile.page.evaluate(()=>route.length),0,'pinch must not start movement route');
+  report.checks.push('mobile +/- zoom buttons, visible percent and two-finger pinch without accidental route');
+  await mobile.context.close();
  await a.context.close();await b.context.close();await stop();await start();const restored=await req('/api/state',null,a.token);const p=restored.players.find(p=>p.id===a.id);assert.equal(p.tools.axe,159);assert.equal(p.toolInfo.axe.max,160);assert.equal(p.toolInfo.pick.max,160);report.checks.push('mobile 390px shop and navigation; actual process restart preserves premium tool condition');
  assert.deepEqual(report.consoleErrors,[]);assert.deepEqual(report.networkErrors,[]);report.pass=true;console.log(JSON.stringify(report,null,2));
 }catch(e){report.pass=false;report.error=e.stack;console.error(e);process.exitCode=1;}finally{if(browser)await browser.close();await stop();fs.mkdirSync(path.join(root,'reports'),{recursive:true});fs.writeFileSync(path.join(root,'reports/tools.json'),JSON.stringify(report,null,2)+'\n');fs.rmSync(tmp,{recursive:true,force:true});}})();
