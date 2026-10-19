@@ -131,6 +131,7 @@ const server=http.createServer(async(req,res)=>{
           p.results||=[];p.results.push({id:data.requestId,result});p.results=p.results.slice(-128);
         }else{
           const id=p.combatP0?.activeSessionId;
+          if(!id&&kind==='input'){json(res,200,{ok:true,ignored:true});return;}
           if(!id)throw Error('Нет активной экспедиции');
           result=combatAction(g.state,g.state.players,id,p.id,data,now);
           if(kind==='extract'||kind==='retreat'){
