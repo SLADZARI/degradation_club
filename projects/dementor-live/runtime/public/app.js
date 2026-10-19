@@ -29,11 +29,18 @@ function currentConfig(){return bridgeActive()?{...state.config,...state.config.
 function projectReady(p=currentProject(),c=currentConfig()){if(!state)return false;const s=c.stages[p.stage];return s&&p.stock.wood>=s.wood&&p.stock.stone>=s.stone;}
 function cargo(){return me?Object.entries(me.bag).reduce((n,[k,v])=>n+v*state.config.weights[k],0)+(me.delivery?.picked?me.delivery.quantity*state.config.weights[me.delivery.kind]:0):0;}
 function allTargets(){if(!state||!me)return [];
-  if(state.scene==='forest')return [...(state.world01?.region?.objects||[]),...state.players.filter(p=>p.id!==me.id&&p.online&&sameScene(p)).map(p=>({...p,type:'social'}))];
+  if(['mentalhumor','mentalhumor-hall'].includes(state.scene))return [...(state.mentalhumor?.objects||[]),...state.players.filter(p=>p.id!==me.id&&p.online&&sameScene(p)).map(p=>({...p,type:'social'}))];
+  if(state.scene==='forest')return [...(state.world01?.region?.objects||[]),{id:'mental-forest-gate',type:'mental-gate',x:37,y:28,title:'Тропа в MentalHumor'},...state.players.filter(p=>p.id!==me.id&&p.online&&sameScene(p)).map(p=>({...p,type:'social'}))];
   if(state.scene!=='city')return livingTargets();
-  return [...(state.cityNetwork?.current==='origin'?[state.world01.region.gate]:[]),state.config.expedition.gate,...(bridgeOpen()?[{id:'east-bank',type:'explore',x:40,y:13.5}]:[]),...(bridgeActive()?[{id:'bridge-drop',type:'project',x:32.5,y:12.3},{id:'bridge-build',type:'build',x:32,y:13.5}]:[]),{id:'tool-shop',type:'shop',x:24,y:3},...(state.forge.stage>=state.config.forge.stages.length?[{id:'forge-use',type:'forge',x:27,y:29.5}]:[]),{id:'warehouse',type:'warehouse',x:12,y:24},...(state.seedMarket.stage>=state.config.seedMarket.stages.length?[{id:'seed-shop',type:'seed-market',x:23,y:7}]:[{id:'seed-shop-build',type:'build',x:23,y:7}]),{id:'seed-shop-drop',type:'project',x:22,y:9},...(state.gardenProject.stage>=state.config.cityGarden.stages.length?[{id:'public-garden',type:'city-garden',x:28,y:9}]:[{id:'public-garden-build',type:'build',x:28,y:9}]),{id:'public-garden-drop',type:'project',x:26,y:9},{id:'city-registry',type:'city-registry',x:19,y:6},{id:'board',type:'board',x:3.2,y:8},{id:'mayor',type:'mayor',x:9,y:3},{id:'tools',type:'tools',x:9,y:6},{id:'project',type:'project',x:15,y:11},{id:'build',type:'build',x:18,y:14},...(forgeActive()?[{id:'forge-drop',type:'project',x:24.5,y:24},{id:'forge-build',type:'build',x:27,y:26}]:[]),...(state.drops||[]),...state.resources,...(state.plaza?.config.objects||[]),...state.plots.map(p=>({...p,type:'plot',x:p.x+p.w/2,y:p.y-1})),...state.players.filter(p=>p.id!==me.id&&p.online&&sameScene(p)).map(p=>({...p,type:'social'}))];
+  return [...(state.cityNetwork?.current==='origin'?[state.world01.region.gate,{id:'mental-city-gate',type:'mental-gate',x:17,y:2,title:'Дорога в MentalHumor'}]:[]),state.config.expedition.gate,...(bridgeOpen()?[{id:'east-bank',type:'explore',x:40,y:13.5}]:[]),...(bridgeActive()?[{id:'bridge-drop',type:'project',x:32.5,y:12.3},{id:'bridge-build',type:'build',x:32,y:13.5}]:[]),{id:'tool-shop',type:'shop',x:24,y:3},...(state.forge.stage>=state.config.forge.stages.length?[{id:'forge-use',type:'forge',x:27,y:29.5}]:[]),{id:'warehouse',type:'warehouse',x:12,y:24},...(state.seedMarket.stage>=state.config.seedMarket.stages.length?[{id:'seed-shop',type:'seed-market',x:23,y:7}]:[{id:'seed-shop-build',type:'build',x:23,y:7}]),{id:'seed-shop-drop',type:'project',x:22,y:9},...(state.gardenProject.stage>=state.config.cityGarden.stages.length?[{id:'public-garden',type:'city-garden',x:28,y:9}]:[{id:'public-garden-build',type:'build',x:28,y:9}]),{id:'public-garden-drop',type:'project',x:26,y:9},{id:'city-registry',type:'city-registry',x:19,y:6},{id:'board',type:'board',x:3.2,y:8},{id:'mayor',type:'mayor',x:9,y:3},{id:'tools',type:'tools',x:9,y:6},{id:'project',type:'project',x:15,y:11},{id:'build',type:'build',x:18,y:14},...(forgeActive()?[{id:'forge-drop',type:'project',x:24.5,y:24},{id:'forge-build',type:'build',x:27,y:26}]:[]),...(state.drops||[]),...state.resources,...(state.plaza?.config.objects||[]),...state.plots.map(p=>({...p,type:'plot',x:p.x+p.w/2,y:p.y-1})),...state.players.filter(p=>p.id!==me.id&&p.online&&sameScene(p)).map(p=>({...p,type:'social'}))];
 }
 function interaction(t){if(!t)return null;
+  if(t.type==='mental-gate')return {type:'mentalEnter',title:'🎭 Дорога в MentalHumor',hint:'Мир с Музеем смеха в центре',enabled:!me.spirit&&!me.job&&!me.delivery?.picked};
+  if(t.type==='mental-exit-city')return {type:'mentalReturnCity',title:'Вернуться в город',hint:'Дорога через музейный парк',enabled:!me.spirit};
+  if(t.type==='mental-exit-forest')return {type:'mentalReturnForest',title:'В Лес идей',hint:'По лесной тропе',enabled:!me.spirit};
+  if(t.type==='mental-museum-entry')return {type:'mentalMuseumEnter',title:'Войти в Музей смеха',hint:'Внутренний музейный зал',enabled:!me.spirit};
+  if(t.type==='mental-hall-exit')return {type:'mentalMuseumLeave',title:'Выйти из музея',hint:'Обратно в парк',enabled:!me.spirit};
+  if(['mental-display','mental-exhibit'].includes(t.type))return {type:'mentalInspect',title:t.title,hint:'Открыть исследовательскую карточку',enabled:!me.spirit};
   if(t.type==='world01-gate')return {type:'world01Enter',title:'Дорога в Лес идей',hint:'Пешком выйти из города · открыть большой регион',enabled:!me.spirit&&!me.job&&!me.delivery?.picked};
   if(t.type==='world01-exit')return {type:'world01Return',title:'Пешком домой',hint:'Вернуться в город той же дорогой',enabled:!me.spirit};
   if(t.type==='world01-scooter')return {type:'world01Scooter',title:'Стоянка самокатов',hint:state.world01.transport==='scooter'?'Вернуть самокат':'Взять тестовый самокат · ускорение ×1,65',enabled:!me.spirit};
@@ -84,18 +91,25 @@ function updateUI(){if(!me)return;renderQuick();
   if(me.wallet>=c.plotPrice&&!state.plots.some(x=>x.owner===me.id))task='Ты заработал на участок. Выбери свободный.';
   if(cargo()>=c.capacity)task='Рюкзак полон: сдай лишнее на городской склад или выложи через «Рюкзак».';
   if(state.scene==='forest')task='Лес идей: исследуй билборды, доску, стоянку самокатов и портал.';
+  if(state.scene==='mentalhumor')task='MentalHumor: исследуй парк, павильоны и музей в центре.';
+  if(state.scene==='mentalhumor-hall')task='Музей смеха: открой три экспозиции и выйди обратно в парк.';
   if(state.scene==='city'&&bridgeActive()&&!me.spirit&&me.hunger>=c.slowBelow&&cargo()<c.capacity&&(me.tools.axe||me.tools.pick))task=bridgeOpen()?'Мост открыт. Исследуй другой берег и добудь новые ресурсы.':'Принеси материалы на мост или возьми курьерский заказ на доске.';
   if(me.delivery&&!me.spirit)task=me.delivery.picked?`Доставь городской груз: ${deliveryLabel(me.delivery)}.`:'Забери заказ на городском складе · между нижними участками.';
-  $('task').textContent=state.scene==='forest'?task:forgeActive()?task.replaceAll('на площадь','к кузнице').replace('Площадь готова','Кузница готова'):task;
+  $('task').textContent=['forest','mentalhumor','mentalhumor-hall'].includes(state.scene)?task:forgeActive()?task.replaceAll('на площадь','к кузнице').replace('Площадь готова','Кузница готова'):task;
   if(state.scene==='forest')document.querySelector('#quest h1').textContent='Лес идей · WORLD-01';
-  $('world01Badge').hidden=state.scene!=='forest';$('world01Transport').textContent=state.world01?.transport==='scooter'?'🛴 Самокат':'🚶 Пешком';
+  if(state.scene==='mentalhumor')document.querySelector('#quest h1').textContent='MentalHumor · WORLD-02';
+  if(state.scene==='mentalhumor-hall')document.querySelector('#quest h1').textContent='Музей смеха · Зал';
+  $('world01Badge').hidden=!['forest','mentalhumor','mentalhumor-hall'].includes(state.scene);
+  $('world01Badge').querySelector('b').textContent=state.scene==='forest'?'🌲 ЛЕС ИДЕЙ':state.scene==='mentalhumor'?'🎭 MENTALHUMOR':'🏛 МУЗЕЙ СМЕХА';$('world01Transport').textContent=state.world01?.transport==='scooter'?'🛴 Самокат':'🚶 Пешком';
   $('world01Fast').hidden=!(state.scene==='city'&&state.world01?.portalUnlocked&&Math.hypot(me.x-30,me.y-2)<=state.config.actionRange);
+  $('mentalRouteButton').textContent=state.scene==='mentalhumor-hall'?'↩ ВЫХОД':state.scene==='mentalhumor'?'🏛 МУЗЕЙ':'🎭 MENTALHUMOR';
+  $('world01FindForest').textContent=state.scene==='mentalhumor'?'🌲 ЛЕС ИДЕЙ':state.scene==='mentalhumor-hall'?'↩ В ПАРК':state.scene==='forest'?'← ГОРОД':'🌲 МАРШРУТ';
   $('axeDurability').textContent=me.tools.axe?`${me.tools.axe} / ${me.toolInfo.axe.max}`:'в мэрии';$('pickDurability').textContent=me.tools.pick?`${me.tools.pick} / ${me.toolInfo.pick.max}`:'в мэрии';$('axeButton').classList.toggle('selected',me.equipped==='axe');$('pickButton').classList.toggle('selected',me.equipped==='pick');
   $('woodCount').querySelector('b').textContent=me.bag.wood;$('stoneCount').querySelector('b').textContent=me.bag.stone;$('foodCount').textContent=me.bag.food;$('cargo').textContent=`${Number(cargo().toFixed(1))} / ${c.capacity}`;$('cargo').parentElement.classList.toggle('full',cargo()>=c.capacity);$('eatButton').disabled=me.bag.food<1&&me.bag.carrot<1;
-  $('socialButton').textContent=state.trades.length?'Сделки · '+state.trades.length:'Жители';if(state.scene!=='city'&&state.scene!=='forest'){document.querySelector('#quest h1').textContent=state.scene==='interior'?'Твоя палатка':'Жизнь на участке';$('task').textContent='☷ Места участка · расчистка, палатка, вода и огород';$('stageTitle').textContent=`Палатка ${state.home.tent}/3 · грядки ${state.home.beds.length}/6`;$('projectPercent').textContent='';$('projectBar').style.width=`${(state.home.tent+state.home.beds.length)/9*100}%`;}$('worldNote').textContent=state.scene==='forest'?'Лес идей. Найди реальные клубные проекты.':state.scene==='city'?'Пустое поле сегодня. Наш город — завтра.':'Выращивай своё. Делись с соседями.';const chatSignature=JSON.stringify(state.chat.slice(-4));if(lastChatSignature!==chatSignature){lastChatSignature=chatSignature;const chat=$('chatMessages');chat.replaceChildren();for(const m of state.chat.slice(-4)){const div=document.createElement('div'),b=document.createElement('b');b.textContent=m.name;div.append(b,document.createTextNode(m.text));chat.append(div);}}
+  $('socialButton').textContent=state.trades.length?'Сделки · '+state.trades.length:'Жители';if(!['city','forest','mentalhumor','mentalhumor-hall'].includes(state.scene)){document.querySelector('#quest h1').textContent=state.scene==='interior'?'Твоя палатка':'Жизнь на участке';$('task').textContent='☷ Места участка · расчистка, палатка, вода и огород';$('stageTitle').textContent=`Палатка ${state.home.tent}/3 · грядки ${state.home.beds.length}/6`;$('projectPercent').textContent='';$('projectBar').style.width=`${(state.home.tent+state.home.beds.length)/9*100}%`;}$('worldNote').textContent=state.scene==='forest'?'Лес идей. Найди реальные клубные проекты.':state.scene==='mentalhumor'?'MentalHumor. Музей смеха и парк.':state.scene==='mentalhumor-hall'?'Музейные исследования и выставки.':state.scene==='city'?'Пустое поле сегодня. Наш город — завтра.':'Выращивай своё. Делись с соседями.';const chatSignature=JSON.stringify(state.chat.slice(-4));if(lastChatSignature!==chatSignature){lastChatSignature=chatSignature;const chat=$('chatMessages');chat.replaceChildren();for(const m of state.chat.slice(-4)){const div=document.createElement('div'),b=document.createElement('b');b.textContent=m.name;div.append(b,document.createTextNode(m.text));chat.append(div);}}
   if($('details').open){const details=$('projectDetails');details.replaceChildren();const rows=[['Древесина',`${p.accepted.wood} / ${c.need.wood} принято`],['Камень',`${p.accepted.stone} / ${c.need.stone} принято`],...c.stages.map((s,i)=>[s.title,i<p.stage?'Готово':i===p.stage?`${p.work} / ${s.works} работ`:'Следующий этап'])];
   for(const [name,value]of rows){const row=document.createElement('div');row.className='stage-row';const b=document.createElement('b'),span=document.createElement('span');b.textContent=name;span.textContent=value;row.append(b,span);details.append(row);}$('cityBudget').textContent=`Казна города · ${state.treasury} PAPER. Выплачено за текущий проект · ${p.spent} PAPER. Тестовые значения прототипа.`;}
-  if(state.scene!=='forest'&&typeof updateQuestTracker==='function')updateQuestTracker();if(typeof syncCityMusic==='function')syncCityMusic();updateContext();updateCityPanels();
+  if(!['forest','mentalhumor','mentalhumor-hall'].includes(state.scene)&&typeof updateQuestTracker==='function')updateQuestTracker();if(typeof syncCityMusic==='function')syncCityMusic();updateContext();updateCityPanels();
 }
 let cityPanelMode=null,cityPanelSignature='';
 function nearby(id){const t=allTargets().find(t=>t.id===id);return t&&Math.hypot(t.x-me.x,t.y-me.y)<=state.config.actionRange;}
@@ -192,7 +206,14 @@ for(const ev of ['pointerup','pointercancel','lostpointercapture'])world01Pad.ad
 });
 $('world01ActionButton').onclick=()=>{if(context?.enabled)doContext();else toast('Подойди к объекту и нажми «Действие».');};
 $('world01Fast').onclick=()=>act('world01FastTravel','world01-city-gate');
-$('world01FindForest').onclick=()=>{const gate=allTargets().find(t=>t.id===(state.scene==='forest'?'world01-exit':'world01-city-gate'));
+$('mentalRouteButton').onclick=()=>{
+  const key=state.scene==='city'?'mental-city-gate':state.scene==='forest'?'mental-forest-gate':
+    state.scene==='mentalhumor'?'mental-museum-entry':'mental-hall-exit';
+  const t=allTargets().find(o=>o.id===key);if(!t)return toast('В этой локации маршрут пока не найден');
+  if(Math.hypot(me.x-t.x,me.y-t.y)<=state.config.actionRange){selected=t.id;updateContext();doContext();return;}
+  navigateTo(t.id);
+};
+$('world01FindForest').onclick=()=>{const dest=state.scene==='forest'?'world01-exit':state.scene==='mentalhumor'?'mental-to-forest':state.scene==='mentalhumor-hall'?'mental-hall-exit':'world01-city-gate';const gate=allTargets().find(t=>t.id===dest);
   if(!gate)return toast('В этом городе входа в лес пока нет');
   selected=gate.id;
   if(Math.hypot(me.x-gate.x,me.y-gate.y)<=state.config.actionRange){updateContext();return doContext();}
@@ -217,6 +238,13 @@ setInterval(()=>{if(!connected||!me)return;let dx=0,dy=0;if(!$('welcome').open&&
 function screen(x,y){return {x:view.w/2+(x-view.cx)*view.s,y:view.h/2+(y-view.cy)*view.s*.76};}
 function worldPoint(x,y){return {x:(x-view.w/2)/view.s+view.cx,y:(y-view.h/2)/(view.s*.76)+view.cy};}
 function blocked(x,y){const c=state.config,r=.35;
+  if(state.scene==='mentalhumor-hall')return x<r||y<r||x>20-r||y>17-r;
+  if(state.scene==='mentalhumor'){
+    const b=state.mentalhumor?.museum;
+    return x<r||y<r||x>80-r||y>60-r||
+      (!!b&&x>b.x-.3&&x<b.x+b.w+.3&&y>b.y-.3&&y<b.y+b.h+.3)||
+      (state.mentalhumor?.trees||[]).some(t=>Math.hypot(x-t.x,y-t.y)<.78);
+  }
   if(state.scene==='forest')return x<r||y<r||x>64-r||y>48-r||(state.world01?.region?.trees||[]).some(t=>Math.hypot(t.x-x,t.y-y)<.78);
   if(state.scene!=='city'){return x<r||y<r||x>16-r||y>16-r||(['plot','expedition'].includes(state.scene)&&state.home.nodes.some(n=>n.left&&Math.hypot(x-n.x,y-n.y)<.63));}if(x<r||y<r||x>c.width-r||y>c.height-r)return true;if(x+r>c.river.x&&x-r<c.river.x+c.river.w&&!(bridgeOpen()&&y-r>=c.bridge.y&&y+r<=c.bridge.y+c.bridge.h))return true;
   if(x+r>4&&x-r<8&&y+r>4&&y-r<7)return true;return state.resources.some(o=>o.stock>0&&o.type!=='food'&&Math.hypot(x-o.x,y-o.y)<.63);
@@ -386,7 +414,7 @@ const q=screen(v.x,v.y),s=view.s*.9;const bob=moving?Math.sin(time*.015)*s*.05:0
 function showWorld01Card(card){
   const dialog=$('world01Card'),title=$('world01CardTitle'),body=$('world01CardBody'),link=$('world01CardLink');
   title.textContent=card.title||'Информация';body.textContent=card.body||'';$('world01CardSource').textContent=card.sourceRef+' · '+card.mode;
-  const url=typeof card.href==='string'&&card.href.startsWith('https://dementor.club/')?card.href:null;
+  const url=typeof card.href==='string'&&['https://dementor.club/','https://eestihuumor.ee/'].some(prefix=>card.href.startsWith(prefix))?card.href:null;
   link.hidden=!url;if(url)link.href=url;else link.removeAttribute('href');
   if(!dialog.open)dialog.showModal();
 }
@@ -404,6 +432,7 @@ function drawWorld01Forest(time){
  const nearby=t=>{const q=screen(t.x,t.y);return q.x>-120&&q.x<view.w+120&&q.y>-160&&q.y<view.h+120;};
  const entities=[...(forest.trees||[]).filter(nearby).map(t=>({y:t.y,draw:()=>drawTree(t)})),
    ...(state.players||[]).filter(p=>(p.online||p.id===me.id)&&sameScene(p)).map(p=>({y:p.y,draw:()=>drawPlayer(p,time)}))];
+ if(nearby({x:37,y:28}))entities.push({y:28,draw:()=>paperBoard(37,28,'MentalHumor →')});
  for(const o of forest.objects||[]){
    if(!nearby(o))continue;
    const p=screen(o.x,o.y);
@@ -419,8 +448,95 @@ function drawWorld01Forest(time){
  if(context){const q=screen(context.x,context.y);ctx.beginPath();ctx.ellipse(q.x,q.y+5,view.s*.65,view.s*.24,0,0,Math.PI*2);ctx.strokeStyle='#577d63';ctx.lineWidth=2;ctx.stroke();}
 }
 
+
+function drawMentalMuseumBuilding(b){
+  // Paper/ink axonometric interpretation inspired by the Purku former school.
+  // Separate low green wings, stone gable, red brick entrance, white windows and red roof.
+  groundRect({x:b.x-1.3,y:b.y-1,w:b.w+2.6,h:b.h+2},'#a6b39023','#899d8b44',false);
+  const unit=view.s,cx=b.x,cy=b.y;
+  const wing=(x,y,w,h)=>{
+    const p=screen(x,y),q=screen(x+w,y+h),wide=q.x-p.x,tall=q.y-p.y;
+    rounded(p.x,p.y-1.3*unit,wide,tall+1.3*unit,2,'#3e695c','#253f3a');
+    for(let lineY=p.y;lineY<q.y;lineY+=unit*.30)line(p.x,lineY,p.x+wide,lineY,'#84a7987d',1);
+    const roof=screen(x,y),edge=screen(x+w,y);
+    poly([[roof.x-4,roof.y-1.4*unit],[roof.x+wide*.46,roof.y-2.15*unit],[edge.x+5,roof.y-1.4*unit],[edge.x+5,roof.y-1.10*unit]],'#ab6552','#765044');
+    for(let i=1;i<Math.floor(w/1.65);i++){
+      const ww=screen(x+i*1.65,y+2);rounded(ww.x-unit*.27,ww.y-unit*1.0,unit*.74,unit*1.12,1,'#ebeee1','#c9d5ca');
+      rounded(ww.x-unit*.16,ww.y-unit*.91,unit*.50,unit*.87,1,'#a1babb','#657c78');
+      line(ww.x+unit*.09,ww.y-unit*.91,ww.x+unit*.09,ww.y-unit*.04,'#f7f8ea',2);
+      line(ww.x-unit*.16,ww.y-unit*.46,ww.x+unit*.34,ww.y-unit*.46,'#f5f6e9',2);
+    }
+  };
+  wing(29,17,6,11);wing(44,17,6,11);
+  const p=screen(34,14),q=screen(44,28),w=q.x-p.x,h=q.y-p.y;
+  rounded(p.x,p.y-1.2*unit,w,h+1.2*unit,2,'#8c9086','#59635d');
+  // Repeating irregular masonry elements rather than actual copyrighted photograph textures.
+  const masonry=['#7b8379','#a5aaa1','#656d68','#b0aa99','#8c8d87'];
+  for(let i=0;i<40;i++){
+    const col=i%8,row=Math.floor(i/8),x=p.x+col*w/8+Math.sin(i*1.6)*unit*.10;
+    const y=p.y-1.05*unit+row*(h+unit*.85)/5;
+    rounded(x+unit*.10,y+unit*.08,Math.max(2,w/9),Math.max(2,unit*.47),1,masonry[i%5],null);
+  }
+  poly([[p.x-unit*.14,p.y-1.22*unit],[p.x+w*.5,p.y-3.3*unit],[q.x+unit*.16,p.y-1.22*unit]],'#a75e4e','#674b45');
+  poly([[p.x+w*.5,p.y-3.3*unit],[q.x+unit*.16,p.y-1.22*unit],[q.x+unit*.10,p.y-.91*unit]],'#814f47','#674b45');
+  // Front red-brick portico.
+  const b0=screen(35.3,23.2),b1=screen(42.7,28.5);
+  rounded(b0.x,b0.y-unit*.45,b1.x-b0.x,b1.y-b0.y+unit*.5,1,'#ac6455','#805c54');
+  for(let i=0;i<6;i++)line(b0.x,b0.y+i*unit*.38,b1.x,b0.y+i*unit*.38,'#cc958077',.8);
+  const door=screen(39,28);rounded(door.x-unit*.44,door.y-unit*1.7,unit*.88,unit*1.7,1,'#574f4a','#e2ddcc');
+  for(const px of [36.7,41.2]){const w=screen(px,27);rounded(w.x-unit*.35,w.y-unit*1.7,unit*.72,unit*1.38,1,'#f1f1e5','#988c82');rounded(w.x-unit*.23,w.y-unit*1.55,unit*.48,unit*1.1,1,'#b8c8c7','#889995');}
+  // Museum plaques stay factual, no official partnership claim.
+  label('EESTI HUUMORIMUUSEUM',39,11.0,true);
+  label('МУЗЕЙ СМЕХА · MENTALHUMOR',39,30.7,true);
+}
+function drawMentalHumor(time){
+  const region=state.mentalhumor;if(!region)return;
+  const hall=state.scene==='mentalhumor-hall',bg=hall?'#dcd1b6':'#e3e7d5',edge=screen(0,0),end=screen(region.width,region.height);
+  rounded(edge.x,edge.y,end.x-edge.x,end.y-edge.y,2,bg,hall?'#a5957b':'#a1b09b');
+  if(hall){
+    // Public-facing *research* hall; no licensed recording or real museum exhibit art.
+    for(let y=1;y<region.height;y+=.95){const a=screen(1,y),b=screen(19,y);line(a.x,a.y,b.x,b.y,'#b3a18455',1);}
+    const rear=screen(2,2),end=screen(18,12);
+    rounded(rear.x,rear.y,end.x-rear.x,end.y-rear.y,5,'#eae1cf','#bcb095');
+    for(const obj of region.objects||[]){
+      const pt=screen(obj.x,obj.y);
+      if(obj.type==='mental-hall-exit'){paperBoard(obj.x,obj.y,'↩ ПАРК');continue;}
+      rounded(pt.x-view.s*.55,pt.y-view.s*.92,view.s*1.1,view.s*.82,3,'#6c806e','#425b49');
+      rounded(pt.x-view.s*.38,pt.y-view.s*.76,view.s*.76,view.s*.48,2,'#ede9d9','#bbc3b5');
+      label(obj.title,obj.x,obj.y-1.8,true);
+    }
+  }else{
+    for(let x=2;x<region.width;x+=5)for(let y=3;y<region.height;y+=5){
+      const p=screen(x,y);ctx.fillStyle='#899b7f12';ctx.fillRect(p.x,p.y,1,1);
+    }
+    for(const road of region.roads||[]){
+      ctx.beginPath();
+      road.forEach(([x,y],i)=>{const p=screen(x,y);i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y);});
+      ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle='#a4a08c';ctx.lineWidth=Math.max(12,view.s*2.4);ctx.stroke();
+      ctx.strokeStyle='#d5ccb6';ctx.lineWidth=Math.max(8,view.s*2.15);ctx.stroke();
+    }
+    const near=obj=>{const p=screen(obj.x,obj.y);return p.x>-140&&p.x<view.w+140&&p.y>-160&&p.y<view.h+160;};
+    const entities=[];
+    for(const t of region.trees||[])if(near(t))entities.push({y:t.y,fn:()=>drawTree(t)});
+    if(near({x:39,y:24}))entities.push({y:27,fn:()=>drawMentalMuseumBuilding(region.museum)});
+    for(const o of region.objects||[])if(near(o)){
+      if(o.type==='mental-museum-entry')continue; // front doors are part of building
+      entities.push({y:o.y,fn:()=>{
+        if(['mental-exit-city','mental-exit-forest'].includes(o.type)){paperBoard(o.x,o.y,o.type==='mental-exit-city'?'← ГОРОД':'← ЛЕС ИДЕЙ');return;}
+        paperBoard(o.x,o.y,o.title);
+      }});
+    }
+    for(const p of state.players.filter(p=>(p.online||p.id===me.id)&&sameScene(p)))entities.push({y:p.y,fn:()=>drawPlayer(p,time)});
+    entities.sort((a,b)=>a.y-b.y);for(const e of entities)e.fn();
+  }
+  if(hall)for(const p of state.players.filter(p=>(p.online||p.id===me.id)&&sameScene(p)))drawPlayer(p,time);
+  if(route.length){const p=screen(route.at(-1).x,route.at(-1).y);ctx.beginPath();ctx.arc(p.x,p.y,7,0,Math.PI*2);ctx.strokeStyle='#637f69';ctx.lineWidth=2;ctx.stroke();}
+  if(context){const p=screen(context.x,context.y);ctx.beginPath();ctx.ellipse(p.x,p.y+4,view.s*.64,view.s*.27,0,0,Math.PI*2);ctx.strokeStyle='#527c5e';ctx.lineWidth=2;ctx.stroke();}
+}
+
 function render(time){positionWindows();ctx.clearRect(0,0,view.w,view.h);ctx.fillStyle='#efebdf';ctx.fillRect(0,0,view.w,view.h);
   updateVisualPlayers(time);if(me){const hero=visualPlayers.get(me.id)||me;view.cx=hero.x;view.cy=hero.y;}
+  if(state&&['mentalhumor','mentalhumor-hall'].includes(state.scene)){drawMentalHumor(time);requestAnimationFrame(render);return;}
   if(state&&state.scene==='forest'){drawWorld01Forest(time);requestAnimationFrame(render);return;}
   if(state&&state.scene!=='city'){drawHome(time);requestAnimationFrame(render);return;}
   // Sparse paper grain; all world geometry below stays interactive and separate.
@@ -435,6 +551,7 @@ function render(time){positionWindows();ctx.clearRect(0,0,view.w,view.h);ctx.fil
   drawBridge();label('Другой берег',42,3,true);
   if(!state){for(const[x,y]of [[41,7],[44,10],[42,23],[45,26]])drawTree({x,y,stock:10});for(const[x,y]of [[42,16],[45,20]])drawStone({x,y,stock:10});}
   if(state?.expedition){const gate=state.config.expedition.gate;paperBoard(gate.x,gate.y,'Миссия · расчистка');}
+  if(state?.cityNetwork?.current==='origin')paperBoard(17,2,'MentalHumor ↗');
   drawProject();if(typeof drawPlaza==='function')drawPlaza();
   if(state){for(const plot of state.plots)drawPlot(plot);}else for(const o of [{x:4,y:15,w:6,h:6},{x:4,y:23,w:6,h:6},{x:14,y:23,w:6,h:6}])drawPlot(o);
   drawForge();
