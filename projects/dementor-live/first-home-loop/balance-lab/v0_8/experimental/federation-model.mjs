@@ -38,7 +38,7 @@ function createCity(id,index,treasury,environment){
   freightCapacity:RULES.freightCapacity,
   unmetMeals:0,unmetNoCash:0,unmetNoFood:0,spoiledCarrot:0,unservedCivic:0,waterShortage:0,
   blockedCargo:0,blockedStorage:0,unfundedWorks:0,harvests:0,services:0,serviceRevenue:0,
-  foodSales:0,foodNeeds:0,foodServed:0,subsidizedMeals:0,subsidySpent:0,workWages:0,workerTurn:0,consignmentPayout:0,ownMeals:0,transportBought:0,
+  foodSales:0,foodNeeds:0,foodServed:0,subsidizedMeals:0,subsidySpent:0,subsidizedZeroWallet:0,workWages:0,workerTurn:0,consignmentPayout:0,ownMeals:0,transportBought:0,
   sourceEvents:[],version:0,environment};
 }
 const active=(world,player)=>world.activity==='daily'||world.day%7<2;
@@ -99,22 +99,30 @@ const payWorker=(world,city,person,wage)=>{
  city.treasury-=wage;person.wallet+=wage;person.workIncome+=wage;city.workWages+=wage;world.wages+=wage;return true;
 };
 function foodForResidents(world,city){
- for(const p of residents(world,city)){
+ const residentsToday=residents(world,city);
+ // Rotate the service queue, rather than permanently favoring player #1.
+ const shift=world.foodMarket==='cooperative-basic'?world.day%Math.max(1,residentsToday.length):0;
+ const queue=residentsToday.slice(shift).concat(residentsToday.slice(0,shift));
+ let basicMealsIssued=0;
+ for(const p of queue){
    if(!active(world,p))continue;
    city.foodNeeds++;world.foodNeeds++;
-   const assistance=world.foodMarket==='cooperative'&&p.wallet<RULES.carrotPrice&&
-     p.wallet>=1&&city.treasury>=RULES.carrotPrice-p.wallet;
+   const basic=world.foodMarket==='cooperative-basic';
+   const assistance=(world.foodMarket==='cooperative'||basic)&&
+     p.wallet<RULES.carrotPrice&&(p.wallet>=1||(basic&&basicMealsIssued<1))&&
+     city.treasury>=RULES.carrotPrice-p.wallet;
    if(carrotCount(city)>0&&(p.wallet>=RULES.carrotPrice||assistance)){
      const contribution=assistance?p.wallet:RULES.carrotPrice;
      const cityCover=RULES.carrotPrice-contribution;
+     if(basic&&p.wallet===0&&cityCover===3){basicMealsIssued++;city.subsidizedZeroWallet++;}
      p.wallet-=contribution;
      if(cityCover){city.treasury-=cityCover;city.subsidySpent+=cityCover;city.subsidizedMeals++;}
      const portions=takeCarrot(city);
-     if(['consignment','cooperative'].includes(world.foodMarket))payGrowers(world,city,portions);
+     if(['consignment','cooperative','cooperative-basic'].includes(world.foodMarket))payGrowers(world,city,portions);
      else city.treasury+=RULES.carrotPrice;
      city.foodSales+=RULES.carrotPrice;
      city.foodServed++;world.consumed.CARROT_PLAYER++;
-   }else if(['consignment','cooperative'].includes(world.foodMarket)&&takeOwnFood(city,p.id)){
+   }else if(['consignment','cooperative','cooperative-basic'].includes(world.foodMarket)&&takeOwnFood(city,p.id)){
      // A grower can eat their own physical carrot without first purchasing it.
      city.foodServed++;city.ownMeals++;world.consumed.CARROT_PLAYER++;
    }else{
@@ -130,8 +138,8 @@ function farm(world,city){
  for(const [plotIndex,bed] of city.plots.entries()){
    if(bed.ready>0&&bed.ready<=world.day){
      if(carrotCount(city)+RULES.harvestCarrot<=city.storageCapacity&&
-        (['consignment','cooperative'].includes(world.foodMarket)||city.treasury>=RULES.carrotWage)){
-       if(!['consignment','cooperative'].includes(world.foodMarket))
+        (['consignment','cooperative','cooperative-basic'].includes(world.foodMarket)||city.treasury>=RULES.carrotWage)){
+       if(!['consignment','cooperative','cooperative-basic'].includes(world.foodMarket))
          must(payWorker(world,city,worker,RULES.carrotWage),'CARROT wages not paid');
        city.stock.CARROT+=RULES.harvestCarrot;
        city.carrots.push({at:world.day,qty:RULES.harvestCarrot,ownerId:worker.id});
@@ -184,7 +192,7 @@ export function createFederation({agents=15,cityCount=3,environment='normal',
  must(['normal','dry','wet'].includes(environment),'unknown weather');
  must(['trade','local'].includes(logistics),'unknown logistics');
  must(['daily','weekends'].includes(activity),'unknown activity');
- must(['municipal','consignment','cooperative'].includes(foodMarket),'unknown food ownership policy');
+ must(['municipal','consignment','cooperative','cooperative-basic'].includes(foodMarket),'unknown food ownership policy');
  const treasuries=Array.from({length:cityCount},(_,i)=>Math.floor(RULES.startingCityPAPER/cityCount)+(i===0?RULES.startingCityPAPER%cityCount:0));
  const cities=treasuries.map((money,i)=>createCity('city-'+(i+1),i,money,environment));
  const walletPool=RULES.totalPAPER-RULES.startingCityPAPER;
@@ -234,7 +242,7 @@ export function checkFederation(world){
  for(const key of ['CARROT','HEMP','PAPER_SHEET'])
    must(b[key]===0,'federation material violation '+key+': '+b[key]);
  for(const c of world.cities){
-   if(['consignment','cooperative'].includes(world.foodMarket))must(c.carrots.every(b=>!!playerById(world,b.ownerId)),
+   if(['consignment','cooperative','cooperative-basic'].includes(world.foodMarket))must(c.carrots.every(b=>!!playerById(world,b.ownerId)),
      'consignment carrots have no registered owner');
    must(c.treasury>=0&&Number.isSafeInteger(c.treasury),'negative treasury '+c.id);
    must(Object.values(c.stock).every(v=>Number.isSafeInteger(v)&&v>=0),'negative city stocks '+c.id);
@@ -380,9 +388,9 @@ export function authorizeSession(world,{actorId,cityId,eventId,accepted=false}){
  p.wallet-=RULES.sessionPrice;
  city.stock.PAPER_SHEET--;world.consumed.PAPER_SHEET_CIVIC++;
  const portions=takeCarrot(city);world.consumed.CARROT_CIVIC++;
- const cityIncome=['consignment','cooperative'].includes(world.foodMarket)?RULES.sessionPrice-RULES.carrotPrice:RULES.sessionPrice;
+ const cityIncome=['consignment','cooperative','cooperative-basic'].includes(world.foodMarket)?RULES.sessionPrice-RULES.carrotPrice:RULES.sessionPrice;
  city.treasury+=cityIncome;
- if(['consignment','cooperative'].includes(world.foodMarket))payGrowers(world,city,portions);
+ if(['consignment','cooperative','cooperative-basic'].includes(world.foodMarket))payGrowers(world,city,portions);
  city.services++;city.serviceRevenue+=cityIncome;world.totalServices++;
  checkFederation(world);
  return {ok:true,paid:RULES.sessionPrice,realGoods:['PAPER_SHEET','CARROT']};
@@ -464,7 +472,7 @@ export function federationMetrics(world){
   water:c.stock.WATER,carrot:c.stock.CARROT,paperSheet:c.stock.PAPER_SHEET,
   founded:c.index>=4,buildings:c.buildings,unmetFood:c.unmetMeals,unmetNoCash:c.unmetNoCash,unmetNoFood:c.unmetNoFood,
   ownMeals:c.ownMeals,consignmentPayout:c.consignmentPayout,
-  subsidizedMeals:c.subsidizedMeals,subsidySpent:c.subsidySpent,
+  subsidizedMeals:c.subsidizedMeals,subsidySpent:c.subsidySpent,zeroWalletMeals:c.subsidizedZeroWallet,
   services:c.services,feesAndSales:c.serviceRevenue,unservedRequests:c.unservedCivic,
   spoilage:c.spoiledCarrot,missingWater:c.waterShortage,blockedCargo:c.blockedCargo,blockedStorage:c.blockedStorage,
   exportable:c.exportable,
@@ -483,6 +491,7 @@ export function federationMetrics(world){
     rejections:world.rejectedShipments},
   food:{needs:world.foodNeeds,unmet:world.unmetMeals,
     subsidized:sum(world.cities.map(c=>c.subsidizedMeals)),
+    zeroWalletMeals:sum(world.cities.map(c=>c.subsidizedZeroWallet)),
     subsidiesSpent:sum(world.cities.map(c=>c.subsidySpent)),
     noCash:sum(world.cities.map(c=>c.unmetNoCash)),noFood:sum(world.cities.map(c=>c.unmetNoFood)),
     eaten:world.consumed.CARROT_PLAYER,
