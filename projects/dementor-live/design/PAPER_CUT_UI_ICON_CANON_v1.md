@@ -1,33 +1,34 @@
-# Dementor Live — PAPER CUT UI ICON CANON v1
-## LOCKED visual standard · 2026-10-19
+# Dementor Live — единый канон игровых иконок
+**PAPER CUT UI ICON CANON v1 · APPROVED / LOCKED**
 
-This document governs item/resource, bag, travel-collection and combat HUD icons. Existing hero, world objects and axonometric environment are **out of scope**.
+Применяется ко **всем версиям Dementor Live — существующим, поддерживаемым и будущим**. Это общий дизайн-контракт, а не новая ветка игры. Для исторических коммитов и уже скачанных сборок обязателен перенос ассетов и подключение при следующем обновлении: Git не изменяет прошлое автоматически.
 
-### Approved source sheets
-- Pack 01: 10 base icons, approved desaturated paper-cut illustration (wood, stone, food, seed_hemp, seed_carrot, hemp, carrot, water, axe, pick).
-- Pack 02: 10 additional icons, approved on 2026-10-19 (rifle, ammo, map, shirt, souvenir, paper, backpack, cargo, health, stamina).
-- The 20 derived transparent 256px PNGs + 64px thumbnails, 5×4 atlas, QA previews and integration installer are bundled in conversation artifact `Dementor_Live_Paper_Icons_v1_READY.zip`. **The binary pack must be installed/committed before enabling the loader in a deployed runtime**. A ZIP filename is not a public hosting URL.
-- Do not replace these with stock emoji, photorealistic icons, new or resampled illustration variants without explicit visual review.
+## Единственный утверждённый набор
+**Pack 01:** `wood`, `stone`, `food`, `seed_hemp`, `seed_carrot`, `hemp`, `carrot`, `water`, `axe`, `pick`.
+**Pack 02:** `rifle` (alias `starter-rifle`), `ammo`, `map`, `shirt`, `souvenir`, `paper`, `backpack`, `cargo`, `health`, `stamina`.
 
-### Nonnegotiable style
-- Childlike hand-scissored paper appliqué, clean but slightly irregular silhouette.
-- Two to four large paper layers; simple cut shapes, no intricate polygon subdivisions.
-- No shaggy fibers, heavy outlines, photorealism, glossy effects or intense contrast.
-- Keep approved muted palette: ochre #C9965B, terracotta #B8654D, sage #81936B, olive #526C4D, warm gray #92938B, water blue #8CAFB5, carrot orange #D98146, cream #E7D8BA.
-- Transparent icon PNGs; physical world sizes are not UI icon sizes. Use 32–48 CSS px for inventory slots. Keep UI count/durability labels as actual text.
+**20 одобренных изображений.** Иконки ресурсов и действий с такими идентификаторами должны выглядеть одинаково в рюкзаке, 6 быстрых слотах, магазинах, городских панелях, боевом HUD, туристическом киоске, документации, превью и новых экранах. Нельзя заменять одобренные иконки похожими изображениями, другими PNG, SVG, эмодзи или цветными пиктограммами. Расширения набора требуют отдельного художественного утверждения.
 
-### Canonical UI IDs
-| Group | IDs |
-| --- | --- |
-| city bag | wood, stone, food, seed_hemp, seed_carrot, hemp, carrot, water |
-| city tools | axe, pick |
-| combat profile | rifle (= starter-rifle), ammo |
-| travel collection | map, shirt, souvenir |
-| interface-only | paper (= PAPER wallet), backpack, cargo, health, stamina |
+## Визуальные правила (LOCK)
+- Детский примитивизм: вырезанная ножницами **бумажная аппликация строго из 2–4 крупных слоёв**.
+- Аккуратные, немного неидеальные линии ножничного реза. Без лохматых волокон, рваного края, множества мелких граней, псевдо-3D, бликов и фотореализма.
+- Приглушённые цвета: охра `#C9965B`, терракота `#B8654D`, шалфей `#81936B`, олива `#526C4D`, тёплый серый `#92938B`, голубой `#8CAFB5`, морковный `#D98146`, кремовый `#E7D8BA`. Перенос готовых исходников не повод их перекрашивать.
+- Прозрачный фон, визуальный размер 32–48 CSS px, исходники 256×256 PNG; маленькая версия 64×64.
+- Название, количество и прочность — настоящие текстовые метки рядом с иконкой, не нарисованные в файле.
 
-**Important:** only 8 types above are city-bag resource kinds. The rifle and ammunition are stored in combat profile, map/shirt/souvenir under worldTravel; interface-only icons do not introduce new inventory resources. Upgraded axes/picks reuse original shapes; show quality/durability in text/badge, not new graphics. The courier cargo is UI status of reserved real wood/stone, not a new physical material. No hero changes.
+## Хранение и подключение
+1. Папка единого runtime: `projects/dementor-live/runtime/public/assets/paper-icons/`.
+2. Единый sprite atlas: `paper_atlas_64_indexed.png` (сетка **5 колонок × 4 строки**), те же 20 иконок в порядке списка выше; JS-адаптер: `projects/dementor-live/runtime/public/paper-icons.js`.
+3. Рабочий исходный комплект, отдельные PNG и подробные хеши: `Dementor_Live_Paper_Icons_v1_READY.zip` (доставляется как артефакт, **не** замена Git-файлам). Установка локально: `node install-paper-icons.mjs <runtime-root>` после распаковки.
+4. Для новых сборок и поддерживаемых старых веток использовать **один и тот же набор файлов по тем же путям**. Файлы, которые не попали в checkout, требуется явно импортировать; одна запись в документации не подключает изображение.
+5. Проверять 20/20 mapping, загрузку атласа, отсутствие emoji для указанных предметов, 32/48px, мобильный интерфейс, быстрые ячейки, боевой HUD, туристическую коллекцию и отсутствие JS ошибок. Не считать версию принятой, пока эти проверки не пройдены.
 
-### Integration and release discipline
-Keep one canonical id->asset mapping. Replace UI item emojis and relevant HUD icons only; never alter game IDs, transaction ledger, saves, movement, combat, city geometry, or character models. Confirm no JS exceptions, 20 PNG alpha, 20 icon ID mappings, quickbar selection and counts, mobile 390px, world travel shop, combat HP/ammo display. Validate in browser before deploy. Production remains subject to separate release gates.
+## Границы игровой модели
+- Ресурсы городского рюкзака: первые **8** ID. `axe`/`pick` — экземпляры инструментов; улучшенные версии используют те же изображения и текстовый индикатор износа.
+- `rifle`/`ammo` — боевой профиль; `map`, `shirt`, `souvenir` — `worldTravel`; `paper`, `backpack`, `cargo`, `health`, `stamina` — визуальные статусы UI, **не** новый материальный ресурс.
+- Не менять героя, модель мира, иконки NPC, серверную экономику, сохранения, балансы и механики ради переноса графики.
 
-**Status:** Visual canonical specification approved. Binary export and standalone local installer packaged. GitHub runtime integration is pending import of the binary icon atlas; this documentation alone does not imply deployment.
+## Change control
+Любая ветка Dementor Live (включая QA, Combat, World Expansion и следующие версии) обязана наследовать этот канон. Обновление иконок разрешается только через ревизию стандарта и замену канонического атласа/PNG одновременно. Не плодить собственные визуальные наборы по версиям.
+
+**Состояние внедрения:** утверждённый канон и пакет готовы; наличие канона в ветке не доказывает публикацию PNG в этой ветке или обновление локального/production сервера.
