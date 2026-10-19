@@ -24,7 +24,7 @@ OLD_IMAGE="dementor-live:pre-world-p0-${STAMP}"
 NEEDS_ROLLBACK=0
 
 fail(){ echo "ERROR: $*" >&2; exit 1; }
-for command in docker curl grep cp node; do
+for command in docker curl grep cp; do
   command -v "$command" >/dev/null || fail "$command is missing on this VM"
 done
 [[ -f "$SOURCE/package.json" && -f "$SOURCE/deploy/Dockerfile" ]] || fail "Source must be a checked-out runtime directory"
@@ -86,7 +86,10 @@ for i in {1..30}; do
   fi
   sleep 1
 done
-[[ "$READY" == 1 ]] || fail "Health did not reach $EXPECTED_VERSION"
+if [[ "$READY" != 1 ]]; then
+  echo "Health did not reach $EXPECTED_VERSION" >&2
+  false # trigger ERR trap and game-only code rollback
+fi
 echo "HEALTH: $(curl -fsS "$PUBLIC_URL/api/health")"
 docker compose -p "$PROJECT" -f "$COMPOSE" --env-file "$ENV_FILE" ps "$SERVICE"
 NEEDS_ROLLBACK=0
