@@ -9,6 +9,7 @@ on:
       - 'projects/dementor-live/runtime/world.mjs'
       - 'projects/dementor-live/runtime/public/**'
       - 'projects/dementor-live/runtime/test/combat-http.test.mjs'
+      - 'projects/dementor-live/runtime/test/combat-mobile-qa.cjs'
       - 'projects/dementor-live/runtime/test/combat-p0.test.mjs'
       - 'projects/dementor-live/combat/**'
       - '.github/workflows/dementor-live-combat-p0.yml'
@@ -80,3 +81,6 @@ jobs:
       - name: Two independent browser clients including mobile
         working-directory: projects/dementor-live/runtime
         run: node test/combat-browser.cjs
+      - name: Mobile portrait, landscape, twin-stick and all controls
+        working-directory: projects/dementor-live/runtime
+        run: node test/combat-mobile-qa.cjs
