@@ -125,3 +125,6 @@ align-items:center;background:#f6f1e4e8;color:#3b5540;padding:7px 12px;border:1p
  .world01-touch-actions{width:110px;bottom:calc(40px + env(safe-area-inset-bottom));gap:3px}
  .world01-touch-actions button{min-height:29px;font-size:9px}
 }
+
+/* Respect HTML hidden for unapproved external sources: even when the anchor has a styled display. */
+.world01-card a[hidden]{display:none!important}
