@@ -19,6 +19,8 @@ const cityMaterials={
 };
 const buildings=[
  {id:'garden',signal:'UNMET_MEALS_OR_POPULATION',wood:18,stone:8,wage:24,afterDay:38},
+ {id:'fieldEast',signal:'REAL_MEAL_SHORTAGE',wood:14,stone:6,wage:19,afterDay:75},
+ {id:'fieldWest',signal:'PROLONGED_MEAL_SHORTAGE',wood:16,stone:8,wage:21,afterDay:110},
  {id:'cistern',signal:'WATER_SHORTAGE',wood:14,stone:12,wage:20,afterDay:45},
  {id:'marketHall',signal:'UNSERVED_CIVIC',wood:20,stone:10,wage:26,afterDay:48},
  {id:'coldStore',signal:'SPOILAGE',wood:16,stone:10,wage:24,afterDay:52},
@@ -28,7 +30,7 @@ export const FEDERATION_PROJECTS=buildings.map(x=>({...x}));
 const unique=(a)=>new Set(a).size===a.length;
 function createCity(id,index,treasury,environment){
  const stock=Object.fromEntries(['WOOD','STONE','WATER','CARROT','HEMP','PAPER_SHEET','SEED_CARROT','SEED_HEMP'].map(k=>[k,cityMaterials[k]?.[index]||0]));
- return {id,index,treasury,stock,carrots:[],plots:[{ready:0},{ready:0}],
+ return {id,index,treasury,stock,exportable:{WOOD:stock.WOOD,STONE:stock.STONE},carrots:[],plots:[{ready:0},{ready:0}],
   hempBed:{ready:0},buildings:[],rainBonus:0,storageCapacity:RULES.initialCarrotCapacity,
   carrotShelf:RULES.carrotShelf,maxWater:100,serviceSlots:RULES.initialServiceSlots,
   freightCapacity:RULES.freightCapacity,
@@ -187,7 +189,9 @@ export function checkFederation(world){
    must(Object.values(c.stock).every(v=>Number.isSafeInteger(v)&&v>=0),'negative city stocks '+c.id);
    must(carrotCount(c)===c.stock.CARROT,'carrot provenance not reflected in stock '+c.id);
    must(unique(c.buildings),'building repeated '+c.id);
-   must(c.plots.length>=2&&c.plots.length<=4,'unbounded plot creation');
+   must(c.plots.length>=2&&c.plots.length<=8,'unbounded plot creation');
+   for(const k of ['WOOD','STONE'])must(Number.isSafeInteger(c.exportable[k])&&c.exportable[k]>=0&&
+     c.exportable[k]<=c.stock[k],'exporting imported assets or broken provenance '+c.id+' '+k);
  }
  for(const p of world.players){
    must(Number.isSafeInteger(p.wallet)&&p.wallet>=0,'negative player balance');
@@ -204,6 +208,8 @@ export function checkFederation(world){
 }
 const projectNeed=(city,project,pop)=>({
  garden:pop>=5||city.unmetMeals>=9,
+ fieldEast:city.buildings.includes('garden')&&city.unmetMeals>=70,
+ fieldWest:city.buildings.includes('fieldEast')&&city.unmetMeals>=200,
  cistern:city.waterShortage>=12,
  marketHall:city.unservedCivic>=12,
  coldStore:city.spoiledCarrot>=8||city.blockedStorage>=8,
@@ -220,10 +226,13 @@ export function proposeProject(world,cityId,projectId,actorId){
  if(city.stock.WOOD<x.wood||city.stock.STONE<x.stone)return {ok:false,reason:'missing-material'};
  if(city.treasury<x.wage)return {ok:false,reason:'unfunded'};
  city.stock.WOOD-=x.wood;city.stock.STONE-=x.stone;
+ // Use imported stocks first when building; never let native export pool exceed stock.
+ city.exportable.WOOD=Math.min(city.exportable.WOOD,city.stock.WOOD);
+ city.exportable.STONE=Math.min(city.exportable.STONE,city.stock.STONE);
  world.embodied.WOOD+=x.wood;world.embodied.STONE+=x.stone;
  must(payWorker(world,city,p,x.wage),'building wage');
  city.buildings.push(x.id);world.totalBuildings++;bookEvent(city,'built:'+x.id);
- if(x.id==='garden')city.plots.push({ready:0},{ready:0});
+ if(['garden','fieldEast','fieldWest'].includes(x.id))city.plots.push({ready:0},{ready:0});
  if(x.id==='cistern'){city.rainBonus+=3;city.maxWater+=30;}
  if(x.id==='marketHall')city.serviceSlots++;
  if(x.id==='coldStore'){city.carrotShelf+=2;city.storageCapacity+=8;}
@@ -246,8 +255,13 @@ export function ship(world,{from,to,asset,qty,shipmentId,actorId,accepted=false}
  const price=RULES.shippingPrice[asset]||1,escrow=price*qty;
  if(qty>a.freightCapacity){a.blockedCargo++;world.rejectedShipments++;return {ok:false,reason:'capacity'};}
  if(a.stock[asset]<qty){world.rejectedShipments++;return {ok:false,reason:'stock'};}
+ if(['WOOD','STONE'].includes(asset)&&a.exportable[asset]<qty){
+   world.rejectedShipments++;return {ok:false,reason:'non-exportable-import'};
+ }
  if(b.treasury<escrow){world.rejectedShipments++;return {ok:false,reason:'unfunded'};}
- a.stock[asset]-=qty;b.treasury-=escrow;
+ a.stock[asset]-=qty;
+ if(['WOOD','STONE'].includes(asset))a.exportable[asset]-=qty;
+ b.treasury-=escrow;
  const d={id:shipmentId,asset,qty,from,to,actorId,eta:world.day+pathLength,
    status:'IN_TRANSIT',escrow,sourcePayment:price,deliveredAt:null};
  world.deliveries.push(d);world.deliveryIds.push(shipmentId);
@@ -280,10 +294,17 @@ export function foundCity(world,{id,parentId,actorId,eventId,funding=80,wood=4,s
  // New city gets NO naturally prefabricated materials or city PAPER. All assets
  // move from an existing owner. Natural rain subsequently follows city terrain.
  Object.keys(newCity.stock).forEach(key=>newCity.stock[key]=0);
+ newCity.exportable.WOOD=0;newCity.exportable.STONE=0;
  newCity.treasury=funding;source.treasury-=funding;
  for(const [asset,count] of [['WOOD',wood],['STONE',stone],
    ['SEED_CARROT',seedCarrot],['SEED_HEMP',seedHemp]]){
      newCity.stock[asset]+=count;source.stock[asset]-=count;
+     if(['WOOD','STONE'].includes(asset)){
+       const nativeMoved=Math.min(source.exportable[asset],count);
+       source.exportable[asset]-=nativeMoved;
+       newCity.exportable[asset]+=nativeMoved;
+       source.exportable[asset]=Math.min(source.exportable[asset],source.stock[asset]);
+     }
  }
  world.cities.push(newCity);actor.cityId=id;world.cityCreationIds.push(eventId);
  checkFederation(world);return newCity;
@@ -331,8 +352,11 @@ function requestSupplies(world,city,project){
   if(!deficit)continue;
   for(const seller of world.cities){
    if(seller.id===city.id)continue;
-   const reserve=kind==='WOOD'?6:4;
-   const movable=Math.max(0,seller.stock[kind]-reserve);
+   const sellerPop=residents(world,seller).length;
+   const pending=buildings.filter(b=>!seller.buildings.includes(b.id)&&
+     world.day>=b.afterDay&&projectNeed(seller,b,sellerPop));
+   const reserve=Math.max(kind==='WOOD'?6:4,...pending.map(p=>kind==='WOOD'?p.wood:p.stone));
+   const movable=Math.max(0,Math.min(seller.stock[kind],seller.exportable[kind])-reserve);
    if(!movable)continue;
    const shipmentQty=Math.min(deficit,movable,seller.freightCapacity);
    if(shipmentQty<=0)continue;
@@ -386,6 +410,7 @@ export function federationMetrics(world){
   founded:c.index>=4,buildings:c.buildings,unmetFood:c.unmetMeals,
   services:c.services,feesAndSales:c.serviceRevenue,unservedRequests:c.unservedCivic,
   spoilage:c.spoiledCarrot,missingWater:c.waterShortage,blockedCargo:c.blockedCargo,blockedStorage:c.blockedStorage,
+  exportable:c.exportable,
   cargoImports:world.arrivalHistory.filter(id=>world.deliveries.find(d=>d.id===id)?.to===c.id).length}));
  return {status:'EXPERIMENTAL_FEDERATION_NOT_ORIGINAL_NOT_SERVER',
   model:FEDERATION_ID,day:world.day,projectionDays:world.day-30,
