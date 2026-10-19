@@ -1,0 +1,177 @@
+{
+  "status": "LAB_REJECTED_UNSOLVED_WELFARE",
+  "workflow": 39277092506,
+  "commit": "042c0d8aae6e9081b5bb5c7d49549570c3ecf743",
+  "testsPass": 582,
+  "anchors": [
+    {
+      "agents": 20,
+      "cities": 3,
+      "environment": "normal",
+      "days": 360,
+      "local": {
+        "treasury": 3367,
+        "buildings": 3,
+        "unservedFood": 5724,
+        "services": 101,
+        "deliveries": 0
+      },
+      "trade": {
+        "treasury": 2869,
+        "buildings": 9,
+        "unservedFood": 5675,
+        "services": 151,
+        "deliveries": 23
+      },
+      "effect": {
+        "extraBuildings": 6,
+        "avoidedHunger": 49,
+        "freightTrades": 23
+      }
+    },
+    {
+      "agents": 20,
+      "cities": 3,
+      "environment": "dry",
+      "days": 360,
+      "local": {
+        "treasury": 3598,
+        "buildings": 3,
+        "unservedFood": 6050,
+        "services": 8,
+        "deliveries": 0
+      },
+      "trade": {
+        "treasury": 3308,
+        "buildings": 9,
+        "unservedFood": 5702,
+        "services": 149,
+        "deliveries": 22
+      },
+      "effect": {
+        "extraBuildings": 6,
+        "avoidedHunger": 348,
+        "freightTrades": 22
+      }
+    },
+    {
+      "agents": 20,
+      "cities": 3,
+      "environment": "wet",
+      "days": 360,
+      "local": {
+        "treasury": 3367,
+        "buildings": 3,
+        "unservedFood": 5724,
+        "services": 101,
+        "deliveries": 0
+      },
+      "trade": {
+        "treasury": 2869,
+        "buildings": 9,
+        "unservedFood": 5675,
+        "services": 151,
+        "deliveries": 23
+      },
+      "effect": {
+        "extraBuildings": 6,
+        "avoidedHunger": 49,
+        "freightTrades": 23
+      }
+    }
+  ],
+  "citySample": [
+    {
+      "id": "city-1",
+      "population": 7,
+      "treasury": 823,
+      "rawWOOD": 0,
+      "rawSTONE": 10,
+      "water": 96,
+      "carrot": 11,
+      "paperSheet": 3,
+      "founded": false,
+      "buildings": [
+        "garden",
+        "marketHall",
+        "fieldEast"
+      ],
+      "unmetFood": 2005,
+      "services": 51,
+      "feesAndSales": 867,
+      "unservedRequests": 34,
+      "spoilage": 1507,
+      "missingWater": 0,
+      "blockedCargo": 0,
+      "blockedStorage": 460,
+      "exportable": {
+        "WOOD": 0,
+        "STONE": 0
+      },
+      "cargoImports": 12
+    },
+    {
+      "id": "city-2",
+      "population": 7,
+      "treasury": 1102,
+      "rawWOOD": 6,
+      "rawSTONE": 10,
+      "water": 96,
+      "carrot": 11,
+      "paperSheet": 3,
+      "founded": false,
+      "buildings": [
+        "garden",
+        "marketHall",
+        "fieldEast"
+      ],
+      "unmetFood": 1997,
+      "services": 49,
+      "feesAndSales": 833,
+      "unservedRequests": 34,
+      "spoilage": 1509,
+      "missingWater": 0,
+      "blockedCargo": 0,
+      "blockedStorage": 464,
+      "exportable": {
+        "WOOD": 6,
+        "STONE": 0
+      },
+      "cargoImports": 4
+    },
+    {
+      "id": "city-3",
+      "population": 6,
+      "treasury": 944,
+      "rawWOOD": 15,
+      "rawSTONE": 14,
+      "water": 96,
+      "carrot": 11,
+      "paperSheet": 3,
+      "founded": false,
+      "buildings": [
+        "garden",
+        "marketHall",
+        "fieldEast"
+      ],
+      "unmetFood": 1673,
+      "services": 51,
+      "feesAndSales": 867,
+      "unservedRequests": 23,
+      "spoilage": 1543,
+      "missingWater": 0,
+      "blockedCargo": 0,
+      "blockedStorage": 466,
+      "exportable": {
+        "WOOD": 0,
+        "STONE": 14
+      },
+      "cargoImports": 7
+    }
+  ],
+  "suspected": [
+    "Need to separate non-affordability of food from actual crop shortages",
+    "Repeatedly paying the first local worker may centralize PAPER wealth rather than providing widespread purchasing power",
+    "Synchronous sowing changed but hunger persisted; cannot claim agricultural fix"
+  ]
+}
