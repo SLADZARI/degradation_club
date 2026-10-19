@@ -30,7 +30,15 @@ function acceptShot(r,startedAt){
 }
 if(!token)location.replace('/');
 function notify(txt){const el=$('message');el.textContent=String(txt);el.classList.add('visible');clearTimeout(msgTimer);msgTimer=setTimeout(()=>el.classList.remove('visible'),2600);}
-const id=()=>crypto.randomUUID();
+// Non-HTTPS local network (http://192.168… / 172…) is not a secure context on iOS.
+// crypto.randomUUID() and even crypto.getRandomValues() may be absent there.
+let localRequestCounter=0;
+const id=()=>{
+  const bytes=new Uint8Array(16);
+  if(globalThis.crypto?.getRandomValues)globalThis.crypto.getRandomValues(bytes);
+  else for(let i=0;i<bytes.length;i++)bytes[i]=Math.floor(Math.random()*256);
+  return 'p0-'+Date.now().toString(36)+'-'+(++localRequestCounter).toString(36)+'-'+Array.from(bytes,b=>b.toString(16).padStart(2,'0')).join('');
+};
 async function api(path,payload){
   const res=await fetch('/api/combat/'+path,{method:payload?'POST':'GET',headers:{...(token?{Authorization:'Bearer '+token}:{}),'Content-Type':'application/json'},
     ...(payload?{body:JSON.stringify({requestId:id(),...payload})}:{})});
