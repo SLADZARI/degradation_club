@@ -7,6 +7,7 @@
  #touchPads{bottom:calc(98px + env(safe-area-inset-bottom))}
 }
 @media(max-height:440px) and (orientation:landscape){
+ #touchPads{display:flex}
  header{height:38px}
  #missionBar{min-height:30px;padding:3px 9px}
  #objective{min-width:auto;flex:1}
