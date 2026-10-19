@@ -28,4 +28,20 @@ export class Game extends CoreGame{
     if(cmd?.type==='worldUse'||cmd?.type==='touristBuy')return worldTravelAction(this,p,cmd);
     return super.action(p,cmd);
   }
+  snapshot(p){
+    const actual=p.scene||'city',extended=!!WORLD_SCENES[actual];
+    let base;
+    if(extended)p.scene='city';
+    try{base=super.snapshot(p);}finally{if(extended)p.scene=actual;}
+    if(extended){
+      base.scene=actual;
+      base.home=null;base.homeTargets=[];
+      base.drops=this.state.drops.filter(o=>(o.scene||'city')===actual);
+      const self=base.players.find(o=>o.id===p.id);
+      if(self)self.scene=actual;
+    }
+    base.worldTravel=worldTravelView(this,p);
+    return base;
+  }
+
 }
