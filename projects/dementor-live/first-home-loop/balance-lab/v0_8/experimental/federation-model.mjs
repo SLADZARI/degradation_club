@@ -7,7 +7,9 @@ export const RULES=Object.freeze({
  totalPAPER:3600,startingCityPAPER:1800,carrotPrice:3,sessionPrice:SESSION_CONTRACT.price,
  harvestCarrot:4,carrotSeeds:2,harvestHemp:6,hempSeeds:2,
  cropWater:2,hempWater:2,craftWater:2,carrotGrowDays:3,hempGrowDays:4,
- carrotWage:3,hempWage:3,craftWage:4,freightCapacity:8,
+ // EXPERIMENT: a 4-CARROT harvest receives the same 12 PAPER that 4 residents pay.
+ // Physical production and real municipal escrow remain required.
+ carrotWage:12,hempWage:6,craftWage:6,freightCapacity:8,
  initialCarrotCapacity:12,carrotShelf:2,initialServiceSlots:1,
  shippingPrice:{WOOD:2,STONE:3},minPAPERForFounding:80,
 });
@@ -36,12 +38,18 @@ function createCity(id,index,treasury,environment){
   freightCapacity:RULES.freightCapacity,
   unmetMeals:0,unmetNoCash:0,unmetNoFood:0,spoiledCarrot:0,unservedCivic:0,waterShortage:0,
   blockedCargo:0,blockedStorage:0,unfundedWorks:0,harvests:0,services:0,serviceRevenue:0,
-  foodSales:0,foodNeeds:0,foodServed:0,workWages:0,transportBought:0,
+  foodSales:0,foodNeeds:0,foodServed:0,workWages:0,workerTurn:0,transportBought:0,
   sourceEvents:[],version:0,environment};
 }
 const active=(world,player)=>world.activity==='daily'||world.day%7<2;
 function residents(world,city){return world.players.filter(p=>p.cityId===city.id);}
-function working(world,city){return residents(world,city).find(p=>active(world,p));}
+function working(world,city){
+ const eligible=residents(world,city).filter(p=>active(world,p));
+ if(!eligible.length)return undefined;
+ const worker=eligible[city.workerTurn%eligible.length];
+ city.workerTurn++; // distribute real, funded work among eligible local residents
+ return worker;
+}
 function refillRain(world,city){
  const rain=world.environment==='dry'?1:world.environment==='wet'?10:6;
  const v=rain+city.rainBonus; // all inflow originates in the weather ledger
