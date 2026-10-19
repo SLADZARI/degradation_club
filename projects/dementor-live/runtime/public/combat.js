@@ -20,7 +20,7 @@ function acceptShot(r,startedAt){
   const effect={...r.shot,hit:!!r.hit,at:performance.now(),duration:280};
   shotEffects.push(effect);
   combatQa.lastShot=effect;combatQa.shots++;
-  if(r.hit){combatQa.hits++;combatQa.hitFeedbackCount++;}
+  if(r.hit){combatQa.hits++;combatQa.hitFeedbackCount++;combatQa.lastHitShot=effect;}
   if(shotEffects.length>12)shotEffects.shift();
   $('shotFeedback').textContent=r.hit?'ПОПАДАНИЕ −'+(r.shot.damage||0):r.shot.blocked?'ПРЕПЯТСТВИЕ':'ПРОМАХ';
   $('shotFeedback').dataset.kind=r.hit?'hit':r.shot.blocked?'blocked':'miss';
