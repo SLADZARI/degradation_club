@@ -233,8 +233,18 @@ setInterval(()=>{if(!connected||!me)return;let dx=0,dy=0;if(!$('welcome').open&&
   }if(!inputPending){inputPending=true;api('input',{dx,dy,sprint:keys.has('ShiftLeft')||keys.has('ShiftRight')}).catch(()=>{}).finally(()=>{inputPending=false;});}
 },80);
 
-function screen(x,y){return {x:view.w/2+(x-view.cx)*view.s,y:view.h/2+(y-view.cy)*view.s*.76};}
-function worldPoint(x,y){return {x:(x-view.w/2)/view.s+view.cx,y:(y-view.h/2)/(view.s*.76)+view.cy};}
+// ISO30 is a projection of the existing world coordinates, not a change to gameplay.
+const ISO_COS=Math.sqrt(3)/2;
+function screen(x,y){
+  if(state?.scene&&state.scene!=='city')return {x:view.w/2+(x-view.cx)*view.s,y:view.h/2+(y-view.cy)*view.s*.76};
+  const dx=x-view.cx,dy=y-view.cy;
+  return {x:view.w/2+(dx-dy)*view.s*ISO_COS,y:view.h/2+(dx+dy)*view.s*.5};
+}
+function worldPoint(x,y){
+  if(state?.scene&&state.scene!=='city')return {x:(x-view.w/2)/view.s+view.cx,y:(y-view.h/2)/(view.s*.76)+view.cy};
+  const u=(x-view.w/2)/(view.s*ISO_COS),v=(y-view.h/2)/(view.s*.5);
+  return {x:view.cx+(u+v)/2,y:view.cy+(v-u)/2};
+}
 function blocked(x,y){const c=state.config,r=.35;if(state.scene!=='city'){return x<r||y<r||x>16-r||y>16-r||(['plot','expedition'].includes(state.scene)&&state.home.nodes.some(n=>n.left&&Math.hypot(x-n.x,y-n.y)<.63));}if(x<r||y<r||x>c.width-r||y>c.height-r)return true;if(x+r>c.river.x&&x-r<c.river.x+c.river.w&&!(bridgeOpen()&&y-r>=c.bridge.y&&y+r<=c.bridge.y+c.bridge.h))return true;
   if(x+r>4&&x-r<8&&y+r>4&&y-r<7)return true;return state.resources.some(o=>o.stock>0&&o.type!=='food'&&Math.hypot(x-o.x,y-o.y)<.63);
 }
@@ -292,7 +302,13 @@ function poly(points,fill,stroke='#595d4b',width=1){ctx.beginPath();points.forEa
 function rounded(x,y,w,h,r,fill,stroke){ctx.beginPath();ctx.roundRect(x,y,w,h,r);if(fill){ctx.fillStyle=fill;ctx.fill();}if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=1;ctx.stroke();}}
 function line(x,y,x2,y2,color,width=1){ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x2,y2);ctx.strokeStyle=color;ctx.lineWidth=width;ctx.stroke();}
 function label(text,x,y,small=false){const p=screen(x,y);ctx.font=`${small?9:10}px Paper, Arial`;const width=ctx.measureText(text).width;rounded(p.x-width/2-7,p.y-10,width+14,18,6,'#f6f3e5dc');ctx.textAlign='center';ctx.fillStyle=small?'#939781':'#6c7460';ctx.fillText(text,p.x,p.y+2);}
-function groundRect(o,color,border,dash=false){const p=screen(o.x,o.y),w=o.w*view.s,h=o.h*view.s*.76;ctx.setLineDash(dash?[4,6]:[]);rounded(p.x,p.y,w,h,3,color,border);ctx.setLineDash([]);return {...p,w,h};}
+function groundRect(o,color,border,dash=false){
+  if(state?.scene&&state.scene!=='city'){const p=screen(o.x,o.y),w=o.w*view.s,h=o.h*view.s*.76;ctx.setLineDash(dash?[4,6]:[]);rounded(p.x,p.y,w,h,3,color,border);ctx.setLineDash([]);return {...p,w,h};}
+  const corners=[[o.x,o.y],[o.x+o.w,o.y],[o.x+o.w,o.y+o.h],[o.x,o.y+o.h]].map(([x,y])=>{const p=screen(x,y);return [p.x,p.y];});
+  ctx.setLineDash(dash?[4,6]:[]);poly(corners,color,border,1);ctx.setLineDash([]);
+  const xs=corners.map(v=>v[0]),ys=corners.map(v=>v[1]);
+  return {x:Math.min(...xs),y:Math.min(...ys),w:Math.max(...xs)-Math.min(...xs),h:Math.max(...ys)-Math.min(...ys)};
+}
 function shadow(x,y,rx,ry){ctx.beginPath();ctx.ellipse(x,y,rx,ry,0,0,Math.PI*2);ctx.fillStyle='#4f584013';ctx.fill();}
 // Shared paper volumes: front, right side and upper fold under one oblique projection.
 function paperBox(x,y,w,h,dx,dy,front='#c9b796',side='#a38e70',top='#e0d2b4'){
@@ -406,11 +422,12 @@ function render(time){positionWindows();ctx.clearRect(0,0,view.w,view.h);ctx.fil
   // Sparse paper grain; all world geometry below stays interactive and separate.
   ctx.fillStyle='#6b6f4b0a';for(let i=0;i<340;i++){const x=(i*137.23)%view.w,y=(i*211.71)%view.h;ctx.fillRect(x,y,1,1);}
   const c=state?.config||{width:48,height:32,river:{x:34,w:4}};
-  const edge=screen(0,0),far=screen(c.width,c.height);rounded(edge.x,edge.y,far.x-edge.x,far.y-edge.y,3,'#f3efdf88','#cbd0b230');
+  groundRect({x:0,y:0,w:c.width,h:c.height},'#f3efdf88','#cbd0b230');
   ctx.strokeStyle='#9ca27e12';ctx.lineWidth=.6;for(let x=0;x<=c.width;x+=2){const a=screen(x,0),b=screen(x,c.height);line(a.x,a.y,b.x,b.y,'#9ca27e12',.6);}for(let y=0;y<=c.height;y+=2){const a=screen(0,y),b=screen(c.width,y);line(a.x,a.y,b.x,b.y,'#9ca27e12',.6);}
   // Worn paths connecting the first public places.
   ctx.lineCap='round';for(const pts of [[[8,8],[11,8],[13,11],[18,14]],[[11,8],[11,21],[7,22]],[[11,21],[22,21],[27,23]]]){ctx.beginPath();for(let i=0;i<pts.length;i++){const p=screen(...pts[i]);i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y);}ctx.strokeStyle='#c5bda521';ctx.lineWidth=view.s*.85;ctx.stroke();}ctx.lineCap='butt';
-  const a=screen(c.river.x,0),b=screen(c.river.x+c.river.w,c.height);ctx.fillStyle='#becdc8';ctx.fillRect(a.x,a.y,b.x-a.x,b.y-a.y);line(a.x,a.y,a.x,b.y,'#96ada256',2);line(b.x,a.y,b.x,b.y,'#96ada256',2);
+  groundRect({x:c.river.x,y:0,w:c.river.w,h:c.height},'#becdc8','#96ada256');
+  for(const bank of [c.river.x,c.river.x+c.river.w]){const a=screen(bank,0),b=screen(bank,c.height);line(a.x,a.y,b.x,b.y,'#96ada256',2);}
   for(let i=0;i<20;i++){const p=screen(34.5+(i%3)*.95,.8+i*1.6);line(p.x,p.y,p.x+view.s*.7,p.y,'#e6ede352',1);}
   drawBridge();label('Другой берег',42,3,true);
   if(!state){for(const[x,y]of [[41,7],[44,10],[42,23],[45,26]])drawTree({x,y,stock:10});for(const[x,y]of [[42,16],[45,20]])drawStone({x,y,stock:10});}
