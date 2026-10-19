@@ -33,7 +33,7 @@ function createCity(id,index,treasury,environment){
   carrotShelf:RULES.carrotShelf,serviceSlots:RULES.initialServiceSlots,
   freightCapacity:RULES.freightCapacity,
   unmetMeals:0,spoiledCarrot:0,unservedCivic:0,waterShortage:0,
-  blockedCargo:0,unfundedWorks:0,harvests:0,services:0,serviceRevenue:0,
+  blockedCargo:0,blockedStorage:0,unfundedWorks:0,harvests:0,services:0,serviceRevenue:0,
   foodSales:0,foodNeeds:0,foodServed:0,workWages:0,transportBought:0,
   sourceEvents:[],version:0,environment};
 }
@@ -89,7 +89,7 @@ function farm(world,city){
        world.grown.CARROT+=RULES.harvestCarrot;world.grown.SEED_CARROT+=RULES.carrotSeeds;
        city.harvests++;bed.ready=0;
      }else{
-       if(carrotCount(city)+RULES.harvestCarrot>city.storageCapacity)city.blockedCargo++;
+       if(carrotCount(city)+RULES.harvestCarrot>city.storageCapacity)city.blockedStorage++;
        else city.unfundedWorks++;
      }
    }
@@ -203,7 +203,7 @@ const projectNeed=(city,project,pop)=>({
  garden:pop>=5||city.unmetMeals>=9,
  cistern:city.waterShortage>=12,
  marketHall:city.unservedCivic>=12,
- coldStore:city.spoiledCarrot>=8,
+ coldStore:city.spoiledCarrot>=8||city.blockedStorage>=8,
  freightDepot:city.blockedCargo>=8
 })[project.id]===true;
 function bookEvent(city,key){if(city.sourceEvents.includes(key))return false;city.sourceEvents.push(key);return true;}
@@ -228,7 +228,7 @@ export function proposeProject(world,cityId,projectId,actorId){
  checkFederation(world);
  return {ok:true,projectId:x.id,cityId};
 }
-export function ship(world,{from,to,asset,qty,shipmentId,actorId}){
+export function ship(world,{from,to,asset,qty,shipmentId,actorId,accepted=false}){
  const old=world.deliveries.find(s=>s.id===shipmentId);
  if(old)return old;
  must(typeof shipmentId==='string'&&shipmentId.length>=4,'ship ID required');
@@ -237,6 +237,7 @@ export function ship(world,{from,to,asset,qty,shipmentId,actorId}){
  const a=cityById(world,from),b=cityById(world,to),actor=playerById(world,actorId);
  must(a&&b&&a!==b&&actor,'invalid logistics parties');
  must(actor.cityId===from,'actor must be present at dispatch city');
+ must(accepted===true,'carrier approval required');
  if(world.logistics==='local')return {ok:false,reason:'isolated-city'};
  const pathLength=Math.abs(a.index-b.index);
  const price=RULES.shippingPrice[asset]||1,escrow=price*qty;
@@ -335,7 +336,7 @@ function requestSupplies(world,city,project){
    const actor=working(world,seller);if(!actor)continue;
    ship(world,{from:seller.id,to:city.id,asset:kind,qty:shipmentQty,
      shipmentId:'restock:'+city.id+':'+project.id+':'+kind+':'+world.day+':'+seller.id,
-     actorId:actor.id});
+     actorId:actor.id,accepted:true});
    return; // one shipment max per city per day; preserves transport capacity
   }
  }
@@ -381,7 +382,7 @@ export function federationMetrics(world){
   water:c.stock.WATER,carrot:c.stock.CARROT,paperSheet:c.stock.PAPER_SHEET,
   founded:c.index>=4,buildings:c.buildings,unmetFood:c.unmetMeals,
   services:c.services,feesAndSales:c.serviceRevenue,unservedRequests:c.unservedCivic,
-  spoilage:c.spoiledCarrot,missingWater:c.waterShortage,blockedCargo:c.blockedCargo,
+  spoilage:c.spoiledCarrot,missingWater:c.waterShortage,blockedCargo:c.blockedCargo,blockedStorage:c.blockedStorage,
   cargoImports:world.arrivalHistory.filter(id=>world.deliveries.find(d=>d.id===id)?.to===c.id).length}));
  return {status:'EXPERIMENTAL_FEDERATION_NOT_ORIGINAL_NOT_SERVER',
   model:FEDERATION_ID,day:world.day,projectionDays:world.day-30,
