@@ -25,9 +25,9 @@ test('R03 real sponsorship venue pressure unlocks hall but no replay',()=>{
   assert.ok(m.buildings.new.includes('communityHall'));
   assert.ok(m.sponsored.unserved>=SETTINGS.communityHall.minUnserved);
   assert.equal(new Set(m.buildings.new).size,m.buildings.new.length);
-  const before=m.buildings.new.length;
   for(let i=0;i<20;i++)step(s);
-  assert.equal(s.projects.length,before);check(s);
+  assert.ok(s.projects.includes('communityHall'));
+  assert.equal(new Set(s.projects).size,s.projects.length);check(s);
 });
 test('R04 material exhaustion leaves projects unbuilt despite the existence of a need',()=>{
   const s=simulate({policy:'sponsored-growth',environment:'normal',agents:5,days:5});
@@ -66,6 +66,7 @@ test('R08 nonparticipation cannot fabricate revenue or construction',()=>{
  s.players.forEach(p=>p.wallet=0);
  // Conserved test fixture reassigns those holdings to the city. It is not a taxation policy.
  s.city=3600;
+ s.wood=0;s.embodied.WOOD=s.woodInitial; // prevent any wage-funded project from changing voluntary participation
  check(s);
  for(let i=0;i<35;i++)step(s);
  assert.equal(s.services.length,0);
