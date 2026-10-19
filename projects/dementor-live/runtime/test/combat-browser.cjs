@@ -23,7 +23,7 @@ async function player(name,mobile=false){
  await page.waitForFunction(()=>typeof me!=='undefined'&&me&&connected);
  const id=await page.evaluate(()=>me.id);
  const token=await page.evaluate(()=>sessionStorage.getItem('dementor-token'));
- return {context,page,id,token};
+ return {context,page,id,token,mobile};
 }
 async function req(pathname,body){
  const r=await fetch(base+pathname,{method:'POST',headers:{'Content-Type':'application/json','x-test-key':'local-integration-tests'},body:JSON.stringify(body)});
@@ -32,7 +32,7 @@ async function req(pathname,body){
 async function toCombat(p){
  await req('/__test',{player:p.id,patch:{x:29,y:35}});
  await p.page.waitForFunction(()=>me&&Math.hypot(me.x-29,me.y-35)<.1&&context?.type==='combat',{timeout:10000});
- await p.page.locator('#actionButton').click();await p.page.waitForURL('**/combat');
+ await p.page.locator(p.mobile?'#mobileCombatButton':'#actionButton').click();await p.page.waitForURL('**/combat');
  await p.page.waitForFunction(()=>typeof battle!=='undefined'&&document.querySelector('#lobby')!==null);
 }
 (async()=>{
