@@ -1,0 +1,73 @@
+name: Dementor Universe MentalHumor museum slice
+on:
+  push:
+    branches:
+      - 'feature/dementor-universe-mentalhumor-*'
+    paths:
+      - 'projects/dementor-live/runtime/**'
+      - 'projects/dementor-live/universe/**'
+      - '.github/workflows/dementor-universe-mentalhumor.yml'
+  pull_request:
+    paths:
+      - 'projects/dementor-live/runtime/**'
+      - 'projects/dementor-live/universe/**'
+      - '.github/workflows/dementor-universe-mentalhumor.yml'
+permissions:
+  contents: read
+jobs:
+  museum-model:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate current shared engine syntax and gallery
+        run: |
+          node --check projects/dementor-live/runtime/world.mjs
+          node --check projects/dementor-live/runtime/mentalhumor.mjs
+          node --check projects/dementor-live/runtime/public/app.js
+          node --check projects/dementor-live/runtime/test/mentalhumor.test.mjs
+      - name: Museum/rights/travel/persistence tests
+        working-directory: projects/dementor-live/runtime
+        run: node --test test/mentalhumor.test.mjs test/world-01.test.mjs
+      - name: Existing city gameplay regressions
+        working-directory: projects/dementor-live/runtime
+        run: npm test
+      - name: Isolated workspace check and portable pack
+        working-directory: projects/dementor-live/runtime
+        run: |
+          npm run check
+          npm run pack
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dementor-universe-mentalhumor-workspace
+          path: projects/dementor-live/dementor-live-workspace.zip
+          if-no-files-found: error
+          retention-days: 14
+  museum-browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install test-only Chromium driver
+        working-directory: projects/dementor-live/runtime
+        run: npm install --no-save --no-package-lock playwright@1.56.1
+      - name: Install Chromium
+        working-directory: projects/dementor-live/runtime
+        run: npx playwright install --with-deps chromium
+      - name: Mobile museum exterior/interior/city/forest round trip
+        working-directory: projects/dementor-live/runtime
+        run: node test/mentalhumor-browser.cjs
+      - name: Browser report and screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dementor-universe-mentalhumor-qa
+          path: projects/dementor-live/runtime/reports/mentalhumor/
+          if-no-files-found: warn
+          retention-days: 14
