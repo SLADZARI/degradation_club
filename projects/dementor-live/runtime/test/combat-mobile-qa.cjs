@@ -17,7 +17,7 @@ async function makePlayer(name,size){
  const r=await fetchJson('/__test',{method:'POST',headers:{'x-test-key':'local-integration-tests','Content-Type':'application/json'},body:JSON.stringify({player:id,patch:{x:29,y:35,bag:{food:5}}})});
  assert.equal(r.status,200);
  await page.waitForFunction(()=>me?.x===29&&me?.y===35&&context?.type==='combat');
- await page.locator('#actionButton').click();await page.waitForURL('**/combat');await page.waitForFunction(()=>!document.querySelector('#lobby').hidden);
+ await page.locator('#mobileCombatButton').click();await page.waitForURL('**/combat');await page.waitForFunction(()=>!document.querySelector('#lobby').hidden);
  return {context,page,id,token};
 }
 function rects(page){return page.evaluate(()=>{
