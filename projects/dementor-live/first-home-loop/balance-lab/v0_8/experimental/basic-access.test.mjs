@@ -4,8 +4,8 @@ const opts={agents:20,cityCount:3,environment:'normal',logistics:'trade'};
 test('B01 zero-wallet residents can eat only a physical carrot, paid by the existing city',()=>{
  const w=createFederation({...opts,foodMarket:'cooperative-basic'}),p=w.players[0],city=w.cities[0];
  const transfer=p.wallet;p.wallet=0;city.treasury+=transfer;
- city.carrots=[{at:w.day,qty:1,ownerId:w.players[3].id}];city.stock.CARROT=1;
- w.grown.CARROT=1;checkFederation(w);
+ city.carrots=[{at:w.day,qty:8,ownerId:w.players[3].id}];city.stock.CARROT=8;
+ w.grown.CARROT=8;checkFederation(w);
  const start=city.treasury;dayStep(w);
  assert.ok(city.subsidizedZeroWallet>=1,'zero wallet basic meal not provided');
  assert.ok(city.subsidySpent>=3);
