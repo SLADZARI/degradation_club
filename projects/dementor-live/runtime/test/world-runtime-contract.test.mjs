@@ -40,8 +40,8 @@ test('R03 invalid kiosk kinds, poor users and unreachable kiosk do not debit mon
  assert.ok(sum>g.state.treasury);
 });
 test('R04 museum/farlands entry returns to exact portal arrival position after reloading state',()=>{
- const {game:g,p}=make();
  for(const [entry,scene,exit] of [['museum-entry','museum','museum-exit'],['farlands-entry','farlands','farlands-exit']]){
+  const {game:g,p}=make();
   at(g,p,entry);const orig={x:p.x,y:p.y};const m=treasuryAndWallet(g,p);
   assert.equal(command(g,p,'worldUse',entry).ok,true);
   assert.equal(p.scene,scene);assert.equal(g.snapshot(p).scene,scene);
@@ -49,8 +49,6 @@ test('R04 museum/farlands entry returns to exact portal arrival position after r
   at(restarted,rp,exit);assert.equal(command(restarted,rp,'worldUse',exit).ok,true);
   assert.equal(rp.scene,'city');assert.deepEqual([rp.x,rp.y],[orig.x,orig.y]);
   assert.equal(treasuryAndWallet(restarted,rp),m);
-  // replace original state to allow next loop, preserving the same player identity
-  g.state=restarted.state;
  }
 });
 test('R05 a player may not use world portals during a courier delivery',()=>{
