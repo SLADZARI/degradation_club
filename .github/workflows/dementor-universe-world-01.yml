@@ -1,0 +1,49 @@
+name: Dementor Universe WORLD-01 isolated forest
+on:
+  push:
+    branches:
+      - 'feature/dementor-universe-world-01-*'
+    paths:
+      - 'projects/dementor-live/runtime/**'
+      - 'projects/dementor-live/universe/**'
+      - '.github/workflows/dementor-universe-world-01.yml'
+  pull_request:
+    paths:
+      - 'projects/dementor-live/runtime/**'
+      - 'projects/dementor-live/universe/**'
+      - '.github/workflows/dementor-universe-world-01.yml'
+permissions:
+  contents: read
+jobs:
+  world-model:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Syntax on existing and new shared engine
+        run: |
+          node --check projects/dementor-live/runtime/world-01.mjs
+          node --check projects/dementor-live/runtime/world.mjs
+          node --check projects/dementor-live/runtime/life.mjs
+          node --check projects/dementor-live/runtime/public/app.js
+          node --check projects/dementor-live/runtime/test/world-01.test.mjs
+      - name: WORLD-01 region, character, money and ledger invariants
+        working-directory: projects/dementor-live/runtime
+        run: node --test test/world-01.test.mjs
+      - name: Existing city, tools, materials and plots regressions
+        working-directory: projects/dementor-live/runtime
+        run: npm test
+      - name: Verify isolated portable build
+        working-directory: projects/dementor-live/runtime
+        run: |
+          npm run check
+          npm run pack
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dementor-universe-world-01-workspace
+          path: projects/dementor-live/dementor-live-workspace.zip
+          if-no-files-found: error
+          retention-days: 14
