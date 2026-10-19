@@ -29,7 +29,7 @@ export function openSponsoredSession(s,{eventId,facility,sponsorId,at=s.day,expi
     const amount=item.quantity*item.unitPrice;
     const order={id:'D'+String(s.nextOrder++).padStart(6,'0'),
       referenceEvent:eventId,asset:item.asset,quantity:item.quantity,
-      remaining:item.quantity,unitPrice:item.unitPrice,escrow:amount,
+      remaining:item.quantity,filled:0,unitPrice:item.unitPrice,escrow:amount,
       status:'OPEN',postedAt:at,expiresAt:at+expiresIn,
       paidBy:'citizen',serviceId:eventId,sponsorId};
     s.orders.push(order);service.items.push(item.asset);
@@ -50,7 +50,7 @@ export function onSponsoredDelivery(s,order){
   if(service.orderIds.every(id=>s.orders.find(o=>o.id===id)?.status==='FILLED')){
     const earned=service.serviceFeeEscrow;
     service.serviceFeeEscrow=0;service.feePaid=earned;
-    s.city+=earned;
+    s.city+=earned;s.servicesRevenue+=earned;
     service.status='COMPLETE';
     s.ledgerEvents++;
   }
@@ -81,7 +81,7 @@ export function validateServices(s){
     invariant(new Set(v.orderIds).size===v.orderIds.length,'service order replay duplicated');
     const orders=v.orderIds.map(id=>s.orders.find(o=>o.id===id));
     invariant(orders.every(o=>o&&o.serviceId===v.id&&o.sponsorId===v.sponsorId),'escrow order mismatch');
-    invariant(v.delivered===orders.reduce((n,o)=>n+o.quantity-(o.status==='EXPIRED'?o.remaining:0)-(o.status==='OPEN'?o.remaining:0),0),
+    invariant(v.delivered===orders.reduce((n,o)=>n+o.filled,0),
       'delivered item ledger mismatch');
     if(v.status==='COMPLETE'){
       invariant(orders.every(o=>o.status==='FILLED')&&v.serviceFeeEscrow===0,'fee paid for incomplete service');
