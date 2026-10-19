@@ -47,6 +47,8 @@ for(const policy of ['upkeep','needs-growth','sponsored-growth'])
        newBuildings:m.buildings.new,orders:m.demand.posted,
        ordersFilled:m.demand.filled,ordersExpired:m.demand.expired,
        unfundedOrders:m.demand.unfunded,foodUnmet:m.food.unmet,
+       serviceFees:m.sponsored.feesEarned,sponsoredEvents:m.sponsored.completed,
+       sponsorRefunds:m.sponsored.refunded,sponsorPartial:m.sponsored.partial,
        sheetsUsed:m.sheets.used,wood:m.finiteMaterials.wood,stone:m.finiteMaterials.stone
      });
    }
