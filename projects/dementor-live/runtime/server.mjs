@@ -142,7 +142,10 @@ const server=http.createServer(async(req,res)=>{
             }
           }
         }
-        g.changed();save();broadcast();json(res,200,result);return;
+        // High-frequency movement is transient: never sync-write the entire world on every 125ms input.
+        // Critical inventory/weapon/combat commands are still persisted immediately.
+        if(kind==='input'){json(res,200,result);return;}
+        g.changed();save();json(res,200,result);return;
       }
       if(url.pathname==='/api/input'){if(!network.gameFor(p).online.has(p.id))throw Error('Нет подключения к миру');network.gameFor(p).input(p,data);json(res,200,{ok:true});return;}
       if(url.pathname==='/api/action'){if(!network.gameFor(p).online.has(p.id))throw Error('Нет подключения к миру');const result=['createCity','travelCity'].includes(data.type)?network.command(p,data):network.gameFor(p).command(p,data);save();broadcast();json(res,200,result);return;}
