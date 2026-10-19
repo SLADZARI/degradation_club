@@ -144,7 +144,7 @@ test('15. model assumptions are clearly TEST and not a game rule',()=>{
   assert.equal(SETTINGS.pantryShelfDays,3);
   assert.equal(SETTINGS.maintenanceIntervalDays,7);
   assert.equal(SETTINGS.oldProjects,3);
-  assert.deepEqual(SETTINGS.experiments,['static','upkeep','needs-growth']);
+  assert.deepEqual(SETTINGS.experiments,['static','upkeep','needs-growth','sponsored-growth']);
 });
 for(const activity of SETTINGS.activityProfiles){
  for(const policy of SETTINGS.experiments){
