@@ -50,6 +50,11 @@ export function initializeWorldTravel(g){
   for(const p of Object.values(g.state.players))p.worldTravel||={mapOwned:false,souvenirs:{shirt:0,souvenir:0},visited:['city']};
 }
 export function worldTravelAction(g,p,cmd){
+  // Return a previously settled paid result *before* proximity or region checks:
+  // delayed network retries must not charge again just because the player moved.
+  if(cmd?.type==='touristBuy'&&p.worldTravel?.purchaseReceipts&&
+      Object.hasOwn(p.worldTravel.purchaseReceipts,cmd.requestId))
+    return p.worldTravel.purchaseReceipts[cmd.requestId];
   const object=worldObjects(p.scene||'city').find(o=>o.id===cmd.target);
   if(!['worldUse','touristBuy'].includes(cmd.type))return null;
   if(!object)throw Error('Такого места нет в текущем регионе');
