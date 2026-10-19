@@ -5,7 +5,7 @@ import {SESSION_CONTRACT,openSponsoredSession,serviceFeeEscrow,validateServices}
 const start=()=>simulate({policy:'sponsored-growth',environment:'normal',agents:3,days:1});
 test('S01 service is citizen-funded: 15 to physically fulfill and 2 HELD until complete',()=>{
   const s=start(),p=s.players[0],oldWallet=p.wallet,oldCity=s.city;
-  const ev=openSponsoredSession(s,{eventId:'intent:square:1',facility:'square',sponsorId:p.id});
+  const ev=openSponsoredSession(s,{eventId:'intent:square:1',facility:'square',sponsorId:p.id,actorId:p.id,accepted:true});
   assert.ok(ev);assert.equal(p.wallet,oldWallet-17);
   assert.equal(s.city,oldCity,'cannot book speculative municipal revenue');
   assert.equal(ev.serviceFeeEscrow,2);assert.equal(serviceFeeEscrow(s),2);
@@ -17,9 +17,9 @@ test('S01 service is citizen-funded: 15 to physically fulfill and 2 HELD until c
 });
 test('S02 duplicate service event cannot double-charge the citizen',()=>{
   const s=start(),p=s.players[0];
-  const ev=openSponsoredSession(s,{eventId:'intent:square:2',facility:'square',sponsorId:p.id});
+  const ev=openSponsoredSession(s,{eventId:'intent:square:2',facility:'square',sponsorId:p.id,actorId:p.id,accepted:true});
   const after=p.wallet;
-  assert.equal(openSponsoredSession(s,{eventId:'intent:square:2',facility:'square',sponsorId:p.id}),ev);
+  assert.equal(openSponsoredSession(s,{eventId:'intent:square:2',facility:'square',sponsorId:p.id,actorId:p.id,accepted:true}),ev);
   assert.equal(p.wallet,after);
   assert.equal(s.orders.length,2);
   assert.equal(s.services.length,1);check(s);
@@ -28,13 +28,13 @@ test('S03 insufficient balance rejects an optional service, with no credit/fee',
   const s=start(),p=s.players[0],before=metrics(s).money;
   p.wallet=10;s.city+=before.players-(s.players.reduce((n,q)=>n+q.wallet,0));
   check(s);
-  assert.equal(openSponsoredSession(s,{eventId:'intent:poor:1',facility:'square',sponsorId:p.id}),null);
+  assert.equal(openSponsoredSession(s,{eventId:'intent:poor:1',facility:'square',sponsorId:p.id,actorId:p.id,accepted:true}),null);
   assert.equal(s.services.length,0);assert.equal(s.orders.length,0);
   assert.equal(s.servicesRevenue,0);check(s);
 });
 test('S04 expired physically unfilled event refunds exactly 17 and cannot grant city fees',()=>{
   const s=start(),p=s.players[0],before=p.wallet,city=s.city;
-  const ev=openSponsoredSession(s,{eventId:'intent:expire:1',facility:'square',sponsorId:p.id,expiresIn:1});
+  const ev=openSponsoredSession(s,{eventId:'intent:expire:1',facility:'square',sponsorId:p.id,actorId:p.id,accepted:true,expiresIn:1});
   assert.equal(ev.serviceFeeEscrow,2);
   step(s); // expires at beginning of day 32, before products or service delivery
   assert.equal(ev.status,'EXPIRED');assert.equal(ev.feePaid,0);
@@ -45,13 +45,13 @@ test('S04 expired physically unfilled event refunds exactly 17 and cannot grant 
 });
 test('S05 manual overwriting of fee escrow is caught as counterfeit PAPER',()=>{
   const s=start(),p=s.players[0];
-  const ev=openSponsoredSession(s,{eventId:'intent:tamper:1',facility:'square',sponsorId:p.id});
+  const ev=openSponsoredSession(s,{eventId:'intent:tamper:1',facility:'square',sponsorId:p.id,actorId:p.id,accepted:true});
   ev.serviceFeeEscrow+=1;assert.throws(()=>check(s),/PAPER minted/);
 });
 test('S06 player cannot sponsor another identity with missing authorization',()=>{
   const s=start();
-  assert.throws(()=>openSponsoredSession(s,{eventId:'intent:ghost:1',facility:'square',sponsorId:'missing'}),/not a registered player/);
-  assert.throws(()=>openSponsoredSession(s,{eventId:'x',facility:'square',sponsorId:s.players[0].id}),/bad service event ID/);
+  assert.throws(()=>openSponsoredSession(s,{eventId:'intent:ghost:1',facility:'square',sponsorId:'missing',actorId:'missing',accepted:true}),/not a registered player/);
+  assert.throws(()=>openSponsoredSession(s,{eventId:'x',facility:'square',sponsorId:s.players[0].id,actorId:s.players[0].id,accepted:true}),/bad service event ID/);
   check(s);
 });
 test('S07 long horizon has no double service fees and all physical goods are accounted',()=>{
@@ -77,7 +77,7 @@ test('S08 unmet venue capacity can cause demand-justified functional hall constr
 });
 test('S09 no public funds are consumed by an unsupported session request',()=>{
   const s=start(),p=s.players[0],beforeCity=s.city;
-  const a=openSponsoredSession(s,{eventId:'intent:square:book',facility:'square',sponsorId:p.id});
+  const a=openSponsoredSession(s,{eventId:'intent:square:book',facility:'square',sponsorId:p.id,actorId:p.id,accepted:true});
   assert.ok(a);
   assert.equal(s.city,beforeCity);
   assert.equal(s.orders.reduce((n,o)=>n+o.escrow,0)+serviceFeeEscrow(s),17);
@@ -97,4 +97,21 @@ test('S11 municipal revenue is tied to fully delivered utility, not the act of c
   check(s);
   assert.equal(s.servicesRevenue,s.services.filter(v=>v.status==='COMPLETE').length*SESSION_CONTRACT.municipalFee);
   assert.equal(s.services.filter(v=>v.status==='PARTIAL'||v.status==='EXPIRED').reduce((n,v)=>n+v.feePaid,0),0);
+});
+
+test('S12 an unaccepted session cannot transfer any PAPER or create a service',()=>{
+ const s=start(),p=s.players[0],old=p.wallet;
+ assert.throws(()=>openSponsoredSession(s,{
+   eventId:'unapproved:1',facility:'square',sponsorId:p.id,actorId:p.id,accepted:false
+ }),/explicit sponsor consent required/);
+ assert.equal(s.services.length,0);assert.equal(s.orders.length,0);
+ assert.equal(p.wallet,old);check(s);
+});
+test('S13 cross-account sponsorship without authenticated actor is rejected',()=>{
+ const s=start(),a=s.players[0],b=s.players[1],before=JSON.stringify(s.players.map(p=>p.wallet));
+ assert.throws(()=>openSponsoredSession(s,{
+   eventId:'impersonated:1',facility:'square',sponsorId:a.id,actorId:b.id,accepted:true
+ }),/caller must be the account holder/);
+ assert.equal(JSON.stringify(s.players.map(p=>p.wallet)),before);
+ assert.equal(s.services.length,0);check(s);
 });
