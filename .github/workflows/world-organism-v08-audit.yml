@@ -43,7 +43,7 @@ jobs:
       - name: Export deterministic projections / D60-D90-D120 and +180/+360 day horizons
         working-directory: projects/dementor-live/first-home-loop/balance-lab/v0_8/experimental
         run: node run-projection.mjs reports
-      - name: Federation model with 10-20 agents and 2-4 cities (162 scenarios)
+      - name: Federation model 10-20 agents, 2-4 cities, 324 scenarios / 2 ownership policies
         working-directory: projects/dementor-live/first-home-loop/balance-lab/v0_8/experimental
         run: node --test federation-model.test.mjs
       - name: Archive federation balance and logistics data
@@ -53,7 +53,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: world-organism-v083-federation-plus-b5-economy-report
+          name: world-organism-v083-federation-324-plus-b5-economy-report
           path: projects/dementor-live/first-home-loop/balance-lab/v0_8/experimental/reports/
           if-no-files-found: warn
           retention-days: 30
