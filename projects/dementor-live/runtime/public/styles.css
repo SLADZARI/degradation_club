@@ -111,3 +111,17 @@ align-items:center;background:#f6f1e4e8;color:#3b5540;padding:7px 12px;border:1p
  .world01-touch-actions button{min-height:33px;font-size:9px}
  .world01-badge{top:36px}
 }
+
+/* MentalHumor route is visible independently of World-01 forest and combat UX. */
+#mentalRouteButton{border-color:#b97f73;background:#ead7c9;color:#533e35}
+@media (max-width:760px),(hover:none) and (pointer:coarse){
+ .world01-touch-actions{bottom:calc(65px + env(safe-area-inset-bottom));gap:5px}
+ .world01-touch-actions button{min-height:42px;font-size:10px}
+ #mentalRouteButton{background:#ab725e;color:#fff7eb;border-color:#9c6656}
+ .world01-badge{max-width:calc(100vw - 80px)}
+ .world01-badge b{max-width:calc(100vw - 180px);overflow:hidden;text-overflow:ellipsis}
+}
+@media (max-height:430px) and (orientation:landscape) and (pointer:coarse){
+ .world01-touch-actions{width:110px;bottom:calc(40px + env(safe-area-inset-bottom));gap:3px}
+ .world01-touch-actions button{min-height:29px;font-size:9px}
+}
