@@ -7,6 +7,7 @@ on:
       - qa/world-organism-v0-8-sustainability-2026-10-19
       - qa/world-organism-v0-8-sponsored-services-2026-10-19
       - qa/world-organism-v0-8-federation-2026-10-19
+      - qa/world-organism-v0-8-food-access-2026-10-19
     paths:
       - ".github/workflows/world-organism-v08-audit.yml"
       - "projects/dementor-live/first-home-loop/balance-lab/v0_8/**"
@@ -45,7 +46,7 @@ jobs:
         run: node run-projection.mjs reports
       - name: Federation model 10-20 agents, 2-4 cities, 324 scenarios / 2 ownership policies
         working-directory: projects/dementor-live/first-home-loop/balance-lab/v0_8/experimental
-        run: node --test federation-model.test.mjs
+        run: node --test federation-model.test.mjs food-access.test.mjs
       - name: Archive federation balance and logistics data
         working-directory: projects/dementor-live/first-home-loop/balance-lab/v0_8/experimental
         run: node run-federation.mjs reports
