@@ -447,6 +447,92 @@ function drawWorld01Forest(time){
  if(context){const q=screen(context.x,context.y);ctx.beginPath();ctx.ellipse(q.x,q.y+5,view.s*.65,view.s*.24,0,0,Math.PI*2);ctx.strokeStyle='#577d63';ctx.lineWidth=2;ctx.stroke();}
 }
 
+
+function drawMentalMuseumBuilding(b){
+  // Paper/ink axonometric interpretation inspired by the Purku former school.
+  // Separate low green wings, stone gable, red brick entrance, white windows and red roof.
+  groundRect({x:b.x-1.3,y:b.y-1,w:b.w+2.6,h:b.h+2},'#a6b39023','#899d8b44',false);
+  const unit=view.s,cx=b.x,cy=b.y;
+  const wing=(x,y,w,h)=>{
+    const p=screen(x,y),q=screen(x+w,y+h),wide=q.x-p.x,tall=q.y-p.y;
+    rounded(p.x,p.y-1.3*unit,wide,tall+1.3*unit,2,'#3e695c','#253f3a');
+    for(let lineY=p.y;lineY<q.y;lineY+=unit*.30)line(p.x,lineY,p.x+wide,lineY,'#84a7987d',1);
+    const roof=screen(x,y),edge=screen(x+w,y);
+    poly([[roof.x-4,roof.y-1.4*unit],[roof.x+wide*.46,roof.y-2.15*unit],[edge.x+5,roof.y-1.4*unit],[edge.x+5,roof.y-1.10*unit]],'#ab6552','#765044');
+    for(let i=1;i<Math.floor(w/1.65);i++){
+      const ww=screen(x+i*1.65,y+2);rounded(ww.x-unit*.27,ww.y-unit*1.0,unit*.74,unit*1.12,1,'#ebeee1','#c9d5ca');
+      rounded(ww.x-unit*.16,ww.y-unit*.91,unit*.50,unit*.87,1,'#a1babb','#657c78');
+      line(ww.x+unit*.09,ww.y-unit*.91,ww.x+unit*.09,ww.y-unit*.04,'#f7f8ea',2);
+      line(ww.x-unit*.16,ww.y-unit*.46,ww.x+unit*.34,ww.y-unit*.46,'#f5f6e9',2);
+    }
+  };
+  wing(29,17,6,11);wing(44,17,6,11);
+  const p=screen(34,14),q=screen(44,28),w=q.x-p.x,h=q.y-p.y;
+  rounded(p.x,p.y-1.2*unit,w,h+1.2*unit,2,'#8c9086','#59635d');
+  // Repeating irregular masonry elements rather than actual copyrighted photograph textures.
+  const masonry=['#7b8379','#a5aaa1','#656d68','#b0aa99','#8c8d87'];
+  for(let i=0;i<40;i++){
+    const col=i%8,row=Math.floor(i/8),x=p.x+col*w/8+Math.sin(i*1.6)*unit*.10;
+    const y=p.y-1.05*unit+row*(h+unit*.85)/5;
+    rounded(x+unit*.10,y+unit*.08,Math.max(2,w/9),Math.max(2,unit*.47),1,masonry[i%5],null);
+  }
+  poly([[p.x-unit*.14,p.y-1.22*unit],[p.x+w*.5,p.y-3.3*unit],[q.x+unit*.16,p.y-1.22*unit]],'#a75e4e','#674b45');
+  poly([[p.x+w*.5,p.y-3.3*unit],[q.x+unit*.16,p.y-1.22*unit],[q.x+unit*.10,p.y-.91*unit]],'#814f47','#674b45');
+  // Front red-brick portico.
+  const b0=screen(35.3,23.2),b1=screen(42.7,28.5);
+  rounded(b0.x,b0.y-unit*.45,b1.x-b0.x,b1.y-b0.y+unit*.5,1,'#ac6455','#805c54');
+  for(let i=0;i<6;i++)line(b0.x,b0.y+i*unit*.38,b1.x,b0.y+i*unit*.38,'#cc958077',.8);
+  const door=screen(39,28);rounded(door.x-unit*.44,door.y-unit*1.7,unit*.88,unit*1.7,1,'#574f4a','#e2ddcc');
+  for(const px of [36.7,41.2]){const w=screen(px,27);rounded(w.x-unit*.35,w.y-unit*1.7,unit*.72,unit*1.38,1,'#f1f1e5','#988c82');rounded(w.x-unit*.23,w.y-unit*1.55,unit*.48,unit*1.1,1,'#b8c8c7','#889995');}
+  // Museum plaques stay factual, no official partnership claim.
+  label('EESTI HUUMORIMUUSEUM',39,11.0,true);
+  label('МУЗЕЙ СМЕХА · MENTALHUMOR',39,30.7,true);
+}
+function drawMentalHumor(time){
+  const region=state.mentalhumor;if(!region)return;
+  const hall=state.scene==='mentalhumor-hall',bg=hall?'#dcd1b6':'#e3e7d5',edge=screen(0,0),end=screen(region.width,region.height);
+  rounded(edge.x,edge.y,end.x-edge.x,end.y-edge.y,2,bg,hall?'#a5957b':'#a1b09b');
+  if(hall){
+    // Public-facing *research* hall; no licensed recording or real museum exhibit art.
+    for(let y=1;y<region.height;y+=.95){const a=screen(1,y),b=screen(19,y);line(a.x,a.y,b.x,b.y,'#b3a18455',1);}
+    const rear=screen(2,2),end=screen(18,12);
+    rounded(rear.x,rear.y,end.x-rear.x,end.y-rear.y,5,'#eae1cf','#bcb095');
+    for(const obj of region.objects||[]){
+      const pt=screen(obj.x,obj.y);
+      if(obj.type==='mental-hall-exit'){paperBoard(obj.x,obj.y,'↩ ПАРК');continue;}
+      rounded(pt.x-view.s*.55,pt.y-view.s*.92,view.s*1.1,view.s*.82,3,'#6c806e','#425b49');
+      rounded(pt.x-view.s*.38,pt.y-view.s*.76,view.s*.76,view.s*.48,2,'#ede9d9','#bbc3b5');
+      label(obj.title,obj.x,obj.y-1.8,true);
+    }
+  }else{
+    for(let x=2;x<region.width;x+=5)for(let y=3;y<region.height;y+=5){
+      const p=screen(x,y);ctx.fillStyle='#899b7f12';ctx.fillRect(p.x,p.y,1,1);
+    }
+    for(const road of region.roads||[]){
+      ctx.beginPath();
+      road.forEach(([x,y],i)=>{const p=screen(x,y);i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y);});
+      ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle='#a4a08c';ctx.lineWidth=Math.max(12,view.s*2.4);ctx.stroke();
+      ctx.strokeStyle='#d5ccb6';ctx.lineWidth=Math.max(8,view.s*2.15);ctx.stroke();
+    }
+    const near=obj=>{const p=screen(obj.x,obj.y);return p.x>-140&&p.x<view.w+140&&p.y>-160&&p.y<view.h+160;};
+    const entities=[];
+    for(const t of region.trees||[])if(near(t))entities.push({y:t.y,fn:()=>drawTree(t)});
+    if(near({x:39,y:24}))entities.push({y:27,fn:()=>drawMentalMuseumBuilding(region.museum)});
+    for(const o of region.objects||[])if(near(o)){
+      if(o.type==='mental-museum-entry')continue; // front doors are part of building
+      entities.push({y:o.y,fn:()=>{
+        if(['mental-exit-city','mental-exit-forest'].includes(o.type)){paperBoard(o.x,o.y,o.type==='mental-exit-city'?'← ГОРОД':'← ЛЕС ИДЕЙ');return;}
+        paperBoard(o.x,o.y,o.title);
+      }});
+    }
+    for(const p of state.players.filter(p=>(p.online||p.id===me.id)&&sameScene(p)))entities.push({y:p.y,fn:()=>drawPlayer(p,time)});
+    entities.sort((a,b)=>a.y-b.y);for(const e of entities)e.fn();
+  }
+  if(hall)for(const p of state.players.filter(p=>(p.online||p.id===me.id)&&sameScene(p)))drawPlayer(p,time);
+  if(route.length){const p=screen(route.at(-1).x,route.at(-1).y);ctx.beginPath();ctx.arc(p.x,p.y,7,0,Math.PI*2);ctx.strokeStyle='#637f69';ctx.lineWidth=2;ctx.stroke();}
+  if(context){const p=screen(context.x,context.y);ctx.beginPath();ctx.ellipse(p.x,p.y+4,view.s*.64,view.s*.27,0,0,Math.PI*2);ctx.strokeStyle='#527c5e';ctx.lineWidth=2;ctx.stroke();}
+}
+
 function render(time){positionWindows();ctx.clearRect(0,0,view.w,view.h);ctx.fillStyle='#efebdf';ctx.fillRect(0,0,view.w,view.h);
   updateVisualPlayers(time);if(me){const hero=visualPlayers.get(me.id)||me;view.cx=hero.x;view.cy=hero.y;}
   if(state&&['mentalhumor','mentalhumor-hall'].includes(state.scene)){drawMentalHumor(time);requestAnimationFrame(render);return;}
