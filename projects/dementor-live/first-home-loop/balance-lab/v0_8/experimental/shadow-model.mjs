@@ -2,6 +2,8 @@
 // Not the historical v0.8 simulator. Does not import from or change the game runtime.
 // Explicitly derived from the published D30 aggregate checkpoint + hypothetical post-D30 policies.
 // All parameters in SETTINGS below are TEST assumptions, not approved game rules.
+import {SESSION_CONTRACT,openSponsoredSession,onSponsoredDelivery,onSponsoredExpiry,serviceFeeEscrow,validateServices} from './sponsored-services.mjs';
+import {pendingProjects,assertRegistry} from './project-registry.mjs';
 export const MODEL_ID='WORLD-ORGANISM/0.8.1-shadow-sustainability';
 export const SETTINGS={
   checkpointDay:30, initialPAPER:3600, cityPAPER:2301, playerPAPER:1299,
@@ -14,7 +16,9 @@ export const SETTINGS={
   recipe:{HEMP:6,WATER:2,PAPER_SHEET:1},
   pantry:{WOOD:30,STONE:20,payout:50,minSpoiled:10,earliestDay:45},
   irrigation:{WOOD:20,STONE:10,payout:60,minUnmet:20,earliestDay:65},
-  experiments:['static','upkeep','needs-growth'],
+  communityHall:{WOOD:22,STONE:10,payout:45,minUnserved:8,earliestDay:55},
+  readingRoom:{WOOD:20,STONE:12,payout:55,minUnserved:25,earliestDay:80},
+  experiments:['static','upkeep','needs-growth','sponsored-growth'],
   environments:['normal','forest','dry','treasury'],
   activityProfiles:['daily','weekends'],
 };
@@ -55,7 +59,8 @@ function initialState({agents=3,environment='normal',policy='upkeep',activity='d
     woodInitial:env.wood,stoneInitial:env.stone,wood:env.wood,stone:env.stone,
     embodied:{WOOD:0,STONE:0},city:cityPAPER,players:p,
     oldProjects:SETTINGS.oldProjects,projects:[],
-    orders:[],postedEvents:[],trades:[],tradeIds:[],
+    orders:[],services:[],servicesRevenue:0,serviceRequestsUnserved:0,serviceRequestsRejected:0,
+    postedEvents:[],trades:[],tradeIds:[],
     nextOrder:1,produced:{CARROT:0,HEMP:0,SEED_CARROT:0,SEED_HEMP:0,PAPER_SHEET:0},
     used:{CARROT_PLAYER:0,CARROT_CITY:0,CARROT_SPOILED:0,HEMP_CRAFT:0,PAPER_SHEET_CITY:0,
       SEED_CARROT:0,SEED_HEMP:0},
@@ -73,7 +78,7 @@ const escrowTotal=s=>s.orders.reduce((n,o)=>n+o.escrow,0);
 const isActive=(s,p)=>s.activity==='daily'||s.day%7<2; // TEST fixed weekend sessions, no online behavior inferred
 export function balance(s){
   const balances={
-    PAPER:s.city+s.players.reduce((n,p)=>n+p.wallet,0)+escrowTotal(s),
+    PAPER:s.city+s.players.reduce((n,p)=>n+p.wallet,0)+escrowTotal(s)+serviceFeeEscrow(s),
     CARROT:s.produced.CARROT-s.used.CARROT_PLAYER-s.used.CARROT_CITY-s.used.CARROT_SPOILED-s.players.reduce((n,p)=>n+carrotUnits(p)+civicUnits(p),0),
     HEMP:s.initial.HEMP+s.produced.HEMP-s.used.HEMP_CRAFT-s.players.reduce((n,p)=>n+p.hemp,0),
     PAPER_SHEET:s.produced.PAPER_SHEET-s.used.PAPER_SHEET_CITY-s.players.reduce((n,p)=>n+p.sheets,0),
@@ -106,6 +111,7 @@ export function check(s){
   required(s.ledgerEvents>=0,'invalid event count');
   required(s.orders.length<=s.postedEvents.length*2+1,'duplicate demand amplification');
   required(s.tradeIds.length===s.trades.length,'trade idempotency tally');
+  validateServices(s);
   return true;
 }
 const hasDemand=(s,asset)=>s.orders.some(o=>o.asset===asset&&o.status==='OPEN'&&o.remaining>0);
@@ -210,7 +216,22 @@ export function submitDemand(s,referenceEvent,asset,quantity,unitPrice){
   check(s);return result;
 }
 function postWeeklyEvents(s){
-  if(s.policy==='static'||(s.day-31)%SETTINGS.maintenanceIntervalDays!==0)return;
+  if(s.policy==='static')return;
+  if(s.policy==='sponsored-growth'){
+    // One explicit finite public meeting ticket per consenting active citizen/week.
+    // Weekend test agents only visit on s.day%7<2; sponsor events occur on day%7==0.
+    if(s.day%SETTINGS.maintenanceIntervalDays!==0)return;
+    const period=Math.floor(s.day/SETTINGS.maintenanceIntervalDays);
+    const willing=s.players.filter(p=>isActive(s,p)&&p.wallet>=SESSION_CONTRACT.price);
+    const venues=['square',...s.projects.filter(v=>['communityHall','readingRoom'].includes(v))];
+    for(let i=0;i<Math.min(willing.length,venues.length);i++)
+      openSponsoredSession(s,{eventId:'sponsor:'+venues[i]+':'+period,
+        facility:venues[i],sponsorId:willing[i].id,actorId:willing[i].id,accepted:true,expiresIn:SETTINGS.orderTtlDays});
+    s.serviceRequestsUnserved+=Math.max(0,willing.length-venues.length);
+    s.serviceRequestsRejected+=Math.max(0,s.players.filter(p=>isActive(s,p)).length-willing.length);
+    return;
+  }
+  if((s.day-31)%SETTINGS.maintenanceIntervalDays!==0)return;
   const period=Math.floor((s.day-31)/SETTINGS.maintenanceIntervalDays);
   const activeProjects=['square','forge','bridge',...s.projects];
   for(const name of activeProjects){
@@ -222,8 +243,12 @@ function postWeeklyEvents(s){
 }
 function refundOverdue(s){
   for(const o of s.orders.filter(o=>o.status==='OPEN'&&s.day>=o.expiresAt)){
-    s.city+=o.escrow;s.refunds+=o.escrow;
-    o.escrow=0;o.remaining=0;o.status='EXPIRED';s.ledgerEvents++;
+    const unspent=o.escrow;
+    if(o.paidBy!=='citizen')s.city+=unspent;
+    s.refunds+=unspent;
+    o.escrow=0;o.remaining=0;o.status='EXPIRED';
+    if(o.paidBy==='citizen')onSponsoredExpiry(s,o,unspent);
+    s.ledgerEvents++;
   }
 }
 function createPaper(s,p){
@@ -243,29 +268,31 @@ function settleDemand(s){
       if(!supplier)break;
       if(o.asset==='PAPER_SHEET'){supplier.sheets--;s.used.PAPER_SHEET_CITY++;}
       else required(consumeOneCarrot(s,supplier,'city','civic'),'owner-linked civic carrot absent at settlement');
-      o.remaining--;o.escrow-=o.unitPrice;s.paperPaid+=o.unitPrice;
+      o.remaining--;o.filled=(o.filled||0)+1;o.escrow-=o.unitPrice;s.paperPaid+=o.unitPrice;
       supplier.wallet+=o.unitPrice;s.ledgerEvents++;
+      if(o.remaining===0)o.status='FILLED';
+      if(o.paidBy==='citizen')onSponsoredDelivery(s,o);
     }
-    if(o.remaining===0)o.status='FILLED';
+    if(o.remaining===0&&o.status==='OPEN')o.status='FILLED';
   }
 }
 function balancePressure(s){
-  if(s.policy!=='needs-growth')return;
-  const policies=[
-    {id:'pantry',spec:SETTINGS.pantry,ready:s.used.CARROT_SPOILED>=SETTINGS.pantry.minSpoiled},
-    {id:'irrigation',spec:SETTINGS.irrigation,ready:s.unmetFood>=SETTINGS.irrigation.minUnmet},
-  ];
-  for(const {id,spec,ready} of policies){
-    if(!ready||s.day<spec.earliestDay||s.projects.includes(id))continue;
-    // Demand justified by demonstrated loss/shortage; fixed cost and physical material source.
-    if(s.wood<spec.WOOD||s.stone<spec.STONE||s.city<spec.payout)continue;
-    s.wood-=spec.WOOD;s.stone-=spec.STONE;
-    s.embodied.WOOD+=spec.WOOD;s.embodied.STONE+=spec.STONE;
-    s.city-=spec.payout;s.buildPaid+=spec.payout;
+  if(!['needs-growth','sponsored-growth'].includes(s.policy))return;
+  assertRegistry(SETTINGS);
+  // The registry provides candidate needs; after each build re-check the LIVE
+  // inventory and treasury, since multiple funded proposals can compete.
+  for(const candidate of pendingProjects(s,SETTINGS)){
+    if(!candidate.needed||!candidate.mature||s.projects.includes(candidate.id))continue;
+    const cost=candidate.cost;
+    if(s.wood<cost.wood||s.stone<cost.stone||s.city<cost.paper)continue;
     const worker=s.players.find(p=>isActive(s,p));
-    if(!worker)throw Error('building worker missing despite accepted funded project');
-    worker.wallet+=spec.payout;s.projects.push(id);s.cityProjectsDone++;s.ledgerEvents++;
-    if(id==='irrigation')s.recharge+=4;
+    if(!worker)continue; // cannot approve invisible offline work
+    s.wood-=cost.wood;s.stone-=cost.stone;
+    s.embodied.WOOD+=cost.wood;s.embodied.STONE+=cost.stone;
+    s.city-=cost.paper;s.buildPaid+=cost.paper;
+    worker.wallet+=cost.paper;s.projects.push(candidate.id);s.cityProjectsDone++;
+    s.ledgerEvents++;
+    if(candidate.effect==='WATER_SOURCE')s.recharge+=4;
   }
 }
 export function tradeHemp(s,{offerId,buyer,seller,quantity,pricePerUnit=1,accepted=false,online=true}){
@@ -327,7 +354,14 @@ export function metrics(s){
   return {
     model:MODEL_ID,sourceStatus:'EXPERIMENTAL_SHADOW_NOT_ORIGINAL_NOT_SERVER',
     day:s.day,projectionDays:s.day-30,agents:s.agents,environment:s.environment,policy:s.policy,activity:s.activity,
-    money:{total:SETTINGS.initialPAPER,city:s.city,players:s.players.reduce((n,p)=>n+p.wallet,0),escrow:escrowTotal(s)},
+    money:{total:SETTINGS.initialPAPER,city:s.city,players:s.players.reduce((n,p)=>n+p.wallet,0),escrow:escrowTotal(s)+serviceFeeEscrow(s)},
+    sponsored:{requested:s.services.length,completed:s.services.filter(x=>x.status==='COMPLETE').length,
+      partial:s.services.filter(x=>x.status==='PARTIAL').length,
+      expired:s.services.filter(x=>x.status==='EXPIRED').length,unserved:s.serviceRequestsUnserved,
+      rejected:s.serviceRequestsRejected,feesEarned:s.servicesRevenue,
+      feeEscrow:serviceFeeEscrow(s),authorized:s.services.length*SESSION_CONTRACT.price,
+      refunded:s.services.reduce((n,v)=>n+v.refunded,0),
+      observedGoods:s.services.reduce((n,v)=>n+v.delivered,0)},
     buildings:{original:3,new:s.projects,completed:s.cityProjectsDone,embodied:s.embodied},
     demand:{posted:s.orders.length,filled,expired,open,unfunded:s.unfunded,paid:s.paperPaid,refunded:s.refunds},
     food:{grown:s.produced.CARROT,eaten:s.used.CARROT_PLAYER,cityConsumed:s.used.CARROT_CITY,spoiled:s.used.CARROT_SPOILED,carried:s.players.reduce((n,p)=>n+carrotUnits(p),0),civicCrate:s.players.reduce((n,p)=>n+civicUnits(p),0),mealNeeds:s.mealNeedsPosted,unmet:s.unmetFood,unmetReasons:s.unmetReasons},

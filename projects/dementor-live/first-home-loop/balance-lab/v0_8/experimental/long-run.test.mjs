@@ -1,9 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {simulate,check,metrics,SETTINGS} from './shadow-model.mjs';
+import {serviceFeeEscrow} from './sponsored-services.mjs';
 
 // These are forward projections from synthetic D30 holdings, NOT a 365-day replay of the original game.
-for(const policy of ['upkeep','needs-growth'])
+for(const policy of ['upkeep','needs-growth','sponsored-growth'])
  for(const environment of ['normal','dry','treasury'])
   for(const agents of [3,5])
    for(const days of [180,360]){
@@ -11,11 +12,11 @@ for(const policy of ['upkeep','needs-growth'])
       const s=simulate({policy,environment,agents,days,activity:'daily'}),m=metrics(s);
       check(s);
       assert.equal(m.money.total,3600,'PAPER inflation/deflation');
-      assert.equal(m.money.escrow,s.orders.reduce((n,o)=>n+o.escrow,0));
+      assert.equal(m.money.escrow,s.orders.reduce((n,o)=>n+o.escrow,0)+serviceFeeEscrow(s));
       assert.equal(m.accounting.WOOD,0);
       assert.equal(m.accounting.STONE,0);
       assert.equal(m.accounting.CARROT,0);
-      assert.ok(m.buildings.completed<=2,'unbounded auto construction');
+      assert.ok(m.buildings.completed<=(policy==='sponsored-growth'?4:2),'unbounded auto construction');
       assert.ok(m.demand.filled<=m.demand.posted);
       assert.ok(m.money.city>=0,'municipality has taken unbacked debt');
     });
