@@ -40,7 +40,7 @@ function createCity(id,index,treasury,environment){
   freightCapacity:RULES.freightCapacity,
   unmetMeals:0,unmetNoCash:0,unmetNoFood:0,spoiledCarrot:0,unservedCivic:0,waterShortage:0,
   blockedCargo:0,blockedStorage:0,unfundedWorks:0,harvests:0,services:0,serviceRevenue:0,
-  foodSales:0,foodNeeds:0,foodServed:0,subsidizedMeals:0,subsidySpent:0,subsidizedZeroWallet:0,welfareWeeklySpent:{},welfareDeniedBudget:0,workWages:0,workerTurn:0,consignmentPayout:0,ownMeals:0,transportBought:0,
+  foodSales:0,foodNeeds:0,foodServed:0,subsidizedMeals:0,subsidySpent:0,subsidizedZeroWallet:0,welfareWeeklySpent:{},welfareDeniedBudget:0,welfareDeniedResidents:{},workWages:0,workerTurn:0,consignmentPayout:0,ownMeals:0,transportBought:0,
   sourceEvents:[],version:0,environment};
 }
 const active=(world,player)=>world.activity==='daily'||world.day%7<2;
@@ -114,13 +114,20 @@ function foodForResidents(world,city){
    const week=Math.floor(world.day/7),weekKey=String(week);
    const potentialCover=Math.max(0,RULES.carrotPrice-p.wallet);
    const budgetAllows=!guarded||(
-     city.treasury-potentialCover>=RULES.welfareMinTreasury&&
-     (city.welfareWeeklySpent[weekKey]||0)+potentialCover<=RULES.welfareWeeklyLimit
+     city.treasury-potentialCover>=world.welfareMinTreasury&&
+     (city.welfareWeeklySpent[weekKey]||0)+potentialCover<=world.welfareWeeklyLimit
    );
    const eligibleHelp=(world.foodMarket==='cooperative'||basic)&&
      p.wallet<RULES.carrotPrice&&(p.wallet>=1||(basic&&basicMealsIssued<1));
    const assistance=eligibleHelp&&city.treasury>=potentialCover&&budgetAllows;
-   if(guarded&&eligibleHelp&&carrotCount(city)>0&&!budgetAllows)city.welfareDeniedBudget++;
+   const feasible=eligibleHelp&&carrotCount(city)>0;
+   if(guarded&&feasible){
+     p.eligibleHelp++;
+     if(!assistance){city.welfareDeniedBudget++;p.deniedHelp++;p.consecutiveDenials++;
+       p.longestDenialStreak=Math.max(p.longestDenialStreak,p.consecutiveDenials);
+       city.welfareDeniedResidents[p.id]=(city.welfareDeniedResidents[p.id]||0)+1;
+     }else p.consecutiveDenials=0;
+   }
    if(carrotCount(city)>0&&(p.wallet>=RULES.carrotPrice||assistance)){
      const contribution=assistance?p.wallet:RULES.carrotPrice;
      const cityCover=RULES.carrotPrice-contribution;
@@ -197,23 +204,25 @@ function farm(world,city){
 export function cityById(world,id){return world.cities.find(c=>c.id===id);}
 export function playerById(world,id){return world.players.find(p=>p.id===id);}
 export function createFederation({agents=15,cityCount=3,environment='normal',
-  logistics='trade',activity='daily',foodMarket='municipal'}={}){
+  logistics='trade',activity='daily',foodMarket='municipal',welfareMinTreasury=RULES.welfareMinTreasury,welfareWeeklyLimit=RULES.welfareWeeklyLimit}={}){
  must(Number.isInteger(agents)&&agents>=10&&agents<=20,'federation agents range 10-20');
  must(Number.isInteger(cityCount)&&cityCount>=2&&cityCount<=4,'federation cities range 2-4');
  must(['normal','dry','wet'].includes(environment),'unknown weather');
  must(['trade','local'].includes(logistics),'unknown logistics');
  must(['daily','weekends'].includes(activity),'unknown activity');
  must(['municipal','consignment','cooperative','cooperative-basic','cooperative-guarded'].includes(foodMarket),'unknown food ownership policy');
+ must(Number.isSafeInteger(welfareMinTreasury)&&welfareMinTreasury>=0,'invalid welfare reserve');
+ must(Number.isSafeInteger(welfareWeeklyLimit)&&welfareWeeklyLimit>=0,'invalid welfare weekly limit');
  const treasuries=Array.from({length:cityCount},(_,i)=>Math.floor(RULES.startingCityPAPER/cityCount)+(i===0?RULES.startingCityPAPER%cityCount:0));
  const cities=treasuries.map((money,i)=>createCity('city-'+(i+1),i,money,environment));
  const walletPool=RULES.totalPAPER-RULES.startingCityPAPER;
  const players=Array.from({length:agents},(_,i)=>({
    id:'agent-'+(i+1),cityId:cities[i%cityCount].id,
-   wallet:Math.floor(walletPool/agents)+(i<walletPool%agents?1:0),workIncome:0,foodNeeds:0,foodEaten:0,foodUnmet:0,helpedMeals:0,active:true
+   wallet:Math.floor(walletPool/agents)+(i<walletPool%agents?1:0),workIncome:0,foodNeeds:0,foodEaten:0,foodUnmet:0,helpedMeals:0,eligibleHelp:0,deniedHelp:0,consecutiveDenials:0,longestDenialStreak:0,active:true
  }));
  const initial={...Object.fromEntries(['WOOD','STONE','WATER','SEED_CARROT','SEED_HEMP'].map(k=>
    [k,sum(cities.map(c=>c.stock[k]))]))};
- const world={schema:FEDERATION_ID,day:30,activity,environment,logistics,foodMarket,
+ const world={schema:FEDERATION_ID,day:30,activity,environment,logistics,foodMarket,welfareMinTreasury,welfareWeeklyLimit,
    cities,players,initial,moneyAtStart:RULES.totalPAPER,
    deliveries:[],deliveryIds:[],arrivalHistory:[],rejectedShipments:0,nextShipment:1,
    movements:[],movementIds:[],cityCreationIds:[],
@@ -260,7 +269,7 @@ export function checkFederation(world){
    must(carrotCount(c)===c.stock.CARROT,'carrot provenance not reflected in stock '+c.id);
    must(unique(c.buildings),'building repeated '+c.id);
    if(world.foodMarket==='cooperative-guarded')for(const spent of Object.values(c.welfareWeeklySpent))
-     must(spent<=RULES.welfareWeeklyLimit,'weekly subsidy cap exceeded');
+     must(spent<=world.welfareWeeklyLimit,'weekly subsidy cap exceeded');
    must(c.plots.length>=2&&c.plots.length<=8,'unbounded plot creation');
    for(const k of ['WOOD','STONE'])must(Number.isSafeInteger(c.exportable[k])&&c.exportable[k]>=0&&
      c.exportable[k]<=c.stock[k],'exporting imported assets or broken provenance '+c.id+' '+k);
@@ -268,6 +277,7 @@ export function checkFederation(world){
  for(const p of world.players){
    must(Number.isSafeInteger(p.wallet)&&p.wallet>=0,'negative player balance');
    must(p.foodNeeds===p.foodEaten+p.foodUnmet,'resident-level food ledger mismatch');
+   must(p.deniedHelp<=p.eligibleHelp,'invalid eligibility/denial ledger');
    must(!!cityById(world,p.cityId),'player in nonexistent city');
  }
  for(const d of world.deliveries){
@@ -517,7 +527,7 @@ export function federationMetrics(world){
   minerals:{WOOD_INITIAL:world.initial.WOOD,WOOD_STOCK:goods(world,'WOOD'),
     WOOD_IN_BUILDINGS:world.embodied.WOOD,STONE_INITIAL:world.initial.STONE,
     STONE_STOCK:goods(world,'STONE'),STONE_IN_BUILDINGS:world.embodied.STONE},
-  residentFood:world.players.map(p=>({id:p.id,cityId:p.cityId,needs:p.foodNeeds,eaten:p.foodEaten,unmet:p.foodUnmet,helped:p.helpedMeals,wallet:p.wallet})),
+  residentFood:world.players.map(p=>({id:p.id,cityId:p.cityId,needs:p.foodNeeds,eaten:p.foodEaten,unmet:p.foodUnmet,helped:p.helpedMeals,eligible:p.eligibleHelp,denied:p.deniedHelp,longestDenialStreak:p.longestDenialStreak,wallet:p.wallet})),
   walletDistribution:{min:Math.min(...world.players.map(p=>p.wallet)),max:Math.max(...world.players.map(p=>p.wallet)),
     workersPaid:world.players.filter(p=>p.workIncome>0).length,zeroWallets:world.players.filter(p=>p.wallet===0).length},
   cityRows,ledger:federationBalances(world)};
