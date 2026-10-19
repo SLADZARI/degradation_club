@@ -11,10 +11,12 @@ export const SESSION_CONTRACT=Object.freeze({
 });
 const invariant=(v,label)=>{if(!v)throw Error(label);};
 const owner=(s,id)=>s.players.find(p=>p.id===id);
-export function openSponsoredSession(s,{eventId,facility,sponsorId,at=s.day,expiresIn=14}){
+export function openSponsoredSession(s,{eventId,facility,sponsorId,actorId,accepted=false,at=s.day,expiresIn=14}){
   invariant(s.services instanceof Array,'missing service register');
   invariant(typeof eventId==='string'&&eventId.length>4,'bad service event ID');
   invariant(typeof facility==='string'&&facility.length>0,'bad service facility');
+  invariant(actorId===sponsorId,'caller must be the account holder');
+  invariant(accepted===true,'explicit sponsor consent required');
   const old=s.services.find(v=>v.id===eventId);
   if(old)return old; // exact replay must not charge again
   const sponsor=owner(s,sponsorId);
