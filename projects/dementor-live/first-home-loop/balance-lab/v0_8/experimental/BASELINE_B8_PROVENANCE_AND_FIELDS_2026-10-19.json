@@ -1,0 +1,178 @@
+{
+  "status": "TEST_LAB_REJECTED_FOOD_REGRESSION",
+  "workflow": 39276865821,
+  "sha": "11d174a8cd8fc3459c9953fe0a2dbb4957b0ee1b",
+  "checks": {
+    "contract": 22,
+    "b5": 374,
+    "federation": 186,
+    "passed": 582
+  },
+  "anchors": [
+    {
+      "agents": 20,
+      "cities": 3,
+      "environment": "normal",
+      "days": 360,
+      "local": {
+        "treasury": 3375,
+        "buildings": 3,
+        "unservedFood": 5746,
+        "services": 109,
+        "deliveries": 0
+      },
+      "trade": {
+        "treasury": 3123,
+        "buildings": 9,
+        "unservedFood": 5658,
+        "services": 149,
+        "deliveries": 23
+      },
+      "effect": {
+        "extraBuildings": 6,
+        "avoidedHunger": 88,
+        "freightTrades": 23
+      }
+    },
+    {
+      "agents": 20,
+      "cities": 3,
+      "environment": "dry",
+      "days": 360,
+      "local": {
+        "treasury": 3598,
+        "buildings": 3,
+        "unservedFood": 6050,
+        "services": 8,
+        "deliveries": 0
+      },
+      "trade": {
+        "treasury": 3168,
+        "buildings": 10,
+        "unservedFood": 5672,
+        "services": 145,
+        "deliveries": 23
+      },
+      "effect": {
+        "extraBuildings": 7,
+        "avoidedHunger": 378,
+        "freightTrades": 23
+      }
+    },
+    {
+      "agents": 20,
+      "cities": 3,
+      "environment": "wet",
+      "days": 360,
+      "local": {
+        "treasury": 3375,
+        "buildings": 3,
+        "unservedFood": 5746,
+        "services": 109,
+        "deliveries": 0
+      },
+      "trade": {
+        "treasury": 3123,
+        "buildings": 9,
+        "unservedFood": 5658,
+        "services": 149,
+        "deliveries": 23
+      },
+      "effect": {
+        "extraBuildings": 6,
+        "avoidedHunger": 88,
+        "freightTrades": 23
+      }
+    }
+  ],
+  "citySample": [
+    {
+      "id": "city-1",
+      "population": 7,
+      "treasury": 828,
+      "rawWOOD": 0,
+      "rawSTONE": 10,
+      "water": 96,
+      "carrot": 11,
+      "paperSheet": 3,
+      "founded": false,
+      "buildings": [
+        "garden",
+        "marketHall",
+        "fieldEast"
+      ],
+      "unmetFood": 1999,
+      "services": 50,
+      "feesAndSales": 850,
+      "unservedRequests": 35,
+      "spoilage": 1506,
+      "missingWater": 0,
+      "blockedCargo": 0,
+      "blockedStorage": 463,
+      "exportable": {
+        "WOOD": 0,
+        "STONE": 0
+      },
+      "cargoImports": 12
+    },
+    {
+      "id": "city-2",
+      "population": 7,
+      "treasury": 1124,
+      "rawWOOD": 6,
+      "rawSTONE": 10,
+      "water": 98,
+      "carrot": 11,
+      "paperSheet": 3,
+      "founded": false,
+      "buildings": [
+        "garden",
+        "marketHall",
+        "fieldEast"
+      ],
+      "unmetFood": 1992,
+      "services": 50,
+      "feesAndSales": 850,
+      "unservedRequests": 36,
+      "spoilage": 1507,
+      "missingWater": 0,
+      "blockedCargo": 0,
+      "blockedStorage": 466,
+      "exportable": {
+        "WOOD": 6,
+        "STONE": 0
+      },
+      "cargoImports": 4
+    },
+    {
+      "id": "city-3",
+      "population": 6,
+      "treasury": 1171,
+      "rawWOOD": 13,
+      "rawSTONE": 10,
+      "water": 98,
+      "carrot": 19,
+      "paperSheet": 3,
+      "founded": false,
+      "buildings": [
+        "garden",
+        "marketHall",
+        "coldStore"
+      ],
+      "unmetFood": 1667,
+      "services": 49,
+      "feesAndSales": 833,
+      "unservedRequests": 25,
+      "spoilage": 1219,
+      "missingWater": 0,
+      "blockedCargo": 0,
+      "blockedStorage": 80,
+      "exportable": {
+        "WOOD": 0,
+        "STONE": 10
+      },
+      "cargoImports": 7
+    }
+  ],
+  "summary": "Goods provenance limits circular shipments: dry deliveries 667→23; synchronous field harvest worsens storage blocking and does not solve hunger. These negative metrics are intentional QA evidence."
+}
