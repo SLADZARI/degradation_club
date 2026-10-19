@@ -3,7 +3,7 @@ import os from 'node:os';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { Game, createWorld } from './world.mjs';
+import { Game, createWorld } from './world-expansion-adapter.mjs';
 import {CityNetwork} from './city-network.mjs';
 import {scanMusic,audioDuration,PLAZA} from './plaza.mjs';
 import {createHash} from 'node:crypto';
@@ -31,6 +31,7 @@ const legacySaveRequiresBackup=fs.existsSync(stateFile)&&state?.schema!=='dement
 let legacyBackupDone=false;
 const network=new CityNetwork(state);
 const game=network.origin;
+const stateFor=p=>({...network.snapshot(p),qaMode:testMode});
 const musicDir=path.join(root,'data','music');fs.mkdirSync(musicDir,{recursive:true});
 function refreshMusic(){network.setMusic(scanMusic([[path.join(root,'public','music'),'/music/'],[musicDir,'/custom-music/']]));}
 refreshMusic();
@@ -47,7 +48,7 @@ function save(){
   fs.renameSync(stateFile+'.tmp',stateFile);
   network.markSaved();
 }
-function broadcast(){for(const[id,set]of streams){const p=network.findId(id)?.p;if(!p)continue;const msg=`data: ${JSON.stringify(network.snapshot(p))}\n\n`;for(const res of set)res.write(msg);}}
+function broadcast(){for(const[id,set]of streams){const p=network.findId(id)?.p;if(!p)continue;const msg=`data: ${JSON.stringify(stateFor(p))}\n\n`;for(const res of set)res.write(msg);}}
 function json(res,status,data){res.writeHead(status,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'});res.end(JSON.stringify(data));}
 async function body(req){let text='';for await(const chunk of req){text+=chunk;if(text.length>4096)throw Error('Слишком большой запрос');}return JSON.parse(text||'{}');}
 const server=http.createServer(async(req,res)=>{
@@ -71,10 +72,10 @@ const server=http.createServer(async(req,res)=>{
       const p=network.findToken(token)?.p;if(!p){json(res,401,{ok:false,message:'Войди в мир заново'});return;}
       if(url.pathname==='/api/events'){
         res.writeHead(200,{'Content-Type':'text/event-stream','Cache-Control':'no-cache, no-transform','Connection':'keep-alive','X-Accel-Buffering':'no'});
-        let set=streams.get(p.id);if(!set){set=new Set();streams.set(p.id,set);network.gameFor(p).connect(p);}set.add(res);res.write(`data: ${JSON.stringify(network.snapshot(p))}\n\n`);
+        let set=streams.get(p.id);if(!set){set=new Set();streams.set(p.id,set);network.gameFor(p).connect(p);}set.add(res);res.write(`data: ${JSON.stringify(stateFor(p))}\n\n`);
         req.on('close',()=>{set.delete(res);if(set.size===0){streams.delete(p.id);network.gameFor(p)?.disconnect(p);save();}});return;
       }
-      if(url.pathname==='/api/state'){json(res,200,network.snapshot(p));return;}
+      if(url.pathname==='/api/state'){json(res,200,stateFor(p));return;}
       if(url.pathname==='/api/combat/state'&&req.method==='GET'){
         const g=network.gameFor(p),id=p.combatP0?.activeSessionId||p.combatP0?.lastSessionId;
         const battle=id?combatRoot(g.state).sessions[id]:null;
@@ -154,11 +155,11 @@ const server=http.createServer(async(req,res)=>{
     if(url.pathname.startsWith('/music/')||url.pathname.startsWith('/custom-music/')){
       const track=game.musicCatalog.find(t=>t.url===url.pathname);if(!track){res.writeHead(404);res.end();return;}const dir=url.pathname.startsWith('/custom-music/')?musicDir:path.join(root,'public','music'),file=path.join(dir,decodeURIComponent(url.pathname.split('/').at(-1))),size=fs.statSync(file).size;const range=req.headers.range;let start=0,end=size-1,status=200;if(range){const m=/^bytes=(\d*)-(\d*)$/.exec(range);if(!m||(!m[1]&&!m[2])){res.writeHead(416,{'Content-Range':`bytes */${size}`});res.end();return;}if(!m[1]){start=Math.max(0,size-Number(m[2]));}else{start=Number(m[1]);if(m[2])end=Math.min(end,Number(m[2]));}if(!Number.isSafeInteger(start)||start>end||start>=size){res.writeHead(416,{'Content-Range':`bytes */${size}`});res.end();return;}status=206;res.setHeader('Content-Range',`bytes ${start}-${end}/${size}`);}res.writeHead(status,{'Content-Type':file.endsWith('.mp3')?'audio/mpeg':'audio/wav','Content-Length':end-start+1,'Accept-Ranges':'bytes','Cache-Control':'no-cache'});if(req.method==='HEAD'){res.end();return;}fs.createReadStream(file,{start,end}).pipe(res);return;
     }
-    const files={'/':'index.html','/app.js':'app.js','/life-ui.js':'life-ui.js','/plaza-ui.js':'plaza-ui.js','/city-ui.js':'city-ui.js','/styles.css':'styles.css','/combat':'combat.html','/combat.html':'combat.html','/combat.js':'combat.js','/combat.css':'combat.css','/manifest.webmanifest':'manifest.webmanifest'};
+    const files={'/':'index.html','/app.js':'app.js','/life-ui.js':'life-ui.js','/plaza-ui.js':'plaza-ui.js','/city-ui.js':'city-ui.js','/world-ui.js':'world-ui.js','/world-ui-fixes.js':'world-ui-fixes.js','/world-quests.js':'world-quests.js','/styles.css':'styles.css','/combat':'combat.html','/combat.html':'combat.html','/combat.js':'combat.js','/combat.css':'combat.css','/manifest.webmanifest':'manifest.webmanifest'};
     const file=files[url.pathname];if(!file){res.writeHead(404);res.end('Not found');return;}
     const types={html:'text/html; charset=utf-8',js:'text/javascript; charset=utf-8',css:'text/css; charset=utf-8',webmanifest:'application/manifest+json; charset=utf-8'};
     res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'self'");
-    res.writeHead(200,{'Content-Type':types[file.split('.').at(-1)],'Cache-Control':'no-cache'});res.end(fs.readFileSync(path.join(root,'public',file)));
+    res.writeHead(200,{'Content-Type':types[file.split('.').at(-1)],'Cache-Control':'no-cache'});res.end(file==='index.html'?fs.readFileSync(path.join(root,'public',file),'utf8').replace('</body>','<script src="/world-ui.js" defer></script><script src="/world-ui-fixes.js" defer></script><script src="/world-quests.js" defer></script></body>'):fs.readFileSync(path.join(root,'public',file)));
   }catch(e){json(res,400,{ok:false,message:e.message});}
 });
 let lastTick=Date.now();
