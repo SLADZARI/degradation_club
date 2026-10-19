@@ -5,6 +5,14 @@ on:
       - 'feature/dementor-live-combat-p0-*'
     paths:
       - 'projects/dementor-live/runtime/combat-p0.mjs'
+      - 'projects/dementor-live/runtime/server.mjs'
+      - 'projects/dementor-live/runtime/world.mjs'
+      - 'projects/dementor-live/runtime/public/**'
+      - 'projects/dementor-live/runtime/test/combat-http.test.mjs'
+      - 'projects/dementor-live/runtime/server.mjs'
+      - 'projects/dementor-live/runtime/world.mjs'
+      - 'projects/dementor-live/runtime/public/**'
+      - 'projects/dementor-live/runtime/test/combat-http.test.mjs'
       - 'projects/dementor-live/runtime/test/combat-p0.test.mjs'
       - 'projects/dementor-live/combat/**'
       - '.github/workflows/dementor-live-combat-p0.yml'
@@ -29,5 +37,14 @@ jobs:
         run: |
           node --check projects/dementor-live/runtime/combat-p0.mjs
           node --check projects/dementor-live/runtime/test/combat-p0.test.mjs
+          node --check projects/dementor-live/runtime/test/combat-http.test.mjs
+          node --check projects/dementor-live/runtime/server.mjs
+          node --check projects/dementor-live/runtime/public/combat.js
       - name: Isolated P0 model invariants (NOT gameplay acceptance)
         run: node --test projects/dementor-live/runtime/test/combat-p0.test.mjs
+      - name: Two player isolated HTTP and true server restart
+        working-directory: projects/dementor-live/runtime
+        run: node --test test/combat-http.test.mjs
+      - name: Existing city model regression (no live save)
+        working-directory: projects/dementor-live/runtime
+        run: npm test
