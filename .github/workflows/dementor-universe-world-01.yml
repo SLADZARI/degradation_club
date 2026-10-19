@@ -47,3 +47,29 @@ jobs:
           path: projects/dementor-live/dementor-live-workspace.zip
           if-no-files-found: error
           retention-days: 14
+
+  world-browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install browser QA (not a game runtime dependency)
+        working-directory: projects/dementor-live/runtime
+        run: npm install --no-save --no-package-lock playwright@1.56.1
+      - name: Chromium for reproducible browser testing
+        working-directory: projects/dementor-live/runtime
+        run: npx playwright install --with-deps chromium
+      - name: Real touch city-to-forest-to-city acceptance
+        working-directory: projects/dementor-live/runtime
+        run: node test/world-01-browser.cjs
+      - name: Upload visual proof and test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dementor-universe-world-01-browser-qa
+          path: projects/dementor-live/runtime/reports/world-01/
+          if-no-files-found: warn
+          retention-days: 14
