@@ -28,7 +28,7 @@ async function enter(name,mobile=false){
    body:JSON.stringify({player:id,patch:{x:29,y:35,bag:{food:5}}})});
  assert.equal(p.status,200);
  await page.waitForFunction(()=>me&&Math.hypot(me.x-29,me.y-35)<.05&&context?.type==='combat');
- await page.locator('#actionButton').click();await page.waitForURL('**/combat');
+ await page.locator(mobile?'#mobileCombatButton':'#actionButton').click();await page.waitForURL('**/combat');
  await page.waitForFunction(()=>document.querySelector('#lobby')&&!document.querySelector('#lobby').hidden);
  return {context,page,id,token};
 }
