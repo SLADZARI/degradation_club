@@ -81,6 +81,7 @@ async function tap(p,selector){const r=await p.page.locator(selector).boundingBo
  await relocate(a,31,10);await tap(a,'#world01ActionButton');
  await a.page.waitForFunction(()=>state.world01.portalUnlocked===true);
  checks.push('portal discovered only by visiting it');
+ await wait(260); // second activation is intentional; same-object 180ms debouncing avoids accidental teleport
  await tap(a,'#world01ActionButton');
  await a.page.waitForFunction(()=>state?.scene==='city'&&state.world01.portalUnlocked);
  checks.push('portal returns player to city and preserves identity');
