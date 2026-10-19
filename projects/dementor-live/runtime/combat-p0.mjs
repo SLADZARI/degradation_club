@@ -32,6 +32,26 @@ function moveBody(body,dx,dy,step){
   if(walkable(tx,body.y))body.x=tx;
   if(walkable(body.x,ty))body.y=ty;
 }
+// 1-unit walkable grid for the small P0 combat map. Prevents chasing a player through a solid wall.
+function nextWaypoint(start,target){
+  const point=p=>({x:Math.max(1,Math.min(15,Math.round(p.x))),y:Math.max(1,Math.min(15,Math.round(p.y)))});
+  const a=point(start),goal=point(target),key=p=>p.x+','+p.y;
+  const queue=[a],parents=new Map([[key(a),null]]);
+  let best=a,bestDistance=hypot(a,target);
+  for(let i=0;i<queue.length;i++){
+    const cur=queue[i],dist=hypot(cur,target);
+    if(dist<bestDistance){best=cur;bestDistance=dist;}
+    if(cur.x===goal.x&&cur.y===goal.y){best=cur;break;}
+    for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){
+      const p={x:cur.x+dx,y:cur.y+dy},k=key(p);
+      if(!parents.has(k)&&walkable(p.x,p.y)){parents.set(k,cur);queue.push(p);}
+    }
+  }
+  let next=best,parent=parents.get(key(next));
+  if(next===a)return target;
+  while(parent&&key(parent)!==key(a)){next=parent;parent=parents.get(key(next));}
+  return next;
+}
 function profile(p){
   if(!p||!p.id)throw Error('Unknown character');
   if(!p.combatP0){p.combatP0={weapon:{id:randomUUID(),kind:'starter-rifle',damage:9+randomInt(3),tier:1},ammo:24,receivedStarter:true};}
@@ -129,7 +149,11 @@ export function advanceCombat(world,sessionId,now){
     const target=active.reduce((a,b)=>hypot(e,a)<hypot(e,b)?a:b);
     if(e.type!=='GUARD'){
       const dist=hypot(e,target),desired=e.type==='RANGED'?4:1.1;
-      if(dist>desired){const dx=(target.x-e.x)/dist,dy=(target.y-e.y)/dist;moveBody(e,dx,dy,(e.type==='CHASER'?1.25:.8)*dt);}
+      if(dist>desired){
+        const waypoint=lineClear(e,target)?target:nextWaypoint(e,target);
+        const d=Math.max(.001,hypot(e,waypoint));
+        moveBody(e,(waypoint.x-e.x)/d,(waypoint.y-e.y)/d,(e.type==='CHASER'?1.25:.8)*dt);
+      }
     }
     const range=e.type==='RANGED'?7:e.type==='GUARD'?2.6:1.35;
     if(now-e.lastAttack>=COMBAT_P0.enemyAttackMs&&hypot(e,target)<=range&&lineClear(e,target)){
