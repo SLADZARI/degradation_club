@@ -30,7 +30,7 @@ function createCity(id,index,treasury,environment){
  const stock=Object.fromEntries(['WOOD','STONE','WATER','CARROT','HEMP','PAPER_SHEET','SEED_CARROT','SEED_HEMP'].map(k=>[k,cityMaterials[k]?.[index]||0]));
  return {id,index,treasury,stock,carrots:[],plots:[{ready:0},{ready:0}],
   hempBed:{ready:0},buildings:[],rainBonus:0,storageCapacity:RULES.initialCarrotCapacity,
-  carrotShelf:RULES.carrotShelf,serviceSlots:RULES.initialServiceSlots,
+  carrotShelf:RULES.carrotShelf,maxWater:100,serviceSlots:RULES.initialServiceSlots,
   freightCapacity:RULES.freightCapacity,
   unmetMeals:0,spoiledCarrot:0,unservedCivic:0,waterShortage:0,
   blockedCargo:0,blockedStorage:0,unfundedWorks:0,harvests:0,services:0,serviceRevenue:0,
@@ -42,8 +42,11 @@ function residents(world,city){return world.players.filter(p=>p.cityId===city.id
 function working(world,city){return residents(world,city).find(p=>active(world,p));}
 function refillRain(world,city){
  const rain=world.environment==='dry'?1:world.environment==='wet'?10:6;
- const v=rain+city.rainBonus;
- city.stock.WATER+=v;world.waterFromRain+=v;
+ const v=rain+city.rainBonus; // all inflow originates in the weather ledger
+ const prior=city.stock.WATER;
+ city.stock.WATER=Math.min(city.maxWater,prior+v);
+ world.waterFromRain+=v;
+ world.waterRunoff+=Math.max(0,prior+v-city.maxWater); // excess is discharged, not mysteriously lost
 }
 const carrotCount=city=>city.carrots.reduce((n,b)=>n+b.qty,0);
 function takeCarrot(city,qty=1){
@@ -147,7 +150,7 @@ export function createFederation({agents=15,cityCount=3,environment='normal',
    grown:{CARROT:0,HEMP:0,PAPER_SHEET:0,SEED_CARROT:0,SEED_HEMP:0},
    consumed:{CARROT_PLAYER:0,CARROT_CIVIC:0,CARROT_SPOILED:0,PAPER_SHEET_CIVIC:0,
      HEMP_CRAFT:0,SEED_CARROT:0,SEED_HEMP:0,WATER:0},
-   embodied:{WOOD:0,STONE:0},waterFromRain:0,foodNeeds:0,unmetMeals:0,
+   embodied:{WOOD:0,STONE:0},waterFromRain:0,waterRunoff:0,foodNeeds:0,unmetMeals:0,
    wages:0,totalServices:0,totalBuildings:0,processedDays:0};
  checkFederation(world);return world;
 }
@@ -159,7 +162,7 @@ export function federationBalances(world){
  return {PAPER:funds,
    WOOD:goods(world,'WOOD')+world.embodied.WOOD,
    STONE:goods(world,'STONE')+world.embodied.STONE,
-   WATER:goods(world,'WATER')+world.consumed.WATER-world.waterFromRain,
+   WATER:goods(world,'WATER')+world.consumed.WATER+world.waterRunoff-world.waterFromRain,
    SEED_CARROT:goods(world,'SEED_CARROT')+world.consumed.SEED_CARROT-world.grown.SEED_CARROT,
    SEED_HEMP:goods(world,'SEED_HEMP')+world.consumed.SEED_HEMP-world.grown.SEED_HEMP,
    CARROT:goods(world,'CARROT')+world.consumed.CARROT_PLAYER+
@@ -221,7 +224,7 @@ export function proposeProject(world,cityId,projectId,actorId){
  must(payWorker(world,city,p,x.wage),'building wage');
  city.buildings.push(x.id);world.totalBuildings++;bookEvent(city,'built:'+x.id);
  if(x.id==='garden')city.plots.push({ready:0},{ready:0});
- if(x.id==='cistern')city.rainBonus+=3;
+ if(x.id==='cistern'){city.rainBonus+=3;city.maxWater+=30;}
  if(x.id==='marketHall')city.serviceSlots++;
  if(x.id==='coldStore'){city.carrotShelf+=2;city.storageCapacity+=8;}
  if(x.id==='freightDepot')city.freightCapacity+=4;
@@ -361,8 +364,8 @@ export function dayStep(world){
  for(const c of world.cities){
    refillRain(world,c);
    expireCarrot(world,c);
+   farm(world,c); // harvest before citizens shop: fresh produce is available on harvest day
    foodForResidents(world,c);
-   farm(world,c);
    weeklyServices(world,c);
  }
  for(const city of world.cities)develop(world,city);
@@ -399,6 +402,8 @@ export function federationMetrics(world){
   food:{needs:world.foodNeeds,unmet:world.unmetMeals,eaten:world.consumed.CARROT_PLAYER,
     civic:world.consumed.CARROT_CIVIC,spoiled:world.consumed.CARROT_SPOILED,
     grown:world.grown.CARROT},
+  water:{initial:world.initial.WATER,rain:world.waterFromRain,consumed:world.consumed.WATER,
+    runoff:world.waterRunoff,stored:goods(world,'WATER')},
   minerals:{WOOD_INITIAL:world.initial.WOOD,WOOD_STOCK:goods(world,'WOOD'),
     WOOD_IN_BUILDINGS:world.embodied.WOOD,STONE_INITIAL:world.initial.STONE,
     STONE_STOCK:goods(world,'STONE'),STONE_IN_BUILDINGS:world.embodied.STONE},
