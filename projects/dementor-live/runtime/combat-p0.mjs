@@ -95,10 +95,11 @@ function down(s,p,now){
   p.hp=0;p.status='DOWNED';p.downedDeadline=now+COMBAT_P0.downedMs;p.input={x:0,y:0};p.feed=null;p.selfFeed=null;
   for(const other of Object.values(s.members))if(other.feed?.target===p.id)other.feed=null;
 }
+function checkpoint(stage){return stage===3?{x:9,y:9}:stage===2?{x:9,y:3}:{x:2,y:2};}
 function wipe(s,now){
   s.attempt++;s.objectiveReady=false;encounter(s);
   for(const m of Object.values(s.members)){
-    m.status='ACTIVE';m.hp=100;m.downedDeadline=0;m.feed=null;m.selfFeed=null;m.x=2;m.y=2;
+    m.status='ACTIVE';m.hp=100;m.downedDeadline=0;m.feed=null;m.selfFeed=null;Object.assign(m,checkpoint(s.stage));
     m.invulnerableUntil=now+COMBAT_P0.reviveProtectionMs;m.input={x:0,y:0};m.inputAt=now;
   }
 }
@@ -119,7 +120,7 @@ export function advanceCombat(world,sessionId,now){
     if(m.status==='DOWNED'){
       if(now>=m.downedDeadline){
         // A single member returns at checkpoint while survivors continue the encounter.
-        m.status='ACTIVE';m.hp=30;m.feed=null;m.selfFeed=null;m.x=2;m.y=2;
+        m.status='ACTIVE';m.hp=30;m.feed=null;m.selfFeed=null;Object.assign(m,checkpoint(s.stage));
         m.invulnerableUntil=now+COMBAT_P0.reviveProtectionMs;m.input={x:0,y:0};m.inputAt=now;
       }
       continue;
