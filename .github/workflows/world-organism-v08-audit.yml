@@ -38,7 +38,7 @@ jobs:
         run: node --test tests/snapshot-contract.test.mjs
       - name: Forward simulator reproducibility (288 combinations; stepwise invariants)
         working-directory: projects/dementor-live/first-home-loop/balance-lab/v0_8/experimental
-        run: node --test shadow-model.test.mjs quality-gates.test.mjs long-run.test.mjs sponsored-services.test.mjs
+        run: node --test shadow-model.test.mjs quality-gates.test.mjs long-run.test.mjs sponsored-services.test.mjs project-registry.test.mjs
       - name: Export deterministic projections / D60-D90-D120 and +180/+360 day horizons
         working-directory: projects/dementor-live/first-home-loop/balance-lab/v0_8/experimental
         run: node run-projection.mjs reports
