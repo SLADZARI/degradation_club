@@ -208,14 +208,29 @@ function command(s,world,players,actorId,cmd,now){
     if(!finite(cmd.dx)||!finite(cmd.dy)||Math.hypot(cmd.dx,cmd.dy)<.001)throw Error('Invalid aim');
     const d=Math.hypot(cmd.dx,cmd.dy),aim={x:cmd.dx/d,y:cmd.dy/d};
     actor.aim=aim;actor.nextShotAt=now+COMBAT_P0.shotCooldownMs;actor.feed=null;actor.selfFeed=null;prof.ammo--;
+    // A hitscan shot is instantaneous but reports its actual ray for a visible tracer on the client.
+    // Clamp the ray at the first solid wall; no phantom hits on opponents behind cover.
+    let wallDistance=COMBAT_P0.shotRange;
+    for(const w of WALLS){
+      let enter=0,leave=COMBAT_P0.shotRange,valid=true;
+      for(const [p,d,lo,hi] of [[actor.x,aim.x,w.x,w.x+w.w],[actor.y,aim.y,w.y,w.y+w.h]]){
+        if(Math.abs(d)<1e-8){if(p<lo||p>hi){valid=false;break;}}
+        else{const t0=(lo-p)/d,t1=(hi-p)/d;enter=Math.max(enter,Math.min(t0,t1));leave=Math.min(leave,Math.max(t0,t1));if(leave<enter){valid=false;break;}}
+      }
+      if(valid)wallDistance=Math.min(wallDistance,Math.max(0,enter));
+    }
     const hits=s.enemies.filter(e=>e.alive).map(e=>({e,dot:(e.x-actor.x)*aim.x+(e.y-actor.y)*aim.y}))
-      .filter(h=>h.dot>=0&&h.dot<=COMBAT_P0.shotRange&&Math.hypot(h.e.x-actor.x-aim.x*h.dot,h.e.y-actor.y-aim.y*h.dot)<.44)
+      .filter(h=>h.dot>=0&&h.dot<=wallDistance+.001&&Math.hypot(h.e.x-actor.x-aim.x*h.dot,h.e.y-actor.y-aim.y*h.dot)<.44)
       .sort((a,b)=>a.dot-b.dot);
-    const nearest=hits.find(h=>lineClear(actor,h.e));
-    if(!nearest)return {hit:false,ammo:prof.ammo};
+    const nearest=hits[0],travel=nearest?nearest.dot:wallDistance;
+    const shot={from:{x:actor.x,y:actor.y},to:{x:actor.x+aim.x*travel,y:actor.y+aim.y*travel},
+      blocked:!nearest&&wallDistance<COMBAT_P0.shotRange-.001,damage:0};
+    if(!nearest)return {hit:false,ammo:prof.ammo,shot};
+    const actualDamage=Math.min(nearest.e.hp,prof.weapon.damage);
     nearest.e.hp-=prof.weapon.damage;
+    shot.damage=actualDamage;
     if(nearest.e.hp<=0){nearest.e.alive=false;awardLoot(s,nearest.e);advanceStage(s,now);}
-    return {hit:true,enemyId:nearest.e.id,ammo:prof.ammo};
+    return {hit:true,enemyId:nearest.e.id,ammo:prof.ammo,shot};
   }
   if(cmd.type==='melee'){
     if(!finite(cmd.dx)||!finite(cmd.dy))throw Error('Invalid melee');
