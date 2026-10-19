@@ -3,6 +3,7 @@
 // Explicitly derived from the published D30 aggregate checkpoint + hypothetical post-D30 policies.
 // All parameters in SETTINGS below are TEST assumptions, not approved game rules.
 import {SESSION_CONTRACT,openSponsoredSession,onSponsoredDelivery,onSponsoredExpiry,serviceFeeEscrow,validateServices} from './sponsored-services.mjs';
+import {pendingProjects,assertRegistry} from './project-registry.mjs';
 export const MODEL_ID='WORLD-ORGANISM/0.8.1-shadow-sustainability';
 export const SETTINGS={
   checkpointDay:30, initialPAPER:3600, cityPAPER:2301, playerPAPER:1299,
@@ -277,29 +278,21 @@ function settleDemand(s){
 }
 function balancePressure(s){
   if(!['needs-growth','sponsored-growth'].includes(s.policy))return;
-  const policies=[
-    {id:'pantry',spec:SETTINGS.pantry,ready:s.used.CARROT_SPOILED>=SETTINGS.pantry.minSpoiled},
-    {id:'irrigation',spec:SETTINGS.irrigation,ready:s.unmetFood>=SETTINGS.irrigation.minUnmet},
-  ];
-  if(s.policy==='sponsored-growth'){
-    policies.push(
-      {id:'communityHall',spec:SETTINGS.communityHall,
-        ready:s.serviceRequestsUnserved>=SETTINGS.communityHall.minUnserved},
-      {id:'readingRoom',spec:SETTINGS.readingRoom,
-        ready:s.serviceRequestsUnserved>=SETTINGS.readingRoom.minUnserved}
-    );
-  }
-  for(const {id,spec,ready} of policies){
-    if(!ready||s.day<spec.earliestDay||s.projects.includes(id))continue;
-    // Demand justified by demonstrated loss/shortage; fixed cost and physical material source.
-    if(s.wood<spec.WOOD||s.stone<spec.STONE||s.city<spec.payout)continue;
-    s.wood-=spec.WOOD;s.stone-=spec.STONE;
-    s.embodied.WOOD+=spec.WOOD;s.embodied.STONE+=spec.STONE;
-    s.city-=spec.payout;s.buildPaid+=spec.payout;
+  assertRegistry(SETTINGS);
+  // The registry provides candidate needs; after each build re-check the LIVE
+  // inventory and treasury, since multiple funded proposals can compete.
+  for(const candidate of pendingProjects(s,SETTINGS)){
+    if(!candidate.needed||!candidate.mature||s.projects.includes(candidate.id))continue;
+    const cost=candidate.cost;
+    if(s.wood<cost.wood||s.stone<cost.stone||s.city<cost.paper)continue;
     const worker=s.players.find(p=>isActive(s,p));
-    if(!worker)throw Error('building worker missing despite accepted funded project');
-    worker.wallet+=spec.payout;s.projects.push(id);s.cityProjectsDone++;s.ledgerEvents++;
-    if(id==='irrigation')s.recharge+=4;
+    if(!worker)continue; // cannot approve invisible offline work
+    s.wood-=cost.wood;s.stone-=cost.stone;
+    s.embodied.WOOD+=cost.wood;s.embodied.STONE+=cost.stone;
+    s.city-=cost.paper;s.buildPaid+=cost.paper;
+    worker.wallet+=cost.paper;s.projects.push(candidate.id);s.cityProjectsDone++;
+    s.ledgerEvents++;
+    if(candidate.effect==='WATER_SOURCE')s.recharge+=4;
   }
 }
 export function tradeHemp(s,{offerId,buyer,seller,quantity,pricePerUnit=1,accepted=false,online=true}){
