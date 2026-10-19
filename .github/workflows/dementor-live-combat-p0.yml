@@ -46,6 +46,23 @@ jobs:
         working-directory: projects/dementor-live/runtime
         run: npm test
 
+
+      - name: Verify existing workspace and record commit provenance
+        working-directory: projects/dementor-live/runtime
+        run: |
+          npm run check
+          printf '{"commit":"%s","status":"ALPHA MODEL / NOT DEPLOYED","source":"COMBAT P0 draft PR"}\n' "$GITHUB_SHA" > BUILD_INFO.json
+      - name: Pack isolated playable test workspace (no data/world.json)
+        working-directory: projects/dementor-live/runtime
+        run: npm run pack
+      - name: Upload portable alpha test workspace
+        uses: actions/upload-artifact@v4
+        with:
+          name: dementor-live-combat-alpha-p0-workspace
+          path: projects/dementor-live/dementor-live-workspace.zip
+          if-no-files-found: error
+          retention-days: 14
+
   combat-browser:
     runs-on: ubuntu-latest
     timeout-minutes: 20
