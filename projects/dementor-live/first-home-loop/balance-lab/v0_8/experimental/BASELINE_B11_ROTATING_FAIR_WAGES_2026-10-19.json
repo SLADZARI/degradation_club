@@ -1,0 +1,181 @@
+{
+  "status": "LAB_ACCEPTED_IMPROVED_MONEY_ACCESS_BUT_ONE_CITY_INSOLVENT",
+  "workflow": 39277788109,
+  "commit": "4b89d0dcd3c29d2ea63ba3ff5c6b89058e844fcf",
+  "baseOriginalPAPER": 3600,
+  "quality": "fair crop wage 12 per 4 CARROT and rotational work",
+  "checksPass": 582,
+  "anchors": [
+    {
+      "agents": 20,
+      "cities": 3,
+      "environment": "normal",
+      "days": 360,
+      "local": {
+        "treasury": 997,
+        "buildings": 3,
+        "unservedFood": 3613,
+        "services": 61,
+        "deliveries": 0
+      },
+      "trade": {
+        "treasury": 1192,
+        "buildings": 9,
+        "unservedFood": 2312,
+        "services": 203,
+        "deliveries": 23
+      },
+      "effect": {
+        "extraBuildings": 6,
+        "avoidedHunger": 1301,
+        "freightTrades": 23
+      }
+    },
+    {
+      "agents": 20,
+      "cities": 3,
+      "environment": "dry",
+      "days": 360,
+      "local": {
+        "treasury": 1641,
+        "buildings": 3,
+        "unservedFood": 4998,
+        "services": 2,
+        "deliveries": 0
+      },
+      "trade": {
+        "treasury": 992,
+        "buildings": 10,
+        "unservedFood": 2579,
+        "services": 126,
+        "deliveries": 23
+      },
+      "effect": {
+        "extraBuildings": 7,
+        "avoidedHunger": 2419,
+        "freightTrades": 23
+      }
+    },
+    {
+      "agents": 20,
+      "cities": 3,
+      "environment": "wet",
+      "days": 360,
+      "local": {
+        "treasury": 997,
+        "buildings": 3,
+        "unservedFood": 3613,
+        "services": 61,
+        "deliveries": 0
+      },
+      "trade": {
+        "treasury": 1192,
+        "buildings": 9,
+        "unservedFood": 2312,
+        "services": 203,
+        "deliveries": 23
+      },
+      "effect": {
+        "extraBuildings": 6,
+        "avoidedHunger": 1301,
+        "freightTrades": 23
+      }
+    }
+  ],
+  "citySample": [
+    {
+      "id": "city-1",
+      "population": 7,
+      "treasury": 474,
+      "rawWOOD": 0,
+      "rawSTONE": 10,
+      "water": 94,
+      "carrot": 5,
+      "paperSheet": 1,
+      "founded": false,
+      "buildings": [
+        "garden",
+        "marketHall",
+        "fieldEast"
+      ],
+      "unmetFood": 355,
+      "unmetNoCash": 219,
+      "unmetNoFood": 136,
+      "services": 88,
+      "feesAndSales": 1496,
+      "unservedRequests": 187,
+      "spoilage": 14,
+      "missingWater": 0,
+      "blockedCargo": 0,
+      "blockedStorage": 320,
+      "exportable": {
+        "WOOD": 0,
+        "STONE": 0
+      },
+      "cargoImports": 12
+    },
+    {
+      "id": "city-2",
+      "population": 7,
+      "treasury": 716,
+      "rawWOOD": 6,
+      "rawSTONE": 10,
+      "water": 94,
+      "carrot": 4,
+      "paperSheet": 2,
+      "founded": false,
+      "buildings": [
+        "garden",
+        "marketHall",
+        "fieldEast"
+      ],
+      "unmetFood": 351,
+      "unmetNoCash": 230,
+      "unmetNoFood": 121,
+      "services": 85,
+      "feesAndSales": 1445,
+      "unservedRequests": 191,
+      "spoilage": 22,
+      "missingWater": 0,
+      "blockedCargo": 0,
+      "blockedStorage": 322,
+      "exportable": {
+        "WOOD": 6,
+        "STONE": 0
+      },
+      "cargoImports": 4
+    },
+    {
+      "id": "city-3",
+      "population": 6,
+      "treasury": 2,
+      "rawWOOD": 15,
+      "rawSTONE": 14,
+      "water": 100,
+      "carrot": 0,
+      "paperSheet": 3,
+      "founded": false,
+      "buildings": [
+        "garden",
+        "marketHall",
+        "fieldEast"
+      ],
+      "unmetFood": 1606,
+      "unmetNoCash": 230,
+      "unmetNoFood": 1376,
+      "services": 30,
+      "feesAndSales": 510,
+      "unservedRequests": 150,
+      "spoilage": 196,
+      "missingWater": 0,
+      "blockedCargo": 0,
+      "blockedStorage": 127,
+      "exportable": {
+        "WOOD": 0,
+        "STONE": 14
+      },
+      "cargoImports": 7
+    }
+  ],
+  "diagnosis": "Greedy advance municipal farm wages can impoverish treasury where production spoils, preventing future physical harvest; test consignment sale directly to producer."
+}
