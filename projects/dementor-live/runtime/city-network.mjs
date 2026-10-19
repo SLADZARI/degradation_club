@@ -1,5 +1,5 @@
 import {randomUUID} from 'node:crypto';
-import {Game,createWorld} from './world.mjs';
+import {Game,createWorld} from './world-expansion-adapter.mjs';
 
 const SCHEMA='dementor-cities-v1';
 const ORIGIN='origin';
