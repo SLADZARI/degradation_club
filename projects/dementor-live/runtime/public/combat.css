@@ -18,3 +18,7 @@
  .stick i{height:28px;width:28px}
  .stick span{bottom:5px;font-size:7px}
 }
+
+#shotFeedback{position:absolute;left:50%;top:78px;transform:translateX(-50%);z-index:4;pointer-events:none;opacity:0;background:#1f352ad9;color:#fefce3;font-size:14px;font-weight:800;letter-spacing:.06em;padding:6px 13px;border-radius:8px;transition:opacity .1s}
+#shotFeedback.active{opacity:1}#shotFeedback[data-kind="hit"]{background:#245b36e8}#shotFeedback[data-kind="blocked"]{background:#765131e6}
+@media(max-width:760px){#shotFeedback{top:68px;font-size:12px}}
