@@ -108,3 +108,27 @@ test('high frequency movement input does not accumulate commands in save',()=>{
   for(let i=0;i<300;i++)x.act('a','input',{dx:1,dy:0},1500+i);
   assert.ok(Object.keys(s.commands).length<=2);
 });
+
+test('CHASER navigates around blocking wall instead of oscillating into it',()=>{
+  const x=setup();x.start();
+  const s=x.world.combatP0.sessions[x.sid],chaser=s.enemies[0];
+  chaser.x=9.2;chaser.y=6;chaser.lastAttack=1e15;
+  s.members.a.x=5;s.members.a.y=6;
+  let now=1000;
+  for(let i=0;i<135;i++){now+=250;advanceCombat(x.world,x.sid,now);}
+  assert.ok(Math.hypot(chaser.x-5,chaser.y-6)<3.5,'Enemy must navigate around wall, not remain at blocked side');
+});
+test('two second self-feeding consumes once only on completion and restores capped HP',()=>{
+  const x=setup();x.start();const s=x.world.combatP0.sessions[x.sid];
+  s.enemies=[];s.members.a.hp=50;
+  x.act('a','selfFeed',{},2000);assert.equal(x.world.players.a.bag.food,3);
+  advanceCombat(x.world,x.sid,4000);
+  assert.equal(x.world.players.a.bag.food,2);assert.equal(s.members.a.hp,65);
+});
+test('downed teammate times out to checkpoint if a partner still stands',()=>{
+  const x=setup(true);x.start();const s=x.world.combatP0.sessions[x.sid];
+  s.enemies=[];s.members.b.status='DOWNED';s.members.b.downedDeadline=1600;
+  advanceCombat(x.world,x.sid,1650);
+  assert.equal(s.members.b.status,'ACTIVE');assert.equal(s.members.b.hp,30);
+  assert.equal(s.stage,1);assert.equal(s.attempt,0);
+});
