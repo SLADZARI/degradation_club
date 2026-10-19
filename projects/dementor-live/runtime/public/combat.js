@@ -66,6 +66,7 @@ function nearestDowned(){
   return Object.values(battle.members).find(p=>p.id!==me&&p.status==='DOWNED'&&Math.hypot(self.x-p.x,self.y-p.y)<1.25);
 }
 $('revive').onclick=()=>{const t=nearestDowned();if(t)act('feed',{target:t.id});else notify('Подойди к раненому товарищу (расстояние ≤1,25).');};
+$('selfFeed').onclick=()=>act('selfFeed');
 function tryInteract(){
   if(!battle||battle.status==='LOBBY')return;
   if(battle.status==='EXTRACT_READY'){act('extract');return;}
