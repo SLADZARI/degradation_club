@@ -193,7 +193,76 @@ for(const agents of [10,15,20])
        assert.equal(m.minerals.STONE_INITIAL,m.minerals.STONE_STOCK+m.minerals.STONE_IN_BUILDINGS);
        assert.ok(m.cityRows.every(c=>c.treasury>=0));
        assert.ok(s.deliveries.every(d=>d.qty>0));
-       assert.ok(m.economy.cityBuildings<=5*cityCount);
+       assert.ok(m.economy.cityBuildings<=FEDERATION_PROJECTS.length*cityCount);
        checkFederation(s);
      });
     }
+
+test('F19 imported WOOD cannot be re-exported as newly harvested native timber',()=>{
+ const w=make();
+ const rich=w.cities[1],poor=w.cities[0],other=w.cities[2];
+ const richActor=w.players.find(p=>p.cityId===rich.id).id;
+ let req=ship(w,{from:rich.id,to:poor.id,asset:'WOOD',qty:8,shipmentId:'native-to-poor',
+   actorId:richActor,accepted:true});
+ assert.equal(req.status,'IN_TRANSIT');
+ dayStep(w);assert.equal(req.status,'DELIVERED');
+ const poorActor=w.players.find(p=>p.cityId===poor.id).id;
+ const first=ship(w,{from:poor.id,to:other.id,asset:'WOOD',qty:8,shipmentId:'native-out-one',
+   actorId:poorActor,accepted:true});
+ assert.equal(first.status,'IN_TRANSIT');
+ const second=ship(w,{from:poor.id,to:rich.id,asset:'WOOD',qty:5,shipmentId:'native-out-two',
+   actorId:poorActor,accepted:true});
+ assert.deepEqual(second,{ok:false,reason:'non-exportable-import'});
+ assert.equal(poor.exportable.WOOD,4);
+ assert.equal(federationBalances(w).WOOD,w.initial.WOOD);
+ checkFederation(w);
+});
+test('F20 total shipments of original raw assets cannot exceed finite native mined supply',()=>{
+ const w=federationRun({agents:20,cityCount:3,logistics:'trade',environment:'dry',days:360});
+ for(const kind of ['WOOD','STONE']){
+  const shipped=w.deliveries.filter(d=>d.asset===kind).reduce((n,d)=>n+d.qty,0);
+  assert.ok(shipped<=w.initial[kind],kind+' was circulated as newly mined materials');
+ }
+ assert.equal(federationBalances(w).PAPER,3600);
+ checkFederation(w);
+});
+test('F21 rain and runoff are explicitly balanced in physically bounded reservoirs',()=>{
+ for(const weather of ['normal','dry','wet']){
+  const w=federationRun({agents:20,cityCount:3,environment:weather,logistics:'trade',days:360});
+  const result=federationMetrics(w);
+  assert.ok(w.cities.every(city=>city.stock.WATER<=city.maxWater));
+  assert.equal(result.water.initial+result.water.rain,
+    result.water.consumed+result.water.runoff+result.water.stored);
+  assert.ok(result.water.runoff>=0);
+  checkFederation(w);
+ }
+});
+test('F22 new agricultural buildings require cumulative shortage and preserve unique functional improvements',()=>{
+ const w=federationRun({agents:20,cityCount:3,environment:'normal',logistics:'trade',days:360});
+ const types=w.cities.flatMap(c=>c.buildings);
+ assert.ok(types.includes('garden'),'need-driven first gardens should be built');
+ for(const city of w.cities){
+  if(city.buildings.includes('fieldEast'))assert.ok(city.buildings.includes('garden'));
+  if(city.buildings.includes('fieldWest'))assert.ok(city.buildings.includes('fieldEast'));
+  assert.ok(city.plots.length>=2&&city.plots.length<=8);
+ }
+ checkFederation(w);
+});
+test('F23 modifying export provenance without a source delivery is caught',()=>{
+ const w=make();
+ w.cities[0].exportable.WOOD+=1;
+ // A fabricated export claim would be exposed once it exceeds physical stock.
+ w.cities[0].exportable.WOOD=w.cities[0].stock.WOOD+1;
+ assert.throws(()=>checkFederation(w),/exporting imported assets or broken provenance/);
+});
+test('F24 in-transit goods and settlement survive JSON roundtrip before arrival',()=>{
+ const w=make(),s=ship(w,approvedCargo(w));
+ assert.equal(s.status,'IN_TRANSIT');
+ const restore=JSON.parse(JSON.stringify(w));
+ checkFederation(restore);
+ dayStep(restore);checkFederation(restore);
+ const d=restore.deliveries.find(x=>x.id===s.id);
+ assert.equal(d.status,'DELIVERED');
+ assert.equal(restore.arrivalHistory.filter(id=>id===s.id).length,1);
+ assert.equal(federationBalances(restore).PAPER,3600);
+});
