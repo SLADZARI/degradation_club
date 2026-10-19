@@ -102,7 +102,7 @@ const server=http.createServer(async(req,res)=>{
       const data=await body(req);
       if(url.pathname==='/api/combat/action'){
         const g=network.gameFor(p),kind=String(data.type||''),now=Date.now();
-        if(!g.online.has(p.id))throw Error('Войди в игровой мир');
+        // HTTP Bearer token authenticates combat independently of city's SSE connection.
         if(!data.requestId||typeof data.requestId!=='string'||data.requestId.length<4||data.requestId.length>100)throw Error('Требуется requestId');
         let result;
         if(['create','join','buyAmmo'].includes(kind)){
