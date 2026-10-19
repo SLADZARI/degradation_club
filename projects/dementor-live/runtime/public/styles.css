@@ -74,3 +74,40 @@ dialog:not(#welcome){position:fixed;inset:220px 24px auto auto;margin:0;transfor
   .city-sound{top:307px}
   .action-dock:not([hidden]){bottom:225px}
 }
+
+/* WORLD-01: isolated branch forest UX — no styling changes to the canonical club site. */
+.world01-badge{position:fixed;top:65px;left:50%;transform:translateX(-50%);z-index:5;display:flex;gap:8px;
+align-items:center;background:#f6f1e4e8;color:#3b5540;padding:7px 12px;border:1px solid #9cac97;border-radius:10px;font:600 11px system-ui;pointer-events:none}
+.world01-badge[hidden],#world01Fast[hidden]{display:none!important}
+.world01-badge small{opacity:.65;font-size:9px}
+.world01-touch{display:none}
+.world01-card{max-width:min(480px,calc(100vw - 24px));padding:28px 24px;color:#364733;background:#f5f0e3;border:1px solid #b6c1ab;border-radius:17px;box-shadow:0 18px 60px #27352480}
+.world01-card::backdrop{background:#1e2a1d9c}
+.world01-card h2{font-size:23px;line-height:1.2;margin:12px 0}
+.world01-card p{font-size:14px;line-height:1.55;white-space:normal}
+.world01-card-eyebrow{font:800 10px system-ui;letter-spacing:.09em;color:#657d67}
+.world01-card small{display:block;margin:14px 0;color:#63776a}
+.world01-card a{display:inline-block;background:#55765b;color:#fff;padding:11px 14px;border-radius:9px;text-decoration:none;font:700 12px system-ui}
+.world01-card .world01-legal{color:#77806d;font-size:11px}
+#world01CardClose{position:absolute;right:12px;top:12px;font-size:20px;border:0;background:transparent;cursor:pointer}
+@media(max-width:760px),(hover:none) and (pointer:coarse){
+ .touch-controls{display:none!important}
+ .world01-touch{display:block;position:fixed;inset:0;pointer-events:none;z-index:14}
+ .world01-move-pad{pointer-events:auto;touch-action:none;user-select:none;position:absolute;left:12px;bottom:calc(82px + env(safe-area-inset-bottom));
+ width:116px;height:116px;border-radius:50%;border:2px solid #56745a7f;background:#dce7d5b8;box-shadow:0 4px 20px #283c3060}
+ .world01-move-pad span{position:absolute;left:50%;top:50%;margin:-19px 0 0 -19px;width:38px;height:38px;border-radius:50%;background:#54785a;pointer-events:none}
+ .world01-move-pad small{position:absolute;bottom:9px;left:0;right:0;text-align:center;font-size:8px;font-weight:700;color:#3a5641}
+ .world01-touch-actions{position:absolute;right:12px;bottom:calc(84px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:7px;width:112px;pointer-events:auto}
+ .world01-touch-actions button{min-height:46px;border-radius:11px;border:1px solid #a2aa91;background:#edf0dfee;color:#344d3c;font:800 11px system-ui;touch-action:manipulation}
+ #world01FindForest{background:#526d56;color:white}
+ .action-dock{display:none!important}
+ .world01-badge{top:50px;font-size:10px;padding:5px 8px;white-space:nowrap}
+ .world01-badge small{display:none}
+}
+@media(max-height:430px) and (orientation:landscape) and (pointer:coarse){
+ .world01-move-pad{width:88px;height:88px;bottom:calc(48px + env(safe-area-inset-bottom))}
+ .world01-move-pad span{width:30px;height:30px;margin:-15px 0 0 -15px}
+ .world01-touch-actions{right:12px;bottom:calc(50px + env(safe-area-inset-bottom));width:104px;gap:4px}
+ .world01-touch-actions button{min-height:33px;font-size:9px}
+ .world01-badge{top:36px}
+}
