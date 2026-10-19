@@ -141,3 +141,27 @@ test('R12 delayed souvenir retry after 140 other commands and restart never debi
  assert.equal(treasuryAndWallet(restored,rp),initial);
  assert.equal(wallet-TOURIST_PRICES.souvenir,rp.wallet);
 });
+
+test('R13 paid purchase retry succeeds after leaving kiosk and changing scenes, without buying again',()=>{
+ const {game:g,p}=make();at(g,p,'tourist-kiosk');
+ const request={requestId:'paid-while-near-retried-from-museum',type:'touristBuy',target:'tourist-kiosk',kind:'shirt'};
+ const first=g.command(p,request);
+ assert.equal(first.ok,true);
+ assert.equal(p.worldTravel.souvenirs.shirt,1);
+ const sum=treasuryAndWallet(g,p),saved=p.wallet;
+ // Exhaust the regular 128-command cache while the player leaves the shop.
+ at(g,p,'travel-sign');
+ for(let i=0;i<140;i++)assert.equal(command(g,p,'worldUse','travel-sign').ok,true);
+ at(g,p,'museum-entry');
+ assert.equal(command(g,p,'worldUse','museum-entry').ok,true);
+ assert.equal(p.scene,'museum');
+ assert.ok(!p.results.some(entry=>entry.id===request.requestId));
+ const replay=g.command(p,request);
+ assert.deepEqual(replay,first);
+ assert.equal(p.worldTravel.souvenirs.shirt,1);
+ assert.equal(p.wallet,saved);
+ assert.equal(treasuryAndWallet(g,p),sum);
+ const restored=new Game(structuredClone(g.state)),rp=restored.auth(p.token);
+ assert.deepEqual(restored.command(rp,request),first);
+ assert.equal(rp.worldTravel.souvenirs.shirt,1);
+});
