@@ -1,6 +1,6 @@
 {
   "name": "dementor-live-local-slice",
-  "version": "0.3.0-rc.1",
+  "version": "0.4.0-world-p0",
   "private": true,
   "type": "module",
   "scripts": {
