@@ -110,7 +110,7 @@ function pad(el,cb){
  function sample(e){const r=el.getBoundingClientRect(),x=(e.clientX-(r.left+r.width/2))/(r.width*.37),y=(e.clientY-(r.top+r.height/2))/(r.height*.37);
  const length=Math.max(1,Math.hypot(x,y)),v={x:x/length,y:y/length};
  dot.style.transform='translate('+(v.x*27)+'px,'+(v.y*27)+'px)';cb(v,true);}
- el.addEventListener('pointerdown',e=>{active=e.pointerId;el.setPointerCapture(active);sample(e);e.preventDefault();});
+ el.addEventListener('pointerdown',e=>{active=e.pointerId;try{el.setPointerCapture(active);}catch{}sample(e);e.preventDefault();});
  el.addEventListener('pointermove',e=>{if(e.pointerId===active)sample(e);});
  for(const name of ['pointerup','pointercancel','lostpointercapture'])el.addEventListener(name,e=>{if(e.pointerId!==active)return;active=null;dot.style.transform='';cb({x:0,y:0},false);});
 }
