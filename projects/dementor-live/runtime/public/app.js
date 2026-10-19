@@ -1,7 +1,7 @@
 const $=id=>document.getElementById(id),canvas=$('world'),ctx=canvas.getContext('2d');
 let lastScene=null;
 let state=null,me=null,token=sessionStorage.getItem('dementor-token'),stream=null,connected=false;
-let keys=new Set(),route=[],selected=null,context=null,lastAction=0,requestPending=false,holdAction=false,touchMove=null,inputPending=false;
+let keys=new Set(),route=[],selected=null,context=null,lastAction=0,requestPending=false,holdAction=false,touchMove=null,inputPending=false,world01Seq=0;
 let routeActivity={x:0,y:0,at:0};
 function setRoute(path){route=path;routeActivity={x:me?.x||0,y:me?.y||0,at:performance.now()};}
 let view={w:innerWidth,h:innerHeight,s:28,cx:innerWidth<760?10:16,cy:innerWidth<760?12:16,zoom:innerWidth<760?1.15:1},toastTimer;
@@ -14,7 +14,7 @@ const icon={wood:'🪵',stone:'🪨',food:'🫐',tools:'⚒',project:'↓',build
 if(new URL(location).searchParams.has('new')){token=null;sessionStorage.removeItem('dementor-token');history.replaceState(null,'','/');}
 function toast(text){$('toast').textContent=text;$('toast').classList.add('visible');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').classList.remove('visible'),2600);}
 async function api(endpoint,data){const res=await fetch('/api/'+endpoint,{method:data?'POST':'GET',headers:{'Content-Type':'application/json',...(token?{Authorization:'Bearer '+token}:{})},...(data?{body:JSON.stringify(data)}:{})});const result=await res.json();if(res.status===401){token=null;sessionStorage.removeItem('dementor-token');stream?.close();$('welcome').showModal();}return result;}
-async function act(type,target,extra={}){if(!connected||requestPending)return;requestPending=true;try{const result=await api('action',{type,target,requestId:Array.from(crypto.getRandomValues(new Uint8Array(16)),b=>b.toString(16).padStart(2,'0')).join(''),...extra});if(result.message&&(!result.started||!holdAction))toast(result.message);return result;}catch{toast('Нет связи с миром. Переподключаемся…');}finally{requestPending=false;}}
+async function act(type,target,extra={}){if(!connected||requestPending)return;requestPending=true;try{const result=await api('action',{type,target,requestId:'w01-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2)+'-'+(++world01Seq),...extra});if(result?.card)showWorld01Card(result.card);if(result.message&&(!result.started||!holdAction))toast(result.message);return result;}catch{toast('Нет связи с миром. Переподключаемся…');}finally{requestPending=false;}}
 function connect(){stream?.close();motionFrames.length=0;stream=new EventSource('/api/events?token='+encodeURIComponent(token));stream.onmessage=e=>{state=JSON.parse(e.data);me=state.players.find(p=>p.id===state.me);if(lastScene!==state.scene+me.plotId+(state.cityNetwork?.current||'origin')){lastScene=state.scene+me.plotId+(state.cityNetwork?.current||'origin');resize();motionFrames.length=0;route=[];selected=null;context=null;if($('cityPanel').open)$('cityPanel').close();}motionFrames.push({at:performance.now(),players:new Map(state.players.map(p=>[p.id,{x:p.x,y:p.y,spirit:p.spirit}]))});if(motionFrames.length>20)motionFrames.shift();connected=true;updateUI();};stream.onerror=()=>{connected=false;$('connection').classList.add('offline');$('connection').lastChild.textContent='Нет связи';};}
 $('joinForm').onsubmit=async e=>{e.preventDefault();const button=e.target.querySelector('button');button.disabled=true;try{const result=await api('join',{name:$('nameInput').value});if(!result.ok){$('joinError').textContent=result.message;return;}token=result.token;sessionStorage.setItem('dementor-token',token);$('welcome').close();connect();canvas.focus();}catch{$('joinError').textContent='Сервер недоступен. Проверь локальный запуск.';}finally{button.disabled=false;}};
 if(token)api('state').then(r=>{if(r.me)connect();else if(!$('welcome').open)$('welcome').showModal();}).catch(()=>$('welcome').showModal());else $('welcome').showModal();
@@ -28,10 +28,18 @@ function currentProject(){return bridgeActive()?state.bridge:forgeActive()?state
 function currentConfig(){return bridgeActive()?{...state.config,...state.config.bridge}:forgeActive()?{...state.config,...state.config.forge}:state.config;}
 function projectReady(p=currentProject(),c=currentConfig()){if(!state)return false;const s=c.stages[p.stage];return s&&p.stock.wood>=s.wood&&p.stock.stone>=s.stone;}
 function cargo(){return me?Object.entries(me.bag).reduce((n,[k,v])=>n+v*state.config.weights[k],0)+(me.delivery?.picked?me.delivery.quantity*state.config.weights[me.delivery.kind]:0):0;}
-function allTargets(){if(!state||!me)return [];if(state.scene!=='city')return livingTargets();
-  return [state.config.expedition.gate,...(bridgeOpen()?[{id:'east-bank',type:'explore',x:40,y:13.5}]:[]),...(bridgeActive()?[{id:'bridge-drop',type:'project',x:32.5,y:12.3},{id:'bridge-build',type:'build',x:32,y:13.5}]:[]),{id:'tool-shop',type:'shop',x:24,y:3},...(state.forge.stage>=state.config.forge.stages.length?[{id:'forge-use',type:'forge',x:27,y:29.5}]:[]),{id:'warehouse',type:'warehouse',x:12,y:24},...(state.seedMarket.stage>=state.config.seedMarket.stages.length?[{id:'seed-shop',type:'seed-market',x:23,y:7}]:[{id:'seed-shop-build',type:'build',x:23,y:7}]),{id:'seed-shop-drop',type:'project',x:22,y:9},...(state.gardenProject.stage>=state.config.cityGarden.stages.length?[{id:'public-garden',type:'city-garden',x:28,y:9}]:[{id:'public-garden-build',type:'build',x:28,y:9}]),{id:'public-garden-drop',type:'project',x:26,y:9},{id:'city-registry',type:'city-registry',x:19,y:6},{id:'board',type:'board',x:3.2,y:8},{id:'mayor',type:'mayor',x:9,y:3},{id:'tools',type:'tools',x:9,y:6},{id:'project',type:'project',x:15,y:11},{id:'build',type:'build',x:18,y:14},...(forgeActive()?[{id:'forge-drop',type:'project',x:24.5,y:24},{id:'forge-build',type:'build',x:27,y:26}]:[]),...(state.drops||[]),...state.resources,...(state.plaza?.config.objects||[]),...state.plots.map(p=>({...p,type:'plot',x:p.x+p.w/2,y:p.y-1})),...state.players.filter(p=>p.id!==me.id&&p.online&&sameScene(p)).map(p=>({...p,type:'social'}))];
+function allTargets(){if(!state||!me)return [];
+  if(state.scene==='forest')return [...(state.world01?.region?.objects||[]),...state.players.filter(p=>p.id!==me.id&&p.online&&sameScene(p)).map(p=>({...p,type:'social'}))];
+  if(state.scene!=='city')return livingTargets();
+  return [...(state.cityNetwork?.current==='origin'?[state.world01.region.gate]:[]),state.config.expedition.gate,...(bridgeOpen()?[{id:'east-bank',type:'explore',x:40,y:13.5}]:[]),...(bridgeActive()?[{id:'bridge-drop',type:'project',x:32.5,y:12.3},{id:'bridge-build',type:'build',x:32,y:13.5}]:[]),{id:'tool-shop',type:'shop',x:24,y:3},...(state.forge.stage>=state.config.forge.stages.length?[{id:'forge-use',type:'forge',x:27,y:29.5}]:[]),{id:'warehouse',type:'warehouse',x:12,y:24},...(state.seedMarket.stage>=state.config.seedMarket.stages.length?[{id:'seed-shop',type:'seed-market',x:23,y:7}]:[{id:'seed-shop-build',type:'build',x:23,y:7}]),{id:'seed-shop-drop',type:'project',x:22,y:9},...(state.gardenProject.stage>=state.config.cityGarden.stages.length?[{id:'public-garden',type:'city-garden',x:28,y:9}]:[{id:'public-garden-build',type:'build',x:28,y:9}]),{id:'public-garden-drop',type:'project',x:26,y:9},{id:'city-registry',type:'city-registry',x:19,y:6},{id:'board',type:'board',x:3.2,y:8},{id:'mayor',type:'mayor',x:9,y:3},{id:'tools',type:'tools',x:9,y:6},{id:'project',type:'project',x:15,y:11},{id:'build',type:'build',x:18,y:14},...(forgeActive()?[{id:'forge-drop',type:'project',x:24.5,y:24},{id:'forge-build',type:'build',x:27,y:26}]:[]),...(state.drops||[]),...state.resources,...(state.plaza?.config.objects||[]),...state.plots.map(p=>({...p,type:'plot',x:p.x+p.w/2,y:p.y-1})),...state.players.filter(p=>p.id!==me.id&&p.online&&sameScene(p)).map(p=>({...p,type:'social'}))];
 }
-function interaction(t){if(!t)return null;const type=t.type,isForge=t.id.startsWith('forge-'),isBridge=t.id.startsWith('bridge-'),isMarket=t.id.startsWith('seed-shop-'),isGarden=t.id.startsWith('public-garden-'),p=isMarket?state.seedMarket:isGarden?state.gardenProject:isBridge?state.bridge:isForge?state.forge:state.project,c=isMarket?{...state.config,...state.config.seedMarket}:isGarden?{...state.config,...state.config.cityGarden}:isBridge?{...state.config,...state.config.bridge}:isForge?{...state.config,...state.config.forge}:state.config;
+function interaction(t){if(!t)return null;
+  if(t.type==='world01-gate')return {type:'world01Enter',title:'Дорога в Лес идей',hint:'Пешком выйти из города · открыть большой регион',enabled:!me.spirit&&!me.job&&!me.delivery?.picked};
+  if(t.type==='world01-exit')return {type:'world01Return',title:'Пешком домой',hint:'Вернуться в город той же дорогой',enabled:!me.spirit};
+  if(t.type==='world01-scooter')return {type:'world01Scooter',title:'Стоянка самокатов',hint:state.world01.transport==='scooter'?'Вернуть самокат':'Взять тестовый самокат · ускорение ×1,65',enabled:!me.spirit};
+  if(t.type==='world01-portal')return {type:'world01Portal',title:state.world01.portalUnlocked?'Портал · в город':'Неизвестный портал',hint:state.world01.portalUnlocked?'Телепортироваться в город':'Исследовать и открыть быстрый путь',enabled:!me.spirit};
+  if(t.type==='world01-board'||t.type==='world01-billboard')return {type:'world01Inspect',title:t.title,hint:'Прочитать клубный материал · демонстрационная публичная ссылка',enabled:!me.spirit};
+  const type=t.type,isForge=t.id.startsWith('forge-'),isBridge=t.id.startsWith('bridge-'),isMarket=t.id.startsWith('seed-shop-'),isGarden=t.id.startsWith('public-garden-'),p=isMarket?state.seedMarket:isGarden?state.gardenProject:isBridge?state.bridge:isForge?state.forge:state.project,c=isMarket?{...state.config,...state.config.seedMarket}:isGarden?{...state.config,...state.config.cityGarden}:isBridge?{...state.config,...state.config.bridge}:isForge?{...state.config,...state.config.forge}:state.config;
   if(type==='seed-market')return {type:'seeds',title:'Семенная лавка',hint:state.seedMarket.stage<state.config.seedMarket.stages.length?'Сначала достройте лавку':'Купить семена для огорода',enabled:true};
   if(type==='city-garden')return {type:'public-garden',title:'Общий городской огород',hint:state.gardenProject.stage<state.config.cityGarden.stages.length?'Нужно построить городской огород':'Посади, полей и собери урожай',enabled:true};
   if(type==='city-registry')return {type:'city-registry',title:'Городской реестр',hint:'Создать город или перейти в другой город',enabled:true};
@@ -75,15 +83,19 @@ function updateUI(){if(!me)return;renderQuick();
   let task=me.spirit?'Найди еду — вернись к жизни':!me.tools.axe&&!me.tools.pick?'Возьми инструмент в мэрии':cargo()>=c.capacity?'Рюкзак полон. Отнеси материалы на площадь.':me.hunger<c.slowBelow?'Пора поесть. Ягоды растут рядом.':p.stage>=c.stages.length?(state.plots.some(x=>x.owner===me.id)?'Твой вклад остался в городе. Участок — твой.':`Площадь готова. Купи участок за ${c.plotPrice} PAPER.`):projectReady()?'Помоги со строительством на площадке.':'Добывай и приноси материалы на площадь.';
   if(me.wallet>=c.plotPrice&&!state.plots.some(x=>x.owner===me.id))task='Ты заработал на участок. Выбери свободный.';
   if(cargo()>=c.capacity)task='Рюкзак полон: сдай лишнее на городской склад или выложи через «Рюкзак».';
-  if(bridgeActive()&&!me.spirit&&me.hunger>=c.slowBelow&&cargo()<c.capacity&&(me.tools.axe||me.tools.pick))task=bridgeOpen()?'Мост открыт. Исследуй другой берег и добудь новые ресурсы.':'Принеси материалы на мост или возьми курьерский заказ на доске.';
+  if(state.scene==='forest')task='Лес идей: исследуй билборды, доску, стоянку самокатов и портал.';
+  if(state.scene==='city'&&bridgeActive()&&!me.spirit&&me.hunger>=c.slowBelow&&cargo()<c.capacity&&(me.tools.axe||me.tools.pick))task=bridgeOpen()?'Мост открыт. Исследуй другой берег и добудь новые ресурсы.':'Принеси материалы на мост или возьми курьерский заказ на доске.';
   if(me.delivery&&!me.spirit)task=me.delivery.picked?`Доставь городской груз: ${deliveryLabel(me.delivery)}.`:'Забери заказ на городском складе · между нижними участками.';
-  $('task').textContent=forgeActive()?task.replaceAll('на площадь','к кузнице').replace('Площадь готова','Кузница готова'):task;
+  $('task').textContent=state.scene==='forest'?task:forgeActive()?task.replaceAll('на площадь','к кузнице').replace('Площадь готова','Кузница готова'):task;
+  if(state.scene==='forest')document.querySelector('#quest h1').textContent='Лес идей · WORLD-01';
+  $('world01Badge').hidden=state.scene!=='forest';$('world01Transport').textContent=state.world01?.transport==='scooter'?'🛴 Самокат':'🚶 Пешком';
+  $('world01Fast').hidden=!(state.scene==='city'&&state.world01?.portalUnlocked&&Math.hypot(me.x-30,me.y-2)<=state.config.actionRange);
   $('axeDurability').textContent=me.tools.axe?`${me.tools.axe} / ${me.toolInfo.axe.max}`:'в мэрии';$('pickDurability').textContent=me.tools.pick?`${me.tools.pick} / ${me.toolInfo.pick.max}`:'в мэрии';$('axeButton').classList.toggle('selected',me.equipped==='axe');$('pickButton').classList.toggle('selected',me.equipped==='pick');
   $('woodCount').querySelector('b').textContent=me.bag.wood;$('stoneCount').querySelector('b').textContent=me.bag.stone;$('foodCount').textContent=me.bag.food;$('cargo').textContent=`${Number(cargo().toFixed(1))} / ${c.capacity}`;$('cargo').parentElement.classList.toggle('full',cargo()>=c.capacity);$('eatButton').disabled=me.bag.food<1&&me.bag.carrot<1;
-  $('socialButton').textContent=state.trades.length?'Сделки · '+state.trades.length:'Жители';if(state.scene!=='city'){document.querySelector('#quest h1').textContent=state.scene==='interior'?'Твоя палатка':'Жизнь на участке';$('task').textContent='☷ Места участка · расчистка, палатка, вода и огород';$('stageTitle').textContent=`Палатка ${state.home.tent}/3 · грядки ${state.home.beds.length}/6`;$('projectPercent').textContent='';$('projectBar').style.width=`${(state.home.tent+state.home.beds.length)/9*100}%`;}$('worldNote').textContent=state.scene==='city'?'Пустое поле сегодня. Наш город — завтра.':'Выращивай своё. Делись с соседями.';const chatSignature=JSON.stringify(state.chat.slice(-4));if(lastChatSignature!==chatSignature){lastChatSignature=chatSignature;const chat=$('chatMessages');chat.replaceChildren();for(const m of state.chat.slice(-4)){const div=document.createElement('div'),b=document.createElement('b');b.textContent=m.name;div.append(b,document.createTextNode(m.text));chat.append(div);}}
+  $('socialButton').textContent=state.trades.length?'Сделки · '+state.trades.length:'Жители';if(state.scene!=='city'&&state.scene!=='forest'){document.querySelector('#quest h1').textContent=state.scene==='interior'?'Твоя палатка':'Жизнь на участке';$('task').textContent='☷ Места участка · расчистка, палатка, вода и огород';$('stageTitle').textContent=`Палатка ${state.home.tent}/3 · грядки ${state.home.beds.length}/6`;$('projectPercent').textContent='';$('projectBar').style.width=`${(state.home.tent+state.home.beds.length)/9*100}%`;}$('worldNote').textContent=state.scene==='forest'?'Лес идей. Найди реальные клубные проекты.':state.scene==='city'?'Пустое поле сегодня. Наш город — завтра.':'Выращивай своё. Делись с соседями.';const chatSignature=JSON.stringify(state.chat.slice(-4));if(lastChatSignature!==chatSignature){lastChatSignature=chatSignature;const chat=$('chatMessages');chat.replaceChildren();for(const m of state.chat.slice(-4)){const div=document.createElement('div'),b=document.createElement('b');b.textContent=m.name;div.append(b,document.createTextNode(m.text));chat.append(div);}}
   if($('details').open){const details=$('projectDetails');details.replaceChildren();const rows=[['Древесина',`${p.accepted.wood} / ${c.need.wood} принято`],['Камень',`${p.accepted.stone} / ${c.need.stone} принято`],...c.stages.map((s,i)=>[s.title,i<p.stage?'Готово':i===p.stage?`${p.work} / ${s.works} работ`:'Следующий этап'])];
   for(const [name,value]of rows){const row=document.createElement('div');row.className='stage-row';const b=document.createElement('b'),span=document.createElement('span');b.textContent=name;span.textContent=value;row.append(b,span);details.append(row);}$('cityBudget').textContent=`Казна города · ${state.treasury} PAPER. Выплачено за текущий проект · ${p.spent} PAPER. Тестовые значения прототипа.`;}
-  if(typeof updateQuestTracker==='function')updateQuestTracker();if(typeof syncCityMusic==='function')syncCityMusic();updateContext();updateCityPanels();
+  if(state.scene!=='forest'&&typeof updateQuestTracker==='function')updateQuestTracker();if(typeof syncCityMusic==='function')syncCityMusic();updateContext();updateCityPanels();
 }
 let cityPanelMode=null,cityPanelSignature='';
 function nearby(id){const t=allTargets().find(t=>t.id===id);return t&&Math.hypot(t.x-me.x,t.y-me.y)<=state.config.actionRange;}
@@ -149,7 +161,11 @@ function updateCityPanels(force=false){
   }
 }
 $('bagButton').onclick=()=>{if(me)openCityPanel('bag');};
-function doContext(){if(!context||!context.enabled||me?.job||performance.now()-lastAction<(context.type==='homeClear'?570:180))return;lastAction=performance.now();if(['mine','homeClear'].includes(context.type)&&heldResource()&&['wood','stone'].includes(state.home?.nodes.find(n=>n.id===context.id)?.kind||allTargets().find(t=>t.id===context.id)?.type)){holdAction=false;toast('Возьми топор или кирку в быстрой панели');return;}if(['board','warehouse','forge','shop','home','social','monument','jukebox','thefts','donation-box','donation-board','seeds','public-garden','city-registry'].includes(context.type)){holdAction=false;if(context.type==='social')selected=context.id;openCityPanel(context.type==='social'?'resident':context.type);return;}act(context.type,context.id);}
+let lastActionObjectId='';
+function doContext(){if(!context||!context.enabled||me?.job)return;
+  const actionKey=context.type+':'+context.id,wait=context.type==='homeClear'?570:180;
+  if(actionKey===lastActionObjectId&&performance.now()-lastAction<wait)return;
+  lastActionObjectId=actionKey;lastAction=performance.now();if(['mine','homeClear'].includes(context.type)&&heldResource()&&['wood','stone'].includes(state.home?.nodes.find(n=>n.id===context.id)?.kind||allTargets().find(t=>t.id===context.id)?.type)){holdAction=false;toast('Возьми топор или кирку в быстрой панели');return;}if(['board','warehouse','forge','shop','home','social','monument','jukebox','thefts','donation-box','donation-board','seeds','public-garden','city-registry'].includes(context.type)){holdAction=false;if(context.type==='social')selected=context.id;openCityPanel(context.type==='social'?'resident':context.type);return;}act(context.type,context.id);}
 $('actionButton').onclick=doContext;$('axeButton').onclick=()=>act('equip','axe');$('pickButton').onclick=()=>act('equip','pick');$('eatButton').onclick=()=>act(me.bag.food?'eat':'eatCarrot');
 $('detailsButton').onclick=()=>{$('details').show();updateUI();};$('helpButton').onclick=()=>$('help').show();document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>$(b.dataset.close).close());
 $('secondPlayer').onclick=()=>window.open('/?new=1','_blank','noopener');
@@ -162,7 +178,27 @@ window.addEventListener('keydown',e=>{
   if(e.code==='KeyE'){holdAction=true;doContext();}if(e.repeat)return;if(/^Digit[1-6]$/.test(e.code))selectQuick(Number(e.code.slice(-1))-1);if(e.code==='KeyQ')placeQuick();if(e.code==='KeyF')act(me.bag.food?'eat':'eatCarrot');if(e.code==='Enter'){$('chatInput').focus();keys.clear();}if(e.code==='Escape'){document.querySelectorAll('dialog[open]').forEach(d=>d.close());route=[];selected=null;act('cancel');}
 });
 window.addEventListener('keyup',e=>{keys.delete(e.code);if(e.code==='KeyE')holdAction=false;});window.addEventListener('blur',()=>{keys.clear();holdAction=false;touchMove=null;route=[];if(token)api('input',{dx:0,dy:0}).catch(()=>{});});
-document.querySelectorAll('[data-move]').forEach(b=>{b.addEventListener('pointerdown',e=>{b.setPointerCapture(e.pointerId);touchMove=b.dataset.move.split(',').map(Number);route=[];});b.addEventListener('pointerup',()=>touchMove=null);b.addEventListener('pointercancel',()=>touchMove=null);b.addEventListener('lostpointercapture',()=>touchMove=null);});
+const world01Pad=$('world01MovePad'),world01Thumb=$('world01MoveThumb');
+let world01Pointer=null;
+world01Pad.addEventListener('pointerdown',e=>{if(world01Pointer!==null)return;world01Pointer=e.pointerId;try{world01Pad.setPointerCapture(e.pointerId);}catch{}setWorld01Stick(e);e.preventDefault();});
+function setWorld01Stick(e){const r=world01Pad.getBoundingClientRect(),rad=r.width*.32;
+  const dx=(e.clientX-r.left-r.width/2)/rad,dy=(e.clientY-r.top-r.height/2)/rad,n=Math.max(1,Math.hypot(dx,dy));
+  touchMove=Math.hypot(dx,dy)>.13?[dx/n,dy/n]:null;route=[];selected=null;
+  world01Thumb.style.transform='translate('+(Math.round(dx/n*rad))+'px,'+(Math.round(dy/n*rad))+'px)';
+}
+world01Pad.addEventListener('pointermove',e=>{if(e.pointerId===world01Pointer){setWorld01Stick(e);e.preventDefault();}});
+for(const ev of ['pointerup','pointercancel','lostpointercapture'])world01Pad.addEventListener(ev,e=>{
+  if(world01Pointer!==e.pointerId)return;world01Pointer=null;touchMove=null;world01Thumb.style.transform='';
+});
+$('world01ActionButton').onclick=()=>{if(context?.enabled)doContext();else toast('Подойди к объекту и нажми «Действие».');};
+$('world01Fast').onclick=()=>act('world01FastTravel','world01-city-gate');
+$('world01FindForest').onclick=()=>{const gate=allTargets().find(t=>t.id===(state.scene==='forest'?'world01-exit':'world01-city-gate'));
+  if(!gate)return toast('В этом городе входа в лес пока нет');
+  selected=gate.id;
+  if(Math.hypot(me.x-gate.x,me.y-gate.y)<=state.config.actionRange){updateContext();return doContext();}
+  navigateTo(gate.id);
+};
+window.__world01Touch=()=>({move:touchMove,active:world01Pointer!==null});
 setInterval(()=>{if(!connected||!me)return;let dx=0,dy=0;if(!$('welcome').open&&!['INPUT','TEXTAREA','SELECT'].includes(document.activeElement?.tagName)){
   dx=Number(keys.has('KeyD')||keys.has('ArrowRight'))-Number(keys.has('KeyA')||keys.has('ArrowLeft'));dy=Number(keys.has('KeyS')||keys.has('ArrowDown'))-Number(keys.has('KeyW')||keys.has('ArrowUp'));if(touchMove)[dx,dy]=touchMove;
   if(!dx&&!dy&&route.length){
@@ -180,7 +216,9 @@ setInterval(()=>{if(!connected||!me)return;let dx=0,dy=0;if(!$('welcome').open&&
 
 function screen(x,y){return {x:view.w/2+(x-view.cx)*view.s,y:view.h/2+(y-view.cy)*view.s*.76};}
 function worldPoint(x,y){return {x:(x-view.w/2)/view.s+view.cx,y:(y-view.h/2)/(view.s*.76)+view.cy};}
-function blocked(x,y){const c=state.config,r=.35;if(state.scene!=='city'){return x<r||y<r||x>16-r||y>16-r||(['plot','expedition'].includes(state.scene)&&state.home.nodes.some(n=>n.left&&Math.hypot(x-n.x,y-n.y)<.63));}if(x<r||y<r||x>c.width-r||y>c.height-r)return true;if(x+r>c.river.x&&x-r<c.river.x+c.river.w&&!(bridgeOpen()&&y-r>=c.bridge.y&&y+r<=c.bridge.y+c.bridge.h))return true;
+function blocked(x,y){const c=state.config,r=.35;
+  if(state.scene==='forest')return x<r||y<r||x>64-r||y>48-r||(state.world01?.region?.trees||[]).some(t=>Math.hypot(t.x-x,t.y-y)<.78);
+  if(state.scene!=='city'){return x<r||y<r||x>16-r||y>16-r||(['plot','expedition'].includes(state.scene)&&state.home.nodes.some(n=>n.left&&Math.hypot(x-n.x,y-n.y)<.63));}if(x<r||y<r||x>c.width-r||y>c.height-r)return true;if(x+r>c.river.x&&x-r<c.river.x+c.river.w&&!(bridgeOpen()&&y-r>=c.bridge.y&&y+r<=c.bridge.y+c.bridge.h))return true;
   if(x+r>4&&x-r<8&&y+r>4&&y-r<7)return true;return state.resources.some(o=>o.stock>0&&o.type!=='food'&&Math.hypot(x-o.x,y-o.y)<.63);
 }
 function pathDistance(path){return path.reduce((distance,p,i)=>distance+Math.hypot(p.x-(i?path[i-1].x:me.x),p.y-(i?path[i-1].y:me.y)),0);}
@@ -345,8 +383,45 @@ const q=screen(v.x,v.y),s=view.s*.9;const bob=moving?Math.sin(time*.015)*s*.05:0
   if(p.id===me?.id&&heldResource()){paperBox(q.x+s*.35,q.y-s*.65,s*.25,s*.25,s*.12,-s*.1,'#b8b09a','#938e7b','#ddd4bc');}
   if(p.id===me?.id){ctx.beginPath();ctx.ellipse(q.x,q.y+3,s*.53,s*.21,0,0,Math.PI*2);ctx.strokeStyle='#8ca46999';ctx.lineWidth=1.5;ctx.stroke();}
 }
+function showWorld01Card(card){
+  const dialog=$('world01Card'),title=$('world01CardTitle'),body=$('world01CardBody'),link=$('world01CardLink');
+  title.textContent=card.title||'Информация';body.textContent=card.body||'';$('world01CardSource').textContent=card.sourceRef+' · '+card.mode;
+  const url=typeof card.href==='string'&&card.href.startsWith('https://dementor.club/')?card.href:null;
+  link.hidden=!url;if(url)link.href=url;else link.removeAttribute('href');
+  if(!dialog.open)dialog.showModal();
+}
+$('world01CardClose').onclick=()=>$('world01Card').close();
+function drawWorld01Forest(time){
+ const forest=state.world01?.region;if(!forest)return;
+ const a=screen(0,0),b=screen(forest.width,forest.height);
+ rounded(a.x,a.y,b.x-a.x,b.y-a.y,3,'#e8e9d8','#b6c1a2');
+ ctx.strokeStyle='#88927f24';ctx.lineWidth=1;
+ for(let x=0;x<forest.width;x+=4){const a=screen(x,0),b=screen(x,forest.height);line(a.x,a.y,b.x,b.y,'#88927f20',1);}
+ for(let y=0;y<forest.height;y+=4){const a=screen(0,y),b=screen(forest.width,y);line(a.x,a.y,b.x,b.y,'#88927f20',1);}
+ for(const road of forest.roads){ctx.beginPath();road.forEach(([x,y],i)=>{const p=screen(x,y);i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y);});
+   ctx.strokeStyle='#c5bb99';ctx.lineWidth=Math.max(10,view.s*2.3);ctx.lineJoin='round';ctx.lineCap='round';ctx.stroke();
+   ctx.strokeStyle='#dcd1b2';ctx.lineWidth=Math.max(6,view.s*1.9);ctx.stroke();}
+ const nearby=t=>{const q=screen(t.x,t.y);return q.x>-120&&q.x<view.w+120&&q.y>-160&&q.y<view.h+120;};
+ const entities=[...(forest.trees||[]).filter(nearby).map(t=>({y:t.y,draw:()=>drawTree(t)})),
+   ...(state.players||[]).filter(p=>(p.online||p.id===me.id)&&sameScene(p)).map(p=>({y:p.y,draw:()=>drawPlayer(p,time)}))];
+ for(const o of forest.objects||[]){
+   if(!nearby(o))continue;
+   const p=screen(o.x,o.y);
+   entities.push({y:o.y,draw:()=>{
+     if(o.type==='world01-billboard'||o.type==='world01-board'){paperBoard(o.x,o.y,o.title);return;}
+     if(o.type==='world01-scooter'){paperBox(p.x-10,p.y-20,20,12,9,-4,'#b0bca2','#83917a','#d8debc');label('🛴 Самокаты',o.x,o.y-1,true);return;}
+     if(o.type==='world01-portal'){ctx.beginPath();ctx.ellipse(p.x,p.y-20,view.s*.65,view.s*1.05,0,0,Math.PI*2);ctx.fillStyle='#94b4ab80';ctx.fill();ctx.strokeStyle='#5a978f';ctx.lineWidth=3;ctx.stroke();label('◉ Портал',o.x,o.y-1.5,true);return;}
+     paperBoard(o.x,o.y,'← Город');
+   }});
+ }
+ entities.sort((a,b)=>a.y-b.y);for(const entity of entities)entity.draw();
+ if(route.length){const q=screen(route.at(-1).x,route.at(-1).y);ctx.beginPath();ctx.arc(q.x,q.y,7,0,Math.PI*2);ctx.strokeStyle='#658d65';ctx.lineWidth=2;ctx.stroke();}
+ if(context){const q=screen(context.x,context.y);ctx.beginPath();ctx.ellipse(q.x,q.y+5,view.s*.65,view.s*.24,0,0,Math.PI*2);ctx.strokeStyle='#577d63';ctx.lineWidth=2;ctx.stroke();}
+}
+
 function render(time){positionWindows();ctx.clearRect(0,0,view.w,view.h);ctx.fillStyle='#efebdf';ctx.fillRect(0,0,view.w,view.h);
   updateVisualPlayers(time);if(me){const hero=visualPlayers.get(me.id)||me;view.cx=hero.x;view.cy=hero.y;}
+  if(state&&state.scene==='forest'){drawWorld01Forest(time);requestAnimationFrame(render);return;}
   if(state&&state.scene!=='city'){drawHome(time);requestAnimationFrame(render);return;}
   // Sparse paper grain; all world geometry below stays interactive and separate.
   ctx.fillStyle='#6b6f4b0a';for(let i=0;i<340;i++){const x=(i*137.23)%view.w,y=(i*211.71)%view.h;ctx.fillRect(x,y,1,1);}
@@ -367,6 +442,7 @@ function render(time){positionWindows();ctx.clearRect(0,0,view.w,view.h);ctx.fil
   if(state?.seedMarket){paperHouse({x:21.8,y:5.3,w:2.5,h:2},state.seedMarket.stage>=state.config.seedMarket.stages.length?'shop':'warehouse');label(state.seedMarket.stage>=state.config.seedMarket.stages.length?'Семенная лавка':'Стройка лавки',23,4.9,true);}
   if(state?.gardenProject){const built=state.gardenProject.stage>=state.config.cityGarden.stages.length;groundRect({x:25.5,y:8.4,w:5.6,h:2.5},built?'#e0dfc6':'#eae5d7','#a7ad89',!built);label(built?'Городской огород':'Стройка огорода',28,8,true);if(built)for(const bed of state.publicGarden.beds){const x=26+(Number(bed.id.split('-').at(-1))%3)*1.6,y=9;groundRect({x,y,w:1.2,h:1},bed.crop?'#98a981':'#c4b49b','#8d956f');}}
   paperBoard(19,6,'Реестр городов');
+  if(state?.cityNetwork?.current==='origin')paperBoard(30,2,'Лес идей →');
   paperHouse({x:10.7,y:25,w:2.6,h:3},'warehouse');label('Городской склад',12,29,true);
   for(const pile of state?.drops||[]){const q=screen(pile.x,pile.y);rounded(q.x-8,q.y-5,16,9,2,pile.kind==='wood'?'#ae9673':pile.kind==='stone'?'#a3aaa0':'#b17b68','#818970');label(`${names[pile.kind]} · ${pile.quantity}`,pile.x,pile.y+.8,true);}
   const resources=state?.resources||[];const entities=[{y:7,draw:drawTent},...resources.map(o=>({y:o.y,draw:()=>o.type==='wood'?drawTree(o):o.type==='stone'?drawStone(o):drawFood(o)})),...(state?.players||[]).filter(p=>(p.online||p.id===me?.id)&&sameScene(p)).map(p=>({y:p.y,draw:()=>drawPlayer(p,time)}))];entities.sort((a,b)=>a.y-b.y);for(const e of entities)e.draw();
