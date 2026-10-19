@@ -266,3 +266,35 @@ test('F24 in-transit goods and settlement survive JSON roundtrip before arrival'
  assert.equal(restore.arrivalHistory.filter(id=>id===s.id).length,1);
  assert.equal(federationBalances(restore).PAPER,3600);
 });
+
+test('F25 founding a real fourth city and moving residents still conserves the 3600-PAPER federation',()=>{
+ const w=make(),source=w.cities[1],founder=w.players.find(p=>p.cityId===source.id);
+ const b=federationBalances(w);
+ foundCity(w,{id:'city-new',parentId:source.id,actorId:founder.id,
+   eventId:'founding-4th-city-real-assets',accepted:true,funding:100,wood:8,stone:4,seedCarrot:2,seedHemp:1});
+ for(const p of w.players.filter(p=>p.cityId!==source.id).slice(0,2))
+   movePlayer(w,{actorId:p.id,to:'city-new',eventId:'moving-'+p.id});
+ assert.equal(w.cities.length,4);
+ assert.deepEqual(federationBalances(w),b,'city founding printed PAPER, WOOD, seeds or STONE');
+ for(let day=0;day<180;day++)dayStep(w);
+ assert.equal(federationMetrics(w).economy.moneyTotal,3600);
+ assert.ok(w.cities.every(c=>c.treasury>=0));
+ checkFederation(w);
+});
+test('F26 long simulation pays actual work to multiple agents, not the same first worker',()=>{
+ const w=federationRun({agents:20,cityCount:3,environment:'normal',logistics:'trade',days:360});
+ const m=federationMetrics(w);
+ assert.ok(m.walletDistribution.workersPaid>=10,'labour wages concentrated on one agent per city');
+ assert.equal(m.food.noCash+m.food.noFood,m.food.unmet);
+ assert.equal(m.economy.moneyTotal,3600);
+ checkFederation(w);
+});
+test('F27 moving a city founder without authorization is blocked before any asset transfer',()=>{
+ const w=make(),founder=w.players.find(p=>p.cityId===w.cities[1].id);
+ const b=federationBalances(w),n=w.cities.length;
+ assert.throws(()=>foundCity(w,{id:'unauthorized',parentId:w.cities[1].id,actorId:founder.id,
+   eventId:'founding-without-approval',funding:100,wood:4,stone:3}),/new city requires approval/);
+ assert.deepEqual(federationBalances(w),b);
+ assert.equal(w.cities.length,n);
+ checkFederation(w);
+});
