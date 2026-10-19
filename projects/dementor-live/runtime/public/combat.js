@@ -4,7 +4,7 @@ const canvas = $('field'), ctx = canvas.getContext('2d');
 const token = sessionStorage.getItem('dementor-token');
 const keys = new Set();
 let data=null, battle=null, self=null, me=null, scale=23, vw=0, vh=0, mouseAim={x:1,y:0};
-let moveStick={x:0,y:0}, aimStick=null, firing=false, fetching=false, inputPending=false, firePending=false, msgTimer=null;
+let moveStick={x:0,y:0}, aimStick=null, firing=false, fetching=false, inputPending=false, firePending=false, lastShotTime=0, msgTimer=null;
 if(!token)location.replace('/');
 function notify(txt){const el=$('message');el.textContent=String(txt);el.classList.add('visible');clearTimeout(msgTimer);msgTimer=setTimeout(()=>el.classList.remove('visible'),2600);}
 const id=()=>crypto.randomUUID();
@@ -121,7 +121,7 @@ setInterval(async()=>{
  const dx=Number(keys.has('KeyD')||keys.has('ArrowRight'))-Number(keys.has('KeyA')||keys.has('ArrowLeft'))+moveStick.x;
  const dy=Number(keys.has('KeyS')||keys.has('ArrowDown'))-Number(keys.has('KeyW')||keys.has('ArrowUp'))+moveStick.y;
  if(!inputPending){inputPending=true;api('action',{type:'input',dx,dy}).catch(()=>{}).finally(()=>{inputPending=false;});}
- if(firing&&!firePending){firePending=true;api('action',{type:'fire',dx:mouseAim.x,dy:mouseAim.y}).catch(e=>{if(!/cooling down/.test(e.message))notify(e.message);}).finally(()=>{firePending=false;});}
+ if(firing&&!firePending&&(data?.profile?.ammo||0)>0&&performance.now()-lastShotTime>=365){lastShotTime=performance.now();firePending=true;api('action',{type:'fire',dx:mouseAim.x,dy:mouseAim.y}).catch(e=>{if(!/cooling down/.test(e.message))notify(e.message);}).finally(()=>{firePending=false;});}
 },125);
 function resize(){const rect=canvas.getBoundingClientRect(),dpr=Math.min(devicePixelRatio||1,2);vw=rect.width;vh=rect.height;
  canvas.width=Math.round(vw*dpr);canvas.height=Math.round(vh*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);
