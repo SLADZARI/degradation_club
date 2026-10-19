@@ -318,7 +318,7 @@ test('F30 a bankrupt city still lets its workers collect physical consignment ha
  const c=w.cities[0],old=c.treasury;
  c.treasury=0;w.players[0].wallet+=old; // conserve overall PAPER in fixture
  for(let i=0;i<7;i++)dayStep(w);
- assert.ok(w.grown.CARROT>0,'prepaid treasury payroll must not be required for consignment production');
+ assert.ok(c.harvests>0,'the zero-treasury city itself must collect physical consignment carrots');
  assert.equal(federationBalances(w).PAPER,3600);
  checkFederation(w);
 });
@@ -332,9 +332,12 @@ test('F31 consignment maintains origin owners after save/reload and cross-city t
  assert.equal(federationMetrics(clone).economy.moneyTotal,3600);
 });
 test('F32 missing physical batch owner is rejected before recording a valid economy',()=>{
- const w=federationRun({agents:10,cityCount:2,environment:'wet',logistics:'trade',foodMarket:'consignment',days:7});
- const c=w.cities.find(c=>c.carrots.length>0);
- assert.ok(c,'must have at least one physical grown CARROT batch');
+ const w=make({agents:10,cityCount:2,foodMarket:'consignment'});
+ const c=w.cities[0],owner=w.players.find(p=>p.cityId===c.id);
+ // Explicitly accounted physical test fixture, used ONLY for a negative mutation.
+ c.carrots.push({qty:1,at:w.day,ownerId:owner.id});
+ c.stock.CARROT++;w.grown.CARROT++;
+ checkFederation(w);
  c.carrots[0].ownerId='forged-unregistered-user';
  assert.throws(()=>checkFederation(w),/consignment carrots have no registered owner/);
 });
