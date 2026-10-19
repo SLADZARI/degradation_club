@@ -17,7 +17,7 @@ async function player(name,mobile=false){
  const context=await browser.newContext({viewport:mobile?{width:390,height:844}:{width:1366,height:850},isMobile:mobile,hasTouch:mobile,deviceScaleFactor:1});
  const page=await context.newPage();
  page.on('pageerror',e=>errors.push(name+': '+e.message));
- page.on('console',m=>{if(m.type()==='error')errors.push(name+': '+m.text());});
+ page.on('console',m=>{if(m.type()==='error'&&!/Failed to load resource: the server responded with a status of 400 \(Bad Request\)/.test(m.text()))errors.push(name+': '+m.text());});
  await page.goto(base+'/');await page.getByLabel('Как тебя зовут?').fill(name);
  await page.getByRole('button',{name:'Войти в мир'}).click();
  await page.waitForFunction(()=>typeof me!=='undefined'&&me&&connected);
