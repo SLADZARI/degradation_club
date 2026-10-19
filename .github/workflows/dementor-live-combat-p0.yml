@@ -11,6 +11,7 @@ on:
       - 'projects/dementor-live/runtime/test/combat-http.test.mjs'
       - 'projects/dementor-live/runtime/test/combat-mobile-qa.cjs'
       - 'projects/dementor-live/runtime/test/combat-feel.cjs'
+      - 'projects/dementor-live/runtime/test/city-mobile-gameplay.cjs'
       - 'projects/dementor-live/runtime/test/combat-p0.test.mjs'
       - 'projects/dementor-live/combat/**'
       - '.github/workflows/dementor-live-combat-p0.yml'
@@ -85,9 +86,20 @@ jobs:
       - name: Mobile portrait, landscape, twin-stick and all controls
         working-directory: projects/dementor-live/runtime
         run: node test/combat-mobile-qa.cjs
+      - name: Actual touchscreen city joystick and mobile combat-entry buttons
+        working-directory: projects/dementor-live/runtime
+        run: node test/city-mobile-gameplay.cjs
       - name: Combat FEEL - live hits, tracer pixels and median FPS >= 24
         working-directory: projects/dementor-live/runtime
         run: node test/combat-feel.cjs
+      - name: Upload city touch UI test screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dementor-city-mobile-screens-and-qa
+          path: projects/dementor-live/runtime/reports/city-mobile/
+          if-no-files-found: warn
+          retention-days: 14
       - name: Upload verifiable visual QA and gameplay report
         if: always()
         uses: actions/upload-artifact@v4
