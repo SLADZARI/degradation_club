@@ -6,6 +6,7 @@ on:
       - qa/world-organism-v0-8-contract-2026-10-19
       - qa/world-organism-v0-8-sustainability-2026-10-19
       - qa/world-organism-v0-8-sponsored-services-2026-10-19
+      - qa/world-organism-v0-8-federation-2026-10-19
     paths:
       - ".github/workflows/world-organism-v08-audit.yml"
       - "projects/dementor-live/first-home-loop/balance-lab/v0_8/**"
@@ -42,11 +43,17 @@ jobs:
       - name: Export deterministic projections / D60-D90-D120 and +180/+360 day horizons
         working-directory: projects/dementor-live/first-home-loop/balance-lab/v0_8/experimental
         run: node run-projection.mjs reports
+      - name: Federation model with 10-20 agents and 2-4 cities (162 scenarios)
+        working-directory: projects/dementor-live/first-home-loop/balance-lab/v0_8/experimental
+        run: node --test federation-model.test.mjs
+      - name: Archive federation balance and logistics data
+        working-directory: projects/dementor-live/first-home-loop/balance-lab/v0_8/experimental
+        run: node run-federation.mjs reports
       - name: Attach complete per-scenario data and short report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: world-organism-v08-shadow-288-plus-36-long-term-and-services-report
+          name: world-organism-v083-federation-plus-b5-economy-report
           path: projects/dementor-live/first-home-loop/balance-lab/v0_8/experimental/reports/
           if-no-files-found: warn
           retention-days: 30
@@ -57,6 +64,6 @@ jobs:
           echo "Re-checks consistency of the published WORLD ORGANISM v0.8 aggregate D30 JSON and its docs, including tamper controls." >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "## What this does NOT validate" >> "$GITHUB_STEP_SUMMARY"
-          echo "No ORIGINAL runnable v0.8 simulator or original agent code is present. An explicitly experimental shadow projection is run separately." >> "$GITHUB_STEP_SUMMARY"
+          echo "No ORIGINAL runnable v0.8 simulator or original agent code is present. v0.8.2 + federation v0.8.3 are explicitly experimental shadow models, not game code." >> "$GITHUB_STEP_SUMMARY"
           echo "Original 52/52, original 36 stress runs, original 41 invariants, and original browser UI remain unverified. New shadow model and tests are NOT a replay of original v0.8." >> "$GITHUB_STEP_SUMMARY"
           echo "Live Dementor game runtime and persistent world are not touched." >> "$GITHUB_STEP_SUMMARY"
