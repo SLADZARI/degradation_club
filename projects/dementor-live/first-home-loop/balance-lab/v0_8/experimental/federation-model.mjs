@@ -34,7 +34,7 @@ function createCity(id,index,treasury,environment){
   hempBed:{ready:0},buildings:[],rainBonus:0,storageCapacity:RULES.initialCarrotCapacity,
   carrotShelf:RULES.carrotShelf,maxWater:100,serviceSlots:RULES.initialServiceSlots,
   freightCapacity:RULES.freightCapacity,
-  unmetMeals:0,spoiledCarrot:0,unservedCivic:0,waterShortage:0,
+  unmetMeals:0,unmetNoCash:0,unmetNoFood:0,spoiledCarrot:0,unservedCivic:0,waterShortage:0,
   blockedCargo:0,blockedStorage:0,unfundedWorks:0,harvests:0,services:0,serviceRevenue:0,
   foodSales:0,foodNeeds:0,foodServed:0,workWages:0,transportBought:0,
   sourceEvents:[],version:0,environment};
@@ -68,7 +68,7 @@ function expireCarrot(world,city){
 }
 const payWorker=(world,city,person,wage)=>{
  if(!person||city.treasury<wage)return false;
- city.treasury-=wage;person.wallet+=wage;city.workWages+=wage;world.wages+=wage;return true;
+ city.treasury-=wage;person.wallet+=wage;person.workIncome+=wage;city.workWages+=wage;world.wages+=wage;return true;
 };
 function foodForResidents(world,city){
  for(const p of residents(world,city)){
@@ -78,7 +78,11 @@ function foodForResidents(world,city){
      p.wallet-=RULES.carrotPrice;city.treasury+=RULES.carrotPrice;
      city.foodSales+=RULES.carrotPrice;takeCarrot(city);
      city.foodServed++;world.consumed.CARROT_PLAYER++;
-   }else{city.unmetMeals++;world.unmetMeals++;}
+   }else{
+     city.unmetMeals++;world.unmetMeals++;
+     if(carrotCount(city)===0)city.unmetNoFood++;
+     else city.unmetNoCash++;
+   }
  }
 }
 function farm(world,city){
@@ -144,7 +148,7 @@ export function createFederation({agents=15,cityCount=3,environment='normal',
  const walletPool=RULES.totalPAPER-RULES.startingCityPAPER;
  const players=Array.from({length:agents},(_,i)=>({
    id:'agent-'+(i+1),cityId:cities[i%cityCount].id,
-   wallet:Math.floor(walletPool/agents)+(i<walletPool%agents?1:0),active:true
+   wallet:Math.floor(walletPool/agents)+(i<walletPool%agents?1:0),workIncome:0,active:true
  }));
  const initial={...Object.fromEntries(['WOOD','STONE','WATER','SEED_CARROT','SEED_HEMP'].map(k=>
    [k,sum(cities.map(c=>c.stock[k]))]))};
@@ -206,6 +210,7 @@ export function checkFederation(world){
    must(['IN_TRANSIT','DELIVERED'].includes(d.status),'invalid shipment status');
    must(!!cityById(world,d.from)&&!!cityById(world,d.to),'shipment points to invalid city');
  }
+ for(const c of world.cities)must(c.unmetMeals===c.unmetNoCash+c.unmetNoFood,'food-access attribution mismatch');
  must(world.totalBuildings===sum(world.cities.map(c=>c.buildings.length)),'missing building ledger');
  return true;
 }
@@ -410,7 +415,7 @@ export function federationMetrics(world){
  const cityRows=world.cities.map(c=>({id:c.id,population:residents(world,c).length,
   treasury:c.treasury,rawWOOD:c.stock.WOOD,rawSTONE:c.stock.STONE,
   water:c.stock.WATER,carrot:c.stock.CARROT,paperSheet:c.stock.PAPER_SHEET,
-  founded:c.index>=4,buildings:c.buildings,unmetFood:c.unmetMeals,
+  founded:c.index>=4,buildings:c.buildings,unmetFood:c.unmetMeals,unmetNoCash:c.unmetNoCash,unmetNoFood:c.unmetNoFood,
   services:c.services,feesAndSales:c.serviceRevenue,unservedRequests:c.unservedCivic,
   spoilage:c.spoiledCarrot,missingWater:c.waterShortage,blockedCargo:c.blockedCargo,blockedStorage:c.blockedStorage,
   exportable:c.exportable,
@@ -427,7 +432,9 @@ export function federationMetrics(world){
   logisticsReport:{shipped:world.deliveries.length,
     delivered:world.arrivalHistory.length,inTransit:world.deliveries.filter(d=>d.status==='IN_TRANSIT').length,
     rejections:world.rejectedShipments},
-  food:{needs:world.foodNeeds,unmet:world.unmetMeals,eaten:world.consumed.CARROT_PLAYER,
+  food:{needs:world.foodNeeds,unmet:world.unmetMeals,
+    noCash:sum(world.cities.map(c=>c.unmetNoCash)),noFood:sum(world.cities.map(c=>c.unmetNoFood)),
+    eaten:world.consumed.CARROT_PLAYER,
     civic:world.consumed.CARROT_CIVIC,spoiled:world.consumed.CARROT_SPOILED,
     grown:world.grown.CARROT},
   water:{initial:world.initial.WATER,rain:world.waterFromRain,consumed:world.consumed.WATER,
@@ -435,5 +442,7 @@ export function federationMetrics(world){
   minerals:{WOOD_INITIAL:world.initial.WOOD,WOOD_STOCK:goods(world,'WOOD'),
     WOOD_IN_BUILDINGS:world.embodied.WOOD,STONE_INITIAL:world.initial.STONE,
     STONE_STOCK:goods(world,'STONE'),STONE_IN_BUILDINGS:world.embodied.STONE},
+  walletDistribution:{min:Math.min(...world.players.map(p=>p.wallet)),max:Math.max(...world.players.map(p=>p.wallet)),
+    workersPaid:world.players.filter(p=>p.workIncome>0).length,zeroWallets:world.players.filter(p=>p.wallet===0).length},
   cityRows,ledger:federationBalances(world)};
 }
