@@ -124,7 +124,8 @@ setInterval(async()=>{
  if(firing&&!firePending&&(data?.profile?.ammo||0)>0&&performance.now()-lastShotTime>=365){lastShotTime=performance.now();firePending=true;api('action',{type:'fire',dx:mouseAim.x,dy:mouseAim.y}).catch(e=>{if(!/cooling down/.test(e.message))notify(e.message);}).finally(()=>{firePending=false;});}
 },125);
 function resize(){const rect=canvas.getBoundingClientRect(),dpr=Math.min(devicePixelRatio||1,2);vw=rect.width;vh=rect.height;
- canvas.width=Math.round(vw*dpr);canvas.height=Math.round(vh*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);
+ const nextW=Math.round(vw*dpr),nextH=Math.round(vh*dpr);
+ if(canvas.width!==nextW||canvas.height!==nextH){canvas.width=nextW;canvas.height=nextH;ctx.setTransform(dpr,0,0,dpr,0,0);}
  scale=Math.max(16,Math.min(34,Math.min(vw/27,vh/13)*1.35));
 }
 const project=(x,y)=>{const mep=self||{x:8,y:8};return {x:vw/2+(x-y-(mep.x-mep.y))*scale,y:vh/2+(x+y-mep.x-mep.y)*scale*.5};};
