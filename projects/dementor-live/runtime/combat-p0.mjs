@@ -54,7 +54,7 @@ function awardLoot(session,e){
   session.loot[id]={id,origin:e.id,kind:'ammo',quantity:COMBAT_P0.lootPerStage,x:e.x,y:e.y,claimedBy:null};
 }
 function newMember(id){return {id,x:2,y:2,hp:100,status:'ACTIVE',downedDeadline:0,invulnerableUntil:0,
-  aim:{x:1,y:0},input:{x:0,y:0},inputAt:0,nextShotAt:0,nextDashAt:0,feed:null};}
+  aim:{x:1,y:0},input:{x:0,y:0},inputAt:0,nextShotAt:0,nextDashAt:0,feed:null,selfFeed:null};}
 export function createCombat(world,players,ownerId,now=Date.now()){
   if(!finite(now))throw Error('Server time required');
   const p=players[ownerId];profile(p);const root=combatRoot(world);
@@ -72,17 +72,17 @@ export function joinCombat(world,players,sessionId,playerId){
 }
 function down(s,p,now){
   if(p.status!=='ACTIVE'||now<p.invulnerableUntil)return;
-  p.hp=0;p.status='DOWNED';p.downedDeadline=now+COMBAT_P0.downedMs;p.input={x:0,y:0};p.feed=null;
+  p.hp=0;p.status='DOWNED';p.downedDeadline=now+COMBAT_P0.downedMs;p.input={x:0,y:0};p.feed=null;p.selfFeed=null;
   for(const other of Object.values(s.members))if(other.feed?.target===p.id)other.feed=null;
 }
 function wipe(s,now){
   s.attempt++;s.objectiveReady=false;encounter(s);
   for(const m of Object.values(s.members)){
-    m.status='ACTIVE';m.hp=100;m.downedDeadline=0;m.feed=null;m.x=2;m.y=2;
+    m.status='ACTIVE';m.hp=100;m.downedDeadline=0;m.feed=null;m.selfFeed=null;m.x=2;m.y=2;
     m.invulnerableUntil=now+COMBAT_P0.reviveProtectionMs;m.input={x:0,y:0};m.inputAt=now;
   }
 }
-function damage(s,p,hp,now){if(p.status!=='ACTIVE'||now<p.invulnerableUntil)return; p.feed=null;p.hp=Math.max(0,p.hp-hp);if(p.hp===0)down(s,p,now);}
+function damage(s,p,hp,now){if(p.status!=='ACTIVE'||now<p.invulnerableUntil)return; p.feed=null;p.selfFeed=null;p.hp=Math.max(0,p.hp-hp);if(p.hp===0)down(s,p,now);}
 function advanceStage(s,now){
   if(s.enemies.some(e=>e.alive))return;
   if(s.stage===2){s.objectiveReady=true;return;} // Retранслятор нужно включить вручную.
@@ -96,22 +96,32 @@ export function advanceCombat(world,sessionId,now){
   if(s.status!=='ACTIVE')return;
   for(const m of Object.values(s.members)){
     if(m.status==='DOWNED'){
-      if(now>=m.downedDeadline){m.status='RESPAWN_PENDING';m.feed=null;}
+      if(now>=m.downedDeadline){
+        // A single member returns at checkpoint while survivors continue the encounter.
+        m.status='ACTIVE';m.hp=30;m.feed=null;m.selfFeed=null;m.x=2;m.y=2;
+        m.invulnerableUntil=now+COMBAT_P0.reviveProtectionMs;m.input={x:0,y:0};m.inputAt=now;
+      }
       continue;
     }
     if(m.status!=='ACTIVE')continue;
     const oldX=m.x,oldY=m.y;
     if(now-m.inputAt<400)moveBody(m,m.input.x,m.input.y,COMBAT_P0.moveSpeed*dt);
-    if(hypot(m,{x:oldX,y:oldY})>.025)m.feed=null;
+    if(hypot(m,{x:oldX,y:oldY})>.025){m.feed=null;m.selfFeed=null;}
     if(m.feed){
       const t=s.members[m.feed.target];
       if(!t||t.status!=='DOWNED'||hypot(m,t)>1.25||now>t.downedDeadline){m.feed=null;continue;}
       if(now>=m.feed.completeAt){
-        const giver=m.feed.owner,food=world.players?.[giver]?.bag?.food;
-        if(finite(food)&&food>=1){world.players[giver].bag.food--;t.hp=40;t.status='ACTIVE';t.downedDeadline=0;t.invulnerableUntil=now+COMBAT_P0.reviveProtectionMs;}
+        const bag=world.players?.[m.id]?.bag,kind=(bag?.food||0)>0?'food':(bag?.carrot||0)>0?'carrot':null;
+        if(kind){bag[kind]--;t.hp=kind==='carrot'?60:40;t.status='ACTIVE';t.downedDeadline=0;t.invulnerableUntil=now+COMBAT_P0.reviveProtectionMs;}
         m.feed=null;
       }
     }
+    if(m.selfFeed&&now>=m.selfFeed.completeAt){
+      const bag=world.players?.[m.id]?.bag,kind=(bag?.food||0)>0?'food':(bag?.carrot||0)>0?'carrot':null;
+      if(kind){bag[kind]--;m.hp=Math.min(100,m.hp+(kind==='carrot'?40:15));}
+      m.selfFeed=null;
+    }
+    if(s.stage===2&&s.objectiveReady&&m.hp<30)m.hp=Math.min(30,m.hp+dt*2);
   }
   for(const e of s.enemies.filter(x=>x.alive)){
     const active=Object.values(s.members).filter(m=>m.status==='ACTIVE');if(!active.length)break;
@@ -153,7 +163,7 @@ function command(s,world,players,actorId,cmd,now){
   if(cmd.type==='input'){
     if(!finite(cmd.dx)||!finite(cmd.dy))throw Error('Invalid movement');
     const d=Math.hypot(cmd.dx,cmd.dy);actor.input={x:d?cmd.dx/Math.max(1,d):0,y:d?cmd.dy/Math.max(1,d):0};actor.inputAt=now;
-    if(d>.01)actor.feed=null;
+    if(d>.01){actor.feed=null;actor.selfFeed=null;}
     return {accepted:true};
   }
   if(cmd.type==='dash'){
@@ -163,7 +173,7 @@ function command(s,world,players,actorId,cmd,now){
     for(let i=0;i<8;i++){const x=actor.x+cmd.dx/d*COMBAT_P0.dashDistance/8,y=actor.y+cmd.dy/d*COMBAT_P0.dashDistance/8;
       if(!walkable(x,y))break;actor.x=x;actor.y=y;count++;
     }
-    actor.nextDashAt=now+COMBAT_P0.dashCooldownMs;actor.feed=null;
+    actor.nextDashAt=now+COMBAT_P0.dashCooldownMs;actor.feed=null;actor.selfFeed=null;
     return {dashSteps:count};
   }
   if(cmd.type==='fire'){
@@ -171,7 +181,7 @@ function command(s,world,players,actorId,cmd,now){
     const prof=profile(players[actorId]);if(!Number.isSafeInteger(prof.ammo)||prof.ammo<1)throw Error('Out of ammo');
     if(!finite(cmd.dx)||!finite(cmd.dy)||Math.hypot(cmd.dx,cmd.dy)<.001)throw Error('Invalid aim');
     const d=Math.hypot(cmd.dx,cmd.dy),aim={x:cmd.dx/d,y:cmd.dy/d};
-    actor.aim=aim;actor.nextShotAt=now+COMBAT_P0.shotCooldownMs;actor.feed=null;prof.ammo--;
+    actor.aim=aim;actor.nextShotAt=now+COMBAT_P0.shotCooldownMs;actor.feed=null;actor.selfFeed=null;prof.ammo--;
     const hits=s.enemies.filter(e=>e.alive).map(e=>({e,dot:(e.x-actor.x)*aim.x+(e.y-actor.y)*aim.y}))
       .filter(h=>h.dot>=0&&h.dot<=COMBAT_P0.shotRange&&Math.hypot(h.e.x-actor.x-aim.x*h.dot,h.e.y-actor.y-aim.y*h.dot)<.44)
       .sort((a,b)=>a.dot-b.dot);
@@ -184,7 +194,7 @@ function command(s,world,players,actorId,cmd,now){
   if(cmd.type==='melee'){
     if(!finite(cmd.dx)||!finite(cmd.dy))throw Error('Invalid melee');
     if(now<(actor.nextMeleeAt||0))throw Error('Melee cooling down');
-    actor.nextMeleeAt=now+800;actor.feed=null;
+    actor.nextMeleeAt=now+800;actor.feed=null;actor.selfFeed=null;
     const enemy=s.enemies.find(e=>e.alive&&hypot(actor,e)<1.35&&lineClear(actor,e));
     if(enemy){enemy.hp-=4;if(enemy.type!=='GUARD'){const d=hypot(actor,enemy)||1;moveBody(enemy,(enemy.x-actor.x)/d,(enemy.y-actor.y)/d,.5);}
       if(enemy.hp<=0){enemy.alive=false;awardLoot(s,enemy);advanceStage(s,now);}}
@@ -192,9 +202,15 @@ function command(s,world,players,actorId,cmd,now){
   }
   if(cmd.type==='feed'){
     const target=person(s,cmd.target);if(target.id===actorId||target.status!=='DOWNED'||now>target.downedDeadline||hypot(actor,target)>1.25)throw Error('Cannot feed');
-    if((players[actorId]?.bag?.food||0)<1)throw Error('No food');
-    actor.input={x:0,y:0};actor.feed={target:target.id,completeAt:now+COMBAT_P0.feedMs,owner:actorId};
+    if((players[actorId]?.bag?.food||0)+(players[actorId]?.bag?.carrot||0)<1)throw Error('No food');
+    actor.input={x:0,y:0};actor.selfFeed=null;actor.feed={target:target.id,completeAt:now+COMBAT_P0.feedMs,owner:actorId};
     return {feedEndsAt:actor.feed.completeAt};
+  }
+  if(cmd.type==='selfFeed'){
+    if(actor.hp>=100)throw Error('Already fully healed');
+    if((players[actorId]?.bag?.food||0)+(players[actorId]?.bag?.carrot||0)<1)throw Error('No food');
+    actor.input={x:0,y:0};actor.feed=null;actor.selfFeed={completeAt:now+COMBAT_P0.feedMs};
+    return {feedEndsAt:actor.selfFeed.completeAt};
   }
   if(cmd.type==='pickup'){
     const obj=s.loot[cmd.target];if(!obj||obj.claimedBy||hypot(actor,obj)>1.3)throw Error('Loot unavailable');
