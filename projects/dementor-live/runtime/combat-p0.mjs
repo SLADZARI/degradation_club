@@ -94,6 +94,7 @@ export function advanceCombat(world,sessionId,now){
   if(!finite(now)||now<s.lastTick)throw Error('Nonmonotonic server clock');
   const dt=Math.min((now-s.lastTick)/1000,.25);s.lastTick=now;
   if(s.status!=='ACTIVE')return;
+  if(Object.values(s.members).every(m=>m.status!=='ACTIVE')){wipe(s,now);return;}
   for(const m of Object.values(s.members)){
     if(m.status==='DOWNED'){
       if(now>=m.downedDeadline){
