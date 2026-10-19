@@ -69,8 +69,12 @@ async function tap(p,selector){const r=await p.page.locator(selector).boundingBo
  const link=await a.page.locator('#world01CardLink').getAttribute('href');assert.equal(link,'https://dementor.club/courses/dengi-na-veter/');
  await a.page.locator('#world01CardClose').click();
  checks.push('real forest billboard opens read-only authenticated-scene public projection; link not fabricated');
- await relocate(a,34,42);await tap(a,'#world01ActionButton');
- await a.page.waitForFunction(()=>state.world01.transport==='scooter');
+ await relocate(a,34,42);
+ const nearScooter=await a.page.evaluate(()=>({context:context?.type,selected,nearby:Math.hypot(me.x-34,me.y-42),scene:state.scene,transport:state.world01.transport}));
+ assert.equal(nearScooter.context,'world01Scooter','Scooter must be selected before tapping '+JSON.stringify(nearScooter));
+ await tap(a,'#world01ActionButton');
+ try{await a.page.waitForFunction(()=>state.world01.transport==='scooter',{timeout:4000});}
+ catch(e){const diag=await a.page.evaluate(()=>({context:context?.type,toast:document.getElementById('toast').textContent,scene:state.scene,transport:state.world01?.transport,active:document.getElementById('world01ActionButton').disabled}));throw Error('Scooter tap failed '+JSON.stringify(diag));}
  checks.push('scooter toggles on in forest and persists via server snapshot');
  await a.page.reload();await a.page.waitForFunction(()=>state?.scene==='forest'&&state.world01.transport==='scooter');
  checks.push('forest and scooter survive browser reload without new character');
