@@ -117,3 +117,27 @@ test('R11 every exposed entry/exit references one of the implemented P0 scenes',
   assert.ok(scene.width>0&&scene.height>0);
  }
 });
+
+test('R12 delayed souvenir retry after 140 other commands and restart never debits again',()=>{
+ const {game:g,p}=make();at(g,p,'tourist-kiosk');
+ const cmd={requestId:'durable-souvenir-transaction-1',type:'touristBuy',target:'tourist-kiosk',kind:'souvenir'};
+ const initial=treasuryAndWallet(g,p),wallet=p.wallet,first=g.command(p,cmd);
+ assert.equal(first.ok,true);assert.equal(p.worldTravel.souvenirs.souvenir,1);
+ // Intentionally exceed Game.command's capped 128-result replay cache.
+ at(g,p,'travel-sign');
+ for(let i=0;i<140;i++)assert.equal(command(g,p,'worldUse','travel-sign').ok,true);
+ assert.ok(!p.results.some(e=>e.id===cmd.requestId));
+ at(g,p,'tourist-kiosk');
+ const oldWallet=p.wallet,oldTreasury=g.state.treasury;
+ const repeat=g.command(p,cmd);
+ assert.deepEqual(repeat,first);
+ assert.equal(p.wallet,oldWallet);
+ assert.equal(g.state.treasury,oldTreasury);
+ assert.equal(p.worldTravel.souvenirs.souvenir,1);
+ const restored=new Game(structuredClone(g.state)),rp=restored.auth(p.token);
+ at(restored,rp,'tourist-kiosk');
+ assert.deepEqual(restored.command(rp,cmd),first);
+ assert.equal(rp.worldTravel.souvenirs.souvenir,1);
+ assert.equal(treasuryAndWallet(restored,rp),initial);
+ assert.equal(wallet-TOURIST_PRICES.souvenir,rp.wallet);
+});
