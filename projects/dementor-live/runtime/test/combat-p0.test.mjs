@@ -66,7 +66,7 @@ test('loot picked by at most one player; duplicate requests cannot mint ammo',()
 });
 test('a mission can extract only after completing all three stages, first win persists once',()=>{
   const x=setup();x.start();const s=x.world.combatP0.sessions[x.sid];assert.throws(()=>x.act('a','extract'),/incomplete/);
-  s.stage=3;s.status='EXTRACT_READY';const first=x.act('a','extract',{},5000);assert.equal(first.completed,true);
+  s.stage=3;s.status='EXTRACT_READY';s.members.a.x=14;s.members.a.y=14;const first=x.act('a','extract',{},5000);assert.equal(first.completed,true);
   assert.equal(s.status,'CLOSED');assert.equal(x.world.combatP0.firstWins.a,5000);
   const another=createCombat(x.world,x.world.players,'a',6000);assert.ok(another!==x.sid);
   assert.equal(x.world.combatP0.firstWins.a,5000);
@@ -79,4 +79,32 @@ test('serialized state retains weapon, session, loot, ammunition and world state
 test('invalid session commands and impersonation are rejected',()=>{
   const x=setup();x.start();assert.throws(()=>x.act('b','fire',{dx:1,dy:0}),/participant/);
   assert.throws(()=>combatAction(x.world,x.world.players,x.sid,'a',{type:'fire',requestId:'x',dx:1,dy:0},1200),/requestId/);
+});
+
+test('repeater must be activated manually after stage two cleared',()=>{
+  const x=setup();x.start();const s=x.world.combatP0.sessions[x.sid];
+  s.stage=2;s.enemies=[];s.objectiveReady=false;
+  assert.throws(()=>x.act('a','activate',{},1100),/Clear enemies/);
+  s.objectiveReady=true;s.members.a.x=9;s.members.a.y=8;
+  assert.equal(x.act('a','activate',{},1200).stage,3);
+  assert.equal(s.stage,3);assert.ok(s.enemies.some(e=>e.type==='GUARD'));
+});
+test('extract requires physically reaching exit, not just completing stage',()=>{
+  const x=setup();x.start();const s=x.world.combatP0.sessions[x.sid];s.status='EXTRACT_READY';
+  assert.throws(()=>x.act('a','extract',{},2000),/extraction/);
+  s.members.a.x=14;s.members.a.y=14;
+  assert.equal(x.act('a','extract',{},2200).completed,true);
+});
+test('retreat leaves permanent personal gear and consumed ammunition unchanged',()=>{
+  const x=setup(true);x.start();const starter=x.world.players.a.combatP0.weapon.id;
+  x.act('a','fire',{dx:1,dy:0},1200);
+  x.act('a','retreat',{},1400);
+  assert.equal(x.world.players.a.combatP0.weapon.id,starter);
+  assert.equal(x.world.players.a.combatP0.ammo,23);
+  assert.equal(x.world.combatP0.sessions[x.sid].status,'CLOSED');
+});
+test('high frequency movement input does not accumulate commands in save',()=>{
+  const x=setup();x.start();const s=x.world.combatP0.sessions[x.sid];
+  for(let i=0;i<300;i++)x.act('a','input',{dx:1,dy:0},1500+i);
+  assert.ok(Object.keys(s.commands).length<=2);
 });
