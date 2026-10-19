@@ -3,9 +3,13 @@ on:
   push:
     branches:
       - 'feature/dementor-live-combat-p0-*'
+      - 'feature/dementor-live-world-expansion-p0-*'
     paths:
       - 'projects/dementor-live/runtime/combat-p0.mjs'
       - 'projects/dementor-live/runtime/server.mjs'
+      - 'projects/dementor-live/runtime/world-expansion*.mjs'
+      - 'projects/dementor-live/runtime/config.mjs'
+      - 'projects/dementor-live/runtime/test/world-expansion.test.mjs'
       - 'projects/dementor-live/runtime/world.mjs'
       - 'projects/dementor-live/runtime/public/**'
       - 'projects/dementor-live/runtime/test/combat-http.test.mjs'
