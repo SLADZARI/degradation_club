@@ -38,7 +38,7 @@ function createCity(id,index,treasury,environment){
   freightCapacity:RULES.freightCapacity,
   unmetMeals:0,unmetNoCash:0,unmetNoFood:0,spoiledCarrot:0,unservedCivic:0,waterShortage:0,
   blockedCargo:0,blockedStorage:0,unfundedWorks:0,harvests:0,services:0,serviceRevenue:0,
-  foodSales:0,foodNeeds:0,foodServed:0,workWages:0,workerTurn:0,transportBought:0,
+  foodSales:0,foodNeeds:0,foodServed:0,workWages:0,workerTurn:0,consignmentPayout:0,ownMeals:0,transportBought:0,
   sourceEvents:[],version:0,environment};
 }
 const active=(world,player)=>world.activity==='daily'||world.day%7<2;
@@ -61,9 +61,29 @@ function refillRain(world,city){
 const carrotCount=city=>city.carrots.reduce((n,b)=>n+b.qty,0);
 function takeCarrot(city,qty=1){
  must(carrotCount(city)>=qty,'trying to sell nonexistent CARROT');
- let remaining=qty;
- for(const b of city.carrots){const n=Math.min(remaining,b.qty);b.qty-=n;remaining-=n;if(!remaining)break;}
+ let remaining=qty,owners=[];
+ for(const b of city.carrots){
+   const n=Math.min(remaining,b.qty);
+   if(n>0)owners.push({ownerId:b.ownerId,qty:n});
+   b.qty-=n;remaining-=n;if(!remaining)break;
+ }
  city.carrots=city.carrots.filter(x=>x.qty>0);city.stock.CARROT-=qty;
+ return owners;
+}
+function takeOwnFood(city,actorId){
+ const owned=city.carrots.find(b=>b.ownerId===actorId&&b.qty>0);
+ if(!owned)return false;
+ owned.qty--;city.stock.CARROT--;
+ city.carrots=city.carrots.filter(b=>b.qty>0);return true;
+}
+function payGrowers(world,city,portions){
+ for(const p of portions){
+   const owner=playerById(world,p.ownerId);
+   must(owner,'carrot delivery from unknown grower');
+   owner.wallet+=p.qty*RULES.carrotPrice;
+   owner.workIncome+=p.qty*RULES.carrotPrice;
+   city.consignmentPayout+=p.qty*RULES.carrotPrice;
+ }
 }
 function expireCarrot(world,city){
  const retained=[];
@@ -83,9 +103,15 @@ function foodForResidents(world,city){
    if(!active(world,p))continue;
    city.foodNeeds++;world.foodNeeds++;
    if(carrotCount(city)>0&&p.wallet>=RULES.carrotPrice){
-     p.wallet-=RULES.carrotPrice;city.treasury+=RULES.carrotPrice;
-     city.foodSales+=RULES.carrotPrice;takeCarrot(city);
+     p.wallet-=RULES.carrotPrice;
+     const portions=takeCarrot(city);
+     if(world.foodMarket==='consignment')payGrowers(world,city,portions);
+     else city.treasury+=RULES.carrotPrice;
+     city.foodSales+=RULES.carrotPrice;
      city.foodServed++;world.consumed.CARROT_PLAYER++;
+   }else if(world.foodMarket==='consignment'&&takeOwnFood(city,p.id)){
+     // A grower can eat their own physical carrot without first purchasing it.
+     city.foodServed++;city.ownMeals++;world.consumed.CARROT_PLAYER++;
    }else{
      city.unmetMeals++;world.unmetMeals++;
      if(carrotCount(city)===0)city.unmetNoFood++;
@@ -98,10 +124,12 @@ function farm(world,city){
  if(!worker)return;
  for(const [plotIndex,bed] of city.plots.entries()){
    if(bed.ready>0&&bed.ready<=world.day){
-     if(carrotCount(city)+RULES.harvestCarrot<=city.storageCapacity&&city.treasury>=RULES.carrotWage){
-       must(payWorker(world,city,worker,RULES.carrotWage),'CARROT wages not paid');
+     if(carrotCount(city)+RULES.harvestCarrot<=city.storageCapacity&&
+        (world.foodMarket==='consignment'||city.treasury>=RULES.carrotWage)){
+       if(world.foodMarket!=='consignment')
+         must(payWorker(world,city,worker,RULES.carrotWage),'CARROT wages not paid');
        city.stock.CARROT+=RULES.harvestCarrot;
-       city.carrots.push({at:world.day,qty:RULES.harvestCarrot});
+       city.carrots.push({at:world.day,qty:RULES.harvestCarrot,ownerId:worker.id});
        city.stock.SEED_CARROT+=RULES.carrotSeeds;
        world.grown.CARROT+=RULES.harvestCarrot;world.grown.SEED_CARROT+=RULES.carrotSeeds;
        city.harvests++;bed.ready=0;
@@ -145,12 +173,13 @@ function farm(world,city){
 export function cityById(world,id){return world.cities.find(c=>c.id===id);}
 export function playerById(world,id){return world.players.find(p=>p.id===id);}
 export function createFederation({agents=15,cityCount=3,environment='normal',
-  logistics='trade',activity='daily'}={}){
+  logistics='trade',activity='daily',foodMarket='municipal'}={}){
  must(Number.isInteger(agents)&&agents>=10&&agents<=20,'federation agents range 10-20');
  must(Number.isInteger(cityCount)&&cityCount>=2&&cityCount<=4,'federation cities range 2-4');
  must(['normal','dry','wet'].includes(environment),'unknown weather');
  must(['trade','local'].includes(logistics),'unknown logistics');
  must(['daily','weekends'].includes(activity),'unknown activity');
+ must(['municipal','consignment'].includes(foodMarket),'unknown food ownership policy');
  const treasuries=Array.from({length:cityCount},(_,i)=>Math.floor(RULES.startingCityPAPER/cityCount)+(i===0?RULES.startingCityPAPER%cityCount:0));
  const cities=treasuries.map((money,i)=>createCity('city-'+(i+1),i,money,environment));
  const walletPool=RULES.totalPAPER-RULES.startingCityPAPER;
@@ -160,7 +189,7 @@ export function createFederation({agents=15,cityCount=3,environment='normal',
  }));
  const initial={...Object.fromEntries(['WOOD','STONE','WATER','SEED_CARROT','SEED_HEMP'].map(k=>
    [k,sum(cities.map(c=>c.stock[k]))]))};
- const world={schema:FEDERATION_ID,day:30,activity,environment,logistics,
+ const world={schema:FEDERATION_ID,day:30,activity,environment,logistics,foodMarket,
    cities,players,initial,moneyAtStart:RULES.totalPAPER,
    deliveries:[],deliveryIds:[],arrivalHistory:[],rejectedShipments:0,nextShipment:1,
    movements:[],movementIds:[],cityCreationIds:[],
@@ -200,6 +229,8 @@ export function checkFederation(world){
  for(const key of ['CARROT','HEMP','PAPER_SHEET'])
    must(b[key]===0,'federation material violation '+key+': '+b[key]);
  for(const c of world.cities){
+   if(world.foodMarket==='consignment')must(c.carrots.every(b=>!!playerById(world,b.ownerId)),
+     'consignment carrots have no registered owner');
    must(c.treasury>=0&&Number.isSafeInteger(c.treasury),'negative treasury '+c.id);
    must(Object.values(c.stock).every(v=>Number.isSafeInteger(v)&&v>=0),'negative city stocks '+c.id);
    must(carrotCount(c)===c.stock.CARROT,'carrot provenance not reflected in stock '+c.id);
@@ -341,10 +372,13 @@ export function authorizeSession(world,{actorId,cityId,eventId,accepted=false}){
  if(p.wallet<RULES.sessionPrice)return {ok:false,reason:'wallet'};
  if(city.stock.PAPER_SHEET<1||city.stock.CARROT<1)return {ok:false,reason:'physical-supply'};
  must(bookEvent(city,'service:'+eventId),'service replay');
- p.wallet-=RULES.sessionPrice;city.treasury+=RULES.sessionPrice;
+ p.wallet-=RULES.sessionPrice;
  city.stock.PAPER_SHEET--;world.consumed.PAPER_SHEET_CIVIC++;
- takeCarrot(city);world.consumed.CARROT_CIVIC++;
- city.services++;city.serviceRevenue+=RULES.sessionPrice;world.totalServices++;
+ const portions=takeCarrot(city);world.consumed.CARROT_CIVIC++;
+ const cityIncome=world.foodMarket==='consignment'?RULES.sessionPrice-RULES.carrotPrice:RULES.sessionPrice;
+ city.treasury+=cityIncome;
+ if(world.foodMarket==='consignment')payGrowers(world,city,portions);
+ city.services++;city.serviceRevenue+=cityIncome;world.totalServices++;
  checkFederation(world);
  return {ok:true,paid:RULES.sessionPrice,realGoods:['PAPER_SHEET','CARROT']};
 }
@@ -424,6 +458,7 @@ export function federationMetrics(world){
   treasury:c.treasury,rawWOOD:c.stock.WOOD,rawSTONE:c.stock.STONE,
   water:c.stock.WATER,carrot:c.stock.CARROT,paperSheet:c.stock.PAPER_SHEET,
   founded:c.index>=4,buildings:c.buildings,unmetFood:c.unmetMeals,unmetNoCash:c.unmetNoCash,unmetNoFood:c.unmetNoFood,
+  ownMeals:c.ownMeals,consignmentPayout:c.consignmentPayout,
   services:c.services,feesAndSales:c.serviceRevenue,unservedRequests:c.unservedCivic,
   spoilage:c.spoiledCarrot,missingWater:c.waterShortage,blockedCargo:c.blockedCargo,blockedStorage:c.blockedStorage,
   exportable:c.exportable,
@@ -431,7 +466,7 @@ export function federationMetrics(world){
  return {status:'EXPERIMENTAL_FEDERATION_NOT_ORIGINAL_NOT_SERVER',
   model:FEDERATION_ID,day:world.day,projectionDays:world.day-30,
   agents:world.players.length,cities:world.cities.length,activity:world.activity,
-  environment:world.environment,logistics:world.logistics,
+  environment:world.environment,logistics:world.logistics,foodMarket:world.foodMarket,
   economy:{moneyTotal:federationBalances(world).PAPER,
     cityMoney:sum(world.cities.map(c=>c.treasury)),playerMoney:sum(world.players.map(p=>p.wallet)),
     escrow:sum(world.deliveries.filter(d=>d.status==='IN_TRANSIT').map(d=>d.escrow)),
