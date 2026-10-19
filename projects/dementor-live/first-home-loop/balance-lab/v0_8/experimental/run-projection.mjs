@@ -36,7 +36,7 @@ const activityContrast=SETTINGS.activityProfiles.map(activity=>{
   return {activity,mealNeeds:m.food.mealNeeds,unmet:m.food.unmet,eaten:m.food.eaten,cityOrders:m.demand.posted,cityOrdersFilled:m.demand.filled};
 });
 const longTerm=[];
-for(const policy of ['upkeep','needs-growth'])
+for(const policy of ['upkeep','needs-growth','sponsored-growth'])
  for(const environment of ['normal','dry','treasury'])
   for(const agents of [3,5])
    for(const days of [180,360]){
@@ -50,6 +50,14 @@ for(const policy of ['upkeep','needs-growth'])
        sheetsUsed:m.sheets.used,wood:m.finiteMaterials.wood,stone:m.finiteMaterials.stone
      });
    }
+const sponsorComparison=SETTINGS.activityProfiles.map(activity=>[3,5].map(agents=>{
+  const r=records.find(r=>r.policy==='sponsored-growth'&&r.environment==='normal'&&r.agents===agents&&r.projectionDays===90&&r.activity===activity);
+  return {activity,agents,cityPAPER:r.money.city,municipalFees:r.sponsored.feesEarned,
+    authorized:r.sponsored.authorized,refunded:r.sponsored.refunded,
+    served:r.sponsored.completed,partial:r.sponsored.partial,
+    expired:r.sponsored.expired,unserved:r.sponsored.unserved,
+    projects:r.buildings.new,unmetFood:r.food.unmet};
+})).flat();
 const result={
  schema:'WORLD_ORGANISM_SHADOW_PROJECTION/0.8.1',
  status:'EXPERIMENTAL_NOT_ORIGINAL_V08_NOT_SERVER',
@@ -67,10 +75,10 @@ const result={
   carrots:'TEST 3 carrots/seedbed harvest, each player eats one/day, unsold produce lasts one day unless pantry has been built.',
   activeSession:'All synthetic agents active daily. A real game must only apply hunger during actual online sessions.',
  },
- sample:combinations,stress,activityContrast,longTerm,records
+ sample:combinations,stress,activityContrast,sponsorComparison,longTerm,records
 };
 mkdirSync(outputDir,{recursive:true});
-writeFileSync(outputDir+'/v08-shadow-projection-216.json',JSON.stringify(result,null,2)+'\n');
+writeFileSync(outputDir+'/v08-shadow-projection-288.json',JSON.stringify(result,null,2)+'\n');
 writeFileSync(outputDir+'/v08-shadow-summary.json',JSON.stringify({...result,records:undefined},null,2)+'\n');
 console.log('RUN_COUNT',records.length);
 console.log('PROVENANCE',result.status);
@@ -78,4 +86,5 @@ console.log('NORMAL_3_AGENTS',JSON.stringify(combinations));
 console.log('STRESS_90_DAYS',JSON.stringify(stress));
 console.log('ACTIVITY_COMPARISON',JSON.stringify(activityContrast));
 console.log('LONG_TERM',JSON.stringify(longTerm));
-console.log('ARTIFACT',outputDir+'/v08-shadow-projection-216.json');
+console.log('SPONSOR_COMPARISON',JSON.stringify(sponsorComparison));
+console.log('ARTIFACT',outputDir+'/v08-shadow-projection-288.json');
