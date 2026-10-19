@@ -74,3 +74,23 @@ test('R08 nonparticipation cannot fabricate revenue or construction',()=>{
  assert.equal(s.serviceRequestsUnserved,0);
  check(s);
 });
+
+test('R09 city treasury is exactly starting funds minus real construction wages plus completed fees',()=>{
+ for(const scenario of ['normal','dry','treasury']){
+  const s=simulate({policy:'sponsored-growth',environment:scenario,agents:3,days:360});
+  const starting=scenario==='treasury'?35:2301;
+  assert.equal(s.city,starting-s.buildPaid+s.servicesRevenue,
+    'city spent unfunded PAPER or created fee without delivery in '+scenario);
+  assert.equal(s.servicesRevenue,s.services.filter(x=>x.status==='COMPLETE').length*2);
+  check(s);
+ }
+});
+test('R10 meeting hall investment is justified by prior unserved willing visitor requests',()=>{
+ const s=simulate({policy:'sponsored-growth',environment:'normal',agents:5,days:180});
+ assert.ok(s.serviceRequestsUnserved>=SETTINGS.communityHall.minUnserved);
+ assert.ok(s.projects.includes('communityHall'));
+ assert.ok(s.projects.includes('readingRoom'));
+ assert.equal(new Set(s.projects).size,s.projects.length);
+ assert.ok(s.players.every(p=>p.wallet>=0));
+ check(s);
+});
