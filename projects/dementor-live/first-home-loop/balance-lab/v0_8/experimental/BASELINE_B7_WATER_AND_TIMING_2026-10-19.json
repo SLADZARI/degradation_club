@@ -1,0 +1,170 @@
+{
+  "status": "TEST_LAB_ONLY",
+  "workflow": "https://github.com/SLADZARI/degradation_club/actions/runs/39276183876",
+  "commit": "4e9ce578051250bd2d394e04310836ae51fd35b0",
+  "checks": {
+    "model": 374,
+    "federation": 180,
+    "contract": 22,
+    "allPass": 576
+  },
+  "anchors": [
+    {
+      "agents": 20,
+      "cities": 3,
+      "environment": "normal",
+      "days": 360,
+      "local": {
+        "treasury": 3550,
+        "buildings": 2,
+        "unservedFood": 5746,
+        "services": 109,
+        "deliveries": 0
+      },
+      "trade": {
+        "treasury": 3557,
+        "buildings": 9,
+        "unservedFood": 5645,
+        "services": 143,
+        "deliveries": 23
+      },
+      "effect": {
+        "extraBuildings": 7,
+        "avoidedHunger": 101,
+        "freightTrades": 23
+      }
+    },
+    {
+      "agents": 20,
+      "cities": 3,
+      "environment": "dry",
+      "days": 360,
+      "local": {
+        "treasury": 3599,
+        "buildings": 2,
+        "unservedFood": 6056,
+        "services": 8,
+        "deliveries": 0
+      },
+      "trade": {
+        "treasury": 3426,
+        "buildings": 9,
+        "unservedFood": 5689,
+        "services": 141,
+        "deliveries": 667
+      },
+      "effect": {
+        "extraBuildings": 7,
+        "avoidedHunger": 367,
+        "freightTrades": 667
+      }
+    },
+    {
+      "agents": 20,
+      "cities": 3,
+      "environment": "wet",
+      "days": 360,
+      "local": {
+        "treasury": 3550,
+        "buildings": 2,
+        "unservedFood": 5746,
+        "services": 109,
+        "deliveries": 0
+      },
+      "trade": {
+        "treasury": 3557,
+        "buildings": 9,
+        "unservedFood": 5645,
+        "services": 143,
+        "deliveries": 23
+      },
+      "effect": {
+        "extraBuildings": 7,
+        "avoidedHunger": 101,
+        "freightTrades": 23
+      }
+    }
+  ],
+  "cities": [
+    {
+      "id": "city-1",
+      "population": 7,
+      "treasury": 1067,
+      "rawWOOD": 0,
+      "rawSTONE": 0,
+      "water": 98,
+      "carrot": 19,
+      "paperSheet": 3,
+      "founded": false,
+      "buildings": [
+        "garden",
+        "marketHall",
+        "coldStore"
+      ],
+      "unmetFood": 1986,
+      "services": 46,
+      "feesAndSales": 782,
+      "unservedRequests": 38,
+      "spoilage": 1181,
+      "missingWater": 0,
+      "blockedCargo": 0,
+      "blockedStorage": 76,
+      "cargoImports": 14
+    },
+    {
+      "id": "city-2",
+      "population": 7,
+      "treasury": 1329,
+      "rawWOOD": 15,
+      "rawSTONE": 0,
+      "water": 98,
+      "carrot": 19,
+      "paperSheet": 3,
+      "founded": false,
+      "buildings": [
+        "garden",
+        "marketHall",
+        "coldStore"
+      ],
+      "unmetFood": 1992,
+      "services": 48,
+      "feesAndSales": 816,
+      "unservedRequests": 36,
+      "spoilage": 1189,
+      "missingWater": 0,
+      "blockedCargo": 0,
+      "blockedStorage": 77,
+      "cargoImports": 3
+    },
+    {
+      "id": "city-3",
+      "population": 6,
+      "treasury": 1161,
+      "rawWOOD": 0,
+      "rawSTONE": 22,
+      "water": 98,
+      "carrot": 19,
+      "paperSheet": 3,
+      "founded": false,
+      "buildings": [
+        "garden",
+        "marketHall",
+        "coldStore"
+      ],
+      "unmetFood": 1667,
+      "services": 49,
+      "feesAndSales": 833,
+      "unservedRequests": 25,
+      "spoilage": 1219,
+      "missingWater": 0,
+      "blockedCargo": 0,
+      "blockedStorage": 80,
+      "cargoImports": 6
+    }
+  ],
+  "problems": [
+    "intercity materials circulate and are bought repeatedly during unfulfillable projects",
+    "not enough productive food beds despite ample captured rain",
+    "unfulfilled food demand survives after adding simple garden"
+  ]
+}
