@@ -23,11 +23,13 @@ for(const population of [10,15,20])
       agents:population,cities:cityCount,environment:weather,days,
       local:{
         treasury:local.economy.cityMoney,buildings:local.economy.cityBuildings,
-        unservedFood:local.food.unmet,services:local.economy.civicSessions,
+        unservedFood:local.food.unmet,unaffordableMeals:local.food.noCash,missingMeals:local.food.noFood,
+        workersPaid:local.walletDistribution.workersPaid,services:local.economy.civicSessions,
         deliveries:local.logisticsReport.delivered,
       },trade:{
         treasury:trading.economy.cityMoney,buildings:trading.economy.cityBuildings,
-        unservedFood:trading.food.unmet,services:trading.economy.civicSessions,
+        unservedFood:trading.food.unmet,unaffordableMeals:trading.food.noCash,missingMeals:trading.food.noFood,
+        workersPaid:trading.walletDistribution.workersPaid,services:trading.economy.civicSessions,
         deliveries:trading.logisticsReport.delivered,
       },
       effect:{
