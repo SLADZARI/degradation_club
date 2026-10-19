@@ -1,0 +1,46 @@
+{
+  "schema": "dementor-paper-cut-ui-icons-v1",
+  "status": "approved_art;binary_import_pending",
+  "canon": "projects/dementor-live/design/PAPER_CUT_UI_ICON_CANON_v1.md",
+  "atlas": {
+    "path": "paper_atlas_64_indexed.png",
+    "cols": 5,
+    "rows": 4,
+    "cellPx": 64,
+    "width": 320,
+    "height": 256,
+    "sha256": "607e40f07a2695148ecbb8e541ec234eeeb92de7a223a26438d754d104576193"
+  },
+  "ids": [
+    "wood",
+    "stone",
+    "food",
+    "seed_hemp",
+    "seed_carrot",
+    "hemp",
+    "carrot",
+    "water",
+    "axe",
+    "pick",
+    "rifle",
+    "ammo",
+    "map",
+    "shirt",
+    "souvenir",
+    "paper",
+    "backpack",
+    "cargo",
+    "health",
+    "stamina"
+  ],
+  "aliases": {
+    "starter-rifle": "rifle",
+    "weapon": "rifle",
+    "ammunition": "ammo",
+    "wallet": "paper",
+    "tshirt": "shirt",
+    "courier": "cargo"
+  },
+  "gameplayPolicy": "UI only. Never add the 5 UI-only keys to the player's bag; do not modify hero or state.",
+  "sourcePack": "Dementor_Live_Paper_Icons_v1_READY.zip"
+}
