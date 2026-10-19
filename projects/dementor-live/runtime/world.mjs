@@ -209,6 +209,7 @@ export class Game {
     for(const p of Object.values(this.state.players))if(p.delivery&&!p.delivery.picked&&p.delivery.expiresAt<=this.now){p.delivery=null;this.changed();}
     for(const r of this.state.resources)if(r.type==='food'&&r.regrowAt&&this.now>=r.regrowAt){r.stock=Math.min(c.foodStock,r.stock+1);r.regrowAt=r.stock<c.foodStock?this.now+c.berryRegrowMs:0;this.changed();}
     for(const id of this.online){const p=this.state.players[id];if(!p)continue;
+      if(p.combatP0?.activeSessionId && this.state.combatP0?.sessions?.[p.combatP0.activeSessionId]?.status!=='CLOSED')continue; // Civil hunger / movement suspended during COMBAT-01 instance.
       this.dirty=true;
       if(!p.spirit){p.hunger=Math.max(0,p.hunger-c.hungerPerSecond*dt);if(p.hunger===0){p.spirit=true;p.health=0;p.job=null;p.x=8;p.y=8;p.scene='city';p.plotId=null;p.stamina=100;this.inputs.set(p.id,{dx:0,dy:0,sprint:false,at:this.now});this.changed();}}
       const input=this.inputs.get(id);let moving=input&&this.now-input.at<400&&Math.hypot(input.dx,input.dy)>0;
