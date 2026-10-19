@@ -11,7 +11,7 @@ Base: `feature/dementor-live-world-expansion-p0-2026-10-19`, **not** the synthet
 - `runtime/test/world-expansion.test.mjs` (existing checks)
 - `runtime/test/world-runtime-contract.test.mjs` (new real-runtime checks)
 
-[GitHub Actions #39332679792](https://github.com/SLADZARI/degradation_club/actions/runs/39332679792): **17/17 PASS**, comprising 6 existing world-expansion tests and 11 new tests, 0 failure.
+[GitHub Actions #39333146914](https://github.com/SLADZARI/degradation_club/actions/runs/39333146914): **19/19 PASS**, comprising 6 existing world-expansion tests and 13 new tests, 0 failure.
 
 ## Observed implementation state
 
@@ -30,7 +30,7 @@ Base: `feature/dementor-live-world-expansion-p0-2026-10-19`, **not** the synthet
 
 ## Proven constraints and remaining defects/risks
 
-- Current command idempotency is implemented in player `results` array limited to last **128 request IDs**. A **replayed consumable purchase after 128 later actions** may be charged again. That is not necessarily invalid if a client deliberately buys the same consumable again, but a repeated network request must not be accepted as a new purchase; use persisted stable transaction ID with explicit retention/expiry. Current test only checks replay within history and through in-memory state rehydration.
+- **Fixed on this QA branch:** the player `results` cache retains only 128 request IDs, but settled tourist purchases now also store a persistent per-player `worldTravel.purchaseReceipts[requestId]`. A delayed same-ID shirt/souvenir replay after 140 unrelated commands returns the original receipt (including after in-memory restart and travel to a different scene) without charging again. **Follow-up needed:** bound receipt retention via explicit TTL/archive policy backed by the durable transaction ledger; currently records accumulate in player state and this is not yet load-tested.
 - P0 tourist purchase gives treasury PAPER from a wallet and therefore does not mint it; world total PAPER conservation across every other income and **city-founding path has not been certified** by this test suite.
 - `worldTravelAction` checks per-player current scene target, proximity and active courier/combat blockers; there is no real pathfinding or end-to-end on-screen walk assertion in this Node run.
 - `museum` and `farlands` are real separate scene records. Woods and mountains in the expanded city are **obstacles and paths**, not independent persisted `forest` / `mountains` scene IDs. Do not equate the synthetic `city→forest→ruins` story graph with actual runtime world scenes.
@@ -39,7 +39,7 @@ Base: `feature/dementor-live-world-expansion-p0-2026-10-19`, **not** the synthet
 
 ## Next acceptance gate
 
-1. Add **durable request ledger** for tourist consumable commands and persistent transaction history beyond the 128-result replay cache; document intentional separate purchases.
+1. Promote the new **purchase receipt deduplication** from this QA branch only after reviewing receipt-retention limits, durable persistence and intentional separate purchases; store/archive old receipts without allowing accidental network replay.
 2. Create an integration branch merging tested world-expansion and Combat Alpha source compatibility (same CharacterId / scene / command route) only after verifying exact base SHAs; include adversarial two-player regressions.
 3. Test actual courier offer→accept→pickup→travel→deliver with authoritative stock and budget, not hand-populated `delivery` fixture flags.
 4. Browser / mobile device walkability acceptance: two crossings, path to museum and farlands, return portals and touch viewport; cover interrupted courier/combat sessions and reconnect.
@@ -47,3 +47,9 @@ Base: `feature/dementor-live-world-expansion-p0-2026-10-19`, **not** the synthet
 6. Only then add the multi-actor v0.9.1 story loop behind feature flags, with isolated test world and **zero writes to live user saves**.
 
 **Final status**: ✅ actual Node module-level world travel + kiosk regression. ❌ not a live, deployed, online multiplayer, browser or PvE runtime acceptance.
+
+## Newly closed failure case (QA only)
+
+- **R12:** delayed repeated souvenir purchase after 140 unrelated commands and in-memory restart cannot debit PAPER twice.
+- **R13:** delayed repeated shirt purchase after the character physically enters the museum still replays the original receipt, despite the kiosk no longer being in the active scene.
+- This patch does **not** create a physical merchandising stock system. It corrects an observable request-idempotency gap in the actual P0 runtime source, separate from v0.9.1's synthetic economy.
