@@ -9,10 +9,6 @@ on:
       - 'projects/dementor-live/runtime/world.mjs'
       - 'projects/dementor-live/runtime/public/**'
       - 'projects/dementor-live/runtime/test/combat-http.test.mjs'
-      - 'projects/dementor-live/runtime/server.mjs'
-      - 'projects/dementor-live/runtime/world.mjs'
-      - 'projects/dementor-live/runtime/public/**'
-      - 'projects/dementor-live/runtime/test/combat-http.test.mjs'
       - 'projects/dementor-live/runtime/test/combat-p0.test.mjs'
       - 'projects/dementor-live/combat/**'
       - '.github/workflows/dementor-live-combat-p0.yml'
@@ -40,6 +36,7 @@ jobs:
           node --check projects/dementor-live/runtime/test/combat-http.test.mjs
           node --check projects/dementor-live/runtime/server.mjs
           node --check projects/dementor-live/runtime/public/combat.js
+          node --check projects/dementor-live/runtime/test/combat-browser.cjs
       - name: Isolated P0 model invariants (NOT gameplay acceptance)
         run: node --test projects/dementor-live/runtime/test/combat-p0.test.mjs
       - name: Two player isolated HTTP and true server restart
@@ -48,3 +45,21 @@ jobs:
       - name: Existing city model regression (no live save)
         working-directory: projects/dementor-live/runtime
         run: npm test
+
+  combat-browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install isolated browser QA dependencies (not game runtime)
+        working-directory: projects/dementor-live/runtime
+        run: npm install --no-save --no-package-lock playwright@1.56.1
+      - name: Install Chromium for browser QA
+        working-directory: projects/dementor-live/runtime
+        run: npx playwright install --with-deps chromium
+      - name: Two independent browser clients including mobile
+        working-directory: projects/dementor-live/runtime
+        run: node test/combat-browser.cjs
