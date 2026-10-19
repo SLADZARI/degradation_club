@@ -91,6 +91,7 @@ addEventListener('keydown',e=>{
  keys.add(e.code);if(e.repeat)return;
  if(e.code==='KeyE')tryInteract();
  if(e.code==='KeyF')$('revive').click();
+ if(e.code==='KeyH')$('selfFeed').click();
  if(e.code==='KeyQ')$('melee').click();
  if(e.code==='Space')dash();
 });
