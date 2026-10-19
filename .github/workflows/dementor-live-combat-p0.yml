@@ -1,0 +1,33 @@
+name: Dementor Live Combat P0 (isolated model)
+on:
+  push:
+    branches:
+      - 'feature/dementor-live-combat-p0-*'
+    paths:
+      - 'projects/dementor-live/runtime/combat-p0.mjs'
+      - 'projects/dementor-live/runtime/test/combat-p0.test.mjs'
+      - 'projects/dementor-live/combat/**'
+      - '.github/workflows/dementor-live-combat-p0.yml'
+  pull_request:
+    paths:
+      - 'projects/dementor-live/runtime/combat-p0.mjs'
+      - 'projects/dementor-live/runtime/test/combat-p0.test.mjs'
+      - 'projects/dementor-live/combat/**'
+      - '.github/workflows/dementor-live-combat-p0.yml'
+permissions:
+  contents: read
+jobs:
+  combat-model:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Syntax checks
+        run: |
+          node --check projects/dementor-live/runtime/combat-p0.mjs
+          node --check projects/dementor-live/runtime/test/combat-p0.test.mjs
+      - name: Isolated P0 model invariants (NOT gameplay acceptance)
+        run: node --test projects/dementor-live/runtime/test/combat-p0.test.mjs
