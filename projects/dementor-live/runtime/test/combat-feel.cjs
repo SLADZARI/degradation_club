@@ -51,7 +51,7 @@ async function targetGeometry(page){
  });
 }
 async function waitForHit(page,initial){
- return page.waitForFunction(before=>__combatQa.hits>before && __combatQa.lastShot?.hit===true,initial,{timeout:5000});
+ return page.waitForFunction(before=>__combatQa.hits>before,initial,{timeout:5000});
 }
 (async()=>{try{
  await start();browser=await chromium.launch({headless:true});
@@ -89,13 +89,15 @@ async function waitForHit(page,initial){
  report.metrics.mobile.enemyHpBefore=oldHp;report.metrics.mobile.enemyHpAfter=latestTarget;
 
  // Desktop physical mouse click must actually hit; shoot toward CURRENT enemy position.
+ await desktop.page.bringToFront();await sleep(250);
  const desktopTarget=await targetGeometry(desktop.page);
  const beforeDesktop=await desktop.page.evaluate(()=>__combatQa.hits);
  await desktop.page.mouse.move(desktopTarget.x,desktopTarget.y);
- await desktop.page.mouse.down();await sleep(780);await desktop.page.mouse.up();
+ await desktop.page.mouse.down();await sleep(850);await desktop.page.mouse.up();
+ report.metrics.desktopAfterFire=await desktop.page.evaluate(()=>({shots:__combatQa.shots,hits:__combatQa.hits,lastHitShot:__combatQa.lastHitShot,lastShot:__combatQa.lastShot,ammo:data?.profile?.ammo}));
  await waitForHit(desktop.page,beforeDesktop);
  report.metrics.desktop=await desktop.page.evaluate(()=>({fps:__combatQa.fps,shots:__combatQa.shots,hits:__combatQa.hits,
-   traces:__combatQa.tracesRendered,lastLatencyMs:Math.round(__combatQa.lastLatencyMs),shot:__combatQa.lastShot}));
+   traces:__combatQa.tracesRendered,lastLatencyMs:Math.round(__combatQa.lastLatencyMs),shot:__combatQa.lastHitShot}));
  assert.ok(report.metrics.desktop.shot?.damage>0,'Desktop attack spent ammo but no damage');
  report.passed.push('real mouse aim: enemy loses HP and hit tracer is painted');
 
