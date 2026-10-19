@@ -226,7 +226,7 @@ function postWeeklyEvents(s){
     const venues=['square',...s.projects.filter(v=>['communityHall','readingRoom'].includes(v))];
     for(let i=0;i<Math.min(willing.length,venues.length);i++)
       openSponsoredSession(s,{eventId:'sponsor:'+venues[i]+':'+period,
-        facility:venues[i],sponsorId:willing[i].id,expiresIn:SETTINGS.orderTtlDays});
+        facility:venues[i],sponsorId:willing[i].id,actorId:willing[i].id,accepted:true,expiresIn:SETTINGS.orderTtlDays});
     s.serviceRequestsUnserved+=Math.max(0,willing.length-venues.length);
     s.serviceRequestsRejected+=Math.max(0,s.players.filter(p=>isActive(s,p)).length-willing.length);
     return;
