@@ -64,6 +64,9 @@ function updateContext(){if(!me)return;const near=allTargets().map(t=>({...t,d:M
   let target=near.find(t=>t.id===selected)||((!me.tools.axe&&!me.tools.pick&&!me.spirit)?near.find(t=>t.type==='tools'):null)||near[0];context=target?{...target,...interaction(target)}:null;
   $('actionTitle').textContent=context?context.title:me.spirit?'Найди куст с едой':'Исследуй поле';$('actionHint').textContent=context?context.hint:me.spirit?'Ходи к ягодам · E вернёт тело':'WASD или нажми на землю · Shift — бежать';$('actionIcon').textContent=context?(icon[context.type]||icon[target.type]||'↗'):'↗';
   $('actionButton').disabled=!context?.enabled||!!me.job||!connected;$('actionButton').querySelector('span').textContent=me.job?'Работаем':context?.type==='buy'?'Купить':context?.type==='give'?'Угостить':'Действие';
+  if($('mobileActionButton')){const b=$('mobileActionButton');b.textContent=context?.enabled?(context.type==='combat'?'⚔ ВОЙТИ':context.type==='give'?'УГОСТИТЬ':context.type==='pickup'?'ПОДОБРАТЬ':'ДЕЙСТВИЕ'):'ДЕЙСТВИЕ';b.setAttribute('aria-label',context?.enabled?context.title:'Подойди к объекту для действия');}
+  if($('mobileCombatButton')){const gateNear=state.scene==='city'&&Math.hypot(me.x-29,me.y-35)<=state.config.actionRange;
+    $('mobileCombatButton').textContent=gateNear?'⚔ В БОЙ':'⚔ К БОЮ';}
 }
 function updateUI(){if(!me)return;renderQuick();
   const c=currentConfig(),p=currentProject(),totalWorks=c.stages.reduce((n,s)=>n+s.works,0),doneWorks=c.stages.slice(0,p.stage).reduce((n,s)=>n+s.works,0)+p.work;
@@ -163,7 +166,58 @@ window.addEventListener('keydown',e=>{
   if(e.code==='KeyE'){holdAction=true;doContext();}if(e.repeat)return;if(/^Digit[1-6]$/.test(e.code))selectQuick(Number(e.code.slice(-1))-1);if(e.code==='KeyQ')placeQuick();if(e.code==='KeyF')act(me.bag.food?'eat':'eatCarrot');if(e.code==='Enter'){$('chatInput').focus();keys.clear();}if(e.code==='Escape'){document.querySelectorAll('dialog[open]').forEach(d=>d.close());route=[];selected=null;act('cancel');}
 });
 window.addEventListener('keyup',e=>{keys.delete(e.code);if(e.code==='KeyE')holdAction=false;});window.addEventListener('blur',()=>{keys.clear();holdAction=false;touchMove=null;route=[];if(token)api('input',{dx:0,dy:0}).catch(()=>{});});
-document.querySelectorAll('[data-move]').forEach(b=>{b.addEventListener('pointerdown',e=>{b.setPointerCapture(e.pointerId);touchMove=b.dataset.move.split(',').map(Number);route=[];});b.addEventListener('pointerup',()=>touchMove=null);b.addEventListener('pointercancel',()=>touchMove=null);b.addEventListener('lostpointercapture',()=>touchMove=null);});
+// Mobile city input: one analog pad left, no directional arrow buttons.
+const cityPad=$('cityMovePad'),cityThumb=$('cityMoveThumb');
+let cityPointerId=null;
+function updateCityStick(e){
+  const r=cityPad.getBoundingClientRect(),radius=r.width*.31;
+  const x=(e.clientX-(r.left+r.width/2))/radius,y=(e.clientY-(r.top+r.height/2))/radius;
+  const distance=Math.hypot(x,y),length=Math.max(1,distance);
+  const sx=x/length,sy=y/length,dead=.13;
+  cityThumb.style.transform='translate('+Math.round(sx*radius)+'px,'+Math.round(sy*radius)+'px)';
+  touchMove=distance>dead?[sx,sy]:null;route=[];selected=null;
+}
+cityPad.addEventListener('pointerdown',e=>{
+  if(cityPointerId!==null)return;
+  cityPointerId=e.pointerId;
+  try{cityPad.setPointerCapture(e.pointerId);}catch{}
+  updateCityStick(e);e.preventDefault();
+});
+cityPad.addEventListener('pointermove',e=>{if(cityPointerId===e.pointerId){updateCityStick(e);e.preventDefault();}});
+function releaseCityStick(e){if(cityPointerId!==e.pointerId)return;cityPointerId=null;touchMove=null;cityThumb.style.transform='';}
+for(const event of ['pointerup','pointercancel','lostpointercapture'])cityPad.addEventListener(event,releaseCityStick);
+$('mobileActionButton').addEventListener('click',()=>{
+  if(!me||!connected){toast('Нет связи с городом');return;}
+  if(!context?.enabled){toast('Подойди к объекту или нажми «К БОЮ»');return;}
+  doContext();
+});
+$('mobileCombatButton').addEventListener('click',()=>{
+  if(!me||!connected){toast('Нет связи с городом');return;}
+  if(state.scene!=='city'){toast('Сначала вернись в город');return;}
+  if(me.spirit||me.job||me.delivery?.picked){toast('Заверши городское задание перед боем');return;}
+  const gate=allTargets().find(t=>t.id==='combat-gate');
+  if(!gate){toast('В этом городе пока нет боевой зоны');return;}
+  selected=gate.id;
+  if(Math.hypot(me.x-gate.x,me.y-gate.y)<=state.config.actionRange){
+    updateContext();if(context?.type==='combat'&&context.enabled)doContext();
+    else toast('Не удалось войти в боевую зону');
+    return;
+  }
+  let paths=[];
+  for(const [x,y] of [[0,1.4],[-1.4,0],[1.4,0],[0,-1.4]]){
+    const candidate=findPath({x:gate.x+x,y:gate.y+y});if(candidate)paths.push(candidate);
+  }
+  paths.sort((a,b)=>pathDistance(a)-pathDistance(b));
+  if(!paths.length){toast('Путь к боевой зоне заблокирован');return;}
+  setRoute(paths[0]);toast('Идём к боевой зоне. Когда подойдёшь — нажми «В БОЙ».');
+});
+$('mobileEatButton').addEventListener('click',()=>{if(me)act(me.bag.food?'eat':'eatCarrot');});
+const standalone=matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
+if(('ontouchstart' in window||navigator.maxTouchPoints>0)&&!standalone&&!sessionStorage.getItem('dementor-standalone-tip')){
+  setTimeout(()=>{if($('standaloneTip'))$('standaloneTip').hidden=false;},3000);
+}
+$('standaloneDismiss').onclick=()=>{$('standaloneTip').hidden=true;sessionStorage.setItem('dementor-standalone-tip','1');};
+window.__cityMobileInput=()=>({active:cityPointerId!==null,movement:touchMove,selected,nearCombat:!!(me&&Math.hypot(me.x-29,me.y-35)<=state?.config?.actionRange)});
 setInterval(()=>{if(!connected||!me)return;let dx=0,dy=0;if(!$('welcome').open&&!['INPUT','TEXTAREA','SELECT'].includes(document.activeElement?.tagName)){
   dx=Number(keys.has('KeyD')||keys.has('ArrowRight'))-Number(keys.has('KeyA')||keys.has('ArrowLeft'));dy=Number(keys.has('KeyS')||keys.has('ArrowDown'))-Number(keys.has('KeyW')||keys.has('ArrowUp'));if(touchMove)[dx,dy]=touchMove;
   if(!dx&&!dy&&route.length){
