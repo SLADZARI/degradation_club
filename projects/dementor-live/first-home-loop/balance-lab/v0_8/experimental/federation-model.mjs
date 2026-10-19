@@ -84,7 +84,7 @@ function foodForResidents(world,city){
 function farm(world,city){
  const worker=working(world,city);
  if(!worker)return;
- for(const bed of city.plots){
+ for(const [plotIndex,bed] of city.plots.entries()){
    if(bed.ready>0&&bed.ready<=world.day){
      if(carrotCount(city)+RULES.harvestCarrot<=city.storageCapacity&&city.treasury>=RULES.carrotWage){
        must(payWorker(world,city,worker,RULES.carrotWage),'CARROT wages not paid');
@@ -102,7 +102,10 @@ function farm(world,city){
      if(city.stock.SEED_CARROT>0&&city.stock.WATER>=RULES.cropWater){
        city.stock.SEED_CARROT--;world.consumed.SEED_CARROT++;
        city.stock.WATER-=RULES.cropWater;world.consumed.WATER+=RULES.cropWater;
-       bed.ready=world.day+RULES.carrotGrowDays;
+       // Each plot has its own crop schedule: stagger FIRST sowing across days.
+       // After harvest, a plot keeps its 3-day cycle; no additional CARROT is minted.
+       bed.ready=world.day+RULES.carrotGrowDays+(bed.plantedOnce?0:plotIndex%RULES.carrotGrowDays);
+       bed.plantedOnce=true;
      }else if(city.stock.WATER<RULES.cropWater)city.waterShortage++;
    }
  }
