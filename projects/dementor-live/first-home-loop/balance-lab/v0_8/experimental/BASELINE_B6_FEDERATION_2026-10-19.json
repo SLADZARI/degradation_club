@@ -1,0 +1,174 @@
+{
+  "schema": "WORLD_ORGANISM_FEDERATION_BASELINE/B6",
+  "status": "EXPERIMENTAL_NOT_ORIGINAL_V08_NOT_SERVER",
+  "workflow": 39275768229,
+  "sha": "bbdf431784d9f8cc15adfaa353db310e8ff58530",
+  "tests": {
+    "historicalContract": 22,
+    "priorB5Experimental": 374,
+    "federation": 180,
+    "passed": 576,
+    "scenarios": 162
+  },
+  "anchors": [
+    {
+      "agents": 20,
+      "cities": 3,
+      "environment": "normal",
+      "days": 360,
+      "local": {
+        "treasury": 3367,
+        "buildings": 2,
+        "unservedFood": 5897,
+        "services": 136,
+        "deliveries": 0
+      },
+      "trade": {
+        "treasury": 3541,
+        "buildings": 9,
+        "unservedFood": 5686,
+        "services": 154,
+        "deliveries": 27
+      },
+      "effect": {
+        "extraBuildings": 7,
+        "avoidedHunger": 211,
+        "freightTrades": 27
+      }
+    },
+    {
+      "agents": 20,
+      "cities": 3,
+      "environment": "dry",
+      "days": 360,
+      "local": {
+        "treasury": 3309,
+        "buildings": 2,
+        "unservedFood": 6158,
+        "services": 9,
+        "deliveries": 0
+      },
+      "trade": {
+        "treasury": 3466,
+        "buildings": 10,
+        "unservedFood": 5701,
+        "services": 152,
+        "deliveries": 39
+      },
+      "effect": {
+        "extraBuildings": 8,
+        "avoidedHunger": 457,
+        "freightTrades": 39
+      }
+    },
+    {
+      "agents": 20,
+      "cities": 3,
+      "environment": "wet",
+      "days": 360,
+      "local": {
+        "treasury": 3367,
+        "buildings": 2,
+        "unservedFood": 5897,
+        "services": 136,
+        "deliveries": 0
+      },
+      "trade": {
+        "treasury": 3541,
+        "buildings": 9,
+        "unservedFood": 5686,
+        "services": 154,
+        "deliveries": 27
+      },
+      "effect": {
+        "extraBuildings": 7,
+        "avoidedHunger": 211,
+        "freightTrades": 27
+      }
+    }
+  ],
+  "citySample": [
+    {
+      "id": "city-1",
+      "population": 7,
+      "treasury": 1059,
+      "rawWOOD": 0,
+      "rawSTONE": 0,
+      "water": 1062,
+      "carrot": 19,
+      "paperSheet": 3,
+      "founded": false,
+      "buildings": [
+        "garden",
+        "coldStore",
+        "marketHall"
+      ],
+      "unmetFood": 2002,
+      "services": 50,
+      "feesAndSales": 850,
+      "unservedRequests": 36,
+      "spoilage": 1193,
+      "missingWater": 0,
+      "blockedCargo": 0,
+      "blockedStorage": 78,
+      "cargoImports": 17
+    },
+    {
+      "id": "city-2",
+      "population": 7,
+      "treasury": 1328,
+      "rawWOOD": 15,
+      "rawSTONE": 0,
+      "water": 1056,
+      "carrot": 19,
+      "paperSheet": 3,
+      "founded": false,
+      "buildings": [
+        "garden",
+        "marketHall",
+        "coldStore"
+      ],
+      "unmetFood": 2009,
+      "services": 53,
+      "feesAndSales": 901,
+      "unservedRequests": 33,
+      "spoilage": 1201,
+      "missingWater": 0,
+      "blockedCargo": 0,
+      "blockedStorage": 78,
+      "cargoImports": 3
+    },
+    {
+      "id": "city-3",
+      "population": 6,
+      "treasury": 1154,
+      "rawWOOD": 0,
+      "rawSTONE": 22,
+      "water": 1050,
+      "carrot": 19,
+      "paperSheet": 3,
+      "founded": false,
+      "buildings": [
+        "garden",
+        "coldStore",
+        "marketHall"
+      ],
+      "unmetFood": 1675,
+      "services": 51,
+      "feesAndSales": 867,
+      "unservedRequests": 25,
+      "spoilage": 1229,
+      "missingWater": 0,
+      "blockedCargo": 0,
+      "blockedStorage": 79,
+      "cargoImports": 7
+    }
+  ],
+  "assetsConserved": true,
+  "risks": [
+    "Food starvation in many scenarios despite food production and overflow, track crop timing and capacity",
+    "Rainwater grows without upper reservoir bound even when farms cannot use it",
+    "3-city resource distribution leaves dependent towns with no build materials, trade helps but not enough",
+    "This autonomous lab does not represent live city/player balances"
+  ]
+}
