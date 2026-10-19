@@ -3,7 +3,7 @@ import os from 'node:os';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { Game, createWorld } from './world.mjs';
+import { Game, createWorld } from './world-expansion-adapter.mjs';
 import {CityNetwork} from './city-network.mjs';
 import {scanMusic,audioDuration,PLAZA} from './plaza.mjs';
 import {createHash} from 'node:crypto';
