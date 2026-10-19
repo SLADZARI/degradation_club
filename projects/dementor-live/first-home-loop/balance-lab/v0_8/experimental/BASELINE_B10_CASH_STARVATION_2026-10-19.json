@@ -1,0 +1,104 @@
+{
+  "status": "LAB_DIAGNOSED_POLICY_FAILURE",
+  "workflow": 39277467207,
+  "sha": "f5ff6d2927318898a54fa16965f5cd18d52e3248",
+  "checksPass": 582,
+  "cityRows": [
+    {
+      "id": "city-1",
+      "population": 7,
+      "treasury": 823,
+      "rawWOOD": 0,
+      "rawSTONE": 10,
+      "water": 96,
+      "carrot": 11,
+      "paperSheet": 3,
+      "founded": false,
+      "buildings": [
+        "garden",
+        "marketHall",
+        "fieldEast"
+      ],
+      "unmetFood": 2005,
+      "unmetNoCash": 1895,
+      "unmetNoFood": 110,
+      "services": 51,
+      "feesAndSales": 867,
+      "unservedRequests": 34,
+      "spoilage": 1507,
+      "missingWater": 0,
+      "blockedCargo": 0,
+      "blockedStorage": 460,
+      "exportable": {
+        "WOOD": 0,
+        "STONE": 0
+      },
+      "cargoImports": 12
+    },
+    {
+      "id": "city-2",
+      "population": 7,
+      "treasury": 1102,
+      "rawWOOD": 6,
+      "rawSTONE": 10,
+      "water": 96,
+      "carrot": 11,
+      "paperSheet": 3,
+      "founded": false,
+      "buildings": [
+        "garden",
+        "marketHall",
+        "fieldEast"
+      ],
+      "unmetFood": 1997,
+      "unmetNoCash": 1902,
+      "unmetNoFood": 95,
+      "services": 49,
+      "feesAndSales": 833,
+      "unservedRequests": 34,
+      "spoilage": 1509,
+      "missingWater": 0,
+      "blockedCargo": 0,
+      "blockedStorage": 464,
+      "exportable": {
+        "WOOD": 6,
+        "STONE": 0
+      },
+      "cargoImports": 4
+    },
+    {
+      "id": "city-3",
+      "population": 6,
+      "treasury": 944,
+      "rawWOOD": 15,
+      "rawSTONE": 14,
+      "water": 96,
+      "carrot": 11,
+      "paperSheet": 3,
+      "founded": false,
+      "buildings": [
+        "garden",
+        "marketHall",
+        "fieldEast"
+      ],
+      "unmetFood": 1673,
+      "unmetNoCash": 1614,
+      "unmetNoFood": 59,
+      "services": 51,
+      "feesAndSales": 867,
+      "unservedRequests": 23,
+      "spoilage": 1543,
+      "missingWater": 0,
+      "blockedCargo": 0,
+      "blockedStorage": 466,
+      "exportable": {
+        "WOOD": 0,
+        "STONE": 14
+      },
+      "cargoImports": 7
+    }
+  ],
+  "noCash": 5411,
+  "noFood": 264,
+  "notes": "Cash scarcity accounts for most observed meals missed. All work wages went to first active resident; 3 PAPER paid for 4 carrots sold at 3 each."
+}
