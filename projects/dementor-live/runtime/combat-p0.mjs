@@ -1,0 +1,207 @@
+// COMBAT-01 P0 — isolated authoritative gameplay model.
+// NOT wired to public HTTP routes or the production save. Uses existing player IDs.
+import { randomUUID, randomInt } from 'node:crypto';
+
+export const COMBAT_P0 = Object.freeze({
+  maxPlayers: 2, maxHp: 100, downedMs: 30_000, feedMs: 2_000,
+  reviveProtectionMs: 3_000, dashCooldownMs: 2_000, dashDistance: 1.6,
+  shotCooldownMs: 320, shotRange: 9, enemyAttackMs: 1_500,
+  worldSize: 16, moveSpeed: 2.9, lootPerStage: 3, stages: 3,
+});
+const WALLS = Object.freeze([{x:6,y:4,w:2,h:5},{x:4,y:11,w:4,h:1}]);
+const ENCOUNTERS = [
+  [{type:'CHASER',x:11,y:2,hp:24}],
+  [{type:'CHASER',x:12,y:4,hp:24},{type:'RANGED',x:12,y:11,hp:20}],
+  [{type:'GUARD',x:13,y:13,hp:45}],
+];
+const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
+const hypot=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
+const finite=n=>typeof n==='number'&&Number.isFinite(n);
+const clampToWorld=n=>clamp(n,.45,COMBAT_P0.worldSize-.45);
+const intersectRect=(ax,ay,bx,by,r)=>{
+  let lo=0,hi=1;for(const [a,b,min,max] of [[ax,bx,r.x,r.x+r.w],[ay,by,r.y,r.y+r.h]]){
+    const d=b-a;if(Math.abs(d)<1e-8){if(a<min||a>max)return false;continue;}
+    const t1=(min-a)/d,t2=(max-a)/d;lo=Math.max(lo,Math.min(t1,t2));hi=Math.min(hi,Math.max(t1,t2));
+    if(lo>hi)return false;
+  }return true;
+};
+export const lineClear=(a,b)=>!WALLS.some(w=>intersectRect(a.x,a.y,b.x,b.y,w));
+export const walkable=(x,y)=>finite(x)&&finite(y)&&x>=.45&&y>=.45&&x<=15.55&&y<=15.55&&!WALLS.some(w=>x>w.x-.3&&x<w.x+w.w+.3&&y>w.y-.3&&y<w.y+w.h+.3);
+function moveBody(body,dx,dy,step){
+  const tx=clampToWorld(body.x+dx*step),ty=clampToWorld(body.y+dy*step);
+  if(walkable(tx,body.y))body.x=tx;
+  if(walkable(body.x,ty))body.y=ty;
+}
+function profile(p){
+  if(!p||!p.id)throw Error('Unknown character');
+  if(!p.combatP0){p.combatP0={weapon:{id:randomUUID(),kind:'starter-rifle',damage:9+randomInt(3),tier:1},ammo:24,receivedStarter:true};}
+  return p.combatP0;
+}
+export function combatRoot(world){
+  if(!world||typeof world!=='object')throw Error('World state required');
+  world.combatP0 ||= {sessions:{},firstWins:{}};
+  return world.combatP0;
+}
+function person(session,id){const p=session.members[id];if(!p)throw Error('Not a combat participant');return p;}
+function encounter(session){
+  session.enemies=ENCOUNTERS[session.stage-1].map((e,i)=>({...e,id:session.id+':s'+session.stage+':r'+session.attempt+':'+i,alive:true,lastAttack:session.lastTick}));
+}
+function awardLoot(session,e){
+  const key=String(session.stage);
+  if(session.issuedStages[key])return;
+  session.issuedStages[key]=true;
+  const id=session.id+':loot:'+key;
+  session.loot[id]={id,origin:e.id,kind:'ammo',quantity:COMBAT_P0.lootPerStage,x:e.x,y:e.y,claimedBy:null};
+}
+function newMember(id){return {id,x:2,y:2,hp:100,status:'ACTIVE',downedDeadline:0,invulnerableUntil:0,
+  aim:{x:1,y:0},input:{x:0,y:0},nextShotAt:0,nextDashAt:0,feed:null};}
+export function createCombat(world,players,ownerId,now=Date.now()){
+  if(!finite(now))throw Error('Server time required');
+  const p=players[ownerId];profile(p);const root=combatRoot(world);
+  if(Object.values(root.sessions).some(s=>s.status!=='CLOSED'&&ownerId in s.members))throw Error('Already in combat');
+  const id=randomUUID();root.sessions[id]={id,ownerId,status:'LOBBY',members:{[ownerId]:newMember(ownerId)},
+    stage:0,attempt:0,enemies:[],loot:{},issuedStages:{},lastTick:now,completedAt:null,commands:{}};
+  return id;
+}
+export function joinCombat(world,players,sessionId,playerId){
+  const s=combatRoot(world).sessions[sessionId];if(!s||s.status!=='LOBBY')throw Error('Combat is closed to joining');
+  if(playerId in s.members)return;
+  if(Object.keys(s.members).length>=COMBAT_P0.maxPlayers)throw Error('Squad is full');
+  if(Object.values(combatRoot(world).sessions).some(other=>other.status!=='CLOSED'&&playerId in other.members))throw Error('Already in combat');
+  profile(players[playerId]);s.members[playerId]=newMember(playerId);
+}
+function down(s,p,now){
+  if(p.status!=='ACTIVE'||now<p.invulnerableUntil)return;
+  p.hp=0;p.status='DOWNED';p.downedDeadline=now+COMBAT_P0.downedMs;p.input={x:0,y:0};p.feed=null;
+  for(const other of Object.values(s.members))if(other.feed?.target===p.id)other.feed=null;
+}
+function wipe(s,now){
+  s.attempt++;encounter(s);
+  for(const m of Object.values(s.members)){
+    m.status='ACTIVE';m.hp=100;m.downedDeadline=0;m.feed=null;m.x=2;m.y=2;
+    m.invulnerableUntil=now+COMBAT_P0.reviveProtectionMs;m.input={x:0,y:0};
+  }
+}
+function damage(s,p,hp,now){if(p.status!=='ACTIVE'||now<p.invulnerableUntil)return; p.feed=null;p.hp=Math.max(0,p.hp-hp);if(p.hp===0)down(s,p,now);}
+function advanceStage(s,now){
+  if(s.enemies.some(e=>e.alive))return;
+  if(s.stage<COMBAT_P0.stages){s.stage++;s.attempt=0;encounter(s);}
+  else{s.status='EXTRACT_READY';s.completedAt=now;}
+}
+export function advanceCombat(world,sessionId,now){
+  const s=combatRoot(world).sessions[sessionId];if(!s)throw Error('Combat missing');
+  if(!finite(now)||now<s.lastTick)throw Error('Nonmonotonic server clock');
+  const dt=Math.min((now-s.lastTick)/1000,.25);s.lastTick=now;
+  if(s.status!=='ACTIVE')return;
+  for(const m of Object.values(s.members)){
+    if(m.status==='DOWNED'){
+      if(now>=m.downedDeadline){m.status='RESPAWN_PENDING';m.feed=null;}
+      continue;
+    }
+    if(m.status!=='ACTIVE')continue;
+    const oldX=m.x,oldY=m.y;
+    moveBody(m,m.input.x,m.input.y,COMBAT_P0.moveSpeed*dt);
+    if(hypot(m,{x:oldX,y:oldY})>.025)m.feed=null;
+    if(m.feed){
+      const t=s.members[m.feed.target];
+      if(!t||t.status!=='DOWNED'||hypot(m,t)>1.25||now>t.downedDeadline){m.feed=null;continue;}
+      if(now>=m.feed.completeAt){
+        const giver=m.feed.owner,food=world.players?.[giver]?.bag?.food;
+        if(finite(food)&&food>=1){world.players[giver].bag.food--;t.hp=40;t.status='ACTIVE';t.downedDeadline=0;t.invulnerableUntil=now+COMBAT_P0.reviveProtectionMs;}
+        m.feed=null;
+      }
+    }
+  }
+  for(const e of s.enemies.filter(x=>x.alive)){
+    const active=Object.values(s.members).filter(m=>m.status==='ACTIVE');if(!active.length)break;
+    const target=active.reduce((a,b)=>hypot(e,a)<hypot(e,b)?a:b);
+    if(e.type!=='GUARD'){
+      const dist=hypot(e,target),desired=e.type==='RANGED'?4:1.1;
+      if(dist>desired){const dx=(target.x-e.x)/dist,dy=(target.y-e.y)/dist;moveBody(e,dx,dy,(e.type==='CHASER'?1.25:.8)*dt);}
+    }
+    const range=e.type==='RANGED'?7:e.type==='GUARD'?2.6:1.35;
+    if(now-e.lastAttack>=COMBAT_P0.enemyAttackMs&&hypot(e,target)<=range&&lineClear(e,target)){
+      e.lastAttack=now;damage(s,target,e.type==='GUARD'?24:12,now);
+    }
+  }
+  if(Object.values(s.members).every(m=>m.status!=='ACTIVE'))wipe(s,now);
+}
+function command(s,world,players,actorId,cmd,now){
+  const actor=person(s,actorId);if(!finite(now))throw Error('Server time required');
+  if(cmd.type==='start'){
+    if(s.status!=='LOBBY'||actorId!==s.ownerId)throw Error('Cannot start');
+    s.status='ACTIVE';s.stage=1;s.attempt=0;s.lastTick=now;encounter(s);return {stage:1};
+  }
+  if(cmd.type==='extract'){
+    if(s.status!=='EXTRACT_READY'||actor.status!=='ACTIVE')throw Error('Objectives incomplete');
+    s.status='CLOSED';s.completedAt=now;combatRoot(world).firstWins[s.ownerId] ||= now;
+    return {completed:true,firstWinAt:combatRoot(world).firstWins[s.ownerId]};
+  }
+  if(s.status!=='ACTIVE'||actor.status!=='ACTIVE')throw Error('Actor is not active');
+  if(cmd.type==='input'){
+    if(!finite(cmd.dx)||!finite(cmd.dy))throw Error('Invalid movement');
+    const d=Math.hypot(cmd.dx,cmd.dy);actor.input={x:d?cmd.dx/Math.max(1,d):0,y:d?cmd.dy/Math.max(1,d):0};
+    if(d>.01)actor.feed=null;
+    return {accepted:true};
+  }
+  if(cmd.type==='dash'){
+    if(now<actor.nextDashAt)throw Error('Dash cooling down');
+    if(!finite(cmd.dx)||!finite(cmd.dy)||Math.hypot(cmd.dx,cmd.dy)<.01)throw Error('Invalid dash');
+    const d=Math.hypot(cmd.dx,cmd.dy);let count=0;
+    for(let i=0;i<8;i++){const x=actor.x+cmd.dx/d*COMBAT_P0.dashDistance/8,y=actor.y+cmd.dy/d*COMBAT_P0.dashDistance/8;
+      if(!walkable(x,y))break;actor.x=x;actor.y=y;count++;
+    }
+    actor.nextDashAt=now+COMBAT_P0.dashCooldownMs;actor.feed=null;
+    return {dashSteps:count};
+  }
+  if(cmd.type==='fire'){
+    if(now<actor.nextShotAt)throw Error('Shot cooling down');
+    const prof=profile(players[actorId]);if(!Number.isSafeInteger(prof.ammo)||prof.ammo<1)throw Error('Out of ammo');
+    if(!finite(cmd.dx)||!finite(cmd.dy)||Math.hypot(cmd.dx,cmd.dy)<.001)throw Error('Invalid aim');
+    const d=Math.hypot(cmd.dx,cmd.dy),aim={x:cmd.dx/d,y:cmd.dy/d};
+    actor.aim=aim;actor.nextShotAt=now+COMBAT_P0.shotCooldownMs;actor.feed=null;prof.ammo--;
+    const hits=s.enemies.filter(e=>e.alive).map(e=>({e,dot:(e.x-actor.x)*aim.x+(e.y-actor.y)*aim.y}))
+      .filter(h=>h.dot>=0&&h.dot<=COMBAT_P0.shotRange&&Math.hypot(h.e.x-actor.x-aim.x*h.dot,h.e.y-actor.y-aim.y*h.dot)<.44)
+      .sort((a,b)=>a.dot-b.dot);
+    const nearest=hits.find(h=>lineClear(actor,h.e));
+    if(!nearest)return {hit:false,ammo:prof.ammo};
+    nearest.e.hp-=prof.weapon.damage;
+    if(nearest.e.hp<=0){nearest.e.alive=false;awardLoot(s,nearest.e);advanceStage(s,now);}
+    return {hit:true,enemyId:nearest.e.id,ammo:prof.ammo};
+  }
+  if(cmd.type==='melee'){
+    if(!finite(cmd.dx)||!finite(cmd.dy))throw Error('Invalid melee');
+    if(now<(actor.nextMeleeAt||0))throw Error('Melee cooling down');
+    actor.nextMeleeAt=now+800;actor.feed=null;
+    const enemy=s.enemies.find(e=>e.alive&&hypot(actor,e)<1.35&&lineClear(actor,e));
+    if(enemy){enemy.hp-=4;if(enemy.type!=='GUARD'){const d=hypot(actor,enemy)||1;moveBody(enemy,(enemy.x-actor.x)/d,(enemy.y-actor.y)/d,.5);}
+      if(enemy.hp<=0){enemy.alive=false;awardLoot(s,enemy);advanceStage(s,now);}}
+    return {hit:!!enemy};
+  }
+  if(cmd.type==='feed'){
+    const target=person(s,cmd.target);if(target.id===actorId||target.status!=='DOWNED'||now>target.downedDeadline||hypot(actor,target)>1.25)throw Error('Cannot feed');
+    if((players[actorId]?.bag?.food||0)<1)throw Error('No food');
+    actor.input={x:0,y:0};actor.feed={target:target.id,completeAt:now+COMBAT_P0.feedMs,owner:actorId};
+    return {feedEndsAt:actor.feed.completeAt};
+  }
+  if(cmd.type==='pickup'){
+    const obj=s.loot[cmd.target];if(!obj||obj.claimedBy||hypot(actor,obj)>1.3)throw Error('Loot unavailable');
+    obj.claimedBy=actorId;profile(players[actorId]).ammo+=obj.quantity;
+    return {kind:obj.kind,quantity:obj.quantity};
+  }
+  throw Error('Unknown combat action');
+}
+export function combatAction(world,players,sessionId,actorId,cmd,now=Date.now()){
+  const s=combatRoot(world).sessions[sessionId];if(!s)throw Error('Combat missing');
+  if(!cmd||typeof cmd.requestId!=='string'||cmd.requestId.length<4||cmd.requestId.length>100)throw Error('Invalid requestId');
+  person(s,actorId);
+  const key=actorId+':'+cmd.requestId;
+  if(s.commands[key])return s.commands[key];
+  const result=command(s,world,players,actorId,cmd,now);
+  s.commands[key]={ok:true,...result};return s.commands[key];
+}
+export function combatView(world,sessionId,actorId){
+  const s=combatRoot(world).sessions[sessionId];if(!s)throw Error('Combat missing');person(s,actorId);
+  return {sessionId:s.id,status:s.status,stage:s.stage,attempt:s.attempt,members:s.members,enemies:s.enemies,loot:s.loot,
+    walls:WALLS};
+}
