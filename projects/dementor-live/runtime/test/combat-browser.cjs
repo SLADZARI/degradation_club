@@ -43,6 +43,11 @@ async function toCombat(p){
   assert.notEqual(a.id,b.id);
   await toCombat(a);await toCombat(b);
   assert.equal(await a.page.locator('#lobby').isVisible(),true);
+  // Reproduce HTTP LAN Safari: randomUUID is unavailable in insecure contexts.
+  await a.page.evaluate(()=>{
+    try{Object.defineProperty(window.crypto,'randomUUID',{value:undefined,configurable:true});}catch{}
+    if(typeof window.crypto?.randomUUID==='function')throw Error('Failed to emulate missing randomUUID');
+  });
   await a.page.locator('#create').click();
   await a.page.waitForFunction(()=>battle?.status==='LOBBY');
   await b.page.waitForFunction(()=>document.querySelector('#lobbies button')?.textContent.includes('Бой QA A'));
