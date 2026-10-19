@@ -298,3 +298,72 @@ test('F27 moving a city founder without authorization is blocked before any asse
  assert.equal(w.cities.length,n);
  checkFederation(w);
 });
+
+test('F28 consignment carrot batches retain owner identity and full material trace',()=>{
+ const w=federationRun({agents:20,cityCount:3,environment:'normal',logistics:'trade',foodMarket:'consignment',days:90});
+ assert.ok(w.grown.CARROT>0);
+ assert.ok(w.cities.every(c=>c.carrots.every(b=>!!playerById(w,b.ownerId)&&b.qty>0)));
+ assert.equal(w.moneyAtStart,3600);checkFederation(w);
+});
+test('F29 citizen food purchases pay grower-owned consignment instead of transferring PAPER to city as tax',()=>{
+ const w=federationRun({agents:20,cityCount:3,environment:'normal',logistics:'trade',foodMarket:'consignment',days:30});
+ const sumPayout=w.cities.reduce((n,c)=>n+c.consignmentPayout,0);
+ assert.ok(sumPayout>0,'there must be real paid physical consignments');
+ assert.ok(w.players.filter(p=>p.workIncome>0).length>=6);
+ assert.equal(federationBalances(w).PAPER,3600);
+ checkFederation(w);
+});
+test('F30 a bankrupt city still lets its workers collect physical consignment harvests',()=>{
+ const w=make({foodMarket:'consignment'});
+ const c=w.cities[0],old=c.treasury;
+ c.treasury=0;w.players[0].wallet+=old; // conserve overall PAPER in fixture
+ for(let i=0;i<7;i++)dayStep(w);
+ assert.ok(w.grown.CARROT>0,'prepaid treasury payroll must not be required for consignment production');
+ assert.equal(federationBalances(w).PAPER,3600);
+ checkFederation(w);
+});
+test('F31 consignment maintains origin owners after save/reload and cross-city travel',()=>{
+ const w=federationRun({agents:15,cityCount:3,environment:'normal',logistics:'trade',foodMarket:'consignment',days:20});
+ const clone=JSON.parse(JSON.stringify(w));checkFederation(clone);
+ const owner=clone.cities.flatMap(c=>c.carrots.map(b=>b.ownerId))[0];
+ if(owner)movePlayer(clone,{actorId:owner,to:clone.cities[2].id,eventId:'consignment-owner-moving'});
+ for(let i=0;i<40;i++)dayStep(clone);
+ checkFederation(clone);
+ assert.equal(federationMetrics(clone).economy.moneyTotal,3600);
+});
+test('F32 missing physical batch owner is rejected before recording a valid economy',()=>{
+ const w=federationRun({agents:10,cityCount:2,environment:'wet',logistics:'trade',foodMarket:'consignment',days:7});
+ const c=w.cities.find(c=>c.carrots.length>0);
+ assert.ok(c,'must have at least one physical grown CARROT batch');
+ c.carrots[0].ownerId='forged-unregistered-user';
+ assert.throws(()=>checkFederation(w),/consignment carrots have no registered owner/);
+});
+test('F33 city founding still never creates new PAPER under consignment',()=>{
+ const w=make({foodMarket:'consignment'});
+ const c=w.cities[1],p=w.players.find(x=>x.cityId===c.id);
+ const original=federationBalances(w);
+ foundCity(w,{id:'seedling',parentId:c.id,actorId:p.id,
+   eventId:'seedling-city-consignment',accepted:true,funding:100,wood:5,stone:4,seedCarrot:2,seedHemp:1});
+ assert.deepEqual(federationBalances(w),original);
+ for(let i=0;i<50;i++)dayStep(w);
+ checkFederation(w);
+});
+for(const agents of [10,15,20])
+ for(const cityCount of [2,3,4])
+  for(const environment of ['normal','dry','wet'])
+   for(const logistics of ['local','trade'])
+    for(const days of [60,180,360]){
+     test('CONSIGNMENT '+agents+' agents / '+cityCount+' cities / '+environment+
+       ' / '+logistics+' / +'+days+' days',()=>{
+       const s=federationRun({agents,cityCount,environment,logistics,days,
+         foodMarket:'consignment'});
+       const m=federationMetrics(s);
+       assert.equal(m.economy.moneyTotal,3600);
+       assert.equal(m.food.noCash+m.food.noFood,m.food.unmet);
+       assert.equal(m.food.needs,m.food.eaten+m.food.unmet);
+       assert.equal(m.minerals.WOOD_INITIAL,m.minerals.WOOD_STOCK+m.minerals.WOOD_IN_BUILDINGS);
+       assert.equal(m.minerals.STONE_INITIAL,m.minerals.STONE_STOCK+m.minerals.STONE_IN_BUILDINGS);
+       assert.ok(m.economy.cityBuildings<=FEDERATION_PROJECTS.length*cityCount);
+       checkFederation(s);
+     });
+    }
