@@ -1,0 +1,42 @@
+name: Dementor Live World P0 clean release candidate
+on:
+  push:
+    branches:
+      - 'release/dementor-live-world-p0-clean-*'
+    paths:
+      - 'projects/dementor-live/runtime/**'
+      - '.github/workflows/dementor-live-world-p0-release.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  clean-release:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    defaults:
+      run:
+        working-directory: projects/dementor-live/runtime
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check rollout script syntax and version
+        run: |
+          bash -n deploy/publish-clean-world.sh
+          node -e "if(require('./package.json').version!=='0.4.0-world-p0')process.exit(1)"
+      - name: Model/syntax/QA checks
+        run: npm run check
+      - name: Two-player HTTP/SSE test on disposable world
+        run: npm run test:integration
+      - name: Durable materials and restart on disposable world
+        run: npm run test:persistence
+      - name: Create standalone game ZIP, excluding existing saves
+        run: npm run pack
+      - name: Upload clean server candidate
+        uses: actions/upload-artifact@v4
+        with:
+          name: dementor-live-world-p0-clean-server
+          path: projects/dementor-live/dementor-live-workspace.zip
+          if-no-files-found: error
+          retention-days: 14
