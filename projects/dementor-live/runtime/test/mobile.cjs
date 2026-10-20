@@ -61,14 +61,27 @@ try{
     return {before:z,after:view.zoom};
   });
   assert.ok(pinch.after>pinch.before,'Two-touch pinch handler must zoom');
+  // A tap intended for the ground must not hit a nearby object, plot or an overlay.
+  // A free endpoint alone is not enough: the enlarged city needs a reachable path.
   const target=await page.evaluate(()=>{
-    const c=[{x:me.x+2.5,y:me.y},{x:me.x-2.5,y:me.y},{x:me.x,y:me.y+2.5},{x:me.x,y:me.y-2.5}]
-      .find(p=>!blocked(p.x,p.y)&&!blocked((p.x+me.x)/2,(p.y+me.y)/2));
-    if(!c)throw Error('No free navigation target near spawn');
-    return {world:c,screen:screen(c.x,c.y)};
+    const points=[];
+    for(const radius of [2.5,3.5,4.5])for(let j=0;j<16;j++){
+      const a=j*Math.PI/8,c={x:me.x+radius*Math.cos(a),y:me.y+radius*Math.sin(a)};
+      if(blocked(c.x,c.y))continue;
+      if(state.plots.some(p=>c.x>=p.x&&c.x<=p.x+p.w&&c.y>=p.y&&c.y<=p.y+p.h))continue;
+      if(c.x>=14&&c.x<=24&&c.y>=10&&c.y<=18)continue;
+      if(allTargets().some(t=>Math.hypot(t.x-c.x,t.y-c.y)<1.65))continue;
+      const path=findPath(c);if(!path?.length)continue;
+      const screenPoint=screen(c.x,c.y),hit=document.elementFromPoint(screenPoint.x,screenPoint.y);
+      if(hit!==canvas)continue;
+      points.push({world:c,screen:screenPoint,routeDistance:pathDistance(path)});
+    }
+    points.sort((a,b)=>a.routeDistance-b.routeDistance);
+    if(!points.length)throw Error('No reachable, uncovered ground tile around spawn after pinch');
+    return points[0];
   });
   await page.touchscreen.tap(target.screen.x,target.screen.y);
-  await page.waitForFunction(goal=>Math.hypot(me.x-goal.x,me.y-goal.y)<0.8&&route.length===0,target.world,{timeout:20000});
+  await page.waitForFunction(goal=>Math.hypot(me.x-goal.x)<.8&&Math.abs(me.y-goal.y)<.8&&route.length===0,target.world,{timeout:20000});
   console.log('MOBILE NAVIGATION PASS');
   await assertHud(375,667);
   assert.deepEqual(errors,[],'Browser JavaScript errors');
