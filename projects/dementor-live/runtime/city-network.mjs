@@ -38,7 +38,7 @@ export class CityNetwork{
     const existing=this.findId(p.id),g=existing?.g,target=this.games.get(destination);
     if(!g||!target)throw Error('Нет такого города');
     this.assertRegistry(p,g);
-    if(existing.cityId===destination)return {message:'Ты уже в этом городе'};
+    if(existing.cityId===destination)return {message:'Ты уже в этом городе',code:'world.city.alreadyHere',params:{}};
     const online=g.online.has(p.id);
     if(online)g.disconnect(p);
     delete g.state.players[p.id];g.changed();
@@ -47,7 +47,7 @@ export class CityNetwork{
     target.state.players[p.id]=p;
     if(online)target.connect(p);
     target.changed();this.directoryDirty=true;
-    return {message:'Добро пожаловать в '+(this.data.cities[destination]?.name||'Первый город')};
+    return {message:'Добро пожаловать в '+(this.data.cities[destination]?.name||'Первый город'),code:'world.city.arrived',params:{cityName:this.data.cities[destination]?.name||'Первый город'}};
   }
   createCity(p,name){
     const r=this.findId(p.id);if(!r)throw Error('Житель не найден');
@@ -60,7 +60,7 @@ export class CityNetwork{
     game.musicCatalog=this.catalog;
     this.data.cities[id]={name:title,founder:p.id,createdAt:Date.now(),state:game.state};
     this.games.set(id,game);this.directoryDirty=true;
-    return {id,message:'Город «'+title+'» основан. Другие жители могут прийти через реестр.'};
+    return {id,message:'Город «'+title+'» основан. Другие жители могут прийти через реестр.',code:'world.city.created',params:{cityName:title}};
   }
   command(p,cmd){
     if(!['createCity','travelCity','pagerBuy','pagerSend','pagerRead','pagerBlock','pagerList','pagerDial'].includes(cmd?.type))throw Error('Неизвестное действие реестра');
