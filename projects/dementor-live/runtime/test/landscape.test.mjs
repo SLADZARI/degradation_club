@@ -14,3 +14,18 @@ test('paving gives x1.2 walking speed; obstacles and distant edits rejected',()=
  assert.equal(c(g,p,'landscapePlace',null,{kind:'paving',x:40,y:20}).ok,false);
  p.x=17;p.y=4;assert.equal(c(g,p,'landscapePlace',null,{kind:'paving',x:17,y:2}).ok,false);
 });
+
+test('built structures relocate obstructed finite deposits without changing IDs, stock or ledgers',()=>{
+ const g=new Game(createWorld()),stockBefore=g.state.resources.filter(r=>r.type!=='food').reduce((n,r)=>n+r.stock,0);
+ g.state.forge.stage=g.c.forge.stages.length;g.state.gardenProject.stage=g.c.cityGarden.stages.length;
+ const before=g.state.resources.map(r=>({id:r.id,x:r.x,y:r.y,stock:r.stock}));
+ const restored=new Game(JSON.parse(JSON.stringify(g.state)));
+ const after=restored.state.resources;assert.equal(after.filter(r=>r.type!=='food').reduce((n,r)=>n+r.stock,0),stockBefore);
+ for(const r of after){assert.equal(r.stock,before.find(x=>x.id===r.id).stock);if(!['stone','wood'].includes(r.type)||r.stock<=0)continue;
+  const s=restored.rects().filter(v=>['forge','seed-shop','public-garden','warehouse','tool-shop'].includes(v.id));
+  assert.equal(s.some(v=>r.x+.95>v.x&&r.x-.95<v.x+v.w&&r.y+.95>v.y&&r.y-.95<v.y+v.h),false,'deposit clear: '+r.id);
+ }
+ assert.ok(restored.state.resourceRelocations?.length>0,'at least one previously obstructed node should relocate');
+ const again=new Game(JSON.parse(JSON.stringify(restored.state)));
+ assert.deepEqual(again.state.resources.map(r=>[r.id,r.x,r.y,r.stock]),restored.state.resources.map(r=>[r.id,r.x,r.y,r.stock]));
+});

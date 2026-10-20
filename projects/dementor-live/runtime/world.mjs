@@ -5,6 +5,7 @@ import { CONFIG } from './config.mjs';
 import {ITEMS,migrateLife,lifeAction,lifeSnapshot,scene} from './life.mjs';
 import {CITY_BUILDINGS,newConstruction,initialiseCityExpansion,cityExpansionAction,cityMaterialReport,recordMaterial} from './city-expansion.mjs';
 import {LANDSCAPE_SHOP,LANDSCAPE_PRODUCTS,ensureLandscape,landscapeSpeed,landscapeAction} from './landscape.mjs';
+import {reconcileResourceClearance} from './resource-clearance.mjs';
 
 const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
 const distance = (a,b) => Math.hypot(a.x-b.x,a.y-b.y);
@@ -25,7 +26,7 @@ export class Game {
     for(const [id,type,x,y,stock]of [['east-wood-1','wood',41,7,48],['east-wood-2','wood',44,10,48],['east-wood-3','wood',42,23,48],['east-wood-4','wood',45,26,48],['east-stone-1','stone',42,16,48],['east-stone-2','stone',45,20,48],['east-food','food',41,12,c.foodStock]])if(!state.resources.some(r=>r.id===id))state.resources.push({id,type,x,y,stock,initial:stock,regrowAt:0});
     state.warehouse ||= {stock:{wood:0,stone:0},municipal:{wood:0,stone:0},spent:0};
     state.drops ||= [];
-    migrateLife(this);initPlaza(this);initialiseCityExpansion(this);ensureLandscape(this);
+    migrateLife(this);initPlaza(this);initialiseCityExpansion(this);ensureLandscape(this);reconcileResourceClearance(this);
     for(const p of Object.values(state.players)){p.job=null;p.results=p.results||[];p.lastMessage=0;p.toolInfo ||= {axe:{tier:'basic',max:c.toolDurability},pick:{tier:'basic',max:c.toolDurability}};syncEquipment(p,c);}
   }
   changed(){this.state.revision++;this.dirty=true;this.onChange();}
@@ -215,7 +216,7 @@ export class Game {
       t.stock--;p.bag[t.type]++;p.tools[tool]--;recordMaterial(this,'mine',t.type,1,'deposit','bag',p.id);
     }else if(job.kind==='build'){
       if(p.spirit||job.stage!==this.projectFor(job.target).stage)return;this.canBuild(job.target);const project=this.projectFor(job.target),stage=this.configFor(job.target).stages[project.stage];this.transfer(p,this.c.pay.work,'work');project.spent+=this.c.pay.work;project.work++;
-      if(project.work>=stage.works){for(const k of ['wood','stone']){project.stock[k]-=stage[k];project.consumed[k]+=stage[k];if(stage[k])recordMaterial(this,'structure-built',k,stage[k],job.target,'structure',p.id);}project.stage++;project.work=0;}
+      if(project.work>=stage.works){for(const k of ['wood','stone']){project.stock[k]-=stage[k];project.consumed[k]+=stage[k];if(stage[k])recordMaterial(this,'structure-built',k,stage[k],job.target,'structure',p.id);}project.stage++;project.work=0;reconcileResourceClearance(this);}
     }
     this.changed();
     }catch{ /* Another player may complete the same final unit first; no payment is made. */ }
