@@ -7,7 +7,7 @@ import { Game, createWorld } from './world-expansion-adapter.mjs';
 import {CityNetwork} from './city-network.mjs';
 import {createQARecorder} from './qa-recorder.mjs';
 import {scanMusic,audioDuration,PLAZA} from './plaza.mjs';
-import {createHash} from 'node:crypto';
+import {createHash,timingSafeEqual} from 'node:crypto';
 import { CONFIG } from './config.mjs';
 import { combatRoot,createCombat,joinCombat,combatAction,combatView,advanceCombat } from './combat-p0.mjs';
 
@@ -33,7 +33,9 @@ const legacySaveRequiresBackup=fs.existsSync(stateFile)&&state?.schema!=='dement
 let legacyBackupDone=false;
 const network=new CityNetwork(state);
 const game=network.origin;
-const stateFor=p=>({...network.snapshot(p),qaMode:testMode,qaRecording:qaRecorder.enabled});
+const adminKey=String(process.env.DEMENTOR_QA_ADMIN_KEY||'');
+const adminAvailable=adminKey.length>=24&&(testMode||publicOrigin.startsWith('https://'));
+const stateFor=p=>({...network.snapshot(p),qaMode:testMode,qaRecording:qaRecorder.enabled,qaAdminAvailable:adminAvailable});
 const musicDir=path.join(root,'data','music');fs.mkdirSync(musicDir,{recursive:true});
 function refreshMusic(){network.setMusic(scanMusic([[path.join(root,'public','music'),'/music/'],[musicDir,'/custom-music/']]));}
 refreshMusic();
@@ -152,8 +154,21 @@ const server=http.createServer(async(req,res)=>{
         if(kind==='input'){qaRecorder.input(p,network.findId(p.id)?.cityId,data);json(res,200,result);return;}
         qaRecorder.command(p,network.findId(p.id)?.cityId,{...data,type:'combat:'+kind},{ok:true},walletBeforeCombat);g.changed();save();json(res,200,result);return;
       }
+      if(url.pathname==='/api/admin/treasury'){
+        if(!adminAvailable){json(res,403,{ok:false,message:'Тестовая казна отключена: нужны HTTPS и серверный ключ'});return;}
+        const supplied=Buffer.from(String(req.headers['x-dementor-qa-admin']||'')),expected=Buffer.from(adminKey);
+        if(supplied.length!==expected.length||!timingSafeEqual(supplied,expected)){json(res,403,{ok:false,message:'Нет полномочий казначея'});return;}
+        const amount=Number(data.amount),target=network.findId(data.targetPlayerId||p.id);
+        if(!Number.isSafeInteger(amount)||amount<1||amount>500||!target)throw Error('Укажи жителя и от 1 до 500 PAPER');
+        if(target.g.state.treasury<amount)throw Error('В казне нет этой суммы');
+        target.g.transfer(target.p,amount,'qa-treasury-grant');
+        target.g.state.transactions.at(-1).approvedBy=p.id;
+        qaRecorder.command(p,network.findId(p.id)?.cityId,{type:'admin:treasury-grant',targetPlayerId:target.p.id,amount},{ok:true},p.wallet);
+        target.g.changed();save();broadcast();
+        json(res,200,{ok:true,message:'Перечислено '+amount+' PAPER из казны',treasury:target.g.state.treasury});return;
+      }
       if(url.pathname==='/api/input'){if(!network.gameFor(p).online.has(p.id))throw Error('Нет подключения к миру');network.gameFor(p).input(p,data);qaRecorder.input(p,network.findId(p.id)?.cityId,data);json(res,200,{ok:true});return;}
-      if(url.pathname==='/api/action'){if(!network.gameFor(p).online.has(p.id))throw Error('Нет подключения к миру');const before=p.wallet;const result=['createCity','travelCity','pagerBuy','pagerSend','pagerRead'].includes(data.type)?network.command(p,data):network.gameFor(p).command(p,data);qaRecorder.command(p,network.findId(p.id)?.cityId,data,result,before);save();broadcast();json(res,200,result);return;}
+      if(url.pathname==='/api/action'){if(!network.gameFor(p).online.has(p.id))throw Error('Нет подключения к миру');const before=p.wallet;const result=['createCity','travelCity','pagerBuy','pagerSend','pagerRead','pagerBlock','pagerList','pagerDial'].includes(data.type)?network.command(p,data):network.gameFor(p).command(p,data);qaRecorder.command(p,network.findId(p.id)?.cityId,data,result,before);save();broadcast();json(res,200,result);return;}
       json(res,404,{ok:false,message:'Нет такого действия'});return;
     }
     if(url.pathname.startsWith('/music/')||url.pathname.startsWith('/custom-music/')){
