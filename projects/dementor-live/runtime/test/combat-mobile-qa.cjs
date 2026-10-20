@@ -62,7 +62,7 @@ async function pad(page,id,dx,dy,holdMs=350){
  server=spawn(process.execPath,['server.mjs','--test'],{cwd:root,env:{...process.env,DEMENTOR_PORT:String(port),DEMENTOR_STATE:path.join(tmp,'world.json')},stdio:'pipe'});
  let logs='';server.stdout.on('data',d=>logs+=d);server.stderr.on('data',d=>logs+=d);
  let up=false;for(let i=0;i<100;i++){try{if((await fetch(base+'/api/health')).ok){up=true;break;}}catch{}await sleep(60);}assert.ok(up,logs);
- browser=await pw.chromium.launch({headless:true});
+ browser=await pw.chromium.launch({channel:'chrome',headless:true});
  const a=await makePlayer('Mobile-A',{width:390,height:844}),b=await makePlayer('Mobile-B',{width:375,height:667});
  await a.page.locator('#create').click();await a.page.waitForFunction(()=>battle?.status==='LOBBY');
  await b.page.waitForFunction(()=>document.querySelector('#lobbies button'));await b.page.locator('#lobbies button').first().click();
