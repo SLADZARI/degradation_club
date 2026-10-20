@@ -26,6 +26,8 @@ jobs:
         run: npm test
       - name: HTTP/SSE regression on disposable world
         run: npm run test:integration
+      - name: Durable Obitel save/restart on disposable world
+        run: node test/obitel-restart.cjs
       - name: Install isolated browser QA tools
         run: |
           npm install --no-save --no-package-lock playwright@1.56.1
