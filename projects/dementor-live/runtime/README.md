@@ -23,3 +23,7 @@
 ## UI-графика — SVG-FIRST
 
 [Единый SVG-first pipeline](../design/styles/SVG_FIRST_PAPER_CUT_PIPELINE_v1.md) · [исходники и сборщик на Google Drive](https://drive.google.com/file/d/1UskpdEQvSBGz-poBvzqdwsvgxOZVzl5e/view). Для новой Paper Cut иконки: сначала один SVG из 2–4 бумажных слоёв, потом генерируем из него PNG 32/48/64/128/256 и атлас, не наоборот. QA двух тестовых SVG прошёл; 20 старых SVG пока 7 CANDIDATE + 13 REWORK и **не устанавливаются автоматически**.
+
+## Новые SVG-иконки · NEW-ONLY v3.1
+
+Интеграция **только 42 новых** номеров (21–62), старые 20 Paper Cut v2 — без изменения: [инструкция, список ID и QA](../design/asset-library/NEW_ONLY_ICONS_V3_1_2026-10-20.md). Скачать [архив с 42 SVG, 210 PNG и установщиком](https://drive.google.com/file/d/13nNQYJ0rLOasHLE2pGA5Vsx2TS2DTiM_/view). Локально: `python3 install_new_only.py /path/to/runtime`; скрипт оставит каталог `public/assets/paper-icons/` и старый код иконок без изменений. Перед публикацией нужны проверки реального Mac, HTTP и мобильного UI.
