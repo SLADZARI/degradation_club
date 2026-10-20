@@ -188,6 +188,17 @@ const server=http.createServer(async(req,res)=>{
       if(req.method==='HEAD'){res.end();return;}
       fs.createReadStream(filePath).pipe(res);return;
     }
+    // NEW ONLY v3 catalog: the immutable installer serves SVG/PNG,
+    // but deliberately leaves JSON out of its strict asset regex.
+    // Expose only this exact catalog path, not arbitrary files.
+    if(url.pathname==='/assets/paper-icons-new-v3/manifest-new-only.json'){
+      const manifestFile=path.join(root,'public','assets','paper-icons-new-v3','manifest-new-only.json');
+      if(!fs.existsSync(manifestFile)){res.writeHead(404);res.end('Icon catalog not installed');return;}
+      res.writeHead(200,{'Content-Type':'application/json; charset=utf-8',
+        'Cache-Control':'no-cache','X-Content-Type-Options':'nosniff'});
+      if(req.method==='HEAD')res.end();else fs.createReadStream(manifestFile).pipe(res);
+      return;
+    }
     const files={'/':'index.html','/app.js':'app.js','/life-ui.js':'life-ui.js','/plaza-ui.js':'plaza-ui.js','/city-ui.js':'city-ui.js','/estate-ui.js':'estate-ui.js','/telecom-ui.js':'telecom-ui.js','/admin-ui.js':'admin-ui.js','/civic-ui.js':'civic-ui.js','/world-ui.js':'world-ui.js','/world-ui-fixes.js':'world-ui-fixes.js','/world-quests.js':'world-quests.js','/styles.css':'styles.css','/terrain-01.js':'terrain-01.js','/combat':'combat.html','/combat.html':'combat.html','/combat.js':'combat.js','/combat.css':'combat.css','/manifest.webmanifest':'manifest.webmanifest'};
     const file=files[url.pathname];if(!file){res.writeHead(404);res.end('Not found');return;}
     const types={html:'text/html; charset=utf-8',js:'text/javascript; charset=utf-8',css:'text/css; charset=utf-8',webmanifest:'application/manifest+json; charset=utf-8'};
