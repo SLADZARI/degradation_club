@@ -237,3 +237,15 @@ dialog:not(#welcome):not(#mayorIdea):not(#payphoneDialog),
 #urgentHunger{position:fixed;top:18px;left:50%;transform:translateX(-50%);z-index:28;background:#fff4e3;border:3px solid #af5048;border-radius:9px;padding:10px 18px;font-size:clamp(13px,2vw,17px);font-weight:800;text-align:center;max-width:min(590px,calc(100vw - 40px));animation:hunger-pulse 1s step-end infinite}
 @keyframes hunger-pulse{50%{background:#f6d9ca}}
 #mobileEatButton{border-radius:12px!important;width:90px;min-width:90px;height:53px;font-size:10px;line-height:1.15;background:radial-gradient(circle at center,#faf9f0ec 26px,transparent 27px)!important;color:#4e674f}
+
+/* DL-TERRAIN-01: tactile thumbnails and accessible confirm on touch + desktop */
+.terrain-thumb{width:112px;height:68px;object-fit:contain;display:block;float:left;margin:0 12px 8px 0;flex:none;background:#e7e5d8;border:1px solid #d4d3c6;border-radius:10px}
+.terrain-bag-heading{padding:10px 12px 5px;font-weight:700;color:#59664f}
+#terrain-placement{position:absolute;z-index:95;left:50%;bottom:max(92px,env(safe-area-inset-bottom));transform:translateX(-50%);background:#fcfaf0ed;border:1px solid #b8b9a8;box-shadow:0 9px 26px #35423127;border-radius:14px;padding:10px 12px;display:flex;align-items:center;gap:10px;min-width:300px;max-width:calc(100vw - 20px)}
+#terrain-placement[hidden]{display:none}
+#terrain-placement strong{white-space:nowrap}
+#terrain-placement span{flex:1;font-size:12px;max-width:230px}
+#terrain-placement button{border-radius:8px;background:#e2ebdc;padding:9px 11px;font-weight:600}
+#terrain-placement button:disabled{opacity:.4}
+#terrain-placement button:last-child{background:#f4e4dc}
+@media(max-width:760px){#terrain-placement{bottom:max(148px,env(safe-area-inset-bottom));width:calc(100vw - 16px);flex-wrap:wrap;justify-content:space-between}#terrain-placement span{flex:1 0 58%}#terrain-placement button{min-height:42px}}
