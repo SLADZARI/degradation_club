@@ -25,7 +25,7 @@ jobs:
           node-version: '22'
       - run: npm run check
       - run: npm test
-      - run: node --test test/combat-p0.test.mjs test/combat-touch.test.mjs
+      - run: node --test test/combat-p0.test.mjs test/combat-touch.test.mjs test/forestry.test.mjs
       - run: npm run test:integration
       - run: npm run test:persistence
   browser:
