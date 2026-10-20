@@ -1,3 +1,4 @@
+import {bagCapacity} from './losev-courses.mjs';
 import {randomUUID} from 'node:crypto';
 import {LIFE} from './life.mjs';
 
@@ -62,7 +63,7 @@ export function cityExpansionAction(g,p,cmd){
       const spring=s.publicGarden.waterSource,elapsed=Math.max(0,Math.floor((g.now-spring.at)/60000));
       if(elapsed){spring.left=Math.min(20,spring.left+elapsed);spring.at+=elapsed*60000;}
       if(p.bag.water>=4)throw Error('Можно носить не более 4 л воды');
-      if(Object.entries(p.bag).reduce((sum,[k,v])=>sum+v*c.weights[k],0)+c.weights.water>c.capacity)throw Error('Нет места в рюкзаке');
+      if(Object.entries(p.bag).reduce((sum,[k,v])=>sum+v*c.weights[k],0)+c.weights.water>bagCapacity(p,c,g.now))throw Error('Нет места в рюкзаке');
       if(spring.left<1)throw Error('Городской источник пополняется: 1 л/мин');
       spring.left--;p.bag.water++;
       return {message:'Получен 1 л воды из городского источника'};
@@ -83,7 +84,7 @@ export function cityExpansionAction(g,p,cmd){
     }
     if(!bed.crop||!bed.watered||bed.readyAt>g.now)throw Error('Урожай ещё не созрел');
     const crop=LIFE.crops[bed.crop],kind=bed.crop,n=crop.yield;
-    if(Object.entries(p.bag).reduce((sum,[k,v])=>sum+v*c.weights[k],0)+n*c.weights[kind]>c.capacity)throw Error('Рюкзак полон');
+    if(Object.entries(p.bag).reduce((sum,[k,v])=>sum+v*c.weights[k],0)+n*c.weights[kind]>bagCapacity(p,c,g.now))throw Error('Рюкзак полон');
     p.bag[kind]+=n;s.publicGarden.harvests++;
     Object.assign(bed,{crop:null,watered:false,readyAt:0});
     return {message:'Урожай собран; городская грядка свободна'};
