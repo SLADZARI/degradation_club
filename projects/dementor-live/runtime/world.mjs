@@ -145,7 +145,7 @@ export class Game {
     const done=p.results.find(r=>r.id===cmd.requestId);if(done)return done.result;
     let result;
     syncEquipment(p,this.c);try{result={ok:true,...this.action(p,cmd)};}catch(e){result={ok:false,message:e.message};}syncEquipment(p,this.c);
-    p.results.push({id:cmd.requestId,result});p.results=p.results.slice(-128);this.changed();return result;
+    if(result.ok&&!p.spirit)p.lastActiveGameplayAt=this.now;p.results.push({id:cmd.requestId,result});p.results=p.results.slice(-128);this.changed();return result;
   }
   action(p,cmd){const {type,target}=cmd,c=this.configFor(target),s=this.state,project=this.projectFor(target);
     const publicResult=plazaAction(this,p,cmd);if(publicResult)return publicResult;
@@ -232,7 +232,7 @@ export class Game {
       this.dirty=true;
       if(!p.spirit){p.hunger=Math.max(0,p.hunger-c.hungerPerSecond*dt);if(p.hunger===0){p.spirit=true;p.health=0;p.job=null;p.x=8;p.y=8;p.scene='city';p.plotId=null;p.stamina=100;this.inputs.set(p.id,{dx:0,dy:0,sprint:false,at:this.now});this.changed();}}
       const input=this.inputs.get(id);let moving=input&&this.now-input.at<400&&Math.hypot(input.dx,input.dy)>0;
-      if(moving&&!p.spirit){p.activeGameMs=Math.min(86400000,(p.activeGameMs||0)+Math.min(ms,250));}
+      if(!p.spirit&&(moving||p.lastActiveGameplayAt&&this.now-p.lastActiveGameplayAt<15000)){p.activeGameMs=Math.min(86400000,(p.activeGameMs||0)+Math.min(ms,250));}
       const sprint=moving&&input.sprint&&!p.spirit&&p.stamina>5&&p.hunger>=c.slowBelow;
       p.stamina=clamp(p.stamina+(sprint?-c.staminaDrain:c.staminaRegen)*dt,0,100);
       if(moving){const speed=(p.hunger<c.slowBelow&&!p.spirit?c.slowSpeed:c.speed)*(sprint?c.sprintMultiplier:1)*landscapeSpeed(this,p);const nx=p.x+input.dx*speed*dt,ny=p.y+input.dy*speed*dt;
