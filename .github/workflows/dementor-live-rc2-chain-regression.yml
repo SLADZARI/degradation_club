@@ -1,0 +1,68 @@
+name: Dementor Live RC2 — Chain Regression and Isolated Reproduction
+on:
+  push:
+    branches:
+      - qa/dementor-live-rc2-chain-audit-2026-10-20
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  chain-model:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: projects/dementor-live/runtime
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Exact tested revision
+        run: 'echo "COMMIT=$GITHUB_SHA"; node -p "require(\"./package.json\").version"'
+      - run: python3 icons-v2/install-v2.py . icons-v2
+      - run: npm run check:icons
+      - run: npm run check
+      - run: npm test
+      - name: Full HTTP / save lifecycle
+        run: |
+          npm run test:integration
+          npm run test:persistence
+          npm run test:upgrade
+      - name: Interaction edge chains
+        run: node --test test/pager-bridge.test.mjs test/estate-mayor.test.mjs test/forestry.test.mjs test/world-passage.test.mjs test/qa-recorder.test.mjs
+  chrome-journeys:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    defaults:
+      run:
+        working-directory: projects/dementor-live/runtime
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-save --no-package-lock playwright@1.56.1
+      - run: npx playwright install --with-deps chrome
+      - run: python3 icons-v2/install-v2.py . icons-v2
+      - name: Repeat previously failed interface/landscape chain twice
+        run: |
+          node test/interface-world-polish.cjs
+          node test/interface-world-polish.cjs
+      - name: Two-player, estate, payphone, quests and video QA routes
+        run: |
+          node test/estate-mayor-ui.cjs
+          node test/playtest-actions.cjs
+          node test/telecom-browser.cjs
+          npm run test:mobile
+          npm run test:quests
+          npm run test:compact-panels
+  archive:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Provenance
+        run: |
+          echo "ISOLATED QA only; no production volume, SSH, production API POST, deployment or published SHA claims."
+          git rev-parse HEAD
