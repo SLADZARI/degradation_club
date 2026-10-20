@@ -27,7 +27,8 @@ function lifePanel(mode,rows,row,canAct){
  }
  if(mode==='seeds'){
   title.textContent='Семенная лавка';intro.textContent=state.seedMarket.stage<state.config.seedMarket.stages.length?'Отдельное здание строится за счёт городской казны. Сдай материалы на стройке лавки.':'Лавка построена. Покупай семена у прилавка, а затем используй их в личном или городском огороде.';
-  for(const kind of ['seed_hemp','seed_carrot'])row((kind==='seed_hemp'?'🌰 ':'🫘 ')+itemName(kind),`В лавке ${state.seedShop[kind]} · у тебя ${me.bag[kind]}. Цена 2 PAPER/шт.`,[button('Купить 1',action('buySeeds',null,{kind,quantity:1}),!canAct||state.scene!=='city'||state.seedMarket.stage<state.config.seedMarket.stages.length||!nearby('seed-shop')||!state.seedShop[kind]||me.wallet<2),button('Идти к лавке',()=>navigateTo('seed-shop'),state.scene!=='city')]);
+  for(const kind of ['seed_hemp','seed_carrot',...Object.keys(state.treeSpecies||{})])row((kind==='seed_hemp'?'🌰 ':'🫘 ')+itemName(kind),`В лавке ${state.seedShop[kind]} · у тебя ${me.bag[kind]}. Цена 2 PAPER/шт.`,[button('Купить 1',action('buySeeds',null,{kind,quantity:1}),!canAct||state.scene!=='city'||state.seedMarket.stage<state.config.seedMarket.stages.length||!nearby('seed-shop')||!state.seedShop[kind]||me.wallet<2),button('Идти к лавке',()=>navigateTo('seed-shop'),state.scene!=='city')]);
+  row('Лопата · '+(me.gardenTools?.shovel||0)+' использований','Нужна для подготовки земли на своём участке.',[button('Купить лопату · 5 PAPER',action('buyShovel','seed-shop'),!canAct||!nearby('seed-shop')||me.wallet<5||me.gardenTools?.shovel>0)]);
   return true;
  }
  if(mode==='resident'){
@@ -62,8 +63,19 @@ function lifePanel(mode,rows,row,canAct){
  else if(t.id==='chest'){
   if(!owner)row('Сундук закрыт','Доступен владельцу.');else for(const[k,def]of Object.entries(state.items))row((itemEmoji[k]||'')+' '+def.name,`В сундуке ${h.chest[k]} · в рюкзаке ${me.bag[k]}`,[button('Убрать 1',action('homeStore',t.id,{kind:k,quantity:1}),!canAct||!me.bag[k]),button('Убрать всё',action('homeStore',t.id,{kind:k,quantity:me.bag[k]}),!canAct||!me.bag[k]),button('Взять 1',action('homeStore',t.id,{kind:k,quantity:1,withdraw:true}),!canAct||!h.chest[k])]);note.textContent='Сундук: до 80 единиц веса. Изъятие проверяет свободное место в рюкзаке.';
  }
- else if(t.id==='garden')row('Новая грядка',`Подготовлено ${h.beds.length} / 6. Сначала расчисти дикую растительность возле грядок.`,[button('Подготовить',action('homePrepare',t.id),!owner||!canAct||h.beds.length>=6,'home-prepare')]);
+ else if(t.id==='garden')row('Новая грядка',`Подготовлено ${h.beds.length} / 6. Сначала расчисти дикую растительность возле грядок.`,[button('Подготовить',action('homePrepare',t.id),!owner||!canAct||h.beds.length>=6,'home-prepare'),button('Вскопать рядом · лопата',action('homeDig','garden'),!owner||!canAct||!me.gardenTools?.shovel||h.soil?.length>=6,'home-dig')]);
  else if(h.nodes.some(n=>n.id===t.id))row(t.title,'Добыча конечна и сохраняется. Для дерева нужен топор, для камня — кирка.',[button('Добыть / расчистить',action('homeClear',t.id),!owner||!canAct||!t.left,'home-clear')]);
+ else if(h.soil?.some(s=>s.id===t.id)){
+  const occupied=h.plantedTrees?.some(tree=>tree.soilId===t.id);
+  row('Вскопанная земля',occupied?'Здесь уже растёт дерево.':'Выбери один из пяти видов.',occupied?[]:Object.entries(state.treeSpecies||{}).map(([kind,def])=>button('Посадить · '+def.name,action('homeSowTree',t.id,{kind}),!owner||!me.bag[kind])));
+ }
+ else if(h.plantedTrees?.some(tree=>tree.id===t.id)){
+  const tree=h.plantedTrees.find(tree=>tree.id===t.id),stage=!tree.wateredAt?1:state.now-tree.wateredAt>=360000?3:state.now-tree.wateredAt>=180000?2:1;
+  row(t.title,tree.wateredAt?'Рост '+stage+'/3 · '+(stage===3?'Древесины осталось '+tree.stock:'Дерево ещё растёт'):'Полей двумя литрами воды.',[
+    button('Полить · 2 л',action('homeWaterTree',t.id),!owner||!!tree.wateredAt||me.bag.water<2),
+    button('Рубить · 1 древесина',action('homeFellTree',t.id),!owner||stage<3||!me.tools.axe)
+  ]);
+ }
  else {const b=h.beds.find(b=>b.id===t.id);if(b){const ripe=b.crop&&b.watered&&state.now>=b.readyAt,allowed=owner;row(t.title,!b.crop?'Выбери культуру. Семя будет потрачено.':b.watered?ripe?'Можно собирать.':`До готовности ${Math.max(1,Math.ceil((b.readyAt-state.now)/1000))} сек.`:'Нужно 2 л воды.',!b.crop?[button('Посеять коноплю',action('homeSow',b.id,{crop:'hemp'}),!owner||!me.bag.seed_hemp,'sow-hemp'),button('Посеять морковь',action('homeSow',b.id,{crop:'carrot'}),!owner||!me.bag.seed_carrot,'sow-carrot')]:[button('Полить',action('homeWater',b.id),!owner||b.watered,'water-crop'),button(allowed?'Собрать':'Собрать с разрешением',action('homeHarvest',b.id),!ripe,'harvest-crop'),...(!owner?[button('Взять без разрешения · кража',action('homeHarvest',b.id,{steal:true}),!ripe,'steal-crop')]:[]),...(owner&&b.crop==='carrot'&&!b.seedPlant?[button('Оставить на семена',action('homeSeed',b.id),!ripe,'seed-crop')]:[])]);}}
  if(owner){row('Гости',h.open?'Участок открыт. Чужой сундук остаётся закрытым.':'Участок закрыт для посетителей.',[button(h.open?'Закрыть участок':'Открыть для гостей',action('homeAccess',null,{open:!h.open}),false,'toggle-visitors')]);for(const other of state.players.filter(p=>p.id!==me.id&&p.online))row(other.name,h.permits[other.id]?'Разрешено забирать урожай':'Без права на урожай',[button(h.permits[other.id]?'Отозвать право сбора':'Разрешить забирать урожай',action('homeAccess',null,{open:h.open,player:other.id,harvest:!h.permits[other.id]}))]);}
  return true;
@@ -74,6 +86,11 @@ function drawHome(time){
  if(['plot','expedition'].includes(state.scene)){
   label(state.scene==='expedition'?'Общая миссия · расчистка':'Участок · '+(state.players.find(p=>p.id===h.owner)?.name||'житель'),8,1);
   for(const n of h.nodes){if(!n.left)continue;const o={...n,stock:n.left};if(n.kind==='wood')drawTree(o);else if(n.kind==='stone')drawStone(o);else {drawFood(o);label(n.kind==='food'?'Дикие ягоды':names[n.kind],n.x,n.y+1,true);}}
+  for(const dirt of h.soil||[])groundRect({x:dirt.x-.35,y:dirt.y-.35,w:.7,h:.7},'#a98e6d','#796f5b');
+  for(const tree of h.plantedTrees||[]){const stage=!tree.wateredAt?1:state.now-tree.wateredAt>=360000?3:state.now-tree.wateredAt>=180000?2:1,k=[0,.34,.61,1][stage],q=screen(tree.x,tree.y),variant=state.treeSpecies?.[tree.kind]?.variant??0;
+    ctx.save();ctx.translate(q.x,q.y);ctx.scale(k,k);ctx.translate(-q.x,-q.y);drawTree({...tree,stock:1,visualVariant:variant});ctx.restore();
+    label(state.treeSpecies?.[tree.kind]?.name||'Дерево',tree.x,tree.y-1,true);
+  }
   if(h.tent)paperTent({x:6,y:5,w:4,h:3},h.tent);
   if(state.scene!=='expedition'){const water=screen(14,3);paperBox(water.x-view.s*.28,water.y-view.s*.45,view.s*.55,view.s*.45,view.s*.25,-view.s*.16,'#b9aa88','#948566','#d9ceb0');poly([[water.x-view.s*.18,water.y-view.s*.42],[water.x+view.s*.2,water.y-view.s*.42],[water.x+view.s*.4,water.y-view.s*.55],[water.x,water.y-view.s*.55]],'#9fb7ad','#7c9489');}
   for(const b of h.beds){groundRect({x:b.x-.6,y:b.y-.6,w:1.2,h:1.2},'#b7a083','#8f8066');if(b.crop){const q=screen(b.x,b.y),ripe=b.watered&&state.now>=b.readyAt;const k=view.s*(ripe?.25:.13);if(b.crop==='hemp'){drawHempBush(b.x,b.y);}else if(b.crop==='carrot'){poly([[q.x-k*.5,q.y-k],[q.x+k*.5,q.y-k],[q.x,q.y+k]],'#c89362','#9a7857');poly([[q.x,q.y-k],[q.x-k,q.y-k*2],[q.x,q.y-k*1.7],[q.x+k,q.y-k*2]],'#8fa476','#73886a');}else{for(const side of [-1,1]){poly([[q.x,q.y],[q.x+side*k,q.y-k],[q.x+side*k*.9,q.y-k*1.7],[q.x,q.y-k*.8]],side<0?'#8ba678':'#a4b58c','#708966');}line(q.x,q.y,q.x,q.y-k*2,'#718466',1.5);}}label(b.crop?b.seedPlant?'На семена':b.watered?(state.now>=b.readyAt?'Созрело':'Растёт'):'Полей':'Грядка',b.x,b.y+1,true);}
