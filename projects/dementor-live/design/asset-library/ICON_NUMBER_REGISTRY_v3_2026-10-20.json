@@ -1,0 +1,571 @@
+{
+  "schema": "dementor-svg-icon-number-registry-v3",
+  "created": "2026-10-20",
+  "status": "CANDIDATE_ONLY_NO_GAME_REPLACEMENT",
+  "asset_count": 62,
+  "style": "DL-STYLE-PAPER-CUT-01",
+  "upstream_v2_approved_archive_sha256": "930d1e390e81e3c1b2734f3abdfa7bbb52077a3feb803bb32efe6b6bd6cd533f",
+  "library_zip_sha256": "280a859e546452128dee15c78b28bb0d7b8fbdfbd316fc6dd3a1f856082094db",
+  "source_archive": "https://drive.google.com/file/d/1XUpBS8dliUCPmGzDvXRudm_oTw3s9lFQ/view",
+  "number_policy": "append-only numbering, do not reuse; icon numbers separate from physical DL-xxx",
+  "entries": [
+    {
+      "icon_no": "DL-ICON-001",
+      "game_id": "wood",
+      "source_svg": "source/svg/wood.svg",
+      "physical_object_id": "DL-068",
+      "role": "item-or-interface",
+      "art_review": "candidate",
+      "technical_build": "pass"
+    },
+    {
+      "icon_no": "DL-ICON-002",
+      "game_id": "stone",
+      "source_svg": "source/svg/stone.svg",
+      "physical_object_id": "DL-069",
+      "role": "item-or-interface",
+      "art_review": "candidate",
+      "technical_build": "pass"
+    },
+    {
+      "icon_no": "DL-ICON-003",
+      "game_id": "food",
+      "source_svg": "source/svg/food.svg",
+      "physical_object_id": "DL-070",
+      "role": "item-or-interface",
+      "art_review": "candidate",
+      "technical_build": "pass"
+    },
+    {
+      "icon_no": "DL-ICON-004",
+      "game_id": "seed_hemp",
+      "source_svg": "source/svg/seed_hemp.svg",
+      "physical_object_id": "DL-071",
+      "role": "item-or-interface",
+      "art_review": "candidate",
+      "technical_build": "pass"
+    },
+    {
+      "icon_no": "DL-ICON-005",
+      "game_id": "seed_carrot",
+      "source_svg": "source/svg/seed_carrot.svg",
+      "physical_object_id": "DL-072",
+      "role": "item-or-interface",
+      "art_review": "candidate",
+      "technical_build": "pass"
+    },
+    {
+      "icon_no": "DL-ICON-006",
+      "game_id": "hemp",
+      "source_svg": "source/svg/hemp.svg",
+      "physical_object_id": "DL-073",
+      "role": "item-or-interface",
+      "art_review": "candidate",
+      "technical_build": "pass"
+    },
+    {
+      "icon_no": "DL-ICON-007",
+      "game_id": "carrot",
+      "source_svg": "source/svg/carrot.svg",
+      "physical_object_id": "DL-074",
+      "role": "item-or-interface",
+      "art_review": "candidate",
+      "technical_build": "pass"
+    },
+    {
+      "icon_no": "DL-ICON-008",
+      "game_id": "water",
+      "source_svg": "source/svg/water.svg",
+      "physical_object_id": "DL-075",
+      "role": "item-or-interface",
+      "art_review": "candidate",
+      "technical_build": "pass"
+    },
+    {
+      "icon_no": "DL-ICON-009",
+      "game_id": "axe",
+      "source_svg": "source/svg/axe.svg",
+      "physical_object_id": "DL-062",
+      "role": "item-or-interface",
+      "art_review": "candidate",
+      "technical_build": "pass"
+    },
+    {
+      "icon_no": "DL-ICON-010",
+      "game_id": "pick",
+      "source_svg": "source/svg/pick.svg",
+      "physical_object_id": "DL-065",
+      "role": "item-or-interface",
+      "art_review": "candidate",
+      "technical_build": "pass"
+    },
+    {
+      "icon_no": "DL-ICON-011",
+      "game_id": "rifle",
+      "source_svg": "source/svg/rifle.svg",
+      "physical_object_id": null,
+      "role": "item-or-interface",
+      "art_review": "candidate",
+      "technical_build": "pass"
+    },
+    {
+      "icon_no": "DL-ICON-012",
+      "game_id": "ammo",
+      "source_svg": "source/svg/ammo.svg",
+      "physical_object_id": null,
+      "role": "item-or-interface",
+      "art_review": "candidate",
+      "technical_build": "pass"
+    },
+    {
+      "icon_no": "DL-ICON-013",
+      "game_id": "map",
+      "source_svg": "source/svg/map.svg",
+      "physical_object_id": null,
+      "role": "item-or-interface",
+      "art_review": "candidate",
+      "technical_build": "pass"
+    },
+    {
+      "icon_no": "DL-ICON-014",
+      "game_id": "shirt",
+      "source_svg": "source/svg/shirt.svg",
+      "physical_object_id": null,
+      "role": "item-or-interface",
+      "art_review": "candidate",
+      "technical_build": "pass"
+    },
+    {
+      "icon_no": "DL-ICON-015",
+      "game_id": "souvenir",
+      "source_svg": "source/svg/souvenir.svg",
+      "physical_object_id": null,
+      "role": "item-or-interface",
+      "art_review": "candidate",
+      "technical_build": "pass"
+    },
+    {
+      "icon_no": "DL-ICON-016",
+      "game_id": "paper",
+      "source_svg": "source/svg/paper.svg",
+      "physical_object_id": null,
+      "role": "item-or-interface",
+      "art_review": "candidate",
+      "technical_build": "pass"
+    },
+    {
+      "icon_no": "DL-ICON-017",
+      "game_id": "backpack",
+      "source_svg": "source/svg/backpack.svg",
+      "physical_object_id": "DL-048",
+      "role": "item-or-interface",
+      "art_review": "candidate",
+      "technical_build": "pass"
+    },
+    {
+      "icon_no": "DL-ICON-018",
+      "game_id": "cargo",
+      "source_svg": "source/svg/cargo.svg",
+      "physical_object_id": "DL-049",
+      "role": "item-or-interface",
+      "art_review": "candidate",
+      "technical_build": "pass"
+    },
+    {
+      "icon_no": "DL-ICON-019",
+      "game_id": "health",
+      "source_svg": "source/svg/health.svg",
+      "physical_object_id": null,
+      "role": "item-or-interface",
+      "art_review": "candidate",
+      "technical_build": "pass"
+    },
+    {
+      "icon_no": "DL-ICON-020",
+      "game_id": "stamina",
+      "source_svg": "source/svg/stamina.svg",
+      "physical_object_id": null,
+      "role": "item-or-interface",
+      "art_review": "candidate",
+      "technical_build": "pass"
+    },
+    {
+      "icon_no": "DL-ICON-021",
+      "game_id": "shovel",
+      "source_svg": "source/svg/shovel.svg",
+      "physical_object_id": null,
+      "role": "item-or-interface",
+      "art_review": "candidate",
+      "technical_build": "pass"
+    },
+    {
+      "icon_no": "DL-ICON-022",
+      "game_id": "seed_tree_broadleaf",
+      "source_svg": "source/svg/seed_tree_broadleaf.svg",
+      "physical_object_id": null,
+      "role": "item-or-interface",
+      "art_review": "candidate",
+      "technical_build": "pass"
+    },
+    {
+      "icon_no": "DL-ICON-023",
+      "game_id": "seed_tree_round",
+      "source_svg": "source/svg/seed_tree_round.svg",
+      "physical_object_id": null,
+      "role": "item-or-interface",
+      "art_review": "candidate",
+      "technical_build": "pass"
+    },
+    {
+      "icon_no": "DL-ICON-024",
+      "game_id": "seed_tree_oak",
+      "source_svg": "source/svg/seed_tree_oak.svg",
+      "physical_object_id": null,
+      "role": "item-or-interface",
+      "art_review": "candidate",
+      "technical_build": "pass"
+    },
+    {
+      "icon_no": "DL-ICON-025",
+      "game_id": "seed_tree_spruce",
+      "source_svg": "source/svg/seed_tree_spruce.svg",
+      "physical_object_id": null,
+      "role": "item-or-interface",
+      "art_review": "candidate",
+      "technical_build": "pass"
+    },
+    {
+      "icon_no": "DL-ICON-026",
+      "game_id": "seed_tree_small",
+      "source_svg": "source/svg/seed_tree_small.svg",
+      "physical_object_id": null,
+      "role": "item-or-interface",
+      "art_review": "candidate",
+      "technical_build": "pass"
+    },
+    {
+      "icon_no": "DL-ICON-027",
+      "game_id": "pistol",
+      "source_svg": "source/svg/pistol.svg",
+      "physical_object_id": null,
+      "role": "item-or-interface",
+      "art_review": "candidate",
+      "technical_build": "pass"
+    },
+    {
+      "icon_no": "DL-ICON-028",
+      "game_id": "pager",
+      "source_svg": "source/svg/pager.svg",
+      "physical_object_id": null,
+      "role": "item-or-interface",
+      "art_review": "candidate",
+      "technical_build": "pass"
+    },
+    {
+      "icon_no": "DL-ICON-029",
+      "game_id": "lantern",
+      "source_svg": "source/svg/lantern.svg",
+      "physical_object_id": null,
+      "role": "item-or-interface",
+      "art_review": "candidate",
+      "technical_build": "pass"
+    },
+    {
+      "icon_no": "DL-ICON-030",
+      "game_id": "oil",
+      "source_svg": "source/svg/oil.svg",
+      "physical_object_id": null,
+      "role": "item-or-interface",
+      "art_review": "candidate",
+      "technical_build": "pass"
+    },
+    {
+      "icon_no": "DL-ICON-031",
+      "game_id": "key",
+      "source_svg": "source/svg/key.svg",
+      "physical_object_id": null,
+      "role": "item-or-interface",
+      "art_review": "candidate",
+      "technical_build": "pass"
+    },
+    {
+      "icon_no": "DL-ICON-032",
+      "game_id": "rod",
+      "source_svg": "source/svg/rod.svg",
+      "physical_object_id": null,
+      "role": "item-or-interface",
+      "art_review": "candidate",
+      "technical_build": "pass"
+    },
+    {
+      "icon_no": "DL-ICON-033",
+      "game_id": "worm",
+      "source_svg": "source/svg/worm.svg",
+      "physical_object_id": null,
+      "role": "item-or-interface",
+      "art_review": "candidate",
+      "technical_build": "pass"
+    },
+    {
+      "icon_no": "DL-ICON-034",
+      "game_id": "larva",
+      "source_svg": "source/svg/larva.svg",
+      "physical_object_id": null,
+      "role": "item-or-interface",
+      "art_review": "candidate",
+      "technical_build": "pass"
+    },
+    {
+      "icon_no": "DL-ICON-035",
+      "game_id": "roach",
+      "source_svg": "source/svg/roach.svg",
+      "physical_object_id": null,
+      "role": "item-or-interface",
+      "art_review": "candidate",
+      "technical_build": "pass"
+    },
+    {
+      "icon_no": "DL-ICON-036",
+      "game_id": "perch",
+      "source_svg": "source/svg/perch.svg",
+      "physical_object_id": null,
+      "role": "item-or-interface",
+      "art_review": "candidate",
+      "technical_build": "pass"
+    },
+    {
+      "icon_no": "DL-ICON-037",
+      "game_id": "carp",
+      "source_svg": "source/svg/carp.svg",
+      "physical_object_id": null,
+      "role": "item-or-interface",
+      "art_review": "candidate",
+      "technical_build": "pass"
+    },
+    {
+      "icon_no": "DL-ICON-038",
+      "game_id": "world:payphone",
+      "source_svg": "source/svg/world__payphone.svg",
+      "physical_object_id": null,
+      "role": "ui-preview-only",
+      "art_review": "candidate",
+      "technical_build": "pass"
+    },
+    {
+      "icon_no": "DL-ICON-039",
+      "game_id": "world:bridge2",
+      "source_svg": "source/svg/world__bridge2.svg",
+      "physical_object_id": null,
+      "role": "ui-preview-only",
+      "art_review": "candidate",
+      "technical_build": "pass"
+    },
+    {
+      "icon_no": "DL-ICON-040",
+      "game_id": "world:retail_sign",
+      "source_svg": "source/svg/world__retail_sign.svg",
+      "physical_object_id": null,
+      "role": "ui-preview-only",
+      "art_review": "candidate",
+      "technical_build": "pass"
+    },
+    {
+      "icon_no": "DL-ICON-041",
+      "game_id": "world:retail_stand",
+      "source_svg": "source/svg/world__retail_stand.svg",
+      "physical_object_id": null,
+      "role": "ui-preview-only",
+      "art_review": "candidate",
+      "technical_build": "pass"
+    },
+    {
+      "icon_no": "DL-ICON-042",
+      "game_id": "ui:mayor_letter",
+      "source_svg": "source/svg/ui__mayor_letter.svg",
+      "physical_object_id": null,
+      "role": "interface",
+      "art_review": "candidate",
+      "technical_build": "pass"
+    },
+    {
+      "icon_no": "DL-ICON-043",
+      "game_id": "world:forest_billboard",
+      "source_svg": "source/svg/world__forest_billboard.svg",
+      "physical_object_id": null,
+      "role": "ui-preview-only",
+      "art_review": "candidate",
+      "technical_build": "pass"
+    },
+    {
+      "icon_no": "DL-ICON-044",
+      "game_id": "world:forest_noticeboard",
+      "source_svg": "source/svg/world__forest_noticeboard.svg",
+      "physical_object_id": null,
+      "role": "ui-preview-only",
+      "art_review": "candidate",
+      "technical_build": "pass"
+    },
+    {
+      "icon_no": "DL-ICON-045",
+      "game_id": "world:scooter_rack",
+      "source_svg": "source/svg/world__scooter_rack.svg",
+      "physical_object_id": null,
+      "role": "ui-preview-only",
+      "art_review": "candidate",
+      "technical_build": "pass"
+    },
+    {
+      "icon_no": "DL-ICON-046",
+      "game_id": "world:forest_portal",
+      "source_svg": "source/svg/world__forest_portal.svg",
+      "physical_object_id": null,
+      "role": "ui-preview-only",
+      "art_review": "candidate",
+      "technical_build": "pass"
+    },
+    {
+      "icon_no": "DL-ICON-047",
+      "game_id": "world:mentalhumor_museum",
+      "source_svg": "source/svg/world__mentalhumor_museum.svg",
+      "physical_object_id": null,
+      "role": "ui-preview-only",
+      "art_review": "candidate",
+      "technical_build": "pass"
+    },
+    {
+      "icon_no": "DL-ICON-048",
+      "game_id": "world:laughter_exhibit",
+      "source_svg": "source/svg/world__laughter_exhibit.svg",
+      "physical_object_id": null,
+      "role": "ui-preview-only",
+      "art_review": "candidate",
+      "technical_build": "pass"
+    },
+    {
+      "icon_no": "DL-ICON-049",
+      "game_id": "world:laughter_station",
+      "source_svg": "source/svg/world__laughter_station.svg",
+      "physical_object_id": null,
+      "role": "ui-preview-only",
+      "art_review": "candidate",
+      "technical_build": "pass"
+    },
+    {
+      "icon_no": "DL-ICON-050",
+      "game_id": "world:cave_wall",
+      "source_svg": "source/svg/world__cave_wall.svg",
+      "physical_object_id": null,
+      "role": "ui-preview-only",
+      "art_review": "candidate",
+      "technical_build": "pass"
+    },
+    {
+      "icon_no": "DL-ICON-051",
+      "game_id": "world:cave_secret_door",
+      "source_svg": "source/svg/world__cave_secret_door.svg",
+      "physical_object_id": null,
+      "role": "ui-preview-only",
+      "art_review": "candidate",
+      "technical_build": "pass"
+    },
+    {
+      "icon_no": "DL-ICON-052",
+      "game_id": "world:cave_altar",
+      "source_svg": "source/svg/world__cave_altar.svg",
+      "physical_object_id": null,
+      "role": "ui-preview-only",
+      "art_review": "candidate",
+      "technical_build": "pass"
+    },
+    {
+      "icon_no": "DL-ICON-053",
+      "game_id": "world:cave_bats",
+      "source_svg": "source/svg/world__cave_bats.svg",
+      "physical_object_id": null,
+      "role": "ui-preview-only",
+      "art_review": "candidate",
+      "technical_build": "pass"
+    },
+    {
+      "icon_no": "DL-ICON-054",
+      "game_id": "ui:fishing_bite",
+      "source_svg": "source/svg/ui__fishing_bite.svg",
+      "physical_object_id": null,
+      "role": "interface",
+      "art_review": "candidate",
+      "technical_build": "pass"
+    },
+    {
+      "icon_no": "DL-ICON-055",
+      "game_id": "concept:bucket",
+      "source_svg": "source/svg/concept__bucket.svg",
+      "physical_object_id": null,
+      "role": "ui-preview-only",
+      "art_review": "candidate",
+      "technical_build": "pass"
+    },
+    {
+      "icon_no": "DL-ICON-056",
+      "game_id": "concept:watering_can",
+      "source_svg": "source/svg/concept__watering_can.svg",
+      "physical_object_id": null,
+      "role": "ui-preview-only",
+      "art_review": "candidate",
+      "technical_build": "pass"
+    },
+    {
+      "icon_no": "DL-ICON-057",
+      "game_id": "concept:hoe",
+      "source_svg": "source/svg/concept__hoe.svg",
+      "physical_object_id": null,
+      "role": "ui-preview-only",
+      "art_review": "candidate",
+      "technical_build": "pass"
+    },
+    {
+      "icon_no": "DL-ICON-058",
+      "game_id": "concept:passport",
+      "source_svg": "source/svg/concept__passport.svg",
+      "physical_object_id": null,
+      "role": "ui-preview-only",
+      "art_review": "candidate",
+      "technical_build": "pass"
+    },
+    {
+      "icon_no": "DL-ICON-059",
+      "game_id": "concept:export_certificate",
+      "source_svg": "source/svg/concept__export_certificate.svg",
+      "physical_object_id": null,
+      "role": "ui-preview-only",
+      "art_review": "candidate",
+      "technical_build": "pass"
+    },
+    {
+      "icon_no": "DL-ICON-060",
+      "game_id": "concept:guard",
+      "source_svg": "source/svg/concept__guard.svg",
+      "physical_object_id": null,
+      "role": "ui-preview-only",
+      "art_review": "candidate",
+      "technical_build": "pass"
+    },
+    {
+      "icon_no": "DL-ICON-061",
+      "game_id": "concept:gabil_world",
+      "source_svg": "source/svg/concept__gabil_world.svg",
+      "physical_object_id": null,
+      "role": "ui-preview-only",
+      "art_review": "candidate",
+      "technical_build": "pass"
+    },
+    {
+      "icon_no": "DL-ICON-062",
+      "game_id": "concept:gabil_guru",
+      "source_svg": "source/svg/concept__gabil_guru.svg",
+      "physical_object_id": null,
+      "role": "ui-preview-only",
+      "art_review": "candidate",
+      "technical_build": "pass"
+    }
+  ]
+}
