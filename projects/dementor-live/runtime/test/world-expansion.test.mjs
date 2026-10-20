@@ -14,6 +14,7 @@ test('city area is 5x, old square and mission are preserved',()=>{
   assert.equal(g.target('combat-gate'),null); // P0 combat entry is handled by the existing server.
   assert.ok(g.state.plots.some(p=>p.id==='plot-1'&&p.x===4));
   assert.equal(WORLD_CITY_TARGETS.filter(x=>x.type==='world-gate').length,2);
+  assert.equal(WORLD_CITY_TARGETS.filter(x=>x.type==='world-portal').length,1); // Arch is buildable, not an unguarded world gate.
 });
 
 test('forest/mountain barriers, public crossing and preserved starter bridge',()=>{

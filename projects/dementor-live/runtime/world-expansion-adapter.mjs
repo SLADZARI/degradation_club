@@ -1,3 +1,4 @@
+import {obitelAction,obitelProfileView} from './obitel-p0.mjs';
 import {Game as CoreGame,createWorld} from './world.mjs';
 import {WORLD_SCENES,WORLD_CITY_TARGETS,SECOND_BRIDGE,terrainBlocked,initializeWorldTravel,worldTravelAction,worldTravelView} from './world-expansion.mjs';
 export {createWorld};
@@ -10,7 +11,7 @@ export class Game extends CoreGame{
   }
   join(name){const p=super.join(name);initializeWorldTravel(this);return p;}
   target(id){return WORLD_CITY_TARGETS.find(o=>o.id===id)||Object.values(WORLD_SCENES)
-    .flatMap(region=>[region.exit,region.main]).find(o=>o.id===id)||super.target(id);}
+    .flatMap(region=>[region.exit,region.main,...(region.nodes||[])]).find(o=>o?.id===id)||super.target(id);}
   walkable(x,y,p=null){
     const scene=p?.scene||'city',r=.3,c=this.c;
     if(WORLD_SCENES[scene])return !terrainBlocked(scene,x,y,r);
@@ -26,6 +27,7 @@ export class Game extends CoreGame{
   }
   action(p,cmd){
     if(cmd?.type==='worldUse'||cmd?.type==='touristBuy')return worldTravelAction(this,p,cmd);
+    if(['obitelAnswer','obitelSkip','obitelContinue'].includes(cmd?.type))return obitelAction(this,p,cmd);
     return super.action(p,cmd);
   }
   snapshot(p){
@@ -41,6 +43,7 @@ export class Game extends CoreGame{
       if(self)self.scene=actual;
     }
     base.worldTravel=worldTravelView(this,p);
+    base.obitel=obitelProfileView(p);
     return base;
   }
 

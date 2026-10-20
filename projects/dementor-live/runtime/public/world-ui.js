@@ -14,6 +14,13 @@ allTargets=function(){
   return base;
 };
 interaction=function(t){
+  if(t?.type==='obitel-card')return {type:'obitel-card',title:t.title,hint:'Открыть вопрос и ответить · E',enabled:!me.spirit&&!me.job&&!me.delivery?.picked};
+  if(t?.type==='world-portal'){
+    const built=!!state?.worldTravel?.obitelPortal?.builtAt;
+    return {type:'worldUse',title:built?'Чёрная арка · войти в Обитель':'Построить арку · Обитель Габеля',
+      hint:built?'Войти через чёрный проход · E':'Твои 4 дерева + 3 камня · 30 PAPER из городской казны · E',
+      enabled:!me.spirit&&!me.job&&!me.delivery?.picked};
+  }
   if(t?.type==='tourist')return {type:'tourist',title:'Туристическое бюро',hint:'Купить карту, майку, сувенир за PAPER',enabled:!me.spirit};
   if(['world-gate','world-sign','world-exhibit','world-preview'].includes(t?.type))
     return {type:'worldUse',title:t.title,hint:t.type==='world-gate'?'Войти / выйти · E':t.type==='world-preview'?'Посмотреть будущую площадку':'Исследовать · E',enabled:!me.spirit&&!me.job&&!me.delivery?.picked};
@@ -22,7 +29,18 @@ interaction=function(t){
 blocked=function(x,y){
   if(!state?.worldTravel)return originalBlocked(x,y);
   const scene=state.scene,region=state.worldTravel.scenes[scene],r=.35;
-  if(region)return x<r||y<r||x>region.width-r||y>region.height-r;
+  if(region){
+    if(x<r||y<r||x>region.width-r||y>region.height-r)return true;
+    if(scene==='obitel-zen'&&Array.isArray(region.path)){
+      const hit=region.path.some((b,i)=>{
+        if(!i)return false;
+        const a=region.path[i-1],dx=b[0]-a[0],dy=b[1]-a[1],t=Math.max(0,Math.min(1,((x-a[0])*dx+(y-a[1])*dy)/(dx*dx+dy*dy)));
+        return Math.hypot(x-a[0]-t*dx,y-a[1]-t*dy)<=2.2;
+      });
+      return !hit;
+    }
+    return false;
+  }
   if(scene!=='city')return originalBlocked(x,y);
   if((state.worldTravel.obstacles||[]).some(o=>x+r>o.x&&x-r<o.x+o.w&&y+r>o.y&&y-r<o.y+o.h))return true;
   const c=state.config,b=state.worldTravel.secondBridge;
@@ -52,6 +70,7 @@ findPath=function(dest){
 };
 
 doContext=function(){
+  if(context?.type==='obitel-card'){act('worldUse',context.id).then(result=>{if(result?.obitel)showObitelCard(result.obitel);});return;}
   if(context?.type==='tourist'){openCityPanel('tourist');return;}
   originalContext();
 };
@@ -62,7 +81,7 @@ updateUI=function(){
     state.scene='city';
     try{originalUpdate();}finally{state.scene=actual;}
     document.querySelector('#quest h1').textContent=state.worldTravel.scenes[actual].name;
-    $('task').textContent='Найди экспонат и выход. Из музея и дальних земель возвращайся пешком к воротам.';
+    $('task').textContent=actual==='obitel-zen'?'Исследуй карты ZEN по кольцевой тропе. К Гуру пока закрыто; дальняя дверь — только на выход.':'Найди экспонат и выход. Из музея и дальних земель возвращайся пешком к воротам.';
     $('worldNote').textContent=state.worldTravel.scenes[actual].name+' · исследуй место';
     updateContext();
     return;
@@ -123,7 +142,7 @@ function openTravelMap(){
   rect(state.config.river.x,0,state.config.river.w,state.config.height,'#9cbdbf');rect(34,53,4,10,'#cbb891');
   cx.lineWidth=3;cx.strokeStyle='#b7a77c';
   for(const path of state.worldTravel.paths||[]){cx.beginPath();path.forEach(([x,y],i)=>{const p=mapPoint(x,y);i?cx.lineTo(p.x,p.y):cx.moveTo(p.x,p.y);});cx.stroke();}
-  for(const [name,x,y] of [['Мэрия',8,8],['Киоск',25,38],['Лес',20,56],['Горы',70,59],['Музей',96,60],['НЕ НАДО',143,60]]){
+  for(const [name,x,y] of [['Мэрия',8,8],['Киоск',25,38],['Лес',20,56],['Горы',70,59],['Музей',96,60],['Арка Обители',138,72],['НЕ НАДО',143,60]]){
     const p=mapPoint(x,y);cx.fillStyle='#4a6154';cx.beginPath();cx.arc(p.x,p.y,5,0,7);cx.fill();cx.fillStyle='#27372e';cx.font='13px sans-serif';cx.fillText(name,p.x+8,p.y-7);
   }
   const location=state.scene==='museum'?[96,60]:state.scene==='farlands'?[143,60]:[me.x,me.y];
@@ -150,7 +169,19 @@ function drawWorldProps(){
   }
   for(const t of w.targets||[]){
     const p=screen(t.x,t.y);if(p.x< -250||p.x>view.w+250||p.y< -250||p.y>view.h+250)continue;
-    if(t.type==='world-sign')paperBoard(t.x,t.y,'↗ '+t.title.slice(0,20));
+    if(t.type==='world-portal'){
+      const built=!!w.obitelPortal?.builtAt,q=screen(t.x,t.y),u=view.s;
+      // Handmade paper-stone arch with an opaque black doorway when funded.
+      ctx.save();ctx.fillStyle=built?'#090D11':'#A49D91';
+      ctx.beginPath();ctx.moveTo(q.x-u*.8,q.y);ctx.lineTo(q.x-u*.8,q.y-u*1.25);
+      ctx.quadraticCurveTo(q.x,q.y-u*2.65,q.x+u*.8,q.y-u*1.25);
+      ctx.lineTo(q.x+u*.8,q.y);ctx.closePath();ctx.fill();
+      ctx.lineWidth=Math.max(3,u*.22);ctx.strokeStyle='#B9AD95';ctx.stroke();
+      ctx.beginPath();ctx.moveTo(q.x-u*.92,q.y-u*.1);ctx.lineTo(q.x-u*.92,q.y-u*1.4);
+      ctx.quadraticCurveTo(q.x,q.y-u*2.92,q.x+u*.92,q.y-u*1.4);
+      ctx.lineTo(q.x+u*.92,q.y-u*.1);ctx.stroke();ctx.restore();
+      label(built?'ОБИТЕЛЬ · ВОЙТИ':'АРКА · СТРОЙКА',t.x,t.y-2.7,true);
+    }else if(t.type==='world-sign')paperBoard(t.x,t.y,'↗ '+t.title.slice(0,20));
     else if(t.type==='tourist'||t.type==='world-gate'||t.type==='world-preview'){
       paperHouse({x:t.x-1.3,y:t.y-1.8,w:2.6,h:1.8},t.type==='tourist'?'shop':'warehouse');
       label(t.title,t.x,t.y-2,true);
@@ -168,6 +199,20 @@ function drawTravelScene(time){
   if(state.scene==='museum'){
     for(const x of [3,7,11,15])groundRect({x,y:2,w:2.5,h:2},'#d1baa4','#967e70');
     paperHouse({x:8,y:3,w:5,h:2.5},'shop');label('МУЗЕЙ СМЕХА',11,1.3);
+  }else if(state.scene==='obitel-zen'){
+    // The ring track wraps around the mountain. Only this track is walkable in P0.
+    if(region.path?.length){
+      ctx.beginPath();region.path.forEach(([x,y],i)=>{const q=screen(x,y);if(i)ctx.lineTo(q.x,q.y);else ctx.moveTo(q.x,q.y);});
+      ctx.strokeStyle='#B1A589';ctx.lineWidth=Math.max(8,view.s*3.9);ctx.lineCap='round';ctx.lineJoin='round';ctx.stroke();
+      ctx.strokeStyle='#E4D7B8';ctx.lineWidth=Math.max(5,view.s*3.25);ctx.stroke();
+    }
+    // A visual mountain is not a walkable shortcut; its ascent needs three artifacts.
+    groundRect({x:13.5,y:10,w:10,h:7},'#A8AAA4','#737E76');
+    const q=screen(18,12),u=view.s;
+    paperBox(q.x-u*1.5,q.y-u*2.5,u*3,u*.9,u*.8,-u*.4,'#B3B5AE','#858F87','#D0D0C6');
+    label('ГОРА ГУРУ · ЗАКРЫТА',18,9,true);
+    for(const [x,y] of [[3,4],[12,13],[18,14],[32,4],[34,24]])drawTree({x,y,stock:10});
+    label('ОБИТЕЛЬ ГАБЕЛЯ · ZEN',18,2,true);
   }else{
     for(const [x,y] of [[7,5],[11,11],[17,15],[22,13]])drawTree({x,y,stock:10});
     const p=screen(21,9),s=view.s;groundRect({x:18.5,y:8,w:5,h:3},'#b9b6a5','#77796c');
@@ -186,5 +231,35 @@ render=function(time){
   originalRender(time);
   drawWorldProps();
 };
+// P0 in-world card dialog: no auto-completion or synthetic follow-up story.
+const obitelDialog=document.createElement('dialog');
+obitelDialog.id='obitelCardDialog';
+obitelDialog.setAttribute('aria-label','Карточка Обители');
+obitelDialog.innerHTML='<h2 id="obitelCardTitle"></h2><p id="obitelCardQuestion"></p><p id="obitelCardStatus"></p><label for="obitelCardAnswer">Твой ответ</label><textarea id="obitelCardAnswer" rows="3" maxlength="500" placeholder="Твой ответ на вопрос"></textarea><div class="obitel-card-buttons"><button id="obitelCardSave">Сохранить ответ</button><button id="obitelCardContinue">Хочу продолжить</button><button id="obitelCardSkip">Пропустить</button><button id="obitelCardClose">Закрыть</button></div>';
+const obitelStyle=document.createElement('style');
+obitelStyle.textContent='#obitelCardDialog{width:min(92vw,540px);max-height:86dvh;overflow:auto;border:1px solid #b2ae9a;background:#f5efdf;color:#344036;padding:20px;border-radius:10px}#obitelCardDialog::backdrop{background:#1d261a99}#obitelCardDialog h2{margin:0 0 12px}#obitelCardDialog textarea{box-sizing:border-box;display:block;width:100%;margin:6px 0 12px;padding:10px;background:#fffdf6;color:#344036;border:1px solid #b2ae9a;border-radius:6px}#obitelCardDialog p{line-height:1.45}.obitel-card-buttons{display:flex;gap:8px;flex-wrap:wrap}.obitel-card-buttons button{padding:9px 12px;border:1px solid #a29e87;border-radius:6px;background:#fffdf6;cursor:pointer}';
+document.head.append(obitelStyle);
+document.body.append(obitelDialog);
+let activeObitelCard=null;
+function showObitelCard(card){
+  activeObitelCard=card.id;
+  $('obitelCardTitle').textContent=card.title;
+  $('obitelCardQuestion').textContent=card.question;
+  $('obitelCardStatus').textContent=card.continuationRequestedAt?'Заявка на продолжение уже сохранена.':'Продолжение сценария пока не завершено. Ответ сохранится, но квест не будет считаться завершённым.';
+  $('obitelCardAnswer').value='';
+  if(!obitelDialog.open)obitelDialog.showModal();
+}
+$('obitelCardClose').onclick=()=>obitelDialog.close();
+async function obitelSend(type,extra={}){
+  if(!activeObitelCard)return;
+  const result=await act(type,activeObitelCard,extra);
+  if(!result?.ok)return;
+  if(result.obitel?.continuationRequestedAt)$('obitelCardStatus').textContent='Заявка на продолжение записана. Карточка остаётся незавершённой.';
+  else if(type==='obitelAnswer')$('obitelCardStatus').textContent='Ответ сохранён с датой. Продолжение истории пока не готово.';
+  if(type==='obitelSkip')obitelDialog.close();
+}
+$('obitelCardSave').onclick=()=>obitelSend('obitelAnswer',{answer:$('obitelCardAnswer').value});
+$('obitelCardContinue').onclick=()=>obitelSend('obitelContinue');
+$('obitelCardSkip').onclick=()=>obitelSend('obitelSkip');
 window.__worldExpansionQA=()=>({scene:state?.scene,mapOwned:!!state?.worldTravel?.profile?.mapOwned,worldWidth:state?.config?.width,worldHeight:state?.config?.height,targetCount:allTargets().length,qaMode:!!state?.qaMode});
 })();
