@@ -32,6 +32,14 @@ async function goContext(page,id){
   const playerId=await page.evaluate(()=>me.id),wallet=await page.evaluate(()=>me.wallet);
   async function position(x,y){await post('/__test',{player:playerId,patch:{x,y}},{'x-test-key':'local-integration-tests'});await page.waitForFunction(([x,y])=>Math.hypot(me.x-x,me.y-y)<.1,[x,y]);}
   await position(138,72);
+  const startingTreasury=await page.evaluate(()=>state.treasury);
+  const bag=await page.evaluate(()=>({...me.bag,wood:4,stone:3}));
+  await post('/__test',{player:playerId,patch:{bag}},{'x-test-key':'local-integration-tests'});
+  await page.waitForFunction(()=>me.bag.wood===4&&me.bag.stone===3);
+  await goContext(page,'obitel-zen-entry');
+  await page.waitForFunction(()=>!!state.worldTravel?.obitelPortal?.builtAt);
+  assert.equal(await page.evaluate(()=>state.treasury),startingTreasury-30);
+  await page.waitForFunction(()=>!requestPending&&performance.now()-lastAction>=190);
   await goContext(page,'obitel-zen-entry');
   await page.waitForFunction(()=>state.scene==='obitel-zen');
   assert.equal(await page.evaluate(()=>state.worldTravel.targets.filter(x=>x.type==='obitel-card').length),7);
@@ -55,11 +63,11 @@ async function goContext(page,id){
   await page.locator('#obitelCardDialog').waitFor({state:'visible'});
   assert.match(await page.locator('#obitelCardQuestion').innerText(),/идеальный день/);
   await page.locator('#obitelCardClose').click();
-  await position(2,17);
+  await position(3,23);
   await goContext(page,'obitel-zen-exit');
   await page.waitForFunction(()=>state.scene==='city');
   assert.deepEqual(failures,[]);
-  console.log('OBITEL BROWSER PASS: enter, 7 cards, answer, pending, skip, mobile dialog, safe exit, no money change');
+  console.log('OBITEL BROWSER PASS: financed arch built, black-door entry, 7 cards, answer, pending, skip, mobile dialog, far exit, no personal money change');
 }catch(e){console.error(e);process.exitCode=1;}
 finally{if(browser)await browser.close();if(server&&server.exitCode===null){server.kill('SIGTERM');await new Promise(resolve=>server.once('exit',resolve));}fs.rmSync(tmp,{recursive:true,force:true});}
 })();
