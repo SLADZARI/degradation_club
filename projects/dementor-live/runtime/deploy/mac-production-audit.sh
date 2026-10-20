@@ -27,7 +27,12 @@ echo "image_created_at=$(docker image inspect --format '{{.Created}}' "$IMAGE")"
 echo "image_tags=$(docker image inspect --format '{{json .RepoTags}}' "$IMAGE")"
 echo "image_digests=$(docker image inspect --format '{{json .RepoDigests}}' "$IMAGE")"
 echo '=== API health on VM ==='
-curl -fsS --connect-timeout 4 --max-time 8 http://127.0.0.1:14173/api/health
+# Production app has strict Host validation; mirror the safe publisher, without printing env values.
+PUBLIC_URL="$(docker inspect "$CID" --format '{{range .Config.Env}}{{println .}}{{end}}' | awk -F= '$1=="DEMENTOR_PUBLIC_URL"{sub(/^[^=]*=/,"");print;exit}')"
+PUBLIC_HOST="${PUBLIC_URL#*://}"
+PUBLIC_HOST="${PUBLIC_HOST%%/*}"
+if [[ -z "$PUBLIC_HOST" || "$PUBLIC_HOST" == *' '* ]]; then echo 'STOP: no configured public Host'; exit 1; fi
+curl -fsS --connect-timeout 4 --max-time 8 -H "Host: $PUBLIC_HOST" http://127.0.0.1:14173/api/health
 printf '\n'
 echo '=== Most recent release receipt / frozen backup ==='
 ROOT=/srv/dementor-live/backups
@@ -38,6 +43,17 @@ fi
 if [[ -n "$LAST" ]]; then
   echo "release_manifest=$LAST"
   awk -F= '$1=="approved_sha"||$1=="version"||$1=="backup" {print "manifest_"$0}' "$LAST"
+  MANIFEST_SHA="$(awk -F= '$1=="approved_sha" {print $2;exit}' "$LAST")"
+  if [[ "$MANIFEST_SHA" =~ ^[0-9a-f]{40}$ ]]; then
+    TAG_ID="$(docker image inspect --format '{{.Id}}' "dementor-live:sha-$MANIFEST_SHA" 2>/dev/null || true)"
+    if [[ -n "$TAG_ID" && "$TAG_ID" == "$IMAGE" ]]; then
+      echo 'approved_sha_tag_matches_running_image=yes'
+    else
+      echo 'approved_sha_tag_matches_running_image=NOT_VERIFIED'
+    fi
+  else
+    echo 'approved_sha_tag_matches_running_image=NOT_VERIFIED'
+  fi
   BACKUP="$(awk -F= '$1=="backup" {print substr($0,index($0,"=")+1);exit}' "$LAST")"
   if [[ "$BACKUP" == "$ROOT"/safe-* && -s "$BACKUP/world.json" && -s "$BACKUP/full-world.tar.gz" ]]; then
     echo 'complete_backup=yes'
