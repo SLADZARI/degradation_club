@@ -32,3 +32,7 @@
 ## Графика мира · 35 SVG · Batch 01 (только кандидат)
 
 [Полный аудит и рисунки](../design/world-assets/WORLD_ASSET_GAP_AUDIT_2026-10-20.md) · [CSV по 139 объектам](../design/world-assets/WORLD_ASSET_GAP_AUDIT_2026-10-20.csv) · исходники `assets-source/world-art-batch01/*.svg`. Зависимости для офлайн-сборки `cairosvg pillow`, команда из `runtime/`: `python3 tools/world-art-batch01/build.py && python3 tools/world-art-batch01/build_atlas.py && python3 tools/world-art-batch01/test_assets.py`. Генерация PNG не обновляет клиент и не меняет `world.json`. Художественная приёмка, world geometry/collision и реальное мобильное тестирование не выполнены. См. Draft PR #301.
+
+## World Art · 139/139 SVG Source Coverage (Batch 02 — DRAFT)
+
+[Аудит и QA](../design/world-assets/WORLD_ART_COVERAGE_139_2026-10-20.md). 90 новых оригинальных SVG + 21 независимое изображение стадий в `assets-source/world-art-batch02/`; 35 базовых SVG — Batch01 PR #301. Действующий рендер/сейвы не меняются. Генерация PNG: `python3 tools/world-art-batch02/build_from_svg.py`, проверка: `python3 tools/world-art-batch02/test_batch02.py` (локально нужны CairoSVG и Pillow). **Библиотека изображений ≠ все картинки нарисованы в игре**: до G6 — привязки к footprint и z-index, художественная QA, две вкладки/iPhone. Старые 20 UI и 17 текстур земли защищены.
