@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
+import vm from 'node:vm';
 import {fileURLToPath} from 'node:url';
 import {Game,createWorld} from '../world-expansion-adapter.mjs';
 import {landscapeIndex,landscapeSpeed} from '../landscape.mjs';
@@ -68,4 +69,27 @@ test('two players preserve independent terrainBag and shared authoritative place
  assert.equal(a.terrainBag.flowers,1);assert.equal(b.terrainBag.flowers,3);
  assert.equal(c(g,b,'landscapePlace',{kind:'flowers',x:14,y:9}).ok,false);
  assert.equal(g.state.landscape.tiles.length,1);
+});
+
+test('renderer is read-only, chooses deterministically and culls outside camera',async()=>{
+ const manifest=JSON.parse(fs.readFileSync(path.join(runtime,'public/assets/terrain/manifest.json'),'utf8'));
+ const source=fs.readFileSync(path.join(runtime,'public/terrain-01.js'),'utf8');
+ let images=0,background=0;
+ const ctx={canvas:{width:1200,height:900},getTransform:()=>({a:1}),drawImage(){images++;},
+ beginPath(){},moveTo(){},lineTo(){},closePath(){},fill(){background++;},set fillStyle(v){this._fill=v;}};
+ const fakeCanvas={width:0,height:0,className:'',setAttribute(){},getContext:()=>ctx};
+ const context={console,window:{},document:{createElement:()=>fakeCanvas},Image:class{set src(value){Promise.resolve().then(()=>this.onload?.());}},fetch:()=>Promise.resolve({ok:true,json:()=>Promise.resolve(manifest)})};
+ vm.runInNewContext(source,context);
+ await new Promise(resolve=>setTimeout(resolve,20));
+ const terrain=context.window.DLTerrain01;assert.equal(terrain.ready,true);
+ assert.equal(terrain.variant('paving',9,11),terrain.variant('paving',9,11));
+ const state={scene:'city',cityNetwork:{current:'origin'},landscape:{revision:4,tiles:[{x:0,y:0,kind:'grass'},{x:1,y:0,kind:'paving'},{x:2,y:0,kind:'paving'},{x:1,y:1,kind:'flowers'}]}};
+ const before=JSON.stringify(state),screen=(x,y)=>({x:600+(x-y)*24,y:200+(x+y)*14});
+ const wp=(x,y)=>({x:(x-600)/24,y:(y-200)/14});
+ assert.equal(terrain.draw(ctx,state,screen,28,wp),true);
+ assert.ok(images>=4);assert.equal(terrain.kindAt(state,1,0),'paving');
+ const same=terrain.rebuild(state);assert.strictEqual(terrain.rebuild(state),same);
+ assert.equal(JSON.stringify(state),before);
+ assert.equal(terrain.draw(ctx,{...state,scene:'museum'},screen,28,wp),false);
+ terrain.catalogImage('grass');assert.ok(images>=5);
 });
