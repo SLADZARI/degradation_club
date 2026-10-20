@@ -1,0 +1,26 @@
+name: Dementor Live P0 Runtime Contract QA
+on:
+  push:
+    branches:
+      - qa/dementor-live-world-runtime-contract-2026-10-20
+  workflow_dispatch:
+jobs:
+  runtime-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    defaults:
+      run:
+        working-directory: projects/dementor-live/runtime
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Existing P0 world expansion tests
+        run: node --test test/world-expansion.test.mjs
+      - name: Additional real world runtime integration contracts
+        run: node --test test/world-runtime-contract.test.mjs
+      - name: Provenance
+        run: echo "These are actual world-expansion branch Node runtime tests, NOT a live server, mobile browser, PvE runtime or v0.9.1 synthetic story simulation."

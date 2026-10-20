@@ -50,6 +50,11 @@ export function initializeWorldTravel(g){
   for(const p of Object.values(g.state.players))p.worldTravel||={mapOwned:false,souvenirs:{shirt:0,souvenir:0},visited:['city']};
 }
 export function worldTravelAction(g,p,cmd){
+  // Return a previously settled paid result *before* proximity or region checks:
+  // delayed network retries must not charge again just because the player moved.
+  if(cmd?.type==='touristBuy'&&p.worldTravel?.purchaseReceipts&&
+      Object.hasOwn(p.worldTravel.purchaseReceipts,cmd.requestId))
+    return p.worldTravel.purchaseReceipts[cmd.requestId];
   const object=worldObjects(p.scene||'city').find(o=>o.id===cmd.target);
   if(!['worldUse','touristBuy'].includes(cmd.type))return null;
   if(!object)throw Error('Такого места нет в текущем регионе');
@@ -59,6 +64,11 @@ export function worldTravelAction(g,p,cmd){
     if(object.id!=='tourist-kiosk')throw Error('Купить сувениры можно только в киоске');
     if(!Object.hasOwn(TOURIST_PRICES,cmd.kind))throw Error('Нет такого товара');
     p.worldTravel||={mapOwned:false,souvenirs:{shirt:0,souvenir:0},visited:['city']};
+    // Real, persisted idempotency for paid products. Player command results retain
+    // only the most recent 128 actions; a delayed network replay must not resell.
+    p.worldTravel.purchaseReceipts ||= {};
+    if(Object.hasOwn(p.worldTravel.purchaseReceipts,cmd.requestId))
+      return p.worldTravel.purchaseReceipts[cmd.requestId];
     const amount=TOURIST_PRICES[cmd.kind];
     if(cmd.kind==='map'&&p.worldTravel.mapOwned)throw Error('Карта уже у тебя');
     if(p.wallet<amount)throw Error('Не хватает PAPER');
@@ -66,7 +76,9 @@ export function worldTravelAction(g,p,cmd){
     g.state.transactions.push({id:cmd.requestId,player:p.id,amount:-amount,reason:'tourist-'+cmd.kind,time:g.now});
     if(cmd.kind==='map')p.worldTravel.mapOwned=true;
     else p.worldTravel.souvenirs[cmd.kind]=(p.worldTravel.souvenirs[cmd.kind]||0)+1;
-    return {message:cmd.kind==='map'?'Карта путешественника куплена. Теперь она доступна через ☷.':'Сувенир куплен и сохранён в коллекции.'};
+    const receipt={message:cmd.kind==='map'?'Карта путешественника куплена. Теперь она доступна через ☷.':'Сувенир куплен и сохранён в коллекции.'};
+    p.worldTravel.purchaseReceipts[cmd.requestId]=receipt;
+    return receipt;
   }
   if(object.type==='world-sign')return {message:object.id==='forest-sign'?'Тропа ведёт в горы через вторую переправу; лесная чаща не везде проходима.':'По дороге на восток: лес → горы → музей смеха → дальние земли.'};
   if(object.type==='world-preview')return {message:object.title+' · стройка и механики появятся в следующих игровых обновлениях.'};
