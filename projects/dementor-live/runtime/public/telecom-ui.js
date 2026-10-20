@@ -61,7 +61,20 @@ doContext=function(){
 };
 const pagerButton=ctl('▣ Пейджер',()=>openCityPanel('pager'));pagerButton.id='openPager';pagerButton.title='Личный пейджер и входящие сообщения';
 document.querySelector('.map-tools')?.append(pagerButton);
-updateUI=function(){formerUpdate();pagerButton.textContent='▣ Пейджер'+(state?.telecom?.unread?' · '+state.telecom.unread:'');};
+let markerCount=0;
+const markButton=ctl('● Метка видео',async()=>{
+ const label='VIDEO-'+String(++markerCount).padStart(3,'0');
+ const result=await api('qa-marker',{label});
+ if(result?.ok)toast('Запись '+label+' · '+result.marker.offsetMs+' мс. Произнесите метку на видео.');
+ else toast('Метка не записана');
+});
+markButton.id='qaVideoMarker';markButton.title='Синхронизировать видео и серверный журнал';
+document.querySelector('.map-tools')?.append(markButton);
+const exportButton=ctl('⇩ QA-лог',async()=>{
+ try{const response=await fetch('/api/qa-export',{headers:{Authorization:'Bearer '+token}});if(!response.ok)throw Error('not allowed');const blob=await response.blob(),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='dementor-qa-'+new Date().toISOString().slice(0,10)+'.ndjson';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}catch{toast('Выгрузка доступна только в тестовой сборке');}
+});
+exportButton.id='qaExport';document.querySelector('.map-tools')?.append(exportButton);
+updateUI=function(){formerUpdate();pagerButton.textContent='▣ Пейджер'+(state?.telecom?.unread?' · '+state.telecom.unread:'');exportButton.hidden=!state?.qaMode;};
 updateCityPanels=function(force=false){
  if(!['secondBridge','pager'].includes(cityPanelMode))return formerPanels(force);
  const rows=$('cityPanelRows');rows.replaceChildren();const canAct=!me?.spirit&&!me?.job;
