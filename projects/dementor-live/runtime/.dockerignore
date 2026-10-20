@@ -8,3 +8,9 @@ node_modules
 reports
 *.log
 deploy/.env
+
+# AppleDouble/xattrs from macOS archive extraction (not application source)
+._*
+**/._*
+__MACOSX
+**/__MACOSX
