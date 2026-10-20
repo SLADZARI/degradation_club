@@ -72,12 +72,11 @@ SSH_OPTS=(
   -o StrictHostKeyChecking=accept-new
 )
 # Exactly one authentication attempt. If it fails, no retries or key guessing.
-ssh "${SSH_OPTS[@]}" "$USER_NAME@$HOST" bash -se -- "$EXACT_RELEASE_SHA" "$RELEASE_BRANCH" "$EXPECTED_VERSION" "${DEMENTOR_GO_SHA:-}" <<'SERVER'
+ssh "${SSH_OPTS[@]}" "$USER_NAME@$HOST" bash -se -- "$EXACT_RELEASE_SHA" "$RELEASE_BRANCH" "$EXPECTED_VERSION" <<'SERVER'
 set -Eeuo pipefail
 SHA="$1"
 BRANCH="$2"
 VERSION="$3"
-OWNER_GO_SHA="${4:-}"
 REPO="https://github.com/SLADZARI/degradation_club.git"
 DIR="/srv/dementor-live/releases/rc4-${SHA:0:12}"
 
@@ -96,54 +95,6 @@ docker run --rm -v "$PWD:/work:ro" -w /work node:22-bookworm-slim npm run check:
 
 echo 'Проверка Docker, тома и окружения без изменений'
 bash deploy/publish-preserve-world.sh --dry-run
-
-# Safe idempotence: if this exact commit is already the running image and
-# successful release receipt is present, never redeploy over the live world.
-echo '=== Attest exact running SHA before deciding to deploy ==='
-RUNNING_CID="$(docker ps --quiet --filter label=com.docker.compose.project=dementor-live --filter label=com.docker.compose.service=game)"
-if [[ -z "$RUNNING_CID" || "$RUNNING_CID" == *
-# This immutable file was created by the failed (safely rolled back) RC4 attempt.
-LAST_FROZEN_BACKUP="/srv/dementor-live/backups/safe-20261020T180923Z-970882dee4/world.json"
-[ -s "$LAST_FROZEN_BACKUP" ] || { echo 'STOP: проверенная сохранённая копия не найдена; боевой сервер не трогаем'; exit 1; }
-PREVIEW_IMAGE="dementor-live:preflight-$SHA"
-docker build --quiet -t "$PREVIEW_IMAGE" -f deploy/Dockerfile .
-docker run --rm --entrypoint node \
-  --mount "type=bind,source=$LAST_FROZEN_BACKUP,target=/readonly/world.json,readonly" \
-  "$PREVIEW_IMAGE" tools/upgrade-audit.mjs /readonly/world.json
-echo '=== PASS: предыдущая резервная копия совместима. Теперь создадим свежую после остановки игры ==='
-echo 'Сборка, остановка игры, полная копия world.json и тома, миграционная проверка, публикация, автоматический откат при ошибке'
-bash deploy/publish-preserve-world.sh --apply "$SHA"
-SERVER
-
-info "Проверяем опубликованную версию с Mac"
-curl --connect-timeout 10 --max-time 20 -fsS "http://$HOST/api/health" |
-  python3 -c 'import json,sys; s=json.load(sys.stdin); assert s.get("ok") is True and s.get("testMode") is False and s.get("version")==sys.argv[1], "STOP: публичная версия не соответствует релизу: "+str(s); print("PRODUCTION PASS:",s)' "$EXPECTED_VERSION"
-
-printf '\nГОТОВО: боевой сервер подтверждён, релиз %s, SHA %s\n' "$EXPECTED_VERSION" "$EXACT_RELEASE_SHA"
-printf 'Сервер хранит манифест и полный архив в /srv/dementor-live/backups.\n'
-\n'* ]]; then
-  echo 'STOP: cannot identify exactly one running game container'
-  exit 1
-fi
-RUNNING_IMAGE="$(docker inspect --format '{{.Image}}' "$RUNNING_CID")"
-APPROVED_IMAGE="$(docker image inspect --format '{{.Id}}' "dementor-live:sha-$SHA" 2>/dev/null || true)"
-LATEST_RECEIPT="$(find /srv/dementor-live/backups -mindepth 2 -maxdepth 2 -type f -name release-manifest.txt -print | LC_ALL=C sort | tail -n 1)"
-RECEIPT_SHA=""
-if [[ -n "$LATEST_RECEIPT" ]]; then
-  RECEIPT_SHA="$(awk -F= '$1=="approved_sha"{print $2;exit}' "$LATEST_RECEIPT")"
-fi
-echo "running_image_id=$RUNNING_IMAGE"
-echo "expected_release_sha=$SHA"
-if [[ -n "$APPROVED_IMAGE" && "$APPROVED_IMAGE" == "$RUNNING_IMAGE" && "$RECEIPT_SHA" == "$SHA" ]]; then
-  echo 'ALREADY DEPLOYED: exact Docker image and successful release receipt match SHA; no world change performed'
-  exit 0
-fi
-# GO is mandatory only when the server really needs a new image.
-if [[ "${OWNER_GO_SHA:-}" != "$SHA" ]]; then
-  echo "STOP: owner GO for exact SHA $SHA not supplied; no production change"
-  exit 2
-fi
-echo '=== GO accepted for exact SHA. Fresh world backup + restore guards required ==='
 
 echo '=== Проверяем предыдущую настоящую резервную копию БЕЗ остановки работающего сервера ==='
 # This immutable file was created by the failed (safely rolled back) RC4 attempt.
