@@ -21,6 +21,46 @@ semanticMutationAuthorized: false
 **Verdict: PREP REPORT / LEAD-ACCEPTED AS DRAFT PLANNING INPUT; INFRASTRUCTURE UNVERIFIED.**  
 **Production effect: NONE.** This report is not a Decision, Result, Gate, host approval or deploy authorization. It proposes no immediate change to existing services. Parent [#237](https://github.com/SLADZARI/degradation_club/issues/237) remains **BACKLOG/DEFERRED**; [#228](https://github.com/SLADZARI/degradation_club/issues/228) does not yet provide an accepted current stable migration baseline.
 
+## DC-Lead-002 — Club-only backend/Auth isolation read-only delta (2026-10-20)
+
+**AUTHORITY:** Owning #237 club-only scope lock and #255 Lead clarification (comment 6278123149) supersede earlier generalized backend/game scope. This is DRAFT/REFERENCE, not a Decision/Gate. Live source metadata gathered read-only using Supabase MCP project mmekfydwbvptbdatwitj on 2026-10-20; no record contents, personal identifiers, credentials or object bytes were read or changed.
+
+### B0. Measured ownership and dependencies
+| Classification | Tables / services | Why / next authority |
+| --- | --- | --- |
+| CLUB_COPY candidate | 28 public dc_* tables | Club membership, role, Board, content, media, collaboration, outbox; check full DDL, FK, RLS, triggers, grants, records, worker semantics with Backend owner |
+| CLUB_SHARED_IDENTITY_EXTRACT | auth.users, auth.identities, public.profiles, Google/PKCE account relationships | Mixed project: never copy whole Auth or profiles; preserve Cloud MP users/roles; Club-only exact UUID or separately mapped identity Decision required |
+| CLUB_COPY candidate, unprefixed | assessment_runs, assessment_snapshots, join_applications | DC-9/Application require these; live metadata 67 runs, 10 snapshots, 4 applications; reviews/outbox FK to join_applications, all three FK to profiles |
+| UNKNOWN_STOP until source/owner evidence | event_registrations, course_enrollments, contact_requests, carts, cart_items, orders, order_items | Remaining 7 of 11 unprefixed; preserve FK closure; 0 rows is not evidence of no product ownership |
+| MP_PRESERVE, DO NOT MIGRATE | 15 public mp_* tables, mp_private, MP RPCs, MP Auth/data | Leave original Cloud MP intact without client/Auth/permissions disruption |
+| ROBO_EXCLUDE | public.game_daily_runs, player_profiles; Edge submit-run, daily-top3, daily-top5 | Separate Robo owner; preserve original Cloud auth dependency |
+| Live/MDAO preserve | Dementor Live runtime, volume dementor-live-world; MDAO /data/*, db-dev, nginx IP/default, Runner, monitoring | Not part of Club cutover; metadata-only no-regression checks |
+
+**Direct structural evidence:** profiles.id references auth.users.id; many dc_* FKs reference profiles. dc_membership_reviews and dc_membership_notification_outbox reference join_applications. Several MP tables reference auth.users directly. A prefix-only export fails FK and user identity parity.
+
+**Aggregate identity metadata, NOT MIGRATION ROSTER:** auth.users=11, auth.identities=11, auth.sessions=43, profiles=11, dc_system_memberships=6, mp_system_memberships=3. A deliberately incomplete union of Club signals (Club membership, DC-9 run, application, Board author, Club role) matched 7 users; all 3 MP-membership users were in that union; 4 did not match that partial set. These results demonstrate overlapping identities and that membership-only filtering loses Club actors. No email, user ID, provider record or session contents accessed. Final Club scope requires full source/call-graph review and owner consent.
+
+**RPC/RLS/worker:** metadata finds 69 dc_*-named public routines, 65 SECURITY DEFINER, 51 mentioning auth.uid, 13 mentioning profiles. A naive text scan mentioning mp_ is not reliable proof of MP table dependency; Backend must inspect exact routine SQL, references, policy predicates, EXECUTE grants, search_path, trigger and RPC invocation graph, with negative tests. Public tables report RLS enabled, but enabling RLS alone does NOT prove access parity.
+
+**Storage:** private dc-community-artifacts bucket: 16 object records, 23,934,580 bytes declared in metadata, NOT downloaded and NOT physical-byte verified. Restore must include actual object bodies, metadata, hashes, content types and private access policy tests.
+
+**Edge:** active telegram-outbox-worker v13 is Club scoped, verify_jwt=false; audit the actual worker authorization/schedule/secrets and dc_distribution_outbox duplicate-send guard before any cutover. Three Robo Edge functions excluded.
+
+### B1. Identity extraction alternatives — neither authorized to implement
+1. Preserve existing Club Auth UUIDs only if supported selective isolated import of approved Club identities and Google links can be independently proven, with no interference in Cloud MP sessions/permissions.
+2. Otherwise approve explicit old-to-new Club UUID mapping, migrate/rewrite only Club-owned FK keys and verify every key; leave original Cloud auth.users and profiles unchanged.
+
+For both: test guest/anonymous, incomplete DC-9, immutable first full DC-9, pre-Application login, Applicant, Member, Dementor and Owner; do not equate Auth with Membership. Test PKCE Google callback, session re-login, refresh, logout and direct RLS/API/Storage negatives. No password hash, session token, provider mapping or client credential extraction under this planning audit.
+
+### B2. Stage sequence and hard-stops
+- B-01 Backend signs exact per-table five-class matrix and complete Club dependency closure (FK + source JS/RPC + row ownership + RLS/storage/worker), not Architect alone.
+- Architect/DevOps confirms post-game VM headroom and isolated namespace under /srv/dementor without any MDAO/game default/legacy volume changes. Old 4-vCPU/7.6 GiB/43GB point-in-time snapshot is NOT a sizing PASS for Supabase full stack.
+- Separate approved Club Auth + DB + Storage + API/Edge restore on isolated staging with encrypted off-VM backup custodian, actual restore evidence and counts/hashes/negative policies. Never replay all Cloud migrations into a shared service blindly.
+- Follow Stage1 site HTTPS domain acceptance with Cloud unchanged, then independently gated Stage2 Club-only backend migration; no Cloud Auth/OAuth changes before new endpoint/actor tests, write freeze and rollback approval.
+- STOP if an unprefixed table owner is unknown, Club identities overlap MP and cannot be isolated safely, private objects are missing, SECURITY DEFINER behavior differs, worker double-sends, negative RLS fails, host resource reserve is unproven or Live/MDAO is affected.
+
+**STATUS:** READ-ONLY CLUB DEPENDENCY MATRIX DELIVERED; implementation BLOCKED on B-01 identity/owner Decisions, independent QA, host capacity and approved Result/Gate. **PRODUCTION/CLOUD/MP/ROBO/LIVE/VM EFFECT: NONE.**
+
 ## Lead wave 9: **Public frontend hosting cutover PREP ONLY** (2026-10-17, ~17:18 UTC)
 
 **New owner scope/sequence:** [#237 owner Stage 1→Stage 2 decision](https://github.com/SLADZARI/degradation_club/issues/237#issuecomment-6237372766) and [Lead assignment #255](https://github.com/SLADZARI/degradation_club/issues/255#issuecomment-6237292833). **Stage 1:** move the actual public frontend hostname `https://dementor.club` from GitHub Pages to existing Kirill VM; keep current Supabase Cloud Auth/RLS/Storage/Edge workers and all semantics. **Stage 2:** backend migration only after Stage 1 acceptance, with *separate* approved Result/Gate, backup/restore and QA. This is **scope/order approval, NOT permission for any production Nginx, certificate, DNS or host change**. Stage A private preview [Draft PR #258](https://github.com/SLADZARI/degradation_club/pull/258) is NOT a public release Gate and carries a recorded pre-Gate execution deviation. Existing architectural Draft PR #257 stays REFERENCE/DRAFT only. Parent #228 stable QA = NO-GO.
