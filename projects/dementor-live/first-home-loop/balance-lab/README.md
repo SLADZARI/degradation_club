@@ -16,3 +16,6 @@
 
 ## Unified Atlas v0.10 · 20.10.2026
 Последний standalone HTML: v0.8 demand engine + v0.9/v0.9.1 role/story contract adapter и [реестр современных направлений CIVIC/UNIVERSE](v0_10/ENTITY_INTEGRATION_MATRIX_v0_10.md), 13 регионов, 48 сущностей, 55/55 PASS, 52 инварианта. [Главный индекс](v0_10/README.md) · [QA](v0_10/QA_AND_RELEASE_GATE_v0_10.md). v0.9/0.9.1 — отдельные research PR, не физически слитый прежний JS и не боевой сервер.
+
+## Real runtime bridge v0.10.1
+[Опциональный read-only мониторинг rc.2 и матрица](v0_10_1/README.md) · [QA и ограничения](v0_10_1/QA_AND_OPEN_GATES.md). Standalone HTML v0.10.1 умеет импортировать реальный агрегат `dementor-organism-live-v1`, который Draft PR #295 может отдавать только по админ-доступу. Нет production deploy. Предыдущие модели/снимки сохранены.
