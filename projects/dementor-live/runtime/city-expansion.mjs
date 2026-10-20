@@ -36,7 +36,7 @@ export function cityMaterialReport(g){
     const field=Object.values(s.plots).flatMap(p=>p.home?.nodes||[]).concat(s.expedition?.home?.nodes||[]).filter(n=>n.kind===kind).reduce((n,x)=>n+x.left,0)
       +(kind==='wood'?s.plots.flatMap(p=>p.home?.plantedTrees||[]).filter(t=>t.wateredAt&&g.now-t.wateredAt>=360000).reduce((n,t)=>n+t.stock,0):0);
     const inventory=Object.values(s.players).reduce((n,p)=>n+(p.bag?.[kind]||0),0);
-    const chests=s.plots.reduce((n,p)=>n+(p.home?.chest?.[kind]||0),0);
+    const chests=s.plots.reduce((n,p)=>n+(p.home?.chest?.[kind]||0),0)+s.plots.reduce((n,p)=>n+(p.shop?.stock?.[kind]||0),0);
     const ground=s.drops.filter(x=>x.kind===kind).reduce((n,x)=>n+x.quantity,0);
     const projects=[s.project,s.forge,s.bridge,s.seedMarket,s.gardenProject];
     const inBuildings=projects.reduce((n,p)=>n+(p?.consumed?.[kind]||0),0);
