@@ -1,0 +1,16 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {Game,createWorld} from '../world-expansion-adapter.mjs';
+const c=(g,p,type,target,extra={},id=type+'-'+Math.random())=>g.command(p,{type,target,requestId:id,...extra});
+test('city buildings have real collision',()=>{const g=new Game(createWorld()),p=g.join('A');for(const [x,y] of [[23.4,2],[12,26],[17,2.4],[17,12]])assert.equal(g.walkable(x,y,p),false);assert.equal(g.walkable(14,8,p),true);});
+test('paving packs cost PAPER and persist through restart without duplicate purchases',()=>{const g=new Game(createWorld()),p=g.join('A');p.wallet=4;p.x=16.7;p.y=4;const cash=g.state.treasury;
+ assert.equal(c(g,p,'landscapeBuy','landscape-shop',{kind:'paving'},'buy1234').ok,true);assert.equal(p.wallet,3);assert.equal(g.state.treasury,cash+1);assert.equal(p.terrainBag.paving,10);
+ assert.equal(c(g,p,'landscapeBuy','landscape-shop',{kind:'paving'},'buy1234').ok,true);assert.equal(p.terrainBag.paving,10);
+ p.x=14;p.y=9;assert.equal(c(g,p,'landscapePlace',null,{kind:'paving',x:14,y:9},'place1234').ok,true);assert.equal(p.terrainBag.paving,9);
+ assert.equal(c(g,p,'landscapePlace',null,{kind:'paving',x:14,y:9},'place1235').ok,false);
+ const saved=JSON.parse(JSON.stringify(g.state)),other=new Game(saved),q=other.auth(p.token);assert.equal(q.wallet,3);assert.equal(q.terrainBag.paving,9);assert.equal(other.state.landscape.tiles.length,1);
+ assert.equal(c(other,q,'landscapeBuy','landscape-shop',{kind:'paving'},'buy1234').ok,true);assert.equal(q.wallet,3);
+});
+test('paving gives x1.2 walking speed; obstacles and distant edits rejected',()=>{const g=new Game(createWorld()),p=g.join('A');p.terrainBag.paving=2;p.x=14;p.y=9;assert.equal(c(g,p,'landscapePlace',null,{kind:'paving',x:14,y:9}).ok,true);
+ p.x=14.3;p.y=9.3;g.input(p,{dx:1,dy:0});g.tick(100);assert.ok(p.x>14.75&&p.x<14.8);
+ assert.equal(c(g,p,'landscapePlace',null,{kind:'paving',x:40,y:20}).ok,false);
+ p.x=17;p.y=4;assert.equal(c(g,p,'landscapePlace',null,{kind:'paving',x:17,y:2}).ok,false);
+});

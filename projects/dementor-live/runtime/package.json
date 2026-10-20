@@ -9,7 +9,7 @@
     "check": "node tools/workspace.mjs check",
     "context": "node tools/workspace.mjs context",
     "pack": "node tools/pack.mjs",
-    "test": "node --test test/model.test.mjs test/life.test.mjs test/plaza.test.mjs test/city-economy.test.mjs test/world-expansion.test.mjs",
+    "test": "node --test test/model.test.mjs test/life.test.mjs test/plaza.test.mjs test/city-economy.test.mjs test/world-expansion.test.mjs test/landscape.test.mjs",
     "test:integration": "node test/integration.mjs",
     "test:browser": "node test/browser.cjs",
     "test:mobile": "node test/mobile.cjs",
