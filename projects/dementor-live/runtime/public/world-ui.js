@@ -15,8 +15,8 @@ allTargets=function(){
 };
 interaction=function(t){
   if(t?.type==='tourist')return {type:'tourist',title:'Туристическое бюро',hint:'Купить карту, майку, сувенир за PAPER',enabled:!me.spirit};
-  if(['world-gate','world-sign','world-exhibit','world-preview'].includes(t?.type))
-    return {type:'worldUse',title:t.title,hint:t.type==='world-gate'?'Войти / выйти · E':t.type==='world-preview'?'Посмотреть будущую площадку':'Исследовать · E',enabled:!me.spirit&&!me.job&&!me.delivery?.picked};
+  if(['world-gate','world-sign','world-exhibit','world-preview','world-summit'].includes(t?.type))
+    return {type:'worldUse',title:t.title,hint:t.type==='world-gate'?'Войти / выйти · E':t.type==='world-summit'?'Достиг вершины! Оставь отметку · E':t.type==='world-preview'?'Посмотреть будущую площадку':'Исследовать · E',enabled:!me.spirit&&!me.job&&!me.delivery?.picked};
   return originalInteraction(t);
 };
 blocked=function(x,y){
@@ -71,6 +71,8 @@ updateUI=function(){
     return;
   }
   originalUpdate();
+  const elevation=state?.worldTravel?.summitElevation||0;
+  if(elevation>0)$('worldNote').textContent='Горная тропа · высота '+elevation+' м · силы '+Math.round(me?.stamina||0)+'%';
 };
 updateCityPanels=function(force=false){
   if(cityPanelMode!=='tourist')return originalPanels(force);
@@ -202,6 +204,7 @@ function worldEntities(){
       if(t.type==='payphone'){drawPaperPayphone(t.x,t.y);label('☎ Таксофон',t.x,t.y-1.6,true);}
       else if(t.type==='world-bridge'){paperBoard(t.x,t.y,w.secondBridgeProject?.stage===2?'Второй мост построен':'Стройка · мост');}
       else if(t.type==='world-sign')paperBoard(t.x,t.y,'↗ '+t.title.slice(0,20));
+      else if(t.type==='world-summit'){paperBoard(t.x,t.y,'▲ ВЕРШИНА · 100 м');}
       else if(t.type==='tourist'||t.type==='world-gate'||t.type==='world-preview'){
         paperHouse({x:t.x-1.3,y:t.y-1.8,w:t.id==='university-site'?3.2:t.id==='museum-entry'?2.8:2.35,h:t.id==='robo-stadium-site'?1.4:2.15},
           t.type==='tourist'?'shop':t.id==='museum-entry'?'museum':t.id==='robo-stadium-site'?'arena':t.id==='farlands-entry'?'gate':t.id==='industry-site'?'factory':'warehouse');
