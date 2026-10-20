@@ -170,6 +170,9 @@ function drawTravelScene(time){
   if(state.scene==='museum'){
     for(const x of [3,7,11,15])groundRect({x,y:2,w:2.5,h:2},'#d1baa4','#967e70');
     paperHouse({x:8,y:3,w:5,h:2.5},'shop');label('МУЗЕЙ СМЕХА',11,1.3);
+  }else if(state.scene==='obitel-zen'){
+    for(const [x,y] of [[4,5],[11,12],[19,13],[31,5],[33,22],[7,23]])drawTree({x,y,stock:10});
+    label('ОБИТЕЛЬ ГАБЕЛЯ · ZEN',18,2,true);
   }else{
     for(const [x,y] of [[7,5],[11,11],[17,15],[22,13]])drawTree({x,y,stock:10});
     const p=screen(21,9),s=view.s;groundRect({x:18.5,y:8,w:5,h:3},'#b9b6a5','#77796c');
