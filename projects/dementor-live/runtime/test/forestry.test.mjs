@@ -24,7 +24,7 @@ test('dig, sow, water, three growth stages, finite axe harvest and reload',()=>{
  assert.equal(command(g,p,'homeFellTree',t.id).ok,false);
  assert.equal(command(g,p,'homeWaterTree',t.id).ok,true);assert.equal(p.bag.water,0);
  g.tick(FORESTRY.firstStageMs+1);assert.equal(growthStage(g.now,t),2);assert.equal(g.walkable(t.x,t.y,p),false);
- const copy=new Game(JSON.parse(JSON.stringify(g.state))),q=copy.auth(p.token),tree=copy.state.plots[0].home.plantedTrees[0];
+ const copy=new Game(JSON.parse(JSON.stringify(g.state))),q=copy.auth(p.token),tree=copy.state.plots[0].home.plantedTrees[0];copy.now=g.now; // Simulated test clock must survive an accelerated-time restart.
  assert.equal(growthStage(copy.now,tree),2);
  copy.tick(FORESTRY.matureMs-FORESTRY.firstStageMs+1);assert.equal(growthStage(copy.now,tree),3);
  const before=copy.snapshot(q).materials.wood.total;
