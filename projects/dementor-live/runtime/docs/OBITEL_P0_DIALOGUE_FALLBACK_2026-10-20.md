@@ -1,6 +1,6 @@
 # Обитель Габеля — P0: неполные цепочки и безопасный обход
 
-Дата: 2026-10-20. **Статус: отдельная ветка, НЕ production, проверки runtime/браузера ещё не выполнены.**
+Дата: 2026-10-20. **Статус: отдельная ветка, НЕ production, автоматические модельные, HTTP/SSE и Chromium desktop/mobile smoke пройдены; production НЕ обновляли.**
 
 ## Жёсткие правила
 - Общие CharacterId, кошелёк PAPER, строительство, земля, города, предметы, перемещение и сохранения Dementor Live остаются без замены.
@@ -45,6 +45,6 @@
 6. Не меняются wallet, treasury, участки, города, инвентарь и права мэра.
 7. Незавершённая карта не выдаёт ачивку и не открывает гору.
 8. Все ранее работающие маршруты city ⇄ museum / farlands остаются рабочими.
-9. npm run check, npm test, HTTP/SSE, desktop и mobile E-action — зафиксировать отдельно; сейчас **NOT RUN**.
+9. `npm run check`, `npm test` с `obitel-p0.test.mjs`, `npm run test:integration`, Chromium browser `test/obitel-browser.cjs` — **PASS** по GitHub Actions [#39453040926](https://github.com/SLADZARI/degradation_club/actions/runs/39453040926) (изолированный временный мир, desktop 1280×800 / mobile viewport 390×844).\n10. Durable shutdown→real file restart с ответами Обители, мультиплеерная изоляция двумя клиентами, реальный iOS Safari, текущий production state — **NOT RUN**. Требуют отдельного release gate.
 
 Источники контента: `obitel.zip` и `obitel_content_registry_2026-10-20.json` из аудита 20 октября 2026. Эти файлы не включены в игровую ветку.
