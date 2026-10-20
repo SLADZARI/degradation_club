@@ -427,7 +427,7 @@ function paperBench(x,y){const s=view.s,p=screen(x,y),w=s*1.8;shadow(p.x,p.y+4,s
 }
 function drawTent(){paperTent({x:4,y:4,w:4,h:3});label('Временная мэрия',6,3.05);
  const s=view.s,t=screen(9,6);paperBox(t.x-s*.5,t.y-s*.9,s,s*.12,s*.3,-s*.18,'#ad9a74','#8a8064','#d5c59e');for(const off of [-.42,.42])paperBox(t.x+off*s,t.y-s*.8,s*.09,s*.88,s*.12,-s*.08,'#9b8d6e','#7d7860','#c4b48f');for(let i=0;i<2;i++){line(t.x+i*s*.28-s*.15,t.y-s*.8,t.x+i*s*.28-s*.15,t.y-s*.1,'#9b8462',3);line(t.x+i*s*.28-s*.28,t.y-s*.7,t.x+i*s*.28,t.y-s*.65,'#72816a',4);}label('Инструменты',9,7.1,true);
- paperBoard(3.2,8,'Доска работ');label('Доставка в мэрию',9,2,true);
+ paperBoard(3.2,8,'Доска работ');label('Приём городского груза',9,2,true);
 }
 function drawProject(){const pr=state?.project||{stage:0,work:0,accepted:{wood:0,stone:0}},o={x:14,y:10,w:10,h:8};let col=pr.stage===0?'#cfc8b419':pr.stage===1?'#d6d5c2':'#dedfce';const p=groundRect(o,col,pr.stage<3?'#aaa88a':'#b3baa0',pr.stage===0);
   if(pr.stage>0){const work=pr.stage>=2?1:pr.work/4;ctx.save();ctx.beginPath();ctx.rect(p.x,p.y,p.w,p.h*work);ctx.clip();for(let y=0;y<8;y++)for(let x=0;x<10;x++){const q=screen(14+x,10+y);rounded(q.x+1,q.y+1,view.s-2,view.s*.76-2,1,(x+y)%3?'#e6e4d1':'#d2d5c0','#c1c6ae66');}ctx.restore();}
@@ -453,7 +453,7 @@ function drawBridge(){
   label(stage>=3?'Общий мост · проход открыт':stage?'Строим переправу':'Будущий мост',36,10.6,true);
   if(bridgeActive()&&stage<3){paperOpenBox(32.5,12.3,'Материалы моста');label('Работа · E',32,15.8,true);}
 }
-function drawPlot(o){const owner=state?.players.find(p=>p.id===o.owner);const mine=o.owner===me?.id;groundRect(o,o.owner?(mine?'#9baa7a18':'#9aa58d12'):'#c8c9a31a',o.owner?'#9da980':'#b9b99b',!o.owner);
+function drawPlot(o,phase='full'){const owner=state?.players.find(p=>p.id===o.owner);const mine=o.owner===me?.id;if(phase!=='props')groundRect(o,o.owner?(mine?'#9baa7a18':'#9aa58d12'):'#c8c9a31a',o.owner?'#9da980':'#b9b99b',!o.owner);if(phase==='ground')return;
   for(const[x,y]of [[o.x,o.y],[o.x+o.w,o.y],[o.x,o.y+o.h],[o.x+o.w,o.y+o.h]]){const p=screen(x,y);line(p.x,p.y-7,p.x,p.y+3,o.owner?'#86936d':'#aca78a',2);}
   label(o.owner?(o.shop?.sign|| (mine?'Твой участок':o.ownerName||owner?.name||'Житель')):o.locked?'Откроется после расчистки':`Участок · ${state?.config.plotPrice||120} PAPER`,o.x+o.w/2,o.y+o.h/2,true);
   if(o.owner&&o.homeVisual){const t=screen(o.x+o.w*.55,o.y+o.h*.56),s=view.s,k=o.homeVisual.tent;if(k){poly([[t.x-s*.28,t.y],[t.x,t.y-s*.60],[t.x+s*.28,t.y]],k===3?'#d8c6a7':'#c1b198','#87907c');poly([[t.x,t.y-s*.60],[t.x+s*.40,t.y-s*.48],[t.x+s*.52,t.y-s*.10],[t.x+s*.28,t.y]],'#a4ab94','#788475');}if(o.homeVisual.beds){for(let i=0;i<Math.min(4,o.homeVisual.beds);i++){const q=screen(o.x+1+(i%2)*.8,o.y+o.h-1-Math.floor(i/2)*.8);rounded(q.x-3,q.y-3,6,5,1,i<o.homeVisual.crops?'#8fa67e':'#c5ae89','#839179');}}}
@@ -517,8 +517,8 @@ function render(time){positionWindows();ctx.clearRect(0,0,view.w,view.h);ctx.fil
   if(state?.expedition){const gate=state.config.expedition.gate;paperBoard(gate.x,gate.y,'Миссия · расчистка');}
   if(state)paperBoard(29,35,'⚔ Боевая зона');
   drawProject();if(typeof drawPlaza==='function')drawPlaza();
-  if(state){for(const plot of state.plots)drawPlot(plot);}else for(const o of [{x:4,y:15,w:6,h:6},{x:4,y:23,w:6,h:6},{x:14,y:23,w:6,h:6}])drawPlot(o);
-  drawForge();
+  if(state){for(const plot of state.plots)drawPlot(plot,'ground');}else for(const o of [{x:4,y:15,w:6,h:6},{x:4,y:23,w:6,h:6},{x:14,y:23,w:6,h:6}])drawPlot(o,'ground');
+  if((state?.forge.stage||0)<2)drawForge();
   drawToolSign(24,3);drawHempBush(16.7,3.3);label('Благоустройство',16.7,1,true);label('Магазин инструмента',24,.3,true);
   if(state?.seedMarket){label(state.seedMarket.stage>=state.config.seedMarket.stages.length?'Семенная лавка':'Стройка лавки',23,4.9,true);}
   if(state?.gardenProject){const built=state.gardenProject.stage>=state.config.cityGarden.stages.length;groundRect({x:25.5,y:8.4,w:5.6,h:2.5},built?'#e0dfc6':'#eae5d7','#a7ad89',!built);label(built?'Городской огород':'Стройка огорода',28,8,true);if(built)for(const bed of state.publicGarden.beds){const x=26+(Number(bed.id.split('-').at(-1))%3)*1.6,y=9;groundRect({x,y,w:1.2,h:1},bed.crop?'#98a981':'#c4b49b','#8d956f');}}
@@ -528,6 +528,8 @@ function render(time){positionWindows();ctx.clearRect(0,0,view.w,view.h);ctx.fil
   const resources=state?.resources||[];
    // The extended world contributes its sprites to this SAME z-sort, never a second paint pass.
    const entities=[
+      ...(state?.plots||[]).map(plot=>({depth:plot.x+plot.w*.55+plot.y+plot.h*.56,draw:()=>drawPlot(plot,'props')})),
+      ...(state?.forge?.stage>=2?[{depth:24+6+23+5,draw:drawForge}]:[]),
       ...(typeof window.__worldEntities==='function'?window.__worldEntities():[]),
      {depth:4+4+4+3,draw:drawTent},
      {depth:22.7+1+2.6+2,draw:()=>paperHouse({x:22.7,y:1,w:2.6,h:2},'shop')},
