@@ -81,7 +81,7 @@ try{
     }return realFetch(url,options);};
   });
   await page.touchscreen.tap(target.screen.x,target.screen.y);
-  await page.waitForFunction(()=>route.length>0||Math.hypot(me.x-arguments[0].x,me.y-arguments[0].y)<0.8,target.world,{timeout:2500}).catch(async err=>{
+  await page.waitForFunction(goal=>route.length>0||Math.hypot(me.x-goal.x,me.y-goal.y)<0.8,target.world,{timeout:2500}).catch(async err=>{
     const status=await page.evaluate(()=>({position:{x:me.x,y:me.y},route,selected,inputs:window.__navQA?.inputs}));
     throw Error('Tap never initiated a route: '+JSON.stringify(status)+'; '+err.message);
   });
@@ -106,7 +106,7 @@ try{
     console.error('MOBILE_NAVIGATION_TIMEOUT_DIAGNOSTIC',JSON.stringify(diagnostic));
     throw navigationError;
   }
-  const audit=await page.evaluate(()=>({movementCommands:window.__navQA.inputs.filter(p=>Math.hypot(p.dx,p.dy)>0.05).length,finalDistance:Math.hypot(me.x-target.world.x,me.y-target.world.y)}));
+  const audit=await page.evaluate(goal=>({movementCommands:window.__navQA.inputs.filter(p=>Math.hypot(p.dx,p.dy)>0.05).length,finalDistance:Math.hypot(me.x-goal.x,me.y-goal.y)}),target.world);
   assert.ok(audit.movementCommands>0,'Tap did not trigger any nonzero /api/input');
   console.log('MOBILE TAP_ROUTE_INPUT_ARRIVAL PASS',JSON.stringify(audit));
   console.log('MOBILE NAVIGATION PASS');
