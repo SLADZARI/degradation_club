@@ -8,6 +8,8 @@ test('completed forge never traps builders or a neighboring human within new col
  builder.x=27;builder.y=26;neighbor.x=26.5;neighbor.y=25;safe.x=18;safe.y=16;
  const before={x:safe.x,y:safe.y};
  assert.equal(g.rects().some(o=>o.id==='forge'),false);
+ // The forge is unlocked only after the shared square is complete.
+ g.state.project.stage=g.c.stages.length;
  g.state.forge.stage=g.c.forge.stages.length-1;
  g.state.forge.work=g.c.forge.stages.at(-1).works-1;
  const total=g.state.treasury+builder.wallet+neighbor.wallet+safe.wallet;
