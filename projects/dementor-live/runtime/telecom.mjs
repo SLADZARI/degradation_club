@@ -71,8 +71,9 @@ export function telecomAction(network,p,cmd){
   if(!recipient)throw Error('Абонент не найден');
   const target=network.findId(recipient.id);
   if(!target)throw Error('Абонент недоступен');
-  const message=cleanText(cmd.text);
-  if(!message||message.length>100)throw Error('Сообщение должно содержать от 1 до 100 символов');
+  const raw=String(cmd.text||'').trim();
+  if(!raw||raw.length>100)throw Error('Сообщение должно содержать от 1 до 100 символов');
+  const message=cleanText(raw);if(!message)throw Error('Напиши сообщение');
   if(p.wallet<PAGE_FEE)throw Error('Нужна 1 PAPER');
   p.wallet-=PAGE_FEE;g.state.treasury+=PAGE_FEE;
   const letter={id:randomUUID(),from:p.pagerNumber,fromName:p.name,to:toNumber,text:message,at:g.now,readAt:null};
