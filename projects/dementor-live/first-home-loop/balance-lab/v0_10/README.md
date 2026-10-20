@@ -21,3 +21,6 @@
 - [Основной FIRST HOME LOOP](../../README.md)
 
 Полный standalone HTML, архив всех подтверждённых прежних HTML, JS, Node/browser тесты, точные JSON реестры и полный отчёт переданы как chat artifacts в ответе пользователю. **Этот GitHub раздел содержит индекс/контракты и не заявляет, будто код игрового runtime был развёрнут.** Production, деньги пользователей, save volumes и Master GDD не изменены.
+
+## Runtime bridge v0.10.1
+Новый слой [v0.10.1](../v0_10_1/README.md) добавляет read-only связку с реальным CityNetwork RC2, не меняя исходное экономическое ядро или паспорта worlds v0.10. [Source integration PR #295](https://github.com/SLADZARI/degradation_club/pull/295). Реальные NPC/wilderness и сохранение мира не переписаны.
