@@ -7,6 +7,7 @@ function setRoute(path){route=path;routeActivity={x:me?.x||0,y:me?.y||0,at:perfo
 let view={w:innerWidth,h:innerHeight,s:28,cx:innerWidth<760?10:16,cy:innerWidth<760?12:16,zoom:innerWidth<760?1.15:1},toastTimer;
 const motionFrames=[];
 let lastWallet=null,lastChatSignature='';
+let seenChatIds=null,hoverWorld=null;
 const colors=['#a97059','#6e8971','#65858f'];
 const names={wood:'Древесина',stone:'Камень',food:'Ягоды',seed_hemp:'Семена конопли',seed_carrot:'Семена моркови',hemp:'Конопля',carrot:'Морковь',water:'Вода'};
 const toolNames={axe:'🪓 Топор',pick:'⛏️ Кирка'};
@@ -15,6 +16,7 @@ if(new URL(location).searchParams.has('new')){token=null;sessionStorage.removeIt
 function toast(text){$('toast').textContent=text;$('toast').classList.add('visible');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').classList.remove('visible'),2600);}
 async function api(endpoint,data){const res=await fetch('/api/'+endpoint,{method:data?'POST':'GET',headers:{'Content-Type':'application/json',...(token?{Authorization:'Bearer '+token}:{})},...(data?{body:JSON.stringify(data)}:{})});const result=await res.json();if(res.status===401){token=null;sessionStorage.removeItem('dementor-token');stream?.close();$('welcome').showModal();}return result;}
 async function act(type,target,extra={}){if(!connected||requestPending)return;requestPending=true;try{const result=await api('action',{type,target,requestId:Array.from(crypto.getRandomValues(new Uint8Array(16)),b=>b.toString(16).padStart(2,'0')).join(''),...extra});if(result.message&&(!result.started||!holdAction))toast(result.message);return result;}catch{toast('Нет связи с миром. Переподключаемся…');}finally{requestPending=false;}}
+function playNeighborChime(){try{const C=window.AudioContext||window.webkitAudioContext;if(!C||navigator.userActivation?.hasBeenActive===false)return;const a=new C(),o=a.createOscillator(),g=a.createGain();o.type='sine';o.frequency.setValueAtTime(650,a.currentTime);o.frequency.exponentialRampToValueAtTime(840,a.currentTime+.12);g.gain.setValueAtTime(.0001,a.currentTime);g.gain.exponentialRampToValueAtTime(.035,a.currentTime+.02);g.gain.exponentialRampToValueAtTime(.0001,a.currentTime+.16);o.connect(g).connect(a.destination);o.start();o.stop(a.currentTime+.17);o.onended=()=>a.close().catch(()=>{});}catch{}}
 function connect(){stream?.close();motionFrames.length=0;stream=new EventSource('/api/events?token='+encodeURIComponent(token));stream.onmessage=e=>{state=JSON.parse(e.data);me=state.players.find(p=>p.id===state.me);if(lastScene!==state.scene+me.plotId+(state.cityNetwork?.current||'origin')){lastScene=state.scene+me.plotId+(state.cityNetwork?.current||'origin');resize();motionFrames.length=0;route=[];selected=null;context=null;if($('cityPanel').open)$('cityPanel').close();}motionFrames.push({at:performance.now(),players:new Map(state.players.map(p=>[p.id,{x:p.x,y:p.y,spirit:p.spirit}]))});if(motionFrames.length>20)motionFrames.shift();connected=true;updateUI();};stream.onerror=()=>{connected=false;$('connection').classList.add('offline');$('connection').lastChild.textContent='Нет связи';};}
 $('joinForm').onsubmit=async e=>{e.preventDefault();const button=e.target.querySelector('button');button.disabled=true;try{const result=await api('join',{name:$('nameInput').value});if(!result.ok){$('joinError').textContent=result.message;return;}token=result.token;sessionStorage.setItem('dementor-token',token);$('welcome').close();connect();canvas.focus();}catch{$('joinError').textContent='Сервер недоступен. Проверь локальный запуск.';}finally{button.disabled=false;}};
 if(token)api('state').then(r=>{if(r.me)connect();else if(!$('welcome').open)$('welcome').showModal();}).catch(()=>$('welcome').showModal());else $('welcome').showModal();
@@ -71,7 +73,7 @@ function updateContext(){if(!me)return;const near=allTargets().map(t=>({...t,d:M
 function updateUI(){if(!me)return;renderQuick();
   const c=currentConfig(),p=currentProject(),totalWorks=c.stages.reduce((n,s)=>n+s.works,0),doneWorks=c.stages.slice(0,p.stage).reduce((n,s)=>n+s.works,0)+p.work;
   const progress=Math.round((p.accepted.wood+p.accepted.stone+doneWorks)/(c.need.wood+c.need.stone+totalWorks)*100);
-  const population=state.players.filter(p=>p.online).length;$('connection').classList.remove('offline');$('connection').lastChild.textContent=population===1?'Ты в мире':`В мире · ${population}`;
+  const population=state.players.filter(p=>p.online).length;$('connection').classList.remove('offline');$('connection').lastChild.textContent=`Жители · ${population}`;
   $('playerName').textContent=me.name;$('avatarDot').style.background=colors[me.color];$('spiritLabel').textContent=me.spirit?'дух':'';if(lastWallet!==me.wallet){lastWallet=me.wallet;$('wallet').innerHTML=`${me.wallet} <small>PAPER</small>`;}
   for(const key of ['health','hunger','stamina']){$(key).value=me[key];$(key+'Value').textContent=Math.ceil(me[key]);}
   document.querySelector('#quest h1').textContent=bridgeActive()?'Мост на другой берег':forgeActive()?'Общественная кузница':'Городская площадь';
@@ -84,7 +86,7 @@ function updateUI(){if(!me)return;renderQuick();
   $('task').textContent=forgeActive()?task.replaceAll('на площадь','к кузнице').replace('Площадь готова','Кузница готова'):task;
   $('axeDurability').textContent=me.tools.axe?`${me.tools.axe} / ${me.toolInfo.axe.max}`:'в мэрии';$('pickDurability').textContent=me.tools.pick?`${me.tools.pick} / ${me.toolInfo.pick.max}`:'в мэрии';$('axeButton').classList.toggle('selected',me.equipped==='axe');$('pickButton').classList.toggle('selected',me.equipped==='pick');
   $('woodCount').querySelector('b').textContent=me.bag.wood;$('stoneCount').querySelector('b').textContent=me.bag.stone;$('foodCount').textContent=me.bag.food;$('cargo').textContent=`${Number(cargo().toFixed(1))} / ${c.capacity}`;$('cargo').parentElement.classList.toggle('full',cargo()>=c.capacity);$('eatButton').disabled=me.bag.food<1&&me.bag.carrot<1;
-  $('socialButton').textContent=state.trades.length?'Сделки · '+state.trades.length:'Жители';if(state.scene!=='city'){document.querySelector('#quest h1').textContent=state.scene==='interior'?'Твоя палатка':'Жизнь на участке';$('task').textContent='☷ Места участка · расчистка, палатка, вода и огород';$('stageTitle').textContent=`Палатка ${state.home.tent}/3 · грядки ${state.home.beds.length}/6`;$('projectPercent').textContent='';$('projectBar').style.width=`${(state.home.tent+state.home.beds.length)/9*100}%`;}$('worldNote').textContent=state.scene==='city'?'Пустое поле сегодня. Наш город — завтра.':'Выращивай своё. Делись с соседями.';const chatSignature=JSON.stringify(state.chat.slice(-4));if(lastChatSignature!==chatSignature){lastChatSignature=chatSignature;const chat=$('chatMessages');chat.replaceChildren();for(const m of state.chat.slice(-4)){const div=document.createElement('div'),b=document.createElement('b');b.textContent=m.name;div.append(b,document.createTextNode(m.text));chat.append(div);}}
+  $('socialButton').textContent=state.trades.length?'Сделки · '+state.trades.length:'Жители';if(state.scene!=='city'){document.querySelector('#quest h1').textContent=state.scene==='interior'?'Твоя палатка':'Жизнь на участке';$('task').textContent='☷ Места участка · расчистка, палатка, вода и огород';$('stageTitle').textContent=`Палатка ${state.home.tent}/3 · грядки ${state.home.beds.length}/6`;$('projectPercent').textContent='';$('projectBar').style.width=`${(state.home.tent+state.home.beds.length)/9*100}%`;}$('worldNote').textContent=state.scene==='city'?'Пустое поле сегодня. Наш город — завтра.':'Выращивай своё. Делись с соседями.';const chatSignature=JSON.stringify(state.chat.slice(-4));if(lastChatSignature!==chatSignature){const newIds=new Set(state.chat.map(m=>m.id));if(seenChatIds&&state.chat.some(m=>!seenChatIds.has(m.id)&&m.player!==me.id))playNeighborChime();seenChatIds=newIds;lastChatSignature=chatSignature;const chat=$('chatMessages');chat.replaceChildren();for(const m of state.chat.slice(-4)){const div=document.createElement('div'),b=document.createElement('b');b.textContent=m.name;div.append(b,document.createTextNode(m.text));chat.append(div);}}
   if($('details').open){const details=$('projectDetails');details.replaceChildren();const rows=[['Древесина',`${p.accepted.wood} / ${c.need.wood} принято`],['Камень',`${p.accepted.stone} / ${c.need.stone} принято`],...c.stages.map((s,i)=>[s.title,i<p.stage?'Готово':i===p.stage?`${p.work} / ${s.works} работ`:'Следующий этап'])];
   for(const [name,value]of rows){const row=document.createElement('div');row.className='stage-row';const b=document.createElement('b'),span=document.createElement('span');b.textContent=name;span.textContent=value;row.append(b,span);details.append(row);}$('cityBudget').textContent=`Казна города · ${state.treasury} PAPER. Выплачено за текущий проект · ${p.spent} PAPER. Тестовые значения прототипа.`;}
   if(typeof updateQuestTracker==='function')updateQuestTracker();if(typeof syncCityMusic==='function')syncCityMusic();updateContext();updateCityPanels();
@@ -218,6 +220,7 @@ if(('ontouchstart' in window||navigator.maxTouchPoints>0)&&!standalone&&!session
 }
 $('standaloneDismiss').onclick=()=>{$('standaloneTip').hidden=true;sessionStorage.setItem('dementor-standalone-tip','1');};
 window.__cityMobileInput=()=>({active:cityPointerId!==null,movement:touchMove,selected,nearCombat:!!(me&&Math.hypot(me.x-29,me.y-35)<=state?.config?.actionRange)});
+function screenAlignedMotion(dx,dy){if(state?.scene!=='city')return [dx,dy];const n=Math.hypot(dx,dy);if(!n)return [0,0];const sx=dx/n,sy=dy/n;return [(sy+sx)/Math.SQRT2,(sy-sx)/Math.SQRT2];}
 setInterval(()=>{if(!connected||!me)return;let dx=0,dy=0;if(!$('welcome').open&&!['INPUT','TEXTAREA','SELECT'].includes(document.activeElement?.tagName)){
   dx=Number(keys.has('KeyD')||keys.has('ArrowRight'))-Number(keys.has('KeyA')||keys.has('ArrowLeft'));dy=Number(keys.has('KeyS')||keys.has('ArrowDown'))-Number(keys.has('KeyW')||keys.has('ArrowUp'));if(touchMove)[dx,dy]=touchMove;
   if(!dx&&!dy&&route.length){
@@ -230,7 +233,7 @@ setInterval(()=>{if(!connected||!me)return;let dx=0,dy=0;if(!$('welcome').open&&
      }
    }
   if(holdAction)doContext();
-  }if(!inputPending){inputPending=true;api('input',{dx,dy,sprint:keys.has('ShiftLeft')||keys.has('ShiftRight')}).catch(()=>{}).finally(()=>{inputPending=false;});}
+  }if((keys.size||touchMove)&&(dx||dy))[dx,dy]=screenAlignedMotion(dx,dy);if(!inputPending){inputPending=true;api('input',{dx,dy,sprint:keys.has('ShiftLeft')||keys.has('ShiftRight')}).catch(()=>{}).finally(()=>{inputPending=false;});}
 },80);
 
 // ISO30 is a projection of the existing world coordinates, not a change to gameplay.
@@ -267,6 +270,7 @@ function selectWorldTarget(e){if(e.button===2)return;if(!me||$('welcome').open)r
   }else{selected=null;const path=findPath(w);if(path)setRoute(path);else toast(w.x>=state.config.river.x&&!bridgeOpen()?'Здесь нужна переправа. Сначала достройте мост.':'Не получается пройти — выбери свободное место.');}
 }
 
+canvas.addEventListener('pointermove',e=>{if(e.pointerType==='mouse'){const r=canvas.getBoundingClientRect();hoverWorld=worldPoint(e.clientX-r.left,e.clientY-r.top);}});canvas.addEventListener('pointerleave',()=>{hoverWorld=null;});
 const activeTouches=new Map();
 let pinchDistance=0,gestureActive=false,tapStart=null;
 canvas.addEventListener('pointerdown',e=>{
@@ -301,7 +305,7 @@ window.addEventListener('resize',resize);resize();
 function poly(points,fill,stroke='#595d4b',width=1){ctx.beginPath();points.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y));ctx.closePath();if(fill){ctx.fillStyle=fill;ctx.fill();}if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=width;ctx.stroke();}}
 function rounded(x,y,w,h,r,fill,stroke){ctx.beginPath();ctx.roundRect(x,y,w,h,r);if(fill){ctx.fillStyle=fill;ctx.fill();}if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=1;ctx.stroke();}}
 function line(x,y,x2,y2,color,width=1){ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x2,y2);ctx.strokeStyle=color;ctx.lineWidth=width;ctx.stroke();}
-function label(text,x,y,small=false){const p=screen(x,y);ctx.font=`${small?9:10}px Paper, Arial`;const width=ctx.measureText(text).width;rounded(p.x-width/2-7,p.y-10,width+14,18,6,'#f6f3e5dc');ctx.textAlign='center';ctx.fillStyle=small?'#939781':'#6c7460';ctx.fillText(text,p.x,p.y+2);}
+function label(text,x,y,small=false){if(me&&Math.hypot(me.x-x,me.y-y)>3.1&&(!hoverWorld||Math.hypot(hoverWorld.x-x,hoverWorld.y-y)>1.4))return;const p=screen(x,y);ctx.font=`${small?9:10}px Paper, Arial`;const width=ctx.measureText(text).width;rounded(p.x-width/2-7,p.y-10,width+14,18,6,'#f6f3e5dc');ctx.textAlign='center';ctx.fillStyle=small?'#939781':'#6c7460';ctx.fillText(text,p.x,p.y+2);}
 function groundRect(o,color,border,dash=false){
   if(state?.scene&&state.scene!=='city'){const p=screen(o.x,o.y),w=o.w*view.s,h=o.h*view.s*.76;ctx.setLineDash(dash?[4,6]:[]);rounded(p.x,p.y,w,h,3,color,border);ctx.setLineDash([]);return {...p,w,h};}
   const corners=[[o.x,o.y],[o.x+o.w,o.y],[o.x+o.w,o.y+o.h],[o.x,o.y+o.h]].map(([x,y])=>{const p=screen(x,y);return [p.x,p.y];});
@@ -405,6 +409,7 @@ function updateVisualPlayers(time){
   }
   for(const id of visualPlayers.keys())if(!visible.has(id))visualPlayers.delete(id);
 }
+function drawSpeechBubble(p,q,headY,s){const msg=[...(state?.chat||[])].reverse().find(m=>m.player===p.id&&state.now-m.at<6000);if(!msg)return;const words=msg.text.slice(0,110).split(/\s+/),lines=[];ctx.font='11px Arial';let row='';for(const word of words){const next=row?row+' '+word:word;if(ctx.measureText(next).width>153&&row){lines.push(row);row=word;}else row=next;}if(row)lines.push(row);const shown=lines.slice(0,3),w=Math.max(75,Math.min(178,...shown.map(l=>ctx.measureText(l).width+20))),h=shown.length*15+14,x=Math.max(7,Math.min(view.w-w-7,q.x-w/2)),y=Math.max(6,headY-s*.75-h);rounded(x,y,w,h,8,'#fffaf0','#c4bda9');poly([[q.x-6,y+h-1],[q.x+5,y+h-1],[q.x-2,y+h+8]],'#fffaf0','#c4bda9');ctx.fillStyle='#354337';ctx.textAlign='left';shown.forEach((v,i)=>ctx.fillText(v,x+10,y+17+i*15));}
 function drawPlayer(p,time){const v=visualPlayers.get(p.id)||p,moving=v.moving;
 const q=screen(v.x,v.y),s=view.s*.9;const bob=moving?Math.sin(time*.015)*s*.05:0;const body=colors[p.color];
   shadow(q.x,q.y+3,s*.48,s*.14);ctx.save();if(p.spirit)ctx.globalAlpha=.6;const headY=q.y-s*1.55+bob;
@@ -414,7 +419,7 @@ const q=screen(v.x,v.y),s=view.s*.9;const bob=moving?Math.sin(time*.015)*s*.05:0
   if(p.id===me?.id&&!p.spirit&&!heldResource()&&me.tools[me.equipped]){const toolX=q.x+s*.5,toolY=q.y-s*.66+((me.job&&me.job.kind==='mine')?Math.sin(time*.03)*s*.2:0);line(toolX,toolY,toolX+s*.23,toolY-s*.48,'#927f5e',3);line(toolX+s*.12,toolY-s*.42,toolX+s*.4,toolY-s*.32,'#6c7b69',5);}
   ctx.restore();ctx.textAlign='center';ctx.font='9px Paper, Arial';ctx.fillStyle=p.id===me?.id?'#5b6b4e':'#818d74';ctx.fillText(p.id===me?.id?`${p.name} · ты`:p.name,q.x,headY-s*.35);
   if(p.id===me?.id&&heldResource()){paperBox(q.x+s*.35,q.y-s*.65,s*.25,s*.25,s*.12,-s*.1,'#b8b09a','#938e7b','#ddd4bc');}
-  if(p.id===me?.id){ctx.beginPath();ctx.ellipse(q.x,q.y+3,s*.53,s*.21,0,0,Math.PI*2);ctx.strokeStyle='#8ca46999';ctx.lineWidth=1.5;ctx.stroke();}
+  if(p.id===me?.id){ctx.beginPath();ctx.ellipse(q.x,q.y+3,s*.53,s*.21,0,0,Math.PI*2);ctx.strokeStyle='#8ca46999';ctx.lineWidth=1.5;ctx.stroke();}drawSpeechBubble(p,q,headY,s);
 }
 function render(time){positionWindows();ctx.clearRect(0,0,view.w,view.h);ctx.fillStyle='#efebdf';ctx.fillRect(0,0,view.w,view.h);
   updateVisualPlayers(time);if(me){const hero=visualPlayers.get(me.id)||me;view.cx=hero.x;view.cy=hero.y;}
@@ -471,6 +476,10 @@ canvas.addEventListener('contextmenu',e=>{e.preventDefault();placeQuick();});
 // Sidebar preference is independent of game progress.
 function setQuestCollapsed(collapsed){$('quest').classList.toggle('collapsed',collapsed);$('questToggle').setAttribute('aria-expanded',String(!collapsed));$('questChevron').textContent=collapsed?'▸':'▾';try{localStorage.setItem(innerWidth<760?'dementor-mobile-quest-collapsed':'dementor-quests-collapsed',String(collapsed));}catch{}}
 $('questToggle').onclick=()=>setQuestCollapsed(!$('quest').classList.contains('collapsed'));
+function setQuestFocused(f){$('quest').classList.toggle('focus',f);$('questViewToggle').textContent=f?'Показать все задания ▾':'Только текущее задание ▴';$('questViewToggle').setAttribute('aria-expanded',String(!f));try{localStorage.setItem('dementor-quest-focused',String(f));}catch{}}
+$('questViewToggle').onclick=()=>setQuestFocused(!$('quest').classList.contains('focus'));
+$('questDoneToggle').onclick=()=>{const el=$('questDoneList');el.hidden=!el.hidden;$('questDoneToggle').setAttribute('aria-expanded',String(!el.hidden));};
+try{setQuestFocused(localStorage.getItem('dementor-quest-focused')!=='false');}catch{setQuestFocused(true);}
 try{
   const mobile=matchMedia('(max-width:760px)').matches;
   const saved=localStorage.getItem(mobile?'dementor-mobile-quest-collapsed':'dementor-quests-collapsed');

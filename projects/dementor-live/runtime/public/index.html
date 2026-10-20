@@ -15,13 +15,12 @@
       <div class="top-right"><span id="connection" class="connection"><i></i>Подключаемся</span><button id="helpButton" class="icon-button" aria-label="Управление и второй игрок">?</button></div>
     </header>
     <section id="quest" class="quest glass" aria-label="Текущая задача">
-      <button id="questToggle" class="quest-toggle" aria-expanded="true" aria-controls="questList"><span>Твои задания</span><span id="questChevron" aria-hidden="true">▾</span></button>
-      <div class="eyebrow"><span class="tiny-dot"></span><span id="questCategory">ОБЩИЙ ПРОЕКТ</span> <span id="projectPercent">0%</span></div>
-      <h1>Городская площадь</h1>
-      <p id="task">Возьми инструмент в мэрии</p>
-      <div class="progress-track"><span id="projectBar"></span></div>
-      <ol id="questList" class="quest-list" aria-label="Задания и статусы"></ol>
-      <div class="quest-footer"><span id="stageTitle">Начинаем с пустого поля</span><button id="detailsButton" aria-label="Подробнее о городском проекте">↗</button></div>
+      <button id="questToggle" class="quest-toggle" aria-expanded="true" aria-controls="questList"><span>Твои задания</span><span id="questChevron" aria-hidden="true">▾</span></button><button id="questActive" class="quest-active" type="button"><span id="questActiveTitle">Текущее задание</span><small id="questActiveHint">Нажми, чтобы идти к цели</small></button>
+      <button id="questViewToggle" class="quest-view-toggle" type="button" aria-expanded="false" aria-controls="questList">Показать все задания ▾</button>
+      <ol id="questList" class="quest-list" aria-label="Активные задания"></ol>
+      <button id="questDoneToggle" class="quest-done-toggle" type="button" aria-expanded="false" aria-controls="questDoneList" hidden>✓ 0 выполнено</button>
+      <ol id="questDoneList" class="quest-done-list" aria-label="Выполненные задания" hidden></ol>
+      <div class="quest-legacy" hidden><span id="questCategory"></span><span id="projectPercent"></span><h1></h1><p id="task"></p><span id="projectBar"></span><span id="stageTitle"></span><button id="detailsButton" type="button"></button></div>
     </section>
     <section id="vitals" class="vitals glass" aria-label="Состояние жителя">
       <div class="identity"><span id="avatarDot"></span><b id="playerName">Житель</b><span id="spiritLabel"></span><strong id="wallet">0 <small>PAPER</small></strong></div>
