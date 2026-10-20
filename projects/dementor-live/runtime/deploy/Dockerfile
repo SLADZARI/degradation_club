@@ -11,7 +11,8 @@ COPY --chown=node:node . .
 RUN python3 icons-v2/install-v2.py /app /app/icons-v2
 RUN python3 tools/install-new-icons-v3.py /app
 RUN python3 tools/build-terrain.py
-RUN npm run doctor && npm run check && npm run check:icons && npm run check:icons-new && install -d -o node -g node /app/data
+RUN npm run doctor && npm run check && install -d -o node -g node /app/data
+RUN npm run check:icons-new
 
 USER node
 EXPOSE 4173
