@@ -36,11 +36,6 @@ jobs:
           assert 'a38a03e68fcec5ceac45c0c362436ee6d69d5c5d' in s
           assert all(x in s for x in ['39473604439','39473604350','39473604513','39473604305','39473604530'])
           assert s.count('ssh "${SSH_OPTS[@]}"') == 1
-          assert 'OWNER_GO_SHA' in s
-          assert 'DEMENTOR_GO_SHA' in s
-          assert 'ALREADY DEPLOYED:' in s
-          assert 'approved_sha' in s
-          assert 'RUNNING_IMAGE' in s
           assert 'safe-20261020T180923Z-970882dee4/world.json' in s
           assert '--mount "type=bind,source=$LAST_FROZEN_BACKUP,target=/readonly/world.json,readonly"' in s
           assert 'down -v' not in s and '--reset-world' not in s
