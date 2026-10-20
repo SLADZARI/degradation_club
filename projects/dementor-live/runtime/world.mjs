@@ -188,6 +188,7 @@ export class Game {
     }
     if(type==='tools'){if(t.type!=='tools')throw Error('Инструменты выдаёт мэрия');syncEquipment(p,c);const missing=['axe','pick'].filter(k=>!p.tools[k]).length;if(p.toolItems.length+missing>12)throw Error('Освободи место для инструментов');for(const tool of ['axe','pick']){if(!p.tools[tool])addTool(p,tool,c.toolDurability,'basic',c);else if(p.toolInfo[tool].max<=c.toolDurability){p.tools[tool]=c.toolDurability;p.toolInfo[tool]={tier:'basic',max:c.toolDurability};}}return {message:'Стартовые инструменты выданы. Улучшенные сохранены без бесплатного ремонта.'};}
     if(type==='mine'){
+      if(t.species==='spruce'&&p.toolInfo?.axe?.tier==='basic')throw Error('Для ели нужен улучшенный топор из кузницы');
       if(!['wood','stone'].includes(t.type))throw Error('Здесь нечего добывать');if(t.stock<=0)throw Error('Этот запас исчерпан');const tool=t.type==='wood'?'axe':'pick';if(p.equipped!==tool)throw Error(tool==='axe'?'Выбери топор — клавиша 1':'Выбери кирку — клавиша 2');if(p.tools[tool]<=0)throw Error('Инструмент сломан — возьми замену в мэрии');
       if(loadWeight(p,c)+c.weights[t.type]>bagCapacity(p,c,this.now))throw Error('Рюкзак полон — отнеси материалы на площадь');return this.start(p,'mine',target,c.mineMs);
     }
