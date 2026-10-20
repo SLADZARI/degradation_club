@@ -62,10 +62,15 @@ try{
   });
   assert.ok(pinch.after>pinch.before,'Two-touch pinch handler must zoom');
   const target=await page.evaluate(()=>{
-    const c=[{x:me.x+2.5,y:me.y},{x:me.x-2.5,y:me.y},{x:me.x,y:me.y+2.5},{x:me.x,y:me.y-2.5}]
-      .find(p=>!blocked(p.x,p.y)&&!blocked((p.x+me.x)/2,(p.y+me.y)/2));
-    if(!c)throw Error('No free navigation target near spawn');
-    return {world:c,screen:screen(c.x,c.y)};
+    const canvasRect=document.getElementById('world').getBoundingClientRect();
+    const candidates=[{x:me.x+2.5,y:me.y},{x:me.x-2.5,y:me.y},{x:me.x,y:me.y+2.5},{x:me.x,y:me.y-2.5}]
+      .map(world=>({world,screen:screen(world.x,world.y),path:findPath(world)}));
+    const chosen=candidates.find(({world,screen:s,path})=>
+      !blocked(world.x,world.y)&&path&&path.length>0&&
+      s.x>24&&s.y>100&&s.x<canvasRect.width-24&&s.y<canvasRect.height-60&&
+      document.elementFromPoint(s.x,s.y)?.id==='world');
+    if(!chosen)throw Error('No visible, tappable and path-connected navigation target: '+JSON.stringify(candidates.map(c=>({world:c.world,screen:c.screen,path:!!c.path}))));
+    return {world:chosen.world,screen:chosen.screen};
   });
   await page.touchscreen.tap(target.screen.x,target.screen.y);
   try{
