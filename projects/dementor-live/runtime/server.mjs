@@ -11,6 +11,7 @@ import {createHash,timingSafeEqual} from 'node:crypto';
 import {packTerrainSse} from './terrain-delta.mjs';
 import { CONFIG } from './config.mjs';
 import { combatRoot,createCombat,joinCombat,combatAction,combatView,advanceCombat } from './combat-p0.mjs';
+import {withActionCode,withHttpCode} from './result-codes.mjs';
 
 const root=path.dirname(fileURLToPath(import.meta.url));
 const version=JSON.parse(fs.readFileSync(path.join(root,'package.json'),'utf8')).version;
@@ -56,7 +57,7 @@ function save(){
 const terrainCursors=new WeakMap();
 function terrainEvent(snapshot,res){const packed=packTerrainSse(snapshot,terrainCursors.get(res));terrainCursors.set(res,packed.cursor);return `data: ${JSON.stringify(packed.snapshot)}\n\n`;}
 function broadcast(){for(const[id,set]of streams){const p=network.findId(id)?.p;if(!p)continue;const snapshot=stateFor(p);for(const res of set)res.write(terrainEvent(snapshot,res));}}
-function json(res,status,data){res.writeHead(status,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'});res.end(JSON.stringify(data));}
+function json(res,status,data){res.writeHead(status,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'});res.end(JSON.stringify(withHttpCode(data,status)));}
 async function body(req){let text='';for await(const chunk of req){text+=chunk;if(text.length>4096)throw Error('Слишком большой запрос');}return JSON.parse(text||'{}');}
 const server=http.createServer(async(req,res)=>{
   try{
@@ -116,7 +117,7 @@ const server=http.createServer(async(req,res)=>{
         if(!data.requestId||typeof data.requestId!=='string'||data.requestId.length<4||data.requestId.length>100)throw Error('Требуется requestId');
         let result;
         if(['create','join','buyAmmo'].includes(kind)){
-          const old=p.results?.find(r=>r.id===data.requestId);if(old){json(res,200,old.result);return;}
+          const old=p.results?.find(r=>r.id===data.requestId);if(old){json(res,200,withActionCode(old.result));return;}
           if((p.scene||'city')!=='city'||p.spirit||p.delivery?.picked||p.job)throw Error('Закончи городское дело перед боем');
           if(network.findId(p.id)?.cityId!=='origin')throw Error('Пока боевая зона только у первого города');
           g.near(p,{x:29,y:35});
@@ -155,7 +156,7 @@ const server=http.createServer(async(req,res)=>{
         // High-frequency movement is transient: never sync-write the entire world on every 125ms input.
         // Critical inventory/weapon/combat commands are still persisted immediately.
         if(kind==='input'){qaRecorder.input(p,network.findId(p.id)?.cityId,data);json(res,200,result);return;}
-        qaRecorder.command(p,network.findId(p.id)?.cityId,{...data,type:'combat:'+kind},{ok:true},walletBeforeCombat);g.changed();save();json(res,200,result);return;
+        qaRecorder.command(p,network.findId(p.id)?.cityId,{...data,type:'combat:'+kind},{ok:true},walletBeforeCombat);g.changed();save();json(res,200,withActionCode(result));return;
       }
       if(url.pathname==='/api/admin/treasury'){
         if(!adminAvailable){json(res,403,{ok:false,message:'Тестовая казна отключена: нужны HTTPS и серверный ключ'});return;}
@@ -171,7 +172,7 @@ const server=http.createServer(async(req,res)=>{
         json(res,200,{ok:true,message:'Перечислено '+amount+' PAPER из казны',treasury:target.g.state.treasury});return;
       }
       if(url.pathname==='/api/input'){if(!network.gameFor(p).online.has(p.id))throw Error('Нет подключения к миру');network.gameFor(p).input(p,data);qaRecorder.input(p,network.findId(p.id)?.cityId,data);json(res,200,{ok:true});return;}
-      if(url.pathname==='/api/action'){if(!network.gameFor(p).online.has(p.id))throw Error('Нет подключения к миру');const before=p.wallet;const result=['createCity','travelCity','pagerBuy','pagerSend','pagerRead','pagerBlock','pagerList','pagerDial'].includes(data.type)?network.command(p,data):network.gameFor(p).command(p,data);qaRecorder.command(p,network.findId(p.id)?.cityId,data,result,before);save();broadcast();json(res,200,result);return;}
+      if(url.pathname==='/api/action'){if(!network.gameFor(p).online.has(p.id))throw Error('Нет подключения к миру');const before=p.wallet;const result=['createCity','travelCity','pagerBuy','pagerSend','pagerRead','pagerBlock','pagerList','pagerDial'].includes(data.type)?network.command(p,data):network.gameFor(p).command(p,data);qaRecorder.command(p,network.findId(p.id)?.cityId,data,result,before);save();broadcast();json(res,200,withActionCode(result));return;}
       json(res,404,{ok:false,message:'Нет такого действия'});return;
     }
     if(url.pathname.startsWith('/music/')||url.pathname.startsWith('/custom-music/')){
