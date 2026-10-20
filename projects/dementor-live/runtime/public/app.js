@@ -7,7 +7,7 @@ function setRoute(path){route=path;routeActivity={x:me?.x||0,y:me?.y||0,at:perfo
 let view={w:innerWidth,h:innerHeight,s:28,cx:innerWidth<760?10:16,cy:innerWidth<760?12:16,zoom:innerWidth<760?1.15:1},toastTimer;
 const motionFrames=[];
 let lastWallet=null,lastChatSignature='';
-let seenChatIds=null,hoverWorld=null,placementKind=null;
+let seenChatIds=null,hoverWorld=null,placementKind=null,placementCell=null;
 const colors=['#a97059','#6e8971','#65858f'];
 const names={wood:'Древесина',stone:'Камень',food:'Ягоды',seed_hemp:'Семена конопли',seed_carrot:'Семена моркови',hemp:'Конопля',carrot:'Морковь',water:'Вода'};
 const toolNames={axe:'🪓 Топор',pick:'⛏️ Кирка'};
@@ -17,7 +17,14 @@ function toast(text){$('toast').textContent=text;$('toast').classList.add('visib
 async function api(endpoint,data){const res=await fetch('/api/'+endpoint,{method:data?'POST':'GET',headers:{'Content-Type':'application/json',...(token?{Authorization:'Bearer '+token}:{})},...(data?{body:JSON.stringify(data)}:{})});const result=await res.json();if(res.status===401){token=null;sessionStorage.removeItem('dementor-token');stream?.close();$('welcome').showModal();}return result;}
 async function act(type,target,extra={}){if(!connected||requestPending)return;requestPending=true;try{const result=await api('action',{type,target,requestId:Array.from(crypto.getRandomValues(new Uint8Array(16)),b=>b.toString(16).padStart(2,'0')).join(''),...extra});if(result.message&&(!result.started||!holdAction))toast(result.message);return result;}catch{toast('Нет связи с миром. Переподключаемся…');}finally{requestPending=false;}}
 function playNeighborChime(){try{const C=window.AudioContext||window.webkitAudioContext;if(!C||navigator.userActivation?.hasBeenActive===false)return;const a=new C(),o=a.createOscillator(),g=a.createGain();o.type='sine';o.frequency.setValueAtTime(650,a.currentTime);o.frequency.exponentialRampToValueAtTime(840,a.currentTime+.12);g.gain.setValueAtTime(.0001,a.currentTime);g.gain.exponentialRampToValueAtTime(.035,a.currentTime+.02);g.gain.exponentialRampToValueAtTime(.0001,a.currentTime+.16);o.connect(g).connect(a.destination);o.start();o.stop(a.currentTime+.17);o.onended=()=>a.close().catch(()=>{});}catch{}}
-function connect(){stream?.close();motionFrames.length=0;stream=new EventSource('/api/events?token='+encodeURIComponent(token));stream.onmessage=e=>{state=JSON.parse(e.data);me=state.players.find(p=>p.id===state.me);if(lastScene!==state.scene+me.plotId+(state.cityNetwork?.current||'origin')){lastScene=state.scene+me.plotId+(state.cityNetwork?.current||'origin');resize();motionFrames.length=0;route=[];selected=null;context=null;if($('cityPanel').open)$('cityPanel').close();}motionFrames.push({at:performance.now(),players:new Map(state.players.map(p=>[p.id,{x:p.x,y:p.y,spirit:p.spirit}]))});if(motionFrames.length>20)motionFrames.shift();connected=true;updateUI();};stream.onerror=()=>{connected=false;$('connection').classList.add('offline');$('connection').lastChild.textContent='Нет связи';};}
+function connect(){stream?.close();motionFrames.length=0;stream=new EventSource('/api/events?token='+encodeURIComponent(token));stream.onmessage=e=>{const next=JSON.parse(e.data);if(next.landscapeDelta){
+ const d=next.landscapeDelta,prev=state?.landscape?.tiles;
+ if(!Array.isArray(prev)||prev.length!==d.from||(state?.cityNetwork?.current||'origin')!==d.city){
+   stream.close();queueMicrotask(connect);return;
+ }
+ next.landscape={...next.landscape,tiles:prev.concat(d.tiles)};delete next.landscapeDelta;
+}
+state=next;me=state.players.find(p=>p.id===state.me);if(lastScene!==state.scene+me.plotId+(state.cityNetwork?.current||'origin')){lastScene=state.scene+me.plotId+(state.cityNetwork?.current||'origin');resize();motionFrames.length=0;route=[];selected=null;context=null;if($('cityPanel').open)$('cityPanel').close();}motionFrames.push({at:performance.now(),players:new Map(state.players.map(p=>[p.id,{x:p.x,y:p.y,spirit:p.spirit}]))});if(motionFrames.length>20)motionFrames.shift();connected=true;updateUI();};stream.onerror=()=>{connected=false;$('connection').classList.add('offline');$('connection').lastChild.textContent='Нет связи';};}
 $('joinForm').onsubmit=async e=>{e.preventDefault();const button=e.target.querySelector('button');button.disabled=true;try{const result=await api('join',{name:$('nameInput').value,gender:$('genderInput').value});if(!result.ok){$('joinError').textContent=result.message;return;}token=result.token;sessionStorage.setItem('dementor-token',token);$('welcome').close();connect();canvas.focus();}catch{$('joinError').textContent='Сервер недоступен. Проверь локальный запуск.';}finally{button.disabled=false;}};
 if(token)api('state').then(r=>{if(r.me)connect();else if(!$('welcome').open)$('welcome').showModal();}).catch(()=>$('welcome').showModal());else $('welcome').showModal();
 
@@ -306,7 +313,7 @@ function findPath(dest){const step=.5,start={x:Math.round(me.x/step),y:Math.roun
    });
 }
 function selectWorldTarget(e){if(e.button===2)return;if(!me||$('welcome').open)return;canvas.focus();const r=canvas.getBoundingClientRect(),w=worldPoint(e.clientX-r.left,e.clientY-r.top);
- if(placementKind){if(state.scene!=='city'){toast('Покрытие можно уложить только в городе');return;}const kind=placementKind;act('landscapePlace',null,{kind,x:Math.floor(w.x),y:Math.floor(w.y)}).then(result=>{if(result?.ok&&!(me.terrainBag?.[kind]>1))setPlacementKind(null);});return;}const targets=allTargets().sort((a,b)=>Math.hypot(a.x-w.x,a.y-w.y)-Math.hypot(b.x-w.x,b.y-w.y));const pile=targets.find(t=>t.type==='pickup'&&Math.hypot(t.x-w.x,t.y-w.y)<.7);const plot=pile||state.scene!=='city'?null:state.plots.find(p=>w.x>=p.x&&w.x<=p.x+p.w&&w.y>=p.y&&w.y<=p.y+p.h);let t=pile||(plot?targets.find(t=>t.id===plot.id):targets[0]);const insideSquare=state.scene==='city'&&w.x>=14&&w.x<=24&&w.y>=10&&w.y<=18;if(!plot&&insideSquare&&Math.hypot(t.x-w.x,t.y-w.y)>=1.3)t=targets.find(t=>t.id==='build');
+ if(placementKind){if(state.scene!=='city'){toast('Покрытие можно уложить только в городе');return;}placementCell={x:Math.floor(w.x),y:Math.floor(w.y)};updateTerrainBar();return;}const targets=allTargets().sort((a,b)=>Math.hypot(a.x-w.x,a.y-w.y)-Math.hypot(b.x-w.x,b.y-w.y));const pile=targets.find(t=>t.type==='pickup'&&Math.hypot(t.x-w.x,t.y-w.y)<.7);const plot=pile||state.scene!=='city'?null:state.plots.find(p=>w.x>=p.x&&w.x<=p.x+p.w&&w.y>=p.y&&w.y<=p.y+p.h);let t=pile||(plot?targets.find(t=>t.id===plot.id):targets[0]);const insideSquare=state.scene==='city'&&w.x>=14&&w.x<=24&&w.y>=10&&w.y<=18;if(!plot&&insideSquare&&Math.hypot(t.x-w.x,t.y-w.y)>=1.3)t=targets.find(t=>t.id==='build');
   if(t&&(plot||insideSquare||Math.hypot(t.x-w.x,t.y-w.y)<1.3)){selected=t.id;if(Math.hypot(t.x-me.x,t.y-me.y)<=state.config.actionRange){updateContext();return;}
     let candidates=[];for(const[dx,dy]of [[0,1.4],[-1.4,0],[1.4,0],[0,-1.4]]){let dest={x:t.x+dx,y:t.y+dy};const path=findPath(dest);if(path)candidates.push(path);}candidates.sort((a,b)=>pathDistance(a)-pathDistance(b));if(candidates[0])setRoute(candidates[0]);else toast('Пока нет доступного пути');
   }else{selected=null;const path=findPath(w);if(path)setRoute(path);else toast(w.x>=state.config.river.x&&!bridgeOpen()?'Здесь нужна переправа. Сначала достройте мост.':'Не получается пройти — выбери свободное место.');}
@@ -339,7 +346,57 @@ function endTouch(e,cancelled=false){
 canvas.addEventListener('pointerup',e=>endTouch(e));
 canvas.addEventListener('pointercancel',e=>endTouch(e,true));
 
-function setPlacementKind(kind){placementKind=kind;canvas.classList.toggle('placing-terrain',!!kind);if(kind){$('cityPanel').close();toast('Укладка: нажми на свободную клетку рядом. Esc — выход.');}else toast('Режим укладки выключен');}
+const terrainBar=document.createElement('div');
+terrainBar.id='terrain-placement';
+terrainBar.setAttribute('aria-live','polite');
+terrainBar.hidden=true;
+const terrainStatus=document.createElement('span'),terrainApply=document.createElement('button'),terrainCancel=document.createElement('button');
+terrainApply.type='button';terrainApply.textContent='Применить';terrainApply.onclick=applyTerrainCell;
+terrainCancel.type='button';terrainCancel.textContent='Отмена';terrainCancel.onclick=()=>setPlacementKind(null);
+terrainBar.append(terrainStatus,terrainApply,terrainCancel);document.querySelector('#game').append(terrainBar);
+function terrainCanPlace(kind,x,y){
+ if(!state||!me||state.scene!=='city')return 'Покрытие доступно только в городе';
+ if(!state.landscapeProducts?.[kind]||!(me.terrainBag?.[kind]>0))return 'Материал закончился';
+ const c=state.config;
+ if(x<0||y<0||x>=c.width||y>=c.height)return 'За границами города';
+ if((state.plots||[]).some(p=>x<p.x+p.w&&x+1>p.x&&y<p.y+p.h&&y+1>p.y&&p.owner!==me.id))return 'Частный или непроданный участок';
+ if(Math.hypot(me.x-(x+.5),me.y-(y+.5))>c.actionRange)return 'Подойди к клетке ближе';
+ if((state.landscape?.tiles||[]).some(t=>t.x===x&&t.y===y))return 'Клетка уже занята';
+ if(blocked(x+.5,y+.5))return 'Здесь препятствие';
+ return '';
+}
+function updateTerrainBar(){
+ terrainBar.hidden=!placementKind;
+ if(!placementKind)return;
+ const cell=placementCell|| (hoverWorld?{x:Math.floor(hoverWorld.x),y:Math.floor(hoverWorld.y)}:null);
+ const reason=cell?terrainCanPlace(placementKind,cell.x,cell.y):'Нажми на клетку, чтобы выбрать место';
+ terrainStatus.textContent=(state?.landscapeProducts?.[placementKind]?.name||placementKind)+' · '+(me?.terrainBag?.[placementKind]||0)+' шт. · '+(cell?cell.x+','+cell.y+' · ':'')+(reason||'Можно уложить');
+ terrainApply.disabled=!!reason||!cell||requestPending;
+}
+async function applyTerrainCell(){
+ if(!placementKind||!placementCell)return;
+ const reason=terrainCanPlace(placementKind,placementCell.x,placementCell.y);
+ if(reason){toast(reason);return;}
+ const kind=placementKind,{x,y}=placementCell;
+ const result=await act('landscapePlace',null,{kind,x,y});
+ if(result?.ok){placementCell=null;if((me?.terrainBag?.[kind]||0)<=1)setPlacementKind(null);}
+ updateTerrainBar();
+}
+function setPlacementKind(kind){
+ placementKind=kind;placementCell=null;canvas.classList.toggle('placing-terrain',!!kind);
+ if(kind){$('cityPanel').close();toast('Выбери клетку на карте и нажми «Применить».');}
+ updateTerrainBar();
+}
+function drawTerrainPlacementGhost(){
+ if(!placementKind||!state||state.scene!=='city')return;
+ const cell=placementCell||(hoverWorld?{x:Math.floor(hoverWorld.x),y:Math.floor(hoverWorld.y)}:null);if(!cell)return;
+ const {x,y}=cell,reason=terrainCanPlace(placementKind,x,y);
+ const pts=[screen(x,y),screen(x+1,y),screen(x+1,y+1),screen(x,y+1)];
+ ctx.save();ctx.beginPath();pts.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));ctx.closePath();
+ ctx.fillStyle=reason?'#cd5e5a7a':'#72a77b75';ctx.fill();ctx.lineWidth=2;
+ ctx.strokeStyle=reason?'#b44f47':'#497958';ctx.stroke();ctx.restore();
+}
+
 function zoom(value){if(!Number.isFinite(value)||value<=0)return;view.zoom=Math.max(.65,Math.min(2.5,view.zoom*value));resize();}
 $('zoomIn').onclick=()=>zoom(1.2);$('zoomOut').onclick=()=>zoom(1/1.2);$('centerButton').onclick=()=>{if(me)openCityPanel('places');};
 canvas.addEventListener('wheel',e=>{e.preventDefault();zoom(e.deltaY<0?1.08:1/1.08);},{passive:false});
@@ -538,7 +595,7 @@ function render(time){positionWindows();ctx.clearRect(0,0,view.w,view.h);ctx.fil
      ...(state?.seedMarket?[{depth:21.8+7.3,draw:()=>paperHouse({x:21.8,y:5.3,w:2.5,h:2},state.seedMarket.stage>=state.config.seedMarket.stages.length?'shop':'construction')}]:[]),
      ...resources.filter(o=>(o.stock>0||o.type==='food')&&!o.id.startsWith('forest-wood-')).map(o=>({depth:o.x+o.y+(o.rockSize?o.rockSize:0),draw:()=>o.type==='wood'?drawTree(o):o.type==='stone'?drawStone(o):drawFood(o)})),
      ...(state?.players||[]).filter(p=>(p.online||p.id===me?.id)&&sameScene(p)).map(p=>({depth:p.x+p.y,draw:()=>drawPlayer(p,time)}))
-   ];entities.sort((a,b)=>a.depth-b.depth);for(const e of entities)e.draw();
+   ];entities.sort((a,b)=>a.depth-b.depth);for(const e of entities)e.draw();drawTerrainPlacementGhost();updateTerrainBar();
   if(route.length){const p=screen(route.at(-1).x,route.at(-1).y);ctx.beginPath();ctx.ellipse(p.x,p.y,7,4,0,0,Math.PI*2);ctx.strokeStyle='#82956a99';ctx.lineWidth=1.4;ctx.stroke();}
   if(context){const p=screen(context.x,context.y);ctx.beginPath();ctx.ellipse(p.x,p.y+4,view.s*.7,view.s*.25,0,0,Math.PI*2);ctx.strokeStyle='#82956999';ctx.lineWidth=1.5;ctx.stroke();}
   if(me?.job){const left=Math.max(0,me.job.ends-(state.now+80)),duration=me.job.ends-me.job.started;$('actionProgress').style.width=`${Math.min(100,(1-left/duration)*100)}%`;}else $('actionProgress').style.width='0';
