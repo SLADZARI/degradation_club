@@ -35,6 +35,36 @@ let server,browser;
  assert.equal(snapshot.blockedRock,true);
  assert.equal(snapshot.rockWidth,5);
  assert.ok(snapshot.desert>30&&snapshot.cacti>=3);
+ // Real browser / server check: projection AND controls never change on plot/interior entry.
+ const playerId=await page.evaluate(()=>me.id);
+ async function enterFixture(scene){
+   const response=await fetch(base+'/__test',{method:'POST',headers:{'Content-Type':'application/json','x-test-key':'local-integration-tests'},body:JSON.stringify({player:playerId,patch:{scene,plotId:'plot-1',x:8,y:8}})});
+   assert.equal(response.status,200,'isolated scene fixture '+scene);
+   await page.waitForFunction(expected=>state?.scene===expected&&me?.x===8&&me?.y===8,scene);
+   await page.waitForTimeout(200);
+   const geometry=await page.evaluate(()=>{const a=screen(8,8),b=screen(9,9),c=screen(10.4,6.2),hit=worldPoint(c.x,c.y);return {diamondX:b.x-a.x,diamondY:b.y-a.y,hitX:hit.x,hitY:hit.y};});
+   assert.ok(Math.abs(geometry.diamondX)<.00001&&geometry.diamondY>0,'ISO30 diamond on '+scene);
+   assert.ok(Math.abs(geometry.hitX-10.4)<.00001&&Math.abs(geometry.hitY-6.2)<.00001,'click inverse on '+scene);
+ }
+ async function assertScreenMove(key,axis,sign){
+   const before=await page.evaluate(()=>({x:me.x,y:me.y}));
+   await page.keyboard.down(key);await page.waitForTimeout(550);await page.keyboard.up(key);
+   await page.waitForTimeout(160);
+   const after=await page.evaluate(()=>({x:me.x,y:me.y}));
+   const worldX=after.x-before.x,worldY=after.y-before.y;
+   const screenX=(worldX-worldY)*Math.sqrt(3)/2,screenY=(worldX+worldY)*.5;
+   const primary=axis==='x'?screenX:screenY,drift=axis==='x'?screenY:screenX;
+   assert.ok(primary*sign>.05,key+' travels '+axis+' on screen');
+   assert.ok(Math.abs(drift)<.08,key+' has no unintended diagonal drift: '+drift);
+ }
+ await enterFixture('plot');
+ await assertScreenMove('s','y',1);
+ await enterFixture('interior');
+ await assertScreenMove('d','x',1);
+ await assertScreenMove('w','y',-1);
+ await assertScreenMove('a','x',-1);
+ // Return to the regular city before checking the P5 render hooks.
+ await enterFixture('city');
  await page.evaluate(()=>{const old=window.__worldEntities;window.__p5Passes=0;window.__worldEntities=()=>{window.__p5Passes++;return old();};});
  await page.waitForFunction(()=>window.__p5Passes>3,{timeout:10000});
  assert.deepEqual(errors,[],'No JS errors during real Canvas render');
