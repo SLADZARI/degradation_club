@@ -10,7 +10,7 @@ export class Game extends CoreGame{
     super(state,c);initializeWorldTravel(this);initSecondBridge(this);
     for(const o of WORLD_OBSTACLES.filter(o=>o.biome==='forest')){
       const id='forest-wood-'+o.x+'-'+o.y;
-      if(!this.state.resources.some(r=>r.id===id))this.state.resources.push({id,type:'wood',x:o.x+o.w/2,y:o.y+o.h/2,stock:18,initial:18,regrowAt:0});
+      if(!this.state.resources.some(r=>r.id===id))this.state.resources.push({id,type:'wood',species:(o.x+o.y)%3===0?'spruce':'common',visualVariant:(o.x+o.y)%3===0?3:0,x:o.x+o.w/2,y:o.y+o.h/2,stock:18,initial:18,regrowAt:0});
     }
     for(const [id,x,y] of [['mountain-stone-a',55,64],['mountain-stone-b',74,63],['mountain-stone-c',88,63]]){
       if(!this.state.resources.some(r=>r.id===id))this.state.resources.push({id,type:'stone',x,y,stock:1000000,initial:1000000,regrowAt:0});
