@@ -38,3 +38,7 @@ All 90 Batch02 SVG have native transparent 512×512, no background extraction, n
 5. Only merge/import after reviewed PR + exact SHA QA; VM cutover requires backup+restore copy, dry-run, no players, explicit owner GO and safe rollback of image and world volume.
 
 **Never:** rewrite live `world.json`, reset volume, merge UNIVERSE drafts as production, mint new PAPER or change `DL-xxx` IDs because of image files.
+
+## Follow-up: unique city houses, gardens and furniture · 2026-10-20
+
+[Separate G6 acceptance, 46 new unique/staged SVG](UNIQUE_HOUSES_ISO30_G6_ACCEPTANCE_2026-10-20.md), [source and gallery](../../runtime/assets-source/world-art-unique-houses/README.md). This is a **supplementary 46-image candidate batch**, not a change to the **139/139 source coverage** accounting (the same physical objects, additional visual variants). New drawings do not add game entities, saves or completed-house state. Actual Cube Unit/occlusion tests and human art approval remain NOT RUN/PENDING. The 14 city structures do not yet replace the general `paperHouse()` renderer. Existing 20 v2 UI icons and 17 terrain SVG immutable.
