@@ -467,7 +467,7 @@ function drawTree(o){if(o.stock<=0)return;const p=screen(o.x,o.y),s=view.s;shado
  poly(points.map(([dx,dy])=>[p.x+dx*r,top+dy*r]),green,'#788d73');poly([[p.x-r*.6,top-r*.4],[p.x-r*.4,top-r*.7],[p.x+r*.25,top-r*.7],[p.x,top]],'#c3c5a4',null);
 }
 function drawHempBush(x,y){const p=screen(x,y),s=view.s;shadow(p.x,p.y+3,s*.4,s*.12);line(p.x,p.y,p.x,p.y-s*.48,'#8e9272',2);for(const [dx,dy,k] of [[-.23,-.35,.38],[.22,-.38,.38],[0,-.62,.5]]){const a=p.x+dx*s,b=p.y+dy*s,r=k*s;poly([[a,b-r],[a+r*.18,b-r*.21],[a+r,b-r*.36],[a+r*.36,b+r*.1],[a+r*.7,b+r*.6],[a,b+r*.24],[a-r*.7,b+r*.6],[a-r*.36,b+r*.1],[a-r,b-r*.36],[a-r*.18,b-r*.21]],'#8da581','#738d70');}}
-function drawStone(o){if(o.stock<=0)return;const p=screen(o.x,o.y),s=view.s;shadow(p.x+5,p.y+2,s*.55,s*.18);poly([[p.x-s*.5,p.y],[p.x-s*.38,p.y-s*.55],[p.x+s*.05,p.y-s*.84],[p.x+s*.45,p.y-s*.4],[p.x+s*.55,p.y+s*.05]],'#a8ada2','#899487');poly([[p.x-s*.38,p.y-s*.55],[p.x+s*.05,p.y-s*.84],[p.x+s*.12,p.y-s*.18]],'#c4c6b9',null);poly([[p.x+s*.05,p.y-s*.84],[p.x+s*.45,p.y-s*.4],[p.x+s*.55,p.y+s*.05],[p.x+s*.12,p.y-s*.18]],'#949e94',null);}
+function drawStone(o){if(o.stock<=0)return;const p=screen(o.x,o.y),s=view.s*(o.rockSize?Math.max(.8,o.rockSize*Math.sqrt(o.stock/Math.max(1,o.initial||o.stock))):1);shadow(p.x+5,p.y+2,s*.55,s*.18);poly([[p.x-s*.5,p.y],[p.x-s*.38,p.y-s*.55],[p.x+s*.05,p.y-s*.84],[p.x+s*.45,p.y-s*.4],[p.x+s*.55,p.y+s*.05]],'#a8ada2','#899487');poly([[p.x-s*.38,p.y-s*.55],[p.x+s*.05,p.y-s*.84],[p.x+s*.12,p.y-s*.18]],'#c4c6b9',null);poly([[p.x+s*.05,p.y-s*.84],[p.x+s*.45,p.y-s*.4],[p.x+s*.55,p.y+s*.05],[p.x+s*.12,p.y-s*.18]],'#949e94',null);}
 function drawFood(o){const p=screen(o.x,o.y),s=view.s;shadow(p.x+4,p.y+3,s*.5,s*.17);
   for(const[dx,dy,r]of [[-.25,-.2,.34],[.24,-.22,.36],[0,-.49,.38]]){const x=p.x+dx*s,y=p.y+dy*s,k=r*s;poly([[x-k,y],[x-k*.6,y-k*.8],[x+k*.4,y-k],[x+k,y-k*.15],[x+k*.7,y+k*.6],[x-k*.5,y+k*.5]],'#8d9d7c','#788b6e');poly([[x-k*.6,y-k*.8],[x+k*.4,y-k],[x,y+k*.2]],'#aabb92',null);line(x,y+k*.2,x+k,y-k*.15,'#74866b77');}
   if(o.stock){for(let i=0;i<Math.min(o.stock,5);i++){const x=p.x+Math.sin(i*2)*s*.25,y=p.y-s*.27+Math.cos(i*2)*s*.19,r=Math.max(2,s*.065);poly([[x-r,y],[x,y-r],[x+r,y],[x,y+r]],o.kind?.startsWith('seed_')?'#d0b47e':'#b66c59','#916a51');}}
@@ -534,7 +534,7 @@ function render(time){positionWindows();ctx.clearRect(0,0,view.w,view.h);ctx.fil
      {depth:15.5+1.5+2.5+2.2,draw:()=>paperHouse({x:15.5,y:1.5,w:2.5,h:2.2},'garden-shop')},
      {depth:10.7+25+2.6+3,draw:()=>paperWarehouse({x:10.7,y:25,w:2.6,h:3})},
      ...(state?.seedMarket?[{depth:21.8+7.3,draw:()=>paperHouse({x:21.8,y:5.3,w:2.5,h:2},state.seedMarket.stage>=state.config.seedMarket.stages.length?'shop':'construction')}]:[]),
-     ...resources.filter(o=>(o.stock>0||o.type==='food')&&!o.id.startsWith('forest-wood-')).map(o=>({depth:o.x+o.y,draw:()=>o.type==='wood'?drawTree(o):o.type==='stone'?drawStone(o):drawFood(o)})),
+     ...resources.filter(o=>(o.stock>0||o.type==='food')&&!o.id.startsWith('forest-wood-')).map(o=>({depth:o.x+o.y+(o.rockSize?o.rockSize:0),draw:()=>o.type==='wood'?drawTree(o):o.type==='stone'?drawStone(o):drawFood(o)})),
      ...(state?.players||[]).filter(p=>(p.online||p.id===me?.id)&&sameScene(p)).map(p=>({depth:p.x+p.y,draw:()=>drawPlayer(p,time)}))
    ];entities.sort((a,b)=>a.depth-b.depth);for(const e of entities)e.draw();
   if(route.length){const p=screen(route.at(-1).x,route.at(-1).y);ctx.beginPath();ctx.ellipse(p.x,p.y,7,4,0,0,Math.PI*2);ctx.strokeStyle='#82956a99';ctx.lineWidth=1.4;ctx.stroke();}
