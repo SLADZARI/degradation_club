@@ -73,7 +73,9 @@ test('key, locked door and first visit YouTube trigger obey state and request id
  const again=caveCommand(CAVE_LAYOUT,p,{type:'openSecretDoor',requestId:'door1'});
  assert.deepEqual(result,again);
  assert.throws(()=>command(p,'offerFish'),/рыбу/);
- p.fish.push('perch');
+ const fishing=newFishingKit();fishing.rod=true;fishing.rodDurability=40;fishing.bait.worm=1;
+ const caught=fishingCommand(p,fishing,{type:'fish',atRiver:true,bait:'worm',requestId:'catch-for-altar'});
+ assert.ok(caught.species);assert.equal(p.fish.length,1,'Fish caught in the river is carried to the altar');
  const altar=caveCommand(CAVE_LAYOUT,p,{type:'offerFish',requestId:'altar'});
  assert.equal(altar.complete,true);assert.equal(p.fish.length,0);
  const replay=caveCommand(CAVE_LAYOUT,p,{type:'offerFish',requestId:'altar'});
@@ -124,4 +126,5 @@ test('bait digging is uncommon across many digs and requires a shovel and soil',
  }
  assert.ok(found>5&&found<60,'rare bait distribution, actual='+found);
  assert.equal(found,kit.bait.worm+kit.bait.larva);
+ assert.throws(()=>fishingCommand(p,kit,{type:'digBait',hasShovel:true,onSoil:true,digSite:0,requestId:'duplicate-site'}),/уже вскопано/);
 });
