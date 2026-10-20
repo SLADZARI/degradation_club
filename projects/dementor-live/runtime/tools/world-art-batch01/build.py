@@ -6,7 +6,10 @@ from xml.etree import ElementTree as ET
 from PIL import Image, ImageDraw, ImageFont
 import cairosvg, json, hashlib, zipfile, re, io, math
 ROOT=Path(__file__).resolve().parent
-SVG=ROOT/'source'/'svg'; PNG=ROOT/'build'/'png_256'; SVG.mkdir(parents=True,exist_ok=True);PNG.mkdir(parents=True,exist_ok=True)
+# Supports both standalone ZIP (source/svg/) and a checked-out game repo.
+REPO_RUNTIME=ROOT.parent.parent if ROOT.name=='world-art-batch01' and ROOT.parent.name=='tools' else None
+SVG=REPO_RUNTIME/'assets-source'/'world-art-batch01' if REPO_RUNTIME and (REPO_RUNTIME/'assets-source'/'world-art-batch01').is_dir() else ROOT/'source'/'svg'
+PNG=ROOT/'build'/'png_256'; SVG.mkdir(parents=True,exist_ok=True);PNG.mkdir(parents=True,exist_ok=True)
 C={'wood':'#B3946D','woodlight':'#D0B38A','wooddark':'#8C7D66', 'stone':'#92938B','stonelight':'#C4C6B9','stonedark':'#6E7772','olive':'#526C4D','sage':'#81936B','grass':'#A3B18F','cream':'#E7D8BA','ochre':'#C9965B','terra':'#B8654D','water':'#8CAFB5','deep':'#566F78','ivory':'#F0E5CF','night':'#45515B','muted':'#7D8877'}
 # The named sources are all separately grounded in the current RC4 or explicitly isolated design branches.
 ASSETS=[
@@ -138,7 +141,7 @@ def render():
         im=Image.open(io.BytesIO(raster)).convert('RGBA')
         bbox=im.getchannel('A').getbbox()
         good=bbox is not None and bbox[0]>=16 and bbox[1]>=15 and bbox[2]<=243 and bbox[3]<=247 and im.getpixel((0,0))[3]==0
-        record=dict(batch_no='DL-WORLD-ART-'+str(idx).zfill(3),id=id,name=title,category=category,branch=source,game_object=physical,svg='source/svg/'+id+'.svg',preview_png='build/png_256/'+id+'.png',style='DL-ISO30-PAPER-WORLD-01',status='CANDIDATE_NOT_DEPLOYED',geometry='ISO30-style illustration; CU collision governed separately by engine',sha256=hashlib.sha256(svg.encode()).hexdigest(),qa={'svg_valid':True,'transparent_corner':True,'safe_margin':good,'bbox':bbox})
+        record=dict(batch_no='DL-WORLD-ART-'+str(idx).zfill(3),id=id,name=title,category=category,branch=source,game_object=physical,svg=str((SVG/(id+'.svg')).relative_to(ROOT)) if SVG.is_relative_to(ROOT) else str((SVG/(id+'.svg')).resolve()),preview_png='build/png_256/'+id+'.png',style='DL-ISO30-PAPER-WORLD-01',status='CANDIDATE_NOT_DEPLOYED',geometry='ISO30-style illustration; CU collision governed separately by engine',sha256=hashlib.sha256(svg.encode()).hexdigest(),qa={'svg_valid':True,'transparent_corner':True,'safe_margin':good,'bbox':bbox})
         manifest.append(record);checks.append(good)
     (ROOT/'manifest.json').write_text(json.dumps({'schema':'DL-WORLD-ASSET-CANDIDATE-01','styles':{'world':'DL-ISO30-PAPER-WORLD-01','items':'DL-STYLE-PAPER-CUT-01'},'count':len(manifest),'assets':manifest},ensure_ascii=False,indent=2))
     # Contact sheet uses white neutral framing but SVG output is genuinely transparent.
