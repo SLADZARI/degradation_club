@@ -57,6 +57,17 @@ jobs:
           npm run test:mobile
           npm run test:quests
           npm run test:compact-panels
+  published-health-readonly:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Read-only health probe of last known public host
+        run: |
+          echo "Checking prior known game host WITHOUT writes or a production login"
+          curl --silent --show-error --location --max-time 12 -D /tmp/game-header.txt -o /tmp/game-health.txt http://138.199.144.94/api/health || true
+          head -c 1200 /tmp/game-health.txt 2>/dev/null || true
+          echo
+          echo "This response alone is NOT proof of the published git SHA, served UI bundle, or saved-world integrity."
   archive:
     runs-on: ubuntu-24.04
     timeout-minutes: 10
