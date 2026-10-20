@@ -7,7 +7,7 @@ ENV NODE_ENV=production \
 
 WORKDIR /app
 COPY --chown=node:node . .
-RUN npm run doctor && npm run check && install -d -o node -g node /app/data
+RUN npm run prepare:icons && npm run doctor && npm run check && install -d -o node -g node /app/data
 
 USER node
 EXPOSE 4173
