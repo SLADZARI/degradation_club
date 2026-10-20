@@ -23,6 +23,11 @@
 | DL-015 | Mayor's office as in-game suggestion inbox with an offer every ~15 active-play minutes; first eligible letter earns 50 PAPER | APPROVED product requirement; anti-spam interpretation one payout per 24h | Prototype, reward treasury-funded, real email is NOT connected |
 | DL-016 | Character gender selection at first entry for Russian forms of address, including unspecified option; forest/mountain terrain audit | APPROVED user-facing requirement | CIVIC implementation candidate, real phone and migration QA pending |
 
+| DL-017 | Public physical payphones in scenes + searchable world subscriber list, six-digit character-number, 100-symbol pager message priced 1 PAPER; expensive 180 PAPER receiving pager | User requirement 20 Oct 2026 | CANDIDATE only; no telephony or external SMS; multi-city server-authoritative receipts |
+| DL-018 | Second bridge must not exist as walkable/finished before its own materials and work are completed; first bridge unaffected | User requirement 20 Oct 2026 | Server + client collision gated by secondBridgeProject stage; save migration QA pending |
+| DL-019 | Minimal building silhouettes vary within same paper canon; same board shape with distinct purpose pictograms; university/Valentina excluded | User requirement 20 Oct 2026 | Candidate visuals, device screenshot review pending |
+| DL-020 | Shared gameplay/video QA protocol for Евгений and Женя with separate timed server event file and synchronization markers, no message bodies or tokens | User requirement 20 Oct 2026 | Opt-in QA recording on isolated server, export test-mode only |
+
 ## Supersession / conflict records
 
 - Existing runtime AGENTS.md on v0.4 allows emojis for UI. New approved PAPER CUT UI canon disallows substitutes for the 20 approved icons. Canon supersedes emoji guidance for those IDs; deployment is still pending.

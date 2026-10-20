@@ -5,6 +5,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Game, createWorld } from './world-expansion-adapter.mjs';
 import {CityNetwork} from './city-network.mjs';
+import {createQARecorder} from './qa-recorder.mjs';
 import {scanMusic,audioDuration,PLAZA} from './plaza.mjs';
 import {createHash} from 'node:crypto';
 import { CONFIG } from './config.mjs';
@@ -25,13 +26,14 @@ if(!testMode&&process.env.DEMENTOR_PUBLIC_URL){
   allowedHosts.add(publicUrl.host);
 }
 const stateFile=process.env.DEMENTOR_STATE||path.join(root,'data','world.json');
+const qaRecorder=createQARecorder(stateFile,{enabled:testMode||process.env.DEMENTOR_QA_LOG==='1'});
 fs.mkdirSync(path.dirname(stateFile),{recursive:true});
 const state=fs.existsSync(stateFile)?JSON.parse(fs.readFileSync(stateFile,'utf8')):createWorld();
 const legacySaveRequiresBackup=fs.existsSync(stateFile)&&state?.schema!=='dementor-cities-v1';
 let legacyBackupDone=false;
 const network=new CityNetwork(state);
 const game=network.origin;
-const stateFor=p=>({...network.snapshot(p),qaMode:testMode});
+const stateFor=p=>({...network.snapshot(p),qaMode:testMode,qaRecording:qaRecorder.enabled});
 const musicDir=path.join(root,'data','music');fs.mkdirSync(musicDir,{recursive:true});
 function refreshMusic(){network.setMusic(scanMusic([[path.join(root,'public','music'),'/music/'],[musicDir,'/custom-music/']]));}
 refreshMusic();
@@ -66,16 +68,18 @@ const server=http.createServer(async(req,res)=>{
       if(data.advanceMs)game.tick(data.advanceMs);
       game.changed();save();broadcast();json(res,200,{ok:true,state:game.state});return;
     }
-    if(url.pathname==='/api/join'&&req.method==='POST'){const d=await body(req);const p=game.join(d.name,d.gender);save();json(res,200,{ok:true,id:p.id,token:p.token});return;}
+    if(url.pathname==='/api/join'&&req.method==='POST'){const d=await body(req);const p=game.join(d.name,d.gender);network.snapshot(p);qaRecorder.join(p,'origin');save();json(res,200,{ok:true,id:p.id,token:p.token});return;}
     if(url.pathname.startsWith('/api/')){
       const token=req.headers.authorization?.replace(/^Bearer /,'')||url.searchParams.get('token');
       const p=network.findToken(token)?.p;if(!p){json(res,401,{ok:false,message:'Войди в мир заново'});return;}
       if(url.pathname==='/api/events'){
         res.writeHead(200,{'Content-Type':'text/event-stream','Cache-Control':'no-cache, no-transform','Connection':'keep-alive','X-Accel-Buffering':'no'});
-        let set=streams.get(p.id);if(!set){set=new Set();streams.set(p.id,set);network.gameFor(p).connect(p);}set.add(res);res.write(`data: ${JSON.stringify(stateFor(p))}\n\n`);
-        req.on('close',()=>{set.delete(res);if(set.size===0){streams.delete(p.id);network.gameFor(p)?.disconnect(p);save();}});return;
+        let set=streams.get(p.id);if(!set){set=new Set();streams.set(p.id,set);network.gameFor(p).connect(p);qaRecorder.connect(p,network.findId(p.id)?.cityId);}set.add(res);res.write(`data: ${JSON.stringify(stateFor(p))}\n\n`);
+        req.on('close',()=>{set.delete(res);if(set.size===0){streams.delete(p.id);qaRecorder.disconnect(p,network.findId(p.id)?.cityId);network.gameFor(p)?.disconnect(p);save();}});return;
       }
       if(url.pathname==='/api/state'){json(res,200,stateFor(p));return;}
+      if(url.pathname==='/api/qa-marker'&&req.method==='POST'){if(!qaRecorder.enabled){json(res,403,{ok:false,message:'Включи DEMENTOR_QA_LOG=1 на тестовом сервере'});return;}const info=await body(req),item=qaRecorder.marker(p,network.findId(p.id)?.cityId,info.label);json(res,200,{ok:true,marker:item});return;}
+      if(testMode&&url.pathname==='/api/qa-export'&&req.method==='GET'){res.writeHead(200,{'Content-Type':'application/x-ndjson; charset=utf-8','Content-Disposition':'attachment; filename="'+path.basename(qaRecorder.file)+'"','Cache-Control':'no-store'});res.end(qaRecorder.export());return;}
       if(url.pathname==='/api/combat/state'&&req.method==='GET'){
         const g=network.gameFor(p),id=p.combatP0?.activeSessionId||p.combatP0?.lastSessionId;
         const battle=id?combatRoot(g.state).sessions[id]:null;
@@ -102,7 +106,7 @@ const server=http.createServer(async(req,res)=>{
       }
       const data=await body(req);
       if(url.pathname==='/api/combat/action'){
-        const g=network.gameFor(p),kind=String(data.type||''),now=Date.now();
+        const g=network.gameFor(p),kind=String(data.type||''),now=Date.now(),walletBeforeCombat=p.wallet;
         // HTTP Bearer token authenticates combat independently of city's SSE connection.
         if(!data.requestId||typeof data.requestId!=='string'||data.requestId.length<4||data.requestId.length>100)throw Error('Требуется requestId');
         let result;
@@ -145,32 +149,33 @@ const server=http.createServer(async(req,res)=>{
         }
         // High-frequency movement is transient: never sync-write the entire world on every 125ms input.
         // Critical inventory/weapon/combat commands are still persisted immediately.
-        if(kind==='input'){json(res,200,result);return;}
-        g.changed();save();json(res,200,result);return;
+        if(kind==='input'){qaRecorder.input(p,network.findId(p.id)?.cityId,data);json(res,200,result);return;}
+        qaRecorder.command(p,network.findId(p.id)?.cityId,{...data,type:'combat:'+kind},{ok:true},walletBeforeCombat);g.changed();save();json(res,200,result);return;
       }
-      if(url.pathname==='/api/input'){if(!network.gameFor(p).online.has(p.id))throw Error('Нет подключения к миру');network.gameFor(p).input(p,data);json(res,200,{ok:true});return;}
-      if(url.pathname==='/api/action'){if(!network.gameFor(p).online.has(p.id))throw Error('Нет подключения к миру');const result=['createCity','travelCity'].includes(data.type)?network.command(p,data):network.gameFor(p).command(p,data);save();broadcast();json(res,200,result);return;}
+      if(url.pathname==='/api/input'){if(!network.gameFor(p).online.has(p.id))throw Error('Нет подключения к миру');network.gameFor(p).input(p,data);qaRecorder.input(p,network.findId(p.id)?.cityId,data);json(res,200,{ok:true});return;}
+      if(url.pathname==='/api/action'){if(!network.gameFor(p).online.has(p.id))throw Error('Нет подключения к миру');const before=p.wallet;const result=['createCity','travelCity','pagerBuy','pagerSend','pagerRead'].includes(data.type)?network.command(p,data):network.gameFor(p).command(p,data);qaRecorder.command(p,network.findId(p.id)?.cityId,data,result,before);save();broadcast();json(res,200,result);return;}
       json(res,404,{ok:false,message:'Нет такого действия'});return;
     }
     if(url.pathname.startsWith('/music/')||url.pathname.startsWith('/custom-music/')){
       const track=game.musicCatalog.find(t=>t.url===url.pathname);if(!track){res.writeHead(404);res.end();return;}const dir=url.pathname.startsWith('/custom-music/')?musicDir:path.join(root,'public','music'),file=path.join(dir,decodeURIComponent(url.pathname.split('/').at(-1))),size=fs.statSync(file).size;const range=req.headers.range;let start=0,end=size-1,status=200;if(range){const m=/^bytes=(\d*)-(\d*)$/.exec(range);if(!m||(!m[1]&&!m[2])){res.writeHead(416,{'Content-Range':`bytes */${size}`});res.end();return;}if(!m[1]){start=Math.max(0,size-Number(m[2]));}else{start=Number(m[1]);if(m[2])end=Math.min(end,Number(m[2]));}if(!Number.isSafeInteger(start)||start>end||start>=size){res.writeHead(416,{'Content-Range':`bytes */${size}`});res.end();return;}status=206;res.setHeader('Content-Range',`bytes ${start}-${end}/${size}`);}res.writeHead(status,{'Content-Type':file.endsWith('.mp3')?'audio/mpeg':'audio/wav','Content-Length':end-start+1,'Accept-Ranges':'bytes','Cache-Control':'no-cache'});if(req.method==='HEAD'){res.end();return;}fs.createReadStream(file,{start,end}).pipe(res);return;
     }
-    const files={'/':'index.html','/app.js':'app.js','/life-ui.js':'life-ui.js','/plaza-ui.js':'plaza-ui.js','/city-ui.js':'city-ui.js','/estate-ui.js':'estate-ui.js','/world-ui.js':'world-ui.js','/world-ui-fixes.js':'world-ui-fixes.js','/world-quests.js':'world-quests.js','/styles.css':'styles.css','/combat':'combat.html','/combat.html':'combat.html','/combat.js':'combat.js','/combat.css':'combat.css','/manifest.webmanifest':'manifest.webmanifest'};
+    const files={'/':'index.html','/app.js':'app.js','/life-ui.js':'life-ui.js','/plaza-ui.js':'plaza-ui.js','/city-ui.js':'city-ui.js','/estate-ui.js':'estate-ui.js','/telecom-ui.js':'telecom-ui.js','/world-ui.js':'world-ui.js','/world-ui-fixes.js':'world-ui-fixes.js','/world-quests.js':'world-quests.js','/styles.css':'styles.css','/combat':'combat.html','/combat.html':'combat.html','/combat.js':'combat.js','/combat.css':'combat.css','/manifest.webmanifest':'manifest.webmanifest'};
     const file=files[url.pathname];if(!file){res.writeHead(404);res.end('Not found');return;}
     const types={html:'text/html; charset=utf-8',js:'text/javascript; charset=utf-8',css:'text/css; charset=utf-8',webmanifest:'application/manifest+json; charset=utf-8'};
     res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'self'");
-    res.writeHead(200,{'Content-Type':types[file.split('.').at(-1)],'Cache-Control':'no-cache'});res.end(file==='index.html'?fs.readFileSync(path.join(root,'public',file),'utf8').replace('</body>','<script src="/world-ui.js" defer></script><script src="/world-ui-fixes.js" defer></script><script src="/world-quests.js" defer></script></body>'):fs.readFileSync(path.join(root,'public',file)));
+    res.writeHead(200,{'Content-Type':types[file.split('.').at(-1)],'Cache-Control':'no-cache'});res.end(file==='index.html'?fs.readFileSync(path.join(root,'public',file),'utf8').replace('</body>','<script src="/world-ui.js" defer></script><script src="/world-ui-fixes.js" defer></script><script src="/world-quests.js" defer></script><script src="/telecom-ui.js" defer></script></body>'):fs.readFileSync(path.join(root,'public',file)));
   }catch(e){json(res,400,{ok:false,message:e.message});}
 });
 let lastTick=Date.now();
-const timer=setInterval(()=>{const now=Date.now();for(const g of network.values()){
+const timer=setInterval(()=>{const now=Date.now();for(const [cityId,g] of network.games){
   g.tick(Math.max(0,now-lastTick));
-  for(const [sid,s] of Object.entries(g.state.combatP0?.sessions||{})){
+  qaRecorder.sampleState(g,cityId);
+   for(const [sid,s] of Object.entries(g.state.combatP0?.sessions||{})){
     if(s.status==='ACTIVE'){advanceCombat(g.state,sid,now);g.changed();}
   }
 }lastTick=now;if(Date.now()-lastBroadcast>=100){broadcast();lastBroadcast=Date.now();}},50);
 const saver=setInterval(save,1000);
-function stop(){clearInterval(timer);clearInterval(saver);save();for(const set of streams.values())for(const res of set)res.end();server.close(()=>process.exit(0));setTimeout(()=>process.exit(0),500).unref();}
+function stop(){clearInterval(timer);clearInterval(saver);qaRecorder.finish();save();for(const set of streams.values())for(const res of set)res.end();server.close(()=>process.exit(0));setTimeout(()=>process.exit(0),500).unref();}
 process.on('SIGTERM',stop);process.on('SIGINT',stop);
 server.listen(port,host,()=>{
   console.log(`Dementor Live · http://127.0.0.1:${port}${testMode?' · isolated test server':''}`);

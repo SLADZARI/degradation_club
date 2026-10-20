@@ -368,6 +368,19 @@ function paperHouse(o,variant='warehouse'){
  if(variant==='warehouse')for(let i=0;i<2;i++)paperBox(p.x+s*.12+i*s*.5,p.y-s*.35,s*.4,s*.35,s*.14,-s*.1,'#b6a07e','#978464','#d2be99');
  if(variant==='shop'){poly([[p.x+w*.04,y+h*.05],[p.x+w*.92,y+h*.05],[p.x+w*.98,y+h*.22],[p.x,y+h*.22]],'#98a487','#77846b');line(p.x+w*.2,y+h*.07,p.x+w*.2,y+h*.2,'#dfe3cd');line(p.x+w*.65,y+h*.07,p.x+w*.65,y+h*.2,'#dfe3cd');}
  if(variant==='forge'){paperBox(p.x+w*.75,peak-s*.5,s*.42,s*1.15,s*.25,-s*.16,'#a99980','#8e806b','#c9bda2');const q=screen(o.x+o.w*.65,o.y+o.h-.45);poly([[q.x-s*.18,q.y],[q.x,q.y-s*.45],[q.x+s*.18,q.y]],'#c89160','#9a785a');}
+ if(variant==='museum'){
+  for(const i of [.16,.44,.74])paperBox(p.x+w*i,p.y-h*.7,s*.14,h*.7,s*.1,-s*.06,'#e4d4b7','#b6a88c','#f4e8cf');
+  poly([[p.x+w*.04,y-s*.05],[p.x+w*.5,y-s*.74],[p.x+w*.96,y-s*.05]],'#c8b596','#788573');
+ }else if(variant==='arena'){
+  for(let i=0;i<3;i++)poly([[p.x+i*w/3,y],[p.x+(i+.5)*w/3,y-s*.54],[p.x+(i+1)*w/3,y]],i===1?'#c9aa7e':'#adb699','#798670');
+  for(const rel of [.18,.79])line(p.x+w*rel,y,p.x+w*rel,y-s*.83,'#7d806e',2);
+ }else if(variant==='factory'){
+  paperBox(p.x+w*.72,peak-s*.91,s*.28,s*1.32,s*.16,-s*.1,'#ada28d','#877f6e','#d9cbb0');
+  paperBox(p.x+w*.42,peak-s*.52,s*.20,s*.83,s*.12,-s*.08,'#9a9f89','#77826e','#c0c9af');
+ }else if(variant==='gate'){
+  for(const rel of [.04,.73])paperBox(p.x+w*rel,y-s*.60,w*.24,h+s*.6,s*.1,-s*.07,'#c2b294','#9c8b75','#ded1b4');
+  poly([[p.x+w*.25,y-s*.35],[p.x+w*.49,y-s*.84],[p.x+w*.73,y-s*.35]],'#9baf99','#7b8c7c');
+ }
 }
 function paperTent(o,stage=3){const s=view.s,p=screen(o.x,o.y+o.h),w=o.w*s*.8,dx=o.w*s*.2,dy=-o.h*s*.43,h=s*1.9;
  shadow(p.x+w*.5+dx*.3,p.y+4,w*.66,s*.2);
@@ -383,6 +396,14 @@ function paperBoard(x,y,title,thefts=false){const s=view.s,p=screen(x,y),w=s*1.6
  shadow(p.x,p.y+s*.12,s*.95,s*.2);for(const off of [-.63,.63])paperBox(p.x+off*s,top+h*.55,s*.09,s*1.1,s*.12,-s*.08,'#ad9b78','#887e62','#c9bc97');
  paperBox(p.x-w*.5,top,w,h,s*.23,-s*.15,'#b9a483','#927e62','#d1bf9d');
  for(let i=0;i<3;i++){const xx=p.x-w*.37+i*w*.25,yy=top+h*.23+(i%2)*s*.09;poly([[xx,yy],[xx+w*.2,yy-s*.025],[xx+w*.2,yy+h*.52],[xx,yy+h*.5]],'#eee6cd','#a6987b');line(xx+w*.03,yy+h*.18,xx+w*.16,yy+h*.18,thefts?'#a77563':'#8b967b');line(xx+w*.03,yy+h*.27,xx+w*.15,yy+h*.27,'#b6ad95');}
+ // One standard wooden board, distinct tiny hand-drawn graphics.
+ const cx=p.x,cy=top+h*.57,k=s*.24;
+ if(/пожертв/i.test(title)){poly([[cx,cy+k*.52],[cx-k*.7,cy-k*.22],[cx-k*.4,cy-k*.58],[cx,cy-k*.27],[cx+k*.4,cy-k*.58],[cx+k*.7,cy-k*.22]],'#b5a07c','#6e8068');}
+ else if(/вор/i.test(title)){rounded(cx-k*.45,cy-k*.07,k*.9,k*.55,1,'#a88272','#776e65');line(cx-k*.3,cy-k*.07,cx-k*.3,cy-k*.55,'#756f63',2);line(cx-k*.3,cy-k*.55,cx+k*.3,cy-k*.55,'#756f63',2);line(cx+k*.3,cy-k*.55,cx+k*.3,cy-k*.07,'#756f63',2);}
+ else if(/работ|строй|мост/i.test(title)){line(cx-k*.65,cy+k*.55,cx+k*.65,cy-k*.6,'#657863',3);line(cx-k*.65,cy-k*.6,cx+k*.65,cy+k*.55,'#887052',3);}
+ else if(/город|реестр/i.test(title)){poly([[cx-k*.65,cy],[cx,cy-k*.65],[cx+k*.65,cy]],'#758d7b','#4c6758');rounded(cx-k*.45,cy,k*.9,k*.52,1,'#b0bca6','#6f7d69');}
+ else if(/боев|мисси/i.test(title)){poly([[cx-k*.4,cy-k*.6],[cx+k*.4,cy-k*.6],[cx+k*.5,cy+k*.1],[cx,cy+k*.65],[cx-k*.5,cy+k*.1]],'#8f786b','#6d655f');}
+ else{line(cx-k*.5,cy+k*.45,cx+k*.5,cy-k*.45,'#70836f',3);poly([[cx+k*.2,cy-k*.45],[cx+k*.55,cy-k*.65],[cx+k*.5,cy-k*.1]],'#91a287','#637c67');}
  label(title,x,y+.65,true);
 }
 function paperBench(x,y){const s=view.s,p=screen(x,y),w=s*1.8;shadow(p.x,p.y+4,s*1.1,s*.21);

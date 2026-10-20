@@ -1,5 +1,6 @@
 import {randomUUID} from 'node:crypto';
 import {Game,createWorld} from './world-expansion-adapter.mjs';
+import {ensureTelephoneDirectory,telecomAction,telecomSnapshot} from './telecom.mjs';
 
 const SCHEMA='dementor-cities-v1';
 const ORIGIN='origin';
@@ -10,7 +11,7 @@ export class CityNetwork{
     this.games=new Map([[ORIGIN,new Game(this.data.origin)]]);
     for(const [id,city]of Object.entries(this.data.cities))this.games.set(id,new Game(city.state));
     this.directoryDirty=false;
-    this.catalog=[];
+    this.catalog=[];ensureTelephoneDirectory(this);
   }
   get origin(){return this.games.get(ORIGIN);}
   values(){return [...this.games.values()];}
@@ -27,7 +28,7 @@ export class CityNetwork{
   }
   snapshot(p){const r=this.findId(p.id);if(!r)throw Error('Житель не найден');
     const estates=[...this.games].flatMap(([cityId,g])=>g.state.plots.filter(t=>t.owner===p.id).map(t=>({cityId,cityName:this.data.cities[cityId]?.name||'Первый город',plotId:t.id,zoning:t.zoning,landUse:t.landUse,leased:!!t.lease,dueAt:t.lease?.dueAt||null,sign:t.shop?.sign||''})));
-    return {...r.g.snapshot(p),cityNetwork:{current:r.cityId,cities:this.list(),estates}};}
+    return {...r.g.snapshot(p),telecom:telecomSnapshot(this,p),cityNetwork:{current:r.cityId,cities:this.list(),estates}};}
   assertRegistry(p,g){
     if((p.scene||'city')!=='city')throw Error('Реестр городов находится на площади');
     if(p.spirit||p.job||p.delivery)throw Error('Закончи работу или курьерский заказ перед переходом в другой город');
@@ -62,11 +63,11 @@ export class CityNetwork{
     return {id,message:'Город «'+title+'» основан. Другие жители могут прийти через реестр.'};
   }
   command(p,cmd){
-    if(!['createCity','travelCity'].includes(cmd?.type))throw Error('Неизвестное действие реестра');
+    if(!['createCity','travelCity','pagerBuy','pagerSend','pagerRead'].includes(cmd?.type))throw Error('Неизвестное действие реестра');
     if(typeof cmd.requestId!=='string'||cmd.requestId.length<4||cmd.requestId.length>100)throw Error('Нет идентификатора действия');
     p.results||=[];const previous=p.results.find(r=>r.id===cmd.requestId);if(previous)return previous.result;
     let result;
-    try{result={ok:true,...(cmd.type==='createCity'?this.createCity(p,cmd.name):this.move(p,cmd.cityId))};}
+    try{result={ok:true,...(['pagerBuy','pagerSend','pagerRead'].includes(cmd.type)?telecomAction(this,p,cmd):cmd.type==='createCity'?this.createCity(p,cmd.name):this.move(p,cmd.cityId))};}
     catch(e){result={ok:false,message:e.message};}
     p.results.push({id:cmd.requestId,result});p.results=p.results.slice(-128);
     this.gameFor(p)?.changed();return result;

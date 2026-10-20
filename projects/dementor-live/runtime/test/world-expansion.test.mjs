@@ -23,7 +23,8 @@ test('forest/mountain barriers, public crossing and preserved starter bridge',()
   assert.equal(g.walkable(woods.x+1,woods.y+1,p),false);
   assert.equal(g.walkable(rocks.x+1,rocks.y+1,p),false);
   assert.equal(g.walkable(35.5,45,p),false);
-  assert.equal(g.walkable(35.5,SECOND_BRIDGE.y+3,p),true);
+  assert.equal(g.walkable(35.5,SECOND_BRIDGE.y+3,p),false,'Second bridge starts unbuilt');
+   g.state.secondBridgeProject.stage=2;assert.equal(g.walkable(35.5,SECOND_BRIDGE.y+3,p),true);
   assert.equal(g.walkable(-1,60,p),false);
   assert.equal(g.state.resources.filter(x=>x.id.startsWith('mountain-stone-')).length,3);
 });

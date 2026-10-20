@@ -152,3 +152,22 @@ dialog#mayorIdea::backdrop{background:#14261e77}
 .idea-actions{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:8px;margin-top:16px}
 .idea-actions .primary{background:#617d62;color:#fff}
 @media(max-width:760px){dialog#mayorIdea{width:calc(100vw - 20px);max-height:calc(100dvh - 24px);padding:17px}#mayorIdea h2{font-size:19px}}
+
+/* PAYPHONE & PAGER v1: compact paper objects and accessible phone composition. */
+.payphone-dialog{position:fixed!important;inset:0!important;margin:auto!important;transform:none!important;width:min(460px,calc(100vw - 20px))!important;max-height:calc(100dvh - 24px)!important;overflow:auto!important;padding:18px!important;background:#f2ebd9!important;border:2px solid #a9b19e!important;border-radius:17px!important;z-index:65!important}
+.payphone-dialog::backdrop{background:#172d2377!important}
+.payphone-dialog header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:10px}
+.payphone-dialog header h2{font-size:23px;margin:0}
+.payphone-dialog header button{width:42px;height:42px;border-radius:50%;background:#d4dccb;font-size:21px}
+.phone-cabinet{padding:14px;border-radius:13px;background:#d0d9cd;border:1px solid #809584;color:#33493c}
+.phone-receiver{display:flex;align-items:center;gap:12px;font-size:23px;font-weight:700;border-bottom:1px solid #99aa9a;padding:8px 0 15px;margin-bottom:12px}
+.phone-receiver span{font-size:11px}
+#phoneBody{display:flex;flex-direction:column;gap:11px}
+#phoneBody p{margin:3px 0 5px;font-size:12px;line-height:1.5}
+#phoneBody input,#phoneBody textarea{display:block;width:100%;max-width:100%;min-height:43px;border:1px solid #a1b09d;border-radius:7px;background:#f9f7ed;padding:10px;font:inherit;color:#34493d;resize:vertical}
+#phoneBody .phone-control{min-height:43px;border-radius:8px;border:1px solid #8c9d8b;padding:8px 12px;background:#e8eedf;text-align:left;color:#354d3b}
+#phoneBody .phone-control:disabled{opacity:.5}
+#phoneBody .subscriber-list{max-height:24dvh;overflow-y:auto;display:flex;flex-direction:column;gap:3px;border:1px solid #9cae9b;padding:5px;border-radius:8px}
+#phoneBody .subscriber-list .phone-control{font-size:12px;min-height:34px}
+#openPager,#qaVideoMarker,#qaExport{font-size:10px!important;padding:7px 8px!important;min-height:36px}
+@media(max-width:760px){.payphone-dialog{padding:12px!important}#openPager,#qaVideoMarker,#qaExport{font-size:9px!important;min-height:34px}}

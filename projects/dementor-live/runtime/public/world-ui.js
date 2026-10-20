@@ -22,12 +22,13 @@ interaction=function(t){
 blocked=function(x,y){
   if(!state?.worldTravel)return originalBlocked(x,y);
   const scene=state.scene,region=state.worldTravel.scenes[scene],r=.35;
+   if((state.telecom?.booths||[]).some(t=>Math.hypot(x-t.x,y-t.y)<.53))return true;
   if(region)return x<r||y<r||x>region.width-r||y>region.height-r;
   if(scene!=='city')return originalBlocked(x,y);
   if((state.worldTravel.obstacles||[]).some(o=>x+r>o.x&&x-r<o.x+o.w&&y+r>o.y&&y-r<o.y+o.h))return true;
   const c=state.config,b=state.worldTravel.secondBridge;
   if(x+r>c.river.x&&x-r<c.river.x+c.river.w&&y-r>=b.y&&y+r<=b.y+b.h)
-    return x<r||y<r||x>c.width-r||y>c.height-r||state.resources.some(o=>o.stock>0&&o.type!=='food'&&Math.hypot(x-o.x,y-o.y)<.63);
+    return state.worldTravel.secondBridgeProject?.stage!==2||x<r||y<r||x>c.width-r||y>c.height-r||state.resources.some(o=>o.stock>0&&o.type!=='food'&&Math.hypot(x-o.x,y-o.y)<.63);
   return originalBlocked(x,y);
 };
 // A coarse 1-tile pathfinder works on the enlarged 160×80 map (<13k search cells).
@@ -139,10 +140,24 @@ function openTravelMap(){
     else toast('QA-переход запрещён сервером');
   }:null;
 }
+function drawPaperPayphone(x,y){const p=screen(x,y),s=view.s;
+  shadow(p.x,p.y+5,s*.57,s*.16);
+  paperBox(p.x-s*.26,p.y-s*1.45,s*.54,s*1.44,s*.18,-s*.10,'#94a9a0','#718a7e','#d2ddca');
+  rounded(p.x-s*.20,p.y-s*1.32,s*.41,s*.23,3,'#e5e2cb','#768a7d');
+  ctx.font=Math.max(10,s*.3)+'px Arial';ctx.textAlign='center';ctx.fillStyle='#54695e';ctx.fillText('☎',p.x,p.y-s*1.12);
+  rounded(p.x-s*.18,p.y-s*.95,s*.34,s*.42,2,'#d2cfb9','#758576');
+  for(let row=0;row<3;row++)for(let col=0;col<3;col++){ctx.beginPath();ctx.arc(p.x+(col-1)*s*.09,p.y-s*.83+row*s*.105,Math.max(1,s*.024),0,7);ctx.fillStyle='#708376';ctx.fill();}
+  // Shared subscriber-number notice beside the booth.
+  paperBox(p.x+s*.34,p.y-s*1.27,s*.43,s*.46,s*.08,-s*.05,'#ded5ba','#92876c','#f4edda');
+  ctx.font=Math.max(7,s*.17)+'px Arial';ctx.fillStyle='#53665c';ctx.fillText('№',p.x+s*.59,p.y-s*1.02);
+}
 function drawWorldProps(){
   const w=state?.worldTravel;if(!w||state.scene!=='city')return;
   for(const path of w.paths||[]){ctx.beginPath();path.forEach(([x,y],i)=>{const p=screen(x,y);i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y);});ctx.strokeStyle='#a99c7566';ctx.lineWidth=Math.max(3,view.s*.33);ctx.stroke();}
-  groundRect(w.secondBridge,'#bcaa86','#857b62');
+  const built=w.secondBridgeProject?.stage===2,started=w.secondBridgeProject?.stage===1;
+  if(built){groundRect(w.secondBridge,'#b9a785','#857b62');for(let y=54;y<62;y+=1.2){const a=screen(34,y),b=screen(38,y);line(a.x,a.y,b.x,b.y,'#d9cba7',1.8);}for(const x of [34,38]){const a=screen(x,53),b=screen(x,63);line(a.x,a.y-9,b.x,b.y-9,'#766e5a',2);}}
+  else if(started){for(const x of [34.5,37.3])for(const y of [54,57,60,62]){const p=screen(x,y);line(p.x,p.y-7,p.x,p.y+4,'#998666',3);}groundRect({x:33.5,y:53.2,w:.7,h:9.5},'#c9bb99','#827c66');}
+  else {const p=screen(33,55);poly([[p.x-10,p.y],[p.x,p.y-8],[p.x+10,p.y],[p.x,p.y+8]],'#bcb79f','#8b8875');}
   for(const o of w.obstacles||[]){
     const p=screen(o.x+o.w/2,o.y+o.h/2);if(p.x< -200||p.x>view.w+200||p.y< -250||p.y>view.h+250)continue;
     if(o.biome==='forest'){drawTree({x:o.x+o.w/2,y:o.y+o.h/2,stock:12});}
@@ -150,9 +165,12 @@ function drawWorldProps(){
   }
   for(const t of w.targets||[]){
     const p=screen(t.x,t.y);if(p.x< -250||p.x>view.w+250||p.y< -250||p.y>view.h+250)continue;
-    if(t.type==='world-sign')paperBoard(t.x,t.y,'↗ '+t.title.slice(0,20));
+    if(t.type==='payphone'){drawPaperPayphone(t.x,t.y);label('☎ Таксофон',t.x,t.y-1.6,true);}
+    else if(t.type==='world-bridge'){paperBoard(t.x,t.y,w.secondBridgeProject?.stage===2?'Второй мост построен':'Стройка · мост');}
+    else if(t.type==='world-sign')paperBoard(t.x,t.y,'↗ '+t.title.slice(0,20));
     else if(t.type==='tourist'||t.type==='world-gate'||t.type==='world-preview'){
-      paperHouse({x:t.x-1.3,y:t.y-1.8,w:2.6,h:1.8},t.type==='tourist'?'shop':'warehouse');
+      paperHouse({x:t.x-1.3,y:t.y-1.8,w:t.id==='university-site'?3.2:t.id==='museum-entry'?2.8:2.35,h:t.id==='robo-stadium-site'?1.4:2.15},
+        t.type==='tourist'?'shop':t.id==='museum-entry'?'museum':t.id==='robo-stadium-site'?'arena':t.id==='farlands-entry'?'gate':t.id==='industry-site'?'factory':'warehouse');
       label(t.title,t.x,t.y-2,true);
     }
   }

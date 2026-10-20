@@ -5,7 +5,10 @@ export const WORLD_SCENES={
   farlands:{name:'Дальние земли',width:28,height:20,exit:{id:'farlands-exit',type:'world-gate',x:2,y:17,title:'Вернуться с дальних земель',to:'city'},main:{id:'not-needed',type:'world-exhibit',x:21,y:9,title:'Пьедестал «НЕ НАДО»'}}
 };
 export const TOURIST_PRICES={map:10,shirt:16,souvenir:4};
+import {SECOND_BRIDGE_SITE} from './second-bridge.mjs';
+import {boothsForScene} from './telecom.mjs';
 export const WORLD_CITY_TARGETS=[
+  SECOND_BRIDGE_SITE,
   {id:'tourist-kiosk',type:'tourist',x:25,y:38,title:'Туристический киоск · карты, майки, сувениры'},
   {id:'travel-sign',type:'world-sign',x:27,y:46,title:'Указатель: лес, горы, дальние земли'},
   {id:'forest-sign',type:'world-sign',x:20,y:56,title:'Лесная развилка'},
@@ -37,9 +40,9 @@ export const WORLD_PATHS=[
  [[51,59],[62,55],[79,55],[96,60]]
 ];
 export function worldObjects(scene='city'){
-  if(scene==='city')return WORLD_CITY_TARGETS;
+  if(scene==='city')return [...WORLD_CITY_TARGETS,...boothsForScene(scene)];
   const region=WORLD_SCENES[scene];
-  return region?[region.exit,region.main]:[];
+  return [...(region?[region.exit,region.main]:[]),...boothsForScene(scene)];
 }
 export function terrainBlocked(scene,x,y,r=.3){
   if(scene==='city')return WORLD_OBSTACLES.some(o=>x+r>o.x&&x-r<o.x+o.w&&y+r>o.y&&y-r<o.y+o.h);
@@ -103,7 +106,7 @@ export function worldTravelAction(g,p,cmd){
 }
 export function worldTravelView(g,p){
   return {scene:p.scene||'city',targets:worldObjects(p.scene||'city'),
-    scenes:WORLD_SCENES,secondBridge:SECOND_BRIDGE,paths:WORLD_PATHS,
+    booths:boothsForScene(p.scene||'city'),scenes:WORLD_SCENES,secondBridge:SECOND_BRIDGE,secondBridgeProject:g.state.secondBridgeProject,paths:WORLD_PATHS,
     obstacles:(p.scene||'city')==='city'?WORLD_OBSTACLES:[],
     prices:TOURIST_PRICES,profile:p.worldTravel||{mapOwned:false,souvenirs:{shirt:0,souvenir:0},visited:['city']},
     worldWidth:g.c.width,worldHeight:g.c.height};
