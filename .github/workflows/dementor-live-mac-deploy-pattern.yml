@@ -1,0 +1,39 @@
+name: Dementor Live — Mac deploy pattern lint
+on:
+  push:
+    branches:
+      - ops/dementor-live-one-command-deploy-2026-10-20
+  pull_request:
+    paths:
+      - 'projects/dementor-live/runtime/deploy/mac-safe-release.sh'
+      - 'projects/dementor-live/runtime/deploy/MAC_RELEASE_PATTERN.md'
+      - '.github/workflows/dementor-live-mac-deploy-pattern.yml'
+permissions:
+  contents: read
+jobs:
+  syntax-and-no-prod-actions:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Shell syntax only — NEVER execute a production connection
+        run: |
+          bash -n projects/dementor-live/runtime/deploy/mac-safe-release.sh
+          bash -n projects/dementor-live/runtime/deploy/publish-preserve-world.sh
+      - name: Ensure fixed SSH identity, exact build and CI gates are present
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          s=Path('projects/dementor-live/runtime/deploy/mac-safe-release.sh').read_text()
+          assert '$HOME/Downloads/dementor_server' in s
+          assert '-o IdentitiesOnly=yes' in s
+          assert '-o BatchMode=yes' in s
+          assert '-o PasswordAuthentication=no' in s
+          assert '-o ConnectionAttempts=1' in s
+          assert 'publish-preserve-world.sh --dry-run' in s
+          assert 'publish-preserve-world.sh --apply' in s
+          assert '970882dee4bf55fe2ab143c0c9e791e79c353e43' in s
+          assert all(x in s for x in ['39468417813','39468427692','39468427666','39468427838','39468427801'])
+          assert s.count('ssh "${SSH_OPTS[@]}"') == 1
+          assert 'down -v' not in s and '--reset-world' not in s
+          print('PASS: local Mac release pattern includes CI, 1 SSH key, safe backup and no world-reset commands')
+          PY
