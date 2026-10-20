@@ -38,7 +38,7 @@ fi
 [[ "$MODE" == "--apply" ]] || fail 'Only --dry-run or --apply is supported'
 [[ "${2:-}" == "$ACTUAL_SHA" ]] || fail 'Approved SHA must match the checkout exactly'
 STAMP="$(date -u +%Y%m%dT%H%M%SZ)"
-BACKUP="$BACKUP_ROOT/safe-$STAMP-$${ACTUAL_SHA:0:10}"
+BACKUP="$BACKUP_ROOT/safe-$STAMP-${ACTUAL_SHA:0:10}"
 mkdir -p "$BACKUP"
 OLD_IMAGE="dementor-live:before-safe-$STAMP"
 NEW_IMAGE="dementor-live:sha-$ACTUAL_SHA"
@@ -54,7 +54,7 @@ rollback(){
    docker run --rm --user 0 --entrypoint sh \
      --mount "type=volume,source=$VOLUME,target=/world" \
      --mount "type=bind,source=$BACKUP,target=/backup,readonly" "$OLD_IMAGE" \
-     -c 'cd /world && tar -xzf /backup/full-world.tar.gz'
+     -c 'test -s /backup/full-world.tar.gz && cd /world && find . -mindepth 1 -maxdepth 1 -exec rm -rf -- {} + && tar -xzf /backup/full-world.tar.gz'
    docker tag "$OLD_IMAGE" dementor-live:local
  fi
  if [[ "$STOPPED" == 1 ]];then
