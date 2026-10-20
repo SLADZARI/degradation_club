@@ -26,3 +26,9 @@ jobs:
         run: npm test
       - name: HTTP/SSE regression on disposable world
         run: npm run test:integration
+      - name: Install isolated browser QA tools
+        run: |
+          npm install --no-save --no-package-lock playwright@1.56.1
+          npx playwright install --with-deps chrome
+      - name: ZEN desktop and mobile dialogue flow
+        run: node test/obitel-browser.cjs
