@@ -512,7 +512,7 @@ function render(time){positionWindows();ctx.clearRect(0,0,view.w,view.h);ctx.fil
   groundRect({x:c.river.x,y:0,w:c.river.w,h:c.height},'#becdc8','#96ada256');
   for(const bank of [c.river.x,c.river.x+c.river.w]){const a=screen(bank,0),b=screen(bank,c.height);line(a.x,a.y,b.x,b.y,'#96ada256',2);}
   for(let i=0;i<20;i++){const p=screen(34.5+(i%3)*.95,.8+i*1.6);line(p.x,p.y,p.x+view.s*.7,p.y,'#e6ede352',1);}
-  drawBridge();label('Другой берег',42,3,true);
+  drawBridge();if(typeof window.__worldGround==='function')window.__worldGround();label('Другой берег',42,3,true);
   if(!state){for(const[x,y]of [[41,7],[44,10],[42,23],[45,26]])drawTree({x,y,stock:10});for(const[x,y]of [[42,16],[45,20]])drawStone({x,y,stock:10});}
   if(state?.expedition){const gate=state.config.expedition.gate;paperBoard(gate.x,gate.y,'Миссия · расчистка');}
   if(state)paperBoard(29,35,'⚔ Боевая зона');
@@ -526,8 +526,9 @@ function render(time){positionWindows();ctx.clearRect(0,0,view.w,view.h);ctx.fil
   label('Городской склад',12,29,true);
   for(const pile of state?.drops||[]){const q=screen(pile.x,pile.y);rounded(q.x-8,q.y-5,16,9,2,pile.kind==='wood'?'#ae9673':pile.kind==='stone'?'#a3aaa0':'#b17b68','#818970');label(`${names[pile.kind]} · ${pile.quantity}`,pile.x,pile.y+.8,true);}
   const resources=state?.resources||[];
-   // ISO depth is x+y (not world y); buildings and trees must hide residents walking behind them.
+   // The extended world contributes its sprites to this SAME z-sort, never a second paint pass.
    const entities=[
+      ...(typeof window.__worldEntities==='function'?window.__worldEntities():[]),
      {depth:4+4+4+3,draw:drawTent},
      {depth:22.7+1+2.6+2,draw:()=>paperHouse({x:22.7,y:1,w:2.6,h:2},'shop')},
      {depth:15.5+1.5+2.5+2.2,draw:()=>paperHouse({x:15.5,y:1.5,w:2.5,h:2.2},'garden-shop')},
