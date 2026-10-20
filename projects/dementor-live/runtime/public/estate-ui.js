@@ -10,6 +10,7 @@ function estatePanel(mode,rows,row,canAct){
  if(mode==='mayor'){
   title.textContent='Мэрия · идеи жителей';
   intro.textContent='Здесь можно предложить доработку города или игры. Письмо сохраняется в городском ящике мэра. За первую подходящую идею в сутки — до 50 PAPER из свободной казны.';
+  if(me.delivery?.picked)row('Курьерская доставка','Передать городской груз мэрии.',[button('Сдать груз',()=>act('courierDeliver','mayor'),!canAct||!nearby('mayor'))]);
   const wrap=document.createElement('form');wrap.id='mayor-letter-form';wrap.className='estate-compose';
   const label=document.createElement('label');label.textContent='Что бы вы хотели добавить или доработать?';
   const textarea=document.createElement('textarea');textarea.required=true;textarea.minLength=20;textarea.maxLength=600;textarea.rows=4;textarea.placeholder='Опишите идею для мэра…';label.append(textarea);
@@ -35,7 +36,7 @@ function estatePanel(mode,rows,row,canAct){
  if(!chosen){note.textContent='В городе пока нет участков.';return true;}
  const near=!!nearby(chosen.id)&&canAct;
  if(chosen.locked){note.textContent='Для открытия участка сначала завершите миссию расчистки.';return true;}
- const mine=chosen.owner===me.id,canEnter=chosen.owner&&(mine||chosen.landUse==='business'&&(!chosen.lease||chosen.lease.dueAt>state.now));
+ const mine=chosen.owner===me.id,canEnter=chosen.owner&&(mine||chosen.publicAccess);
  const landUse=chosen.zoning==='universal'?'universal':chosen.zoning;
  if(!chosen.owner){
   row('Оформить '+chosen.id,'Стоимость покупки '+state.config.plotPrice+' PAPER. Для бизнеса и универсальной земли доступна аренда 1 PAPER/сутки.',[
@@ -48,6 +49,7 @@ function estatePanel(mode,rows,row,canAct){
  }
  if(mine){
   if(chosen.zoning==='universal'){
+   row('Доступ для гостей',chosen.publicAccess?'Открыт':'Закрыт',[button(chosen.publicAccess?'Закрыть':'Открыть',()=>act('plotUse',chosen.id,{landUse:chosen.landUse,open:!chosen.publicAccess}),!near)]);
    row('Назначение','Можно использовать для дома, бизнеса или совмещать.',[
     ...['residential','business','universal'].map(use=>button(names[use],()=>act('plotUse',chosen.id,{landUse:use,open:chosen.landUse==='business'||!!chosen.home?.open}),!near||chosen.landUse===use))]);
   }
