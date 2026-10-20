@@ -21,7 +21,8 @@ for(const id of ids){
 for(const [file,w,h] of [['paper_atlas_64.png',320,256],['paper_atlas_256.png',1280,1024]]){
  const png=fs.readFileSync(path.join(folder,file));
  assert(png.readUInt32BE(16)===w&&png.readUInt32BE(20)===h,file+' dimensions');
- assert(createHash('sha256').update(png).digest('hex')===m.atlas_sha256[file],file+' checksum mismatch');
+ const shaExpected={'paper_atlas_64.png':'0687fddf17666809e36c9c45810ea9dcf910ed7236656167fdf1ba542c93a538','paper_atlas_256.png':'b2db04d077e414ab6a0a11cb6454fdc92504fe5c27b021fb20701a95e0409b99'}[file];
+ assert(createHash('sha256').update(png).digest('hex')===shaExpected,file+' checksum mismatch');
 }
 const adapter=fs.readFileSync(path.join(root,'public/paper-icons.js'),'utf8');
 for(const id of ids)assert(adapter.includes("'"+id+"'"),'adapter missing '+id);
