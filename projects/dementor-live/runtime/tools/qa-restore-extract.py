@@ -28,7 +28,10 @@ def extract(archive, output, limit_bytes):
             if name.startswith("/") or "\0" in name:
                 raise ValueError("unsafe archive path")
             parts = pathlib.PurePosixPath(name).parts
-            if any(p in ("..",) for p in parts) or not parts:
+            if not parts and member.isdir():
+                # GNU tar -czf backup.tar.gz . starts with a root "./" dir.
+                continue
+            if any(p == ".." for p in parts) or not parts:
                 raise ValueError("unsafe archive traversal")
             if not member.isdir() and not member.isfile():
                 raise ValueError("archive contains link, device or special file")
