@@ -29,6 +29,8 @@ jobs:
           npm run test:integration
           npm run test:persistence
           npm run test:upgrade
+      - name: New end-to-end RC2 scenario chains
+        run: node --test test/rc2-cross-chain.test.mjs
       - name: Interaction edge chains
         run: node --test test/pager-bridge.test.mjs test/estate-mayor.test.mjs test/forestry.test.mjs test/world-passage.test.mjs test/qa-recorder.test.mjs
   chrome-journeys:
