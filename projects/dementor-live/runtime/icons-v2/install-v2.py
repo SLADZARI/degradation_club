@@ -13,7 +13,7 @@ if len(sys.argv) != 3:
     raise SystemExit('Usage: python3 install-v2.py CANDIDATE_RUNTIME ICONS_SOURCE_DIR')
 candidate = Path(sys.argv[1]).resolve()
 source = Path(sys.argv[2]).resolve()
-archive = source / 'Dementor_Live_Paper_Icons_v2_CLEAN_REVIEW.zip'
+archive = source.parent / 'assets-source' / 'Dementor_Live_Paper_Icons_v2_CLEAN_REVIEW.zip'
 expected = '930d1e390e81e3c1b2734f3abdfa7bbb52077a3feb803bb32efe6b6bd6cd533f'
 if not archive.is_file() or hashlib.sha256(archive.read_bytes()).hexdigest() != expected:
     raise SystemExit('STOP: Missing or wrong owner-selected v2 archive')
