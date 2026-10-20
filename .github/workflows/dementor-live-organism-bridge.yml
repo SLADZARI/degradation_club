@@ -20,7 +20,7 @@ jobs:
           node-version: '22'
       - name: New isolated aggregate + two-client HTTP tests
         working-directory: projects/dementor-live/runtime
-        run: node --test test/organism-bridge.test.mjs test/organism-runtime-integration.test.mjs
+        run: node --test test/organism-bridge.test.mjs test/organism-runtime-integration.test.mjs test/organism-save-readback.test.mjs
       - name: Existing game model regression
         working-directory: projects/dementor-live/runtime
         run: npm test
