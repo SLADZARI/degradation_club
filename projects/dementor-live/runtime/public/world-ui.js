@@ -25,7 +25,7 @@ blocked=function(x,y){
    if((state.telecom?.booths||[]).some(t=>Math.hypot(x-t.x,y-t.y)<.53))return true;
   if(region)return x<r||y<r||x>region.width-r||y>region.height-r;
   if(scene!=='city')return originalBlocked(x,y);
-  if((state.worldTravel.obstacles||[]).some(o=>(o.biome!=='forest'||state.resources.some(t=>t.id==='forest-wood-'+o.x+'-'+o.y&&t.stock>0))&&x+r>o.x&&x-r<o.x+o.w&&y+r>o.y&&y-r<o.y+o.h))return true;
+  if((state.worldTravel.footprints||[]).some(o=>x+r>o.x&&x-r<o.x+o.w&&y+r>o.y&&y-r<o.y+o.h))return true;
   const c=state.config,b=state.worldTravel.secondBridge;
   if(x+r>c.river.x&&x-r<c.river.x+c.river.w&&y-r>=b.y&&y+r<=b.y+b.h)
     return state.worldTravel.secondBridgeProject?.stage!==2||x<r||y<r||x>c.width-r||y>c.height-r||state.resources.some(o=>o.stock>0&&o.type!=='food'&&Math.hypot(x-o.x,y-o.y)<.63);
@@ -154,9 +154,18 @@ function drawPaperPayphone(x,y){const p=screen(x,y),s=view.s;
 function drawWorldGround(){
   const w=state?.worldTravel;if(!w||state.scene!=='city')return;
   for(const path of w.paths||[]){ctx.beginPath();path.forEach(([x,y],i)=>{const p=screen(x,y);i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y);});ctx.strokeStyle='#a99c7566';ctx.lineWidth=Math.max(3,view.s*.33);ctx.stroke();}
-  const built=w.secondBridgeProject?.stage===2,started=w.secondBridgeProject?.stage===1;
-  if(built){groundRect(w.secondBridge,'#b9a785','#857b62');for(let y=54;y<62;y+=1.2){const a=screen(34,y),b=screen(38,y);line(a.x,a.y,b.x,b.y,'#d9cba7',1.8);}for(const x of [34,38]){const a=screen(x,53),b=screen(x,63);line(a.x,a.y-9,b.x,b.y-9,'#766e5a',2);}}
-  else if(started){for(const x of [34.5,37.3])for(const y of [54,57,60,62]){const p=screen(x,y);line(p.x,p.y-7,p.x,p.y+4,'#998666',3);}groundRect({x:33.5,y:53.2,w:.7,h:9.5},'#c9bb99','#827c66');}
+  const built=w.secondBridgeProject?.stage===2,started=w.secondBridgeProject?.stage===1,br=w.secondBridge;
+  if(built){
+    // One measured deck; supports, beams and plank endpoints use the same real coordinates.
+    groundRect(br,'#b9a785','#857b62');
+    for(let y=br.y+.6;y<br.y+br.h-.3;y+=.9){const a=screen(br.x+.3,y),b=screen(br.x+br.w-.3,y);line(a.x,a.y,b.x,b.y,'#e0d5b8',Math.max(1,view.s*.09));}
+    for(const x of [br.x+.15,br.x+br.w-.15]){
+      const a=screen(x,br.y),b=screen(x,br.y+br.h);
+      line(a.x,a.y-8,b.x,b.y-8,'#746c5c',Math.max(2,view.s*.09));
+      for(let y=br.y;y<=br.y+br.h;y+=2.2){const p=screen(x,y);line(p.x,p.y-8,p.x,p.y+3,'#756d5d',2);}
+    }
+  }
+  else if(started){for(const x of [br.x+.5,br.x+br.w-.7])for(const y of [br.y+1,br.y+br.h/2,br.y+br.h-1]){const p=screen(x,y);line(p.x,p.y-7,p.x,p.y+4,'#998666',3);}groundRect({x:br.x-.5,y:br.y+.2,w:.7,h:br.h-.5},'#c9bb99','#827c66');}
   else {const p=screen(33,55);poly([[p.x-10,p.y],[p.x,p.y-8],[p.x+10,p.y],[p.x,p.y+8]],'#bcb79f','#8b8875');}
 }
 function worldEntities(){
@@ -165,11 +174,12 @@ function worldEntities(){
   for(const o of w.obstacles||[]){
     const p=screen(o.x+o.w/2,o.y+o.h/2);if(p.x< -200||p.x>view.w+200||p.y< -250||p.y>view.h+250)continue;
     if(o.biome==='forest'&&!state.resources.some(t=>t.id==='forest-wood-'+o.x+'-'+o.y&&t.stock>0))continue;
-    layers.push({depth:o.x+o.w/2+o.y+o.h/2,draw:()=>{if(o.biome==='forest')drawTree({x:o.x+o.w/2,y:o.y+o.h/2,stock:12,visualVariant:state.resources.find(t=>t.id==='forest-wood-'+o.x+'-'+o.y)?.visualVariant??0});else{groundRect(o,'#b3b0a3','#868c86');drawStone({x:o.x+o.w/2,y:o.y+o.h/2,stock:16});}}});
+    layers.push({depth:o.x+o.w+o.y+o.h,draw:()=>{if(o.biome==='forest')drawTree({x:o.x+o.w/2,y:o.y+o.h/2,stock:12,visualVariant:state.resources.find(t=>t.id==='forest-wood-'+o.x+'-'+o.y)?.visualVariant??0});else{groundRect(o,'#b3b0a3','#868c86');drawStone({x:o.x+o.w/2,y:o.y+o.h/2,stock:16});}}});
   }
   for(const t of w.targets||[]){
     const p=screen(t.x,t.y);if(p.x< -250||p.x>view.w+250||p.y< -250||p.y>view.h+250)continue;
-    layers.push({depth:t.x+t.y,draw:()=>{
+    const f=w.footprints?.find(o=>o.id==='structure-'+t.id||o.id===t.id);
+    layers.push({depth:f?.depth||t.x+t.y,draw:()=>{
       if(t.type==='payphone'){drawPaperPayphone(t.x,t.y);label('☎ Таксофон',t.x,t.y-1.6,true);}
       else if(t.type==='world-bridge'){paperBoard(t.x,t.y,w.secondBridgeProject?.stage===2?'Второй мост построен':'Стройка · мост');}
       else if(t.type==='world-sign')paperBoard(t.x,t.y,'↗ '+t.title.slice(0,20));
