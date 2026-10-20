@@ -151,13 +151,16 @@ function drawPaperPayphone(x,y){const p=screen(x,y),s=view.s;
   paperBox(p.x+s*.34,p.y-s*1.27,s*.43,s*.46,s*.08,-s*.05,'#ded5ba','#92876c','#f4edda');
   ctx.font=Math.max(7,s*.17)+'px Arial';ctx.fillStyle='#53665c';ctx.fillText('№',p.x+s*.59,p.y-s*1.02);
 }
-function drawWorldProps(){
+function drawWorldGround(){
   const w=state?.worldTravel;if(!w||state.scene!=='city')return;
   for(const path of w.paths||[]){ctx.beginPath();path.forEach(([x,y],i)=>{const p=screen(x,y);i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y);});ctx.strokeStyle='#a99c7566';ctx.lineWidth=Math.max(3,view.s*.33);ctx.stroke();}
   const built=w.secondBridgeProject?.stage===2,started=w.secondBridgeProject?.stage===1;
   if(built){groundRect(w.secondBridge,'#b9a785','#857b62');for(let y=54;y<62;y+=1.2){const a=screen(34,y),b=screen(38,y);line(a.x,a.y,b.x,b.y,'#d9cba7',1.8);}for(const x of [34,38]){const a=screen(x,53),b=screen(x,63);line(a.x,a.y-9,b.x,b.y-9,'#766e5a',2);}}
   else if(started){for(const x of [34.5,37.3])for(const y of [54,57,60,62]){const p=screen(x,y);line(p.x,p.y-7,p.x,p.y+4,'#998666',3);}groundRect({x:33.5,y:53.2,w:.7,h:9.5},'#c9bb99','#827c66');}
   else {const p=screen(33,55);poly([[p.x-10,p.y],[p.x,p.y-8],[p.x+10,p.y],[p.x,p.y+8]],'#bcb79f','#8b8875');}
+}
+function worldEntities(){
+  const w=state?.worldTravel;if(!w||state.scene!=='city')return [];
   const layers=[];
   for(const o of w.obstacles||[]){
     const p=screen(o.x+o.w/2,o.y+o.h/2);if(p.x< -200||p.x>view.w+200||p.y< -250||p.y>view.h+250)continue;
@@ -177,10 +180,7 @@ function drawWorldProps(){
       }
     }});
   }
-  for(const player of state.players.filter(p=>(p.online||p.id===me?.id)&&p.scene===state.scene)){
-    layers.push({depth:player.x+player.y,draw:()=>drawPlayer(player,performance.now())});
-  }
-  layers.sort((a,b)=>a.depth-b.depth);for(const layer of layers)layer.draw();
+  return layers;
 }
 function drawTravelScene(time){
   const region=state.worldTravel.scenes[state.scene];
@@ -208,7 +208,8 @@ function drawTravelScene(time){
 render=function(time){
   if(isTravelScene()){drawTravelScene(time);return;}
   originalRender(time);
-  drawWorldProps();
 };
+window.__worldGround=drawWorldGround;
+window.__worldEntities=worldEntities;
 window.__worldExpansionQA=()=>({scene:state?.scene,mapOwned:!!state?.worldTravel?.profile?.mapOwned,worldWidth:state?.config?.width,worldHeight:state?.config?.height,targetCount:allTargets().length,qaMode:!!state?.qaMode});
 })();
