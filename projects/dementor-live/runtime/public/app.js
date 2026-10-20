@@ -291,7 +291,7 @@ function worldPoint(x,y){
   return {x:view.cx+(u+v)/2,y:view.cy+(v-u)/2};
 }
 function blocked(x,y){const c=state.config,r=.35;if(state.scene!=='city'){
-  if(x<r||y<r||x>16-r||y>16-r)return true;
+  if(x<.5||y<.5||x>15.5||y>15.5)return true;
   // Same authoritative local footprints that the server uses to resolve motion.
   return (state.homeFootprints||[]).some(o=>{
     if(!o.solid)return false;
