@@ -1,3 +1,14 @@
+# 20.10.2026 — V3 manifest route correction (candidate; NOT deployed)
+
+The v3 icon installer copied `manifest-new-only.json` to `public/assets/paper-icons-new-v3/`, but its allowlisted HTTP route matched only SVG/PNG paths. This caused the documented production 404. Candidate source branch `fix/dementor-live-v3-manifest-route-2026-10-20` is based on hotfix `a38a03e68fcec5ceac45c0c362436ee6d69d5c5d`; code commits: route `d6e42c5f00ea08a63b6f79f8ad2633a340a19bce`, focused regression `f16a49bfedbe5b608eaada5270b3f3cacd7ab44d`. The route serves only the exact manifest path as JSON and allows GET/HEAD; icon GET/HEAD still uses the existing 42-name allowlist. Installer pre/post SHA checks for the full v2 directory and v2 JS/CSS remain intact.
+
+- BUILD: source fix and regression assertions committed; candidate PR pending exact-SHA CI.
+- VALIDATION: GitHub CI **PENDING**; local checks against this remote RC4 source were **NOT RUN** (the open local workspace is older 0.2.3 without this Git source tree).
+- RELEASE: **NO-GO / NOT DEPLOYED**. No VM, save, Docker image, production or player state was accessed or changed. Running SHA/backup and two-client/iPhone acceptance remain NOT VERIFIED.
+- GRID-02: remains on the P5 dependency line `feature/dementor-live-p5-footprint-biomes-routes-2026-10-20`; this manifest repair does not bypass or merge that dependency.
+
+---
+
 # Dementor Live 0.2.1 · первый запуск на VM
 
 Дата: 18 октября 2026.
