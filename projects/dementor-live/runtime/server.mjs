@@ -5,6 +5,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Game, createWorld } from './world-expansion-adapter.mjs';
 import {CityNetwork} from './city-network.mjs';
+import {aggregateWorld} from './organism-bridge.mjs';
+import {organismAccess,organismEnabled} from './organism-access.mjs';
 import {createQARecorder} from './qa-recorder.mjs';
 import {scanMusic,audioDuration,PLAZA} from './plaza.mjs';
 import {createHash} from 'node:crypto';
@@ -60,6 +62,15 @@ const server=http.createServer(async(req,res)=>{
     res.setHeader('X-Content-Type-Options','nosniff');
     if(url.pathname==='/favicon.ico'){res.writeHead(204);res.end();return;}
     if(url.pathname==='/api/health'){json(res,200,{ok:true,version,testMode});return;}
+    // Optional ADMIN-only aggregate telemetry; disabled unless isolated --test or explicit HTTPS secret.
+    // This route never calls snapshot() or save(), never lists player IDs, names or tokens.
+    if(url.pathname==='/api/organism/snapshot'){
+      if(req.method!=='GET'){json(res,405,{ok:false,message:'GET only'});return;}
+      const scope={testMode,secret:process.env.DEMENTOR_ORGANISM_READ_TOKEN||'',publicUrl:process.env.DEMENTOR_PUBLIC_URL||''};
+      if(!organismEnabled(scope)){json(res,404,{ok:false,message:'Not found'});return;}
+      if(!organismAccess(req,scope)){json(res,403,{ok:false,message:'Restricted aggregate telemetry'});return;}
+      json(res,200,aggregateWorld(network,{version,testMode}));return;
+    }
     if(testMode&&url.pathname==='/__test'&&req.method==='POST'){
       if(req.headers['x-test-key']!=='local-integration-tests'){json(res,403,{ok:false});return;}
       const data=await body(req);
