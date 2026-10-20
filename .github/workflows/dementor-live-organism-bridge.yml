@@ -3,6 +3,9 @@ on:
   push:
     branches:
       - integration/dementor-live-organism-v0-10-bridge-2026-10-20
+  pull_request:
+    branches:
+      - qa/dementor-live-rc2-chain-audit-2026-10-20
   workflow_dispatch:
 permissions:
   contents: read
