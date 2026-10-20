@@ -183,3 +183,74 @@ dialog:not(#welcome):not(#mayorIdea):not(#payphoneDialog),
 /* QA-01 regression: the world-map toolbar must NEVER cover a modal close control. */
 #cityPanel,#details{z-index:50!important;position:fixed;}
 .map-tools{z-index:8;}
+
+
+/* PAYPHONE P4 · only four paper planes: background, cabinet, receiver, board. */
+.paper-telephone-screen{position:fixed!important;inset:0!important;margin:0!important;width:100vw!important;height:100dvh!important;max-width:none!important;max-height:none!important;padding:0!important;border:0!important;border-radius:0!important;overflow:auto!important;background:#ece6d6;color:#293d36;z-index:10000!important}
+.paper-telephone-screen::backdrop{background:#1e2928dd}
+.phone-sheet{min-height:100dvh;display:flex;flex-direction:column;padding:clamp(12px,3vw,30px);background:#efe8d8}
+.phone-top{display:flex;align-items:center;justify-content:space-between;max-width:1100px;width:100%;margin:0 auto;border-bottom:3px solid #90a597;padding-bottom:8px;font-size:clamp(14px,1.6vw,19px);letter-spacing:.06em}
+#payphoneClose{background:#6f877b;color:#fff;width:43px;height:43px;border-radius:7px;font-size:26px}
+.phone-stage{flex:1;display:grid;grid-template-columns:minmax(300px,1fr) minmax(280px,.9fr);gap:clamp(12px,3vw,34px);width:100%;max-width:1100px;margin:12px auto}
+.phone-machine{position:relative;min-height:430px;max-width:540px;justify-self:center;width:100%;display:flex;align-items:center;justify-content:center}
+.phone-svg{width:min(100%,420px);height:auto;max-height:68vh;display:block;filter:none}
+.paper-hand{position:absolute;left:4%;top:34%;font-size:clamp(32px,5vw,65px);transform:rotate(-15deg);transition:transform .3s,top .3s;pointer-events:none;filter:grayscale(1)}
+.phone-lifted .paper-hand{top:21%;transform:rotate(-40deg)}
+#phoneDisplay{position:absolute;top:39%;width:35%;left:32.5%;height:8%;font:bold clamp(14px,2.2vw,25px) monospace;text-align:center;white-space:nowrap;letter-spacing:.13em;color:#3b514b;pointer-events:none}
+.phone-keys{position:absolute;top:59%;left:38%;width:24%;height:27%;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(4,1fr);gap:3px}
+.phone-digit{background:#f5ebd6;border:2px solid #829689;border-radius:5px;font-weight:800;font-size:clamp(12px,1.4vw,22px);min-width:0;padding:0}
+.phone-digit:disabled{opacity:.66}
+.phone-digit:active{background:#d4d7c2;transform:translateY(2px)}
+.phone-lift{position:absolute;bottom:3%;width:62%;padding:12px 6px;border-radius:8px;background:#668377;color:#fff;font-weight:700;letter-spacing:.03em}
+.phone-notice{background:#f8f3e6;border:5px solid #a6af96;border-radius:9px;padding:clamp(13px,2.5vw,26px);min-width:0;display:flex;flex-direction:column;max-height:82dvh}
+.phone-notice h2{font-size:clamp(20px,2.7vw,31px);margin:0}
+.phone-notice p{font-size:13px;line-height:1.5}
+#phoneSearch{padding:10px;border:2px solid #b4bca9;border-radius:4px;width:100%;background:#fffdf2;font-size:15px}
+.phone-directory{flex:1;min-height:100px;overflow:auto;display:flex;flex-direction:column;gap:4px;margin:10px 0}
+.phone-contact{background:#eee8d6;border-bottom:1px dashed #9da69a;text-align:left;padding:10px;font-size:13px}
+.phone-contact:disabled{opacity:.55}
+.phone-action{background:#688679!important;color:#fff!important;padding:12px;border-radius:4px;margin-top:6px;font-weight:650}
+.phone-compose{display:flex;flex-direction:column}
+.phone-compose textarea{width:100%;font-size:16px;background:#fffdf2;color:#27392f;border:2px solid #b4bca9;padding:9px}
+.phone-compose small{font-size:11px}
+.qa-admin-panel{width:min(460px,calc(100vw - 24px));max-height:80dvh;overflow:auto}
+.qa-admin-panel header{display:flex;justify-content:space-between;align-items:center}
+.qa-admin-panel label{display:flex;flex-direction:column;margin:12px 0;gap:4px}
+.qa-admin-panel input,.qa-admin-panel select{padding:9px;border:1px solid #9cab9c;border-radius:5px}
+#qaAdminSubmit{background:#698376;color:#fff;padding:13px;border-radius:5px}
+.brand-mark{cursor:pointer}
+.vitals.vitals-column{position:absolute;top:85px;right:8px;width:118px;min-width:118px;padding:10px 9px;display:flex;flex-direction:column;gap:9px}
+.vitals.vitals-column .identity{display:flex;flex-direction:column;align-items:flex-start;gap:5px}
+.vitals.vitals-column .identity strong{margin:0}
+.vitals.vitals-column .vital-grid{flex-direction:column;margin:0;gap:9px;width:100%}
+.vitals.vitals-column .vital-grid>div{width:100%}
+.inventory #placeQuick,.inventory .tools,.inventory #woodCount,.inventory #stoneCount,.inventory #eatButton{display:none!important}
+.inventory{gap:4px!important;min-width:0!important}
+.inventory .bag{border-left:0;padding:0}
+.inventory #bagButton{border:none!important;background:none!important;box-shadow:none!important;font-size:25px}
+.inventory #cargo{font-size:11px;margin:0 3px}
+#game.starving:not(.spirit-alert):after{border:12px solid #b7403999;box-shadow:inset 0 0 90px #aa27275a;animation:urgent-hunger 1s step-end infinite}
+@keyframes urgent-hunger{50%{border-color:#b7403920;box-shadow:inset 0 0 10px #aa272511}}
+@media(max-width:760px){.phone-stage{grid-template-columns:1fr;gap:2px}.phone-machine{min-height:300px;width:min(85%,390px)}.phone-svg{max-height:315px}.phone-notice{max-height:none;min-height:300px}.paper-hand{font-size:32px}.phone-sheet{padding:10px}.vitals.vitals-column{top:70px;right:5px;width:91px;min-width:91px}.vitals.vitals-column .identity strong{font-size:13px}.phone-lift{bottom:0}}
+
+#urgentHunger[hidden]{display:none}
+#urgentHunger{position:fixed;top:18px;left:50%;transform:translateX(-50%);z-index:28;background:#fff4e3;border:3px solid #af5048;border-radius:9px;padding:10px 18px;font-size:clamp(13px,2vw,17px);font-weight:800;text-align:center;max-width:min(590px,calc(100vw - 40px));animation:hunger-pulse 1s step-end infinite}
+@keyframes hunger-pulse{50%{background:#f6d9ca}}
+#mobileEatButton{border-radius:12px!important;width:90px;min-width:90px;height:53px;font-size:10px;line-height:1.15;background:radial-gradient(circle at center,#faf9f0ec 26px,transparent 27px)!important;color:#4e674f}
+
+/* DL-TERRAIN-01 · thumbnails are generated from the SAME purchase atlas. */
+.terrain-product{position:relative;min-height:96px;padding-left:132px!important}
+.terrain-preview{width:112px;height:65px;object-fit:contain;position:absolute;left:9px;top:12px;background:#92a68520;border:1px solid #70806d2a;border-radius:6px}
+#terrain-placement{position:absolute;z-index:90;left:50%;transform:translateX(-50%);bottom:94px;display:flex;align-items:center;justify-content:center;gap:8px;max-width:min(96vw,680px);padding:9px 12px;background:#f8f5e8f4;box-shadow:0 4px 18px #39403533;border:1px solid #a6aa93;border-radius:12px;pointer-events:auto;flex-wrap:wrap}
+#terrain-placement[hidden]{display:none!important}
+#terrain-placement span{font-size:12px;font-weight:600;max-width:290px}
+#terrain-placement button{min-height:40px;padding:8px 13px;background:#d8e2cc;border:1px solid #a3b098;border-radius:8px}
+#terrain-placement button:disabled{opacity:.4}
+#terrain-placement button:first-of-type{background:#758f6d;color:#fff;border-color:#526c4d}
+#world.placing-terrain{cursor:crosshair}
+@media(max-width:760px){
+ #terrain-placement{bottom:calc(122px + env(safe-area-inset-bottom));width:min(94vw,480px);gap:6px;padding:8px}
+ #terrain-placement span{flex:1 1 100%;max-width:none;text-align:center}
+ .terrain-product{padding-left:108px!important;min-height:100px}
+ .terrain-preview{width:87px;height:55px}
+}

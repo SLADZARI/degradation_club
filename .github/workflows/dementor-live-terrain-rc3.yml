@@ -1,0 +1,57 @@
+name: Dementor Live RC3 — Terrain Canvas and Safe World
+on:
+  push:
+    branches:
+      - 'feature/dementor-live-terrain-placement-rc3-*'
+  pull_request:
+    paths:
+      - 'projects/dementor-live/runtime/**'
+      - 'projects/dementor-live/design/DL_TERRAIN_01_RC3_GAMEPLAY.md'
+      - '.github/workflows/dementor-live-terrain-rc3.yml'
+permissions:
+  contents: read
+jobs:
+  model-assets-saves:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    defaults:
+      run:
+        working-directory: projects/dementor-live/runtime
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: sudo apt-get update -qq && sudo apt-get install -y python3-cairosvg python3-pil
+      - run: python3 tools/build-terrain.py
+      - run: node --check public/app.js && node --check public/terrain-01.js && node --check server.mjs
+      - run: npm run check:terrain
+      - run: python3 icons-v2/install-v2.py . icons-v2
+      - run: npm run check:icons
+      - run: npm test
+      - run: npm run test:persistence
+      - run: npm run test:integration
+  docker-assets:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -f projects/dementor-live/runtime/deploy/Dockerfile -t dementor-live:rc3-terrain projects/dementor-live/runtime
+  browser-multi-client:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: projects/dementor-live/runtime
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: sudo apt-get update -qq && sudo apt-get install -y python3-cairosvg python3-pil
+      - run: python3 tools/build-terrain.py
+      - run: python3 icons-v2/install-v2.py . icons-v2
+      - run: npm install --no-save --no-package-lock playwright@1.56.1
+      - run: npx playwright install --with-deps chromium
+      - run: node test/cities-browser.cjs
+      - run: node test/terrain-rc3-browser.cjs

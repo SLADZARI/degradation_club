@@ -22,6 +22,17 @@ function lifePanel(mode,rows,row,canAct){
   if(tool){row(`${tool.kind==='axe'?'🪓':'⛏️'} ${toolNames[tool.kind]}`,`Прочность ${tool.durability} / ${tool.max}${me.activeTools[tool.kind]===tool.id?' · выбран':''}`,[button('Взять в руки',()=>{assignQuick(quickIndex,tool.id);selectQuick(quickIndex);},!canAct||tool.durability<=0,'equip-tool'),button('Удалить',()=>{if(confirm('Удалить этот инструмент безвозвратно?'))act('discardTool',tool.id);},!canAct,'discard-tool')]);}
   else if(state.items[bagSelection]){const k=bagSelection;row(`${emoji[k]} ${itemName(k)} · ${me.bag[k]||0}`,`Вес единицы ${state.items[k].weight}`,[button('Выложить 1',action('drop',null,{kind:k,quantity:1}),!canAct||!me.bag[k],'drop-one-'+k),button('Выложить всё',action('drop',null,{kind:k}),!canAct||!me.bag[k],'drop-all-'+k),...(['carrot','food'].includes(k)?[button('Съесть',action(k==='carrot'?'eatCarrot':'eat'),!me.bag[k])]:[])]);const section=rows.lastChild,field=num('Количество',1),drop=document.createElement('button');field.querySelector('input').max=me.bag[k]||0;drop.textContent='Выложить';drop.disabled=!canAct||!me.bag[k];drop.onclick=()=>act('drop',null,{kind:k,quantity:Number(field.querySelector('input').value)});section.append(field,drop);}
   else row('Выбери предмет','Нажми на ячейку, чтобы посмотреть количество и действия.');
+  // Terrain packs are persistent terrainBag supplies, not physical material stacks.
+  const terrainSupplies=Object.entries(state.landscapeProducts||{}).filter(([kind])=>(me.terrainBag?.[kind]||0)>0);
+  if(terrainSupplies.length){
+    row('Покрытия для строительства','Купленные комплекты хранятся отдельно от дерева, камня и еды. Выбери материал и укажи клетку на карте.');
+    for(const [kind,item] of terrainSupplies){
+      const card=row(item.name+' · '+me.terrainBag[kind]+' шт.','Покрытие 1×1. Место на карте выбираешь сам.',[
+        button('Выбрать · Применить на карте',()=>setPlacementKind(kind),!canAct)]);
+      card.classList.add('terrain-product');const preview=window.DLTerrain01?.previewCanvas?.(kind);
+      if(preview)card.prepend(preview);
+    }
+  }
   if(me.delivery)row('Городской груз · отдельно',`${me.delivery.quantity} · ${itemName(me.delivery.kind)}. ${me.delivery.picked?'Груз у тебя и занимает вес.':'Ожидает на складе.'} Нельзя подарить или продать.`);
   return true;
  }

@@ -4,6 +4,7 @@ on:
     branches:
       - qa/dementor-live-rc2-chain-audit-2026-10-20
       - release/dementor-live-civic-p3-safe-upgrade-rc3-2026-10-20
+      - release/dementor-live-2026-10-20-integrated-rc4
     paths:
       - '.github/workflows/dementor-live-seven-gates.yml'
       - 'projects/dementor-live/runtime/**'
