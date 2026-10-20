@@ -101,7 +101,7 @@ function record(p,id,value){
  if(keys.length>256)delete p.receipts[keys[0]];
  return value;
 }
-export function caveCommand(layout,p,command){
+export function caveCommand(layout,p,command,serverVerifiedPeers=[]){
  const {type,requestId}=command;
  if(!requestId||typeof requestId!=='string')throw Error('Нужен requestId');
  if(Object.hasOwn(p.receipts,requestId))return p.receipts[requestId];
@@ -126,11 +126,12 @@ export function caveCommand(layout,p,command){
   if(layout.spareOilAt&&pos===key(layout.spareOilAt.x,layout.spareOilAt.y)&&!p.collectedOil){
    p.collectedOil=true;p.oil+=layout.spareOilAmount;events.push('oil');
   }
-  if(pos===key(layout.keyAt.x,layout.keyAt.y)&&!p.keyFound){p.keyFound=true;events.push('key');}
+  if(pos===key(layout.keyAt.x,layout.keyAt.y)&&!p.keyFound&&caveVisibleCells(layout,[p,...serverVerifiedPeers]).has(pos)){p.keyFound=true;events.push('key');}
   return record(p,requestId,{type,x,y,events,oil:p.oil,health:p.health});
  }
  if(type==='openSecretDoor'){
   if(!p.keyFound)throw Error('Тайная дверь заперта: нужен ключ');
+  if(!caveVisibleCells(layout,[p,...serverVerifiedPeers]).has(key(layout.secretDoor.x,layout.secretDoor.y)))throw Error('Без света тайную дверь не видно');
   if(Math.abs(p.x-layout.secretDoor.x)+Math.abs(p.y-layout.secretDoor.y)>1)throw Error('Слишком далеко до секретной двери');
   p.doorOpened=true;p.videoSeen=true;
   return record(p,requestId,{type,playYouTube:CAVE_VIDEO_ID,artifact:CAVE_ARTIFACT,altarMessage:'Принеси рыбу'});
@@ -146,7 +147,7 @@ export function caveCommand(layout,p,command){
 }
 const fishByBait={worm:['roach','perch','carp'],larva:['roach','perch','perch']};
 function hash(str){let h=2166136261;for(const c of str){h^=c.charCodeAt(0);h=Math.imul(h,16777619);}return h>>>0;}
-export function newFishingKit(){return {rod:false,rodDurability:0,bait:{worm:0,larva:0},digAttempts:0,fish:[],receipts:{}};}
+export function newFishingKit(){return {rod:false,rodDurability:0,bait:{worm:0,larva:0},digAttempts:0,dugSites:[],fish:[],receipts:{}};}
 export function fishingCommand(p,kit,command){
  const {type,requestId}=command;if(!requestId||typeof requestId!=='string')throw Error('Нужен requestId');
  if(Object.hasOwn(kit.receipts,requestId))return kit.receipts[requestId];
@@ -160,6 +161,8 @@ export function fishingCommand(p,kit,command){
  if(type==='digBait'){
   if(!command.hasShovel||!command.onSoil)throw Error('Нужна лопатка и почва');
   if(!Number.isInteger(command.digSite)||command.digSite<0||command.digSite>10000)throw Error('Некорректный участок почвы');
+  if(kit.dugSites.includes(command.digSite))throw Error('Это место уже вскопано');
+  kit.dugSites.push(command.digSite);
   kit.digAttempts++;const roll=hash(p.id+':'+kit.digAttempts+':'+command.digSite)%1000;
   const bait=roll<13?'worm':roll<26?'larva':null; // 2.6% of eligible digs
   if(bait)kit.bait[bait]++;
@@ -172,7 +175,8 @@ export function fishingCommand(p,kit,command){
   kit.bait[command.bait]--;kit.rodDurability--;
   const roll=hash(p.id+':'+requestId)%100;
   const species=roll<60?fishByBait[command.bait][0]:roll<95?fishByBait[command.bait][1]:fishByBait[command.bait][2];
-  kit.fish.push(species);return once({type,species,remainingBait:kit.bait[command.bait],rodDurability:kit.rodDurability});
+  const bag=Array.isArray(p.fish)?p.fish:kit.fish;
+  bag.push(species);return once({type,species,remainingBait:kit.bait[command.bait],rodDurability:kit.rodDurability});
  }
  throw Error('Неизвестная команда рыбалки');
 }
