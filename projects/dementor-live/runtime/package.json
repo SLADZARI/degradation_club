@@ -9,7 +9,7 @@
     "check": "node tools/workspace.mjs check",
     "context": "node tools/workspace.mjs context",
     "pack": "node tools/pack.mjs",
-    "test": "node --test test/model.test.mjs test/life.test.mjs test/plaza.test.mjs test/city-economy.test.mjs test/world-expansion.test.mjs test/landscape.test.mjs test/forestry.test.mjs test/estate-mayor.test.mjs test/world-passage.test.mjs test/pager-bridge.test.mjs test/qa-recorder.test.mjs test/upgrade-audit.test.mjs",
+    "test": "node --test test/model.test.mjs test/life.test.mjs test/plaza.test.mjs test/city-economy.test.mjs test/world-expansion.test.mjs test/landscape.test.mjs test/forestry.test.mjs test/estate-mayor.test.mjs test/world-passage.test.mjs test/pager-bridge.test.mjs test/qa-recorder.test.mjs test/upgrade-audit.test.mjs test/playtest-p4.test.mjs",
     "test:integration": "node test/integration.mjs",
     "test:browser": "node test/browser.cjs",
     "test:mobile": "node test/mobile.cjs",
@@ -29,7 +29,8 @@
     "test:donations": "node test/donations.cjs",
     "test:perimeter": "node test/perimeter.cjs",
     "test:axonometry": "node test/axonometry.cjs",
-    "test:upgrade": "node --test test/upgrade-audit.test.mjs"
+    "test:upgrade": "node --test test/upgrade-audit.test.mjs",
+    "test:playtest-p4": "node --test test/playtest-p4.test.mjs"
   },
   "engines": {
     "node": ">=22"
