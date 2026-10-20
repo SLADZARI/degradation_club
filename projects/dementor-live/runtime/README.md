@@ -19,3 +19,7 @@
 ## 0.3.0-rc.1 — кандидат обновления (не production)
 
 [Отчёт и процедура миграции](docs/RELEASE_0.3.0_RC1.md). Доступны отдельная семенная лавка, городской опытный огород и реестр новых городов. Сводная ведомость `materials` показывает дерево и камень на всех этапах. `npm run test:persistence` проверяет реальный перезапуск с одним `world.json`, `npm run test:cities-browser` проверяет переход двух живых браузерных сессий. Перед обновлением VM обязателен отдельный backup `dementor-live-world`; в текущем кандидате используется новая `dementor-cities-v1` схема сохранения. ZIP собирается командой `npm run pack` или в GitHub Actions PR #261 после PASS.
+
+## UI-графика — SVG-FIRST
+
+[Единый SVG-first pipeline](../design/styles/SVG_FIRST_PAPER_CUT_PIPELINE_v1.md) · [исходники и сборщик на Google Drive](https://drive.google.com/file/d/1UskpdEQvSBGz-poBvzqdwsvgxOZVzl5e/view). Для новой Paper Cut иконки: сначала один SVG из 2–4 бумажных слоёв, потом генерируем из него PNG 32/48/64/128/256 и атлас, не наоборот. QA двух тестовых SVG прошёл; 20 старых SVG пока 7 CANDIDATE + 13 REWORK и **не устанавливаются автоматически**.
