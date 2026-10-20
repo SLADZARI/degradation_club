@@ -11,7 +11,7 @@ export function ensureLandscape(g){
  for(const p of Object.values(g.state.players)){p.terrainBag||={paving:0,grass:0,flowers:0};p.landscapeReceipts||={};}
 }
 export function landscapeIndex(g){
- ensureLandscape(g);
+ if(!g.state.landscape||!Array.isArray(g.state.landscape.tiles))ensureLandscape(g);
  const land=g.state.landscape;
  let item=INDEX.get(land);
  if(!item||item.array!==land.tiles||item.length!==land.tiles.length||item.revision!==land.revision){
