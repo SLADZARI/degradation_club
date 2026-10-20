@@ -28,3 +28,9 @@ jobs:
         run: |
           npm run test:integration
           npm run test:persistence
+      - name: Browser HUD regression on isolated world
+        run: |
+          npm install --no-save --no-package-lock playwright@1.56.1
+          npx playwright install --with-deps chrome
+          node test/interface-world-polish.cjs
+          node test/city-mobile-gameplay.cjs
