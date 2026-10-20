@@ -68,7 +68,26 @@ try{
     return {world:c,screen:screen(c.x,c.y)};
   });
   await page.touchscreen.tap(target.screen.x,target.screen.y);
-  await page.waitForFunction(goal=>Math.hypot(me.x-goal.x,me.y-goal.y)<0.8&&route.length===0,target.world,{timeout:20000});
+  try{
+    await page.waitForFunction(goal=>Math.hypot(me.x-goal.x,me.y-goal.y)<0.8&&route.length===0,target.world,{timeout:20000});
+  }catch(navigationError){
+    // Do not mask timeout: surface all state required to reproduce a stuck
+    // route, blocked map tap, oscillation or out-of-bounds tap.
+    const diagnostic=await page.evaluate(goal=>({
+      target:goal,
+      current:{x:me.x,y:me.y,scene:me.scene},
+      distance:Math.hypot(me.x-goal.x,me.y-goal.y),
+      routeLength:route.length,
+      routePreview:route.slice(0,12),
+      selected:typeof selected==='undefined'?null:selected,
+      viewport:{width:innerWidth,height:innerHeight},
+      canvas:(()=>{const r=document.getElementById('world').getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,height:r.height};})(),
+      zoom:view.zoom,
+      browserErrors:errors
+    }),target.world);
+    console.error('MOBILE_NAVIGATION_TIMEOUT_DIAGNOSTIC',JSON.stringify(diagnostic));
+    throw navigationError;
+  }
   console.log('MOBILE NAVIGATION PASS');
   await assertHud(375,667);
   assert.deepEqual(errors,[],'Browser JavaScript errors');
