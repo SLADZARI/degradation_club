@@ -23,7 +23,7 @@ test('dig, sow, water, three growth stages, finite axe harvest and reload',()=>{
  const t=plot.home.plantedTrees[0];assert.equal(growthStage(g.now,t),1);
  assert.equal(command(g,p,'homeFellTree',t.id).ok,false);
  assert.equal(command(g,p,'homeWaterTree',t.id).ok,true);assert.equal(p.bag.water,0);
- g.tick(FORESTRY.firstStageMs+1);assert.equal(growthStage(g.now,t),2);assert.equal(g.walkable(t.x,t.y,p),false);
+ g.tick(FORESTRY.firstStageMs+1);assert.equal(growthStage(g.now,t),2);assert.equal(g.walkable(t.x,t.y,p),false);p.x=t.x;p.y=t.y;assert.equal(g.walkable(t.x+.12,t.y,p),true,'Player standing where a seedling grew must be able to exit outward');p.x=t.x;p.y=t.y;
  const copy=new Game(JSON.parse(JSON.stringify(g.state))),q=copy.auth(p.token),tree=copy.state.plots[0].home.plantedTrees[0];copy.now=g.now; // Simulated test clock must survive an accelerated-time restart.
  assert.equal(growthStage(copy.now,tree),2);
  copy.tick(FORESTRY.matureMs-FORESTRY.firstStageMs+1);assert.equal(growthStage(copy.now,tree),3);
