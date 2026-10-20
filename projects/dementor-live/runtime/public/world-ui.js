@@ -79,7 +79,7 @@ updateCityPanels=function(force=false){
   $('cityPanelNote').textContent='Известные маршруты: лес → горы → музей смеха → дальние земли. На карте нет телепорта для игроков.';
   const make=(title,description,kind,price,owned=false)=>{
     const el=document.createElement('section');el.className='city-row';const h=document.createElement('h3'),s=document.createElement('p'),buttons=document.createElement('div');
-    h.textContent=title;s.textContent=description;buttons.className='city-actions';
+    h.textContent=title;const paper=window.PaperIcons?.icon(kind);if(paper)h.prepend(paper);s.textContent=description;buttons.className='city-actions';
     const b=document.createElement('button');b.textContent=owned?'Куплено':('Купить · '+price+' PAPER');
     b.disabled=owned||me.wallet<price||me.spirit||!!me.job||!nearby('tourist-kiosk');
     b.onclick=()=>act('touristBuy','tourist-kiosk',{kind}).then(()=>{cityPanelSignature='';updateCityPanels(true);});
@@ -109,7 +109,7 @@ style.textContent=`
 `;
 document.head.append(style);
 const tools=$('centerButton').parentElement,button=document.createElement('button');
-button.id='worldMapButton';button.title='Карта путешественника';button.textContent='🗺';button.setAttribute('aria-label','Открыть карту путешественника');tools.prepend(button);
+button.id='worldMapButton';button.title='Карта путешественника';button.replaceChildren(window.PaperIcons?.icon('map')||document.createTextNode('🗺'));button.setAttribute('aria-label','Открыть карту путешественника');tools.prepend(button);
 const dialog=document.createElement('dialog');dialog.id='travelMap';dialog.innerHTML='<h2>Карта путешественника</h2><canvas id="travelMapCanvas" width="720" height="360" aria-label="Город, лес, горы, музей смеха и дальние земли"></canvas><p id="travelMapCaption">Карта доступна после покупки. Точки показывают направления; перемещение только пешком.</p><button id="closeTravelMap">Закрыть</button>';
 document.body.append(dialog);$('closeTravelMap').onclick=()=>dialog.close();
 button.onclick=()=>{if(!state?.worldTravel?.profile?.mapOwned){toast('Купи карту в туристическом киоске · ☷ покажет дорогу');if(state?.scene==='city')navigateTo('tourist-kiosk');return;}openTravelMap();};
