@@ -34,3 +34,4 @@ jobs:
           npx playwright install --with-deps chrome
           node test/interface-world-polish.cjs
           node test/city-mobile-gameplay.cjs
+          node test/cave-hud-smoke.cjs
