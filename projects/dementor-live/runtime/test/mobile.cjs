@@ -81,7 +81,7 @@ try{
     return points[0];
   });
   await page.touchscreen.tap(target.screen.x,target.screen.y);
-  await page.waitForFunction(goal=>Math.hypot(me.x-goal.x)<.8&&Math.abs(me.y-goal.y)<.8&&route.length===0,target.world,{timeout:20000});
+  await page.waitForFunction(goal=>Math.hypot(me.x-goal.x,me.y-goal.y)<0.8&&route.length===0,target.world,{timeout:20000});
   console.log('MOBILE NAVIGATION PASS');
   await assertHud(375,667);
   assert.deepEqual(errors,[],'Browser JavaScript errors');
