@@ -4,10 +4,12 @@ on:
   push:
     branches:
       - qa/dementor-live-chat-2026-10-18
+      - qa/dementor-live-0-3-balance-audit-2026-10-18
   pull_request:
     types: [opened, synchronize, reopened, edited]
     branches:
       - deploy/dementor-live-isolated-2026-10-18
+      - feature/dementor-live-economy-seeds-cities-2026-10-18
     paths:
       - ".github/workflows/dementor-live-qa.yml"
       - "projects/dementor-live/runtime/**"
@@ -46,6 +48,8 @@ jobs:
           node-version: "22"
       - name: Syntax, models, regression
         run: npm run check
+      - name: Economic balance and long-session audit (isolated world)
+        run: node --test test/balance-audit.test.mjs
       - name: HTTP/SSE with temporary world
         run: npm run test:integration
       - name: Durable wood and stone after server restart
