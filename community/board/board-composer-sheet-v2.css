@@ -21,3 +21,55 @@
 .dc-composer-visibility__options label:has(input:checked){background:#d8ff3e}
 .dc-composer-visibility__options input{width:16px;height:16px;margin:0;accent-color:#111}
 @media(max-width:430px){.dc-composer-visibility__options{grid-template-columns:1fr}.dc-composer-visibility__options label{min-height:46px}}
+
+
+/* Board composer opacity/geometry corrective (2026-10-20).
+   The later fullscreen Board stylesheet makes .dc-board-entry transparent and
+   fixes all four inset edges with !important. Restore the existing composer
+   surface only while the canonical sheet is open; leave other Board states alone. */
+.dcw-board-view .dc-board-entry.is-composer-sheet-open{
+  left:auto!important;
+  right:0!important;
+  background:#f8f5ed!important;
+  overflow-x:hidden!important;
+  overflow-y:auto!important;
+  overscroll-behavior:contain;
+}
+.dcw-board-view .dc-board-entry.is-composer-sheet-open>.dc-board-shell{
+  min-height:100%!important;
+  height:auto!important;
+  background:#f8f5ed!important;
+}
+.dcw-board-view .dc-board-entry.is-composer-sheet-open #entryHost,
+.dcw-board-view .dc-board-entry.is-composer-sheet-open .dc-composer{
+  height:auto!important;
+  background:#f8f5ed;
+}
+.dcw-board-view .dc-board-entry.is-composer-sheet-open .dc-composer-field input:not([type="radio"]):not([type="checkbox"]),
+.dcw-board-view .dc-board-entry.is-composer-sheet-open .dc-composer-field textarea,
+.dcw-board-view .dc-board-entry.is-composer-sheet-open .dc-composer-field select{
+  min-width:0;
+  background:#fffdf7!important;
+  color:#111!important;
+}
+.dcw-board-view .dc-board-entry.is-composer-sheet-open .dc-composer-actions{
+  background:#f8f5ed!important;
+  padding-bottom:calc(4px + env(safe-area-inset-bottom,0px));
+}
+@media(max-width:768px){
+  .dcw-board-view .dc-board-entry.is-composer-sheet-open{
+    left:0!important;
+    right:0!important;
+    top:auto!important;
+    bottom:0!important;
+    width:100%!important;
+    height:min(92dvh,calc(100dvh - 136px))!important;
+    max-height:calc(100dvh - 136px)!important;
+  }
+}
+@media(max-width:520px){
+  .dcw-board-view .dc-board-entry.is-composer-sheet-open{
+    height:min(94dvh,calc(100dvh - 132px))!important;
+    max-height:calc(100dvh - 132px)!important;
+  }
+}
