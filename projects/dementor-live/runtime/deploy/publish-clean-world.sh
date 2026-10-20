@@ -43,6 +43,9 @@ CURRENT_CONTAINER="$(docker compose -p "$PROJECT" -f "$COMPOSE" --env-file "$ENV
 docker image inspect dementor-live:local >/dev/null || fail "Expected current image dementor-live:local was not found"
 echo "Existing live state: $(curl --max-time 6 -fsS "$PUBLIC_URL/api/health" || echo unavailable)"
 echo 'New code verification and Docker build — old game stays online during this phase.'
+# macOS bsdtar can add AppleDouble ._*.js sidecars. They are metadata, not source.
+# Clean ONLY this standalone release staging directory before building the image.
+find "$SOURCE" -type f -name '._*' -delete
 # Dockerfile executes npm run doctor + npm run check; no production volume mounted during build.
 docker build -t "$NEW_IMAGE" -f "$SOURCE/deploy/Dockerfile" "$SOURCE"
 docker tag dementor-live:local "$OLD_IMAGE"
