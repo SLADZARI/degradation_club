@@ -1,7 +1,7 @@
 {
   "schema": "DL-WORLD-UNIQUE-ISO30-01",
   "version": "2026-10-20-1",
-  "items": 46,
+  "items": 54,
   "stage_assets": 21,
   "source_branch": "feature/dementor-live-world-art-closure-batch02-2026-10-20",
   "approval": "CANDIDATE",
@@ -229,6 +229,134 @@
       "gameplay_connected": false,
       "sha256": "b7ebb11091a538cdf43f52e8a010110c28fb32732d2f8266a4f2946e9aa914eb",
       "png256_sha256": "3dc3f10bd0b5fb594722b3874ebc06fe42a2b7a237568162e151b06b3ab5edde"
+    },
+    {
+      "asset_id": "plot-personal-tent-plot-1",
+      "title": "Личная палатка: вариант участка 1",
+      "game_id": "plot-1",
+      "scope": "RC4/PLOT-CANDIDATE",
+      "svg": "source/svg/plot-personal-tent-plot-1.svg",
+      "footprint_CU": [
+        4.0,
+        3.0
+      ],
+      "anchor": "southern base center; PENDING PIXEL<->CU CHECK",
+      "art_state": "CANDIDATE_NOT_APPROVED",
+      "gameplay_connected": false,
+      "sha256": "05ef8fde74241607d26aed98f0f83443cb13eacd3227caefe9657ead77d46db4",
+      "png256_sha256": "c4c7b664eb1e70395553d713605430c700f34fd4450b06a24c9de099a935d431"
+    },
+    {
+      "asset_id": "plot-personal-tent-plot-2",
+      "title": "Личная палатка: вариант участка 2",
+      "game_id": "plot-2",
+      "scope": "RC4/PLOT-CANDIDATE",
+      "svg": "source/svg/plot-personal-tent-plot-2.svg",
+      "footprint_CU": [
+        4.0,
+        3.0
+      ],
+      "anchor": "southern base center; PENDING PIXEL<->CU CHECK",
+      "art_state": "CANDIDATE_NOT_APPROVED",
+      "gameplay_connected": false,
+      "sha256": "11854bc71145a74c6969977d2b6519d0963a12875d32f33ee138ea4afa1660eb",
+      "png256_sha256": "084cb8093d4a0e21ebfb38b9dafb351cb0730a211f9373c14f73f1e0d868970f"
+    },
+    {
+      "asset_id": "plot-personal-tent-plot-3",
+      "title": "Личная палатка: вариант участка 3",
+      "game_id": "plot-3",
+      "scope": "RC4/PLOT-CANDIDATE",
+      "svg": "source/svg/plot-personal-tent-plot-3.svg",
+      "footprint_CU": [
+        4.0,
+        3.0
+      ],
+      "anchor": "southern base center; PENDING PIXEL<->CU CHECK",
+      "art_state": "CANDIDATE_NOT_APPROVED",
+      "gameplay_connected": false,
+      "sha256": "ed89996acd4d9c77ace2122806a743243b9e78dc8c7b1a6364bd88418e942bf0",
+      "png256_sha256": "7ad7a7566bae102f406feafe66afefdc130fefbd912dd2a671cd6f3b46d7087d"
+    },
+    {
+      "asset_id": "plot-personal-tent-plot-4",
+      "title": "Личная палатка: вариант участка 4",
+      "game_id": "plot-4",
+      "scope": "RC4/PLOT-CANDIDATE",
+      "svg": "source/svg/plot-personal-tent-plot-4.svg",
+      "footprint_CU": [
+        4.0,
+        3.0
+      ],
+      "anchor": "southern base center; PENDING PIXEL<->CU CHECK",
+      "art_state": "CANDIDATE_NOT_APPROVED",
+      "gameplay_connected": false,
+      "sha256": "3b8aaa46f1934061185e2914c5470d64cfb6253596a1a673866cd8bbbcf70f29",
+      "png256_sha256": "63a292a9e9e0f1250485d8ebc304a78ca45cda85448bc2ed42ebb36a743ec032"
+    },
+    {
+      "asset_id": "plot-personal-tent-plot-5",
+      "title": "Личная палатка: вариант участка 5",
+      "game_id": "plot-5",
+      "scope": "RC4/PLOT-CANDIDATE",
+      "svg": "source/svg/plot-personal-tent-plot-5.svg",
+      "footprint_CU": [
+        4.0,
+        3.0
+      ],
+      "anchor": "southern base center; PENDING PIXEL<->CU CHECK",
+      "art_state": "CANDIDATE_NOT_APPROVED",
+      "gameplay_connected": false,
+      "sha256": "a7a9f90c1d21c74451426b1024a2de5c7b30e1419dc8db6d35a3708364624f9d",
+      "png256_sha256": "ce0442583c78c3c2e1a619fea3cedde6188e29c90f3683071dd0fbd067a48822"
+    },
+    {
+      "asset_id": "plot-personal-tent-plot-6",
+      "title": "Личная палатка: вариант участка 6",
+      "game_id": "plot-6",
+      "scope": "RC4/PLOT-CANDIDATE",
+      "svg": "source/svg/plot-personal-tent-plot-6.svg",
+      "footprint_CU": [
+        4.0,
+        3.0
+      ],
+      "anchor": "southern base center; PENDING PIXEL<->CU CHECK",
+      "art_state": "CANDIDATE_NOT_APPROVED",
+      "gameplay_connected": false,
+      "sha256": "2564bfa3c47813627ab41045f6e77c8b2d6ca46de5d24f1324551333a1f45f8f",
+      "png256_sha256": "31cc519e75f8817d7ebca5798ac60fb464b5db15ad258322c9de43e468cc4e0c"
+    },
+    {
+      "asset_id": "plot-personal-tent-plot-7",
+      "title": "Личная палатка: вариант участка 7",
+      "game_id": "plot-7",
+      "scope": "RC4/PLOT-CANDIDATE",
+      "svg": "source/svg/plot-personal-tent-plot-7.svg",
+      "footprint_CU": [
+        4.0,
+        3.0
+      ],
+      "anchor": "southern base center; PENDING PIXEL<->CU CHECK",
+      "art_state": "CANDIDATE_NOT_APPROVED",
+      "gameplay_connected": false,
+      "sha256": "78dc20bcd07aad33588eec5ad3cb19c35a53d04de669231f753bde95d75753c9",
+      "png256_sha256": "2a0b5e0e5e5277418ddef83682aa78c2e87ba733b6f0bca5cf9c0497e86fa6df"
+    },
+    {
+      "asset_id": "plot-personal-tent-plot-8",
+      "title": "Личная палатка: вариант участка 8",
+      "game_id": "plot-8",
+      "scope": "RC4/PLOT-CANDIDATE",
+      "svg": "source/svg/plot-personal-tent-plot-8.svg",
+      "footprint_CU": [
+        4.0,
+        3.0
+      ],
+      "anchor": "southern base center; PENDING PIXEL<->CU CHECK",
+      "art_state": "CANDIDATE_NOT_APPROVED",
+      "gameplay_connected": false,
+      "sha256": "6960a27d4bc0c9172a024be8def75ba88c31753009f48e05e5f2d4700a60bf01",
+      "png256_sha256": "16100b2560ada3b44c9dd43056e68762bbfedc33de1791182e65230e1ac0dcaf"
     },
     {
       "asset_id": "plot-garden-bed-empty",

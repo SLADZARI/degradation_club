@@ -32,6 +32,10 @@ props={
 'interior-chair-sage':('Стул · зелёный','chair',None,None,'GRID-02'),
 'interior-table':('Стол · интерьер','table',None,None,'GRID-02'),
 'interior-chest':('Сундук · интерьер','chest',1.6,1.3,'GRID-02')}
+# Eight stable visual facade variants for the existing eight plot IDs. These are VISUAL ONLY:
+# owner/city identity, footprint and state remain server-owned; no new dwelling entity.
+for i in range(1,9):
+ styles[f'plot-personal-tent-plot-{i}']=(f'Личная палатка: вариант участка {i}',f'plot-{i}',4.0,3.0,'RC4/PLOT-CANDIDATE')
 # Geometry authored as ISO30 paper forms: 2 planar axes at ±30° in screen plane.
 def P(points,fill):return f'<polygon points="{" ".join(f"{x:.1f},{y:.1f}" for x,y in points)}" fill="{C.get(fill,fill)}"/>'
 def R(x,y,w,h,fill,rad=0):return f'<rect x="{x:.1f}" y="{y:.1f}" width="{w:.1f}" height="{h:.1f}" rx="{rad:.1f}" fill="{C.get(fill,fill)}"/>'
@@ -53,7 +57,27 @@ def door(cx=260,y=340,wide=35,color='wooddark'):return [P([(cx-wide*.5,y-26),(cx
 def window(x,y,color='water',double=False):return [P([(x,y),(x+28,y-15),(x+28,y+18),(x,y+33)],'ivory'),P([(x+4,y+3),(x+24,y-8),(x+24,y+15),(x+4,y+25)],color)]+([L(x+14,y-3,x+14,y+18,'wood',3)] if double else [])
 def post(x,y,h=65,col='wood'):return P([(x-6,y),(x-7,y-h),(x+5,y-h-5),(x+6,y)],col)
 
+def unique_personal_tent(index):
+ # Variation in physical silhouette, entrance angle, roof paper facets and facade; no extra object or collision.
+ palettes=[('cream','terracotta','sage'),('woodlight','sage','olive'),('cream','ochre','wooddark'),('sage','cream','terracotta'),('terracotta','woodlight','olive'),('ivory','olive','sage'),('ochre','cream','stone'),('woodlight','terracotta','sage')]
+ front,side,accent=palettes[index-1]
+ peakx=243+((index*17)%37)-18
+ peaky=164+(index%3)*12
+ left=137+((index*13)%28)
+ right=364+((index*11)%25)
+ lower=411+(index%3)*6
+ s=[P([(left,361),(peakx,peaky),(right,360),(255,lower)],front),P([(left,361),(peakx,peaky),(255,lower)],side),P([(peakx,peaky),(right,360),(255,lower)],accent)]
+ doorx=244+(index%4)*5
+ s += [P([(doorx-16,367),(doorx,325),(doorx+21,363),(doorx+21,411),(doorx-16,423)],'night')]
+ if index%2==0:s += [P([(left+32,323),(peakx-12,peaky+61),(peakx+8,peaky+76),(left+51,349)],'cream')]
+ else:s += [P([(peakx+6,peaky+47),(right-38,320),(right-25,334),(peakx+8,peaky+86)],'woodlight')]
+ if index in (2,5,8):s += [P([(right-52,348),(right-24,330),(right-13,354),(right-39,374)],'sage')]
+ if index in (3,6):s += [P([(left+30,366),(left+47,351),(left+56,362),(left+39,380)],'ochre')]
+ if index==7:s += [P([(peakx-20,peaky+20),(peakx,peaky),(peakx+18,peaky+30),(peakx,peaky+42)],'terracotta')]
+ return s
+
 def make_house(name):
+ if name.startswith('plot-personal-tent-plot-'):return unique_personal_tent(int(name.rsplit('-',1)[1]))
  col='ivory';side='stone';roofstyle='gable';palette=('terracotta','ochre')
  cfg={
  'city-tool-shop':('woodlight','wood','gable',('terracotta','ochre')),

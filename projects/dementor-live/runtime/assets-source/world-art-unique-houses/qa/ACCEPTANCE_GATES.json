@@ -2,7 +2,7 @@
   "schema": "DL-ISO30-ART-QA-V1",
   "version": "1.0",
   "art_status": "CANDIDATES_WAITING_FOR_OWNER",
-  "images": 46,
+  "images": 54,
   "acceptance_gates": [
     {
       "gate": "G5_SOURCE",
@@ -11,7 +11,7 @@
     },
     {
       "gate": "G6_ART_DIRECTION",
-      "pass_criteria": "owner reviews 46 individual visuals, unique facade silhouettes incl 64px screenshot, correct paper layers and no external shadow",
+      "pass_criteria": "owner reviews 54 individual visuals, unique facade silhouettes incl 64px screenshot, correct paper layers and no external shadow",
       "status": "PENDING"
     },
     {

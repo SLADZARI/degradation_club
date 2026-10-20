@@ -5,9 +5,10 @@
 ## Contents
 
 - **14** visually differentiated architectural structures and site-gate candidates, including shop/tool/seed/garden, warehouse, forge, visitor kiosk, museum entrance, future university/arena/industry site, farlands gate, two distinct temporary/personal tents and garden pavilion.
+- **8** distinct personal-plot tent variants, one stable design per plot-1..8 in the existing city; for another city the 8 designs rotate deterministically according to cityId; no extra saved field.
 - **11** detailed 2D ISO30 assets: five garden-bed growth states, two benches, two chairs, table, chest.
 - **21** staged drawings across seven referenced object types: conceptual foundation/frame/partially enclosed, with distinct silhouettes. **Not all seven objects have server-side construction stages; these images MUST NOT be bound to runtime stages until the actual state machine is mapped.** For forge/garden/seed shop the state must be inspected at exact RC4 SHA; for tool shop, warehouse, mayor tent conceptual variants are documentation only.
-- **46** independent transparent 512×512 SVG, **92** PNG at 256/128, browsable `GALLERY.html`, SHA manifest, visual review export, QA gates.
+- **54** independent transparent 512×512 SVG, **108** PNG at 256/128, browsable `GALLERY.html`, SHA manifest, visual review export, QA gates.
 
 ## Existing canon kept
 
@@ -17,7 +18,7 @@
 
 ## Exact QA method
 
-`python3 build_unique_world_house_set.py` (local generator source) then `python3 finalize_unique_houses.py` to check deterministic raster, alpha-safe 8-pixel margins, identity and 30 degree base projection. In `GALLERY.html`, review each 46 source images, mark APPROVED/REWORK and export JSON. `qa/ACCEPTANCE_GATES.json` records explicit gate criteria and NOT RUNs. Do not treat this technical pass as a visual or game release pass.
+`python3 build_unique_world_house_set.py` (local generator source) then `python3 finalize_unique_houses.py` to check deterministic raster, alpha-safe 8-pixel margins, identity and 30 degree base projection. In `GALLERY.html`, review each 54 source images, mark APPROVED/REWORK and export JSON. `qa/ACCEPTANCE_GATES.json` records explicit gate criteria and NOT RUNs. Do not treat this technical pass as a visual or game release pass.
 
 ## Correct in-game future wiring
 
