@@ -29,13 +29,14 @@ function currentConfig(){return bridgeActive()?{...state.config,...state.config.
 function projectReady(p=currentProject(),c=currentConfig()){if(!state)return false;const s=c.stages[p.stage];return s&&p.stock.wood>=s.wood&&p.stock.stone>=s.stone;}
 function cargo(){return me?Object.entries(me.bag).reduce((n,[k,v])=>n+v*state.config.weights[k],0)+(me.delivery?.picked?me.delivery.quantity*state.config.weights[me.delivery.kind]:0):0;}
 function allTargets(){if(!state||!me)return [];if(state.scene!=='city')return livingTargets();
-  return [state.config.expedition.gate,...(bridgeOpen()?[{id:'east-bank',type:'explore',x:40,y:13.5}]:[]),...(bridgeActive()?[{id:'bridge-drop',type:'project',x:32.5,y:12.3},{id:'bridge-build',type:'build',x:32,y:13.5}]:[]),{id:'tool-shop',type:'shop',x:24,y:3},...(state.forge.stage>=state.config.forge.stages.length?[{id:'forge-use',type:'forge',x:27,y:29.5}]:[]),{id:'warehouse',type:'warehouse',x:12,y:24},...(state.seedMarket.stage>=state.config.seedMarket.stages.length?[{id:'seed-shop',type:'seed-market',x:23,y:7}]:[{id:'seed-shop-build',type:'build',x:23,y:7}]),{id:'seed-shop-drop',type:'project',x:22,y:9},...(state.gardenProject.stage>=state.config.cityGarden.stages.length?[{id:'public-garden',type:'city-garden',x:28,y:9}]:[{id:'public-garden-build',type:'build',x:28,y:9}]),{id:'public-garden-drop',type:'project',x:26,y:9},{id:'city-registry',type:'city-registry',x:19,y:6},{id:'board',type:'board',x:3.2,y:8},{id:'mayor',type:'mayor',x:9,y:3},{id:'tools',type:'tools',x:9,y:6},{id:'project',type:'project',x:15,y:11},{id:'build',type:'build',x:18,y:14},...(forgeActive()?[{id:'forge-drop',type:'project',x:24.5,y:24},{id:'forge-build',type:'build',x:27,y:26}]:[]),...(state.drops||[]),...state.resources,...(state.plaza?.config.objects||[]),...state.plots.map(p=>({...p,type:'plot',x:p.x+p.w/2,y:p.y-1})),...state.players.filter(p=>p.id!==me.id&&p.online&&sameScene(p)).map(p=>({...p,type:'social'}))];
+  return [{id:'combat-gate',type:'combat',x:29,y:35},state.config.expedition.gate,...(bridgeOpen()?[{id:'east-bank',type:'explore',x:40,y:13.5}]:[]),...(bridgeActive()?[{id:'bridge-drop',type:'project',x:32.5,y:12.3},{id:'bridge-build',type:'build',x:32,y:13.5}]:[]),{id:'tool-shop',type:'shop',x:24,y:3},...(state.forge.stage>=state.config.forge.stages.length?[{id:'forge-use',type:'forge',x:27,y:29.5}]:[]),{id:'warehouse',type:'warehouse',x:12,y:24},...(state.seedMarket.stage>=state.config.seedMarket.stages.length?[{id:'seed-shop',type:'seed-market',x:23,y:7}]:[{id:'seed-shop-build',type:'build',x:23,y:7}]),{id:'seed-shop-drop',type:'project',x:22,y:9},...(state.gardenProject.stage>=state.config.cityGarden.stages.length?[{id:'public-garden',type:'city-garden',x:28,y:9}]:[{id:'public-garden-build',type:'build',x:28,y:9}]),{id:'public-garden-drop',type:'project',x:26,y:9},{id:'city-registry',type:'city-registry',x:19,y:6},{id:'board',type:'board',x:3.2,y:8},{id:'mayor',type:'mayor',x:9,y:3},{id:'tools',type:'tools',x:9,y:6},{id:'project',type:'project',x:15,y:11},{id:'build',type:'build',x:18,y:14},...(forgeActive()?[{id:'forge-drop',type:'project',x:24.5,y:24},{id:'forge-build',type:'build',x:27,y:26}]:[]),...(state.drops||[]),...state.resources,...(state.plaza?.config.objects||[]),...state.plots.map(p=>({...p,type:'plot',x:p.x+p.w/2,y:p.y-1})),...state.players.filter(p=>p.id!==me.id&&p.online&&sameScene(p)).map(p=>({...p,type:'social'}))];
 }
 function interaction(t){if(!t)return null;const type=t.type,isForge=t.id.startsWith('forge-'),isBridge=t.id.startsWith('bridge-'),isMarket=t.id.startsWith('seed-shop-'),isGarden=t.id.startsWith('public-garden-'),p=isMarket?state.seedMarket:isGarden?state.gardenProject:isBridge?state.bridge:isForge?state.forge:state.project,c=isMarket?{...state.config,...state.config.seedMarket}:isGarden?{...state.config,...state.config.cityGarden}:isBridge?{...state.config,...state.config.bridge}:isForge?{...state.config,...state.config.forge}:state.config;
   if(type==='seed-market')return {type:'seeds',title:'Семенная лавка',hint:state.seedMarket.stage<state.config.seedMarket.stages.length?'Сначала достройте лавку':'Купить семена для огорода',enabled:true};
   if(type==='city-garden')return {type:'public-garden',title:'Общий городской огород',hint:state.gardenProject.stage<state.config.cityGarden.stages.length?'Нужно построить городской огород':'Посади, полей и собери урожай',enabled:true};
   if(type==='city-registry')return {type:'city-registry',title:'Городской реестр',hint:'Создать город или перейти в другой город',enabled:true};
-  if(type==='mission')return {type:'missionEnter',title:'Выйти на миссию расчистки',hint:state.expedition.completedAt?'Зона открыта · можно вернуться за ресурсами':`Расчистите новую территорию · осталось ${state.expedition.remaining}`,enabled:!me.job&&!me.delivery?.picked};
+  if(type==='combat')return {type:'combat',title:'Боевая экспедиция',hint:'Закрытая PvE-миссия · E для входа',enabled:!me.spirit&&!me.job&&!me.delivery?.picked};
+   if(type==='mission')return {type:'missionEnter',title:'Выйти на миссию расчистки',hint:state.expedition.completedAt?'Зона открыта · можно вернуться за ресурсами':`Расчистите новую территорию · осталось ${state.expedition.remaining}`,enabled:!me.job&&!me.delivery?.picked};
   if(type==='plot'&&t.locked)return {type:'buy',title:'Участок ещё не открыт',hint:'Завершите общую миссию расчистки на юге города',enabled:false};
   if(type==='home'&&t.id==='mission-exit')return {type:'homeUse',title:t.title,hint:'Вернуться с добычей · прогресс сохранится',enabled:true};
   if(type==='plaza'&&t.id.startsWith('donation-'))return {type:t.id,title:t.title,hint:t.id==='donation-box'?'Передать ресурсы или монеты городу без оплаты':'Жители, поддержавшие город',enabled:true};
@@ -63,6 +64,9 @@ function updateContext(){if(!me)return;const near=allTargets().map(t=>({...t,d:M
   let target=near.find(t=>t.id===selected)||((!me.tools.axe&&!me.tools.pick&&!me.spirit)?near.find(t=>t.type==='tools'):null)||near[0];context=target?{...target,...interaction(target)}:null;
   $('actionTitle').textContent=context?context.title:me.spirit?'Найди куст с едой':'Исследуй поле';$('actionHint').textContent=context?context.hint:me.spirit?'Ходи к ягодам · E вернёт тело':'WASD или нажми на землю · Shift — бежать';$('actionIcon').textContent=context?(icon[context.type]||icon[target.type]||'↗'):'↗';
   $('actionButton').disabled=!context?.enabled||!!me.job||!connected;$('actionButton').querySelector('span').textContent=me.job?'Работаем':context?.type==='buy'?'Купить':context?.type==='give'?'Угостить':'Действие';
+  if($('mobileActionButton')){const b=$('mobileActionButton');b.textContent=context?.enabled?(context.type==='combat'?'⚔ ВОЙТИ':context.type==='give'?'УГОСТИТЬ':context.type==='pickup'?'ПОДОБРАТЬ':'ДЕЙСТВИЕ'):'ДЕЙСТВИЕ';b.setAttribute('aria-label',context?.enabled?context.title:'Подойди к объекту для действия');}
+  if($('mobileCombatButton')){const gateNear=state.scene==='city'&&Math.hypot(me.x-29,me.y-35)<=state.config.actionRange;
+    $('mobileCombatButton').textContent=gateNear?'⚔ В БОЙ':'⚔ К БОЮ';}
 }
 function updateUI(){if(!me)return;renderQuick();
   const c=currentConfig(),p=currentProject(),totalWorks=c.stages.reduce((n,s)=>n+s.works,0),doneWorks=c.stages.slice(0,p.stage).reduce((n,s)=>n+s.works,0)+p.work;
@@ -149,7 +153,7 @@ function updateCityPanels(force=false){
   }
 }
 $('bagButton').onclick=()=>{if(me)openCityPanel('bag');};
-function doContext(){if(!context||!context.enabled||me?.job||performance.now()-lastAction<(context.type==='homeClear'?570:180))return;lastAction=performance.now();if(['mine','homeClear'].includes(context.type)&&heldResource()&&['wood','stone'].includes(state.home?.nodes.find(n=>n.id===context.id)?.kind||allTargets().find(t=>t.id===context.id)?.type)){holdAction=false;toast('Возьми топор или кирку в быстрой панели');return;}if(['board','warehouse','forge','shop','home','social','monument','jukebox','thefts','donation-box','donation-board','seeds','public-garden','city-registry'].includes(context.type)){holdAction=false;if(context.type==='social')selected=context.id;openCityPanel(context.type==='social'?'resident':context.type);return;}act(context.type,context.id);}
+function doContext(){if(!context||!context.enabled||me?.job||performance.now()-lastAction<(context.type==='homeClear'?570:180))return;lastAction=performance.now();if(context.type==='combat'){holdAction=false;location.href='/combat';return;}if(['mine','homeClear'].includes(context.type)&&heldResource()&&['wood','stone'].includes(state.home?.nodes.find(n=>n.id===context.id)?.kind||allTargets().find(t=>t.id===context.id)?.type)){holdAction=false;toast('Возьми топор или кирку в быстрой панели');return;}if(['board','warehouse','forge','shop','home','social','monument','jukebox','thefts','donation-box','donation-board','seeds','public-garden','city-registry'].includes(context.type)){holdAction=false;if(context.type==='social')selected=context.id;openCityPanel(context.type==='social'?'resident':context.type);return;}act(context.type,context.id);}
 $('actionButton').onclick=doContext;$('axeButton').onclick=()=>act('equip','axe');$('pickButton').onclick=()=>act('equip','pick');$('eatButton').onclick=()=>act(me.bag.food?'eat':'eatCarrot');
 $('detailsButton').onclick=()=>{$('details').show();updateUI();};$('helpButton').onclick=()=>$('help').show();document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>$(b.dataset.close).close());
 $('secondPlayer').onclick=()=>window.open('/?new=1','_blank','noopener');
@@ -162,7 +166,58 @@ window.addEventListener('keydown',e=>{
   if(e.code==='KeyE'){holdAction=true;doContext();}if(e.repeat)return;if(/^Digit[1-6]$/.test(e.code))selectQuick(Number(e.code.slice(-1))-1);if(e.code==='KeyQ')placeQuick();if(e.code==='KeyF')act(me.bag.food?'eat':'eatCarrot');if(e.code==='Enter'){$('chatInput').focus();keys.clear();}if(e.code==='Escape'){document.querySelectorAll('dialog[open]').forEach(d=>d.close());route=[];selected=null;act('cancel');}
 });
 window.addEventListener('keyup',e=>{keys.delete(e.code);if(e.code==='KeyE')holdAction=false;});window.addEventListener('blur',()=>{keys.clear();holdAction=false;touchMove=null;route=[];if(token)api('input',{dx:0,dy:0}).catch(()=>{});});
-document.querySelectorAll('[data-move]').forEach(b=>{b.addEventListener('pointerdown',e=>{b.setPointerCapture(e.pointerId);touchMove=b.dataset.move.split(',').map(Number);route=[];});b.addEventListener('pointerup',()=>touchMove=null);b.addEventListener('pointercancel',()=>touchMove=null);b.addEventListener('lostpointercapture',()=>touchMove=null);});
+// Mobile city input: one analog pad left, no directional arrow buttons.
+const cityPad=$('cityMovePad'),cityThumb=$('cityMoveThumb');
+let cityPointerId=null;
+function updateCityStick(e){
+  const r=cityPad.getBoundingClientRect(),radius=r.width*.31;
+  const x=(e.clientX-(r.left+r.width/2))/radius,y=(e.clientY-(r.top+r.height/2))/radius;
+  const distance=Math.hypot(x,y),length=Math.max(1,distance);
+  const sx=x/length,sy=y/length,dead=.13;
+  cityThumb.style.transform='translate('+Math.round(sx*radius)+'px,'+Math.round(sy*radius)+'px)';
+  touchMove=distance>dead?[sx,sy]:null;route=[];selected=null;
+}
+cityPad.addEventListener('pointerdown',e=>{
+  if(cityPointerId!==null)return;
+  cityPointerId=e.pointerId;
+  try{cityPad.setPointerCapture(e.pointerId);}catch{}
+  updateCityStick(e);e.preventDefault();
+});
+cityPad.addEventListener('pointermove',e=>{if(cityPointerId===e.pointerId){updateCityStick(e);e.preventDefault();}});
+function releaseCityStick(e){if(cityPointerId!==e.pointerId)return;cityPointerId=null;touchMove=null;cityThumb.style.transform='';}
+for(const event of ['pointerup','pointercancel','lostpointercapture'])cityPad.addEventListener(event,releaseCityStick);
+$('mobileActionButton').addEventListener('click',()=>{
+  if(!me||!connected){toast('Нет связи с городом');return;}
+  if(!context?.enabled){toast('Подойди к объекту или нажми «К БОЮ»');return;}
+  doContext();
+});
+$('mobileCombatButton').addEventListener('click',()=>{
+  if(!me||!connected){toast('Нет связи с городом');return;}
+  if(state.scene!=='city'){toast('Сначала вернись в город');return;}
+  if(me.spirit||me.job||me.delivery?.picked){toast('Заверши городское задание перед боем');return;}
+  const gate=allTargets().find(t=>t.id==='combat-gate');
+  if(!gate){toast('В этом городе пока нет боевой зоны');return;}
+  selected=gate.id;
+  if(Math.hypot(me.x-gate.x,me.y-gate.y)<=state.config.actionRange){
+    updateContext();if(context?.type==='combat'&&context.enabled)doContext();
+    else toast('Не удалось войти в боевую зону');
+    return;
+  }
+  let paths=[];
+  for(const [x,y] of [[0,1.4],[-1.4,0],[1.4,0],[0,-1.4]]){
+    const candidate=findPath({x:gate.x+x,y:gate.y+y});if(candidate)paths.push(candidate);
+  }
+  paths.sort((a,b)=>pathDistance(a)-pathDistance(b));
+  if(!paths.length){toast('Путь к боевой зоне заблокирован');return;}
+  setRoute(paths[0]);toast('Идём к боевой зоне. Когда подойдёшь — нажми «В БОЙ».');
+});
+$('mobileEatButton').addEventListener('click',()=>{if(me)act(me.bag.food?'eat':'eatCarrot');});
+const standalone=matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
+if(('ontouchstart' in window||navigator.maxTouchPoints>0)&&!standalone&&!sessionStorage.getItem('dementor-standalone-tip')){
+  setTimeout(()=>{if($('standaloneTip'))$('standaloneTip').hidden=false;},3000);
+}
+$('standaloneDismiss').onclick=()=>{$('standaloneTip').hidden=true;sessionStorage.setItem('dementor-standalone-tip','1');};
+window.__cityMobileInput=()=>({active:cityPointerId!==null,movement:touchMove,selected,nearCombat:!!(me&&Math.hypot(me.x-29,me.y-35)<=state?.config?.actionRange)});
 setInterval(()=>{if(!connected||!me)return;let dx=0,dy=0;if(!$('welcome').open&&!['INPUT','TEXTAREA','SELECT'].includes(document.activeElement?.tagName)){
   dx=Number(keys.has('KeyD')||keys.has('ArrowRight'))-Number(keys.has('KeyA')||keys.has('ArrowLeft'));dy=Number(keys.has('KeyS')||keys.has('ArrowDown'))-Number(keys.has('KeyW')||keys.has('ArrowUp'));if(touchMove)[dx,dy]=touchMove;
   if(!dx&&!dy&&route.length){
@@ -178,8 +233,18 @@ setInterval(()=>{if(!connected||!me)return;let dx=0,dy=0;if(!$('welcome').open&&
   }if(!inputPending){inputPending=true;api('input',{dx,dy,sprint:keys.has('ShiftLeft')||keys.has('ShiftRight')}).catch(()=>{}).finally(()=>{inputPending=false;});}
 },80);
 
-function screen(x,y){return {x:view.w/2+(x-view.cx)*view.s,y:view.h/2+(y-view.cy)*view.s*.76};}
-function worldPoint(x,y){return {x:(x-view.w/2)/view.s+view.cx,y:(y-view.h/2)/(view.s*.76)+view.cy};}
+// ISO30 is a projection of the existing world coordinates, not a change to gameplay.
+const ISO_COS=Math.sqrt(3)/2;
+function screen(x,y){
+  if(state?.scene&&state.scene!=='city')return {x:view.w/2+(x-view.cx)*view.s,y:view.h/2+(y-view.cy)*view.s*.76};
+  const dx=x-view.cx,dy=y-view.cy;
+  return {x:view.w/2+(dx-dy)*view.s*ISO_COS,y:view.h/2+(dx+dy)*view.s*.5};
+}
+function worldPoint(x,y){
+  if(state?.scene&&state.scene!=='city')return {x:(x-view.w/2)/view.s+view.cx,y:(y-view.h/2)/(view.s*.76)+view.cy};
+  const u=(x-view.w/2)/(view.s*ISO_COS),v=(y-view.h/2)/(view.s*.5);
+  return {x:view.cx+(u+v)/2,y:view.cy+(v-u)/2};
+}
 function blocked(x,y){const c=state.config,r=.35;if(state.scene!=='city'){return x<r||y<r||x>16-r||y>16-r||(['plot','expedition'].includes(state.scene)&&state.home.nodes.some(n=>n.left&&Math.hypot(x-n.x,y-n.y)<.63));}if(x<r||y<r||x>c.width-r||y>c.height-r)return true;if(x+r>c.river.x&&x-r<c.river.x+c.river.w&&!(bridgeOpen()&&y-r>=c.bridge.y&&y+r<=c.bridge.y+c.bridge.h))return true;
   if(x+r>4&&x-r<8&&y+r>4&&y-r<7)return true;return state.resources.some(o=>o.stock>0&&o.type!=='food'&&Math.hypot(x-o.x,y-o.y)<.63);
 }
@@ -237,7 +302,13 @@ function poly(points,fill,stroke='#595d4b',width=1){ctx.beginPath();points.forEa
 function rounded(x,y,w,h,r,fill,stroke){ctx.beginPath();ctx.roundRect(x,y,w,h,r);if(fill){ctx.fillStyle=fill;ctx.fill();}if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=1;ctx.stroke();}}
 function line(x,y,x2,y2,color,width=1){ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x2,y2);ctx.strokeStyle=color;ctx.lineWidth=width;ctx.stroke();}
 function label(text,x,y,small=false){const p=screen(x,y);ctx.font=`${small?9:10}px Paper, Arial`;const width=ctx.measureText(text).width;rounded(p.x-width/2-7,p.y-10,width+14,18,6,'#f6f3e5dc');ctx.textAlign='center';ctx.fillStyle=small?'#939781':'#6c7460';ctx.fillText(text,p.x,p.y+2);}
-function groundRect(o,color,border,dash=false){const p=screen(o.x,o.y),w=o.w*view.s,h=o.h*view.s*.76;ctx.setLineDash(dash?[4,6]:[]);rounded(p.x,p.y,w,h,3,color,border);ctx.setLineDash([]);return {...p,w,h};}
+function groundRect(o,color,border,dash=false){
+  if(state?.scene&&state.scene!=='city'){const p=screen(o.x,o.y),w=o.w*view.s,h=o.h*view.s*.76;ctx.setLineDash(dash?[4,6]:[]);rounded(p.x,p.y,w,h,3,color,border);ctx.setLineDash([]);return {...p,w,h};}
+  const corners=[[o.x,o.y],[o.x+o.w,o.y],[o.x+o.w,o.y+o.h],[o.x,o.y+o.h]].map(([x,y])=>{const p=screen(x,y);return [p.x,p.y];});
+  ctx.setLineDash(dash?[4,6]:[]);poly(corners,color,border,1);ctx.setLineDash([]);
+  const xs=corners.map(v=>v[0]),ys=corners.map(v=>v[1]);
+  return {x:Math.min(...xs),y:Math.min(...ys),w:Math.max(...xs)-Math.min(...xs),h:Math.max(...ys)-Math.min(...ys)};
+}
 function shadow(x,y,rx,ry){ctx.beginPath();ctx.ellipse(x,y,rx,ry,0,0,Math.PI*2);ctx.fillStyle='#4f584013';ctx.fill();}
 // Shared paper volumes: front, right side and upper fold under one oblique projection.
 function paperBox(x,y,w,h,dx,dy,front='#c9b796',side='#a38e70',top='#e0d2b4'){
@@ -351,15 +422,17 @@ function render(time){positionWindows();ctx.clearRect(0,0,view.w,view.h);ctx.fil
   // Sparse paper grain; all world geometry below stays interactive and separate.
   ctx.fillStyle='#6b6f4b0a';for(let i=0;i<340;i++){const x=(i*137.23)%view.w,y=(i*211.71)%view.h;ctx.fillRect(x,y,1,1);}
   const c=state?.config||{width:48,height:32,river:{x:34,w:4}};
-  const edge=screen(0,0),far=screen(c.width,c.height);rounded(edge.x,edge.y,far.x-edge.x,far.y-edge.y,3,'#f3efdf88','#cbd0b230');
+  groundRect({x:0,y:0,w:c.width,h:c.height},'#f3efdf88','#cbd0b230');
   ctx.strokeStyle='#9ca27e12';ctx.lineWidth=.6;for(let x=0;x<=c.width;x+=2){const a=screen(x,0),b=screen(x,c.height);line(a.x,a.y,b.x,b.y,'#9ca27e12',.6);}for(let y=0;y<=c.height;y+=2){const a=screen(0,y),b=screen(c.width,y);line(a.x,a.y,b.x,b.y,'#9ca27e12',.6);}
   // Worn paths connecting the first public places.
   ctx.lineCap='round';for(const pts of [[[8,8],[11,8],[13,11],[18,14]],[[11,8],[11,21],[7,22]],[[11,21],[22,21],[27,23]]]){ctx.beginPath();for(let i=0;i<pts.length;i++){const p=screen(...pts[i]);i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y);}ctx.strokeStyle='#c5bda521';ctx.lineWidth=view.s*.85;ctx.stroke();}ctx.lineCap='butt';
-  const a=screen(c.river.x,0),b=screen(c.river.x+c.river.w,c.height);ctx.fillStyle='#becdc8';ctx.fillRect(a.x,a.y,b.x-a.x,b.y-a.y);line(a.x,a.y,a.x,b.y,'#96ada256',2);line(b.x,a.y,b.x,b.y,'#96ada256',2);
+  groundRect({x:c.river.x,y:0,w:c.river.w,h:c.height},'#becdc8','#96ada256');
+  for(const bank of [c.river.x,c.river.x+c.river.w]){const a=screen(bank,0),b=screen(bank,c.height);line(a.x,a.y,b.x,b.y,'#96ada256',2);}
   for(let i=0;i<20;i++){const p=screen(34.5+(i%3)*.95,.8+i*1.6);line(p.x,p.y,p.x+view.s*.7,p.y,'#e6ede352',1);}
   drawBridge();label('Другой берег',42,3,true);
   if(!state){for(const[x,y]of [[41,7],[44,10],[42,23],[45,26]])drawTree({x,y,stock:10});for(const[x,y]of [[42,16],[45,20]])drawStone({x,y,stock:10});}
   if(state?.expedition){const gate=state.config.expedition.gate;paperBoard(gate.x,gate.y,'Миссия · расчистка');}
+  if(state)paperBoard(29,35,'⚔ Боевая зона');
   drawProject();if(typeof drawPlaza==='function')drawPlaza();
   if(state){for(const plot of state.plots)drawPlot(plot);}else for(const o of [{x:4,y:15,w:6,h:6},{x:4,y:23,w:6,h:6},{x:14,y:23,w:6,h:6}])drawPlot(o);
   drawForge();

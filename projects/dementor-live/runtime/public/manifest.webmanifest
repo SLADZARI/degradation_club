@@ -1,0 +1,12 @@
+{
+  "name": "Dementor Live",
+  "short_name": "Dementor",
+  "description": "Город и кооперативные боевые экспедиции",
+  "lang": "ru",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#eeeadf",
+  "theme_color": "#eeeadf"
+}

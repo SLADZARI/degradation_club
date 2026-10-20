@@ -74,3 +74,48 @@ dialog:not(#welcome){position:fixed;inset:220px 24px auto auto;margin:0;transfor
   .city-sound{top:307px}
   .action-dock:not([hidden]){bottom:225px}
 }
+
+
+/* 2026-10-19 Mobile touch layout LOCK. D-pad has been replaced by a persistent analog joystick.
+   Keep the HUD light: play area must remain visible between the left stick and right action stack. */
+.mobile-game-controls{display:none}
+#standaloneTip[hidden]{display:none!important}
+@media (max-width:760px), (hover:none) and (pointer:coarse){
+ #game{min-height:0;height:100dvh}
+ .touch-controls{display:none!important}
+ .mobile-game-controls{display:block;position:fixed;inset:0;z-index:12;pointer-events:none}
+ .city-move-pad{position:absolute;left:12px;bottom:calc(79px + env(safe-area-inset-bottom));width:116px;height:116px;
+   border-radius:50%;border:2px solid #536a50a6;background:#e0e8d4a6;box-shadow:0 4px 18px #293f2540;
+   pointer-events:auto;touch-action:none;user-select:none;-webkit-user-select:none}
+ .city-stick-ring{position:absolute;inset:15px;border:1px solid #73847290;border-radius:50%;pointer-events:none}
+ .city-move-thumb{position:absolute;left:50%;top:50%;margin-left:-19px;margin-top:-19px;width:38px;height:38px;
+   border-radius:50%;background:#547454e8;box-shadow:inset 0 0 0 3px #b9caae77;pointer-events:none}
+ .city-stick-label{position:absolute;bottom:10px;width:100%;text-align:center;font-size:8px;font-weight:700;letter-spacing:.07em;color:#35533e;pointer-events:none}
+ .city-action-controls{position:absolute;right:12px;bottom:calc(85px + env(safe-area-inset-bottom));
+   width:113px;display:flex;flex-direction:column;gap:8px;pointer-events:auto}
+ .city-action-controls button{min-height:49px;max-width:100%;background:#f5f4e5ed;border:1px solid #8797808f;
+   border-radius:12px;font-size:12px;font-weight:800;letter-spacing:.03em;color:#253b2b;touch-action:manipulation;
+   box-shadow:0 4px 13px #30402b2b}
+ #mobileCombatButton{background:#4c6b56;color:#fffced;border-color:#4c6b56}
+ #mobileEatButton{min-height:40px}
+ .action-dock:not([hidden]){display:none!important}
+ .chat-area{display:none!important}
+ .city-sound{display:none!important}
+ .inventory{z-index:10;bottom:max(4px,env(safe-area-inset-bottom))}
+ .toast{z-index:21;left:50%;transform:translateX(-50%);bottom:calc(257px + env(safe-area-inset-bottom));pointer-events:none}
+ #standaloneTip{position:fixed;top:calc(42px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);
+   z-index:35;max-width:calc(100vw - 30px);display:flex;align-items:center;gap:10px;background:#263e32ef;color:white;
+   padding:10px 13px;border-radius:12px;font-size:11px;line-height:1.3;box-shadow:0 8px 24px #2228}
+ #standaloneTip button{color:white;background:#ffffff20;border-radius:7px;padding:4px 8px;font-size:17px;flex:none}
+}
+@media (max-height:470px) and (orientation:landscape) and (hover:none) and (pointer:coarse){
+ .city-move-pad{width:92px;height:92px;bottom:calc(54px + env(safe-area-inset-bottom));left:13px}
+ .city-move-thumb{width:30px;height:30px;margin-left:-15px;margin-top:-15px}
+ .city-action-controls{width:103px;gap:4px;bottom:calc(55px + env(safe-area-inset-bottom))}
+ .city-action-controls button{min-height:35px;font-size:10px}
+ #mobileEatButton{min-height:32px}
+ .inventory{max-width:calc(100vw - 210px);left:50%}
+ .map-tools{top:56px}
+ .quest,.vitals{top:44px}
+ #standaloneTip{top:4px}
+}

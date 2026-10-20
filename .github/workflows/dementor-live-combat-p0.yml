@@ -1,0 +1,110 @@
+name: Dementor Live Combat P0 (isolated model)
+on:
+  push:
+    branches:
+      - 'feature/dementor-live-combat-p0-*'
+    paths:
+      - 'projects/dementor-live/runtime/combat-p0.mjs'
+      - 'projects/dementor-live/runtime/server.mjs'
+      - 'projects/dementor-live/runtime/world.mjs'
+      - 'projects/dementor-live/runtime/public/**'
+      - 'projects/dementor-live/runtime/test/combat-http.test.mjs'
+      - 'projects/dementor-live/runtime/test/combat-mobile-qa.cjs'
+      - 'projects/dementor-live/runtime/test/combat-feel.cjs'
+      - 'projects/dementor-live/runtime/test/city-mobile-gameplay.cjs'
+      - 'projects/dementor-live/runtime/test/combat-p0.test.mjs'
+      - 'projects/dementor-live/combat/**'
+      - '.github/workflows/dementor-live-combat-p0.yml'
+  pull_request:
+    paths:
+      - 'projects/dementor-live/runtime/combat-p0.mjs'
+      - 'projects/dementor-live/runtime/test/combat-p0.test.mjs'
+      - 'projects/dementor-live/combat/**'
+      - '.github/workflows/dementor-live-combat-p0.yml'
+permissions:
+  contents: read
+jobs:
+  combat-model:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Syntax checks
+        run: |
+          node --check projects/dementor-live/runtime/combat-p0.mjs
+          node --check projects/dementor-live/runtime/test/combat-p0.test.mjs
+          node --check projects/dementor-live/runtime/test/combat-http.test.mjs
+          node --check projects/dementor-live/runtime/server.mjs
+          node --check projects/dementor-live/runtime/public/combat.js
+          node --check projects/dementor-live/runtime/test/combat-browser.cjs
+      - name: Isolated P0 model invariants (NOT gameplay acceptance)
+        run: node --test projects/dementor-live/runtime/test/combat-p0.test.mjs
+      - name: Two player isolated HTTP and true server restart
+        working-directory: projects/dementor-live/runtime
+        run: node --test test/combat-http.test.mjs
+      - name: Existing city model regression (no live save)
+        working-directory: projects/dementor-live/runtime
+        run: npm test
+
+
+      - name: Verify existing workspace and record commit provenance
+        working-directory: projects/dementor-live/runtime
+        run: |
+          npm run check
+          printf '{"commit":"%s","status":"ALPHA MODEL / NOT DEPLOYED","source":"COMBAT P0 draft PR"}\n' "$GITHUB_SHA" > BUILD_INFO.json
+      - name: Pack isolated playable test workspace (no data/world.json)
+        working-directory: projects/dementor-live/runtime
+        run: npm run pack
+      - name: Upload portable alpha test workspace
+        uses: actions/upload-artifact@v4
+        with:
+          name: dementor-live-combat-alpha-p0-workspace
+          path: projects/dementor-live/dementor-live-workspace.zip
+          if-no-files-found: error
+          retention-days: 14
+
+  combat-browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install isolated browser QA dependencies (not game runtime)
+        working-directory: projects/dementor-live/runtime
+        run: npm install --no-save --no-package-lock playwright@1.56.1
+      - name: Install Chromium for browser QA
+        working-directory: projects/dementor-live/runtime
+        run: npx playwright install --with-deps chromium
+      - name: Two independent browser clients including mobile
+        working-directory: projects/dementor-live/runtime
+        run: node test/combat-browser.cjs
+      - name: Mobile portrait, landscape, twin-stick and all controls
+        working-directory: projects/dementor-live/runtime
+        run: node test/combat-mobile-qa.cjs
+      - name: Actual touchscreen city joystick and mobile combat-entry buttons
+        working-directory: projects/dementor-live/runtime
+        run: node test/city-mobile-gameplay.cjs
+      - name: Combat FEEL - live hits, tracer pixels and median FPS >= 24
+        working-directory: projects/dementor-live/runtime
+        run: node test/combat-feel.cjs
+      - name: Upload city touch UI test screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dementor-city-mobile-screens-and-qa
+          path: projects/dementor-live/runtime/reports/city-mobile/
+          if-no-files-found: warn
+          retention-days: 14
+      - name: Upload verifiable visual QA and gameplay report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dementor-combat-feel-screenshots-and-metrics
+          path: projects/dementor-live/runtime/reports/combat-feel/
+          if-no-files-found: warn
+          retention-days: 14
