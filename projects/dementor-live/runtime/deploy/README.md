@@ -1,5 +1,11 @@
 # Dementor Live server deployment
 
+## Safe releases after the 20 October 2026 two-player playtest
+The original `publish-clean-world.sh --reset-world` is **legacy destructive software** and MUST NOT be run on a populated live world. To deploy the v0.5.0-rc.1 combined CIVIC candidate without destroying character progress, follow [RELEASE_0.5.0_RC1_SAFE](../docs/RELEASE_0.5.0_RC1_SAFE.md). Its new `publish-preserve-world.sh` requires an independent checkout and an exact SHA, takes a full frozen backup of `dementor-live-world`, performs a read-only migration audit, and can roll back both image and volume. These instructions describe a proposed safe deployment; they do not assert that the live VM has been updated. Keep the current release unchanged until the live-save gate and release window pass.
+
+## Historical initial installation and release notes
+
+
 This Compose project owns only `dementor-live`, loopback port `127.0.0.1:14173`, and volume `dementor-live-world`. Public HTTP traffic reaches the app through a dedicated Nginx virtual-host file at `/etc/nginx/sites-available/dementor-live.conf`; existing site files and other Compose projects are left untouched.
 
 ## Current VM deployment (2026-10-18)
