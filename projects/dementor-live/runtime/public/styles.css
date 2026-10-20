@@ -119,3 +119,20 @@ dialog:not(#welcome){position:fixed;inset:220px 24px auto auto;margin:0;transfor
  .quest,.vitals{top:44px}
  #standaloneTip{top:4px}
 }
+
+/* Compact no-duplicates task stack: header / current task / expanded list / completed bubble. */
+#quest .quest-legacy[hidden]{display:none!important}
+#quest .quest-active{display:block;width:100%;text-align:left;padding:10px 11px;background:#e4e9d9;border:1px solid #bac7aa;border-radius:9px;margin:3px 0 6px}
+#quest .quest-active span{display:block;font-size:12px;font-weight:700;line-height:1.4}
+#quest .quest-active small{display:block;font-size:10px;color:#5d6d52;line-height:1.4;margin-top:4px}
+#quest .quest-view-toggle{display:block;width:100%;font-size:10px;color:#556a48;text-align:left;padding:5px 2px}
+#quest.focus .quest-list{display:none}
+#quest:not(.focus) .quest-active{display:none}
+#quest .quest-done-toggle{border:1px solid #c7ceba;border-radius:20px;background:#ecefe5;padding:6px 11px;font-size:10px;color:#586954;margin:7px 0 4px}
+#quest .quest-done-toggle[hidden],#quest .quest-done-list[hidden]{display:none}
+#quest .quest-done-list{list-style:none;padding:0;margin:3px 0;max-height:15dvh;overflow:auto}
+#quest .quest-done-list li{border-left:2px solid #a8b49b;padding:6px 8px;font-size:10px}
+#quest .quest-done-list button{text-align:left;width:100%;opacity:.75}#quest .quest-done-list b{display:block;font-size:10px}
+#quest .quest-done-list small{display:none}
+#quest.collapsed>:not(.quest-toggle){display:none!important}
+@media(max-width:760px){#quest .quest-active{padding:7px}#quest .quest-active span{font-size:11px}#quest .quest-active small{font-size:9px}}

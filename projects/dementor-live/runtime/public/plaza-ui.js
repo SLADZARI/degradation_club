@@ -33,13 +33,12 @@ function plazaPanel(mode,rows,row,canAct){if(!['monument','jukebox','donation-bo
 function drawPlaza(){if(!state?.plaza)return;const s=view.s;for(const o of state.plaza.config.objects){const p=screen(o.x,o.y);
  if(o.id==='donation-box'){paperOpenBox(o.x,o.y,'Пожертвования городу');continue;}if(o.id==='donation-board'){paperBoard(o.x,o.y,'Доска пожертвований',true);continue;}
  if(o.id==='theft-board'){paperBoard(o.x,o.y,'Доска воров',true);continue;}
- if(o.id==='monument'){
-  shadow(p.x,p.y+4,s*.72,s*.19);
+ if(o.id==='monument'){ctx.save();ctx.translate(p.x,p.y);ctx.scale(1.6,1.6);ctx.translate(-p.x,-p.y);shadow(p.x,p.y+4,s*.72,s*.19);
   poly([[p.x-s*.6,p.y],[p.x,p.y-s*.24],[p.x+s*.6,p.y],[p.x,p.y+s*.24]],'#d8d5c3','#8b907a');
   poly([[p.x-s*.38,p.y-s*.62],[p.x,p.y-s*.8],[p.x+s*.38,p.y-s*.62],[p.x,p.y-s*.44]],'#e9e4d1','#8b907a');
   poly([[p.x-s*.38,p.y-s*.62],[p.x,p.y-s*.44],[p.x,p.y+s*.04],[p.x-s*.38,p.y-s*.12]],'#c9c6b1','#8b907a');
   poly([[p.x,p.y-s*.44],[p.x+s*.38,p.y-s*.62],[p.x+s*.38,p.y-s*.12],[p.x,p.y+s*.04]],'#aaaF9a','#8b907a');
-  label('Памятник · +50',o.x,o.y+1,true);
+  ctx.restore();label('Памятник · +50',o.x,o.y+1,true);
  }else{
   shadow(p.x,p.y+4,s*.6,s*.17);const x=p.x-s*.36,y=p.y-s*1.2,w=s*.72,h=s*1.3;
   poly([[x,y],[x+w,y],[x+w+s*.2,y-s*.12],[x+s*.2,y-s*.12]],'#d6c4a2','#7f826b');

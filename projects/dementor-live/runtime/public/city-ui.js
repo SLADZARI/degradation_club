@@ -2,6 +2,18 @@
 function civicPanel(mode,rows,row,canAct){
  const title=$('cityPanelTitle'),intro=$('cityPanelIntro'),note=$('cityPanelNote');
  const button=(text,click,disabled=false,id)=>({text,click,disabled,id});
+ if(mode==='landscape'){
+  title.textContent='Магазин благоустройства';intro.textContent='Покупай материалы и укладывай их на пустой земле рядом с собой. 10 штук за 1 PAPER — пробная цена. Плитка ускоряет движение на 20%.';
+  const near=nearby('landscape-shop')&&canAct;
+  for(const [kind,item] of Object.entries(state.landscapeProducts||{})){
+    const stock=me.terrainBag?.[kind]||0;
+    row(item.name+' · у тебя '+stock+' шт.','Комплект '+item.pack+' шт. за '+item.price+' PAPER'+(kind==='paving'?' · скорость ×1.2':''),[
+      button('Купить 10 · 1 PAPER',()=>act('landscapeBuy','landscape-shop',{kind}),!near||me.wallet<item.price),
+      button('Укладывать',()=>setPlacementKind(kind),!canAct||stock<1)]);
+  }
+  note.textContent='Укладка: выбери материал, закрой магазин и нажми на свободную клетку рядом. Esc отменяет режим укладки. Материалы и покрытия сохраняются в твоём городе.';
+  return true;
+ }
  if(mode==='public-garden'){
    title.textContent='Городской опытный огород';
    const complete=state.gardenProject.stage>=state.config.cityGarden.stages.length;
