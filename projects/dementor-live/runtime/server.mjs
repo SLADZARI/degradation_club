@@ -66,7 +66,7 @@ const server=http.createServer(async(req,res)=>{
       if(data.advanceMs)game.tick(data.advanceMs);
       game.changed();save();broadcast();json(res,200,{ok:true,state:game.state});return;
     }
-    if(url.pathname==='/api/join'&&req.method==='POST'){const d=await body(req);const p=game.join(d.name);save();json(res,200,{ok:true,id:p.id,token:p.token});return;}
+    if(url.pathname==='/api/join'&&req.method==='POST'){const d=await body(req);const p=game.join(d.name,d.gender);save();json(res,200,{ok:true,id:p.id,token:p.token});return;}
     if(url.pathname.startsWith('/api/')){
       const token=req.headers.authorization?.replace(/^Bearer /,'')||url.searchParams.get('token');
       const p=network.findToken(token)?.p;if(!p){json(res,401,{ok:false,message:'Войди в мир заново'});return;}
