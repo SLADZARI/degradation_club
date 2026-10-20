@@ -44,3 +44,53 @@ Do not deploy a QA shard into the current production container or world volume. 
 ## 5. Gate / completion
 
 A green Bash syntax CI only certifies shell validity and static safety checks, **not** VM attestation, backup restore, asset SHA verification, two-player G6, or G7 acceptance. Preserve immutable source + workflow run URLs, operator redacted output and a 3-2-1/off-VM restore-on-copy proof. Lead signs manual GO; G8 after the actual deployed image/rollback evidence, not after a Draft PR.
+
+
+## 6. Owner-authorized private off-VM backup restore (DEC-REL-01; not G7 GO)
+
+Only from an **already authorized Mac** with an out-of-band verified game-VM
+SSH host fingerprint in its known_hosts. The Mac must have Node 22+, Python 3,
+and enough **private local** disk space. Nothing is extracted or modified on the
+game VM; no Docker build, service restart, live save write or deploy occurs.
+
+Use the reviewed OPS source branch; pin the exact candidate build SHA (OPS
+checkout may differ from the intended H0 candidate, so distinguish those in the
+Result). Example, when the operator already has that candidate as a clean,
+immutable **local Mac checkout**:
+
+```bash
+DEMENTOR_CANDIDATE_RUNTIME="/private/path/to/checked-out/game/runtime" \
+DEMENTOR_CANDIDATE_SHA="<exact-40-character-candidate-SHA>" \
+bash deploy/mac-private-backup-restore.sh
+```
+
+The helper performs **two** strict-host-verified, one-key read-only SSH
+connections: snapshot metadata and private streaming of only the selected
+pre-existing full-world archive and adjacent world.json. They arrive in a new
+0700 directory under the operator's Mac home, never in GitHub or chat. SHA-256
+must match server-side file hashes. A hardened local Python extractor rejects
+tar traversal, links, special files, duplicate paths and extraction beyond
+disk/size quotas. Local `upgrade-audit.mjs` then tests the chosen candidate
+on the restored copy, and two **independent fresh Node processes** rehydrate it,
+checking saved CharacterId/token (comparisons only, never output), PAPER,
+properties, resources, transactions, preserved receipts and requestId replay.
+
+Optional explicit `DEMENTOR_BACKUP_ID=safe-...` chooses a particular existing
+snapshot; otherwise the latest complete-looking `safe-*` pair is selected,
+without claiming it corresponds to the live running image. If disk is too
+small, corrupt/incomplete data appears, game upgrade fails, or a Mac/key is
+offline, the script **stops without VM writes** and removes any incomplete
+private local transfer. Default max archive transfer size is 16 GiB and
+can be adjusted locally only after confirming spare space.
+
+The resulting `RESULT.txt` and private QA logs stay only on the operator Mac.
+The off-VM Mac extraction and cold Node-load are **not** a running production
+container restart or live mobile validation. An archive pair being present
+is not the same as successful restore. Any upload must contain **only
+redacted aggregate results**, NEVER the archive/world/token/IDs. The owner
+Decision [DEC-REL-01](https://github.com/SLADZARI/dementor_live/blob/audit/rc4-production-inventory-20261020/docs/decisions/DEC_RELEASE_H0_AUDIT_F1_SEQUENCE.v1.0.md)
+authorizes this rehearsal, but **no release application (G7 GO)**.
+
+Synthetic-only CI: `python3 -m unittest discover -s test -p 'test_qa_restore_extract.py'`
+and `node --test test/qa-private-restore.test.mjs`; these test the tool,
+not a real production backup.
