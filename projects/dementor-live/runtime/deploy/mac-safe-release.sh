@@ -38,7 +38,7 @@ if [ -z "$SSH_KEY" ]; then
   stop 'SSH-ключ не найден. Не пробуем неизвестные ключи на сервере.'
   exit 1
 fi
-chmod 600 "$SSH_KEY" || { stop "Не удаётся установить права 600 для ключа"; exit 1; }
+# Read-only key validation. SSH itself rejects unsafe key permissions; never chmod user credentials here.
 ssh-keygen -lf "$SSH_KEY" || { stop "Ключ не читается. Не выполняем SSH-подключение."; exit 1; }
 printf 'Рабочий путь: %s\n' "$SSH_KEY"
 
@@ -69,7 +69,7 @@ SSH_OPTS=(
   -o NumberOfPasswordPrompts=0
   -o ConnectTimeout=12
   -o ConnectionAttempts=1
-  -o StrictHostKeyChecking=accept-new
+  -o StrictHostKeyChecking=yes
 )
 # Exactly one authentication attempt. If it fails, no retries or key guessing.
 ssh "${SSH_OPTS[@]}" "$USER_NAME@$HOST" bash -se -- "$EXACT_RELEASE_SHA" "$RELEASE_BRANCH" "$EXPECTED_VERSION" "${DEMENTOR_GO_SHA:-}" "${DEMENTOR_NO_PLAYERS_GO:-}" <<'SERVER'
@@ -82,24 +82,10 @@ NO_PLAYERS_GO="${5:-}"
 REPO="https://github.com/SLADZARI/degradation_club.git"
 DIR="/srv/dementor-live/releases/rc4-${SHA:0:12}"
 
-command -v git >/dev/null && command -v docker >/dev/null || { echo 'STOP: git/docker отсутствуют'; exit 1; }
-mkdir -p "$(dirname "$DIR")"
-if [ ! -d "$DIR/.git" ]; then
-  git clone --depth 1 --single-branch --branch "$BRANCH" "$REPO" "$DIR"
-fi
-[ "$(git -C "$DIR" rev-parse HEAD)" = "$SHA" ] || { echo "STOP: checkout не соответствует одобренному SHA"; exit 1; }
-cd "$DIR/projects/dementor-live/runtime"
-[ -f deploy/publish-preserve-world.sh ] || { echo 'STOP: нет безопасного скрипта деплоя'; exit 1; }
-[ "$(node -p "require('./package.json').version" 2>/dev/null || sed -n 's/.*"version": "\([^"]*\)".*/\1/p' package.json | head -1)" = "$VERSION" ] || { echo 'STOP: версия не совпадает'; exit 1; }
-
-echo 'Проверка набора файлов релиза'
-docker run --rm -v "$PWD:/work:ro" -w /work node:22-bookworm-slim npm run check:release
-
-echo 'Проверка Docker, тома и окружения без изменений'
-bash deploy/publish-preserve-world.sh --dry-run
-
-# Read-only, exact-SHA idempotence guard before changing anything.
-echo '=== Checking whether exact SHA is already deployed ==='
+# FIRST inspect the running game image/receipt without changing VM files or
+# creating a container. Owner GO is not required for exact-SHA attestation.
+command -v docker >/dev/null || { echo 'STOP: Docker absent'; exit 1; }
+echo '=== Read-only exact-SHA attestation (no VM writes) ==='
 RUNNING_CID="$(docker ps --quiet --filter label=com.docker.compose.project=dementor-live --filter label=com.docker.compose.service=game)"
 RUNNING_COUNT="$(docker ps --quiet --filter label=com.docker.compose.project=dementor-live --filter label=com.docker.compose.service=game | wc -l | tr -d ' ')"
 [ "$RUNNING_COUNT" = 1 ] || { echo 'STOP: unexpected running game container count'; exit 1; }
@@ -123,6 +109,22 @@ fi
 [ "$OWNER_GO_SHA" = "$SHA" ] || { echo 'STOP: explicit exact-SHA owner GO required; no changes'; exit 1; }
 [ "$NO_PLAYERS_GO" = "yes" ] || { echo 'STOP: owner has not confirmed player-free window; no changes'; exit 1; }
 echo 'GO accepted for exact SHA and player-free maintenance window'
+# Never create release directories, clone Git, run Docker containers or build
+# images until BOTH approvals above succeed. The ALREADY DEPLOYED path returns
+# before reaching any of the commands below.
+command -v git >/dev/null || { echo 'STOP: Git absent'; exit 1; }
+mkdir -p "$(dirname "$DIR")"
+if [ ! -d "$DIR/.git" ]; then
+  git clone --depth 1 --single-branch --branch "$BRANCH" "$REPO" "$DIR"
+fi
+[ "$(git -C "$DIR" rev-parse HEAD)" = "$SHA" ] || { echo 'STOP: checkout does not match approved SHA'; exit 1; }
+cd "$DIR/projects/dementor-live/runtime"
+[ -f deploy/publish-preserve-world.sh ] || { echo 'STOP: safe publisher not found'; exit 1; }
+[ "$(node -p "require('./package.json').version" 2>/dev/null || sed -n 's/.*"version": "\([^"]*\)".*/\1/p' package.json | head -1)" = "$VERSION" ] || { echo 'STOP: release version mismatch'; exit 1; }
+echo 'Inspecting release files in a throwaway candidate container (after owner GO)'
+docker run --rm -v "$PWD:/work:ro" -w /work node:22-bookworm-slim npm run check:release
+echo 'Preflight live Docker/volume config (no apply)'
+bash deploy/publish-preserve-world.sh --dry-run
 
 echo '=== Проверяем предыдущую настоящую резервную копию БЕЗ остановки работающего сервера ==='
 # This immutable file was created by the failed (safely rolled back) RC4 attempt.
