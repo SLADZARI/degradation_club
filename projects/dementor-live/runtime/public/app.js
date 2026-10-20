@@ -261,7 +261,9 @@ if(('ontouchstart' in window||navigator.maxTouchPoints>0)&&!standalone&&!session
 }
 $('standaloneDismiss').onclick=()=>{$('standaloneTip').hidden=true;sessionStorage.setItem('dementor-standalone-tip','1');};
 window.__cityMobileInput=()=>({active:cityPointerId!==null,movement:touchMove,selected,nearCombat:!!(me&&Math.hypot(me.x-29,me.y-35)<=state?.config?.actionRange)});
-function screenAlignedMotion(dx,dy){if(state?.scene!=='city')return [dx,dy];const n=Math.hypot(dx,dy);if(!n)return [0,0];const sx=dx/n,sy=dy/n;return [(sy+sx)/Math.SQRT2,(sy-sx)/Math.SQRT2];}
+// Arrow keys and the mobile stick describe screen directions in EVERY scene.
+// Convert that intent to world axes; automatic routes already use world coordinates.
+function screenAlignedMotion(dx,dy){const n=Math.hypot(dx,dy);if(!n)return [0,0];const sx=dx/n,sy=dy/n;return [(sy+sx)/Math.SQRT2,(sy-sx)/Math.SQRT2];}
 setInterval(()=>{if(!connected||!me)return;let dx=0,dy=0;if(!$('welcome').open&&!['INPUT','TEXTAREA','SELECT'].includes(document.activeElement?.tagName)){
   dx=Number(keys.has('KeyD')||keys.has('ArrowRight'))-Number(keys.has('KeyA')||keys.has('ArrowLeft'));dy=Number(keys.has('KeyS')||keys.has('ArrowDown'))-Number(keys.has('KeyW')||keys.has('ArrowUp'));if(touchMove)[dx,dy]=touchMove;
   if(!dx&&!dy&&route.length){
@@ -277,19 +279,26 @@ setInterval(()=>{if(!connected||!me)return;let dx=0,dy=0;if(!$('welcome').open&&
   }if((touchMove||[...keys].some(k=>['KeyW','KeyA','KeyS','KeyD','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(k)))&&(dx||dy))[dx,dy]=screenAlignedMotion(dx,dy);if(!inputPending){inputPending=true;api('input',{dx,dy,sprint:keys.has('ShiftLeft')||keys.has('ShiftRight')}).catch(()=>{}).finally(()=>{inputPending=false;});}
 },80);
 
-// ISO30 is a projection of the existing world coordinates, not a change to gameplay.
+// ISO30 is the same world-to-screen projection in city, plots, interiors and regions.
+// Local scenes keep their saved 16x16 coordinates; only their presentation changes.
 const ISO_COS=Math.sqrt(3)/2;
 function screen(x,y){
-  if(state?.scene&&state.scene!=='city')return {x:view.w/2+(x-view.cx)*view.s,y:view.h/2+(y-view.cy)*view.s*.76};
   const dx=x-view.cx,dy=y-view.cy;
   return {x:view.w/2+(dx-dy)*view.s*ISO_COS,y:view.h/2+(dx+dy)*view.s*.5};
 }
 function worldPoint(x,y){
-  if(state?.scene&&state.scene!=='city')return {x:(x-view.w/2)/view.s+view.cx,y:(y-view.h/2)/(view.s*.76)+view.cy};
   const u=(x-view.w/2)/(view.s*ISO_COS),v=(y-view.h/2)/(view.s*.5);
   return {x:view.cx+(u+v)/2,y:view.cy+(v-u)/2};
 }
-function blocked(x,y){const c=state.config,r=.35;if(state.scene!=='city'){return x<r||y<r||x>16-r||y>16-r||(['plot','expedition'].includes(state.scene)&&(state.home.nodes.some(n=>n.left&&Math.hypot(x-n.x,y-n.y)<.63)||state.scene==='plot'&&state.home.plantedTrees?.some(t=>t.wateredAt&&state.now-t.wateredAt>=180000&&Math.hypot(x-t.x,y-t.y)<.6)));}if(x<r||y<r||x>c.width-r||y>c.height-r)return true;if(x+r>c.river.x&&x-r<c.river.x+c.river.w&&!(bridgeOpen()&&y-r>=c.bridge.y&&y+r<=c.bridge.y+c.bridge.h))return true;
+function blocked(x,y){const c=state.config,r=.35;if(state.scene!=='city'){
+  if(x<.5||y<.5||x>15.5||y>15.5)return true;
+  // Same authoritative local footprints that the server uses to resolve motion.
+  return (state.homeFootprints||[]).some(o=>{
+    if(!o.solid)return false;
+    const dx=Math.max(o.x-x,0,x-o.x-o.w),dy=Math.max(o.y-y,0,y-o.y-o.h);
+    return dx*dx+dy*dy<.3*.3;
+  });
+} if(x<r||y<r||x>c.width-r||y>c.height-r)return true;if(x+r>c.river.x&&x-r<c.river.x+c.river.w&&!(bridgeOpen()&&y-r>=c.bridge.y&&y+r<=c.bridge.y+c.bridge.h))return true;
   if((state.citySolids||[{x:4,y:4,w:4,h:3}]).some(o=>x+r>o.x&&x-r<o.x+o.w&&y+r>o.y&&y-r<o.y+o.h))return true;/* Extended solids checked by world-ui from authoritative footprints. */return state.resources.some(o=>o.stock>0&&o.type!=='food'&&Math.hypot(x-o.x,y-o.y)<.63);
 }
 function pathDistance(path){return path.reduce((distance,p,i)=>distance+Math.hypot(p.x-(i?path[i-1].x:me.x),p.y-(i?path[i-1].y:me.y)),0);}
@@ -350,7 +359,6 @@ function rounded(x,y,w,h,r,fill,stroke){ctx.beginPath();ctx.roundRect(x,y,w,h,r)
 function line(x,y,x2,y2,color,width=1){ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x2,y2);ctx.strokeStyle=color;ctx.lineWidth=width;ctx.stroke();}
 function label(text,x,y,small=false){if(me&&Math.hypot(me.x-x,me.y-y)>3.1&&(!hoverWorld||Math.hypot(hoverWorld.x-x,hoverWorld.y-y)>1.4))return;const p=screen(x,y);ctx.font=`${small?9:10}px Paper, Arial`;const width=ctx.measureText(text).width;rounded(p.x-width/2-7,p.y-10,width+14,18,6,'#f6f3e5dc');ctx.textAlign='center';ctx.fillStyle=small?'#939781':'#6c7460';ctx.fillText(text,p.x,p.y+2);}
 function groundRect(o,color,border,dash=false){
-  if(state?.scene&&state.scene!=='city'){const p=screen(o.x,o.y),w=o.w*view.s,h=o.h*view.s*.76;ctx.setLineDash(dash?[4,6]:[]);rounded(p.x,p.y,w,h,3,color,border);ctx.setLineDash([]);return {...p,w,h};}
   const corners=[[o.x,o.y],[o.x+o.w,o.y],[o.x+o.w,o.y+o.h],[o.x,o.y+o.h]].map(([x,y])=>{const p=screen(x,y);return [p.x,p.y];});
   ctx.setLineDash(dash?[4,6]:[]);poly(corners,color,border,1);ctx.setLineDash([]);
   const xs=corners.map(v=>v[0]),ys=corners.map(v=>v[1]);

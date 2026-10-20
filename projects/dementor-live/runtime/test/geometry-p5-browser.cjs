@@ -35,6 +35,55 @@ let server,browser;
  assert.equal(snapshot.blockedRock,true);
  assert.equal(snapshot.rockWidth,5);
  assert.ok(snapshot.desert>30&&snapshot.cacti>=3);
+ // Real browser / server check: projection AND controls never change on plot/interior entry.
+ const playerId=await page.evaluate(()=>me.id);
+ async function enterFixture(scene){
+   const spawnY=scene==='interior'?11:8; // Test free walking; collisions are asserted independently.
+   const response=await fetch(base+'/__test',{method:'POST',headers:{'Content-Type':'application/json','x-test-key':'local-integration-tests'},body:JSON.stringify({player:playerId,patch:{scene,plotId:'plot-1',x:8,y:spawnY}})});
+   assert.equal(response.status,200,'isolated scene fixture '+scene);
+   await page.waitForFunction(expected=>state?.scene===expected.scene&&me?.x===8&&me?.y===expected.y,{scene,y:spawnY});
+   await page.waitForTimeout(200);
+   const geometry=await page.evaluate(()=>{const a=screen(8,8),b=screen(9,9),c=screen(10.4,6.2),hit=worldPoint(c.x,c.y);return {diamondX:b.x-a.x,diamondY:b.y-a.y,hitX:hit.x,hitY:hit.y};});
+   assert.ok(Math.abs(geometry.diamondX)<.00001&&geometry.diamondY>0,'ISO30 diamond on '+scene);
+   assert.ok(Math.abs(geometry.hitX-10.4)<.00001&&Math.abs(geometry.hitY-6.2)<.00001,'click inverse on '+scene);
+   if(scene==='plot'||scene==='interior'){
+     const props=await page.evaluate(()=>({kinds:(state.homeFootprints||[]).map(o=>o.kind),well:blocked(14,3),chest:blocked(3.8,5.4),bed:blocked(9.6,5.9)}));
+     if(scene==='plot'){assert.ok(props.kinds.includes('well'));assert.equal(props.well,true,'well collision rendered on plot');}
+     else{
+       assert.ok(props.kinds.includes('room-wall')&&props.kinds.includes('chest')&&props.kinds.includes('bed'),'authoritative room furniture serialized');
+       assert.equal(props.chest,true,'chest collision');assert.equal(props.bed,true,'bed collision');
+       const depth=await page.evaluate(()=>{
+         const events=[],origPlayer=drawPlayer,origChest=localChest,origBed=localBed;
+         try{
+           drawPlayer=function(p,t){events.push('player');return origPlayer(p,t)};
+           localChest=function(o){events.push('chest');return origChest(o)};
+           localBed=function(o){events.push('bed');return origBed(o)};
+           drawHome(performance.now());return events;
+         }finally{drawPlayer=origPlayer;localChest=origChest;localBed=origBed;}
+       });
+       assert.ok(depth.includes('player')&&depth.indexOf('chest')<depth.indexOf('player')&&depth.indexOf('bed')<depth.indexOf('player'),'nearer player paints in front of room furniture');
+     }
+   }
+ }
+ async function assertScreenMove(key,axis,sign){
+   const before=await page.evaluate(()=>({x:me.x,y:me.y}));
+   await page.keyboard.down(key);await page.waitForTimeout(550);await page.keyboard.up(key);
+   await page.waitForTimeout(160);
+   const after=await page.evaluate(()=>({x:me.x,y:me.y}));
+   const worldX=after.x-before.x,worldY=after.y-before.y;
+   const screenX=(worldX-worldY)*Math.sqrt(3)/2,screenY=(worldX+worldY)*.5;
+   const primary=axis==='x'?screenX:screenY,drift=axis==='x'?screenY:screenX;
+   assert.ok(primary*sign>.05,key+' travels '+axis+' on screen');
+   assert.ok(Math.abs(drift)<.08,key+' has no unintended diagonal drift: '+drift);
+ }
+ await enterFixture('plot');
+ await assertScreenMove('s','y',1);
+ await enterFixture('interior');
+ await assertScreenMove('d','x',1);
+ await assertScreenMove('w','y',-1);
+ await assertScreenMove('a','x',-1);
+ // Return to the regular city before checking the P5 render hooks.
+ await enterFixture('city');
  await page.evaluate(()=>{const old=window.__worldEntities;window.__p5Passes=0;window.__worldEntities=()=>{window.__p5Passes++;return old();};});
  await page.waitForFunction(()=>window.__p5Passes>3,{timeout:10000});
  assert.deepEqual(errors,[],'No JS errors during real Canvas render');
