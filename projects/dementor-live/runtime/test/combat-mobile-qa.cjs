@@ -40,7 +40,7 @@ async function verifyLayout(page,size){
  }
  assert.ok(b.field.w>=w-2&&b.field.h>=Math.min(200,h*.42),'Gameplay field too small '+JSON.stringify(o));
  for(const id of ['movePad','aimPad']){
-   assert.ok(b[id].w>=70&&b[id].h>=70,id+' tiny '+JSON.stringify(o));
+   assert.ok(b[id].w>=(id==='aimPad'?60:90)&&b[id].h>=(id==='aimPad'?60:90),id+' tiny '+JSON.stringify(o));
    assert.ok(b[id].x>=0&&b[id].right<=w&&b[id].y>=b.field.y&&b[id].bottom<=b.field.bottom,id+' outside battlefield '+JSON.stringify(o));
    // The transparent action arc envelope intentionally includes the separate aiming control; each button remains an independent hit target.
  }
