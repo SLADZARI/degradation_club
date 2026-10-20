@@ -35,6 +35,13 @@ A tested Node model is not a tested browser or production deployment. The versio
 - [COMBAT Touch v2 + Forestry v1](../design/COMBAT_TOUCH_V2_CIVIC_FORESTRY_V1_2026-10-20.md) — iPhone combat and plantable trees.
 - These are cumulative implementation candidates, not proof that the production VM runs the newest code; no UNIVERSE port is implied.
 
+## Playtest communications & bridge candidate
+
+- [PAYPHONE + PAGER + second bridge construction and visual diversity](../design/PAYPHONE_PAGER_BRIDGE02_QA_v1_2026-10-20.md) — phone booth directory, expensive pager, isolated second river crossing, picture-marked notice boards.
+- [Two-player merged QA checklist](../qa/PLAYTEST_CHECKLIST_v2_2026-10-20.md) — checkboxes for CIVIC, Touch v2, new bridge/communications, and synchronised video findings.
+- [Server QA recording runbook](../qa/QA_RECORDING_RUNBOOK_2026-10-20.md) — opt-in per-session JSONL log next to isolated save and video marker guide.
+- Unmerged candidate only; no live VM/save claim. The UNIVERSE branch requires its own integration gate.
+
 ## Relevant existing sources
 
 - [Core first stage](../CORE_AND_FIRST_LEVEL_v0.1.md) — design source, not a runtime claim.
