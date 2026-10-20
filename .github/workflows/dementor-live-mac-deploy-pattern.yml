@@ -35,6 +35,23 @@ jobs:
           assert 'publish-preserve-world.sh --apply' in s
           assert 'a38a03e68fcec5ceac45c0c362436ee6d69d5c5d' in s
           assert all(x in s for x in ['39473604439','39473604350','39473604513','39473604305','39473604530'])
+          # Exact-SHA attestation must NOT mutate the VM unless explicit release
+          # and no-player approvals are both validated. This catches regressions
+          # where a dry run, git clone or docker build runs before owner GO.
+          remote=s.split("<<'SERVER'\n",1)[1].split("\nSERVER",1)[0]
+          split_token="echo 'GO accepted for exact SHA and player-free maintenance window'"
+          assert remote.count(split_token)==1
+          before_go,after_go=remote.split(split_token)
+          assert '[ "$OWNER_GO_SHA" = "$SHA" ]' in before_go
+          assert '[ "$NO_PLAYERS_GO" = "yes" ]' in before_go
+          assert before_go.index('[ "$OWNER_GO_SHA" = "$SHA" ]') < before_go.index('[ "$NO_PLAYERS_GO" = "yes" ]')
+          forbidden_before_go=['mkdir -p','git clone','docker build','docker run','docker tag','docker compose','--apply','--dry-run','rm -','chmod ','cp ','mv ','tar -']
+          for forbidden in forbidden_before_go:
+              assert forbidden not in before_go, f"VM mutation before owner GO: {forbidden}"
+          assert all(x in after_go for x in ['mkdir -p', 'git clone', 'docker run', 'publish-preserve-world.sh --dry-run','publish-preserve-world.sh --apply'])
+          assert 'StrictHostKeyChecking=yes' in s
+          assert 'StrictHostKeyChecking=accept-new' not in s
+          assert 'chmod 600 "$SSH_KEY"' not in s
           assert s.count('ssh "${SSH_OPTS[@]}"') == 1
           assert 'ALREADY DEPLOYED:' in s
           assert 'OWNER_GO_SHA' in s and 'DEMENTOR_GO_SHA' in s
@@ -50,6 +67,11 @@ jobs:
           assert audit.count('ssh "') == 1
           assert 'release-manifest.txt' in audit and '/app/data/world.json' in audit
           assert 'sha256sum' in audit and 'docker exec -i' in audit
+          assert 'StrictHostKeyChecking=yes' in audit
+          assert 'StrictHostKeyChecking=accept-new' not in audit
+          assert 'backup_files_present=yes' in audit and 'complete_backup=NOT_VERIFIED' in audit
+          assert 'archive_restore_on_copy=NOT_RUN' in audit
+          assert 'docker stats --no-stream' in audit and 'host_mem_available_kib' in audit
           assert '-H "Host: $PUBLIC_HOST"' in audit
           assert 'approved_sha_tag_matches_running_image' in audit
           assert not any(x in audit for x in ('--apply','down -v','--reset-world','docker stop','docker compose up','docker tag','docker rm','rm -rf','docker volume rm'))
