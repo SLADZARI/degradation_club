@@ -22,7 +22,7 @@ function connect(){stream?.close();motionFrames.length=0;stream=new EventSource(
  if(!Array.isArray(prev)||prev.length!==d.from||(state?.cityNetwork?.current||'origin')!==d.city){
    stream.close();queueMicrotask(connect);return;
  }
- next.landscape={...next.landscape,tiles:prev.concat(d.tiles)};delete next.landscapeDelta;
+ next.landscape={...next.landscape,tiles:d.tiles.length?prev.concat(d.tiles):prev};delete next.landscapeDelta;
 }
 state=next;me=state.players.find(p=>p.id===state.me);if(lastScene!==state.scene+me.plotId+(state.cityNetwork?.current||'origin')){lastScene=state.scene+me.plotId+(state.cityNetwork?.current||'origin');resize();motionFrames.length=0;route=[];selected=null;context=null;if($('cityPanel').open)$('cityPanel').close();}motionFrames.push({at:performance.now(),players:new Map(state.players.map(p=>[p.id,{x:p.x,y:p.y,spirit:p.spirit}]))});if(motionFrames.length>20)motionFrames.shift();connected=true;updateUI();};stream.onerror=()=>{connected=false;$('connection').classList.add('offline');$('connection').lastChild.textContent='Нет связи';};}
 $('joinForm').onsubmit=async e=>{e.preventDefault();const button=e.target.querySelector('button');button.disabled=true;try{const result=await api('join',{name:$('nameInput').value,gender:$('genderInput').value});if(!result.ok){$('joinError').textContent=result.message;return;}token=result.token;sessionStorage.setItem('dementor-token',token);$('welcome').close();connect();canvas.focus();}catch{$('joinError').textContent='Сервер недоступен. Проверь локальный запуск.';}finally{button.disabled=false;}};
@@ -361,7 +361,7 @@ function terrainCanPlace(kind,x,y){
  if(x<0||y<0||x>=c.width||y>=c.height)return 'За границами города';
  if((state.plots||[]).some(p=>x<p.x+p.w&&x+1>p.x&&y<p.y+p.h&&y+1>p.y&&p.owner!==me.id))return 'Частный или непроданный участок';
  if(Math.hypot(me.x-(x+.5),me.y-(y+.5))>c.actionRange)return 'Подойди к клетке ближе';
- if((state.landscape?.tiles||[]).some(t=>t.x===x&&t.y===y))return 'Клетка уже занята';
+ if(window.DLTerrain01?.occupied?.(state,x,y)||(window.DLTerrain01?false:(state.landscape?.tiles||[]).some(t=>t.x===x&&t.y===y)))return 'Клетка уже занята';
  if(blocked(x+.5,y+.5))return 'Здесь препятствие';
  return '';
 }
@@ -371,7 +371,7 @@ function updateTerrainBar(){
  const cell=placementCell|| (hoverWorld?{x:Math.floor(hoverWorld.x),y:Math.floor(hoverWorld.y)}:null);
  const reason=cell?terrainCanPlace(placementKind,cell.x,cell.y):'Нажми на клетку, чтобы выбрать место';
  terrainStatus.textContent=(state?.landscapeProducts?.[placementKind]?.name||placementKind)+' · '+(me?.terrainBag?.[placementKind]||0)+' шт. · '+(cell?cell.x+','+cell.y+' · ':'')+(reason||'Можно уложить');
- terrainApply.disabled=!!reason||!cell||requestPending;
+ terrainApply.disabled=!!reason||!placementCell||requestPending;
 }
 async function applyTerrainCell(){
  if(!placementKind||!placementCell)return;
@@ -563,8 +563,8 @@ function render(time){positionWindows();ctx.clearRect(0,0,view.w,view.h);ctx.fil
   ctx.fillStyle='#6b6f4b0a';for(let i=0;i<340;i++){const x=(i*137.23)%view.w,y=(i*211.71)%view.h;ctx.fillRect(x,y,1,1);}
   const c=state?.config||{width:48,height:32,river:{x:34,w:4}};
   groundRect({x:0,y:0,w:c.width,h:c.height},'#f3efdf88','#cbd0b230');
- if(state?.landscape?.tiles)for(const tile of state.landscape.tiles){const col=tile.kind==='paving'?'#d6c7a6':tile.kind==='grass'?'#b4c49f':'#d5c2aa';groundRect({x:tile.x,y:tile.y,w:1,h:1},col,'#a8aa93');if(tile.kind==='flowers'){const p=screen(tile.x+.5,tile.y+.5),r=Math.max(2,view.s*.11);for(const [dx,dy]of [[-1,0],[1,0],[0,-1],[0,1]]){ctx.beginPath();ctx.arc(p.x+dx*r,p.y+dy*r,r*.7,0,7);ctx.fillStyle='#c68981';ctx.fill();}ctx.beginPath();ctx.arc(p.x,p.y,r*.45,0,7);ctx.fillStyle='#e8d5a8';ctx.fill();}}
-  ctx.strokeStyle='#9ca27e12';ctx.lineWidth=.6;for(let x=0;x<=c.width;x+=2){const a=screen(x,0),b=screen(x,c.height);line(a.x,a.y,b.x,b.y,'#9ca27e12',.6);}for(let y=0;y<=c.height;y+=2){const a=screen(0,y),b=screen(c.width,y);line(a.x,a.y,b.x,b.y,'#9ca27e12',.6);}
+ if(!window.DLTerrain01?.draw(ctx,state,screen,view.s)&&state?.landscape?.tiles)for(const tile of state.landscape.tiles){const col=tile.kind==='paving'?'#d6c7a6':tile.kind==='grass'?'#b4c49f':'#d5c2aa';groundRect({x:tile.x,y:tile.y,w:1,h:1},col,'#a8aa93');if(tile.kind==='flowers'){const p=screen(tile.x+.5,tile.y+.5),r=Math.max(2,view.s*.11);for(const [dx,dy]of [[-1,0],[1,0],[0,-1],[0,1]]){ctx.beginPath();ctx.arc(p.x+dx*r,p.y+dy*r,r*.7,0,7);ctx.fillStyle='#c68981';ctx.fill();}ctx.beginPath();ctx.arc(p.x,p.y,r*.45,0,7);ctx.fillStyle='#e8d5a8';ctx.fill();}}
+  if(!window.DLTerrain01?.ready){ctx.strokeStyle='#9ca27e12';ctx.lineWidth=.6;for(let x=0;x<=c.width;x+=2){const a=screen(x,0),b=screen(x,c.height);line(a.x,a.y,b.x,b.y,'#9ca27e12',.6);}for(let y=0;y<=c.height;y+=2){const a=screen(0,y),b=screen(c.width,y);line(a.x,a.y,b.x,b.y,'#9ca27e12',.6);}}
   // No pre-painted footpaths: paving will be placed by players.
   groundRect({x:c.river.x,y:0,w:c.river.w,h:c.height},'#becdc8','#96ada256');
   for(const bank of [c.river.x,c.river.x+c.river.w]){const a=screen(bank,0),b=screen(bank,c.height);line(a.x,a.y,b.x,b.y,'#96ada256',2);}
