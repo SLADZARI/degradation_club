@@ -52,7 +52,25 @@ function save(){
   fs.renameSync(stateFile+'.tmp',stateFile);
   network.markSaved();
 }
-function broadcast(){for(const[id,set]of streams){const p=network.findId(id)?.p;if(!p)continue;const msg=`data: ${JSON.stringify(stateFor(p))}\n\n`;for(const res of set)res.write(msg);}}
+// SSE terrain deltas: send full terrain only on connect/city switch or missed revisions.
+const terrainSeen=new WeakMap();
+function streamState(p,res){
+ const payload=stateFor(p);
+ const land=payload.landscape;
+ if(land&&Array.isArray(land.tiles)){
+   const city=payload.cityNetwork?.current||'origin';
+   const revision=Number.isSafeInteger(land.revision)?land.revision:land.tiles.length;
+   const previous=terrainSeen.get(res);
+   terrainSeen.set(res,{city,revision});
+   if(previous?.city===city){
+     if(previous.revision===revision)payload.landscape={version:land.version,revision};
+     else if(previous.revision===revision-1&&land.tiles.length&&revision===land.tiles.length)
+       payload.landscape={version:land.version,revision,delta:[land.tiles[land.tiles.length-1]]};
+   }
+ }
+ return payload;
+}
+function broadcast(){for(const[id,set]of streams){const p=network.findId(id)?.p;if(!p)continue;for(const res of set)res.write(`data: ${JSON.stringify(streamState(p,res))}\n\n`);}}
 function json(res,status,data){res.writeHead(status,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'});res.end(JSON.stringify(data));}
 async function body(req){let text='';for await(const chunk of req){text+=chunk;if(text.length>4096)throw Error('Слишком большой запрос');}return JSON.parse(text||'{}');}
 const server=http.createServer(async(req,res)=>{
@@ -76,7 +94,7 @@ const server=http.createServer(async(req,res)=>{
       const p=network.findToken(token)?.p;if(!p){json(res,401,{ok:false,message:'Войди в мир заново'});return;}
       if(url.pathname==='/api/events'){
         res.writeHead(200,{'Content-Type':'text/event-stream','Cache-Control':'no-cache, no-transform','Connection':'keep-alive','X-Accel-Buffering':'no'});
-        let set=streams.get(p.id);if(!set){set=new Set();streams.set(p.id,set);network.gameFor(p).connect(p);qaRecorder.connect(p,network.findId(p.id)?.cityId);}set.add(res);res.write(`data: ${JSON.stringify(stateFor(p))}\n\n`);
+        let set=streams.get(p.id);if(!set){set=new Set();streams.set(p.id,set);network.gameFor(p).connect(p);qaRecorder.connect(p,network.findId(p.id)?.cityId);}set.add(res);res.write(`data: ${JSON.stringify(streamState(p,res))}\n\n`);
         req.on('close',()=>{set.delete(res);if(set.size===0){streams.delete(p.id);qaRecorder.disconnect(p,network.findId(p.id)?.cityId);network.gameFor(p)?.disconnect(p);save();}});return;
       }
       if(url.pathname==='/api/state'){json(res,200,stateFor(p));return;}
