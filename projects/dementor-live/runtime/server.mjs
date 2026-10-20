@@ -192,6 +192,10 @@ const server=http.createServer(async(req,res)=>{
     // but deliberately leaves JSON out of its strict asset regex.
     // Expose only this exact catalog path, not arbitrary files.
     if(url.pathname==='/assets/paper-icons-new-v3/manifest-new-only.json'){
+      if(req.method!=='GET'&&req.method!=='HEAD'){
+        res.writeHead(405,{'Allow':'GET, HEAD','Cache-Control':'no-store'});
+        res.end('Method not allowed');return;
+      }
       const manifestFile=path.join(root,'public','assets','paper-icons-new-v3','manifest-new-only.json');
       if(!fs.existsSync(manifestFile)){res.writeHead(404);res.end('Icon catalog not installed');return;}
       res.writeHead(200,{'Content-Type':'application/json; charset=utf-8',
