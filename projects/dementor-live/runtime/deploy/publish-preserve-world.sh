@@ -66,6 +66,8 @@ rollback(){
 trap rollback EXIT
 # Verify candidate builds with no production save mounted.
 docker build --tag "$NEW_IMAGE" --file "$SOURCE/deploy/Dockerfile" "$SOURCE"
+# Retain the exact approved Paper Cut UI v2 assets from the currently live 0.4.1 build.
+docker run --rm --entrypoint node "$NEW_IMAGE" tools/verify-paper-icons-v2.mjs
 docker tag dementor-live:local "$OLD_IMAGE"
 echo "CANDIDATE built: $NEW_IMAGE. Stopping game to freeze its authoritative state."
 STOPPED=1
@@ -93,6 +95,9 @@ for i in $(seq 1 40);do
 done
 [[ "$READY" == 1 ]] || fail 'New game health/version check failed'
 curl --max-time 5 -fsS "http://127.0.0.1:$PORT/" >/dev/null || fail 'Game index route unavailable'
+for icon in /paper-icons.js /paper-icons.css /assets/paper-icons/paper_atlas_64.png /assets/paper-icons/png_256/wood.png;do
+  curl --max-time 5 -fsS "http://127.0.0.1:$PORT$icon" >/dev/null || fail "Canonical icon asset missing after cutover: $icon"
+done
 docker compose -p "$PROJECT" -f "$COMPOSE" --env-file "$ENV_FILE" ps "$SERVICE"
 printf 'approved_sha=%s\nversion=%s\nbackup=%s\n' "$ACTUAL_SHA" "$EXPECTED_VERSION" "$BACKUP" > "$BACKUP/release-manifest.txt"
 CUTOVER=0;STOPPED=0;trap - EXIT
