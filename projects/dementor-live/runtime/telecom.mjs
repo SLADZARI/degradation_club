@@ -27,29 +27,55 @@ export function ensureTelephoneDirectory(network){
    p.pagerNumber=String(network.data.telecom.nextNumber++);
    network.directoryDirty=true;g.changed();
   }
-  seen.add(p.pagerNumber);p.pagerInbox||=[];p.pagerOwns||=false;p.pagerReceipts||={};
+  seen.add(p.pagerNumber);p.pagerInbox||=[];p.pagerOwns||=false;p.pagerReceipts||={};p.pagerBlocked||=[];p.pagerListed??=false;
  }
 }
-export function publicSubscriberList(network){
+export const NPC_NUMBERS=Object.freeze({museum:'500001',mayor:'500002'});
+export function publicSubscriberList(network,viewer=null){
  ensureTelephoneDirectory(network);
- return [...network.values()].flatMap(g=>Object.values(g.state.players).map(p=>({id:p.id,name:p.name,number:p.pagerNumber,hasPager:!!p.pagerOwns})))
- .sort((a,b)=>a.name.localeCompare(b.name,'ru')).slice(0,500);
+ const people=[...network.values()].flatMap(g=>Object.values(g.state.players).filter(p=>p.pagerListed||p.id===viewer?.id).map(p=>({id:p.id,name:p.name,number:p.pagerNumber,hasPager:!!p.pagerOwns,kind:'resident'})));
+const services=[{id:'npc-mayor',name:'Мэрия · поручения',number:NPC_NUMBERS.mayor,kind:'npc'},
+ ...((viewer?.worldTravel?.visited||[]).includes('museum')?[{id:'npc-museum',name:'Музей смеха',number:NPC_NUMBERS.museum,kind:'npc'}]:[])];
+return [...services,...people].sort((a,b)=>a.name.localeCompare(b.name,'ru')).slice(0,500);
 }
 export function telecomSnapshot(network,p){
  return {number:p.pagerNumber,hasPager:!!p.pagerOwns,price:PAGER_PRICE,messageFee:PAGE_FEE,
-  directory:publicSubscriberList(network),
+  directory:publicSubscriberList(network,p),listed:!!p.pagerListed,blocked:p.pagerBlocked||[],
   inbox:p.pagerOwns?p.pagerInbox.slice(-80):[],
   unread:p.pagerOwns?p.pagerInbox.filter(m=>!m.readAt).length:0,
   booths:boothsForScene(p.scene)};
 }
 export function telecomAction(network,p,cmd){
- if(!['pagerBuy','pagerSend','pagerRead'].includes(cmd?.type))return null;
+ if(!['pagerBuy','pagerSend','pagerRead','pagerBlock','pagerList','pagerDial'].includes(cmd?.type))return null;
  const r=network.findId(p.id),g=r?.g;if(!g)throw Error('Житель не найден');
  if(p.spirit||p.job||p.delivery?.picked)throw Error('Заверши работу перед звонком');
  const requestId=cmd.requestId;
  if(p.pagerReceipts?.[requestId])return p.pagerReceipts[requestId];
  let result;
- if(cmd.type==='pagerBuy'){
+ if(cmd.type==='pagerList'){
+  p.pagerListed=!!cmd.listed;
+  result={message:p.pagerListed?'Номер добавлен в общий справочник':'Номер скрыт из общего справочника'};
+ }else if(cmd.type==='pagerBlock'){
+  const number=String(cmd.number||'').trim();
+  if(!/^\d{6}$/.test(number)||number===p.pagerNumber)throw Error('Выбери другой номер');
+  const blocked=new Set(p.pagerBlocked||[]);
+  if(cmd.blocked){if(blocked.size>=200)throw Error('Список блокировок заполнен');blocked.add(number);}
+  else blocked.delete(number);
+  p.pagerBlocked=[...blocked];
+  result={message:cmd.blocked?'Номер заблокирован':'Номер разблокирован'};
+ }else if(cmd.type==='pagerDial'){
+  const booth=PHONE_BOOTHS.find(b=>b.id===cmd.target);
+  if(!booth||booth.scene!==(p.scene||'city'))throw Error('Нужен таксофон');
+  g.near(p,booth);
+  const number=String(cmd.number||'').trim();
+  if(number===NPC_NUMBERS.museum&&(p.worldTravel?.visited||[]).includes('museum'))
+   result={message:'Музей смеха отвечает',npc:'museum',sound:'laughter'};
+  else if(number===NPC_NUMBERS.mayor)
+   result={message:'Мэрия на линии. Посмотри поручения на доске работ.',npc:'mayor',sound:'dial-tone'};
+  else if(publicSubscriberList(network,p).some(x=>x.number===number))
+   result={message:'Абонент выбран. Напиши сообщение.',recipient:number};
+  else throw Error('Номер не найден или ещё не открыт');
+ }else if(cmd.type==='pagerBuy'){
   if((p.scene||'city')!=='city')throw Error('Пейджеры продают в городском магазине инструментов');
   g.near(p,g.target('tool-shop'));
   if(p.pagerOwns)throw Error('У тебя уже есть пейджер');
@@ -68,10 +94,10 @@ export function telecomAction(network,p,cmd){
   g.near(p,booth);
   const toNumber=String(cmd.number||'').trim();
   if(!/^\d{6}$/.test(toNumber))throw Error('Введите шестизначный номер абонента');
-  const recipient=publicSubscriberList(network).find(x=>x.number===toNumber);
+  const recipient=publicSubscriberList(network,p).find(x=>x.number===toNumber&&x.kind==='resident');
   if(!recipient)throw Error('Абонент не найден');
   const target=network.findId(recipient.id);
-  if(!target)throw Error('Абонент недоступен');
+  if(!target||target.p.pagerBlocked?.includes(p.pagerNumber))throw Error('Абонент недоступен');
   const raw=String(cmd.text||'').trim();
   if(!raw||raw.length>100)throw Error('Сообщение должно содержать от 1 до 100 символов');
   const message=cleanText(raw);if(!message)throw Error('Напиши сообщение');
