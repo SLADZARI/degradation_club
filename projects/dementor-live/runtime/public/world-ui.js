@@ -162,7 +162,7 @@ function drawWorldProps(){
   for(const o of w.obstacles||[]){
     const p=screen(o.x+o.w/2,o.y+o.h/2);if(p.x< -200||p.x>view.w+200||p.y< -250||p.y>view.h+250)continue;
     if(o.biome==='forest'&&!state.resources.some(t=>t.id==='forest-wood-'+o.x+'-'+o.y&&t.stock>0))continue;
-    layers.push({depth:o.x+o.w/2+o.y+o.h/2,draw:()=>{if(o.biome==='forest')drawTree({x:o.x+o.w/2,y:o.y+o.h/2,stock:12});else{groundRect(o,'#b3b0a3','#868c86');drawStone({x:o.x+o.w/2,y:o.y+o.h/2,stock:16});}}});
+    layers.push({depth:o.x+o.w/2+o.y+o.h/2,draw:()=>{if(o.biome==='forest')drawTree({x:o.x+o.w/2,y:o.y+o.h/2,stock:12,visualVariant:state.resources.find(t=>t.id==='forest-wood-'+o.x+'-'+o.y)?.visualVariant??0});else{groundRect(o,'#b3b0a3','#868c86');drawStone({x:o.x+o.w/2,y:o.y+o.h/2,stock:16});}}});
   }
   for(const t of w.targets||[]){
     const p=screen(t.x,t.y);if(p.x< -250||p.x>view.w+250||p.y< -250||p.y>view.h+250)continue;
