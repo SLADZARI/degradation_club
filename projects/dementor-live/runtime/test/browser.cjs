@@ -71,7 +71,24 @@ async function screenshot(p,name){const file=path.join(out,name);await p.page.sc
   assert.deepEqual(await a.page.evaluate(()=>state.forge.consumed),{wood:24,stone:24});
   await screenshot(a,'dementor-live-forge.png');report.checks.push('both residents build forge through full UI resource chain; stages, consumed materials and single final payout');
   await patch(b,{hunger:.001,health:100,x:8,y:8});await b.page.waitForFunction(()=>me.spirit);const rejected=await b.page.evaluate(()=>api('action',{type:'build',target:'build',requestId:crypto.randomUUID()}));assert.equal(rejected.ok,false);await go(b,'food-1');await action(b);await b.page.waitForFunction(()=>!me.spirit&&me.hunger>50);report.checks.push('online hunger creates spirit; work rejected; self-recovery via actual bush UI');
-  await go(a,'food-1');await action(a);await a.page.waitForFunction(()=>me.bag.food>0);await patch(b,{spirit:true,hunger:0,health:0,x:8,y:8});await b.page.waitForFunction(()=>me.spirit);await go(a,b.id);await action(a);await a.page.getByRole('button',{name:'🫐 Накормить',exact:true}).click();await a.page.locator('[data-close="cityPanel"]').click();await b.page.waitForFunction(()=>!me.spirit);report.checks.push('actual UI food assistance from other player');
+  await go(a,'food-1');await action(a);await a.page.waitForFunction(()=>me.bag.food>0);await patch(b,{spirit:true,hunger:0,health:0,x:8,y:8});
+ await b.page.waitForFunction(()=>me.spirit);
+ // Wait for the second player's new location to reach the FIRST client's SSE
+ // snapshot before routing toward them. An old target position is not a valid
+ // recipient for a proximity-based social action.
+ await a.page.waitForFunction(id=>{
+  const other=state.players.find(p=>p.id===id);
+  return other&&other.spirit&&Math.hypot(other.x-8,other.y-8)<.15;
+ },b.id,{timeout:6000});
+ await go(a,b.id);
+ await a.page.waitForFunction(id=>{
+  const other=state.players.find(p=>p.id===id);
+  return other&&Math.hypot(me.x-other.x,me.y-other.y)<=state.config.actionRange;
+ },b.id,{timeout:5000});
+ await a.page.evaluate(id=>{selected=id;updateContext();},b.id);
+ await action(a);
+ await a.page.locator('#cityPanel[open]').waitFor({state:'visible'});
+ await a.page.getByRole('button',{name:'🫐 Накормить',exact:true}).click();await a.page.locator('[data-close="cityPanel"]').click();await b.page.waitForFunction(()=>!me.spirit);report.checks.push('actual UI food assistance from other player');
   await b.page.goto('about:blank');await sleep(200);const offBefore=await req('/api/state',null,b.token);const offHunger=offBefore.players.find(p=>p.id===b.id).hunger;await req('/__test',{advanceMs:5000});const offAfter=await req('/api/state',null,b.token);assert.equal(offAfter.players.find(p=>p.id===b.id).hunger,offHunger);await b.page.goto(base);await b.page.waitForFunction(()=>me&&connected);report.checks.push('real client disconnect pauses hunger; reconnect resumes same identity');
   await req('/__test',{resources:[{id:'wood-3',stock:1}]});for(const p of [a,b])await patch(p,{x:28,y:7,spirit:false,hunger:100,bag:{wood:0,stone:0,food:0},tools:{axe:1,pick:1},equipped:'axe'});await Promise.all([req('/api/action',{type:'mine',target:'wood-3',requestId:'race-'+(++seq)},a.token),req('/api/action',{type:'mine',target:'wood-3',requestId:'race-'+(++seq)},b.token)]);await req('/__test',{advanceMs:551});let sa=await req('/api/state',null,a.token),sb=await req('/api/state',null,b.token);assert.equal(sa.players.find(p=>p.id===a.id).bag.wood+sb.players.find(p=>p.id===b.id).bag.wood,1);report.checks.push('concurrent last physical resource across browser identities: no duplication (isolated fixture)');
   await patch(a,{x:33.6,y:13});await a.page.waitForFunction(()=>me.x>33);await a.page.keyboard.down('KeyD');await sleep(700);await a.page.keyboard.up('KeyD');assert.ok((await snap(a)).x<34);report.checks.push('real keyboard movement cannot cross river at planned bridge');
