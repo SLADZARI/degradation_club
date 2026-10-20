@@ -71,3 +71,7 @@ Use physical features sufficient for recognition in 32px, not a complex photorea
 - [Existing Paper Cut UI Icon Canon v1](../PAPER_CUT_UI_ICON_CANON_v1.md) locks the **20 already approved item IDs and assets**.
 - This document locks the **generation method for new or replacement illustrations**, but does **not** auto-approve any of the v2 trial assets and does not change the in-game source of truth.
 - Separate ISO30 paper world drawings, hero and terrain are outside this icon prompt's scope. Cross-game use requires an explicit style derivative and separate QA.
+
+## Проверки генерации
+
+Фактические результаты: [TEST RESULTS · 2026-10-20](PAPER_CUT_APPLIQUE_TEST_RESULTS_2026-10-20.md). Два пробных запроса на одиночные иконки были **REJECT** (вместо отдельных предметов созданы плакаты). Попытка запуска с явным прозрачным фоном через альтернативный сервис **BLOCKED** (нет кредитов). **Не считать данный генерационный стиль визуально прошедшим тест, пока нет двух одобренных самостоятельных PNG.** Это не отменяет зафиксированные правила.
