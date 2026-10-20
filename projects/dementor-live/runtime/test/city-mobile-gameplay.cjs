@@ -78,7 +78,7 @@ async function tap(page,selector){
  await page.touchscreen.tap(r.x+r.width/2,r.y+r.height/2);
 }
 (async()=>{try{
- await start();browser=await chromium.launch({headless:true});
+ await start();browser=await chromium.launch({channel:'chrome',headless:true});
  const manifest=await fetch(base+'/manifest.webmanifest');assert.equal(manifest.status,200);
  const m=await manifest.json();assert.equal(m.display,'standalone');
  report.checks.push('PWA manifest display=standalone served on /');

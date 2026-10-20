@@ -8,7 +8,7 @@ export class Game extends CoreGame{
       if(!this.state.resources.some(r=>r.id===id))this.state.resources.push({id,type:'stone',x,y,stock:1000000,initial:1000000,regrowAt:0});
     }
   }
-  join(name){const p=super.join(name);initializeWorldTravel(this);return p;}
+  join(name,gender='unspecified'){const p=super.join(name,gender);initializeWorldTravel(this);return p;}
   target(id){return WORLD_CITY_TARGETS.find(o=>o.id===id)||Object.values(WORLD_SCENES)
     .flatMap(region=>[region.exit,region.main]).find(o=>o.id===id)||super.target(id);}
   walkable(x,y,p=null){

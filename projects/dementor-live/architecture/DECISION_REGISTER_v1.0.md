@@ -18,6 +18,11 @@
 | DL-011 | Mobile COMBAT: larger shifted movement stick, semicircular action controls, neutral/aim/fire concentric hold zones, separate rifle/pistol cadence and automatic magazines | APPROVED product requirement 20 Oct 2026 | Implementation candidate PR #284, device acceptance PENDING |
 | DL-012 | Tree planting: species-linked seeds, shovel soil prep, 3 growth stages, real-time growth and finite harvested wood | APPROVED product requirement 20 Oct 2026 | CIVIC personal-plot implementation candidate PR #284; public-space tree planting and UNIVERSE port PENDING |
 
+| DL-013 | Multiple plots per character in one and multiple CIVIC cities, retained by character ID without forcing ownership of exactly one plot | APPROVED product requirement 20 Oct 2026 | Draft PR for core implementation; production release pending |
+| DL-014 | Residential / business / universal zoning, public business by default; rental 1 PAPER/day with visible signage, on-site stocked public stall and escrow | APPROVED product requirement, anti-loss guard adopted | Prototype CIVIC implementation; trade/saved-goods QA pending |
+| DL-015 | Mayor's office as in-game suggestion inbox with an offer every ~15 active-play minutes; first eligible letter earns 50 PAPER | APPROVED product requirement; anti-spam interpretation one payout per 24h | Prototype, reward treasury-funded, real email is NOT connected |
+| DL-016 | Character gender selection at first entry for Russian forms of address, including unspecified option; forest/mountain terrain audit | APPROVED user-facing requirement | CIVIC implementation candidate, real phone and migration QA pending |
+
 ## Supersession / conflict records
 
 - Existing runtime AGENTS.md on v0.4 allows emojis for UI. New approved PAPER CUT UI canon disallows substitutes for the 20 approved icons. Canon supersedes emoji guidance for those IDs; deployment is still pending.

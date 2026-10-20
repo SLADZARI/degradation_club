@@ -7,6 +7,8 @@ import {CITY_BUILDINGS,newConstruction,initialiseCityExpansion,cityExpansionActi
 import {LANDSCAPE_SHOP,LANDSCAPE_PRODUCTS,ensureLandscape,landscapeSpeed,landscapeAction} from './landscape.mjs';
 import {reconcileResourceClearance} from './resource-clearance.mjs';
 import {initForestry,forestryAction,TREE_SPECIES} from './forestry.mjs';
+import {initEstates,estateAction,tickEstateLeases} from './estate.mjs';
+import {initMayor,mayorAction} from './mayor-ideas.mjs';
 
 const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
 const distance = (a,b) => Math.hypot(a.x-b.x,a.y-b.y);
@@ -27,15 +29,15 @@ export class Game {
     for(const [id,type,x,y,stock]of [['east-wood-1','wood',41,7,48],['east-wood-2','wood',44,10,48],['east-wood-3','wood',42,23,48],['east-wood-4','wood',45,26,48],['east-stone-1','stone',42,16,48],['east-stone-2','stone',45,20,48],['east-food','food',41,12,c.foodStock]])if(!state.resources.some(r=>r.id===id))state.resources.push({id,type,x,y,stock,initial:stock,regrowAt:0});
     state.warehouse ||= {stock:{wood:0,stone:0},municipal:{wood:0,stone:0},spent:0};
     state.drops ||= [];
-    migrateLife(this);initPlaza(this);initialiseCityExpansion(this);ensureLandscape(this);initForestry(this);reconcileResourceClearance(this);
+    migrateLife(this);initPlaza(this);initialiseCityExpansion(this);ensureLandscape(this);initForestry(this);initEstates(this);initMayor(this);reconcileResourceClearance(this);
     for(const p of Object.values(state.players)){p.job=null;p.results=p.results||[];p.lastMessage=0;p.toolInfo ||= {axe:{tier:'basic',max:c.toolDurability},pick:{tier:'basic',max:c.toolDurability}};syncEquipment(p,c);}
   }
   changed(){this.state.revision++;this.dirty=true;this.onChange();}
-  join(name){
+  join(name,gender='unspecified'){
     name=String(name||'').trim().replace(/[<>\x00-\x1f]/g,'').slice(0,20);
-    if(!name)throw Error('Как тебя зовут?');
-    const id=randomUUID(),token=randomUUID();const p={id,token,name,x:8+(Object.keys(this.state.players).length%3)*0.8,y:8,color:Object.keys(this.state.players).length%3,wallet:0,bag:{wood:0,stone:0,food:0},tools:{axe:0,pick:0},equipped:'axe',hunger:100,health:100,stamina:100,spirit:false,job:null,results:[],lastMessage:0};
-    p.toolInfo={axe:{tier:'basic',max:this.c.toolDurability},pick:{tier:'basic',max:this.c.toolDurability}};this.state.players[id]=p;migrateLife(this);ensureLandscape(this);initForestry(this);this.changed();return p;
+    if(!name)throw Error('Как тебя зовут?');if(!['male','female','unspecified'].includes(gender))throw Error('Выбери корректное обращение');
+    const id=randomUUID(),token=randomUUID();const p={id,token,name,gender,x:8+(Object.keys(this.state.players).length%3)*0.8,y:8,color:Object.keys(this.state.players).length%3,wallet:0,bag:{wood:0,stone:0,food:0},tools:{axe:0,pick:0},equipped:'axe',hunger:100,health:100,stamina:100,spirit:false,job:null,results:[],lastMessage:0};
+    p.toolInfo={axe:{tier:'basic',max:this.c.toolDurability},pick:{tier:'basic',max:this.c.toolDurability}};this.state.players[id]=p;migrateLife(this);ensureLandscape(this);initForestry(this);initMayor(this);this.changed();return p;
   }
   auth(token){return Object.values(this.state.players).find(p=>p.token===token);}
   connect(p){this.online.add(p.id);this.inputs.set(p.id,{dx:0,dy:0,sprint:false,at:this.now});this.changed();}
@@ -143,13 +145,13 @@ export class Game {
     const done=p.results.find(r=>r.id===cmd.requestId);if(done)return done.result;
     let result;
     syncEquipment(p,this.c);try{result={ok:true,...this.action(p,cmd)};}catch(e){result={ok:false,message:e.message};}syncEquipment(p,this.c);
-    p.results.push({id:cmd.requestId,result});p.results=p.results.slice(-128);this.changed();return result;
+    if(result.ok&&!p.spirit)p.lastActiveGameplayAt=this.now;p.results.push({id:cmd.requestId,result});p.results=p.results.slice(-128);this.changed();return result;
   }
   action(p,cmd){const {type,target}=cmd,c=this.configFor(target),s=this.state,project=this.projectFor(target);
     const publicResult=plazaAction(this,p,cmd);if(publicResult)return publicResult;
     const discarded=cmd.type==='discardTool'?p.toolItems?.find(t=>t.id===target)?.ingredients:null;
     const equipmentResult=equipmentAction(p,cmd,this.c);if(equipmentResult){if(discarded){s.materialScrap||={wood:0,stone:0};for(const [kind,quantity]of Object.entries(discarded)){s.materialScrap[kind]+=quantity;recordMaterial(this,'tool-discard',kind,quantity,'tool','scrap',p.id);}}return equipmentResult;}
-    const forestryResult=forestryAction(this,p,cmd);if(forestryResult)return forestryResult;const livingResult=lifeAction(this,p,cmd);if(livingResult)return livingResult;
+    const estateResult=estateAction(this,p,cmd);if(estateResult)return estateResult;const ideaResult=mayorAction(this,p,cmd);if(ideaResult)return ideaResult;const forestryResult=forestryAction(this,p,cmd);if(forestryResult)return forestryResult;const livingResult=lifeAction(this,p,cmd);if(livingResult)return livingResult;
     const expansionResult=cityExpansionAction(this,p,cmd);if(expansionResult)return expansionResult;const landscapeResult=landscapeAction(this,p,cmd);if(landscapeResult)return landscapeResult;
     if(scene(p)!=='city'&&!['chat','eat','give','equip','cancel','drop','pickup'].includes(type))throw Error('Это действие доступно в городе');
     const cityResult=this.cityAction(p,cmd);if(cityResult)return cityResult;
@@ -201,7 +203,7 @@ export class Game {
       if(t.type!=='build')throw Error('Подойди к месту строительных работ');this.canBuild(target);if(s.treasury<c.pay.work)throw Error('Нет резерва оплаты');return this.start(p,'build',target,c.buildMs);
     }
     if(type==='buy'){
-      if(t.type!=='plot')throw Error('Это не участок');const plot=s.plots.find(x=>x.id===target);if(plot.locked)throw Error('Завершите миссию расчистки, чтобы открыть этот участок');if(plot.owner)throw Error('Участок уже куплен');if(s.plots.some(x=>x.owner===p.id))throw Error('В первой сцене можно купить один участок');if(p.wallet<c.plotPrice)throw Error(`Участок стоит ${c.plotPrice} PAPER`);
+      if(t.type!=='plot')throw Error('Это не участок');const plot=s.plots.find(x=>x.id===target);if(plot.locked)throw Error('Завершите миссию расчистки, чтобы открыть этот участок');if(plot.owner)throw Error('Участок уже куплен');if(p.wallet<c.plotPrice)throw Error(`Участок стоит ${c.plotPrice} PAPER`);
       p.wallet-=c.plotPrice;s.treasury+=c.plotPrice;plot.owner=p.id;s.transactions.push({id:randomUUID(),player:p.id,amount:-c.plotPrice,reason:'plot',time:this.now});return {message:'Твоё место в городе. Участок куплен!'};
     }
     throw Error('Неизвестное действие');
@@ -222,7 +224,7 @@ export class Game {
     this.changed();
     }catch{ /* Another player may complete the same final unit first; no payment is made. */ }
   }
-  tick(ms){this.now+=ms;for(const t of this.state.trades)if(t.status==='offered'&&t.expires<=this.now){t.status='expired';this.changed();}const dt=ms/1000,c=this.c;
+  tick(ms){this.now+=ms;tickEstateLeases(this);for(const t of this.state.trades)if(t.status==='offered'&&t.expires<=this.now){t.status='expired';this.changed();}const dt=ms/1000,c=this.c;
     for(const p of Object.values(this.state.players))if(p.delivery&&!p.delivery.picked&&p.delivery.expiresAt<=this.now){p.delivery=null;this.changed();}
     for(const r of this.state.resources)if(r.type==='food'&&r.regrowAt&&this.now>=r.regrowAt){r.stock=Math.min(c.foodStock,r.stock+1);r.regrowAt=r.stock<c.foodStock?this.now+c.berryRegrowMs:0;this.changed();}
     for(const id of this.online){const p=this.state.players[id];if(!p)continue;
@@ -230,6 +232,7 @@ export class Game {
       this.dirty=true;
       if(!p.spirit){p.hunger=Math.max(0,p.hunger-c.hungerPerSecond*dt);if(p.hunger===0){p.spirit=true;p.health=0;p.job=null;p.x=8;p.y=8;p.scene='city';p.plotId=null;p.stamina=100;this.inputs.set(p.id,{dx:0,dy:0,sprint:false,at:this.now});this.changed();}}
       const input=this.inputs.get(id);let moving=input&&this.now-input.at<400&&Math.hypot(input.dx,input.dy)>0;
+      if(!p.spirit&&(moving||p.lastActiveGameplayAt&&this.now-p.lastActiveGameplayAt<15000)){p.activeGameMs=Math.min(86400000,(p.activeGameMs||0)+Math.min(ms,250));}
       const sprint=moving&&input.sprint&&!p.spirit&&p.stamina>5&&p.hunger>=c.slowBelow;
       p.stamina=clamp(p.stamina+(sprint?-c.staminaDrain:c.staminaRegen)*dt,0,100);
       if(moving){const speed=(p.hunger<c.slowBelow&&!p.spirit?c.slowSpeed:c.speed)*(sprint?c.sprintMultiplier:1)*landscapeSpeed(this,p);const nx=p.x+input.dx*speed*dt,ny=p.y+input.dy*speed*dt;
@@ -238,9 +241,9 @@ export class Game {
       if(p.job&&this.now>=p.job.ends)this.finish(p);
     }
   }
-  snapshot(p){syncEquipment(p,this.c);const s=this.state,c=this.c;return {plaza:plazaSnapshot(this,p),...lifeSnapshot(this,p),now:this.now,revision:s.revision,me:p.id,config:c,treasury:s.treasury,citySolids:this.rects(),landscape:s.landscape,landscapeShop:LANDSCAPE_SHOP,landscapeProducts:LANDSCAPE_PRODUCTS,treeSpecies:TREE_SPECIES,project:s.project,forge:s.forge,seedMarket:s.seedMarket,gardenProject:s.gardenProject,publicGarden:s.publicGarden,materials:cityMaterialReport(this),materialEvents:s.materialEvents.slice(-30),bridge:{...s.bridge,reserved:{wood:this.committed('wood',false,'bridge'),stone:this.committed('stone',false,'bridge')}},plots:s.plots.map(({home,...plot})=>plot),resources:s.resources,
+  snapshot(p){syncEquipment(p,this.c);const s=this.state,c=this.c;return {plaza:plazaSnapshot(this,p),...lifeSnapshot(this,p),now:this.now,revision:s.revision,me:p.id,config:c,treasury:s.treasury,citySolids:this.rects(),landscape:s.landscape,landscapeShop:LANDSCAPE_SHOP,landscapeProducts:LANDSCAPE_PRODUCTS,treeSpecies:TREE_SPECIES,project:s.project,forge:s.forge,seedMarket:s.seedMarket,gardenProject:s.gardenProject,publicGarden:s.publicGarden,materials:cityMaterialReport(this),materialEvents:s.materialEvents.slice(-30),bridge:{...s.bridge,reserved:{wood:this.committed('wood',false,'bridge'),stone:this.committed('stone',false,'bridge')}},plots:s.plots.map(({home,...plot})=>({...plot,publicAccess:!!plot.owner&&(!plot.lease||plot.lease.dueAt>this.now)&&(plot.landUse==='business'||!!home?.open)})),mayorMail:s.mayorMail.filter(t=>t.player===p.id).slice(-10).map(t=>({id:t.id,text:t.text,at:t.at,reward:t.reward})),resources:s.resources,
     warehouse:{...s.warehouse,free:{wood:this.warehouseFree('wood'),stone:this.warehouseFree('stone')},funds:this.cityFunds()},courierOffers:['mayor','bridge'].flatMap(destination=>['wood','stone'].map(k=>this.courierOffer(k,destination))).filter(Boolean),drops:s.drops.filter(d=>(d.scene||'city')===scene(p)&&(scene(p)==='city'||d.plotId===p.plotId)),
-    players:Object.values(s.players).filter(o=>o.id===p.id||this.online.has(o.id)||s.plots.some(x=>x.owner===o.id)).map(o=>({id:o.id,name:o.name,x:o.x,y:o.y,scene:scene(o),plotId:o.plotId||null,color:o.color,online:this.online.has(o.id),spirit:o.spirit,...(o.id===p.id?{wallet:o.wallet,bag:o.bag,toolItems:o.toolItems,activeTools:o.activeTools,tools:o.tools,toolInfo:o.toolInfo,equipped:o.equipped,hunger:o.hunger,health:o.health,stamina:o.stamina,job:o.job,gardenTools:o.gardenTools,terrainBag:o.terrainBag,delivery:o.delivery||null}: {})})),
+    players:Object.values(s.players).filter(o=>o.id===p.id||this.online.has(o.id)||s.plots.some(x=>x.owner===o.id)).map(o=>({id:o.id,name:o.name,gender:o.gender||'unspecified',x:o.x,y:o.y,scene:scene(o),plotId:o.plotId||null,color:o.color,online:this.online.has(o.id),spirit:o.spirit,...(o.id===p.id?{wallet:o.wallet,bag:o.bag,toolItems:o.toolItems,activeTools:o.activeTools,tools:o.tools,toolInfo:o.toolInfo,equipped:o.equipped,hunger:o.hunger,health:o.health,stamina:o.stamina,job:o.job,gardenTools:o.gardenTools,terrainBag:o.terrainBag,activeGameMs:o.activeGameMs||0,mayorFeedback:{lastRewardAt:o.mayorFeedback?.lastRewardAt||0},delivery:o.delivery||null}: {})})),
     chat:s.chat.filter(m=>this.now-m.at<600000&&(m.scene||'city')===scene(p)&&(scene(p)==='city'||m.plotId===p.plotId)&&distance(p,m)<=c.chatRange).slice(-15)};
   }
 }
