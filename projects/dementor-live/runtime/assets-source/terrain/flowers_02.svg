@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="148" viewBox="0 0 256 148" data-style="DL-TERRAIN-01">
+<defs><clipPath id="diamond"><path d="M128 0 L256 74 L128 148 L0 74 Z"/></clipPath></defs>
+<path d="M128 0 L256 74 L128 148 L0 74 Z" fill="#9FAB8C"/>
+<g clip-path="url(#diamond)"><path d="M122 61 L116 52 L125 44 L140 49 L143 60 L133 67 Z" fill="#C58C7C"/><path d="M93 89 L85 80 L94 72 L107 75 L110 86 L102 94 Z" fill="#E7D8BA"/><path d="M159 98 L153 89 L160 81 L172 85 L174 95 L166 103 Z" fill="#B8654D"/></g></svg>
