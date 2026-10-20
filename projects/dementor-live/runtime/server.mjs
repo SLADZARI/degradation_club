@@ -177,7 +177,18 @@ const server=http.createServer(async(req,res)=>{
     if(url.pathname.startsWith('/music/')||url.pathname.startsWith('/custom-music/')){
       const track=game.musicCatalog.find(t=>t.url===url.pathname);if(!track){res.writeHead(404);res.end();return;}const dir=url.pathname.startsWith('/custom-music/')?musicDir:path.join(root,'public','music'),file=path.join(dir,decodeURIComponent(url.pathname.split('/').at(-1))),size=fs.statSync(file).size;const range=req.headers.range;let start=0,end=size-1,status=200;if(range){const m=/^bytes=(\d*)-(\d*)$/.exec(range);if(!m||(!m[1]&&!m[2])){res.writeHead(416,{'Content-Range':`bytes */${size}`});res.end();return;}if(!m[1]){start=Math.max(0,size-Number(m[2]));}else{start=Number(m[1]);if(m[2])end=Math.min(end,Number(m[2]));}if(!Number.isSafeInteger(start)||start>end||start>=size){res.writeHead(416,{'Content-Range':`bytes */${size}`});res.end();return;}status=206;res.setHeader('Content-Range',`bytes ${start}-${end}/${size}`);}res.writeHead(status,{'Content-Type':file.endsWith('.mp3')?'audio/mpeg':'audio/wav','Content-Length':end-start+1,'Accept-Ranges':'bytes','Cache-Control':'no-cache'});if(req.method==='HEAD'){res.end();return;}fs.createReadStream(file,{start,end}).pipe(res);return;
     }
-    const files={'/':'index.html','/app.js':'app.js','/life-ui.js':'life-ui.js','/plaza-ui.js':'plaza-ui.js','/city-ui.js':'city-ui.js','/estate-ui.js':'estate-ui.js','/telecom-ui.js':'telecom-ui.js','/admin-ui.js':'admin-ui.js','/civic-ui.js':'civic-ui.js','/world-ui.js':'world-ui.js','/world-ui-fixes.js':'world-ui-fixes.js','/world-quests.js':'world-quests.js','/styles.css':'styles.css','/combat':'combat.html','/combat.html':'combat.html','/combat.js':'combat.js','/combat.css':'combat.css','/manifest.webmanifest':'manifest.webmanifest'};
+    // DL-TERRAIN-01 immutable, allowlisted assets; no arbitrary filesystem reads.
+    const terrainFile=/^\/assets\/terrain\/(manifest\.json|dl-terrain-01-atlas-(?:128|256)-[a-f0-9]{12}\.(?:png|webp))$/.exec(url.pathname);
+    if(terrainFile){
+      const name=terrainFile[1],filePath=path.join(root,'public','assets','terrain',name);
+      if(!fs.existsSync(filePath)){res.writeHead(404);res.end('Terrain not built');return;}
+      const isManifest=name==='manifest.json';
+      res.writeHead(200,{'Content-Type':isManifest?'application/json; charset=utf-8':name.endsWith('.webp')?'image/webp':'image/png',
+        'Cache-Control':isManifest?'no-cache':'public, max-age=31536000, immutable'});
+      if(req.method==='HEAD'){res.end();return;}
+      fs.createReadStream(filePath).pipe(res);return;
+    }
+    const files={'/':'index.html','/app.js':'app.js','/life-ui.js':'life-ui.js','/plaza-ui.js':'plaza-ui.js','/city-ui.js':'city-ui.js','/estate-ui.js':'estate-ui.js','/telecom-ui.js':'telecom-ui.js','/admin-ui.js':'admin-ui.js','/civic-ui.js':'civic-ui.js','/world-ui.js':'world-ui.js','/world-ui-fixes.js':'world-ui-fixes.js','/world-quests.js':'world-quests.js','/styles.css':'styles.css','/terrain-01.js':'terrain-01.js','/combat':'combat.html','/combat.html':'combat.html','/combat.js':'combat.js','/combat.css':'combat.css','/manifest.webmanifest':'manifest.webmanifest'};
     const file=files[url.pathname];if(!file){res.writeHead(404);res.end('Not found');return;}
     const types={html:'text/html; charset=utf-8',js:'text/javascript; charset=utf-8',css:'text/css; charset=utf-8',webmanifest:'application/manifest+json; charset=utf-8'};
     res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'self'");
