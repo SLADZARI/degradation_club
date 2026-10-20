@@ -3,6 +3,7 @@ import {WORLD_SCENES,WORLD_CITY_TARGETS,WORLD_OBSTACLES,SECOND_BRIDGE,terrainBlo
 import {initSecondBridge,secondBridgeOpen,secondBridgeAction} from './second-bridge.mjs';
 import {PHONE_BOOTHS} from './telecom.mjs';
 import {civicAction,civicView} from './civic-earnings.mjs';
+import {losevAction,losevView} from './losev-courses.mjs';
 export {createWorld};
 export class Game extends CoreGame{
   constructor(state,c){
@@ -34,6 +35,7 @@ export class Game extends CoreGame{
     return super.walkable(x,y,p);
   }
   action(p,cmd){
+    const course=losevAction(this,p,cmd);if(course)return course;
     const task=civicAction(this,p,cmd);if(task)return task;
     const build=secondBridgeAction(this,p,cmd);if(build)return build;
     if(cmd?.type==='worldUse'||cmd?.type==='touristBuy')return worldTravelAction(this,p,cmd);
@@ -53,6 +55,7 @@ export class Game extends CoreGame{
     }
     base.worldTravel=worldTravelView(this,p);
     base.civicJobs=civicView(this,p);
+    base.losevCourse=losevView(p,this.now);
     return base;
   }
 
