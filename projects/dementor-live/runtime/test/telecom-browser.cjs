@@ -35,6 +35,7 @@ async function create(name,viewport){
  await a.locator('#phoneText').fill('Проверка пейджера с двух устройств.');
  await a.getByRole('button',{name:'ОТПРАВИТЬ · 1 PAPER'}).click();
  await b.waitForFunction(()=>state.telecom.unread===1,{timeout:10000});
+ await a.waitForFunction(()=>me.wallet===4,{timeout:10000});
  assert.equal(await a.evaluate(()=>me.wallet),4);
  await b.locator('#openPager').click();
  assert.match(await b.locator('#cityPanelRows').innerText(),/Проверка пейджера с двух устройств/);
