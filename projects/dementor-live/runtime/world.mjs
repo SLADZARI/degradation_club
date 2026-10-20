@@ -9,6 +9,7 @@ import {reconcileResourceClearance} from './resource-clearance.mjs';
 import {initForestry,forestryAction,TREE_SPECIES} from './forestry.mjs';
 import {initEstates,estateAction,tickEstateLeases} from './estate.mjs';
 import {bagCapacity} from './losev-courses.mjs';
+import {stoneSize} from './world-footprints.mjs';
 import {initMayor,mayorAction} from './mayor-ideas.mjs';
 
 const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
@@ -138,7 +139,12 @@ export class Game {
     const pile=s.drops.find(d=>d.id===id);if(pile)return pile;
     const r=s.resources.find(x=>x.id===id);if(r)return r;const plot=s.plots.find(x=>x.id===id);if(plot)return {...plot,type:'plot',x:plot.x+plot.w/2,y:plot.y-1};return null;
   }
-  near(p,target){if(!target||distance(p,target)>this.c.actionRange)throw Error('Подойди ближе к объекту');}
+  near(p,target){
+    if(!target)throw Error('Подойди ближе к объекту');
+    const size=stoneSize(target);
+    const near=size?Math.hypot(Math.max(0,Math.abs(p.x-target.x)-size/2),Math.max(0,Math.abs(p.y-target.y)-size/2)):distance(p,target);
+    if(near>this.c.actionRange)throw Error('Подойди ближе к объекту');
+  }
   transfer(p,amount,reason){if(!Number.isInteger(amount)||amount<0||this.state.treasury<amount)throw Error('Городской резерв исчерпан');this.state.treasury-=amount;p.wallet+=amount;this.state.transactions.push({id:randomUUID(),player:p.id,amount,reason,time:this.now});}
   input(p,{dx,dy,sprint}){if(!Number.isFinite(dx)||!Number.isFinite(dy))throw Error('Некорректное движение');const len=Math.hypot(dx,dy);this.inputs.set(p.id,{dx:len?dx/Math.max(1,len):0,dy:len?dy/Math.max(1,len):0,sprint:!!sprint,at:this.now});}
   command(p,cmd){
