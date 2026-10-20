@@ -1,3 +1,4 @@
+import {bagCapacity} from './losev-courses.mjs';
 // CIVIC Forestry v1 — five seeds, reusable soil, shovel, water and three timed stages.
 import {randomUUID} from 'node:crypto';
 import {recordMaterial} from './city-expansion.mjs';
@@ -52,7 +53,7 @@ export function forestryAction(g,p,cmd){
  if(!tree||growthStage(g.now,tree)<3||tree.stock<1)throw Error('Дерево ещё не выросло');
  if(p.equipped!=='axe'||!p.tools.axe)throw Error('Нужен исправный топор');
  const load=Object.entries(p.bag).reduce((n,[k,v])=>n+v*(g.c.weights[k]||0),0);
- if(load+1>g.c.capacity)throw Error('Нет места в рюкзаке');
+ if(load+1>bagCapacity(p,g.c,g.now))throw Error('Нет места в рюкзаке');
  tree.stock--;p.bag.wood++;p.tools.axe--;
  recordMaterial(g,'grown-tree-wood','wood',1,tree.id,'bag',p.id);
  if(!tree.stock)h.plantedTrees=h.plantedTrees.filter(t=>t.id!==tree.id);
