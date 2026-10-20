@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - 'release/dementor-live-world-p0-clean-*'
+      - 'fix/dementor-live-paper-cut-icons-v1-*'
     paths:
       - 'projects/dementor-live/runtime/**'
       - '.github/workflows/dementor-live-world-p0-release.yml'
