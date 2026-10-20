@@ -8,7 +8,7 @@ const root=path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const output=path.join(path.dirname(root),'dementor-live-workspace.zip');
 const excluded=new Set(['node_modules','data','.git','backups','.local','__pycache__']);
 const files=[];
-function scan(dir){for(const e of fs.readdirSync(path.join(root,dir),{withFileTypes:true})){const rel=path.join(dir,e.name);if(e.isSymbolicLink()||excluded.has(e.name)||e.name.startsWith('.env')||e.name==='.DS_Store'||e.name.endsWith('.zip'))continue;if(e.isDirectory())scan(rel);else if(e.isFile()&&e.name!=='MANIFEST.json')files.push(rel);}}
+function scan(dir){for(const e of fs.readdirSync(path.join(root,dir),{withFileTypes:true})){const rel=path.join(dir,e.name);if(e.isSymbolicLink()||excluded.has(e.name)||e.name.startsWith('.env')||e.name.startsWith('._')||e.name==='__MACOSX'||e.name==='.DS_Store'||e.name.endsWith('.zip'))continue;if(e.isDirectory())scan(rel);else if(e.isFile()&&e.name!=='MANIFEST.json')files.push(rel);}}
 scan('');files.sort();
 const manifest={project:'Dementor Live local workspace',createdAt:new Date().toISOString(),checks:fs.existsSync(path.join(root,'reports/check.json'))?JSON.parse(fs.readFileSync(path.join(root,'reports/check.json'),'utf8')):{browser:'NOT RUN',httpSse:'NOT RUN'},files:files.map(file=>{const bytes=fs.readFileSync(path.join(root,file));return {path:file.split(path.sep).join('/'),bytes:bytes.length,sha256:createHash('sha256').update(bytes).digest('hex')};})};
 fs.writeFileSync(path.join(root,'MANIFEST.json'),JSON.stringify(manifest,null,2)+'\n');files.push('MANIFEST.json');
