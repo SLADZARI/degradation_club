@@ -18,7 +18,7 @@ export const WORLD_CITY_TARGETS=[
   {id:'farlands-entry',type:'world-gate',x:143,y:60,title:'Дальние земли · вход',to:'farlands'},
   {id:'university-site',type:'world-preview',x:18,y:42,title:'Университет · будущие курсы'},
   {id:'robo-stadium-site',type:'world-preview',x:29,y:43,title:'Стадион Robo Games · проект'},
-  {id:'industry-site',type:'world-preview',x:73,y:69,title:'Производство и агротехника · проект'}
+  {id:'industry-site',type:'world-preview',x:94,y:67,title:'Производство и агротехника · проект'}
 ];
 export const SECOND_BRIDGE={x:34,y:53,w:4,h:10};
 const forest=[];
