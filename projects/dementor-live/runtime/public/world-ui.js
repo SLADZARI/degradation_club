@@ -25,7 +25,9 @@ blocked=function(x,y){
    if((state.telecom?.booths||[]).some(t=>Math.hypot(x-t.x,y-t.y)<.53))return true;
   if(region)return x<r||y<r||x>region.width-r||y>region.height-r;
   if(scene!=='city')return originalBlocked(x,y);
-  if((state.worldTravel.footprints||[]).some(o=>x+r>o.x&&x-r<o.x+o.w&&y+r>o.y&&y-r<o.y+o.h))return true;
+  const trail=state.worldTravel.summitTrail||[];
+  const onTrail=trail.some(([ax,ay],i)=>{if(!i)return false;const [bx,by]=trail[i-1],dx=ax-bx,dy=ay-by,t=Math.max(0,Math.min(1,((x-bx)*dx+(y-by)*dy)/(dx*dx+dy*dy)));return Math.hypot(x-bx-t*dx,y-by-t*dy)<=.95;});
+  if((state.worldTravel.footprints||[]).some(o=>(o.kind!=='mountain'||!onTrail)&&x+r>o.x&&x-r<o.x+o.w&&y+r>o.y&&y-r<o.y+o.h))return true;
   const c=state.config,b=state.worldTravel.secondBridge;
   if(x+r>c.river.x&&x-r<c.river.x+c.river.w&&y-r>=b.y&&y+r<=b.y+b.h)
     return state.worldTravel.secondBridgeProject?.stage!==2||x<r||y<r||x>c.width-r||y>c.height-r||state.resources.some(o=>o.stock>0&&o.type!=='food'&&Math.hypot(x-o.x,y-o.y)<.63);
@@ -153,7 +155,15 @@ function drawPaperPayphone(x,y){const p=screen(x,y),s=view.s;
 }
 function drawWorldGround(){
   const w=state?.worldTravel;if(!w||state.scene!=='city')return;
+  // All biome terrain is drawn as the bottom plane, below shared z-sorted sprites.
+  if(w.desert)groundRect(w.desert,'#eddbb3','#c8b78b');
+  for(const o of w.obstacles||[])if(o.biome==='mountain')groundRect(o,'#b6b0a2','#8e9186');
   for(const path of w.paths||[]){ctx.beginPath();path.forEach(([x,y],i)=>{const p=screen(x,y);i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y);});ctx.strokeStyle='#a99c7566';ctx.lineWidth=Math.max(3,view.s*.33);ctx.stroke();}
+  // A carved walking trail remains visually readable even when mountain layers overlap.
+  const trail=w.summitTrail||[];
+  if(trail.length){ctx.beginPath();trail.forEach(([x,y],i)=>{const p=screen(x,y);i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y);});ctx.strokeStyle='#796f59';ctx.lineWidth=Math.max(5,view.s*.24);ctx.stroke();ctx.strokeStyle='#e4d6b3';ctx.lineWidth=Math.max(2,view.s*.12);ctx.stroke();
+    const [x,y]=trail.at(-1);label('ВЕРШИНА · 100 м',x,y-1.4,true);
+  }
   const built=w.secondBridgeProject?.stage===2,started=w.secondBridgeProject?.stage===1,br=w.secondBridge;
   if(built){
     // One measured deck; supports, beams and plank endpoints use the same real coordinates.
@@ -168,13 +178,22 @@ function drawWorldGround(){
   else if(started){for(const x of [br.x+.5,br.x+br.w-.7])for(const y of [br.y+1,br.y+br.h/2,br.y+br.h-1]){const p=screen(x,y);line(p.x,p.y-7,p.x,p.y+4,'#998666',3);}groundRect({x:br.x-.5,y:br.y+.2,w:.7,h:br.h-.5},'#c9bb99','#827c66');}
   else {const p=screen(33,55);poly([[p.x-10,p.y],[p.x,p.y-8],[p.x+10,p.y],[p.x,p.y+8]],'#bcb79f','#8b8875');}
 }
+function drawCactus(t){const p=screen(t.x+.5,t.y+.5),s=view.s;shadow(p.x+4,p.y+3,s*.4,s*.13);
+  // Three paper layers: shadow, body, light edge. Silhouette is unique to this biome.
+  rounded(p.x-s*.12,p.y-s*1.23,s*.25,s*1.22,s*.11,'#738d78','#567363');
+  rounded(p.x-s*.43,p.y-s*.83,s*.22,s*.45,s*.11,'#8da38a','#617d69');
+  rounded(p.x+s*.19,p.y-s*.96,s*.25,s*.54,s*.1,'#8da38a','#617d69');
+  line(p.x-s*.12,p.y-s*.63,p.x-s*.32,p.y-s*.63,'#687f6a',Math.max(2,s*.11));
+  line(p.x+s*.11,p.y-s*.51,p.x+s*.32,p.y-s*.51,'#687f6a',Math.max(2,s*.11));
+}
 function worldEntities(){
   const w=state?.worldTravel;if(!w||state.scene!=='city')return [];
   const layers=[];
+  for(const c of w.cacti||[])layers.push({depth:c.x+c.y+c.w+c.h,draw:()=>drawCactus(c)});
   for(const o of w.obstacles||[]){
     const p=screen(o.x+o.w/2,o.y+o.h/2);if(p.x< -200||p.x>view.w+200||p.y< -250||p.y>view.h+250)continue;
     if(o.biome==='forest'&&!state.resources.some(t=>t.id==='forest-wood-'+o.x+'-'+o.y&&t.stock>0))continue;
-    layers.push({depth:o.x+o.w+o.y+o.h,draw:()=>{if(o.biome==='forest')drawTree({x:o.x+o.w/2,y:o.y+o.h/2,stock:12,visualVariant:state.resources.find(t=>t.id==='forest-wood-'+o.x+'-'+o.y)?.visualVariant??0});else{groundRect(o,'#b3b0a3','#868c86');drawStone({x:o.x+o.w/2,y:o.y+o.h/2,stock:16});}}});
+    layers.push({depth:o.x+o.w+o.y+o.h,draw:()=>{if(o.biome==='forest')drawTree({x:o.x+o.w/2,y:o.y+o.h/2,stock:12,visualVariant:state.resources.find(t=>t.id==='forest-wood-'+o.x+'-'+o.y)?.visualVariant??0});else{drawStone({x:o.x+o.w/2,y:o.y+o.h/2,stock:16});}}});
   }
   for(const t of w.targets||[]){
     const p=screen(t.x,t.y);if(p.x< -250||p.x>view.w+250||p.y< -250||p.y>view.h+250)continue;
