@@ -6,6 +6,9 @@ projectStage: PLANNING
 gate: G4_APPROVAL_PENDING
 status: DRAFT
 workStatus: WAITING_APPROVAL
+ownerScopeConfirmed: true
+g4PreparationAuthorized: true
+ownerDecision: https://github.com/SLADZARI/degradation_club/issues/237#issuecomment-6302633113
 version: 0.1
 updated: 2026-10-20
 owner: Modern Pilgrims
@@ -24,7 +27,13 @@ changeControlRequired: true
 
 # Portal VM Site Hosting Stage 1 · G4 proposal v0.1 — DRAFT, NOT APPROVED
 
-**Decision requested, NOT a permission to implement.** Canonical owner: [#237](https://github.com/SLADZARI/degradation_club/issues/237). Host readiness: [#255 / Draft #257](https://github.com/SLADZARI/degradation_club/pull/257). Portal-only private preview [Draft #258](https://github.com/SLADZARI/degradation_club/pull/258) is a DIFFERENT, non-authorizing Result and documents an approval-order deviation; do not reuse its G4 status to authorize public hosting. #228 baseline remains NO-GO. This file is intentionally unindexed/unactivated and must not update `.weekly-os/PROJECT.json` / `ARTIFACT_INDEX.json` / `APPROVED_STATE.json` before separate owner and authority review.
+**G4 decision still requested; owner has CONFIRMED the bounded scope and AUTHORIZED PREPARATION ONLY, not implementation.** Canonical owner: [#237](https://github.com/SLADZARI/degradation_club/issues/237). Host readiness: [#255 / Draft #257](https://github.com/SLADZARI/degradation_club/pull/257). Portal-only private preview [Draft #258](https://github.com/SLADZARI/degradation_club/pull/258) is a DIFFERENT, non-authorizing Result and documents an approval-order deviation; do not reuse its G4 status to authorize public hosting. #228 baseline remains NO-GO. Stage1 is intentionally **unindexed/unactivated**; the separately owner-authorized BQA-23 pause updated PROJECT/INDEX without making Stage1 current. `APPROVED_STATE.json` is unchanged.
+
+## Owner scope and priority decision (2026-10-20)
+
+**OWNER SCOPE CONFIRMED / G4 PREPARATION AUTHORIZED / G4 PASS STILL PENDING.** [Canonical owner decision](https://github.com/SLADZARI/degradation_club/issues/237#issuecomment-6302633113) explicitly confirms only the existing site/Workspace/Board/Join frontend hosting on the VM with the **current Supabase Cloud unchanged**; the team may finish G4 documentation and read-only host/QA readiness checks. **The owner did NOT authorize production, VM writes, Nginx reload, DNS, backend/Auth/data migration, source merge or any feature change.**
+
+**Kernel precondition update:** stale branch pointer corrected in [`e4cacb8`](https://github.com/SLADZARI/degradation_club/commit/e4cacb8ef1f962c534ad937fbbf6bdd125ad34de); BQA-23 [formally OWNER-PAUSED at G5](https://github.com/SLADZARI/degradation_club/commit/6c5d552d89c94e6662c78c2f9b54a9f576f54c13) with owning Result v0.2 status WAITING, no active integration branch and [Draft PR #252](https://github.com/SLADZARI/degradation_club/pull/252) preserved. **This Draft proposal branch is NOT an active Result/integration branch.** Stage1 G4 still needs explicit later approval and registration by the kernel owner with no competing integration owner.
 
 ## Goal and bounded outcome
 
@@ -39,18 +48,18 @@ Deliver **the existing Dementor Club public site + Workspace + Board + Join/DC-9
 - Operator evidence says a dual-SAN `dementor.club` / `www.dementor.club` VM certificate was issued (valid until 2027-01-15), with a DNS-01 hook configuration staged. **Actual future unattended renewal and live Nginx CA-valid chain/SNI remain NOT VERIFIED.** Reconfiguration and orphan TXT cleanup records from #255 are not automatic-renewal PASS.
 - Later than initial 2026-10-17 Nginx snapshot, **Dementor Live** was deployed to the same host with IP Host `138.199.144.94`, separate `dementor-live.conf`, loopback `127.0.0.1:14173`, Compose `dementor-live`, volume `dementor-live-world`. Current SHA/health and POST-GAME Nginx map still need read-only operator confirmation.
 - Protected legacy: **MDAO `/data/*`, `db-dev`, Nginx old vhosts, Docker networks/volumes, monitoring, n8n, Graylog, GitLab Runner**. NO content reads, writes, restarts, volume cleanup or repurposed default/IP game vhost.
-- Current kernel is internally inconsistent: top-level `activeIntegrationBranch=result/board-media-performance-v1` points to a CLOSED/G8 Result, while `currentResult=dementor-club.result.owner-admin-community-ops-v1` is ACTIVE/G5 with its own `integrationBranch=result/owner-admin-community-ops-v1`. Existing [BQA-23 Draft #252](https://github.com/SLADZARI/degradation_club/pull/252) must stay separate.
+- **RESOLVED (2026-10-20):** exact kernel branch mismatch repaired by [`e4cacb8`](https://github.com/SLADZARI/degradation_club/commit/e4cacb8ef1f962c534ad937fbbf6bdd125ad34de). BQA-23 is now **WAITING / OWNER-PAUSED** in [`6c5d552d`](https://github.com/SLADZARI/degradation_club/commit/6c5d552d89c94e6662c78c2f9b54a9f576f54c13); `currentResult` retains its WAITING pointer for traceability, but `activeIntegrationBranch=null` and implementation permissions are false. #252 remains Draft. Stage1 still not activated.
 
 ## Owner/authority decisions required BEFORE G4 PASS
 
-1. **KERNEL-1 — mechanical pointer correction authorization:** after validating current `PROJECT.json`, `ARTIFACT_INDEX.json` and both owning Result files, proposed temporary correction `activeIntegrationBranch: result/board-media-performance-v1 → result/owner-admin-community-ops-v1` to match the *currently* active Result; NO status, Gate, scope or code changes. Authority owner must approve the specific edit and exact base SHA. If they designate a different owner/result, STOP and reconcile rather than force this proposal.
-2. **KERNEL-2 — serial ownership:** authority owner/Lead must either finish/park the unrelated BQA-23 Owner Admin G5 track with explicit state and branch ownership, or approve a non-conflicting Stage 1 planning lane. Never replace the active `currentResult` by implication. Only **after** approval may a Stage 1 active integration branch be selected/registered. This Draft branch is NOT an integration branch.
-3. **G4-1 — scope and scope-out approval:** site-only Host/HTTPS serving on VM, same Cloud/PKCE URL in both `site-config.js` AND hard-coded `auth/callback/index.html`; no legacy route rewrites, game changes, new Table/RPC/Auth/Storage or domain switches. Existing Board composer and known mobile/guest P1 corrections require separate Web/UI Results and their own acceptance, not silent bundling in this infrastructure Result.
+1. **KERNEL-1 — DONE / VERIFIED:** owner's exact pointer fix [`e4cacb8`](https://github.com/SLADZARI/degradation_club/commit/e4cacb8ef1f962c534ad937fbbf6bdd125ad34de) corrected the stale top-level integration branch. No other pointer edits needed.
+2. **KERNEL-2 — OWNER PARK DONE:** [`6c5d552d`](https://github.com/SLADZARI/degradation_club/commit/6c5d552d89c94e6662c78c2f9b54a9f576f54c13) preserves BQA-23 as WAITING at last historic G5 with PR #252 Draft. Current implementation branch pointer is null. **Stage1 activation remains a separate next G4 decision**: on approval, reconcile WAITING BQA-23 into `waitingResults` and register only one Stage1 Result/integration branch. This Draft proposal branch is NOT that integration branch.
+3. **G4-1 — OWNER SCOPE CONFIRMED / G4 PASS PENDING:** owner permits G4 preparation for site-only Host/HTTPS serving on VM, same Cloud/PKCE URL in both `site-config.js` AND hard-coded `auth/callback/index.html`; no route rewrite, game, new Table/RPC/Auth/Storage or domain switch. **Implementation cannot start** before a separate recorded full G4 approval after exact host/QA evidence. Existing Board composer and mobile/guest P1 corrections require separate Web/UI Results and acceptance, never silent bundling.
 4. **HOST-1 — host operator and Club owner:** Kirill/authorized host operator supplies dated POST-GAME Nginx listener+effective vhost/default mapping, fresh RAM/CPU/disk+free backup capacity, and precise no-touch evidence for MDAO and Live, then approves exact **new-only** `dementor.club` Nginx file/symlink, `nginx -t`/controlled reload and STOP/rollback boundaries. This is separate from public DNS cutover approval.
 5. **TLS-1 — renewal proof:** demonstrate client-trusted apex+www CA full chain and SNI without `-k`, and explicit custodianship plus a testable unattended renewal mechanism; do not infer real renewal from active certbot.timer. An authorized guarded rehearsal may have ACME/DNS side effects and needs separate scope.
 6. **QA-1 — actor fixtures:** Q-01 requires existing authorized actor state map and non-sensitive fixture instructions for anonymous, Guest/DC-9, Applicant, Member, Dementor, Owner, CIRCLE outsider. The Board can invoke lifecycle-writing RPCs; do not describe opening the real Board as strictly read-only without checking actual calls and permissions.
 
-**Approvals: PENDING.** Club owner approval of this exact G4 scope does not replace Kirill host mutation consent, independent QA G6, clean G7 RC or final public DNS production release authorization.
+**Owner scope and G4 preparation: CONFIRMED. G4 PASS / implementation: PENDING.** This consent does not replace Kirill host mutation consent, independent QA G6, clean G7 RC or final public DNS production release authorization.
 
 ## Before-G6 frontend correction dependencies (SEPARATE Web/UI ownership)
 
@@ -77,7 +86,7 @@ All S1 checks remain **NOT VERIFIED on public VM**, unless a specifically dated 
 
 ## Execution lanes (parallel read-only; serial writes)
 
-- **Lead (existing #237):** reconcile kernel pointer with authority; isolate competing BQA-23; seek approval of this standalone Stage 1 G4. Gate status remains PENDING.
+- **Lead (existing #237):** kernel pointer and BQA-23 pause are VERIFIED in separate authority commits. Stage1 scope is owner-confirmed; collect remaining G4 evidence and seek the separate **implementation-authorizing** Stage1 G4 decision. Gate remains PENDING.
 - **A-01/I-01 DevOps (#255 / Draft #257):** dated post-game host headroom, no-MDAO-drift baseline, separated new-only Nginx config and renewal rehearsal contract; no sudo writes/reloads until host approval.
 - **F-01/Dev2 + Board owner (#256, #126, #227, PR #308):** accepted browser route/site transport as evidence, independent scoped Web/UI corrective review; no extra shell/Auth/Board implementation from this Result.
 - **Q-01 (#228):** independent CSS candidate review then separate P1-A/P1-B, full actor+Cloud+Storage negative matrix; no unapproved new users, payloads or Cloud writes.
@@ -85,9 +94,10 @@ All S1 checks remain **NOT VERIFIED on public VM**, unless a specifically dated 
 
 ## Owner/authority checklist to return in #237
 
-- [ ] Authority accepts specific stale-pointer correction while BQA-23 is still G5; exact base SHA and conflict handling recorded.
-- [ ] BQA-23 precedence / parking is decided; no simultaneous shared-state implementation branches.
-- [ ] Club owner approves bounded site-only Stage 1 G4 (without granting DNS/VM mutation).
+- [x] Exact kernel pointer repair approved and verified ([`e4cacb8`](https://github.com/SLADZARI/degradation_club/commit/e4cacb8ef1f962c534ad937fbbf6bdd125ad34de)).
+- [x] BQA-23 parked at historic G5, owning Result v0.2 WAITING and no active integration branch ([`6c5d552d`](https://github.com/SLADZARI/degradation_club/commit/6c5d552d89c94e6662c78c2f9b54a9f576f54c13)); PR #252 stays Draft.
+- [x] Owner confirms bounded site-only Stage1 scope and G4 preparation ([decision](https://github.com/SLADZARI/degradation_club/issues/237#issuecomment-6302633113)).
+- [ ] Approving authority/owner gives separate Stage1 **G4 PASS** for implementation after the required evidence; only then promote a current Result/one integration branch.
 - [ ] Kirill and owner approve exact Host-only config/reload scope after dated service/resource check.
 - [ ] Q-01 independently accepts G6 actor/privacy/visual evidence, then separately release G7 and public DNS owner signoff.
 
