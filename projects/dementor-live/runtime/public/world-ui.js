@@ -169,7 +169,7 @@ function drawWorldProps(){
     else if(t.type==='world-sign')paperBoard(t.x,t.y,'↗ '+t.title.slice(0,20));
     else if(t.type==='tourist'||t.type==='world-gate'||t.type==='world-preview'){
       paperHouse({x:t.x-1.3,y:t.y-1.8,w:t.id==='university-site'?3.2:t.id==='museum-entry'?2.8:2.35,h:t.id==='robo-stadium-site'?1.4:2.15},
-        t.type==='tourist'?'shop':t.id==='museum-entry'?'museum':t.id==='robo-stadium-site'?'arena':t.id==='university-site'?'academy':t.id==='industry-site'?'factory':'warehouse');
+        t.type==='tourist'?'shop':t.id==='museum-entry'?'museum':t.id==='robo-stadium-site'?'arena':t.id==='farlands-entry'?'gate':t.id==='industry-site'?'factory':'warehouse');
       label(t.title,t.x,t.y-2,true);
     }
   }
