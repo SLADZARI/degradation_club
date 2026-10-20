@@ -5,13 +5,13 @@
 set -Eeuo pipefail
 umask 077
 HOST="138.199.144.94"
-KEY="\${DEMENTOR_SSH_KEY:-$HOME/Downloads/dementor_server}"
-ID="\${DEMENTOR_BACKUP_ID:-latest}"
-SCRIPT_DIR="$(cd "$(dirname "\${BASH_SOURCE[0]}")" && pwd -P)"
+KEY="${DEMENTOR_SSH_KEY:-$HOME/Downloads/dementor_server}"
+ID="${DEMENTOR_BACKUP_ID:-latest}"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
 RUNTIME="$(cd "$SCRIPT_DIR/.." && pwd -P)"
-CANDIDATE="\${DEMENTOR_CANDIDATE_RUNTIME:-$RUNTIME}"
-MAX_GIB="\${DEMENTOR_QA_MAX_ARCHIVE_GIB:-16}"
-BASE="\${DEMENTOR_QA_HOME:-$HOME/Library/Application Support/DementorLivePrivateQA}"
+CANDIDATE="${DEMENTOR_CANDIDATE_RUNTIME:-$RUNTIME}"
+MAX_GIB="${DEMENTOR_QA_MAX_ARCHIVE_GIB:-16}"
+BASE="${DEMENTOR_QA_HOME:-$HOME/Library/Application Support/DementorLivePrivateQA}"
 WORK=""
 SUCCESS=no
 fail(){ printf '%s\n' "QA_RESTORE_STOP: $*" >&2; exit 1; }
@@ -33,7 +33,7 @@ NODE_MAJOR="$(node -p "Number(process.versions.node.split('.')[0])")"
 (( NODE_MAJOR >= 22 )) || fail "Node 22+ is required on isolated Mac"
 CANDIDATE_SHA="$(git -C "$CANDIDATE" rev-parse HEAD 2>/dev/null)" || fail "candidate must be a git checkout"
 [[ "$CANDIDATE_SHA" =~ ^[0-9a-f]{40}$ ]] || fail "candidate SHA unavailable"
-if [[ -n "\${DEMENTOR_CANDIDATE_SHA:-}" ]]; then
+if [[ -n "${DEMENTOR_CANDIDATE_SHA:-}" ]]; then
   [[ "$CANDIDATE_SHA" == "$DEMENTOR_CANDIDATE_SHA" ]] || fail "source candidate SHA changed; no restore"
 fi
 mkdir -p -- "$BASE"
@@ -48,8 +48,8 @@ SSH_OPTS=(-T -i "$KEY" -o BatchMode=yes -o IdentitiesOnly=yes
 # Docker, extract, copy, touching save, configuration, or service restart.
 cat > "$WORK/remote-readonly.sh" <<'VM'
 set -Eeuo pipefail
-MODE="\${1:-}"
-SELECTOR="\${2:-}"
+MODE="${1:-}"
+SELECTOR="${2:-}"
 ROOT=/srv/dementor-live/backups
 [[ -d "$ROOT" && ! -L "$ROOT" ]] || exit 3
 [[ "$SELECTOR" == latest || "$SELECTOR" =~ ^safe-[A-Za-z0-9_-]{8,96}$ ]] || exit 3
@@ -79,7 +79,7 @@ if [[ "$MODE" == inspect ]]; then
   printf 'backup_id=%s\narchive_sha256=%s\nworld_sha256=%s\narchive_bytes=%s\nworld_bytes=%s\n' \
     "$CHOSEN" "$ARCHIVE_HASH" "$WORLD_HASH" "$ARCHIVE_SIZE" "$WORLD_SIZE"
 elif [[ "$MODE" == fetch ]]; then
-  [[ "\${3:-}" == "$ARCHIVE_HASH" && "\${4:-}" == "$WORLD_HASH" ]] || exit 3
+  [[ "${3:-}" == "$ARCHIVE_HASH" && "${4:-}" == "$WORLD_HASH" ]] || exit 3
   # Two known regular files only; stdout is BINARY. All extraction stays on Mac.
   tar -cf - -C "$DIR" -- world.json full-world.tar.gz
 else
@@ -88,7 +88,7 @@ fi
 VM
 # Only approved host/identity; two *read-only* SSH sessions:
 # (1) immutable metadata, (2) stream pre-existing backup files to private Mac.
-META="$(ssh "\${SSH_OPTS[@]}" "root@$HOST" bash -s -- inspect "$ID" < "$WORK/remote-readonly.sh")" ||
+META="$(ssh "${SSH_OPTS[@]}" "root@$HOST" bash -s -- inspect "$ID" < "$WORK/remote-readonly.sh")" ||
   fail "read-only SSH metadata attestation failed; no copy made"
 field(){ printf '%s\n' "$META" | awk -F= -v k="$1" '$1==k {print $2;exit}'; }
 BACKUP_ID="$(field backup_id)"
@@ -112,7 +112,7 @@ PY
 (( FREE > ARCHIVE_BYTES*2 + 512*1024*1024 )) ||
   fail "insufficient free space for safe Mac-only copy"
 printf 'Inspect-only SSH complete; approved private copy selected (bytes=%s)\n' "$ARCHIVE_BYTES"
-if ! ssh "\${SSH_OPTS[@]}" "root@$HOST" bash -s -- fetch "$BACKUP_ID" "$ARCHIVE_HASH" "$WORLD_HASH" \
+if ! ssh "${SSH_OPTS[@]}" "root@$HOST" bash -s -- fetch "$BACKUP_ID" "$ARCHIVE_HASH" "$WORLD_HASH" \
     < "$WORK/remote-readonly.sh" 2> "$WORK/transfer-private.err" | tar -xf - -C "$WORK"; then
   fail "secure backup stream failed; private partial copy will be deleted"
 fi
