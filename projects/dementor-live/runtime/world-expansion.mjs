@@ -13,11 +13,12 @@ export const WORLD_CITY_TARGETS=[
   {id:'travel-sign',type:'world-sign',x:27,y:46,title:'Указатель: лес, горы, дальние земли'},
   {id:'forest-sign',type:'world-sign',x:20,y:56,title:'Лесная развилка'},
   {id:'mountain-sign',type:'world-sign',x:51,y:60,title:'Горный перевал'},
+  {id:'mountain-summit',type:'world-summit',x:75,y:37,title:'Вершина горы · памятная отметка'},
   {id:'museum-entry',type:'world-gate',x:96,y:60,title:'Музей смеха · вход',to:'museum'},
   {id:'farlands-entry',type:'world-gate',x:143,y:60,title:'Дальние земли · вход',to:'farlands'},
   {id:'university-site',type:'world-preview',x:18,y:42,title:'Университет · будущие курсы'},
   {id:'robo-stadium-site',type:'world-preview',x:29,y:43,title:'Стадион Robo Games · проект'},
-  {id:'industry-site',type:'world-preview',x:73,y:69,title:'Производство и агротехника · проект'}
+  {id:'industry-site',type:'world-preview',x:94,y:67,title:'Производство и агротехника · проект'}
 ];
 export const SECOND_BRIDGE={x:34,y:53,w:4,h:10};
 const forest=[];
@@ -26,6 +27,12 @@ for(let y=47;y<77;y+=5)for(let x=3;x<33;x+=5){
   if((x>=18&&x<=28&&y>=51&&y<=61)||(x>=27&&y<=65)||(x<13&&y>=56&&y<=66))continue;
   if((x*7+y*3)%11<8)forest.push({x,y,w:2.4,h:2.4,biome:'forest'});
 }
+// Forest beyond the factories and green region (kept clear of the main eastern path).
+for(const [x,y] of [[98,70],[104,74],[111,75],[127,73],[137,74]])forest.push({x,y,w:2.4,h:2.4,biome:'forest'});
+export const WORLD_DESERT={x:112,y:18,w:44,h:36};
+export const WORLD_CACTI=Object.freeze([[122,30],[130,45],[138,36],[149,26]].map(([x,y],i)=>({id:'desert-cactus-'+i,x,y,w:1,h:1,kind:'cactus'})));
+// A walkable trail through formerly solid mountain panels, with summit at the last point.
+export const WORLD_SUMMIT_TRAIL=Object.freeze([[51,60],[51,53],[51,49],[51,45],[51,41],[55,41],[60,40],[66,40],[72,40],[75,37]]);
 const mountain=[
   {x:46,y:30,w:11,h:18,biome:'mountain'}, {x:58,y:30,w:9,h:20,biome:'mountain'},
   {x:69,y:35,w:10,h:16,biome:'mountain'}, {x:81,y:30,w:11,h:19,biome:'mountain'},
@@ -83,7 +90,15 @@ export function worldTravelAction(g,p,cmd){
     p.worldTravel.purchaseReceipts[cmd.requestId]=receipt;
     return receipt;
   }
-  if(object.type==='world-sign')return {message:object.id==='forest-sign'?'Тропа ведёт в горы через вторую переправу; лесная чаща не везде проходима.':'По дороге на восток: лес → горы → музей смеха → дальние земли.'};
+  if(object.type==='world-sign')return {message:object.id==='mountain-sign'?'Горная тропа начинается здесь: подъём тратит силы и ускоряет голод. Иди до вершины и отдыхай на остановках.':object.id==='forest-sign'?'Тропа ведёт в горы через вторую переправу; лесная чаща не везде проходима.':'По дороге на восток: лес → горы → музей смеха → дальние земли.'};
+  if(object.type==='world-summit'){
+    p.worldTravel||={mapOwned:false,souvenirs:{shirt:0,souvenir:0},visited:['city']};
+    if(p.worldTravel.summitReachedAt)return {message:'Ты уже покорил эту вершину. Путешествие осталось в дневнике.'};
+    p.worldTravel.summitReachedAt=g.now;
+    const reward=g.cityFunds()>=40?40:0;
+    if(reward)g.transfer(p,reward,'summit-discovery');
+    return {message:'Ты поднялся на вершину!'+(reward?' · +40 PAPER из казны':' · Казна пока не выделила награду'),reward};
+  }
   if(object.type==='world-preview')return {message:object.title+' · стройка и механики появятся в следующих игровых обновлениях.'};
   if(object.type==='world-exhibit')return {message:object.id==='not-needed'?'«НЕ НАДО» — пьедестал дальних земель. Путешествие завершено, но мир продолжается.':'Музей смеха · первая выставка открыта, коллекция будет пополняться.'};
   if(object.type==='world-gate'){
@@ -107,7 +122,7 @@ export function worldTravelAction(g,p,cmd){
 export function worldTravelView(g,p){
   return {scene:p.scene||'city',targets:worldObjects(p.scene||'city'),
     booths:boothsForScene(p.scene||'city'),scenes:WORLD_SCENES,secondBridge:SECOND_BRIDGE,secondBridgeProject:g.state.secondBridgeProject,paths:WORLD_PATHS,
-    obstacles:(p.scene||'city')==='city'?WORLD_OBSTACLES:[],
+    obstacles:(p.scene||'city')==='city'?WORLD_OBSTACLES:[],desert:WORLD_DESERT,cacti:WORLD_CACTI,summitTrail:WORLD_SUMMIT_TRAIL,
     prices:TOURIST_PRICES,profile:p.worldTravel||{mapOwned:false,souvenirs:{shirt:0,souvenir:0},visited:['city']},
     worldWidth:g.c.width,worldHeight:g.c.height};
 }

@@ -15,8 +15,8 @@ allTargets=function(){
 };
 interaction=function(t){
   if(t?.type==='tourist')return {type:'tourist',title:'Туристическое бюро',hint:'Купить карту, майку, сувенир за PAPER',enabled:!me.spirit};
-  if(['world-gate','world-sign','world-exhibit','world-preview'].includes(t?.type))
-    return {type:'worldUse',title:t.title,hint:t.type==='world-gate'?'Войти / выйти · E':t.type==='world-preview'?'Посмотреть будущую площадку':'Исследовать · E',enabled:!me.spirit&&!me.job&&!me.delivery?.picked};
+  if(['world-gate','world-sign','world-exhibit','world-preview','world-summit'].includes(t?.type))
+    return {type:'worldUse',title:t.title,hint:t.type==='world-gate'?'Войти / выйти · E':t.type==='world-summit'?'Достиг вершины! Оставь отметку · E':t.type==='world-preview'?'Посмотреть будущую площадку':'Исследовать · E',enabled:!me.spirit&&!me.job&&!me.delivery?.picked};
   return originalInteraction(t);
 };
 blocked=function(x,y){
@@ -25,7 +25,9 @@ blocked=function(x,y){
    if((state.telecom?.booths||[]).some(t=>Math.hypot(x-t.x,y-t.y)<.53))return true;
   if(region)return x<r||y<r||x>region.width-r||y>region.height-r;
   if(scene!=='city')return originalBlocked(x,y);
-  if((state.worldTravel.obstacles||[]).some(o=>(o.biome!=='forest'||state.resources.some(t=>t.id==='forest-wood-'+o.x+'-'+o.y&&t.stock>0))&&x+r>o.x&&x-r<o.x+o.w&&y+r>o.y&&y-r<o.y+o.h))return true;
+  const trail=state.worldTravel.summitTrail||[];
+  const onTrail=trail.some(([ax,ay],i)=>{if(!i)return false;const [bx,by]=trail[i-1],dx=ax-bx,dy=ay-by,t=Math.max(0,Math.min(1,((x-bx)*dx+(y-by)*dy)/(dx*dx+dy*dy)));return Math.hypot(x-bx-t*dx,y-by-t*dy)<=.95;});
+  if((state.worldTravel.footprints||[]).some(o=>(o.kind!=='mountain'||!onTrail)&&x+r>o.x&&x-r<o.x+o.w&&y+r>o.y&&y-r<o.y+o.h))return true;
   const c=state.config,b=state.worldTravel.secondBridge;
   if(x+r>c.river.x&&x-r<c.river.x+c.river.w&&y-r>=b.y&&y+r<=b.y+b.h)
     return state.worldTravel.secondBridgeProject?.stage!==2||x<r||y<r||x>c.width-r||y>c.height-r||state.resources.some(o=>o.stock>0&&o.type!=='food'&&Math.hypot(x-o.x,y-o.y)<.63);
@@ -69,6 +71,8 @@ updateUI=function(){
     return;
   }
   originalUpdate();
+  const elevation=state?.worldTravel?.summitElevation||0;
+  if(elevation>0)$('worldNote').textContent='Горная тропа · высота '+elevation+' м · силы '+Math.round(me?.stamina||0)+'%';
 };
 updateCityPanels=function(force=false){
   if(cityPanelMode!=='tourist')return originalPanels(force);
@@ -151,25 +155,56 @@ function drawPaperPayphone(x,y){const p=screen(x,y),s=view.s;
   paperBox(p.x+s*.34,p.y-s*1.27,s*.43,s*.46,s*.08,-s*.05,'#ded5ba','#92876c','#f4edda');
   ctx.font=Math.max(7,s*.17)+'px Arial';ctx.fillStyle='#53665c';ctx.fillText('№',p.x+s*.59,p.y-s*1.02);
 }
-function drawWorldProps(){
+function drawWorldGround(){
   const w=state?.worldTravel;if(!w||state.scene!=='city')return;
+  // All biome terrain is drawn as the bottom plane, below shared z-sorted sprites.
+  if(w.desert)groundRect(w.desert,'#eddbb3','#c8b78b');
+  for(const o of w.obstacles||[])if(o.biome==='mountain')groundRect(o,'#b6b0a2','#8e9186');
   for(const path of w.paths||[]){ctx.beginPath();path.forEach(([x,y],i)=>{const p=screen(x,y);i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y);});ctx.strokeStyle='#a99c7566';ctx.lineWidth=Math.max(3,view.s*.33);ctx.stroke();}
-  const built=w.secondBridgeProject?.stage===2,started=w.secondBridgeProject?.stage===1;
-  if(built){groundRect(w.secondBridge,'#b9a785','#857b62');for(let y=54;y<62;y+=1.2){const a=screen(34,y),b=screen(38,y);line(a.x,a.y,b.x,b.y,'#d9cba7',1.8);}for(const x of [34,38]){const a=screen(x,53),b=screen(x,63);line(a.x,a.y-9,b.x,b.y-9,'#766e5a',2);}}
-  else if(started){for(const x of [34.5,37.3])for(const y of [54,57,60,62]){const p=screen(x,y);line(p.x,p.y-7,p.x,p.y+4,'#998666',3);}groundRect({x:33.5,y:53.2,w:.7,h:9.5},'#c9bb99','#827c66');}
+  // A carved walking trail remains visually readable even when mountain layers overlap.
+  const trail=w.summitTrail||[];
+  if(trail.length){ctx.beginPath();trail.forEach(([x,y],i)=>{const p=screen(x,y);i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y);});ctx.strokeStyle='#796f59';ctx.lineWidth=Math.max(5,view.s*.24);ctx.stroke();ctx.strokeStyle='#e4d6b3';ctx.lineWidth=Math.max(2,view.s*.12);ctx.stroke();
+    const [x,y]=trail.at(-1);label('ВЕРШИНА · 100 м',x,y-1.4,true);
+  }
+  const built=w.secondBridgeProject?.stage===2,started=w.secondBridgeProject?.stage===1,br=w.secondBridge;
+  if(built){
+    // One measured deck; supports, beams and plank endpoints use the same real coordinates.
+    groundRect(br,'#b9a785','#857b62');
+    for(let y=br.y+.6;y<br.y+br.h-.3;y+=.9){const a=screen(br.x+.3,y),b=screen(br.x+br.w-.3,y);line(a.x,a.y,b.x,b.y,'#e0d5b8',Math.max(1,view.s*.09));}
+    for(const x of [br.x+.15,br.x+br.w-.15]){
+      const a=screen(x,br.y),b=screen(x,br.y+br.h);
+      line(a.x,a.y-8,b.x,b.y-8,'#746c5c',Math.max(2,view.s*.09));
+      for(let y=br.y;y<=br.y+br.h;y+=2.2){const p=screen(x,y);line(p.x,p.y-8,p.x,p.y+3,'#756d5d',2);}
+    }
+  }
+  else if(started){for(const x of [br.x+.5,br.x+br.w-.7])for(const y of [br.y+1,br.y+br.h/2,br.y+br.h-1]){const p=screen(x,y);line(p.x,p.y-7,p.x,p.y+4,'#998666',3);}groundRect({x:br.x-.5,y:br.y+.2,w:.7,h:br.h-.5},'#c9bb99','#827c66');}
   else {const p=screen(33,55);poly([[p.x-10,p.y],[p.x,p.y-8],[p.x+10,p.y],[p.x,p.y+8]],'#bcb79f','#8b8875');}
+}
+function drawCactus(t){const p=screen(t.x+.5,t.y+.5),s=view.s;shadow(p.x+4,p.y+3,s*.4,s*.13);
+  // Three paper layers: shadow, body, light edge. Silhouette is unique to this biome.
+  rounded(p.x-s*.12,p.y-s*1.23,s*.25,s*1.22,s*.11,'#738d78','#567363');
+  rounded(p.x-s*.43,p.y-s*.83,s*.22,s*.45,s*.11,'#8da38a','#617d69');
+  rounded(p.x+s*.19,p.y-s*.96,s*.25,s*.54,s*.1,'#8da38a','#617d69');
+  line(p.x-s*.12,p.y-s*.63,p.x-s*.32,p.y-s*.63,'#687f6a',Math.max(2,s*.11));
+  line(p.x+s*.11,p.y-s*.51,p.x+s*.32,p.y-s*.51,'#687f6a',Math.max(2,s*.11));
+}
+function worldEntities(){
+  const w=state?.worldTravel;if(!w||state.scene!=='city')return [];
   const layers=[];
+  for(const c of w.cacti||[])layers.push({depth:c.x+c.y+c.w+c.h,draw:()=>drawCactus(c)});
   for(const o of w.obstacles||[]){
     const p=screen(o.x+o.w/2,o.y+o.h/2);if(p.x< -200||p.x>view.w+200||p.y< -250||p.y>view.h+250)continue;
     if(o.biome==='forest'&&!state.resources.some(t=>t.id==='forest-wood-'+o.x+'-'+o.y&&t.stock>0))continue;
-    layers.push({depth:o.x+o.w/2+o.y+o.h/2,draw:()=>{if(o.biome==='forest')drawTree({x:o.x+o.w/2,y:o.y+o.h/2,stock:12,visualVariant:state.resources.find(t=>t.id==='forest-wood-'+o.x+'-'+o.y)?.visualVariant??0});else{groundRect(o,'#b3b0a3','#868c86');drawStone({x:o.x+o.w/2,y:o.y+o.h/2,stock:16});}}});
+    layers.push({depth:o.x+o.w+o.y+o.h,draw:()=>{if(o.biome==='forest')drawTree({x:o.x+o.w/2,y:o.y+o.h/2,stock:12,visualVariant:state.resources.find(t=>t.id==='forest-wood-'+o.x+'-'+o.y)?.visualVariant??0});else{drawStone({x:o.x+o.w/2,y:o.y+o.h/2,stock:16});}}});
   }
   for(const t of w.targets||[]){
     const p=screen(t.x,t.y);if(p.x< -250||p.x>view.w+250||p.y< -250||p.y>view.h+250)continue;
-    layers.push({depth:t.x+t.y,draw:()=>{
+    const f=w.footprints?.find(o=>o.id==='structure-'+t.id||o.id===t.id);
+    layers.push({depth:f?.depth||t.x+t.y,draw:()=>{
       if(t.type==='payphone'){drawPaperPayphone(t.x,t.y);label('☎ Таксофон',t.x,t.y-1.6,true);}
       else if(t.type==='world-bridge'){paperBoard(t.x,t.y,w.secondBridgeProject?.stage===2?'Второй мост построен':'Стройка · мост');}
       else if(t.type==='world-sign')paperBoard(t.x,t.y,'↗ '+t.title.slice(0,20));
+      else if(t.type==='world-summit'){paperBoard(t.x,t.y,'▲ ВЕРШИНА · 100 м');}
       else if(t.type==='tourist'||t.type==='world-gate'||t.type==='world-preview'){
         paperHouse({x:t.x-1.3,y:t.y-1.8,w:t.id==='university-site'?3.2:t.id==='museum-entry'?2.8:2.35,h:t.id==='robo-stadium-site'?1.4:2.15},
           t.type==='tourist'?'shop':t.id==='museum-entry'?'museum':t.id==='robo-stadium-site'?'arena':t.id==='farlands-entry'?'gate':t.id==='industry-site'?'factory':'warehouse');
@@ -177,10 +212,7 @@ function drawWorldProps(){
       }
     }});
   }
-  for(const player of state.players.filter(p=>(p.online||p.id===me?.id)&&p.scene===state.scene)){
-    layers.push({depth:player.x+player.y,draw:()=>drawPlayer(player,performance.now())});
-  }
-  layers.sort((a,b)=>a.depth-b.depth);for(const layer of layers)layer.draw();
+  return layers;
 }
 function drawTravelScene(time){
   const region=state.worldTravel.scenes[state.scene];
@@ -208,7 +240,8 @@ function drawTravelScene(time){
 render=function(time){
   if(isTravelScene()){drawTravelScene(time);return;}
   originalRender(time);
-  drawWorldProps();
 };
+window.__worldGround=drawWorldGround;
+window.__worldEntities=worldEntities;
 window.__worldExpansionQA=()=>({scene:state?.scene,mapOwned:!!state?.worldTravel?.profile?.mapOwned,worldWidth:state?.config?.width,worldHeight:state?.config?.height,targetCount:allTargets().length,qaMode:!!state?.qaMode});
 })();

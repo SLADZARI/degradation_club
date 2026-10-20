@@ -1,3 +1,4 @@
+import {localFootprints, blockedByLocalFootprints} from './local-geometry.mjs';
 import { randomUUID } from 'node:crypto';
 import {syncEquipment,addTool,equipmentAction} from './equipment.mjs';
 import {initPlaza,plazaAction,plazaSnapshot,PLAZA} from './plaza.mjs';
@@ -9,6 +10,7 @@ import {reconcileResourceClearance} from './resource-clearance.mjs';
 import {initForestry,forestryAction,TREE_SPECIES} from './forestry.mjs';
 import {initEstates,estateAction,tickEstateLeases} from './estate.mjs';
 import {bagCapacity} from './losev-courses.mjs';
+import {stoneSize} from './world-footprints.mjs';
 import {initMayor,mayorAction} from './mayor-ideas.mjs';
 
 const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
@@ -58,7 +60,11 @@ export class Game {
  if(s.forge?.stage>=this.c.forge.stages.length)footprints.push({x:24,y:23,w:6,h:5,id:'forge'});
  if(s.gardenProject?.stage>=this.c.cityGarden.stages.length)footprints.push({x:25.5,y:8.4,w:5.6,h:2.5,id:'public-garden'});
  return footprints;}
-  walkable(x,y,p=null){if(p&&scene(p)!=='city'){if(x<.5||y<.5||x>15.5||y>15.5)return false;const h=scene(p)==='expedition'?this.state.expedition.home:this.state.plots.find(l=>l.id===p.plotId)?.home;if(['plot','expedition'].includes(scene(p))&&h?.nodes.some(n=>n.left>0&&Math.hypot(x-n.x,y-n.y)<.58))return false;if(scene(p)==='plot'&&h?.plantedTrees?.some(t=>{if(!t.wateredAt||this.now-t.wateredAt<180000)return false;const candidate=Math.hypot(x-t.x,y-t.y),prior=Math.hypot(p.x-t.x,p.y-t.y);return candidate<.55&&!(prior<.55&&candidate>prior+1e-6);}))return false;return true;}const r=.3,c=this.c;if(x<r||y<r||x>c.width-r||y>c.height-r)return false;
+  walkable(x,y,p=null){if(p&&scene(p)!=='city'){
+    if(x<.5||y<.5||x>15.5||y>15.5)return false;
+    const h=scene(p)==='expedition'?this.state.expedition.home:this.state.plots.find(l=>l.id===p.plotId)?.home;
+    return !blockedByLocalFootprints(x,y,localFootprints(scene(p),h,this.now),.3,{x:p.x,y:p.y});
+  }const r=.3,c=this.c;if(x<r||y<r||x>c.width-r||y>c.height-r)return false;
     if(x+r>c.river.x&&x-r<c.river.x+c.river.w&&!(this.state.bridge.stage>=c.bridge.stages.length&&y-r>=c.bridge.y&&y+r<=c.bridge.y+c.bridge.h))return false;
     if(this.rects().some(o=>x+r>o.x&&x-r<o.x+o.w&&y+r>o.y&&y-r<o.y+o.h))return false;
     return !this.state.resources.some(o=>o.stock>0&&o.type!=='food'&&Math.hypot(x-o.x,y-o.y)<.58);
@@ -138,7 +144,12 @@ export class Game {
     const pile=s.drops.find(d=>d.id===id);if(pile)return pile;
     const r=s.resources.find(x=>x.id===id);if(r)return r;const plot=s.plots.find(x=>x.id===id);if(plot)return {...plot,type:'plot',x:plot.x+plot.w/2,y:plot.y-1};return null;
   }
-  near(p,target){if(!target||distance(p,target)>this.c.actionRange)throw Error('Подойди ближе к объекту');}
+  near(p,target){
+    if(!target)throw Error('Подойди ближе к объекту');
+    const size=stoneSize(target);
+    const near=size?Math.hypot(Math.max(0,Math.abs(p.x-target.x)-size/2),Math.max(0,Math.abs(p.y-target.y)-size/2)):distance(p,target);
+    if(near>this.c.actionRange)throw Error('Подойди ближе к объекту');
+  }
   transfer(p,amount,reason){if(!Number.isInteger(amount)||amount<0||this.state.treasury<amount)throw Error('Городской резерв исчерпан');this.state.treasury-=amount;p.wallet+=amount;this.state.transactions.push({id:randomUUID(),player:p.id,amount,reason,time:this.now});}
   input(p,{dx,dy,sprint}){if(!Number.isFinite(dx)||!Number.isFinite(dy))throw Error('Некорректное движение');const len=Math.hypot(dx,dy);this.inputs.set(p.id,{dx:len?dx/Math.max(1,len):0,dy:len?dy/Math.max(1,len):0,sprint:!!sprint,at:this.now});}
   command(p,cmd){
@@ -236,8 +247,10 @@ export class Game {
       const input=this.inputs.get(id);let moving=input&&this.now-input.at<400&&Math.hypot(input.dx,input.dy)>0;
       if(!p.spirit&&(moving||p.lastActiveGameplayAt&&this.now-p.lastActiveGameplayAt<15000)){p.activeGameMs=Math.min(86400000,(p.activeGameMs||0)+Math.min(ms,250));}
       const sprint=moving&&input.sprint&&!p.spirit&&p.stamina>5&&p.hunger>=c.slowBelow;
-      p.stamina=clamp(p.stamina+(sprint?-c.staminaDrain:c.staminaRegen)*dt,0,100);
-      if(moving){const speed=(p.hunger<c.slowBelow&&!p.spirit?c.slowSpeed:c.speed)*(sprint?c.sprintMultiplier:1)*landscapeSpeed(this,p);const nx=p.x+input.dx*speed*dt,ny=p.y+input.dy*speed*dt;
+      const biome=moving&&typeof this.movementBiome==='function'?this.movementBiome(p,input):null;
+      p.stamina=clamp(p.stamina+(sprint?-c.staminaDrain:(biome?.staminaDelta??c.staminaRegen))*dt,0,100);
+      if(biome?.hungerExtra&&!p.spirit)p.hunger=Math.max(0,p.hunger-biome.hungerExtra*dt);
+      if(moving){const speed=(p.hunger<c.slowBelow&&!p.spirit?c.slowSpeed:c.speed)*(sprint?c.sprintMultiplier:1)*landscapeSpeed(this,p)*(biome?.speed??1);const nx=p.x+input.dx*speed*dt,ny=p.y+input.dy*speed*dt;
         if(this.walkable(nx,p.y,p))p.x=nx;if(this.walkable(p.x,ny,p))p.y=ny;p.job=null;this.dirty=true;
       }
       if(p.job&&this.now>=p.job.ends)this.finish(p);
