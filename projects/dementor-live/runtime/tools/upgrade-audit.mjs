@@ -70,7 +70,12 @@ const after=extract(roundtrip);
 for(const key of ['cities','players','ownedPlots','treasury','wallets','projectStages'])
  if(after[key]!==input[key])throw Error('Compatibility failure: aggregate '+key+' changed');
 for(const k of ['wood','stone'])if(after.stock[k]<input.stock[k])throw Error('Compatibility failure: world '+k+' stock decreased');
-for(const g of network.values())for(const p of Object.values(g.state.players))g.snapshot(p);
+// Crossing/building edits are not merely cosmetic: block migration if any persisted avatar
+// would spawn inside a now-impassable river, mountain, building or physical payphone.
+for(const g of network.values())for(const p of Object.values(g.state.players)){
+ if(!g.walkable(p.x,p.y,p))throw Error('Compatibility failure: a saved resident would spawn in a blocked cell; do not auto-deploy');
+ g.snapshot(p);
+}
 console.log(JSON.stringify({status:'PASS_READ_ONLY',sha256:createHash('sha256').update(buf).digest('hex'),
  schemaBefore:original.schema||'legacy',schemaAfter:roundtrip.schema,
  countsBefore:input,countsAfter:after,sourceFileUntouched:true},null,2));
