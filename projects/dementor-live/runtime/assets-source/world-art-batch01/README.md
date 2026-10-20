@@ -34,3 +34,7 @@ python3 test_assets.py
 Нет прямой установки в production, нет слияния игрового движка, нет browser/iPhone QA/Retina/FPS, нет художественного утверждения пользователем, нет полной сетки размеров CU, нет окончательной графики всех стадий зданий. Для крупных физических объектов нужны отдельные стадии и обрезка окклюзии с тестом глубины. Исходники представлены в отдельной ветке и архиве для дизайнерской проверки, без замены SVG/PNG текущего клиента.
 
 **Нельзя**: `--reset-world`, запись в `world.json`, изменение героя, импорт старых неутверждённых UI-картинок, выдача тестовой сцены за рабочую игру.
+
+## Repo test suite
+
+The checked-out branch stores SVG under `runtime/assets-source/world-art-batch01/`. The build script detects this layout and outputs PNG and atlases into `runtime/tools/world-art-batch01/build/` without changing public game files. Run `python3 tools/world-art-batch01/build.py && python3 tools/world-art-batch01/build_atlas.py && python3 tools/world-art-batch01/test_assets.py`. To regenerate the historical CSV audit, set `DL_ORIGAMI_REGISTRY_ZIP` and `DL_PHYSICAL_REGISTRY_ZIP` to local archived catalog ZIP paths.
