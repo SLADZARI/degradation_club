@@ -21,6 +21,32 @@ function connect(){stream?.close();motionFrames.length=0;stream=new EventSource(
 $('joinForm').onsubmit=async e=>{e.preventDefault();const button=e.target.querySelector('button');button.disabled=true;try{const result=await api('join',{name:$('nameInput').value,gender:$('genderInput').value});if(!result.ok){$('joinError').textContent=result.message;return;}token=result.token;sessionStorage.setItem('dementor-token',token);$('welcome').close();connect();canvas.focus();}catch{$('joinError').textContent='Сервер недоступен. Проверь локальный запуск.';}finally{button.disabled=false;}};
 if(token)api('state').then(r=>{if(r.me)connect();else if(!$('welcome').open)$('welcome').showModal();}).catch(()=>$('welcome').showModal());else $('welcome').showModal();
 
+// Mayor letter only after 15 minutes of verified, non-idle gameplay. Each dismissal resets its active-play clock.
+const IDEA_INTERVAL_MS=15*60*1000;
+let mayorIdeaNextByPlayer=new Map(),lastIdeaInteraction=performance.now();
+window.addEventListener('pointerdown',()=>{lastIdeaInteraction=performance.now();},{passive:true});
+window.addEventListener('keydown',()=>{lastIdeaInteraction=performance.now();});
+function postponeMayorIdea(){
+ if(!me)return;
+ const next=(me.activeGameMs||0)+IDEA_INTERVAL_MS;
+ mayorIdeaNextByPlayer.set(me.id,next);
+ try{sessionStorage.setItem('mayor-next-'+me.id,String(next));}catch{}
+ $('mayorIdea').close();
+}
+$('mayorIdeaLater').addEventListener('click',postponeMayorIdea);
+$('mayorIdeaForm').addEventListener('submit',async e=>{
+ e.preventDefault();if(!me)return;
+ const text=$('mayorIdeaText').value.trim();
+ const result=await act('mayorIdea',null,{text,fromPrompt:true});
+ if(result?.ok){$('mayorIdeaText').value='';postponeMayorIdea();}
+});
+setInterval(()=>{
+ if(!me||!connected||document.visibilityState!=='visible'||$('welcome').open||$('mayorIdea').open)return;
+ if(document.querySelector('dialog[open]')||performance.now()-lastIdeaInteraction>20000)return;
+ let next=mayorIdeaNextByPlayer.get(me.id);
+ if(next==null){const saved=Number(sessionStorage.getItem('mayor-next-'+me.id));next=saved>=IDEA_INTERVAL_MS?saved:IDEA_INTERVAL_MS;mayorIdeaNextByPlayer.set(me.id,next);}
+ if((me.activeGameMs||0)>=next){$('mayorIdea').showModal();}
+},5000);
 function forgeActive(){return state?.project.stage>=state?.config.stages.length;}
 function bridgeActive(){return state?.forge.stage>=state?.config.forge.stages.length;}
 function bridgeOpen(){return state?.bridge.stage>=state?.config.bridge.stages.length;}
