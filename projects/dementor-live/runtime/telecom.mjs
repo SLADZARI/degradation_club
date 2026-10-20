@@ -4,16 +4,16 @@ import {randomUUID} from 'node:crypto';
 export const PAGER_PRICE=180;
 export const PAGE_FEE=1;
 export const PHONE_BOOTHS=Object.freeze([
- {id:'phone-square',scene:'city',x:10,y:12,title:'Таксофон · городская площадь'},
- {id:'phone-tourist',scene:'city',x:25,y:42,title:'Таксофон · туристическая улица'},
- {id:'phone-forest',scene:'city',x:18,y:59,title:'Таксофон · у леса'},
- {id:'phone-mountain',scene:'city',x:52,y:57,title:'Таксофон · у перевала'},
- {id:'phone-museum-outside',scene:'city',x:94,y:59,title:'Таксофон · возле музея'},
- {id:'phone-farlands-outside',scene:'city',x:139,y:58,title:'Таксофон · дальние земли'},
- {id:'phone-museum',scene:'museum',x:3,y:11,title:'Таксофон · музей смеха'},
- {id:'phone-farlands',scene:'farlands',x:4,y:16,title:'Таксофон · дальние земли'},
- {id:'phone-home',scene:'plot',x:3,y:12,title:'Общий таксофон · участок'},
- {id:'phone-expedition',scene:'expedition',x:3,y:12,title:'Таксофон · экспедиция'}
+ {id:'phone-square',type:'payphone',scene:'city',x:10,y:12,title:'Таксофон · городская площадь'},
+ {id:'phone-tourist',type:'payphone',scene:'city',x:25,y:42,title:'Таксофон · туристическая улица'},
+ {id:'phone-forest',type:'payphone',scene:'city',x:18,y:59,title:'Таксофон · у леса'},
+ {id:'phone-mountain',type:'payphone',scene:'city',x:52,y:57,title:'Таксофон · у перевала'},
+ {id:'phone-museum-outside',type:'payphone',scene:'city',x:94,y:59,title:'Таксофон · возле музея'},
+ {id:'phone-farlands-outside',type:'payphone',scene:'city',x:139,y:58,title:'Таксофон · дальние земли'},
+ {id:'phone-museum',type:'payphone',scene:'museum',x:3,y:11,title:'Таксофон · музей смеха'},
+ {id:'phone-farlands',type:'payphone',scene:'farlands',x:4,y:16,title:'Таксофон · дальние земли'},
+ {id:'phone-home',type:'payphone',scene:'plot',x:3,y:12,title:'Общий таксофон · участок'},
+ {id:'phone-expedition',type:'payphone',scene:'expedition',x:3,y:12,title:'Таксофон · экспедиция'}
 ]);
 export const boothsForScene=scene=>PHONE_BOOTHS.filter(b=>b.scene===(scene||'city'));
 const NUMBER_START=410000;
