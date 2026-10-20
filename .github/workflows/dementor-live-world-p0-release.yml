@@ -27,6 +27,11 @@ jobs:
           node -e "if(require('./package.json').version!=='0.4.0-world-p0')process.exit(1)"
       - name: Model/syntax/QA checks
         run: npm run check
+      - name: Regression - malicious syntax in AppleDouble metadata must be ignored
+        run: |
+          printf '%s' 'this is not valid JavaScript!!!' > public/._world-ui.js
+          npm run check
+          rm -f public/._world-ui.js
       - name: Two-player HTTP/SSE test on disposable world
         run: npm run test:integration
       - name: Durable materials and restart on disposable world
