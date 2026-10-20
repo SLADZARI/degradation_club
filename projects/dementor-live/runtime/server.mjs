@@ -26,14 +26,14 @@ if(!testMode&&process.env.DEMENTOR_PUBLIC_URL){
   allowedHosts.add(publicUrl.host);
 }
 const stateFile=process.env.DEMENTOR_STATE||path.join(root,'data','world.json');
-const qaRecorder=createQARecorder(stateFile);
+const qaRecorder=createQARecorder(stateFile,{enabled:testMode||process.env.DEMENTOR_QA_LOG==='1'});
 fs.mkdirSync(path.dirname(stateFile),{recursive:true});
 const state=fs.existsSync(stateFile)?JSON.parse(fs.readFileSync(stateFile,'utf8')):createWorld();
 const legacySaveRequiresBackup=fs.existsSync(stateFile)&&state?.schema!=='dementor-cities-v1';
 let legacyBackupDone=false;
 const network=new CityNetwork(state);
 const game=network.origin;
-const stateFor=p=>({...network.snapshot(p),qaMode:testMode});
+const stateFor=p=>({...network.snapshot(p),qaMode:testMode,qaRecording:qaRecorder.enabled});
 const musicDir=path.join(root,'data','music');fs.mkdirSync(musicDir,{recursive:true});
 function refreshMusic(){network.setMusic(scanMusic([[path.join(root,'public','music'),'/music/'],[musicDir,'/custom-music/']]));}
 refreshMusic();
@@ -78,7 +78,7 @@ const server=http.createServer(async(req,res)=>{
         req.on('close',()=>{set.delete(res);if(set.size===0){streams.delete(p.id);qaRecorder.disconnect(p,network.findId(p.id)?.cityId);network.gameFor(p)?.disconnect(p);save();}});return;
       }
       if(url.pathname==='/api/state'){json(res,200,stateFor(p));return;}
-      if(url.pathname==='/api/qa-marker'&&req.method==='POST'){const info=await body(req),item=qaRecorder.marker(p,network.findId(p.id)?.cityId,info.label);json(res,200,{ok:true,marker:item});return;}
+      if(url.pathname==='/api/qa-marker'&&req.method==='POST'){if(!qaRecorder.enabled){json(res,403,{ok:false,message:'Включи DEMENTOR_QA_LOG=1 на тестовом сервере'});return;}const info=await body(req),item=qaRecorder.marker(p,network.findId(p.id)?.cityId,info.label);json(res,200,{ok:true,marker:item});return;}
       if(testMode&&url.pathname==='/api/qa-export'&&req.method==='GET'){res.writeHead(200,{'Content-Type':'application/x-ndjson; charset=utf-8','Content-Disposition':'attachment; filename="'+path.basename(qaRecorder.file)+'"','Cache-Control':'no-store'});res.end(qaRecorder.export());return;}
       if(url.pathname==='/api/combat/state'&&req.method==='GET'){
         const g=network.gameFor(p),id=p.combatP0?.activeSessionId||p.combatP0?.lastSessionId;
