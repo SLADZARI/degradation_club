@@ -13,7 +13,9 @@ async function post(route,payload,headers={}){
 async function goContext(page,id){
   await page.evaluate(id=>{selected=id;updateContext();},id);
   await page.waitForFunction(id=>context?.id===id&&context.enabled,id,{timeout:5000});
-  await page.locator('#actionButton').click();
+  const desktop=page.locator('#actionButton');
+  if(await desktop.isVisible())await desktop.click();
+  else await page.locator('#mobileActionButton').click();
 }
 (async()=>{try{
   server=spawn(process.execPath,['server.mjs','--test'],{cwd:root,env:{...process.env,DEMENTOR_PORT:String(port),DEMENTOR_STATE:path.join(tmp,'world.json')},stdio:['ignore','pipe','pipe']});
