@@ -1,0 +1,689 @@
+{
+  "schema": "DL-WORLD-UNIQUE-ISO30-01",
+  "version": "2026-10-20-1",
+  "items": 46,
+  "stage_assets": 21,
+  "source_branch": "feature/dementor-live-world-art-closure-batch02-2026-10-20",
+  "approval": "CANDIDATE",
+  "entries": [
+    {
+      "asset_id": "city-tool-shop",
+      "title": "Город · инструментальная лавка",
+      "game_id": "tool-shop",
+      "scope": "RC4",
+      "svg": "source/svg/city-tool-shop.svg",
+      "footprint_CU": [
+        2.6,
+        2.0
+      ],
+      "anchor": "southern base center; PENDING PIXEL<->CU CHECK",
+      "art_state": "CANDIDATE_NOT_APPROVED",
+      "gameplay_connected": false,
+      "sha256": "ea57640f2adeb1da3da72ef860684d5ece499aca40d79532d23cec267eae4dc8",
+      "png256_sha256": "d17b863c856e41b09f80f3ed38652df604e8098db189aa78418a03d8adb4bac2"
+    },
+    {
+      "asset_id": "city-garden-shop",
+      "title": "Город · лавка благоустройства",
+      "game_id": "garden-shop",
+      "scope": "RC4",
+      "svg": "source/svg/city-garden-shop.svg",
+      "footprint_CU": [
+        2.5,
+        2.2
+      ],
+      "anchor": "southern base center; PENDING PIXEL<->CU CHECK",
+      "art_state": "CANDIDATE_NOT_APPROVED",
+      "gameplay_connected": false,
+      "sha256": "4c4b86e70d54c881b60d497ea9455010667049c3373d7b741348e869899b1562",
+      "png256_sha256": "1da1d9aa8e16cb41fc42b69afa53a670bef68f4287a0006ce6019eec0cc57738"
+    },
+    {
+      "asset_id": "city-seed-shop",
+      "title": "Город · семенная лавка",
+      "game_id": "seed-market",
+      "scope": "RC4",
+      "svg": "source/svg/city-seed-shop.svg",
+      "footprint_CU": [
+        2.5,
+        2.0
+      ],
+      "anchor": "southern base center; PENDING PIXEL<->CU CHECK",
+      "art_state": "CANDIDATE_NOT_APPROVED",
+      "gameplay_connected": false,
+      "sha256": "93eb48d7560da530b7f28a60a843ffc91390bc57785e54fdd8d6868db95c9293",
+      "png256_sha256": "e0683bcff32ba56b2109bf0b4192b6d96fec506c66f40398e2ce24780fbb29e1"
+    },
+    {
+      "asset_id": "city-warehouse",
+      "title": "Город · склад",
+      "game_id": "warehouse",
+      "scope": "RC4",
+      "svg": "source/svg/city-warehouse.svg",
+      "footprint_CU": [
+        2.6,
+        3.0
+      ],
+      "anchor": "southern base center; PENDING PIXEL<->CU CHECK",
+      "art_state": "CANDIDATE_NOT_APPROVED",
+      "gameplay_connected": false,
+      "sha256": "ba45b39e5ebcaa470747f68d3238f6d9004d95d2d5b4fa991546fd076d79693d",
+      "png256_sha256": "c79194fce8070d74183c3e8ba84e35a3281b47a7b74ac6d7c22a5cace2af8f91"
+    },
+    {
+      "asset_id": "city-forge",
+      "title": "Город · кузница",
+      "game_id": "forge",
+      "scope": "RC4",
+      "svg": "source/svg/city-forge.svg",
+      "footprint_CU": [
+        6.0,
+        5.0
+      ],
+      "anchor": "southern base center; PENDING PIXEL<->CU CHECK",
+      "art_state": "CANDIDATE_NOT_APPROVED",
+      "gameplay_connected": false,
+      "sha256": "c481a36fb594a6000da8237c7d171ecb28ab82456151966493b00c213b75e677",
+      "png256_sha256": "0b22677dda510c623ca2017cc368509edfa673a13d2bae7e6f918ad05d580925"
+    },
+    {
+      "asset_id": "city-tourist-kiosk",
+      "title": "Город · туристический киоск",
+      "game_id": "tourist-kiosk",
+      "scope": "RC4",
+      "svg": "source/svg/city-tourist-kiosk.svg",
+      "footprint_CU": [
+        2.35,
+        1.25
+      ],
+      "anchor": "southern base center; PENDING PIXEL<->CU CHECK",
+      "art_state": "CANDIDATE_NOT_APPROVED",
+      "gameplay_connected": false,
+      "sha256": "a2679e09285ea03819cf95b09e5ae00bcd7451112baeb7e242181dd1d8779519",
+      "png256_sha256": "ff9ee6fcefa671293614b0131fdd17c97c83f3eaca486577579269bb05ed65c9"
+    },
+    {
+      "asset_id": "city-museum-gate",
+      "title": "Город · вход в музей смеха",
+      "game_id": "museum-entry",
+      "scope": "RC4",
+      "svg": "source/svg/city-museum-gate.svg",
+      "footprint_CU": [
+        2.8,
+        1.25
+      ],
+      "anchor": "southern base center; PENDING PIXEL<->CU CHECK",
+      "art_state": "CANDIDATE_NOT_APPROVED",
+      "gameplay_connected": false,
+      "sha256": "2d14ec0b2077d253ac23c6ecf31e2829642a319f9417dd318f1c2ba16dd5254e",
+      "png256_sha256": "351d1d9399132a25553fa87afbbab183d611a768d0495ec0da76c2fba5199f37"
+    },
+    {
+      "asset_id": "city-university-site",
+      "title": "Город · будущий университет",
+      "game_id": "university-site",
+      "scope": "RC4-PREVIEW",
+      "svg": "source/svg/city-university-site.svg",
+      "footprint_CU": [
+        3.2,
+        1.25
+      ],
+      "anchor": "southern base center; PENDING PIXEL<->CU CHECK",
+      "art_state": "CANDIDATE_NOT_APPROVED",
+      "gameplay_connected": false,
+      "sha256": "bf88518337508bdb414779253746efe191aac533aa5f753fe6ad1582b3c90b78",
+      "png256_sha256": "13c513d9bd4ca9c09db155ee52c75fabe83ce1b414a064407acdcb503575e2e1"
+    },
+    {
+      "asset_id": "city-robo-stadium-site",
+      "title": "Город · стадион Robo Games",
+      "game_id": "robo-stadium-site",
+      "scope": "RC4-PREVIEW",
+      "svg": "source/svg/city-robo-stadium-site.svg",
+      "footprint_CU": [
+        2.35,
+        1.0
+      ],
+      "anchor": "southern base center; PENDING PIXEL<->CU CHECK",
+      "art_state": "CANDIDATE_NOT_APPROVED",
+      "gameplay_connected": false,
+      "sha256": "de5aafb4086cd840b6aa6b07b0ab5b6b0690ccae2d01d5a5915bbd8ccc771f75",
+      "png256_sha256": "e05d6b43777080df02997c074ab0c32bf01f89a3f6834a862b112416b474d085"
+    },
+    {
+      "asset_id": "city-industry-site",
+      "title": "Город · будущая агротехника",
+      "game_id": "industry-site",
+      "scope": "RC4-PREVIEW",
+      "svg": "source/svg/city-industry-site.svg",
+      "footprint_CU": [
+        2.35,
+        1.25
+      ],
+      "anchor": "southern base center; PENDING PIXEL<->CU CHECK",
+      "art_state": "CANDIDATE_NOT_APPROVED",
+      "gameplay_connected": false,
+      "sha256": "f5f93aa5d724c6d5d56d570d424dd912c4d4c023ccabf3e6d456cf5f77ebf32e",
+      "png256_sha256": "98066b5b57860fe63b95fb8e777297092dc632978075233c8d761f1b2615b0f5"
+    },
+    {
+      "asset_id": "city-farlands-gate",
+      "title": "Город · ворота дальних земель",
+      "game_id": "farlands-entry",
+      "scope": "RC4",
+      "svg": "source/svg/city-farlands-gate.svg",
+      "footprint_CU": [
+        2.35,
+        1.25
+      ],
+      "anchor": "southern base center; PENDING PIXEL<->CU CHECK",
+      "art_state": "CANDIDATE_NOT_APPROVED",
+      "gameplay_connected": false,
+      "sha256": "8cd1422b4534707ad5e75184104130bdec7ab7c914d1373a2fd0352c3a1a43be",
+      "png256_sha256": "7032bc0f9e1572823a3a408bce65ca7772513618c06f029c29d75a02537bcb53"
+    },
+    {
+      "asset_id": "city-mayor-tent",
+      "title": "Временная мэрия · городская палатка",
+      "game_id": "mayor",
+      "scope": "RC4",
+      "svg": "source/svg/city-mayor-tent.svg",
+      "footprint_CU": [
+        4.0,
+        3.0
+      ],
+      "anchor": "southern base center; PENDING PIXEL<->CU CHECK",
+      "art_state": "CANDIDATE_NOT_APPROVED",
+      "gameplay_connected": false,
+      "sha256": "24f46cb15243c7a6ff8dedf59b49da4c3ac19ad1857278d49b4d5f5b758daf46",
+      "png256_sha256": "73d03dc7ecd71dff23bdbe13c02c0cdc755d78d09fc72cf25777d5fc9677b37b"
+    },
+    {
+      "asset_id": "plot-personal-tent",
+      "title": "Личная палатка · участок",
+      "game_id": "tent",
+      "scope": "RC4/PLOT",
+      "svg": "source/svg/plot-personal-tent.svg",
+      "footprint_CU": [
+        4.0,
+        3.0
+      ],
+      "anchor": "southern base center; PENDING PIXEL<->CU CHECK",
+      "art_state": "CANDIDATE_NOT_APPROVED",
+      "gameplay_connected": false,
+      "sha256": "c6161a20a38965b5ed8b3bf6dac604de010bfd2842260e0ce1ef3115674a067e",
+      "png256_sha256": "22b11bc2b5c9276bb3b851d6b2cb9a88585051ae5255125cea22c56fcd2917e3"
+    },
+    {
+      "asset_id": "city-garden-pavilion",
+      "title": "Город · общественный огород",
+      "game_id": "public-garden",
+      "scope": "RC4",
+      "svg": "source/svg/city-garden-pavilion.svg",
+      "footprint_CU": [
+        5.6,
+        2.5
+      ],
+      "anchor": "southern base center; PENDING PIXEL<->CU CHECK",
+      "art_state": "CANDIDATE_NOT_APPROVED",
+      "gameplay_connected": false,
+      "sha256": "b7ebb11091a538cdf43f52e8a010110c28fb32732d2f8266a4f2946e9aa914eb",
+      "png256_sha256": "3dc3f10bd0b5fb594722b3874ebc06fe42a2b7a237568162e151b06b3ab5edde"
+    },
+    {
+      "asset_id": "plot-garden-bed-empty",
+      "title": "Грядка · пустая",
+      "game_id": "garden-bed",
+      "scope": "GRID-02",
+      "svg": "source/svg/plot-garden-bed-empty.svg",
+      "footprint_CU": [
+        1.1,
+        1.1
+      ],
+      "anchor": "southern base center; PENDING PIXEL<->CU CHECK",
+      "art_state": "CANDIDATE_NOT_APPROVED",
+      "gameplay_connected": false,
+      "sha256": "d8a5c4adcdadbc8df3c296d51d601d73b8788d169d9f03da45b2b001343c7114",
+      "png256_sha256": "8e8923a2aae06a5a7bb3be280549a75f75fab380c03845ca8287dc04046ee2fe"
+    },
+    {
+      "asset_id": "plot-garden-bed-seeded",
+      "title": "Грядка · посажена",
+      "game_id": "garden-bed",
+      "scope": "GRID-02",
+      "svg": "source/svg/plot-garden-bed-seeded.svg",
+      "footprint_CU": [
+        1.1,
+        1.1
+      ],
+      "anchor": "southern base center; PENDING PIXEL<->CU CHECK",
+      "art_state": "CANDIDATE_NOT_APPROVED",
+      "gameplay_connected": false,
+      "sha256": "6d98686bf410cf1bfddf5098bc5d866ef55980da0633e952eb0ad41d6edb21d7",
+      "png256_sha256": "37e356bff21b464aad8a899a08199e9a0af5b8e93206d127ea1bd8ab17497bb7"
+    },
+    {
+      "asset_id": "plot-garden-bed-hemp",
+      "title": "Грядка · конопля растёт",
+      "game_id": "garden-bed",
+      "scope": "GRID-02",
+      "svg": "source/svg/plot-garden-bed-hemp.svg",
+      "footprint_CU": [
+        1.1,
+        1.1
+      ],
+      "anchor": "southern base center; PENDING PIXEL<->CU CHECK",
+      "art_state": "CANDIDATE_NOT_APPROVED",
+      "gameplay_connected": false,
+      "sha256": "a82355a2e21b9bde93c4aa0b2bc520fde58cae738a03f44aec50800a14bd091e",
+      "png256_sha256": "67e9d189e632561180484d2ee398acfbc1179b2d18197828789c5a5f4424b20f"
+    },
+    {
+      "asset_id": "plot-garden-bed-carrot",
+      "title": "Грядка · морковь растёт",
+      "game_id": "garden-bed",
+      "scope": "GRID-02",
+      "svg": "source/svg/plot-garden-bed-carrot.svg",
+      "footprint_CU": [
+        1.1,
+        1.1
+      ],
+      "anchor": "southern base center; PENDING PIXEL<->CU CHECK",
+      "art_state": "CANDIDATE_NOT_APPROVED",
+      "gameplay_connected": false,
+      "sha256": "a64ef8d2fe797d9ebdaef1b33386125aac659e51d6c147acbfe624f88ca39c7a",
+      "png256_sha256": "3f1574c2263676cf06b08b270ea06a9a8304ccea626c7b80fb0be9a1dc834a68"
+    },
+    {
+      "asset_id": "plot-garden-bed-ready",
+      "title": "Грядка · готова к сбору",
+      "game_id": "garden-bed",
+      "scope": "GRID-02",
+      "svg": "source/svg/plot-garden-bed-ready.svg",
+      "footprint_CU": [
+        1.1,
+        1.1
+      ],
+      "anchor": "southern base center; PENDING PIXEL<->CU CHECK",
+      "art_state": "CANDIDATE_NOT_APPROVED",
+      "gameplay_connected": false,
+      "sha256": "51bbddd2349c5a21e508f79cf6580a025b8a86a17242658e7d70a2bcbf64bc6b",
+      "png256_sha256": "208ef80dbdba4e6494d97f4936d600491180c1b8a9661e6a66be3e4765a40977"
+    },
+    {
+      "asset_id": "city-park-bench",
+      "title": "Скамейка · городская",
+      "game_id": "bench",
+      "scope": "RC4",
+      "svg": "source/svg/city-park-bench.svg",
+      "footprint_CU": null,
+      "anchor": "southern base center; PENDING PIXEL<->CU CHECK",
+      "art_state": "CANDIDATE_NOT_APPROVED",
+      "gameplay_connected": false,
+      "sha256": "14ecbb0e251d56c7e4db7ef389018dd6156b42ead8667bafc12ea20c4e24056a",
+      "png256_sha256": "deb5722ad867d22bd049790468ccc5585843820e08a82b6922b46836a7535a6d"
+    },
+    {
+      "asset_id": "city-garden-bench",
+      "title": "Скамейка · огородная",
+      "game_id": "bench",
+      "scope": "RC4",
+      "svg": "source/svg/city-garden-bench.svg",
+      "footprint_CU": null,
+      "anchor": "southern base center; PENDING PIXEL<->CU CHECK",
+      "art_state": "CANDIDATE_NOT_APPROVED",
+      "gameplay_connected": false,
+      "sha256": "d09826963d64eae82b2922d1fb8105080ec65392aa793c529841769d3a45270d",
+      "png256_sha256": "bb9d614069c9923b28cd11e73975ea7395e9c3aaaf52c6056154b7c3d34a2245"
+    },
+    {
+      "asset_id": "interior-chair-wood",
+      "title": "Стул · деревянный",
+      "game_id": "chair",
+      "scope": "GRID-02",
+      "svg": "source/svg/interior-chair-wood.svg",
+      "footprint_CU": null,
+      "anchor": "southern base center; PENDING PIXEL<->CU CHECK",
+      "art_state": "CANDIDATE_NOT_APPROVED",
+      "gameplay_connected": false,
+      "sha256": "ab99158f2f57b52e6d9f2e5caaa0d41bb1204824a3bd831ea988d3da36437834",
+      "png256_sha256": "91a56e1e0ac7a1adb4144ce0ec810e171f9880e138e8b18338530be560b22b73"
+    },
+    {
+      "asset_id": "interior-chair-sage",
+      "title": "Стул · зелёный",
+      "game_id": "chair",
+      "scope": "GRID-02",
+      "svg": "source/svg/interior-chair-sage.svg",
+      "footprint_CU": null,
+      "anchor": "southern base center; PENDING PIXEL<->CU CHECK",
+      "art_state": "CANDIDATE_NOT_APPROVED",
+      "gameplay_connected": false,
+      "sha256": "a42d473f405d3e5be3de6015abfb4fa55dcc13ef8d4f773418555cc4b4b9d0ac",
+      "png256_sha256": "1d8e2e4ed2a14592bd81a0f2531634dff7c365b5adbe670f35d261895d1fcea3"
+    },
+    {
+      "asset_id": "interior-table",
+      "title": "Стол · интерьер",
+      "game_id": "table",
+      "scope": "GRID-02",
+      "svg": "source/svg/interior-table.svg",
+      "footprint_CU": null,
+      "anchor": "southern base center; PENDING PIXEL<->CU CHECK",
+      "art_state": "CANDIDATE_NOT_APPROVED",
+      "gameplay_connected": false,
+      "sha256": "27f048c0ddae9c16a4b5a698808c6d1e766eedb99225975a3759af793911be7f",
+      "png256_sha256": "3cfdd3780a2a5d897946c85585397827616cc7d228f7ffba64a537ca390e8592"
+    },
+    {
+      "asset_id": "interior-chest",
+      "title": "Сундук · интерьер",
+      "game_id": "chest",
+      "scope": "GRID-02",
+      "svg": "source/svg/interior-chest.svg",
+      "footprint_CU": [
+        1.6,
+        1.3
+      ],
+      "anchor": "southern base center; PENDING PIXEL<->CU CHECK",
+      "art_state": "CANDIDATE_NOT_APPROVED",
+      "gameplay_connected": false,
+      "sha256": "4b0e9bda44832803e319ef018f92382edff591d08893f6cbc4a633ae7ba0ee64",
+      "png256_sha256": "ad3003159575773f1e711816b5a3006fb633bff216618e45a90155747799aa09"
+    },
+    {
+      "asset_id": "city-mayor-tent--stage-0",
+      "title": "Временная мэрия · городская палатка · stage 0",
+      "game_id": "mayor",
+      "physical_object_id": "DL-012",
+      "stage_candidate": 0,
+      "mapping_status": "NOT_MAPPED_TO_SERVER_STAGE",
+      "scope": "RC4",
+      "svg": "source/svg/city-mayor-tent--stage-0.svg",
+      "art_state": "CANDIDATE_NOT_APPROVED",
+      "gameplay_connected": false,
+      "sha256": "02ce69fcba9ebc3e61966adc67ea50eda1f4ba60c4cee0bcab52427535dc35e4",
+      "png256_sha256": "87861d9d5b8c8eda03a68794a74c662ba2fe4635ee26dd57862fd7dedfc39c92"
+    },
+    {
+      "asset_id": "city-mayor-tent--stage-1",
+      "title": "Временная мэрия · городская палатка · stage 1",
+      "game_id": "mayor",
+      "physical_object_id": "DL-012",
+      "stage_candidate": 1,
+      "mapping_status": "NOT_MAPPED_TO_SERVER_STAGE",
+      "scope": "RC4",
+      "svg": "source/svg/city-mayor-tent--stage-1.svg",
+      "art_state": "CANDIDATE_NOT_APPROVED",
+      "gameplay_connected": false,
+      "sha256": "fbd07093a2a29636b7aa117a2b2891bc9c061f1fe69ce93f59f210ead555aabe",
+      "png256_sha256": "9d4d2a83e6059814a58dbb3f48249c940eee23d935162f2fcb47f37bf7bc4753"
+    },
+    {
+      "asset_id": "city-mayor-tent--stage-2",
+      "title": "Временная мэрия · городская палатка · stage 2",
+      "game_id": "mayor",
+      "physical_object_id": "DL-012",
+      "stage_candidate": 2,
+      "mapping_status": "NOT_MAPPED_TO_SERVER_STAGE",
+      "scope": "RC4",
+      "svg": "source/svg/city-mayor-tent--stage-2.svg",
+      "art_state": "CANDIDATE_NOT_APPROVED",
+      "gameplay_connected": false,
+      "sha256": "cab3f682836e5a728430a028488a5bf56824e820cc271888307a78ed69649ff6",
+      "png256_sha256": "7cee5a161a50f57bb08e31c18a4ea1991a29b674c90fd5e7f4ae4339220e5ae0"
+    },
+    {
+      "asset_id": "plot-personal-tent--stage-0",
+      "title": "Личная палатка · участок · stage 0",
+      "game_id": "tent",
+      "physical_object_id": "DL-020",
+      "stage_candidate": 0,
+      "mapping_status": "NOT_MAPPED_TO_SERVER_STAGE",
+      "scope": "RC4/PLOT",
+      "svg": "source/svg/plot-personal-tent--stage-0.svg",
+      "art_state": "CANDIDATE_NOT_APPROVED",
+      "gameplay_connected": false,
+      "sha256": "d41205756ceffab5886ac9fe658558b4162b1c8dbda8b0f94c9585895e3070b1",
+      "png256_sha256": "377ee0ba7057eb1566b65786c1c0373aefeb330af5b212f03991472ddd15f394"
+    },
+    {
+      "asset_id": "plot-personal-tent--stage-1",
+      "title": "Личная палатка · участок · stage 1",
+      "game_id": "tent",
+      "physical_object_id": "DL-020",
+      "stage_candidate": 1,
+      "mapping_status": "NOT_MAPPED_TO_SERVER_STAGE",
+      "scope": "RC4/PLOT",
+      "svg": "source/svg/plot-personal-tent--stage-1.svg",
+      "art_state": "CANDIDATE_NOT_APPROVED",
+      "gameplay_connected": false,
+      "sha256": "315560d627a23565f7da408d77e425292231018d259ec13fc0269d8eb757a349",
+      "png256_sha256": "c5c3489360c95c47e875903d6c2c7dd0c38f9038f9ad3d0e7a2e689ffdb08c3e"
+    },
+    {
+      "asset_id": "plot-personal-tent--stage-2",
+      "title": "Личная палатка · участок · stage 2",
+      "game_id": "tent",
+      "physical_object_id": "DL-020",
+      "stage_candidate": 2,
+      "mapping_status": "NOT_MAPPED_TO_SERVER_STAGE",
+      "scope": "RC4/PLOT",
+      "svg": "source/svg/plot-personal-tent--stage-2.svg",
+      "art_state": "CANDIDATE_NOT_APPROVED",
+      "gameplay_connected": false,
+      "sha256": "3aa3e180207290ee311a255d93b2b765f34d8151c782ae74e5a28d43df455019",
+      "png256_sha256": "d023d13a7edad5a0fa70f5f8a74e9bfd222aa0b4ffc69bb5b36cf2b7e88b5591"
+    },
+    {
+      "asset_id": "city-forge--stage-0",
+      "title": "Город · кузница · stage 0",
+      "game_id": "forge",
+      "physical_object_id": "DL-014",
+      "stage_candidate": 0,
+      "mapping_status": "NOT_MAPPED_TO_SERVER_STAGE",
+      "scope": "RC4",
+      "svg": "source/svg/city-forge--stage-0.svg",
+      "art_state": "CANDIDATE_NOT_APPROVED",
+      "gameplay_connected": false,
+      "sha256": "ea5010a2d0ff4ee26dfa999419a5dfd8959c298ae36f8403afe9f183a20cb5fa",
+      "png256_sha256": "7b47ffb499a163b0563bdfb79e48d0a387a485878db964934836b3ca48bc17d9"
+    },
+    {
+      "asset_id": "city-forge--stage-1",
+      "title": "Город · кузница · stage 1",
+      "game_id": "forge",
+      "physical_object_id": "DL-014",
+      "stage_candidate": 1,
+      "mapping_status": "NOT_MAPPED_TO_SERVER_STAGE",
+      "scope": "RC4",
+      "svg": "source/svg/city-forge--stage-1.svg",
+      "art_state": "CANDIDATE_NOT_APPROVED",
+      "gameplay_connected": false,
+      "sha256": "1435c553d258179252266249346da2bc9c988523bf5804c2dfef95603e396061",
+      "png256_sha256": "74772bfd3605beb421341ea66256eaa51e56519b635b5a70b43b29b5e353f974"
+    },
+    {
+      "asset_id": "city-forge--stage-2",
+      "title": "Город · кузница · stage 2",
+      "game_id": "forge",
+      "physical_object_id": "DL-014",
+      "stage_candidate": 2,
+      "mapping_status": "NOT_MAPPED_TO_SERVER_STAGE",
+      "scope": "RC4",
+      "svg": "source/svg/city-forge--stage-2.svg",
+      "art_state": "CANDIDATE_NOT_APPROVED",
+      "gameplay_connected": false,
+      "sha256": "71c3cc626d9db41176729654d05abc1c0f1ce29fc53d0d268d4c808afccd4652",
+      "png256_sha256": "471c918393fa4b702588d34c45c54d50e774a5b0f0870df7802523d7b8e263f1"
+    },
+    {
+      "asset_id": "city-seed-shop--stage-0",
+      "title": "Город · семенная лавка · stage 0",
+      "game_id": "seed-market",
+      "physical_object_id": "DL-018",
+      "stage_candidate": 0,
+      "mapping_status": "NOT_MAPPED_TO_SERVER_STAGE",
+      "scope": "RC4",
+      "svg": "source/svg/city-seed-shop--stage-0.svg",
+      "art_state": "CANDIDATE_NOT_APPROVED",
+      "gameplay_connected": false,
+      "sha256": "3022b5b64cecadc779f11c71d7b8f57b81766d3a37618c58909ae07a1ccc3c66",
+      "png256_sha256": "0534c59c1f263438cb25e8f59a37ea67037f01bfe38102014ac85ad5ba64df7e"
+    },
+    {
+      "asset_id": "city-seed-shop--stage-1",
+      "title": "Город · семенная лавка · stage 1",
+      "game_id": "seed-market",
+      "physical_object_id": "DL-018",
+      "stage_candidate": 1,
+      "mapping_status": "NOT_MAPPED_TO_SERVER_STAGE",
+      "scope": "RC4",
+      "svg": "source/svg/city-seed-shop--stage-1.svg",
+      "art_state": "CANDIDATE_NOT_APPROVED",
+      "gameplay_connected": false,
+      "sha256": "4d630d8ebf1c54eb2436672a1e431e7b9e6e636c26a13b9a5a40e425c2b85ed4",
+      "png256_sha256": "d508aba9c2e568cb8778ced12fea1ed81270e549b993927dfdbedc9d7153c5ec"
+    },
+    {
+      "asset_id": "city-seed-shop--stage-2",
+      "title": "Город · семенная лавка · stage 2",
+      "game_id": "seed-market",
+      "physical_object_id": "DL-018",
+      "stage_candidate": 2,
+      "mapping_status": "NOT_MAPPED_TO_SERVER_STAGE",
+      "scope": "RC4",
+      "svg": "source/svg/city-seed-shop--stage-2.svg",
+      "art_state": "CANDIDATE_NOT_APPROVED",
+      "gameplay_connected": false,
+      "sha256": "e45718668152eeb224441c2d51360bc3173359caae5763aa367383fe293ab9c9",
+      "png256_sha256": "5dc628e581bc642b21166ffed622e05539dc447a532acf37b93e802cfcaa7ad6"
+    },
+    {
+      "asset_id": "city-garden-pavilion--stage-0",
+      "title": "Город · общественный огород · stage 0",
+      "game_id": "public-garden",
+      "physical_object_id": "DL-019",
+      "stage_candidate": 0,
+      "mapping_status": "NOT_MAPPED_TO_SERVER_STAGE",
+      "scope": "RC4",
+      "svg": "source/svg/city-garden-pavilion--stage-0.svg",
+      "art_state": "CANDIDATE_NOT_APPROVED",
+      "gameplay_connected": false,
+      "sha256": "2c731ce32d35b6a34bc2650cc663f629196c29cf15b057d617b53c4040d675b4",
+      "png256_sha256": "aa502b186de51cf15fba234afa8121d844571a52a3f01ae18de899d43602bc7e"
+    },
+    {
+      "asset_id": "city-garden-pavilion--stage-1",
+      "title": "Город · общественный огород · stage 1",
+      "game_id": "public-garden",
+      "physical_object_id": "DL-019",
+      "stage_candidate": 1,
+      "mapping_status": "NOT_MAPPED_TO_SERVER_STAGE",
+      "scope": "RC4",
+      "svg": "source/svg/city-garden-pavilion--stage-1.svg",
+      "art_state": "CANDIDATE_NOT_APPROVED",
+      "gameplay_connected": false,
+      "sha256": "17c9e3c185c160028d80bb65d230b3f7881c605fa6ee3ddb0bc62e839a64b22a",
+      "png256_sha256": "33855842f8b48b963e23d266968caee3b3904f761f7351c2bc5258da8b353261"
+    },
+    {
+      "asset_id": "city-garden-pavilion--stage-2",
+      "title": "Город · общественный огород · stage 2",
+      "game_id": "public-garden",
+      "physical_object_id": "DL-019",
+      "stage_candidate": 2,
+      "mapping_status": "NOT_MAPPED_TO_SERVER_STAGE",
+      "scope": "RC4",
+      "svg": "source/svg/city-garden-pavilion--stage-2.svg",
+      "art_state": "CANDIDATE_NOT_APPROVED",
+      "gameplay_connected": false,
+      "sha256": "f794bcd8aec6a24d0d892fecb4bc0ce29c9e6878dba9365d5762063bba992b4f",
+      "png256_sha256": "c8df831f0133a55ab5df49d4d9432fdf96b7c592f23059a69dcfe40522ab4ca0"
+    },
+    {
+      "asset_id": "city-warehouse--stage-0",
+      "title": "Город · склад · stage 0",
+      "game_id": "warehouse",
+      "physical_object_id": "DL-016",
+      "stage_candidate": 0,
+      "mapping_status": "NOT_MAPPED_TO_SERVER_STAGE",
+      "scope": "RC4",
+      "svg": "source/svg/city-warehouse--stage-0.svg",
+      "art_state": "CANDIDATE_NOT_APPROVED",
+      "gameplay_connected": false,
+      "sha256": "49bb403596152f7daac2cab5837497540fa3dceddc5f1de3201b08447b487f74",
+      "png256_sha256": "b8720708e95197552e484cc78d41e2f0fd2869f5127206c0d098dd48cf152815"
+    },
+    {
+      "asset_id": "city-warehouse--stage-1",
+      "title": "Город · склад · stage 1",
+      "game_id": "warehouse",
+      "physical_object_id": "DL-016",
+      "stage_candidate": 1,
+      "mapping_status": "NOT_MAPPED_TO_SERVER_STAGE",
+      "scope": "RC4",
+      "svg": "source/svg/city-warehouse--stage-1.svg",
+      "art_state": "CANDIDATE_NOT_APPROVED",
+      "gameplay_connected": false,
+      "sha256": "907e6ab1695ed2894d39ad1667fe8c4a32d69d5e8c5e90f120370c6517153ba7",
+      "png256_sha256": "fb80d7c8b6370934c0fde353e75a8316168f3c9d3577807d0409632002cd63df"
+    },
+    {
+      "asset_id": "city-warehouse--stage-2",
+      "title": "Город · склад · stage 2",
+      "game_id": "warehouse",
+      "physical_object_id": "DL-016",
+      "stage_candidate": 2,
+      "mapping_status": "NOT_MAPPED_TO_SERVER_STAGE",
+      "scope": "RC4",
+      "svg": "source/svg/city-warehouse--stage-2.svg",
+      "art_state": "CANDIDATE_NOT_APPROVED",
+      "gameplay_connected": false,
+      "sha256": "ca099d014ff429c1d2476bfcac2cf0270e9f33fd36bc37b1ff70a4dcec9c6cbf",
+      "png256_sha256": "352693214b4c53fcc54ce8c4200aadf116f6caf8a057e196496fd4f5bee351b2"
+    },
+    {
+      "asset_id": "city-tool-shop--stage-0",
+      "title": "Город · инструментальная лавка · stage 0",
+      "game_id": "tool-shop",
+      "physical_object_id": "DL-017",
+      "stage_candidate": 0,
+      "mapping_status": "NOT_MAPPED_TO_SERVER_STAGE",
+      "scope": "RC4",
+      "svg": "source/svg/city-tool-shop--stage-0.svg",
+      "art_state": "CANDIDATE_NOT_APPROVED",
+      "gameplay_connected": false,
+      "sha256": "97935a429ce5161bfc8cf14db4304c273e667f033f9b9e8efb6d85f47203eec0",
+      "png256_sha256": "bd758f27874fa862a2299190e9bf04451e236814af8e2283d42975f5365ef698"
+    },
+    {
+      "asset_id": "city-tool-shop--stage-1",
+      "title": "Город · инструментальная лавка · stage 1",
+      "game_id": "tool-shop",
+      "physical_object_id": "DL-017",
+      "stage_candidate": 1,
+      "mapping_status": "NOT_MAPPED_TO_SERVER_STAGE",
+      "scope": "RC4",
+      "svg": "source/svg/city-tool-shop--stage-1.svg",
+      "art_state": "CANDIDATE_NOT_APPROVED",
+      "gameplay_connected": false,
+      "sha256": "4feee52d2845bb9d3decf5ded29ff9931223469a460ed5ed640b02fae52afca6",
+      "png256_sha256": "e45e7835df3c727c6f9c917dddb393fc0acf9a728dad3b9bf4fdc353119d32e8"
+    },
+    {
+      "asset_id": "city-tool-shop--stage-2",
+      "title": "Город · инструментальная лавка · stage 2",
+      "game_id": "tool-shop",
+      "physical_object_id": "DL-017",
+      "stage_candidate": 2,
+      "mapping_status": "NOT_MAPPED_TO_SERVER_STAGE",
+      "scope": "RC4",
+      "svg": "source/svg/city-tool-shop--stage-2.svg",
+      "art_state": "CANDIDATE_NOT_APPROVED",
+      "gameplay_connected": false,
+      "sha256": "84d5f4e71d2aaa8d9da4455ac7d28e562e5f958706d802219125e7017a6956f8",
+      "png256_sha256": "87bb68b3c757eeb0fb1edc043d7babf8da44769d46cd64131e8c7c68a3f38fc9"
+    }
+  ]
+}
