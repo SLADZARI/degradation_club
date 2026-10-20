@@ -19,7 +19,10 @@ test('ZEN supports answer, skip, pending request, persistence and safe return wi
   const entry=g.target('obitel-zen-entry');assert.ok(entry);
   p.x=entry.x;p.y=entry.y;
   const initialWallet=p.wallet,initialTreasury=g.state.treasury;
-  assert.equal(run(g,p,'worldUse','obitel-zen-entry').ok,true);
+  p.bag.wood=4;p.bag.stone=3;
+  assert.equal(run(g,p,'worldUse','obitel-zen-entry').ok,true); // construction uses personal resources and municipal funds
+  assert.equal(g.state.treasury,initialTreasury-30);
+  assert.equal(run(g,p,'worldUse','obitel-zen-entry').ok,true); // enter the finished arch
   assert.equal(p.scene,'obitel-zen');
   assert.equal(g.snapshot(p).obitel.mountainUnlocked,false);
   const card=g.target('OB-C02');assert.ok(card);
@@ -43,7 +46,7 @@ test('ZEN supports answer, skip, pending request, persistence and safe return wi
   assert.equal(Object.keys(p.obitel.continuationRequests).length,1);
   assert.equal(p.obitel.continuationRequests[card.id].status,'pending');
   assert.equal(g.snapshot(p).obitel.completedQuests,0);
-  assert.equal(p.wallet,initialWallet);assert.equal(g.state.treasury,initialTreasury);
+  assert.equal(p.wallet,initialWallet);assert.equal(g.state.treasury,initialTreasury-30);
   const restored=new Game(structuredClone(g.state));
   const same=restored.auth(p.token);
   assert.equal(restored.snapshot(same).obitel.cards[card.id].answerCount,1);
@@ -57,7 +60,8 @@ test('ZEN supports answer, skip, pending request, persistence and safe return wi
 test('cannot answer remotely from city or another card, and no completion shortcuts',()=>{
   const g=new Game(createWorld()),p=g.join('Защита');
   assert.equal(run(g,p,'obitelAnswer','OB-C01',{answer:'test'}).ok,false);
-  const gate=g.target('obitel-zen-entry');p.x=gate.x;p.y=gate.y;
+  const gate=g.target('obitel-zen-entry');p.x=gate.x;p.y=gate.y;p.bag.wood=4;p.bag.stone=3;
+  assert.equal(run(g,p,'worldUse',gate.id).ok,true);
   assert.equal(run(g,p,'worldUse',gate.id).ok,true);
   assert.equal(run(g,p,'obitelAnswer','OB-C07',{answer:'test'}).ok,false);
   const target=g.target('OB-C01');p.x=target.x;p.y=target.y;
