@@ -59,3 +59,15 @@ test('resource trees, stone, garden and growing trees do not overlap server navi
  assert.ok(expedition.length>0);
  assert.equal(expedition.some(o=>o.kind==='well'||o.kind==='tent'),false,'no home furniture in expedition');
 });
+
+test('garden construction rejects tree soil overlap before modifying saved beds',()=>{
+ const {g,p,h}=fixture();h.nodes.forEach(n=>n.left=0);
+ p.x=7;p.y=11;
+ h.soil=[{id:'reserved-tree-spot',x:6,y:10}];
+ const before=h.beds.length;
+ assert.equal(g.command(p,{type:'homePrepare',target:'garden',requestId:'garden-overlap-block'}).ok,false);
+ assert.equal(h.beds.length,before,'failed placement must not mutate the save');
+ h.soil.length=0;
+ assert.equal(g.command(p,{type:'homePrepare',target:'garden',requestId:'garden-clear-spot'}).ok,true);
+ assert.equal(h.beds.length,before+1);
+});
