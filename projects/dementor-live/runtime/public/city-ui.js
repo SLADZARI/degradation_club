@@ -7,11 +7,14 @@ function civicPanel(mode,rows,row,canAct){
   const near=nearby('landscape-shop')&&canAct;
   for(const [kind,item] of Object.entries(state.landscapeProducts||{})){
     const stock=me.terrainBag?.[kind]||0;
-    row(item.name+' · у тебя '+stock+' шт.','Комплект '+item.pack+' шт. за '+item.price+' PAPER'+(kind==='paving'?' · скорость ×1.2':''),[
-      button('Купить 10 · 1 PAPER',()=>act('landscapeBuy','landscape-shop',{kind}),!near||me.wallet<item.price),
-      button('Укладывать',()=>setPlacementKind(kind),!canAct||stock<1)]);
+    const card=row(item.name+' · у тебя '+stock+' шт.','Комплект '+item.pack+' шт. за '+item.price+' PAPER'+(kind==='paving'?' · скорость ×1.2':''),[
+      button('Купить '+item.pack+' · '+item.price+' PAPER',()=>act('landscapeBuy','landscape-shop',{kind}).then(()=>updateCityPanels(true)),!near||me.wallet<item.price),
+      button('Выбрать для укладки',()=>setPlacementKind(kind),!canAct||stock<1)]);
+    card.classList.add('terrain-product');
+    const preview=window.DLTerrain01?.previewCanvas?.(kind);
+    if(preview){preview.setAttribute('aria-label','Образец покрытия: '+item.name);card.prepend(preview);}
   }
-  note.textContent='Укладка: выбери материал, закрой магазин и нажми на свободную клетку рядом. Esc отменяет режим укладки. Материалы и покрытия сохраняются в твоём городе.';
+  note.textContent='Посмотри изображение, купи комплект — он окажется в рюкзаке, в разделе «Покрытия». Выбери материал, отметь клетку и нажми «Применить». Недоступная клетка подсвечивается красным. Esc отменяет укладку.';
   return true;
  }
  if(mode==='public-garden'){
