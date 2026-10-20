@@ -153,6 +153,14 @@ dialog#mayorIdea::backdrop{background:#14261e77}
 .idea-actions .primary{background:#617d62;color:#fff}
 @media(max-width:760px){dialog#mayorIdea{width:calc(100vw - 20px);max-height:calc(100dvh - 24px);padding:17px}#mayorIdea h2{font-size:19px}}
 
+/* Playtest 20 Oct — long descriptions must scroll inside safe screen bounds. */
+dialog:not(#welcome):not(#mayorIdea):not(#payphoneDialog),
+#cityPanel,#details{overflow-y:auto!important;overscroll-behavior:contain;overflow-wrap:anywhere;max-height:min(80dvh,calc(100dvh - 40px))!important;}
+#cityPanelRows,.panel-body{min-width:0;overflow-wrap:anywhere;}
+#cityPanel h2,#details h2{overflow-wrap:anywhere;}
+#game.starving::after{content:'';position:absolute;inset:0;pointer-events:none;border:8px solid #9b433c33;box-shadow:inset 0 0 65px #9b433c35;z-index:2;}
+#game.spirit-alert::after{content:'';position:absolute;inset:0;pointer-events:none;background:radial-gradient(transparent 55%,#454f5960 100%);z-index:2;}
+@media(max-width:760px){dialog:not(#welcome):not(#mayorIdea):not(#payphoneDialog),#cityPanel,#details{inset:auto 8px max(18px,env(safe-area-inset-bottom)) 8px!important;margin:0 auto!important;width:calc(100vw - 16px)!important;max-height:min(70dvh,calc(100dvh - 52px))!important;}}
 /* PAYPHONE & PAGER v1: compact paper objects and accessible phone composition. */
 .payphone-dialog{position:fixed!important;inset:0!important;margin:auto!important;transform:none!important;width:min(460px,calc(100vw - 20px))!important;max-height:calc(100dvh - 24px)!important;overflow:auto!important;padding:18px!important;background:#f2ebd9!important;border:2px solid #a9b19e!important;border-radius:17px!important;z-index:65!important}
 .payphone-dialog::backdrop{background:#172d2377!important}
