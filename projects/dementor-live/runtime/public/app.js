@@ -101,7 +101,7 @@ function updateUI(){if(!me)return;renderQuick();
   const c=currentConfig(),p=currentProject(),totalWorks=c.stages.reduce((n,s)=>n+s.works,0),doneWorks=c.stages.slice(0,p.stage).reduce((n,s)=>n+s.works,0)+p.work;
   const progress=Math.round((p.accepted.wood+p.accepted.stone+doneWorks)/(c.need.wood+c.need.stone+totalWorks)*100);
   const population=state.players.filter(p=>p.online).length;$('connection').classList.remove('offline');$('connection').lastChild.textContent=`Жители · ${population}`;
-  $('playerName').textContent=me.name;$('avatarDot').style.background=colors[me.color];$('spiritLabel').textContent=me.spirit?'дух':'';if(lastWallet!==me.wallet){lastWallet=me.wallet;$('wallet').innerHTML=`${me.wallet} <small>PAPER</small>`;}
+  $('playerName').textContent=me.name;$('playerPronoun').textContent=me.gender==='female'?'жительница':me.gender==='male'?'житель':'персонаж';$('avatarDot').style.background=colors[me.color];$('spiritLabel').textContent=me.spirit?'дух':'';if(lastWallet!==me.wallet){lastWallet=me.wallet;$('wallet').innerHTML=`${me.wallet} <small>PAPER</small>`;}
   for(const key of ['health','hunger','stamina']){$(key).value=me[key];$(key+'Value').textContent=Math.ceil(me[key]);}
   document.querySelector('#quest h1').textContent=bridgeActive()?'Мост на другой берег':forgeActive()?'Общественная кузница':'Городская площадь';
   $('projectPercent').textContent=progress+'%';$('projectBar').style.width=progress+'%';$('stageTitle').textContent=p.stage>=c.stages.length?'Открыта для всех':`${p.stage+1} / ${c.stages.length} · ${c.stages[p.stage].title}`;
