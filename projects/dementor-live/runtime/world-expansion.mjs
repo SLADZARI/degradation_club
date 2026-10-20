@@ -13,6 +13,7 @@ export const WORLD_CITY_TARGETS=[
   {id:'travel-sign',type:'world-sign',x:27,y:46,title:'Указатель: лес, горы, дальние земли'},
   {id:'forest-sign',type:'world-sign',x:20,y:56,title:'Лесная развилка'},
   {id:'mountain-sign',type:'world-sign',x:51,y:60,title:'Горный перевал'},
+  {id:'mountain-summit',type:'world-summit',x:75,y:37,title:'Вершина горы · памятная отметка'},
   {id:'museum-entry',type:'world-gate',x:96,y:60,title:'Музей смеха · вход',to:'museum'},
   {id:'farlands-entry',type:'world-gate',x:143,y:60,title:'Дальние земли · вход',to:'farlands'},
   {id:'university-site',type:'world-preview',x:18,y:42,title:'Университет · будущие курсы'},
@@ -89,7 +90,15 @@ export function worldTravelAction(g,p,cmd){
     p.worldTravel.purchaseReceipts[cmd.requestId]=receipt;
     return receipt;
   }
-  if(object.type==='world-sign')return {message:object.id==='forest-sign'?'Тропа ведёт в горы через вторую переправу; лесная чаща не везде проходима.':'По дороге на восток: лес → горы → музей смеха → дальние земли.'};
+  if(object.type==='world-sign')return {message:object.id==='mountain-sign'?'Горная тропа начинается здесь: подъём тратит силы и ускоряет голод. Иди до вершины и отдыхай на остановках.':object.id==='forest-sign'?'Тропа ведёт в горы через вторую переправу; лесная чаща не везде проходима.':'По дороге на восток: лес → горы → музей смеха → дальние земли.'};
+  if(object.type==='world-summit'){
+    p.worldTravel||={mapOwned:false,souvenirs:{shirt:0,souvenir:0},visited:['city']};
+    if(p.worldTravel.summitReachedAt)return {message:'Ты уже покорил эту вершину. Путешествие осталось в дневнике.'};
+    p.worldTravel.summitReachedAt=g.now;
+    const reward=g.cityFunds()>=40?40:0;
+    if(reward)g.transfer(p,reward,'summit-discovery');
+    return {message:'Ты поднялся на вершину!'+(reward?' · +40 PAPER из казны':' · Казна пока не выделила награду'),reward};
+  }
   if(object.type==='world-preview')return {message:object.title+' · стройка и механики появятся в следующих игровых обновлениях.'};
   if(object.type==='world-exhibit')return {message:object.id==='not-needed'?'«НЕ НАДО» — пьедестал дальних земель. Путешествие завершено, но мир продолжается.':'Музей смеха · первая выставка открыта, коллекция будет пополняться.'};
   if(object.type==='world-gate'){
