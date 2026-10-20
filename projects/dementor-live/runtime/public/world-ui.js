@@ -14,6 +14,7 @@ allTargets=function(){
   return base;
 };
 interaction=function(t){
+  if(t?.type==='obitel-card')return {type:'obitel-card',title:t.title,hint:'Открыть вопрос и ответить · E',enabled:!me.spirit&&!me.job&&!me.delivery?.picked};
   if(t?.type==='tourist')return {type:'tourist',title:'Туристическое бюро',hint:'Купить карту, майку, сувенир за PAPER',enabled:!me.spirit};
   if(['world-gate','world-sign','world-exhibit','world-preview'].includes(t?.type))
     return {type:'worldUse',title:t.title,hint:t.type==='world-gate'?'Войти / выйти · E':t.type==='world-preview'?'Посмотреть будущую площадку':'Исследовать · E',enabled:!me.spirit&&!me.job&&!me.delivery?.picked};
@@ -52,6 +53,7 @@ findPath=function(dest){
 };
 
 doContext=function(){
+  if(context?.type==='obitel-card'){act('worldUse',context.id).then(result=>{if(result?.obitel)showObitelCard(result.obitel);});return;}
   if(context?.type==='tourist'){openCityPanel('tourist');return;}
   originalContext();
 };
@@ -186,5 +188,35 @@ render=function(time){
   originalRender(time);
   drawWorldProps();
 };
+// P0 in-world card dialog: no auto-completion or synthetic follow-up story.
+const obitelDialog=document.createElement('dialog');
+obitelDialog.id='obitelCardDialog';
+obitelDialog.setAttribute('aria-label','Карточка Обители');
+obitelDialog.innerHTML='<h2 id="obitelCardTitle"></h2><p id="obitelCardQuestion"></p><p id="obitelCardStatus"></p><label for="obitelCardAnswer">Твой ответ</label><textarea id="obitelCardAnswer" rows="3" maxlength="500" placeholder="Твой ответ на вопрос"></textarea><div class="obitel-card-buttons"><button id="obitelCardSave">Сохранить ответ</button><button id="obitelCardContinue">Хочу продолжить</button><button id="obitelCardSkip">Пропустить</button><button id="obitelCardClose">Закрыть</button></div>';
+const obitelStyle=document.createElement('style');
+obitelStyle.textContent='#obitelCardDialog{width:min(92vw,540px);max-height:86dvh;overflow:auto;border:1px solid #b2ae9a;background:#f5efdf;color:#344036;padding:20px;border-radius:10px}#obitelCardDialog::backdrop{background:#1d261a99}#obitelCardDialog h2{margin:0 0 12px}#obitelCardDialog textarea{box-sizing:border-box;display:block;width:100%;margin:6px 0 12px;padding:10px;background:#fffdf6;color:#344036;border:1px solid #b2ae9a;border-radius:6px}#obitelCardDialog p{line-height:1.45}.obitel-card-buttons{display:flex;gap:8px;flex-wrap:wrap}.obitel-card-buttons button{padding:9px 12px;border:1px solid #a29e87;border-radius:6px;background:#fffdf6;cursor:pointer}';
+document.head.append(obitelStyle);
+document.body.append(obitelDialog);
+let activeObitelCard=null;
+function showObitelCard(card){
+  activeObitelCard=card.id;
+  $('obitelCardTitle').textContent=card.title;
+  $('obitelCardQuestion').textContent=card.question;
+  $('obitelCardStatus').textContent=card.continuationRequestedAt?'Заявка на продолжение уже сохранена.':'Продолжение сценария пока не завершено. Ответ сохранится, но квест не будет считаться завершённым.';
+  $('obitelCardAnswer').value='';
+  if(!obitelDialog.open)obitelDialog.showModal();
+}
+$('obitelCardClose').onclick=()=>obitelDialog.close();
+async function obitelSend(type,extra={}){
+  if(!activeObitelCard)return;
+  const result=await act(type,activeObitelCard,extra);
+  if(!result?.ok)return;
+  if(result.obitel?.continuationRequestedAt)$('obitelCardStatus').textContent='Заявка на продолжение записана. Карточка остаётся незавершённой.';
+  else if(type==='obitelAnswer')$('obitelCardStatus').textContent='Ответ сохранён с датой. Продолжение истории пока не готово.';
+  if(type==='obitelSkip')obitelDialog.close();
+}
+$('obitelCardSave').onclick=()=>obitelSend('obitelAnswer',{answer:$('obitelCardAnswer').value});
+$('obitelCardContinue').onclick=()=>obitelSend('obitelContinue');
+$('obitelCardSkip').onclick=()=>obitelSend('obitelSkip');
 window.__worldExpansionQA=()=>({scene:state?.scene,mapOwned:!!state?.worldTravel?.profile?.mapOwned,worldWidth:state?.config?.width,worldHeight:state?.config?.height,targetCount:allTargets().length,qaMode:!!state?.qaMode});
 })();
