@@ -92,3 +92,6 @@
 
 ## 10. WORLD ORGANISM v0.10 UNIFIED ATLAS (20.10.2026)
 Объединённая автономная модель с экономическим исполняемым ядром v0.8 и подтверждёнными контрактами Role Lab v0.9 / Story Loop v0.9.1, а также новыми паспортами CIVIC и UNIVERSE. Реестр **13 регионов/сцен, 48 EntityKind**, старая SVG схема и pinned KPI, 55/55 QA + 36 stress. [Индекс v0.10](balance-lab/v0_10/README.md) · [Матрица сущностей](balance-lab/v0_10/ENTITY_INTEGRATION_MATRIX_v0_10.md) · [QA/NO-GO](balance-lab/v0_10/QA_AND_RELEASE_GATE_v0_10.md). Не являeтся реальным серверным объединением, данные production/save не менялись.
+
+## 11. WORLD ORGANISM v0.10.1 — Runtime Bridge (20.10.2026)
+Начата integration с **реальным CityNetwork игрового runtime 0.5.0-rc.2** (не синтетическая игра): агрегаты PAPER, инвентари по местам, казна, склад, магазины и строения подключены через закрытый по умолчанию GET-only API. Ветка и Draft PR: [#295](https://github.com/SLADZARI/degradation_club/pull/295). [Начать](balance-lab/v0_10_1/README.md) · [Матрица](balance-lab/v0_10_1/INTEGRATION_MATRIX.md) · [QA](balance-lab/v0_10_1/QA_AND_OPEN_GATES.md). Четыре GitHub CI группы PASS, но actual production-save copy, human two-device gameplay и полное объединение NPC/UNIVERSE ещё не завершены. Сервер и Master GDD не менялись.
