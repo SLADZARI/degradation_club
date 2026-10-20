@@ -57,6 +57,8 @@ jobs:
           node test/playtest-actions.cjs
           node test/telecom-browser.cjs
           npm run test:mobile
+          npm run test:mobile
+          npm run test:mobile
           npm run test:quests
           npm run test:compact-panels
   published-health-readonly:
