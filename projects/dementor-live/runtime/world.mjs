@@ -129,20 +129,20 @@ export class Game {
       if(!Number.isInteger(n)||n<=0||n>p.bag[kind])throw Error('Нет такого количества в рюкзаке');
       let pile=this.state.drops.find(d=>d.kind===kind&&(d.scene||'city')===scene(p)&&d.plotId===(p.plotId||undefined)&&distance(d,p)<.7);
       if(!pile){pile={id:'pile-'+randomUUID(),type:'pickup',kind,scene:scene(p),plotId:p.plotId||undefined,x:p.x,y:p.y,quantity:0};this.state.drops.push(pile);}
-      p.bag[kind]-=n;pile.quantity+=n;return {message:`Выложено на землю: ${n}. Любой житель может подобрать.`};
+      p.bag[kind]-=n;pile.quantity+=n;return {message:`Выложено на землю: ${n}. Любой житель может подобрать.`,code:'action.inventory.drop',params:{quantity:n}};
     }
     if(type==='pickup'){
       const pile=this.state.drops.find(d=>d.id===cmd.target&&(d.scene||'city')===scene(p)&&(scene(p)==='city'||d.plotId===p.plotId));this.near(p,pile);
       const n=Math.min(pile.quantity,Math.floor((bagCapacity(p,c,this.now)-loadWeight(p,c))/c.weights[pile.kind]));
       if(n<=0)throw Error('В рюкзаке нет места');p.bag[pile.kind]+=n;pile.quantity-=n;
-      this.state.drops=this.state.drops.filter(d=>d.quantity>0);return {message:`Подобрано: ${n}`};
+      this.state.drops=this.state.drops.filter(d=>d.quantity>0);return {message:`Подобрано: ${n}`,code:'action.inventory.pickup',params:{quantity:n}};
     }
     if(type==='warehouseSell'){
       this.near(p,this.target('warehouse'));if(!['wood','stone'].includes(kind))throw Error('Склад принимает древесину и камень');
       const price=c.warehouse.pay[kind],n=Math.min(p.bag[kind],this.warehouseFree(kind),Math.floor(this.cityFunds()/price));
       if(n<=0)throw Error(!p.bag[kind]?'В рюкзаке нет этого материала':!this.warehouseFree(kind)?'Склад заполнен этим материалом':'Свободный бюджет приёмки исчерпан');
       p.bag[kind]-=n;w.stock[kind]+=n;this.transfer(p,n*price,'warehouse');w.spent+=n*price;recordMaterial(this,'warehouse-accept',kind,n,'bag','warehouse',p.id);
-      return {message:`Склад принял ${n} · +${n*price} PAPER`,reward:n*price};
+      return {message:`Склад принял ${n} · +${n*price} PAPER`,reward:n*price,code:'action.warehouse.deposit',params:{quantity:n,reward:n*price}};
     }
     if(type==='courierAccept'){
       this.near(p,this.target('board'));if(p.delivery)throw Error('Сначала заверши или отмени свой заказ');
@@ -160,7 +160,7 @@ export class Game {
     if(type==='courierDeliver'){
       this.near(p,this.target(d.destination==='bridge'?'bridge-drop':'mayor'));if(!d.picked)throw Error('Сначала забери груз на складе');
       this.transfer(p,d.reward,'courier');if(d.destination==='bridge'){supplyBridge(this.state.bridge,d.kind,d.quantity);this.state.bridge.spent+=d.reward;}else w.municipal[d.kind]+=d.quantity;recordMaterial(this,'courier-deliver',d.kind,d.quantity,'transit',d.destination==='bridge'?'bridge':'municipal',p.id);w.spent+=d.reward;p.delivery=null;
-      return {message:`Доставка принята · +${d.reward} PAPER`,reward:d.reward};
+      return {message:`Доставка принята · +${d.reward} PAPER`,reward:d.reward,code:'action.courier.delivered',params:{quantity:d.quantity,reward:d.reward}};
     }
     if(d.picked){this.near(p,this.target('warehouse'));w.stock[d.kind]+=d.quantity;recordMaterial(this,'courier-return',d.kind,d.quantity,'transit','warehouse',p.id);}
     p.delivery=null;return {message:'Заказ отменён. Городской груз остаётся на складе.'};
@@ -238,14 +238,14 @@ export class Game {
       for(const k of ['wood','stone']){let n=Math.min(p.bag[k],Math.max(0,c.need[k]-project.accepted[k]-(target==='bridge-drop'?this.committed(k,false,'bridge'):0)));if(n>0){reward+=n*c.pay[k];count+=n;}}
       if(!count)throw Error('Нет нужных материалов: проверь потребность площади');if(s.treasury<reward)throw Error('Нет обеспеченного городского резерва');
       for(const k of ['wood','stone']){const n=Math.min(p.bag[k],Math.max(0,c.need[k]-project.accepted[k]-(target==='bridge-drop'?this.committed(k,false,'bridge'):0)));p.bag[k]-=n;project.accepted[k]+=n;project.stock[k]+=n;if(n)recordMaterial(this,'construction-delivery',k,n,'bag',target,p.id);}
-      this.transfer(p,reward,'materials');project.spent+=reward;return {message:`Принято ${count} · +${reward} PAPER`,reward};
+      this.transfer(p,reward,'materials');project.spent+=reward;return {message:`Принято ${count} · +${reward} PAPER`,reward,code:'action.project.deliver',params:{quantity:count,reward}};
     }
     if(type==='build'){
       if(t.type!=='build')throw Error('Подойди к месту строительных работ');this.canBuild(target);if(s.treasury<c.pay.work)throw Error('Нет резерва оплаты');return this.start(p,'build',target,c.buildMs);
     }
     if(type==='buy'){
       if(t.type!=='plot')throw Error('Это не участок');const plot=s.plots.find(x=>x.id===target);if(plot.locked)throw Error('Завершите миссию расчистки, чтобы открыть этот участок');if(plot.owner)throw Error('Участок уже куплен');if(p.wallet<c.plotPrice)throw Error(`Участок стоит ${c.plotPrice} PAPER`);
-      p.wallet-=c.plotPrice;s.treasury+=c.plotPrice;plot.owner=p.id;s.transactions.push({id:randomUUID(),player:p.id,amount:-c.plotPrice,reason:'plot',time:this.now});return {message:'Твоё место в городе. Участок куплен!'};
+      p.wallet-=c.plotPrice;s.treasury+=c.plotPrice;plot.owner=p.id;s.transactions.push({id:randomUUID(),player:p.id,amount:-c.plotPrice,reason:'plot',time:this.now});return {message:'Твоё место в городе. Участок куплен!',code:'action.plot.purchased',params:{}};
     }
     throw Error('Неизвестное действие');
   }
