@@ -1,0 +1,48 @@
+{
+  "schema": "DL-ISO30-ART-QA-V1",
+  "version": "1.0",
+  "art_status": "CANDIDATES_WAITING_FOR_OWNER",
+  "images": 54,
+  "acceptance_gates": [
+    {
+      "gate": "G5_SOURCE",
+      "pass_criteria": "unique valid SVG; no scripts/filter/image; alpha=0 corners, >=8px margins at 256; deterministic build; correct IDs",
+      "status": "PASS"
+    },
+    {
+      "gate": "G6_ART_DIRECTION",
+      "pass_criteria": "owner reviews 54 individual visuals, unique facade silhouettes incl 64px screenshot, correct paper layers and no external shadow",
+      "status": "PENDING"
+    },
+    {
+      "gate": "G6_FOOTPRINT",
+      "pass_criteria": "exact W×D×H CU from server, screenshot bbox/anchor, ground 30 degree, obstacle/door no overlap",
+      "status": "NOT_RUN"
+    },
+    {
+      "gate": "G6_BUILD_STAGES",
+      "pass_criteria": "server state stage mapping with no invented stages; stage 0/1/2/(final) only when actual sequence exists; no premature finished houses",
+      "status": "NOT_RUN"
+    },
+    {
+      "gate": "G6_GAMEPLAY",
+      "pass_criteria": "city/plot/interior/expedition, depth vs hero/NPC/z sorted, move/interaction, both clients, no wallet/save regression",
+      "status": "NOT_RUN"
+    },
+    {
+      "gate": "G6_PERFORMANCE",
+      "pass_criteria": "Chrome Desktop 60 FPS and real iPhone Safari >=30 FPS goals under agreed hardware, 100/500/1200 ground tiles",
+      "status": "NOT_RUN"
+    },
+    {
+      "gate": "G7_DEPLOY",
+      "pass_criteria": "exact SHA CI, backup+restore copy, dry-run, 0-player window, explicit owner GO",
+      "status": "NOT_RUN"
+    }
+  ],
+  "scope_notes": {
+    "unique_house_instance": "facade profile tied to persistent objectId/cityId; do not randomly resample between reloads; plot personal dwelling remains a tent until gameplay contract updated",
+    "world": "Do not merge isolated WORLD-01/Museum/Obitel scenarios merely because an SVG exists",
+    "protected": "20 v2 CLEAN UI icons, 17 DL-TERRAIN-01 SVG/atlas, hero, world.json, economic ledger"
+  }
+}

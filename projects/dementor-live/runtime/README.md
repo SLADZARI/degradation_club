@@ -36,3 +36,11 @@
 ## World Art · 139/139 SVG Source Coverage (Batch 02 — DRAFT)
 
 [Аудит и QA](../design/world-assets/WORLD_ART_COVERAGE_139_2026-10-20.md). 90 новых оригинальных SVG + 21 независимое изображение стадий в `assets-source/world-art-batch02/`; 35 базовых SVG — Batch01 PR #301. Действующий рендер/сейвы не меняются. Генерация PNG: `python3 tools/world-art-batch02/build_from_svg.py`, проверка: `python3 tools/world-art-batch02/test_batch02.py` (локально нужны CairoSVG и Pillow). **Библиотека изображений ≠ все картинки нарисованы в игре**: до G6 — привязки к footprint и z-index, художественная QA, две вкладки/iPhone. Старые 20 UI и 17 текстур земли защищены.
+
+## Уникальные здания ISO30 — самостоятельная художественная партия
+
+[14 строений + 11 объектов грядок/мебели + 21 визуальная стадия, QA](../design/world-assets/UNIQUE_HOUSES_ISO30_G6_ACCEPTANCE_2026-10-20.md) · [исходные SVG](assets-source/world-art-unique-houses/) · [скачать полный каталог SVG+PNG](https://drive.google.com/file/d/13hNk-YY4ulbkzSVLWWv6Tsj9deFdplA6/view). Технические SVG/alpha/детерминизм PASS, но художественная приёмка, точные Cube Units, позиции, коллизии и клиентские тесты **не завершены**. Рендер пока остаётся старым Canvas. Не вносить графические кандидаты в production и не переписывать старые Paper Cut v2/UI или DL-TERRAIN-01.
+
+### Уточнение v1.1 — 8 личных участков (20.10.2026)
+
+Помимо 14 индивидуальных городских зданий, 11 грядок/скамеек/стульев/мебели и 21 рисунка строительных стадий, подготовлены **8 стабильных фасадов личной палатки** на `plot-1…plot-8`. Полный комплект: **54 SVG / 108 PNG**; [архив v1.1](https://drive.google.com/file/d/1-N4bkRh9JyxGI3o9jjWGUUroCmoqO-ZA/view) · [G6 критерии](../design/world-assets/UNIQUE_HOUSES_ISO30_G6_ACCEPTANCE_2026-10-20.md). Детерминированная функция в `assets-source/world-art-unique-houses/visual-variants.mjs` выбирает стиль по существующим `cityId` и `plotId`; **не вводить дополнительное поле в world.json**. PNG и SVG не подменяют действующий Canvas до art/CU/browser QA, не добавляют игрокам новые дома вместо палатки.

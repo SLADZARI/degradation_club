@@ -1,0 +1,15 @@
+{
+  "status": "PASS_TECHNICAL_ONLY",
+  "svg_count": 54,
+  "unique_RGBA_256": 54,
+  "png_count": 108,
+  "xml": "PASS",
+  "alpha_corners": "PASS",
+  "safe_margin": "PASS",
+  "hash_uniq": "PASS",
+  "visual_art_approval": "NOT_RUN",
+  "footprint_visual_alignment": "NOT_RUN",
+  "scene_browser": "NOT_RUN",
+  "real_iphone": "NOT_RUN",
+  "production": "NOT_DEPLOYED"
+}

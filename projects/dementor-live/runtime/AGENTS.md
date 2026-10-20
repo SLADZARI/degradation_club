@@ -49,3 +49,11 @@
 ## ISO30 World Asset Source Coverage · 139/139 (CANDIDATE)
 
 Для новых сцен и рисунков использовать [аудит 139 объектов](../design/world-assets/WORLD_ART_COVERAGE_139_2026-10-20.md) и исходные SVG в `assets-source/world-art-batch01/` + `assets-source/world-art-batch02/`. Есть 125 базовых ISO30 SVG-кандидатов для 124 физических ID, 21 кандидат строительных стадий и 15 логических ID без отдельного спрайта. **НЕ считать это подтверждением runtime UI, художественного APPROVED, DEPLOYED или маппинга к CU-footprint**. Для нового мира требуется прямой game-object→sprite→anchor→stage→depth контракт и G6 браузерная проверка. 20 Paper Cut v2 и 17 DL-TERRAIN-01 не изменять, особенно hero / `world.json` / live state.
+
+## Unique City Houses / ISO30 G6 art (PR stack after #303)
+
+[Unique houses and furniture G6 acceptance](../design/world-assets/UNIQUE_HOUSES_ISO30_G6_ACCEPTANCE_2026-10-20.md) contains 46 individual SVG sources: 14 unique structure designs, 11 bed/bench/chair/furniture designs and 21 candidate construction states in `assets-source/world-art-unique-houses/`. SVG → PNG 128/256 only. **NO AUTOMATIC RUNTIME REPLACEMENT**. Every physical building still uses server-authoritative footprint and depth, and every actual stage must be read from existing game state, not inferred from art. Static warehouse/tool shop/mayor tent have **no stage machine**; their extra stage images are not playable. Residential plots currently support a three-stage tent, not a new house. Keep 20 approved UI v2 icons, 17 terrain tiles, original hero and saves immutable. Real iPhone/browser G6 NOT RUN; G7 not approved.
+
+### Уточнение v1.1 — 8 личных участков (20.10.2026)
+
+Помимо 14 индивидуальных городских зданий, 11 грядок/скамеек/стульев/мебели и 21 рисунка строительных стадий, подготовлены **8 стабильных фасадов личной палатки** на `plot-1…plot-8`. Полный комплект: **54 SVG / 108 PNG**; [архив v1.1](https://drive.google.com/file/d/1-N4bkRh9JyxGI3o9jjWGUUroCmoqO-ZA/view) · [G6 критерии](../design/world-assets/UNIQUE_HOUSES_ISO30_G6_ACCEPTANCE_2026-10-20.md). Детерминированная функция в `assets-source/world-art-unique-houses/visual-variants.mjs` выбирает стиль по существующим `cityId` и `plotId`; **не вводить дополнительное поле в world.json**. PNG и SVG не подменяют действующий Canvas до art/CU/browser QA, не добавляют игрокам новые дома вместо палатки.
