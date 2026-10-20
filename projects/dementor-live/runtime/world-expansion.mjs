@@ -1,8 +1,10 @@
+import {OBITEL_ZEN_CARDS,obitelCardView} from './obitel-p0.mjs';
 // WORLD EXPANSION P0: deterministic geometry shared with clients through snapshots.
 // Numbers are test parameters, not the frozen GDD. No new economy or separate player IDs.
 export const WORLD_SCENES={
   museum:{name:'Музей смеха',width:20,height:16,exit:{id:'museum-exit',type:'world-gate',x:2,y:13,title:'Выход из музея',to:'city'},main:{id:'laugh-exhibit',type:'world-exhibit',x:11,y:6,title:'Первая коллекция смеха'}},
-  farlands:{name:'Дальние земли',width:28,height:20,exit:{id:'farlands-exit',type:'world-gate',x:2,y:17,title:'Вернуться с дальних земель',to:'city'},main:{id:'not-needed',type:'world-exhibit',x:21,y:9,title:'Пьедестал «НЕ НАДО»'}}
+  farlands:{name:'Дальние земли',width:28,height:20,exit:{id:'farlands-exit',type:'world-gate',x:2,y:17,title:'Вернуться с дальних земель',to:'city'},main:{id:'not-needed',type:'world-exhibit',x:21,y:9,title:'Пьедестал «НЕ НАДО»'}},
+  'obitel-zen':{name:'Обитель Габеля · ZEN (P0)',width:36,height:27,exit:{id:'obitel-zen-exit',type:'world-gate',x:2,y:17,title:'Выход в общий мир',to:'city'},main:{...OBITEL_ZEN_CARDS[0],type:'obitel-card'},nodes:OBITEL_ZEN_CARDS.slice(1).map(card=>({...card,type:'obitel-card'}))}
 };
 export const TOURIST_PRICES={map:10,shirt:16,souvenir:4};
 export const WORLD_CITY_TARGETS=[
@@ -12,6 +14,7 @@ export const WORLD_CITY_TARGETS=[
   {id:'mountain-sign',type:'world-sign',x:51,y:60,title:'Горный перевал'},
   {id:'museum-entry',type:'world-gate',x:96,y:60,title:'Музей смеха · вход',to:'museum'},
   {id:'farlands-entry',type:'world-gate',x:143,y:60,title:'Дальние земли · вход',to:'farlands'},
+  {id:'obitel-zen-entry',type:'world-gate',x:138,y:72,title:'Обитель Габеля · ZEN (первая территория)',to:'obitel-zen'},
   {id:'university-site',type:'world-preview',x:18,y:42,title:'Университет · будущие курсы'},
   {id:'robo-stadium-site',type:'world-preview',x:29,y:43,title:'Стадион Robo Games · проект'},
   {id:'industry-site',type:'world-preview',x:73,y:69,title:'Производство и агротехника · проект'}
@@ -39,7 +42,7 @@ export const WORLD_PATHS=[
 export function worldObjects(scene='city'){
   if(scene==='city')return WORLD_CITY_TARGETS;
   const region=WORLD_SCENES[scene];
-  return region?[region.exit,region.main]:[];
+  return region?[region.exit,region.main,...(region.nodes||[])]:[];
 }
 export function terrainBlocked(scene,x,y,r=.3){
   if(scene==='city')return WORLD_OBSTACLES.some(o=>x+r>o.x&&x-r<o.x+o.w&&y+r>o.y&&y-r<o.y+o.h);
@@ -82,10 +85,11 @@ export function worldTravelAction(g,p,cmd){
   }
   if(object.type==='world-sign')return {message:object.id==='forest-sign'?'Тропа ведёт в горы через вторую переправу; лесная чаща не везде проходима.':'По дороге на восток: лес → горы → музей смеха → дальние земли.'};
   if(object.type==='world-preview')return {message:object.title+' · стройка и механики появятся в следующих игровых обновлениях.'};
+  if(object.type==='obitel-card')return {message:'',obitel:obitelCardView(p,object.id)};
   if(object.type==='world-exhibit')return {message:object.id==='not-needed'?'«НЕ НАДО» — пьедестал дальних земель. Путешествие завершено, но мир продолжается.':'Музей смеха · первая выставка открыта, коллекция будет пополняться.'};
   if(object.type==='world-gate'){
     const from=p.scene||'city',to=object.to;
-    if(!['city','museum','farlands'].includes(to))throw Error('Недоступный регион');
+    if(!['city','museum','farlands','obitel-zen'].includes(to))throw Error('Недоступный регион');
     if(to==='city'){
       const back=p.worldTravel?.returnTo;
       if(!back||back.scene!=='city')throw Error('Не найдено место возвращения');
