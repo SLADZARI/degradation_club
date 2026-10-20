@@ -1,0 +1,1261 @@
+{
+  "created": "2026-10-20",
+  "count": 139,
+  "logical_no_sprite": 15,
+  "svg_from_batch02": 90,
+  "svg_from_batch01_object_ids": 34,
+  "extra_batch01_stone_size_variant": 1,
+  "coverage": [
+    {
+      "object_id": "DL-001",
+      "name": "Городской мир",
+      "category": "world",
+      "old_status": "LOGICAL_NO_INDEPENDENT_SPRITE_REQUIRED",
+      "new_status": "NO_SPRITE_NEEDED",
+      "requires_visual_approval": false,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-002",
+      "name": "Западный берег",
+      "category": "world",
+      "old_status": "LOGICAL_NO_INDEPENDENT_SPRITE_REQUIRED",
+      "new_status": "NO_SPRITE_NEEDED",
+      "requires_visual_approval": false,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-003",
+      "name": "Восточный берег",
+      "category": "world",
+      "old_status": "LOGICAL_NO_INDEPENDENT_SPRITE_REQUIRED",
+      "new_status": "NO_SPRITE_NEEDED",
+      "requires_visual_approval": false,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-004",
+      "name": "Река",
+      "category": "world",
+      "old_status": "MISSING_INDEPENDENT_APPROVED_SVG",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-005",
+      "name": "Городская площадь — территория",
+      "category": "world",
+      "old_status": "MISSING_INDEPENDENT_APPROVED_SVG",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-006",
+      "name": "Дорога и тропинка",
+      "category": "world",
+      "old_status": "MISSING_INDEPENDENT_APPROVED_SVG",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-007",
+      "name": "Личный городской участок",
+      "category": "world",
+      "old_status": "LOGICAL_NO_INDEPENDENT_SPRITE_REQUIRED",
+      "new_status": "NO_SPRITE_NEEDED",
+      "requires_visual_approval": false,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-008",
+      "name": "Отдельная сцена личного участка",
+      "category": "world",
+      "old_status": "LOGICAL_NO_INDEPENDENT_SPRITE_REQUIRED",
+      "new_status": "NO_SPRITE_NEEDED",
+      "requires_visual_approval": false,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-009",
+      "name": "Экспедиционная территория",
+      "category": "world",
+      "old_status": "MISSING_INDEPENDENT_APPROVED_SVG",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-010",
+      "name": "Интерьер палатки — пространство",
+      "category": "world",
+      "old_status": "LOGICAL_NO_INDEPENDENT_SPRITE_REQUIRED",
+      "new_status": "NO_SPRITE_NEEDED",
+      "requires_visual_approval": false,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-011",
+      "name": "Территория дополнительного города",
+      "category": "world",
+      "old_status": "LOGICAL_NO_INDEPENDENT_SPRITE_REQUIRED",
+      "new_status": "NO_SPRITE_NEEDED",
+      "requires_visual_approval": false,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-012",
+      "name": "Палатка временной мэрии",
+      "category": "building",
+      "old_status": "LEGACY_SVG_CANDIDATE_NOT_QA_APPROVED",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-013",
+      "name": "Городская площадь — покрытие",
+      "category": "building",
+      "old_status": "LEGACY_SVG_CANDIDATE_NOT_QA_APPROVED",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-014",
+      "name": "Общественная кузница",
+      "category": "building",
+      "old_status": "LEGACY_SVG_CANDIDATE_NOT_QA_APPROVED",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-015",
+      "name": "Мост",
+      "category": "building",
+      "old_status": "LEGACY_SVG_CANDIDATE_NOT_QA_APPROVED",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-016",
+      "name": "Городской склад",
+      "category": "building",
+      "old_status": "LEGACY_SVG_CANDIDATE_NOT_QA_APPROVED",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-017",
+      "name": "Магазин инструментов",
+      "category": "building",
+      "old_status": "LEGACY_SVG_CANDIDATE_NOT_QA_APPROVED",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-018",
+      "name": "Семенная лавка",
+      "category": "building",
+      "old_status": "LEGACY_SVG_CANDIDATE_NOT_QA_APPROVED",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-019",
+      "name": "Общественный огород",
+      "category": "building",
+      "old_status": "LEGACY_SVG_CANDIDATE_NOT_QA_APPROVED",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-020",
+      "name": "Личная палатка",
+      "category": "building",
+      "old_status": "LEGACY_SVG_CANDIDATE_NOT_QA_APPROVED",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-021",
+      "name": "Личный огород",
+      "category": "building",
+      "old_status": "LEGACY_PNG_ONLY_CANDIDATE_REQUIRES_SVG",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-022",
+      "name": "Стойка инструментов",
+      "category": "civic",
+      "old_status": "MISSING_INDEPENDENT_APPROVED_SVG",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-023",
+      "name": "Доска городских работ",
+      "category": "civic",
+      "old_status": "LEGACY_SVG_CANDIDATE_NOT_QA_APPROVED",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-024",
+      "name": "Реестр городов",
+      "category": "civic",
+      "old_status": "NEW_ISO30_SVG_CANDIDATE",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH01_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-025",
+      "name": "Указатель экспедиции",
+      "category": "civic",
+      "old_status": "LEGACY_PNG_ONLY_CANDIDATE_REQUIRES_SVG",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-026",
+      "name": "Приёмный ящик площади",
+      "category": "civic",
+      "old_status": "LEGACY_PNG_ONLY_CANDIDATE_REQUIRES_SVG",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-027",
+      "name": "Приёмный ящик кузницы",
+      "category": "civic",
+      "old_status": "MISSING_INDEPENDENT_APPROVED_SVG",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-028",
+      "name": "Приёмный ящик моста",
+      "category": "civic",
+      "old_status": "MISSING_INDEPENDENT_APPROVED_SVG",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-029",
+      "name": "Приёмный ящик лавки",
+      "category": "civic",
+      "old_status": "NEW_ISO30_SVG_CANDIDATE",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH01_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-030",
+      "name": "Приёмный ящик огорода",
+      "category": "civic",
+      "old_status": "NEW_ISO30_SVG_CANDIDATE",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH01_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-031",
+      "name": "Коробка пожертвований",
+      "category": "civic",
+      "old_status": "NEW_ISO30_SVG_CANDIDATE",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH01_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-032",
+      "name": "Доска пожертвований",
+      "category": "civic",
+      "old_status": "MISSING_INDEPENDENT_APPROVED_SVG",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-033",
+      "name": "Доска воров",
+      "category": "civic",
+      "old_status": "MISSING_INDEPENDENT_APPROVED_SVG",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-034",
+      "name": "Пьедестал памятника",
+      "category": "civic",
+      "old_status": "NEW_ISO30_SVG_CANDIDATE",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH01_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-035",
+      "name": "Музыкальный автомат",
+      "category": "civic",
+      "old_status": "NEW_ISO30_SVG_CANDIDATE",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH01_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-036",
+      "name": "Скамейка",
+      "category": "civic",
+      "old_status": "LEGACY_SVG_CANDIDATE_NOT_QA_APPROVED",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-037",
+      "name": "Столбик разметки",
+      "category": "civic",
+      "old_status": "NEW_ISO30_SVG_CANDIDATE",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH01_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-038",
+      "name": "Флаг владельца",
+      "category": "civic",
+      "old_status": "LEGACY_PNG_ONLY_CANDIDATE_REQUIRES_SVG",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-039",
+      "name": "Ящики у городского склада",
+      "category": "civic",
+      "old_status": "LEGACY_SVG_CANDIDATE_NOT_QA_APPROVED",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-040",
+      "name": "Личный источник воды",
+      "category": "civic",
+      "old_status": "LEGACY_PNG_ONLY_CANDIDATE_REQUIRES_SVG",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-041",
+      "name": "Городской источник воды",
+      "category": "civic",
+      "old_status": "NEW_ISO30_SVG_CANDIDATE",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH01_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-042",
+      "name": "Сундук",
+      "category": "furniture",
+      "old_status": "LEGACY_SVG_CANDIDATE_NOT_QA_APPROVED",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-043",
+      "name": "Кровать",
+      "category": "furniture",
+      "old_status": "LEGACY_SVG_CANDIDATE_NOT_QA_APPROVED",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-044",
+      "name": "Матрас и подушка",
+      "category": "furniture",
+      "old_status": "MISSING_INDEPENDENT_APPROVED_SVG",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-045",
+      "name": "Грядка личная",
+      "category": "furniture",
+      "old_status": "MISSING_INDEPENDENT_APPROVED_SVG",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-046",
+      "name": "Колодец — форма",
+      "category": "furniture",
+      "old_status": "LEGACY_PNG_ONLY_CANDIDATE_REQUIRES_SVG",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-047",
+      "name": "Кучка вещей на земле",
+      "category": "furniture",
+      "old_status": "NEW_ISO30_SVG_CANDIDATE",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH01_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-048",
+      "name": "Рюкзак",
+      "category": "furniture",
+      "old_status": "LOGICAL_NO_INDEPENDENT_SPRITE_REQUIRED",
+      "new_status": "NO_SPRITE_NEEDED",
+      "requires_visual_approval": false,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-049",
+      "name": "Курьерский ящик / груз",
+      "category": "furniture",
+      "old_status": "LOGICAL_NO_INDEPENDENT_SPRITE_REQUIRED",
+      "new_status": "NO_SPRITE_NEEDED",
+      "requires_visual_approval": false,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-050",
+      "name": "Дерево целиком",
+      "category": "nature",
+      "old_status": "LEGACY_SVG_CANDIDATE_NOT_QA_APPROVED",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-051",
+      "name": "Ствол дерева",
+      "category": "nature",
+      "old_status": "MISSING_INDEPENDENT_APPROVED_SVG",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-052",
+      "name": "Крона дерева",
+      "category": "nature",
+      "old_status": "MISSING_INDEPENDENT_APPROVED_SVG",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-053",
+      "name": "Пень",
+      "category": "nature",
+      "old_status": "LEGACY_PNG_ONLY_CANDIDATE_REQUIRES_SVG",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-054",
+      "name": "Каменная глыба",
+      "category": "nature",
+      "old_status": "NEW_ISO30_SVG_CANDIDATE",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH01_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-055",
+      "name": "Остатки породы",
+      "category": "nature",
+      "old_status": "MISSING_INDEPENDENT_APPROVED_SVG",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-056",
+      "name": "Ягодный куст",
+      "category": "nature",
+      "old_status": "LEGACY_SVG_CANDIDATE_NOT_QA_APPROVED",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-057",
+      "name": "Дикий куст конопли",
+      "category": "nature",
+      "old_status": "MISSING_INDEPENDENT_APPROVED_SVG",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-058",
+      "name": "Дикая морковь / семенное растение",
+      "category": "nature",
+      "old_status": "MISSING_INDEPENDENT_APPROVED_SVG",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-059",
+      "name": "Конопля выращенная",
+      "category": "nature",
+      "old_status": "MISSING_INDEPENDENT_APPROVED_SVG",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-060",
+      "name": "Морковь выращенная",
+      "category": "nature",
+      "old_status": "MISSING_INDEPENDENT_APPROVED_SVG",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-061",
+      "name": "Морковь на семена",
+      "category": "nature",
+      "old_status": "MISSING_INDEPENDENT_APPROVED_SVG",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-062",
+      "name": "Топор — стартовый",
+      "category": "tool",
+      "old_status": "LEGACY_SVG_CANDIDATE_NOT_QA_APPROVED",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-063",
+      "name": "Топор — кузница",
+      "category": "tool",
+      "old_status": "MISSING_INDEPENDENT_APPROVED_SVG",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-064",
+      "name": "Топор — магазинный",
+      "category": "tool",
+      "old_status": "MISSING_INDEPENDENT_APPROVED_SVG",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-065",
+      "name": "Кирка — стартовая",
+      "category": "tool",
+      "old_status": "LEGACY_SVG_CANDIDATE_NOT_QA_APPROVED",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-066",
+      "name": "Кирка — кузница",
+      "category": "tool",
+      "old_status": "MISSING_INDEPENDENT_APPROVED_SVG",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-067",
+      "name": "Кирка — магазинная",
+      "category": "tool",
+      "old_status": "MISSING_INDEPENDENT_APPROVED_SVG",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-068",
+      "name": "Древесина — ресурс",
+      "category": "resource",
+      "old_status": "LEGACY_PNG_ONLY_CANDIDATE_REQUIRES_SVG",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-069",
+      "name": "Камень — ресурс",
+      "category": "resource",
+      "old_status": "LEGACY_PNG_ONLY_CANDIDATE_REQUIRES_SVG",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-070",
+      "name": "Ягода",
+      "category": "resource",
+      "old_status": "LOGICAL_NO_INDEPENDENT_SPRITE_REQUIRED",
+      "new_status": "NO_SPRITE_NEEDED",
+      "requires_visual_approval": false,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-071",
+      "name": "Семя конопли",
+      "category": "resource",
+      "old_status": "LOGICAL_NO_INDEPENDENT_SPRITE_REQUIRED",
+      "new_status": "NO_SPRITE_NEEDED",
+      "requires_visual_approval": false,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-072",
+      "name": "Семя моркови",
+      "category": "resource",
+      "old_status": "LOGICAL_NO_INDEPENDENT_SPRITE_REQUIRED",
+      "new_status": "NO_SPRITE_NEEDED",
+      "requires_visual_approval": false,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-073",
+      "name": "Конопля — связка сырья",
+      "category": "resource",
+      "old_status": "LOGICAL_NO_INDEPENDENT_SPRITE_REQUIRED",
+      "new_status": "NO_SPRITE_NEEDED",
+      "requires_visual_approval": false,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-074",
+      "name": "Морковь — предмет",
+      "category": "resource",
+      "old_status": "LEGACY_SVG_CANDIDATE_NOT_QA_APPROVED",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-075",
+      "name": "Вода — 1 литр",
+      "category": "resource",
+      "old_status": "LOGICAL_NO_INDEPENDENT_SPRITE_REQUIRED",
+      "new_status": "NO_SPRITE_NEEDED",
+      "requires_visual_approval": false,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-076",
+      "name": "Деревянная доска",
+      "category": "component",
+      "old_status": "LEGACY_PNG_ONLY_CANDIDATE_REQUIRES_SVG",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-077",
+      "name": "Строительная балка",
+      "category": "component",
+      "old_status": "MISSING_INDEPENDENT_APPROVED_SVG",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-078",
+      "name": "Опорный столб",
+      "category": "component",
+      "old_status": "MISSING_INDEPENDENT_APPROVED_SVG",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-079",
+      "name": "Деревянный колышек",
+      "category": "component",
+      "old_status": "MISSING_INDEPENDENT_APPROVED_SVG",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-080",
+      "name": "Каменный строительный блок",
+      "category": "component",
+      "old_status": "LEGACY_PNG_ONLY_CANDIDATE_REQUIRES_SVG",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-081",
+      "name": "Плитка площади",
+      "category": "component",
+      "old_status": "MISSING_INDEPENDENT_APPROVED_SVG",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-082",
+      "name": "Доска настила моста",
+      "category": "component",
+      "old_status": "MISSING_INDEPENDENT_APPROVED_SVG",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-083",
+      "name": "Стойка мостовых перил",
+      "category": "component",
+      "old_status": "MISSING_INDEPENDENT_APPROVED_SVG",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-084",
+      "name": "Перекладина перил",
+      "category": "component",
+      "old_status": "MISSING_INDEPENDENT_APPROVED_SVG",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-085",
+      "name": "Планка скамейки",
+      "category": "component",
+      "old_status": "MISSING_INDEPENDENT_APPROVED_SVG",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-086",
+      "name": "Ножка скамейки",
+      "category": "component",
+      "old_status": "MISSING_INDEPENDENT_APPROVED_SVG",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-087",
+      "name": "Опора доски объявлений",
+      "category": "component",
+      "old_status": "MISSING_INDEPENDENT_APPROVED_SVG",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-088",
+      "name": "Бумажное объявление",
+      "category": "component",
+      "old_status": "MISSING_INDEPENDENT_APPROVED_SVG",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-089",
+      "name": "Кровельная панель",
+      "category": "component",
+      "old_status": "MISSING_INDEPENDENT_APPROVED_SVG",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-090",
+      "name": "Дверь",
+      "category": "component",
+      "old_status": "MISSING_INDEPENDENT_APPROVED_SVG",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-091",
+      "name": "Оконная рама",
+      "category": "component",
+      "old_status": "MISSING_INDEPENDENT_APPROVED_SVG",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-092",
+      "name": "Оконное стекло",
+      "category": "component",
+      "old_status": "MISSING_INDEPENDENT_APPROVED_SVG",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-093",
+      "name": "Торговый навес",
+      "category": "component",
+      "old_status": "MISSING_INDEPENDENT_APPROVED_SVG",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-094",
+      "name": "Дымоход кузницы",
+      "category": "component",
+      "old_status": "MISSING_INDEPENDENT_APPROVED_SVG",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-095",
+      "name": "Тентовое полотно",
+      "category": "component",
+      "old_status": "MISSING_INDEPENDENT_APPROVED_SVG",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-096",
+      "name": "Опора палатки",
+      "category": "component",
+      "old_status": "MISSING_INDEPENDENT_APPROVED_SVG",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-097",
+      "name": "Палаточный колышек",
+      "category": "component",
+      "old_status": "MISSING_INDEPENDENT_APPROVED_SVG",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-098",
+      "name": "Ящик материалов",
+      "category": "component",
+      "old_status": "MISSING_INDEPENDENT_APPROVED_SVG",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-099",
+      "name": "Полотнище флага",
+      "category": "component",
+      "old_status": "MISSING_INDEPENDENT_APPROVED_SVG",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-100",
+      "name": "Семя — универсальная модель",
+      "category": "component",
+      "old_status": "LOGICAL_NO_INDEPENDENT_SPRITE_REQUIRED",
+      "new_status": "NO_SPRITE_NEEDED",
+      "requires_visual_approval": false,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-101",
+      "name": "Ягода на кусте",
+      "category": "component",
+      "old_status": "MISSING_INDEPENDENT_APPROVED_SVG",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-102",
+      "name": "Корнеплод моркови",
+      "category": "component",
+      "old_status": "MISSING_INDEPENDENT_APPROVED_SVG",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-103",
+      "name": "Лист растения",
+      "category": "component",
+      "old_status": "MISSING_INDEPENDENT_APPROVED_SVG",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-104",
+      "name": "Стебель конопли",
+      "category": "component",
+      "old_status": "MISSING_INDEPENDENT_APPROVED_SVG",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-NEW-BERRIES-CLUSTER-01",
+      "name": "Гроздь ягод",
+      "category": "resource",
+      "old_status": "LEGACY_PNG_ONLY_CANDIDATE_REQUIRES_SVG",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-NEW-SAPLING-01",
+      "name": "Саженец",
+      "category": "nature",
+      "old_status": "LEGACY_PNG_ONLY_CANDIDATE_REQUIRES_SVG",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-NEW-CAMPFIRE-01",
+      "name": "Костёр",
+      "category": "survival",
+      "old_status": "LEGACY_PNG_ONLY_CANDIDATE_REQUIRES_SVG",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-NEW-BUCKET-01",
+      "name": "Ведро",
+      "category": "survival",
+      "old_status": "LEGACY_PNG_ONLY_CANDIDATE_REQUIRES_SVG",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-NEW-SACK-01",
+      "name": "Мешок",
+      "category": "furniture",
+      "old_status": "LEGACY_PNG_ONLY_CANDIDATE_REQUIRES_SVG",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-NEW-TORCH-01",
+      "name": "Факел",
+      "category": "tool",
+      "old_status": "LEGACY_PNG_ONLY_CANDIDATE_REQUIRES_SVG",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-NEW-SIGN-01",
+      "name": "Табличка",
+      "category": "civic",
+      "old_status": "LEGACY_PNG_ONLY_CANDIDATE_REQUIRES_SVG",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-NEW-SHOVEL-01",
+      "name": "Лопата",
+      "category": "tool",
+      "old_status": "LEGACY_PNG_ONLY_CANDIDATE_REQUIRES_SVG",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-NEW-BARREL-01",
+      "name": "Бочка",
+      "category": "furniture",
+      "old_status": "LEGACY_PNG_ONLY_CANDIDATE_REQUIRES_SVG",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-NEW-CHAIR-01",
+      "name": "Стул",
+      "category": "furniture",
+      "old_status": "NEW_ISO30_SVG_CANDIDATE",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH01_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-NEW-WORKBENCH-01",
+      "name": "Рабочий верстак",
+      "category": "furniture",
+      "old_status": "LEGACY_PNG_ONLY_CANDIDATE_REQUIRES_SVG",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "DL-NEW-LADDER-01",
+      "name": "Лестница",
+      "category": "component",
+      "old_status": "LEGACY_PNG_ONLY_CANDIDATE_REQUIRES_SVG",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH02_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "world-desert-cactus",
+      "name": "Кактус пустынного биома",
+      "category": "nature",
+      "old_status": "NEW_ISO30_SVG_CANDIDATE",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH01_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "world-mountain-cliff",
+      "name": "Скала горного массива",
+      "category": "nature",
+      "old_status": "NEW_ISO30_SVG_CANDIDATE",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH01_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "world-mountain-route",
+      "name": "Указатель горной тропы",
+      "category": "civic",
+      "old_status": "NEW_ISO30_SVG_CANDIDATE",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH01_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "world-bridge-02",
+      "name": "Второй мост · готовое состояние",
+      "category": "building",
+      "old_status": "NEW_ISO30_SVG_CANDIDATE",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH01_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "world-payphone",
+      "name": "Уличный таксофон",
+      "category": "civic",
+      "old_status": "NEW_ISO30_SVG_CANDIDATE",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH01_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "world-industrial-pavilion",
+      "name": "Промышленный павильон",
+      "category": "building",
+      "old_status": "NEW_ISO30_SVG_CANDIDATE",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH01_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "world-forestry-sapling",
+      "name": "Дерево: стадия саженца",
+      "category": "nature",
+      "old_status": "NEW_ISO30_SVG_CANDIDATE",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH01_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "world-forestry-spruce",
+      "name": "Выращенная ель · взрослая",
+      "category": "nature",
+      "old_status": "NEW_ISO30_SVG_CANDIDATE",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH01_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "room-wall",
+      "name": "Внутренняя комната: угол стен",
+      "category": "interior",
+      "old_status": "NEW_ISO30_SVG_CANDIDATE",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH01_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "chest",
+      "name": "Сундук в интерьере",
+      "category": "furniture",
+      "old_status": "NEW_ISO30_SVG_CANDIDATE",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH01_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "bed",
+      "name": "Кровать в интерьере",
+      "category": "furniture",
+      "old_status": "NEW_ISO30_SVG_CANDIDATE",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH01_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "interior-table-proposal",
+      "name": "Стол для внутренних помещений",
+      "category": "furniture",
+      "old_status": "NEW_ISO30_SVG_CANDIDATE",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH01_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "world01-billboard",
+      "name": "Информационный билборд леса идей",
+      "category": "civic",
+      "old_status": "NEW_ISO30_SVG_CANDIDATE_ISOLATED",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH01_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "world01-portal",
+      "name": "Портал леса идей",
+      "category": "civic",
+      "old_status": "NEW_ISO30_SVG_CANDIDATE_ISOLATED",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH01_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "world01-scooter-rack",
+      "name": "Стойка самоката",
+      "category": "prop",
+      "old_status": "NEW_ISO30_SVG_CANDIDATE_ISOLATED",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH01_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "mentalhumor-museum",
+      "name": "Музей смеха · здание",
+      "category": "building",
+      "old_status": "NEW_ISO30_SVG_CANDIDATE_ISOLATED",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH01_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "mentalhumor-research-demo",
+      "name": "Исследовательский стенд музея",
+      "category": "furniture",
+      "old_status": "NEW_ISO30_SVG_CANDIDATE_ISOLATED",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH01_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "cave-lantern",
+      "name": "Фонарь для пещеры",
+      "category": "prop",
+      "old_status": "NEW_ISO30_SVG_CANDIDATE_ISOLATED",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH01_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "cave-secret-door",
+      "name": "Секретная дверь пещеры",
+      "category": "building",
+      "old_status": "NEW_ISO30_SVG_CANDIDATE_ISOLATED",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH01_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "cave-altar",
+      "name": "Алтарь за секретной дверью",
+      "category": "furniture",
+      "old_status": "NEW_ISO30_SVG_CANDIDATE_ISOLATED",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH01_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "cave-bats",
+      "name": "Летучая мышь пещеры",
+      "category": "nature",
+      "old_status": "NEW_ISO30_SVG_CANDIDATE_ISOLATED",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH01_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "obitel-zen-arch",
+      "name": "Чёрная арка входа ZEN",
+      "category": "building",
+      "old_status": "NEW_ISO30_SVG_CANDIDATE_ISOLATED",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH01_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    },
+    {
+      "object_id": "OB-C01..OB-C07",
+      "name": "Карточка ZEN (7 позиций)",
+      "category": "civic",
+      "old_status": "NEW_ISO30_SVG_CANDIDATE_ISOLATED",
+      "new_status": "SVG_SOURCE_EXISTS_BATCH01_NOT_APPROVED",
+      "requires_visual_approval": true,
+      "runtime_bound": false
+    }
+  ]
+}

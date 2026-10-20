@@ -1,0 +1,195 @@
+{
+  "count": 21,
+  "state_notes": "Candidate sprites are not wired to actual server project.stage; exact stage mapping is still G6 work",
+  "variants": [
+    {
+      "physical_id": "DL-012",
+      "visual_state": "stage-0",
+      "source": "source/stages/temporary-mayor-tent--stage-0.svg",
+      "png": "build/stages_png_256/temporary-mayor-tent--stage-0.png",
+      "requires_runtime_stage_mapping": true,
+      "approved": false,
+      "sha256": "757636bcfdc69f25db3ebd2eec9c420efa88e8162edcd71eb37d79e065ca3634"
+    },
+    {
+      "physical_id": "DL-012",
+      "visual_state": "stage-1",
+      "source": "source/stages/temporary-mayor-tent--stage-1.svg",
+      "png": "build/stages_png_256/temporary-mayor-tent--stage-1.png",
+      "requires_runtime_stage_mapping": true,
+      "approved": false,
+      "sha256": "489de2ad5e37aedbbc7d1052f7228f6b49467d469659cc5a567aef3d6f374f69"
+    },
+    {
+      "physical_id": "DL-012",
+      "visual_state": "stage-2",
+      "source": "source/stages/temporary-mayor-tent--stage-2.svg",
+      "png": "build/stages_png_256/temporary-mayor-tent--stage-2.png",
+      "requires_runtime_stage_mapping": true,
+      "approved": false,
+      "sha256": "52b4274efd8904fe4446144073dd0f57ef065e2b86d6d622ffc2e5b7b1a8e11c"
+    },
+    {
+      "physical_id": "DL-013",
+      "visual_state": "stage-0",
+      "source": "source/stages/town-square--stage-0.svg",
+      "png": "build/stages_png_256/town-square--stage-0.png",
+      "requires_runtime_stage_mapping": true,
+      "approved": false,
+      "sha256": "92bbf4566365132e8db8eba9287b1417651c437cdd01c399bf1dca8086b4e696"
+    },
+    {
+      "physical_id": "DL-013",
+      "visual_state": "stage-1",
+      "source": "source/stages/town-square--stage-1.svg",
+      "png": "build/stages_png_256/town-square--stage-1.png",
+      "requires_runtime_stage_mapping": true,
+      "approved": false,
+      "sha256": "8bf9484312f357936f5a72b98192245c062af4a9fec16aefe2c0a6427aa2b6a5"
+    },
+    {
+      "physical_id": "DL-013",
+      "visual_state": "stage-2",
+      "source": "source/stages/town-square--stage-2.svg",
+      "png": "build/stages_png_256/town-square--stage-2.png",
+      "requires_runtime_stage_mapping": true,
+      "approved": false,
+      "sha256": "fced011f3c90cda747a7f1530fd57c418b4e266abac06d2b12badda4a7ad49a5"
+    },
+    {
+      "physical_id": "DL-014",
+      "visual_state": "stage-0",
+      "source": "source/stages/city-forge--stage-0.svg",
+      "png": "build/stages_png_256/city-forge--stage-0.png",
+      "requires_runtime_stage_mapping": true,
+      "approved": false,
+      "sha256": "e0569ad436dd14ba7ed2631698646fe7a1267b7751baac4c3a635b9390343feb"
+    },
+    {
+      "physical_id": "DL-014",
+      "visual_state": "stage-1",
+      "source": "source/stages/city-forge--stage-1.svg",
+      "png": "build/stages_png_256/city-forge--stage-1.png",
+      "requires_runtime_stage_mapping": true,
+      "approved": false,
+      "sha256": "ab8195b6cc841d94b4513383cf5a17db2121b4275eb7e58b0d17e350733cba50"
+    },
+    {
+      "physical_id": "DL-014",
+      "visual_state": "stage-2",
+      "source": "source/stages/city-forge--stage-2.svg",
+      "png": "build/stages_png_256/city-forge--stage-2.png",
+      "requires_runtime_stage_mapping": true,
+      "approved": false,
+      "sha256": "3b1424791c62c409557b84f2d8449be13a4c40f923ba970c6e7a143496e1b3a1"
+    },
+    {
+      "physical_id": "DL-015",
+      "visual_state": "stage-0",
+      "source": "source/stages/public-bridge--stage-0.svg",
+      "png": "build/stages_png_256/public-bridge--stage-0.png",
+      "requires_runtime_stage_mapping": true,
+      "approved": false,
+      "sha256": "0ad1a4b36a9fd4229328e0e3594395578c1232a48765e355a75f5c2e8c730b8f"
+    },
+    {
+      "physical_id": "DL-015",
+      "visual_state": "stage-1",
+      "source": "source/stages/public-bridge--stage-1.svg",
+      "png": "build/stages_png_256/public-bridge--stage-1.png",
+      "requires_runtime_stage_mapping": true,
+      "approved": false,
+      "sha256": "8f485912bd19519db0c6371022bd2036793413f8afcbb3a8eee101acb7565388"
+    },
+    {
+      "physical_id": "DL-015",
+      "visual_state": "stage-2",
+      "source": "source/stages/public-bridge--stage-2.svg",
+      "png": "build/stages_png_256/public-bridge--stage-2.png",
+      "requires_runtime_stage_mapping": true,
+      "approved": false,
+      "sha256": "d63e04d64e00a819b5f35ee2a192e8f123db550a97daceac789864774a2536d7"
+    },
+    {
+      "physical_id": "DL-018",
+      "visual_state": "stage-0",
+      "source": "source/stages/seed-shop--stage-0.svg",
+      "png": "build/stages_png_256/seed-shop--stage-0.png",
+      "requires_runtime_stage_mapping": true,
+      "approved": false,
+      "sha256": "55486630afb03f70165a039e5af4051964b14a6b43107d42b3dfafee57e066c3"
+    },
+    {
+      "physical_id": "DL-018",
+      "visual_state": "stage-1",
+      "source": "source/stages/seed-shop--stage-1.svg",
+      "png": "build/stages_png_256/seed-shop--stage-1.png",
+      "requires_runtime_stage_mapping": true,
+      "approved": false,
+      "sha256": "6ebb5c7ce66b6b8504162e371b13209d22aa4862c31860c39f4461065a39a85c"
+    },
+    {
+      "physical_id": "DL-018",
+      "visual_state": "stage-2",
+      "source": "source/stages/seed-shop--stage-2.svg",
+      "png": "build/stages_png_256/seed-shop--stage-2.png",
+      "requires_runtime_stage_mapping": true,
+      "approved": false,
+      "sha256": "908ccd7cb62fee3fe5fee22d1fc53146f88477269a94da85a682632e75cd1972"
+    },
+    {
+      "physical_id": "DL-019",
+      "visual_state": "stage-0",
+      "source": "source/stages/public-garden--stage-0.svg",
+      "png": "build/stages_png_256/public-garden--stage-0.png",
+      "requires_runtime_stage_mapping": true,
+      "approved": false,
+      "sha256": "11b6b78a2e4a36078a5fb32a4df2d8d684c3eb276ce3f8e066b95d319d5cc2fe"
+    },
+    {
+      "physical_id": "DL-019",
+      "visual_state": "stage-1",
+      "source": "source/stages/public-garden--stage-1.svg",
+      "png": "build/stages_png_256/public-garden--stage-1.png",
+      "requires_runtime_stage_mapping": true,
+      "approved": false,
+      "sha256": "0bdf35fd6c50915a76967a4af2f98abd14a674f6bb643ff7648b48132c13bad0"
+    },
+    {
+      "physical_id": "DL-019",
+      "visual_state": "stage-2",
+      "source": "source/stages/public-garden--stage-2.svg",
+      "png": "build/stages_png_256/public-garden--stage-2.png",
+      "requires_runtime_stage_mapping": true,
+      "approved": false,
+      "sha256": "a344376425c759334d21d51c6843ed7d7f3fdbc961e685725f8f9ede039c40e5"
+    },
+    {
+      "physical_id": "DL-020",
+      "visual_state": "stage-0",
+      "source": "source/stages/personal-tent--stage-0.svg",
+      "png": "build/stages_png_256/personal-tent--stage-0.png",
+      "requires_runtime_stage_mapping": true,
+      "approved": false,
+      "sha256": "469fcc6c52d3e245ddb1c32375128876ab6c13e1a150a04587ecac64035cdca2"
+    },
+    {
+      "physical_id": "DL-020",
+      "visual_state": "stage-1",
+      "source": "source/stages/personal-tent--stage-1.svg",
+      "png": "build/stages_png_256/personal-tent--stage-1.png",
+      "requires_runtime_stage_mapping": true,
+      "approved": false,
+      "sha256": "2d31bdb31a05a0b13363463bdc54e7b11acb3d169a2d70e9b36194cadb8dbb0d"
+    },
+    {
+      "physical_id": "DL-020",
+      "visual_state": "stage-2",
+      "source": "source/stages/personal-tent--stage-2.svg",
+      "png": "build/stages_png_256/personal-tent--stage-2.png",
+      "requires_runtime_stage_mapping": true,
+      "approved": false,
+      "sha256": "6d4bb824a2e425667e61b0f5bb9e4124429e0d522d342d5a0ebd42963f049a5b"
+    }
+  ]
+}

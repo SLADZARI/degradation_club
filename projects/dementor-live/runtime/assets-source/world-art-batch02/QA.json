@@ -1,0 +1,9 @@
+{
+  "svg_valid": 90,
+  "png_256": 90,
+  "png_128": 90,
+  "safe_margin_pass": 90,
+  "margin_failures": [],
+  "source_count": 90,
+  "status": "TECHNICAL_CHECK_ONLY_NOT_ART_APPROVED"
+}
