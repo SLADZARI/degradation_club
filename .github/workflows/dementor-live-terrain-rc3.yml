@@ -1,0 +1,58 @@
+name: Dementor Live Terrain RC3 - isolated acceptance
+on:
+  push:
+    branches:
+      - 'release/dementor-live-terrain-rc3-*'
+  pull_request:
+    paths:
+      - 'projects/dementor-live/runtime/**'
+      - '.github/workflows/dementor-live-terrain-rc3.yml'
+permissions:
+  contents: read
+jobs:
+  svg-atlas-gameplay:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    defaults:
+      run:
+        working-directory: projects/dementor-live/runtime
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: JS parse checks
+        run: |
+          node --check server.mjs
+          node --check landscape.mjs
+          node --check public/app.js
+          node --check public/city-ui.js
+          node --check public/life-ui.js
+          node --check public/terrain-01.js
+      - name: Terrain asset integrity, geometry and hash
+        run: |
+          python3 - <<'PY'
+          import json,pathlib,hashlib,xml.etree.ElementTree as ET
+          root=pathlib.Path('.')
+          m=json.loads((root/'public/assets/terrain/manifest.json').read_text())
+          assert m['schema']=='DL-TERRAIN-01' and len(m['tile_names'])==17
+          for name in m['tile_names']:
+              svg=root/'assets-source/terrain'/f'{name}.svg'
+              tree=ET.parse(svg).getroot()
+              assert tree.get('viewBox')=='0 0 256 148'
+              assert hashlib.sha256(svg.read_bytes()).hexdigest()==m['assets'][name]['source_sha256']
+          for size in ('128','256'):
+              entry=m['atlas'][size]
+              for filename,sha in ((entry['file'],entry['sha256']),(entry['fallback_png'],entry['fallback_png_sha256'])):
+                  path=root/'public/assets/terrain'/filename
+                  assert path.is_file() and hashlib.sha256(path.read_bytes()).hexdigest()==sha
+          print('PASS: 17 SVG, 4 hashed atlas images')
+          PY
+      - name: Terrain targeted game model tests
+        run: npm run test:terrain
+      - name: Full existing game model suite
+        run: npm test
+      - name: Save/persistence and HTTP integration
+        run: |
+          npm run test:integration
+          npm run test:persistence
