@@ -182,7 +182,20 @@ function updateCityPanels(force=false){
   }
 }
 $('bagButton').onclick=()=>{if(me)openCityPanel('bag');};
-function doContext(){if(!context||!context.enabled||me?.job||performance.now()-lastAction<(context.type==='homeClear'?570:180))return;lastAction=performance.now();if(context.type==='combat'){holdAction=false;location.href='/combat';return;}if(['mine','homeClear'].includes(context.type)&&heldResource()&&['wood','stone'].includes(state.home?.nodes.find(n=>n.id===context.id)?.kind||allTargets().find(t=>t.id===context.id)?.type)){holdAction=false;toast('Возьми топор или кирку в быстрой панели');return;}if(['board','warehouse','forge','shop','home','social','monument','jukebox','thefts','donation-box','donation-board','seeds','public-garden','city-registry','landscape','estate','mayor'].includes(context.type)){holdAction=false;if(context.type==='social')selected=context.id;openCityPanel(context.type==='social'?'resident':context.type);return;}act(context.type,context.id);}
+function quickHomeAction(){
+ if(context?.type!=='home'||!state?.home)return false;
+ const id=context.id,h=state.home;
+ if(['plot-exit','home-exit','tent','bed'].includes(id)){act('homeUse',id);return true;}
+ if(id==='well'){act('homeWater',id);return true;}
+ if(id==='garden'){if(h.owner===me.id){act('homePrepare',id);return true;}return false;}
+ const node=h.nodes?.find(n=>n.id===id&&n.left>0);
+ if(node){act('homeClear',id);return true;}
+ const bed=h.beds?.find(b=>b.id===id);
+ if(bed?.crop&&!bed.watered){act('homeWater',id);return true;}
+ if(bed?.crop&&bed.watered&&state.now>=bed.readyAt){act('homeHarvest',id);return true;}
+ return false;
+}
+function doContext(){if(!context||!context.enabled||me?.job||performance.now()-lastAction<(context.type==='homeClear'?570:180))return;lastAction=performance.now();if(context.type==='combat'){holdAction=false;location.href='/combat';return;}if(['mine','homeClear'].includes(context.type)&&heldResource()&&['wood','stone'].includes(state.home?.nodes.find(n=>n.id===context.id)?.kind||allTargets().find(t=>t.id===context.id)?.type)){holdAction=false;toast('Возьми топор или кирку в быстрой панели');return;}if(quickHomeAction())return;if(['board','warehouse','forge','shop','home','social','monument','jukebox','thefts','donation-box','donation-board','seeds','public-garden','city-registry','landscape','estate','mayor'].includes(context.type)){holdAction=false;if(context.type==='social')selected=context.id;openCityPanel(context.type==='social'?'resident':context.type);return;}act(context.type,context.id);}
 $('actionButton').onclick=doContext;$('axeButton').onclick=()=>act('equip','axe');$('pickButton').onclick=()=>act('equip','pick');$('eatButton').onclick=()=>act(me.bag.food?'eat':'eatCarrot');
 $('detailsButton').onclick=()=>{$('details').show();updateUI();};$('helpButton').onclick=()=>$('help').show();document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>$(b.dataset.close).close());
 $('secondPlayer').onclick=()=>window.open('/?new=1','_blank','noopener');
