@@ -28,6 +28,13 @@ A tested Node model is not a tested browser or production deployment. The versio
 - [COMBAT Touch v2 + CIVIC Forestry v1](../design/COMBAT_TOUCH_V2_CIVIC_FORESTRY_V1_2026-10-20.md) — iPhone 14 combat gestures and five plantable tree variants. Draft PR #284, follows Polish P1.
 - CIVIC and COMBAT additions remain proposals under QA; UNIVERSE port, exact production VM provenance, and production save migration remain separate gates.
 
+## CIVIC development contracts since v0.4
+
+- [CIVIC P2: land, business space, mayor feedback, forest & mountain checks](../design/CIVIC_LAND_MAYOR_REGIONS_P2_2026-10-20.md) — multi-city estate ownership, public business rentals, municipal mail and non-idle prompts; separate Draft PR.
+- [CIVIC UI Polish P1](../design/CIVIC_UI_WORLD_POLISH_P1_2026-10-20.md) — quests, collision, paving, visual refresh.
+- [COMBAT Touch v2 + Forestry v1](../design/COMBAT_TOUCH_V2_CIVIC_FORESTRY_V1_2026-10-20.md) — iPhone combat and plantable trees.
+- These are cumulative implementation candidates, not proof that the production VM runs the newest code; no UNIVERSE port is implied.
+
 ## Relevant existing sources
 
 - [Core first stage](../CORE_AND_FIRST_LEVEL_v0.1.md) — design source, not a runtime claim.
