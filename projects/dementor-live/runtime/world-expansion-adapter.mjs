@@ -6,6 +6,7 @@ import {civicAction,civicView} from './civic-earnings.mjs';
 import {losevAction,losevView} from './losev-courses.mjs';
 import {worldFootprints,blockedByRect} from './world-footprints.mjs';
 import {mountainMovement,onSummitTrail,summitPosition} from './mountain-trail.mjs';
+import {recoverBlockedSavedResidents} from './resident-recovery.mjs';
 export {createWorld};
 export class Game extends CoreGame{
   constructor(state,c){
@@ -23,6 +24,7 @@ export class Game extends CoreGame{
       const id='tiered-rock-'+tier;
       if(!this.state.resources.some(r=>r.id===id))this.state.resources.push({id,type:'stone',x,y,rockSize:tier,stock,initial:stock,regrowAt:0});
     }
+    recoverBlockedSavedResidents(this);
   }
   join(name,gender='unspecified'){const p=super.join(name,gender);initializeWorldTravel(this);return p;}
   target(id){return PHONE_BOOTHS.find(o=>o.id===id)||WORLD_CITY_TARGETS.find(o=>o.id===id)||Object.values(WORLD_SCENES)
