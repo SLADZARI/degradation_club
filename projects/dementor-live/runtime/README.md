@@ -28,3 +28,7 @@
 ## Новые SVG-иконки · NEW-ONLY v3.1
 
 Интеграция **только 42 новых** номеров (21–62), старые 20 Paper Cut v2 — без изменения: [инструкция, список ID и QA](../design/asset-library/NEW_ONLY_ICONS_V3_1_2026-10-20.md). Скачать [архив с 42 SVG, 210 PNG и установщиком](https://drive.google.com/file/d/13nNQYJ0rLOasHLE2pGA5Vsx2TS2DTiM_/view). Локально: `python3 install_new_only.py /path/to/runtime`; скрипт оставит каталог `public/assets/paper-icons/` и старый код иконок без изменений. Перед публикацией нужны проверки реального Mac, HTTP и мобильного UI.
+
+## DL-TERRAIN-01 · изометрическая земля (P0 assets, no deployment)
+
+[ТЗ, 17 SVG, результаты QA и установка](../design/DL_TERRAIN_01_ISO30_P0_2026-10-20.md) · [готовый пакет SVG/атласов](https://drive.google.com/file/d/1ofFxr1jWCWGUhqlUfNtjQio4u-hFGYqw/view). Плитки 256×148, 1×1 клетки, ISO30. Загрузчик рендерит *только* имеющиеся `landscape.tiles`; старый процедурный слой остаётся fallback. Перед релизом обязательны iPhone Safari/две сессии/backup; production не обновлён.
