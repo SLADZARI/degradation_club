@@ -25,7 +25,7 @@ blocked=function(x,y){
    if((state.telecom?.booths||[]).some(t=>Math.hypot(x-t.x,y-t.y)<.53))return true;
   if(region)return x<r||y<r||x>region.width-r||y>region.height-r;
   if(scene!=='city')return originalBlocked(x,y);
-  if((state.worldTravel.obstacles||[]).some(o=>x+r>o.x&&x-r<o.x+o.w&&y+r>o.y&&y-r<o.y+o.h))return true;
+  if((state.worldTravel.obstacles||[]).some(o=>(o.biome!=='forest'||state.resources.some(t=>t.id==='forest-wood-'+o.x+'-'+o.y&&t.stock>0))&&x+r>o.x&&x-r<o.x+o.w&&y+r>o.y&&y-r<o.y+o.h))return true;
   const c=state.config,b=state.worldTravel.secondBridge;
   if(x+r>c.river.x&&x-r<c.river.x+c.river.w&&y-r>=b.y&&y+r<=b.y+b.h)
     return state.worldTravel.secondBridgeProject?.stage!==2||x<r||y<r||x>c.width-r||y>c.height-r||state.resources.some(o=>o.stock>0&&o.type!=='food'&&Math.hypot(x-o.x,y-o.y)<.63);
@@ -161,7 +161,8 @@ function drawWorldProps(){
   const layers=[];
   for(const o of w.obstacles||[]){
     const p=screen(o.x+o.w/2,o.y+o.h/2);if(p.x< -200||p.x>view.w+200||p.y< -250||p.y>view.h+250)continue;
-    layers.push({depth:o.x+o.w/2+o.y+o.h/2,draw:()=>{if(o.biome==='forest')drawTree({x:o.x+o.w/2,y:o.y+o.h/2,stock:12});else{groundRect(o,'#b3b0a3','#868c86');drawStone({x:o.x+o.w/2,y:o.y+o.h/2,stock:16});}}});
+    if(o.biome==='forest'&&!state.resources.some(t=>t.id==='forest-wood-'+o.x+'-'+o.y&&t.stock>0))continue;
+    layers.push({depth:o.x+o.w/2+o.y+o.h/2,draw:()=>{if(o.biome==='forest')drawTree({x:o.x+o.w/2,y:o.y+o.h/2,stock:12,visualVariant:state.resources.find(t=>t.id==='forest-wood-'+o.x+'-'+o.y)?.visualVariant??0});else{groundRect(o,'#b3b0a3','#868c86');drawStone({x:o.x+o.w/2,y:o.y+o.h/2,stock:16});}}});
   }
   for(const t of w.targets||[]){
     const p=screen(t.x,t.y);if(p.x< -250||p.x>view.w+250||p.y< -250||p.y>view.h+250)continue;

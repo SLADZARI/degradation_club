@@ -45,7 +45,7 @@ export function worldObjects(scene='city'){
   return [...(region?[region.exit,region.main]:[]),...boothsForScene(scene)];
 }
 export function terrainBlocked(scene,x,y,r=.3){
-  if(scene==='city')return WORLD_OBSTACLES.some(o=>x+r>o.x&&x-r<o.x+o.w&&y+r>o.y&&y-r<o.y+o.h);
+  if(scene==='city')return WORLD_OBSTACLES.filter(o=>o.biome!=='forest').some(o=>x+r>o.x&&x-r<o.x+o.w&&y+r>o.y&&y-r<o.y+o.h);
   const region=WORLD_SCENES[scene];return !!region&&(x<r||y<r||x>region.width-r||y>region.height-r);
 }
 export function initializeWorldTravel(g){

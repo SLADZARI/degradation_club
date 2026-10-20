@@ -1,0 +1,24 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import {Game,createWorld} from '../world-expansion-adapter.mjs';
+import {bagCapacity,UNIVERSITY} from '../losev-courses.mjs';
+let i=0;const action=(g,p,type)=>g.command(p,{type,target:'university-site',requestId:'losev-test-'+(++i)});
+test('University grants +15 carrying capacity immediately and +15 only after 48 real hours; preserves PAPER',()=>{
+ const g=new Game(createWorld()),p=g.join('Ученик');g.connect(p);p.x=18;p.y=42;p.wallet=350;
+ const total=p.wallet+g.state.treasury;
+ assert.equal(bagCapacity(p,g.c,g.now),12);
+ assert.equal(action(g,p,'losevAdvanced').ok,false);
+ assert.equal(action(g,p,'losevFast').ok,true);
+ assert.equal(g.snapshot(p).config.capacity,27);
+ assert.equal(action(g,p,'losevFast').ok,false,'fast course must be one-time');
+ assert.equal(action(g,p,'losevAdvanced').ok,true);
+ assert.equal(p.wallet,50);assert.equal(g.state.treasury+p.wallet,total);
+ assert.equal(g.snapshot(p).config.capacity,27,'advanced course is not instant');
+ const old=new Game(structuredClone(g.state)),same=old.auth(p.token);
+ assert.equal(old.snapshot(same).config.capacity,27,'course progress survives world reload');
+ old.now=same.losevCourses.advancedEndsAt-1;
+ assert.equal(old.snapshot(same).config.capacity,27);
+ old.now=same.losevCourses.advancedEndsAt;
+ assert.equal(old.snapshot(same).config.capacity,42);
+ assert.equal(action(old,same,'losevAdvanced').ok,false,'one-time tuition cannot charge again');
+ assert.equal(same.wallet,50);
+});

@@ -39,7 +39,8 @@ function estatePanel(mode,rows,row,canAct){
  const mine=chosen.owner===me.id,canEnter=chosen.owner&&(mine||chosen.publicAccess);
  const landUse=chosen.zoning==='universal'?'universal':chosen.zoning;
  if(!chosen.owner){
-  row('Оформить '+chosen.id,'Стоимость покупки '+state.config.plotPrice+' PAPER. Для бизнеса и универсальной земли доступна аренда 1 PAPER/сутки.',[
+  row('Оформить '+chosen.id,'Покупка '+state.config.plotPrice+' PAPER · баланс '+me.wallet+' · не хватает '+Math.max(0,state.config.plotPrice-me.wallet)+' PAPER. '+(!near?'Подойди к табличке участка. ':'')+'Бизнес-аренда стоит 1 PAPER в день.',[
+    button('Показать путь',()=>{const id=chosen.id;document.querySelector('#cityPanel').close();navigateTo(id);}),
    button('Купить · '+state.config.plotPrice+' PAPER',()=>act('buy',chosen.id,{landUse}),!near||me.wallet<state.config.plotPrice,'estate-buy'),
    button('Арендовать · 1 PAPER/день',()=>act('plotRent',chosen.id,{landUse}),!near||me.wallet<1||landUse==='residential','estate-rent')]);
  }else{
@@ -64,7 +65,7 @@ function estatePanel(mode,rows,row,canAct){
   const products=['wood','stone','food','hemp','carrot'];
   for(const kind of products){
    const label=state.items[kind]?.name||kind,qty=stock[kind]||0,price=prices[kind]||0;
-   row(label+' · '+qty+' шт.',(price?price+' PAPER/шт.':'Цена не назначена')+' · '+(mine?'в твоём рюкзаке '+(me.bag[kind]||0):'продаётся в витрине'),mine?[
+   row(({wood:'🪵',stone:'🪨',food:'🫐',hemp:'🌿',carrot:'🥕'}[kind]||'')+' '+label+' · '+qty+' шт.',(price?price+' PAPER/шт.':'Цена не назначена')+' · '+(mine?'в твоём рюкзаке '+(me.bag[kind]||0):'продаётся в витрине'),mine?[
     button('Выставить 1',()=>act('shopStock',chosen.id,{kind,quantity:1}),!near||!me.bag[kind]),
     button('Вернуть 1',()=>act('shopUnstock',chosen.id,{kind,quantity:1}),!near||qty<1),
     button('Цена +1',()=>act('shopPrice',chosen.id,{kind,price:Math.min(999,price+1)}),!near)
