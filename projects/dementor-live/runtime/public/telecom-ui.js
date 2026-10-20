@@ -74,7 +74,7 @@ const exportButton=ctl('⇩ QA-лог',async()=>{
  try{const response=await fetch('/api/qa-export',{headers:{Authorization:'Bearer '+token}});if(!response.ok)throw Error('not allowed');const blob=await response.blob(),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='dementor-qa-'+new Date().toISOString().slice(0,10)+'.ndjson';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}catch{toast('Выгрузка доступна только в тестовой сборке');}
 });
 exportButton.id='qaExport';document.querySelector('.map-tools')?.append(exportButton);
-updateUI=function(){formerUpdate();pagerButton.textContent='▣ Пейджер'+(state?.telecom?.unread?' · '+state.telecom.unread:'');exportButton.hidden=!state?.qaMode;};
+updateUI=function(){formerUpdate();pagerButton.textContent='▣ Пейджер'+(state?.telecom?.unread?' · '+state.telecom.unread:'');markButton.hidden=!state?.qaRecording;exportButton.hidden=!state?.qaMode;};
 updateCityPanels=function(force=false){
  if(!['secondBridge','pager'].includes(cityPanelMode))return formerPanels(force);
  const rows=$('cityPanelRows');rows.replaceChildren();const canAct=!me?.spirit&&!me?.job;
