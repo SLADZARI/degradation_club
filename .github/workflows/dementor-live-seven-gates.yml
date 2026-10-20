@@ -1,0 +1,64 @@
+name: Dementor Live - Seven Sequential Acceptance Gates
+on:
+  push:
+    branches: [qa/dementor-live-rc2-chain-audit-2026-10-20]
+    paths:
+      - '.github/workflows/dementor-live-seven-gates.yml'
+      - 'projects/dementor-live/runtime/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  seven-gates:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    defaults:
+      run:
+        working-directory: projects/dementor-live/runtime
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Prepare isolated browser and icons
+        run: |
+          npm install --no-save --no-package-lock playwright@1.56.1
+          npx playwright install --with-deps chrome
+          python3 icons-v2/install-v2.py . icons-v2
+      - name: Seven test gates - sequential, no confirmations, all results retained
+        shell: bash
+        run: |
+          set +e
+          mkdir -p reports/seven-gates
+          run_gate() {
+            local label="$1"; shift
+            echo "::group::$label"
+            echo "=== $label ===" | tee "reports/seven-gates/$label.log"
+            "$@" 2>&1 | tee -a "reports/seven-gates/$label.log"
+            local status=${PIPESTATUS[0]}
+            printf '%s,%s\n' "$label" "$status" >> reports/seven-gates/status.csv
+            echo "::endgroup::"
+          }
+          echo "gate,exit_code" > reports/seven-gates/status.csv
+          run_gate 01-navigation node test/mobile.cjs
+          run_gate 02-mobile-ui node test/compact-panels.cjs
+          run_gate 03-interaction node test/playtest-actions.cjs
+          run_gate 04-inventory-build node test/inventory.cjs
+          run_gate 05-cities-ownership node test/estate-mayor-ui.cjs
+          run_gate 06-persistence sh -c 'npm run test:persistence && npm run test:upgrade && node --test test/rc2-cross-chain.test.mjs'
+          run_gate 07-full-browser sh -c 'node test/interface-world-polish.cjs && node test/browser.cjs && npm run test:quests'
+          cat reports/seven-gates/status.csv
+          failed=$(awk -F, 'NR>1 && $2!=0 {n++} END {print n+0}' reports/seven-gates/status.csv)
+          echo "### Seven sequential gates" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Stage | Exit |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|---|---|" >> "$GITHUB_STEP_SUMMARY"
+          awk -F, 'NR>1 {print "| "$1" | "$2" |"}' reports/seven-gates/status.csv >> "$GITHUB_STEP_SUMMARY"
+          echo "Failed stages: $failed" | tee -a reports/seven-gates/summary.txt
+          test "$failed" -eq 0
+      - name: Upload all seven stage logs even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dementor-live-seven-gates-${{ github.run_id }}
+          path: projects/dementor-live/runtime/reports/seven-gates/
+          if-no-files-found: warn
