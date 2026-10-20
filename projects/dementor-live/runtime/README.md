@@ -1,6 +1,6 @@
-# Dementor Live · 0.5.0-rc.1 (кандидат безопасного обновления)
+# Dementor Live · 0.5.0-rc.2 (кандидат безопасного обновления)
 
-**Важно:** этот checkout объединяет CIVIC P1–P3 и исправления совместной игры 20 октября, но **не является доказательством обновления production VM**. Используйте [release guide](docs/RELEASE_0.5.0_RC1_SAFE.md), [QA reconciliation](../qa/PLAYTEST_2026-10-20_RECONCILIATION.md), [combined playtest checklist](../qa/PLAYTEST_CHECKLIST_v2_2026-10-20.md) и [QA recording runbook](../qa/QA_RECORDING_RUNBOOK_2026-10-20.md). До независимой проверки живого `dementor-live-world` не делать cutover.
+**Важно:** этот checkout объединяет CIVIC P1–P3 и исправления совместной игры 20 октября, но **не является доказательством обновления production VM**. Используйте [release guide](docs/RELEASE_0.5.0_RC2_SAFE.md), [QA reconciliation](../qa/PLAYTEST_2026-10-20_RECONCILIATION.md), [combined playtest checklist](../qa/PLAYTEST_CHECKLIST_v2_2026-10-20.md) и [QA recording runbook](../qa/QA_RECORDING_RUNBOOK_2026-10-20.md). До независимой проверки живого `dementor-live-world` не делать cutover.
 
 Ни в коем случае не использовать `deploy/publish-clean-world.sh --reset-world`; новый безопасный путь — `deploy/publish-preserve-world.sh` с exact SHA, полной копией игрового тома, проверкой миграции на копии и восстановлением после неуспешного запуска.
 
