@@ -234,7 +234,7 @@ setInterval(()=>{if(!connected||!me)return;let dx=0,dy=0;if(!$('welcome').open&&
      }
    }
   if(holdAction)doContext();
-  }if((keys.size||touchMove)&&(dx||dy))[dx,dy]=screenAlignedMotion(dx,dy);if(!inputPending){inputPending=true;api('input',{dx,dy,sprint:keys.has('ShiftLeft')||keys.has('ShiftRight')}).catch(()=>{}).finally(()=>{inputPending=false;});}
+  }if((touchMove||[...keys].some(k=>['KeyW','KeyA','KeyS','KeyD','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(k)))&&(dx||dy))[dx,dy]=screenAlignedMotion(dx,dy);if(!inputPending){inputPending=true;api('input',{dx,dy,sprint:keys.has('ShiftLeft')||keys.has('ShiftRight')}).catch(()=>{}).finally(()=>{inputPending=false;});}
 },80);
 
 // ISO30 is a projection of the existing world coordinates, not a change to gameplay.
@@ -323,6 +323,13 @@ function paperBox(x,y,w,h,dx,dy,front='#c9b796',side='#a38e70',top='#e0d2b4'){
  poly([[x+w,y],[x+w+dx,y+dy],[x+w+dx,y+h+dy],[x+w,y+h]],side,'#7b806a');
  poly([[x,y],[x+dx,y+dy],[x+w+dx,y+dy],[x+w,y]],top,'#7b806a');
 }
+function paperWarehouse(o){const s=view.s,p=screen(o.x,o.y+o.h),w=o.w*s,y=p.y-s*1.38;
+ shadow(p.x+w*.5,p.y,s*1.3,s*.2);groundRect(o,'#bfb49b','#a49a80');
+ for(const off of [.08,.83])paperBox(p.x+w*off,y+s*.35,s*.15,s*1.3,s*.15,-s*.09,'#a79170','#80725c','#cdbb96');
+ poly([[p.x-s*.14,y+s*.24],[p.x+w*.53,y-s*.35],[p.x+w+s*.22,y+s*.18],[p.x+w*.32,y+s*.62]],'#c8b691','#7f7e67');
+ for(let i=0;i<3;i++)paperBox(p.x+s*(.18+i*.55),p.y-s*.40,s*.45,s*.42,s*.16,-s*.1,i===1?'#8d9b92':'#b09a79','#887c65','#d8c5a1');
+}
+function drawToolSign(x,y){const p=screen(x,y),s=view.s;const a=p.x,b=p.y-s*.9;paperBox(a-s*.47,b,s*.94,s*.38,s*.10,-s*.07,'#85947d','#61745e','#aebba1');line(a-s*.27,b+s*.12,a-s*.05,b+s*.29,'#f7ebc9',2.5);poly([[a-s*.35,b+s*.08],[a-s*.16,b+s*.06],[a-s*.12,b+s*.17],[a-s*.33,b+s*.17]],'#e9e1ca','#f5eddb');line(a+s*.09,b+s*.12,a+s*.32,b+s*.29,'#f7ebc9',2.5);poly([[a+s*.16,b+s*.09],[a+s*.37,b+s*.09],[a+s*.40,b+s*.18],[a+s*.13,b+s*.18]],'#e9e1ca','#f5eddb');}
 function paperHouse(o,variant='warehouse'){
  const s=view.s,p=screen(o.x,o.y+o.h),w=o.w*s,h=Math.min(o.h*.76,2.1)*s,dx=s*.65,dy=-s*.45,y=p.y-h,peak=y-s*.75;
  shadow(p.x+w*.5+dx*.4,p.y+4,w*.63,s*.2);paperBox(p.x,y,w,h,dx,dy,variant==='forge'?'#bfad8c':'#d2c2a3','#aa9778','#e5d9bb');
@@ -331,7 +338,7 @@ function paperHouse(o,variant='warehouse'){
  line(p.x+w*.45,peak,p.x+w*.45+dx,peak+dy,'#eee5cc',1);
  const doorw=Math.min(w*.26,s*.9),doorx=p.x+w*.45-doorw*.5;poly([[doorx,p.y-h*.62],[doorx+doorw,p.y-h*.62],[doorx+doorw,p.y],[doorx,p.y]],'#63705d','#7b806a');
  line(doorx+doorw*.5,p.y-h*.62,doorx+doorw*.5,p.y,'#a4ac8c');
- for(const rel of [.13,.73]){const wx=p.x+w*rel,wy=y+h*.24,ww=Math.min(s*.55,w*.15),wh=s*.42;paperBox(wx,wy,ww,wh,s*.06,-s*.04,'#8b9f91','#718575','#d2d8c2');line(wx+ww*.5,wy,wx+ww*.5,wy+wh,'#d8dfcb');}
+ for(const rel of (variant==='shop'?[.73]:[.13,.73])){const wx=p.x+w*rel,wy=y+h*.24,ww=Math.min(s*.55,w*.15),wh=s*.42;paperBox(wx,wy,ww,wh,s*.06,-s*.04,'#8b9f91','#718575','#d2d8c2');line(wx+ww*.5,wy,wx+ww*.5,wy+wh,'#d8dfcb');}
  if(variant==='warehouse')for(let i=0;i<2;i++)paperBox(p.x+s*.12+i*s*.5,p.y-s*.35,s*.4,s*.35,s*.14,-s*.1,'#b6a07e','#978464','#d2be99');
  if(variant==='shop'){poly([[p.x+w*.04,y+h*.05],[p.x+w*.92,y+h*.05],[p.x+w*.98,y+h*.22],[p.x,y+h*.22]],'#98a487','#77846b');line(p.x+w*.2,y+h*.07,p.x+w*.2,y+h*.2,'#dfe3cd');line(p.x+w*.65,y+h*.07,p.x+w*.65,y+h*.2,'#dfe3cd');}
  if(variant==='forge'){paperBox(p.x+w*.75,peak-s*.5,s*.42,s*1.15,s*.25,-s*.16,'#a99980','#8e806b','#c9bda2');const q=screen(o.x+o.w*.65,o.y+o.h-.45);poly([[q.x-s*.18,q.y],[q.x,q.y-s*.45],[q.x+s*.18,q.y]],'#c89160','#9a785a');}
@@ -398,7 +405,7 @@ function drawTree(o){if(o.stock<=0)return;const p=screen(o.x,o.y),s=view.s;shado
  poly(points.map(([dx,dy])=>[p.x+dx*r,top+dy*r]),green,'#788d73');poly([[p.x-r*.6,top-r*.4],[p.x-r*.4,top-r*.7],[p.x+r*.25,top-r*.7],[p.x,top]],'#c3c5a4',null);
 }
 function drawHempBush(x,y){const p=screen(x,y),s=view.s;shadow(p.x,p.y+3,s*.4,s*.12);line(p.x,p.y,p.x,p.y-s*.48,'#8e9272',2);for(const [dx,dy,k] of [[-.23,-.35,.38],[.22,-.38,.38],[0,-.62,.5]]){const a=p.x+dx*s,b=p.y+dy*s,r=k*s;poly([[a,b-r],[a+r*.18,b-r*.21],[a+r,b-r*.36],[a+r*.36,b+r*.1],[a+r*.7,b+r*.6],[a,b+r*.24],[a-r*.7,b+r*.6],[a-r*.36,b+r*.1],[a-r,b-r*.36],[a-r*.18,b-r*.21]],'#8da581','#738d70');}}
-function drawStone(o){const p=screen(o.x,o.y),s=view.s;shadow(p.x+5,p.y+2,s*.55,s*.18);if(o.stock<=0)return;poly([[p.x-s*.5,p.y],[p.x-s*.38,p.y-s*.55],[p.x+s*.05,p.y-s*.84],[p.x+s*.45,p.y-s*.4],[p.x+s*.55,p.y+s*.05]],'#a8ada2','#899487');poly([[p.x-s*.38,p.y-s*.55],[p.x+s*.05,p.y-s*.84],[p.x+s*.12,p.y-s*.18]],'#c4c6b9',null);poly([[p.x+s*.05,p.y-s*.84],[p.x+s*.45,p.y-s*.4],[p.x+s*.55,p.y+s*.05],[p.x+s*.12,p.y-s*.18]],'#949e94',null);}
+function drawStone(o){if(o.stock<=0)return;const p=screen(o.x,o.y),s=view.s;shadow(p.x+5,p.y+2,s*.55,s*.18);poly([[p.x-s*.5,p.y],[p.x-s*.38,p.y-s*.55],[p.x+s*.05,p.y-s*.84],[p.x+s*.45,p.y-s*.4],[p.x+s*.55,p.y+s*.05]],'#a8ada2','#899487');poly([[p.x-s*.38,p.y-s*.55],[p.x+s*.05,p.y-s*.84],[p.x+s*.12,p.y-s*.18]],'#c4c6b9',null);poly([[p.x+s*.05,p.y-s*.84],[p.x+s*.45,p.y-s*.4],[p.x+s*.55,p.y+s*.05],[p.x+s*.12,p.y-s*.18]],'#949e94',null);}
 function drawFood(o){const p=screen(o.x,o.y),s=view.s;shadow(p.x+4,p.y+3,s*.5,s*.17);
   for(const[dx,dy,r]of [[-.25,-.2,.34],[.24,-.22,.36],[0,-.49,.38]]){const x=p.x+dx*s,y=p.y+dy*s,k=r*s;poly([[x-k,y],[x-k*.6,y-k*.8],[x+k*.4,y-k],[x+k,y-k*.15],[x+k*.7,y+k*.6],[x-k*.5,y+k*.5]],'#8d9d7c','#788b6e');poly([[x-k*.6,y-k*.8],[x+k*.4,y-k],[x,y+k*.2]],'#aabb92',null);line(x,y+k*.2,x+k,y-k*.15,'#74866b77');}
   if(o.stock){for(let i=0;i<Math.min(o.stock,5);i++){const x=p.x+Math.sin(i*2)*s*.25,y=p.y-s*.27+Math.cos(i*2)*s*.19,r=Math.max(2,s*.065);poly([[x-r,y],[x,y-r],[x+r,y],[x,y+r]],o.kind?.startsWith('seed_')?'#d0b47e':'#b66c59','#916a51');}}
@@ -450,11 +457,11 @@ function render(time){positionWindows();ctx.clearRect(0,0,view.w,view.h);ctx.fil
   drawProject();if(typeof drawPlaza==='function')drawPlaza();
   if(state){for(const plot of state.plots)drawPlot(plot);}else for(const o of [{x:4,y:15,w:6,h:6},{x:4,y:23,w:6,h:6},{x:14,y:23,w:6,h:6}])drawPlot(o);
   drawForge();
-  paperHouse({x:22.7,y:1,w:2.6,h:2},'shop');paperHouse({x:15.5,y:1.5,w:2.5,h:2.2},'garden-shop');label('Благоустройство',16.7,1,true);label('Магазин инструмента',24,.3,true);
+  paperHouse({x:22.7,y:1,w:2.6,h:2},'shop');drawToolSign(24,3);paperHouse({x:15.5,y:1.5,w:2.5,h:2.2},'garden-shop');drawHempBush(16.7,3.3);label('Благоустройство',16.7,1,true);label('Магазин инструмента',24,.3,true);
   if(state?.seedMarket){paperHouse({x:21.8,y:5.3,w:2.5,h:2},state.seedMarket.stage>=state.config.seedMarket.stages.length?'shop':'construction');label(state.seedMarket.stage>=state.config.seedMarket.stages.length?'Семенная лавка':'Стройка лавки',23,4.9,true);}
   if(state?.gardenProject){const built=state.gardenProject.stage>=state.config.cityGarden.stages.length;groundRect({x:25.5,y:8.4,w:5.6,h:2.5},built?'#e0dfc6':'#eae5d7','#a7ad89',!built);label(built?'Городской огород':'Стройка огорода',28,8,true);if(built)for(const bed of state.publicGarden.beds){const x=26+(Number(bed.id.split('-').at(-1))%3)*1.6,y=9;groundRect({x,y,w:1.2,h:1},bed.crop?'#98a981':'#c4b49b','#8d956f');}}
   paperBoard(19,6,'Реестр городов');
-  paperHouse({x:10.7,y:25,w:2.6,h:3},'warehouse');label('Городской склад',12,29,true);
+  paperWarehouse({x:10.7,y:25,w:2.6,h:3});label('Городской склад',12,29,true);
   for(const pile of state?.drops||[]){const q=screen(pile.x,pile.y);rounded(q.x-8,q.y-5,16,9,2,pile.kind==='wood'?'#ae9673':pile.kind==='stone'?'#a3aaa0':'#b17b68','#818970');label(`${names[pile.kind]} · ${pile.quantity}`,pile.x,pile.y+.8,true);}
   const resources=state?.resources||[];const entities=[{y:7,draw:drawTent},...resources.filter(o=>o.stock>0||o.type==='food').map(o=>({y:o.y,draw:()=>o.type==='wood'?drawTree(o):o.type==='stone'?drawStone(o):drawFood(o)})),...(state?.players||[]).filter(p=>(p.online||p.id===me?.id)&&sameScene(p)).map(p=>({y:p.y,draw:()=>drawPlayer(p,time)}))];entities.sort((a,b)=>a.y-b.y);for(const e of entities)e.draw();
   if(route.length){const p=screen(route.at(-1).x,route.at(-1).y);ctx.beginPath();ctx.ellipse(p.x,p.y,7,4,0,0,Math.PI*2);ctx.strokeStyle='#82956a99';ctx.lineWidth=1.4;ctx.stroke();}
