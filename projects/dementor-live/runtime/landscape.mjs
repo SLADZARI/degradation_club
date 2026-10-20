@@ -1,8 +1,42 @@
-// Player-built CITY landscaping with durable supplies; all currency stays in the shared treasury.
+// Player-built CITY landscaping. Owner checks and O(1) spatial lookup are server-authoritative.
 export const LANDSCAPE_SHOP={id:'landscape-shop',type:'landscape',x:16.7,y:4};
 export const LANDSCAPE_PRODUCTS=Object.freeze({paving:{name:'Дорожная плитка',pack:10,price:1},grass:{name:'Газон',pack:10,price:1},flowers:{name:'Цветы',pack:10,price:1}});
-export function ensureLandscape(g){g.state.landscape||={version:1,tiles:[]};for(const p of Object.values(g.state.players)){p.terrainBag||={paving:0,grass:0,flowers:0};p.landscapeReceipts||={};}}
-export function landscapeSpeed(g,p){if((p.scene||'city')!=='city')return 1;const x=Math.floor(p.x),y=Math.floor(p.y);return g.state.landscape?.tiles?.some(t=>t.kind==='paving'&&t.x===x&&t.y===y)?1.2:1;}
+const INDEX=new WeakMap();
+const tileKey=(x,y)=>x+','+y;
+export function ensureLandscape(g){
+ g.state.landscape||={version:1,tiles:[]};
+ const land=g.state.landscape;
+ if(!Array.isArray(land.tiles))land.tiles=[];
+ if(!Number.isSafeInteger(land.revision)||land.revision<0)land.revision=land.tiles.length;
+ for(const p of Object.values(g.state.players)){p.terrainBag||={paving:0,grass:0,flowers:0};p.landscapeReceipts||={};}
+}
+export function landscapeIndex(g){
+ ensureLandscape(g);
+ const land=g.state.landscape;
+ let item=INDEX.get(land);
+ if(!item||item.array!==land.tiles||item.length!==land.tiles.length||item.revision!==land.revision){
+   const tiles=new Map();
+   for(const t of land.tiles)tiles.set(tileKey(t.x,t.y),t);
+   item={array:land.tiles,length:land.tiles.length,revision:land.revision,tiles};
+   INDEX.set(land,item);
+ }
+ return item.tiles;
+}
+export function landscapeSpeed(g,p){
+ if((p.scene||'city')!=='city')return 1;
+ return landscapeIndex(g).get(tileKey(Math.floor(p.x),Math.floor(p.y)))?.kind==='paving'?1.2:1;
+}
+// Plots offered for sale are reserved; privately held plots are owner-only.
+// Outside plot boundaries, buildable municipal city land is public unless walkable() rejects it.
+export function landscapePlotPermission(g,p,x,y){
+ const plots=g.state.plots||[];
+ for(const plot of plots){
+   if(x<plot.x+plot.w&&x+1>plot.x&&y<plot.y+plot.h&&y+1>plot.y){
+     if(!plot.owner)throw Error('Это зарезервированный участок; покрытие можно уложить после покупки');
+     if(plot.owner!==p.id)throw Error('Чужая территория: укладывать покрытие может только владелец');
+   }
+ }
+}
 export function landscapeAction(g,p,cmd){
  if(!['landscapeBuy','landscapePlace'].includes(cmd?.type))return null;
  if((p.scene||'city')!=='city')throw Error('Магазин благоустройства доступен только в городе');
@@ -23,8 +57,14 @@ export function landscapeAction(g,p,cmd){
  if(!p.terrainBag[kind])throw Error('Купи материалы в магазине');
  if(Math.hypot(p.x-(x+.5),p.y-(y+.5))>g.c.actionRange)throw Error('Подойди к выбранной клетке');
  if(g.state.landscape.tiles.length>=1200)throw Error('Предел покрытий этого города');
- if(g.state.landscape.tiles.some(t=>t.x===x&&t.y===y))throw Error('Клетка уже обустроена');
+ if(landscapeIndex(g).has(tileKey(x,y)))throw Error('Клетка уже обустроена');
+ landscapePlotPermission(g,p,x,y);
  if(!g.walkable(x+.5,y+.5,p))throw Error('Здесь препятствие; укладка запрещена');
- p.terrainBag[kind]--;g.state.landscape.tiles.push({x,y,kind,owner:p.id,at:g.now});
- return {message:LANDSCAPE_PRODUCTS[kind].name+' уложена'};
+ p.terrainBag[kind]--;
+ const tile={x,y,kind,owner:p.id,at:g.now};
+ g.state.landscape.tiles.push(tile);
+ g.state.landscape.revision++;
+ const item=INDEX.get(g.state.landscape);
+ if(item){item.tiles.set(tileKey(x,y),tile);item.length=g.state.landscape.tiles.length;item.revision=g.state.landscape.revision;}
+ return {message:LANDSCAPE_PRODUCTS[kind].name+' уложена',tile,revision:g.state.landscape.revision};
 }
