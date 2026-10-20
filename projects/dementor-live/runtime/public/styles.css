@@ -237,3 +237,20 @@ dialog:not(#welcome):not(#mayorIdea):not(#payphoneDialog),
 #urgentHunger{position:fixed;top:18px;left:50%;transform:translateX(-50%);z-index:28;background:#fff4e3;border:3px solid #af5048;border-radius:9px;padding:10px 18px;font-size:clamp(13px,2vw,17px);font-weight:800;text-align:center;max-width:min(590px,calc(100vw - 40px));animation:hunger-pulse 1s step-end infinite}
 @keyframes hunger-pulse{50%{background:#f6d9ca}}
 #mobileEatButton{border-radius:12px!important;width:90px;min-width:90px;height:53px;font-size:10px;line-height:1.15;background:radial-gradient(circle at center,#faf9f0ec 26px,transparent 27px)!important;color:#4e674f}
+
+/* DL-TERRAIN-01 · thumbnails are generated from the SAME purchase atlas. */
+.terrain-product{position:relative;min-height:96px;padding-left:132px!important}
+.terrain-preview{width:112px;height:65px;object-fit:contain;position:absolute;left:9px;top:12px;background:#92a68520;border:1px solid #70806d2a;border-radius:6px}
+#terrain-placement{position:absolute;z-index:90;left:50%;transform:translateX(-50%);bottom:94px;display:flex;align-items:center;justify-content:center;gap:8px;max-width:min(96vw,680px);padding:9px 12px;background:#f8f5e8f4;box-shadow:0 4px 18px #39403533;border:1px solid #a6aa93;border-radius:12px;pointer-events:auto;flex-wrap:wrap}
+#terrain-placement[hidden]{display:none!important}
+#terrain-placement span{font-size:12px;font-weight:600;max-width:290px}
+#terrain-placement button{min-height:40px;padding:8px 13px;background:#d8e2cc;border:1px solid #a3b098;border-radius:8px}
+#terrain-placement button:disabled{opacity:.4}
+#terrain-placement button:first-of-type{background:#758f6d;color:#fff;border-color:#526c4d}
+#world.placing-terrain{cursor:crosshair}
+@media(max-width:760px){
+ #terrain-placement{bottom:calc(122px + env(safe-area-inset-bottom));width:min(94vw,480px);gap:6px;padding:8px}
+ #terrain-placement span{flex:1 1 100%;max-width:none;text-align:center}
+ .terrain-product{padding-left:108px!important;min-height:100px}
+ .terrain-preview{width:87px;height:55px}
+}
