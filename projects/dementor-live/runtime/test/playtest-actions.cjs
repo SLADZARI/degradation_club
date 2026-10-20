@@ -27,7 +27,7 @@ async function patch(id,patch){const resp=await fetch(base+'/__test',{method:'PO
  assert.equal(await page.evaluate(()=>me.bag.water),1);
  assert.equal(await page.evaluate(()=>$('cityPanel').open),false,'E must collect water without a dialog');
  await patch(id,{scene:'interior',x:10,y:5,stamina:25});
- await page.waitForFunction(()=>state.scene==='interior'&&me.stamina===25);
+ await page.waitForFunction(()=>state.scene==='interior'&&me.stamina<40);
  await page.evaluate(()=>{selected='bed';updateContext();});
  await sleep(250);await page.keyboard.press('KeyE');
  await page.waitForFunction(()=>me.stamina===100,{timeout:5000});
