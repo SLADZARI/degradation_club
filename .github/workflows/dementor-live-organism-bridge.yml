@@ -1,0 +1,29 @@
+name: DEMENTOR LIVE World Organism Bridge
+on:
+  push:
+    branches:
+      - integration/dementor-live-organism-v0-10-bridge-2026-10-20
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  organism-integration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: New isolated aggregate + two-client HTTP tests
+        working-directory: projects/dementor-live/runtime
+        run: node --test test/organism-bridge.test.mjs test/organism-runtime-integration.test.mjs
+      - name: Existing game model regression
+        working-directory: projects/dementor-live/runtime
+        run: npm test
+      - name: Read-only upgrade compatibility smoke
+        working-directory: projects/dementor-live/runtime
+        run: |
+          node --check server.mjs
+          node --check organism-bridge.mjs
+          node --check organism-access.mjs
