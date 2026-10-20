@@ -8,7 +8,7 @@
     "doctor": "node tools/workspace.mjs doctor",
     "check": "node tools/workspace.mjs check",
     "context": "node tools/workspace.mjs context",
-    "pack": "node tools/pack.mjs",
+    "pack": "npm run check:icons && node tools/pack.mjs",
     "test": "node --test test/model.test.mjs test/life.test.mjs test/plaza.test.mjs test/city-economy.test.mjs test/world-expansion.test.mjs",
     "test:integration": "node test/integration.mjs",
     "test:browser": "node test/browser.cjs",
@@ -28,7 +28,8 @@
     "test:quests": "node test/quests.cjs",
     "test:donations": "node test/donations.cjs",
     "test:perimeter": "node test/perimeter.cjs",
-    "test:axonometry": "node test/axonometry.cjs"
+    "test:axonometry": "node test/axonometry.cjs",
+    "check:icons": "node tools/verify-paper-icons.mjs"
   },
   "engines": {
     "node": ">=22"
