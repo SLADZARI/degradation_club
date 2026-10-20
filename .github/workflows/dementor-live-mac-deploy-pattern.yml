@@ -46,6 +46,8 @@ jobs:
           assert audit.count('ssh "') == 1
           assert 'release-manifest.txt' in audit and '/app/data/world.json' in audit
           assert 'sha256sum' in audit and 'docker exec -i' in audit
+          assert '-H "Host: $PUBLIC_HOST"' in audit
+          assert 'approved_sha_tag_matches_running_image' in audit
           assert not any(x in audit for x in ('--apply','down -v','--reset-world','docker stop','docker compose up','docker tag','docker rm','rm -rf','docker volume rm'))
           print('PASS: Mac G7 read-only SSH attestation with one key and no mutating commands')
           print('PASS: local Mac release pattern includes CI, 1 SSH key, safe backup and no world-reset commands')
