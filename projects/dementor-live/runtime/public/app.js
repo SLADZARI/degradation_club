@@ -23,7 +23,7 @@ if(token)api('state').then(r=>{if(r.me)connect();else if(!$('welcome').open)$('w
 
 // Mayor letter only after 15 minutes of verified, non-idle gameplay. Each dismissal resets its active-play clock.
 const IDEA_INTERVAL_MS=15*60*1000;
-let mayorIdeaNextByPlayer=new Map(),lastIdeaInteraction=performance.now();
+let mayorIdeaNextByPlayer=new Map(),lastIdeaInteraction=-Infinity;
 window.addEventListener('pointerdown',()=>{lastIdeaInteraction=performance.now();},{passive:true});
 window.addEventListener('keydown',()=>{lastIdeaInteraction=performance.now();});
 function postponeMayorIdea(){
