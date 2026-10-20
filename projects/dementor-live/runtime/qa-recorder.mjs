@@ -3,20 +3,20 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import {randomUUID} from 'node:crypto';
-export function createQARecorder(stateFile){
+export function createQARecorder(stateFile,{enabled=true}={}){
  const startedAt=Date.now(),sessionId=startedAt+'-'+randomUUID().slice(0,8);
- const base=path.dirname(stateFile),folder=path.join(base,'qa-recordings');fs.mkdirSync(folder,{recursive:true});
+ const base=path.dirname(stateFile),folder=path.join(base,'qa-recordings');if(enabled)fs.mkdirSync(folder,{recursive:true});
  const file=path.join(folder,'session-'+sessionId+'.ndjson');
  const players=new Map(),lastMotion=new Map();let sequence=0;
  const write=(type,data={})=>{
    const record={seq:++sequence,sessionId,wallTime:new Date().toISOString(),offsetMs:Date.now()-startedAt,type,...data};
-   fs.appendFileSync(file,JSON.stringify(record)+'\n',{encoding:'utf8',flag:'a'});
+   if(enabled)fs.appendFileSync(file,JSON.stringify(record)+'\n',{encoding:'utf8',flag:'a'});
    return record;
  };
  write('recording_started',{schema:'dementor-qa-v1',notes:'Synchronize audio/video via QA marker'});
  const round=n=>Number.isFinite(n)?Math.round(n*10)/10:null;
  const where=(p,cityId)=>({playerId:p.id,playerName:p.name?.slice(0,20),cityId,scene:p.scene||'city',x:round(p.x),y:round(p.y)});
- const session={file,sessionId,startedAt,write,
+ const session={file:enabled?file:null,enabled,sessionId,startedAt,write,
   join(p,cityId){write('player_join',where(p,cityId));},
   connect(p,cityId){write('player_connect',where(p,cityId));},
   disconnect(p,cityId){write('player_disconnect',where(p,cityId));},
@@ -30,7 +30,7 @@ export function createQARecorder(stateFile){
     if(!title)throw Error('Укажи название момента записи');
     return write('video_marker',{...where(p,cityId),label:title});
   },
-  export(){return fs.readFileSync(file,'utf8');},
+  export(){return enabled?fs.readFileSync(file,'utf8'):'';},
   finish(){write('recording_stopped');}
  };
  return session;
