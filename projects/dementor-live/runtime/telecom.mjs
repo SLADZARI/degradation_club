@@ -13,7 +13,8 @@ export const PHONE_BOOTHS=Object.freeze([
  {id:'phone-museum',type:'payphone',scene:'museum',x:3,y:11,title:'Таксофон · музей смеха'},
  {id:'phone-farlands',type:'payphone',scene:'farlands',x:4,y:16,title:'Таксофон · дальние земли'},
  {id:'phone-home',type:'payphone',scene:'plot',x:3,y:12,title:'Общий таксофон · участок'},
- {id:'phone-expedition',type:'payphone',scene:'expedition',x:3,y:12,title:'Таксофон · экспедиция'}
+ {id:'phone-expedition',type:'payphone',scene:'expedition',x:3,y:12,title:'Таксофон · экспедиция'},
+ {id:'phone-interior',type:'payphone',scene:'interior',x:3,y:6,title:'Таксофон · помещение'}
 ]);
 export const boothsForScene=scene=>PHONE_BOOTHS.filter(b=>b.scene===(scene||'city'));
 const NUMBER_START=410000;
