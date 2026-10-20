@@ -11,7 +11,7 @@ SSH_OPTS=(-i "$SSH_KEY" -o BatchMode=yes -o IdentitiesOnly=yes
   -o PreferredAuthentications=publickey -o PasswordAuthentication=no
   -o KbdInteractiveAuthentication=no -o NumberOfPasswordPrompts=0
   -o ConnectTimeout=12 -o ConnectionAttempts=1
-  -o StrictHostKeyChecking=accept-new)
+  -o StrictHostKeyChecking=yes)
 ssh "${SSH_OPTS[@]}" "root@$HOST" 'bash -se' <<'VM'
 set -Eeuo pipefail
 echo '=== Container/image (no env or secrets) ==='
@@ -26,6 +26,17 @@ echo "running_image_id=$IMAGE"
 echo "image_created_at=$(docker image inspect --format '{{.Created}}' "$IMAGE")"
 echo "image_tags=$(docker image inspect --format '{{json .RepoTags}}' "$IMAGE")"
 echo "image_digests=$(docker image inspect --format '{{json .RepoDigests}}' "$IMAGE")"
+echo '=== Host/VM capacity (metadata only; no load test) ==='
+printf 'host_cpu_count='; getconf _NPROCESSORS_ONLN || echo UNKNOWN
+awk '/^MemTotal:/ {printf "host_mem_total_kib=%s\n",$2} /^MemAvailable:/ {printf "host_mem_available_kib=%s\n",$2}' /proc/meminfo
+echo "host_loadavg=$(cut -d' ' -f1-3 /proc/loadavg)"
+if [[ -d /srv/dementor-live ]]; then df -Pk /srv/dementor-live | awk 'NR==2 {printf "srv_disk_total_kib=%s\nsrv_disk_free_kib=%s\n",$2,$4}'; fi
+echo "game_memory_limit_bytes=$(docker inspect --format '{{.HostConfig.Memory}}' "$CID")"
+echo "game_cpu_quota=$(docker inspect --format '{{.HostConfig.CpuQuota}}' "$CID")"
+echo "game_cpu_period=$(docker inspect --format '{{.HostConfig.CpuPeriod}}' "$CID")"
+echo "game_pids_limit=$(docker inspect --format '{{.HostConfig.PidsLimit}}' "$CID")"
+echo '=== One-shot game-container resource reading (not a stress test) ==='
+docker stats --no-stream --format 'game_stats={{.CPUPerc}} CPU, {{.MemUsage}} RAM, {{.NetIO}} NET' "$CID" || echo 'game_stats=UNKNOWN'
 echo '=== API health on VM ==='
 # Production app has strict Host validation; mirror the safe publisher, without printing env values.
 PUBLIC_URL="$(docker inspect "$CID" --format '{{range .Config.Env}}{{println .}}{{end}}' | awk -F= '$1=="DEMENTOR_PUBLIC_URL"{sub(/^[^=]*=/,"");print;exit}')"
@@ -56,7 +67,11 @@ if [[ -n "$LAST" ]]; then
   fi
   BACKUP="$(awk -F= '$1=="backup" {print substr($0,index($0,"=")+1);exit}' "$LAST")"
   if [[ "$BACKUP" == "$ROOT"/safe-* && -s "$BACKUP/world.json" && -s "$BACKUP/full-world.tar.gz" ]]; then
-    echo 'complete_backup=yes'
+    # Nonempty files are NOT restore proof. Never say complete_backup=yes
+    # until an isolated tar read + restore + save auditor actually passes.
+    echo 'backup_files_present=yes'
+    echo 'complete_backup=NOT_VERIFIED'
+    echo 'archive_restore_on_copy=NOT_RUN'
     echo "backup_archive_bytes=$(stat -c %s "$BACKUP/full-world.tar.gz")"
     echo "backup_world_sha256=$(sha256sum "$BACKUP/world.json" | awk '{print $1}')"
   else
