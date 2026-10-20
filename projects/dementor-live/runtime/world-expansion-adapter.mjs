@@ -1,6 +1,7 @@
 import {Game as CoreGame,createWorld} from './world.mjs';
 import {WORLD_SCENES,WORLD_CITY_TARGETS,SECOND_BRIDGE,terrainBlocked,initializeWorldTravel,worldTravelAction,worldTravelView} from './world-expansion.mjs';
 import {initSecondBridge,secondBridgeOpen,secondBridgeAction} from './second-bridge.mjs';
+import {PHONE_BOOTHS} from './telecom.mjs';
 export {createWorld};
 export class Game extends CoreGame{
   constructor(state,c){
@@ -10,7 +11,7 @@ export class Game extends CoreGame{
     }
   }
   join(name,gender='unspecified'){const p=super.join(name,gender);initializeWorldTravel(this);return p;}
-  target(id){return WORLD_CITY_TARGETS.find(o=>o.id===id)||Object.values(WORLD_SCENES)
+  target(id){return PHONE_BOOTHS.find(o=>o.id===id)||WORLD_CITY_TARGETS.find(o=>o.id===id)||Object.values(WORLD_SCENES)
     .flatMap(region=>[region.exit,region.main]).find(o=>o.id===id)||super.target(id);}
   walkable(x,y,p=null){
     const scene=p?.scene||'city',r=.3,c=this.c;
