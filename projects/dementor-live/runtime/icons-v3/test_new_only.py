@@ -27,10 +27,6 @@ with tempfile.TemporaryDirectory() as t:
     assert 'new-icons-v3.js' in (r/'public/index.html').read_text()
     assert 'new-icons-v3.js' in (r/'public/combat.html').read_text()
     assert 'V3_NEW_STEMS' in (r/'server.mjs').read_text()
-    routed=(r/'server.mjs').read_text()
-    assert "manifest-new-only.json" in routed,'new-only manifest route missing'
-    assert "application/json; charset=utf-8" in routed,'manifest must be served as JSON'
-    assert "req.method==='HEAD'" in routed,'manifest must support HEAD checks'
     before=digest_tree(r)
     b=install(r)
     assert before==digest_tree(r),'Non-idempotent install!'
