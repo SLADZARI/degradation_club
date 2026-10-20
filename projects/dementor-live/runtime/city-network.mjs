@@ -25,7 +25,9 @@ export class CityNetwork{
     return [{id:ORIGIN,name:'Первый город',founder:null,online:this.origin.online.size},
      ...Object.entries(this.data.cities).map(([id,c])=>({id,name:c.name,founder:c.founder,online:this.games.get(id).online.size,createdAt:c.createdAt}))];
   }
-  snapshot(p){const r=this.findId(p.id);if(!r)throw Error('Житель не найден');return {...r.g.snapshot(p),cityNetwork:{current:r.cityId,cities:this.list()}};}
+  snapshot(p){const r=this.findId(p.id);if(!r)throw Error('Житель не найден');
+    const estates=[...this.games].flatMap(([cityId,g])=>g.state.plots.filter(t=>t.owner===p.id).map(t=>({cityId,cityName:this.data.cities[cityId]?.name||'Первый город',plotId:t.id,zoning:t.zoning,landUse:t.landUse,leased:!!t.lease,dueAt:t.lease?.dueAt||null,sign:t.shop?.sign||''})));
+    return {...r.g.snapshot(p),cityNetwork:{current:r.cityId,cities:this.list(),estates}};}
   assertRegistry(p,g){
     if((p.scene||'city')!=='city')throw Error('Реестр городов находится на площади');
     if(p.spirit||p.job||p.delivery)throw Error('Закончи работу или курьерский заказ перед переходом в другой город');
