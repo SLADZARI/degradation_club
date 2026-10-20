@@ -39,6 +39,13 @@ async function main(){
   }
   const manifestUrl='/assets/paper-icons-new-v3/manifest-new-only.json';
   const manifestBody=await check(manifestUrl,/application\/json/);
+  const head=await fetch(base+manifestUrl,{method:'HEAD'});
+  assert.equal(head.status,200,'HEAD catalog returns success');
+  assert.match(head.headers.get('content-type')||'',/application\/json/,'HEAD must retain JSON MIME');
+  assert.equal((await head.arrayBuffer()).byteLength,0,'HEAD response must have no body');
+  const wrongMethod=await fetch(base+manifestUrl,{method:'POST'});
+  assert.equal(wrongMethod.status,405,'manifest must reject POST');
+  assert.equal(wrongMethod.headers.get('allow'),'GET, HEAD','method whitelist must be discoverable');
   const manifest=JSON.parse(manifestBody.toString('utf8'));
   assert.equal(manifest.items.length,42);
   const images=new Set();
@@ -65,7 +72,7 @@ async function main(){
    const r=await fetch(base+bad);
    assert.ok([400,403,404].includes(r.status),'unsafe/bogus icon URL allowed: '+bad+' '+r.status);
   }
-  console.log('PASS: HTTP manifest + 210 v3 PNGs + locked v2 legacy assets; 3 invalid URLs denied');
+  console.log('PASS: HTTP GET/HEAD 200, POST 405, manifest + 210 v3 PNGs + locked v2 legacy assets; 3 invalid URLs denied');
  }finally{
   if(server && server.exitCode===null){server.kill('SIGTERM');await new Promise(resolve=>{server.once('exit',resolve);setTimeout(resolve,1500).unref();});}
   fs.rmSync(temp,{recursive:true,force:true});
