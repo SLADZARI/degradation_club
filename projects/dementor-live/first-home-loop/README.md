@@ -89,3 +89,6 @@
 
 ## 9. WORLD ORGANISM v0.8 — Demand Lab (19.10.2026)
 В разделе [BALANCE LAB / v0.8](balance-lab/v0_8/README.md) зафиксирована новая автономная экономическая модель спроса: реальная конечная потребность → обеспеченный заказ → доставка → оплата из escrow → потребление товара. Продукты и TEST PAPER_SHEET имеют конечные sink, новый контролируемый посев и P2P consent до transfer. 52/52 тестов, 3–5 test agents, 36 stress. [Условия GDD / открытые решения](balance-lab/v0_8/DECISIONS_FOR_INTEGRATION_v0_8.md). Реальный сервер и MASTER GDD не менялись.
+
+## 10. WORLD ORGANISM v0.10 UNIFIED ATLAS (20.10.2026)
+Объединённая автономная модель с экономическим исполняемым ядром v0.8 и подтверждёнными контрактами Role Lab v0.9 / Story Loop v0.9.1, а также новыми паспортами CIVIC и UNIVERSE. Реестр **13 регионов/сцен, 48 EntityKind**, старая SVG схема и pinned KPI, 55/55 QA + 36 stress. [Индекс v0.10](balance-lab/v0_10/README.md) · [Матрица сущностей](balance-lab/v0_10/ENTITY_INTEGRATION_MATRIX_v0_10.md) · [QA/NO-GO](balance-lab/v0_10/QA_AND_RELEASE_GATE_v0_10.md). Не являeтся реальным серверным объединением, данные production/save не менялись.
