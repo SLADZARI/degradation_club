@@ -72,7 +72,20 @@ try{
     if(!chosen)throw Error('No visible, tappable and path-connected navigation target: '+JSON.stringify(candidates.map(c=>({world:c.world,screen:c.screen,path:!!c.path}))));
     return {world:chosen.world,screen:chosen.screen};
   });
+  // Trace the actual browser -> HTTP movement chain, not merely eventual coordinates.
+  await page.evaluate(()=>{
+    window.__navQA={inputs:[],startedAt:performance.now()};
+    const realFetch=window.fetch.bind(window);
+    window.fetch=(url,options)=>{if(String(url).includes('/api/input')&&options?.body){
+      try{const x=JSON.parse(options.body);window.__navQA.inputs.push({dx:x.dx,dy:x.dy,at:performance.now()});}catch{}
+    }return realFetch(url,options);};
+  });
   await page.touchscreen.tap(target.screen.x,target.screen.y);
+  await page.waitForFunction(()=>route.length>0||Math.hypot(me.x-arguments[0].x,me.y-arguments[0].y)<0.8,target.world,{timeout:2500}).catch(async err=>{
+    const status=await page.evaluate(()=>({position:{x:me.x,y:me.y},route,selected,inputs:window.__navQA?.inputs}));
+    throw Error('Tap never initiated a route: '+JSON.stringify(status)+'; '+err.message);
+  });
+  await page.waitForFunction(()=>window.__navQA?.inputs.some(p=>Math.hypot(p.dx,p.dy)>0.05),null,{timeout:3500});
   try{
     await page.waitForFunction(goal=>Math.hypot(me.x-goal.x,me.y-goal.y)<0.8&&route.length===0,target.world,{timeout:20000});
   }catch(navigationError){
@@ -93,6 +106,9 @@ try{
     console.error('MOBILE_NAVIGATION_TIMEOUT_DIAGNOSTIC',JSON.stringify(diagnostic));
     throw navigationError;
   }
+  const audit=await page.evaluate(()=>({movementCommands:window.__navQA.inputs.filter(p=>Math.hypot(p.dx,p.dy)>0.05).length,finalDistance:Math.hypot(me.x-target.world.x,me.y-target.world.y)}));
+  assert.ok(audit.movementCommands>0,'Tap did not trigger any nonzero /api/input');
+  console.log('MOBILE TAP_ROUTE_INPUT_ARRIVAL PASS',JSON.stringify(audit));
   console.log('MOBILE NAVIGATION PASS');
   await assertHud(375,667);
   assert.deepEqual(errors,[],'Browser JavaScript errors');
