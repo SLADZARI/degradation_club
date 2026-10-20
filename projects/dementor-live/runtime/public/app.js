@@ -24,7 +24,7 @@ function connect(){stream?.close();motionFrames.length=0;stream=new EventSource(
     const sameCity=(next.cityNetwork?.current||'origin')===(state.cityNetwork?.current||'origin');
     const prior=state.landscape;
     const d=Array.isArray(next.landscape.delta)?next.landscape.delta:[];
-    if(sameCity&&prior.revision+d.length===next.landscape.revision)
+    if(sameCity&&(Number.isSafeInteger(prior.revision)?prior.revision:prior.tiles.length)+d.length===next.landscape.revision)
       next.landscape={...prior,...next.landscape,tiles:d.length?[...prior.tiles,...d]:prior.tiles};
     else {stream?.close();connected=false;setTimeout(connect,300);return;}
     delete next.landscape.delta;
