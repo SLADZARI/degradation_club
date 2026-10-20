@@ -35,7 +35,7 @@ export class Game {
     name=String(name||'').trim().replace(/[<>\x00-\x1f]/g,'').slice(0,20);
     if(!name)throw Error('Как тебя зовут?');
     const id=randomUUID(),token=randomUUID();const p={id,token,name,x:8+(Object.keys(this.state.players).length%3)*0.8,y:8,color:Object.keys(this.state.players).length%3,wallet:0,bag:{wood:0,stone:0,food:0},tools:{axe:0,pick:0},equipped:'axe',hunger:100,health:100,stamina:100,spirit:false,job:null,results:[],lastMessage:0};
-    p.toolInfo={axe:{tier:'basic',max:this.c.toolDurability},pick:{tier:'basic',max:this.c.toolDurability}};this.state.players[id]=p;migrateLife(this);ensureLandscape(this);this.changed();return p;
+    p.toolInfo={axe:{tier:'basic',max:this.c.toolDurability},pick:{tier:'basic',max:this.c.toolDurability}};this.state.players[id]=p;migrateLife(this);ensureLandscape(this);initForestry(this);this.changed();return p;
   }
   auth(token){return Object.values(this.state.players).find(p=>p.token===token);}
   connect(p){this.online.add(p.id);this.inputs.set(p.id,{dx:0,dy:0,sprint:false,at:this.now});this.changed();}
