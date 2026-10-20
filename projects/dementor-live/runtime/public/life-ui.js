@@ -23,6 +23,15 @@ function lifePanel(mode,rows,row,canAct){
   else if(state.items[bagSelection]){const k=bagSelection;row(`${emoji[k]} ${itemName(k)} · ${me.bag[k]||0}`,`Вес единицы ${state.items[k].weight}`,[button('Выложить 1',action('drop',null,{kind:k,quantity:1}),!canAct||!me.bag[k],'drop-one-'+k),button('Выложить всё',action('drop',null,{kind:k}),!canAct||!me.bag[k],'drop-all-'+k),...(['carrot','food'].includes(k)?[button('Съесть',action(k==='carrot'?'eatCarrot':'eat'),!me.bag[k])]:[])]);const section=rows.lastChild,field=num('Количество',1),drop=document.createElement('button');field.querySelector('input').max=me.bag[k]||0;drop.textContent='Выложить';drop.disabled=!canAct||!me.bag[k];drop.onclick=()=>act('drop',null,{kind:k,quantity:Number(field.querySelector('input').value)});section.append(field,drop);}
   else row('Выбери предмет','Нажми на ячейку, чтобы посмотреть количество и действия.');
   if(me.delivery)row('Городской груз · отдельно',`${me.delivery.quantity} · ${itemName(me.delivery.kind)}. ${me.delivery.picked?'Груз у тебя и занимает вес.':'Ожидает на складе.'} Нельзя подарить или продать.`);
+  // Owned surface materials are a separate construction pocket, not a new weight-bearing game resource.
+  const surf=document.createElement('div');surf.className='terrain-bag-heading';surf.textContent='Покрытия · материалы для укладки';rows.append(surf);
+  const surfaceLabels={paving:'Дорожная плитка',grass:'Газон',flowers:'Цветы'};
+  for(const kind of ['paving','grass','flowers']){
+    const quantity=me.terrainBag?.[kind]||0;
+    const tileRow=row(surfaceLabels[kind]+' · '+quantity+' шт.','Уложить на свободную клетку на своей или муниципальной земле.',[
+      button('Выбрать',()=>setPlacementKind(kind),!canAct||quantity<1,'terrain-bag-'+kind)]);
+    if(window.DLTerrain01?.catalogImage)tileRow.prepend(window.DLTerrain01.catalogImage(kind));
+  }
   return true;
  }
  if(mode==='seeds'){
