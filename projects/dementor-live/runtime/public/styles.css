@@ -179,3 +179,7 @@ dialog:not(#welcome):not(#mayorIdea):not(#payphoneDialog),
 #phoneBody .subscriber-list .phone-control{font-size:12px;min-height:34px}
 #openPager,#qaVideoMarker,#qaExport{font-size:10px!important;padding:7px 8px!important;min-height:36px}
 @media(max-width:760px){.payphone-dialog{padding:12px!important}#openPager,#qaVideoMarker,#qaExport{font-size:9px!important;min-height:34px}}
+
+/* QA-01 regression: the world-map toolbar must NEVER cover a modal close control. */
+#cityPanel,#details{z-index:50!important;position:fixed;}
+.map-tools{z-index:8;}
