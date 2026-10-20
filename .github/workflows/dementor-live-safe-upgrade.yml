@@ -1,4 +1,4 @@
-name: Dementor Live v0.5 RC — Save-Preserving Release Gates
+name: Dementor Live v0.5 RC3 — Save-Preserving Release Gates
 on:
   push:
     branches:
@@ -22,8 +22,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Release gate syntax
-        run: bash -n deploy/publish-preserve-world.sh
+      - name: Release gate syntax and RC3 publication contract
+        run: |
+          bash -n deploy/publish-preserve-world.sh
+          npm run check:release
       - run: npm run doctor
       - run: python3 icons-v2/install-v2.py . icons-v2
       - run: npm run check:icons
@@ -60,4 +62,4 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Build release candidate without any production save
-        run: docker build -t dementor-live:0.5.0-rc.2 -f projects/dementor-live/runtime/deploy/Dockerfile projects/dementor-live/runtime
+        run: docker build -t dementor-live:0.5.0-rc.3 -f projects/dementor-live/runtime/deploy/Dockerfile projects/dementor-live/runtime

@@ -31,8 +31,42 @@ export class Game {
     state.drops ||= [];
     migrateLife(this);initPlaza(this);initialiseCityExpansion(this);ensureLandscape(this);initForestry(this);initEstates(this);initMayor(this);reconcileResourceClearance(this);
     for(const p of Object.values(state.players)){p.job=null;p.results=p.results||[];p.lastMessage=0;p.toolInfo ||= {axe:{tier:'basic',max:c.toolDurability},pick:{tier:'basic',max:c.toolDurability}};syncEquipment(p,c);}
+    // A completed city building adds its footprint dynamically. Remember current
+    // solids so an occupant can be moved OUT once, not silently stranded inside it.
+    this._solidIds=new Set(this.rects().map(o=>o.id));
   }
-  changed(){this.state.revision++;this.dirty=true;this.onChange();}
+  evacuateNewFootprints(newFootprints){
+    for(const p of Object.values(this.state.players)){
+      if(scene(p)!=='city'||this.walkable(p.x,p.y,p))continue;
+      const trapped=newFootprints.find(o=>p.x+.3>o.x&&p.x-.3<o.x+o.w&&p.y+.3>o.y&&p.y-.3<o.y+o.h);
+      if(!trapped)continue;
+      const from={x:p.x,y:p.y};let destination=null;
+      for(let radius=.5;radius<=12&&!destination;radius+=.5){
+        for(let n=0;n<32;n++){
+          const theta=2*Math.PI*n/32;
+          const x=Math.round((from.x+Math.cos(theta)*radius)*1000)/1000;
+          const y=Math.round((from.y+Math.sin(theta)*radius)*1000)/1000;
+          if(this.walkable(x,y,p)&&!Object.values(this.state.players).some(other=>other!==p&&scene(other)==='city'&&Math.hypot(x-other.x,y-other.y)<.65)){
+            destination={x,y};break;
+          }
+        }
+      }
+      if(!destination)throw Error('No safe exit near newly constructed '+trapped.id);
+      p.x=destination.x;p.y=destination.y;p.job=null;
+      this.inputs.set(p.id,{dx:0,dy:0,sprint:false,at:this.now});
+      this.state.constructionRescues ||= [];
+      this.state.constructionRescues.push({id:p.id,building:trapped.id,from,to:destination,at:this.now});
+      this.state.constructionRescues=this.state.constructionRescues.slice(-30);
+    }
+  }
+  changed(){
+    if(this._solidIds){
+      const now=this.rects(),added=now.filter(o=>!this._solidIds.has(o.id));
+      if(added.length)this.evacuateNewFootprints(added);
+      this._solidIds=new Set(now.map(o=>o.id));
+    }
+    this.state.revision++;this.dirty=true;this.onChange();
+  }
   join(name,gender='unspecified'){
     name=String(name||'').trim().replace(/[<>\x00-\x1f]/g,'').slice(0,20);
     if(!name)throw Error('Как тебя зовут?');if(!['male','female','unspecified'].includes(gender))throw Error('Выбери корректное обращение');
