@@ -30,7 +30,10 @@ async function go(p,id){
   throw error;
  }
 }
-async function action(p){await p.page.locator('#actionButton').click();}
+async function action(p){
+ const isMobile=await p.page.evaluate(()=>innerWidth<760&&getComputedStyle(document.getElementById('mobileActionButton')).display!=='none');
+ await p.page.locator(isMobile?'#mobileActionButton':'#actionButton').click();
+}
 async function purchaseEstate(p,id){
   await go(p,id);
   await action(p);
