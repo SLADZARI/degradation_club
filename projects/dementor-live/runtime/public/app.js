@@ -517,13 +517,23 @@ function render(time){positionWindows();ctx.clearRect(0,0,view.w,view.h);ctx.fil
   drawProject();if(typeof drawPlaza==='function')drawPlaza();
   if(state){for(const plot of state.plots)drawPlot(plot);}else for(const o of [{x:4,y:15,w:6,h:6},{x:4,y:23,w:6,h:6},{x:14,y:23,w:6,h:6}])drawPlot(o);
   drawForge();
-  paperHouse({x:22.7,y:1,w:2.6,h:2},'shop');drawToolSign(24,3);paperHouse({x:15.5,y:1.5,w:2.5,h:2.2},'garden-shop');drawHempBush(16.7,3.3);label('Благоустройство',16.7,1,true);label('Магазин инструмента',24,.3,true);
-  if(state?.seedMarket){paperHouse({x:21.8,y:5.3,w:2.5,h:2},state.seedMarket.stage>=state.config.seedMarket.stages.length?'shop':'construction');label(state.seedMarket.stage>=state.config.seedMarket.stages.length?'Семенная лавка':'Стройка лавки',23,4.9,true);}
+  drawToolSign(24,3);drawHempBush(16.7,3.3);label('Благоустройство',16.7,1,true);label('Магазин инструмента',24,.3,true);
+  if(state?.seedMarket){label(state.seedMarket.stage>=state.config.seedMarket.stages.length?'Семенная лавка':'Стройка лавки',23,4.9,true);}
   if(state?.gardenProject){const built=state.gardenProject.stage>=state.config.cityGarden.stages.length;groundRect({x:25.5,y:8.4,w:5.6,h:2.5},built?'#e0dfc6':'#eae5d7','#a7ad89',!built);label(built?'Городской огород':'Стройка огорода',28,8,true);if(built)for(const bed of state.publicGarden.beds){const x=26+(Number(bed.id.split('-').at(-1))%3)*1.6,y=9;groundRect({x,y,w:1.2,h:1},bed.crop?'#98a981':'#c4b49b','#8d956f');}}
   paperBoard(19,6,'Реестр городов');
-  paperWarehouse({x:10.7,y:25,w:2.6,h:3});label('Городской склад',12,29,true);
+  label('Городской склад',12,29,true);
   for(const pile of state?.drops||[]){const q=screen(pile.x,pile.y);rounded(q.x-8,q.y-5,16,9,2,pile.kind==='wood'?'#ae9673':pile.kind==='stone'?'#a3aaa0':'#b17b68','#818970');label(`${names[pile.kind]} · ${pile.quantity}`,pile.x,pile.y+.8,true);}
-  const resources=state?.resources||[];const entities=[{y:7,draw:drawTent},...resources.filter(o=>o.stock>0||o.type==='food').map(o=>({y:o.y,draw:()=>o.type==='wood'?drawTree(o):o.type==='stone'?drawStone(o):drawFood(o)})),...(state?.players||[]).filter(p=>(p.online||p.id===me?.id)&&sameScene(p)).map(p=>({y:p.y,draw:()=>drawPlayer(p,time)}))];entities.sort((a,b)=>a.y-b.y);for(const e of entities)e.draw();
+  const resources=state?.resources||[];
+   // ISO depth is x+y (not world y); buildings and trees must hide residents walking behind them.
+   const entities=[
+     {depth:9+6,draw:drawTent},
+     {depth:22.7+3,draw:()=>paperHouse({x:22.7,y:1,w:2.6,h:2},'shop')},
+     {depth:15.5+3.7,draw:()=>paperHouse({x:15.5,y:1.5,w:2.5,h:2.2},'garden-shop')},
+     {depth:10.7+28,draw:()=>paperWarehouse({x:10.7,y:25,w:2.6,h:3})},
+     ...(state?.seedMarket?[{depth:21.8+7.3,draw:()=>paperHouse({x:21.8,y:5.3,w:2.5,h:2},state.seedMarket.stage>=state.config.seedMarket.stages.length?'shop':'construction')}]:[]),
+     ...resources.filter(o=>o.stock>0||o.type==='food').map(o=>({depth:o.x+o.y,draw:()=>o.type==='wood'?drawTree(o):o.type==='stone'?drawStone(o):drawFood(o)})),
+     ...(state?.players||[]).filter(p=>(p.online||p.id===me?.id)&&sameScene(p)).map(p=>({depth:p.x+p.y,draw:()=>drawPlayer(p,time)}))
+   ];entities.sort((a,b)=>a.depth-b.depth);for(const e of entities)e.draw();
   if(route.length){const p=screen(route.at(-1).x,route.at(-1).y);ctx.beginPath();ctx.ellipse(p.x,p.y,7,4,0,0,Math.PI*2);ctx.strokeStyle='#82956a99';ctx.lineWidth=1.4;ctx.stroke();}
   if(context){const p=screen(context.x,context.y);ctx.beginPath();ctx.ellipse(p.x,p.y+4,view.s*.7,view.s*.25,0,0,Math.PI*2);ctx.strokeStyle='#82956999';ctx.lineWidth=1.5;ctx.stroke();}
   if(me?.job){const left=Math.max(0,me.job.ends-(state.now+80)),duration=me.job.ends-me.job.started;$('actionProgress').style.width=`${Math.min(100,(1-left/duration)*100)}%`;}else $('actionProgress').style.width='0';
