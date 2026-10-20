@@ -1,5 +1,8 @@
 # Dementor Live — Asset Library v2 · Audit 2026-10-20
 
+> **ИСТОРИЧЕСКИЙ АУДИТ V2.** Библиотека теперь расширена до 62 независимых SVG: [SVG-FIRST v3](ASSET_LIBRARY_v3_2026-10-20.md) / [реестр DL-ICON номеров](ICON_NUMBER_REGISTRY_v3_2026-10-20.json). Старые утверждённые PNG v2 CLEAN остаются активными до художественной приёмки новой графики; v3 пока CANDIDATE, не production.
+
+
 > **PACKAGE:** [SVG Asset Library v2 ZIP · complete 62-entry register, 37 SVG renders and QA]( https://drive.google.com/file/d/1tHD9_cCiJGAlwaZVW9YO5PRSnjjQE2fU/view ). This GitHub copy is the audit/index; individual new SVG, PNG and browser gallery are included in the package, not auto-installed in any game branch. New art remains candidate until manual visual sign-off.
 
 
