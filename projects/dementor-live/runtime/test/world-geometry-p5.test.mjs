@@ -41,6 +41,8 @@ test('Tier 2–5 rocks have finite, shrinking, persisted bounds; mining near per
  const restarted=new Game(structuredClone(g.state));
  assert.equal(restarted.target('tiered-rock-5').stock,g.target('tiered-rock-5').stock);
  const big=restarted.target('tiered-rock-5');big.stock=0;
+ // Test fixture modifies server state directly; publish a revision to invalidate the P5 footprint cache.
+ restarted.changed();
  assert.equal(worldFootprints(restarted).some(o=>o.id==='tiered-rock-5'),false);
  assert.equal(restarted.walkable(big.x,big.y,p),true);
 });

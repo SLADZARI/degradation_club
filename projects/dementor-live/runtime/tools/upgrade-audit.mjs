@@ -43,12 +43,22 @@ function extract(raw){
 }
 const input=extract(original),network=new CityNetwork(structuredClone(original)),roundtrip=network.serialize();
 const from=new Map(cities(original)),to=new Map(cities(roundtrip));
+const residentRelocations=[];
 for(const [cityId,old]of from){
  const upgraded=to.get(cityId);
  if(!upgraded)throw Error('Compatibility failure: city missing');
  for(const [id,p]of Object.entries(old?.players||{})){
   const next=upgraded.players?.[id];
   if(!next)throw Error('Compatibility failure: player missing');
+  const locationChanged=p.x!==next.x||p.y!==next.y;
+  if(locationChanged){
+   const history=(upgraded.residentRelocations||[]).slice((old.residentRelocations||[]).length);
+   const proof=history.filter(rec=>rec.id===id&&rec.cause==='rc4-p4-p5-footprint'&&rec.scene==='city'
+    &&rec.from?.x===p.x&&rec.from?.y===p.y&&rec.to?.x===next.x&&rec.to?.y===next.y);
+   if(proof.length!==1||(p.scene||'city')!=='city'||Math.hypot(next.x-p.x,next.y-p.y)>24.001)
+    throw Error('Compatibility failure: unapproved player coordinate change in city '+cityId);
+   residentRelocations.push({city:cityId,from:{x:p.x,y:p.y},to:{x:next.x,y:next.y}});
+  }
   for(const field of ['id','token','name','wallet','bag','tools','toolItems','activeTools','health','hunger','stamina','pagerInbox','pagerNumber','pagerOwns'])
    if(Object.hasOwn(p,field))assertPreserved(p[field],next[field],'players.'+field);
  }
@@ -73,9 +83,9 @@ for(const k of ['wood','stone'])if(after.stock[k]<input.stock[k])throw Error('Co
 // Crossing/building edits are not merely cosmetic: block migration if any persisted avatar
 // would spawn inside a now-impassable river, mountain, building or physical payphone.
 for(const g of network.values())for(const p of Object.values(g.state.players)){
- if(!g.walkable(p.x,p.y,p))throw Error('Compatibility failure: a saved resident would spawn in a blocked cell; do not auto-deploy');
+ if(!g.walkable(p.x,p.y,p))throw Error('Compatibility failure: a saved resident would spawn in a blocked cell; do not auto-deploy (scene '+(p.scene||'city')+', x='+p.x+', y='+p.y+')');
  g.snapshot(p);
 }
 console.log(JSON.stringify({status:'PASS_READ_ONLY',sha256:createHash('sha256').update(buf).digest('hex'),
  schemaBefore:original.schema||'legacy',schemaAfter:roundtrip.schema,
- countsBefore:input,countsAfter:after,sourceFileUntouched:true},null,2));
+ countsBefore:input,countsAfter:after,residentRelocations,sourceFileUntouched:true},null,2));

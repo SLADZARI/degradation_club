@@ -29,3 +29,15 @@ test('legacy pre-multi-city save passes read-only migration and preserves finite
  assert.equal(report.status,'PASS_READ_ONLY');
  assert.equal(report.countsBefore.wallets,report.countsAfter.wallets);
 });
+
+test('legacy blocked resident migration is read-only, preserves identity and records coordinate proof',()=>{
+ const g=new Game(createWorld()),p=g.join('Blocked legacy');p.x=10;p.y=12;p.wallet=198;p.bag.wood=4;
+ const old=structuredClone(g.state),report=runAudit(old);
+ assert.equal(report.status,'PASS_READ_ONLY');
+ assert.equal(report.residentRelocations.length,1);
+ assert.deepEqual(report.residentRelocations[0].from,{x:10,y:12});
+ assert.equal(report.countsBefore.wallets,report.countsAfter.wallets);
+ const upgraded=new Game(structuredClone(old));
+ assert.equal(upgraded.auth(p.token).wallet,198);
+ assert.ok(upgraded.walkable(upgraded.auth(p.token).x,upgraded.auth(p.token).y,upgraded.auth(p.token)));
+});
