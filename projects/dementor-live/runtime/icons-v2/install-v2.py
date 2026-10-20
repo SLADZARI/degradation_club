@@ -77,11 +77,11 @@ change('server.mjs',"'\/manifest.webmanifest':'manifest.webmanifest'".replace('\
        "'/manifest.webmanifest':'manifest.webmanifest','/paper-icons.js':'paper-icons.js','/paper-icons.css':'paper-icons.css'")
 pkg=candidate/'package.json'
 p=json.loads(pkg.read_text(encoding='utf-8'))
-if p['version'] not in ['0.4.0-world-p0','0.4.1-icons-v2','0.5.0-rc.2']:
+if p['version'] not in ['0.4.0-world-p0','0.4.1-icons-v2','0.5.0-rc.2','0.5.0-rc.3']:
     raise SystemExit('STOP: Unexpected runtime baseline for clean icon v2 overlay')
 if p['version']=='0.4.0-world-p0':
     p['version']='0.4.1-icons-v2'
-# Keep the 0.5.0 release identity unchanged while applying exact icon bytes.
+# Keep the approved RC2/RC3 release identity unchanged while applying exact icon bytes.
 p['scripts']['check:icons']='node tools/verify-paper-icons-v2.mjs'
 pkg.write_text(json.dumps(p,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
 change('deploy/Dockerfile',
