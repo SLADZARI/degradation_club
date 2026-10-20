@@ -1,0 +1,41 @@
+name: Dementor Live I18N-01 Dev1 — Server Receipt Compatibility
+on:
+  push:
+    branches:
+      - feature/dementor-live-i18n-dev1-result-codes-20261020
+    paths:
+      - projects/dementor-live/runtime/**
+      - .github/workflows/dementor-live-i18n-server.yml
+  pull_request:
+    paths:
+      - projects/dementor-live/runtime/**
+      - .github/workflows/dementor-live-i18n-server.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  contract-receipts:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    defaults:
+      run:
+        working-directory: projects/dementor-live/runtime
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: JS syntax / no build side effects
+        run: |
+          node --check result-codes.mjs
+          node --check server.mjs
+          node --check world.mjs
+          node --check city-network.mjs
+          node --check test/result-codes.test.mjs
+          node --check test/result-codes-game.test.mjs
+      - name: Pure envelope and model/save replay tests
+        run: npm run test:i18n-server
+      - name: Existing model suite
+        run: npm test
+      - name: Isolated loopback HTTP/SSE two-player test (temporary save)
+        run: npm run test:integration
