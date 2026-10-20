@@ -12,7 +12,17 @@ const prefix='Dementor_Live_Paper_Icons_v1/runtime/public/';
 const expected=['wood','stone','food','seed_hemp','seed_carrot','hemp','carrot','water','axe','pick','rifle','ammo','map','shirt','souvenir','paper','backpack','cargo','health','stamina'];
 const hash=(b)=>createHash('sha256').update(b).digest('hex');
 const approved='607e40f07a2695148ecbb8e541ec234eeeb92de7a223a26438d754d104576193';
-if(!fs.existsSync(archive))throw Error('Approved Paper Cut icon ZIP missing: '+archive);
+if(!fs.existsSync(archive)){
+  // Portable release ZIPs intentionally omit nested ZIP sources. Their actual PNGs were
+  // already materialized by the release builder, and check:icons validates every file.
+  const atlas=path.join(root,'public/assets/paper-icons/paper_atlas_64_indexed.png');
+  const adapter=path.join(root,'public/paper-icons.js');
+  if(fs.existsSync(atlas)&&fs.existsSync(adapter)){
+    console.log('PAPER CUT UI ICONS: using materialized portable release assets');
+    process.exit(0);
+  }
+  throw Error('Approved Paper Cut icon ZIP or preinstalled atlas missing: '+archive);
+}
 const zip=fs.readFileSync(archive);
 let eocd=-1;
 for(let p=zip.length-22;p>=Math.max(0,zip.length-65558);--p){
