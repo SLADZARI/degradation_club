@@ -1,6 +1,6 @@
 // P5 shared collision footprints: source of truth for world objects and axonometric depth.
 // Derived on demand from persisted entities. Never delete or relocate a saved object.
-import {WORLD_OBSTACLES,WORLD_CITY_TARGETS} from './world-expansion.mjs';
+import {WORLD_OBSTACLES,WORLD_CITY_TARGETS,WORLD_CACTI} from './world-expansion.mjs';
 import {PHONE_BOOTHS} from './telecom.mjs';
 export const BODY_RADIUS=.3;
 export const rectOverlaps=(a,b)=>a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y;
@@ -33,7 +33,7 @@ export function worldFootprints(g){
    .map((o,i)=>({id:'mountain-'+i,kind:'mountain',x:o.x,y:o.y,w:o.w,h:o.h,depth:isoDepth(o)}));
  const phone=PHONE_BOOTHS.filter(o=>o.scene==='city').map(o=>({id:o.id,kind:'payphone',x:o.x-.5,y:o.y-.5,w:1,h:1,depth:o.x+o.y}));
  const oversized=g.state.resources.map(footprintForResource).filter(Boolean);
- return [...STRUCTURES,...mountains,...forests,...phone,...oversized];
+ return [...STRUCTURES,...mountains,...forests,...phone,...WORLD_CACTI,...oversized];
 }
 // Non-mutating audit: detects new overlapping static objects before adding any procedural prop.
 // Existing persisted residents and original building footprints remain checked by release audit.
