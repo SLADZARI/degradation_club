@@ -80,25 +80,122 @@ function lifePanel(mode,rows,row,canAct){
  if(owner){row('Гости',h.open?'Участок открыт. Чужой сундук остаётся закрытым.':'Участок закрыт для посетителей.',[button(h.open?'Закрыть участок':'Открыть для гостей',action('homeAccess',null,{open:!h.open}),false,'toggle-visitors')]);for(const other of state.players.filter(p=>p.id!==me.id&&p.online))row(other.name,h.permits[other.id]?'Разрешено забирать урожай':'Без права на урожай',[button(h.permits[other.id]?'Отозвать право сбора':'Разрешить забирать урожай',action('homeAccess',null,{open:h.open,player:other.id,harvest:!h.permits[other.id]}))]);}
  return true;
 }
+// Local furniture: ISO30 prisms anchored to the same physical footprints as collisions.
+function localPrism(o,height,front,side,top){
+ const base=[[o.x,o.y],[o.x+o.w,o.y],[o.x+o.w,o.y+o.h],[o.x,o.y+o.h]]
+   .map(([x,y])=>{const p=screen(x,y);return [p.x,p.y];});
+ const raised=base.map(([x,y])=>[x,y-height*view.s]);
+ poly([base[3],base[2],raised[2],raised[3]],front,'#847c69');
+ poly([base[2],base[1],raised[1],raised[2]],side,'#847c69');
+ poly(raised,top,'#847c69');
+}
+function localTent(o,stage){
+ const s=view.s,base=[[o.x,o.y],[o.x+o.w,o.y],[o.x+o.w,o.y+o.h],[o.x,o.y+o.h]]
+   .map(([x,y])=>{const p=screen(x,y);return [p.x,p.y];});
+ const ridgeBack=screen(o.x+o.w/2,o.y),ridgeFront=screen(o.x+o.w/2,o.y+o.h),h=s*1.9;
+ const rb=[ridgeBack.x,ridgeBack.y-h],rf=[ridgeFront.x,ridgeFront.y-h];
+ groundRect(o,'#c9c0a4','#9b987d');
+ if(stage===1){
+   for(let i=0;i<4;i++){const peak=i<2?rb:rf;line(base[i][0],base[i][1],peak[0],peak[1],'#8b8165',2.5);}
+   line(...rb,...rf,'#8b8165',2.5);return;
+ }
+ poly([base[0],rb,rf,base[3]],'#e6ddc4','#8d846b');
+ poly([rb,base[1],base[2],rf],stage>=3?'#bdae91':'#d7ceb6','#8d846b');
+ poly([base[3],rf,base[2]],'#dac8a7','#8d846b');
+ const doorLeft=screen(o.x+o.w*.36,o.y+o.h),doorRight=screen(o.x+o.w*.64,o.y+o.h);
+ poly([[doorLeft.x,doorLeft.y],[ridgeFront.x,ridgeFront.y-h*.57],[doorRight.x,doorRight.y]],'#586457','#77785f');
+}
+function localWell(o){
+ localPrism(o,.58,'#b7a386','#95856d','#d8cab0');
+ const pad=.15,water=[[o.x+pad,o.y+pad],[o.x+o.w-pad,o.y+pad],[o.x+o.w-pad,o.y+o.h-pad],[o.x+pad,o.y+o.h-pad]]
+   .map(([x,y])=>{const p=screen(x,y);return [p.x,p.y-.59*view.s]});
+ poly(water,'#9bbaaf','#748f87');
+}
+function localChest(o){
+ localPrism(o,.85,'#ae9471','#897459','#d2bb93');
+ localPrism({x:o.x-.05,y:o.y-.05,w:o.w+.1,h:o.h+.1},.15,'#cfb389','#9a8060','#e0cba4');
+ const p=screen(o.x+o.w,o.y+o.h);line(p.x-6,p.y-view.s*.5,p.x+6,p.y-view.s*.5,'#77654f',2);
+}
+function localBed(o){
+ localPrism(o,.48,'#9d8b74','#81725e','#cfc3aa');
+ localPrism({x:o.x+.18,y:o.y+.15,w:o.w-.36,h:o.h-.3},.12,'#d8d5c9','#c6c1b2','#ebe6d9');
+ const pillow=screen(o.x+.48,o.y+.48),edge=screen(o.x+.95,o.y+.48);
+ line(pillow.x,pillow.y-.62*view.s,edge.x,edge.y-.62*view.s,'#b9b5a7',view.s*.18);
+}
+function localCrop(b){
+ groundRect({x:b.x-.55,y:b.y-.55,w:1.1,h:1.1},'#b7a083','#8f8066');
+ if(!b.crop)return;
+ const q=screen(b.x,b.y),ripe=b.watered&&state.now>=b.readyAt,k=view.s*(ripe?.25:.13);
+ if(b.crop==='hemp')drawHempBush(b.x,b.y);
+ else if(b.crop==='carrot'){
+   poly([[q.x-k*.5,q.y-k],[q.x+k*.5,q.y-k],[q.x,q.y+k]],'#c89362','#9a7857');
+   poly([[q.x,q.y-k],[q.x-k,q.y-k*2],[q.x,q.y-k*1.7],[q.x+k,q.y-k*2]],'#8fa476','#73886a');
+ }else{
+   for(const side of [-1,1])poly([[q.x,q.y],[q.x+side*k,q.y-k],[q.x+side*k*.9,q.y-k*1.7],[q.x,q.y-k*.8]],side<0?'#8ba678':'#a4b58c','#708966');
+   line(q.x,q.y,q.x,q.y-k*2,'#718466',1.5);
+ }
+}
 function drawHome(time){
- const h=state.home;groundRect({x:0,y:0,w:16,h:16},state.scene==='interior'?'#e2d5b9':'#e4e7cf','#929c7b');
- for(let x=0;x<=16;x++){const a=screen(x,0),b=screen(x,16);line(a.x,a.y,b.x,b.y,'#a1a58630');}for(let y=0;y<=16;y++){const a=screen(0,y),b=screen(16,y);line(a.x,a.y,b.x,b.y,'#a1a58630');}
- if(['plot','expedition'].includes(state.scene)){
-  label(state.scene==='expedition'?'Общая миссия · расчистка':'Участок · '+(state.players.find(p=>p.id===h.owner)?.name||'житель'),8,1);
-  for(const n of h.nodes){if(!n.left)continue;const o={...n,stock:n.left};if(n.kind==='wood')drawTree(o);else if(n.kind==='stone')drawStone(o);else {drawFood(o);label(n.kind==='food'?'Дикие ягоды':names[n.kind],n.x,n.y+1,true);}}
-  for(const dirt of h.soil||[])groundRect({x:dirt.x-.35,y:dirt.y-.35,w:.7,h:.7},'#a98e6d','#796f5b');
-  for(const tree of h.plantedTrees||[]){const stage=!tree.wateredAt?1:state.now-tree.wateredAt>=360000?3:state.now-tree.wateredAt>=180000?2:1,k=[0,.34,.61,1][stage],q=screen(tree.x,tree.y),variant=state.treeSpecies?.[tree.kind]?.variant??0;
-    ctx.save();ctx.translate(q.x,q.y);ctx.scale(k,k);ctx.translate(-q.x,-q.y);drawTree({...tree,stock:1,visualVariant:variant});ctx.restore();
-    label(state.treeSpecies?.[tree.kind]?.name||'Дерево',tree.x,tree.y-1,true);
-  }
-  if(h.tent)paperTent({x:6,y:5,w:4,h:3},h.tent);
-  if(state.scene!=='expedition'){const water=screen(14,3);paperBox(water.x-view.s*.28,water.y-view.s*.45,view.s*.55,view.s*.45,view.s*.25,-view.s*.16,'#b9aa88','#948566','#d9ceb0');poly([[water.x-view.s*.18,water.y-view.s*.42],[water.x+view.s*.2,water.y-view.s*.42],[water.x+view.s*.4,water.y-view.s*.55],[water.x,water.y-view.s*.55]],'#9fb7ad','#7c9489');}
-  for(const b of h.beds){groundRect({x:b.x-.6,y:b.y-.6,w:1.2,h:1.2},'#b7a083','#8f8066');if(b.crop){const q=screen(b.x,b.y),ripe=b.watered&&state.now>=b.readyAt;const k=view.s*(ripe?.25:.13);if(b.crop==='hemp'){drawHempBush(b.x,b.y);}else if(b.crop==='carrot'){poly([[q.x-k*.5,q.y-k],[q.x+k*.5,q.y-k],[q.x,q.y+k]],'#c89362','#9a7857');poly([[q.x,q.y-k],[q.x-k,q.y-k*2],[q.x,q.y-k*1.7],[q.x+k,q.y-k*2]],'#8fa476','#73886a');}else{for(const side of [-1,1]){poly([[q.x,q.y],[q.x+side*k,q.y-k],[q.x+side*k*.9,q.y-k*1.7],[q.x,q.y-k*.8]],side<0?'#8ba678':'#a4b58c','#708966');}line(q.x,q.y,q.x,q.y-k*2,'#718466',1.5);}}label(b.crop?b.seedPlant?'На семена':b.watered?(state.now>=b.readyAt?'Созрело':'Растёт'):'Полей':'Грядка',b.x,b.y+1,true);}
- }else {const s=view.s,c=screen(3,5.5),b=screen(9,6);paperBox(c.x,c.y-s*.7,s*1.65,s*.7,s*.35,-s*.24,'#b29a75','#907d60','#d2bd96');line(c.x+s*.8,c.y-s*.7,c.x+s*.8,c.y,'#81765e',2);paperBox(b.x,b.y-s*.35,s*1.7,s*.35,s*.55,-s*.38,'#d1c7b1','#a99e86','#eee6d2');paperBox(b.x+s*.13,b.y-s*.5,s*.7,s*.15,s*.25,-s*.17,'#eee9d8','#bdb59e','#faf3df');label('Сундук',4,6,true);label('Кровать',10,7,true);}
+ const h=state.home,scene=state.scene,interior=scene==='interior',mission=scene==='expedition';
+ const footprints=state.homeFootprints||[],object=(id,fallback)=>footprints.find(o=>o.id===id)||fallback;
+ groundRect({x:0,y:0,w:16,h:16},interior?'#e2d5b9':'#e4e7cf','#929c7b');
+ for(let i=0;i<=16;i++){
+   const a=screen(i,0),b=screen(i,16),c=screen(0,i),d=screen(16,i);
+   line(a.x,a.y,b.x,b.y,'#a1a58630',.6);
+   line(c.x,c.y,d.x,d.y,'#a1a58630',.6);
+ }
+ const entities=[],add=(depth,fn)=>entities.push({depth,fn});
+ if(interior){
+   for(const id of ['room-wall-north','room-wall-west']){
+     const wall=footprints.find(o=>o.id===id);
+     if(wall)localPrism(wall,wall.height,'#cfbea0','#b3a78e','#e4d7be');
+   }
+   const chest=object('chest',{x:3,y:4.8,w:1.6,h:1.3});
+   const bed=object('bed',{x:8.4,y:5.1,w:2.4,h:1.7});
+   add(chest.x+chest.w/2+chest.y+chest.h/2,()=>localChest(chest));
+   add(bed.x+bed.w/2+bed.y+bed.h/2,()=>localBed(bed));
+ }else{
+   label(mission?'Общая миссия · расчистка':'Участок · '+(state.players.find(p=>p.id===h.owner)?.name||'житель'),8,1);
+   for(const dirt of h.soil||[])groundRect({x:dirt.x-.35,y:dirt.y-.35,w:.7,h:.7},'#a98e6d','#796f5b');
+   for(const n of h.nodes||[])if(n.left)add(n.x+n.y,()=>{
+     const o={...n,stock:n.left};
+     if(n.kind==='wood')drawTree(o);else if(n.kind==='stone')drawStone(o);else drawFood(o);
+   });
+   for(const tree of h.plantedTrees||[])add(tree.x+tree.y,()=>{
+     const stage=!tree.wateredAt?1:state.now-tree.wateredAt>=360000?3:state.now-tree.wateredAt>=180000?2:1;
+     const k=[0,.34,.61,1][stage],q=screen(tree.x,tree.y),variant=state.treeSpecies?.[tree.kind]?.variant??0;
+     ctx.save();ctx.translate(q.x,q.y);ctx.scale(k,k);ctx.translate(-q.x,-q.y);
+     drawTree({...tree,stock:1,visualVariant:variant});ctx.restore();
+   });
+   if(!mission){
+     if(h.tent){
+       const tent=object('tent-visual',{x:6,y:5,w:4,h:3});
+       add(tent.x+tent.w/2+tent.y+tent.h,()=>localTent(tent,h.tent));
+     }
+     const well=object('well',{x:13.45,y:2.45,w:1.1,h:1.1});
+     add(well.x+well.w/2+well.y+well.h/2,()=>localWell(well));
+     for(const b of h.beds||[])add(b.x+b.y,()=>localCrop(b));
+   }
+ }
+ // One painter queue for props, furniture, terrain and both players.
+ for(const p of state.players.filter(p=>(p.online||p.id===me.id)&&sameScene(p))){
+   const v=visualPlayers.get(p.id)||p;
+   add(v.x+v.y,()=>drawPlayer(p,time));
+ }
+ entities.sort((a,b)=>a.depth-b.depth);
+ for(const entry of entities)entry.fn();
+ if(!interior){
+   for(const n of h.nodes||[])if(n.left&&n.kind!=='wood'&&n.kind!=='stone')label(n.kind==='food'?'Дикие ягоды':names[n.kind],n.x,n.y+1,true);
+   for(const tree of h.plantedTrees||[])label(state.treeSpecies?.[tree.kind]?.name||'Дерево',tree.x,tree.y-1,true);
+   for(const b of h.beds||[])label(b.crop?b.seedPlant?'На семена':b.watered?(state.now>=b.readyAt?'Созрело':'Растёт'):'Полей':'Грядка',b.x,b.y+1,true);
+ }else{label('Сундук',4,6,true);label('Кровать',10,7,true);}
  for(const t of state.homeTargets.filter(t=>['mission-exit','plot-exit','home-exit','tent','well','garden'].includes(t.id)))label(t.title,t.x,t.y,true);
- for(const d of state.drops)label(`${names[d.kind]} × ${d.quantity}`,d.x,d.y,true);
- for(const p of state.players.filter(p=>(p.online||p.id===me.id)&&sameScene(p)))drawPlayer(p,time);
- if(context){const q=screen(context.x,context.y);ctx.beginPath();ctx.ellipse(q.x,q.y+4,view.s*.7,view.s*.25,0,0,Math.PI*2);ctx.strokeStyle='#829569';ctx.stroke();}
+ for(const d of state.drops)label(names[d.kind]+' × '+d.quantity,d.x,d.y,true);
+ if(context){
+   const q=screen(context.x,context.y);ctx.beginPath();
+   ctx.ellipse(q.x,q.y+4,view.s*.7,view.s*.25,0,0,Math.PI*2);
+   ctx.strokeStyle='#829569';ctx.stroke();
+ }
 }
 
 let questListSignature='';
