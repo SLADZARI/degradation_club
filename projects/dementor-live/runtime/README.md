@@ -28,3 +28,7 @@
 ## DL-TERRAIN-01 / RC3 — покрытия земли (SVG-first)
 
 [ТЗ, UI-покупки, рюкзак, предпросмотр и серверные права](../design/DL_TERRAIN_01_RC3_GAMEPLAY.md) · [безопасный RC3 runbook](docs/RELEASE_0.5.0_RC3_TERRAIN_SAFE.md). Пять правил: **три товара — paving, grass, flowers; пакет 10 за 1 PAPER; старые 20 UI-иконок неизменны; частный участок покрывает только владелец; реальный world.json никогда не сбрасывать**. Отдельные 17 SVG собираются через `python3 tools/build-terrain.py` в один версионированный атлас на размер; в магазине отображать картинки атласа, покупку складывать в существующий `terrainBag`, на карте сначала выбирать ромб, потом «Применить». Статус: draft candidate, не продакшен. Измерить FPS и проверить два браузера/мобильный телефон перед merge и публикацией.
+
+## Графика мира · 35 SVG · Batch 01 (только кандидат)
+
+[Полный аудит и рисунки](../design/world-assets/WORLD_ASSET_GAP_AUDIT_2026-10-20.md) · [CSV по 139 объектам](../design/world-assets/WORLD_ASSET_GAP_AUDIT_2026-10-20.csv) · исходники `assets-source/world-art-batch01/*.svg`. Зависимости для офлайн-сборки `cairosvg pillow`, команда из `runtime/`: `python3 tools/world-art-batch01/build.py && python3 tools/world-art-batch01/build_atlas.py && python3 tools/world-art-batch01/test_assets.py`. Генерация PNG не обновляет клиент и не меняет `world.json`. Художественная приёмка, world geometry/collision и реальное мобильное тестирование не выполнены. См. Draft PR #301.
