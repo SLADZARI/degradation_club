@@ -1,11 +1,15 @@
 import {Game as CoreGame,createWorld} from './world.mjs';
-import {WORLD_SCENES,WORLD_CITY_TARGETS,SECOND_BRIDGE,terrainBlocked,initializeWorldTravel,worldTravelAction,worldTravelView} from './world-expansion.mjs';
+import {WORLD_SCENES,WORLD_CITY_TARGETS,WORLD_OBSTACLES,SECOND_BRIDGE,terrainBlocked,initializeWorldTravel,worldTravelAction,worldTravelView} from './world-expansion.mjs';
 import {initSecondBridge,secondBridgeOpen,secondBridgeAction} from './second-bridge.mjs';
 import {PHONE_BOOTHS} from './telecom.mjs';
 export {createWorld};
 export class Game extends CoreGame{
   constructor(state,c){
     super(state,c);initializeWorldTravel(this);initSecondBridge(this);
+    for(const o of WORLD_OBSTACLES.filter(o=>o.biome==='forest')){
+      const id='forest-wood-'+o.x+'-'+o.y;
+      if(!this.state.resources.some(r=>r.id===id))this.state.resources.push({id,type:'wood',x:o.x+o.w/2,y:o.y+o.h/2,stock:18,initial:18,regrowAt:0});
+    }
     for(const [id,x,y] of [['mountain-stone-a',55,64],['mountain-stone-b',74,63],['mountain-stone-c',88,63]]){
       if(!this.state.resources.some(r=>r.id===id))this.state.resources.push({id,type:'stone',x,y,stock:1000000,initial:1000000,regrowAt:0});
     }
@@ -19,6 +23,7 @@ export class Game extends CoreGame{
     if(WORLD_SCENES[scene])return !terrainBlocked(scene,x,y,r);
     if(scene==='city'){
       if(terrainBlocked('city',x,y,r))return false;
+      if(WORLD_OBSTACLES.some(o=>o.biome==='forest'&&x+r>o.x&&x-r<o.x+o.w&&y+r>o.y&&y-r<o.y+o.h&&this.state.resources.some(t=>t.id==='forest-wood-'+o.x+'-'+o.y&&t.stock>0)))return false;
       if(secondBridgeOpen(this)&&x+r>c.river.x&&x-r<c.river.x+c.river.w&&y-r>=SECOND_BRIDGE.y&&y+r<=SECOND_BRIDGE.y+SECOND_BRIDGE.h){
         if(x<r||y<r||x>c.width-r||y>c.height-r)return false;
         if(this.rects().some(o=>x+r>o.x&&x-r<o.x+o.w&&y+r>o.y&&y-r<o.y+o.h))return false;
