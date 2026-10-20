@@ -4,7 +4,8 @@ import {initSecondBridge,secondBridgeOpen,secondBridgeAction} from './second-bri
 import {PHONE_BOOTHS} from './telecom.mjs';
 import {civicAction,civicView} from './civic-earnings.mjs';
 import {losevAction,losevView} from './losev-courses.mjs';
-import {worldFootprints,blockedByRect,BODY_RADIUS} from './world-footprints.mjs';
+import {worldFootprints,blockedByRect} from './world-footprints.mjs';
+import {mountainMovement,onSummitTrail,summitPosition} from './mountain-trail.mjs';
 export {createWorld};
 export class Game extends CoreGame{
   constructor(state,c){
@@ -26,13 +27,14 @@ export class Game extends CoreGame{
   join(name,gender='unspecified'){const p=super.join(name,gender);initializeWorldTravel(this);return p;}
   target(id){return PHONE_BOOTHS.find(o=>o.id===id)||WORLD_CITY_TARGETS.find(o=>o.id===id)||Object.values(WORLD_SCENES)
     .flatMap(region=>[region.exit,region.main]).find(o=>o.id===id)||super.target(id);}
+  movementBiome(p,input){return mountainMovement(p,input);}
   walkable(x,y,p=null){
     const scene=p?.scene||'city',r=.3,c=this.c;
      if(PHONE_BOOTHS.some(b=>b.scene===scene&&Math.hypot(x-b.x,y-b.y)<.50))return false;
     if(WORLD_SCENES[scene])return !terrainBlocked(scene,x,y,r);
     if(scene==='city'){
       // A single physical catalogue is consumed by the server and sent to client.
-      if(worldFootprints(this).some(o=>blockedByRect(x,y,r,o)))return false;
+      if(worldFootprints(this).some(o=>(o.kind!=='mountain'||!onSummitTrail(x,y))&&blockedByRect(x,y,r,o)))return false;
       if(secondBridgeOpen(this)&&x+r>c.river.x&&x-r<c.river.x+c.river.w&&y-r>=SECOND_BRIDGE.y&&y+r<=SECOND_BRIDGE.y+SECOND_BRIDGE.h){
         if(x<r||y<r||x>c.width-r||y>c.height-r)return false;
         if(this.rects().some(o=>x+r>o.x&&x-r<o.x+o.w&&y+r>o.y&&y-r<o.y+o.h))return false;
@@ -61,7 +63,7 @@ export class Game extends CoreGame{
       if(self)self.scene=actual;
     }
     base.worldTravel=worldTravelView(this,p);
-    if(actual==='city')base.worldTravel.footprints=worldFootprints(this);
+    if(actual==='city'){base.worldTravel.footprints=worldFootprints(this);base.worldTravel.summitElevation=summitPosition(p.x,p.y)?.elevation||0;}
     base.civicJobs=civicView(this,p);
     base.losevCourse=losevView(p,this.now);
     return base;
