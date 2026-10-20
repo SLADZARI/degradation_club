@@ -101,9 +101,9 @@ try{
       viewport:{width:innerWidth,height:innerHeight},
       canvas:(()=>{const r=document.getElementById('world').getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,height:r.height};})(),
       zoom:view.zoom,
-      browserErrors:errors
+      browserErrors:window.__navQA?.inputs?.length||0
     }),target.world);
-    console.error('MOBILE_NAVIGATION_TIMEOUT_DIAGNOSTIC',JSON.stringify(diagnostic));
+    console.error('MOBILE_NAVIGATION_TIMEOUT_DIAGNOSTIC',JSON.stringify({...diagnostic,pageErrors:errors}));
     throw navigationError;
   }
   const audit=await page.evaluate(goal=>({movementCommands:window.__navQA.inputs.filter(p=>Math.hypot(p.dx,p.dy)>0.05).length,finalDistance:Math.hypot(me.x-goal.x,me.y-goal.y)}),target.world);
