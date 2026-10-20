@@ -10,7 +10,26 @@ async function start(){server=spawn(process.execPath,['server.mjs','--test'],{cw
 async function stop(){if(server&&server.exitCode===null){server.kill('SIGTERM');await new Promise(r=>server.once('exit',r));}}
 async function player(name,mobile=false){const context=await browser.newContext({viewport:mobile?{width:390,height:844}:{width:1440,height:960},deviceScaleFactor:1});const page=await context.newPage();page.on('pageerror',e=>report.consoleErrors.push(e.message));page.on('console',m=>{if(m.type()==='error')report.consoleErrors.push(m.text());});page.on('requestfailed',r=>{if(!r.url().includes('/api/events')&&!r.failure()?.errorText?.includes('ABORTED'))report.networkErrors.push(r.url()+': '+r.failure()?.errorText);});await page.goto(base);await page.getByLabel('Как тебя зовут?').fill(name);await page.getByRole('button',{name:'Войти в мир'}).click();await page.waitForFunction(()=>typeof me!=='undefined'&&me&&connected);const id=await page.evaluate(()=>me.id),token=await page.evaluate(()=>sessionStorage.getItem('dementor-token'));return {context,page,id,token,name};}
 async function snap(p){return p.page.evaluate(()=>JSON.parse(JSON.stringify(me)));}
-async function go(p,id){const page=p.page;await page.bringToFront();await page.locator('#centerButton').click();await page.locator('#goto-'+id).click();await page.waitForFunction(id=>{const t=allTargets().find(t=>t.id===id);return t&&Math.hypot(t.x-me.x,t.y-me.y)<=state.config.actionRange&&route.length===0;},id,{timeout:30000});await page.waitForFunction(id=>context?.id===id,id,{timeout:4000});}
+async function go(p,id){
+ const page=p.page;console.log('NAVIGATE',p.name,id);
+ await page.bringToFront();
+ await page.locator('#centerButton').click();
+ await page.locator('#goto-'+id).click();
+ try{
+  await page.waitForFunction(id=>{const t=allTargets().find(t=>t.id===id);return t&&Math.hypot(t.x-me.x,t.y-me.y)<=state.config.actionRange&&route.length===0;},id,{timeout:30000});
+  await page.waitForFunction(id=>context?.id===id,id,{timeout:4000});
+ }catch(error){
+  const details=await page.evaluate(id=>{
+   const t=allTargets().find(t=>t.id===id);
+   return {target:id,targetExists:!!t,coordinates:t&&{x:t.x,y:t.y},position:{x:me.x,y:me.y},distance:t?Math.hypot(t.x-me.x,t.y-me.y):null,
+    routeLength:route.length,routePreview:route.slice(0,6),context,selected,
+    notification:document.getElementById('toast')?.textContent,scene:state.scene,
+    navigationAlternative:t?[[0,1.4],[-1.4,0],[1.4,0],[0,-1.4]].map(([dx,dy])=>findPath({x:t.x+dx,y:t.y+dy})?.length||0):[]};
+  },id);
+  console.error('LEGACY_FULL_BROWSER_NAVIGATION_FAILURE',JSON.stringify({player:p.name,...details}));
+  throw error;
+ }
+}
 async function action(p){await p.page.locator('#actionButton').click();}
 async function tools(p){await go(p,'tools');await action(p);await p.page.waitForFunction(()=>me.tools.axe===state.config.toolDurability&&me.tools.pick===state.config.toolDurability);}
 async function harvestDeliver(p,kind,quantity,forge=false){let remaining=quantity;while(remaining){const batch=Math.min(kind==='wood'?12:6,remaining),tool=kind==='wood'?'axe':'pick';if((await snap(p)).tools[tool]<batch)await tools(p);await p.page.keyboard.press(kind==='wood'?'Digit1':'Digit2');await p.page.waitForFunction(tool=>me.equipped===tool,tool);await go(p,kind+(forge?'-2':'-1'));for(let i=0;i<batch;i++){const before=(await snap(p)).bag[kind];await action(p);await p.page.waitForFunction(({kind,before})=>me.bag[kind]===before+1&&!me.job,{kind,before},{timeout:5000});}
