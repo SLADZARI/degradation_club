@@ -1,0 +1,40 @@
+name: Dementor Live Paper Cut Icons v2 QA
+on:
+  push:
+    branches:
+      - 'fix/dementor-live-icons-v2-clean-*'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify-clean-icons-v2:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: projects/dementor-live/runtime
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate shell / Python / JavaScript syntax
+        run: |
+          bash -n icons-v2/remote-deploy.sh
+          python3 -m py_compile icons-v2/install-v2.py
+          node --check icons-v2/paper-icons.js
+          node --check icons-v2/verify-paper-icons-v2.mjs
+      - name: Apply exact approved ZIP to disposable runtime
+        run: python3 icons-v2/install-v2.py . icons-v2
+      - name: Check artwork checksums and 20-icon adapter
+        run: node tools/verify-paper-icons-v2.mjs
+      - name: Verify all original game mechanics remain functional
+        run: |
+          npm run doctor
+          npm run check
+          npm run test:integration
+          npm run test:persistence
+      - name: Verify actual Docker candidate build
+        run: |
+          docker build -t dementor-live:icon-v2-qa -f deploy/Dockerfile .
+          docker run --rm --entrypoint node dementor-live:icon-v2-qa tools/verify-paper-icons-v2.mjs
