@@ -8,7 +8,7 @@ let server,browser;const failures=[];
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 async function post(route,payload,headers={}){
   const res=await fetch(base+route,{method:'POST',headers:{'Content-Type':'application/json',...headers},body:JSON.stringify(payload)});
-  assert.equal(res.status,200,route+' '+await res.text());return res.json();
+  const raw=await res.text();assert.equal(res.status,200,route+' '+raw);return JSON.parse(raw);
 }
 async function goContext(page,id){
   await page.evaluate(id=>{selected=id;updateContext();},id);
