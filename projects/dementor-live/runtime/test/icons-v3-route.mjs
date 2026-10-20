@@ -27,9 +27,10 @@ try{
   }
   assert.ok(ready,'isolated test server did not become ready');
   const manifestResponse=await fetch(baseUrl+'/assets/paper-icons-new-v3/manifest-new-only.json');
-  assert.equal(manifestResponse.status,200,'manifest GET must be served');
+  const manifestBody=await manifestResponse.text();
+  assert.equal(manifestResponse.status,200,`manifest GET must be served; body=${manifestBody.slice(0,160)}; expectedFile=${fs.existsSync(path.join(root,'public/assets/paper-icons-new-v3/manifest-new-only.json'))}`);
   assert.ok((manifestResponse.headers.get('content-type')||'').includes('application/json'),'manifest must use JSON content type');
-  const manifest=await manifestResponse.json();
+  const manifest=JSON.parse(manifestBody);
   assert.equal(manifest.items.length,42,'all 42 new-only icons must be cataloged');
   const head=await fetch(baseUrl+'/assets/paper-icons-new-v3/manifest-new-only.json',{method:'HEAD'});
   assert.equal(head.status,200,'manifest HEAD must be served');
