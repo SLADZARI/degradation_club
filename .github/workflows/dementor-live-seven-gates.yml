@@ -1,7 +1,9 @@
 name: Dementor Live - Seven Sequential Acceptance Gates
 on:
   push:
-    branches: [qa/dementor-live-rc2-chain-audit-2026-10-20]
+    branches:
+      - qa/dementor-live-rc2-chain-audit-2026-10-20
+      - release/dementor-live-civic-p3-safe-upgrade-rc3-2026-10-20
     paths:
       - '.github/workflows/dementor-live-seven-gates.yml'
       - 'projects/dementor-live/runtime/**'
@@ -25,6 +27,8 @@ jobs:
           npm install --no-save --no-package-lock playwright@1.56.1
           npx playwright install --with-deps chrome
           python3 icons-v2/install-v2.py . icons-v2
+      - name: Verify RC3 release contents
+        run: npm run check:release
       - name: Seven test gates - sequential, no confirmations, all results retained
         shell: bash
         run: |
