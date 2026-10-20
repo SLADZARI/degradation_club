@@ -3,11 +3,13 @@
 from pathlib import Path
 from zipfile import ZipFile
 from collections import Counter
-import csv, json, hashlib, xml.etree.ElementTree as ET, io
+import csv, json, hashlib, xml.etree.ElementTree as ET, io, os
 from PIL import Image
 ROOT=Path(__file__).resolve().parent
-ZIP=Path('/mnt/data/Dementor_Live_Origami_PNG_Catalog_v04.zip')
-OLD=Path('/mnt/data/Dementor_Live_Physical_Asset_Registry_v0_1.zip')
+ZIP=Path(os.environ.get('DL_ORIGAMI_REGISTRY_ZIP','/mnt/data/Dementor_Live_Origami_PNG_Catalog_v04.zip'))
+OLD=Path(os.environ.get('DL_PHYSICAL_REGISTRY_ZIP','/mnt/data/Dementor_Live_Physical_Asset_Registry_v0_1.zip'))
+if not ZIP.is_file() or not OLD.is_file():
+    raise SystemExit('Для повторного сравнительного аудита укажи DL_ORIGAMI_REGISTRY_ZIP и DL_PHYSICAL_REGISTRY_ZIP (локальные архивы прежних каталогов). Имеющийся WORLD_ASSET_GAP_AUDIT.csv уже сохранён в репозитории.')
 with ZipFile(ZIP) as z: old=json.loads(z.read('Dementor_Live_Origami_Registry_v04/registry.json'))['objects']
 with ZipFile(OLD) as z: existing_svg={Path(n).stem for n in z.namelist() if n.endswith('.svg')}
 new=json.loads((ROOT/'manifest.json').read_text())['assets'];new_legacy={x['game_object'] for x in new if x['game_object'].startswith('DL-')}
