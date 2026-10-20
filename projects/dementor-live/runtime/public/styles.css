@@ -152,3 +152,27 @@ dialog#mayorIdea::backdrop{background:#14261e77}
 .idea-actions{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:8px;margin-top:16px}
 .idea-actions .primary{background:#617d62;color:#fff}
 @media(max-width:760px){dialog#mayorIdea{width:calc(100vw - 20px);max-height:calc(100dvh - 24px);padding:17px}#mayorIdea h2{font-size:19px}}
+
+/* DL-CAVE-01 shared compact HUD: only six square hotbar items at bottom. Existing
+   controls stay in the DOM for F/Q and state refresh, but no duplicate bottom row. */
+#game .inventory>.tools,#game .inventory>.bag{display:none!important}
+#game .inventory{width:max-content;max-width:calc(100vw - 24px);padding:6px 7px!important;bottom:max(6px,env(safe-area-inset-bottom));left:50%;right:auto;transform:translateX(-50%);z-index:15}
+#game .inventory .quickbar{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:4px}
+#game .inventory .quick-slot{width:48px;height:48px;min-width:0;border-radius:5px}
+#game .topbar{z-index:65}
+#game .top-right>.icon-button{display:inline-grid;place-items:center;flex:0 0 32px;width:32px;height:32px;min-width:32px;padding:0;border-radius:50%;font-size:17px;font-weight:600}
+#game .top-right #socialButton{font-size:16px;color:#566446}
+#game .top-right #bagButton{font-size:16px;color:#566446;border:1px solid #363c3120;border-radius:50%;padding:0}
+@media(max-width:760px){
+  #game .topbar{inset:11px 10px auto}
+  #game .brand{gap:5px}
+  #game .brand-mark{width:30px;height:30px;line-height:26px;font-size:22px}
+  #game .brand b{font-size:9px;letter-spacing:.45px}
+  #game .brand small{display:none}
+  #game .top-right{gap:4px}
+  #game .top-right>.icon-button{flex-basis:30px;width:30px;min-width:30px;height:30px}
+  #game .top-right .connection{padding:5px;border-radius:50%;font-size:0;max-width:20px;min-width:20px;width:20px;height:20px;overflow:hidden}
+  #game .top-right .connection i{width:7px;height:7px;flex:0 0 7px}
+  #game .inventory .quick-slot{width:clamp(39px,12vw,46px);height:46px}
+}
+@media(max-width:370px){#game .brand b{font-size:8px}#game .top-right{gap:2px}#game .top-right>.icon-button{width:27px;min-width:27px;flex-basis:27px}}
