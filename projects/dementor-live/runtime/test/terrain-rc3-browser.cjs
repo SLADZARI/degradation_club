@@ -60,7 +60,9 @@ let server,browser;
  await second.page.waitForFunction(()=>state?.landscape?.tiles?.some(t=>t.x===14&&t.y===9));
  // Repeated tap cannot duplicate placement.
  await first.page.evaluate(()=>setPlacementKind('paving'));
- await first.page.touchscreen.tap(point.x,point.y);
+ // Camera follows the character; calculate a fresh screen projection before the second tap.
+ const repeatPoint=await first.page.evaluate(()=>{const q=screen(14.5,9.5),r=canvas.getBoundingClientRect();return {x:q.x+r.left,y:q.y+r.top};});
+ await first.page.touchscreen.tap(repeatPoint.x,repeatPoint.y);
  await first.page.waitForFunction(()=>placementCell?.x===14&&placementCell?.y===9);
  assert.equal(await first.page.getByRole('button',{name:'Применить'}).isDisabled(),true);
  // Existing save and the same tokens survive reload.
