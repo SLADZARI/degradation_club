@@ -121,7 +121,7 @@ function openTravelMap(){
   cx.fillStyle='#eee8d8';cx.fillRect(0,0,w,h);
   const rect=(x,y,rw,rh,color)=>{const a=mapPoint(x,y);cx.fillStyle=color;cx.fillRect(a.x,a.y,rw/state.config.width*680,rh/state.config.height*315);};
   rect(0,0,34,80,'#c6d0ad');rect(38,25,122,55,'#e5dcc3');rect(2,44,31,34,'#a5bb99');rect(46,30,50,48,'#bbb8aa');
-  rect(state.config.river.x,0,state.config.river.w,state.config.height,'#9cbdbf');rect(34,53,4,10,'#cbb891');
+  rect(state.config.river.x,0,state.config.river.w,state.config.height,'#9cbdbf');if(state.worldTravel.secondBridgeProject?.stage===2)rect(34,53,4,10,'#cbb891');
   cx.lineWidth=3;cx.strokeStyle='#b7a77c';
   for(const path of state.worldTravel.paths||[]){cx.beginPath();path.forEach(([x,y],i)=>{const p=mapPoint(x,y);i?cx.lineTo(p.x,p.y):cx.moveTo(p.x,p.y);});cx.stroke();}
   for(const [name,x,y] of [['Мэрия',8,8],['Киоск',25,38],['Лес',20,56],['Горы',70,59],['Музей',96,60],['НЕ НАДО',143,60]]){
