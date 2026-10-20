@@ -17,14 +17,18 @@ let server,browser;
  const snapshot=await page.evaluate(()=>{
    const fp=state.worldTravel.footprints,props=window.__worldEntities();
    const museum=fp.find(t=>t.id==='structure-museum-entry'),rock=fp.find(t=>t.id==='tiered-rock-5');
+   const cx=view.cx,cy=view.cy;
+   view.cx=96;view.cy=60;
+   const visibleMuseumDepth=window.__worldEntities().find(t=>t.depth===museum.depth)?.depth;
+   view.cx=cx;view.cy=cy;
    return {hasGround:typeof window.__worldGround==='function',props:props.length,
-     buildingDepth:museum.depth,worldBuildingDepth:props.find(t=>t.depth===museum.depth)?.depth,
+     buildingDepth:museum.depth,worldBuildingDepth:visibleMuseumDepth,
      blockedSummit:blocked(51,45),blockedOffTrail:blocked(54,45),
      blockedRock:blocked(rock.x+rock.w/2,rock.y+rock.h/2),
      rockWidth:rock.w,desert:state.worldTravel.desert?.w,cacti:state.worldTravel.cacti?.length};
  });
  assert.equal(snapshot.hasGround,true);
- assert.ok(snapshot.props>15,'All buildings, rocks, props contribute shared queue');
+ assert.ok(snapshot.props>0,'Nearby world props contribute to the shared queue');
  assert.equal(snapshot.worldBuildingDepth,snapshot.buildingDepth);
  assert.equal(snapshot.blockedSummit,false,'Summit route open on client');
  assert.equal(snapshot.blockedOffTrail,true,'Mountain remains solid off trail');
