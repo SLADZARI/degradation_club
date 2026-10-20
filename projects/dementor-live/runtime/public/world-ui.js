@@ -22,6 +22,7 @@ interaction=function(t){
 blocked=function(x,y){
   if(!state?.worldTravel)return originalBlocked(x,y);
   const scene=state.scene,region=state.worldTravel.scenes[scene],r=.35;
+   if((state.telecom?.booths||[]).some(t=>Math.hypot(x-t.x,y-t.y)<.53))return true;
   if(region)return x<r||y<r||x>region.width-r||y>region.height-r;
   if(scene!=='city')return originalBlocked(x,y);
   if((state.worldTravel.obstacles||[]).some(o=>x+r>o.x&&x-r<o.x+o.w&&y+r>o.y&&y-r<o.y+o.h))return true;
