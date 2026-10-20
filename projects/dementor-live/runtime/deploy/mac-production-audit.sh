@@ -2,7 +2,7 @@
 # Read-only game VM attestation after G7 release, one known Mac key, one SSH attempt.
 set -Eeuo pipefail
 HOST="138.199.144.94"
-SSH_KEY="\${DEMENTOR_SSH_KEY:-$HOME/Downloads/dementor_server}"
+SSH_KEY="${DEMENTOR_SSH_KEY:-$HOME/Downloads/dementor_server}"
 echo '=== Dementor Live production G7 / READ ONLY ==='
 if [[ ! -f "$SSH_KEY" ]]; then echo "STOP: key not found: $SSH_KEY" >&2; exit 1; fi
 if ! ssh-keygen -lf "$SSH_KEY" >/dev/null 2>&1; then echo 'STOP: key unreadable' >&2; exit 1; fi
@@ -12,7 +12,7 @@ SSH_OPTS=(-i "$SSH_KEY" -o BatchMode=yes -o IdentitiesOnly=yes
   -o KbdInteractiveAuthentication=no -o NumberOfPasswordPrompts=0
   -o ConnectTimeout=12 -o ConnectionAttempts=1
   -o StrictHostKeyChecking=accept-new)
-ssh "\${SSH_OPTS[@]}" "root@$HOST" 'bash -se' <<'VM'
+ssh "${SSH_OPTS[@]}" "root@$HOST" 'bash -se' <<'VM'
 set -Eeuo pipefail
 echo '=== Container/image (no env or secrets) ==='
 command -v docker >/dev/null || { echo 'STOP: Docker unavailable'; exit 1; }
