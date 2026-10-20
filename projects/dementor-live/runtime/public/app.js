@@ -383,6 +383,14 @@ function paperBoard(x,y,title,thefts=false){const s=view.s,p=screen(x,y),w=s*1.6
  shadow(p.x,p.y+s*.12,s*.95,s*.2);for(const off of [-.63,.63])paperBox(p.x+off*s,top+h*.55,s*.09,s*1.1,s*.12,-s*.08,'#ad9b78','#887e62','#c9bc97');
  paperBox(p.x-w*.5,top,w,h,s*.23,-s*.15,'#b9a483','#927e62','#d1bf9d');
  for(let i=0;i<3;i++){const xx=p.x-w*.37+i*w*.25,yy=top+h*.23+(i%2)*s*.09;poly([[xx,yy],[xx+w*.2,yy-s*.025],[xx+w*.2,yy+h*.52],[xx,yy+h*.5]],'#eee6cd','#a6987b');line(xx+w*.03,yy+h*.18,xx+w*.16,yy+h*.18,thefts?'#a77563':'#8b967b');line(xx+w*.03,yy+h*.27,xx+w*.15,yy+h*.27,'#b6ad95');}
+ // One standard wooden board, distinct tiny hand-drawn graphics.
+ const cx=p.x,cy=top+h*.57,k=s*.24;
+ if(/пожертв/i.test(title)){poly([[cx,cy+k*.52],[cx-k*.7,cy-k*.22],[cx-k*.4,cy-k*.58],[cx,cy-k*.27],[cx+k*.4,cy-k*.58],[cx+k*.7,cy-k*.22]],'#b5a07c','#6e8068');}
+ else if(/вор/i.test(title)){rounded(cx-k*.45,cy-k*.07,k*.9,k*.55,1,'#a88272','#776e65');line(cx-k*.3,cy-k*.07,cx-k*.3,cy-k*.55,'#756f63',2);line(cx-k*.3,cy-k*.55,cx+k*.3,cy-k*.55,'#756f63',2);line(cx+k*.3,cy-k*.55,cx+k*.3,cy-k*.07,'#756f63',2);}
+ else if(/работ|строй|мост/i.test(title)){line(cx-k*.65,cy+k*.55,cx+k*.65,cy-k*.6,'#657863',3);line(cx-k*.65,cy-k*.6,cx+k*.65,cy+k*.55,'#887052',3);}
+ else if(/город|реестр/i.test(title)){poly([[cx-k*.65,cy],[cx,cy-k*.65],[cx+k*.65,cy]],'#758d7b','#4c6758');rounded(cx-k*.45,cy,k*.9,k*.52,1,'#b0bca6','#6f7d69');}
+ else if(/боев|мисси/i.test(title)){poly([[cx-k*.4,cy-k*.6],[cx+k*.4,cy-k*.6],[cx+k*.5,cy+k*.1],[cx,cy+k*.65],[cx-k*.5,cy+k*.1]],'#8f786b','#6d655f');}
+ else{line(cx-k*.5,cy+k*.45,cx+k*.5,cy-k*.45,'#70836f',3);poly([[cx+k*.2,cy-k*.45],[cx+k*.55,cy-k*.65],[cx+k*.5,cy-k*.1]],'#91a287','#637c67');}
  label(title,x,y+.65,true);
 }
 function paperBench(x,y){const s=view.s,p=screen(x,y),w=s*1.8;shadow(p.x,p.y+4,s*1.1,s*.21);
