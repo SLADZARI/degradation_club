@@ -66,7 +66,7 @@ const server=http.createServer(async(req,res)=>{
       if(data.advanceMs)game.tick(data.advanceMs);
       game.changed();save();broadcast();json(res,200,{ok:true,state:game.state});return;
     }
-    if(url.pathname==='/api/join'&&req.method==='POST'){const d=await body(req);const p=game.join(d.name,d.gender);save();json(res,200,{ok:true,id:p.id,token:p.token});return;}
+    if(url.pathname==='/api/join'&&req.method==='POST'){const d=await body(req);const p=game.join(d.name,d.gender);network.snapshot(p);save();json(res,200,{ok:true,id:p.id,token:p.token});return;}
     if(url.pathname.startsWith('/api/')){
       const token=req.headers.authorization?.replace(/^Bearer /,'')||url.searchParams.get('token');
       const p=network.findToken(token)?.p;if(!p){json(res,401,{ok:false,message:'Войди в мир заново'});return;}
@@ -149,7 +149,7 @@ const server=http.createServer(async(req,res)=>{
         g.changed();save();json(res,200,result);return;
       }
       if(url.pathname==='/api/input'){if(!network.gameFor(p).online.has(p.id))throw Error('Нет подключения к миру');network.gameFor(p).input(p,data);json(res,200,{ok:true});return;}
-      if(url.pathname==='/api/action'){if(!network.gameFor(p).online.has(p.id))throw Error('Нет подключения к миру');const result=['createCity','travelCity'].includes(data.type)?network.command(p,data):network.gameFor(p).command(p,data);save();broadcast();json(res,200,result);return;}
+      if(url.pathname==='/api/action'){if(!network.gameFor(p).online.has(p.id))throw Error('Нет подключения к миру');const result=['createCity','travelCity','pagerBuy','pagerSend','pagerRead'].includes(data.type)?network.command(p,data):network.gameFor(p).command(p,data);save();broadcast();json(res,200,result);return;}
       json(res,404,{ok:false,message:'Нет такого действия'});return;
     }
     if(url.pathname.startsWith('/music/')||url.pathname.startsWith('/custom-music/')){
