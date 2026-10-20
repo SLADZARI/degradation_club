@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - 'feature/dementor-live-land-mayor-feedback-*'
+      - 'hotfix/dementor-live-rc4-saved-resident-recovery-2026-10-20'
   pull_request:
     paths:
       - 'projects/dementor-live/runtime/**'
