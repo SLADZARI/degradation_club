@@ -26,6 +26,12 @@ for(let y=47;y<77;y+=5)for(let x=3;x<33;x+=5){
   if((x>=18&&x<=28&&y>=51&&y<=61)||(x>=27&&y<=65)||(x<13&&y>=56&&y<=66))continue;
   if((x*7+y*3)%11<8)forest.push({x,y,w:2.4,h:2.4,biome:'forest'});
 }
+// Forest beyond the factories and green region (kept clear of the main eastern path).
+for(const [x,y] of [[98,70],[104,74],[111,75],[127,73],[137,74]])forest.push({x,y,w:2.4,h:2.4,biome:'forest'});
+export const WORLD_DESERT={x:112,y:18,w:44,h:36};
+export const WORLD_CACTI=Object.freeze([[122,30],[130,45],[138,36],[149,26]].map(([x,y],i)=>({id:'desert-cactus-'+i,x,y,w:1,h:1,kind:'cactus'})));
+// A walkable trail through formerly solid mountain panels, with summit at the last point.
+export const WORLD_SUMMIT_TRAIL=Object.freeze([[51,60],[51,53],[51,49],[51,45],[51,41],[55,41],[60,40],[66,40],[72,40],[75,37]]);
 const mountain=[
   {x:46,y:30,w:11,h:18,biome:'mountain'}, {x:58,y:30,w:9,h:20,biome:'mountain'},
   {x:69,y:35,w:10,h:16,biome:'mountain'}, {x:81,y:30,w:11,h:19,biome:'mountain'},
@@ -107,7 +113,7 @@ export function worldTravelAction(g,p,cmd){
 export function worldTravelView(g,p){
   return {scene:p.scene||'city',targets:worldObjects(p.scene||'city'),
     booths:boothsForScene(p.scene||'city'),scenes:WORLD_SCENES,secondBridge:SECOND_BRIDGE,secondBridgeProject:g.state.secondBridgeProject,paths:WORLD_PATHS,
-    obstacles:(p.scene||'city')==='city'?WORLD_OBSTACLES:[],
+    obstacles:(p.scene||'city')==='city'?WORLD_OBSTACLES:[],desert:WORLD_DESERT,cacti:WORLD_CACTI,summitTrail:WORLD_SUMMIT_TRAIL,
     prices:TOURIST_PRICES,profile:p.worldTravel||{mapOwned:false,souvenirs:{shirt:0,souvenir:0},visited:['city']},
     worldWidth:g.c.width,worldHeight:g.c.height};
 }
