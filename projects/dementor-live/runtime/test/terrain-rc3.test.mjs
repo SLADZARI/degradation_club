@@ -76,7 +76,7 @@ test('renderer is read-only, chooses deterministically and culls outside camera'
  const source=fs.readFileSync(path.join(runtime,'public/terrain-01.js'),'utf8');
  let images=0,background=0;
  const ctx={canvas:{width:1200,height:900},getTransform:()=>({a:1}),drawImage(){images++;},
- beginPath(){},moveTo(){},lineTo(){},closePath(){},fill(){background++;},set fillStyle(v){this._fill=v;}};
+ clearRect(){},beginPath(){},moveTo(){},lineTo(){},closePath(){},fill(){background++;},set fillStyle(v){this._fill=v;}};
  const fakeCanvas={width:0,height:0,className:'',setAttribute(){},getContext:()=>ctx};
  const context={console,window:{},document:{createElement:()=>fakeCanvas},Image:class{set src(value){Promise.resolve().then(()=>this.onload?.());}},fetch:()=>Promise.resolve({ok:true,json:()=>Promise.resolve(manifest)})};
  vm.runInNewContext(source,context);
