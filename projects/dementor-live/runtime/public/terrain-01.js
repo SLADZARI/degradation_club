@@ -40,7 +40,8 @@ y0:Math.floor(Math.min(...corners.map(p=>p.y)))-2,y1:Math.ceil(Math.max(...corne
 function draw(ctx,state,screen,unit,worldPoint){
 if(!ready||!state||state.scene!=='city'||!Array.isArray(state.landscape?.tiles)||!(unit>0))return false;
 const indexed=rebuild(state),b=bounds(ctx,screen,unit,worldPoint),list=[];
-for(let cy=Math.floor(b.y0/CHUNK);cy<=Math.floor(b.y1/CHUNK);cy++)for(let cx=Math.floor(b.x0/CHUNK);cx<=Math.floor(b.x1/CHUNK);cx++){
+if(!worldPoint){for(const items of indexed.chunks.values())list.push(...items);}
+else for(let cy=Math.floor(b.y0/CHUNK);cy<=Math.floor(b.y1/CHUNK);cy++)for(let cx=Math.floor(b.x0/CHUNK);cx<=Math.floor(b.x1/CHUNK);cx++){
 const chunk=indexed.chunks.get(key(cx,cy));if(chunk)for(const t of chunk){if(t.x<b.x0||t.x>b.x1||t.y<b.y0||t.y>b.y1)continue;list.push(t);}}
 for(const t of list){if(t.kind==='paving')roadUnderpaint(ctx,t.x,t.y,screen);drawSprite(ctx,variant(t.kind,t.x,t.y),t.x,t.y,screen,unit);}
 const visible=new Set(list.map(t=>key(t.x,t.y)));
