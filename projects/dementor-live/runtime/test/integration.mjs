@@ -23,6 +23,19 @@ const report={createdAt:new Date().toISOString(),scope:'real HTTP and independen
 try{
   await start();const a=await request('/api/join',{name:'Лист'}),b=await request('/api/join',{name:'Крафт'});const aEvents=await connect(a),bEvents=await connect(b);
   assert.equal((await state(a)).players.filter(p=>p.online).length,2);passed++;
+  // A pre-upgrade persisted receipt remains exact in the save even when an HTTP
+  // client retries its ID with a different action type.
+  const oldReceipt={ok:true,message:'Склад принял 3 · +6 PAPER',reward:6};
+  await request('/__test',{player:b.id,patch:{results:[{id:'legacy-i18n-replay',result:oldReceipt}]}});
+  const walletLegacy=(await state(b)).players.find(p=>p.id===b.id).wallet;
+  const legacyReplay=await request('/api/action',{type:'buy',target:'plot-1',requestId:'legacy-i18n-replay'},b.token);
+  assert.equal(legacyReplay.code,'action.warehouse.deposit');
+  assert.deepEqual(legacyReplay.params,{quantity:3,reward:6});
+  assert.equal(legacyReplay.message,oldReceipt.message);
+  assert.equal((await state(b)).players.find(p=>p.id===b.id).wallet,walletLegacy);
+  const rawSaved=(await request('/__test',{})).state.players[b.id].results.find(r=>r.id==='legacy-i18n-replay');
+  assert.deepEqual(rawSaved.result,oldReceipt,'legacy receipt is not modified on disk');
+  passed++;
   const before=(await state(a)).players.find(p=>p.id===a.id);await request('/api/input',{dx:1,dy:0},a.token);await pause(180);await request('/api/input',{dx:0,dy:0},a.token);const after=(await state(a)).players.find(p=>p.id===a.id);assert.ok(after.x>before.x);await pause(150);assert.ok(bEvents.at(-1).players.find(p=>p.id===a.id).x>before.x);passed++;
   await place(a,9,7);assert.equal((await act(a,'tools','tools')).ok,true);await place(b,9,7);await act(b,'tools','tools');
   for(const kind of ['wood','stone']){
@@ -30,7 +43,7 @@ try{
       for(let i=0;i<n;i++){assert.equal((await act(a,'mine',kind+'-1')).ok,true);await advance(551);}
       // Each full batch fills capacity; the final partial batch exhausts this node.
       assert.equal((await act(a,'mine',kind+'-1')).ok,false);
-      await act(a,'cancel');await place(a,13,12);const id='deposit-'+(++sequence);const result=await request('/api/action',{type:'deliver',target:'project',requestId:id},a.token);assert.equal(result.ok,true);const wallet=(await state(a)).players.find(p=>p.id===a.id).wallet;await request('/api/action',{type:'deliver',target:'project',requestId:id},a.token);assert.equal((await state(a)).players.find(p=>p.id===a.id).wallet,wallet);left-=n;
+      await act(a,'cancel');await place(a,13,12);const id='deposit-'+(++sequence);const result=await request('/api/action',{type:'deliver',target:'project',requestId:id},a.token);assert.equal(result.ok,true);assert.equal(result.code,'action.project.deliver');assert.deepEqual(result.params,{quantity:n,reward:result.reward});const wallet=(await state(a)).players.find(p=>p.id===a.id).wallet;const duplicate=await request('/api/action',{type:'deliver',target:'project',requestId:id},a.token);assert.deepEqual(duplicate,result);assert.equal((await state(a)).players.find(p=>p.id===a.id).wallet,wallet);left-=n;
     }
   }passed++;
   for(const count of [2,4,2]){await place(a,18,15);for(let i=0;i<count;i++){assert.equal((await act(a,'build','build')).ok,true);await advance(1101);}}
