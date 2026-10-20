@@ -77,7 +77,7 @@ change('server.mjs',"'\/manifest.webmanifest':'manifest.webmanifest'".replace('\
        "'/manifest.webmanifest':'manifest.webmanifest','/paper-icons.js':'paper-icons.js','/paper-icons.css':'paper-icons.css'")
 pkg=candidate/'package.json'
 p=json.loads(pkg.read_text(encoding='utf-8'))
-if p['version'] not in ['0.4.0-world-p0','0.4.1-icons-v2','0.5.0-rc.2','0.5.0-rc.3']:
+if p['version'] not in ['0.4.0-world-p0','0.4.1-icons-v2','0.5.0-rc.2','0.5.0-rc.3','0.5.0-rc.4']:
     raise SystemExit('STOP: Unexpected runtime baseline for clean icon v2 overlay')
 if p['version']=='0.4.0-world-p0':
     p['version']='0.4.1-icons-v2'
