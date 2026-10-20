@@ -72,11 +72,13 @@ SSH_OPTS=(
   -o StrictHostKeyChecking=accept-new
 )
 # Exactly one authentication attempt. If it fails, no retries or key guessing.
-ssh "${SSH_OPTS[@]}" "$USER_NAME@$HOST" bash -se -- "$EXACT_RELEASE_SHA" "$RELEASE_BRANCH" "$EXPECTED_VERSION" <<'SERVER'
+ssh "${SSH_OPTS[@]}" "$USER_NAME@$HOST" bash -se -- "$EXACT_RELEASE_SHA" "$RELEASE_BRANCH" "$EXPECTED_VERSION" "${DEMENTOR_GO_SHA:-}" "${DEMENTOR_NO_PLAYERS_GO:-}" <<'SERVER'
 set -Eeuo pipefail
 SHA="$1"
 BRANCH="$2"
 VERSION="$3"
+OWNER_GO_SHA="${4:-}"
+NO_PLAYERS_GO="${5:-}"
 REPO="https://github.com/SLADZARI/degradation_club.git"
 DIR="/srv/dementor-live/releases/rc4-${SHA:0:12}"
 
@@ -95,6 +97,32 @@ docker run --rm -v "$PWD:/work:ro" -w /work node:22-bookworm-slim npm run check:
 
 echo 'Проверка Docker, тома и окружения без изменений'
 bash deploy/publish-preserve-world.sh --dry-run
+
+# Read-only, exact-SHA idempotence guard before changing anything.
+echo '=== Checking whether exact SHA is already deployed ==='
+RUNNING_CID="$(docker ps --quiet --filter label=com.docker.compose.project=dementor-live --filter label=com.docker.compose.service=game)"
+RUNNING_COUNT="$(docker ps --quiet --filter label=com.docker.compose.project=dementor-live --filter label=com.docker.compose.service=game | wc -l | tr -d ' ')"
+[ "$RUNNING_COUNT" = 1 ] || { echo 'STOP: unexpected running game container count'; exit 1; }
+RUNNING_IMAGE="$(docker inspect --format '{{.Image}}' "$RUNNING_CID")"
+EXPECTED_IMAGE="$(docker image inspect --format '{{.Id}}' "dementor-live:sha-$SHA" 2>/dev/null || true)"
+LAST_RECEIPT="$(find /srv/dementor-live/backups -mindepth 2 -maxdepth 2 -type f -name release-manifest.txt -print | LC_ALL=C sort | tail -n 1)"
+RECEIPT_SHA=""
+if [ -n "$LAST_RECEIPT" ]; then
+  RECEIPT_SHA="$(awk -F= '$1=="approved_sha" {print $2;exit}' "$LAST_RECEIPT")"
+fi
+echo "running_image_id=$RUNNING_IMAGE"
+echo "expected_sha=$SHA"
+if [ -n "$EXPECTED_IMAGE" ] && [ "$RUNNING_IMAGE" = "$EXPECTED_IMAGE" ]; then
+  if [ "$RECEIPT_SHA" != "$SHA" ]; then
+    echo 'STOP: matching image but missing/mismatched successful release receipt; do not redeploy'
+    exit 1
+  fi
+  echo 'ALREADY DEPLOYED: running image and latest successful receipt match exact SHA; no changes'
+  exit 0
+fi
+[ "$OWNER_GO_SHA" = "$SHA" ] || { echo 'STOP: explicit exact-SHA owner GO required; no changes'; exit 1; }
+[ "$NO_PLAYERS_GO" = "yes" ] || { echo 'STOP: owner has not confirmed player-free window; no changes'; exit 1; }
+echo 'GO accepted for exact SHA and player-free maintenance window'
 
 echo '=== Проверяем предыдущую настоящую резервную копию БЕЗ остановки работающего сервера ==='
 # This immutable file was created by the failed (safely rolled back) RC4 attempt.
