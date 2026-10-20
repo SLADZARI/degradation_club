@@ -45,6 +45,24 @@ let server,browser;
    const geometry=await page.evaluate(()=>{const a=screen(8,8),b=screen(9,9),c=screen(10.4,6.2),hit=worldPoint(c.x,c.y);return {diamondX:b.x-a.x,diamondY:b.y-a.y,hitX:hit.x,hitY:hit.y};});
    assert.ok(Math.abs(geometry.diamondX)<.00001&&geometry.diamondY>0,'ISO30 diamond on '+scene);
    assert.ok(Math.abs(geometry.hitX-10.4)<.00001&&Math.abs(geometry.hitY-6.2)<.00001,'click inverse on '+scene);
+   if(scene==='plot'||scene==='interior'){
+     const props=await page.evaluate(()=>({kinds:(state.homeFootprints||[]).map(o=>o.kind),well:blocked(14,3),chest:blocked(3.8,5.4),bed:blocked(9.6,5.9)}));
+     if(scene==='plot'){assert.ok(props.kinds.includes('well'));assert.equal(props.well,true,'well collision rendered on plot');}
+     else{
+       assert.ok(props.kinds.includes('room-wall')&&props.kinds.includes('chest')&&props.kinds.includes('bed'),'authoritative room furniture serialized');
+       assert.equal(props.chest,true,'chest collision');assert.equal(props.bed,true,'bed collision');
+       const depth=await page.evaluate(()=>{
+         const events=[],origPlayer=drawPlayer,origChest=localChest,origBed=localBed;
+         try{
+           drawPlayer=function(p,t){events.push('player');return origPlayer(p,t)};
+           localChest=function(o){events.push('chest');return origChest(o)};
+           localBed=function(o){events.push('bed');return origBed(o)};
+           drawHome(performance.now());return events;
+         }finally{drawPlayer=origPlayer;localChest=origChest;localBed=origBed;}
+       });
+       assert.ok(depth.includes('player')&&depth.indexOf('chest')<depth.indexOf('player')&&depth.indexOf('bed')<depth.indexOf('player'),'nearer player paints in front of room furniture');
+     }
+   }
  }
  async function assertScreenMove(key,axis,sign){
    const before=await page.evaluate(()=>({x:me.x,y:me.y}));
