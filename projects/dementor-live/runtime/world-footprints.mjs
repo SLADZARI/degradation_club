@@ -25,6 +25,10 @@ const STRUCTURES=Object.freeze(WORLD_CITY_TARGETS.filter(t=>['world-gate','world
  }));
 export const WORLD_STRUCTURE_FOOTPRINTS=STRUCTURES;
 export function worldFootprints(g){
+ // Character movement checks this many times per second. Collision shapes are
+ // rebuilt only after a world revision (harvest, construction or world changes).
+ const cache=g._worldFootprintsP5;
+ if(cache?.revision===g.state.revision)return cache.shapes;
  const resources=new Map(g.state.resources.map(r=>[r.id,r]));
  const forests=WORLD_OBSTACLES.filter(o=>o.biome==='forest')
    .filter(o=>(resources.get('forest-wood-'+o.x+'-'+o.y)?.stock||0)>0)
@@ -33,7 +37,9 @@ export function worldFootprints(g){
    .map((o,i)=>({id:'mountain-'+i,kind:'mountain',x:o.x,y:o.y,w:o.w,h:o.h,depth:isoDepth(o)}));
  const phone=PHONE_BOOTHS.filter(o=>o.scene==='city').map(o=>({id:o.id,kind:'payphone',x:o.x-.5,y:o.y-.5,w:1,h:1,depth:o.x+o.y}));
  const oversized=g.state.resources.map(footprintForResource).filter(Boolean);
- return [...STRUCTURES,...mountains,...forests,...phone,...WORLD_CACTI,...oversized];
+ const shapes=[...STRUCTURES,...mountains,...forests,...phone,...WORLD_CACTI,...oversized];
+ g._worldFootprintsP5={revision:g.state.revision,shapes};
+ return shapes;
 }
 // Non-mutating audit: detects new overlapping static objects before adding any procedural prop.
 // Existing persisted residents and original building footprints remain checked by release audit.
