@@ -136,3 +136,19 @@ dialog:not(#welcome){position:fixed;inset:220px 24px auto auto;margin:0;transfor
 #quest .quest-done-list small{display:none}
 #quest.collapsed>:not(.quest-toggle){display:none!important}
 @media(max-width:760px){#quest .quest-active{padding:7px}#quest .quest-active span{font-size:11px}#quest .quest-active small{font-size:9px}}
+
+/* CIVIC P2 — accessible municipal letter and typed land merchant inputs */
+#genderInput{display:block;width:100%;min-height:42px;margin:7px 0 14px;padding:8px 11px;border:1px solid #b8bba9;border-radius:9px;background:#fffdf3;color:#2e3b30}
+#playerPronoun{font-size:10px;color:#89937d;margin-left:5px;white-space:nowrap}
+.estate-input,.estate-compose label{display:flex;flex-direction:column;gap:7px;color:#53624f;font-size:12px;font-weight:650}
+.estate-input input,.estate-compose textarea,#mayorIdea textarea{width:100%;min-height:44px;border:1px solid #b9c4af;border-radius:9px;padding:11px;background:#fffdf5;color:#28372c;font:inherit;resize:vertical}
+.estate-compose{display:flex;flex-direction:column;gap:13px;margin:12px 0}
+.estate-compose button,.idea-actions button{min-height:42px;padding:10px 15px;border-radius:9px;background:#dbe7d1;color:#263c2b;font-weight:700}
+dialog#mayorIdea{position:fixed;inset:0;margin:auto;transform:none;width:min(440px,calc(100vw - 24px));max-height:calc(100dvh - 30px);overflow:auto;padding:22px 22px 26px;border:1px solid #98a58b;border-radius:16px;background:#faf7e9;box-shadow:0 18px 48px #25352944;z-index:60}
+dialog#mayorIdea::backdrop{background:#14261e77}
+#mayorIdea h2{font-size:22px;line-height:1.2;margin:12px 0}
+#mayorIdea p{font-size:13px;line-height:1.5;color:#576657}
+#mayorIdea textarea{min-height:145px}
+.idea-actions{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:8px;margin-top:16px}
+.idea-actions .primary{background:#617d62;color:#fff}
+@media(max-width:760px){dialog#mayorIdea{width:calc(100vw - 20px);max-height:calc(100dvh - 24px);padding:17px}#mayorIdea h2{font-size:19px}}
