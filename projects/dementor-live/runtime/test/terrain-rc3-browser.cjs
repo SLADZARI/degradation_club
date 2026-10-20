@@ -52,6 +52,8 @@ let server,browser;
  await fixture(first.id,{x:14.2,y:9.2});
  await first.page.waitForFunction(()=>Math.abs(me?.x-14.2)<.01);
  // Touch screen simulates placing one independent cell: no drag-and-drop.
+ // Wait until server-side player relocation reaches the interpolated camera; otherwise touch coordinates refer to an obsolete view.
+ await first.page.waitForFunction(()=>{const hero=visualPlayers.get(me?.id);return hero&&Math.hypot(hero.x-me.x,hero.y-me.y)<.06&&Math.hypot(view.cx-me.x,view.cy-me.y)<.06;});
  const point=await first.page.evaluate(()=>{const q=screen(14.5,9.5),r=canvas.getBoundingClientRect();return {x:q.x+r.left,y:q.y+r.top};});
  await first.page.touchscreen.tap(point.x,point.y);
  const tapDiagnostic=await first.page.evaluate(({x,y})=>{

@@ -27,6 +27,8 @@ jobs:
         run: |
           npm install --no-save --no-package-lock playwright@1.56.1
           npx playwright install --with-deps chrome
+          sudo apt-get update -qq && sudo apt-get install -y python3-cairosvg python3-pil
+          python3 tools/build-terrain.py
           python3 icons-v2/install-v2.py . icons-v2
       - name: Verify RC3 release contents
         run: npm run check:release

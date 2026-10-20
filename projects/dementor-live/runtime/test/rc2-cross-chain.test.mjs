@@ -19,6 +19,8 @@ test('RC2-LINK-01 mayor idea -> earned PAPER -> real payphone -> inbox -> save/r
  assert.equal(network.origin.command(a,idea).ok,true);
  assert.equal(a.wallet,50);
  a.x=10;a.y=12;
+ // P4 privacy: delivery is permitted only after a recipient explicitly opts into public listing.
+ assert.equal(network.command(b,{requestId:'qa-list-cross-01',type:'pagerList',listed:true}).ok,true);
  const message={requestId:'qa-pager-cross-01',type:'pagerSend',target:'phone-square',number:b.pagerNumber,text:'Материалы ждут у склада'};
  assert.equal(network.command(a,message).ok,true);
  assert.equal(network.command(a,message).ok,true);

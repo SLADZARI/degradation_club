@@ -40,10 +40,13 @@ async function patch(player,patch){const r=await fetch(base+'/__test',{method:'P
  await page.evaluate(()=>openCityPanel('landscape'));
  await page.getByRole('button',{name:'Купить 10 · 1 PAPER'}).first().click();
  await page.waitForFunction(()=>me.terrainBag?.paving===10);
- await page.getByRole('button',{name:'Укладывать'}).first().click();
+ await page.evaluate(()=>openCityPanel('bag'));await page.locator('#cityPanel .city-row').filter({hasText:'Дорожная плитка'}).getByRole('button',{name:/Выбрать/}).click();
  assert.equal(await page.evaluate(()=>placementKind),'paving');
  await patch(player,{x:14,y:9});await page.waitForFunction(()=>Math.abs(me.x-14)<.01&&Math.abs(me.y-9)<.01);
- const point=await page.evaluate(()=>screen(14.5,9.5));await page.mouse.click(point.x,point.y);
+ await page.waitForFunction(()=>Math.hypot(view.cx-me.x,view.cy-me.y)<.06);
+  const point=await page.evaluate(()=>screen(14.5,9.5));await page.mouse.click(point.x,point.y);
+  await page.waitForFunction(()=>placementCell?.x===14&&placementCell?.y===9);
+  await page.getByRole('button',{name:'Применить'}).click();
  await page.waitForFunction(()=>state.landscape?.tiles?.some(t=>t.x===14&&t.y===9&&t.kind==='paving'));
  assert.equal(await page.evaluate(()=>me.terrainBag.paving),9);
  assert.deepEqual(errors,[],'Browser page errors');
