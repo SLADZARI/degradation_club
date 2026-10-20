@@ -46,7 +46,7 @@ STOPPED=0
 CUTOVER=0
 rollback(){
  status=$?
- trap - ERR
+ trap - EXIT
  set +e
  if [[ "$CUTOVER" == 1 ]];then
    echo 'Candidate failed: restoring previous image AND full game volume archive'
@@ -63,7 +63,7 @@ rollback(){
  echo "STOP: deployment failed, check old health and restore: $BACKUP"
  exit "$status"
 }
-trap rollback ERR
+trap rollback EXIT
 # Verify candidate builds with no production save mounted.
 docker build --tag "$NEW_IMAGE" --file "$SOURCE/deploy/Dockerfile" "$SOURCE"
 docker tag dementor-live:local "$OLD_IMAGE"
@@ -95,6 +95,6 @@ done
 curl --max-time 5 -fsS "http://127.0.0.1:$PORT/" >/dev/null || fail 'Game index route unavailable'
 docker compose -p "$PROJECT" -f "$COMPOSE" --env-file "$ENV_FILE" ps "$SERVICE"
 printf 'approved_sha=%s\nversion=%s\nbackup=%s\n' "$ACTUAL_SHA" "$EXPECTED_VERSION" "$BACKUP" > "$BACKUP/release-manifest.txt"
-CUTOVER=0;STOPPED=0;trap - ERR
+CUTOVER=0;STOPPED=0;trap - EXIT
 echo "DEPLOYED safely. Live player save remains in $VOLUME. Backup: $BACKUP"
 echo 'Retain old image and full backup. Do not run publish-clean-world.sh --reset-world.'
