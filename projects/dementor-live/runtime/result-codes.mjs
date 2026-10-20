@@ -66,7 +66,12 @@ function checkedInteger(value){
 // authoritative *saved result*, never from a new requestId/type/body.
 function legacySuccess(result){
   const message=result.message;
-  if(typeof message!=='string')return null;
+  if(typeof message!=='string'){
+    if(typeof result.sessionId==='string')return {code:'combat.session.ready',params:{}};
+    if(Number.isSafeInteger(result.ammo)&&Number.isSafeInteger(result.shopRemaining))
+      return {code:'combat.ammo.purchased',params:{}};
+    return null;
+  }
   let match;
   if((match=/^Склад принял (\d+) · \+(\d+) PAPER$/.exec(message))){
     const quantity=checkedInteger(match[1]),reward=checkedInteger(match[2]);
@@ -96,11 +101,6 @@ function legacySuccess(result){
     return {code:'action.pager.purchased',params:{}};
   const code=SUCCESS_CODES.get(message);
   if(code)return {code,params:{}};
-  // Combat commands have structured results even when old clients received
-  // no localized message. Avoid the request type as a source of semantics.
-  if(typeof result.sessionId==='string')return {code:'combat.session.ready',params:{}};
-  if(Number.isSafeInteger(result.ammo)&&Number.isSafeInteger(result.shopRemaining))
-    return {code:'combat.ammo.purchased',params:{}};
   return null;
 }
 function legacyError(result){
