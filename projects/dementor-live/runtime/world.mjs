@@ -1,3 +1,4 @@
+import {localFootprints, blockedByLocalFootprints} from './local-geometry.mjs';
 import { randomUUID } from 'node:crypto';
 import {syncEquipment,addTool,equipmentAction} from './equipment.mjs';
 import {initPlaza,plazaAction,plazaSnapshot,PLAZA} from './plaza.mjs';
@@ -59,7 +60,11 @@ export class Game {
  if(s.forge?.stage>=this.c.forge.stages.length)footprints.push({x:24,y:23,w:6,h:5,id:'forge'});
  if(s.gardenProject?.stage>=this.c.cityGarden.stages.length)footprints.push({x:25.5,y:8.4,w:5.6,h:2.5,id:'public-garden'});
  return footprints;}
-  walkable(x,y,p=null){if(p&&scene(p)!=='city'){if(x<.5||y<.5||x>15.5||y>15.5)return false;const h=scene(p)==='expedition'?this.state.expedition.home:this.state.plots.find(l=>l.id===p.plotId)?.home;if(['plot','expedition'].includes(scene(p))&&h?.nodes.some(n=>n.left>0&&Math.hypot(x-n.x,y-n.y)<.58))return false;if(scene(p)==='plot'&&h?.plantedTrees?.some(t=>{if(!t.wateredAt||this.now-t.wateredAt<180000)return false;const candidate=Math.hypot(x-t.x,y-t.y),prior=Math.hypot(p.x-t.x,p.y-t.y);return candidate<.55&&!(prior<.55&&candidate>prior+1e-6);}))return false;return true;}const r=.3,c=this.c;if(x<r||y<r||x>c.width-r||y>c.height-r)return false;
+  walkable(x,y,p=null){if(p&&scene(p)!=='city'){
+    if(x<.5||y<.5||x>15.5||y>15.5)return false;
+    const h=scene(p)==='expedition'?this.state.expedition.home:this.state.plots.find(l=>l.id===p.plotId)?.home;
+    return !blockedByLocalFootprints(x,y,localFootprints(scene(p),h,this.now),.3,{x:p.x,y:p.y});
+  }const r=.3,c=this.c;if(x<r||y<r||x>c.width-r||y>c.height-r)return false;
     if(x+r>c.river.x&&x-r<c.river.x+c.river.w&&!(this.state.bridge.stage>=c.bridge.stages.length&&y-r>=c.bridge.y&&y+r<=c.bridge.y+c.bridge.h))return false;
     if(this.rects().some(o=>x+r>o.x&&x-r<o.x+o.w&&y+r>o.y&&y-r<o.y+o.h))return false;
     return !this.state.resources.some(o=>o.stock>0&&o.type!=='food'&&Math.hypot(x-o.x,y-o.y)<.58);
