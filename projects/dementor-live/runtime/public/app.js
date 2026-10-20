@@ -528,12 +528,12 @@ function render(time){positionWindows();ctx.clearRect(0,0,view.w,view.h);ctx.fil
   const resources=state?.resources||[];
    // ISO depth is x+y (not world y); buildings and trees must hide residents walking behind them.
    const entities=[
-     {depth:9+6,draw:drawTent},
-     {depth:22.7+3,draw:()=>paperHouse({x:22.7,y:1,w:2.6,h:2},'shop')},
-     {depth:15.5+3.7,draw:()=>paperHouse({x:15.5,y:1.5,w:2.5,h:2.2},'garden-shop')},
-     {depth:10.7+28,draw:()=>paperWarehouse({x:10.7,y:25,w:2.6,h:3})},
+     {depth:4+4+4+3,draw:drawTent},
+     {depth:22.7+1+2.6+2,draw:()=>paperHouse({x:22.7,y:1,w:2.6,h:2},'shop')},
+     {depth:15.5+1.5+2.5+2.2,draw:()=>paperHouse({x:15.5,y:1.5,w:2.5,h:2.2},'garden-shop')},
+     {depth:10.7+25+2.6+3,draw:()=>paperWarehouse({x:10.7,y:25,w:2.6,h:3})},
      ...(state?.seedMarket?[{depth:21.8+7.3,draw:()=>paperHouse({x:21.8,y:5.3,w:2.5,h:2},state.seedMarket.stage>=state.config.seedMarket.stages.length?'shop':'construction')}]:[]),
-     ...resources.filter(o=>o.stock>0||o.type==='food').map(o=>({depth:o.x+o.y,draw:()=>o.type==='wood'?drawTree(o):o.type==='stone'?drawStone(o):drawFood(o)})),
+     ...resources.filter(o=>(o.stock>0||o.type==='food')&&!o.id.startsWith('forest-wood-')).map(o=>({depth:o.x+o.y,draw:()=>o.type==='wood'?drawTree(o):o.type==='stone'?drawStone(o):drawFood(o)})),
      ...(state?.players||[]).filter(p=>(p.online||p.id===me?.id)&&sameScene(p)).map(p=>({depth:p.x+p.y,draw:()=>drawPlayer(p,time)}))
    ];entities.sort((a,b)=>a.depth-b.depth);for(const e of entities)e.draw();
   if(route.length){const p=screen(route.at(-1).x,route.at(-1).y);ctx.beginPath();ctx.ellipse(p.x,p.y,7,4,0,0,Math.PI*2);ctx.strokeStyle='#82956a99';ctx.lineWidth=1.4;ctx.stroke();}
