@@ -1,0 +1,12 @@
+/* Paper Cut v2: display exact transparent PNGs, no external shadows */
+.paper-icon{display:inline-block!important;inline-size:1.9em;block-size:1.9em;max-inline-size:none;object-fit:contain;vertical-align:-.42em;flex:0 0 auto;box-shadow:none!important;filter:none!important;pointer-events:none;user-select:none}
+.paper-icon-bearing{display:inline-flex!important;align-items:center;gap:.05em}
+.paper-icon-bearing>.paper-icon{margin-inline-start:-.23em;margin-inline-end:-.26em}
+.quick-slot .paper-icon{width:40px;height:40px;vertical-align:middle;margin-inline:-7px}
+.slot .paper-icon{width:34px;height:34px;vertical-align:middle;margin-inline:-5px}
+#bagButton .paper-icon,#worldMapButton .paper-icon{width:33px;height:33px;margin-inline:-6px;vertical-align:middle}
+#woodCount .paper-icon,#stoneCount .paper-icon,#eatButton .paper-icon{width:30px;height:30px;vertical-align:middle;margin-inline:-5px}
+#actionIcon .paper-icon{width:40px;height:40px;margin-inline:-6px;vertical-align:middle}
+.city-row h3.paper-icon-bearing .paper-icon{width:37px;height:37px;vertical-align:middle}
+#missionBar .paper-icon-bearing .paper-icon{width:32px;height:32px;vertical-align:middle}
+@media(max-width:760px){.quick-slot .paper-icon{width:34px;height:34px;margin-inline:-5px}.slot .paper-icon{width:30px;height:30px}#woodCount .paper-icon,#stoneCount .paper-icon,#eatButton .paper-icon{width:25px;height:25px}}

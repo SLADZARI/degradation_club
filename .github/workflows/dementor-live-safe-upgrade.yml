@@ -1,0 +1,63 @@
+name: Dementor Live v0.5 RC — Save-Preserving Release Gates
+on:
+  push:
+    branches:
+      - 'release/dementor-live-civic-p3-safe-upgrade-*'
+  pull_request:
+    paths:
+      - 'projects/dementor-live/runtime/**'
+      - 'projects/dementor-live/qa/**'
+      - '.github/workflows/dementor-live-safe-upgrade.yml'
+permissions:
+  contents: read
+jobs:
+  model-and-upgrade:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: projects/dementor-live/runtime
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Release gate syntax
+        run: bash -n deploy/publish-preserve-world.sh
+      - run: npm run doctor
+      - run: python3 icons-v2/install-v2.py . icons-v2
+      - run: npm run check:icons
+      - run: npm run check
+      - run: npm test
+      - run: npm run test:integration
+      - run: npm run test:persistence
+      - run: node --test test/combat-p0.test.mjs test/combat-touch.test.mjs
+  browser-compatibility:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    defaults:
+      run:
+        working-directory: projects/dementor-live/runtime
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-save --no-package-lock playwright@1.56.1
+      - run: npx playwright install --with-deps chrome
+      - run: python3 icons-v2/install-v2.py . icons-v2
+      - run: npm run check:icons
+      - run: node test/interface-world-polish.cjs
+      - run: node test/estate-mayor-ui.cjs
+      - run: node test/playtest-actions.cjs
+      - run: node test/telecom-browser.cjs
+      - run: npm run test:mobile
+      - run: npm run test:quests
+      - run: node test/compact-panels.cjs
+  candidate-docker-build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build release candidate without any production save
+        run: docker build -t dementor-live:0.5.0-rc.2 -f projects/dementor-live/runtime/deploy/Dockerfile projects/dementor-live/runtime
