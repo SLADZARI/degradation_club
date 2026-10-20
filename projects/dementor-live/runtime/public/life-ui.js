@@ -81,9 +81,9 @@ function lifePanel(mode,rows,row,canAct){
  return true;
 }
 // Local furniture: ISO30 prisms anchored to the same physical footprints as collisions.
-function localPrism(o,height,front,side,top){
+function localPrism(o,height,front,side,top,elevation=0){
  const base=[[o.x,o.y],[o.x+o.w,o.y],[o.x+o.w,o.y+o.h],[o.x,o.y+o.h]]
-   .map(([x,y])=>{const p=screen(x,y);return [p.x,p.y];});
+   .map(([x,y])=>{const p=screen(x,y);return [p.x,p.y-elevation*view.s];});
  const raised=base.map(([x,y])=>[x,y-height*view.s]);
  poly([base[3],base[2],raised[2],raised[3]],front,'#847c69');
  poly([base[2],base[1],raised[1],raised[2]],side,'#847c69');
@@ -113,12 +113,12 @@ function localWell(o){
 }
 function localChest(o){
  localPrism(o,.85,'#ae9471','#897459','#d2bb93');
- localPrism({x:o.x-.05,y:o.y-.05,w:o.w+.1,h:o.h+.1},.15,'#cfb389','#9a8060','#e0cba4');
+ localPrism({x:o.x-.05,y:o.y-.05,w:o.w+.1,h:o.h+.1},.15,'#cfb389','#9a8060','#e0cba4',.85);
  const p=screen(o.x+o.w,o.y+o.h);line(p.x-6,p.y-view.s*.5,p.x+6,p.y-view.s*.5,'#77654f',2);
 }
 function localBed(o){
  localPrism(o,.48,'#9d8b74','#81725e','#cfc3aa');
- localPrism({x:o.x+.18,y:o.y+.15,w:o.w-.36,h:o.h-.3},.12,'#d8d5c9','#c6c1b2','#ebe6d9');
+ localPrism({x:o.x+.18,y:o.y+.15,w:o.w-.36,h:o.h-.3},.12,'#d8d5c9','#c6c1b2','#ebe6d9',.48);
  const pillow=screen(o.x+.48,o.y+.48),edge=screen(o.x+.95,o.y+.48);
  line(pillow.x,pillow.y-.62*view.s,edge.x,edge.y-.62*view.s,'#b9b5a7',view.s*.18);
 }
