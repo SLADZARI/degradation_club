@@ -1,0 +1,28 @@
+name: Obitel ZEN P0 isolated QA
+on:
+  push:
+    branches:
+      - 'feature/dementor-live-obitel-dialogue-fallback-p0-*'
+    paths:
+      - 'projects/dementor-live/runtime/**'
+      - '.github/workflows/dementor-live-obitel-p0-qa.yml'
+permissions:
+  contents: read
+jobs:
+  obitel-p0:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    defaults:
+      run:
+        working-directory: projects/dementor-live/runtime
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Syntax and base model checks
+        run: npm run check
+      - name: Extended unit regression and Obitel P0
+        run: npm test
+      - name: HTTP/SSE regression on disposable world
+        run: npm run test:integration
