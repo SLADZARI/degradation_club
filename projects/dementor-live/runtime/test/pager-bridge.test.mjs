@@ -6,7 +6,7 @@ let seq=0;const action=(g,p,type,target=null,extra={})=>g.command(p,{type,target
 const networkAction=(n,p,type,target=null,extra={})=>n.command(p,{type,target,requestId:'phonebridge-'+(++seq),...extra});
 test('Every resident gets a stable unique 6-digit number; messages travel between cities and only recipient reads inbox',()=>{
  const n=new CityNetwork(createWorld()),a=n.origin.join('Отправитель'),b=n.origin.join('Получатель');
- n.snapshot(a);n.snapshot(b);assert.match(a.pagerNumber,/^\d{6}$/);assert.notEqual(a.pagerNumber,b.pagerNumber);
+ n.snapshot(a);n.snapshot(b);b.pagerListed=true;assert.match(a.pagerNumber,/^\d{6}$/);assert.notEqual(a.pagerNumber,b.pagerNumber);
  const origin=n.origin;
  b.x=19;b.y=6;
  const founded=n.createCity(b,'Дальний город');n.move(b,founded.id);
@@ -30,7 +30,7 @@ test('Every resident gets a stable unique 6-digit number; messages travel betwee
 });
 test('Payphone checks physical proximity, six-digit subscriber number, fee and 100 character limit',()=>{
  const n=new CityNetwork(createWorld()),a=n.origin.join('Женя'),b=n.origin.join('Евгений');
- n.snapshot(a);n.snapshot(b);a.wallet=4;a.x=3;a.y=3;
+ n.snapshot(a);n.snapshot(b);b.pagerListed=true;a.wallet=4;a.x=3;a.y=3;
  const base={number:b.pagerNumber,text:'Короткая записка'};
  assert.equal(networkAction(n,a,'pagerSend','phone-square',base).ok,false);
  a.x=10;a.y=12;
@@ -61,4 +61,32 @@ test('Second river crossing physically closed until one wood/stone delivery and 
  assert.equal(action(g,p,'secondBridgeWork','second-bridge-site').ok,false);
  const saved=new Game(JSON.parse(JSON.stringify(g.state)));
  assert.equal(saved.walkable(35.5,56.5,p),true);
+});
+
+test('Unlisted numbers are private; listing and blocking persist and reject delivery free of charge',()=>{
+ const n=new CityNetwork(createWorld()),a=n.origin.join('A'),b=n.origin.join('B');
+ n.snapshot(a);n.snapshot(b);a.wallet=5;a.x=10;a.y=12;
+ assert.equal(n.snapshot(a).telecom.directory.some(x=>x.number===b.pagerNumber),false);
+ assert.equal(networkAction(n,a,'pagerSend','phone-square',{number:b.pagerNumber,text:'hello'}).ok,false);
+ assert.equal(a.wallet,5);
+ assert.equal(networkAction(n,b,'pagerList',null,{listed:true}).ok,true);
+ assert.equal(n.snapshot(a).telecom.directory.some(x=>x.number===b.pagerNumber),true);
+ assert.equal(networkAction(n,b,'pagerBlock',null,{number:a.pagerNumber,blocked:true}).ok,true);
+ assert.equal(networkAction(n,a,'pagerSend','phone-square',{number:b.pagerNumber,text:'hello'}).ok,false);
+ assert.equal(a.wallet,5);
+ const reboot=new CityNetwork(structuredClone(n.serialize()));
+ const other=reboot.findId(b.id).p;
+ assert.equal(other.pagerListed,true);
+ assert.ok(other.pagerBlocked.includes(a.pagerNumber));
+ assert.equal(networkAction(reboot,other,'pagerBlock',null,{number:a.pagerNumber,blocked:false}).ok,true);
+ const me=reboot.findId(a.id).p;
+ assert.equal(networkAction(reboot,me,'pagerSend','phone-square',{number:b.pagerNumber,text:'works'}).ok,true);
+});
+test('Museum becomes callable only after discovery; mayor line appears in every city',()=>{
+ const n=new CityNetwork(createWorld()),p=n.origin.join('Visitor');n.snapshot(p);p.x=10;p.y=12;
+ assert.equal(networkAction(n,p,'pagerDial','phone-square',{number:'500001'}).ok,false);
+ assert.equal(networkAction(n,p,'pagerDial','phone-square',{number:'500002'}).ok,true);
+ p.worldTravel.visited.push('museum');
+ const reply=networkAction(n,p,'pagerDial','phone-square',{number:'500001'});
+ assert.equal(reply.ok,true);assert.equal(reply.npc,'museum');assert.equal(reply.sound,'laughter');
 });
