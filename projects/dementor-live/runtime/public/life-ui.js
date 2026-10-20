@@ -177,6 +177,13 @@ function drawHome(time){
      for(const b of h.beds||[])add(b.x+b.y,()=>localCrop(b));
    }
  }
+ // Dropped inventory appears as a little ISO30 bundle at its actual world position.
+ // Pickups remain walkable and do not gain new physical restrictions.
+ for(const drop of state.drops||[])add(drop.x+drop.y,()=>{
+   const stone=drop.kind==='stone';
+   localPrism({x:drop.x-.18,y:drop.y-.18,w:.36,h:.36},.18,
+     stone?'#9a9e96':'#bdac8c',stone?'#747d76':'#89775d',stone?'#cbd0c5':'#e0d2b2');
+ });
  // One painter queue for props, furniture, terrain and both players.
  for(const p of state.players.filter(p=>(p.online||p.id===me.id)&&sameScene(p))){
    const v=visualPlayers.get(p.id)||p;
