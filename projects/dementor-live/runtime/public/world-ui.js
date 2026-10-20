@@ -158,24 +158,28 @@ function drawWorldProps(){
   if(built){groundRect(w.secondBridge,'#b9a785','#857b62');for(let y=54;y<62;y+=1.2){const a=screen(34,y),b=screen(38,y);line(a.x,a.y,b.x,b.y,'#d9cba7',1.8);}for(const x of [34,38]){const a=screen(x,53),b=screen(x,63);line(a.x,a.y-9,b.x,b.y-9,'#766e5a',2);}}
   else if(started){for(const x of [34.5,37.3])for(const y of [54,57,60,62]){const p=screen(x,y);line(p.x,p.y-7,p.x,p.y+4,'#998666',3);}groundRect({x:33.5,y:53.2,w:.7,h:9.5},'#c9bb99','#827c66');}
   else {const p=screen(33,55);poly([[p.x-10,p.y],[p.x,p.y-8],[p.x+10,p.y],[p.x,p.y+8]],'#bcb79f','#8b8875');}
+  const layers=[];
   for(const o of w.obstacles||[]){
     const p=screen(o.x+o.w/2,o.y+o.h/2);if(p.x< -200||p.x>view.w+200||p.y< -250||p.y>view.h+250)continue;
-    if(o.biome==='forest'){drawTree({x:o.x+o.w/2,y:o.y+o.h/2,stock:12});}
-    else{groundRect(o,'#b3b0a3','#868c86');drawStone({x:o.x+o.w/2,y:o.y+o.h/2,stock:16});}
+    layers.push({depth:o.x+o.w/2+o.y+o.h/2,draw:()=>{if(o.biome==='forest')drawTree({x:o.x+o.w/2,y:o.y+o.h/2,stock:12});else{groundRect(o,'#b3b0a3','#868c86');drawStone({x:o.x+o.w/2,y:o.y+o.h/2,stock:16});}}});
   }
   for(const t of w.targets||[]){
     const p=screen(t.x,t.y);if(p.x< -250||p.x>view.w+250||p.y< -250||p.y>view.h+250)continue;
-    if(t.type==='payphone'){drawPaperPayphone(t.x,t.y);label('☎ Таксофон',t.x,t.y-1.6,true);}
-    else if(t.type==='world-bridge'){paperBoard(t.x,t.y,w.secondBridgeProject?.stage===2?'Второй мост построен':'Стройка · мост');}
-    else if(t.type==='world-sign')paperBoard(t.x,t.y,'↗ '+t.title.slice(0,20));
-    else if(t.type==='tourist'||t.type==='world-gate'||t.type==='world-preview'){
-      paperHouse({x:t.x-1.3,y:t.y-1.8,w:t.id==='university-site'?3.2:t.id==='museum-entry'?2.8:2.35,h:t.id==='robo-stadium-site'?1.4:2.15},
-        t.type==='tourist'?'shop':t.id==='museum-entry'?'museum':t.id==='robo-stadium-site'?'arena':t.id==='farlands-entry'?'gate':t.id==='industry-site'?'factory':'warehouse');
-      label(t.title,t.x,t.y-2,true);
-    }
+    layers.push({depth:t.x+t.y,draw:()=>{
+      if(t.type==='payphone'){drawPaperPayphone(t.x,t.y);label('☎ Таксофон',t.x,t.y-1.6,true);}
+      else if(t.type==='world-bridge'){paperBoard(t.x,t.y,w.secondBridgeProject?.stage===2?'Второй мост построен':'Стройка · мост');}
+      else if(t.type==='world-sign')paperBoard(t.x,t.y,'↗ '+t.title.slice(0,20));
+      else if(t.type==='tourist'||t.type==='world-gate'||t.type==='world-preview'){
+        paperHouse({x:t.x-1.3,y:t.y-1.8,w:t.id==='university-site'?3.2:t.id==='museum-entry'?2.8:2.35,h:t.id==='robo-stadium-site'?1.4:2.15},
+          t.type==='tourist'?'shop':t.id==='museum-entry'?'museum':t.id==='robo-stadium-site'?'arena':t.id==='farlands-entry'?'gate':t.id==='industry-site'?'factory':'warehouse');
+        label(t.title,t.x,t.y-2,true);
+      }
+    }});
   }
-  // Keep the player readable when standing on the bridge or behind scenery.
-  const self=state.players.find(p=>p.id===me?.id);if(self)drawPlayer(self,performance.now());
+  for(const player of state.players.filter(p=>(p.online||p.id===me?.id)&&p.scene===state.scene)){
+    layers.push({depth:player.x+player.y,draw:()=>drawPlayer(player,performance.now())});
+  }
+  layers.sort((a,b)=>a.depth-b.depth);for(const layer of layers)layer.draw();
 }
 function drawTravelScene(time){
   const region=state.worldTravel.scenes[state.scene];
@@ -194,6 +198,7 @@ function drawTravelScene(time){
   }
   for(const o of state.worldTravel.targets||[]){
     if(o.type==='world-exhibit'){const p=screen(o.x,o.y);ctx.fillStyle='#ad6e55';ctx.beginPath();ctx.arc(p.x,p.y,view.s*.24,0,7);ctx.fill();label(o.title,o.x,o.y-1,true);}
+    else if(o.type==='payphone')drawPaperPayphone(o.x,o.y);
     else paperBoard(o.x,o.y,o.title);
   }
   for(const p of state.players.filter(p=>(p.online||p.id===me.id)&&p.scene===state.scene))drawPlayer(p,time);
