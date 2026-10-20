@@ -18,9 +18,18 @@ jobs:
       - uses: actions/checkout@v4
       - name: Shell syntax only — NEVER execute a production connection
         run: |
+          bash -n projects/dementor-live/runtime/deploy/mac-private-backup-restore.sh
           bash -n projects/dementor-live/runtime/deploy/mac-safe-release.sh
           bash -n projects/dementor-live/runtime/deploy/mac-production-audit.sh
           bash -n projects/dementor-live/runtime/deploy/publish-preserve-world.sh
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Synthetic private restore / archive security checks only (NO SSH)
+        run: |
+          python3 -m unittest discover -s projects/dementor-live/runtime/test -p 'test_qa_restore_extract.py' -v
+          node --check projects/dementor-live/runtime/tools/qa-restore-identity-audit.mjs
+          node --test projects/dementor-live/runtime/test/qa-private-restore.test.mjs
       - name: Ensure fixed SSH identity, exact build and CI gates are present
         run: |
           python3 - <<'PY'
@@ -76,5 +85,17 @@ jobs:
           assert 'approved_sha_tag_matches_running_image' in audit
           assert not any(x in audit for x in ('--apply','down -v','--reset-world','docker stop','docker compose up','docker tag','docker rm','rm -rf','docker volume rm'))
           print('PASS: Mac G7 read-only SSH attestation with one key and no mutating commands')
-          print('PASS: local Mac release pattern includes CI, 1 SSH key, safe backup and no world-reset commands')
+          restore=Path('projects/dementor-live/runtime/deploy/mac-private-backup-restore.sh').read_text()
+          assert 'StrictHostKeyChecking=yes' in restore
+          assert restore.count('ssh "${SSH_OPTS[@]}"') == 2
+          assert 'DEMENTOR_BACKUP_ID' in restore and 'DEMENTOR_QA_MAX_ARCHIVE_GIB' in restore
+          assert 'sha256' in restore and 'shasum -a 256' in restore
+          remote=restore.split("cat > \"$WORK/remote-readonly.sh\" <<'VM'\n",1)[1].split("\nVM\n",1)[0]
+          assert 'tar -cf -' in remote and 'sha256sum' in remote
+          for forbidden in ['docker ', 'systemctl ', 'service ', 'tar -xf','mkdir ', 'touch ', 'chmod ', 'rm -rf', '--apply', '--reset-world', 'down -v']:
+              assert forbidden not in remote, "VM copy must be strictly read-only: "+forbidden
+          assert 'qa-restore-extract.py' in restore
+          assert 'qa-restore-identity-audit.mjs' in restore
+          print('PASS: private off-VM source backup transport has no server mutations')
+          print('PASS: local Mac release pattern includes CI, one key, safe backup and no world-reset commands')
           PY
