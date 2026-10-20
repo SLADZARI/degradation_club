@@ -236,8 +236,10 @@ export class Game {
       const input=this.inputs.get(id);let moving=input&&this.now-input.at<400&&Math.hypot(input.dx,input.dy)>0;
       if(!p.spirit&&(moving||p.lastActiveGameplayAt&&this.now-p.lastActiveGameplayAt<15000)){p.activeGameMs=Math.min(86400000,(p.activeGameMs||0)+Math.min(ms,250));}
       const sprint=moving&&input.sprint&&!p.spirit&&p.stamina>5&&p.hunger>=c.slowBelow;
-      p.stamina=clamp(p.stamina+(sprint?-c.staminaDrain:c.staminaRegen)*dt,0,100);
-      if(moving){const speed=(p.hunger<c.slowBelow&&!p.spirit?c.slowSpeed:c.speed)*(sprint?c.sprintMultiplier:1)*landscapeSpeed(this,p);const nx=p.x+input.dx*speed*dt,ny=p.y+input.dy*speed*dt;
+      const biome=moving&&typeof this.movementBiome==='function'?this.movementBiome(p,input):null;
+      p.stamina=clamp(p.stamina+(sprint?-c.staminaDrain:(biome?.staminaDelta??c.staminaRegen))*dt,0,100);
+      if(biome?.hungerExtra&&!p.spirit)p.hunger=Math.max(0,p.hunger-biome.hungerExtra*dt);
+      if(moving){const speed=(p.hunger<c.slowBelow&&!p.spirit?c.slowSpeed:c.speed)*(sprint?c.sprintMultiplier:1)*landscapeSpeed(this,p)*(biome?.speed??1);const nx=p.x+input.dx*speed*dt,ny=p.y+input.dy*speed*dt;
         if(this.walkable(nx,p.y,p))p.x=nx;if(this.walkable(p.x,ny,p))p.y=ny;p.job=null;this.dirty=true;
       }
       if(p.job&&this.now>=p.job.ends)this.finish(p);
