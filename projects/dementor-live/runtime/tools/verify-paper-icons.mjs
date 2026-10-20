@@ -23,7 +23,7 @@ else {
 if(manifest){
   if(manifest.schema!=='dementor-paper-cut-ui-icons-v1')errors.push('Unexpected icon registry schema');
   if(JSON.stringify(manifest.ids)!==JSON.stringify(expectedIds))errors.push('20-icon id/order mismatch');
-  if(manifest.atlas?.cols!==5||manifest.atlas?.rows!==4||manifest.atlas?.cellPx!==64)errors.push('Atlas layout must be 5x4 of 64px');
+  if(manifest.atlas?.cols!==5||manifest.atlas?.rows!==4||JSON.stringify(manifest.atlas?.size)!=='[320,256]')errors.push('Atlas layout must be 5x4 of 64px / 320x256');
   if(manifest.atlas?.sha256!=='607e40f07a2695148ecbb8e541ec234eeeb92de7a223a26438d754d104576193')errors.push('Approved atlas SHA-256 differs from canonical checksum');
 }
 if(!fs.existsSync(atlasPath))errors.push('Missing APPROVED icon atlas: public/assets/paper-icons/paper_atlas_64_indexed.png');
@@ -34,7 +34,12 @@ else {
   const sha=createHash('sha256').update(data).digest('hex');
   if(sha!==manifest?.atlas?.sha256)errors.push('Atlas mismatch: SHA-256 '+sha+' is not approved');
 }
+if(manifest?.status!=='approved_and_packaged')errors.push('Artwork is not the finalized approved pack');
 if(!fs.existsSync(adapterPath))errors.push('Missing public/paper-icons.js runtime adapter');
+for(const id of expectedIds)for(const n of [64,256]){
+  const png=path.join(folder,'icons_'+n,id+'.png');
+  if(!fs.existsSync(png))errors.push('Missing '+id+' '+n+'px PNG');
+}
 if(errors.length){
   console.error('PAPER CUT ICON CANON v1: BLOCKED — do not release without approved files.');
   for(const error of errors)console.error(' - '+error);
