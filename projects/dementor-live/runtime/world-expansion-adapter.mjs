@@ -15,6 +15,7 @@ export class Game extends CoreGame{
     .flatMap(region=>[region.exit,region.main]).find(o=>o.id===id)||super.target(id);}
   walkable(x,y,p=null){
     const scene=p?.scene||'city',r=.3,c=this.c;
+     if(PHONE_BOOTHS.some(b=>b.scene===scene&&Math.hypot(x-b.x,y-b.y)<.50))return false;
     if(WORLD_SCENES[scene])return !terrainBlocked(scene,x,y,r);
     if(scene==='city'){
       if(terrainBlocked('city',x,y,r))return false;
