@@ -8,6 +8,7 @@ export const COMBAT_P0 = Object.freeze({
   shotCooldownMs: 320, shotRange: 9, enemyAttackMs: 1_500,
   worldSize: 16, moveSpeed: 2.9, lootPerStage: 3, stages: 3,
 });
+export const COMBAT_WEAPONS=Object.freeze({rifle:{label:'Автомат',magazine:12,cooldown:260,reloadMs:1300},pistol:{label:'Пистолет',magazine:8,cooldown:620,reloadMs:1050,damage:8}});
 const WALLS = Object.freeze([{x:6,y:4,w:2,h:5},{x:4,y:11,w:4,h:1}]);
 const ENCOUNTERS = [
   [{type:'CHASER',x:11,y:2,hp:24}],
@@ -55,7 +56,7 @@ function nextWaypoint(start,target){
 function profile(p){
   if(!p||!p.id)throw Error('Unknown character');
   if(!p.combatP0){p.combatP0={weapon:{id:randomUUID(),kind:'starter-rifle',damage:9+randomInt(3),tier:1},ammo:24,receivedStarter:true};}
-  return p.combatP0;
+  const v=p.combatP0;v.selectedWeapon||='rifle';if(!Object.hasOwn(COMBAT_WEAPONS,v.selectedWeapon))v.selectedWeapon='rifle';if(!Number.isSafeInteger(v.magazine))v.magazine=Math.min(v.ammo,COMBAT_WEAPONS[v.selectedWeapon].magazine);v.magazine=Math.max(0,Math.min(v.magazine,v.ammo,COMBAT_WEAPONS[v.selectedWeapon].magazine));v.reloadEndsAt||=0;return v;
 }
 export function combatRoot(world){
   if(!world||typeof world!=='object')throw Error('World state required');
@@ -126,7 +127,7 @@ export function advanceCombat(world,sessionId,now){
       continue;
     }
     if(m.status!=='ACTIVE')continue;
-    const oldX=m.x,oldY=m.y;
+    const profileState=profile(world.players[m.id]);if(profileState.reloadEndsAt&&now>=profileState.reloadEndsAt){profileState.magazine=Math.min(profileState.ammo,COMBAT_WEAPONS[profileState.selectedWeapon].magazine);profileState.reloadEndsAt=0;}if(!profileState.magazine&&profileState.ammo>0&&!profileState.reloadEndsAt)profileState.reloadEndsAt=now+COMBAT_WEAPONS[profileState.selectedWeapon].reloadMs;const oldX=m.x,oldY=m.y;
     if(now-m.inputAt<400)moveBody(m,m.input.x,m.input.y,COMBAT_P0.moveSpeed*dt);
     if(hypot(m,{x:oldX,y:oldY})>.025){m.feed=null;m.selfFeed=null;}
     if(m.feed){
@@ -202,12 +203,13 @@ function command(s,world,players,actorId,cmd,now){
     actor.nextDashAt=now+COMBAT_P0.dashCooldownMs;actor.feed=null;actor.selfFeed=null;
     return {dashSteps:count};
   }
-  if(cmd.type==='fire'){
+  if(cmd.type==='weaponSelect'){const prof=profile(players[actorId]);if(!Object.hasOwn(COMBAT_WEAPONS,cmd.weapon))throw Error('Unknown weapon');prof.selectedWeapon=cmd.weapon;prof.magazine=Math.min(prof.magazine,COMBAT_WEAPONS[cmd.weapon].magazine);actor.nextShotAt=Math.max(actor.nextShotAt,now+250);if(!prof.magazine&&prof.ammo>0&&!prof.reloadEndsAt)prof.reloadEndsAt=now+COMBAT_WEAPONS[cmd.weapon].reloadMs;return {weapon:cmd.weapon,magazine:prof.magazine,ammo:prof.ammo};}
+   if(cmd.type==='fire'){
     if(now<actor.nextShotAt)throw Error('Shot cooling down');
-    const prof=profile(players[actorId]);if(!Number.isSafeInteger(prof.ammo)||prof.ammo<1)throw Error('Out of ammo');
+    const prof=profile(players[actorId]);if(!Number.isSafeInteger(prof.ammo)||prof.ammo<1)throw Error('Out of ammo');if(prof.reloadEndsAt||prof.magazine<1)throw Error('Reloading');
     if(!finite(cmd.dx)||!finite(cmd.dy)||Math.hypot(cmd.dx,cmd.dy)<.001)throw Error('Invalid aim');
     const d=Math.hypot(cmd.dx,cmd.dy),aim={x:cmd.dx/d,y:cmd.dy/d};
-    actor.aim=aim;actor.nextShotAt=now+COMBAT_P0.shotCooldownMs;actor.feed=null;actor.selfFeed=null;prof.ammo--;
+    actor.aim=aim;actor.nextShotAt=now+COMBAT_WEAPONS[prof.selectedWeapon].cooldown;actor.feed=null;actor.selfFeed=null;prof.ammo--;prof.magazine--;if(prof.magazine===0&&prof.ammo>0)prof.reloadEndsAt=now+COMBAT_WEAPONS[prof.selectedWeapon].reloadMs;
     // A hitscan shot is instantaneous but reports its actual ray for a visible tracer on the client.
     // Clamp the ray at the first solid wall; no phantom hits on opponents behind cover.
     let wallDistance=COMBAT_P0.shotRange;
@@ -225,12 +227,12 @@ function command(s,world,players,actorId,cmd,now){
     const nearest=hits[0],travel=nearest?nearest.dot:wallDistance;
     const shot={from:{x:actor.x,y:actor.y},to:{x:actor.x+aim.x*travel,y:actor.y+aim.y*travel},
       blocked:!nearest&&wallDistance<COMBAT_P0.shotRange-.001,damage:0};
-    if(!nearest)return {hit:false,ammo:prof.ammo,shot};
-    const actualDamage=Math.min(nearest.e.hp,prof.weapon.damage);
-    nearest.e.hp-=prof.weapon.damage;
+    if(!nearest)return {hit:false,ammo:prof.ammo,magazine:prof.magazine,reloadEndsAt:prof.reloadEndsAt,shot};
+    const damage=prof.selectedWeapon==='pistol'?COMBAT_WEAPONS.pistol.damage:prof.weapon.damage;const actualDamage=Math.min(nearest.e.hp,damage);
+    nearest.e.hp-=damage;
     shot.damage=actualDamage;
     if(nearest.e.hp<=0){nearest.e.alive=false;awardLoot(s,nearest.e);advanceStage(s,now);}
-    return {hit:true,enemyId:nearest.e.id,ammo:prof.ammo,shot};
+    return {hit:true,enemyId:nearest.e.id,ammo:prof.ammo,magazine:prof.magazine,reloadEndsAt:prof.reloadEndsAt,shot};
   }
   if(cmd.type==='melee'){
     if(!finite(cmd.dx)||!finite(cmd.dy))throw Error('Invalid melee');
