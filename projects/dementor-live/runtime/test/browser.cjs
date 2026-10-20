@@ -31,6 +31,19 @@ async function go(p,id){
  }
 }
 async function action(p){await p.page.locator('#actionButton').click();}
+async function purchaseEstate(p,id){
+  await go(p,id);
+  await action(p);
+  const dialog=p.page.locator('#cityPanel[open]');
+  await dialog.waitFor({state:'visible'});
+  assert.match(await p.page.locator('#cityPanelTitle').innerText(),/Земл|участ|Имуществ|Недвижим/i,'Action should open current estate panel');
+  const buy=p.page.locator('#estate-buy');
+  await buy.waitFor({state:'visible'});
+  assert.equal(await buy.isEnabled(),true,'Estate purchase not available for this player');
+  await buy.click();
+  await p.page.waitForFunction(id=>state.plots.find(x=>x.id===id)?.owner===me.id,id);
+  await p.page.locator('[data-close="cityPanel"]').click();
+}
 async function tools(p){await go(p,'tools');await action(p);await p.page.waitForFunction(()=>me.tools.axe===state.config.toolDurability&&me.tools.pick===state.config.toolDurability);}
 async function harvestDeliver(p,kind,quantity,forge=false){let remaining=quantity;while(remaining){const batch=Math.min(kind==='wood'?12:6,remaining),tool=kind==='wood'?'axe':'pick';if((await snap(p)).tools[tool]<batch)await tools(p);await p.page.keyboard.press(kind==='wood'?'Digit1':'Digit2');await p.page.waitForFunction(tool=>me.equipped===tool,tool);await go(p,kind+(forge?'-2':'-1'));for(let i=0;i<batch;i++){const before=(await snap(p)).bag[kind];await action(p);await p.page.waitForFunction(({kind,before})=>me.bag[kind]===before+1&&!me.job,{kind,before},{timeout:5000});}
   const current=await snap(p);assert.ok(current.bag.wood+current.bag.stone*2+current.bag.food<=12);const money=current.wallet;await go(p,forge?'forge-drop':'project');await action(p);await p.page.waitForFunction(({money,batch,rate})=>me.wallet===money+batch*rate,{money,batch,rate:kind==='wood'?2:3});remaining-=batch;console.log(`${p.name}: ${kind} delivered ${quantity-remaining}/${quantity}`);
@@ -44,7 +57,7 @@ async function screenshot(p,name){const file=path.join(out,name);await p.page.sc
   await harvestDeliver(a,'wood',20);await harvestDeliver(a,'stone',20);await harvestDeliver(b,'wood',20);await harvestDeliver(b,'stone',20);report.checks.push('real UI movement, free tools, wood/stone extraction, changing durability/replacement, cargo, physical delivery and individual immediate pay');
   await work(b,4);await work(b,1);await go(a,'build');await go(b,'build');const before=(await snap(a)).wallet+(await snap(b)).wallet;await Promise.all([action(a),action(b)]);await a.page.waitForFunction(()=>state.project.stage===3);await b.page.waitForFunction(()=>state.project.stage===3);assert.equal((await snap(a)).wallet+(await snap(b)).wallet,before+10);report.checks.push('simultaneous final work: one payment and one stage completion');
   const project=await a.page.evaluate(()=>state.project);assert.deepEqual(project.stock,{wood:0,stone:0});assert.deepEqual(project.consumed,{wood:40,stone:40});assert.equal(project.spent,280);
-  await go(a,'plot-1');await action(a);await a.page.waitForFunction(()=>state.plots[0].owner===me.id);await go(b,'plot-2');await action(b);await b.page.waitForFunction(()=>state.plots[1].owner===me.id);assert.equal((await snap(a)).wallet+(await snap(b)).wallet,40);assert.equal(await a.page.evaluate(()=>state.treasury),960);report.checks.push('square completed, all materials consumed, two earned plot purchases, conserved money');
+  await purchaseEstate(a,'plot-1');await purchaseEstate(b,'plot-2');assert.equal((await snap(a)).wallet+(await snap(b)).wallet,40);assert.equal(await a.page.evaluate(()=>state.treasury),960);report.checks.push('square completed, all materials consumed, two earned plot purchases, conserved money');
   await a.page.locator('#chatInput').fill('Мы построили площадь!');await a.page.locator('#chatInput').press('Enter');await b.page.waitForFunction(()=>state.chat.some(m=>m.text==='Мы построили площадь!'));report.checks.push('local chat between real browser clients');
   await screenshot(a,'dementor-live-completed.png');const saved=await snap(a);await a.page.reload();await a.page.waitForFunction(()=>me&&connected);assert.equal((await snap(a)).id,saved.id);assert.equal((await snap(a)).wallet,saved.wallet);assert.equal(await a.page.evaluate(()=>state.plots[0].owner===me.id),true);report.checks.push('actual browser reload retains identity, wallet and owned plot');
   for(const p of [a,b]){await harvestDeliver(p,'wood',12,true);await harvestDeliver(p,'stone',12,true);}
