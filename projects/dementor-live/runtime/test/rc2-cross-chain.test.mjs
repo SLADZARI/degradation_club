@@ -13,10 +13,10 @@ test('RC2-LINK-01 mayor idea -> earned PAPER -> real payphone -> inbox -> save/r
  a.x=9;a.y=3;
  const funds=network.origin.state.treasury;
  const idea={requestId:'qa-idea-cross-01',type:'mayorIdea',target:'mayor',text:'Пожалуйста добавьте более понятную дорогу к библиотеке и складу'};
- assert.equal(network.command(a,idea).ok,true);
+ assert.equal(network.origin.command(a,idea).ok,true);
  assert.equal(a.wallet,50);
  assert.equal(network.origin.state.treasury,funds-50);
- assert.equal(network.command(a,idea).ok,true);
+ assert.equal(network.origin.command(a,idea).ok,true);
  assert.equal(a.wallet,50);
  a.x=10;a.y=12;
  const message={requestId:'qa-pager-cross-01',type:'pagerSend',target:'phone-square',number:b.pagerNumber,text:'Материалы ждут у склада'};
@@ -57,6 +57,7 @@ test('RC2-LINK-03 simultaneous cross-city owners retain identity and assets afte
  const n=new CityNetwork(createWorld()),a=n.origin.join('Хозяин'),b=n.origin.join('Гость');
  n.snapshot(a);n.snapshot(b);
  a.wallet=500;
+ b.x=19;b.y=6;
  const city=n.createCity(b,'Город B');
  const initialA={id:a.id,token:a.token,wallet:a.wallet};
  assert.equal(n.command(b,{requestId:'qa-ride-city-b',type:'travelCity',cityId:city.id}).ok,true);
