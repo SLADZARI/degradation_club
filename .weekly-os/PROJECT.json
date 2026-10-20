@@ -563,7 +563,7 @@
       "note": "STAB-01 released and live-retested. Anonymous smoke PASS and owner-confirmed authenticated Board/private-image retest PASS. Residual parent stabilization #228 remains open; no active implementation ownership."
     }
   ],
-  "activeIntegrationBranch": "result/board-media-performance-v1",
+  "activeIntegrationBranch": "result/owner-admin-community-ops-v1",
   "activeReleaseBranch": null,
   "reportPath": "operations/MEMBERSHIP_V2_PRODUCTION_FLOW_QA_2026-09-02.md",
   "completedResults": [
