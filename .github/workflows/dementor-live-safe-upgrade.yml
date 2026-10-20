@@ -45,6 +45,7 @@ jobs:
       - run: npx playwright install --with-deps chrome
       - run: node test/interface-world-polish.cjs
       - run: node test/estate-mayor-ui.cjs
+      - run: node test/playtest-actions.cjs
       - run: node test/telecom-browser.cjs
       - run: npm run test:mobile
       - run: npm run test:quests
