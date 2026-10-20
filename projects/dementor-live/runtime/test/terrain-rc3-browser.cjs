@@ -54,6 +54,13 @@ let server,browser;
  // Touch screen simulates placing one independent cell: no drag-and-drop.
  const point=await first.page.evaluate(()=>{const q=screen(14.5,9.5),r=canvas.getBoundingClientRect();return {x:q.x+r.left,y:q.y+r.top};});
  await first.page.touchscreen.tap(point.x,point.y);
+ const tapDiagnostic=await first.page.evaluate(({x,y})=>{
+   const e=document.elementFromPoint(x,y),r=canvas.getBoundingClientRect();
+   return {hit:e?.id||e?.className||e?.tagName,point:{x,y},canvas:{x:r.left,y:r.top,width:r.width,height:r.height},
+     selected:typeof placementCell==='undefined'?null:placementCell,kind:typeof placementKind==='undefined'?null:placementKind,
+     projected:screen(14.5,9.5),scene:state?.scene,me:{x:me?.x,y:me?.y},bar:document.querySelector('#terrain-placement')?.getBoundingClientRect()?.toJSON?.()};
+ },point);
+ console.log('TERRAIN TOUCH DIAGNOSTIC',JSON.stringify(tapDiagnostic));
  await first.page.waitForFunction(()=>placementCell?.x===14&&placementCell?.y===9);
  await first.page.getByRole('button',{name:'Применить'}).click();
  await first.page.waitForFunction(()=>state?.landscape?.tiles?.some(t=>t.x===14&&t.y===9&&t.kind==='paving')&&me?.terrainBag?.paving===9);
