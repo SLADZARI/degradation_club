@@ -104,12 +104,13 @@ style.textContent=`
   #travelMap canvas{display:block;width:100%;height:auto;background:#ede7d5;border:1px solid #beb89f;border-radius:8px;touch-action:manipulation}
   #travelMap p{font-size:13px;line-height:1.4}
   #travelMap button{padding:9px 14px;cursor:pointer;border:1px solid #9ca38a;background:#fffdf6;border-radius:8px}
-  #worldMapButton{height:36px;min-width:39px;font-size:18px}
+  #worldMapButton{position:fixed;right:22px;bottom:135px;z-index:35;width:49px;height:49px;border-radius:50%;font-size:24px;background:#f8f5e9e8;border:2px solid #73826b;box-shadow:0 3px 12px #0002;display:grid;place-items:center;touch-action:manipulation}
+  @media(max-width:760px){#worldMapButton{right:13px;bottom:max(175px,calc(env(safe-area-inset-bottom) + 168px));width:48px;height:48px}}
   @media(min-width:760px){#actionDock{max-width:min(390px,65vw)!important;bottom:auto!important;right:auto!important;z-index:70}}
 `;
 document.head.append(style);
-const tools=$('centerButton').parentElement,button=document.createElement('button');
-button.id='worldMapButton';button.title='Карта путешественника';button.textContent='🗺';button.setAttribute('aria-label','Открыть карту путешественника');tools.prepend(button);
+const button=document.createElement('button');
+button.id='worldMapButton';button.title='Карта путешественника';button.textContent='🗺';button.setAttribute('aria-label','Открыть карту путешественника');document.querySelector('#game').append(button);
 const dialog=document.createElement('dialog');dialog.id='travelMap';dialog.innerHTML='<h2>Карта путешественника</h2><canvas id="travelMapCanvas" width="720" height="360" aria-label="Город, лес, горы, музей смеха и дальние земли"></canvas><p id="travelMapCaption">Карта доступна после покупки. Точки показывают направления; перемещение только пешком.</p><button id="closeTravelMap">Закрыть</button>';
 document.body.append(dialog);$('closeTravelMap').onclick=()=>dialog.close();
 button.onclick=()=>{if(!state?.worldTravel?.profile?.mapOwned){toast('Купи карту в туристическом киоске · ☷ покажет дорогу');if(state?.scene==='city')navigateTo('tourist-kiosk');return;}openTravelMap();};

@@ -12,7 +12,7 @@
     <canvas id="world" tabindex="0" aria-label="Карта. На телефоне нажми на землю, чтобы идти, двумя пальцами меняй масштаб, левым стиком двигайся и действуй кнопками справа. На компьютере WASD, E и колесо мыши."></canvas>
     <header class="topbar">
       <div class="brand"><span class="brand-mark">d.</span><div><b>DEMENTOR <span>LIVE</span></b><small>ОБЩЕЕ НАЧАЛО</small></div></div>
-      <div class="top-right"><span id="connection" class="connection"><i></i>Подключаемся</span><button id="helpButton" class="icon-button" aria-label="Управление и второй игрок">?</button></div>
+      <div class="top-right"><span id="connection" class="connection"><i></i>Подключаемся</span><button id="centerButton" class="icon-button" type="button" aria-label="Места города" title="Места города">☷</button><button id="socialButton" class="icon-button" type="button" aria-label="Жители и сделки" title="Жители">♧</button><button id="bagButton" class="icon-button" type="button" aria-label="Открыть рюкзак" title="Рюкзак">▣</button><button id="helpButton" class="icon-button" aria-label="Управление и второй игрок">?</button></div>
     </header>
     <section id="quest" class="quest glass" aria-label="Текущая задача">
       <button id="questToggle" class="quest-toggle" aria-expanded="true" aria-controls="questList"><span>Твои задания</span><span id="questChevron" aria-hidden="true">▾</span></button><button id="questActive" class="quest-active" type="button"><span id="questActiveTitle">Текущее задание</span><small id="questActiveHint">Нажми, чтобы идти к цели</small></button>
@@ -31,11 +31,11 @@
       </div>
     </section>
     <button id="citySound" class="city-sound glass" aria-label="Звук города">🔇 Включить звук города</button><div id="worldNote" class="world-note">Пустое поле сегодня. Наш город — завтра.</div>
-    <div class="map-tools glass" aria-label="Управление картой"><button id="zoomOut" aria-label="Отдалить карту">−</button><button id="centerButton" aria-label="Места города">☷</button><button id="zoomIn" aria-label="Приблизить карту">+</button></div>
+    <div class="map-tools glass" aria-label="Управление масштабом"><button id="zoomOut" aria-label="Отдалить карту">−</button><button id="zoomIn" aria-label="Приблизить карту">+</button></div>
     <section id="actionDock" class="action-dock glass" aria-label="Доступное действие"><span id="actionIcon" class="action-icon">↗</span><div><b id="actionTitle">Исследуй поле</b><small id="actionHint">WASD или нажми на землю</small></div><button id="actionButton"><kbd>E</kbd><span>Действие</span></button><div id="actionProgress"></div></section>
     <section class="inventory glass" aria-label="Снаряжение и переноска">
       <div class="tools"><button id="axeButton" class="slot selected" aria-label="Выбрать топор"><kbd>1</kbd><span>⚒</span><small id="axeDurability">—</small></button><button id="pickButton" class="slot" aria-label="Выбрать кирку"><kbd>2</kbd><span>⛏</span><small id="pickDurability">—</small></button></div>
-      <div class="bag"><span id="woodCount">🪵 <b>0</b></span><span id="stoneCount">🪨 <b>0</b></span><button id="eatButton" title="Съесть порцию · F">🫐 <b id="foodCount">0</b><kbd>F</kbd></button><small id="cargo">0 / 12</small><button id="socialButton" aria-label="Жители и сделки">Жители</button><button id="bagButton" aria-label="Открыть рюкзак">🎒</button></div>
+      <div class="bag"><span id="woodCount">🪵 <b>0</b></span><span id="stoneCount">🪨 <b>0</b></span><button id="eatButton" title="Съесть порцию · F">🫐 <b id="foodCount">0</b><kbd>F</kbd></button><small id="cargo">0 / 12</small></div>
     </section>
     <aside class="chat-area" aria-label="Общение рядом"><div id="chatMessages" aria-live="polite"></div><form id="chatForm" class="glass"><span>↗</span><input id="chatInput" maxlength="180" placeholder="Скажи что-нибудь соседу…" aria-label="Сообщение рядом"><button type="submit" aria-label="Отправить">↑</button></form></aside>
     <div id="toast" class="toast" role="status" aria-live="polite"></div>

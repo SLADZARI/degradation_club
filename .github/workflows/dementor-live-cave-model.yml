@@ -1,0 +1,37 @@
+name: Dementor Live Cave Adventure P0 model
+on:
+  push:
+    branches:
+      - 'feature/dementor-live-mountain-cave-fishing-p0-*'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  cave-model-and-core-regression:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: projects/dementor-live/runtime
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Test cave model
+        run: node --test test/cave-adventure.test.mjs
+      - name: Existing model and syntax regression
+        run: |
+          npm run check
+          npm test
+      - name: Existing HTTP and world persistence regression
+        run: |
+          npm run test:integration
+          npm run test:persistence
+      - name: Browser HUD regression on isolated world
+        run: |
+          npm install --no-save --no-package-lock playwright@1.56.1
+          npx playwright install --with-deps chrome
+          node test/interface-world-polish.cjs
+          node test/city-mobile-gameplay.cjs
+          node test/cave-hud-smoke.cjs
