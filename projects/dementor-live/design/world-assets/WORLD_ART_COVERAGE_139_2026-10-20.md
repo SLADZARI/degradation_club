@@ -42,3 +42,7 @@ All 90 Batch02 SVG have native transparent 512×512, no background extraction, n
 ## Follow-up: unique city houses, gardens and furniture · 2026-10-20
 
 [Separate G6 acceptance, 46 new unique/staged SVG](UNIQUE_HOUSES_ISO30_G6_ACCEPTANCE_2026-10-20.md), [source and gallery](../../runtime/assets-source/world-art-unique-houses/README.md). This is a **supplementary 46-image candidate batch**, not a change to the **139/139 source coverage** accounting (the same physical objects, additional visual variants). New drawings do not add game entities, saves or completed-house state. Actual Cube Unit/occlusion tests and human art approval remain NOT RUN/PENDING. The 14 city structures do not yet replace the general `paperHouse()` renderer. Existing 20 v2 UI icons and 17 terrain SVG immutable.
+
+### Уточнение v1.1 — 8 личных участков (20.10.2026)
+
+Помимо 14 индивидуальных городских зданий, 11 грядок/скамеек/стульев/мебели и 21 рисунка строительных стадий, подготовлены **8 стабильных фасадов личной палатки** на `plot-1…plot-8`. Полный комплект: **54 SVG / 108 PNG**; [архив v1.1](https://drive.google.com/file/d/1-N4bkRh9JyxGI3o9jjWGUUroCmoqO-ZA/view) · [G6 критерии](UNIQUE_HOUSES_ISO30_G6_ACCEPTANCE_2026-10-20.md). Детерминированная функция в `../../runtime/assets-source/world-art-unique-houses/visual-variants.mjs` выбирает стиль по существующим `cityId` и `plotId`; **не вводить дополнительное поле в world.json**. PNG и SVG не подменяют действующий Canvas до art/CU/browser QA, не добавляют игрокам новые дома вместо палатки.
