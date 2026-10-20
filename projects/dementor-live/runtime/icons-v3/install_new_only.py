@@ -48,12 +48,17 @@ def install(runtime:Path,stage_only=False):
     rawcombat=combat.read_text(encoding='utf8')
     if '    const files={' not in rawserver:raise ValueError('Cannot add static asset routes to this server without review')
     route='''    // V3-NEW-ONLY STATIC ROUTE (approved v2 paths unchanged)
-    if(req.method==='GET'&&/^\\/assets\\/paper-icons-new-v3\\/(?:svg|png_(?:32|48|64|128|256))\\/[A-Za-z0-9_-]+\\.(?:svg|png)$/.test(url.pathname)){
-      const assetStem=url.pathname.split('/').pop().replace(/\\.(png|svg)$/,'');
-      if(!V3_NEW_STEMS.has(assetStem)){res.writeHead(404);res.end('Unknown icon');return;}
+    const isV3Manifest=url.pathname==='/assets/paper-icons-new-v3/manifest-new-only.json';
+    const iconAsset=/^\\/assets\\/paper-icons-new-v3\\/(?:svg|png_(?:32|48|64|128|256))\\/([A-Za-z0-9_-]+)\\.(?:svg|png)$/.exec(url.pathname);
+    if((req.method==='GET'||req.method==='HEAD')&&(isV3Manifest||iconAsset)){
+      const assetStem=iconAsset?.[1];
+      if(!isV3Manifest&&!V3_NEW_STEMS.has(assetStem)){res.writeHead(404);res.end('Unknown icon');return;}
       const f=path.join(root,'public',url.pathname.slice(1));
-      if(!fs.existsSync(f)){res.writeHead(404);res.end('Icon unavailable');return;}
-      res.writeHead(200,{'Content-Type':f.endsWith('.svg')?'image/svg+xml; charset=utf-8':'image/png','Cache-Control':'public, max-age=120','X-Content-Type-Options':'nosniff'});res.end(fs.readFileSync(f));return;
+      if(!fs.existsSync(f)){res.writeHead(404);res.end(isV3Manifest?'Icon manifest unavailable':'Icon unavailable');return;}
+      const contentType=isV3Manifest?'application/json; charset=utf-8':f.endsWith('.svg')?'image/svg+xml; charset=utf-8':'image/png';
+      res.writeHead(200,{'Content-Type':contentType,'Cache-Control':isV3Manifest?'no-cache':'public, max-age=120','X-Content-Type-Options':'nosniff'});
+      if(req.method==='HEAD'){res.end();return;}
+      res.end(fs.readFileSync(f));return;
     }
 '''
     stems=', '.join(repr(x['id'].replace(':','__')) for x in items)

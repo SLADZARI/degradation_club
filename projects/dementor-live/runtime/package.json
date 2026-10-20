@@ -37,7 +37,7 @@
     "check:terrain": "node --test test/terrain-rc3.test.mjs test/terrain-renderer-rc3.test.cjs",
     "check:release": "node tools/verify-rc3-release.mjs",
     "test:terrain-browser": "node test/terrain-rc3-browser.cjs",
-    "check:icons-new": "node tools/verify-new-icons-v3.mjs"
+    "check:icons-new": "node tools/verify-new-icons-v3.mjs && node test/icons-v3-route.mjs"
   },
   "engines": {
     "node": ">=22"

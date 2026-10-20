@@ -1,3 +1,16 @@
+# 20.10.2026 — V3 manifest route correction (candidate; NOT deployed)
+
+The v3 installer copied `manifest-new-only.json` to `public/assets/paper-icons-new-v3/`, while its static allowlist matched only SVG/PNG. The first code-only change did not affect the installation path because the wrapper executed the installer embedded in the owner-approved ZIP. CI caught that mismatch; the wrapper now overlays only the checked-in installer into the temporary extraction. The ZIP SHA and the approved 42 SVG / 210 PNG payload are unchanged.
+
+- Source PR #304: `fix/dementor-live-v3-manifest-route-2026-10-20`, source code candidate SHA `77d7adae98698b9c7a1dbc69460a26d530c3d47c`, based on hotfix `a38a03e68fcec5ceac45c0c362436ee6d69d5c5d`. Original RC4 `970882dee4bf55fe2ab143c0c9e791e79c353e43` is untouched.
+- BUILD: exact manifest route, installer wrapper overlay, rollout notes, and an isolated HTTP smoke were added.
+- VALIDATION: **PASS on code candidate SHA `77d7adae98698b9c7a1dbc69460a26d530c3d47c`** across four workflow groups: [Terrain/saves/Docker 39491349103](https://github.com/SLADZARI/degradation_club/actions/runs/39491349103), [Payphones/bridge 39491349241](https://github.com/SLADZARI/degradation_club/actions/runs/39491349241), [save-preserving release 39491349290](https://github.com/SLADZARI/degradation_club/actions/runs/39491349290), [land/mayor 39491349128](https://github.com/SLADZARI/degradation_club/actions/runs/39491349128). Exact-source CI verified v2 **20/20 PNG** and v3 **42 SVG / 210 PNG** hashes. Isolated HTTP test: manifest GET/HEAD 200, 42 entries, unknown icon 404. The docs-only head `0423020b4a00e2ef85106c13da38e56eb6df1874` also passed the same four exact-SHA workflow groups: [Land/mayor 39491825925](https://github.com/SLADZARI/degradation_club/actions/runs/39491825925), [save-preserving release 39491826332](https://github.com/SLADZARI/degradation_club/actions/runs/39491826332), [terrain/saves/Docker 39491826010](https://github.com/SLADZARI/degradation_club/actions/runs/39491826010), [Payphones/bridge 39491826086](https://github.com/SLADZARI/degradation_club/actions/runs/39491826086). An initial browser setup attempt (39491782781) failed installing Playwright; its retry passed on the same SHA.
+- Local tests against remote RC4 source: **NOT RUN**; local workspace contains only legacy runtime 0.2.3.
+- RELEASE: **NO-GO / NOT DEPLOYED**. VM/Docker image SHA, backup manifest, real save rehearsal, two human clients and physical iPhone remain NOT VERIFIED.
+- GRID-02: remains sequenced P4 → P5 → GRID-02 (#294) on `feature/dementor-live-p5-footprint-biomes-routes-2026-10-20`; not part of this manifest-only patch.
+
+---
+
 # Dementor Live 0.2.1 · первый запуск на VM
 
 Дата: 18 октября 2026.
