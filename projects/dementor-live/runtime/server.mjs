@@ -106,7 +106,7 @@ const server=http.createServer(async(req,res)=>{
       }
       const data=await body(req);
       if(url.pathname==='/api/combat/action'){
-        const g=network.gameFor(p),kind=String(data.type||''),now=Date.now();
+        const g=network.gameFor(p),kind=String(data.type||''),now=Date.now(),walletBeforeCombat=p.wallet;
         // HTTP Bearer token authenticates combat independently of city's SSE connection.
         if(!data.requestId||typeof data.requestId!=='string'||data.requestId.length<4||data.requestId.length>100)throw Error('Требуется requestId');
         let result;
@@ -149,8 +149,8 @@ const server=http.createServer(async(req,res)=>{
         }
         // High-frequency movement is transient: never sync-write the entire world on every 125ms input.
         // Critical inventory/weapon/combat commands are still persisted immediately.
-        if(kind==='input'){json(res,200,result);return;}
-        g.changed();save();json(res,200,result);return;
+        if(kind==='input'){qaRecorder.input(p,network.findId(p.id)?.cityId,data);json(res,200,result);return;}
+        qaRecorder.command(p,network.findId(p.id)?.cityId,{...data,type:'combat:'+kind},{ok:true},walletBeforeCombat);g.changed();save();json(res,200,result);return;
       }
       if(url.pathname==='/api/input'){if(!network.gameFor(p).online.has(p.id))throw Error('Нет подключения к миру');network.gameFor(p).input(p,data);qaRecorder.input(p,network.findId(p.id)?.cityId,data);json(res,200,{ok:true});return;}
       if(url.pathname==='/api/action'){if(!network.gameFor(p).online.has(p.id))throw Error('Нет подключения к миру');const before=p.wallet;const result=['createCity','travelCity','pagerBuy','pagerSend','pagerRead'].includes(data.type)?network.command(p,data):network.gameFor(p).command(p,data);qaRecorder.command(p,network.findId(p.id)?.cityId,data,result,before);save();broadcast();json(res,200,result);return;}
@@ -167,9 +167,10 @@ const server=http.createServer(async(req,res)=>{
   }catch(e){json(res,400,{ok:false,message:e.message});}
 });
 let lastTick=Date.now();
-const timer=setInterval(()=>{const now=Date.now();for(const g of network.values()){
+const timer=setInterval(()=>{const now=Date.now();for(const [cityId,g] of network.games){
   g.tick(Math.max(0,now-lastTick));
-  for(const [sid,s] of Object.entries(g.state.combatP0?.sessions||{})){
+  qaRecorder.sampleState(g,cityId);
+   for(const [sid,s] of Object.entries(g.state.combatP0?.sessions||{})){
     if(s.status==='ACTIVE'){advanceCombat(g.state,sid,now);g.changed();}
   }
 }lastTick=now;if(Date.now()-lastBroadcast>=100){broadcast();lastBroadcast=Date.now();}},50);
