@@ -8,6 +8,7 @@ import {CityNetwork} from './city-network.mjs';
 import {createQARecorder} from './qa-recorder.mjs';
 import {scanMusic,audioDuration,PLAZA} from './plaza.mjs';
 import {createHash,timingSafeEqual} from 'node:crypto';
+import {packTerrainSse} from './terrain-delta.mjs';
 import { CONFIG } from './config.mjs';
 import { combatRoot,createCombat,joinCombat,combatAction,combatView,advanceCombat } from './combat-p0.mjs';
 
@@ -52,7 +53,9 @@ function save(){
   fs.renameSync(stateFile+'.tmp',stateFile);
   network.markSaved();
 }
-function broadcast(){for(const[id,set]of streams){const p=network.findId(id)?.p;if(!p)continue;const msg=`data: ${JSON.stringify(stateFor(p))}\n\n`;for(const res of set)res.write(msg);}}
+const terrainCursors=new WeakMap();
+function terrainEvent(snapshot,res){const packed=packTerrainSse(snapshot,terrainCursors.get(res));terrainCursors.set(res,packed.cursor);return `data: ${JSON.stringify(packed.snapshot)}\n\n`;}
+function broadcast(){for(const[id,set]of streams){const p=network.findId(id)?.p;if(!p)continue;const snapshot=stateFor(p);for(const res of set)res.write(terrainEvent(snapshot,res));}}
 function json(res,status,data){res.writeHead(status,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'});res.end(JSON.stringify(data));}
 async function body(req){let text='';for await(const chunk of req){text+=chunk;if(text.length>4096)throw Error('Слишком большой запрос');}return JSON.parse(text||'{}');}
 const server=http.createServer(async(req,res)=>{
@@ -76,7 +79,7 @@ const server=http.createServer(async(req,res)=>{
       const p=network.findToken(token)?.p;if(!p){json(res,401,{ok:false,message:'Войди в мир заново'});return;}
       if(url.pathname==='/api/events'){
         res.writeHead(200,{'Content-Type':'text/event-stream','Cache-Control':'no-cache, no-transform','Connection':'keep-alive','X-Accel-Buffering':'no'});
-        let set=streams.get(p.id);if(!set){set=new Set();streams.set(p.id,set);network.gameFor(p).connect(p);qaRecorder.connect(p,network.findId(p.id)?.cityId);}set.add(res);res.write(`data: ${JSON.stringify(stateFor(p))}\n\n`);
+        let set=streams.get(p.id);if(!set){set=new Set();streams.set(p.id,set);network.gameFor(p).connect(p);qaRecorder.connect(p,network.findId(p.id)?.cityId);}set.add(res);res.write(terrainEvent(stateFor(p),res));
         req.on('close',()=>{set.delete(res);if(set.size===0){streams.delete(p.id);qaRecorder.disconnect(p,network.findId(p.id)?.cityId);network.gameFor(p)?.disconnect(p);save();}});return;
       }
       if(url.pathname==='/api/state'){json(res,200,stateFor(p));return;}
