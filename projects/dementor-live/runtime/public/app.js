@@ -290,7 +290,15 @@ function worldPoint(x,y){
   const u=(x-view.w/2)/(view.s*ISO_COS),v=(y-view.h/2)/(view.s*.5);
   return {x:view.cx+(u+v)/2,y:view.cy+(v-u)/2};
 }
-function blocked(x,y){const c=state.config,r=.35;if(state.scene!=='city'){return x<r||y<r||x>16-r||y>16-r||(['plot','expedition'].includes(state.scene)&&(state.home.nodes.some(n=>n.left&&Math.hypot(x-n.x,y-n.y)<.63)||state.scene==='plot'&&state.home.plantedTrees?.some(t=>t.wateredAt&&state.now-t.wateredAt>=180000&&Math.hypot(x-t.x,y-t.y)<.6)));}if(x<r||y<r||x>c.width-r||y>c.height-r)return true;if(x+r>c.river.x&&x-r<c.river.x+c.river.w&&!(bridgeOpen()&&y-r>=c.bridge.y&&y+r<=c.bridge.y+c.bridge.h))return true;
+function blocked(x,y){const c=state.config,r=.35;if(state.scene!=='city'){
+  if(x<r||y<r||x>16-r||y>16-r)return true;
+  // Same authoritative local footprints that the server uses to resolve motion.
+  return (state.homeFootprints||[]).some(o=>{
+    if(!o.solid)return false;
+    const dx=Math.max(o.x-x,0,x-o.x-o.w),dy=Math.max(o.y-y,0,y-o.y-o.h);
+    return dx*dx+dy*dy<.3*.3;
+  });
+} if(x<r||y<r||x>c.width-r||y>c.height-r)return true;if(x+r>c.river.x&&x-r<c.river.x+c.river.w&&!(bridgeOpen()&&y-r>=c.bridge.y&&y+r<=c.bridge.y+c.bridge.h))return true;
   if((state.citySolids||[{x:4,y:4,w:4,h:3}]).some(o=>x+r>o.x&&x-r<o.x+o.w&&y+r>o.y&&y-r<o.y+o.h))return true;/* Extended solids checked by world-ui from authoritative footprints. */return state.resources.some(o=>o.stock>0&&o.type!=='food'&&Math.hypot(x-o.x,y-o.y)<.63);
 }
 function pathDistance(path){return path.reduce((distance,p,i)=>distance+Math.hypot(p.x-(i?path[i-1].x:me.x),p.y-(i?path[i-1].y:me.y)),0);}
