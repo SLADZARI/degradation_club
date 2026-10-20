@@ -10,7 +10,7 @@ test('paving packs cost PAPER and persist through restart without duplicate purc
  assert.equal(c(other,q,'landscapeBuy','landscape-shop',{kind:'paving'},'buy1234').ok,true);assert.equal(q.wallet,3);
 });
 test('paving gives x1.2 walking speed; obstacles and distant edits rejected',()=>{const g=new Game(createWorld()),p=g.join('A');p.terrainBag.paving=2;p.x=14;p.y=9;assert.equal(c(g,p,'landscapePlace',null,{kind:'paving',x:14,y:9}).ok,true);
- p.x=14.3;p.y=9.3;g.input(p,{dx:1,dy:0});g.tick(100);assert.ok(p.x>14.75&&p.x<14.8);
+ p.x=14.3;p.y=9.3;g.connect(p);g.input(p,{dx:1,dy:0});g.tick(100);assert.ok(p.x>14.75&&p.x<14.8);
  assert.equal(c(g,p,'landscapePlace',null,{kind:'paving',x:40,y:20}).ok,false);
  p.x=17;p.y=4;assert.equal(c(g,p,'landscapePlace',null,{kind:'paving',x:17,y:2}).ok,false);
 });
