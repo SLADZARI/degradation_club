@@ -12,6 +12,7 @@ test('dense forests and mountain barriers exist physically, and essential signs 
 });
 test('roads to forest, mountains and museums have traversable continuous paths',()=>{
  const g=new Game(createWorld()),p=g.join('Cartographer'),start={x:25,y:38};
+ g.state.secondBridgeProject.stage=2; // Passage audit starts AFTER independently verified bridge construction.
  // Grid quarter-cell buffer omitted; game geometry and server collision decide occupancy.
  const accessible=(x,y)=>x>=1&&y>=1&&x<=155&&y<=75&&g.walkable(x,y,p);
  const key=(x,y)=>x+','+y,queue=[[start.x,start.y]],seen=new Set([key(start.x,start.y)]);
