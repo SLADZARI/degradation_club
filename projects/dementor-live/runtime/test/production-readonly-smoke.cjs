@@ -35,6 +35,10 @@ async function run(){
  if(report.liveVersion==='0.5.0-rc.4'){
   await probe('RC4:terrain-script','/terrain-01.js',isTextJS);
   await probe('RC4:v3-icons-script','/new-icons-v3.js',isTextJS);
+  // Sample physical v3 PNGs to distinguish a broken catalog route from missing images.
+  for(const name of ['shovel','pager','world__payphone'])
+   await probe('RC4:v3-sample:'+name,'/assets/paper-icons-new-v3/png_256/'+name+'.png',isPNG);
+
   await probe('RC4:v3-manifest','/assets/paper-icons-new-v3/manifest-new-only.json',d=>{
    try{return d.code===200&&Array.isArray(JSON.parse(d.bytes.toString('utf8')).items)&&JSON.parse(d.bytes.toString('utf8')).items.length===42}catch{return false}
   });
