@@ -28,7 +28,7 @@ export function estateAction(g,p,cmd){
   if(cmd.type==='plotRent'&&use==='residential')throw Error('Аренда доступна коммерческим и универсальным участкам');
   const price=cmd.type==='buy'?g.c.plotPrice:1;
   if(p.wallet<price)throw Error('Недостаточно PAPER');
-  p.wallet-=price;g.state.treasury+=price;plot.owner=p.id;plot.ownerName=p.name;plot.landUse=use;
+  p.wallet-=price;g.state.treasury+=price;plot.owner=p.id;plot.ownerName=p.name;plot.ownerGender=p.gender||'unspecified';plot.landUse=use;
   plot.lease=cmd.type==='plotRent'?{dueAt:g.now+LEASE_DAY_MS,pricePerDay:1}:null;
   if(use==='business')plot.home.open=true;g.state.transactions.push({id:cmd.requestId,player:p.id,amount:-price,reason:cmd.type==='buy'?'land-buy':'land-rent',time:g.now,plot:plot.id});
   return {message:cmd.type==='buy'?'Участок куплен и сохранён за тобой':'Участок арендован на сутки · 1 PAPER'};
