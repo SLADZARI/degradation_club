@@ -36,7 +36,7 @@ export function cityMaterialReport(g){
     const field=Object.values(s.plots).flatMap(p=>p.home?.nodes||[]).concat(s.expedition?.home?.nodes||[]).filter(n=>n.kind===kind).reduce((n,x)=>n+x.left,0)
       +(kind==='wood'?s.plots.flatMap(p=>p.home?.plantedTrees||[]).filter(t=>t.wateredAt&&g.now-t.wateredAt>=360000).reduce((n,t)=>n+t.stock,0):0);
     const inventory=Object.values(s.players).reduce((n,p)=>n+(p.bag?.[kind]||0),0);
-    const chests=s.plots.reduce((n,p)=>n+(p.home?.chest?.[kind]||0),0)+s.plots.reduce((n,p)=>n+(p.shop?.stock?.[kind]||0),0);
+    const chests=s.plots.reduce((n,p)=>n+(p.home?.chest?.[kind]||0),0);const shops=s.plots.reduce((n,p)=>n+(p.shop?.stock?.[kind]||0),0);
     const ground=s.drops.filter(x=>x.kind===kind).reduce((n,x)=>n+x.quantity,0);
     const projects=[s.project,s.forge,s.bridge,s.seedMarket,s.gardenProject];
     const inBuildings=projects.reduce((n,p)=>n+(p?.consumed?.[kind]||0),0);
@@ -46,8 +46,8 @@ export function cityMaterialReport(g){
     const privateStructures=s.plots.reduce((n,p)=>n+(p.home?.materialEmbodied?.[kind]||0),0);
     const crafted=Object.values(s.players).flatMap(p=>p.toolItems||[]).reduce((n,t)=>n+(t.ingredients?.[kind]||0),0);
     const scrap=s.materialScrap?.[kind]||0;
-    const covered=source+field+inventory+chests+ground+inBuildings+awaitingConstruction+warehouse+municipal+transit+privateStructures+crafted+scrap;
-    result[kind]={inNature:source+field,inBags:inventory,inChests:chests,onGround:ground,onWarehouse:warehouse,inMunicipal:municipal,inTransit:transit,onConstruction:awaitingConstruction,inStructures:inBuildings+privateStructures,inTools:crafted,inScrap:scrap,total:covered};
+    const covered=source+field+inventory+chests+shops+ground+inBuildings+awaitingConstruction+warehouse+municipal+transit+privateStructures+crafted+scrap;
+    result[kind]={inNature:source+field,inBags:inventory,inChests:chests,inShops:shops,onGround:ground,onWarehouse:warehouse,inMunicipal:municipal,inTransit:transit,onConstruction:awaitingConstruction,inStructures:inBuildings+privateStructures,inTools:crafted,inScrap:scrap,total:covered};
   }
   return result;
 }
