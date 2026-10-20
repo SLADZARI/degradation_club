@@ -7,12 +7,12 @@
     "projectStage": "BUILD",
     "gate": "G5_BUILD",
     "status": "APPROVED",
-    "version": "3.23",
-    "updated": "2026-09-30",
+    "version": "3.24",
+    "updated": "2026-10-20",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "3.22"
+    "supersedes": "3.23"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -308,7 +308,7 @@
     "operations/BOARD_MEDIA_PERFORMANCE_G8_2026-09-30.md",
     ".weekly-os/results/board-media-performance-v1.v1.0.md",
     "operations/OWNER_ADMIN_COMMUNITY_OPS_G4_2026-09-30.md",
-    ".weekly-os/results/owner-admin-community-ops-v1.v0.1.md"
+    ".weekly-os/results/owner-admin-community-ops-v1.v0.2.md"
   ],
   "authority": {
     "mpDslCore": {
@@ -475,20 +475,20 @@
   },
   "currentResult": {
     "artifactId": "dementor-club.result.owner-admin-community-ops-v1",
-    "version": "0.1",
-    "status": "ACTIVE",
-    "workStatus": "ACTIVE",
-    "path": ".weekly-os/results/owner-admin-community-ops-v1.v0.1.md",
+    "version": "0.2",
+    "status": "WAITING",
+    "workStatus": "WAITING",
+    "path": ".weekly-os/results/owner-admin-community-ops-v1.v0.2.md",
     "gate": "G5_BUILD",
     "scope": [
       "BQA-23 Owner Admin Community/Artifact operations UI"
     ],
-    "integrationBranch": "result/owner-admin-community-ops-v1",
+    "integrationBranch": null,
     "integrationBaseRef": "dementor-club-production",
     "integrationBaseCommit": "cde332779ab0e256dd1e498660d6fa651e91846e",
     "productionBaseCommit": "cde332779ab0e256dd1e498660d6fa651e91846e",
-    "implementationStartAuthorized": true,
-    "schemaChangeImplementationAuthorized": true,
+    "implementationStartAuthorized": false,
+    "schemaChangeImplementationAuthorized": false,
     "schemaChangeBoundary": "READ_ONLY_OWNER_ADMIN_PROJECTION_ONLY",
     "liveDatabaseMutationAuthorized": false,
     "productionMergeAuthorized": false,
@@ -496,7 +496,12 @@
     "changeControlRequired": false,
     "g4Status": "PASS",
     "g4Evidence": "operations/OWNER_ADMIN_COMMUNITY_OPS_G4_2026-09-30.md",
-    "gateReadiness": "G5_BUILD_ACTIVE"
+    "gateReadiness": "G5_PAUSED_BY_OWNER",
+    "pausedIntegrationBranch": "result/owner-admin-community-ops-v1",
+    "pausedCandidateCommit": "93baa5dd38f1cbf24d40bfac8966b7411ef958c6",
+    "pausedPullRequest": 252,
+    "pauseReason": "OWNER_PRIORITY_STAGE1_VM_MIGRATION",
+    "pauseDecision": "https://github.com/SLADZARI/degradation_club/issues/237#issuecomment-6302633113"
   },
   "waitingResults": [
     {
@@ -563,7 +568,7 @@
       "note": "STAB-01 released and live-retested. Anonymous smoke PASS and owner-confirmed authenticated Board/private-image retest PASS. Residual parent stabilization #228 remains open; no active implementation ownership."
     }
   ],
-  "activeIntegrationBranch": "result/owner-admin-community-ops-v1",
+  "activeIntegrationBranch": null,
   "activeReleaseBranch": null,
   "reportPath": "operations/MEMBERSHIP_V2_PRODUCTION_FLOW_QA_2026-09-02.md",
   "completedResults": [
