@@ -1,0 +1,885 @@
+{
+  "schema": "DL-WORLD-ASSET-CANDIDATE-01",
+  "styles": {
+    "world": "DL-ISO30-PAPER-WORLD-01",
+    "items": "DL-STYLE-PAPER-CUT-01"
+  },
+  "count": 35,
+  "assets": [
+    {
+      "batch_no": "DL-WORLD-ART-001",
+      "id": "city-register",
+      "name": "Реестр городов: физический стенд",
+      "category": "civic",
+      "branch": "RC4",
+      "game_object": "DL-024",
+      "svg": "source/svg/city-register.svg",
+      "preview_png": "build/png_256/city-register.png",
+      "style": "DL-ISO30-PAPER-WORLD-01",
+      "status": "CANDIDATE_NOT_DEPLOYED",
+      "geometry": "ISO30-style illustration; CU collision governed separately by engine",
+      "sha256": "91e86f2458d38a88ebb895418c9ec1f26e3d05995b0cf8694bca692e8dffcd07",
+      "qa": {
+        "svg_valid": true,
+        "transparent_corner": true,
+        "safe_margin": true,
+        "bbox": [
+          76,
+          102,
+          180,
+          220
+        ]
+      }
+    },
+    {
+      "batch_no": "DL-WORLD-ART-002",
+      "id": "seed-shop-drop",
+      "name": "Приёмный ящик семенной лавки",
+      "category": "civic",
+      "branch": "RC4",
+      "game_object": "DL-029",
+      "svg": "source/svg/seed-shop-drop.svg",
+      "preview_png": "build/png_256/seed-shop-drop.png",
+      "style": "DL-ISO30-PAPER-WORLD-01",
+      "status": "CANDIDATE_NOT_DEPLOYED",
+      "geometry": "ISO30-style illustration; CU collision governed separately by engine",
+      "sha256": "7f3468c3d230a3cc7361dbea69c4225d375d90316f56f290e4e981100279a7a6",
+      "qa": {
+        "svg_valid": true,
+        "transparent_corner": true,
+        "safe_margin": true,
+        "bbox": [
+          77,
+          134,
+          178,
+          239
+        ]
+      }
+    },
+    {
+      "batch_no": "DL-WORLD-ART-003",
+      "id": "public-garden-drop",
+      "name": "Приёмный ящик общественного огорода",
+      "category": "civic",
+      "branch": "RC4",
+      "game_object": "DL-030",
+      "svg": "source/svg/public-garden-drop.svg",
+      "preview_png": "build/png_256/public-garden-drop.png",
+      "style": "DL-ISO30-PAPER-WORLD-01",
+      "status": "CANDIDATE_NOT_DEPLOYED",
+      "geometry": "ISO30-style illustration; CU collision governed separately by engine",
+      "sha256": "0fc827fefc519006e62b2b1e32f61914c8667097b5766e710c7951c898cbae66",
+      "qa": {
+        "svg_valid": true,
+        "transparent_corner": true,
+        "safe_margin": true,
+        "bbox": [
+          77,
+          134,
+          178,
+          239
+        ]
+      }
+    },
+    {
+      "batch_no": "DL-WORLD-ART-004",
+      "id": "donation-box",
+      "name": "Коробка пожертвований",
+      "category": "civic",
+      "branch": "RC4",
+      "game_object": "DL-031",
+      "svg": "source/svg/donation-box.svg",
+      "preview_png": "build/png_256/donation-box.png",
+      "style": "DL-ISO30-PAPER-WORLD-01",
+      "status": "CANDIDATE_NOT_DEPLOYED",
+      "geometry": "ISO30-style illustration; CU collision governed separately by engine",
+      "sha256": "3a4ad4659d30232fcba60d00ce093601fb595f5382cc3f2bd181e52b68851d9b",
+      "qa": {
+        "svg_valid": true,
+        "transparent_corner": true,
+        "safe_margin": true,
+        "bbox": [
+          84,
+          131,
+          172,
+          229
+        ]
+      }
+    },
+    {
+      "batch_no": "DL-WORLD-ART-005",
+      "id": "monument-pedestal",
+      "name": "Пьедестал памятника",
+      "category": "civic",
+      "branch": "RC4",
+      "game_object": "DL-034",
+      "svg": "source/svg/monument-pedestal.svg",
+      "preview_png": "build/png_256/monument-pedestal.png",
+      "style": "DL-ISO30-PAPER-WORLD-01",
+      "status": "CANDIDATE_NOT_DEPLOYED",
+      "geometry": "ISO30-style illustration; CU collision governed separately by engine",
+      "sha256": "4ce027a487ec9b14ec4d208e86ea1dcdec60645f368643e361cea78f9f1f0620",
+      "qa": {
+        "svg_valid": true,
+        "transparent_corner": true,
+        "safe_margin": true,
+        "bbox": [
+          71,
+          100,
+          185,
+          241
+        ]
+      }
+    },
+    {
+      "batch_no": "DL-WORLD-ART-006",
+      "id": "jukebox",
+      "name": "Музыкальный автомат",
+      "category": "civic",
+      "branch": "RC4",
+      "game_object": "DL-035",
+      "svg": "source/svg/jukebox.svg",
+      "preview_png": "build/png_256/jukebox.png",
+      "style": "DL-ISO30-PAPER-WORLD-01",
+      "status": "CANDIDATE_NOT_DEPLOYED",
+      "geometry": "ISO30-style illustration; CU collision governed separately by engine",
+      "sha256": "c7956ba7a41445dea81c61d9adcc4f0c50acd8a10530dbfa350730fe3a6663d0",
+      "qa": {
+        "svg_valid": true,
+        "transparent_corner": true,
+        "safe_margin": true,
+        "bbox": [
+          89,
+          87,
+          167,
+          243
+        ]
+      }
+    },
+    {
+      "batch_no": "DL-WORLD-ART-007",
+      "id": "survey-marker",
+      "name": "Межевой столбик",
+      "category": "civic",
+      "branch": "RC4",
+      "game_object": "DL-037",
+      "svg": "source/svg/survey-marker.svg",
+      "preview_png": "build/png_256/survey-marker.png",
+      "style": "DL-ISO30-PAPER-WORLD-01",
+      "status": "CANDIDATE_NOT_DEPLOYED",
+      "geometry": "ISO30-style illustration; CU collision governed separately by engine",
+      "sha256": "945012a256d95e142e91fbb7c10790c2479c7bc3b0a50729a7991861d500ca21",
+      "qa": {
+        "svg_valid": true,
+        "transparent_corner": true,
+        "safe_margin": true,
+        "bbox": [
+          119,
+          134,
+          139,
+          208
+        ]
+      }
+    },
+    {
+      "batch_no": "DL-WORLD-ART-008",
+      "id": "city-water",
+      "name": "Общественный источник воды",
+      "category": "civic",
+      "branch": "RC4",
+      "game_object": "DL-041",
+      "svg": "source/svg/city-water.svg",
+      "preview_png": "build/png_256/city-water.png",
+      "style": "DL-ISO30-PAPER-WORLD-01",
+      "status": "CANDIDATE_NOT_DEPLOYED",
+      "geometry": "ISO30-style illustration; CU collision governed separately by engine",
+      "sha256": "87301ed07ac27e6b5f28454612bd54c7652336d385c9f98df8bc1dcab00b4e29",
+      "qa": {
+        "svg_valid": true,
+        "transparent_corner": true,
+        "safe_margin": true,
+        "bbox": [
+          75,
+          73,
+          180,
+          236
+        ]
+      }
+    },
+    {
+      "batch_no": "DL-WORLD-ART-009",
+      "id": "dropped-cargo",
+      "name": "Выложенные вещи на земле",
+      "category": "prop",
+      "branch": "RC4",
+      "game_object": "DL-047",
+      "svg": "source/svg/dropped-cargo.svg",
+      "preview_png": "build/png_256/dropped-cargo.png",
+      "style": "DL-ISO30-PAPER-WORLD-01",
+      "status": "CANDIDATE_NOT_DEPLOYED",
+      "geometry": "ISO30-style illustration; CU collision governed separately by engine",
+      "sha256": "2740b25a01e1212ff374a51931bc980dcac8229f7649e89acfa16921924f5241",
+      "qa": {
+        "svg_valid": true,
+        "transparent_corner": true,
+        "safe_margin": true,
+        "bbox": [
+          99,
+          136,
+          157,
+          213
+        ]
+      }
+    },
+    {
+      "batch_no": "DL-WORLD-ART-010",
+      "id": "stone-cluster-2",
+      "name": "Залежь камня 2×2",
+      "category": "nature",
+      "branch": "RC4",
+      "game_object": "DL-054",
+      "svg": "source/svg/stone-cluster-2.svg",
+      "preview_png": "build/png_256/stone-cluster-2.png",
+      "style": "DL-ISO30-PAPER-WORLD-01",
+      "status": "CANDIDATE_NOT_DEPLOYED",
+      "geometry": "ISO30-style illustration; CU collision governed separately by engine",
+      "sha256": "a1d8b5cdc0da330ba3ac8d76b29d53fa1fd90b71fb18884b17b192a0404e1029",
+      "qa": {
+        "svg_valid": true,
+        "transparent_corner": true,
+        "safe_margin": true,
+        "bbox": [
+          86,
+          125,
+          171,
+          208
+        ]
+      }
+    },
+    {
+      "batch_no": "DL-WORLD-ART-011",
+      "id": "stone-cluster-5",
+      "name": "Залежь камня 5×5",
+      "category": "nature",
+      "branch": "RC4",
+      "game_object": "DL-054",
+      "svg": "source/svg/stone-cluster-5.svg",
+      "preview_png": "build/png_256/stone-cluster-5.png",
+      "style": "DL-ISO30-PAPER-WORLD-01",
+      "status": "CANDIDATE_NOT_DEPLOYED",
+      "geometry": "ISO30-style illustration; CU collision governed separately by engine",
+      "sha256": "2002a94be2cb07593288ce1bb70bef9d0b98ba54d3350893e023d09b0dd26fc6",
+      "qa": {
+        "svg_valid": true,
+        "transparent_corner": true,
+        "safe_margin": true,
+        "bbox": [
+          69,
+          94,
+          188,
+          208
+        ]
+      }
+    },
+    {
+      "batch_no": "DL-WORLD-ART-012",
+      "id": "desert-cactus",
+      "name": "Кактус пустынного биома",
+      "category": "nature",
+      "branch": "RC4",
+      "game_object": "world-desert-cactus",
+      "svg": "source/svg/desert-cactus.svg",
+      "preview_png": "build/png_256/desert-cactus.png",
+      "style": "DL-ISO30-PAPER-WORLD-01",
+      "status": "CANDIDATE_NOT_DEPLOYED",
+      "geometry": "ISO30-style illustration; CU collision governed separately by engine",
+      "sha256": "e01e6f80146156ad70be5ce30d98d68e581416ab404a59f5ad5ffd905d68b1bd",
+      "qa": {
+        "svg_valid": true,
+        "transparent_corner": true,
+        "safe_margin": true,
+        "bbox": [
+          87,
+          103,
+          167,
+          204
+        ]
+      }
+    },
+    {
+      "batch_no": "DL-WORLD-ART-013",
+      "id": "mountain-cliff",
+      "name": "Скала горного массива",
+      "category": "nature",
+      "branch": "RC4",
+      "game_object": "world-mountain-cliff",
+      "svg": "source/svg/mountain-cliff.svg",
+      "preview_png": "build/png_256/mountain-cliff.png",
+      "style": "DL-ISO30-PAPER-WORLD-01",
+      "status": "CANDIDATE_NOT_DEPLOYED",
+      "geometry": "ISO30-style illustration; CU collision governed separately by engine",
+      "sha256": "f9c97a491508ccf72c0388f43300be98ac611a29dcc7dc793e70f16763c08373",
+      "qa": {
+        "svg_valid": true,
+        "transparent_corner": true,
+        "safe_margin": true,
+        "bbox": [
+          50,
+          70,
+          209,
+          209
+        ]
+      }
+    },
+    {
+      "batch_no": "DL-WORLD-ART-014",
+      "id": "mountain-trail-sign",
+      "name": "Указатель горной тропы",
+      "category": "civic",
+      "branch": "RC4",
+      "game_object": "world-mountain-route",
+      "svg": "source/svg/mountain-trail-sign.svg",
+      "preview_png": "build/png_256/mountain-trail-sign.png",
+      "style": "DL-ISO30-PAPER-WORLD-01",
+      "status": "CANDIDATE_NOT_DEPLOYED",
+      "geometry": "ISO30-style illustration; CU collision governed separately by engine",
+      "sha256": "a5fa087494ad045df461d9b5b24664f2ecba0d4cc5ff4104cb2864da8f846e5d",
+      "qa": {
+        "svg_valid": true,
+        "transparent_corner": true,
+        "safe_margin": true,
+        "bbox": [
+          76,
+          115,
+          183,
+          218
+        ]
+      }
+    },
+    {
+      "batch_no": "DL-WORLD-ART-015",
+      "id": "second-bridge",
+      "name": "Второй мост · готовое состояние",
+      "category": "building",
+      "branch": "RC4",
+      "game_object": "world-bridge-02",
+      "svg": "source/svg/second-bridge.svg",
+      "preview_png": "build/png_256/second-bridge.png",
+      "style": "DL-ISO30-PAPER-WORLD-01",
+      "status": "CANDIDATE_NOT_DEPLOYED",
+      "geometry": "ISO30-style illustration; CU collision governed separately by engine",
+      "sha256": "18576aa833bcc9bf56154a92a81bd16019438a836c7ffde0a2c052bd94ad8fb0",
+      "qa": {
+        "svg_valid": true,
+        "transparent_corner": true,
+        "safe_margin": true,
+        "bbox": [
+          57,
+          94,
+          205,
+          221
+        ]
+      }
+    },
+    {
+      "batch_no": "DL-WORLD-ART-016",
+      "id": "payphone",
+      "name": "Уличный таксофон",
+      "category": "civic",
+      "branch": "RC4",
+      "game_object": "world-payphone",
+      "svg": "source/svg/payphone.svg",
+      "preview_png": "build/png_256/payphone.png",
+      "style": "DL-ISO30-PAPER-WORLD-01",
+      "status": "CANDIDATE_NOT_DEPLOYED",
+      "geometry": "ISO30-style illustration; CU collision governed separately by engine",
+      "sha256": "4589b2c8ddf019a26bc1022bf2160cff983881568a2fa89d2018603c911599ae",
+      "qa": {
+        "svg_valid": true,
+        "transparent_corner": true,
+        "safe_margin": true,
+        "bbox": [
+          94,
+          85,
+          163,
+          241
+        ]
+      }
+    },
+    {
+      "batch_no": "DL-WORLD-ART-017",
+      "id": "industrial-pavilion",
+      "name": "Промышленный павильон",
+      "category": "building",
+      "branch": "RC4",
+      "game_object": "world-industrial-pavilion",
+      "svg": "source/svg/industrial-pavilion.svg",
+      "preview_png": "build/png_256/industrial-pavilion.png",
+      "style": "DL-ISO30-PAPER-WORLD-01",
+      "status": "CANDIDATE_NOT_DEPLOYED",
+      "geometry": "ISO30-style illustration; CU collision governed separately by engine",
+      "sha256": "82619e38e04655f873951082ed67918689d123cb4b569285236f97228ec801ad",
+      "qa": {
+        "svg_valid": true,
+        "transparent_corner": true,
+        "safe_margin": true,
+        "bbox": [
+          55,
+          67,
+          201,
+          235
+        ]
+      }
+    },
+    {
+      "batch_no": "DL-WORLD-ART-018",
+      "id": "garden-sapling",
+      "name": "Дерево: стадия саженца",
+      "category": "nature",
+      "branch": "RC4",
+      "game_object": "world-forestry-sapling",
+      "svg": "source/svg/garden-sapling.svg",
+      "preview_png": "build/png_256/garden-sapling.png",
+      "style": "DL-ISO30-PAPER-WORLD-01",
+      "status": "CANDIDATE_NOT_DEPLOYED",
+      "geometry": "ISO30-style illustration; CU collision governed separately by engine",
+      "sha256": "8ecb8fc003a25f061c27d9d4a42e3c38c09968647c57b96d41ae98cce54cec09",
+      "qa": {
+        "svg_valid": true,
+        "transparent_corner": true,
+        "safe_margin": true,
+        "bbox": [
+          100,
+          137,
+          164,
+          210
+        ]
+      }
+    },
+    {
+      "batch_no": "DL-WORLD-ART-019",
+      "id": "garden-grown-spruce",
+      "name": "Выращенная ель · взрослая",
+      "category": "nature",
+      "branch": "RC4",
+      "game_object": "world-forestry-spruce",
+      "svg": "source/svg/garden-grown-spruce.svg",
+      "preview_png": "build/png_256/garden-grown-spruce.png",
+      "style": "DL-ISO30-PAPER-WORLD-01",
+      "status": "CANDIDATE_NOT_DEPLOYED",
+      "geometry": "ISO30-style illustration; CU collision governed separately by engine",
+      "sha256": "b64d44664e1825d5b80346e0c8b656d6ddfa87a55107c6d61f75fdf5c7fc2443",
+      "qa": {
+        "svg_valid": true,
+        "transparent_corner": true,
+        "safe_margin": true,
+        "bbox": [
+          71,
+          61,
+          184,
+          209
+        ]
+      }
+    },
+    {
+      "batch_no": "DL-WORLD-ART-020",
+      "id": "interior-room",
+      "name": "Внутренняя комната: угол стен",
+      "category": "interior",
+      "branch": "GRID-02",
+      "game_object": "room-wall",
+      "svg": "source/svg/interior-room.svg",
+      "preview_png": "build/png_256/interior-room.png",
+      "style": "DL-ISO30-PAPER-WORLD-01",
+      "status": "CANDIDATE_NOT_DEPLOYED",
+      "geometry": "ISO30-style illustration; CU collision governed separately by engine",
+      "sha256": "bb823f89ccee06c24297118f1eb93fd10341d11d99b5adf14e64516d61684f2c",
+      "qa": {
+        "svg_valid": true,
+        "transparent_corner": true,
+        "safe_margin": true,
+        "bbox": [
+          55,
+          75,
+          201,
+          221
+        ]
+      }
+    },
+    {
+      "batch_no": "DL-WORLD-ART-021",
+      "id": "interior-chest",
+      "name": "Сундук в интерьере",
+      "category": "furniture",
+      "branch": "GRID-02",
+      "game_object": "chest",
+      "svg": "source/svg/interior-chest.svg",
+      "preview_png": "build/png_256/interior-chest.png",
+      "style": "DL-ISO30-PAPER-WORLD-01",
+      "status": "CANDIDATE_NOT_DEPLOYED",
+      "geometry": "ISO30-style illustration; CU collision governed separately by engine",
+      "sha256": "6da38b6d2d230da3d15349cff4499828e5bd99993acf8a057bf23c0e0a25c206",
+      "qa": {
+        "svg_valid": true,
+        "transparent_corner": true,
+        "safe_margin": true,
+        "bbox": [
+          75,
+          139,
+          181,
+          234
+        ]
+      }
+    },
+    {
+      "batch_no": "DL-WORLD-ART-022",
+      "id": "interior-bed",
+      "name": "Кровать в интерьере",
+      "category": "furniture",
+      "branch": "GRID-02",
+      "game_object": "bed",
+      "svg": "source/svg/interior-bed.svg",
+      "preview_png": "build/png_256/interior-bed.png",
+      "style": "DL-ISO30-PAPER-WORLD-01",
+      "status": "CANDIDATE_NOT_DEPLOYED",
+      "geometry": "ISO30-style illustration; CU collision governed separately by engine",
+      "sha256": "b73fd697c0b6fb8ddccbfc9af653fba354a7ced791521d5273dee5046d66c01d",
+      "qa": {
+        "svg_valid": true,
+        "transparent_corner": true,
+        "safe_margin": true,
+        "bbox": [
+          65,
+          132,
+          191,
+          225
+        ]
+      }
+    },
+    {
+      "batch_no": "DL-WORLD-ART-023",
+      "id": "interior-table",
+      "name": "Стол для внутренних помещений",
+      "category": "furniture",
+      "branch": "GRID-02",
+      "game_object": "interior-table-proposal",
+      "svg": "source/svg/interior-table.svg",
+      "preview_png": "build/png_256/interior-table.png",
+      "style": "DL-ISO30-PAPER-WORLD-01",
+      "status": "CANDIDATE_NOT_DEPLOYED",
+      "geometry": "ISO30-style illustration; CU collision governed separately by engine",
+      "sha256": "86bc470dfd73be75e01d7fe0fda52fde931a1cbc16bcbafa93d127467f151630",
+      "qa": {
+        "svg_valid": true,
+        "transparent_corner": true,
+        "safe_margin": true,
+        "bbox": [
+          71,
+          115,
+          185,
+          215
+        ]
+      }
+    },
+    {
+      "batch_no": "DL-WORLD-ART-024",
+      "id": "interior-chair",
+      "name": "Стул для внутренних помещений",
+      "category": "furniture",
+      "branch": "GRID-02",
+      "game_object": "DL-NEW-CHAIR-01",
+      "svg": "source/svg/interior-chair.svg",
+      "preview_png": "build/png_256/interior-chair.png",
+      "style": "DL-ISO30-PAPER-WORLD-01",
+      "status": "CANDIDATE_NOT_DEPLOYED",
+      "geometry": "ISO30-style illustration; CU collision governed separately by engine",
+      "sha256": "87f037e9cc8992194d24f364f4d29dc1a61d7cf3f660818b52b8dd6802881f02",
+      "qa": {
+        "svg_valid": true,
+        "transparent_corner": true,
+        "safe_margin": true,
+        "bbox": [
+          91,
+          90,
+          164,
+          214
+        ]
+      }
+    },
+    {
+      "batch_no": "DL-WORLD-ART-025",
+      "id": "ideas-forest-billboard",
+      "name": "Информационный билборд леса идей",
+      "category": "civic",
+      "branch": "WORLD-01",
+      "game_object": "world01-billboard",
+      "svg": "source/svg/ideas-forest-billboard.svg",
+      "preview_png": "build/png_256/ideas-forest-billboard.png",
+      "style": "DL-ISO30-PAPER-WORLD-01",
+      "status": "CANDIDATE_NOT_DEPLOYED",
+      "geometry": "ISO30-style illustration; CU collision governed separately by engine",
+      "sha256": "0468c7c39284c100e82f7835995b4ef3e0f833f94a36bbbfe63cc54099b88ee9",
+      "qa": {
+        "svg_valid": true,
+        "transparent_corner": true,
+        "safe_margin": true,
+        "bbox": [
+          76,
+          102,
+          180,
+          220
+        ]
+      }
+    },
+    {
+      "batch_no": "DL-WORLD-ART-026",
+      "id": "ideas-forest-portal",
+      "name": "Портал леса идей",
+      "category": "civic",
+      "branch": "WORLD-01",
+      "game_object": "world01-portal",
+      "svg": "source/svg/ideas-forest-portal.svg",
+      "preview_png": "build/png_256/ideas-forest-portal.png",
+      "style": "DL-ISO30-PAPER-WORLD-01",
+      "status": "CANDIDATE_NOT_DEPLOYED",
+      "geometry": "ISO30-style illustration; CU collision governed separately by engine",
+      "sha256": "851758eac46221d003107d75882820560bce6ae7f5774e582baba1ce8a4c92bc",
+      "qa": {
+        "svg_valid": true,
+        "transparent_corner": true,
+        "safe_margin": true,
+        "bbox": [
+          82,
+          70,
+          174,
+          203
+        ]
+      }
+    },
+    {
+      "batch_no": "DL-WORLD-ART-027",
+      "id": "ideas-forest-scooter",
+      "name": "Стойка самоката",
+      "category": "prop",
+      "branch": "WORLD-01",
+      "game_object": "world01-scooter-rack",
+      "svg": "source/svg/ideas-forest-scooter.svg",
+      "preview_png": "build/png_256/ideas-forest-scooter.png",
+      "style": "DL-ISO30-PAPER-WORLD-01",
+      "status": "CANDIDATE_NOT_DEPLOYED",
+      "geometry": "ISO30-style illustration; CU collision governed separately by engine",
+      "sha256": "dfd93b4d401354618b1575b108a8a50e6d2545c3103058901080631be34805ef",
+      "qa": {
+        "svg_valid": true,
+        "transparent_corner": true,
+        "safe_margin": true,
+        "bbox": [
+          71,
+          120,
+          178,
+          219
+        ]
+      }
+    },
+    {
+      "batch_no": "DL-WORLD-ART-028",
+      "id": "mentalhumor-museum",
+      "name": "Музей смеха · здание",
+      "category": "building",
+      "branch": "WORLD-02",
+      "game_object": "mentalhumor-museum",
+      "svg": "source/svg/mentalhumor-museum.svg",
+      "preview_png": "build/png_256/mentalhumor-museum.png",
+      "style": "DL-ISO30-PAPER-WORLD-01",
+      "status": "CANDIDATE_NOT_DEPLOYED",
+      "geometry": "ISO30-style illustration; CU collision governed separately by engine",
+      "sha256": "54aeb40f58b3f67cc6d1430da1e894243f3ae73bce46c92bc1c4e007a5d3ad63",
+      "qa": {
+        "svg_valid": true,
+        "transparent_corner": true,
+        "safe_margin": true,
+        "bbox": [
+          49,
+          69,
+          207,
+          245
+        ]
+      }
+    },
+    {
+      "batch_no": "DL-WORLD-ART-029",
+      "id": "mentalhumor-exhibit",
+      "name": "Исследовательский стенд музея",
+      "category": "furniture",
+      "branch": "WORLD-02",
+      "game_object": "mentalhumor-research-demo",
+      "svg": "source/svg/mentalhumor-exhibit.svg",
+      "preview_png": "build/png_256/mentalhumor-exhibit.png",
+      "style": "DL-ISO30-PAPER-WORLD-01",
+      "status": "CANDIDATE_NOT_DEPLOYED",
+      "geometry": "ISO30-style illustration; CU collision governed separately by engine",
+      "sha256": "24b320f489a6bcc973e852c7a124c6bc0fefe317d7dfd18e28bcf6d3e1a77822",
+      "qa": {
+        "svg_valid": true,
+        "transparent_corner": true,
+        "safe_margin": true,
+        "bbox": [
+          79,
+          91,
+          177,
+          237
+        ]
+      }
+    },
+    {
+      "batch_no": "DL-WORLD-ART-030",
+      "id": "cave-lantern",
+      "name": "Фонарь для пещеры",
+      "category": "prop",
+      "branch": "CAVE-P0",
+      "game_object": "cave-lantern",
+      "svg": "source/svg/cave-lantern.svg",
+      "preview_png": "build/png_256/cave-lantern.png",
+      "style": "DL-ISO30-PAPER-WORLD-01",
+      "status": "CANDIDATE_NOT_DEPLOYED",
+      "geometry": "ISO30-style illustration; CU collision governed separately by engine",
+      "sha256": "aaab1d3913019c9e07701ff49e24e083fa29b68e90d8e798a2d6bd5188fdfb97",
+      "qa": {
+        "svg_valid": true,
+        "transparent_corner": true,
+        "safe_margin": true,
+        "bbox": [
+          92,
+          91,
+          165,
+          229
+        ]
+      }
+    },
+    {
+      "batch_no": "DL-WORLD-ART-031",
+      "id": "cave-secret-door",
+      "name": "Секретная дверь пещеры",
+      "category": "building",
+      "branch": "CAVE-P0",
+      "game_object": "cave-secret-door",
+      "svg": "source/svg/cave-secret-door.svg",
+      "preview_png": "build/png_256/cave-secret-door.png",
+      "style": "DL-ISO30-PAPER-WORLD-01",
+      "status": "CANDIDATE_NOT_DEPLOYED",
+      "geometry": "ISO30-style illustration; CU collision governed separately by engine",
+      "sha256": "4ede614aa14ce75504f63b72dece443b15bbb790c3e11e273ff055a0a7bd1bc9",
+      "qa": {
+        "svg_valid": true,
+        "transparent_corner": true,
+        "safe_margin": true,
+        "bbox": [
+          95,
+          97,
+          164,
+          200
+        ]
+      }
+    },
+    {
+      "batch_no": "DL-WORLD-ART-032",
+      "id": "cave-altar",
+      "name": "Алтарь за секретной дверью",
+      "category": "furniture",
+      "branch": "CAVE-P0",
+      "game_object": "cave-altar",
+      "svg": "source/svg/cave-altar.svg",
+      "preview_png": "build/png_256/cave-altar.png",
+      "style": "DL-ISO30-PAPER-WORLD-01",
+      "status": "CANDIDATE_NOT_DEPLOYED",
+      "geometry": "ISO30-style illustration; CU collision governed separately by engine",
+      "sha256": "de715081b84f52ff1918ec48e3a096b2bfbd0954f1709535d76238a5aa417c69",
+      "qa": {
+        "svg_valid": true,
+        "transparent_corner": true,
+        "safe_margin": true,
+        "bbox": [
+          67,
+          123,
+          189,
+          247
+        ]
+      }
+    },
+    {
+      "batch_no": "DL-WORLD-ART-033",
+      "id": "cave-bat",
+      "name": "Летучая мышь пещеры",
+      "category": "nature",
+      "branch": "CAVE-P0",
+      "game_object": "cave-bats",
+      "svg": "source/svg/cave-bat.svg",
+      "preview_png": "build/png_256/cave-bat.png",
+      "style": "DL-ISO30-PAPER-WORLD-01",
+      "status": "CANDIDATE_NOT_DEPLOYED",
+      "geometry": "ISO30-style illustration; CU collision governed separately by engine",
+      "sha256": "81b97ca0c860c45560b90bd77fe02e3c57b17242a3d0cafcf18c12471f6c395b",
+      "qa": {
+        "svg_valid": true,
+        "transparent_corner": true,
+        "safe_margin": true,
+        "bbox": [
+          62,
+          115,
+          196,
+          186
+        ]
+      }
+    },
+    {
+      "batch_no": "DL-WORLD-ART-034",
+      "id": "obitel-black-arch",
+      "name": "Чёрная арка входа ZEN",
+      "category": "building",
+      "branch": "OBITEL-P0",
+      "game_object": "obitel-zen-arch",
+      "svg": "source/svg/obitel-black-arch.svg",
+      "preview_png": "build/png_256/obitel-black-arch.png",
+      "style": "DL-ISO30-PAPER-WORLD-01",
+      "status": "CANDIDATE_NOT_DEPLOYED",
+      "geometry": "ISO30-style illustration; CU collision governed separately by engine",
+      "sha256": "b070e8fe46b6b053107f3618c068c8782a09c58e6ca263fe0e212441311a3e8e",
+      "qa": {
+        "svg_valid": true,
+        "transparent_corner": true,
+        "safe_margin": true,
+        "bbox": [
+          82,
+          75,
+          172,
+          208
+        ]
+      }
+    },
+    {
+      "batch_no": "DL-WORLD-ART-035",
+      "id": "obitel-card-station",
+      "name": "Карточка ZEN (7 позиций)",
+      "category": "civic",
+      "branch": "OBITEL-P0",
+      "game_object": "OB-C01..OB-C07",
+      "svg": "source/svg/obitel-card-station.svg",
+      "preview_png": "build/png_256/obitel-card-station.png",
+      "style": "DL-ISO30-PAPER-WORLD-01",
+      "status": "CANDIDATE_NOT_DEPLOYED",
+      "geometry": "ISO30-style illustration; CU collision governed separately by engine",
+      "sha256": "685845e997572c0ebda5f9e8141ace11073c32744edcdce6cdb46be7eda15009",
+      "qa": {
+        "svg_valid": true,
+        "transparent_corner": true,
+        "safe_margin": true,
+        "bbox": [
+          80,
+          107,
+          176,
+          216
+        ]
+      }
+    }
+  ]
+}
