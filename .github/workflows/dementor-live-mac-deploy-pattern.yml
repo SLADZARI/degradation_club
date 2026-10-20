@@ -6,6 +6,7 @@ on:
   pull_request:
     paths:
       - 'projects/dementor-live/runtime/deploy/mac-safe-release.sh'
+      - 'projects/dementor-live/runtime/deploy/mac-production-audit.sh'
       - 'projects/dementor-live/runtime/deploy/MAC_RELEASE_PATTERN.md'
       - '.github/workflows/dementor-live-mac-deploy-pattern.yml'
 permissions:
@@ -18,6 +19,7 @@ jobs:
       - name: Shell syntax only — NEVER execute a production connection
         run: |
           bash -n projects/dementor-live/runtime/deploy/mac-safe-release.sh
+          bash -n projects/dementor-live/runtime/deploy/mac-production-audit.sh
           bash -n projects/dementor-live/runtime/deploy/publish-preserve-world.sh
       - name: Ensure fixed SSH identity, exact build and CI gates are present
         run: |
@@ -37,5 +39,14 @@ jobs:
           assert 'safe-20261020T180923Z-970882dee4/world.json' in s
           assert '--mount "type=bind,source=$LAST_FROZEN_BACKUP,target=/readonly/world.json,readonly"' in s
           assert 'down -v' not in s and '--reset-world' not in s
+          audit=Path('projects/dementor-live/runtime/deploy/mac-production-audit.sh').read_text()
+          assert '$HOME/Downloads/dementor_server' in audit
+          assert 'IdentitiesOnly=yes' in audit and 'BatchMode=yes' in audit
+          assert 'ConnectionAttempts=1' in audit
+          assert audit.count('ssh "') == 1
+          assert 'release-manifest.txt' in audit and '/app/data/world.json' in audit
+          assert 'sha256sum' in audit and 'docker exec -i' in audit
+          assert not any(x in audit for x in ('--apply','down -v','--reset-world','docker stop','docker compose up','docker tag','docker rm','rm -rf','docker volume rm'))
+          print('PASS: Mac G7 read-only SSH attestation with one key and no mutating commands')
           print('PASS: local Mac release pattern includes CI, 1 SSH key, safe backup and no world-reset commands')
           PY
