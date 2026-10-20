@@ -29,8 +29,15 @@ CONTAINER="$(docker compose -p "$PROJECT" -f "$COMPOSE" --env-file "$ENV_FILE" p
 [[ "$(docker inspect "$CONTAINER" --format '{{index .Config.Labels "com.docker.compose.project"}}')" == "$PROJECT" ]] || fail 'Unexpected container owner'
 [[ "$(docker inspect "$CONTAINER" --format '{{index .Config.Labels "com.docker.compose.service"}}')" == "$SERVICE" ]] || fail 'Unexpected container service'
 docker image inspect dementor-live:local >/dev/null || fail 'Existing game image not present'
+# Public origin is already configured in the running container. Loopback:14173 is
+# a Docker proxy port, NOT an allowed HTTP Host on the application port 4173.
+PUBLIC_URL="$(docker inspect "$CONTAINER" --format '{{range .Config.Env}}{{println .}}{{end}}' | awk -F= '$1=="DEMENTOR_PUBLIC_URL"{sub(/^[^=]*=/,"");print;exit}')"
+[[ "$PUBLIC_URL" =~ ^https?://[^/]+/?$ ]] || fail 'Current container has no valid DEMENTOR_PUBLIC_URL'
+PUBLIC_HOST="${PUBLIC_URL#*://}"
+PUBLIC_HOST="${PUBLIC_HOST%%/*}"
+LOCAL_URL="http://127.0.0.1:$PORT"
 echo "CHECK: source=$ACTUAL_SHA version=$EXPECTED_VERSION existing container=$CONTAINER volume=$VOLUME"
-echo "LIVE HEALTH: $(curl --max-time 5 -fsS "http://127.0.0.1:$PORT/api/health" || echo 'unavailable')"
+echo "LIVE HEALTH: $(curl --max-time 5 -fsS -H "Host: $PUBLIC_HOST" "$LOCAL_URL/api/health" || echo 'unavailable')"
 if [[ "$MODE" == "--dry-run" ]];then
  echo 'DRY RUN PASS: no container, volume or save modified. To deploy, provide --apply and exact commit SHA.'
  exit 0
@@ -90,13 +97,13 @@ docker tag "$NEW_IMAGE" dementor-live:local
 docker compose -p "$PROJECT" -f "$COMPOSE" --env-file "$ENV_FILE" up -d --no-deps --no-build --force-recreate "$SERVICE"
 READY=0
 for i in $(seq 1 40);do
- if curl --max-time 3 -fsS "http://127.0.0.1:$PORT/api/health" | grep -Fq "\"version\":\"$EXPECTED_VERSION\"";then READY=1;break;fi
+ if curl --max-time 3 -fsS -H "Host: $PUBLIC_HOST" "$LOCAL_URL/api/health" | grep -Fq "\"version\":\"$EXPECTED_VERSION\"";then READY=1;break;fi
  sleep 1
 done
 [[ "$READY" == 1 ]] || fail 'New game health/version check failed'
-curl --max-time 5 -fsS "http://127.0.0.1:$PORT/" >/dev/null || fail 'Game index route unavailable'
+curl --max-time 5 -fsS -H "Host: $PUBLIC_HOST" "$LOCAL_URL/" >/dev/null || fail 'Game index route unavailable'
 for icon in /paper-icons.js /paper-icons.css /assets/paper-icons/paper_atlas_64.png /assets/paper-icons/png_256/wood.png;do
-  curl --max-time 5 -fsS "http://127.0.0.1:$PORT$icon" >/dev/null || fail "Canonical icon asset missing after cutover: $icon"
+  curl --max-time 5 -fsS -H "Host: $PUBLIC_HOST" "$LOCAL_URL$icon" >/dev/null || fail "Canonical icon asset missing after cutover: $icon"
 done
 docker compose -p "$PROJECT" -f "$COMPOSE" --env-file "$ENV_FILE" ps "$SERVICE"
 printf 'approved_sha=%s\nversion=%s\nbackup=%s\n' "$ACTUAL_SHA" "$EXPECTED_VERSION" "$BACKUP" > "$BACKUP/release-manifest.txt"
