@@ -32,7 +32,23 @@ async function run(){
  for(const file of basic)await probe('asset:'+file,file,d=>isTextJS(d));
  const png=['/assets/paper-icons/paper_atlas_64.png','/assets/paper-icons/png_256/wood.png'];
  for(const file of png)await probe('png:'+file,file,isPNG);
- if(report.liveVersion==='0.5.0-rc.4')await probe('RC4:terrain-script','/terrain-01.js',isTextJS);
+ if(report.liveVersion==='0.5.0-rc.4'){
+  await probe('RC4:terrain-script','/terrain-01.js',isTextJS);
+  await probe('RC4:v3-icons-script','/new-icons-v3.js',isTextJS);
+  await probe('RC4:v3-manifest','/assets/paper-icons-new-v3/manifest-new-only.json',d=>{
+   try{return d.code===200&&Array.isArray(JSON.parse(d.bytes.toString('utf8')).items)&&JSON.parse(d.bytes.toString('utf8')).items.length===42}catch{return false}
+  });
+  const terrain=await probe('RC4:terrain-manifest','/assets/terrain/manifest.json',d=>{
+   try{const v=JSON.parse(d.bytes.toString('utf8'));return d.code===200&&v.schema==='DL-TERRAIN-01'&&!!v.atlas?.['256']?.file}catch{return false}
+  });
+  if(terrain?.code===200){
+   try{
+    const m=JSON.parse(terrain.bytes.toString('utf8'));
+    const atlas=m.atlas['256'];
+    await probe('RC4:terrain-atlas-256','/assets/terrain/'+atlas.file,d=>d.code===200&&d.mime.startsWith('image/')&&d.bytes.length>4000);
+   }catch(e){add('RC4:terrain-atlas-256',false,{error:String(e.message||e).slice(0,110)})}
+  }
+ }
  // Permission check: inspect HTTP STATUS ONLY. Do NOT print anonymous game-state response.
  try{const r=await doGet('/api/state');add('anonymous-state-access-blocked',[400,401,403].includes(r.code),{status:r.code,bodyRedacted:true});}
  catch(e){add('anonymous-state-access-blocked',false,{error:String(e.message||e).slice(0,130)});}
