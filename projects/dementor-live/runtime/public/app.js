@@ -375,10 +375,9 @@ function terrainPlacementReason(t){
    if(!p.owner)return 'Участок зарезервирован для покупки';
    if(p.owner!==me.id)return 'Чужая территория';
  }
- if((state.citySolids||[]).some(o=>t.x<o.x+o.w&&t.x+1>o.x&&t.y<o.y+o.h&&t.y+1>o.y+o.h))return 'Клетка пересекается со зданием';
+ if((state.citySolids||[]).some(o=>t.x<o.x+o.w&&t.x+1>o.x&&t.y<o.y+o.h&&t.y+1>o.y))return 'Клетка пересекается со зданием';
  if((state.resources||[]).some(o=>o.stock>0&&o.type!=='food'&&Math.hypot(Math.max(t.x,Math.min(t.x+1,o.x))-o.x,Math.max(t.y,Math.min(t.y+1,o.y))-o.y)<.58))return 'Клетка пересекается с ресурсом';
- for(const [dx,dy] of [[.5,.5],[.2,.2],[.8,.2],[.2,.8],[.8,.8]])
-   if(blocked(t.x+dx,t.y+dy))return 'Клетка занята зданием или препятствием';
+ if(blocked(t.x+.5,t.y+.5))return 'Клетка занята зданием или препятствием';
  return '';
 }
 function updateTerrainDock(){
