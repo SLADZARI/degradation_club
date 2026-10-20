@@ -7,7 +7,7 @@ export function createQARecorder(stateFile,{enabled=true}={}){
  const startedAt=Date.now(),sessionId=startedAt+'-'+randomUUID().slice(0,8);
  const base=path.dirname(stateFile),folder=path.join(base,'qa-recordings');if(enabled)fs.mkdirSync(folder,{recursive:true});
  const file=path.join(folder,'session-'+sessionId+'.ndjson');
- const players=new Map(),lastMotion=new Map();let sequence=0;
+ const lastMotion=new Map(),lastState=new Map();let sequence=0;
  const write=(type,data={})=>{
    const record={seq:++sequence,sessionId,wallTime:new Date().toISOString(),offsetMs:Date.now()-startedAt,type,...data};
    if(enabled)fs.appendFileSync(file,JSON.stringify(record)+'\n',{encoding:'utf8',flag:'a'});
@@ -21,6 +21,19 @@ export function createQARecorder(stateFile,{enabled=true}={}){
   connect(p,cityId){write('player_connect',where(p,cityId));},
   disconnect(p,cityId){write('player_disconnect',where(p,cityId));},
   input(p,cityId,input){const now=Date.now(),last=lastMotion.get(p.id)||0;if(now-last<2000)return;lastMotion.set(p.id,now);write('movement_sample',{...where(p,cityId),motion:{dx:round(input.dx),dy:round(input.dy),sprint:!!input.sprint}});},
+  sampleState(g,cityId){
+   if(!enabled)return;
+   const now=Date.now();
+   for(const p of Object.values(g.state.players)){
+    if(!g.online.has(p.id)||now-(lastState.get(p.id)||0)<2500)continue;
+    lastState.set(p.id,now);
+    const snapshot={...where(p,cityId),wallet:p.wallet,health:round(p.health),hunger:round(p.hunger),
+      bag:{wood:p.bag?.wood||0,stone:p.bag?.stone||0,food:p.bag?.food||0},
+      stage:{square:g.state.project?.stage,bridge:g.state.bridge?.stage,secondBridge:g.state.secondBridgeProject?.stage,forge:g.state.forge?.stage},
+      treasury:g.state.treasury};
+    write('player_state',snapshot);
+   }
+  },
   command(p,cityId,cmd,result,before){
     // Deliberately avoid storing private chat, pager numbers or free-text letters.
     write('game_action',{...where(p,cityId),action:String(cmd.type||'unknown').slice(0,48),target:String(cmd.target||'').slice(0,72),requestId:String(cmd.requestId||'').slice(0,100),ok:!!result.ok,walletBefore:before,walletAfter:p.wallet,deltaPaper:p.wallet-before,errorCode:result.ok?null:'ACTION_REJECTED'});
