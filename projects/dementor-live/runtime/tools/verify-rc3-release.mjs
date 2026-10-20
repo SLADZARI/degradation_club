@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 const read=name=>fs.readFileSync(new URL('../'+name,import.meta.url),'utf8');
-assert.equal(JSON.parse(read('package.json')).version,'0.5.0-rc.3');
+assert.equal(JSON.parse(read('package.json')).version,'0.5.0-rc.4');
 const world=read('world.mjs');
 for(const marker of ['evacuateNewFootprints(', 'this.evacuateNewFootprints(added)','constructionRescues'])assert.ok(world.includes(marker),'Missing anti-trap gameplay fix '+marker);
 const browser=read('test/browser.cjs');

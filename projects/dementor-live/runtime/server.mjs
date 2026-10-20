@@ -7,7 +7,8 @@ import { Game, createWorld } from './world-expansion-adapter.mjs';
 import {CityNetwork} from './city-network.mjs';
 import {createQARecorder} from './qa-recorder.mjs';
 import {scanMusic,audioDuration,PLAZA} from './plaza.mjs';
-import {createHash} from 'node:crypto';
+import {createHash,timingSafeEqual} from 'node:crypto';
+import {packTerrainSse} from './terrain-delta.mjs';
 import { CONFIG } from './config.mjs';
 import { combatRoot,createCombat,joinCombat,combatAction,combatView,advanceCombat } from './combat-p0.mjs';
 
@@ -33,7 +34,9 @@ const legacySaveRequiresBackup=fs.existsSync(stateFile)&&state?.schema!=='dement
 let legacyBackupDone=false;
 const network=new CityNetwork(state);
 const game=network.origin;
-const stateFor=p=>({...network.snapshot(p),qaMode:testMode,qaRecording:qaRecorder.enabled});
+const adminKey=String(process.env.DEMENTOR_QA_ADMIN_KEY||'');
+const adminAvailable=adminKey.length>=24&&(testMode||publicOrigin.startsWith('https://'));
+const stateFor=p=>({...network.snapshot(p),qaMode:testMode,qaRecording:qaRecorder.enabled,qaAdminAvailable:adminAvailable});
 const musicDir=path.join(root,'data','music');fs.mkdirSync(musicDir,{recursive:true});
 function refreshMusic(){network.setMusic(scanMusic([[path.join(root,'public','music'),'/music/'],[musicDir,'/custom-music/']]));}
 refreshMusic();
@@ -50,7 +53,9 @@ function save(){
   fs.renameSync(stateFile+'.tmp',stateFile);
   network.markSaved();
 }
-function broadcast(){for(const[id,set]of streams){const p=network.findId(id)?.p;if(!p)continue;const msg=`data: ${JSON.stringify(stateFor(p))}\n\n`;for(const res of set)res.write(msg);}}
+const terrainCursors=new WeakMap();
+function terrainEvent(snapshot,res){const packed=packTerrainSse(snapshot,terrainCursors.get(res));terrainCursors.set(res,packed.cursor);return `data: ${JSON.stringify(packed.snapshot)}\n\n`;}
+function broadcast(){for(const[id,set]of streams){const p=network.findId(id)?.p;if(!p)continue;const snapshot=stateFor(p);for(const res of set)res.write(terrainEvent(snapshot,res));}}
 function json(res,status,data){res.writeHead(status,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'});res.end(JSON.stringify(data));}
 async function body(req){let text='';for await(const chunk of req){text+=chunk;if(text.length>4096)throw Error('Слишком большой запрос');}return JSON.parse(text||'{}');}
 const server=http.createServer(async(req,res)=>{
@@ -74,7 +79,7 @@ const server=http.createServer(async(req,res)=>{
       const p=network.findToken(token)?.p;if(!p){json(res,401,{ok:false,message:'Войди в мир заново'});return;}
       if(url.pathname==='/api/events'){
         res.writeHead(200,{'Content-Type':'text/event-stream','Cache-Control':'no-cache, no-transform','Connection':'keep-alive','X-Accel-Buffering':'no'});
-        let set=streams.get(p.id);if(!set){set=new Set();streams.set(p.id,set);network.gameFor(p).connect(p);qaRecorder.connect(p,network.findId(p.id)?.cityId);}set.add(res);res.write(`data: ${JSON.stringify(stateFor(p))}\n\n`);
+        let set=streams.get(p.id);if(!set){set=new Set();streams.set(p.id,set);network.gameFor(p).connect(p);qaRecorder.connect(p,network.findId(p.id)?.cityId);}set.add(res);res.write(terrainEvent(stateFor(p),res));
         req.on('close',()=>{set.delete(res);if(set.size===0){streams.delete(p.id);qaRecorder.disconnect(p,network.findId(p.id)?.cityId);network.gameFor(p)?.disconnect(p);save();}});return;
       }
       if(url.pathname==='/api/state'){json(res,200,stateFor(p));return;}
@@ -152,18 +157,42 @@ const server=http.createServer(async(req,res)=>{
         if(kind==='input'){qaRecorder.input(p,network.findId(p.id)?.cityId,data);json(res,200,result);return;}
         qaRecorder.command(p,network.findId(p.id)?.cityId,{...data,type:'combat:'+kind},{ok:true},walletBeforeCombat);g.changed();save();json(res,200,result);return;
       }
+      if(url.pathname==='/api/admin/treasury'){
+        if(!adminAvailable){json(res,403,{ok:false,message:'Тестовая казна отключена: нужны HTTPS и серверный ключ'});return;}
+        const supplied=Buffer.from(String(req.headers['x-dementor-qa-admin']||'')),expected=Buffer.from(adminKey);
+        if(supplied.length!==expected.length||!timingSafeEqual(supplied,expected)){json(res,403,{ok:false,message:'Нет полномочий казначея'});return;}
+        const amount=Number(data.amount),target=network.findId(data.targetPlayerId||p.id);
+        if(!Number.isSafeInteger(amount)||amount<1||amount>500||!target)throw Error('Укажи жителя и от 1 до 500 PAPER');
+        if(target.g.state.treasury<amount)throw Error('В казне нет этой суммы');
+        target.g.transfer(target.p,amount,'qa-treasury-grant');
+        target.g.state.transactions.at(-1).approvedBy=p.id;
+        qaRecorder.command(p,network.findId(p.id)?.cityId,{type:'admin:treasury-grant',targetPlayerId:target.p.id,amount},{ok:true},p.wallet);
+        target.g.changed();save();broadcast();
+        json(res,200,{ok:true,message:'Перечислено '+amount+' PAPER из казны',treasury:target.g.state.treasury});return;
+      }
       if(url.pathname==='/api/input'){if(!network.gameFor(p).online.has(p.id))throw Error('Нет подключения к миру');network.gameFor(p).input(p,data);qaRecorder.input(p,network.findId(p.id)?.cityId,data);json(res,200,{ok:true});return;}
-      if(url.pathname==='/api/action'){if(!network.gameFor(p).online.has(p.id))throw Error('Нет подключения к миру');const before=p.wallet;const result=['createCity','travelCity','pagerBuy','pagerSend','pagerRead'].includes(data.type)?network.command(p,data):network.gameFor(p).command(p,data);qaRecorder.command(p,network.findId(p.id)?.cityId,data,result,before);save();broadcast();json(res,200,result);return;}
+      if(url.pathname==='/api/action'){if(!network.gameFor(p).online.has(p.id))throw Error('Нет подключения к миру');const before=p.wallet;const result=['createCity','travelCity','pagerBuy','pagerSend','pagerRead','pagerBlock','pagerList','pagerDial'].includes(data.type)?network.command(p,data):network.gameFor(p).command(p,data);qaRecorder.command(p,network.findId(p.id)?.cityId,data,result,before);save();broadcast();json(res,200,result);return;}
       json(res,404,{ok:false,message:'Нет такого действия'});return;
     }
     if(url.pathname.startsWith('/music/')||url.pathname.startsWith('/custom-music/')){
       const track=game.musicCatalog.find(t=>t.url===url.pathname);if(!track){res.writeHead(404);res.end();return;}const dir=url.pathname.startsWith('/custom-music/')?musicDir:path.join(root,'public','music'),file=path.join(dir,decodeURIComponent(url.pathname.split('/').at(-1))),size=fs.statSync(file).size;const range=req.headers.range;let start=0,end=size-1,status=200;if(range){const m=/^bytes=(\d*)-(\d*)$/.exec(range);if(!m||(!m[1]&&!m[2])){res.writeHead(416,{'Content-Range':`bytes */${size}`});res.end();return;}if(!m[1]){start=Math.max(0,size-Number(m[2]));}else{start=Number(m[1]);if(m[2])end=Math.min(end,Number(m[2]));}if(!Number.isSafeInteger(start)||start>end||start>=size){res.writeHead(416,{'Content-Range':`bytes */${size}`});res.end();return;}status=206;res.setHeader('Content-Range',`bytes ${start}-${end}/${size}`);}res.writeHead(status,{'Content-Type':file.endsWith('.mp3')?'audio/mpeg':'audio/wav','Content-Length':end-start+1,'Accept-Ranges':'bytes','Cache-Control':'no-cache'});if(req.method==='HEAD'){res.end();return;}fs.createReadStream(file,{start,end}).pipe(res);return;
     }
-    const files={'/':'index.html','/app.js':'app.js','/life-ui.js':'life-ui.js','/plaza-ui.js':'plaza-ui.js','/city-ui.js':'city-ui.js','/estate-ui.js':'estate-ui.js','/telecom-ui.js':'telecom-ui.js','/world-ui.js':'world-ui.js','/world-ui-fixes.js':'world-ui-fixes.js','/world-quests.js':'world-quests.js','/styles.css':'styles.css','/combat':'combat.html','/combat.html':'combat.html','/combat.js':'combat.js','/combat.css':'combat.css','/manifest.webmanifest':'manifest.webmanifest'};
+    // DL-TERRAIN-01 immutable, allowlisted assets; no arbitrary filesystem reads.
+    const terrainFile=/^\/assets\/terrain\/(manifest\.json|dl-terrain-01-atlas-(?:128|256)-[a-f0-9]{12}\.(?:png|webp))$/.exec(url.pathname);
+    if(terrainFile){
+      const name=terrainFile[1],filePath=path.join(root,'public','assets','terrain',name);
+      if(!fs.existsSync(filePath)){res.writeHead(404);res.end('Terrain not built');return;}
+      const isManifest=name==='manifest.json';
+      res.writeHead(200,{'Content-Type':isManifest?'application/json; charset=utf-8':name.endsWith('.webp')?'image/webp':'image/png',
+        'Cache-Control':isManifest?'no-cache':'public, max-age=31536000, immutable'});
+      if(req.method==='HEAD'){res.end();return;}
+      fs.createReadStream(filePath).pipe(res);return;
+    }
+    const files={'/':'index.html','/app.js':'app.js','/life-ui.js':'life-ui.js','/plaza-ui.js':'plaza-ui.js','/city-ui.js':'city-ui.js','/estate-ui.js':'estate-ui.js','/telecom-ui.js':'telecom-ui.js','/admin-ui.js':'admin-ui.js','/civic-ui.js':'civic-ui.js','/world-ui.js':'world-ui.js','/world-ui-fixes.js':'world-ui-fixes.js','/world-quests.js':'world-quests.js','/styles.css':'styles.css','/terrain-01.js':'terrain-01.js','/combat':'combat.html','/combat.html':'combat.html','/combat.js':'combat.js','/combat.css':'combat.css','/manifest.webmanifest':'manifest.webmanifest'};
     const file=files[url.pathname];if(!file){res.writeHead(404);res.end('Not found');return;}
     const types={html:'text/html; charset=utf-8',js:'text/javascript; charset=utf-8',css:'text/css; charset=utf-8',webmanifest:'application/manifest+json; charset=utf-8'};
     res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'self'");
-    res.writeHead(200,{'Content-Type':types[file.split('.').at(-1)],'Cache-Control':'no-cache'});res.end(file==='index.html'?fs.readFileSync(path.join(root,'public',file),'utf8').replace('</body>','<script src="/world-ui.js" defer></script><script src="/world-ui-fixes.js" defer></script><script src="/world-quests.js" defer></script><script src="/telecom-ui.js" defer></script></body>'):fs.readFileSync(path.join(root,'public',file)));
+    res.writeHead(200,{'Content-Type':types[file.split('.').at(-1)],'Cache-Control':'no-cache'});res.end(file==='index.html'?fs.readFileSync(path.join(root,'public',file),'utf8').replace('</body>','<script src="/world-ui.js" defer></script><script src="/world-ui-fixes.js" defer></script><script src="/world-quests.js" defer></script><script src="/telecom-ui.js" defer></script><script src="/admin-ui.js" defer></script><script src="/civic-ui.js" defer></script></body>'):fs.readFileSync(path.join(root,'public',file)));
   }catch(e){json(res,400,{ok:false,message:e.message});}
 });
 let lastTick=Date.now();

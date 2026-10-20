@@ -1,3 +1,4 @@
+import {bagCapacity} from './losev-courses.mjs';
 // CITY estate v1: zoning, multi-plot ownership, daily public commercial leases and stocked stalls.
 export const ZONING=Object.freeze({residential:'Для жизни',business:'Для бизнеса',universal:'Универсальный'});
 export const LEASE_DAY_MS=86400000;
@@ -76,13 +77,13 @@ export function estateAction(g,p,cmd){
  if(cmd.type==='shopUnstock'){
   if(!owner)throw Error('Товар принадлежит другому владельцу');
   if((shop.stock[kind]||0)<n)throw Error('В витрине меньше товара');
-  if(Object.entries(p.bag).reduce((a,[k,v])=>a+v*(g.c.weights[k]||0),0)+n*(g.c.weights[kind]||0)>g.c.capacity)throw Error('Нет места в рюкзаке');
+  if(Object.entries(p.bag).reduce((a,[k,v])=>a+v*(g.c.weights[k]||0),0)+n*(g.c.weights[kind]||0)>bagCapacity(p,g.c,g.now))throw Error('Нет места в рюкзаке');
   shop.stock[kind]-=n;p.bag[kind]=(p.bag[kind]||0)+n;return {message:'Товар снят с продажи'};
  }
  if(owner)throw Error('Нельзя купить товар у самого себя');
  const price=shop.prices[kind]||0,cost=price*n;
  if(!price||shop.stock[kind]<n||p.wallet<cost)throw Error('Товар закончился или недостаточно PAPER');
- if(Object.entries(p.bag).reduce((a,[k,v])=>a+v*(g.c.weights[k]||0),0)+n*(g.c.weights[kind]||0)>g.c.capacity)throw Error('Рюкзак полон');
+ if(Object.entries(p.bag).reduce((a,[k,v])=>a+v*(g.c.weights[k]||0),0)+n*(g.c.weights[kind]||0)>bagCapacity(p,g.c,g.now))throw Error('Рюкзак полон');
  p.wallet-=cost;shop.stock[kind]-=n;shop.till=(shop.till||0)+cost;p.bag[kind]=(p.bag[kind]||0)+n;
  g.state.transactions.push({id:cmd.requestId,player:p.id,amount:-cost,reason:'private-stall',plot:plot.id,kind,quantity:n,time:g.now});
  return {message:'Куплено '+n+' · '+cost+' PAPER'};

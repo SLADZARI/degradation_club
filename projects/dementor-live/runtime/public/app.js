@@ -7,7 +7,7 @@ function setRoute(path){route=path;routeActivity={x:me?.x||0,y:me?.y||0,at:perfo
 let view={w:innerWidth,h:innerHeight,s:28,cx:innerWidth<760?10:16,cy:innerWidth<760?12:16,zoom:innerWidth<760?1.15:1},toastTimer;
 const motionFrames=[];
 let lastWallet=null,lastChatSignature='';
-let seenChatIds=null,hoverWorld=null,placementKind=null;
+let seenChatIds=null,hoverWorld=null,placementKind=null,placementCell=null;
 const colors=['#a97059','#6e8971','#65858f'];
 const names={wood:'Древесина',stone:'Камень',food:'Ягоды',seed_hemp:'Семена конопли',seed_carrot:'Семена моркови',hemp:'Конопля',carrot:'Морковь',water:'Вода'};
 const toolNames={axe:'🪓 Топор',pick:'⛏️ Кирка'};
@@ -17,7 +17,14 @@ function toast(text){$('toast').textContent=text;$('toast').classList.add('visib
 async function api(endpoint,data){const res=await fetch('/api/'+endpoint,{method:data?'POST':'GET',headers:{'Content-Type':'application/json',...(token?{Authorization:'Bearer '+token}:{})},...(data?{body:JSON.stringify(data)}:{})});const result=await res.json();if(res.status===401){token=null;sessionStorage.removeItem('dementor-token');stream?.close();$('welcome').showModal();}return result;}
 async function act(type,target,extra={}){if(!connected||requestPending)return;requestPending=true;try{const result=await api('action',{type,target,requestId:Array.from(crypto.getRandomValues(new Uint8Array(16)),b=>b.toString(16).padStart(2,'0')).join(''),...extra});if(result.message&&(!result.started||!holdAction))toast(result.message);return result;}catch{toast('Нет связи с миром. Переподключаемся…');}finally{requestPending=false;}}
 function playNeighborChime(){try{const C=window.AudioContext||window.webkitAudioContext;if(!C||navigator.userActivation?.hasBeenActive===false)return;const a=new C(),o=a.createOscillator(),g=a.createGain();o.type='sine';o.frequency.setValueAtTime(650,a.currentTime);o.frequency.exponentialRampToValueAtTime(840,a.currentTime+.12);g.gain.setValueAtTime(.0001,a.currentTime);g.gain.exponentialRampToValueAtTime(.035,a.currentTime+.02);g.gain.exponentialRampToValueAtTime(.0001,a.currentTime+.16);o.connect(g).connect(a.destination);o.start();o.stop(a.currentTime+.17);o.onended=()=>a.close().catch(()=>{});}catch{}}
-function connect(){stream?.close();motionFrames.length=0;stream=new EventSource('/api/events?token='+encodeURIComponent(token));stream.onmessage=e=>{state=JSON.parse(e.data);me=state.players.find(p=>p.id===state.me);if(lastScene!==state.scene+me.plotId+(state.cityNetwork?.current||'origin')){lastScene=state.scene+me.plotId+(state.cityNetwork?.current||'origin');resize();motionFrames.length=0;route=[];selected=null;context=null;if($('cityPanel').open)$('cityPanel').close();}motionFrames.push({at:performance.now(),players:new Map(state.players.map(p=>[p.id,{x:p.x,y:p.y,spirit:p.spirit}]))});if(motionFrames.length>20)motionFrames.shift();connected=true;updateUI();};stream.onerror=()=>{connected=false;$('connection').classList.add('offline');$('connection').lastChild.textContent='Нет связи';};}
+function connect(){stream?.close();motionFrames.length=0;stream=new EventSource('/api/events?token='+encodeURIComponent(token));stream.onmessage=e=>{const next=JSON.parse(e.data);if(next.landscapeDelta){
+ const d=next.landscapeDelta,prev=state?.landscape?.tiles;
+ if(!Array.isArray(prev)||prev.length!==d.from||(state?.cityNetwork?.current||'origin')!==d.city){
+   stream.close();queueMicrotask(connect);return;
+ }
+ next.landscape=d.tiles.length?{...next.landscape,tiles:prev.concat(d.tiles)}:state.landscape;delete next.landscapeDelta;
+}
+state=next;me=state.players.find(p=>p.id===state.me);if(lastScene!==state.scene+me.plotId+(state.cityNetwork?.current||'origin')){lastScene=state.scene+me.plotId+(state.cityNetwork?.current||'origin');resize();motionFrames.length=0;route=[];selected=null;context=null;if($('cityPanel').open)$('cityPanel').close();}motionFrames.push({at:performance.now(),players:new Map(state.players.map(p=>[p.id,{x:p.x,y:p.y,spirit:p.spirit}]))});if(motionFrames.length>20)motionFrames.shift();connected=true;updateUI();};stream.onerror=()=>{connected=false;$('connection').classList.add('offline');$('connection').lastChild.textContent='Нет связи';};}
 $('joinForm').onsubmit=async e=>{e.preventDefault();const button=e.target.querySelector('button');button.disabled=true;try{const result=await api('join',{name:$('nameInput').value,gender:$('genderInput').value});if(!result.ok){$('joinError').textContent=result.message;return;}token=result.token;sessionStorage.setItem('dementor-token',token);$('welcome').close();connect();canvas.focus();}catch{$('joinError').textContent='Сервер недоступен. Проверь локальный запуск.';}finally{button.disabled=false;}};
 if(token)api('state').then(r=>{if(r.me)connect();else if(!$('welcome').open)$('welcome').showModal();}).catch(()=>$('welcome').showModal());else $('welcome').showModal();
 
@@ -89,7 +96,7 @@ function interaction(t){if(!t)return null;const type=t.type,isForge=t.id.startsW
   if(type==='plot'){const owner=state.players.find(p=>p.id===t.owner);return {type:'estate',title:t.owner?`Участок · ${t.ownerName||owner?.name||'житель'}`:'Оформить участок',hint:t.shop?.sign||t.landUse||'Выбери покупку или аренду',enabled:!me.spirit};}
   if(type==='give')return {type:'give',title:`Угостить · ${t.name}`,hint:t.spirit?'Вернуть соседу тело':'Передать порцию еды',enabled:!me.spirit&&me.bag.food>0};return null;
 }
-function updateContext(){if(!me)return;const near=allTargets().map(t=>({...t,d:Math.hypot(t.x-me.x,t.y-me.y)})).filter(t=>t.d<=state.config.actionRange).sort((a,b)=>a.d-b.d);
+function updateContext(){if(!me)return;const near=allTargets().map(t=>{const size=t.rockSize&&t.stock>0?Math.max(.8,t.rockSize*Math.sqrt(t.stock/Math.max(1,t.initial||t.stock))):0;const d=size?Math.hypot(Math.max(0,Math.abs(t.x-me.x)-size/2),Math.max(0,Math.abs(t.y-me.y)-size/2)):Math.hypot(t.x-me.x,t.y-me.y);return {...t,d};}).filter(t=>t.d<=state.config.actionRange).sort((a,b)=>a.d-b.d);
   let target=near.find(t=>t.id===selected)||((!me.tools.axe&&!me.tools.pick&&!me.spirit)?near.find(t=>t.type==='tools'):null)||near[0];context=target?{...target,...interaction(target)}:null;
   $('actionTitle').textContent=context?context.title:me.spirit?'Найди куст с едой':'Исследуй поле';$('actionHint').textContent=context?context.hint:me.spirit?'Ходи к ягодам · E вернёт тело':'WASD или нажми на землю · Shift — бежать';$('actionIcon').textContent=context?(icon[context.type]||icon[target.type]||'↗'):'↗';
   $('actionButton').disabled=!context?.enabled||!!me.job||!connected;$('actionButton').querySelector('span').textContent=me.job?'Работаем':context?.type==='buy'?'Купить':context?.type==='give'?'Угостить':'Действие';
@@ -130,7 +137,7 @@ function navigateTo(id){
 function openCityPanel(mode){$('cityPanel').style.left='';$('cityPanel').style.top='';cityPanelMode=mode;cityPanelSignature='';keys.clear();holdAction=false;route=[];touchMove=null;api('input',{dx:0,dy:0}).catch(()=>{});updateCityPanels(true);$('cityPanel').dataset.mode=mode;if(!$('cityPanel').open)$('cityPanel').show();}
 function updateCityPanels(force=false){
   if(!me||!cityPanelMode||(!force&&!$('cityPanel').open))return;
-  const sig=cityPanelMode==='bag'?JSON.stringify([me.bag,me.toolItems,me.activeTools,me.delivery,me.spirit,!!me.job]):JSON.stringify([cityPanelMode,me.tools,me.toolInfo,me.wallet,me.bag,me.delivery,me.spirit,!!me.job,state.warehouse,state.courierOffers,state.project,state.forge,state.bridge,state.plaza,me.toolItems,me.activeTools,state.scene,state.home,state.trades,state.seedShop,state.seedMarket,state.gardenProject,state.publicGarden,state.materials,state.cityNetwork,state.thefts,state.players.map(p=>[p.id,p.name,p.online,sameScene(p),Math.hypot(p.x-me.x,p.y-me.y)<=state.config.actionRange]),state.landscape,me.terrainBag,state.plots,state.mayorMail,Math.floor(state.now/1000)*(cityPanelMode==='home'?1:0),nearby('warehouse'),nearby('board'),nearby('forge-use'),nearby('tool-shop')]);
+  const sig=cityPanelMode==='bag'?JSON.stringify([me.bag,me.terrainBag,me.toolItems,me.activeTools,me.delivery,me.spirit,!!me.job]):JSON.stringify([cityPanelMode,me.tools,me.toolInfo,me.wallet,me.bag,me.delivery,me.spirit,!!me.job,state.warehouse,state.courierOffers,state.project,state.forge,state.bridge,state.plaza,me.toolItems,me.activeTools,state.scene,state.home,state.trades,state.seedShop,state.seedMarket,state.gardenProject,state.publicGarden,state.materials,state.cityNetwork,state.thefts,state.players.map(p=>[p.id,p.name,p.online,sameScene(p),Math.hypot(p.x-me.x,p.y-me.y)<=state.config.actionRange]),state.landscape,me.terrainBag,state.plots,state.mayorMail,Math.floor(state.now/1000)*(cityPanelMode==='home'?1:0),nearby('warehouse'),nearby('board'),nearby('forge-use'),nearby('tool-shop')]);
   if(!force&&$('cityPanel').contains(document.activeElement)&&['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName))return;if(!force&&sig===cityPanelSignature)return;cityPanelSignature=sig;
   $('cityPanel').classList.toggle('compact-bag',cityPanelMode==='bag');$('cityPanel').querySelector('.eyebrow').textContent=cityPanelMode==='bag'?'СНАРЯЖЕНИЕ':cityPanelMode==='social'?'ЖИТЕЛИ И СДЕЛКИ':'МИР И ХОЗЯЙСТВО';const rows=$('cityPanelRows');rows.replaceChildren();
   function row(title,description,buttons=[]){const el=document.createElement('section');el.className='city-row';const h=document.createElement('h3'),p=document.createElement('p');h.textContent=title;p.textContent=description;el.append(h,p);const actions=document.createElement('div');actions.className='city-actions';for(const b of buttons){const button=document.createElement('button');button.textContent=b.text;button.disabled=!!b.disabled;if(b.id)button.id=b.id;button.onclick=b.click;actions.append(button);}el.append(actions);rows.append(el);return el;}
@@ -290,7 +297,7 @@ function worldPoint(x,y){
   return {x:view.cx+(u+v)/2,y:view.cy+(v-u)/2};
 }
 function blocked(x,y){const c=state.config,r=.35;if(state.scene!=='city'){return x<r||y<r||x>16-r||y>16-r||(['plot','expedition'].includes(state.scene)&&(state.home.nodes.some(n=>n.left&&Math.hypot(x-n.x,y-n.y)<.63)||state.scene==='plot'&&state.home.plantedTrees?.some(t=>t.wateredAt&&state.now-t.wateredAt>=180000&&Math.hypot(x-t.x,y-t.y)<.6)));}if(x<r||y<r||x>c.width-r||y>c.height-r)return true;if(x+r>c.river.x&&x-r<c.river.x+c.river.w&&!(bridgeOpen()&&y-r>=c.bridge.y&&y+r<=c.bridge.y+c.bridge.h))return true;
-  if((state.citySolids||[{x:4,y:4,w:4,h:3}]).some(o=>x+r>o.x&&x-r<o.x+o.w&&y+r>o.y&&y-r<o.y+o.h))return true;if((state.worldTravel?.obstacles||[]).some(o=>x+r>o.x&&x-r<o.x+o.w&&y+r>o.y&&y-r<o.y+o.h))return true;return state.resources.some(o=>o.stock>0&&o.type!=='food'&&Math.hypot(x-o.x,y-o.y)<.63);
+  if((state.citySolids||[{x:4,y:4,w:4,h:3}]).some(o=>x+r>o.x&&x-r<o.x+o.w&&y+r>o.y&&y-r<o.y+o.h))return true;/* Extended solids checked by world-ui from authoritative footprints. */return state.resources.some(o=>o.stock>0&&o.type!=='food'&&Math.hypot(x-o.x,y-o.y)<.63);
 }
 function pathDistance(path){return path.reduce((distance,p,i)=>distance+Math.hypot(p.x-(i?path[i-1].x:me.x),p.y-(i?path[i-1].y:me.y)),0);}
 function findPath(dest){const step=.5,start={x:Math.round(me.x/step),y:Math.round(me.y/step)},goal={x:Math.round(dest.x/step),y:Math.round(dest.y/step)};const key=p=>p.x+','+p.y;
@@ -306,7 +313,7 @@ function findPath(dest){const step=.5,start={x:Math.round(me.x/step),y:Math.roun
    });
 }
 function selectWorldTarget(e){if(e.button===2)return;if(!me||$('welcome').open)return;canvas.focus();const r=canvas.getBoundingClientRect(),w=worldPoint(e.clientX-r.left,e.clientY-r.top);
- if(placementKind){if(state.scene!=='city'){toast('Покрытие можно уложить только в городе');return;}const kind=placementKind;act('landscapePlace',null,{kind,x:Math.floor(w.x),y:Math.floor(w.y)}).then(result=>{if(result?.ok&&!(me.terrainBag?.[kind]>1))setPlacementKind(null);});return;}const targets=allTargets().sort((a,b)=>Math.hypot(a.x-w.x,a.y-w.y)-Math.hypot(b.x-w.x,b.y-w.y));const pile=targets.find(t=>t.type==='pickup'&&Math.hypot(t.x-w.x,t.y-w.y)<.7);const plot=pile||state.scene!=='city'?null:state.plots.find(p=>w.x>=p.x&&w.x<=p.x+p.w&&w.y>=p.y&&w.y<=p.y+p.h);let t=pile||(plot?targets.find(t=>t.id===plot.id):targets[0]);const insideSquare=state.scene==='city'&&w.x>=14&&w.x<=24&&w.y>=10&&w.y<=18;if(!plot&&insideSquare&&Math.hypot(t.x-w.x,t.y-w.y)>=1.3)t=targets.find(t=>t.id==='build');
+ if(placementKind){if(state.scene!=='city'){toast('Покрытие можно уложить только в городе');return;}placementCell={x:Math.floor(w.x),y:Math.floor(w.y)};updateTerrainBar();return;}const targets=allTargets().sort((a,b)=>Math.hypot(a.x-w.x,a.y-w.y)-Math.hypot(b.x-w.x,b.y-w.y));const pile=targets.find(t=>t.type==='pickup'&&Math.hypot(t.x-w.x,t.y-w.y)<.7);const plot=pile||state.scene!=='city'?null:state.plots.find(p=>w.x>=p.x&&w.x<=p.x+p.w&&w.y>=p.y&&w.y<=p.y+p.h);let t=pile||(plot?targets.find(t=>t.id===plot.id):targets[0]);const insideSquare=state.scene==='city'&&w.x>=14&&w.x<=24&&w.y>=10&&w.y<=18;if(!plot&&insideSquare&&Math.hypot(t.x-w.x,t.y-w.y)>=1.3)t=targets.find(t=>t.id==='build');
   if(t&&(plot||insideSquare||Math.hypot(t.x-w.x,t.y-w.y)<1.3)){selected=t.id;if(Math.hypot(t.x-me.x,t.y-me.y)<=state.config.actionRange){updateContext();return;}
     let candidates=[];for(const[dx,dy]of [[0,1.4],[-1.4,0],[1.4,0],[0,-1.4]]){let dest={x:t.x+dx,y:t.y+dy};const path=findPath(dest);if(path)candidates.push(path);}candidates.sort((a,b)=>pathDistance(a)-pathDistance(b));if(candidates[0])setRoute(candidates[0]);else toast('Пока нет доступного пути');
   }else{selected=null;const path=findPath(w);if(path)setRoute(path);else toast(w.x>=state.config.river.x&&!bridgeOpen()?'Здесь нужна переправа. Сначала достройте мост.':'Не получается пройти — выбери свободное место.');}
@@ -339,7 +346,57 @@ function endTouch(e,cancelled=false){
 canvas.addEventListener('pointerup',e=>endTouch(e));
 canvas.addEventListener('pointercancel',e=>endTouch(e,true));
 
-function setPlacementKind(kind){placementKind=kind;canvas.classList.toggle('placing-terrain',!!kind);if(kind){$('cityPanel').close();toast('Укладка: нажми на свободную клетку рядом. Esc — выход.');}else toast('Режим укладки выключен');}
+const terrainBar=document.createElement('div');
+terrainBar.id='terrain-placement';
+terrainBar.setAttribute('aria-live','polite');
+terrainBar.hidden=true;
+const terrainStatus=document.createElement('span'),terrainApply=document.createElement('button'),terrainCancel=document.createElement('button');
+terrainApply.type='button';terrainApply.textContent='Применить';terrainApply.onclick=applyTerrainCell;
+terrainCancel.type='button';terrainCancel.textContent='Отмена';terrainCancel.onclick=()=>setPlacementKind(null);
+terrainBar.append(terrainStatus,terrainApply,terrainCancel);document.querySelector('#game').append(terrainBar);
+function terrainCanPlace(kind,x,y){
+ if(!state||!me||state.scene!=='city')return 'Покрытие доступно только в городе';
+ if(!state.landscapeProducts?.[kind]||!(me.terrainBag?.[kind]>0))return 'Материал закончился';
+ const c=state.config;
+ if(x<0||y<0||x>=c.width||y>=c.height)return 'За границами города';
+ if((state.plots||[]).some(p=>x<p.x+p.w&&x+1>p.x&&y<p.y+p.h&&y+1>p.y&&p.owner!==me.id))return 'Частный или непроданный участок';
+ if(Math.hypot(me.x-(x+.5),me.y-(y+.5))>c.actionRange)return 'Подойди к клетке ближе';
+ if(window.DLTerrain01?.occupied?.(state,x,y)||(window.DLTerrain01?false:(state.landscape?.tiles||[]).some(t=>t.x===x&&t.y===y)))return 'Клетка уже занята';
+ if(blocked(x+.5,y+.5))return 'Здесь препятствие';
+ return '';
+}
+function updateTerrainBar(){
+ terrainBar.hidden=!placementKind;
+ if(!placementKind)return;
+ const cell=placementCell|| (hoverWorld?{x:Math.floor(hoverWorld.x),y:Math.floor(hoverWorld.y)}:null);
+ const reason=cell?terrainCanPlace(placementKind,cell.x,cell.y):'Нажми на клетку, чтобы выбрать место';
+ const line=(state?.landscapeProducts?.[placementKind]?.name||placementKind)+' · '+(me?.terrainBag?.[placementKind]||0)+' шт. · '+(cell?cell.x+','+cell.y+' · ':'')+(reason||'Можно уложить');if(terrainStatus.textContent!==line)terrainStatus.textContent=line;
+ terrainApply.disabled=!!reason||!placementCell||requestPending;
+}
+async function applyTerrainCell(){
+ if(!placementKind||!placementCell)return;
+ const reason=terrainCanPlace(placementKind,placementCell.x,placementCell.y);
+ if(reason){toast(reason);return;}
+ const kind=placementKind,{x,y}=placementCell;
+ const result=await act('landscapePlace',null,{kind,x,y});
+ if(result?.ok){placementCell=null;if((me?.terrainBag?.[kind]||0)<=1)setPlacementKind(null);}
+ updateTerrainBar();
+}
+function setPlacementKind(kind){
+ placementKind=kind;placementCell=null;canvas.classList.toggle('placing-terrain',!!kind);
+ if(kind){$('cityPanel').close();toast('Выбери клетку на карте и нажми «Применить».');}
+ updateTerrainBar();
+}
+function drawTerrainPlacementGhost(){
+ if(!placementKind||!state||state.scene!=='city')return;
+ const cell=placementCell||(hoverWorld?{x:Math.floor(hoverWorld.x),y:Math.floor(hoverWorld.y)}:null);if(!cell)return;
+ const {x,y}=cell,reason=terrainCanPlace(placementKind,x,y);
+ const pts=[screen(x,y),screen(x+1,y),screen(x+1,y+1),screen(x,y+1)];
+ ctx.save();ctx.beginPath();pts.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));ctx.closePath();
+ ctx.fillStyle=reason?'#cd5e5a7a':'#72a77b75';ctx.fill();ctx.lineWidth=2;
+ ctx.strokeStyle=reason?'#b44f47':'#497958';ctx.stroke();ctx.restore();
+}
+
 function zoom(value){if(!Number.isFinite(value)||value<=0)return;view.zoom=Math.max(.65,Math.min(2.5,view.zoom*value));resize();}
 $('zoomIn').onclick=()=>zoom(1.2);$('zoomOut').onclick=()=>zoom(1/1.2);$('centerButton').onclick=()=>{if(me)openCityPanel('places');};
 canvas.addEventListener('wheel',e=>{e.preventDefault();zoom(e.deltaY<0?1.08:1/1.08);},{passive:false});
@@ -427,7 +484,7 @@ function paperBench(x,y){const s=view.s,p=screen(x,y),w=s*1.8;shadow(p.x,p.y+4,s
 }
 function drawTent(){paperTent({x:4,y:4,w:4,h:3});label('Временная мэрия',6,3.05);
  const s=view.s,t=screen(9,6);paperBox(t.x-s*.5,t.y-s*.9,s,s*.12,s*.3,-s*.18,'#ad9a74','#8a8064','#d5c59e');for(const off of [-.42,.42])paperBox(t.x+off*s,t.y-s*.8,s*.09,s*.88,s*.12,-s*.08,'#9b8d6e','#7d7860','#c4b48f');for(let i=0;i<2;i++){line(t.x+i*s*.28-s*.15,t.y-s*.8,t.x+i*s*.28-s*.15,t.y-s*.1,'#9b8462',3);line(t.x+i*s*.28-s*.28,t.y-s*.7,t.x+i*s*.28,t.y-s*.65,'#72816a',4);}label('Инструменты',9,7.1,true);
- paperBoard(3.2,8,'Доска работ');label('Доставка в мэрию',9,2,true);
+ paperBoard(3.2,8,'Доска работ');label('Приём городского груза',9,2,true);
 }
 function drawProject(){const pr=state?.project||{stage:0,work:0,accepted:{wood:0,stone:0}},o={x:14,y:10,w:10,h:8};let col=pr.stage===0?'#cfc8b419':pr.stage===1?'#d6d5c2':'#dedfce';const p=groundRect(o,col,pr.stage<3?'#aaa88a':'#b3baa0',pr.stage===0);
   if(pr.stage>0){const work=pr.stage>=2?1:pr.work/4;ctx.save();ctx.beginPath();ctx.rect(p.x,p.y,p.w,p.h*work);ctx.clip();for(let y=0;y<8;y++)for(let x=0;x<10;x++){const q=screen(14+x,10+y);rounded(q.x+1,q.y+1,view.s-2,view.s*.76-2,1,(x+y)%3?'#e6e4d1':'#d2d5c0','#c1c6ae66');}ctx.restore();}
@@ -453,7 +510,7 @@ function drawBridge(){
   label(stage>=3?'Общий мост · проход открыт':stage?'Строим переправу':'Будущий мост',36,10.6,true);
   if(bridgeActive()&&stage<3){paperOpenBox(32.5,12.3,'Материалы моста');label('Работа · E',32,15.8,true);}
 }
-function drawPlot(o){const owner=state?.players.find(p=>p.id===o.owner);const mine=o.owner===me?.id;groundRect(o,o.owner?(mine?'#9baa7a18':'#9aa58d12'):'#c8c9a31a',o.owner?'#9da980':'#b9b99b',!o.owner);
+function drawPlot(o,phase='full'){const owner=state?.players.find(p=>p.id===o.owner);const mine=o.owner===me?.id;if(phase!=='props')groundRect(o,o.owner?(mine?'#9baa7a18':'#9aa58d12'):'#c8c9a31a',o.owner?'#9da980':'#b9b99b',!o.owner);if(phase==='ground')return;
   for(const[x,y]of [[o.x,o.y],[o.x+o.w,o.y],[o.x,o.y+o.h],[o.x+o.w,o.y+o.h]]){const p=screen(x,y);line(p.x,p.y-7,p.x,p.y+3,o.owner?'#86936d':'#aca78a',2);}
   label(o.owner?(o.shop?.sign|| (mine?'Твой участок':o.ownerName||owner?.name||'Житель')):o.locked?'Откроется после расчистки':`Участок · ${state?.config.plotPrice||120} PAPER`,o.x+o.w/2,o.y+o.h/2,true);
   if(o.owner&&o.homeVisual){const t=screen(o.x+o.w*.55,o.y+o.h*.56),s=view.s,k=o.homeVisual.tent;if(k){poly([[t.x-s*.28,t.y],[t.x,t.y-s*.60],[t.x+s*.28,t.y]],k===3?'#d8c6a7':'#c1b198','#87907c');poly([[t.x,t.y-s*.60],[t.x+s*.40,t.y-s*.48],[t.x+s*.52,t.y-s*.10],[t.x+s*.28,t.y]],'#a4ab94','#788475');}if(o.homeVisual.beds){for(let i=0;i<Math.min(4,o.homeVisual.beds);i++){const q=screen(o.x+1+(i%2)*.8,o.y+o.h-1-Math.floor(i/2)*.8);rounded(q.x-3,q.y-3,6,5,1,i<o.homeVisual.crops?'#8fa67e':'#c5ae89','#839179');}}}
@@ -467,7 +524,7 @@ function drawTree(o){if(o.stock<=0)return;const p=screen(o.x,o.y),s=view.s;shado
  poly(points.map(([dx,dy])=>[p.x+dx*r,top+dy*r]),green,'#788d73');poly([[p.x-r*.6,top-r*.4],[p.x-r*.4,top-r*.7],[p.x+r*.25,top-r*.7],[p.x,top]],'#c3c5a4',null);
 }
 function drawHempBush(x,y){const p=screen(x,y),s=view.s;shadow(p.x,p.y+3,s*.4,s*.12);line(p.x,p.y,p.x,p.y-s*.48,'#8e9272',2);for(const [dx,dy,k] of [[-.23,-.35,.38],[.22,-.38,.38],[0,-.62,.5]]){const a=p.x+dx*s,b=p.y+dy*s,r=k*s;poly([[a,b-r],[a+r*.18,b-r*.21],[a+r,b-r*.36],[a+r*.36,b+r*.1],[a+r*.7,b+r*.6],[a,b+r*.24],[a-r*.7,b+r*.6],[a-r*.36,b+r*.1],[a-r,b-r*.36],[a-r*.18,b-r*.21]],'#8da581','#738d70');}}
-function drawStone(o){if(o.stock<=0)return;const p=screen(o.x,o.y),s=view.s;shadow(p.x+5,p.y+2,s*.55,s*.18);poly([[p.x-s*.5,p.y],[p.x-s*.38,p.y-s*.55],[p.x+s*.05,p.y-s*.84],[p.x+s*.45,p.y-s*.4],[p.x+s*.55,p.y+s*.05]],'#a8ada2','#899487');poly([[p.x-s*.38,p.y-s*.55],[p.x+s*.05,p.y-s*.84],[p.x+s*.12,p.y-s*.18]],'#c4c6b9',null);poly([[p.x+s*.05,p.y-s*.84],[p.x+s*.45,p.y-s*.4],[p.x+s*.55,p.y+s*.05],[p.x+s*.12,p.y-s*.18]],'#949e94',null);}
+function drawStone(o){if(o.stock<=0)return;const p=screen(o.x,o.y),s=view.s*(o.rockSize?Math.max(.8,o.rockSize*Math.sqrt(o.stock/Math.max(1,o.initial||o.stock))):1);shadow(p.x+5,p.y+2,s*.55,s*.18);poly([[p.x-s*.5,p.y],[p.x-s*.38,p.y-s*.55],[p.x+s*.05,p.y-s*.84],[p.x+s*.45,p.y-s*.4],[p.x+s*.55,p.y+s*.05]],'#a8ada2','#899487');poly([[p.x-s*.38,p.y-s*.55],[p.x+s*.05,p.y-s*.84],[p.x+s*.12,p.y-s*.18]],'#c4c6b9',null);poly([[p.x+s*.05,p.y-s*.84],[p.x+s*.45,p.y-s*.4],[p.x+s*.55,p.y+s*.05],[p.x+s*.12,p.y-s*.18]],'#949e94',null);}
 function drawFood(o){const p=screen(o.x,o.y),s=view.s;shadow(p.x+4,p.y+3,s*.5,s*.17);
   for(const[dx,dy,r]of [[-.25,-.2,.34],[.24,-.22,.36],[0,-.49,.38]]){const x=p.x+dx*s,y=p.y+dy*s,k=r*s;poly([[x-k,y],[x-k*.6,y-k*.8],[x+k*.4,y-k],[x+k,y-k*.15],[x+k*.7,y+k*.6],[x-k*.5,y+k*.5]],'#8d9d7c','#788b6e');poly([[x-k*.6,y-k*.8],[x+k*.4,y-k],[x,y+k*.2]],'#aabb92',null);line(x,y+k*.2,x+k,y-k*.15,'#74866b77');}
   if(o.stock){for(let i=0;i<Math.min(o.stock,5);i++){const x=p.x+Math.sin(i*2)*s*.25,y=p.y-s*.27+Math.cos(i*2)*s*.19,r=Math.max(2,s*.065);poly([[x-r,y],[x,y-r],[x+r,y],[x,y+r]],o.kind?.startsWith('seed_')?'#d0b47e':'#b66c59','#916a51');}}
@@ -506,19 +563,19 @@ function render(time){positionWindows();ctx.clearRect(0,0,view.w,view.h);ctx.fil
   ctx.fillStyle='#6b6f4b0a';for(let i=0;i<340;i++){const x=(i*137.23)%view.w,y=(i*211.71)%view.h;ctx.fillRect(x,y,1,1);}
   const c=state?.config||{width:48,height:32,river:{x:34,w:4}};
   groundRect({x:0,y:0,w:c.width,h:c.height},'#f3efdf88','#cbd0b230');
- if(state?.landscape?.tiles)for(const tile of state.landscape.tiles){const col=tile.kind==='paving'?'#d6c7a6':tile.kind==='grass'?'#b4c49f':'#d5c2aa';groundRect({x:tile.x,y:tile.y,w:1,h:1},col,'#a8aa93');if(tile.kind==='flowers'){const p=screen(tile.x+.5,tile.y+.5),r=Math.max(2,view.s*.11);for(const [dx,dy]of [[-1,0],[1,0],[0,-1],[0,1]]){ctx.beginPath();ctx.arc(p.x+dx*r,p.y+dy*r,r*.7,0,7);ctx.fillStyle='#c68981';ctx.fill();}ctx.beginPath();ctx.arc(p.x,p.y,r*.45,0,7);ctx.fillStyle='#e8d5a8';ctx.fill();}}
-  ctx.strokeStyle='#9ca27e12';ctx.lineWidth=.6;for(let x=0;x<=c.width;x+=2){const a=screen(x,0),b=screen(x,c.height);line(a.x,a.y,b.x,b.y,'#9ca27e12',.6);}for(let y=0;y<=c.height;y+=2){const a=screen(0,y),b=screen(c.width,y);line(a.x,a.y,b.x,b.y,'#9ca27e12',.6);}
+ if(!window.DLTerrain01?.draw(ctx,state,screen,view.s)&&state?.landscape?.tiles)for(const tile of state.landscape.tiles){const col=tile.kind==='paving'?'#d6c7a6':tile.kind==='grass'?'#b4c49f':'#d5c2aa';groundRect({x:tile.x,y:tile.y,w:1,h:1},col,'#a8aa93');if(tile.kind==='flowers'){const p=screen(tile.x+.5,tile.y+.5),r=Math.max(2,view.s*.11);for(const [dx,dy]of [[-1,0],[1,0],[0,-1],[0,1]]){ctx.beginPath();ctx.arc(p.x+dx*r,p.y+dy*r,r*.7,0,7);ctx.fillStyle='#c68981';ctx.fill();}ctx.beginPath();ctx.arc(p.x,p.y,r*.45,0,7);ctx.fillStyle='#e8d5a8';ctx.fill();}}
+  if(!window.DLTerrain01?.ready){ctx.strokeStyle='#9ca27e12';ctx.lineWidth=.6;for(let x=0;x<=c.width;x+=2){const a=screen(x,0),b=screen(x,c.height);line(a.x,a.y,b.x,b.y,'#9ca27e12',.6);}for(let y=0;y<=c.height;y+=2){const a=screen(0,y),b=screen(c.width,y);line(a.x,a.y,b.x,b.y,'#9ca27e12',.6);}}
   // No pre-painted footpaths: paving will be placed by players.
   groundRect({x:c.river.x,y:0,w:c.river.w,h:c.height},'#becdc8','#96ada256');
   for(const bank of [c.river.x,c.river.x+c.river.w]){const a=screen(bank,0),b=screen(bank,c.height);line(a.x,a.y,b.x,b.y,'#96ada256',2);}
   for(let i=0;i<20;i++){const p=screen(34.5+(i%3)*.95,.8+i*1.6);line(p.x,p.y,p.x+view.s*.7,p.y,'#e6ede352',1);}
-  drawBridge();label('Другой берег',42,3,true);
+  drawBridge();if(typeof window.__worldGround==='function')window.__worldGround();label('Другой берег',42,3,true);
   if(!state){for(const[x,y]of [[41,7],[44,10],[42,23],[45,26]])drawTree({x,y,stock:10});for(const[x,y]of [[42,16],[45,20]])drawStone({x,y,stock:10});}
   if(state?.expedition){const gate=state.config.expedition.gate;paperBoard(gate.x,gate.y,'Миссия · расчистка');}
   if(state)paperBoard(29,35,'⚔ Боевая зона');
   drawProject();if(typeof drawPlaza==='function')drawPlaza();
-  if(state){for(const plot of state.plots)drawPlot(plot);}else for(const o of [{x:4,y:15,w:6,h:6},{x:4,y:23,w:6,h:6},{x:14,y:23,w:6,h:6}])drawPlot(o);
-  drawForge();
+  if(state){for(const plot of state.plots)drawPlot(plot,'ground');}else for(const o of [{x:4,y:15,w:6,h:6},{x:4,y:23,w:6,h:6},{x:14,y:23,w:6,h:6}])drawPlot(o,'ground');
+  if((state?.forge.stage||0)<2)drawForge();
   drawToolSign(24,3);drawHempBush(16.7,3.3);label('Благоустройство',16.7,1,true);label('Магазин инструмента',24,.3,true);
   if(state?.seedMarket){label(state.seedMarket.stage>=state.config.seedMarket.stages.length?'Семенная лавка':'Стройка лавки',23,4.9,true);}
   if(state?.gardenProject){const built=state.gardenProject.stage>=state.config.cityGarden.stages.length;groundRect({x:25.5,y:8.4,w:5.6,h:2.5},built?'#e0dfc6':'#eae5d7','#a7ad89',!built);label(built?'Городской огород':'Стройка огорода',28,8,true);if(built)for(const bed of state.publicGarden.beds){const x=26+(Number(bed.id.split('-').at(-1))%3)*1.6,y=9;groundRect({x,y,w:1.2,h:1},bed.crop?'#98a981':'#c4b49b','#8d956f');}}
@@ -526,16 +583,19 @@ function render(time){positionWindows();ctx.clearRect(0,0,view.w,view.h);ctx.fil
   label('Городской склад',12,29,true);
   for(const pile of state?.drops||[]){const q=screen(pile.x,pile.y);rounded(q.x-8,q.y-5,16,9,2,pile.kind==='wood'?'#ae9673':pile.kind==='stone'?'#a3aaa0':'#b17b68','#818970');label(`${names[pile.kind]} · ${pile.quantity}`,pile.x,pile.y+.8,true);}
   const resources=state?.resources||[];
-   // ISO depth is x+y (not world y); buildings and trees must hide residents walking behind them.
+   // The extended world contributes its sprites to this SAME z-sort, never a second paint pass.
    const entities=[
-     {depth:9+6,draw:drawTent},
-     {depth:22.7+3,draw:()=>paperHouse({x:22.7,y:1,w:2.6,h:2},'shop')},
-     {depth:15.5+3.7,draw:()=>paperHouse({x:15.5,y:1.5,w:2.5,h:2.2},'garden-shop')},
-     {depth:10.7+28,draw:()=>paperWarehouse({x:10.7,y:25,w:2.6,h:3})},
+      ...(state?.plots||[]).map(plot=>({depth:plot.x+plot.w*.55+plot.y+plot.h*.56,draw:()=>drawPlot(plot,'props')})),
+      ...(state?.forge?.stage>=2?[{depth:24+6+23+5,draw:drawForge}]:[]),
+      ...(typeof window.__worldEntities==='function'?window.__worldEntities():[]),
+     {depth:4+4+4+3,draw:drawTent},
+     {depth:22.7+1+2.6+2,draw:()=>paperHouse({x:22.7,y:1,w:2.6,h:2},'shop')},
+     {depth:15.5+1.5+2.5+2.2,draw:()=>paperHouse({x:15.5,y:1.5,w:2.5,h:2.2},'garden-shop')},
+     {depth:10.7+25+2.6+3,draw:()=>paperWarehouse({x:10.7,y:25,w:2.6,h:3})},
      ...(state?.seedMarket?[{depth:21.8+7.3,draw:()=>paperHouse({x:21.8,y:5.3,w:2.5,h:2},state.seedMarket.stage>=state.config.seedMarket.stages.length?'shop':'construction')}]:[]),
-     ...resources.filter(o=>o.stock>0||o.type==='food').map(o=>({depth:o.x+o.y,draw:()=>o.type==='wood'?drawTree(o):o.type==='stone'?drawStone(o):drawFood(o)})),
+     ...resources.filter(o=>(o.stock>0||o.type==='food')&&!o.id.startsWith('forest-wood-')).map(o=>({depth:o.x+o.y+(o.rockSize?o.rockSize:0),draw:()=>o.type==='wood'?drawTree(o):o.type==='stone'?drawStone(o):drawFood(o)})),
      ...(state?.players||[]).filter(p=>(p.online||p.id===me?.id)&&sameScene(p)).map(p=>({depth:p.x+p.y,draw:()=>drawPlayer(p,time)}))
-   ];entities.sort((a,b)=>a.depth-b.depth);for(const e of entities)e.draw();
+   ];entities.sort((a,b)=>a.depth-b.depth);for(const e of entities)e.draw();drawTerrainPlacementGhost();updateTerrainBar();
   if(route.length){const p=screen(route.at(-1).x,route.at(-1).y);ctx.beginPath();ctx.ellipse(p.x,p.y,7,4,0,0,Math.PI*2);ctx.strokeStyle='#82956a99';ctx.lineWidth=1.4;ctx.stroke();}
   if(context){const p=screen(context.x,context.y);ctx.beginPath();ctx.ellipse(p.x,p.y+4,view.s*.7,view.s*.25,0,0,Math.PI*2);ctx.strokeStyle='#82956999';ctx.lineWidth=1.5;ctx.stroke();}
   if(me?.job){const left=Math.max(0,me.job.ends-(state.now+80)),duration=me.job.ends-me.job.started;$('actionProgress').style.width=`${Math.min(100,(1-left/duration)*100)}%`;}else $('actionProgress').style.width='0';

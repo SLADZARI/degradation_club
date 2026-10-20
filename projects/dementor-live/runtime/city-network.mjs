@@ -63,11 +63,11 @@ export class CityNetwork{
     return {id,message:'Город «'+title+'» основан. Другие жители могут прийти через реестр.'};
   }
   command(p,cmd){
-    if(!['createCity','travelCity','pagerBuy','pagerSend','pagerRead'].includes(cmd?.type))throw Error('Неизвестное действие реестра');
+    if(!['createCity','travelCity','pagerBuy','pagerSend','pagerRead','pagerBlock','pagerList','pagerDial'].includes(cmd?.type))throw Error('Неизвестное действие реестра');
     if(typeof cmd.requestId!=='string'||cmd.requestId.length<4||cmd.requestId.length>100)throw Error('Нет идентификатора действия');
     p.results||=[];const previous=p.results.find(r=>r.id===cmd.requestId);if(previous)return previous.result;
     let result;
-    try{result={ok:true,...(['pagerBuy','pagerSend','pagerRead'].includes(cmd.type)?telecomAction(this,p,cmd):cmd.type==='createCity'?this.createCity(p,cmd.name):this.move(p,cmd.cityId))};}
+    try{result={ok:true,...(['pagerBuy','pagerSend','pagerRead','pagerBlock','pagerList','pagerDial'].includes(cmd.type)?telecomAction(this,p,cmd):cmd.type==='createCity'?this.createCity(p,cmd.name):this.move(p,cmd.cityId))};}
     catch(e){result={ok:false,message:e.message};}
     p.results.push({id:cmd.requestId,result});p.results=p.results.slice(-128);
     this.gameFor(p)?.changed();return result;

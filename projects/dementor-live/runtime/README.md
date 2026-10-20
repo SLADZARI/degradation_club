@@ -25,10 +25,6 @@
 
 [Отчёт и процедура миграции](docs/RELEASE_0.3.0_RC1.md). Доступны отдельная семенная лавка, городской опытный огород и реестр новых городов. Сводная ведомость `materials` показывает дерево и камень на всех этапах. `npm run test:persistence` проверяет реальный перезапуск с одним `world.json`, `npm run test:cities-browser` проверяет переход двух живых браузерных сессий. Перед обновлением VM обязателен отдельный backup `dementor-live-world`; в текущем кандидате используется новая `dementor-cities-v1` схема сохранения. ZIP собирается командой `npm run pack` или в GitHub Actions PR #261 после PASS.
 
-## Новые SVG-иконки · NEW-ONLY v3.1
+## DL-TERRAIN-01 / RC3 — покрытия земли (SVG-first)
 
-Интеграция **только 42 новых** номеров (21–62), старые 20 Paper Cut v2 — без изменения: [инструкция, список ID и QA](../design/asset-library/NEW_ONLY_ICONS_V3_1_2026-10-20.md). Скачать [архив с 42 SVG, 210 PNG и установщиком](https://drive.google.com/file/d/13nNQYJ0rLOasHLE2pGA5Vsx2TS2DTiM_/view). Локально: `python3 install_new_only.py /path/to/runtime`; скрипт оставит каталог `public/assets/paper-icons/` и старый код иконок без изменений. Перед публикацией нужны проверки реального Mac, HTTP и мобильного UI.
-
-## DL-TERRAIN-01 · изометрическая земля (P0 assets, no deployment)
-
-[ТЗ, 17 SVG, результаты QA и установка](../design/DL_TERRAIN_01_ISO30_P0_2026-10-20.md) · [готовый пакет SVG/атласов](https://drive.google.com/file/d/1ofFxr1jWCWGUhqlUfNtjQio4u-hFGYqw/view). Плитки 256×148, 1×1 клетки, ISO30. Загрузчик рендерит *только* имеющиеся `landscape.tiles`; старый процедурный слой остаётся fallback. Перед релизом обязательны iPhone Safari/две сессии/backup; production не обновлён.
+[ТЗ, UI-покупки, рюкзак, предпросмотр и серверные права](../design/DL_TERRAIN_01_RC3_GAMEPLAY.md) · [безопасный RC3 runbook](docs/RELEASE_0.5.0_RC3_TERRAIN_SAFE.md). Пять правил: **три товара — paving, grass, flowers; пакет 10 за 1 PAPER; старые 20 UI-иконок неизменны; частный участок покрывает только владелец; реальный world.json никогда не сбрасывать**. Отдельные 17 SVG собираются через `python3 tools/build-terrain.py` в один версионированный атлас на размер; в магазине отображать картинки атласа, покупку складывать в существующий `terrainBag`, на карте сначала выбирать ромб, потом «Применить». Статус: draft candidate, не продакшен. Измерить FPS и проверить два браузера/мобильный телефон перед merge и публикацией.

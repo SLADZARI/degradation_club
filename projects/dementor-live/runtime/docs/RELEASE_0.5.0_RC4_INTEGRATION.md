@@ -1,0 +1,7 @@
+# Dementor Live · consolidated RC4 · 20 Oct 2026
+
+**Status: integration candidate, NOT YET PRODUCTION.** Canonical candidate combines exact parents RC3 1b62ef5232dbd795015c465cb9491ca409797e46 and terrain/P4/P5 1c48a3d3a9a281d4bbd683e784b8112aab3b83a4. Only deploy following unified full-SHA CI PASS, offline backup-copy migration gate and production dry-run. Never reset world.json or named volume.
+
+Includes RC3 dynamic footprint evacuation and regression chain; P4/P5 obstacles and biomes; 17 SVG ISO30 editable source tiles, server-authorized purchase→bag→placement, atlas build and client tests; existing approved 20 Paper Cut v2 icons remain unchanged. Adds owner-approved 42 NEW-ONLY supplementary SVG icons 21..62 with 210 PNGs from original source archive (SHA256 83fdd8133a62e1c64e8704c9df887769f88cd4b7e6b4ee855aa3e0fe17bed99a). Release CI checks old 20 Paper Cut v2 sources remain unchanged. Experimental Obitel/Universe branches remain isolated and require their own rollout gates.
+
+Release scripts: npm run check:release; npm run check; npm test; npm run test:integration; npm run test:persistence; npm run test:mobile; npm run test:terrain-browser; npm run test:upgrade. Run browser and Docker GitHub Actions plus seven sequential gates on this exact SHA. Staging can use its own throwaway world but must not read/write production saves. Production must use deploy/publish-preserve-world.sh --dry-run, full volume+world.json backup, --apply <approved-full-SHA>, after players disconnect, with rollback of both image and volume.
