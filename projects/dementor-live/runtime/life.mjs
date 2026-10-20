@@ -3,6 +3,7 @@ import {randomUUID} from 'node:crypto';
 import {recordMaterial} from './city-expansion.mjs';
 import {TREE_SPECIES,growthStage} from './forestry.mjs';
 import {publiclyAccessible} from './estate.mjs';
+import {localFootprints} from './local-geometry.mjs';
 export const ITEMS={wood:{name:'Древесина',weight:1},stone:{name:'Камень',weight:2},food:{name:'Ягоды',weight:1},seed_hemp:{name:'Семена конопли',weight:.1},seed_carrot:{name:'Семена моркови',weight:.1},hemp:{name:'Конопля · сырьё',weight:1},carrot:{name:'Морковь',weight:1},water:{name:'Вода · л',weight:1},...Object.fromEntries(Object.entries(TREE_SPECIES).map(([k,v])=>[k,{name:'Семена: '+v.name,weight:.1}]))};
 export const LIFE={size:16,chestCapacity:80,tent:{wood:6,stone:2},crops:{hemp:{seed:'seed_hemp',duration:180000,yield:3,water:2},carrot:{seed:'seed_carrot',duration:120000,yield:3,water:2}},seedDuration:120000};
 export const scene=p=>p.scene||'city';
@@ -66,4 +67,4 @@ export function lifeAction(g,p,cmd){const {type,target}=cmd,s=g.state;
  }
  throw Error('Здесь это действие недоступно');
 }
-export function lifeSnapshot(g,p){const l=scene(p)==='expedition'?g.state.expedition:g.state.plots.find(l=>l.id===p.plotId);const e=g.state.expedition,blocking=e.home.nodes.filter(n=>['wood','stone'].includes(n.kind));return {expedition:{completedAt:e.completedAt,remaining:blocking.reduce((n,r)=>n+r.left,0),total:blocking.reduce((n,r)=>n+r.initial,0),gate:g.c.expedition.gate},items:ITEMS,lifeConfig:LIFE,scene:scene(p),home:l?{id:l.id,owner:l.owner,...l.home,chest:l.owner===p.id?l.home.chest:undefined,permits:l.owner===p.id?l.home.permits:undefined}:null,homeTargets:lifeTargets(g,p),trades:g.state.trades.filter(t=>[t.from,t.to].includes(p.id)&&t.status==='offered'&&t.expires>g.now),thefts:g.state.thefts.slice(-30),seedShop:g.state.seedShop};}
+export function lifeSnapshot(g,p){const l=scene(p)==='expedition'?g.state.expedition:g.state.plots.find(l=>l.id===p.plotId);const e=g.state.expedition,blocking=e.home.nodes.filter(n=>['wood','stone'].includes(n.kind));return {expedition:{completedAt:e.completedAt,remaining:blocking.reduce((n,r)=>n+r.left,0),total:blocking.reduce((n,r)=>n+r.initial,0),gate:g.c.expedition.gate},items:ITEMS,lifeConfig:LIFE,scene:scene(p),home:l?{id:l.id,owner:l.owner,...l.home,chest:l.owner===p.id?l.home.chest:undefined,permits:l.owner===p.id?l.home.permits:undefined}:null,homeTargets:lifeTargets(g,p),homeFootprints:localFootprints(scene(p),l?.home,g.now),trades:g.state.trades.filter(t=>[t.from,t.to].includes(p.id)&&t.status==='offered'&&t.expires>g.now),thefts:g.state.thefts.slice(-30),seedShop:g.state.seedShop};}
