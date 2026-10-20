@@ -43,6 +43,13 @@ async function goContext(page,id){
   await goContext(page,'obitel-zen-entry');
   await page.waitForFunction(()=>state.scene==='obitel-zen');
   assert.equal(await page.evaluate(()=>state.worldTravel.targets.filter(x=>x.type==='obitel-card').length),7);
+  const routeLength=await page.evaluate(()=>{
+    const route=findPath({x:3,y:23});
+    if(!route)return -1;
+    const points=[{x:me.x,y:me.y},...route],distance=points.reduce((sum,p,i)=>i?sum+Math.hypot(p.x-points[i-1].x,p.y-points[i-1].y):0,0);
+    return Math.round(distance);
+  });
+  assert.ok(routeLength>35,'ring client path cannot bypass mountain or back door: '+routeLength);
   await position(7,7);
   await goContext(page,'OB-C01');
   await page.locator('#obitelCardDialog').waitFor({state:'visible'});
