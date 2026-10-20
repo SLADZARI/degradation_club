@@ -15,6 +15,9 @@ async function patch(player,patch){const r=await fetch(base+'/__test',{method:'P
  assert.equal(await page.locator('#quest').isVisible(),true);assert.equal(await page.locator('#questActive').isVisible(),true);
  assert.equal(await page.locator('#questList').isVisible(),false);
  await page.locator('#questViewToggle').click();assert.equal(await page.locator('#questList').isVisible(),true);
+ assert.equal(await page.locator('#questActive').isVisible(),false,'Current task should not appear twice in full mode');
+ await page.locator('#questViewToggle').click();assert.equal(await page.locator('#questActive').isVisible(),true);
+ await page.locator('#questActive').click();assert.equal(await page.evaluate(()=>selected),'tools','Current task should navigate to its interactable');
  await page.locator('#questToggle').click();assert.equal(await page.locator('#quest').evaluate(e=>e.classList.contains('collapsed')),true);
  await page.locator('#questToggle').click();
  const before=await page.evaluate(()=>({x:me.x,y:me.y}));
@@ -23,6 +26,15 @@ async function patch(player,patch){const r=await fetch(base+'/__test',{method:'P
  const screenX=((after.x-after.y)-(before.x-before.y))*Math.sqrt(3)/2;
  const screenY=((after.x+after.y)-(before.x+before.y))*.5;
  assert.ok(screenY>.4,'ArrowDown must travel visibly downward');assert.ok(Math.abs(screenX)<.5,'ArrowDown must not move sideways');
+ const neighbor=await browser.newPage({viewport:{width:1200,height:800}});neighbor.on('pageerror',e=>errors.push('neighbor: '+e.message));
+ await neighbor.goto(base);await neighbor.getByLabel('Как тебя зовут?').fill('Сосед');await neighbor.getByRole('button',{name:'Войти в мир'}).click();
+ await neighbor.waitForFunction(()=>typeof me!=='undefined'&&me&&connected);
+ await page.waitForFunction(()=>state.players.filter(p=>p.online).length===2);
+ assert.match(await page.locator('#connection').innerText(),/Жители.*2/);
+ await neighbor.locator('#chatInput').fill('Привет, сосед!');
+ await neighbor.locator('#chatForm button[type="submit"]').click();
+ await page.waitForFunction(()=>state.chat.some(m=>m.text==='Привет, сосед!'));
+ assert.ok(await page.evaluate(()=>state.chat.some(m=>m.text==='Привет, сосед!'&&m.player!==me.id)),'Incoming speech must be visible to neighbor');
  const player=await page.evaluate(()=>me.id);
  await patch(player,{x:16.7,y:4,wallet:5});await page.waitForFunction(()=>Math.abs(me.x-16.7)<.01&&me.wallet===5);
  await page.evaluate(()=>openCityPanel('landscape'));
@@ -35,5 +47,5 @@ async function patch(player,patch){const r=await fetch(base+'/__test',{method:'P
  await page.waitForFunction(()=>state.landscape?.tiles?.some(t=>t.x===14&&t.y===9&&t.kind==='paving'));
  assert.equal(await page.evaluate(()=>me.terrainBag.paving),9);
  assert.deepEqual(errors,[],'Browser page errors');
- console.log('PASS: quest modes, residents count, arrow-down axes, landscape store and placed paving');
+ console.log('PASS: quest modes, two residents and chat, arrow-down axes, landscape store and placed paving');
 } catch(e){console.error(e);process.exitCode=1;}finally{if(browser)await browser.close();if(server&&server.exitCode===null){server.kill('SIGTERM');await new Promise(r=>server.once('exit',r));}fs.rmSync(tmp,{recursive:true,force:true});}})();
