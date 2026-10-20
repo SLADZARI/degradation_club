@@ -25,6 +25,12 @@ el('qaAdminSubmit').onclick=async()=>{
   const result=await response.json();el('qaAdminMessage').textContent=result.message||'Ошибка запроса';
  }catch{el('qaAdminMessage').textContent='Нет соединения с казначейством';}
 };
+// Large, accessible starvation hint accompanies the visual vignette.
+const warning=document.createElement('div');warning.id='urgentHunger';warning.hidden=true;warning.setAttribute('role','status');document.querySelector('#game')?.append(warning);
+const priorUpdate=updateUI;
+updateUI=function(){priorUpdate();if(!me)return;const dying=me.spirit||me.hunger<state.config.slowBelow;
+ warning.hidden=!dying;warning.textContent=me.spirit?'Ты потерял тело · найди ягоды, чтобы вернуться':me.bag.food||me.bag.carrot?'Ты умираешь с голоду! Нажми F или кнопку «ЕСТЬ»':'Ты умираешь с голоду! Срочно найди ягоды';
+};
 let vertical=false;const vitals=document.getElementById('vitals');
 try{vertical=localStorage.getItem('dementor-vitals-column')==='true';}catch{}
 vitals.classList.toggle('vitals-column',vertical);
