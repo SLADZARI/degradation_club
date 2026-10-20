@@ -22,7 +22,7 @@ function connect(){stream?.close();motionFrames.length=0;stream=new EventSource(
  if(!Array.isArray(prev)||prev.length!==d.from||(state?.cityNetwork?.current||'origin')!==d.city){
    stream.close();queueMicrotask(connect);return;
  }
- next.landscape={...next.landscape,tiles:d.tiles.length?prev.concat(d.tiles):prev};delete next.landscapeDelta;
+ next.landscape=d.tiles.length?{...next.landscape,tiles:prev.concat(d.tiles)}:state.landscape;delete next.landscapeDelta;
 }
 state=next;me=state.players.find(p=>p.id===state.me);if(lastScene!==state.scene+me.plotId+(state.cityNetwork?.current||'origin')){lastScene=state.scene+me.plotId+(state.cityNetwork?.current||'origin');resize();motionFrames.length=0;route=[];selected=null;context=null;if($('cityPanel').open)$('cityPanel').close();}motionFrames.push({at:performance.now(),players:new Map(state.players.map(p=>[p.id,{x:p.x,y:p.y,spirit:p.spirit}]))});if(motionFrames.length>20)motionFrames.shift();connected=true;updateUI();};stream.onerror=()=>{connected=false;$('connection').classList.add('offline');$('connection').lastChild.textContent='Нет связи';};}
 $('joinForm').onsubmit=async e=>{e.preventDefault();const button=e.target.querySelector('button');button.disabled=true;try{const result=await api('join',{name:$('nameInput').value,gender:$('genderInput').value});if(!result.ok){$('joinError').textContent=result.message;return;}token=result.token;sessionStorage.setItem('dementor-token',token);$('welcome').close();connect();canvas.focus();}catch{$('joinError').textContent='Сервер недоступен. Проверь локальный запуск.';}finally{button.disabled=false;}};
@@ -370,7 +370,7 @@ function updateTerrainBar(){
  if(!placementKind)return;
  const cell=placementCell|| (hoverWorld?{x:Math.floor(hoverWorld.x),y:Math.floor(hoverWorld.y)}:null);
  const reason=cell?terrainCanPlace(placementKind,cell.x,cell.y):'Нажми на клетку, чтобы выбрать место';
- terrainStatus.textContent=(state?.landscapeProducts?.[placementKind]?.name||placementKind)+' · '+(me?.terrainBag?.[placementKind]||0)+' шт. · '+(cell?cell.x+','+cell.y+' · ':'')+(reason||'Можно уложить');
+ const line=(state?.landscapeProducts?.[placementKind]?.name||placementKind)+' · '+(me?.terrainBag?.[placementKind]||0)+' шт. · '+(cell?cell.x+','+cell.y+' · ':'')+(reason||'Можно уложить');if(terrainStatus.textContent!==line)terrainStatus.textContent=line;
  terrainApply.disabled=!!reason||!placementCell||requestPending;
 }
 async function applyTerrainCell(){
