@@ -38,9 +38,10 @@ let server,browser;
  // Real browser / server check: projection AND controls never change on plot/interior entry.
  const playerId=await page.evaluate(()=>me.id);
  async function enterFixture(scene){
-   const response=await fetch(base+'/__test',{method:'POST',headers:{'Content-Type':'application/json','x-test-key':'local-integration-tests'},body:JSON.stringify({player:playerId,patch:{scene,plotId:'plot-1',x:8,y:8}})});
+   const spawnY=scene==='interior'?11:8; // Test free walking; collisions are asserted independently.
+   const response=await fetch(base+'/__test',{method:'POST',headers:{'Content-Type':'application/json','x-test-key':'local-integration-tests'},body:JSON.stringify({player:playerId,patch:{scene,plotId:'plot-1',x:8,y:spawnY}})});
    assert.equal(response.status,200,'isolated scene fixture '+scene);
-   await page.waitForFunction(expected=>state?.scene===expected&&me?.x===8&&me?.y===8,scene);
+   await page.waitForFunction(expected=>state?.scene===expected.scene&&me?.x===8&&me?.y===expected.y,{scene,y:spawnY});
    await page.waitForTimeout(200);
    const geometry=await page.evaluate(()=>{const a=screen(8,8),b=screen(9,9),c=screen(10.4,6.2),hit=worldPoint(c.x,c.y);return {diamondX:b.x-a.x,diamondY:b.y-a.y,hitX:hit.x,hitY:hit.y};});
    assert.ok(Math.abs(geometry.diamondX)<.00001&&geometry.diamondY>0,'ISO30 diamond on '+scene);
