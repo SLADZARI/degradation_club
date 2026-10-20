@@ -37,7 +37,20 @@ export class Game {
   auth(token){return Object.values(this.state.players).find(p=>p.token===token);}
   connect(p){this.online.add(p.id);this.inputs.set(p.id,{dx:0,dy:0,sprint:false,at:this.now});this.changed();}
   disconnect(p){this.online.delete(p.id);this.inputs.delete(p.id);p.job=null;this.changed();}
-  rects(){return [{x:4,y:4,w:4,h:3}];}
+  rects(){const s=this.state,footprints=[
+ {x:4,y:4,w:4,h:3,id:'mayor-tent'},
+ {x:22.7,y:1,w:2.6,h:2,id:'tool-shop'},
+ {x:10.7,y:25,w:2.6,h:3,id:'warehouse'},
+ {x:2.9,y:7.7,w:.6,h:.6,id:'work-board'},
+ {x:18.7,y:5.7,w:.6,h:.6,id:'city-registry'},
+ {x:16.4,y:11.4,w:1.2,h:1.2,id:'monument'},
+ {x:20.7,y:11.7,w:.6,h:.6,id:'jukebox'},
+ {x:18.7,y:10.5,w:.6,h:.6,id:'donation-board'},
+ {x:22.7,y:10.5,w:.6,h:.6,id:'theft-board'}
+ ];if(s.seedMarket?.stage>=this.c.seedMarket.stages.length)footprints.push({x:21.8,y:5.3,w:2.5,h:2,id:'seed-shop'});
+ if(s.forge?.stage>=this.c.forge.stages.length)footprints.push({x:24,y:23,w:6,h:5,id:'forge'});
+ if(s.gardenProject?.stage>=this.c.cityGarden.stages.length)footprints.push({x:25.5,y:8.4,w:5.6,h:2.5,id:'public-garden'});
+ return footprints;}
   walkable(x,y,p=null){if(p&&scene(p)!=='city'){if(x<.5||y<.5||x>15.5||y>15.5)return false;const h=scene(p)==='expedition'?this.state.expedition.home:this.state.plots.find(l=>l.id===p.plotId)?.home;if(['plot','expedition'].includes(scene(p))&&h?.nodes.some(n=>n.left>0&&Math.hypot(x-n.x,y-n.y)<.58))return false;return true;}const r=.3,c=this.c;if(x<r||y<r||x>c.width-r||y>c.height-r)return false;
     if(x+r>c.river.x&&x-r<c.river.x+c.river.w&&!(this.state.bridge.stage>=c.bridge.stages.length&&y-r>=c.bridge.y&&y+r<=c.bridge.y+c.bridge.h))return false;
     if(this.rects().some(o=>x+r>o.x&&x-r<o.x+o.w&&y+r>o.y&&y-r<o.y+o.h))return false;
@@ -221,7 +234,7 @@ export class Game {
       if(p.job&&this.now>=p.job.ends)this.finish(p);
     }
   }
-  snapshot(p){syncEquipment(p,this.c);const s=this.state,c=this.c;return {plaza:plazaSnapshot(this,p),...lifeSnapshot(this,p),now:this.now,revision:s.revision,me:p.id,config:c,treasury:s.treasury,project:s.project,forge:s.forge,seedMarket:s.seedMarket,gardenProject:s.gardenProject,publicGarden:s.publicGarden,materials:cityMaterialReport(this),materialEvents:s.materialEvents.slice(-30),bridge:{...s.bridge,reserved:{wood:this.committed('wood',false,'bridge'),stone:this.committed('stone',false,'bridge')}},plots:s.plots.map(({home,...plot})=>plot),resources:s.resources,
+  snapshot(p){syncEquipment(p,this.c);const s=this.state,c=this.c;return {plaza:plazaSnapshot(this,p),...lifeSnapshot(this,p),now:this.now,revision:s.revision,me:p.id,config:c,treasury:s.treasury,citySolids:this.rects(),project:s.project,forge:s.forge,seedMarket:s.seedMarket,gardenProject:s.gardenProject,publicGarden:s.publicGarden,materials:cityMaterialReport(this),materialEvents:s.materialEvents.slice(-30),bridge:{...s.bridge,reserved:{wood:this.committed('wood',false,'bridge'),stone:this.committed('stone',false,'bridge')}},plots:s.plots.map(({home,...plot})=>plot),resources:s.resources,
     warehouse:{...s.warehouse,free:{wood:this.warehouseFree('wood'),stone:this.warehouseFree('stone')},funds:this.cityFunds()},courierOffers:['mayor','bridge'].flatMap(destination=>['wood','stone'].map(k=>this.courierOffer(k,destination))).filter(Boolean),drops:s.drops.filter(d=>(d.scene||'city')===scene(p)&&(scene(p)==='city'||d.plotId===p.plotId)),
     players:Object.values(s.players).filter(o=>o.id===p.id||this.online.has(o.id)||s.plots.some(x=>x.owner===o.id)).map(o=>({id:o.id,name:o.name,x:o.x,y:o.y,scene:scene(o),plotId:o.plotId||null,color:o.color,online:this.online.has(o.id),spirit:o.spirit,...(o.id===p.id?{wallet:o.wallet,bag:o.bag,toolItems:o.toolItems,activeTools:o.activeTools,tools:o.tools,toolInfo:o.toolInfo,equipped:o.equipped,hunger:o.hunger,health:o.health,stamina:o.stamina,job:o.job,delivery:o.delivery||null}: {})})),
     chat:s.chat.filter(m=>this.now-m.at<600000&&(m.scene||'city')===scene(p)&&(scene(p)==='city'||m.plotId===p.plotId)&&distance(p,m)<=c.chatRange).slice(-15)};
