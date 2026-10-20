@@ -27,7 +27,7 @@
 
 ## Первая партия — 35 изометрических SVG
 
-**[Архив со всеми SVG/PNG/скриптами и CSV-аудитом](https://drive.google.com/file/d/1XX0CgvZmEzdLajSlLAw8Y93Gh-4D7X2z/view)** · ZIP **555 254 байт** · SHA-256 `4a1f9506ca1fb8ea80534a855e81d80b542eda47225c066d4b20d0444aa37a7e`.
+**[Архив со всеми SVG/PNG/скриптами и CSV-аудитом](https://drive.google.com/file/d/1XX0CgvZmEzdLajSlLAw8Y93Gh-4D7X2z/view)** · ZIP **556 137 байт** · SHA-256 `da8af92d9560718b857e6c7c53ab42d8eabdab55483d69aa278d23c2a8fa7c81`.
 
 **[Контрольный лист всех 35 рисунков](https://drive.google.com/file/d/1Cb8DmFzIklY8JnrSECnX52pEwjUpghX-/view)**.
 
