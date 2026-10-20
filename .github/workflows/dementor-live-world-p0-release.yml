@@ -25,6 +25,8 @@ jobs:
         run: |
           bash -n deploy/publish-clean-world.sh
           node -e "if(require('./package.json').version!=='0.4.0-world-p0')process.exit(1)"
+      - name: Import exact approved 20-icon artwork and verify SHA
+        run: npm run prepare:icons
       - name: Model/syntax/QA checks
         run: npm run check
       - name: Regression - malicious syntax in AppleDouble metadata must be ignored
