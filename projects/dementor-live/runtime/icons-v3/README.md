@@ -11,15 +11,17 @@
 - URL static handler serves only exact whitelisted new source names and PNG sizes. CSP remains unchanged; new files use original self origin.
 
 ## Reproducible rollout
-Extract ZIP and in a terminal:
+Use the candidate runtime wrapper from its root:
 
 ```
-python3 install_new_only.py /path/to/existing/dementor-live/runtime
-node --check /path/to/existing/dementor-live/runtime/server.mjs
-node --check /path/to/existing/dementor-live/runtime/public/new-icons-v3.js
+python3 tools/install-new-icons-v3.py .
+npm run check:icons
+npm run check:icons-new
 ```
 
-Then restart `npm start` from existing `runtime`, hard-refresh browser. Before applying to a real VM, test with disposable save, verify all new image HTTP 200, old v2 hashes, desktop/mobile UI, backup/save migration and release gate. Never `--reset-world`.
+The wrapper verifies the approved ZIP SHA and entries, extracts assets to a temporary directory, and overlays only the checked-in `icons-v3/install_new_only.py` implementation before installation. The ZIP and its 42 SVG / 210 PNG payload are unchanged. The checked-in installer exposes the exact new-only manifest URL as JSON; the smoke check exercises GET/HEAD against an isolated server.
+
+Then restart `npm start` from existing `runtime`, hard-refresh browser. Before applying to a real VM, test with disposable save, verify new image HTTP 200, old v2 hashes, desktop/mobile UI, backup/save migration and release gate. Never `--reset-world`.
 
 ## Expected acceptance state
 All 42 new independent SVGs, 210 PNGs and ID mapping pass static checks; existing 20 left unchanged; runtime activation may still require browser/mobile QA for final release. A successful ZIP build is not equivalent to a deployed server. Keep this as release candidate until approved.
