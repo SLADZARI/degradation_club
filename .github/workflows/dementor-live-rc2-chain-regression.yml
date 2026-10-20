@@ -1,8 +1,9 @@
-name: Dementor Live RC2 — Chain Regression and Isolated Reproduction
+name: Dementor Live RC3 — Chain Regression and Isolated Reproduction
 on:
   push:
     branches:
       - qa/dementor-live-rc2-chain-audit-2026-10-20
+      - release/dementor-live-civic-p3-safe-upgrade-rc3-2026-10-20
   workflow_dispatch:
 permissions:
   contents: read
