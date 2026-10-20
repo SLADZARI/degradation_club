@@ -6,7 +6,9 @@ ENV NODE_ENV=production \
     DEMENTOR_STATE=/app/data/world.json
 
 WORKDIR /app
+RUN apt-get update && apt-get install -y --no-install-recommends python3 && rm -rf /var/lib/apt/lists/*
 COPY --chown=node:node . .
+RUN python3 icons-v2/install-v2.py /app /app/icons-v2
 RUN npm run doctor && npm run check && install -d -o node -g node /app/data
 
 USER node
