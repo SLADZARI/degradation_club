@@ -7,7 +7,7 @@ function setRoute(path){route=path;routeActivity={x:me?.x||0,y:me?.y||0,at:perfo
 let view={w:innerWidth,h:innerHeight,s:28,cx:innerWidth<760?10:16,cy:innerWidth<760?12:16,zoom:innerWidth<760?1.15:1},toastTimer;
 const motionFrames=[];
 let lastWallet=null,lastChatSignature='';
-let seenChatIds=null,hoverWorld=null,placementKind=null;
+let seenChatIds=null,hoverWorld=null,placementKind=null,placementTarget=null;
 const colors=['#a97059','#6e8971','#65858f'];
 const names={wood:'Древесина',stone:'Камень',food:'Ягоды',seed_hemp:'Семена конопли',seed_carrot:'Семена моркови',hemp:'Конопля',carrot:'Морковь',water:'Вода'};
 const toolNames={axe:'🪓 Топор',pick:'⛏️ Кирка'};
@@ -318,7 +318,11 @@ function findPath(dest){const step=.5,start={x:Math.round(me.x/step),y:Math.roun
    });
 }
 function selectWorldTarget(e){if(e.button===2)return;if(!me||$('welcome').open)return;canvas.focus();const r=canvas.getBoundingClientRect(),w=worldPoint(e.clientX-r.left,e.clientY-r.top);
- if(placementKind){if(state.scene!=='city'){toast('Покрытие можно уложить только в городе');return;}const kind=placementKind;act('landscapePlace',null,{kind,x:Math.floor(w.x),y:Math.floor(w.y)}).then(result=>{if(result?.ok&&!(me.terrainBag?.[kind]>1))setPlacementKind(null);});return;}const targets=allTargets().sort((a,b)=>Math.hypot(a.x-w.x,a.y-w.y)-Math.hypot(b.x-w.x,b.y-w.y));const pile=targets.find(t=>t.type==='pickup'&&Math.hypot(t.x-w.x,t.y-w.y)<.7);const plot=pile||state.scene!=='city'?null:state.plots.find(p=>w.x>=p.x&&w.x<=p.x+p.w&&w.y>=p.y&&w.y<=p.y+p.h);let t=pile||(plot?targets.find(t=>t.id===plot.id):targets[0]);const insideSquare=state.scene==='city'&&w.x>=14&&w.x<=24&&w.y>=10&&w.y<=18;if(!plot&&insideSquare&&Math.hypot(t.x-w.x,t.y-w.y)>=1.3)t=targets.find(t=>t.id==='build');
+ if(placementKind){
+   placementTarget={x:Math.floor(w.x),y:Math.floor(w.y)};
+   updateTerrainDock();
+   return;
+ }const targets=allTargets().sort((a,b)=>Math.hypot(a.x-w.x,a.y-w.y)-Math.hypot(b.x-w.x,b.y-w.y));const pile=targets.find(t=>t.type==='pickup'&&Math.hypot(t.x-w.x,t.y-w.y)<.7);const plot=pile||state.scene!=='city'?null:state.plots.find(p=>w.x>=p.x&&w.x<=p.x+p.w&&w.y>=p.y&&w.y<=p.y+p.h);let t=pile||(plot?targets.find(t=>t.id===plot.id):targets[0]);const insideSquare=state.scene==='city'&&w.x>=14&&w.x<=24&&w.y>=10&&w.y<=18;if(!plot&&insideSquare&&Math.hypot(t.x-w.x,t.y-w.y)>=1.3)t=targets.find(t=>t.id==='build');
   if(t&&(plot||insideSquare||Math.hypot(t.x-w.x,t.y-w.y)<1.3)){selected=t.id;if(Math.hypot(t.x-me.x,t.y-me.y)<=state.config.actionRange){updateContext();return;}
     let candidates=[];for(const[dx,dy]of [[0,1.4],[-1.4,0],[1.4,0],[0,-1.4]]){let dest={x:t.x+dx,y:t.y+dy};const path=findPath(dest);if(path)candidates.push(path);}candidates.sort((a,b)=>pathDistance(a)-pathDistance(b));if(candidates[0])setRoute(candidates[0]);else toast('Пока нет доступного пути');
   }else{selected=null;const path=findPath(w);if(path)setRoute(path);else toast(w.x>=state.config.river.x&&!bridgeOpen()?'Здесь нужна переправа. Сначала достройте мост.':'Не получается пройти — выбери свободное место.');}
@@ -351,7 +355,53 @@ function endTouch(e,cancelled=false){
 canvas.addEventListener('pointerup',e=>endTouch(e));
 canvas.addEventListener('pointercancel',e=>endTouch(e,true));
 
-function setPlacementKind(kind){placementKind=kind;canvas.classList.toggle('placing-terrain',!!kind);if(kind){$('cityPanel').close();toast('Укладка: нажми на свободную клетку рядом. Esc — выход.');}else toast('Режим укладки выключен');}
+// Preview/confirm mode works with click or mobile tap; server revalidates every action.
+const terrainDock=document.createElement('div');terrainDock.id='terrain-placement';terrainDock.hidden=true;terrainDock.setAttribute('role','group');
+const terrainTitle=document.createElement('strong'),terrainHint=document.createElement('span');
+const terrainApply=document.createElement('button'),terrainCancel=document.createElement('button');
+terrainApply.type='button';terrainApply.textContent='Применить';terrainCancel.type='button';terrainCancel.textContent='Отмена';
+terrainDock.append(terrainTitle,terrainHint,terrainApply,terrainCancel);
+document.querySelector('#game').append(terrainDock);
+const terrainLabels={paving:'Дорожная плитка',grass:'Газон',flowers:'Цветы'};
+function terrainPlacementReason(t){
+ if(!placementKind||!t)return 'Выбери клетку на земле';
+ if(state?.scene!=='city')return 'Укладка доступна только в городе';
+ if(!Number.isInteger(t.x)||!Number.isInteger(t.y)||t.x<0||t.y<0||t.x>=state.config.width||t.y>=state.config.height)return 'За пределами карты';
+ if(me?.spirit||me?.job||me?.delivery?.picked)return 'Сначала заверши текущее дело';
+ if(!me?.terrainBag?.[placementKind])return 'Материал закончился';
+ if(Math.hypot(me.x-(t.x+.5),me.y-(t.y+.5))>state.config.actionRange)return 'Слишком далеко от игрока';
+ if(window.DLTerrain01?.kindAt(state,t.x,t.y))return 'Клетка уже занята покрытием';
+ for(const p of state.plots||[])if(t.x<p.x+p.w&&t.x+1>p.x&&t.y<p.y+p.h&&t.y+1>p.y){
+   if(!p.owner)return 'Участок зарезервирован для покупки';
+   if(p.owner!==me.id)return 'Чужая территория';
+ }
+ if(blocked(t.x+.5,t.y+.5))return 'Клетка занята зданием или препятствием';
+ return '';
+}
+function updateTerrainDock(){
+ terrainDock.hidden=!placementKind;
+ if(!placementKind)return;
+ terrainTitle.textContent=terrainLabels[placementKind]||placementKind;
+ const issue=terrainPlacementReason(placementTarget);
+ terrainHint.textContent=placementTarget?`Клетка (${placementTarget.x}, ${placementTarget.y}) · ${issue||'доступна'}`:'Коснись клетки на карте, затем нажми «Применить»';
+ terrainApply.disabled=!placementTarget||!!issue||requestPending;
+}
+terrainCancel.onclick=()=>setPlacementKind(null);
+terrainApply.onclick=async()=>{
+ if(!placementTarget||terrainPlacementReason(placementTarget))return updateTerrainDock();
+ const {x,y}=placementTarget,kind=placementKind;
+ terrainApply.disabled=true;
+ const left=me?.terrainBag?.[kind]||0;
+ const result=await act('landscapePlace',null,{kind,x,y});
+ if(result?.ok){placementTarget=null;if(left<=1){setPlacementKind(null);return;}}
+ updateTerrainDock();
+};
+
+function setPlacementKind(kind){
+ placementKind=kind;placementTarget=null;canvas.classList.toggle('placing-terrain',!!kind);
+ if(kind){$('cityPanel').close();toast('Выбери клетку, затем нажми «Применить»');}
+ updateTerrainDock();
+}
 function zoom(value){if(!Number.isFinite(value)||value<=0)return;view.zoom=Math.max(.65,Math.min(2.5,view.zoom*value));resize();}
 $('zoomIn').onclick=()=>zoom(1.2);$('zoomOut').onclick=()=>zoom(1/1.2);$('centerButton').onclick=()=>{if(me)openCityPanel('places');};
 canvas.addEventListener('wheel',e=>{e.preventDefault();zoom(e.deltaY<0?1.08:1/1.08);},{passive:false});
@@ -518,9 +568,23 @@ function render(time){positionWindows();ctx.clearRect(0,0,view.w,view.h);ctx.fil
   ctx.fillStyle='#6b6f4b0a';for(let i=0;i<340;i++){const x=(i*137.23)%view.w,y=(i*211.71)%view.h;ctx.fillRect(x,y,1,1);}
   const c=state?.config||{width:48,height:32,river:{x:34,w:4}};
   groundRect({x:0,y:0,w:c.width,h:c.height},'#f3efdf88','#cbd0b230');
+ if(!(window.DLTerrain01?.draw(ctx,state,screen,view.s,worldPoint))){
  if(state?.landscape?.tiles)for(const tile of state.landscape.tiles){const col=tile.kind==='paving'?'#d6c7a6':tile.kind==='grass'?'#b4c49f':'#d5c2aa';groundRect({x:tile.x,y:tile.y,w:1,h:1},col,'#a8aa93');if(tile.kind==='flowers'){const p=screen(tile.x+.5,tile.y+.5),r=Math.max(2,view.s*.11);for(const [dx,dy]of [[-1,0],[1,0],[0,-1],[0,1]]){ctx.beginPath();ctx.arc(p.x+dx*r,p.y+dy*r,r*.7,0,7);ctx.fillStyle='#c68981';ctx.fill();}ctx.beginPath();ctx.arc(p.x,p.y,r*.45,0,7);ctx.fillStyle='#e8d5a8';ctx.fill();}}
+  }
+  if(!window.DLTerrain01?.ready){
   ctx.strokeStyle='#9ca27e12';ctx.lineWidth=.6;for(let x=0;x<=c.width;x+=2){const a=screen(x,0),b=screen(x,c.height);line(a.x,a.y,b.x,b.y,'#9ca27e12',.6);}for(let y=0;y<=c.height;y+=2){const a=screen(0,y),b=screen(c.width,y);line(a.x,a.y,b.x,b.y,'#9ca27e12',.6);}
   // No pre-painted footpaths: paving will be placed by players.
+  }
+  // Ghost overlay is in the ground pass, underneath buildings/NPCs/player.
+  if(placementKind&&state?.scene==='city'){
+    const t=placementTarget||(hoverWorld?{x:Math.floor(hoverWorld.x),y:Math.floor(hoverWorld.y)}:null);
+    if(t&&t.x>=0&&t.y>=0&&t.x<c.width&&t.y<c.height){
+      const corners=[screen(t.x,t.y),screen(t.x+1,t.y),screen(t.x+1,t.y+1),screen(t.x,t.y+1)];
+      const valid=!terrainPlacementReason(t);
+      ctx.save();ctx.beginPath();corners.forEach((v,i)=>i?ctx.lineTo(v.x,v.y):ctx.moveTo(v.x,v.y));ctx.closePath();
+      ctx.fillStyle=valid?'#7aaf7899':'#c4696299';ctx.fill();ctx.lineWidth=2.2;ctx.strokeStyle=valid?'#386a45':'#9e3937';ctx.stroke();ctx.restore();
+    }
+  }
   groundRect({x:c.river.x,y:0,w:c.river.w,h:c.height},'#becdc8','#96ada256');
   for(const bank of [c.river.x,c.river.x+c.river.w]){const a=screen(bank,0),b=screen(bank,c.height);line(a.x,a.y,b.x,b.y,'#96ada256',2);}
   for(let i=0;i<20;i++){const p=screen(34.5+(i%3)*.95,.8+i*1.6);line(p.x,p.y,p.x+view.s*.7,p.y,'#e6ede352',1);}
