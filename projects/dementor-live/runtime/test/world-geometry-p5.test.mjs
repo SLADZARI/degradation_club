@@ -21,7 +21,7 @@ test('Every world structure has a footprint; markers, public routes and existing
  }
  assert.ok(WORLD_DESERT.x>WORLD_SUMMIT_TRAIL.at(-1)[0]);
  assert.ok(WORLD_CACTI.length>=3);
- const clashes=footprintConflicts(f).filter(pair=>pair.some(id=>id.startsWith('tiered-rock-')||id.startsWith('desert-cactus-')));
+ const clashes=footprintConflicts(f);
  assert.deepEqual(clashes,[],'New procedural rocks and cacti must never overlap any physical footprint');
 });
 test('Tier 2–5 rocks have finite, shrinking, persisted bounds; mining near perimeter works',()=>{
@@ -64,4 +64,20 @@ test('Player-laid road still yields 20% movement boost; no new double-spending',
  p.x=9.5;p.y=42.5;g.input(p,{dx:1,dy:0,sprint:false});
  const x=p.x;g.tick(200);
  assert.ok(p.x-x>.80&&p.x-x<1,'Paving applies ~1.2x of 4 cells/sec');
+});
+
+test('Mountain summit grants treasury-backed one-time recognition, persists across reload and never double-pays',()=>{
+ const g=new Game(createWorld()),p=g.join('Восходитель');g.connect(p);
+ const t=g.target('mountain-summit');p.x=t.x;p.y=t.y;
+ assert.equal(g.walkable(p.x,p.y,p),true);
+ const money=g.state.treasury+p.wallet;
+ const first=command(g,p,'worldUse','mountain-summit');
+ assert.equal(first.ok,true,first.message);assert.equal(first.reward,40);
+ assert.equal(p.wallet,40);assert.equal(g.state.treasury+p.wallet,money);
+ const second=command(g,p,'worldUse','mountain-summit');
+ assert.equal(second.ok,true);assert.equal(p.wallet,40);
+ const old=new Game(structuredClone(g.state)),resident=old.auth(p.token);
+ assert.ok(resident.worldTravel.summitReachedAt);
+ assert.equal(command(old,resident,'worldUse','mountain-summit').reward,undefined);
+ assert.equal(resident.wallet,40);
 });
