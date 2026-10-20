@@ -7,10 +7,10 @@ set -Eeuo pipefail
 REPO="SLADZARI/degradation_club"
 HOST="138.199.144.94"
 USER_NAME="root"
-RELEASE_BRANCH="release/dementor-live-2026-10-20-integrated-rc4"
-EXACT_RELEASE_SHA="970882dee4bf55fe2ab143c0c9e791e79c353e43"
+RELEASE_BRANCH="hotfix/dementor-live-rc4-saved-resident-recovery-2026-10-20"
+EXACT_RELEASE_SHA="a38a03e68fcec5ceac45c0c362436ee6d69d5c5d"
 EXPECTED_VERSION="0.5.0-rc.4"
-RUNS=(39468417813 39468427692 39468427666 39468427838 39468427801)
+RUNS=(39473604439 39473604350 39473604513 39473604305 39473604530)
 
 info(){ printf '\n== %s ==\n' "$*"; }
 stop(){ printf '\nSTOP: %s\n' "$*" >&2; return 1; }
@@ -96,6 +96,16 @@ docker run --rm -v "$PWD:/work:ro" -w /work node:22-bookworm-slim npm run check:
 echo 'Проверка Docker, тома и окружения без изменений'
 bash deploy/publish-preserve-world.sh --dry-run
 
+echo '=== Проверяем предыдущую настоящую резервную копию БЕЗ остановки работающего сервера ==='
+# This immutable file was created by the failed (safely rolled back) RC4 attempt.
+LAST_FROZEN_BACKUP="/srv/dementor-live/backups/safe-20261020T180923Z-970882dee4/world.json"
+[ -s "$LAST_FROZEN_BACKUP" ] || { echo 'STOP: проверенная сохранённая копия не найдена; боевой сервер не трогаем'; exit 1; }
+PREVIEW_IMAGE="dementor-live:preflight-$SHA"
+docker build --quiet -t "$PREVIEW_IMAGE" -f deploy/Dockerfile .
+docker run --rm --entrypoint node \
+  --mount "type=bind,source=$LAST_FROZEN_BACKUP,target=/readonly/world.json,readonly" \
+  "$PREVIEW_IMAGE" tools/upgrade-audit.mjs /readonly/world.json
+echo '=== PASS: предыдущая резервная копия совместима. Теперь создадим свежую после остановки игры ==='
 echo 'Сборка, остановка игры, полная копия world.json и тома, миграционная проверка, публикация, автоматический откат при ошибке'
 bash deploy/publish-preserve-world.sh --apply "$SHA"
 SERVER

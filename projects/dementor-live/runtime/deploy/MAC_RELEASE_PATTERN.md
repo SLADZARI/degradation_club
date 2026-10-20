@@ -26,3 +26,11 @@
 - Если GitHub Actions `in_progress`/`failure` — **никакого SSH**.
 - Не добавлять `|| exit 1` в интерактивную команду Mac: она закрывает терминал; остановкой управляет только дочерний Bash-скрипт.
 - Не вводить в терминал Markdown-ссылки вида `[https://...](https://...)`: только чистые команды.
+
+
+## Инцидент 20.10.2026 — подтверждённое исправление
+- Предыдущий запуск на `970882d` корректно остановился при несовместимых координатах сохранённого персонажа в P4/P5.
+- Backup from the frozen volume: `/srv/dementor-live/backups/safe-20261020T180923Z-970882dee4/world.json`; old container restored and public health reports RC2.
+- Hotfix game branch `hotfix/dementor-live-rc4-saved-resident-recovery-2026-10-20`, SHA `a38a03e68fcec5ceac45c0c362436ee6d69d5c5d` adds deterministic collision migration and append-only ledger without changing wallets/bags/land.
+- Before *any downtime*, the one-command deploy builds a clean candidate image and runs `upgrade-audit.mjs` on this REAL FROZEN BACKUP as readonly Docker bind. Missing backup or failed migration = STOP WITHOUT INTERRUPTING THE LIVE GAME.
+- New candidate requires all five exact-SHA green CI runs and fresh backup + audit before cutover, with rollback guards preserved.
