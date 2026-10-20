@@ -59,7 +59,11 @@ export function landscapeAction(g,p,cmd){
  if(g.state.landscape.tiles.length>=1200)throw Error('Предел покрытий этого города');
  if(landscapeIndex(g).has(tileKey(x,y)))throw Error('Клетка уже обустроена');
  landscapePlotPermission(g,p,x,y);
- if(!g.walkable(x+.5,y+.5,p))throw Error('Здесь препятствие; укладка запрещена');
+ // Whole cell matters: not just its center. Never bury structures or resource nodes.
+ if(g.rects().some(o=>x<o.x+o.w&&x+1>o.x&&y<o.y+o.h&&y+1>o.y))throw Error('Клетка пересекается с постройкой');
+ if((g.state.resources||[]).some(o=>o.stock>0&&o.type!=='food'&&Math.hypot(Math.max(x,Math.min(x+1,o.x))-o.x,Math.max(y,Math.min(y+1,o.y))-o.y)<.58))throw Error('Клетка пересекается с ресурсом');
+ for(const [dx,dy] of [[.5,.5],[.2,.2],[.8,.2],[.2,.8],[.8,.8]])
+   if(!g.walkable(x+dx,y+dy,p))throw Error('Здесь препятствие; укладка запрещена');
  p.terrainBag[kind]--;
  const tile={x,y,kind,owner:p.id,at:g.now};
  g.state.landscape.tiles.push(tile);
