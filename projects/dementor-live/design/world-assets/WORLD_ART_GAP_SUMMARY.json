@@ -1,0 +1,23 @@
+{
+  "physical_registry_objects": 116,
+  "existing_png_candidates": 42,
+  "existing_legacy_svg_candidates": 23,
+  "legacy_logical": 20,
+  "new_world_svg_candidates": 35,
+  "new_scene_objects_without_prior_registry": 23,
+  "audit_records": 139,
+  "classification": {
+    "LOGICAL_NO_INDEPENDENT_SPRITE_REQUIRED": 15,
+    "MISSING_INDEPENDENT_APPROVED_SVG": 49,
+    "LEGACY_SVG_CANDIDATE_NOT_QA_APPROVED": 19,
+    "LEGACY_PNG_ONLY_CANDIDATE_REQUIRES_SVG": 22,
+    "NEW_ISO30_SVG_CANDIDATE": 23,
+    "NEW_ISO30_SVG_CANDIDATE_ISOLATED": 11
+  },
+  "limits": [
+    "Not an exhaustive survey of every generated runtime obstacle instance",
+    "Historical physical inventory v04 is 116 types, not a list of every currently deployed sprite",
+    "Legacy AI-extracted PNGs are visual candidates and may contain rough cutouts",
+    "No production server, world save or hero modified. Research branches remain isolated."
+  ]
+}

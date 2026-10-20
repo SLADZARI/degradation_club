@@ -1,0 +1,140 @@
+object_id,name,category,source_status,legacy_png_candidate,legacy_svg_candidate,new_svg_candidate,asset_status,notes
+DL-001,Городской мир,world,logical,False,False,,LOGICAL_NO_INDEPENDENT_SPRITE_REQUIRED,Карта 80×96 клеток — ЦЕЛЕВОЕ расширение; исходная 64×40
+DL-002,Западный берег,world,logical,False,False,,LOGICAL_NO_INDEPENDENT_SPRITE_REQUIRED,Река остаётся при x=34; берег x=0..34
+DL-003,Восточный берег,world,logical,False,False,,LOGICAL_NO_INDEPENDENT_SPRITE_REQUIRED,Участок x=38..80 (целевой проект)
+DL-004,Река,world,temporary,False,False,,MISSING_INDEPENDENT_APPROVED_SVG,"Река x=34, ширина 4 клетки; расширение длины"
+DL-005,Городская площадь — территория,world,temporary,False,False,,MISSING_INDEPENDENT_APPROVED_SVG,Существующее 10×8 игровых клеток
+DL-006,Дорога и тропинка,world,temporary,False,False,,MISSING_INDEPENDENT_APPROVED_SVG,"Ширина примерная, длина переменная"
+DL-007,Личный городской участок,world,logical,False,False,,LOGICAL_NO_INDEPENDENT_SPRITE_REQUIRED,Требование: 16×16 городских клеток вместо 6×6; НЕ задеплоено
+DL-008,Отдельная сцена личного участка,world,logical,False,False,,LOGICAL_NO_INDEPENDENT_SPRITE_REQUIRED,"16×16 локальных клеток, физически 1:1 с городом"
+DL-009,Экспедиционная территория,world,temporary,False,False,,MISSING_INDEPENDENT_APPROVED_SVG,16×16 клеток в runtime
+DL-010,Интерьер палатки — пространство,world,logical,False,False,,LOGICAL_NO_INDEPENDENT_SPRITE_REQUIRED,Размер полезного пространства — целевое предложение
+DL-011,Территория дополнительного города,world,logical,False,False,,LOGICAL_NO_INDEPENDENT_SPRITE_REQUIRED,Шаблон физической карты — целевое расширение
+DL-012,Палатка временной мэрии,building,temporary,True,True,,LEGACY_SVG_CANDIDATE_NOT_QA_APPROVED,drawTent; существующая площадка 4×3 клетки
+DL-013,Городская площадь — покрытие,building,temporary,False,True,,LEGACY_SVG_CANDIDATE_NOT_QA_APPROVED,drawProject; стадийный объект
+DL-014,Общественная кузница,building,temporary,True,True,,LEGACY_SVG_CANDIDATE_NOT_QA_APPROVED,drawForge; footprint 6×5 клетки
+DL-015,Мост,building,temporary,True,True,,LEGACY_SVG_CANDIDATE_NOT_QA_APPROVED,drawBridge; footprint 8×3 клетки
+DL-016,Городской склад,building,temporary,True,True,,LEGACY_SVG_CANDIDATE_NOT_QA_APPROVED,paperHouse warehouse; отдельной стройки нет
+DL-017,Магазин инструментов,building,temporary,True,True,,LEGACY_SVG_CANDIDATE_NOT_QA_APPROVED,paperHouse shop; footprint округлён
+DL-018,Семенная лавка,building,temporary,True,True,,LEGACY_SVG_CANDIDATE_NOT_QA_APPROVED,"Строится в PR261, SVG новый кандидат"
+DL-019,Общественный огород,building,temporary,True,True,,LEGACY_SVG_CANDIDATE_NOT_QA_APPROVED,3 грядки; построить в PR261
+DL-020,Личная палатка,building,temporary,True,True,,LEGACY_SVG_CANDIDATE_NOT_QA_APPROVED,3 строительные стадии и отдельный интерьер
+DL-021,Личный огород,building,temporary,True,False,,LEGACY_PNG_ONLY_CANDIDATE_REQUIRES_SVG,Зона с максимум шестью грядками
+DL-022,Стойка инструментов,civic,temporary,False,False,,MISSING_INDEPENDENT_APPROVED_SVG,Рендер в drawTent; базовые инструменты
+DL-023,Доска городских работ,civic,temporary,True,True,,LEGACY_SVG_CANDIDATE_NOT_QA_APPROVED,paperBoard; игровой объект
+DL-024,Реестр городов,civic,temporary,False,False,city-register,NEW_ISO30_SVG_CANDIDATE,Ветка 0.3.0-rc.1; отдельная доска
+DL-025,Указатель экспедиции,civic,temporary,True,False,,LEGACY_PNG_ONLY_CANDIDATE_REQUIRES_SVG,Указатель входа в миссию
+DL-026,Приёмный ящик площади,civic,temporary,True,False,,LEGACY_PNG_ONLY_CANDIDATE_REQUIRES_SVG,paperOpenBox; точка приёмки
+DL-027,Приёмный ящик кузницы,civic,temporary,False,False,,MISSING_INDEPENDENT_APPROVED_SVG,paperOpenBox; точка приёмки
+DL-028,Приёмный ящик моста,civic,temporary,False,False,,MISSING_INDEPENDENT_APPROVED_SVG,paperOpenBox; точка приёмки
+DL-029,Приёмный ящик лавки,civic,logical,False,False,seed-shop-drop,NEW_ISO30_SVG_CANDIDATE,PR261; форма отдельной точки взаимодействия
+DL-030,Приёмный ящик огорода,civic,logical,False,False,public-garden-drop,NEW_ISO30_SVG_CANDIDATE,PR261; форма отдельной точки взаимодействия
+DL-031,Коробка пожертвований,civic,temporary,False,False,donation-box,NEW_ISO30_SVG_CANDIDATE,plaza donation-box
+DL-032,Доска пожертвований,civic,temporary,False,False,,MISSING_INDEPENDENT_APPROVED_SVG,plaza donation-board
+DL-033,Доска воров,civic,temporary,False,False,,MISSING_INDEPENDENT_APPROVED_SVG,plaza theft-board
+DL-034,Пьедестал памятника,civic,temporary,False,True,monument-pedestal,NEW_ISO30_SVG_CANDIDATE,Только пьедестал; готовой статуи нет
+DL-035,Музыкальный автомат,civic,temporary,False,True,jukebox,NEW_ISO30_SVG_CANDIDATE,plaza jukebox
+DL-036,Скамейка,civic,temporary,True,True,,LEGACY_SVG_CANDIDATE_NOT_QA_APPROVED,paperBench; высота включает спинку
+DL-037,Столбик разметки,civic,temporary,False,False,survey-marker,NEW_ISO30_SVG_CANDIDATE,По периметру участков/стройки
+DL-038,Флаг владельца,civic,temporary,True,False,,LEGACY_PNG_ONLY_CANDIDATE_REQUIRES_SVG,Флаг и стойка участка
+DL-039,Ящики у городского склада,civic,temporary,True,True,,LEGACY_SVG_CANDIDATE_NOT_QA_APPROVED,Декоративные коробки у склада
+DL-040,Личный источник воды,civic,temporary,True,False,,LEGACY_PNG_ONLY_CANDIDATE_REQUIRES_SVG,Действие well в отдельной сцене
+DL-041,Городской источник воды,civic,logical,True,False,city-water,NEW_ISO30_SVG_CANDIDATE,"Есть механика, отдельный визуал требуется"
+DL-042,Сундук,furniture,temporary,True,True,,LEGACY_SVG_CANDIDATE_NOT_QA_APPROVED,chest; инвентарь в интерьере
+DL-043,Кровать,furniture,temporary,True,True,,LEGACY_SVG_CANDIDATE_NOT_QA_APPROVED,bed; отдых
+DL-044,Матрас и подушка,furniture,temporary,False,False,,MISSING_INDEPENDENT_APPROVED_SVG,Деталь кровати; не автономная сущность
+DL-045,Грядка личная,furniture,temporary,False,False,,MISSING_INDEPENDENT_APPROVED_SVG,Грядка — интерактивный объект
+DL-046,Колодец — форма,furniture,temporary,True,False,,LEGACY_PNG_ONLY_CANDIDATE_REQUIRES_SVG,Вариант личного источника воды
+DL-047,Кучка вещей на земле,furniture,temporary,False,False,dropped-cargo,NEW_ISO30_SVG_CANDIDATE,Состав определяется инвентарём
+DL-048,Рюкзак,furniture,logical,False,False,,LOGICAL_NO_INDEPENDENT_SPRITE_REQUIRED,"В инвентаре логический, 3D-объект на спине ещё не готов"
+DL-049,Курьерский ящик / груз,furniture,logical,False,False,,LOGICAL_NO_INDEPENDENT_SPRITE_REQUIRED,"В модели транспортируется, отдельный вид не готов"
+DL-050,Дерево целиком,nature,temporary,True,True,,LEGACY_SVG_CANDIDATE_NOT_QA_APPROVED,Изображение дерева существует; масштаб предложен
+DL-051,Ствол дерева,nature,temporary,False,False,,MISSING_INDEPENDENT_APPROVED_SVG,Часть составного дерева
+DL-052,Крона дерева,nature,temporary,False,False,,MISSING_INDEPENDENT_APPROVED_SVG,Часть составного дерева
+DL-053,Пень,nature,temporary,True,False,,LEGACY_PNG_ONLY_CANDIDATE_REQUIRES_SVG,След после добычи
+DL-054,Каменная глыба,nature,temporary,False,True,stone-cluster-2;stone-cluster-5,NEW_ISO30_SVG_CANDIDATE,Добываемый камень
+DL-055,Остатки породы,nature,temporary,False,False,,MISSING_INDEPENDENT_APPROVED_SVG,След после добычи
+DL-056,Ягодный куст,nature,temporary,True,True,,LEGACY_SVG_CANDIDATE_NOT_QA_APPROVED,Возобновляемый источник ягод
+DL-057,Дикий куст конопли,nature,temporary,False,False,,MISSING_INDEPENDENT_APPROVED_SVG,Источник семян; текущая графика универсального куста
+DL-058,Дикая морковь / семенное растение,nature,temporary,False,False,,MISSING_INDEPENDENT_APPROVED_SVG,Источник семян; графика временная
+DL-059,Конопля выращенная,nature,temporary,False,False,,MISSING_INDEPENDENT_APPROVED_SVG,Культура грядки
+DL-060,Морковь выращенная,nature,temporary,False,False,,MISSING_INDEPENDENT_APPROVED_SVG,Культура грядки
+DL-061,Морковь на семена,nature,temporary,False,False,,MISSING_INDEPENDENT_APPROVED_SVG,Переходная стадия семенного растения
+DL-062,Топор — стартовый,tool,temporary,True,True,,LEGACY_SVG_CANDIDATE_NOT_QA_APPROVED,Прочность 16; числовой баланс
+DL-063,Топор — кузница,tool,temporary,False,False,,MISSING_INDEPENDENT_APPROVED_SVG,Прочность 48
+DL-064,Топор — магазинный,tool,temporary,False,False,,MISSING_INDEPENDENT_APPROVED_SVG,Прочность 160
+DL-065,Кирка — стартовая,tool,temporary,True,True,,LEGACY_SVG_CANDIDATE_NOT_QA_APPROVED,Прочность 16
+DL-066,Кирка — кузница,tool,temporary,False,False,,MISSING_INDEPENDENT_APPROVED_SVG,Прочность 48
+DL-067,Кирка — магазинная,tool,temporary,False,False,,MISSING_INDEPENDENT_APPROVED_SVG,Прочность 160
+DL-068,Древесина — ресурс,resource,logical,True,False,,LEGACY_PNG_ONLY_CANDIDATE_REQUIRES_SVG,Одна условная ресурсная единица
+DL-069,Камень — ресурс,resource,logical,True,False,,LEGACY_PNG_ONLY_CANDIDATE_REQUIRES_SVG,Одна условная ресурсная единица
+DL-070,Ягода,resource,logical,False,False,,LOGICAL_NO_INDEPENDENT_SPRITE_REQUIRED,Единица ягоды — физическая модель кандидата
+DL-071,Семя конопли,resource,logical,False,False,,LOGICAL_NO_INDEPENDENT_SPRITE_REQUIRED,Размер частички — предложен
+DL-072,Семя моркови,resource,logical,False,False,,LOGICAL_NO_INDEPENDENT_SPRITE_REQUIRED,Размер частички — предложен
+DL-073,Конопля — связка сырья,resource,logical,False,False,,LOGICAL_NO_INDEPENDENT_SPRITE_REQUIRED,Предложенная форма для урожая
+DL-074,Морковь — предмет,resource,temporary,True,True,,LEGACY_SVG_CANDIDATE_NOT_QA_APPROVED,Питание/урожай; упрощённая форма
+DL-075,Вода — 1 литр,resource,logical,False,False,,LOGICAL_NO_INDEPENDENT_SPRITE_REQUIRED,Эквивалентный куб объёма; форма зависит от ёмкости
+DL-076,Деревянная доска,component,temporary,True,False,,LEGACY_PNG_ONLY_CANDIDATE_REQUIRES_SVG,"Деталь сооружения, не самостоятельный инвентарь"
+DL-077,Строительная балка,component,temporary,False,False,,MISSING_INDEPENDENT_APPROVED_SVG,Деталь сооружения
+DL-078,Опорный столб,component,temporary,False,False,,MISSING_INDEPENDENT_APPROVED_SVG,Деталь сооружения
+DL-079,Деревянный колышек,component,temporary,False,False,,MISSING_INDEPENDENT_APPROVED_SVG,Разметка/палатка
+DL-080,Каменный строительный блок,component,temporary,True,False,,LEGACY_PNG_ONLY_CANDIDATE_REQUIRES_SVG,Деталь конструкции
+DL-081,Плитка площади,component,temporary,False,False,,MISSING_INDEPENDENT_APPROVED_SVG,Деталь покрытия
+DL-082,Доска настила моста,component,temporary,False,False,,MISSING_INDEPENDENT_APPROVED_SVG,Деталь моста
+DL-083,Стойка мостовых перил,component,temporary,False,False,,MISSING_INDEPENDENT_APPROVED_SVG,Деталь моста
+DL-084,Перекладина перил,component,temporary,False,False,,MISSING_INDEPENDENT_APPROVED_SVG,Деталь моста
+DL-085,Планка скамейки,component,temporary,False,False,,MISSING_INDEPENDENT_APPROVED_SVG,Деталь скамьи
+DL-086,Ножка скамейки,component,temporary,False,False,,MISSING_INDEPENDENT_APPROVED_SVG,Деталь скамьи
+DL-087,Опора доски объявлений,component,temporary,False,False,,MISSING_INDEPENDENT_APPROVED_SVG,Деталь информационной доски
+DL-088,Бумажное объявление,component,temporary,False,False,,MISSING_INDEPENDENT_APPROVED_SVG,"Графическая деталь, отдельного лута нет"
+DL-089,Кровельная панель,component,temporary,False,False,,MISSING_INDEPENDENT_APPROVED_SVG,Деталь крыши
+DL-090,Дверь,component,temporary,False,False,,MISSING_INDEPENDENT_APPROVED_SVG,Конструктивный элемент
+DL-091,Оконная рама,component,temporary,False,False,,MISSING_INDEPENDENT_APPROVED_SVG,Конструктивный элемент
+DL-092,Оконное стекло,component,temporary,False,False,,MISSING_INDEPENDENT_APPROVED_SVG,Конструктивный элемент
+DL-093,Торговый навес,component,temporary,False,False,,MISSING_INDEPENDENT_APPROVED_SVG,Деталь магазина
+DL-094,Дымоход кузницы,component,temporary,False,False,,MISSING_INDEPENDENT_APPROVED_SVG,Часть здания
+DL-095,Тентовое полотно,component,temporary,False,False,,MISSING_INDEPENDENT_APPROVED_SVG,"Габариты покрытия, не толщина ткани"
+DL-096,Опора палатки,component,temporary,False,False,,MISSING_INDEPENDENT_APPROVED_SVG,Деталь палатки
+DL-097,Палаточный колышек,component,temporary,False,False,,MISSING_INDEPENDENT_APPROVED_SVG,Деталь палатки
+DL-098,Ящик материалов,component,temporary,False,False,,MISSING_INDEPENDENT_APPROVED_SVG,Повторный модуль
+DL-099,Полотнище флага,component,temporary,False,False,,MISSING_INDEPENDENT_APPROVED_SVG,Деталь флага
+DL-100,Семя — универсальная модель,component,logical,False,False,,LOGICAL_NO_INDEPENDENT_SPRITE_REQUIRED,Визуальный вариант семян
+DL-101,Ягода на кусте,component,temporary,False,False,,MISSING_INDEPENDENT_APPROVED_SVG,Деталь куста
+DL-102,Корнеплод моркови,component,temporary,False,False,,MISSING_INDEPENDENT_APPROVED_SVG,Деталь растения
+DL-103,Лист растения,component,temporary,False,False,,MISSING_INDEPENDENT_APPROVED_SVG,Деталь растения
+DL-104,Стебель конопли,component,temporary,False,False,,MISSING_INDEPENDENT_APPROVED_SVG,Деталь растения
+DL-NEW-BERRIES-CLUSTER-01,Гроздь ягод,resource,planned,True,False,,LEGACY_PNG_ONLY_CANDIDATE_REQUIRES_SVG,Новый кандидат. Габариты предлагаемые; требуется приёмка.
+DL-NEW-SAPLING-01,Саженец,nature,planned,True,False,,LEGACY_PNG_ONLY_CANDIDATE_REQUIRES_SVG,Новый кандидат. Габариты предлагаемые; требуется приёмка.
+DL-NEW-CAMPFIRE-01,Костёр,survival,planned,True,False,,LEGACY_PNG_ONLY_CANDIDATE_REQUIRES_SVG,Новый кандидат. Габариты предлагаемые; требуется приёмка.
+DL-NEW-BUCKET-01,Ведро,survival,planned,True,False,,LEGACY_PNG_ONLY_CANDIDATE_REQUIRES_SVG,Новый кандидат. Габариты предлагаемые; требуется приёмка.
+DL-NEW-SACK-01,Мешок,furniture,planned,True,False,,LEGACY_PNG_ONLY_CANDIDATE_REQUIRES_SVG,Новый кандидат. Габариты предлагаемые; требуется приёмка.
+DL-NEW-TORCH-01,Факел,tool,planned,True,False,,LEGACY_PNG_ONLY_CANDIDATE_REQUIRES_SVG,Новый кандидат. Габариты предлагаемые; требуется приёмка.
+DL-NEW-SIGN-01,Табличка,civic,planned,True,False,,LEGACY_PNG_ONLY_CANDIDATE_REQUIRES_SVG,Новый кандидат. Габариты предлагаемые; требуется приёмка.
+DL-NEW-SHOVEL-01,Лопата,tool,planned,True,False,,LEGACY_PNG_ONLY_CANDIDATE_REQUIRES_SVG,Новый кандидат. Габариты предлагаемые; требуется приёмка.
+DL-NEW-BARREL-01,Бочка,furniture,planned,True,False,,LEGACY_PNG_ONLY_CANDIDATE_REQUIRES_SVG,"Новый тип-кандидат, размеры требуют проверки."
+DL-NEW-CHAIR-01,Стул,furniture,planned,True,False,interior-chair,NEW_ISO30_SVG_CANDIDATE,"Новый тип-кандидат, размеры требуют проверки."
+DL-NEW-WORKBENCH-01,Рабочий верстак,furniture,planned,True,False,,LEGACY_PNG_ONLY_CANDIDATE_REQUIRES_SVG,"Новый тип-кандидат, размеры требуют проверки."
+DL-NEW-LADDER-01,Лестница,component,planned,True,False,,LEGACY_PNG_ONLY_CANDIDATE_REQUIRES_SVG,"Новый тип-кандидат, размеры требуют проверки."
+world-desert-cactus,Кактус пустынного биома,nature,RC4,False,False,desert-cactus,NEW_ISO30_SVG_CANDIDATE,Rendering only; no game geometry/rights/logic added
+world-mountain-cliff,Скала горного массива,nature,RC4,False,False,mountain-cliff,NEW_ISO30_SVG_CANDIDATE,Rendering only; no game geometry/rights/logic added
+world-mountain-route,Указатель горной тропы,civic,RC4,False,False,mountain-trail-sign,NEW_ISO30_SVG_CANDIDATE,Rendering only; no game geometry/rights/logic added
+world-bridge-02,Второй мост · готовое состояние,building,RC4,False,False,second-bridge,NEW_ISO30_SVG_CANDIDATE,Rendering only; no game geometry/rights/logic added
+world-payphone,Уличный таксофон,civic,RC4,False,False,payphone,NEW_ISO30_SVG_CANDIDATE,Rendering only; no game geometry/rights/logic added
+world-industrial-pavilion,Промышленный павильон,building,RC4,False,False,industrial-pavilion,NEW_ISO30_SVG_CANDIDATE,Rendering only; no game geometry/rights/logic added
+world-forestry-sapling,Дерево: стадия саженца,nature,RC4,False,False,garden-sapling,NEW_ISO30_SVG_CANDIDATE,Rendering only; no game geometry/rights/logic added
+world-forestry-spruce,Выращенная ель · взрослая,nature,RC4,False,False,garden-grown-spruce,NEW_ISO30_SVG_CANDIDATE,Rendering only; no game geometry/rights/logic added
+room-wall,Внутренняя комната: угол стен,interior,GRID-02,False,False,interior-room,NEW_ISO30_SVG_CANDIDATE,Rendering only; no game geometry/rights/logic added
+chest,Сундук в интерьере,furniture,GRID-02,False,False,interior-chest,NEW_ISO30_SVG_CANDIDATE,Rendering only; no game geometry/rights/logic added
+bed,Кровать в интерьере,furniture,GRID-02,False,False,interior-bed,NEW_ISO30_SVG_CANDIDATE,Rendering only; no game geometry/rights/logic added
+interior-table-proposal,Стол для внутренних помещений,furniture,GRID-02,False,False,interior-table,NEW_ISO30_SVG_CANDIDATE,Rendering only; no game geometry/rights/logic added
+world01-billboard,Информационный билборд леса идей,civic,WORLD-01,False,False,ideas-forest-billboard,NEW_ISO30_SVG_CANDIDATE_ISOLATED,Rendering only; no game geometry/rights/logic added
+world01-portal,Портал леса идей,civic,WORLD-01,False,False,ideas-forest-portal,NEW_ISO30_SVG_CANDIDATE_ISOLATED,Rendering only; no game geometry/rights/logic added
+world01-scooter-rack,Стойка самоката,prop,WORLD-01,False,False,ideas-forest-scooter,NEW_ISO30_SVG_CANDIDATE_ISOLATED,Rendering only; no game geometry/rights/logic added
+mentalhumor-museum,Музей смеха · здание,building,WORLD-02,False,False,mentalhumor-museum,NEW_ISO30_SVG_CANDIDATE_ISOLATED,Rendering only; no game geometry/rights/logic added
+mentalhumor-research-demo,Исследовательский стенд музея,furniture,WORLD-02,False,False,mentalhumor-exhibit,NEW_ISO30_SVG_CANDIDATE_ISOLATED,Rendering only; no game geometry/rights/logic added
+cave-lantern,Фонарь для пещеры,prop,CAVE-P0,False,False,cave-lantern,NEW_ISO30_SVG_CANDIDATE_ISOLATED,Rendering only; no game geometry/rights/logic added
+cave-secret-door,Секретная дверь пещеры,building,CAVE-P0,False,False,cave-secret-door,NEW_ISO30_SVG_CANDIDATE_ISOLATED,Rendering only; no game geometry/rights/logic added
+cave-altar,Алтарь за секретной дверью,furniture,CAVE-P0,False,False,cave-altar,NEW_ISO30_SVG_CANDIDATE_ISOLATED,Rendering only; no game geometry/rights/logic added
+cave-bats,Летучая мышь пещеры,nature,CAVE-P0,False,False,cave-bat,NEW_ISO30_SVG_CANDIDATE_ISOLATED,Rendering only; no game geometry/rights/logic added
+obitel-zen-arch,Чёрная арка входа ZEN,building,OBITEL-P0,False,False,obitel-black-arch,NEW_ISO30_SVG_CANDIDATE_ISOLATED,Rendering only; no game geometry/rights/logic added
+OB-C01..OB-C07,Карточка ZEN (7 позиций),civic,OBITEL-P0,False,False,obitel-card-station,NEW_ISO30_SVG_CANDIDATE_ISOLATED,Rendering only; no game geometry/rights/logic added
