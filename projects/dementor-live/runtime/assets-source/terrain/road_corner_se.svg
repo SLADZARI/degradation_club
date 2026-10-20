@@ -1,0 +1,3 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="148" viewBox="0 0 256 148" data-style="DL-TERRAIN-01">
+<defs><clipPath id="diamond"><path d="M128 0 L256 74 L128 148 L0 74 Z"/></clipPath></defs>
+<g clip-path="url(#diamond)"><polygon points="128,148 110,128 128,113 147,130" fill="#9FAB8C"/></g></svg>

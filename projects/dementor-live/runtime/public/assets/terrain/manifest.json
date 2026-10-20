@@ -1,0 +1,657 @@
+{
+  "schema": "DL-TERRAIN-01",
+  "version": "1.0.0-rc.1",
+  "source": "individual SVG; all PNG derived",
+  "status": "asset-candidate",
+  "viewBox": [
+    0,
+    0,
+    256,
+    148
+  ],
+  "tile_world_cells": [
+    1,
+    1
+  ],
+  "isometric": {
+    "slope_degrees": 30,
+    "screenX": "(worldX-worldY)*cos(30)*unit",
+    "screenY": "(worldX+worldY)*0.5*unit",
+    "world_neighbors": {
+      "n": [
+        0,
+        -1
+      ],
+      "e": [
+        1,
+        0
+      ],
+      "s": [
+        0,
+        1
+      ],
+      "w": [
+        -1,
+        0
+      ]
+    },
+    "anchors": {
+      "top": [
+        128,
+        0
+      ],
+      "center": [
+        128,
+        74
+      ],
+      "right": [
+        256,
+        74
+      ],
+      "bottom": [
+        128,
+        148
+      ],
+      "left": [
+        0,
+        74
+      ]
+    }
+  },
+  "tile_names": [
+    "road_01",
+    "road_02",
+    "road_03",
+    "grass_01",
+    "grass_02",
+    "grass_03",
+    "flowers_01",
+    "flowers_02",
+    "flowers_03",
+    "road_edge_n",
+    "road_edge_e",
+    "road_edge_s",
+    "road_edge_w",
+    "road_corner_nw",
+    "road_corner_ne",
+    "road_corner_se",
+    "road_corner_sw"
+  ],
+  "variants": {
+    "paving": [
+      "road_01",
+      "road_02",
+      "road_03"
+    ],
+    "grass": [
+      "grass_01",
+      "grass_02",
+      "grass_03"
+    ],
+    "flowers": [
+      "flowers_01",
+      "flowers_02",
+      "flowers_03"
+    ]
+  },
+  "layering": [
+    "variant_base",
+    "road_edges",
+    "road_corners"
+  ],
+  "placement_policy": "Player buys paving/grass/flowers only. Roads choose exposed edge/corner overlays automatically from world-neighbor occupancy.",
+  "palette": {
+    "road": "#C8B69A",
+    "roadLight": "#D7C5A7",
+    "roadDeep": "#B5A183",
+    "grass": "#9FAB8C",
+    "grassLight": "#B3BC9C",
+    "grassDeep": "#899A7E",
+    "soil": "#C5B49B",
+    "soilLight": "#D4C4AA",
+    "terracotta": "#B8654D",
+    "coral": "#C58C7C",
+    "cream": "#E7D8BA",
+    "olive": "#526C4D"
+  },
+  "atlas": {
+    "256": {
+      "file": "dl-terrain-01-atlas-256-c83aaabf570b.webp",
+      "format": "image/webp",
+      "sha256": "c83aaabf570b52c1908fbc371f35e39feb9a181bff41bb2eae4214d976085fee",
+      "fallback_png": "dl-terrain-01-atlas-256-83a1ab1a4dd2.png",
+      "fallback_png_sha256": "83a1ab1a4dd25fb6165202c6e4e468565ffb944a55bd0762b167a1b6258df42a",
+      "width": 1320,
+      "height": 624,
+      "gutter_px": 4,
+      "columns": 5,
+      "rows": 4,
+      "tile_px": [
+        256,
+        148
+      ],
+      "bytes": 14258,
+      "png_bytes": 41807,
+      "webp_bytes": 14258,
+      "compression_saving_pct": 65.9
+    },
+    "128": {
+      "file": "dl-terrain-01-atlas-128-25e4d8c8fe04.webp",
+      "format": "image/webp",
+      "sha256": "25e4d8c8fe04da6899aa1897008f47c5608dfb77099949b70f6e7bf63f6ad312",
+      "fallback_png": "dl-terrain-01-atlas-128-a8e26cc80f81.png",
+      "fallback_png_sha256": "a8e26cc80f811ae6f8370fab10f56268eb575b6c0a835520ff9414ecf2fc1e01",
+      "width": 680,
+      "height": 328,
+      "gutter_px": 4,
+      "columns": 5,
+      "rows": 4,
+      "tile_px": [
+        128,
+        74
+      ],
+      "bytes": 7808,
+      "png_bytes": 19398,
+      "webp_bytes": 7808,
+      "compression_saving_pct": 59.7
+    }
+  },
+  "assets": {
+    "road_01": {
+      "group": "road",
+      "role": "main",
+      "source": "assets-source/terrain/road_01.svg",
+      "raster": {
+        "256": {
+          "x": 4,
+          "y": 4,
+          "w": 256,
+          "h": 148
+        },
+        "128": {
+          "x": 4,
+          "y": 4,
+          "w": 128,
+          "h": 74
+        }
+      },
+      "anchor": [
+        0.5,
+        0
+      ],
+      "center": [
+        0.5,
+        0.5
+      ],
+      "source_sha256": "700b1d2c82773da9a1364a3aed072d20ada0599a719a4a66163a093db3b198b4"
+    },
+    "road_02": {
+      "group": "road",
+      "role": "variant_a",
+      "source": "assets-source/terrain/road_02.svg",
+      "raster": {
+        "256": {
+          "x": 268,
+          "y": 4,
+          "w": 256,
+          "h": 148
+        },
+        "128": {
+          "x": 140,
+          "y": 4,
+          "w": 128,
+          "h": 74
+        }
+      },
+      "anchor": [
+        0.5,
+        0
+      ],
+      "center": [
+        0.5,
+        0.5
+      ],
+      "source_sha256": "02c4aea741d4b27f29b27ba6f7b0462f6c766b84a1a70b949fc69a3b77e90f42"
+    },
+    "road_03": {
+      "group": "road",
+      "role": "variant_b",
+      "source": "assets-source/terrain/road_03.svg",
+      "raster": {
+        "256": {
+          "x": 532,
+          "y": 4,
+          "w": 256,
+          "h": 148
+        },
+        "128": {
+          "x": 276,
+          "y": 4,
+          "w": 128,
+          "h": 74
+        }
+      },
+      "anchor": [
+        0.5,
+        0
+      ],
+      "center": [
+        0.5,
+        0.5
+      ],
+      "source_sha256": "ea26d2ea3c1c4ef1e7adef2bd2252d761d5ebb0a6b3dbc99e08e107a46a02cab"
+    },
+    "grass_01": {
+      "group": "grass",
+      "role": "main",
+      "source": "assets-source/terrain/grass_01.svg",
+      "raster": {
+        "256": {
+          "x": 796,
+          "y": 4,
+          "w": 256,
+          "h": 148
+        },
+        "128": {
+          "x": 412,
+          "y": 4,
+          "w": 128,
+          "h": 74
+        }
+      },
+      "anchor": [
+        0.5,
+        0
+      ],
+      "center": [
+        0.5,
+        0.5
+      ],
+      "source_sha256": "f8de0f2aa7f5e5a8f8be84263e6ea44466bdecb34c5f58c87e57ed11b278574c"
+    },
+    "grass_02": {
+      "group": "grass",
+      "role": "variant_a",
+      "source": "assets-source/terrain/grass_02.svg",
+      "raster": {
+        "256": {
+          "x": 1060,
+          "y": 4,
+          "w": 256,
+          "h": 148
+        },
+        "128": {
+          "x": 548,
+          "y": 4,
+          "w": 128,
+          "h": 74
+        }
+      },
+      "anchor": [
+        0.5,
+        0
+      ],
+      "center": [
+        0.5,
+        0.5
+      ],
+      "source_sha256": "3482afd21a22417e35c5083660373ab93bade514b104be1c9b398be4656e0d61"
+    },
+    "grass_03": {
+      "group": "grass",
+      "role": "variant_b",
+      "source": "assets-source/terrain/grass_03.svg",
+      "raster": {
+        "256": {
+          "x": 4,
+          "y": 160,
+          "w": 256,
+          "h": 148
+        },
+        "128": {
+          "x": 4,
+          "y": 86,
+          "w": 128,
+          "h": 74
+        }
+      },
+      "anchor": [
+        0.5,
+        0
+      ],
+      "center": [
+        0.5,
+        0.5
+      ],
+      "source_sha256": "498d1ebd1d2537b6a43dd507231be1469541ca0b3ed76ac1546924b2c81e0a4e"
+    },
+    "flowers_01": {
+      "group": "flowers",
+      "role": "main",
+      "source": "assets-source/terrain/flowers_01.svg",
+      "raster": {
+        "256": {
+          "x": 268,
+          "y": 160,
+          "w": 256,
+          "h": 148
+        },
+        "128": {
+          "x": 140,
+          "y": 86,
+          "w": 128,
+          "h": 74
+        }
+      },
+      "anchor": [
+        0.5,
+        0
+      ],
+      "center": [
+        0.5,
+        0.5
+      ],
+      "source_sha256": "5b1f508f537da4acf911aac749c6c3acfa127a2ab7a89893e7f57b0d2766342b"
+    },
+    "flowers_02": {
+      "group": "flowers",
+      "role": "variant_a",
+      "source": "assets-source/terrain/flowers_02.svg",
+      "raster": {
+        "256": {
+          "x": 532,
+          "y": 160,
+          "w": 256,
+          "h": 148
+        },
+        "128": {
+          "x": 276,
+          "y": 86,
+          "w": 128,
+          "h": 74
+        }
+      },
+      "anchor": [
+        0.5,
+        0
+      ],
+      "center": [
+        0.5,
+        0.5
+      ],
+      "source_sha256": "a8cccb4fa51933e542178dbbfc9b07eedea167f944abcd265b22268827043b24"
+    },
+    "flowers_03": {
+      "group": "flowers",
+      "role": "variant_b",
+      "source": "assets-source/terrain/flowers_03.svg",
+      "raster": {
+        "256": {
+          "x": 796,
+          "y": 160,
+          "w": 256,
+          "h": 148
+        },
+        "128": {
+          "x": 412,
+          "y": 86,
+          "w": 128,
+          "h": 74
+        }
+      },
+      "anchor": [
+        0.5,
+        0
+      ],
+      "center": [
+        0.5,
+        0.5
+      ],
+      "source_sha256": "a0e77dcd0eec9e96dd44661f3290bb45e7658f97628f20cc71e937c2730a5de0"
+    },
+    "road_edge_n": {
+      "group": "edge",
+      "role": "n",
+      "source": "assets-source/terrain/road_edge_n.svg",
+      "raster": {
+        "256": {
+          "x": 1060,
+          "y": 160,
+          "w": 256,
+          "h": 148
+        },
+        "128": {
+          "x": 548,
+          "y": 86,
+          "w": 128,
+          "h": 74
+        }
+      },
+      "anchor": [
+        0.5,
+        0
+      ],
+      "center": [
+        0.5,
+        0.5
+      ],
+      "source_sha256": "c1df5e393d5c84d3b3d67cfc06e3a1a009e83d8bf2999a331dc7a5d742286f7e"
+    },
+    "road_edge_e": {
+      "group": "edge",
+      "role": "e",
+      "source": "assets-source/terrain/road_edge_e.svg",
+      "raster": {
+        "256": {
+          "x": 4,
+          "y": 316,
+          "w": 256,
+          "h": 148
+        },
+        "128": {
+          "x": 4,
+          "y": 168,
+          "w": 128,
+          "h": 74
+        }
+      },
+      "anchor": [
+        0.5,
+        0
+      ],
+      "center": [
+        0.5,
+        0.5
+      ],
+      "source_sha256": "469db0abbe6bd5869a8f979d602f718ff9b72e5ccc4127f2ba77f46d2fe0aa67"
+    },
+    "road_edge_s": {
+      "group": "edge",
+      "role": "s",
+      "source": "assets-source/terrain/road_edge_s.svg",
+      "raster": {
+        "256": {
+          "x": 268,
+          "y": 316,
+          "w": 256,
+          "h": 148
+        },
+        "128": {
+          "x": 140,
+          "y": 168,
+          "w": 128,
+          "h": 74
+        }
+      },
+      "anchor": [
+        0.5,
+        0
+      ],
+      "center": [
+        0.5,
+        0.5
+      ],
+      "source_sha256": "2c42d7be4b68c4f04444d1e75c33eeb56a1fb115ae9399fcf522480e961fde89"
+    },
+    "road_edge_w": {
+      "group": "edge",
+      "role": "w",
+      "source": "assets-source/terrain/road_edge_w.svg",
+      "raster": {
+        "256": {
+          "x": 532,
+          "y": 316,
+          "w": 256,
+          "h": 148
+        },
+        "128": {
+          "x": 276,
+          "y": 168,
+          "w": 128,
+          "h": 74
+        }
+      },
+      "anchor": [
+        0.5,
+        0
+      ],
+      "center": [
+        0.5,
+        0.5
+      ],
+      "source_sha256": "f90422a6c83cc6ea4da5d6ef261382c5a30d407e7386e0ec320397bdc2222e55"
+    },
+    "road_corner_nw": {
+      "group": "corner",
+      "role": "nw",
+      "source": "assets-source/terrain/road_corner_nw.svg",
+      "raster": {
+        "256": {
+          "x": 796,
+          "y": 316,
+          "w": 256,
+          "h": 148
+        },
+        "128": {
+          "x": 412,
+          "y": 168,
+          "w": 128,
+          "h": 74
+        }
+      },
+      "anchor": [
+        0.5,
+        0
+      ],
+      "center": [
+        0.5,
+        0.5
+      ],
+      "source_sha256": "10eef5d20e30ecd5a942a39280fe125dae3687c04309fe4b727da77782580edd"
+    },
+    "road_corner_ne": {
+      "group": "corner",
+      "role": "ne",
+      "source": "assets-source/terrain/road_corner_ne.svg",
+      "raster": {
+        "256": {
+          "x": 1060,
+          "y": 316,
+          "w": 256,
+          "h": 148
+        },
+        "128": {
+          "x": 548,
+          "y": 168,
+          "w": 128,
+          "h": 74
+        }
+      },
+      "anchor": [
+        0.5,
+        0
+      ],
+      "center": [
+        0.5,
+        0.5
+      ],
+      "source_sha256": "0a6fc829fa1fd72e5995d076a1a08399ef5dfcb60da78892da29db4743ffdf2a"
+    },
+    "road_corner_se": {
+      "group": "corner",
+      "role": "se",
+      "source": "assets-source/terrain/road_corner_se.svg",
+      "raster": {
+        "256": {
+          "x": 4,
+          "y": 472,
+          "w": 256,
+          "h": 148
+        },
+        "128": {
+          "x": 4,
+          "y": 250,
+          "w": 128,
+          "h": 74
+        }
+      },
+      "anchor": [
+        0.5,
+        0
+      ],
+      "center": [
+        0.5,
+        0.5
+      ],
+      "source_sha256": "9f4daf4b6349d04e3a5d8740411ad10caf1d581097d310965cd4b87ae6a1d791"
+    },
+    "road_corner_sw": {
+      "group": "corner",
+      "role": "sw",
+      "source": "assets-source/terrain/road_corner_sw.svg",
+      "raster": {
+        "256": {
+          "x": 268,
+          "y": 472,
+          "w": 256,
+          "h": 148
+        },
+        "128": {
+          "x": 140,
+          "y": 250,
+          "w": 128,
+          "h": 74
+        }
+      },
+      "anchor": [
+        0.5,
+        0
+      ],
+      "center": [
+        0.5,
+        0.5
+      ],
+      "source_sha256": "d064cfb003eebe49948876ea2fca152aede1e0b0b69cfaa647024bfda2c825fd"
+    }
+  },
+  "shapes": {
+    "road_01": 3,
+    "road_02": 3,
+    "road_03": 3,
+    "grass_01": 3,
+    "grass_02": 3,
+    "grass_03": 3,
+    "flowers_01": 4,
+    "flowers_02": 4,
+    "flowers_03": 4,
+    "road_edge_n": 1,
+    "road_edge_e": 1,
+    "road_edge_s": 1,
+    "road_edge_w": 1,
+    "road_corner_nw": 1,
+    "road_corner_ne": 1,
+    "road_corner_se": 1,
+    "road_corner_sw": 1
+  },
+  "note": "Road overlays are transparent except for paper-ground accents; base tiles are opaque only inside diamond. Draw tiles with 0.6px bounds overlap in output device space."
+}
