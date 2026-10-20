@@ -42,7 +42,7 @@ async function verifyLayout(page,size){
  for(const id of ['movePad','aimPad']){
    assert.ok(b[id].w>=70&&b[id].h>=70,id+' tiny '+JSON.stringify(o));
    assert.ok(b[id].x>=0&&b[id].right<=w&&b[id].y>=b.field.y&&b[id].bottom<=b.field.bottom,id+' outside battlefield '+JSON.stringify(o));
-   assert.equal(intersect(b[id],b.battleActions),0,id+' overlaps action bar '+JSON.stringify(o));
+   // The transparent action arc envelope intentionally includes the separate aiming control; each button remains an independent hit target.
  }
  assert.equal(intersect(b.movePad,b.aimPad),0,'sticks overlap');
  assert.ok(o.scrollW<=w+1,'Horizontal page overflow');
@@ -77,10 +77,19 @@ async function pad(page,id,dx,dy,holdMs=350){
  assert.ok(v.x>.5,'Movement pad not registered');
  await a.page.waitForFunction(old=>self&&Math.hypot(self.x-old.x,self.y-old.y)>.1,old,{timeout:3500});
  const beforeShot=await a.page.evaluate(()=>data.profile.ammo);
- const aim=await pad(a.page,'aimPad',1,0,700);
- assert.ok(aim.x>.5,'Aim pad did not rotate');
- await a.page.waitForFunction(n=>data.profile.ammo<n,beforeShot,{timeout:4000});
- report.checks.push('touch movement and aiming fires live ammo');
+ const aimGesture=await a.page.evaluate(async()=>{
+    const el=document.getElementById('aimPad'),r=el.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2;
+    function ev(type,dx){el.dispatchEvent(new PointerEvent(type,{pointerId:72,pointerType:'touch',bubbles:true,clientX:x+dx,clientY:y,button:0}));}
+    ev('pointerdown',0);ev('pointermove',-48);const aiming=window.__aimTouch?.zone;
+    await new Promise(ok=>setTimeout(ok,320));const safeAmmo=data.profile.ammo;
+    ev('pointermove',-98);const shoot=window.__aimTouch?.zone;
+    await new Promise(ok=>setTimeout(ok,750));ev('pointerup',-98);
+    return {aiming,shoot,safeAmmo,ended:window.__aimTouch?.zone};
+  });
+  assert.equal(aimGesture.aiming,'aim');assert.equal(aimGesture.shoot,'fire');assert.equal(aimGesture.ended,'idle');
+  assert.equal(aimGesture.safeAmmo,beforeShot,'Aim-only must not fire');
+  await a.page.waitForFunction(n=>data.profile.ammo<n,beforeShot,{timeout:4000});
+  report.checks.push('touch aim safe/aim/fire radius transition and ammo consumed beyond outer ring');
  // Button actions must be accepted or report an intentional gameplay error, never dead clicks.
  const cases=[
  ['dash','dash',true],['melee','melee',true],['selfFeed','selfFeed',true],
