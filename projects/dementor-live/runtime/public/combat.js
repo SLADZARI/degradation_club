@@ -71,6 +71,9 @@ async function load(){
         stage===1?'Этап 1/3 · прорыв к ретранслятору':
         stage===2?(battle.objectiveReady?'Этап 2/3 · активируй ретранслятор (9,8)':'Этап 2/3 · очисти территорию'):'Этап 3/3 · эвакуация';
       $('ammo').textContent='Патроны: '+s.profile?.ammo;
+       const prof=s.profile;
+       $('weaponStatus').textContent=(prof?.selectedWeapon==='pistol'?'Пистолет':'Автомат')+' · '+(prof?.magazine??'—')+' в магазине'+(prof?.reloadEndsAt>Date.now()?' · перезарядка':'');
+       $('switchWeapon').querySelector('.action-caption').textContent=prof?.selectedWeapon==='pistol'?'Пистолет → автомат':'Автомат → пистолет';
       $('health').textContent='HP: '+Math.ceil(self?.hp||0)+(self?.status==='DOWNED'?' · РАНЕН':'');
       $('food').textContent='Еда: '+s.food;
       $('start').hidden=battle.status!=='LOBBY'||battle.ownerId!==s.me;
@@ -110,6 +113,7 @@ function tryInteract(){
 $('interact').onclick=tryInteract;
 $('melee').onclick=()=>{if(self)act('melee',{dx:mouseAim.x,dy:mouseAim.y});};
 $('dash').onclick=()=>dash();
+$('switchWeapon').onclick=async()=>{if(!self)return;const weapon=data?.profile?.selectedWeapon==='pistol'?'rifle':'pistol';const r=await act('weaponSelect',{weapon});if(r?.ok)await load();};
 function dash(){
   if(!self)return;
   const x=Number(keys.has('KeyD')||keys.has('ArrowRight'))-Number(keys.has('KeyA')||keys.has('ArrowLeft'));
@@ -147,16 +151,23 @@ function pad(el,cb){
  for(const name of ['pointerup','pointercancel','lostpointercapture'])el.addEventListener(name,e=>{if(e.pointerId!==active)return;active=null;dot.style.transform='';cb({x:0,y:0},false);});
 }
 pad($('movePad'),(v,on)=>{moveStick=on?screenStickToWorld(v):{x:0,y:0};});
-pad($('aimPad'),(v,on)=>{aimStick=on?v:null;if(on&&Math.hypot(v.x,v.y)>.2){mouseAim=screenStickToWorld(v);firing=true;}else firing=false;});
+// Move from inner safe circle to rotate aim; cross outer circle to fire repeatedly.
+const aimPad=$('aimPad');let aimPointer=null;
+function sampleAim(e){const r=aimPad.getBoundingClientRect(),dx=e.clientX-r.left-r.width/2,dy=e.clientY-r.top-r.height/2,d=Math.hypot(dx,dy),v=d?{x:dx/d,y:dy/d}:{x:0,y:0};aimPad.classList.toggle('aiming',d>=28);aimPad.classList.toggle('shooting',d>=88);if(d>=28){aimStick=v;mouseAim=screenStickToWorld(v);}else aimStick=null;firing=d>=88;window.__aimTouch={distance:d,zone:d>=88?'fire':d>=28?'aim':'safe',direction:mouseAim};}
+function stopAim(e){if(e.pointerId!==aimPointer)return;aimPointer=null;aimStick=null;firing=false;aimPad.classList.remove('active','aiming','shooting');window.__aimTouch={zone:'idle',distance:0};}
+aimPad.addEventListener('pointerdown',e=>{if(aimPointer!==null)return;aimPointer=e.pointerId;aimPad.classList.add('active');try{aimPad.setPointerCapture(e.pointerId);}catch{}sampleAim(e);e.preventDefault();});
+aimPad.addEventListener('pointermove',e=>{if(e.pointerId===aimPointer){sampleAim(e);e.preventDefault();}});
+for(const event of ['pointerup','pointercancel','lostpointercapture'])aimPad.addEventListener(event,stopAim);
 setInterval(async()=>{
  if(!battle||battle.status!=='ACTIVE'||!self||self.status!=='ACTIVE')return;
  const dx=Number(keys.has('KeyD')||keys.has('ArrowRight'))-Number(keys.has('KeyA')||keys.has('ArrowLeft'))+moveStick.x;
  const dy=Number(keys.has('KeyS')||keys.has('ArrowDown'))-Number(keys.has('KeyW')||keys.has('ArrowUp'))+moveStick.y;
  if(!inputPending){inputPending=true;api('action',{type:'input',dx,dy}).catch(()=>{}).finally(()=>{inputPending=false;});}
- if(firing&&!firePending&&(data?.profile?.ammo||0)>0&&performance.now()-lastShotTime>=430){
+ const rate=data?.profile?.selectedWeapon==='pistol'?620:260;
+  if(firing&&!firePending&&(data?.profile?.ammo||0)>0&&!(data?.profile?.reloadEndsAt>Date.now())&&performance.now()-lastShotTime>=rate){
   lastShotTime=performance.now();firePending=true;const startedAt=performance.now();
   api('action',{type:'fire',dx:mouseAim.x,dy:mouseAim.y}).then(r=>acceptShot(r,startedAt))
-    .catch(e=>{if(!/cooling down/.test(e.message))notify(e.message);}).finally(()=>{firePending=false;});
+    .catch(e=>{if(!/cooling down|Reloading/.test(e.message))notify(e.message);}).finally(()=>{firePending=false;});
  }
 },125);
 function resize(){const rect=canvas.getBoundingClientRect(),dpr=Math.min(devicePixelRatio||1,2);vw=rect.width;vh=rect.height;

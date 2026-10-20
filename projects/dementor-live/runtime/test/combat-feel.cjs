@@ -63,12 +63,12 @@ async function waitForHit(page,initial){
  assert.ok(report.metrics.canvas.clientH>=200,'Mobile canvas hidden by HUD');
  report.passed.push('live crosshair rendered; playable mobile canvas area');
 
- // Finger gesture from Chromium CDP (not a DOM dispatchEvent): right stick aims in SCREEN space and fires.
+ // Finger gesture from Chromium CDP (not a DOM dispatchEvent): inner zone aims, moving beyond outer 88px ring fires.
  const mobileTarget=await targetGeometry(mobile.page);
  const pad=await mobile.page.locator('#aimPad').boundingBox();
  const cx=pad.x+pad.width/2,cy=pad.y+pad.height/2;
  const n=Math.hypot(mobileTarget.ux,mobileTarget.uy)||1;
- const px=cx+mobileTarget.ux/n*32,py=cy+mobileTarget.uy/n*32;
+ const px=cx+mobileTarget.ux/n*96,py=cy+mobileTarget.uy/n*96; // Touch v2 requires crossing the outer 88px firing ring.
  const cdp=await mobile.context.newCDPSession(mobile.page);
  const oldHp=mobileTarget.hp;
  const beforeMobile=await mobile.page.evaluate(()=>__combatQa.hits);

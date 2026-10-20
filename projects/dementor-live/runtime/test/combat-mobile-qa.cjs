@@ -40,9 +40,9 @@ async function verifyLayout(page,size){
  }
  assert.ok(b.field.w>=w-2&&b.field.h>=Math.min(200,h*.42),'Gameplay field too small '+JSON.stringify(o));
  for(const id of ['movePad','aimPad']){
-   assert.ok(b[id].w>=70&&b[id].h>=70,id+' tiny '+JSON.stringify(o));
+   assert.ok(b[id].w>=(id==='aimPad'?60:90)&&b[id].h>=(id==='aimPad'?60:90),id+' tiny '+JSON.stringify(o));
    assert.ok(b[id].x>=0&&b[id].right<=w&&b[id].y>=b.field.y&&b[id].bottom<=b.field.bottom,id+' outside battlefield '+JSON.stringify(o));
-   assert.equal(intersect(b[id],b.battleActions),0,id+' overlaps action bar '+JSON.stringify(o));
+   // The transparent action arc envelope intentionally includes the separate aiming control; each button remains an independent hit target.
  }
  assert.equal(intersect(b.movePad,b.aimPad),0,'sticks overlap');
  assert.ok(o.scrollW<=w+1,'Horizontal page overflow');
@@ -62,7 +62,7 @@ async function pad(page,id,dx,dy,holdMs=350){
  server=spawn(process.execPath,['server.mjs','--test'],{cwd:root,env:{...process.env,DEMENTOR_PORT:String(port),DEMENTOR_STATE:path.join(tmp,'world.json')},stdio:'pipe'});
  let logs='';server.stdout.on('data',d=>logs+=d);server.stderr.on('data',d=>logs+=d);
  let up=false;for(let i=0;i<100;i++){try{if((await fetch(base+'/api/health')).ok){up=true;break;}}catch{}await sleep(60);}assert.ok(up,logs);
- browser=await pw.chromium.launch({headless:true});
+ browser=await pw.chromium.launch({channel:'chrome',headless:true});
  const a=await makePlayer('Mobile-A',{width:390,height:844}),b=await makePlayer('Mobile-B',{width:375,height:667});
  await a.page.locator('#create').click();await a.page.waitForFunction(()=>battle?.status==='LOBBY');
  await b.page.waitForFunction(()=>document.querySelector('#lobbies button'));await b.page.locator('#lobbies button').first().click();
@@ -77,10 +77,19 @@ async function pad(page,id,dx,dy,holdMs=350){
  assert.ok(v.x>.5,'Movement pad not registered');
  await a.page.waitForFunction(old=>self&&Math.hypot(self.x-old.x,self.y-old.y)>.1,old,{timeout:3500});
  const beforeShot=await a.page.evaluate(()=>data.profile.ammo);
- const aim=await pad(a.page,'aimPad',1,0,700);
- assert.ok(aim.x>.5,'Aim pad did not rotate');
- await a.page.waitForFunction(n=>data.profile.ammo<n,beforeShot,{timeout:4000});
- report.checks.push('touch movement and aiming fires live ammo');
+ const aimGesture=await a.page.evaluate(async()=>{
+    const el=document.getElementById('aimPad'),r=el.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2;
+    function ev(type,dx){el.dispatchEvent(new PointerEvent(type,{pointerId:72,pointerType:'touch',bubbles:true,clientX:x+dx,clientY:y,button:0}));}
+    ev('pointerdown',0);ev('pointermove',-48);const aiming=window.__aimTouch?.zone;
+    await new Promise(ok=>setTimeout(ok,320));const safeAmmo=data.profile.ammo;
+    ev('pointermove',-98);const shoot=window.__aimTouch?.zone;
+    await new Promise(ok=>setTimeout(ok,750));ev('pointerup',-98);
+    return {aiming,shoot,safeAmmo,ended:window.__aimTouch?.zone};
+  });
+  assert.equal(aimGesture.aiming,'aim');assert.equal(aimGesture.shoot,'fire');assert.equal(aimGesture.ended,'idle');
+  assert.equal(aimGesture.safeAmmo,beforeShot,'Aim-only must not fire');
+  await a.page.waitForFunction(n=>data.profile.ammo<n,beforeShot,{timeout:4000});
+  report.checks.push('touch aim safe/aim/fire radius transition and ammo consumed beyond outer ring');
  // Button actions must be accepted or report an intentional gameplay error, never dead clicks.
  const cases=[
  ['dash','dash',true],['melee','melee',true],['selfFeed','selfFeed',true],

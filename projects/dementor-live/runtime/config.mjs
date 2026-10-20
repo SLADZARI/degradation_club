@@ -17,7 +17,7 @@ export const CONFIG = {
   expedition: {gate:{id:'frontier-gate',type:'mission',x:31,y:35}},
   width: 160, height: 80, river: { x: 34, w: 4 },
   treasury: 1000, plotPrice: 120, capacity: 12,
-  weights: { wood: 1, stone: 2, food: 1, seed_hemp:.1, seed_carrot:.1, hemp:1, carrot:1, water:1 },
+  weights: { seed_tree_broadleaf:.1,seed_tree_round:.1,seed_tree_oak:.1,seed_tree_spruce:.1,seed_tree_small:.1,wood: 1, stone: 2, food: 1, seed_hemp:.1, seed_carrot:.1, hemp:1, carrot:1, water:1 },
   need: { wood: 40, stone: 40 }, pay: { wood: 2, stone: 3, work: 10 },
   stages: [
     { title: 'Подготовка', works: 2, wood: 0, stone: 0 },

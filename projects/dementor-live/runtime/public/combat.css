@@ -46,3 +46,42 @@
  #battleActions button{min-width:0;min-height:34px;height:34px;font-size:9px;padding:2px;line-height:1.05}
  #shotFeedback{top:110px}
 }
+
+/* COMBAT Touch v2. Safe-area thumb reach, action semicircle, aiming and fire thresholds. */
+.action-icon{display:none}
+@media(max-width:760px),(hover:none) and (pointer:coarse){
+ #touchPads{display:flex;left:0;right:0;bottom:calc(12px + env(safe-area-inset-bottom,0px));height:150px;padding:0;overflow:visible;pointer-events:none}
+ #movePad{position:absolute;left:calc(28px + env(safe-area-inset-left,0px));bottom:0;width:136px;height:136px;pointer-events:auto}
+ #movePad i{width:43px;height:43px}
+ #aimPad{position:absolute;right:calc(81px + env(safe-area-inset-right,0px));bottom:23px;width:70px;height:70px;z-index:8;overflow:visible;pointer-events:auto;background:#d6e8d2}
+ #aimPad>i{width:22px;height:22px;box-shadow:none;pointer-events:none}
+ #aimPad>span{font-size:9px;bottom:2px;pointer-events:none}
+ #aimPad .aim-inner,#aimPad .aim-outer{position:absolute;left:50%;top:50%;border-radius:50%;transform:translate(-50%,-50%);pointer-events:none;opacity:0}
+ #aimPad .aim-inner{width:56px;height:56px;border:2px dashed #5e7756}
+ #aimPad .aim-outer{width:176px;height:176px;border:2px solid #ad815f;background:#dda06b12}
+ #aimPad.active .aim-inner,#aimPad.active .aim-outer{opacity:1}
+ #aimPad.aiming .aim-inner{border-color:#39764e}
+ #aimPad.shooting .aim-outer{border:3px solid #c35c3b;background:#d17a3935}
+ #battleActions{position:absolute;display:block;top:auto;right:0;bottom:0;left:auto;width:216px;height:315px;max-height:none;overflow:visible;background:none;border:0;padding:0;z-index:7;pointer-events:none}
+ #battleActions button{position:absolute;width:50px;height:50px;min-height:50px;display:grid;place-items:center;align-content:center;padding:3px;border-radius:50%;background:#526a56ed;box-shadow:0 3px 8px #273b2e44;pointer-events:auto;touch-action:manipulation;white-space:normal}
+ #battleActions .action-icon{display:block;font-size:22px;line-height:1}
+ #battleActions .action-caption{display:none}
+ #battleActions #interact{right:12px;bottom:207px}
+ #battleActions #melee{right:79px;bottom:215px}
+ #battleActions #dash{right:144px;bottom:164px}
+ #battleActions #selfFeed{right:12px;bottom:266px}
+ #battleActions #revive{right:78px;bottom:275px}
+ #battleActions #switchWeapon{right:144px;bottom:233px}
+ #battleActions #retreat{top:-34px;right:4px;width:44px;height:36px;min-height:36px;border-radius:18px;font-size:9px}
+ #battleActions #start{top:-34px;right:58px;width:84px;height:36px;min-height:36px;border-radius:18px}
+}
+@media(max-height:440px) and (orientation:landscape) and (hover:none) and (pointer:coarse){
+ #touchPads{height:115px;bottom:calc(4px + env(safe-area-inset-bottom,0px))}
+ #movePad{width:104px;height:104px;left:calc(30px + env(safe-area-inset-left,0px))}
+ #aimPad{right:calc(105px + env(safe-area-inset-right,0px));bottom:8px;width:65px;height:65px}
+ #battleActions{right:0;bottom:0;width:192px;height:235px;max-height:none;display:block}
+ #battleActions button{width:44px;height:44px;min-height:44px}
+ #battleActions #interact{right:12px;bottom:114px}#battleActions #melee{right:68px;bottom:141px}#battleActions #dash{right:127px;bottom:112px}
+ #battleActions #selfFeed{right:10px;bottom:170px}#battleActions #revive{right:67px;bottom:190px}#battleActions #switchWeapon{right:127px;bottom:168px}
+ #battleActions #retreat{right:5px;top:-20px}#battleActions #start{right:60px;top:-20px}
+}

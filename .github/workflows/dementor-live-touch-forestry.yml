@@ -1,0 +1,46 @@
+name: Dementor Live Touch Forestry QA
+on:
+  push:
+    branches:
+      - 'feature/dementor-live-touch-forestry-*'
+  pull_request:
+    branches:
+      - 'feature/dementor-live-interface-world-polish-2026-10-20'
+    paths:
+      - 'projects/dementor-live/runtime/**'
+      - '.github/workflows/dementor-live-touch-forestry.yml'
+permissions:
+  contents: read
+jobs:
+  model:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    defaults:
+      run:
+        working-directory: projects/dementor-live/runtime
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm run check
+      - run: npm test
+      - run: node --test test/combat-p0.test.mjs test/combat-touch.test.mjs test/forestry.test.mjs
+      - run: npm run test:integration
+      - run: npm run test:persistence
+  browser:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    defaults:
+      run:
+        working-directory: projects/dementor-live/runtime
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-save --no-package-lock playwright@1.56.1
+      - run: npx playwright install --with-deps chrome
+      - run: node test/combat-mobile-qa.cjs
+      - run: npm run test:mobile
+      - run: npm run test:quests

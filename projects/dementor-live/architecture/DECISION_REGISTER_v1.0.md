@@ -15,6 +15,9 @@
 | DL-009 | CIVIC small Museum of Laughter to become gateway/preview for MentalHumor park/hall | PROPOSAL, not yet final content approval | Design and technical alignment required |
 | DL-010 | New integration candidate may be branched from known v0.4 GitHub release, but does not replace deployed VM or real save | Preparation decision | Docs branch and empty integration branch only |
 
+| DL-011 | Mobile COMBAT: larger shifted movement stick, semicircular action controls, neutral/aim/fire concentric hold zones, separate rifle/pistol cadence and automatic magazines | APPROVED product requirement 20 Oct 2026 | Implementation candidate PR #284, device acceptance PENDING |
+| DL-012 | Tree planting: species-linked seeds, shovel soil prep, 3 growth stages, real-time growth and finite harvested wood | APPROVED product requirement 20 Oct 2026 | CIVIC personal-plot implementation candidate PR #284; public-space tree planting and UNIVERSE port PENDING |
+
 ## Supersession / conflict records
 
 - Existing runtime AGENTS.md on v0.4 allows emojis for UI. New approved PAPER CUT UI canon disallows substitutes for the 20 approved icons. Canon supersedes emoji guidance for those IDs; deployment is still pending.

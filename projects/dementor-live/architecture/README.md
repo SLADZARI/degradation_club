@@ -22,6 +22,12 @@
 
 A tested Node model is not a tested browser or production deployment. The version in package.json is not evidence of the live VM build. A document saying APPROVED is not proof of binary assets being installed.
 
+## Current implementation candidates (NOT production)
+
+- [CIVIC UI / World Polish P1](../design/CIVIC_UI_WORLD_POLISH_P1_2026-10-20.md) — new quests, collisions, terrain/paving. Draft PR #282.
+- [COMBAT Touch v2 + CIVIC Forestry v1](../design/COMBAT_TOUCH_V2_CIVIC_FORESTRY_V1_2026-10-20.md) — iPhone 14 combat gestures and five plantable tree variants. Draft PR #284, follows Polish P1.
+- CIVIC and COMBAT additions remain proposals under QA; UNIVERSE port, exact production VM provenance, and production save migration remain separate gates.
+
 ## Relevant existing sources
 
 - [Core first stage](../CORE_AND_FIRST_LEVEL_v0.1.md) — design source, not a runtime claim.
