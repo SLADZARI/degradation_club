@@ -18,8 +18,36 @@ semanticMutationAuthorized: false
 
 # #255 · Dementor VM isolation, backup and security readiness — read-only audit
 
-**Verdict: PREP REPORT / LEAD-ACCEPTED AS DRAFT PLANNING INPUT; INFRASTRUCTURE UNVERIFIED.**  
+**Verdict: PREP REPORT / LEAD-ACCEPTED AS DRAFT PLANNING INPUT; HOST READ-ONLY AFTER VERIFIED AT W12; STATIC MANIFEST FALSE-ALARM CORRECTED AT W13; STAGE1 RELEASE STILL NO-GO.**  
 **Production effect: NONE.** This report is not a Decision, Result, Gate, host approval or deploy authorization. It proposes no immediate change to existing services. Parent [#237](https://github.com/SLADZARI/degradation_club/issues/237) remains **BACKLOG/DEFERRED**; [#228](https://github.com/SLADZARI/degradation_club/issues/228) does not yet provide an accepted current stable migration baseline.
+
+## A-01/I-01 · W13 independent forensics of W12 static manifest ordering — 2026-10-21 08:58–08:59 UTC
+
+**STATUS: STATIC_BYTE_PARITY PASS (READ-ONLY RECHECK); W12 HASH ALARM ROOT CAUSE IDENTIFIED AS MANIFEST SORT ORDER.** The preceding W12 historical FAIL is retained unmodified as observed. After [Dev2's exact 468/468 file-level reconciliation](https://github.com/SLADZARI/degradation_club/issues/256#issuecomment-6312014541) and [A-01 recheck request](https://github.com/SLADZARI/degradation_club/issues/255#issuecomment-6312030083), Architect independently ran two **non-mutating, in-memory** hash calculations on the **same live existing release tree** using `MacBook-Pro-Zena.local`, already authorized strict-known-host SSH, `2026-10-21 08:58:34Z` and `08:59:06Z`. No site files, VM state, secrets, caches, source branch or services changed.
+
+**Exactly reproduced both recorded SHA values from two different orderings** while keeping the same 468 file paths and bytes, identical per-file row schema `{"path", "bytes", "sha256"}`, outer object `{"sourceSHA", "files"}`, and compact UTF-8 `json.dumps(..., separators=(',', ':'), ensure_ascii=False)`:
+
+| Sort expression before JSON | Count / bytes | SHA256 of manifest | Provenance / verdict |
+| --- | --- | --- | --- |
+| `sorted(files)` = Python `Path` component-wise ordering (Dev2's actual reference implementation) | 468 / 17,425,725 | **`b2da2d55847be160dd1827d4fc2169f3d078f06c121ef6667ffcde51d1490c63`** | **PASS**, matches Dev2 clean local build and latest VM source-by-file check |
+| `sorted(files, key=lambda p: p.relative_to(root).as_posix())` = lexicographic POSIX path string ordering (W12 original Architect script) | 468 / 17,425,725 | **`516af743538e7f854d6da75ff3f81619419abbd24d4c3e54a236bce446f205c7`** | **EXPECTED DIFFERENT DIGEST**, not different file data |
+
+**Direct reproducer first order divergence, same input filesystem:** element index 4 is `about/index.html` for Path component ordering, but `about-definition-v1.css` for POSIX string ordering. Python compares `Path` by components (e.g. directory `about` vs filename `about-definition...`), whereas the serialized POSIX path compares slash and hyphen as characters. This changes row order and therefore aggregate JSON SHA256. Both orderings produce the **SAME file set**, and independent Dev2 source-vs-VM per-file SHA/size comparison found **ZERO changed, missing or extra files**. VM `index.html` and actual localhost HTTP-served homepage sha256 `1f807b08e772ceae853cb7518f149b73024d5933de65f55af510003e4ffc0f30` match Dev2 clean build.
+
+**Corrective conclusion:** W12 did **not** establish changed/corrupted VM content; it compared different manifest serialization orders. Historical recorded digests remain correct for their *respective* ordering and W12 source-level STOP was conservative at the time. **Supersede ONLY that static file-byte-parity STOP** after this independent recheck; use the exact `sorted(Path)` reference method for future agreed hash equality, or preferably compare per-file path-keyed `SHA256 + size` before declaring a deployment mismatch. Document canonical order explicitly in the owning artifact contract (#256). Do NOT re-upload, overwrite, re-build, chmod or restart the existing VM release for this now-explained difference.
+
+**NOT A RELEASE GO:** Stage1 [Draft #309](https://github.com/SLADZARI/degradation_club/pull/309) `G4_APPROVAL_PENDING` / implementation false; W12 real Nginx named map indicates no existing `dementor.club` name but the candidate vhost is NOT installed; public CA-trusted VM SNI and unattended DNS-01 certificate renewal NOT VERIFIED; MDAO 3×502 must not be mislabelled healthy; 24–72h VM peaks, off-VM restore, UX P1, #228 role/PKCE/CIRCLE/RLS/Storage actor negatives and explicit G6/G7/owner release remain BLOCKED.
+
+```text
+STATUS: #255 ARCHITECT HOST AUDIT DONE / STATIC PARITY PASS_RECHECK / #309 SITE IMPLEMENTATION G4 PENDING
+CHECKED: Dev2 #256 per-file evidence; both original W12 and Dev2 sorted(Path) manifests independently on current exact VM tree
+CHANGED: SAME one-file Draft PR #257 report; no host, production, game, Cloud or DNS edits
+VERIFIED: identical 468 file set, same 17,425,725 bytes, both original hash values independently reproducible from different sort order; Dev2 468/468 source parity
+NOT VERIFIED: staged public SNI/TLS renew, protected full MDAO health, QA actors/privacy, off-VM recovery, release authorization
+BLOCKERS: all non-static-release Gates above remain, except W12 manifest-hash STOP corrected
+NEXT: Q-01 independently classify corrected static byte-parity evidence; Lead evaluate Stage1 #309 G4 and remaining separate DNS/host approvals
+PRODUCTION EFFECT: NONE / VM EFFECT: NONE
+```
 
 ## A-01/I-01 · W12 ACTUAL trusted-SSH VM AFTER snapshot — 2026-10-21 08:37–08:41 UTC
 
@@ -212,7 +240,7 @@ For BOTH: force safe Google/PKCE re-login with separately owned callback/issuer/
 | Owner rights and protected services | MDAO /data, nginx, docker, runner, db-dev existing and protected | Kirill's explicit vhost file owner and approved *future* site-only change path; signed/sanitized BEFORE and AFTER service snapshot. **No edits** to current configs or `/data/*` |
 | DNS registrar/account and TTL control | Authoritative DNS points to DomainControl/GoDaddy nameservers | Actual domain management account/DNS editor, ability to replace four apex A with approved VM IPv4, live TTL/rollback plan and propagation window owner |
 
-**CHRONOLOGY / SUPERSESSION (2026-10-17):** The preceding table describes **gaps at the start of W9**, NOT today's state. W9-6/7 later established by **owner terminal evidence**: `nginx -t` PASS, `sites-enabled/*` active (default + graylog + monitoring + n8n; filtered map showed no Dementor vhost), site root/index and `www-data` read PASS. W9-8/9 **superseded 'no VM cert'**: with specific owner consent, a manual DNS-01 apex+www certificate was issued at `/etc/letsencrypt/live/dementor.club/{fullchain.pem,privkey.pem}`, and X.509 CN/SAN/validity verified, expiring 2027-01-15. Club owner **is** the GoDaddy DNS operator and added both TXT challenges. **Current state: CERT PRESENT / DEMENTOR NGINX TLS VHOST ABSENT / RENEWAL NOT AUTOMATIC / PUBLIC DNS STILL PAGES.** Timer alone does not renew this lineage. No independent client-trusted SNI, full static manifest, I1–I8 or release Gate pass.
+**CHRONOLOGY / SUPERSESSION (2026-10-17):** The preceding table describes **gaps at the start of W9**, NOT today's state. W9-6/7 later established by **owner terminal evidence**: `nginx -t` PASS, `sites-enabled/*` active (default + graylog + monitoring + n8n; filtered map showed no Dementor vhost), site root/index and `www-data` read PASS. W9-8/9 **superseded 'no VM cert'**: with specific owner consent, a manual DNS-01 apex+www certificate was issued at `/etc/letsencrypt/live/dementor.club/{fullchain.pem,privkey.pem}`, and X.509 CN/SAN/validity verified, expiring 2027-01-15. Club owner **is** the GoDaddy DNS operator and added both TXT challenges. **Current state: CERT PRESENT / DEMENTOR NGINX TLS VHOST ABSENT / RENEWAL NOT AUTOMATIC / PUBLIC DNS STILL PAGES.** Timer alone does not renew this lineage. **2026-10-21 later W13:** static 468-file byte parity PASS after sorting-method reconciliation; client-trusted public VM SNI, full I1–I8, unattended renewal and release Gate still NOT VERIFIED.
 
 ### W9-3. Minimal **separate** virtual-host proposal (NOT A CONFIG DEPLOYED)
 
