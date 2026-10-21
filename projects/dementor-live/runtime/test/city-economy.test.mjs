@@ -49,13 +49,13 @@ test('Seed shop is independent city construction and public garden supports crop
  assert.equal(cmd(g,p,'buySeeds',null,{kind:'seed_carrot',quantity:1}).ok,false,'Unavailable until built');
  construct(g,p,'seed-shop-drop','seed-shop-build','wood',8);
  construct(g,p,'seed-shop-drop','seed-shop-build','stone',6);
- finishConstruction(g,p,'seed-shop-build',2);
- assert.equal(g.state.seedMarket.stage,1);
+ finishConstruction(g,p,'seed-shop-build',4);
+ assert.equal(g.state.seedMarket.stage,3);
  near(g,p,'seed-shop');assert.equal(cmd(g,p,'buySeeds',null,{kind:'seed_carrot',quantity:2}).ok,true);
  assert.equal(p.bag.seed_carrot,2);
  construct(g,p,'public-garden-drop','public-garden-build','wood',6);
  construct(g,p,'public-garden-drop','public-garden-build','stone',4);
- finishConstruction(g,p,'public-garden-build',2);
+ finishConstruction(g,p,'public-garden-build',4);
  near(g,p,'public-garden');
  const before=totals(g);
  assert.equal(cmd(g,p,'publicSow','public-bed-0',{crop:'carrot'}).ok,true);
@@ -66,8 +66,8 @@ test('Seed shop is independent city construction and public garden supports crop
  assert.equal(p.bag.carrot,3);
  assert.deepEqual(totals(g),before,'Growing crops must not magically remove building materials');
  const saved=new Game(JSON.parse(JSON.stringify(g.state)));
- assert.equal(saved.state.seedMarket.stage,1);
- assert.equal(saved.state.gardenProject.stage,1);
+ assert.equal(saved.state.seedMarket.stage,3);
+ assert.equal(saved.state.gardenProject.stage,3);
  assert.equal(saved.state.publicGarden.harvests,1);
 });
 test('Independent city worlds can be created, joined and revisited by separate players',()=>{
