@@ -64,6 +64,7 @@ function currentConfig(){return bridgeActive()?{...state.config,...state.config.
 function projectReady(p=currentProject(),c=currentConfig()){if(!state)return false;const s=c.stages[p.stage];return s&&p.stock.wood>=s.wood&&p.stock.stone>=s.stone;}
 function cargo(){return me?Object.entries(me.bag).reduce((n,[k,v])=>n+v*state.config.weights[k],0)+(me.delivery?.picked?me.delivery.quantity*state.config.weights[me.delivery.kind]:0):0;}
 function allTargets(){if(!state||!me)return [];if(state.scene!=='city')return livingTargets();
+  if(state.startingCity&&!state.expedition?.completedAt)return [state.config.expedition.gate,{id:'board',type:'board',x:3.2,y:8},{id:'mayor',type:'mayor',x:9,y:3},{id:'tools',type:'tools',x:9,y:6},...state.resources,...state.plots.map(p=>({...p,type:'plot',x:p.x+p.w/2,y:p.y-1})),...state.players.filter(p=>p.id!==me.id&&p.online&&sameScene(p)).map(p=>({...p,type:'social'}))];
   return [{id:'combat-gate',type:'combat',x:29,y:35},state.config.expedition.gate,...(bridgeOpen()?[{id:'east-bank',type:'explore',x:40,y:13.5}]:[]),...(bridgeActive()?[{id:'bridge-drop',type:'project',x:32.5,y:12.3},{id:'bridge-build',type:'build',x:32,y:13.5}]:[]),{id:'tool-shop',type:'shop',x:24,y:3},{id:'landscape-shop',type:'landscape',x:16.7,y:4},...(state.forge.stage>=state.config.forge.stages.length?[{id:'forge-use',type:'forge',x:27,y:29.5}]:[]),{id:'warehouse',type:'warehouse',x:12,y:24},...(state.seedMarket.stage>=state.config.seedMarket.stages.length?[{id:'seed-shop',type:'seed-market',x:23,y:7}]:[{id:'seed-shop-build',type:'build',x:23,y:7}]),{id:'seed-shop-drop',type:'project',x:22,y:9},...(state.gardenProject.stage>=state.config.cityGarden.stages.length?[{id:'public-garden',type:'city-garden',x:28,y:9}]:[{id:'public-garden-build',type:'build',x:28,y:9}]),{id:'public-garden-drop',type:'project',x:26,y:9},{id:'city-registry',type:'city-registry',x:19,y:6},{id:'board',type:'board',x:3.2,y:8},{id:'mayor',type:'mayor',x:9,y:3},{id:'tools',type:'tools',x:9,y:6},{id:'project',type:'project',x:15,y:11},{id:'build',type:'build',x:18,y:14},...(forgeActive()?[{id:'forge-drop',type:'project',x:24.5,y:24},{id:'forge-build',type:'build',x:27,y:26}]:[]),...(state.drops||[]),...state.resources,...(state.plaza?.config.objects||[]),...state.plots.map(p=>({...p,type:'plot',x:p.x+p.w/2,y:p.y-1})),...state.players.filter(p=>p.id!==me.id&&p.online&&sameScene(p)).map(p=>({...p,type:'social'}))];
 }
 function interaction(t){if(!t)return null;const type=t.type,isForge=t.id.startsWith('forge-'),isBridge=t.id.startsWith('bridge-'),isMarket=t.id.startsWith('seed-shop-'),isGarden=t.id.startsWith('public-garden-'),p=isMarket?state.seedMarket:isGarden?state.gardenProject:isBridge?state.bridge:isForge?state.forge:state.project,c=isMarket?{...state.config,...state.config.seedMarket}:isGarden?{...state.config,...state.config.cityGarden}:isBridge?{...state.config,...state.config.bridge}:isForge?{...state.config,...state.config.forge}:state.config;
@@ -586,6 +587,7 @@ function render(time){positionWindows();ctx.clearRect(0,0,view.w,view.h);ctx.fil
   // Sparse paper grain; all world geometry below stays interactive and separate.
   ctx.fillStyle='#6b6f4b0a';for(let i=0;i<340;i++){const x=(i*137.23)%view.w,y=(i*211.71)%view.h;ctx.fillRect(x,y,1,1);}
   const c=state?.config||{width:48,height:32,river:{x:34,w:4}};
+  const emptyStart=!!state?.startingCity&&!state?.expedition?.completedAt;
   groundRect({x:0,y:0,w:c.width,h:c.height},'#f3efdf88','#cbd0b230');
  if(!window.DLTerrain01?.draw(ctx,state,screen,view.s)&&state?.landscape?.tiles)for(const tile of state.landscape.tiles){const col=tile.kind==='paving'?'#d6c7a6':tile.kind==='grass'?'#b4c49f':'#d5c2aa';groundRect({x:tile.x,y:tile.y,w:1,h:1},col,'#a8aa93');if(tile.kind==='flowers'){const p=screen(tile.x+.5,tile.y+.5),r=Math.max(2,view.s*.11);for(const [dx,dy]of [[-1,0],[1,0],[0,-1],[0,1]]){ctx.beginPath();ctx.arc(p.x+dx*r,p.y+dy*r,r*.7,0,7);ctx.fillStyle='#c68981';ctx.fill();}ctx.beginPath();ctx.arc(p.x,p.y,r*.45,0,7);ctx.fillStyle='#e8d5a8';ctx.fill();}}
   if(!window.DLTerrain01?.ready){ctx.strokeStyle='#9ca27e12';ctx.lineWidth=.6;for(let x=0;x<=c.width;x+=2){const a=screen(x,0),b=screen(x,c.height);line(a.x,a.y,b.x,b.y,'#9ca27e12',.6);}for(let y=0;y<=c.height;y+=2){const a=screen(0,y),b=screen(c.width,y);line(a.x,a.y,b.x,b.y,'#9ca27e12',.6);}}
@@ -593,30 +595,33 @@ function render(time){positionWindows();ctx.clearRect(0,0,view.w,view.h);ctx.fil
   groundRect({x:c.river.x,y:0,w:c.river.w,h:c.height},'#becdc8','#96ada256');
   for(const bank of [c.river.x,c.river.x+c.river.w]){const a=screen(bank,0),b=screen(bank,c.height);line(a.x,a.y,b.x,b.y,'#96ada256',2);}
   for(let i=0;i<20;i++){const p=screen(34.5+(i%3)*.95,.8+i*1.6);line(p.x,p.y,p.x+view.s*.7,p.y,'#e6ede352',1);}
-  drawBridge();if(typeof window.__worldGround==='function')window.__worldGround();label('Другой берег',42,3,true);
+  if(!emptyStart){drawBridge();if(typeof window.__worldGround==='function')window.__worldGround();label('Другой берег',42,3,true);}else if(typeof window.__worldGround==='function')window.__worldGround();
   if(!state){for(const[x,y]of [[41,7],[44,10],[42,23],[45,26]])drawTree({x,y,stock:10});for(const[x,y]of [[42,16],[45,20]])drawStone({x,y,stock:10});}
   if(state?.expedition){const gate=state.config.expedition.gate;paperBoard(gate.x,gate.y,'Миссия · расчистка');}
-  if(state)paperBoard(29,35,'⚔ Боевая зона');
-  drawProject();if(typeof drawPlaza==='function')drawPlaza();
+  if(state&&!emptyStart)paperBoard(29,35,'⚔ Боевая зона');
+  if(!emptyStart){drawProject();if(typeof drawPlaza==='function')drawPlaza();}
   if(state){for(const plot of state.plots)drawPlot(plot,'ground');}else for(const o of [{x:4,y:15,w:6,h:6},{x:4,y:23,w:6,h:6},{x:14,y:23,w:6,h:6}])drawPlot(o,'ground');
-  if((state?.forge.stage||0)<2)drawForge();
-  drawToolSign(24,3);drawHempBush(16.7,3.3);label('Благоустройство',16.7,1,true);label('Магазин инструмента',24,.3,true);
+  if(!emptyStart&&(state?.forge.stage||0)<2)drawForge();
+  if(emptyStart)drawToolSign(9,6);else{drawToolSign(24,3);drawHempBush(16.7,3.3);label('Благоустройство',16.7,1,true);label('Магазин инструмента',24,.3,true);}
   if(state?.seedMarket){label(state.seedMarket.stage>=state.config.seedMarket.stages.length?'Семенная лавка':'Стройка лавки',23,4.9,true);}
   if(state?.gardenProject){const built=state.gardenProject.stage>=state.config.cityGarden.stages.length;groundRect({x:25.5,y:8.4,w:5.6,h:2.5},built?'#e0dfc6':'#eae5d7','#a7ad89',!built);label(built?'Городской огород':'Стройка огорода',28,8,true);if(built)for(const bed of state.publicGarden.beds){const x=26+(Number(bed.id.split('-').at(-1))%3)*1.6,y=9;groundRect({x,y,w:1.2,h:1},bed.crop?'#98a981':'#c4b49b','#8d956f');}}
-  paperBoard(19,6,'Реестр городов');
-  label('Городской склад',12,29,true);
+  if(!emptyStart){paperBoard(19,6,'Реестр городов');label('Городской склад',12,29,true);}
   for(const pile of state?.drops||[]){const q=screen(pile.x,pile.y);rounded(q.x-8,q.y-5,16,9,2,pile.kind==='wood'?'#ae9673':pile.kind==='stone'?'#a3aaa0':'#b17b68','#818970');label(`${names[pile.kind]} · ${pile.quantity}`,pile.x,pile.y+.8,true);}
   const resources=state?.resources||[];
    // The extended world contributes its sprites to this SAME z-sort, never a second paint pass.
    const entities=[
       ...(state?.plots||[]).map(plot=>({depth:plot.x+plot.w*.55+plot.y+plot.h*.56,draw:()=>drawPlot(plot,'props')})),
       ...(state?.forge?.stage>=2?[{depth:24+6+23+5,draw:drawForge}]:[]),
-      ...(typeof window.__worldEntities==='function'?window.__worldEntities():[]),
+      ...(!emptyStart&&typeof window.__worldEntities==='function'?window.__worldEntities():[]),
      {depth:4+4+4+3,draw:drawTent},
-     {depth:22.7+1+2.6+2,draw:()=>paperHouse({x:22.7,y:1,w:2.6,h:2},'shop')},
+     ...(!emptyStart?[{depth:22.7+1+2.6+2,draw:()=>paperHouse({x:22.7,y:1,w:2.6,h:2},'shop')},
      {depth:15.5+1.5+2.5+2.2,draw:()=>paperHouse({x:15.5,y:1.5,w:2.5,h:2.2},'garden-shop')},
      {depth:10.7+25+2.6+3,draw:()=>paperWarehouse({x:10.7,y:25,w:2.6,h:3})},
      ...(state?.seedMarket?[{depth:21.8+7.3,draw:()=>paperHouse({x:21.8,y:5.3,w:2.5,h:2},state.seedMarket.stage>=state.config.seedMarket.stages.length?'shop':'construction')}]:[]),
+     ...resources.filter(o=>(o.stock>0||o.type==='food')&&!o.id.startsWith('forest-wood-')).map(o=>({depth:o.x+o.y+(o.rockSize?o.rockSize:0),draw:()=>o.type==='wood'?drawTree(o):o.type==='stone'?drawStone(o):drawFood(o)})),
+     ...(state?.players||[]).filter(p=>(p.online||p.id===me?.id)&&sameScene(p)).map(p=>({depth:p.x+p.y,draw:()=>drawPlayer(p,time)}))
+     ]:[]),
+     {depth:4+4+4+3,draw:drawTent},
      ...resources.filter(o=>(o.stock>0||o.type==='food')&&!o.id.startsWith('forest-wood-')).map(o=>({depth:o.x+o.y+(o.rockSize?o.rockSize:0),draw:()=>o.type==='wood'?drawTree(o):o.type==='stone'?drawStone(o):drawFood(o)})),
      ...(state?.players||[]).filter(p=>(p.online||p.id===me?.id)&&sameScene(p)).map(p=>({depth:p.x+p.y,draw:()=>drawPlayer(p,time)}))
    ];entities.sort((a,b)=>a.depth-b.depth);for(const e of entities)e.draw();drawTerrainPlacementGhost();updateTerrainBar();
