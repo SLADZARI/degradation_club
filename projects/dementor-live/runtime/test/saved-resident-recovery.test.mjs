@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {createWorld,Game} from '../world-expansion-adapter.mjs';
 import {CityNetwork} from '../city-network.mjs';
 
-test('RC4 legacy residents overlapping new payphone footprint migrate only their coordinates',()=>{
+test('Legacy residents at removed static payphone locations keep their saved coordinates',()=>{
  const game=new Game(createWorld()),a=game.join('First'),b=game.join('Second');
  a.x=10;a.y=12;b.x=10.1;b.y=12.2;
  a.wallet=187;a.bag.wood=7;b.wallet=41;b.bag.stone=4;
@@ -13,7 +13,7 @@ test('RC4 legacy residents overlapping new payphone footprint migrate only their
   const q=upgraded.auth(p.token);
   assert.ok(upgraded.walkable(q.x,q.y,q),'after upgrade, character must stand on walkable ground');
   assert.equal(q.wallet,p.wallet);assert.deepEqual(q.bag,p.bag);
-  assert.equal(q.token,p.token);assert.notDeepEqual({x:q.x,y:q.y},{x:p.x,y:p.y});
+  assert.equal(q.token,p.token);assert.deepEqual({x:q.x,y:q.y},{x:p.x,y:p.y});
  }
  assert.equal(upgraded.state.residentRelocations.length,2);
  const notes=upgraded.state.residentRelocations;
@@ -53,8 +53,8 @@ test('RC4 multi-city legacy save preserves all wallets, documents and owner plot
  const original=structuredClone(n.serialize());
  const migrated=new CityNetwork(structuredClone(original));
  const q=migrated.findId(p.id).p;
- assert.notEqual(q.x,p.x);assert.equal(q.wallet,402);
+ assert.equal(q.x,p.x);assert.equal(q.y,p.y);assert.equal(q.wallet,402);
  assert.equal(migrated.origin.state.plots[0].owner,p.id);
  assert.ok(migrated.origin.walkable(q.x,q.y,q));
- assert.equal(migrated.origin.state.residentRelocations.length,1);
+ assert.equal(migrated.origin.state.residentRelocations.length,0);
 });

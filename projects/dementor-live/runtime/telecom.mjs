@@ -40,7 +40,7 @@ const services=[{id:'npc-mayor',name:'Мэрия · поручения',number:N
 return [...services,...people].sort((a,b)=>a.name.localeCompare(b.name,'ru')).slice(0,500);
 }
 export function telecomSnapshot(network,p){
- const game=network.findId(p.id)?.g;let booths=boothsForScene(p.scene);booths=game?.state.technologies?.payphones?booths.filter(b=>b.siteId&&municipalBuilt(game.state,b.siteId)):[];
+ const game=network.findId(p.id)?.g;let booths=boothsForScene(p.scene);booths=game?.state.startingCity&&game.state.technologies?.payphones?booths.filter(b=>b.siteId&&municipalBuilt(game.state,b.siteId)):[];
  return {number:p.pagerNumber,hasPager:!!p.pagerOwns,price:PAGER_PRICE,messageFee:PAGE_FEE,
   directory:publicSubscriberList(network,p),listed:!!p.pagerListed,blocked:p.pagerBlocked||[],
   inbox:p.pagerOwns?p.pagerInbox.slice(-80):[],
@@ -67,7 +67,7 @@ export function telecomAction(network,p,cmd){
   result={message:cmd.blocked?'Номер заблокирован':'Номер разблокирован'};
  }else if(cmd.type==='pagerDial'){
   const booth=PHONE_BOOTHS.find(b=>b.id===cmd.target);
-  if(!booth||booth.scene!==(p.scene||'city'))throw Error('Нужен таксофон');if(g.state.startingCity&&(!g.state.technologies?.payphones||!booth.siteId||!municipalBuilt(g.state,booth.siteId)))throw Error('Сначала изучите технологию и постройте таксофон мэрией.');
+  if(!booth||booth.scene!==(p.scene||'city'))throw Error('Нужен таксофон');if(!g.state.startingCity||!g.state.technologies?.payphones||!booth.siteId||!municipalBuilt(g.state,booth.siteId))throw Error('Сначала изучите технологию и постройте таксофон мэрией.');
   g.near(p,booth);
   const number=String(cmd.number||'').trim();
   if(number===NPC_NUMBERS.museum&&(p.worldTravel?.visited||[]).includes('museum'))
