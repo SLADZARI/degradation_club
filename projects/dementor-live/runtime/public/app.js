@@ -8,7 +8,7 @@ let view={w:innerWidth,h:innerHeight,s:28,cx:innerWidth<760?10:16,cy:innerWidth<
 const motionFrames=[];
 let lastWallet=null,lastChatSignature='';
 let seenChatIds=null,hoverWorld=null,placementKind=null,placementCell=null;
-let fogOwner=null,fogExplored=new Set(),fogSaveTimer=null;
+let fogOwner=null,fogExplored=new Set(),fogSaveTimer=null,fogMaskPath=null,fogMaskVersion=0,fogMaskBuiltVersion=-1,fogMaskWidth=0,fogMaskHeight=0,fogScanX=NaN,fogScanY=NaN;
 function fogStorageKey(){return `dementor-fog-${state?.worldId||'legacy'}-${state?.cityNetwork?.current||'origin'}-${me?.id||''}`;}
 const colors=['#a97059','#6e8971','#65858f'];
 const names={wood:'Древесина',stone:'Камень',food:'Ягоды',seed_hemp:'Семена конопли',seed_carrot:'Семена моркови',hemp:'Конопля',carrot:'Морковь',water:'Вода'};
@@ -305,28 +305,43 @@ function worldPoint(x,y){
 }
 function recordFogDiscovery(){
  if(!me||!state?.startingCity||state.scene!=='city')return;
- const storageKey=fogStorageKey();if(fogOwner!==storageKey){fogOwner=storageKey;try{fogExplored=new Set(JSON.parse(localStorage.getItem(storageKey)||'[]'));}catch{fogExplored=new Set();}}
- const radius=10.5,minX=Math.max(0,Math.floor(me.x-radius)),maxX=Math.min(state.config.width-1,Math.ceil(me.x+radius)),minY=Math.max(0,Math.floor(me.y-radius)),maxY=Math.min(state.config.height-1,Math.ceil(me.y+radius));let changed=false;
- for(let y=minY;y<=maxY;y++)for(let x=minX;x<=maxX;x++)if(Math.hypot(x+.5-me.x,y+.5-me.y)<=radius){const key=x+','+y;if(!fogExplored.has(key)){fogExplored.add(key);changed=true;}}
- if(changed&&!fogSaveTimer){const saveKey=fogOwner;fogSaveTimer=setTimeout(()=>{fogSaveTimer=null;if(fogOwner===saveKey)try{localStorage.setItem(saveKey,JSON.stringify([...fogExplored]));}catch{}},300);}
+ const storageKey=fogStorageKey();
+ if(fogOwner!==storageKey){
+   fogOwner=storageKey;
+   try{fogExplored=new Set(JSON.parse(localStorage.getItem(storageKey)||'[]'));}catch{fogExplored=new Set();}
+   fogMaskPath=null;fogMaskVersion++;fogMaskBuiltVersion=-1;fogScanX=NaN;fogScanY=NaN;
+ }
+ // The reveal scan need not run on every animation frame: grid coverage changes only after a small move.
+ if(Number.isFinite(fogScanX)&&Math.hypot(me.x-fogScanX,me.y-fogScanY)<.3)return;
+ fogScanX=me.x;fogScanY=me.y;
+ const radius=10.5,radiusSq=radius*radius,minX=Math.max(0,Math.floor(me.x-radius)),maxX=Math.min(state.config.width-1,Math.ceil(me.x+radius)),minY=Math.max(0,Math.floor(me.y-radius)),maxY=Math.min(state.config.height-1,Math.ceil(me.y+radius));let changed=false;
+ for(let y=minY;y<=maxY;y++)for(let x=minX;x<=maxX;x++){const dx=x+.5-me.x,dy=y+.5-me.y;if(dx*dx+dy*dy<=radiusSq){const key=x+','+y;if(!fogExplored.has(key)){fogExplored.add(key);changed=true;}}}
+ if(changed){
+   fogMaskPath=null;fogMaskVersion++;
+   if(!fogSaveTimer){const saveKey=fogOwner;fogSaveTimer=setTimeout(()=>{fogSaveTimer=null;if(fogOwner===saveKey)try{localStorage.setItem(saveKey,JSON.stringify([...fogExplored]));}catch{}},300);}
+ }
+}
+function fogMask(){
+ const width=state.config.width,height=state.config.height;
+ if(fogMaskPath&&fogMaskBuiltVersion===fogMaskVersion&&fogMaskWidth===width&&fogMaskHeight===height)return fogMaskPath;
+ if(typeof Path2D!=='function')return null;
+ const path=new Path2D(),pad=.0175;
+ for(let y=0;y<height;y++)for(let x=0;x<width;x++)if(!fogExplored.has(x+','+y)){
+   path.moveTo(x-pad,y-pad);path.lineTo(x+1+pad,y-pad);path.lineTo(x+1+pad,y+1+pad);path.lineTo(x-pad,y+1+pad);path.closePath();
+ }
+ fogMaskPath=path;fogMaskWidth=width;fogMaskHeight=height;fogMaskBuiltVersion=fogMaskVersion;
+ return fogMaskPath;
 }
 function drawFogOfWar(){
  if(!me||!state?.startingCity||state.scene!=='city')return;
  recordFogDiscovery();
- const corners=[[0,0],[view.w,0],[view.w,view.h],[0,view.h]].map(([x,y])=>worldPoint(x,y));
- const minX=Math.max(0,Math.floor(Math.min(...corners.map(p=>p.x))-1)),maxX=Math.min(state.config.width-1,Math.ceil(Math.max(...corners.map(p=>p.x))+1));
- const minY=Math.max(0,Math.floor(Math.min(...corners.map(p=>p.y))-1)),maxY=Math.min(state.config.height-1,Math.ceil(Math.max(...corners.map(p=>p.y))+1));
- const hidden=[];for(let y=minY;y<=maxY;y++)for(let x=minX;x<=maxX;x++)if(!fogExplored.has(x+','+y))hidden.push([x,y]);
- // Mask only undiscovered grid cells with the same paper color as the map surround.
- // No radius, ring, or tint is drawn over the cells that have already been discovered.
- ctx.beginPath();
- for(const [x,y] of hidden){
-   const raw=[[x,y],[x+1,y],[x+1,y+1],[x,y+1]].map(([wx,wy])=>screen(wx,wy));
-   const center={x:raw.reduce((n,p)=>n+p.x,0)/4,y:raw.reduce((n,p)=>n+p.y,0)/4};
-   const pts=raw.map(p=>({x:center.x+(p.x-center.x)*1.035,y:center.y+(p.y-center.y)*1.035}));
-   ctx.moveTo(pts[0].x,pts[0].y);for(let k=1;k<pts.length;k++)ctx.lineTo(pts[k].x,pts[k].y);ctx.closePath();
- }
- ctx.fillStyle='#efebdf';ctx.fill();
+ const path=fogMask();if(!path)return;
+ // Cached world-space Path2D: camera movement only changes this affine transform.
+ const dpr=devicePixelRatio||1,k=view.s*ISO_COS,h=view.s*.5;
+ ctx.save();
+ ctx.setTransform(dpr*k,dpr*h,-dpr*k,dpr*h,dpr*(view.w/2+(view.cy-view.cx)*k),dpr*(view.h/2-(view.cx+view.cy)*h));
+ ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';ctx.fillStyle='#efebdf';ctx.fill(path);
+ ctx.restore();
 }
 function blocked(x,y){const c=state.config,r=.35;if(state.scene!=='city'){return x<r||y<r||x>16-r||y>16-r||(['plot','expedition'].includes(state.scene)&&(state.home.nodes.some(n=>n.left&&Math.hypot(x-n.x,y-n.y)<.63)||state.scene==='plot'&&state.home.plantedTrees?.some(t=>t.wateredAt&&state.now-t.wateredAt>=180000&&Math.hypot(x-t.x,y-t.y)<.6)));}if(x<r||y<r||x>c.width-r||y>c.height-r)return true;if(x+r>c.river.x&&x-r<c.river.x+c.river.w&&!(bridgeOpen()&&y-r>=c.bridge.y&&y+r<=c.bridge.y+c.bridge.h))return true;
   if((state.citySolids||[{x:4,y:4,w:4,h:3}]).some(o=>x+r>o.x&&x-r<o.x+o.w&&y+r>o.y&&y-r<o.y+o.h))return true;/* Extended solids checked by world-ui from authoritative footprints. */return state.resources.some(o=>o.stock>0&&o.type!=='food'&&Math.hypot(x-o.x,y-o.y)<.63);
