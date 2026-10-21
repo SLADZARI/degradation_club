@@ -52,7 +52,9 @@ async function main(){
   const results=[];
   for(const person of people){
    const {page,name,mode,mobile}=person;
-   await page.waitForFunction(()=>window.DLWorldArtG6?.debugHealth().loaded>0,{timeout:20000});
+   await page.waitForFunction(()=>window.DLWorldArtG6?.debugHealth().loaded>0,null,{timeout:20000});
+   await page.waitForFunction(ids=>ids.every(id=>state.players.some(p=>p.id===id)),
+     people.map(p=>p.id),{timeout:20000});
    const before=await page.evaluate(()=>({
     mode:window.DLWorldArtG6.mode,
     health:window.DLWorldArtG6.debugHealth(),
