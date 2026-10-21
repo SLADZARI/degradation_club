@@ -2,7 +2,7 @@ let bagSelection=null;
 function sameScene(p){return (p.scene||'city')===(me.scene||'city')&&((me.scene||'city')==='city'||p.plotId===me.plotId);}
 function livingTargets(){return [...state.homeTargets,...state.drops,...state.players.filter(p=>p.id!==me.id&&p.online&&sameScene(p)).map(p=>({...p,type:'social'}))];}
 function lifePanel(mode,rows,row,canAct){
- const title=$('cityPanelTitle'),intro=$('cityPanelIntro'),note=$('cityPanelNote');note.textContent='Числа пробные. Все предметы, деньги и изменения сохраняются.';
+ const title=$('cityPanelTitle'),intro=$('cityPanelIntro'),note=$('cityPanelNote');$('cityPanel').classList.remove('chest-panel');delete $('cityPanel').dataset.mode;note.textContent='Числа пробные. Все предметы, деньги и изменения сохраняются.';
  const action=(type,target,extra={})=>()=>act(type,target,extra);
  const button=(text,click,disabled=false,id)=>({text,click,disabled,id});
  const itemName=k=>state.items[k]?.name||k;
