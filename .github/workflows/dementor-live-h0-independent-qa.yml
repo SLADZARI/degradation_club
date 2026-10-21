@@ -8,7 +8,7 @@ on:
 permissions:
   contents: read
 env:
-  SOURCE_SHA: 8a55be8fdded1a7264e6cf2a116cec405ea06c6c
+  SOURCE_SHA: 6d09e9828a549b6ce64a354c5f7bf0a29717a700
   DEMENTOR_HOST: 127.0.0.1
   DEMENTOR_QA_LOG: '1'
 jobs:
