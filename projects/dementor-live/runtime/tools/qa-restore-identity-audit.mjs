@@ -5,7 +5,8 @@
 import fs from 'node:fs';
 import {createHash} from 'node:crypto';
 import assert from 'node:assert/strict';
-import {CityNetwork} from '../city-network.mjs';
+import {pathToFileURL} from 'node:url';
+import {resolve} from 'node:path';
 
 const path=process.argv[2];
 if(!path){console.error('QA_RESTORE_FAIL: private restored world path required');process.exit(2);}
@@ -70,6 +71,13 @@ try{
   const source=fs.readFileSync(path);
   const sourceDigest=createHash('sha256').update(source).digest('hex');
   const initial=JSON.parse(source.toString('utf8'));
+  // Audit using the EXACT RELEASE CANDIDATE's code, not the OPS checkout's
+  // possibly older CityNetwork. Path is a private local checked-out runtime.
+  const candidateRuntime=process.argv[3];
+  const candidateModule=candidateRuntime
+    ?pathToFileURL(resolve(candidateRuntime,'city-network.mjs')).href
+    :new URL('../city-network.mjs',import.meta.url).href;
+  const {CityNetwork}=await import(candidateModule);
   // Constructors only touch structuredClone, never the restored source.
   const first=new CityNetwork(structuredClone(initial));
   const once=structuredClone(first.serialize());
