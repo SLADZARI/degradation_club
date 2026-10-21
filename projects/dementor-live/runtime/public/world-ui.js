@@ -198,6 +198,7 @@ function worldEntities(){
     if(o.biome==='forest'&&!state.resources.some(t=>t.id==='forest-wood-'+o.x+'-'+o.y&&t.stock>0))continue;
     layers.push({depth:o.x+o.w+o.y+o.h,draw:()=>{if(o.biome==='forest')drawTree({x:o.x+o.w/2,y:o.y+o.h/2,stock:12,visualVariant:state.resources.find(t=>t.id==='forest-wood-'+o.x+'-'+o.y)?.visualVariant??0});else{drawStone({x:o.x+o.w/2,y:o.y+o.h/2,stock:16});}}});
   }
+  for(const t of state.telecom?.booths||[]){const p=screen(t.x,t.y);if(p.x< -200||p.x>view.w+200||p.y< -250||p.y>view.h+250)continue;layers.push({depth:t.x+t.y,draw:()=>{drawPaperPayphone(t.x,t.y);label(t.title,t.x,t.y-1.5,true);}});}
   for(const t of w.targets||[]){
     const p=screen(t.x,t.y);if(p.x< -250||p.x>view.w+250||p.y< -250||p.y>view.h+250)continue;
     const f=w.footprints?.find(o=>o.id==='structure-'+t.id||o.id===t.id);
