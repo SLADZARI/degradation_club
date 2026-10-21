@@ -1,0 +1,50 @@
+name: Dementor Live H0 - mobile social UX regression (isolated)
+on:
+  push:
+    branches:
+      - fix/dementor-live-h0-mobile-social-sheet-20261021
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  mobile-social:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: projects/dementor-live/runtime
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify exact H0 ancestry and scoped diff
+        env:
+          SOURCE_SHA: 6d09e9828a549b6ce64a354c5f7bf0a29717a700
+        run: |
+          set -euo pipefail
+          git -C ../../.. merge-base --is-ancestor "$SOURCE_SHA" HEAD
+          changed="$(git -C ../../.. diff --name-only "$SOURCE_SHA" HEAD -- projects/dementor-live/runtime | grep -vE '^projects/dementor-live/runtime/(public/styles\.css|test/h0-mobile-social\.cjs)$' || true)"
+          test -z "$changed" || { echo "Unexpected runtime change: $changed"; exit 1; }
+      - name: Run disposable two-browser mobile social UI regression
+        env:
+          SOURCE_SHA: 6d09e9828a549b6ce64a354c5f7bf0a29717a700
+          DEMENTOR_HOST: 127.0.0.1
+        run: |
+          set -euo pipefail
+          npm install --no-save --no-package-lock playwright@1.56.1
+          npx playwright install --with-deps chrome
+          node --check test/h0-mobile-social.cjs
+          node test/h0-mobile-social.cjs
+      - name: Preserve test evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: h0-mobile-social-ux-evidence
+          path: |
+            projects/dementor-live/runtime/reports/h0-mobile-social.json
+            projects/dementor-live/runtime/reports/h0-mobile-social.png
+          retention-days: 7

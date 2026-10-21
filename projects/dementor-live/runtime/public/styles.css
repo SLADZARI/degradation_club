@@ -254,3 +254,6 @@ dialog:not(#welcome):not(#mayorIdea):not(#payphoneDialog),
  .terrain-product{padding-left:108px!important;min-height:100px}
  .terrain-preview{width:87px;height:55px}
 }
+
+/* H0 mobile trade QA: responsive edge insets must not inherit the desktop centering shift. */
+@media(max-width:760px){#cityPanel[data-mode=social]{transform:none!important}}
