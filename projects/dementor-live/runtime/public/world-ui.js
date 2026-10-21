@@ -166,6 +166,7 @@ function drawWorldGround(){
   if(trail.length){ctx.beginPath();trail.forEach(([x,y],i)=>{const p=screen(x,y);i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y);});ctx.strokeStyle='#796f59';ctx.lineWidth=Math.max(5,view.s*.24);ctx.stroke();ctx.strokeStyle='#e4d6b3';ctx.lineWidth=Math.max(2,view.s*.12);ctx.stroke();
     const [x,y]=trail.at(-1);label('ВЕРШИНА · 100 м',x,y-1.4,true);
   }
+  if(state.startingCity&&!state.expedition?.completedAt)return;
   const built=w.secondBridgeProject?.stage===2,started=w.secondBridgeProject?.stage===1,br=w.secondBridge;
   if(built){
     // One measured deck; supports, beams and plank endpoints use the same real coordinates.
