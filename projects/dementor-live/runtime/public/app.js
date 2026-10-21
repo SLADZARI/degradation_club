@@ -312,16 +312,21 @@ function recordFogDiscovery(){
 }
 function drawFogOfWar(){
  if(!me||!state?.startingCity||state.scene!=='city')return;
- recordFogDiscovery();const radius=10.5,fade=1.35,corners=[[0,0],[view.w,0],[view.w,view.h],[0,view.h]].map(([x,y])=>worldPoint(x,y)),minX=Math.max(0,Math.floor(Math.min(...corners.map(p=>p.x))-2)),maxX=Math.min(state.config.width-1,Math.ceil(Math.max(...corners.map(p=>p.x))+2)),minY=Math.max(0,Math.floor(Math.min(...corners.map(p=>p.y))-2)),maxY=Math.min(state.config.height-1,Math.ceil(Math.max(...corners.map(p=>p.y))+2));
- const contour=r=>Array.from({length:96},(_,i)=>{const a=2*Math.PI*i/96,edge=r+.18*Math.sin(a*3+me.x*.13)+.12*Math.sin(a*7+me.y*.19);return screen(me.x+Math.cos(a)*edge,me.y+Math.sin(a)*edge);});
- const trace=points=>{ctx.moveTo(points[0].x,points[0].y);for(let i=1;i<points.length;i++)ctx.lineTo(points[i].x,points[i].y);ctx.closePath();};
- // The unexplored field matches the map's outer canvas; a feathered, slightly irregular edge hides the reveal circle.
- ctx.save();ctx.beginPath();ctx.rect(0,0,view.w,view.h);trace(contour(radius+fade));ctx.clip('evenodd');ctx.fillStyle='#efebdf';ctx.fillRect(0,0,view.w,view.h);ctx.restore();
- const bands=24;
- for(let i=0;i<bands;i++){const inner=contour(radius-fade+2*fade*i/bands),outer=contour(radius-fade+2*fade*(i+1)/bands);ctx.save();ctx.beginPath();trace(outer);trace(inner);ctx.clip('evenodd');ctx.globalAlpha=(i+.5)/bands;ctx.fillStyle='#efebdf';ctx.fillRect(0,0,view.w,view.h);ctx.restore();}
+ recordFogDiscovery();
+ const corners=[[0,0],[view.w,0],[view.w,view.h],[0,view.h]].map(([x,y])=>worldPoint(x,y));
+ const minX=Math.max(0,Math.floor(Math.min(...corners.map(p=>p.x))-1)),maxX=Math.min(state.config.width-1,Math.ceil(Math.max(...corners.map(p=>p.x))+1));
+ const minY=Math.max(0,Math.floor(Math.min(...corners.map(p=>p.y))-1)),maxY=Math.min(state.config.height-1,Math.ceil(Math.max(...corners.map(p=>p.y))+1));
+ const hidden=window.DLFogGrid?.hiddenCells(fogExplored,minX,maxX,minY,maxY)||[];
+ // Mask only undiscovered grid cells with the same paper color as the map surround.
+ // No radius, ring, or tint is drawn over the cells that have already been discovered.
  ctx.beginPath();
- for(const key of fogExplored){const [x,y]=key.split(',').map(Number);if(x<minX||x>maxX||y<minY||y>maxY||Math.hypot(x+.5-me.x,y+.5-me.y)<=radius)continue;const pts=[[x,y],[x+1,y],[x+1,y+1],[x,y+1]].map(([wx,wy])=>screen(wx,wy));ctx.moveTo(pts[0].x,pts[0].y);for(let i=1;i<pts.length;i++)ctx.lineTo(pts[i].x,pts[i].y);ctx.closePath();}
- ctx.fillStyle='rgba(208,199,165,.48)';ctx.fill();
+ for(const [x,y] of hidden){
+   const raw=[[x,y],[x+1,y],[x+1,y+1],[x,y+1]].map(([wx,wy])=>screen(wx,wy));
+   const center={x:raw.reduce((n,p)=>n+p.x,0)/4,y:raw.reduce((n,p)=>n+p.y,0)/4};
+   const pts=raw.map(p=>({x:center.x+(p.x-center.x)*1.035,y:center.y+(p.y-center.y)*1.035}));
+   ctx.moveTo(pts[0].x,pts[0].y);for(let k=1;k<pts.length;k++)ctx.lineTo(pts[k].x,pts[k].y);ctx.closePath();
+ }
+ ctx.fillStyle='#efebdf';ctx.fill();
 }
 function blocked(x,y){const c=state.config,r=.35;if(state.scene!=='city'){return x<r||y<r||x>16-r||y>16-r||(['plot','expedition'].includes(state.scene)&&(state.home.nodes.some(n=>n.left&&Math.hypot(x-n.x,y-n.y)<.63)||state.scene==='plot'&&state.home.plantedTrees?.some(t=>t.wateredAt&&state.now-t.wateredAt>=180000&&Math.hypot(x-t.x,y-t.y)<.6)));}if(x<r||y<r||x>c.width-r||y>c.height-r)return true;if(x+r>c.river.x&&x-r<c.river.x+c.river.w&&!(bridgeOpen()&&y-r>=c.bridge.y&&y+r<=c.bridge.y+c.bridge.h))return true;
   if((state.citySolids||[{x:4,y:4,w:4,h:3}]).some(o=>x+r>o.x&&x-r<o.x+o.w&&y+r>o.y&&y-r<o.y+o.h))return true;/* Extended solids checked by world-ui from authoritative footprints. */return state.resources.some(o=>o.stock>0&&o.type!=='food'&&Math.hypot(x-o.x,y-o.y)<.63);

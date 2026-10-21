@@ -102,3 +102,10 @@ test('world identity isolates persistent fog and survives state reload',()=>{
   new Game(JSON.parse(JSON.stringify(legacy)));
   assert.equal(legacy.worldId,migratedId,'reload does not reset the migrated world identity');
 });
+
+import '../public/fog-grid.js';
+test('fog masks only unexplored grid cells and does not tint discovered ground',()=>{
+  const explored=new Set(['2,2','3,2']);
+  assert.deepEqual(globalThis.DLFogGrid.hiddenCells(explored,2,4,2,3),[[2,3],[3,3],[4,2],[4,3]]);
+  assert.equal(explored.has('2,2'),true,'discovered cells stay visible after leaving the reveal radius');
+});
