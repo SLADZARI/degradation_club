@@ -13,5 +13,5 @@ assert.ok(read('test/rc2-cross-chain.test.mjs').includes('RC2-LINK-03'));
 const publish=read('deploy/publish-preserve-world.sh');
 for(const marker of ['--dry-run','--apply','--apply-fresh','full-world.tar.gz','upgrade-audit.mjs','rollback','dementor-live-world','rm -f /world/world.json'])
  assert.ok(publish.includes(marker),'Missing save-preservation guard '+marker);
-assert.ok(publish.indexOf('full-world.tar.gz')<publish.indexOf('rm -f /world/world.json'),'Fresh start must archive the full world before resetting the active save');
+assert.ok(publish.indexOf('test -s "$BACKUP/world.json" && test -s "$BACKUP/full-world.tar.gz"')<publish.indexOf('rm -f /world/world.json'),'Fresh start must archive the full world before resetting the active save');
 console.log('RC3 RELEASE CONTENT PASS: corrected building geometry, tested UI chains, version and safe volume migration.');
