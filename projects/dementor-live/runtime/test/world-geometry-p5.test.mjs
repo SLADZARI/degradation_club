@@ -86,3 +86,23 @@ test('Mountain summit grants treasury-backed one-time recognition, persists acro
  assert.equal(command(old,resident,'worldUse','mountain-summit').reward,undefined);
  assert.equal(resident.wallet,40);
 });
+
+test('Fresh live world starts at the marked parcel and hides city services until it is cleared',()=>{
+ const g=new Game(createWorld(undefined,{startingCity:true})),p=g.join('Первый житель');g.connect(p);
+ assert.equal(g.state.startingCity,true);
+ assert.equal(g.state.plots.find(plot=>plot.id==='plot-1').locked,true);
+ assert.equal(g.state.plots.find(plot=>plot.id==='plot-1').clearanceParcel,true);
+ assert.deepEqual(g.rects().map(o=>o.id).sort(),['mayor-tent','work-board']);
+ const view=g.snapshot(p);
+ assert.equal(view.startingCity,true);
+ assert.deepEqual(view.worldTravel.targets,[]);
+ assert.deepEqual(view.worldTravel.booths,[]);
+ assert.deepEqual(view.worldTravel.footprints,[]);
+ const hidden=command(g,p,'touristBuy','tourist-kiosk',{kind:'shirt'});
+ assert.equal(hidden.ok,false);
+ p.x=g.c.expedition.gate.x;p.y=g.c.expedition.gate.y;
+ const entered=command(g,p,'missionEnter','plot-1');
+ assert.equal(entered.ok,true);
+ assert.equal(p.scene,'expedition');
+ assert.equal(p.plotId,'plot-1');
+});
