@@ -627,7 +627,7 @@ function render(time){positionWindows();ctx.clearRect(0,0,view.w,view.h);ctx.fil
       ...(state?.municipalSites||[]).filter(s=>s.built&&s.id==='field-toilet').map(s=>({depth:s.x+s.y+s.w+s.h,draw:()=>{paperHouse({x:s.x,y:s.y,w:s.w,h:s.h},'construction');label('Туалет',s.x+s.w/2,s.y-.6,true);}})),
       ...resources.filter(o=>(o.stock>0||o.type==='food')&&!o.id.startsWith('forest-wood-')).map(o=>({depth:o.x+o.y+(o.rockSize?o.rockSize:0),draw:()=>o.type==='wood'?drawTree(o):o.type==='stone'?drawStone(o):drawFood(o)})),
       ...(state?.players||[]).filter(p=>(p.online||p.id===me?.id)&&sameScene(p)).map(p=>({depth:p.x+p.y,draw:()=>drawPlayer(p,time)}))
-   ];];entities.sort((a,b)=>a.depth-b.depth);for(const e of entities)e.draw();drawTerrainPlacementGhost();updateTerrainBar();
+   ];entities.sort((a,b)=>a.depth-b.depth);for(const e of entities)e.draw();drawTerrainPlacementGhost();updateTerrainBar();
   if(route.length){const p=screen(route.at(-1).x,route.at(-1).y);ctx.beginPath();ctx.ellipse(p.x,p.y,7,4,0,0,Math.PI*2);ctx.strokeStyle='#82956a99';ctx.lineWidth=1.4;ctx.stroke();}
   if(context){const p=screen(context.x,context.y);ctx.beginPath();ctx.ellipse(p.x,p.y+4,view.s*.7,view.s*.25,0,0,Math.PI*2);ctx.strokeStyle='#82956999';ctx.lineWidth=1.5;ctx.stroke();}
   if(me?.job){const left=Math.max(0,me.job.ends-(state.now+80)),duration=me.job.ends-me.job.started;$('actionProgress').style.width=`${Math.min(100,(1-left/duration)*100)}%`;}else $('actionProgress').style.width='0';
