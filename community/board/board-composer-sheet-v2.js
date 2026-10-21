@@ -178,7 +178,12 @@
       requestOpen();
       return;
     }
-    if(event.target.closest('#cancelComposer'))setTimeout(()=>closeSheet(),0);
+    if(event.target.closest('#cancelComposer')){
+      // Cancel is never publication, even after a previously rejected submit.
+      // Preserve opener focus and do not announce a false successful artifact.
+      publishing=false;
+      setTimeout(()=>closeSheet(),0);
+    }
   },true);
 
   document.addEventListener('keydown',event=>{
@@ -193,6 +198,13 @@
     if(event.key!=='Tab')return;
     const list=focusables();if(!list.length)return;
     const first=list[0],last=list[list.length-1];
+    // Clicking an inert backdrop can blur the editor to BODY without
+    // activating any background control. Recover both keyboard directions.
+    if(!composer()?.contains(document.activeElement)){
+      event.preventDefault();
+      (event.shiftKey?last:first).focus();
+      return;
+    }
     if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus()}
     else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus()}
   });

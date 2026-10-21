@@ -191,6 +191,24 @@ for(const viewport of [{width:390,height:844,label:'390'},{width:360,height:800,
             await page.mouse.click(rect.x+Math.min(rect.width/2,10),rect.y+rect.height/2);
             const clicks=await page.evaluate(()=>window.__QA_MODAL_FILTER_CLICKS__||0);
             expect(clicks===0,`G6 ${engine.name} ${width}: modal allowed background filter click ${clicks}`);
+            await page.keyboard.press('Shift+Tab');
+            const reverse=await page.evaluate(()=>{
+              const root=document.querySelector('#entryHost .dc-composer');
+              const list=[...root.querySelectorAll('a[href],button:not([disabled]),input:not([disabled]),textarea:not([disabled]),select:not([disabled]),[tabindex]:not([tabindex="-1"])')]
+                .filter(el=>!el.hidden&&el.offsetParent!==null);
+              return{lastInside:document.activeElement===list[list.length-1],active:document.activeElement?.tagName};
+            });
+            expect(reverse.lastInside,`G6 ${engine.name} ${width}: Shift+Tab from outside did not recover to last modal control ${JSON.stringify(reverse)}`);
+            await page.locator('#artifactBody').focus();
+            await page.mouse.click(rect.x+Math.min(rect.width/2,10),rect.y+rect.height/2);
+            await page.keyboard.press('Tab');
+            const forward=await page.evaluate(()=>{
+              const root=document.querySelector('#entryHost .dc-composer');
+              const list=[...root.querySelectorAll('a[href],button:not([disabled]),input:not([disabled]),textarea:not([disabled]),select:not([disabled]),[tabindex]:not([tabindex="-1"])')]
+                .filter(el=>!el.hidden&&el.offsetParent!==null);
+              return{firstInside:document.activeElement===list[0],active:document.activeElement?.tagName};
+            });
+            expect(forward.firstInside,`G6 ${engine.name} ${width}: Tab from outside did not recover to first modal control ${JSON.stringify(forward)}`);
           }
         }
       }
@@ -205,6 +223,23 @@ for(const viewport of [{width:390,height:844,label:'390'},{width:360,height:800,
         `G6 ${engine.name} ${width}: inert background not restored ${JSON.stringify(restored)}`);
       expect(restored.focusOnPrimary,
         `G6 ${engine.name} ${width}: Escape did not return to visible opener ${JSON.stringify(restored)}`);
+      if(width===390){
+        await page.locator('.dc-board-primary.is-visible button').click();
+        await page.locator('#entrySection.is-composer-sheet-open').waitFor({state:'visible',timeout:3000});
+        await page.locator('#artifactBody').fill('');
+        // Submit event from novalidate form: existing board.js rejects empty body
+        // before any RPC, and a subsequent Cancel must never signal success.
+        await page.locator('#artifactForm').evaluate(el=>el.dispatchEvent(new Event('submit',{bubbles:true,cancelable:true})));
+        await page.locator('#cancelComposer').click();
+        await page.waitForFunction(()=>!document.getElementById('entrySection')?.classList.contains('is-composer-sheet-open'),null,{timeout:3000});
+        const cancelAfterInvalid=await page.evaluate(()=>({
+          falseSuccess:!!document.querySelector('.dc-board-toast.is-visible'),
+          focusOnPrimary:document.activeElement===document.querySelector('.dc-board-primary.is-visible button'),
+          writes:globalThis.__QA_DB_WRITES__?.length||0
+        }));
+        expect(!cancelAfterInvalid.falseSuccess&&cancelAfterInvalid.focusOnPrimary&&cancelAfterInvalid.writes===0,
+          `G6 ${engine.name} 390: invalid submit then Cancel shows false success or loses focus ${JSON.stringify(cancelAfterInvalid)}`);
+      }
       expect(!errors.length,`G6 ${engine.name} ${width}: page errors ${errors.join(' | ')}`);
       await ctx.close();
     }
