@@ -137,6 +137,11 @@
   ctx.restore();
   return mode==='replace';
  }
- window.DLWorldArtG6=Object.freeze({enabled,mode,draw,drawGroundProp,bedArtId,forgeArtId,seedArtId,footprintLayout,tentArtId,ids:Object.freeze([...allowed]),failed});
+ function debugHealth(){return Object.freeze({
+  loaded:[...assets.values()].filter(v=>v.loaded).length,
+  requested:assets.size,failed:failed.size,
+  mode
+ });}
+ window.DLWorldArtG6=Object.freeze({enabled,mode,draw,drawGroundProp,bedArtId,forgeArtId,seedArtId,footprintLayout,tentArtId,debugHealth,ids:Object.freeze([...allowed]),failed});
  if(enabled)console.info('Dementor G6 candidate art preview:',mode,'No gameplay state mutation.');
 })();
