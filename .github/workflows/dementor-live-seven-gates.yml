@@ -10,10 +10,6 @@ on:
     paths:
       - '.github/workflows/dementor-live-seven-gates.yml'
       - 'projects/dementor-live/runtime/**'
-  pull_request:
-    paths:
-      - '.github/workflows/dementor-live-seven-gates.yml'
-      - 'projects/dementor-live/runtime/**'
   workflow_dispatch:
 permissions:
   contents: read

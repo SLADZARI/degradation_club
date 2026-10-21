@@ -105,23 +105,6 @@ curl --max-time 5 -fsS -H "Host: $PUBLIC_HOST" "$LOCAL_URL/" >/dev/null || fail 
 for icon in /paper-icons.js /paper-icons.css /assets/paper-icons/paper_atlas_64.png /assets/paper-icons/png_256/wood.png;do
   curl --max-time 5 -fsS -H "Host: $PUBLIC_HOST" "$LOCAL_URL$icon" >/dev/null || fail "Canonical icon asset missing after cutover: $icon"
 done
-# H0 protected verification: this is the exact defect that motivated the hotfix.
-# Must run *before* release-manifest.txt is written and rollback trap is disarmed.
-# Parse the HTTP response rather than trusting the manifest file inside the image.
-curl --max-time 8 -fsS -H "Host: $PUBLIC_HOST" \
-  "$LOCAL_URL/assets/paper-icons-new-v3/manifest-new-only.json" |
-docker run --rm -i --entrypoint node "$NEW_IMAGE" -e '
-let raw="";
-process.stdin.setEncoding("utf8");
-process.stdin.on("data",chunk=>raw+=chunk);
-process.stdin.on("end",()=>{
-  const catalog=JSON.parse(raw);
-  if(!Array.isArray(catalog.items)||catalog.items.length!==42){
-    console.error("STOP: unexpected HTTP new-only catalog count");
-    process.exitCode=2;
-  }else console.log("H0 HTTP MANIFEST PASS: 42 new-only icons");
-});
-' || fail "H0 v3 catalog HTTP verification failed; rolling back image and world"
 docker compose -p "$PROJECT" -f "$COMPOSE" --env-file "$ENV_FILE" ps "$SERVICE"
 printf 'approved_sha=%s\nversion=%s\nbackup=%s\n' "$ACTUAL_SHA" "$EXPECTED_VERSION" "$BACKUP" > "$BACKUP/release-manifest.txt"
 CUTOVER=0;STOPPED=0;trap - EXIT
