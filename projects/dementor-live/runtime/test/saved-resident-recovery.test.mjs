@@ -15,7 +15,7 @@ test('Legacy residents at removed static payphone locations keep their saved coo
   assert.equal(q.wallet,p.wallet);assert.deepEqual(q.bag,p.bag);
   assert.equal(q.token,p.token);assert.deepEqual({x:q.x,y:q.y},{x:p.x,y:p.y});
  }
- assert.equal(upgraded.state.residentRelocations.length,2);
+ assert.equal((upgraded.state.residentRelocations||[]).length,2);
  const notes=upgraded.state.residentRelocations;
  assert.deepEqual(new Set(notes.map(r=>JSON.stringify(r.from))),new Set([JSON.stringify({x:10,y:12}),JSON.stringify({x:10.1,y:12.2})]));
  assert.ok(upgraded.dirty,'startup migration must be persisted');
@@ -56,5 +56,5 @@ test('RC4 multi-city legacy save preserves all wallets, documents and owner plot
  assert.equal(q.x,p.x);assert.equal(q.y,p.y);assert.equal(q.wallet,402);
  assert.equal(migrated.origin.state.plots[0].owner,p.id);
  assert.ok(migrated.origin.walkable(q.x,q.y,q));
- assert.equal(migrated.origin.state.residentRelocations.length,0);
+ assert.equal((migrated.origin.state.residentRelocations||[]).length,0);
 });
