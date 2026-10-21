@@ -9,6 +9,7 @@ import {createServer} from 'node:net';
 import {setTimeout as pause} from 'node:timers/promises';
 import {Game,createWorld} from '../world.mjs';
 import {createRecoveryKit,verifyRecoveryKit,beginRecovery,confirmRecovery,
+  createReturnTicket,claimReturnTicket,retryReturnTicket,
   admitCharacterAttempt,RECOVERY_PENDING_MS} from '../character-return.mjs';
 
 const runtime=path.dirname(path.dirname(fileURLToPath(import.meta.url)));
@@ -83,6 +84,11 @@ test('offline proof is independent of all lost bearer tokens; one pending reques
   assert.ok(renewed.recoveryCode);
   assert.equal(verifyRecoveryKit(reloaded,kit.recoveryCode),false);
   assert.equal(verifyRecoveryKit(reloaded,renewed.recoveryCode),true);
+  const oneTime=createReturnTicket(reloaded,600);
+  assert.ok(claimReturnTicket(reloaded,oneTime.code,601,id1));
+  assert.ok(retryReturnTicket(reloaded,oneTime.code,id1,602));
+  createRecoveryKit(reloaded,603);
+  assert.equal(retryReturnTicket(reloaded,oneTime.code,id1,604),null);
   assert.equal(beginRecovery(p,kit.recoveryCode,id2,300+RECOVERY_PENDING_MS+1).id,p.id);
   // Legacy resident without an independently issued key: fail CLOSED, even with public id/name.
   assert.equal(beginRecovery({id:p.id,name:'90',token:null},kit.recoveryCode,id1,200),null);

@@ -31,6 +31,7 @@ export function createReturnTicket(p,now=Date.now()){
   const code=freshCode(),salt=freshSalt(),expiresAt=now+RETURN_TTL_MS;
   p.characterReturn={version:1,salt,digest:proofDigest('return-ticket',salt,code),expiresAt};
   delete p.characterReturnReplay;
+  delete p.recoveryHandoff;
   return {characterId:p.id,code,expiresAt};
 }
 export function verifyReturnTicket(p,code,now=Date.now()){
@@ -71,6 +72,8 @@ export function createRecoveryKit(p,now=Date.now()){
   const code=freshCode(),salt=freshSalt();
   p.characterRecovery={version:1,salt,digest:proofDigest('offline-recovery',salt,code),createdAt:now};
   delete p.recoveryHandoff;
+  delete p.characterReturn;
+  delete p.characterReturnReplay; // old one-time acknowledgements must not resurrect access after re-enrollment
   return {characterId:p.id,recoveryCode:code,createdAt:now};
 }
 export function verifyRecoveryKit(p,code){
