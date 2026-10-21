@@ -58,6 +58,6 @@ test('berry bushes regrow, can be planted, and uprooting requires a long continu
  for(let i=0;i<LIFE.berryUprootWork;i++){g.tick(600);assert.equal(command(g,p,'homeClear',bush.id).ok,true);}
  assert.equal(plot.home.nodes.includes(bush),false,'the long action eventually removes the bush');
  const soil={id:'test-soil',x:8,y:10};plot.home.soil.push(soil);p.bag.food=1;p.x=8;p.y=10;
- assert.equal(command(g,p,'homeSowBerry',soil.id).ok,true);assert.equal(p.bag.food,0);assert.equal(plot.home.soil.includes(soil),false);
+ const planted=command(g,p,'homeSowBerry',soil.id);assert.equal(planted.ok,true,planted.message);assert.equal(p.bag.food,0);assert.equal(plot.home.soil.includes(soil),false);
  assert.equal(plot.home.nodes.some(n=>n.kind==='food'&&n.planted),true);
 });
