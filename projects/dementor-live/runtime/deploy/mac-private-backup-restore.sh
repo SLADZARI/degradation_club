@@ -5,7 +5,13 @@
 set -Eeuo pipefail
 umask 077
 HOST="138.199.144.94"
-KEY="${DEMENTOR_SSH_KEY:-$HOME/Downloads/dementor_server}"
+# Prefer the already-authorized ~/.ssh key; retain historic Downloads fallback.
+KEY="${DEMENTOR_SSH_KEY:-}"
+if [[ -z "$KEY" ]]; then
+  for candidate in "$HOME/.ssh/dementor_server" "$HOME/Downloads/dementor_server" "$HOME/Downloads/dementor_server.pem"; do
+    if [[ -f "$candidate" && ! -L "$candidate" ]]; then KEY="$candidate"; break; fi
+  done
+fi
 ID="${DEMENTOR_BACKUP_ID:-latest}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
 RUNTIME="$(cd "$SCRIPT_DIR/.." && pwd -P)"
