@@ -12,6 +12,9 @@ test('Every world structure has a footprint; markers, public routes and existing
  assert.ok(f.some(o=>o.id==='phone-square'));
  assert.ok(f.some(o=>o.kind==='mountain'));
  assert.ok(f.some(o=>o.kind==='forest'));
+ const forests=WORLD_OBSTACLES.filter(o=>o.biome==='forest');
+ assert.ok(forests.length>=30,'starter and eastern forests should form several substantial groups');
+ assert.ok(forests.some(o=>Math.abs(o.x-Math.round(o.x))>.05),'forest positions should not align to a visible square grid');
  assert.ok(f.some(o=>o.id==='tiered-rock-5'));
  assert.ok(f.some(o=>o.kind==='cactus'));
  assert.ok(isoDepth(f.find(o=>o.id==='structure-museum-entry'))>0);
