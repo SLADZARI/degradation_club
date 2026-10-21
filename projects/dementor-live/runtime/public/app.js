@@ -603,8 +603,8 @@ function render(time){positionWindows();ctx.clearRect(0,0,view.w,view.h);ctx.fil
   if(state){for(const plot of state.plots)drawPlot(plot,'ground');}else for(const o of [{x:4,y:15,w:6,h:6},{x:4,y:23,w:6,h:6},{x:14,y:23,w:6,h:6}])drawPlot(o,'ground');
   if(!emptyStart&&(state?.forge.stage||0)<2)drawForge();
   if(emptyStart)drawToolSign(9,6);else{drawToolSign(24,3);drawHempBush(16.7,3.3);label('Благоустройство',16.7,1,true);label('Магазин инструмента',24,.3,true);}
-  if(state?.seedMarket){label(state.seedMarket.stage>=state.config.seedMarket.stages.length?'Семенная лавка':'Стройка лавки',23,4.9,true);}
-  if(state?.gardenProject){const built=state.gardenProject.stage>=state.config.cityGarden.stages.length;groundRect({x:25.5,y:8.4,w:5.6,h:2.5},built?'#e0dfc6':'#eae5d7','#a7ad89',!built);label(built?'Городской огород':'Стройка огорода',28,8,true);if(built)for(const bed of state.publicGarden.beds){const x=26+(Number(bed.id.split('-').at(-1))%3)*1.6,y=9;groundRect({x,y,w:1.2,h:1},bed.crop?'#98a981':'#c4b49b','#8d956f');}}
+  if(state?.seedMarket&&!emptyStart){const stage=state.seedMarket.stage,total=state.config.seedMarket.stages.length;label(stage>=total?'Семенная лавка':stage===2?'Коробка лавки':stage===1?'Площадка лавки':'Участок лавки',23,4.9,true);}
+  if(state?.gardenProject&&!emptyStart){const stage=state.gardenProject.stage,total=state.config.cityGarden.stages.length,built=stage>=total;groundRect({x:25.5,y:8.4,w:5.6,h:2.5},built?'#e0dfc6':stage>0?'#d5c4a4':'#eae5d7','#a7ad89',stage===0);if(stage>=2&&!built)groundRect({x:26,y:8.8,w:2,h:1.4},'#b7a083','#8d956f');label(built?'Городской огород':stage===2?'Короба огорода':stage===1?'Площадка огорода':'Участок огорода',28,8,true);if(built)for(const bed of state.publicGarden.beds){const x=26+(Number(bed.id.split('-').at(-1))%3)*1.6,y=9;groundRect({x,y,w:1.2,h:1},bed.crop?'#98a981':'#c4b49b','#8d956f');}}
   if(!emptyStart){paperBoard(19,6,'Реестр городов');label('Городской склад',12,29,true);}
   for(const pile of state?.drops||[]){const q=screen(pile.x,pile.y);rounded(q.x-8,q.y-5,16,9,2,pile.kind==='wood'?'#ae9673':pile.kind==='stone'?'#a3aaa0':'#b17b68','#818970');label(`${names[pile.kind]} · ${pile.quantity}`,pile.x,pile.y+.8,true);}
   const resources=state?.resources||[];
@@ -618,7 +618,7 @@ function render(time){positionWindows();ctx.clearRect(0,0,view.w,view.h);ctx.fil
         {depth:22.7+1+2.6+2,draw:()=>paperHouse({x:22.7,y:1,w:2.6,h:2},'shop')},
         {depth:15.5+1.5+2.5+2.2,draw:()=>paperHouse({x:15.5,y:1.5,w:2.5,h:2.2},'garden-shop')},
         {depth:10.7+25+2.6+3,draw:()=>paperWarehouse({x:10.7,y:25,w:2.6,h:3})},
-        ...(state?.seedMarket?[{depth:21.8+7.3,draw:()=>paperHouse({x:21.8,y:5.3,w:2.5,h:2},state.seedMarket.stage>=state.config.seedMarket.stages.length?'shop':'construction')}]:[]),
+        ...(state?.seedMarket&&state.seedMarket.stage>=state.config.seedMarket.stages.length?[{depth:21.8+7.3,draw:()=>paperHouse({x:21.8,y:5.3,w:2.5,h:2},'shop')}]:state?.seedMarket?.stage>=2?[{depth:21.8+7.3,draw:()=>paperHouse({x:21.8,y:5.3,w:2.5,h:2},'construction')}]:state?.seedMarket?.stage===1?[{depth:21.8+7.3,draw:()=>groundRect({x:21.8,y:5.3,w:2.5,h:2},'#d5c4a4','#a7ad89')}]:[]),
       ]:[]),
       ...resources.filter(o=>(o.stock>0||o.type==='food')&&!o.id.startsWith('forest-wood-')).map(o=>({depth:o.x+o.y+(o.rockSize?o.rockSize:0),draw:()=>o.type==='wood'?drawTree(o):o.type==='stone'?drawStone(o):drawFood(o)})),
       ...(state?.players||[]).filter(p=>(p.online||p.id===me?.id)&&sameScene(p)).map(p=>({depth:p.x+p.y,draw:()=>drawPlayer(p,time)}))
