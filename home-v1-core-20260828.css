@@ -35,9 +35,10 @@
 @media(max-width:390px){.dc-home .dc-hero{padding-left:14px!important;padding-right:14px!important}.dc-home .dc-hero__title{font-size:clamp(48px,13.6vw,56px)!important;width:calc(100% + 14px)!important}.dc-home .dc-hero__media{width:calc(100% + 28px)!important;margin-left:-14px!important;margin-right:-14px!important}.dc-home .dc-hero__bottom{padding:0 6px!important}.dc-home .dc-hero__bottom .dc-action{font-size:9px!important;padding:0 8px!important}}
 
 
-/* P1-B / owner Web/UI G4: keep the existing Hero first line within mobile viewport. */
+/* P1-B / owner Web/UI G4: beat the pre-existing integrated-ink mobile 14.8vw rule.
+   Keep complete first-line type in the existing mobile Hero without changing desktop. */
 @media(max-width:700px){
-  .dc-home .dc-hero__title{
+  .dc-home .dc-hero .dc-hero__title{
     font-size:clamp(32px,10.2vw,56px)!important;
     width:100%!important;
   }
