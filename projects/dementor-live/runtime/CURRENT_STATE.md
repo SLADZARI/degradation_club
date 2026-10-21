@@ -7,7 +7,7 @@
 
 `publish-preserve-world.sh --apply-fresh <SHA>` делает архив полного тома и проверяет его до удаления только активного `world.json`; при неуспешном health/version check восстанавливает весь архив. Старое изображение и архив сохраняются. Обычный `--apply` сохраняет текущий мир. Не запускать `publish-clean-world.sh --reset-world`.
 
-Production пока не обновлён. До выпуска нужны проходящие CI для точного SHA и сверка кандидата. Новый режим намеренно запускает с нуля только после отдельной резервной копии сохранения.
+Production пока не обновлён. Четыре набора candidate CI PASS для runtime SHA `5b059395109ff41c12cb67552b847c0a639c0a83`: save-preserving release gates, terrain/safe-world, payphones/bridge, land/mayor/regional QA. Для развёртывания используется только точный проверенный SHA с режимом `--apply-fresh`; он сохраняет архив полного старого тома и старый image.
 
 ---
 
