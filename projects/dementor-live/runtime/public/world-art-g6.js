@@ -7,7 +7,11 @@
  const allowed=new Set([
   'city-tool-shop','city-garden-shop','city-seed-shop','city-warehouse',
   'city-tourist-kiosk','city-museum-gate','city-university-site',
-  'city-robo-stadium-site','city-industry-site','city-farlands-gate'
+  'city-robo-stadium-site','city-industry-site','city-farlands-gate',
+  'city-forge','city-forge--stage-0','city-forge--stage-1','city-forge--stage-2',
+  'city-seed-shop--stage-0','plot-garden-bed-empty','plot-garden-bed-seeded',
+  'plot-garden-bed-hemp','plot-garden-bed-carrot','plot-garden-bed-ready',
+  'city-park-bench','city-garden-bench'
  ]);
  const assets=new Map(),failed=new Set();
  function getArt(id){
@@ -33,6 +37,47 @@
   image.src='/__art-g6/'+id+'.svg';
   assets.set(id,record);return record;
  }
+ // Footprint is authoritative world geometry; image alpha bounds never establish collisions.
+ // Ground reference is the southern projected vertex, not a magic sprite pixel offset.
+ function footprintLayout(o,screen,unit,bbox){
+  if(!o||![o.x,o.y,o.w,o.h,unit,bbox?.w,bbox?.h].every(Number.isFinite)||o.w<=0||o.h<=0||unit<=0||bbox.w<=0||bbox.h<=0)return null;
+  const corners=[screen(o.x,o.y),screen(o.x+o.w,o.y),
+    screen(o.x+o.w,o.y+o.h),screen(o.x,o.y+o.h)];
+  if(corners.some(p=>!Number.isFinite(p.x)||!Number.isFinite(p.y)))return null;
+  const xs=corners.map(p=>p.x),ys=corners.map(p=>p.y);
+  const groundWidth=Math.max(...xs)-Math.min(...xs);
+  const groundDepth=Math.max(...ys)-Math.min(...ys);
+  // Candidate proportions retain their own height; width is based on projected CU.
+  const width=Math.max(.01,groundWidth*.92);
+  const height=width*bbox.h/bbox.w;
+  const foot=corners[2]; // +X,+Y is the closest ground vertex in city ISO30.
+  return {left:foot.x-width/2,top:foot.y-height,width,height,foot,corners,groundWidth,groundDepth};
+ }
+ function bedArtId(bed,now){
+  if(!bed?.crop)return 'plot-garden-bed-empty';
+  if(!bed.watered)return 'plot-garden-bed-seeded';
+  if(Number.isFinite(bed.readyAt)&&now>=bed.readyAt)return 'plot-garden-bed-ready';
+  return bed.crop==='hemp'?'plot-garden-bed-hemp':bed.crop==='carrot'?'plot-garden-bed-carrot':'plot-garden-bed-seeded';
+ }
+ function forgeArtId(stage,total){
+  if(!Number.isInteger(stage)||!Number.isInteger(total)||total!==3||stage<0||stage>total)return null;
+  return stage===total?'city-forge':'city-forge--stage-'+stage;
+ }
+ function seedArtId(stage,total){
+  if(!Number.isInteger(stage)||total!==1||stage<0||stage>total)return null;
+  return stage===total?'city-seed-shop':'city-seed-shop--stage-0';
+ }
+ function drawGroundProp(ctx,id,x,y,screen,unit,size=1.2){
+  if(!enabled||!allowed.has(id)||!(unit>0))return false;
+  const art=getArt(id);if(!art?.loaded)return false;
+  const foot=screen(x,y),bbox=art.bbox,width=size*unit,height=width*bbox.h/bbox.w;
+  ctx.save();
+  let left=foot.x-width/2,top=foot.y-height;
+  if(mode==='compare'){left+=width*1.1;ctx.globalAlpha=.86;}
+  ctx.drawImage(art.image,bbox.x,bbox.y,bbox.w,bbox.h,left,top,width,height);
+  ctx.restore();
+  return mode==='replace';
+ }
  function draw(ctx,id,footprint,screen,unit){
   if(!enabled||!allowed.has(id)||!footprint||!(unit>0))return false;
   const art=getArt(id);if(!art?.loaded)return false;
@@ -40,12 +85,10 @@
   if(![x,y,w,h].every(Number.isFinite)||w<=0||h<=0)return false;
   const {bbox,image}=art;
   // Preliminary scene-scale mapping: drawn alpha bounds, not collision. G6 must confirm this alignment.
-  const bottom=screen(x+w,y+h);
-  const middle=screen(x+w/2,y+h/2);
-  const width=Math.min(12*unit,Math.max(1.7*unit,(w+h)*Math.sqrt(3)/2*unit*.90));
-  const height=width*bbox.h/bbox.w;
-  let left=middle.x-width/2;
-  let top=bottom.y-height;
+  const layout=footprintLayout(footprint,screen,unit,bbox);
+  if(!layout)return false;
+  const {width,height}=layout;
+  let {left,top}=layout;
   ctx.save();
   if(mode==='compare'){
     // Comparison mode never changes the normal procedural render.
@@ -60,6 +103,6 @@
   ctx.restore();
   return mode==='replace';
  }
- window.DLWorldArtG6=Object.freeze({enabled,mode,draw,ids:Object.freeze([...allowed]),failed});
+ window.DLWorldArtG6=Object.freeze({enabled,mode,draw,drawGroundProp,bedArtId,forgeArtId,seedArtId,footprintLayout,ids:Object.freeze([...allowed]),failed});
  if(enabled)console.info('Dementor G6 candidate art preview:',mode,'No gameplay state mutation.');
 })();
