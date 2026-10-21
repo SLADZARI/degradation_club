@@ -34,14 +34,14 @@ export class Game extends CoreGame{
   movementBiome(p,input){return mountainMovement(p,input);}
   walkable(x,y,p=null){
     const scene=p?.scene||'city',r=.3,c=this.c;
-     if(PHONE_BOOTHS.some(b=>b.scene===scene&&Math.hypot(x-b.x,y-b.y)<.50))return false;
+     if(PHONE_BOOTHS.some(b=>b.scene===scene&&Math.hypot(x-b.x,y-b.y)<.50&&(!this.state.startingCity||(this.state.technologies?.payphones&&b.siteId&&municipalBuilt(this.state,b.siteId)))))return false;
     if(WORLD_SCENES[scene])return !terrainBlocked(scene,x,y,r);
     if(scene==='city'){
       // A single physical catalogue is consumed by the server and sent to client.
       let footprints=worldFootprints(this);
       if(this.state.startingCity)footprints=footprints.filter(o=>{
         if(['forest','mountain','cactus','tree','stone'].includes(o.kind))return true;
-        if(o.kind==='payphone')return o.id==='phone-square'&&municipalBuilt(this.state,'phone-square');
+        if(o.kind==='payphone'){const booth=PHONE_BOOTHS.find(b=>b.id===o.id);return !!booth&&!!this.state.technologies?.payphones&&!!booth.siteId&&municipalBuilt(this.state,booth.siteId);}
         if(String(o.id||'').startsWith('structure-')){const id=o.id.slice('structure-'.length);if(MUNICIPAL_SITES[id])return municipalBuilt(this.state,id);if(id==='second-bridge-site')return this.state.secondBridgeProject?.stage>=2;if(['monument','jukebox','donation-board','theft-board'].includes(id))return this.state.project.stage>=this.c.stages.length;return false;}
         return true;
       });
@@ -90,12 +90,12 @@ export class Game extends CoreGame{
       const intro=!this.state.expedition?.completedAt;
       const constructionIds=new Set(['tourist-kiosk','university-site','robo-stadium-site','industry-site','museum-entry']);
       base.worldTravel.targets=intro?[]:base.worldTravel.targets.filter(t=>constructionIds.has(t.id)?municipalBuilt(this.state,t.id):t.id!=='second-bridge-site'||this.state.secondBridgeProject?.stage>=2);
-      base.worldTravel.booths=intro||!municipalBuilt(this.state,'phone-square')?[]:base.worldTravel.booths.filter(t=>t.id==='phone-square');
+      base.worldTravel.booths=intro||!this.state.technologies?.payphones?[]:base.worldTravel.booths.filter(t=>{const booth=PHONE_BOOTHS.find(b=>b.id===t.id);return !!booth?.siteId&&municipalBuilt(this.state,booth.siteId);});
       base.worldTravel.footprints=(base.worldTravel.footprints||[]).filter(o=>{
         if(intro)return ['forest','mountain','cactus','rock'].includes(o.kind);
         const id=String(o.id||'').replace(/^structure-/,'');
         if(id==='second-bridge-site')return this.state.secondBridgeProject?.stage>=2;
-        if(constructionIds.has(id)||id==='phone-square')return municipalBuilt(this.state,id);
+        if(constructionIds.has(id))return municipalBuilt(this.state,id);if(o.kind==='payphone'){const booth=PHONE_BOOTHS.find(b=>b.id===o.id);return !!booth&&!!this.state.technologies?.payphones&&!!booth.siteId&&municipalBuilt(this.state,booth.siteId);}
         return true;
       });
     }

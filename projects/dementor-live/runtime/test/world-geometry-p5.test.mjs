@@ -132,7 +132,13 @@ test('Municipal phone opens only after three treasury-funded construction stages
  const g=new Game(createWorld(undefined,{startingCity:true})),p=g.join('Городской строитель');g.connect(p);
  p.scene='city';p.plotId=null;
  g.state.expedition.completedAt=g.now;g.state.plots.find(x=>x.id==='plot-1').locked=false;
- assert.equal(g.snapshot(p).worldTravel.booths.some(x=>x.id==='phone-square'),false);
+ g.state.project.stage=g.c.stages.length;g.state.mayorLevel=2;
+ p.x=9;p.y=3;
+ assert.equal(command(g,p,'researchPayphones','mayor').ok,true,'second-level mairie starts the 240-second phone technology research');
+ g.tick(240001);
+ assert.equal(g.snapshot(p).technologies.payphones,true,'technology unlocks when its research timer finishes');
+ assert.equal(g.snapshot(p).worldTravel.booths.some(x=>x.id==='phone-square'),false,'research enables construction but does not create booths');
+ assert.equal(g.walkable(10.2,12.2,p),true,'unbuilt phone location remains traversable after research');
  const hidden=command(g,p,'worldUse','phone-square');assert.equal(hidden.ok,false);
  p.x=22.7;p.y=1;
  assert.equal(command(g,p,'buyTool','tool-shop',{tool:'axe'}).ok,false,'unbuilt shop must reject direct purchase');

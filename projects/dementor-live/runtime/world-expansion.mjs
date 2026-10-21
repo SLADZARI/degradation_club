@@ -7,6 +7,7 @@ export const WORLD_SCENES={
 export const TOURIST_PRICES={map:10,shirt:16,souvenir:4};
 import {SECOND_BRIDGE_SITE} from './second-bridge.mjs';
 import {boothsForScene} from './telecom.mjs';
+import {municipalBuilt} from './municipal-buildings.mjs';
 export const WORLD_CITY_TARGETS=[
   SECOND_BRIDGE_SITE,
   {id:'tourist-kiosk',type:'tourist',x:25,y:38,title:'Туристический киоск · карты, майки, сувениры'},
@@ -125,8 +126,12 @@ export function worldTravelAction(g,p,cmd){
   throw Error('Этот объект пока не поддерживает действия');
 }
 export function worldTravelView(g,p){
-  return {scene:p.scene||'city',targets:worldObjects(p.scene||'city'),
-    booths:boothsForScene(p.scene||'city'),scenes:WORLD_SCENES,secondBridge:SECOND_BRIDGE,secondBridgeProject:g.state.secondBridgeProject,paths:WORLD_PATHS,
+  const scene=p.scene||'city';let booths=boothsForScene(scene);
+  if(g.state.startingCity)booths=g.state.technologies?.payphones?booths.filter(b=>b.siteId&&municipalBuilt(g.state,b.siteId)):[];
+  const visibleBooths=new Set(booths.map(b=>b.id));
+  const targets=worldObjects(scene).filter(t=>t.type!=='payphone'||visibleBooths.has(t.id));
+  return {scene,targets,
+    booths,scenes:WORLD_SCENES,secondBridge:SECOND_BRIDGE,secondBridgeProject:g.state.secondBridgeProject,paths:WORLD_PATHS,
     obstacles:(p.scene||'city')==='city'?WORLD_OBSTACLES:[],desert:WORLD_DESERT,cacti:WORLD_CACTI,summitTrail:WORLD_SUMMIT_TRAIL,
     prices:TOURIST_PRICES,profile:p.worldTravel||{mapOwned:false,souvenirs:{shirt:0,souvenir:0},visited:['city']},
     worldWidth:g.c.width,worldHeight:g.c.height};

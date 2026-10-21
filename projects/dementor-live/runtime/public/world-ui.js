@@ -113,7 +113,7 @@ style.textContent=`
   @media(min-width:760px){#actionDock{max-width:min(390px,65vw)!important;bottom:auto!important;right:auto!important;z-index:70}}
 `;
 document.head.append(style);
-const tools=$('centerButton').parentElement,button=document.createElement('button');
+const tools=$('cityTools')||document.querySelector('.top-right');if(!tools)return;const button=document.createElement('button');
 button.id='worldMapButton';button.title='Карта путешественника';button.textContent='🗺';button.setAttribute('aria-label','Открыть карту путешественника');tools.prepend(button);
 const dialog=document.createElement('dialog');dialog.id='travelMap';dialog.innerHTML='<h2>Карта путешественника</h2><canvas id="travelMapCanvas" width="720" height="360" aria-label="Город, лес, горы, музей смеха и дальние земли"></canvas><p id="travelMapCaption">Карта доступна после покупки. Точки показывают направления; перемещение только пешком.</p><button id="closeTravelMap">Закрыть</button>';
 document.body.append(dialog);$('closeTravelMap').onclick=()=>dialog.close();
