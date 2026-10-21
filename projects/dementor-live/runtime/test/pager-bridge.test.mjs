@@ -7,8 +7,13 @@ const networkAction=(n,p,type,target=null,extra={})=>n.command(p,{type,target,re
 const legacyWorld=()=>{const g=new Game(createWorld(undefined,{startingCity:true}));g.state.technologies.payphones=true;g.state.municipalBuildings['phone-square'].stage=3;g.state.expedition.completedAt=g.now;return g.state;};
 test('Every resident gets a stable unique 6-digit number; messages travel between cities and only recipient reads inbox',()=>{
  const n=new CityNetwork(legacyWorld()),a=n.origin.join('Отправитель'),b=n.origin.join('Получатель');
- n.snapshot(a);n.snapshot(b);b.pagerListed=true;assert.match(a.pagerNumber,/^\d{6}$/);assert.notEqual(a.pagerNumber,b.pagerNumber);
+ n.snapshot(a);n.snapshot(b);assert.match(a.pagerNumber,/^\d{6}$/);assert.notEqual(a.pagerNumber,b.pagerNumber);
  const origin=n.origin;
+ assert.equal(n.snapshot(a).telecom.directory.some(x=>x.number===b.pagerNumber),false);
+ assert.equal(networkAction(n,b,'pagerList',null,{listed:true}).ok,false);
+ b.wallet=200;b.x=24;b.y=3;
+ assert.equal(networkAction(n,b,'pagerBuy','tool-shop').ok,true);
+ assert.equal(networkAction(n,b,'pagerList',null,{listed:true}).ok,true);
  b.x=19;b.y=6;
  const founded=n.createCity(b,'Дальний город');n.move(b,founded.id);
  assert.equal(n.findId(b.id).cityId,founded.id);
@@ -19,10 +24,8 @@ test('Every resident gets a stable unique 6-digit number; messages travel betwee
  assert.equal(n.command(a,command).ok,true);
  assert.equal(a.wallet,7);assert.equal(origin.state.treasury,funds+1);
  assert.equal(b.pagerInbox.length,1);assert.equal(n.snapshot(a).telecom.inbox.length,0);
- assert.equal(n.snapshot(b).telecom.inbox.length,0,'pager hardware required to read messages');
- b.wallet=200;b.x=24;b.y=3;
- assert.equal(networkAction(n,b,'pagerBuy','tool-shop').ok,true);
- assert.equal(b.wallet,20);assert.equal(n.snapshot(b).telecom.inbox[0].text,command.text);
+ assert.equal(n.snapshot(b).telecom.inbox[0].text,command.text);
+ assert.equal(b.wallet,20);
  assert.equal(networkAction(n,b,'pagerRead',null,{messageId:b.pagerInbox[0].id}).ok,true);
  assert.equal(n.snapshot(b).telecom.unread,0);
  const restored=new CityNetwork(JSON.parse(JSON.stringify(n.serialize())));
@@ -32,6 +35,11 @@ test('Every resident gets a stable unique 6-digit number; messages travel betwee
 test('Payphone checks physical proximity, six-digit subscriber number, fee and 100 character limit',()=>{
  const n=new CityNetwork(legacyWorld()),a=n.origin.join('Женя'),b=n.origin.join('Евгений');
  n.snapshot(a);n.snapshot(b);b.pagerListed=true;a.wallet=4;a.x=3;a.y=3;
+ assert.equal(n.snapshot(a).telecom.directory.some(x=>x.number===b.pagerNumber),false);
+ assert.equal(networkAction(n,b,'pagerList',null,{listed:true}).ok,false);
+ b.wallet=200;b.x=24;b.y=3;
+ assert.equal(networkAction(n,b,'pagerBuy','tool-shop').ok,true);
+ assert.equal(networkAction(n,b,'pagerList',null,{listed:true}).ok,true);
  const base={number:b.pagerNumber,text:'Короткая записка'};
  assert.equal(networkAction(n,a,'pagerSend','phone-square',base).ok,false);
  a.x=10;a.y=12;
@@ -70,6 +78,9 @@ test('Unlisted numbers are private; listing and blocking persist and reject deli
  assert.equal(n.snapshot(a).telecom.directory.some(x=>x.number===b.pagerNumber),false);
  assert.equal(networkAction(n,a,'pagerSend','phone-square',{number:b.pagerNumber,text:'hello'}).ok,false);
  assert.equal(a.wallet,5);
+ assert.equal(networkAction(n,b,'pagerList',null,{listed:true}).ok,false,'a resident without pager cannot publish');
+ b.wallet=200;b.x=24;b.y=3;
+ assert.equal(networkAction(n,b,'pagerBuy','tool-shop').ok,true);
  assert.equal(networkAction(n,b,'pagerList',null,{listed:true}).ok,true);
  assert.equal(n.snapshot(a).telecom.directory.some(x=>x.number===b.pagerNumber),true);
  assert.equal(networkAction(n,b,'pagerBlock',null,{number:a.pagerNumber,blocked:true}).ok,true);
