@@ -8,7 +8,7 @@ Check out the reviewed source commit into the Alpha app directory and copy the e
 
 ```sh
 sudo mkdir -p /srv/dementor-live-alpha/app /srv/dementor-live-alpha/backups
-sudo chown "$USER":"$USER" /srv/dementor-live-alpha/app
+sudo chown "$USER":"$USER" /srv/dementor-live-alpha/app /srv/dementor-live-alpha/backups
 cd /srv/dementor-live-alpha/app
 cp deploy/.env.alpha.example deploy/.env.alpha
 ```
@@ -44,7 +44,7 @@ Archive only the Alpha volume before an update. Then build/recreate only the Alp
 
 ```sh
 STAMP=$(date -u +%Y%m%dT%H%M%SZ)
-docker run --rm --mount type=volume,source=dementor-live-alpha-world,target=/world,readonly alpine:3.20 sh -c "tar -czf /tmp/alpha-world.tar.gz -C /world ."
+docker run --rm --mount type=volume,source=dementor-live-alpha-world,target=/world,readonly --mount type=bind,source=/srv/dementor-live-alpha/backups,target=/backup alpine:3.20 sh -c "tar -czf /backup/alpha-world-$STAMP.tar.gz -C /world ."
 docker compose -f deploy/compose-alpha.yaml --env-file deploy/.env.alpha up -d --build game
 ```
 
