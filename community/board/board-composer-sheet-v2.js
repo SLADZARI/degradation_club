@@ -171,28 +171,30 @@
         if(form&&!form.dataset.sheetBound){
           form.dataset.sheetBound='1';
           form.addEventListener('submit',event=>{
-            // A later submission while a real RPC is still running is never a
-            // second publish. This gate does not intercept the first submit.
+            // Capture handles duplicates before Board's submit handler.
+            // A first valid submit must reach Board's validation unchanged.
             if(publishing){event.preventDefault();event.stopImmediatePropagation();return}
-            // Board's existing submit handler has to pass all validation and
-            // disable Submit before the sheet enters the non-cancellable state.
-            queueMicrotask(()=>{
-              if(!form.isConnected||!isOpen()||publishing)return;
-              if(!form.querySelector('button[type=submit]')?.disabled)return;
-              publishing=true;
-              publishConfirmed=false;
-              form.dataset.publishInFlight='1';
-              const action=form.querySelector('#cancelComposer,#removeDraft');
-              if(action){
-                action.dataset.publishPreviousLabel=action.textContent||'';
-                action.disabled=true;
-                action.textContent='ОТПРАВЛЯЕМ…';
-                action.setAttribute('aria-label','Публикация выполняется. Дождитесь результата.');
-              }
-              const state=form.querySelector('#composerState');
-              if(state){state.hidden=false;state.setAttribute('role','status');state.setAttribute('aria-live','polite')}
-            });
           },true);
+          form.addEventListener('submit',()=>{
+            // Run on the same form in bubble phase AFTER board.js validates
+            // synchronously and disables Submit, never in a capture microtask.
+            // In particular, real submit-button clicks must lock Cancel before
+            // the first asynchronous draft/publish RPC can complete.
+            if(!form.isConnected||!isOpen()||publishing)return;
+            if(!form.querySelector('button[type=submit]')?.disabled)return;
+            publishing=true;
+            publishConfirmed=false;
+            form.dataset.publishInFlight='1';
+            const action=form.querySelector('#cancelComposer,#removeDraft');
+            if(action){
+              action.dataset.publishPreviousLabel=action.textContent||'';
+              action.disabled=true;
+              action.textContent='ОТПРАВЛЯЕМ…';
+              action.setAttribute('aria-label','Публикация выполняется. Дождитесь результата.');
+            }
+            const state=form.querySelector('#composerState');
+            if(state){state.hidden=false;state.setAttribute('role','status');state.setAttribute('aria-live','polite')}
+          });
         }
         // A definite failed RPC restores Cancel/Edit/Retry, but a confirmed
         // publish cannot be re-submitted if Board refresh later fails.
