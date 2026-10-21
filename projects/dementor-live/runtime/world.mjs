@@ -107,7 +107,7 @@ export class Game {
   cityFunds(){
     // Keep unfinished construction funded before offering optional purchases and courier work.
     let reserved=this.deliveries().reduce((n,d)=>n+d.reward,0);
-    for(const [p,c]of [[this.state.project,this.c],[this.state.forge,{...this.c,...this.c.forge}],[this.state.bridge,{...this.c,...this.c.bridge}],[this.state.seedMarket,{...this.c,...this.c.seedMarket}],[this.state.gardenProject,{...this.c,...this.c.cityGarden}],...Object.values(MUNICIPAL_SITES).map(site=>[this.state.municipalBuildings?.[site.id],{...this.c,...site}]).filter(x=>x[0])]){
+    for(const [p,c]of [[this.state.project,this.c],[this.state.forge,{...this.c,...this.c.forge}],[this.state.bridge,{...this.c,...this.c.bridge}],[this.state.seedMarket,{...this.c,...this.c.seedMarket}],[this.state.gardenProject,{...this.c,...this.c.cityGarden}],...Object.values(MUNICIPAL_SITES).filter(site=>this.state.startingCity&&(this.state.municipalBuildings?.[site.id]?.stage||0)<site.stages.length).map(site=>[this.state.municipalBuildings[site.id],{...this.c,...site}])]){
       for(const k of ['wood','stone'])reserved+=Math.max(0,c.need[k]-p.accepted[k])*c.pay[k];
       reserved+=c.stages.slice(p.stage).reduce((n,s)=>n+s.works,0)*c.pay.work-p.work*c.pay.work;
     }
