@@ -77,7 +77,7 @@ function interaction(t){if(!t)return null;const type=t.type,isForge=t.id.startsW
   if(type==='plaza'&&t.id.startsWith('donation-'))return {type:t.id,title:t.title,hint:t.id==='donation-box'?'Передать ресурсы или монеты городу без оплаты':'Жители, поддержавшие город',enabled:true};
   if(type==='plaza'&&t.id==='theft-board')return {type:'thefts',title:'Доска воров',hint:'Записи о неразрешённом сборе урожая',enabled:true};
   if(type==='plaza')return {type:t.id,title:t.title,hint:t.id==='monument'?'Какой памятник ты оставил бы здесь? · +50 монет':'Общая музыка города · трек 2 монеты · заявка 1 монета',enabled:true};
-  if(type==='home'&&state.home?.nodes.some(n=>n.id===t.id))return {type:'homeClear',title:t.title,hint:'E · добыть и собрать',enabled:(state.scene==='expedition'||state.home.owner===me.id)&&t.left>0&&!me.spirit};
+  if(type==='home'&&state.home?.nodes.some(n=>n.id===t.id))return {type:'homeClear',title:t.title,hint:t.kind==='food'?'E · собирать ягоды · удерживать для выкорчёвывания':'E · добыть и собрать',enabled:(state.scene==='expedition'||state.home.owner===me.id)&&(t.left>0||t.kind==='food')&&!me.spirit};
   if(type==='home')return {type:'home',title:t.title,hint:'Открыть действия с объектом',enabled:true};
   if(type==='social')return {type:'social',title:'Общение и обмен · '+t.name,hint:'Подарить, обменять, продать предметы',enabled:true};
   if(type==='explore')return {type:'explore',title:'Другой берег открыт',hint:'Новые деревья, камень и ягоды. Выбери ресурс в местах города.',enabled:false};
