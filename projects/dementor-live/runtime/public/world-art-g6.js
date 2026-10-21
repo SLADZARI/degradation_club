@@ -11,7 +11,8 @@
   'city-forge','city-forge--stage-0','city-forge--stage-1','city-forge--stage-2',
   'city-seed-shop--stage-0','plot-garden-bed-empty','plot-garden-bed-seeded',
   'plot-garden-bed-hemp','plot-garden-bed-carrot','plot-garden-bed-ready',
-  'city-park-bench','city-garden-bench'
+  'city-park-bench','city-garden-bench',
+  ...Array.from({length:8},(_,i)=>'plot-personal-tent-plot-'+(i+1))
  ]);
  const assets=new Map(),failed=new Set();
  function getArt(id){
@@ -67,6 +68,19 @@
   if(!Number.isInteger(stage)||total!==1||stage<0||stage>total)return null;
   return stage===total?'city-seed-shop':'city-seed-shop--stage-0';
  }
+ // Mirrors existing visual-variants.mjs without writing to character, plot or world save.
+ function stableHash(value){
+  let h=2166136261;
+  for(const ch of String(value)){h^=ch.codePointAt(0);h=Math.imul(h,16777619);}
+  return h>>>0;
+ }
+ function tentArtId(cityId,plotId,stage){
+  if(stage!==3)return null; // only actual completed existing player tents
+  const match=/^plot-(\\d+)$/.exec(String(plotId));
+  const idx=match?(Number(match[1])-1)%8:stableHash(plotId)%8;
+  const offset=cityId==='origin'?0:stableHash(cityId)%8;
+  return 'plot-personal-tent-plot-'+(1+(idx+offset)%8);
+ }
  function drawGroundProp(ctx,id,x,y,screen,unit,size=1.2){
   if(!enabled||!allowed.has(id)||!(unit>0))return false;
   const art=getArt(id);if(!art?.loaded)return false;
@@ -103,6 +117,6 @@
   ctx.restore();
   return mode==='replace';
  }
- window.DLWorldArtG6=Object.freeze({enabled,mode,draw,drawGroundProp,bedArtId,forgeArtId,seedArtId,footprintLayout,ids:Object.freeze([...allowed]),failed});
+ window.DLWorldArtG6=Object.freeze({enabled,mode,draw,drawGroundProp,bedArtId,forgeArtId,seedArtId,footprintLayout,tentArtId,ids:Object.freeze([...allowed]),failed});
  if(enabled)console.info('Dementor G6 candidate art preview:',mode,'No gameplay state mutation.');
 })();
