@@ -7,6 +7,7 @@
 
   let requested=false;
   let publishing=false;
+  let publishConfirmed=false;
   let previouslyFocused=null;
   let observer=null;
   let toastTimer=null;
@@ -140,6 +141,27 @@
     document.querySelector('.dc-spatial-controls [data-mine]')?.click();
   }
 
+  // Publication may already be committed before Board's asynchronous refresh.
+  // Only a *confirmed* publish event is allowed to show the success notice.
+  window.addEventListener('dc:board:artifact-published',()=>{
+    if(!publishing||!isOpen())return;
+    publishConfirmed=true;
+    showToast();
+    focusPublishedArtifact();
+  });
+
+  function restorePublishControls(form){
+    publishing=false;
+    const action=form?.querySelector('#cancelComposer,#removeDraft');
+    if(action&&action.dataset.publishPreviousLabel!==undefined){
+      action.disabled=false;
+      action.textContent=action.dataset.publishPreviousLabel;
+      action.removeAttribute('data-publish-previous-label');
+      action.removeAttribute('aria-label');
+    }
+    form?.removeAttribute('data-publish-in-flight');
+  }
+
   function watchMutations(){
     observer=new MutationObserver(()=>{
       setSlotVocabulary();
@@ -148,16 +170,47 @@
         const form=root.querySelector('#artifactForm');
         if(form&&!form.dataset.sheetBound){
           form.dataset.sheetBound='1';
-          form.addEventListener('submit',()=>{publishing=true},{capture:true});
+          form.addEventListener('submit',event=>{
+            // A later submission while a real RPC is still running is never a
+            // second publish. This gate does not intercept the first submit.
+            if(publishing){event.preventDefault();event.stopImmediatePropagation();return}
+            // Board's existing submit handler has to pass all validation and
+            // disable Submit before the sheet enters the non-cancellable state.
+            queueMicrotask(()=>{
+              if(!form.isConnected||!isOpen()||publishing)return;
+              if(!form.querySelector('button[type=submit]')?.disabled)return;
+              publishing=true;
+              publishConfirmed=false;
+              form.dataset.publishInFlight='1';
+              const action=form.querySelector('#cancelComposer,#removeDraft');
+              if(action){
+                action.dataset.publishPreviousLabel=action.textContent||'';
+                action.disabled=true;
+                action.textContent='ОТПРАВЛЯЕМ…';
+                action.setAttribute('aria-label','Публикация выполняется. Дождитесь результата.');
+              }
+              const state=form.querySelector('#composerState');
+              if(state){state.hidden=false;state.setAttribute('role','status');state.setAttribute('aria-live','polite')}
+            });
+          },true);
+        }
+        // A definite failed RPC restores Cancel/Edit/Retry, but a confirmed
+        // publish cannot be re-submitted if Board refresh later fails.
+        const submit=form?.querySelector('button[type=submit]');
+        if(publishing&&submit&&!submit.disabled){
+          if(publishConfirmed){
+            restorePublishControls(form);
+            closeSheet({restoreFocus:true});
+          }else restorePublishControls(form);
         }
         if(requested)openSheet();
         return;
       }
       if(isOpen()){
-        const wasPublishing=publishing;
+        const wasConfirmed=publishConfirmed;
         publishing=false;
-        closeSheet({restoreFocus:!wasPublishing});
-        if(wasPublishing){showToast();focusPublishedArtifact()}
+        publishConfirmed=false;
+        closeSheet({restoreFocus:!wasConfirmed});
       }
     });
     observer.observe(entryHost,{childList:true,subtree:true});
@@ -179,9 +232,14 @@
       return;
     }
     if(event.target.closest('#cancelComposer')){
-      // Cancel is never publication, even after a previously rejected submit.
-      // Preserve opener focus and do not announce a false successful artifact.
-      publishing=false;
+      if(publishing){
+        // A networked publish cannot be cancelled by hiding its editor.
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        return;
+      }
+      // Invalid/local-only edits still close without a success notification.
+      publishConfirmed=false;
       setTimeout(()=>closeSheet(),0);
     }
   },true);
@@ -190,6 +248,7 @@
     if(!isOpen())return;
     if(event.key==='Escape'){
       event.preventDefault();
+      if(publishing)return;
       const cancel=document.getElementById('cancelComposer');
       if(cancel)cancel.click();
       else closeSheet();
