@@ -114,3 +114,16 @@ test('G6 camera names are strictly allowlisted read-only visual viewpoints, not 
  assert.equal(qa.camera,null);
  assert.doesNotMatch(source,/\.x\s*=\s*camera|\.y\s*=\s*camera|\.wallet\s*=/);
 });
+
+test('alpha-bounds crop uses intrinsic SVG pixels rather than the 256px staging-canvas units',()=>{
+ const b={x:35,y:18,w:169,h:207};
+ const svg=qa.sourceRect({image:{naturalWidth:512,naturalHeight:512},bbox:b});
+ assert.deepEqual([svg.x,svg.y,svg.w,svg.h],[70,36,338,414]);
+ const raster=qa.sourceRect({image:{naturalWidth:256,naturalHeight:256},bbox:b});
+ assert.deepEqual([raster.x,raster.y,raster.w,raster.h],[35,18,169,207]);
+ const rect=qa.sourceRect({image:{naturalWidth:640,naturalHeight:320},bbox:b});
+ nearly(rect.x,87.5);nearly(rect.y,22.5);
+ nearly(rect.w,422.5);nearly(rect.h,258.75);
+ assert.match(source,/sourceRect\(art\)/);
+ assert.doesNotMatch(source,/drawImage\(image,bbox\.x,bbox\.y,bbox\.w,bbox\.h/);
+});
