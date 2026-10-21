@@ -21,6 +21,27 @@ semanticMutationAuthorized: false
 **Verdict: PREP REPORT / LEAD-ACCEPTED AS DRAFT PLANNING INPUT; HOST READ-ONLY AFTER VERIFIED AT W12; STATIC MANIFEST FALSE-ALARM CORRECTED AT W13; STAGE1 RELEASE STILL NO-GO.**  
 **Production effect: NONE.** This report is not a Decision, Result, Gate, host approval or deploy authorization. It proposes no immediate change to existing services. Parent [#237](https://github.com/SLADZARI/degradation_club/issues/237) remains **BACKLOG/DEFERRED**; [#228](https://github.com/SLADZARI/degradation_club/issues/228) does not yet provide an accepted current stable migration baseline.
 
+## W23 · Club owner MDAO functional acceptance — 2026-10-21
+
+**NEW OWNER STATEMENT (USER IN PROJECT CHAT):** «все с мдао хорошо что нужно работает». This is explicit **OWNER-REPORTED FUNCTIONAL ACCEPTANCE of the MDAO workflows the owner requires**, not an independent all-endpoint diagnosis and not a Kirill-authored technical health proof. Do not keep characterizing MDAO as **user-reported broken** based solely on the legacy three HEAD 502 probes. The prior owner-selected K1 pre-existing-502 conditional no-regression interpretation remains accepted at the **narrow HTTP probe** level.
+
+**EVIDENCE TIERS ARE NOT INTERCHANGEABLE:**
+- **OWNER_REPORTED_MDAO_FUNCTIONAL_OK:** YES, dated 2026-10-21; no additional burden on Club owner to repeat old 502 tests. Existing MDAO functional usefulness as experienced by owner is acknowledged.
+- **CURRENT READ-ONLY TECHNICAL PROBES:** Legacy Graylog and Monitoring HEAD http 502; n8n HEAD http 301 → HTTPS, n8n HEAD https 502; these probes alone cannot contradict owner's functional experience or independently validate all needed functions. `nginx -t` PASS; MDAO site configuration hashes unchanged at W22; `db-dev` running. Exact same scheme/Host/method must be used when comparing historical codes.
+- **MDAO KIRILL BASELINE/OWNER SCOPE:** An actual Kirill-selected **safe positive** service readiness signal, timestamped BEFORE and same-method AFTER, plus named future shared-Nginx rollback operator is **still NOT DOCUMENTED** in #255. If Kirill considers owner's functional confirmation enough for business acceptance, record that **as a separate signed risk/health-coverage decision**, not as a fabricated successful test.
+- **OTHER INFRA CHANGE:** An independent Game ALPHA TLS site has become the implicit unknown-SNI :443 default and original `dementor-live.conf` SHA changed (W22). Kirill + Live SRE #51 own risk acceptance/correction, not Club. **Do not change an operational MDAO system just to silence its historic 502 probes.**
+
+**REVISED BLOCKER STATEMENT:** **MDAO_USER_COMPLAINT=NONE / OWNER_FUNCTIONAL_ACCEPTED=YES / KIRILL_POSITIVE_PROBE_AND_HOST_GRANT=WAITING**. This is NOT permission to reload Nginx, reset `db-dev`, inspect `/data/*`, edit certbot, migrate Stage2 database, or declare Stage1 G8. No new user-terminal action requested. Kirill/Lead may now proceed with documentation of their safe change-control criteria without requesting another generic MDAO status confirmation.
+
+**STATUS / CHECKED / CHANGED / VERIFIED / NOT VERIFIED / BLOCKERS / NEXT / PRODUCTION EFFECT:**
+- STATUS: owner operational assurance RECORDED; historical 502 classified as limited probe not user-facing incident.
+- CHECKED: owning #255 W19–W22 and latest #237 Stage2 handoffs; current Draft #257 authority.
+- CHANGED: one existing Draft #257 reference report and Issue #255 handoff, no service or DB writes.
+- VERIFIED: exact owner statement exists in this chat; earlier bounded Nginx hash and listener probes as separately dated.
+- NOT VERIFIED: Kirill positive health method and formal host change consent, ALPHA 443 default acceptance, Stage1 G7/G8 and Stage2 resource/restore Gate.
+- BLOCKERS: future shared-host change needs Kirill operator + no-regression evidence and applicable owner Gate; Stage2 independent capacity/identity/storage/backup Gate.
+- NEXT: hand off Kirill safe health method / signoff in #255 only, without delaying architectural read-only Stage2 preparation or blaming MDAO; Lead to track cross-repo TLS routing.
+- PRODUCTION EFFECT: NONE.
 ## W22 · Current live VM Stage1 drift, Board UUID route and Game/MDAO 443 default · 2026-10-21 20:51–20:53 UTC
 
 **STATUS: ACTUAL CLUB PUBLIC HTTPS + D1 DNS OBSERVED; W22 REVIEW-ONLY RECONCILIATION; PRODUCTION G8 NOT ACCEPTED.** Supersedes W20's *pre-install* facts only for current live runtime. Existing [Lead P0 cutover reconciliation](https://github.com/SLADZARI/degradation_club/issues/255#issuecomment-6324764162), [Lead pre-DNS SNI](https://github.com/SLADZARI/degradation_club/issues/255#issuecomment-6324775100), [Board emergency UUID route / #237](https://github.com/SLADZARI/degradation_club/issues/237#issuecomment-6324768480), and separate [Live #51](https://github.com/SLADZARI/dementor_live/issues/51) are the current owner threads. New Club source PR/branch is not authorized; this update is ONLY within the existing one-file Draft #257. **No agent host writes or ACME challenge/DNS mutation in W22.**
