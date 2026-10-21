@@ -7,6 +7,7 @@ on:
       - 'projects/dementor-live/runtime/public/world-ui.js'
       - 'projects/dementor-live/runtime/server.mjs'
       - 'projects/dementor-live/runtime/test/world-art-g6.test.mjs'
+      - 'projects/dementor-live/runtime/test/world-art-g6-http.test.mjs'
       - 'projects/dementor-live/runtime/assets-source/world-art-unique-houses/**'
       - '.github/workflows/dementor-live-art-g6.yml'
   workflow_dispatch:
@@ -23,7 +24,9 @@ jobs:
           node-version: '22'
       - name: G6 ISO30 source manifest and server safety
         working-directory: projects/dementor-live/runtime
-        run: npm run test:art-g6
+        run: |
+          npm run test:art-g6
+          npm run test:art-g6:http
       - name: RC4 syntax and model baseline
         working-directory: projects/dementor-live/runtime
         run: |
