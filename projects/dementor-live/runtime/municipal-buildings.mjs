@@ -21,7 +21,8 @@ export const MUNICIPAL_SITES=Object.freeze({
  'robo-stadium-site':site('robo-stadium-site','Стадион Robo Games','world-preview',29,43,4,3,26,46,30,47,[[4,3],[6,4],[6,3]]),
  'industry-site':site('industry-site','Производство и агротехника','world-preview',94,67,5,4,90,71,95,72,[[5,3],[7,5],[6,4]]),
  'museum-entry':site('museum-entry','Библиотека и музей','world-gate',96,60,3,3,92,63,96,64,[[3,2],[5,3],[4,3]]),
- 'combat-gate':site('combat-gate','Боевая экспедиция','combat',27,33,4,3,27,33,29,34,[[2,2],[4,3],[3,2]])
+ 'combat-gate':site('combat-gate','Боевая экспедиция','combat',27,33,4,3,27,33,29,34,[[2,2],[4,3],[3,2]]),
+ 'field-toilet':site('field-toilet','Уличный туалет','none',31.5,34,1.2,1.2,30,35.5,32.5,35.5,[[1,0],[1,1],[1,0]])
 });
 export const emptyMunicipalProject=()=>({stage:0,work:0,accepted:{wood:0,stone:0},stock:{wood:0,stone:0},consumed:{wood:0,stone:0},spent:0});
 export const municipalBuilt=(state,id)=>!!state?.municipalBuildings?.[id]&&state.municipalBuildings[id].stage>=MUNICIPAL_SITES[id]?.stages.length;
