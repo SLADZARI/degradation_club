@@ -599,7 +599,7 @@ function render(time){positionWindows();ctx.clearRect(0,0,view.w,view.h);ctx.fil
   if(!state){for(const[x,y]of [[41,7],[44,10],[42,23],[45,26]])drawTree({x,y,stock:10});for(const[x,y]of [[42,16],[45,20]])drawStone({x,y,stock:10});}
   if(state?.expedition){const gate=state.config.expedition.gate;paperBoard(gate.x,gate.y,'Миссия · расчистка');}
   if(state&&!emptyStart)paperBoard(29,35,'⚔ Боевая зона');
-  if(!emptyStart){drawProject();if(typeof drawPlaza==='function')drawPlaza();}
+  if(!emptyStart){drawProject();if(typeof drawPlaza==='function')drawPlaza();}else paperBoard(3.2,8,'Работы мэрии');
   if(state){for(const plot of state.plots)drawPlot(plot,'ground');}else for(const o of [{x:4,y:15,w:6,h:6},{x:4,y:23,w:6,h:6},{x:14,y:23,w:6,h:6}])drawPlot(o,'ground');
   if(!emptyStart&&(state?.forge.stage||0)<2)drawForge();
   if(emptyStart)drawToolSign(9,6);else{drawToolSign(24,3);drawHempBush(16.7,3.3);label('Благоустройство',16.7,1,true);label('Магазин инструмента',24,.3,true);}
