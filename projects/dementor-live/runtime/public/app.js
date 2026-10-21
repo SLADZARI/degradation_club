@@ -316,7 +316,7 @@ function drawFogOfWar(){
  const corners=[[0,0],[view.w,0],[view.w,view.h],[0,view.h]].map(([x,y])=>worldPoint(x,y));
  const minX=Math.max(0,Math.floor(Math.min(...corners.map(p=>p.x))-1)),maxX=Math.min(state.config.width-1,Math.ceil(Math.max(...corners.map(p=>p.x))+1));
  const minY=Math.max(0,Math.floor(Math.min(...corners.map(p=>p.y))-1)),maxY=Math.min(state.config.height-1,Math.ceil(Math.max(...corners.map(p=>p.y))+1));
- const hidden=window.DLFogGrid?.hiddenCells(fogExplored,minX,maxX,minY,maxY)||[];
+ const hidden=[];for(let y=minY;y<=maxY;y++)for(let x=minX;x<=maxX;x++)if(!fogExplored.has(x+','+y))hidden.push([x,y]);
  // Mask only undiscovered grid cells with the same paper color as the map surround.
  // No radius, ring, or tint is drawn over the cells that have already been discovered.
  ctx.beginPath();
