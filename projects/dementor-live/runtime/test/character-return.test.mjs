@@ -142,8 +142,12 @@ test('isolated HTTP: bearer proof, one-time transfer, unchanged PAPER and receip
     assert.notEqual(transfer.data.token,old.token);
     assert.equal((await self(base,old.token)).status,401);
     assert.equal((await self(base,transfer.data.token)).status,200);
-    const streamClose=await Promise.race([sseReader.read(),sleep(1500).then(()=>({timeout:true}))]);
-    assert.equal(streamClose.done,true,'prior SSE was not closed');
+    // SSE may have buffered snapshot frames; drain them until EOF rather than
+    // incorrectly treating the first buffered chunk as proof the old bearer survived.
+    const waitForClose=(async()=>{while(true){const frame=await sseReader.read();if(frame.done)return true;}})()
+      .catch(()=>false);
+    const streamClosed=await Promise.race([waitForClose,sleep(2000).then(()=>false)]);
+    assert.equal(streamClosed,true,'prior SSE was not closed');
     controller.abort();
     const retried=await post(base,'/api/identity/transfer/claim',{characterId:old.id,code:issue.data.code,requestId:'a'.repeat(32)});
     assert.equal(retried.status,200);assert.equal(retried.data.token,transfer.data.token);
