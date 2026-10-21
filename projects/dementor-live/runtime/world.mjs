@@ -11,6 +11,7 @@ import {initEstates,estateAction,tickEstateLeases} from './estate.mjs';
 import {bagCapacity} from './losev-courses.mjs';
 import {stoneSize} from './world-footprints.mjs';
 import {initMayor,mayorAction} from './mayor-ideas.mjs';
+import {MUNICIPAL_SITES,emptyMunicipalProject,municipalBuildingView,municipalBuilt} from './municipal-buildings.mjs';
 
 const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
 const distance = (a,b) => Math.hypot(a.x-b.x,a.y-b.y);
@@ -28,6 +29,8 @@ const newProject=()=>({stage:0,work:0,accepted:{wood:0,stone:0},stock:{wood:0,st
 export class Game {
   constructor(state=createWorld(),c=CONFIG){ this.state=state;this.c=state?.startingCity?{...c,expedition:{...c.expedition,gate:{...c.expedition.gate,x:7,y:18}}}:c;this.online=new Set();this.inputs=new Map();this.now=Date.now(); this.onChange=()=>{};this.dirty=false;
     state.forge ||= newProject();state.bridge ||= newProject();
+    state.municipalBuildings ||= {};
+    for(const site of Object.values(MUNICIPAL_SITES)){if(!state.municipalBuildings[site.id]){const p=emptyMunicipalProject();if(!state.startingCity)p.stage=site.stages.length;state.municipalBuildings[site.id]=p;}}
     for(const [id,type,x,y,stock]of [['east-wood-1','wood',41,7,48],['east-wood-2','wood',44,10,48],['east-wood-3','wood',42,23,48],['east-wood-4','wood',45,26,48],['east-stone-1','stone',42,16,48],['east-stone-2','stone',45,20,48],['east-food','food',41,12,c.foodStock]])if(!state.resources.some(r=>r.id===id))state.resources.push({id,type,x,y,stock,initial:stock,regrowAt:0});
     state.warehouse ||= {stock:{wood:0,stone:0},municipal:{wood:0,stone:0},spent:0};
     state.drops ||= [];
@@ -91,20 +94,20 @@ export class Game {
  ];if(s.seedMarket?.stage>=this.c.seedMarket.stages.length)footprints.push({x:21.8,y:5.3,w:2.5,h:2,id:'seed-shop'});
  if(s.forge?.stage>=this.c.forge.stages.length)footprints.push({x:24,y:23,w:6,h:5,id:'forge'});
  if(s.gardenProject?.stage>=this.c.cityGarden.stages.length)footprints.push({x:25.5,y:8.4,w:5.6,h:2.5,id:'public-garden'});
- return s.startingCity&&!s.expedition?.completedAt?footprints.filter(o=>['mayor-tent','work-board'].includes(o.id)):footprints;}
+ if(!s.startingCity)return footprints;return footprints.filter(o=>['mayor-tent','work-board'].includes(o.id)||municipalBuilt(s,o.id)||s.project.stage>=this.c.stages.length&&['monument','jukebox','donation-board','theft-board'].includes(o.id));}
   walkable(x,y,p=null){if(p&&scene(p)!=='city'){if(x<.5||y<.5||x>15.5||y>15.5)return false;const h=scene(p)==='expedition'?this.state.expedition.home:this.state.plots.find(l=>l.id===p.plotId)?.home;if(['plot','expedition'].includes(scene(p))&&h?.nodes.some(n=>n.left>0&&Math.hypot(x-n.x,y-n.y)<.58))return false;if(scene(p)==='plot'&&h?.plantedTrees?.some(t=>{if(!t.wateredAt||this.now-t.wateredAt<180000)return false;const candidate=Math.hypot(x-t.x,y-t.y),prior=Math.hypot(p.x-t.x,p.y-t.y);return candidate<.55&&!(prior<.55&&candidate>prior+1e-6);}))return false;return true;}const r=.3,c=this.c;if(x<r||y<r||x>c.width-r||y>c.height-r)return false;
     if(x+r>c.river.x&&x-r<c.river.x+c.river.w&&!(this.state.bridge.stage>=c.bridge.stages.length&&y-r>=c.bridge.y&&y+r<=c.bridge.y+c.bridge.h))return false;
     if(this.rects().some(o=>x+r>o.x&&x-r<o.x+o.w&&y+r>o.y&&y-r<o.y+o.h))return false;
     return !this.state.resources.some(o=>o.stock>0&&o.type!=='food'&&Math.hypot(x-o.x,y-o.y)<.58);
   }
-  projectFor(target){return target?.startsWith('seed-shop-')?this.state.seedMarket:target?.startsWith('public-garden-')?this.state.gardenProject:target?.startsWith('bridge-')?this.state.bridge:target?.startsWith('forge-')?this.state.forge:this.state.project;}
+  projectFor(target){const municipal=target?.match(/^municipal-(.+)-(?:drop|build)$/);return municipal?this.state.municipalBuildings[municipal[1]]:target?.startsWith('seed-shop-')?this.state.seedMarket:target?.startsWith('public-garden-')?this.state.gardenProject:target?.startsWith('bridge-')?this.state.bridge:target?.startsWith('forge-')?this.state.forge:this.state.project;}
   deliveries(){return Object.values(this.state.players).filter(p=>p.delivery).map(p=>p.delivery);}
   committed(kind,pickedOnly=false,destination=null){return this.deliveries().filter(d=>d.kind===kind&&(!pickedOnly||d.picked)&&(!destination||(d.destination||'mayor')===destination)).reduce((n,d)=>n+d.quantity,0);}
   warehouseFree(kind){return Math.max(0,this.c.warehouse.capacity-this.state.warehouse.stock[kind]-this.committed(kind,true));}
   cityFunds(){
     // Keep unfinished construction funded before offering optional purchases and courier work.
     let reserved=this.deliveries().reduce((n,d)=>n+d.reward,0);
-    for(const [p,c]of [[this.state.project,this.c],[this.state.forge,{...this.c,...this.c.forge}],[this.state.bridge,{...this.c,...this.c.bridge}],[this.state.seedMarket,{...this.c,...this.c.seedMarket}],[this.state.gardenProject,{...this.c,...this.c.cityGarden}]]){
+    for(const [p,c]of [[this.state.project,this.c],[this.state.forge,{...this.c,...this.c.forge}],[this.state.bridge,{...this.c,...this.c.bridge}],[this.state.seedMarket,{...this.c,...this.c.seedMarket}],[this.state.gardenProject,{...this.c,...this.c.cityGarden}],...Object.values(MUNICIPAL_SITES).map(site=>[this.state.municipalBuildings?.[site.id],{...this.c,...site}]).filter(x=>x[0])]){
       for(const k of ['wood','stone'])reserved+=Math.max(0,c.need[k]-p.accepted[k])*c.pay[k];
       reserved+=c.stages.slice(p.stage).reduce((n,s)=>n+s.works,0)*c.pay.work-p.work*c.pay.work;
     }
@@ -165,8 +168,8 @@ export class Game {
     if(d.picked){this.near(p,this.target('warehouse'));w.stock[d.kind]+=d.quantity;recordMaterial(this,'courier-return',d.kind,d.quantity,'transit','warehouse',p.id);}
     p.delivery=null;return {message:'Заказ отменён. Городской груз остаётся на складе.'};
   }
-  configFor(target){return target?.startsWith('seed-shop-')?{...this.c,...this.c.seedMarket}:target?.startsWith('public-garden-')?{...this.c,...this.c.cityGarden}:target?.startsWith('bridge-')?{...this.c,...this.c.bridge}:target?.startsWith('forge-')?{...this.c,...this.c.forge}:this.c;}
-  target(id){if(CITY_BUILDINGS[id])return CITY_BUILDINGS[id];if(id==='frontier-gate')return this.c.expedition.gate;if(id==='landscape-shop')return LANDSCAPE_SHOP;const po=PLAZA.objects.find(o=>o.id===id);if(po)return po;const s=this.state;if(id==='bridge-drop')return {id,x:32.5,y:12.3,type:'project'};if(id==='bridge-build')return {id,x:32,y:13.5,type:'build'};if(id==='east-bank')return {id,x:40,y:13.5,type:'explore'};if(id==='forge-drop')return {id,x:24.5,y:24,type:'project'};if(id==='forge-build')return {id,x:27,y:26,type:'build'};if(id==='tools')return {id,x:9,y:6,type:'tools'};if(id==='project')return {id,x:15,y:11,type:'project'};if(id==='build')return {id,x:18,y:14,type:'build'};
+  configFor(target){const municipal=target?.match(/^municipal-(.+)-(?:drop|build)$/);return municipal?{...this.c,...MUNICIPAL_SITES[municipal[1]]}:target?.startsWith('seed-shop-')?{...this.c,...this.c.seedMarket}:target?.startsWith('public-garden-')?{...this.c,...this.c.cityGarden}:target?.startsWith('bridge-')?{...this.c,...this.c.bridge}:target?.startsWith('forge-')?{...this.c,...this.c.forge}:this.c;}
+  target(id){const municipal=Object.values(MUNICIPAL_SITES).find(site=>site.drop.id===id||site.build.id===id);if(municipal)return id===municipal.drop.id?municipal.drop:municipal.build;if(CITY_BUILDINGS[id])return CITY_BUILDINGS[id];if(id==='frontier-gate')return this.c.expedition.gate;if(id==='landscape-shop')return LANDSCAPE_SHOP;const po=PLAZA.objects.find(o=>o.id===id);if(po)return po;const s=this.state;if(id==='bridge-drop')return {id,x:32.5,y:12.3,type:'project'};if(id==='bridge-build')return {id,x:32,y:13.5,type:'build'};if(id==='east-bank')return {id,x:40,y:13.5,type:'explore'};if(id==='forge-drop')return {id,x:24.5,y:24,type:'project'};if(id==='forge-build')return {id,x:27,y:26,type:'build'};if(id==='tools')return {id,x:9,y:6,type:'tools'};if(id==='project')return {id,x:15,y:11,type:'project'};if(id==='build')return {id,x:18,y:14,type:'build'};
     if(id==='forge-use')return {id,type:'forge',x:27,y:29.5};if(id==='tool-shop')return {id,type:'shop',x:24,y:3};
     if(id==='warehouse')return {id,type:'warehouse',x:12,y:24};if(id==='board')return {id,type:'board',x:3.2,y:8};if(id==='mayor')return {id,type:'mayor',x:9,y:3};
     const pile=s.drops.find(d=>d.id===id);if(pile)return pile;
@@ -284,7 +287,7 @@ export class Game {
       if(p.job&&this.now>=p.job.ends)this.finish(p);
     }
   }
-  snapshot(p){syncEquipment(p,this.c);const s=this.state,c=this.c;return {plaza:plazaSnapshot(this,p),...lifeSnapshot(this,p),now:this.now,revision:s.revision,me:p.id,config:{...c,capacity:bagCapacity(p,c,this.now)},treasury:s.treasury,citySolids:this.rects(),landscape:s.landscape,landscapeShop:LANDSCAPE_SHOP,landscapeProducts:LANDSCAPE_PRODUCTS,treeSpecies:TREE_SPECIES,project:s.project,forge:s.forge,seedMarket:s.seedMarket,gardenProject:s.gardenProject,publicGarden:s.publicGarden,materials:cityMaterialReport(this),materialEvents:s.materialEvents.slice(-30),bridge:{...s.bridge,reserved:{wood:this.committed('wood',false,'bridge'),stone:this.committed('stone',false,'bridge')}},plots:s.plots.map(({home,...plot})=>({...plot,homeVisual:{tent:home?.tent||0,beds:home?.beds?.length||0,crops:home?.beds?.filter(b=>b.crop).length||0},publicAccess:!!plot.owner&&(!plot.lease||plot.lease.dueAt>this.now)&&(plot.landUse==='business'||!!home?.open)})),startingCity:!!s.startingCity,mayorMail:s.mayorMail.filter(t=>t.player===p.id).slice(-10).map(t=>({id:t.id,text:t.text,at:t.at,reward:t.reward})),resources:s.resources,
+  snapshot(p){syncEquipment(p,this.c);const s=this.state,c=this.c;return {plaza:plazaSnapshot(this,p),...lifeSnapshot(this,p),now:this.now,revision:s.revision,me:p.id,config:{...c,capacity:bagCapacity(p,c,this.now)},treasury:s.treasury,citySolids:this.rects(),landscape:s.landscape,landscapeShop:LANDSCAPE_SHOP,landscapeProducts:LANDSCAPE_PRODUCTS,treeSpecies:TREE_SPECIES,project:s.project,forge:s.forge,seedMarket:s.seedMarket,gardenProject:s.gardenProject,publicGarden:s.publicGarden,materials:cityMaterialReport(this),materialEvents:s.materialEvents.slice(-30),bridge:{...s.bridge,reserved:{wood:this.committed('wood',false,'bridge'),stone:this.committed('stone',false,'bridge')}},plots:s.plots.map(({home,...plot})=>({...plot,homeVisual:{tent:home?.tent||0,beds:home?.beds?.length||0,crops:home?.beds?.filter(b=>b.crop).length||0},publicAccess:!!plot.owner&&(!plot.lease||plot.lease.dueAt>this.now)&&(plot.landUse==='business'||!!home?.open)})),startingCity:!!s.startingCity,municipalBuildings:s.municipalBuildings,municipalSites:municipalBuildingView(s),mayorMail:s.mayorMail.filter(t=>t.player===p.id).slice(-10).map(t=>({id:t.id,text:t.text,at:t.at,reward:t.reward})),resources:s.resources,
     warehouse:{...s.warehouse,free:{wood:this.warehouseFree('wood'),stone:this.warehouseFree('stone')},funds:this.cityFunds()},courierOffers:['mayor','bridge'].flatMap(destination=>['wood','stone'].map(k=>this.courierOffer(k,destination))).filter(Boolean),drops:s.drops.filter(d=>(d.scene||'city')===scene(p)&&(scene(p)==='city'||d.plotId===p.plotId)),
     players:Object.values(s.players).filter(o=>o.id===p.id||this.online.has(o.id)||s.plots.some(x=>x.owner===o.id)).map(o=>({id:o.id,name:o.name,gender:o.gender||'unspecified',x:o.x,y:o.y,scene:scene(o),plotId:o.plotId||null,color:o.color,online:this.online.has(o.id),spirit:o.spirit,...(o.id===p.id?{wallet:o.wallet,bag:o.bag,toolItems:o.toolItems,activeTools:o.activeTools,tools:o.tools,toolInfo:o.toolInfo,equipped:o.equipped,hunger:o.hunger,health:o.health,stamina:o.stamina,job:o.job,gardenTools:o.gardenTools,terrainBag:o.terrainBag,activeGameMs:o.activeGameMs||0,mayorFeedback:{lastRewardAt:o.mayorFeedback?.lastRewardAt||0},delivery:o.delivery||null}: {})})),
     chat:s.chat.filter(m=>this.now-m.at<600000&&(m.scene||'city')===scene(p)&&(scene(p)==='city'||m.plotId===p.plotId)&&distance(p,m)<=c.chatRange).slice(-15)};
