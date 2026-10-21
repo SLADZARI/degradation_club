@@ -9,6 +9,7 @@ import {createQARecorder} from './qa-recorder.mjs';
 import {scanMusic,audioDuration,PLAZA} from './plaza.mjs';
 import {createHash,timingSafeEqual} from 'node:crypto';
 import {packTerrainSse} from './terrain-delta.mjs';
+import {createReturnTicket,claimReturnTicket,verifyReturnTicket,revokeReturnTicket,isCharacterId,ReturnAttemptLimiter} from './character-return.mjs';
 import { CONFIG } from './config.mjs';
 import { combatRoot,createCombat,joinCombat,combatAction,combatView,advanceCombat } from './combat-p0.mjs';
 
@@ -36,6 +37,8 @@ const network=new CityNetwork(state);
 const game=network.origin;
 const adminKey=String(process.env.DEMENTOR_QA_ADMIN_KEY||'');
 const adminAvailable=adminKey.length>=24&&(testMode||publicOrigin.startsWith('https://'));
+const identityTransferEnabled=testMode||process.env.DEMENTOR_IDENTITY_TRANSFER_ENABLED==='1';
+const returnAttempts=new ReturnAttemptLimiter();
 const stateFor=p=>({...network.snapshot(p),qaMode:testMode,qaRecording:qaRecorder.enabled,qaAdminAvailable:adminAvailable});
 const musicDir=path.join(root,'data','music');fs.mkdirSync(musicDir,{recursive:true});
 function refreshMusic(){network.setMusic(scanMusic([[path.join(root,'public','music'),'/music/'],[musicDir,'/custom-music/']]));}
@@ -57,6 +60,39 @@ const terrainCursors=new WeakMap();
 function terrainEvent(snapshot,res){const packed=packTerrainSse(snapshot,terrainCursors.get(res));terrainCursors.set(res,packed.cursor);return `data: ${JSON.stringify(packed.snapshot)}\n\n`;}
 function broadcast(){for(const[id,set]of streams){const p=network.findId(id)?.p;if(!p)continue;const snapshot=stateFor(p);for(const res of set)res.write(terrainEvent(snapshot,res));}}
 function json(res,status,data){res.writeHead(status,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'});res.end(JSON.stringify(data));}
+// Sensitive identity actions are disabled by default and fail closed on non-HTTPS public hosts.
+function allowIdentityTransfer(req,res,url) {
+  if(!identityTransferEnabled||(!testMode&&!publicOrigin.startsWith('https://'))){
+    json(res,503,{ok:false,message:'Безопасный перенос персонажа на этом сервере пока недоступен'});return false;
+  }
+  const expected=publicOrigin||`http://${req.headers.host}`;
+  if(req.headers.origin!==expected || url.search!=='' ||
+      !/^application\/json(?:\s*;|$)/i.test(String(req.headers['content-type']||'')) ||
+      (req.headers['sec-fetch-site']&&!['same-origin','none'].includes(req.headers['sec-fetch-site']))){
+    json(res,403,{ok:false,message:'Запрос переноса запрещён'});return false;
+  }
+  res.setHeader('Referrer-Policy','no-referrer');
+  return true;
+}
+// No acknowledgement until the changed token / salted verifier is saved atomically.
+function commitIdentityChange(p,mutate){
+  const g=network.gameFor(p);
+  if(!g)throw Error('Житель не найден');
+  const previousToken=p.token,previousReturn=p.characterReturn,hadReturn=Object.hasOwn(p,'characterReturn');
+  try{
+    const result=mutate();g.changed();save();return result;
+  }catch{
+    p.token=previousToken;
+    if(hadReturn)p.characterReturn=previousReturn;else delete p.characterReturn;
+    g.dirty=true; // force a retry of the preserved previous state, never ACK a failed save
+    throw Error('Безопасный перенос не удалось сохранить');
+  }
+}
+function commitIdentityChangeIfValid(p,code) {
+  const now=Date.now();
+  if(!verifyReturnTicket(p,code,now))return null;
+  return commitIdentityChange(p,()=>claimReturnTicket(p,code,now).token);
+}
 async function body(req){let text='';for await(const chunk of req){text+=chunk;if(text.length>4096)throw Error('Слишком большой запрос');}return JSON.parse(text||'{}');}
 const server=http.createServer(async(req,res)=>{
   try{
@@ -74,9 +110,42 @@ const server=http.createServer(async(req,res)=>{
       game.changed();save();broadcast();json(res,200,{ok:true,state:game.state});return;
     }
     if(url.pathname==='/api/join'&&req.method==='POST'){const d=await body(req);const p=game.join(d.name,d.gender);network.snapshot(p);qaRecorder.join(p,'origin');save();json(res,200,{ok:true,id:p.id,token:p.token});return;}
+    if(url.pathname.startsWith('/api/identity/transfer/')&&req.method!=='POST'){
+      json(res,405,{ok:false,message:'Требуется POST'});return;
+    }
+    if(url.pathname==='/api/identity/transfer/claim'){
+      if(!allowIdentityTransfer(req,res,url))return;
+      const d=await body(req);
+      const id=isCharacterId(d.characterId)?d.characterId:null;
+      const peer=String(req.socket.remoteAddress||'unknown');
+      if(!returnAttempts.admit('peer:'+peer,60) || (id&&!returnAttempts.admit('claim:'+id,5))){
+        json(res,429,{ok:false,message:'Слишком много попыток. Повтори позже'});return;
+      }
+      const found=id?network.findId(id):null;
+      const p=found?.p||null;
+      const token=p?commitIdentityChangeIfValid(p,d.code):null;
+      if(!token){json(res,401,{ok:false,message:'Недействительный или истёкший код'});return;}
+      // Handoff revokes the prior bearer; do not leave an authenticated SSE stream open.
+      for(const client of streams.get(p.id)||[])client.end();
+      json(res,200,{ok:true,id:p.id,token});return;
+    }
     if(url.pathname.startsWith('/api/')){
       const token=req.headers.authorization?.replace(/^Bearer /,'')||url.searchParams.get('token');
       const p=network.findToken(token)?.p;if(!p){json(res,401,{ok:false,message:'Войди в мир заново'});return;}
+      if(url.pathname==='/api/identity/transfer/create'||url.pathname==='/api/identity/transfer/revoke'){
+        if(!allowIdentityTransfer(req,res,url))return;
+        if(!/^Bearer [A-Za-z0-9_-]{30,80}$/.test(String(req.headers.authorization||''))){
+          json(res,401,{ok:false,message:'Требуется активная сессия'});return;
+        }
+        if(!returnAttempts.admit('issue:'+p.id,5)){
+          json(res,429,{ok:false,message:'Слишком много попыток. Повтори позже'});return;
+        }
+        await body(req);
+        const create=url.pathname.endsWith('/create');
+        const result=commitIdentityChange(p,()=>create?createReturnTicket(p):(
+          revokeReturnTicket(p),{ok:true}));
+        json(res,200,{ok:true,...result});return;
+      }
       if(url.pathname==='/api/events'){
         res.writeHead(200,{'Content-Type':'text/event-stream','Cache-Control':'no-cache, no-transform','Connection':'keep-alive','X-Accel-Buffering':'no'});
         let set=streams.get(p.id);if(!set){set=new Set();streams.set(p.id,set);network.gameFor(p).connect(p);qaRecorder.connect(p,network.findId(p.id)?.cityId);}set.add(res);res.write(terrainEvent(stateFor(p),res));
