@@ -61,7 +61,11 @@ export class Game extends CoreGame{
       if(cmd.type==='homeClear'&&(p.scene||'city')!=='expedition')throw Error('Сначала войди в миссию расчистки.');
       if(cmd.type==='homeUse'&&cmd.target!=='mission-exit')throw Error('Сейчас доступен только выход с расчистки.');
     }
-    if(this.state.startingCity&&(cmd?.type==='worldUse'||cmd?.type==='touristBuy')){const site=MUNICIPAL_SITES[cmd.target];if(site&&!municipalBuilt(this.state,site.id))throw Error('Сначала построй этот городской объект в три этапа.');}
+    if(this.state.startingCity&&!intro){
+      const site=MUNICIPAL_SITES[cmd?.target];
+      if(site&&!municipalBuilt(this.state,site.id)&&!/^municipal-.+-(drop|build)$/.test(String(cmd?.target||'')))throw Error('Сначала построй этот городской объект в три этапа.');
+      if(['donate','monumentAnswer','musicRequest','musicPlay'].includes(cmd?.type)&&this.state.project.stage<this.c.stages.length)throw Error('Сначала построй городскую площадь.');
+    }
     const course=losevAction(this,p,cmd);if(course)return course;
     const task=civicAction(this,p,cmd);if(task)return task;
     const build=secondBridgeAction(this,p,cmd);if(build)return build;
