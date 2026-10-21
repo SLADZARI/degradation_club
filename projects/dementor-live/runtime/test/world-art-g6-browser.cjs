@@ -65,16 +65,30 @@ async function main(){
    assert.ok(before.peers.includes(people[0].id)&&before.peers.includes(people[1].id));
    assert.equal(before.health.failed,0,'source-art requests must not fail');
    assert.ok(before.health.loaded>0,'must render an actual SVG, not empty panel');
-   for(const zoom of [0.65,1,2]){
-    await page.evaluate(z=>{view.zoom=z;resize();},zoom);
-    await page.waitForTimeout(140);
-    const suffix=mobile?'mobile-dpr2':'desktop-dpr1';
-    await page.screenshot({path:path.join(shots,'g6-'+mode+'-'+suffix+'-zoom'+zoom+'.png')});
+   const suffix=mobile?'mobile-dpr2':'desktop-dpr1';
+   await page.screenshot({path:path.join(shots,'g6-'+mode+'-'+suffix+'-players-at-spawn.png')});
+   for(const camera of ['tool-shop','forge','warehouse']){
+    await page.evaluate(name=>{
+      history.replaceState(null,'','/?artG6='+window.DLWorldArtG6.mode+'&artG6Camera='+name);
+    },camera);
+    const target={'tool-shop':[23.7,3.5],forge:[27,25.5],warehouse:[12,27.5]}[camera];
+    for(const zoom of (camera==='tool-shop'?[0.65,1,2]:[1])){
+     await page.evaluate(z=>{view.zoom=z;resize();},zoom);
+     await page.waitForTimeout(280);
+     const actual=await page.evaluate(()=>({cx:view.cx,cy:view.cy}));
+     assert.ok(Math.abs(actual.cx-target[0])<0.01&&Math.abs(actual.cy-target[1])<0.01,
+       'G6 camera must stay on known city CU without modifying player movement');
+     await page.screenshot({path:path.join(shots,'g6-'+mode+'-'+suffix+'-'+camera+'-zoom'+zoom+'.png')});
+    }
    }
    results.push({name,mode,scene:before.scene,peers:before.peers.length,loaded:before.health.loaded,failed:before.health.failed});
   }
   assert.deepEqual(errors,[],'no client-side exceptions');
-  const report={status:'AUTOMATED_BROWSER_PASS_NOT_ART_APPROVAL',exactSha:process.env.GITHUB_SHA||'local',
+  const gitEvent=process.env.GITHUB_EVENT_PATH&&fs.existsSync(process.env.GITHUB_EVENT_PATH)
+   ?JSON.parse(fs.readFileSync(process.env.GITHUB_EVENT_PATH,'utf8')):{};
+  const report={status:'AUTOMATED_BROWSER_PASS_NOT_ART_APPROVAL',
+   sourceHeadSha:gitEvent.pull_request?.head?.sha||process.env.GITHUB_SHA||'local',
+   githubCheckoutSha:process.env.GITHUB_SHA||'local',
    clients:results,shots:fs.readdirSync(shots).filter(n=>n.endsWith('.png')),
    caveats:['screenshots require human visual/CU/door validation','mobile viewport is not physical iPhone Safari',
     'test server uses disposable empty world; not production']};
