@@ -91,7 +91,7 @@ export class Game {
  {x:20.7,y:11.7,w:.6,h:.6,id:'jukebox'},
  {x:18.7,y:10.5,w:.6,h:.6,id:'donation-board'},
  {x:22.7,y:10.5,w:.6,h:.6,id:'theft-board'}
- ];if(s.seedMarket?.stage>=this.c.seedMarket.stages.length)footprints.push({x:21.8,y:5.3,w:2.5,h:2,id:'seed-shop'});
+ ];if(s.startingCity)for(const site of Object.values(MUNICIPAL_SITES))if(municipalBuilt(s,site.id)&&!footprints.some(f=>f.id===site.id))footprints.push({x:site.x,y:site.y,w:site.w,h:site.h,id:site.id});if(s.seedMarket?.stage>=this.c.seedMarket.stages.length)footprints.push({x:21.8,y:5.3,w:2.5,h:2,id:'seed-shop'});
  if(s.forge?.stage>=this.c.forge.stages.length)footprints.push({x:24,y:23,w:6,h:5,id:'forge'});
  if(s.gardenProject?.stage>=this.c.cityGarden.stages.length)footprints.push({x:25.5,y:8.4,w:5.6,h:2.5,id:'public-garden'});
  if(!s.startingCity)return footprints;return footprints.filter(o=>['mayor-tent','work-board'].includes(o.id)||municipalBuilt(s,o.id)||s.project.stage>=this.c.stages.length&&['monument','jukebox','donation-board','theft-board'].includes(o.id));}
