@@ -7,12 +7,12 @@
     "projectStage": "BUILD",
     "gate": "G5_BUILD",
     "status": "APPROVED",
-    "version": "3.24",
-    "updated": "2026-10-20",
+    "version": "3.25",
+    "updated": "2026-10-21",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "3.23"
+    "supersedes": "3.24"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -26,6 +26,8 @@
     ".weekly-os/PROJECT.json",
     ".weekly-os/ARTIFACT_INDEX.json",
     ".weekly-os/APPROVED_STATE.json",
+    ".weekly-os/results/pre-vm-webui-gate-correctives-v1.v0.1.md",
+    ".weekly-os/results/portal-vm-site-hosting-stage1.v0.2.md",
     "operations/MP_DSL_LIFECYCLE_FIELD_MAPPING_DECISION_V1.md",
     "operations/FUENGIROLA_ACCESS_POLICY_DECISION_V1.md",
     "operations/MERCH_CANONICAL_OWNERSHIP_AND_OWNER_WRITE_PATH_V1.md",
@@ -474,34 +476,36 @@
     "DESIGN": null
   },
   "currentResult": {
-    "artifactId": "dementor-club.result.owner-admin-community-ops-v1",
-    "version": "0.2",
-    "status": "WAITING",
-    "workStatus": "WAITING",
-    "path": ".weekly-os/results/owner-admin-community-ops-v1.v0.2.md",
+    "artifactId": "dementor-club.result.pre-vm-webui-gate-correctives-v1",
+    "version": "0.1",
+    "status": "ACTIVE",
+    "workStatus": "ACTIVE",
+    "path": ".weekly-os/results/pre-vm-webui-gate-correctives-v1.v0.1.md",
     "gate": "G5_BUILD",
     "scope": [
-      "BQA-23 Owner Admin Community/Artifact operations UI"
+      "Existing Board composer visual + Escape/Cancel focus",
+      "P1 anonymous Board login visibility",
+      "P1 mobile Home H1 readability"
     ],
-    "integrationBranch": null,
+    "parentIssues": [
+      126,
+      227,
+      228,
+      237
+    ],
+    "integrationBranch": "fix/board-composer-visual-stability-20261020",
     "integrationBaseRef": "dementor-club-production",
     "integrationBaseCommit": "cde332779ab0e256dd1e498660d6fa651e91846e",
     "productionBaseCommit": "cde332779ab0e256dd1e498660d6fa651e91846e",
-    "implementationStartAuthorized": false,
+    "g4Status": "PASS",
+    "g4Evidence": "https://github.com/SLADZARI/degradation_club/issues/237#issuecomment-6320105037",
+    "implementationStartAuthorized": true,
     "schemaChangeImplementationAuthorized": false,
-    "schemaChangeBoundary": "READ_ONLY_OWNER_ADMIN_PROJECTION_ONLY",
     "liveDatabaseMutationAuthorized": false,
     "productionMergeAuthorized": false,
     "productionDeployAuthorized": false,
     "changeControlRequired": false,
-    "g4Status": "PASS",
-    "g4Evidence": "operations/OWNER_ADMIN_COMMUNITY_OPS_G4_2026-09-30.md",
-    "gateReadiness": "G5_PAUSED_BY_OWNER",
-    "pausedIntegrationBranch": "result/owner-admin-community-ops-v1",
-    "pausedCandidateCommit": "93baa5dd38f1cbf24d40bfac8966b7411ef958c6",
-    "pausedPullRequest": 252,
-    "pauseReason": "OWNER_PRIORITY_STAGE1_VM_MIGRATION",
-    "pauseDecision": "https://github.com/SLADZARI/degradation_club/issues/237#issuecomment-6302633113"
+    "gateReadiness": "G5_BUILD_QA_PENDING"
   },
   "waitingResults": [
     {
@@ -566,9 +570,32 @@
       "authenticatedLiveRetest": "PASS",
       "integrationBranch": null,
       "note": "STAB-01 released and live-retested. Anonymous smoke PASS and owner-confirmed authenticated Board/private-image retest PASS. Residual parent stabilization #228 remains open; no active implementation ownership."
+    },
+    {
+      "artifactId": "dementor-club.result.owner-admin-community-ops-v1",
+      "version": "0.2",
+      "status": "WAITING",
+      "workStatus": "WAITING",
+      "path": ".weekly-os/results/owner-admin-community-ops-v1.v0.2.md",
+      "gate": "G5_BUILD",
+      "pausedIntegrationBranch": "result/owner-admin-community-ops-v1",
+      "pausedPullRequest": 252,
+      "pausedCandidateCommit": "93baa5dd38f1cbf24d40bfac8966b7411ef958c6",
+      "note": "Owner PAUSED BQA-23 at historical G5, PR #252 unchanged; no implementation until reactivated."
+    },
+    {
+      "artifactId": "dementor-club.result.portal-vm-site-hosting-stage1",
+      "version": "0.2",
+      "status": "APPROVED",
+      "workStatus": "WAITING",
+      "path": ".weekly-os/results/portal-vm-site-hosting-stage1.v0.2.md",
+      "gate": "G4_PASS",
+      "integrationBranch": null,
+      "ownerG4Decision": "https://github.com/SLADZARI/degradation_club/issues/237#issuecomment-6320105037",
+      "note": "Owner G4 approved limited isolated code but serial waiting behind Web/UI result; no VM/Nginx/DNS/Cloud authorization."
     }
   ],
-  "activeIntegrationBranch": null,
+  "activeIntegrationBranch": "fix/board-composer-visual-stability-20261020",
   "activeReleaseBranch": null,
   "reportPath": "operations/MEMBERSHIP_V2_PRODUCTION_FLOW_QA_2026-09-02.md",
   "completedResults": [
