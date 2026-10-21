@@ -8,6 +8,7 @@ import {createWorld} from '../world-expansion-adapter.mjs';
 import {CityNetwork} from '../city-network.mjs';
 
 const tool=path.resolve(import.meta.dirname,'../tools/qa-restore-identity-audit.mjs');
+const candidate=path.resolve(import.meta.dirname,'..');
 function run(input){
   const dir=fs.mkdtempSync(path.join(os.tmpdir(),'dl-ops-private-fixture-'));
   const file=path.join(dir,'world.json');
@@ -15,8 +16,8 @@ function run(input){
     const data=JSON.stringify(input);
     fs.writeFileSync(file,data,{mode:0o600});
     const before=fs.readFileSync(file);
-    const a=spawnSync(process.execPath,[tool,file],{encoding:'utf8',timeout:20000});
-    const b=spawnSync(process.execPath,[tool,file],{encoding:'utf8',timeout:20000});
+    const a=spawnSync(process.execPath,[tool,file,candidate],{encoding:'utf8',timeout:20000});
+    const b=spawnSync(process.execPath,[tool,file,candidate],{encoding:'utf8',timeout:20000});
     assert.equal(a.status,0,'first synthetic cold-load failed');
     assert.equal(b.status,0,'second synthetic cold-load failed');
     assert.equal(a.stdout,b.stdout,'success summaries must match between separate processes');
@@ -51,4 +52,17 @@ test('no receipt is NOT misrepresented as replay PASS',()=>{
   assert.equal(summary.requestIdReplayStatus,'NOT_TESTED_NO_CACHED_RECEIPTS');
   assert.equal(summary.players,0);
   assert.equal(summary.sourceFileUntouched,true);
+});
+
+test('incorrect candidate checkout fails closed without logging private fixture',()=>{
+  const dir=fs.mkdtempSync(path.join(os.tmpdir(),'dl-ops-bad-candidate-'));
+  const file=path.join(dir,'world.json');
+  try{
+    const original=JSON.stringify(new CityNetwork(createWorld()).serialize());
+    fs.writeFileSync(file,original,{mode:0o600});
+    const p=spawnSync(process.execPath,[tool,file,path.join(dir,'non-existent-runtime')],{encoding:'utf8',timeout:20000});
+    assert.notEqual(p.status,0,'candidate mismatch must block restore');
+    assert.ok(!p.stdout.includes(original),'must not leak world');
+    assert.deepEqual(fs.readFileSync(file,'utf8'),original,'failed QA must not modify restored save');
+  }finally{fs.rmSync(dir,{recursive:true,force:true});}
 });
