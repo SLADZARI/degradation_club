@@ -99,6 +99,14 @@
   const offset=cityId==='origin'?0:stableHash(cityId)%8;
   return 'plot-personal-tent-plot-'+(1+(idx+offset)%8);
  }
+ // Alpha bbox is measured on a 256px staging canvas. Canvas drawImage source coordinates
+ // must be in the SVG's *intrinsic* 512×512 image pixel coordinates, not staging pixels.
+ // Otherwise only the upper-left quarter is rendered and houses appear as severed fragments.
+ function sourceRect(art){
+  const {image,bbox}=art;
+  const sx=(Number(image.naturalWidth)||256)/256,sy=(Number(image.naturalHeight)||256)/256;
+  return {x:bbox.x*sx,y:bbox.y*sy,w:bbox.w*sx,h:bbox.h*sy};
+ }
  function drawGroundProp(ctx,id,x,y,screen,unit,size=1.2){
   if(!enabled||!allowed.has(id)||!(unit>0))return false;
   const art=getArt(id);if(!art?.loaded)return false;
@@ -106,7 +114,8 @@
   ctx.save();
   let left=foot.x-width/2,top=foot.y-height;
   if(mode==='compare'){left+=width*1.1;ctx.globalAlpha=.86;}
-  ctx.drawImage(art.image,bbox.x,bbox.y,bbox.w,bbox.h,left,top,width,height);
+  const source=sourceRect(art);
+  ctx.drawImage(art.image,source.x,source.y,source.w,source.h,left,top,width,height);
   ctx.restore();
   return mode==='replace';
  }
@@ -127,7 +136,8 @@
     left+=Math.max(width*.9,unit*1.5);
     ctx.globalAlpha=.86;
   }
-  ctx.drawImage(image,bbox.x,bbox.y,bbox.w,bbox.h,left,top,width,height);
+  const source=sourceRect(art);
+  ctx.drawImage(image,source.x,source.y,source.w,source.h,left,top,width,height);
   if(mode==='compare'){
    // Measurable debug evidence: world footprint diamond, projected southern anchor,
    // and candidate art without modifying the original building/actor z-order.
@@ -154,6 +164,6 @@
   requested:assets.size,failed:failed.size,
   mode
  });}
- window.DLWorldArtG6=Object.freeze({enabled,mode,get camera(){return qaCamera();},draw,drawGroundProp,bedArtId,forgeArtId,seedArtId,footprintLayout,tentArtId,debugHealth,ids:Object.freeze([...allowed]),failed});
+ window.DLWorldArtG6=Object.freeze({enabled,mode,get camera(){return qaCamera();},draw,drawGroundProp,bedArtId,forgeArtId,seedArtId,footprintLayout,tentArtId,debugHealth,sourceRect,ids:Object.freeze([...allowed]),failed});
  if(enabled)console.info('Dementor G6 candidate art preview:',mode,'No gameplay state mutation.');
 })();
