@@ -127,7 +127,7 @@ export function worldTravelAction(g,p,cmd){
 }
 export function worldTravelView(g,p){
   const scene=p.scene||'city';let booths=boothsForScene(scene);
-  if(g.state.startingCity)booths=g.state.technologies?.payphones?booths.filter(b=>b.siteId&&municipalBuilt(g.state,b.siteId)):[];
+  booths=g.state.technologies?.payphones?booths.filter(b=>b.siteId&&municipalBuilt(g.state,b.siteId)):[];
   const visibleBooths=new Set(booths.map(b=>b.id));
   const targets=worldObjects(scene).filter(t=>t.type!=='payphone'||visibleBooths.has(t.id));
   return {scene,targets,

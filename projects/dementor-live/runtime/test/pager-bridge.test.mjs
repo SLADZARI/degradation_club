@@ -4,8 +4,9 @@ import {Game,createWorld} from '../world-expansion-adapter.mjs';
 import {SECOND_BRIDGE_PRICE} from '../second-bridge.mjs';
 let seq=0;const action=(g,p,type,target=null,extra={})=>g.command(p,{type,target,requestId:'phonebridge-'+(++seq),...extra});
 const networkAction=(n,p,type,target=null,extra={})=>n.command(p,{type,target,requestId:'phonebridge-'+(++seq),...extra});
+const legacyWorld=()=>{const w=createWorld(undefined,{startingCity:false});w.technologies={...w.technologies,payphones:true};return w;};
 test('Every resident gets a stable unique 6-digit number; messages travel between cities and only recipient reads inbox',()=>{
- const n=new CityNetwork(createWorld(undefined,{startingCity:false})),a=n.origin.join('Отправитель'),b=n.origin.join('Получатель');
+ const n=new CityNetwork(legacyWorld()),a=n.origin.join('Отправитель'),b=n.origin.join('Получатель');
  n.snapshot(a);n.snapshot(b);b.pagerListed=true;assert.match(a.pagerNumber,/^\d{6}$/);assert.notEqual(a.pagerNumber,b.pagerNumber);
  const origin=n.origin;
  b.x=19;b.y=6;
@@ -29,7 +30,7 @@ test('Every resident gets a stable unique 6-digit number; messages travel betwee
  assert.equal(restored.findId(a.id).p.pagerNumber,a.pagerNumber);
 });
 test('Payphone checks physical proximity, six-digit subscriber number, fee and 100 character limit',()=>{
- const n=new CityNetwork(createWorld(undefined,{startingCity:false})),a=n.origin.join('Женя'),b=n.origin.join('Евгений');
+ const n=new CityNetwork(legacyWorld()),a=n.origin.join('Женя'),b=n.origin.join('Евгений');
  n.snapshot(a);n.snapshot(b);b.pagerListed=true;a.wallet=4;a.x=3;a.y=3;
  const base={number:b.pagerNumber,text:'Короткая записка'};
  assert.equal(networkAction(n,a,'pagerSend','phone-square',base).ok,false);
@@ -64,7 +65,7 @@ test('Second river crossing physically closed until one wood/stone delivery and 
 });
 
 test('Unlisted numbers are private; listing and blocking persist and reject delivery free of charge',()=>{
- const n=new CityNetwork(createWorld(undefined,{startingCity:false})),a=n.origin.join('A'),b=n.origin.join('B');
+ const n=new CityNetwork(legacyWorld()),a=n.origin.join('A'),b=n.origin.join('B');
  n.snapshot(a);n.snapshot(b);a.wallet=5;a.x=10;a.y=12;
  assert.equal(n.snapshot(a).telecom.directory.some(x=>x.number===b.pagerNumber),false);
  assert.equal(networkAction(n,a,'pagerSend','phone-square',{number:b.pagerNumber,text:'hello'}).ok,false);
@@ -83,7 +84,7 @@ test('Unlisted numbers are private; listing and blocking persist and reject deli
  assert.equal(networkAction(reboot,me,'pagerSend','phone-square',{number:b.pagerNumber,text:'works'}).ok,true);
 });
 test('Museum becomes callable only after discovery; mayor line appears in every city',()=>{
- const n=new CityNetwork(createWorld(undefined,{startingCity:false})),p=n.origin.join('Visitor');n.snapshot(p);p.x=10;p.y=12;
+ const n=new CityNetwork(legacyWorld()),p=n.origin.join('Visitor');n.snapshot(p);p.x=10;p.y=12;
  assert.equal(networkAction(n,p,'pagerDial','phone-square',{number:'500001'}).ok,false);
  assert.equal(networkAction(n,p,'pagerDial','phone-square',{number:'500002'}).ok,true);
  p.worldTravel.visited.push('museum');

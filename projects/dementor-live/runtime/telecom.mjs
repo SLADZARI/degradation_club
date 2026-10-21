@@ -40,7 +40,7 @@ const services=[{id:'npc-mayor',name:'Мэрия · поручения',number:N
 return [...services,...people].sort((a,b)=>a.name.localeCompare(b.name,'ru')).slice(0,500);
 }
 export function telecomSnapshot(network,p){
- const game=network.findId(p.id)?.g;let booths=boothsForScene(p.scene);if(game?.state.startingCity)booths=game.state.technologies?.payphones?booths.filter(b=>b.siteId&&municipalBuilt(game.state,b.siteId)):[];
+ const game=network.findId(p.id)?.g;let booths=boothsForScene(p.scene);booths=game?.state.technologies?.payphones?booths.filter(b=>b.siteId&&municipalBuilt(game.state,b.siteId)):[];
  return {number:p.pagerNumber,hasPager:!!p.pagerOwns,price:PAGER_PRICE,messageFee:PAGE_FEE,
   directory:publicSubscriberList(network,p),listed:!!p.pagerListed,blocked:p.pagerBlocked||[],
   inbox:p.pagerOwns?p.pagerInbox.slice(-80):[],

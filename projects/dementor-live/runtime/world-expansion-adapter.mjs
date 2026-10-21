@@ -34,11 +34,11 @@ export class Game extends CoreGame{
   movementBiome(p,input){return mountainMovement(p,input);}
   walkable(x,y,p=null){
     const scene=p?.scene||'city',r=.3,c=this.c;
-     if(PHONE_BOOTHS.some(b=>b.scene===scene&&Math.hypot(x-b.x,y-b.y)<.50&&(!this.state.startingCity||(this.state.technologies?.payphones&&b.siteId&&municipalBuilt(this.state,b.siteId)))))return false;
+     if(PHONE_BOOTHS.some(b=>b.scene===scene&&Math.hypot(x-b.x,y-b.y)<.50&&this.state.technologies?.payphones&&b.siteId&&municipalBuilt(this.state,b.siteId)))return false;
     if(WORLD_SCENES[scene])return !terrainBlocked(scene,x,y,r);
     if(scene==='city'){
       // A single physical catalogue is consumed by the server and sent to client.
-      let footprints=worldFootprints(this);
+      let footprints=worldFootprints(this).filter(o=>o.kind!=='payphone'||(()=>{const booth=PHONE_BOOTHS.find(b=>b.id===o.id);return !!booth&&!!this.state.technologies?.payphones&&!!booth.siteId&&municipalBuilt(this.state,booth.siteId);})());
       if(this.state.startingCity)footprints=footprints.filter(o=>{
         if(['forest','mountain','cactus','tree','stone'].includes(o.kind))return true;
         if(o.kind==='payphone'){const booth=PHONE_BOOTHS.find(b=>b.id===o.id);return !!booth&&!!this.state.technologies?.payphones&&!!booth.siteId&&municipalBuilt(this.state,booth.siteId);}
@@ -99,6 +99,7 @@ export class Game extends CoreGame{
         return true;
       });
     }
+    base.worldTravel.footprints=(base.worldTravel.footprints||[]).filter(o=>{if(o.kind!=='payphone')return true;const booth=PHONE_BOOTHS.find(b=>b.id===o.id);return !!booth&&!!this.state.technologies?.payphones&&!!booth.siteId&&municipalBuilt(this.state,booth.siteId);});
     base.civicJobs=civicView(this,p);
     base.losevCourse=losevView(p,this.now);
     return base;
