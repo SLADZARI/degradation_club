@@ -99,3 +99,18 @@ test('Interior furniture preview is tied to a REAL chest and is compare-only',()
  assert.match(life,/DLWorldArtG6\?\.mode==='compare'\)window\.DLWorldArtG6\.drawGroundProp\(ctx,'interior-chest'/);
  assert.doesNotMatch(life,/drawGroundProp\(ctx,'interior-chair/);
 });
+
+test('G6 camera names are strictly allowlisted read-only visual viewpoints, not player state',()=>{
+ sandbox.location.search='?artG6=compare&artG6Camera=tool-shop';
+ assert.equal(qa.camera.x,23.7);
+ assert.equal(qa.camera.y,3.5);
+ sandbox.location.search='?artG6=compare&artG6Camera=forge';
+ assert.equal(qa.camera.x,27);
+ sandbox.location.search='?artG6=compare&artG6Camera=warehouse';
+ assert.equal(qa.camera.y,27.5);
+ sandbox.location.search='?artG6=compare&artG6Camera=../../server';
+ assert.equal(qa.camera,null);
+ sandbox.location.search='?artG6=compare';
+ assert.equal(qa.camera,null);
+ assert.doesNotMatch(source,/\.x\s*=\s*camera|\.y\s*=\s*camera|\.wallet\s*=/);
+});
