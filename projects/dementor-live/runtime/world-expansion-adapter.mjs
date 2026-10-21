@@ -37,7 +37,14 @@ export class Game extends CoreGame{
     if(WORLD_SCENES[scene])return !terrainBlocked(scene,x,y,r);
     if(scene==='city'){
       // A single physical catalogue is consumed by the server and sent to client.
-      if(worldFootprints(this).some(o=>(o.kind!=='mountain'||!onSummitTrail(x,y))&&blockedByRect(x,y,r,o)))return false;
+      let footprints=worldFootprints(this);
+      if(this.state.startingCity)footprints=footprints.filter(o=>{
+        if(['forest','mountain','cactus','tree','stone'].includes(o.kind))return true;
+        if(o.kind==='payphone')return o.id==='phone-square'&&municipalBuilt(this.state,'phone-square');
+        if(String(o.id||'').startsWith('structure-')){const id=o.id.slice('structure-'.length);if(MUNICIPAL_SITES[id])return municipalBuilt(this.state,id);if(id==='second-bridge-site')return this.state.secondBridgeProject?.stage>=2;if(['monument','jukebox','donation-board','theft-board'].includes(id))return this.state.project.stage>=this.c.stages.length;return false;}
+        return true;
+      });
+      if(footprints.some(o=>(o.kind!=='mountain'||!onSummitTrail(x,y))&&blockedByRect(x,y,r,o)))return false;
       if(secondBridgeOpen(this)&&x+r>c.river.x&&x-r<c.river.x+c.river.w&&y-r>=SECOND_BRIDGE.y&&y+r<=SECOND_BRIDGE.y+SECOND_BRIDGE.h){
         if(x<r||y<r||x>c.width-r||y>c.height-r)return false;
         if(this.rects().some(o=>x+r>o.x&&x-r<o.x+o.w&&y+r>o.y&&y-r<o.y+o.h))return false;
