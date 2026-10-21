@@ -6,10 +6,14 @@ export const CONFIG = {
     {title:'Перила и открытие',works:2,wood:0,stone:0}
   ] },
   seedMarket: {need:{wood:8,stone:6},stages:[
-    {title:'Стены и стойка лавки',works:2,wood:8,stone:6}
+    {title:'Площадка лавки',works:1,wood:2,stone:2},
+    {title:'Коробка лавки',works:2,wood:3,stone:2},
+    {title:'Отделка и открытие',works:1,wood:3,stone:2}
   ]},
   cityGarden: {need:{wood:6,stone:4},stages:[
-    {title:'Огород и дорожки',works:2,wood:6,stone:4}
+    {title:'Разметка и площадка огорода',works:1,wood:2,stone:1},
+    {title:'Короба и водосбор',works:2,wood:2,stone:1},
+    {title:'Грядки и запуск',works:1,wood:2,stone:2}
   ]},
   toolMaking: { durability:48, recipe:{wood:2,stone:2} },
   toolShop: { durability:160, price:180 },

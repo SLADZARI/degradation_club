@@ -29,7 +29,7 @@ if(!testMode&&process.env.DEMENTOR_PUBLIC_URL){
 const stateFile=process.env.DEMENTOR_STATE||path.join(root,'data','world.json');
 const qaRecorder=createQARecorder(stateFile,{enabled:testMode||process.env.DEMENTOR_QA_LOG==='1'});
 fs.mkdirSync(path.dirname(stateFile),{recursive:true});
-const state=fs.existsSync(stateFile)?JSON.parse(fs.readFileSync(stateFile,'utf8')):createWorld();
+const state=fs.existsSync(stateFile)?JSON.parse(fs.readFileSync(stateFile,'utf8')):createWorld(CONFIG,{startingCity:!testMode&&process.env.DEMENTOR_STARTING_CITY!=='0'});
 const legacySaveRequiresBackup=fs.existsSync(stateFile)&&state?.schema!=='dementor-cities-v1';
 let legacyBackupDone=false;
 const network=new CityNetwork(state);

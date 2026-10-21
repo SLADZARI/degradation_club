@@ -3,6 +3,7 @@
 # Run on the game VM from a SEPARATE immutable checkout.
 # bash deploy/publish-preserve-world.sh --dry-run
 # bash deploy/publish-preserve-world.sh --apply <approved full 40-character commit SHA>
+# bash deploy/publish-preserve-world.sh --apply-fresh <approved full 40-character commit SHA> (archive old world, start a new one)
 set -Eeuo pipefail
 MODE="${1:---dry-run}"
 SOURCE="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd -P)"
@@ -18,6 +19,7 @@ fail(){ echo "STOP: $*" >&2; exit 2; }
 for dep in docker git curl awk tar grep;do command -v "$dep" >/dev/null || fail "Missing $dep";done
 [[ "$SOURCE" != "$APP" ]] || fail 'Do not deploy from the live app directory'
 [[ -f "$ENV_FILE" && -f "$COMPOSE" && -f "$SOURCE/package.json" ]] || fail 'Missing live config or release source'
+[[ "${MODE}" == "--dry-run" || "${MODE}" == "--apply" || "${MODE}" == "--apply-fresh" ]] || fail 'Only --dry-run, --apply or --apply-fresh is supported'
 [[ "${2:-}" == "" || "${2}" =~ ^[0-9a-f]{40}$ ]] || fail 'Supply a full Git commit SHA'
 ACTUAL_SHA="$(git -C "$SOURCE" rev-parse HEAD)"
 EXPECTED_VERSION="$(awk -F'"' '/"version"/ {print $4; exit}' "$SOURCE/package.json")"
@@ -42,7 +44,7 @@ if [[ "$MODE" == "--dry-run" ]];then
  echo 'DRY RUN PASS: no container, volume or save modified. To deploy, provide --apply and exact commit SHA.'
  exit 0
 fi
-[[ "$MODE" == "--apply" ]] || fail 'Only --dry-run or --apply is supported'
+[[ "$MODE" == "--apply" || "$MODE" == "--apply-fresh" ]] || fail 'Only --dry-run, --apply or --apply-fresh is supported'
 [[ "${2:-}" == "$ACTUAL_SHA" ]] || fail 'Approved SHA must match the checkout exactly'
 STAMP="$(date -u +%Y%m%dT%H%M%SZ)"
 BACKUP="$BACKUP_ROOT/safe-$STAMP-${ACTUAL_SHA:0:10}"
@@ -91,6 +93,14 @@ docker run --rm --entrypoint node \
   tools/upgrade-audit.mjs /backup/world.json | tee "$BACKUP/upgrade-audit.json"
 grep -q '"status": "PASS_READ_ONLY"' "$BACKUP/upgrade-audit.json"
 echo "World backup and compatibility gate PASS: $BACKUP"
+# Fresh mode removes only world.json after the full volume archive is verified. Rollback restores that archive.
+if [[ "$MODE" == "--apply-fresh" ]];then
+ CUTOVER=1
+ docker run --rm --user 0 --entrypoint sh \
+   --mount "type=volume,source=$VOLUME,target=/world" "$NEW_IMAGE" \
+   -c 'test -s /world/world.json && rm -f /world/world.json /world/world.json.tmp'
+ echo "FRESH START: previous world archived at $BACKUP; creating a new empty-start world."
+fi
 # Only the approved named game image/service will change. /app/data mounts the original persistent volume.
 CUTOVER=1
 docker tag "$NEW_IMAGE" dementor-live:local
@@ -108,5 +118,9 @@ done
 docker compose -p "$PROJECT" -f "$COMPOSE" --env-file "$ENV_FILE" ps "$SERVICE"
 printf 'approved_sha=%s\nversion=%s\nbackup=%s\n' "$ACTUAL_SHA" "$EXPECTED_VERSION" "$BACKUP" > "$BACKUP/release-manifest.txt"
 CUTOVER=0;STOPPED=0;trap - EXIT
-echo "DEPLOYED safely. Live player save remains in $VOLUME. Backup: $BACKUP"
+if [[ "$MODE" == "--apply-fresh" ]];then
+ echo "DEPLOYED with a new empty-start world. Full previous world archive: $BACKUP/full-world.tar.gz"
+else
+ echo "DEPLOYED safely. Live player save remains in $VOLUME. Backup: $BACKUP"
+fi
 echo 'Retain old image and full backup. Do not run publish-clean-world.sh --reset-world.'

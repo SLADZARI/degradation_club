@@ -1,6 +1,7 @@
 // World-wide public numbers / city payphones / recipient-only pager inbox.
 // Number is a public 6-digit routing ID, NEVER the authentication token.
 import {randomUUID} from 'node:crypto';
+import {municipalBuilt} from './municipal-buildings.mjs';
 export const PAGER_PRICE=180;
 export const PAGE_FEE=1;
 export const PHONE_BOOTHS=Object.freeze([
@@ -39,11 +40,13 @@ const services=[{id:'npc-mayor',name:'Мэрия · поручения',number:N
 return [...services,...people].sort((a,b)=>a.name.localeCompare(b.name,'ru')).slice(0,500);
 }
 export function telecomSnapshot(network,p){
+ const game=network.findId(p.id)?.g;let booths=boothsForScene(p.scene);
+ if(game?.state.startingCity)booths=game.state.expedition?.completedAt&&municipalBuilt(game.state,'phone-square')?booths.filter(b=>b.id==='phone-square'):[];
  return {number:p.pagerNumber,hasPager:!!p.pagerOwns,price:PAGER_PRICE,messageFee:PAGE_FEE,
   directory:publicSubscriberList(network,p),listed:!!p.pagerListed,blocked:p.pagerBlocked||[],
   inbox:p.pagerOwns?p.pagerInbox.slice(-80):[],
   unread:p.pagerOwns?p.pagerInbox.filter(m=>!m.readAt).length:0,
-  booths:boothsForScene(p.scene)};
+  booths};
 }
 export function telecomAction(network,p,cmd){
  if(!['pagerBuy','pagerSend','pagerRead','pagerBlock','pagerList','pagerDial'].includes(cmd?.type))return null;
@@ -66,6 +69,7 @@ export function telecomAction(network,p,cmd){
  }else if(cmd.type==='pagerDial'){
   const booth=PHONE_BOOTHS.find(b=>b.id===cmd.target);
   if(!booth||booth.scene!==(p.scene||'city'))throw Error('Нужен таксофон');
+  if(g.state.startingCity&&(booth.id!=='phone-square'||!municipalBuilt(g.state,'phone-square')))throw Error('Сначала построй городской таксофон.');
   g.near(p,booth);
   const number=String(cmd.number||'').trim();
   if(number===NPC_NUMBERS.museum&&(p.worldTravel?.visited||[]).includes('museum'))

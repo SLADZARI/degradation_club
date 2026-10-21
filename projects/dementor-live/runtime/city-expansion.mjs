@@ -39,7 +39,7 @@ export function cityMaterialReport(g){
     const inventory=Object.values(s.players).reduce((n,p)=>n+(p.bag?.[kind]||0),0);
     const chests=s.plots.reduce((n,p)=>n+(p.home?.chest?.[kind]||0),0);const shops=s.plots.reduce((n,p)=>n+(p.shop?.stock?.[kind]||0),0);
     const ground=s.drops.filter(x=>x.kind===kind).reduce((n,x)=>n+x.quantity,0);
-    const projects=[s.project,s.forge,s.bridge,s.seedMarket,s.gardenProject,s.secondBridgeProject].filter(Boolean);
+    const projects=[s.project,s.forge,s.bridge,s.seedMarket,s.gardenProject,s.secondBridgeProject,...Object.values(s.municipalBuildings||{})].filter(Boolean);
     const inBuildings=projects.reduce((n,p)=>n+(p?.consumed?.[kind]||0),0);
     const awaitingConstruction=projects.reduce((n,p)=>n+(p?.stock?.[kind]||0),0);
     const warehouse=s.warehouse.stock[kind],municipal=s.warehouse.municipal[kind];
