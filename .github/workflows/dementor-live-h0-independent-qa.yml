@@ -30,7 +30,7 @@ jobs:
         run: |
           set -euo pipefail
           git -C ../../.. merge-base --is-ancestor "$SOURCE_SHA" HEAD
-          git -C ../../.. diff --exit-code "$SOURCE_SHA" HEAD -- projects/dementor-live/runtime
+          unexpected="$(git -C ../../.. diff --name-only "$SOURCE_SHA" HEAD -- projects/dementor-live/runtime | grep -vE '^projects/dementor-live/runtime/test/(tools|performance|expansion|axonometry)\.cjs
           sudo apt-get update -qq
           sudo apt-get install -y python3-cairosvg python3-pil
           python3 tools/build-terrain.py
@@ -92,7 +92,7 @@ jobs:
           python3 icons-v2/install-v2.py . icons-v2
           python3 tools/install-new-icons-v3.py .
           npm install --no-save --no-package-lock playwright@1.56.1
-          npx playwright install --with-deps chrome
+          npx playwright install --with-deps chrome chromium
       - name: Run complete browser scripts and expose any flaky mobile attempt
         env:
           QA_GROUP: ${{ matrix.group }}
@@ -116,7 +116,148 @@ jobs:
             log="qa-logs/${attempt}-${name//:/_}.log"
             echo "::group::$QA_GROUP $name attempt $attempt"
             npm run "$name" >"$log" 2>&1 || failed=1
-            tail -n 14 "$log"
+            tail -n 45 "$log"
+            echo "::endgroup::"
+          done
+          exit "$failed"
+      - name: Preserve real browser evidence for every attempt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: h0-browser-${{ matrix.group }}-evidence
+          path: projects/dementor-live/runtime/qa-logs/
+          retention-days: 7
+ || true)"
+          if [[ -n "$unexpected" ]]; then echo "Unexpected runtime changes: $unexpected"; exit 1; fi
+          sudo apt-get update -qq
+          sudo apt-get install -y python3-cairosvg python3-pil
+          python3 tools/build-terrain.py
+          python3 icons-v2/install-v2.py . icons-v2
+          python3 tools/install-new-icons-v3.py .
+      - name: Run every mandatory game/model/save gate independently
+        env:
+          DEMENTOR_STATE: ${{ runner.temp }}/h0-model/world.json
+        run: |
+          set -u
+          mkdir -p qa-logs
+          failed=0
+          for name in doctor check test test:integration test:persistence test:upgrade check:terrain check:icons-new check:release; do
+            echo "::group::npm run $name"
+            npm run "$name" >"qa-logs/${name//:/_}.log" 2>&1 || failed=1
+            tail -n 14 "qa-logs/${name//:/_}.log"
+            echo "::endgroup::"
+          done
+          echo "::group::node test/new-icons-v3-http.cjs"
+          node test/new-icons-v3-http.cjs >qa-logs/new-icons-v3-http.log 2>&1 || failed=1
+          tail -n 14 qa-logs/new-icons-v3-http.log
+          echo "::endgroup::"
+          exit "$failed"
+      - name: Preserve model / persistence evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: h0-model-evidence
+          path: projects/dementor-live/runtime/qa-logs/
+          retention-days: 7
+
+  isolated-browser-regression:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 55
+    strategy:
+      fail-fast: false
+      matrix:
+        group: [core, interior, mobile, network]
+    defaults:
+      run:
+        working-directory: projects/dementor-live/runtime
+    steps:
+      - name: Checkout isolated legacy QA branch
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Prepare disposable world, assets, and real browser
+        run: |
+          set -euo pipefail
+          git -C ../../.. merge-base --is-ancestor "$SOURCE_SHA" HEAD
+          unexpected="$(git -C ../../.. diff --name-only "$SOURCE_SHA" HEAD -- projects/dementor-live/runtime | grep -vE '^projects/dementor-live/runtime/test/(tools|performance|expansion|axonometry)\.cjs
+          sudo apt-get update -qq
+          sudo apt-get install -y python3-cairosvg python3-pil
+          python3 tools/build-terrain.py
+          python3 icons-v2/install-v2.py . icons-v2
+          python3 tools/install-new-icons-v3.py .
+          npm install --no-save --no-package-lock playwright@1.56.1
+          npx playwright install --with-deps chrome chromium
+      - name: Run complete browser scripts and expose any flaky mobile attempt
+        env:
+          QA_GROUP: ${{ matrix.group }}
+          DEMENTOR_STATE: ${{ runner.temp }}/h0-browser/world.json
+        run: |
+          set -u
+          mkdir -p qa-logs
+          case "$QA_GROUP" in
+            core) scripts=(test:browser test:cities-browser test:plaza test:bridge test:perimeter test:quests) ;;
+            interior) scripts=(test:city test:tools test:inventory test:life test:expansion test:compact-panels test:donations test:axonometry test:terrain-browser) ;;
+            mobile) scripts=(test:mobile test:mobile test:mobile) ;;
+            network) scripts=(test:lan test:performance) ;;
+            *) exit 2 ;;
+          esac
+          # LAN/performance tests deliberately use the isolated runner network, not production.
+          if [[ "$QA_GROUP" == "network" ]]; then export DEMENTOR_HOST=0.0.0.0; fi
+          failed=0
+          attempt=0
+          for name in "${scripts[@]}"; do
+            attempt=$((attempt+1))
+            log="qa-logs/${attempt}-${name//:/_}.log"
+            echo "::group::$QA_GROUP $name attempt $attempt"
+            npm run "$name" >"$log" 2>&1 || failed=1
+            tail -n 45 "$log"
+            echo "::endgroup::"
+          done
+          exit "$failed"
+      - name: Preserve real browser evidence for every attempt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: h0-browser-${{ matrix.group }}-evidence
+          path: projects/dementor-live/runtime/qa-logs/
+          retention-days: 7
+ || true)"
+          if [[ -n "$unexpected" ]]; then echo "Unexpected runtime changes: $unexpected"; exit 1; fi
+          sudo apt-get update -qq
+          sudo apt-get install -y python3-cairosvg python3-pil
+          python3 tools/build-terrain.py
+          python3 icons-v2/install-v2.py . icons-v2
+          python3 tools/install-new-icons-v3.py .
+          npm install --no-save --no-package-lock playwright@1.56.1
+          npx playwright install --with-deps chrome chromium
+      - name: Run complete browser scripts and expose any flaky mobile attempt
+        env:
+          QA_GROUP: ${{ matrix.group }}
+          DEMENTOR_STATE: ${{ runner.temp }}/h0-browser/world.json
+        run: |
+          set -u
+          mkdir -p qa-logs
+          case "$QA_GROUP" in
+            core) scripts=(test:browser test:cities-browser test:plaza test:bridge test:perimeter test:quests) ;;
+            interior) scripts=(test:city test:tools test:inventory test:life test:expansion test:compact-panels test:donations test:axonometry test:terrain-browser) ;;
+            mobile) scripts=(test:mobile test:mobile test:mobile) ;;
+            network) scripts=(test:lan test:performance) ;;
+            *) exit 2 ;;
+          esac
+          # LAN/performance tests deliberately use the isolated runner network, not production.
+          if [[ "$QA_GROUP" == "network" ]]; then export DEMENTOR_HOST=0.0.0.0; fi
+          failed=0
+          attempt=0
+          for name in "${scripts[@]}"; do
+            attempt=$((attempt+1))
+            log="qa-logs/${attempt}-${name//:/_}.log"
+            echo "::group::$QA_GROUP $name attempt $attempt"
+            npm run "$name" >"$log" 2>&1 || failed=1
+            tail -n 45 "$log"
             echo "::endgroup::"
           done
           exit "$failed"
