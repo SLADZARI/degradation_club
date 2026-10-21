@@ -8,6 +8,7 @@ on:
       - 'projects/dementor-live/runtime/server.mjs'
       - 'projects/dementor-live/runtime/test/world-art-g6.test.mjs'
       - 'projects/dementor-live/runtime/test/world-art-g6-http.test.mjs'
+      - 'projects/dementor-live/runtime/test/world-art-g6-geometry.test.mjs'
       - 'projects/dementor-live/runtime/assets-source/world-art-unique-houses/**'
       - '.github/workflows/dementor-live-art-g6.yml'
   workflow_dispatch:
@@ -27,6 +28,7 @@ jobs:
         run: |
           npm run test:art-g6
           npm run test:art-g6:http
+          npm run test:art-g6:geometry
       - name: RC4 syntax and model baseline
         working-directory: projects/dementor-live/runtime
         run: |
