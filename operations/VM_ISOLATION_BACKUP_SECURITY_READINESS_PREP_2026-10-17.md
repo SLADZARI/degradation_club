@@ -21,6 +21,63 @@ semanticMutationAuthorized: false
 **Verdict: PREP REPORT / LEAD-ACCEPTED AS DRAFT PLANNING INPUT; HOST READ-ONLY AFTER VERIFIED AT W12; STATIC MANIFEST FALSE-ALARM CORRECTED AT W13; STAGE1 RELEASE STILL NO-GO.**  
 **Production effect: NONE.** This report is not a Decision, Result, Gate, host approval or deploy authorization. It proposes no immediate change to existing services. Parent [#237](https://github.com/SLADZARI/degradation_club/issues/237) remains **BACKLOG/DEFERRED**; [#228](https://github.com/SLADZARI/degradation_club/issues/228) does not yet provide an accepted current stable migration baseline.
 
+## W27 · Lead current host SRE evidence, Game canonical TLS and Stage2 go/no-go — 2026-10-21 23:00–23:03 UTC
+
+**AUTHORITY:** [Lead W27 #255](https://github.com/SLADZARI/degradation_club/issues/255#issuecomment-6328135991) and [W27 parent #237](https://github.com/SLADZARI/degradation_club/issues/237#issuecomment-6328135331). Existing W24 six-image pinned proposal stands; **NO duplicate Compose, fixture, network or PR**. D2 owner-approved synthetic-only Mac fixture is **now actually operated by B-01**, not A-01/I-01: B-01's [24/24 synthetic HTTP tests twice](https://github.com/SLADZARI/degradation_club/issues/237#issuecomment-6327620792) use a private `dc-b01-g4-synthetic` network with zero published host ports. It remains a *7-table source-derived analogue*, not 28-table/69-RPC/real PKCE acceptance. **DO NOT touch/recreate it**; Q-01 independent acceptance remains separately owned. Active PROJECT Result is Web/UI G5 on branch `fix/board-composer-visual-stability-20261020`; Stage1 G8 and Stage2 real-VM host G4 remain NOT AUTHORIZED.
+
+### W27-A. DIRECT historic OS metrics read, not a new stress test
+
+On **already connected trusted** `MacBook-Pro-Zena.local`, current root SSH key/known_hosts with `BatchMode=yes` and `StrictHostKeyChecking=yes` authenticated to existing VM. Read-only commands: `date`, `uptime`, `free`, `df`, `docker stats --no-stream`, `ss -lnt`, `systemctl is-active/show`, `nginx -t`, `find`, `sha256sum`, `openssl x509/s_client`, `sar` reading preexisting system historical `/var/log/sysstat/sa21`. NO storage/media/DB/game/MDAO contents or Certbot hook secrets read, no new monitoring process, no files or services changed.
+
+| Metric at 2026-10-21 23:00–23:03 UTC | DIRECT evidence | Assessment |
+| --- | --- | --- |
+| Host OS / load | **4 vCPU**, load **0.18 / 0.12 / 0.12**, RAM **7751 MiB total / 6800 MiB available**, **0 swap**, filesystem **75G total / 41G available (43% used)** | POINT-SAMPLE ONLY, not peak capacity |
+| Historical `sar` CPU | Existing Oct 21 sysstat **138 valid ten-minute samples** spanning **00:10→23:00 UTC**; MIN interval-average **CPU idle=95.46%** at 14:40 UTC; sample-set max one-minute load **0.53** at 10:50 UTC | Direct **historic measured series**, but is **per interval mean**, not subminute peak or per-service p95 |
+| Historical `sar` memory | Same 138 samples, minimum `kbavail=6,703,276 KiB` at 21:30 UTC (≈**6.39 GiB**) | Direct historical lower bound for those samples; excludes transient dips between samples |
+| CURRENT simultaneous game/legacy process points | ALPHA **5.26% CPU / 37.74 MiB** Docker memory, BETA **19.00% CPU / 71.09 MiB**, db-dev **0.00% / 36.05 MiB**; all three containers healthy/running; Beta Host/IP `/api/health` **HTTP200** | Single Docker `--no-stream` instant; CPU percentages per container are NOT VM percentage; no 24h game events, saves/SSE or iPhone p95 |
+| Listening/port exclusion | 80/443 public Nginx, game **127.0.0.1:14173/14174**, db-dev **0.0.0.0/[::]:32778** unchanged; proposed Club backend `127.0.0.1:18431` **no listener seen** | Existing services protected; proposed port NOT reserved or approved |
+| Capacity interpretation | BETA has been up ~9h and ALPHA only ~1h at this check, MDAO/db-dev long-running; archived 138 samples **do not span 24h of ALPHA+BETA+MDAO together**. W24 resource caps total **3328 MiB**, disk proposal ~**41 GiB** plus unknown restore scratch | **STAGE2 SHARED-VM CAPACITY=NOT APPROVED** despite low measured OS CPU: need ≥24h representative concurrent players and event load, worst-case game/DB/Storage RAM/disk/latency and >16GiB protected free reserve, and restore scratch before G4. No blind `docker compose up`, `prune`, swap or resizing |
+
+### W27-B. Exact current Nginx cross-project evidence after Game SRE canonical domain release
+
+[Game SRE #51 canonical DNS/TLS work](https://github.com/SLADZARI/dementor_live/issues/51#issuecomment-6328353057) owns recently enabled **`dementor-live-canonical.conf`**, play/alpha A records and certs; Game PR #59 SHA `ec39f7cbda6fcea6eb5038e90703ac2d4a201f51` is separate DRAFT/game owner. Independent VM read-only `nginx -t` **PASS** and current *enabled site list*:
+
+`default`, `dementor-live-alpha.conf`, `dementor-live-canonical.conf`, `dementor-live.conf`, `graylog.conf`, `monitoring.conf`, `n8n.conf`, `zz-dementor.club.conf`.
+
+**Current SHA256 named-vhost metadata, at 23:02 UTC:**
+
+| Site | SHA256/current role | Compared with W18 |
+| --- | --- | --- |
+| `default` | `ce0901350a021608139b5639cf4ccd7717bef8c3a9e4f79031eb46386b67b03f` | SAME |
+| `graylog.conf` | `4574f21408c4cc60b93343a0ee75091485583789dc6a7867929196eb7cc7d5d3` | SAME |
+| `monitoring.conf` | `c547a60bae6ade4735c30f5d0183af74266cb8223506ef3a9ae7a0c857f2ce18` | SAME |
+| `n8n.conf` | `f6eaeb722e748240f89bcde9f99612b2096c69fb9ee76a2c2307e356dd7d4064` | SAME |
+| `dementor-live.conf` | `b6846c6625dc6d92ed9118f557d6f478e56061d517a7e6617b4f52ed1c923fcd` | CHANGED previously; **GAME OWNER** |
+| `dementor-live-alpha.conf` | `33ece5481ac6fa97cb29664de78b7d9b6110d23fd52a8cac14c16c240b5eb0cd` | NEW GAME OWNER |
+| `dementor-live-canonical.conf` | `7100d55e30c4222496842a836105756c5d921e77c867e20fab2368b5b8c3d72c` | NEW GAME OWNER |
+| `zz-dementor.club.conf` | `899fad9bc3f1387dcb5865819f135df48f323e6ebd41eedae5200d78dd2cf6bf` | NEW EXISTING CLUB |
+
+**Direct live SNI leaf subjects** (no HTTP credential/auth interaction): unknown `unknown.invalid` ⇒ **`CN alpha.138.199.144.94.sslip.io`** (ALPHA is still implicit default 443); `dementor.club` and `www.dementor.club` ⇒ `CN dementor.club`; `n8n.g155333.ru` ⇒ `CN n8n.g155333.ru`; `alpha.dementor.club` ⇒ `CN alpha.dementor.club`; `play.dementor.club` ⇒ `CN play.dementor.club`. Original Beta IP Host API stays HTTP200. Explicit name routing works at **leaf-subject tier**; unknown-host ALPHA default remains an **owner Game SRE+Kirill design choice**, not a Club change. This alone **does not prove HTTPS trust/reachability/private ingress on every route** or full MDAO business application health. Kirill MUST accept protected MDAO named business canary or provide a technical risk/coverage statement before any further shared-host write. User previously reported needed MDAO functions work; **do not label MDAO down** or demand another vague owner check. No existing legacy vhost was edited by A-01.
+
+### W27-C. TLS control and backup/restore concrete Gate
+
+- Current Club apex+www certificate still **valid Oct 17, 2026 to Jan 15, 2027 17:14:06Z**, dual SAN. `certbot.timer` **ACTIVE**; `LastTriggerUSec=Oct 21 16:00:44Z`, `NextElapseUSecRealtime=Oct 22 07:20:56Z` at the snapshot. **This is scheduler evidence only**, not a successful noninteractive DNS-01 renewal or successful Nginx certificate deployment. Preserve owner's temporary **MANUAL RENEWAL WITH NAMED REMINDERS** risk classification from #255; do not flip to AUTO/PASS and do not run a mutating certbot dry-run without DNS/host permission.
+- **Encrypted independent off-VM restore**: current status **NOT RUN / NO DEDICATED OWNER GRANT / NOT A BACKUP PASS**. W24 contracts still apply; no Cloud data export or VM backup mutation. For future acceptance, obtain *named* owner (Kirill host snapshot, separate Club private DB/Storage custodian), documented encrypted target and key recovery (secrets out of Git), source exact SHA and approved Club-only allowlist, actual private Storage bytes+SHA/ACL, then isolated PG17+Storage restore with timed UTC start/end, FK/RLS/API/role negatives, `RTO_actual`, `RPO_actual`, failure/rollback proof, second independently held off-VM copy, scheduler OFF until cutover. Proposed RPO ≤15min/RTO ≤120min is **TARGET ONLY**.
+- **Before ANY Stage2 VM G4**: commit only a redacted exact host/routing/source decision; require G6 source-faithful 28-table/69-RPC RLS actor negatives (B-01 sandbox currently 7-table analogue), stable single Telegram scheduler, acceptable real-world 24h overlap load and >16GiB residual disk plus restore/backup scratch; Kirill host grant and G7 owner release. The *Mac D2 synthetic-only* permission is NOT real account copy, new Cloud OAuth, VM DB install or production cutover authorization.
+
+### W27-D. Lead handoff / verification tier
+
+```text
+STATUS: W27 DIRECT_VM_HISTORY_AND_CROSS_PROJECT_TLS_EVIDENCE_DELIVERED / G3-ONLY
+CHECKED: approved kernel active Web/UI; B-01 already-running 24/24 synthetic Mac fixture; VM 138-point historical sysstat + current Docker/OS/ports + cert timer; Nginx five historic and three new-vhost SHA; SNI for six names; Game SRE #51 new domain owner
+CHANGED: SAME one-file Draft PR #257 W27 only, NO host/Cloud/Mac/DNS/secret/data mutations
+VERIFIED: historical 10-min CPU/RAM samples, live protected configs 4/4 SHA stable, named Club/n8n/game TLS leaf routing, Beta API200, current game+db-dev states, valid unexpired Club cert
+NOT VERIFIED: 24h simultaneous representative Alpha+Beta+MDAO load, peak/OOM/save/SSE/iPhone, Kirill positive business probe/rollback signoff, unknown-SNI default owner acceptance, unattended DNS-01 renewal, encrypted independent off-VM restore, real Club 28/69 security negatives and Stage1 G8
+BLOCKERS: Stage2 HOST G4/production non-authorized, real backend migration capacity/recovery FAIL-TO-PROVE; keep B-01 D2 fixture intact
+NEXT: Kirill+Game SRE select safe positive MDAO canary/443 implicit-default criterion; host owner obtain representative full overlap evidence and encrypted independent restore custodian; Q-01 independent 24 synthetic negatives and exact source differences; Lead serial Stage1 G8 and future Stage2 authorization
+PRODUCTION EFFECT: NONE
+```
+
 ## W24 · Lead Stage2 minimal isolated backend + Mac fixture + recovery contract (2026-10-21 21:14 UTC)
 
 **STATUS: G3 SOURCE + REGISTRY + HOST-METADATA PREP DELIVERED; DEPLOYABLE COMPOSE AND CAPACITY/RESTORE G4 NOT YET APPROVED.** Owner approved target Club-only migration and read-only/offline preparation; [Lead exact #255 W24 task](https://github.com/SLADZARI/degradation_club/issues/255#issuecomment-6326589657) and [#237 W24](https://github.com/SLADZARI/degradation_club/issues/237#issuecomment-6326581091) explicitly FORBID existing Mac container restart/rebind, real account/Storage export, VM Docker/ports/network, Nginx/DNS/OAuth or production writes. This section is a minimal **reviewable Compose DESIGN + pinned release candidates**, not a complete runnable Compose or authority to implement. Preserve live Stage1 public site & UUID route and BETA/ALPHA/MDAO unchanged. Existing PR #257 remains single-file Draft/REFERENCE, no competing Result/branch while Web/UI #308 owns active G5.
