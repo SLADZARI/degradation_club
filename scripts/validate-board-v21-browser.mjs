@@ -305,14 +305,29 @@ for(const viewport of [{width:390,height:844,label:'390'},{width:360,height:800,
         expect(await page.locator('.dc-board-toast.is-visible').count()===1,
           `G6 ${engine.name}: success RPC did not produce exactly one toast`);
         if(outcome==='refresh-failure'){
-          const after=await page.evaluate(()=>({
-            fallback:document.querySelector('#entryHost .dc-board-error')?.textContent||'',
-            hiddenFalseError:document.querySelector('#entryHost')?.textContent?.includes('НЕ ОПУБЛИКОВАНО')||false,
-            staleComposer:!!document.querySelector('#entryHost #artifactForm'),
-            calls:globalThis.__QA_RPC_CALLS__.filter(r=>r.name==='dc_publish_artifact_v1').length
-          }));
-          expect(after.fallback.includes('ПУБЛИКАЦИЯ СОХРАНЕНА')&&!after.hiddenFalseError&&!after.staleComposer&&after.calls===1,
-            `G6 ${engine.name}: confirmed publish was falsely reclassified on refresh failure ${JSON.stringify(after)}`);
+          // The editor is hidden when a successful publish closes. The recovery
+          // instruction must be readable AND live-announced outside that dialog.
+          await page.waitForFunction(()=>{
+            const toast=document.querySelector('[data-board-toast].is-refresh-warning.is-visible');
+            return toast?.textContent?.includes('ДОСКА ПОКА НЕ ОБНОВИЛАСЬ')
+              &&Number(getComputedStyle(toast).opacity)>.9;
+          },null,{timeout:4000});
+          const after=await page.evaluate(()=>{
+            const toast=document.querySelector('[data-board-toast].is-refresh-warning.is-visible');
+            const rect=toast?.getBoundingClientRect();
+            return{
+              notice:toast?.textContent||'',
+              live:toast?.getAttribute('aria-live'),
+              role:toast?.getAttribute('role'),
+              visible:!!rect&&rect.width>0&&rect.height>0&&rect.left>=-1&&rect.right<=innerWidth+1,
+              outsideClosedComposer:!!toast&&!document.getElementById('entrySection')?.contains(toast),
+              hiddenFalseError:document.querySelector('#entryHost')?.textContent?.includes('НЕ ОПУБЛИКОВАНО')||false,
+              staleComposer:!!document.querySelector('#entryHost #artifactForm'),
+              calls:globalThis.__QA_RPC_CALLS__.filter(r=>r.name==='dc_publish_artifact_v1').length
+            };
+          });
+          expect(after.notice.includes('ПУБЛИКАЦИЯ СОХРАНЕНА')&&after.visible&&after.outsideClosedComposer&&after.role==='status'&&after.live==='polite'&&!after.hiddenFalseError&&!after.staleComposer&&after.calls===1,
+            `G6 ${engine.name}: confirmed publish recovery notice hidden or publication misclassified ${JSON.stringify(after)}`);
         }
       }else{
         await page.waitForFunction(()=>document.getElementById('cancelComposer')?.disabled===false&&document.querySelector('#artifactForm button[type=submit]')?.disabled===false,null,{timeout:4000});
