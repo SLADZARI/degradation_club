@@ -140,10 +140,10 @@ assert j.get("status")=="PASS_READ_ONLY" and j.get("sourceFileUntouched") is Tru
 PY
 # Two fresh OS processes rehydrate the same separate Mac copy. RequestId
 # replay must be immutable; no real server, no network, no auth/tokens emitted.
-node "$RUNTIME/tools/qa-restore-identity-audit.mjs" "$WORK/restored/world.json" \
+node "$RUNTIME/tools/qa-restore-identity-audit.mjs" "$WORK/restored/world.json" "$CANDIDATE" \
   > "$WORK/cold-start-1.json" 2> "$WORK/cold-start-1.err" ||
   fail "first private cold-load or requestId check failed"
-node "$RUNTIME/tools/qa-restore-identity-audit.mjs" "$WORK/restored/world.json" \
+node "$RUNTIME/tools/qa-restore-identity-audit.mjs" "$WORK/restored/world.json" "$CANDIDATE" \
   > "$WORK/cold-start-2.json" 2> "$WORK/cold-start-2.err" ||
   fail "second private cold-load or requestId check failed"
 cmp -s "$WORK/cold-start-1.json" "$WORK/cold-start-2.json" ||
