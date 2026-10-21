@@ -57,7 +57,7 @@ test('first G6 mapping is constrained to existing RC4 objects, not a new game sc
  }
  assert.ok(app.includes('if(artId&&window.DLWorldArtG6?.draw(ctx,artId,o,screen,view.s))return;'));
  assert.ok(world.includes("'tourist-kiosk':'city-tourist-kiosk'"));
- assert.ok(app.includes("state.seedMarket.stage>=state.config.seedMarket.stages.length?'city-seed-shop':null"));
+ assert.ok(app.includes("window.DLWorldArtG6?.seedArtId(state.seedMarket.stage,state.config.seedMarket.stages.length)"));
  assert.ok(app.includes("drawPlot(o,phase='full')")); // personal plots remain unchanged
 });
 test('approved UI icons, landscape sprites, hero and save schema are never part of G6 renderer',()=>{
