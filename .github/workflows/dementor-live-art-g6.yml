@@ -1,0 +1,31 @@
+name: Dementor Live — G6 Art Preview Safety
+on:
+  pull_request:
+    paths:
+      - 'projects/dementor-live/runtime/public/world-art-g6.js'
+      - 'projects/dementor-live/runtime/public/app.js'
+      - 'projects/dementor-live/runtime/public/world-ui.js'
+      - 'projects/dementor-live/runtime/server.mjs'
+      - 'projects/dementor-live/runtime/test/world-art-g6.test.mjs'
+      - 'projects/dementor-live/runtime/assets-source/world-art-unique-houses/**'
+      - '.github/workflows/dementor-live-art-g6.yml'
+  workflow_dispatch:
+jobs:
+  g6-syntax-integrity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: G6 ISO30 source manifest and server safety
+        working-directory: projects/dementor-live/runtime
+        run: npm run test:art-g6
+      - name: RC4 syntax and model baseline
+        working-directory: projects/dementor-live/runtime
+        run: |
+          npm run check
+          npm test
