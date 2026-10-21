@@ -34,7 +34,7 @@ test('CU geometry scales uniformly with zoom, preserving anchored foot position'
  const screen=unit=>(x,y)=>({x:(x-y)*unit*Math.sqrt(3)/2,y:(x+y)*unit*.5});
  const a=qa.footprintLayout(o,screen(20),20,bbox),b=qa.footprintLayout(o,screen(40),40,bbox);
  nearly(b.width/a.width,2);nearly(b.height/a.height,2);
- nearly(b.foot.x/a.foot.x,2);nearly(b.foot.y/a.foot.y,2);
+ nearly(b.foot.x,2*a.foot.x);nearly(b.foot.y,2*a.foot.y);
  assert.equal(qa.footprintLayout({...o,w:0},screen(20),20,bbox),null);
  assert.equal(qa.footprintLayout(o,screen(20),20,{w:0,h:20}),null);
 });
