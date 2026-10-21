@@ -483,7 +483,7 @@ function paperBench(x,y){const s=view.s,p=screen(x,y),w=s*1.8;shadow(p.x,p.y+4,s
  paperBox(p.x-w*.5,p.y-s*.4,w,s*.14,s*.34,-s*.23,'#bba17c','#958362','#d8c29c');
  paperBox(p.x-w*.5,p.y-s*1.02,w,s*.34,s*.12,-s*.08,'#c3ac87','#998767','#dfcda8');line(p.x-w*.48,p.y-s*.84,p.x+w*.48,p.y-s*.84,'#a18e6b');
 }
-function drawTent(){paperTent({x:4,y:4,w:4,h:3});label('Временная мэрия',6,3.05);
+function drawTent(){if(!window.DLWorldArtG6?.draw(ctx,'city-mayor-tent',{x:4,y:4,w:4,h:3},screen,view.s))paperTent({x:4,y:4,w:4,h:3});label('Временная мэрия',6,3.05);
  const s=view.s,t=screen(9,6);paperBox(t.x-s*.5,t.y-s*.9,s,s*.12,s*.3,-s*.18,'#ad9a74','#8a8064','#d5c59e');for(const off of [-.42,.42])paperBox(t.x+off*s,t.y-s*.8,s*.09,s*.88,s*.12,-s*.08,'#9b8d6e','#7d7860','#c4b48f');for(let i=0;i<2;i++){line(t.x+i*s*.28-s*.15,t.y-s*.8,t.x+i*s*.28-s*.15,t.y-s*.1,'#9b8462',3);line(t.x+i*s*.28-s*.28,t.y-s*.7,t.x+i*s*.28,t.y-s*.65,'#72816a',4);}label('Инструменты',9,7.1,true);
  paperBoard(3.2,8,'Доска работ');label('Приём городского груза',9,2,true);
 }
