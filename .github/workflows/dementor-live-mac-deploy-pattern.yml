@@ -44,6 +44,12 @@ jobs:
           assert 'publish-preserve-world.sh --apply' in s
           assert 'a38a03e68fcec5ceac45c0c362436ee6d69d5c5d' in s
           assert all(x in s for x in ['39473604439','39473604350','39473604513','39473604305','39473604530'])
+          # H0 is an explicit immutable profile; never replace old resident-recovery gate.
+          assert 'DEMENTOR_RELEASE_PROFILE' in s and 'resident-recovery' in s and 'h0-v3' in s
+          assert '6d09e9828a549b6ce64a354c5f7bf0a29717a700' in s
+          assert 'fix/dementor-live-v3-icon-static-http-20261020' in s
+          assert all(x in s for x in ['39564570805','39564570819','39564570767','39564570839','39564570774','39564570818'])
+          assert 'unknown release profile' in s
           # Exact-SHA attestation must NOT mutate the VM unless explicit release
           # and no-player approvals are both validated. This catches regressions
           # where a dry run, git clone or docker build runs before owner GO.
