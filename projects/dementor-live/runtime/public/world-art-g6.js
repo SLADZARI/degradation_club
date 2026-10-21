@@ -111,8 +111,17 @@
   }
   ctx.drawImage(image,bbox.x,bbox.y,bbox.w,bbox.h,left,top,width,height);
   if(mode==='compare'){
-   ctx.globalAlpha=1;ctx.fillStyle='#53664b';ctx.font='11px sans-serif';
-   ctx.fillText('G6 art candidate',left,top-5);
+   // Measurable debug evidence: world footprint diamond, projected southern anchor,
+   // and candidate art without modifying the original building/actor z-order.
+   ctx.globalAlpha=1;
+   ctx.strokeStyle='#317e81';ctx.lineWidth=1.5;ctx.setLineDash([5,4]);
+   ctx.beginPath();
+   layout.corners.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));
+   ctx.closePath();ctx.stroke();ctx.setLineDash([]);
+   ctx.beginPath();ctx.arc(layout.foot.x,layout.foot.y,4,0,Math.PI*2);
+   ctx.fillStyle='#b34f39';ctx.fill();
+   ctx.fillStyle='#53664b';ctx.font='11px sans-serif';
+   ctx.fillText('G6 candidate · CU '+w+'×'+h,left,top-5);
   }
   ctx.restore();
   return mode==='replace';
