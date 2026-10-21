@@ -59,3 +59,17 @@ test('QA only: derived sprite pixels never change hitbox or save model',()=>{
  assert.match(source,/candidate|G6/i);
  assert.match(source,/const mode=new URLSearchParams\(location.search\).get\('artG6'\)/);
 });
+
+test('8 private-plot tent candidates mirror saved-game identity without rerolling after restart',async()=>{
+ const {stablePlotTentVariant}=await import('../assets-source/world-art-unique-houses/visual-variants.mjs');
+ for(const city of ['origin','city-01','city-02','test-other-city']){
+  const ids=Array.from({length:8},(_,i)=>qa.tentArtId(city,'plot-'+(i+1),3));
+  assert.equal(new Set(ids).size,8);
+  for(let i=1;i<=8;i++){
+   const expected='plot-personal-tent-plot-'+stablePlotTentVariant(city,'plot-'+i);
+   assert.equal(ids[i-1],expected);
+   assert.equal(qa.tentArtId(city,'plot-'+i,2),null);
+   assert.equal(qa.tentArtId(city,'plot-'+i,0),null);
+  }
+ }
+});
