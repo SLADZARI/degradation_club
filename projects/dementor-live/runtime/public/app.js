@@ -624,6 +624,7 @@ function render(time){positionWindows();ctx.clearRect(0,0,view.w,view.h);ctx.fil
       ...(!emptyStart&&state?.seedMarket?.stage===2?[{depth:21.8+7.3,draw:()=>paperHouse({x:21.8,y:5.3,w:2.5,h:2},'construction')}]:[]),
       ...(!stagedCity||state?.seedMarket?.stage>=state?.config?.seedMarket?.stages?.length?[{depth:21.8+7.3,draw:()=>paperHouse({x:21.8,y:5.3,w:2.5,h:2},'shop')}]:[]),
       ...(state?.municipalSites||[]).filter(s=>!s.built&&!emptyStart&&(s.project?.stage===1||s.project?.stage===2)).map(s=>({depth:s.x+s.y+s.w+s.h,draw:()=>{if(s.project.stage===1)groundRect({x:s.x,y:s.y,w:s.w,h:s.h},'#d5c4a4','#a7ad89');else paperHouse({x:s.x,y:s.y,w:s.w,h:s.h},'construction');label(s.project.stage===1?'Площадка · '+s.title:'Коробка · '+s.title,s.x+s.w/2,s.y-.6,true);}})),
+      ...(state?.municipalSites||[]).filter(s=>s.built&&s.id==='field-toilet').map(s=>({depth:s.x+s.y+s.w+s.h,draw:()=>{paperHouse({x:s.x,y:s.y,w:s.w,h:s.h},'construction');label('Туалет',s.x+s.w/2,s.y-.6,true);}})),
       ...resources.filter(o=>(o.stock>0||o.type==='food')&&!o.id.startsWith('forest-wood-')).map(o=>({depth:o.x+o.y+(o.rockSize?o.rockSize:0),draw:()=>o.type==='wood'?drawTree(o):o.type==='stone'?drawStone(o):drawFood(o)})),
       ...(state?.players||[]).filter(p=>(p.online||p.id===me?.id)&&sameScene(p)).map(p=>({depth:p.x+p.y,draw:()=>drawPlayer(p,time)}))
    ];];entities.sort((a,b)=>a.depth-b.depth);for(const e of entities)e.draw();drawTerrainPlacementGhost();updateTerrainBar();
