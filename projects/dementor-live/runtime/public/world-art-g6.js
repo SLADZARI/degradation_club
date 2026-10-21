@@ -76,7 +76,7 @@
  }
  function tentArtId(cityId,plotId,stage){
   if(stage!==3)return null; // only actual completed existing player tents
-  const match=/^plot-(\\d+)$/.exec(String(plotId));
+  const match=/^plot-(\d+)$/.exec(String(plotId));
   const idx=match?(Number(match[1])-1)%8:stableHash(plotId)%8;
   const offset=cityId==='origin'?0:stableHash(cityId)%8;
   return 'plot-personal-tent-plot-'+(1+(idx+offset)%8);
