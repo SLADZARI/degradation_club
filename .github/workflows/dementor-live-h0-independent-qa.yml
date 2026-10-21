@@ -107,6 +107,8 @@ jobs:
             network) scripts=(test:lan test:performance) ;;
             *) exit 2 ;;
           esac
+          # LAN/performance tests deliberately use the isolated runner network, not production.
+          if [[ "$QA_GROUP" == "network" ]]; then export DEMENTOR_HOST=0.0.0.0; fi
           failed=0
           attempt=0
           for name in "${scripts[@]}"; do
