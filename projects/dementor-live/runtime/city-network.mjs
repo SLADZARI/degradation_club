@@ -56,7 +56,7 @@ export class CityNetwork{
     if(Object.keys(this.data.cities).length>=12)throw Error('Пока можно создать не более 12 городов');
     if(Object.values(this.data.cities).some(c=>c.name.toLowerCase()===title.toLowerCase()))throw Error('Город с таким названием уже существует');
     if(Object.values(this.data.cities).some(c=>c.founder===p.id))throw Error('Ты уже основал один город');
-    const id='city-'+randomUUID(),game=new Game(createWorld());
+    const id='city-'+randomUUID(),game=new Game(createWorld(undefined,{startingCity:true}));
     game.musicCatalog=this.catalog;
     this.data.cities[id]={name:title,founder:p.id,createdAt:Date.now(),state:game.state};
     this.games.set(id,game);this.directoryDirty=true;

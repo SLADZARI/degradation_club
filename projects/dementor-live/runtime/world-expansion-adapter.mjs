@@ -21,13 +21,14 @@ export class Game extends CoreGame{
       if(!this.state.resources.some(r=>r.id===id))this.state.resources.push({id,type:'stone',x,y,stock:144,initial:144,regrowAt:0});
     }
     // Tiered stone deposits. Fixed IDs ensure cold restarts never restore depleted stock.
-    for(const [tier,x,y,stock] of [[2,105,69,12],[3,115,38,32],[4,121,70,72],[5,148,39,150]]){
-      const id='tiered-rock-'+tier;
+    for(const [id,tier,x,y,stock] of [['tiered-rock-2',2,105,69,12],['tiered-rock-3',3,115,38,32],['tiered-rock-4',4,121,70,72],['tiered-rock-5',5,148,39,150],['eastern-rock-small',2,103,55,18],['eastern-rock-medium',3,109,66,36]]){
       if(!this.state.resources.some(r=>r.id===id))this.state.resources.push({id,type:'stone',x,y,rockSize:tier,stock,initial:stock,regrowAt:0});
     }
     recoverBlockedSavedResidents(this);
   }
-  join(name,gender='unspecified'){const p=super.join(name,gender);initializeWorldTravel(this);return p;}
+  join(name,gender='unspecified'){const p=super.join(name,gender);initializeWorldTravel(this);this.startAtClearance(p);return p;}
+  startAtClearance(p){if(this.state.startingCity&&!this.state.expedition?.completedAt&&(p.scene||'city')!=='expedition'){p.scene='expedition';p.plotId='plot-1';p.missionReturn={x:8,y:8};p.x=8;p.y=14;}}
+  connect(p){this.startAtClearance(p);return super.connect(p);}
   target(id){return PHONE_BOOTHS.find(o=>o.id===id)||WORLD_CITY_TARGETS.find(o=>o.id===id)||Object.values(WORLD_SCENES)
     .flatMap(region=>[region.exit,region.main]).find(o=>o.id===id)||super.target(id);}
   movementBiome(p,input){return mountainMovement(p,input);}
@@ -56,10 +57,9 @@ export class Game extends CoreGame{
   action(p,cmd){
     const intro=this.state.startingCity&&!this.state.expedition?.completedAt;
     if(intro){
-      const allowed=new Set(['missionEnter','homeClear','homeUse','board','tools','equip','equipItem','mine','gather','pickup','drop']);
+      const allowed=new Set(['homeClear','board','tools','equip','equipItem','mine','gather','pickup','drop']);
       if(!allowed.has(cmd?.type))throw Error('Сначала расчисти стартовый участок. Городские объекты появятся по мере строительства.');
       if(cmd.type==='homeClear'&&(p.scene||'city')!=='expedition')throw Error('Сначала войди в миссию расчистки.');
-      if(cmd.type==='homeUse'&&cmd.target!=='mission-exit')throw Error('Сейчас доступен только выход с расчистки.');
     }
     if(this.state.startingCity&&!intro){
       const site=MUNICIPAL_SITES[cmd?.target];

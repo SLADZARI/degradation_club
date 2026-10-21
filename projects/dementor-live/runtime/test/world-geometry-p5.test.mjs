@@ -1,7 +1,7 @@
 import test from 'node:test';import assert from 'node:assert/strict';
 import {Game,createWorld} from '../world-expansion-adapter.mjs';
 import {WORLD_SUMMIT_TRAIL,WORLD_DESERT,WORLD_CACTI,WORLD_OBSTACLES} from '../world-expansion.mjs';
-import {worldFootprints,stoneSize,blockedByRect,footprintConflicts,isoDepth} from '../world-footprints.mjs';
+import {worldFootprints,WORLD_STRUCTURE_FOOTPRINTS,stoneSize,blockedByRect,footprintConflicts,isoDepth} from '../world-footprints.mjs';
 import {mountainMovement,summitPosition} from '../mountain-trail.mjs';
 import {MUNICIPAL_SITES} from '../municipal-buildings.mjs';
 let counter=0;const command=(g,p,type,target,extra={})=>g.command(p,{type,target,requestId:'geometry-p5-'+(++counter),...extra});
@@ -10,6 +10,10 @@ test('Every world structure has a footprint; markers, public routes and existing
  const f=worldFootprints(g);
  assert.ok(f.some(o=>o.id==='structure-museum-entry'));
  assert.ok(f.some(o=>o.id==='structure-university-site'));
+ for(const box of WORLD_STRUCTURE_FOOTPRINTS){
+  assert.ok(g.rects().some(s=>s.id===box.id),'building footprint is shared with server collision: '+box.id);
+  assert.equal(g.walkable(box.x+box.w/2,box.y+box.h/2,p),false,'player cannot walk through: '+box.id);
+ }
  assert.ok(f.some(o=>o.id==='phone-square'));
  assert.ok(f.some(o=>o.kind==='mountain'));
  assert.ok(f.some(o=>o.kind==='forest'));
@@ -17,6 +21,8 @@ test('Every world structure has a footprint; markers, public routes and existing
  assert.ok(forests.length>=30,'starter and eastern forests should form several substantial groups');
  assert.ok(forests.some(o=>Math.abs(o.x-Math.round(o.x))>.05),'forest positions should not align to a visible square grid');
  assert.ok(f.some(o=>o.id==='tiered-rock-5'));
+ assert.ok(f.some(o=>o.id==='eastern-rock-small'));
+ assert.ok(f.some(o=>o.id==='eastern-rock-medium'));
  assert.ok(f.some(o=>o.kind==='cactus'));
  assert.ok(isoDepth(f.find(o=>o.id==='structure-museum-entry'))>0);
  assert.equal(g.walkable(p.x,p.y,p),true);
@@ -88,31 +94,43 @@ test('Mountain summit grants treasury-backed one-time recognition, persists acro
  assert.equal(resident.wallet,40);
 });
 
-test('Fresh live world starts at the marked parcel and hides city services until it is cleared',()=>{
- const g=new Game(createWorld(undefined,{startingCity:true})),p=g.join('Первый житель');g.connect(p);
+test('Fresh live world starts in the clearing parcel and moves everyone into town after the last tree or rock',()=>{
+ const g=new Game(createWorld(undefined,{startingCity:true})),p=g.join('Первый житель'),q=g.join('Второй житель');g.connect(p);g.connect(q);
  assert.equal(g.state.startingCity,true);
  assert.equal(g.state.plots.find(plot=>plot.id==='plot-1').locked,true);
  assert.equal(g.state.plots.find(plot=>plot.id==='plot-1').clearanceParcel,true);
+ assert.equal(p.scene,'expedition');assert.equal(p.plotId,'plot-1');assert.deepEqual([p.x,p.y],[8,14]);
+ assert.equal(q.scene,'expedition','every newcomer shares the active clearing');
+ q.scene='city';q.plotId=null;g.disconnect(q);g.connect(q);
+ assert.equal(q.scene,'expedition','a saved city resident resumes an unfinished starter clearance');
  assert.deepEqual(g.rects().map(o=>o.id).sort(),['mayor-tent','work-board']);
- assert.equal(g.walkable(23.4,2,p),true,'unbuilt tool shop must not block movement');
- assert.equal(g.walkable(12,26,p),true,'unbuilt warehouse must not block movement');
+ assert.equal(g.walkable(23.4,2),true,'unbuilt tool shop must not block movement');
+ assert.equal(g.walkable(12,26),true,'unbuilt warehouse must not block movement');
  const view=g.snapshot(p);
  assert.equal(view.startingCity,true);
  assert.deepEqual(view.worldTravel.targets,[]);
  assert.deepEqual(view.worldTravel.booths,[]);
  assert.ok(!view.worldTravel.footprints.some(o=>o.kind==='building'||o.kind==='payphone'),'city structures stay hidden before clearing');
- assert.ok(view.worldTravel.footprints.some(o=>['forest','mountain','rock'].includes(o.kind)),'natural barriers remain visible and solid');
+ assert.ok(worldFootprints(g).some(o=>['forest','mountain','rock'].includes(o.kind)),'natural barriers remain in the shared city layout');
+ assert.ok(view.homeTargets.some(t=>t.id==='tools'),'starter tools are available before entering town');
  const hidden=command(g,p,'touristBuy','tourist-kiosk',{kind:'shirt'});
  assert.equal(hidden.ok,false);
- p.x=g.c.expedition.gate.x;p.y=g.c.expedition.gate.y;
- const entered=command(g,p,'missionEnter','plot-1');
- assert.equal(entered.ok,true);
- assert.equal(p.scene,'expedition');
- assert.equal(p.plotId,'plot-1');
+ for(const resident of [p,q]){resident.x=9;resident.y=6;assert.equal(command(g,resident,'tools','tools').ok,true);resident.tools.axe=48;resident.tools.pick=48;}
+ const blockers=g.state.expedition.home.nodes.filter(n=>['wood','stone'].includes(n.kind));
+ for(const n of blockers)for(let i=0;i<n.initial;i++){
+  const resident=i%2?q:p;resident.x=n.x;resident.y=n.y;resident.equipped=n.kind==='wood'?'axe':'pick';g.tick(600);
+  const cleared=command(g,resident,'homeClear',n.id);assert.equal(cleared.ok,true,`${n.id} ${i+1}: ${cleared.message}`);
+ }
+ assert.ok(g.state.expedition.completedAt);
+ assert.equal(g.state.plots.find(plot=>plot.id==='plot-1').locked,false);
+ assert.equal(p.scene,'city','last clearing action returns the player automatically');
+ assert.equal(q.scene,'city','all players leave the starter zone together');
+ assert.equal(g.snapshot(p).project.stage,0,'the first city construction remains ready after the tutorial');
 });
 
 test('Municipal phone opens only after three treasury-funded construction stages',()=>{
  const g=new Game(createWorld(undefined,{startingCity:true})),p=g.join('Городской строитель');g.connect(p);
+ p.scene='city';p.plotId=null;
  g.state.expedition.completedAt=g.now;g.state.plots.find(x=>x.id==='plot-1').locked=false;
  assert.equal(g.snapshot(p).worldTravel.booths.some(x=>x.id==='phone-square'),false);
  const hidden=command(g,p,'worldUse','phone-square');assert.equal(hidden.ok,false);

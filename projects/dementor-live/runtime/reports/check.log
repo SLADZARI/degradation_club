@@ -1,18 +1,80 @@
+SYNTAX city-expansion.mjs
+
+SYNTAX city-network.mjs
+
+SYNTAX civic-earnings.mjs
+
+SYNTAX combat-p0.mjs
+
 SYNTAX config.mjs
 
 SYNTAX equipment.mjs
 
+SYNTAX estate.mjs
+
+SYNTAX forestry.mjs
+
+SYNTAX icons-v2/paper-icons.js
+
+SYNTAX icons-v2/verify-paper-icons-v2.mjs
+
+SYNTAX landscape.mjs
+
 SYNTAX life.mjs
+
+SYNTAX losev-courses.mjs
+
+SYNTAX mayor-ideas.mjs
+
+SYNTAX mountain-trail.mjs
+
+SYNTAX municipal-buildings.mjs
 
 SYNTAX plaza.mjs
 
+SYNTAX public/admin-ui.js
+
 SYNTAX public/app.js
+
+SYNTAX public/city-ui.js
+
+SYNTAX public/civic-ui.js
+
+SYNTAX public/combat.js
+
+SYNTAX public/estate-ui.js
+
+SYNTAX public/garden-visuals.js
 
 SYNTAX public/life-ui.js
 
+SYNTAX public/paper-icons-v3-registry.js
+
 SYNTAX public/plaza-ui.js
 
+SYNTAX public/telecom-ui.js
+
+SYNTAX public/terrain-01.js
+
+SYNTAX public/world-quests.js
+
+SYNTAX public/world-ui-fixes.js
+
+SYNTAX public/world-ui.js
+
+SYNTAX qa-recorder.mjs
+
+SYNTAX resident-recovery.mjs
+
+SYNTAX resource-clearance.mjs
+
+SYNTAX second-bridge.mjs
+
 SYNTAX server.mjs
+
+SYNTAX telecom.mjs
+
+SYNTAX terrain-delta.mjs
 
 SYNTAX test/axonometry.cjs
 
@@ -20,291 +82,185 @@ SYNTAX test/bridge.cjs
 
 SYNTAX test/browser.cjs
 
+SYNTAX test/cities-browser.cjs
+
+SYNTAX test/city-economy.test.mjs
+
+SYNTAX test/city-mobile-gameplay.cjs
+
 SYNTAX test/city.cjs
+
+SYNTAX test/combat-browser.cjs
+
+SYNTAX test/combat-feel.cjs
+
+SYNTAX test/combat-http.test.mjs
+
+SYNTAX test/combat-mobile-qa.cjs
+
+SYNTAX test/combat-p0.test.mjs
+
+SYNTAX test/combat-touch.test.mjs
 
 SYNTAX test/compact-panels.cjs
 
 SYNTAX test/donations.cjs
 
+SYNTAX test/dynamic-footprint-evacuation.test.mjs
+
+SYNTAX test/estate-mayor-ui.cjs
+
+SYNTAX test/estate-mayor.test.mjs
+
 SYNTAX test/expansion.cjs
 
+SYNTAX test/forestry.test.mjs
+
+SYNTAX test/garden-visuals.test.mjs
+
+SYNTAX test/geometry-p5-browser.cjs
+
 SYNTAX test/integration.mjs
+
+SYNTAX test/interface-world-polish.cjs
 
 SYNTAX test/inventory.cjs
 
 SYNTAX test/lan.cjs
 
+SYNTAX test/landscape.test.mjs
+
 SYNTAX test/life.cjs
 
 SYNTAX test/life.test.mjs
 
+SYNTAX test/losev-courses.test.mjs
+
+SYNTAX test/mobile.cjs
+
 SYNTAX test/model.test.mjs
+
+SYNTAX test/pager-bridge.test.mjs
 
 SYNTAX test/performance.cjs
 
 SYNTAX test/perimeter.cjs
 
+SYNTAX test/persistence.cjs
+
+SYNTAX test/playtest-actions.cjs
+
+SYNTAX test/playtest-p4.test.mjs
+
 SYNTAX test/plaza.cjs
 
 SYNTAX test/plaza.test.mjs
 
+SYNTAX test/public-smoke.cjs
+
+SYNTAX test/qa-recorder.test.mjs
+
 SYNTAX test/quests.cjs
+
+SYNTAX test/rc2-cross-chain.test.mjs
+
+SYNTAX test/saved-resident-recovery.test.mjs
+
+SYNTAX test/telecom-browser.cjs
+
+SYNTAX test/terrain-rc3-browser.cjs
+
+SYNTAX test/terrain-rc3.test.mjs
+
+SYNTAX test/terrain-renderer-rc3.test.cjs
 
 SYNTAX test/tools.cjs
 
+SYNTAX test/upgrade-audit.test.mjs
+
+SYNTAX test/world-expansion.test.mjs
+
+SYNTAX test/world-geometry-p5.test.mjs
+
+SYNTAX test/world-passage.test.mjs
+
+SYNTAX test/world-runtime-contract.test.mjs
+
 SYNTAX tools/pack.mjs
+
+SYNTAX tools/upgrade-audit.mjs
+
+SYNTAX tools/verify-new-icons-v3.mjs
+
+SYNTAX tools/verify-rc3-release.mjs
 
 SYNTAX tools/workspace.mjs
 
+SYNTAX world-expansion-adapter.mjs
+
+SYNTAX world-expansion.mjs
+
+SYNTAX world-footprints.mjs
+
 SYNTAX world.mjs
 
-TAP version 13
-# Subtest: trade atomically conserves assets and PAPER, retries cannot duplicate settlement
-ok 1 - trade atomically conserves assets and PAPER, retries cannot duplicate settlement
-  ---
-  duration_ms: 3.045042
-  ...
-# Subtest: failed consent, spent stock, full bag, offline or remote partner never partially commit
-ok 2 - failed consent, spent stock, full bag, offline or remote partner never partially commit
-  ---
-  duration_ms: 0.524292
-  ...
-# Subtest: offers reject invalid quantities and can be cancelled or expire without losing items
-ok 3 - offers reject invalid quantities and can be cancelled or expire without losing items
-  ---
-  duration_ms: 0.450625
-  ...
-# Subtest: private scene access, finite clearing, tool wear and save reload preserve ownership
-ok 4 - private scene access, finite clearing, tool wear and save reload preserve ownership
-  ---
-  duration_ms: 1.012791
-  ...
-# Subtest: tent consumes materials once; private chest capacity and bed survive scene transitions
-ok 5 - tent consumes materials once; private chest capacity and bed survive scene transitions
-  ---
-  duration_ms: 0.618166
-  ...
-# Subtest: seed and water spending, growth, one-time harvest, carrot seed plant and theft journal
-ok 6 - seed and water spending, growth, one-time harvest, carrot seed plant and theft journal
-  ---
-  duration_ms: 1.702167
-  ...
-# Subtest: cross-scene gifts, city work and chest access are blocked; authorized harvest is not theft
-ok 7 - cross-scene gifts, city work and chest access are blocked; authorized harvest is not theft
-  ---
-  duration_ms: 0.488
-  ...
-# Subtest: water source and seed shop have finite stock; carried water and planted seed cannot be spent twice
-ok 8 - water source and seed shop have finite stock; carried water and planted seed cannot be spent twice
-  ---
-  duration_ms: 0.320375
-  ...
-# Subtest: ground piles are isolated by scene and plot; private chest contents never appear in public plot snapshots
-ok 9 - ground piles are isolated by scene and plot; private chest contents never appear in public plot snapshots
-  ---
-  duration_ms: 0.837667
-  ...
-# Subtest: multiple axes retain independent wear, switching and reload; no stock or payment duplicated
-ok 10 - multiple axes retain independent wear, switching and reload; no stock or payment duplicated
-  ---
-  duration_ms: 0.885667
-  ...
-# Subtest: tool capacity rejects purchases before spending and free issue cannot stockpile intact tools
-ok 11 - tool capacity rejects purchases before spending and free issue cannot stockpile intact tools
-  ---
-  duration_ms: 0.723709
-  ...
-# Subtest: home quest milestones only follow successful actions and persist independently of carried items
-ok 12 - home quest milestones only follow successful actions and persist independently of carried items
-  ---
-  duration_ms: 0.315542
-  ...
-# Subtest: expansion migrates once, blocks locked plots and saves cooperative clearing without duplicate resources
-ok 13 - expansion migrates once, blocks locked plots and saves cooperative clearing without duplicate resources
-  ---
-  duration_ms: 1.157666
-  ...
-# Subtest: frontier entry and final-node race enforce proximity, tools, capacity and a single completion
-ok 14 - frontier entry and final-node race enforce proximity, tools, capacity and a single completion
-  ---
-  duration_ms: 0.307834
-  ...
-# Subtest: prototype budget and cargo units agree
-ok 15 - prototype budget and cargo units agree
-  ---
-  duration_ms: 0.704375
-  ...
-# Subtest: tool is required, wrong tool fails, durability falls, replacement is free
-ok 16 - tool is required, wrong tool fails, durability falls, replacement is free
-  ---
-  duration_ms: 3.005583
-  ...
-# Subtest: capacity caps physical extraction, harvesting never pays money
-ok 17 - capacity caps physical extraction, harvesting never pays money
-  ---
-  duration_ms: 1.771459
-  ...
-# Subtest: accepted delivery pays immediately once; a repeated request cannot pay twice
-ok 18 - accepted delivery pays immediately once; a repeated request cannot pay twice
-  ---
-  duration_ms: 0.847667
-  ...
-# Subtest: acceptance is capped by remaining need and keeps excess in the bag
-ok 19 - acceptance is capped by remaining need and keeps excess in the bag
-  ---
-  duration_ms: 0.19975
-  ...
-# Subtest: two real player states compete for the last resource; only one receives it
-ok 20 - two real player states compete for the last resource; only one receives it
-  ---
-  duration_ms: 0.280417
-  ...
-# Subtest: competing final construction work cannot duplicate reward or stage progress
-ok 21 - competing final construction work cannot duplicate reward or stage progress
-  ---
-  duration_ms: 0.250083
-  ...
-# Subtest: a solo player completes the physical project, consumes stock and buys one plot
-ok 22 - a solo player completes the physical project, consumes stock and buys one plot
-  ---
-  duration_ms: 1.64675
-  ...
-# Subtest: concurrent plot purchase has one owner, one payment and no duplicate debit
-ok 23 - concurrent plot purchase has one owner, one payment and no duplicate debit
-  ---
-  duration_ms: 0.437166
-  ...
-# Subtest: construction jobs require physical proximity; movement cancels work
-ok 24 - construction jobs require physical proximity; movement cancels work
-  ---
-  duration_ms: 0.603
-  ...
-# Subtest: river is continuous and does not become walkable at bridge marker
-ok 25 - river is continuous and does not become walkable at bridge marker
-  ---
-  duration_ms: 0.857375
-  ...
-# Subtest: hunger advances only online, slows movement, then makes a non-working spirit
-ok 26 - hunger advances only online, slows movement, then makes a non-working spirit
-  ---
-  duration_ms: 0.242458
-  ...
-# Subtest: a spirit can self-recover for free even with a full bag; berries replenish
-ok 27 - a spirit can self-recover for free even with a full bag; berries replenish
-  ---
-  duration_ms: 0.164917
-  ...
-# Subtest: another player can feed a spirit and pays one physical food portion
-ok 28 - another player can feed a spirit and pays one physical food portion
-  ---
-  duration_ms: 0.125541
-  ...
-# Subtest: reload preserves player identity, wallet, purchased land, resources and project
-ok 29 - reload preserves player identity, wallet, purchased land, resources and project
-  ---
-  duration_ms: 0.428041
-  ...
-# Subtest: snapshots hide other tokens, inventories and wallets; nearby chat is shared
-ok 30 - snapshots hide other tokens, inventories and wallets; nearby chat is shared
-  ---
-  duration_ms: 0.722666
-  ...
-# Subtest: forge unlocks after square, consumes own stock, settles competing finish once and persists
-ok 31 - forge unlocks after square, consumes own stock, settles competing finish once and persists
-  ---
-  duration_ms: 0.506041
-  ...
-# Subtest: dropping and competing pickup conserve resources, capacity and idempotency
-ok 32 - dropping and competing pickup conserve resources, capacity and idempotency
-  ---
-  duration_ms: 0.228667
-  ...
-# Subtest: warehouse buys excess after construction, has capacity and protects construction budget
-ok 33 - warehouse buys excess after construction, has capacity and protects construction budget
-  ---
-  duration_ms: 0.286208
-  ...
-# Subtest: courier reservation races, real cargo, protected return space and exactly-once payment
-ok 34 - courier reservation races, real cargo, protected return space and exactly-once payment
-  ---
-  duration_ms: 0.67075
-  ...
-# Subtest: uncollected courier reservations expire; picked cargo survives offline and cannot be sold as personal stock
-ok 35 - uncollected courier reservations expire; picked cargo survives offline and cannot be sold as personal stock
-  ---
-  duration_ms: 0.169
-  ...
-# Subtest: forge manufacturing needs completed building and personal materials; repeats do not duplicate
-ok 36 - forge manufacturing needs completed building and personal materials; repeats do not duplicate
-  ---
-  duration_ms: 0.212458
-  ...
-# Subtest: premium tools pay city once, wear normally, survive save and cannot get free repair or downgrade
-ok 37 - premium tools pay city once, wear normally, survive save and cannot get free repair or downgrade
-  ---
-  duration_ms: 0.346083
-  ...
-# Subtest: bridge unlocks after forge and opens only its completed river corridor
-ok 38 - bridge unlocks after forge and opens only its completed river corridor
-  ---
-  duration_ms: 0.647
-  ...
-# Subtest: bridge courier reserves remaining demand, prevents direct overfill and pays only transport
-ok 39 - bridge courier reserves remaining demand, prevents direct overfill and pays only transport
-  ---
-  duration_ms: 0.292792
-  ...
-# Subtest: new bank migration preserves depletion and existing players, and canceled bridge cargo releases demand
-ok 40 - new bank migration preserves depletion and existing players, and canceled bridge cargo releases demand
-  ---
-  duration_ms: 0.27875
-  ...
-# Subtest: monument response pays treasury money once; retry, new request and restart cannot repeat reward
-ok 41 - monument response pays treasury money once; retry, new request and restart cannot repeat reward
-  ---
-  duration_ms: 5.301792
-  ...
-# Subtest: answer needs proximity, body, text and funded budget; failure never records answer or creates money
-ok 42 - answer needs proximity, body, text and funded budget; failure never records answer or creates money
-  ---
-  duration_ms: 1.993584
-  ...
-# Subtest: music play charges once, global race has one winner, fixed end and restart do not restart track
-ok 43 - music play charges once, global race has one winner, fixed end and restart do not restart track
-  ---
-  duration_ms: 2.260166
-  ...
-# Subtest: music requests debit exactly once, validate text and duplicates and persist with player name
-ok 44 - music requests debit exactly once, validate text and duplicates and persist with player name
-  ---
-  duration_ms: 1.3875
-  ...
-# Subtest: invalid tracks and insufficient money do not charge; music actions unavailable on private scenes
-ok 45 - invalid tracks and insufficient money do not charge; music actions unavailable on private scenes
-  ---
-  duration_ms: 1.800625
-  ...
-# Subtest: catalog rejects malformed audio and only accepts validated local audio
-ok 46 - catalog rejects malformed audio and only accepts validated local audio
-  ---
-  duration_ms: 1.173708
-  ...
-# Subtest: same client request string from two different residents still produces distinct playback IDs
-ok 47 - same client request string from two different residents still produces distinct playback IDs
-  ---
-  duration_ms: 1.357292
-  ...
-# Subtest: donations conserve coins/materials, deduplicate retries, persist and validate capacity/proximity
-ok 48 - donations conserve coins/materials, deduplicate retries, persist and validate capacity/proximity
-  ---
-  duration_ms: 1.172834
-  ...
-1..48
-# tests 48
-# suites 0
-# pass 48
-# fail 0
-# cancelled 0
-# skipped 0
-# todo 0
-# duration_ms 77.5535
+✔ Warehouse wood and stone balances survive reload, courier pickup, delivery and retry (157.098164ms)
+✔ Seed shop is independent city construction and public garden supports crops (95.495086ms)
+✔ Independent city worlds can be created, joined and revisited by separate players (362.564442ms)
+✔ trade atomically conserves assets and PAPER, retries cannot duplicate settlement (176.940891ms)
+✔ failed consent, spent stock, full bag, offline or remote partner never partially commit (5.10411ms)
+✔ offers reject invalid quantities and can be cancelled or expire without losing items (9.045809ms)
+✔ private scene access, finite clearing, tool wear and save reload preserve ownership (56.532821ms)
+✔ tent consumes materials once; private chest capacity and bed survive scene transitions (10.855151ms)
+✔ seed and water spending, growth, one-time harvest, carrot seed plant and theft journal (8.482011ms)
+✔ cross-scene gifts, city work and chest access are blocked; authorized harvest is not theft (13.522733ms)
+✔ water source and seed shop have finite stock; carried water and planted seed cannot be spent twice (18.050113ms)
+✔ ground piles are isolated by scene and plot; private chest contents never appear in public plot snapshots (24.709528ms)
+✔ multiple axes retain independent wear, switching and reload; no stock or payment duplicated (21.563828ms)
+✔ tool capacity rejects purchases before spending and free issue cannot stockpile intact tools (25.802057ms)
+✔ home quest milestones only follow successful actions and persist independently of carried items (11.367944ms)
+✔ expansion migrates once, blocks locked plots and saves cooperative clearing without duplicate resources (25.769081ms)
+✔ frontier entry and final-node race enforce proximity, tools, capacity and a single completion (22.255445ms)
+✔ berries restore 25 percent while carrots restore more energy and strength (13.94789ms)
+✔ prototype budget and cargo units agree (7.891258ms)
+✔ tool is required, wrong tool fails, durability falls, replacement is free (51.100386ms)
+✔ capacity caps physical extraction, harvesting never pays money (19.010116ms)
+✔ accepted delivery pays immediately once; a repeated request cannot pay twice (16.914138ms)
+✔ acceptance is capped by remaining need and keeps excess in the bag (2.016259ms)
+✔ two real player states compete for the last resource; only one receives it (3.988854ms)
+✔ competing final construction work cannot duplicate reward or stage progress (2.923625ms)
+✔ a solo player completes the physical project, consumes stock and buys one plot (43.580766ms)
+✔ concurrent plot purchase has one owner, one payment and no duplicate debit (5.341738ms)
+✔ construction jobs require physical proximity; movement cancels work (9.289612ms)
+✔ river is continuous and does not become walkable at bridge marker (12.16353ms)
+✔ hunger advances only online, slows movement, then makes a non-working spirit (18.150736ms)
+✔ a spirit can self-recover for free even with a full bag; berries replenish (12.314775ms)
+✔ another player can feed a spirit and pays one physical food portion (6.52949ms)
+✔ reload preserves player identity, wallet, purchased land, resources and project (18.371323ms)
+✔ snapshots hide other tokens, inventories and wallets; nearby chat is shared (13.558506ms)
+✔ forge unlocks after square, consumes own stock, settles competing finish once and persists (13.50256ms)
+✔ dropping and competing pickup conserve resources, capacity and idempotency (3.367516ms)
+✔ warehouse buys excess after construction, has capacity and protects construction budget (15.687587ms)
+✔ courier reservation races, real cargo, protected return space and exactly-once payment (18.045051ms)
+✔ uncollected courier reservations expire; picked cargo survives offline and cannot be sold as personal stock (4.735585ms)
+✔ forge manufacturing needs completed building and personal materials; repeats do not duplicate (4.354561ms)
+✔ premium tools pay city once, wear normally, survive save and cannot get free repair or downgrade (13.249893ms)
+✔ bridge unlocks after forge and opens only its completed river corridor (11.010161ms)
+✔ bridge courier reserves remaining demand, prevents direct overfill and pays only transport (5.909367ms)
+✔ new bank migration preserves depletion and existing players, and canceled bridge cargo releases demand (3.586103ms)
+✔ monument response pays treasury money once; retry, new request and restart cannot repeat reward (123.482701ms)
+✔ answer needs proximity, body, text and funded budget; failure never records answer or creates money (57.824259ms)
+✔ music play charges once, global race has one winner, fixed end and restart do not restart track (33.402306ms)
+✔ music requests debit exactly once, validate text and duplicates and persist with player name (27.52192ms)
+✔ invalid tracks and insufficient money do not charge; music actions unavailable on private scenes (21.334601ms)
+✔ catalog rejects malformed audio and only accepts validated local audio (40.240612ms)
+✔ same client request string from two different residents still produces distinct playback IDs (30.764205ms)
+✔ donations conserve coins/materials, deduplicate retries, persist and validate capacity/proximity (50.99458ms)
+ℹ tests 52
+ℹ suites 0
+ℹ pass 52
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2871.955665

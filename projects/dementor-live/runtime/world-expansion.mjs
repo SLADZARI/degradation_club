@@ -30,7 +30,7 @@ for(let row=0,y=47;y<77;row++,y+=4.8)for(let col=0,x=3;x<33;col++,x+=4.8){
   const px=Math.round((x+jitterX)*10)/10,py=Math.round((y+jitterY)*10)/10;
   // Leave a winding starting trail and a wider clearing around the combat approach.
   if((px>=18&&px<=28&&py>=51&&py<=61)||(px>=27&&py<=65)||(px<13&&py>=56&&py<=66))continue;
-  if(((seed>>>8)%11)<9)forest.push({x:px,y:py,w:2.4,h:2.4,biome:'forest'});
+  if(((seed>>>8)%11)<10)forest.push({x:px,y:py,w:2.4,h:2.4,biome:'forest'});
 }
 // Forest beyond the factories and green region (kept clear of the main eastern path).
 for(const [x,y] of [[98,70],[104,74],[111,75],[127,73],[137,74]])forest.push({x,y,w:2.4,h:2.4,biome:'forest'});

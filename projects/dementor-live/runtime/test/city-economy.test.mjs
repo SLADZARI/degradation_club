@@ -2,6 +2,7 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {Game,createWorld} from '../world.mjs';
 import {CityNetwork} from '../city-network.mjs';
+import {MUNICIPAL_SITES} from '../municipal-buildings.mjs';
 import {cityMaterialReport} from '../city-expansion.mjs';
 
 let seq=0;
@@ -84,12 +85,15 @@ test('Independent city worlds can be created, joined and revisited by separate p
  assert.equal(restored.list()[1].id,id);
  assert.equal(restored.command(p2,{type:'travelCity',requestId:'travel-1',cityId:id}).ok,true);
  assert.equal(restored.findToken(p.token).cityId,id);
+ assert.equal(restored.gameFor(p2).state.startingCity,true,'each newly founded city uses the clearing-first start');
+ assert.equal(p2.scene,'expedition','the founder arrives at the shared starter parcel');
+ const newCity=restored.gameFor(p2);newCity.state.expedition.completedAt=newCity.now;newCity.state.plots.find(plot=>plot.id==='plot-1').locked=false;newCity.state.municipalBuildings.warehouse.stage=MUNICIPAL_SITES.warehouse.stages.length;newCity.state.treasury=10000;p2.scene='city';p2.plotId=null;
  assert.equal(restored.findToken(friend.token).cityId,'origin');
  assert.notEqual(restored.gameFor(p2).state.warehouse,restored.gameFor(friend2).state.warehouse);
  assert.equal(restored.command(friend2,{type:'travelCity',requestId:'travel-2',cityId:id}).ok,true);
  assert.equal(restored.list().find(c=>c.id===id).online,2);
  p2.bag.stone=2;near(restored.gameFor(p2),p2,'warehouse');
- assert.equal(cmd(restored.gameFor(p2),p2,'warehouseSell','warehouse',{kind:'stone'}).ok,true);
+ const sold=cmd(restored.gameFor(p2),p2,'warehouseSell','warehouse',{kind:'stone'});assert.equal(sold.ok,true,sold.message);
  assert.equal(restored.origin.state.warehouse.stock.stone,0);
  assert.equal(restored.gameFor(p2).state.warehouse.stock.stone,2);
  const state=JSON.parse(JSON.stringify(restored.serialize())),again=new CityNetwork(state);

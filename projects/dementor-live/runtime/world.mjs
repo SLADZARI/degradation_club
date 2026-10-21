@@ -12,6 +12,7 @@ import {bagCapacity} from './losev-courses.mjs';
 import {stoneSize} from './world-footprints.mjs';
 import {initMayor,mayorAction} from './mayor-ideas.mjs';
 import {MUNICIPAL_SITES,emptyMunicipalProject,municipalBuildingView,municipalBuilt} from './municipal-buildings.mjs';
+import {WORLD_STRUCTURE_FOOTPRINTS} from './world-footprints.mjs';
 
 const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
 const distance = (a,b) => Math.hypot(a.x-b.x,a.y-b.y);
@@ -80,7 +81,7 @@ export class Game {
   auth(token){return Object.values(this.state.players).find(p=>p.token===token);}
   connect(p){this.online.add(p.id);this.inputs.set(p.id,{dx:0,dy:0,sprint:false,at:this.now});this.changed();}
   disconnect(p){this.online.delete(p.id);this.inputs.delete(p.id);p.job=null;this.changed();}
-  rects(){const s=this.state,footprints=[
+  rects(){const s=this.state,footprints=[...WORLD_STRUCTURE_FOOTPRINTS,
  {x:4,y:4,w:4,h:3,id:'mayor-tent'},
  {x:22.7,y:1,w:2.6,h:2,id:'tool-shop'},
  {x:15.5,y:1.5,w:2.5,h:2.2,id:'landscape-shop'},
@@ -196,7 +197,7 @@ export class Game {
     const equipmentResult=equipmentAction(p,cmd,this.c);if(equipmentResult){if(discarded){s.materialScrap||={wood:0,stone:0};for(const [kind,quantity]of Object.entries(discarded)){s.materialScrap[kind]+=quantity;recordMaterial(this,'tool-discard',kind,quantity,'tool','scrap',p.id);}}return equipmentResult;}
     const estateResult=estateAction(this,p,cmd);if(estateResult)return estateResult;const ideaResult=mayorAction(this,p,cmd);if(ideaResult)return ideaResult;const forestryResult=forestryAction(this,p,cmd);if(forestryResult)return forestryResult;const livingResult=lifeAction(this,p,cmd);if(livingResult)return livingResult;
     const expansionResult=cityExpansionAction(this,p,cmd);if(expansionResult)return expansionResult;const landscapeResult=landscapeAction(this,p,cmd);if(landscapeResult)return landscapeResult;
-    if(scene(p)!=='city'&&!['chat','eat','give','equip','cancel','drop','pickup'].includes(type))throw Error('Это действие доступно в городе');
+    if(scene(p)!=='city'&&!['chat','eat','give','equip','tools','cancel','drop','pickup'].includes(type))throw Error('Это действие доступно в городе');
     const cityResult=this.cityAction(p,cmd);if(cityResult)return cityResult;
     if(type==='chat'){
       const text=String(cmd.text||'').trim().replace(/[<>\x00-\x1f]/g,'').slice(0,180);if(!text)throw Error('Напиши сообщение');if(this.now-p.lastMessage<600)throw Error('Небольшая пауза между сообщениями');p.lastMessage=this.now;
