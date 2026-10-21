@@ -44,16 +44,16 @@ export function lifeAction(g,p,cmd){const {type,target}=cmd,s=g.state;
  if(type==='homeUse'&&target==='home-exit'){moveScene(g,p,'plot',8,8);return {message:'Ты вышел из палатки'};}
  if(p.spirit)throw Error('Сначала верни тело: поешь или вернись к городским ягодам');
  if(type==='homeClear'){
-  if(scene(p)!=='expedition')requireOwner(l,p);const n=h.nodes.find(n=>n.id===target);if(!n||(!n.left&&n.kind!=='food'))throw Error('Здесь уже расчищено');if(p.lastClear&&g.now-p.lastClear<550)throw Error('Дай действию закончиться');p.lastClear=g.now;
+  if(scene(p)!=='expedition')requireOwner(l,p);const n=h.nodes.find(n=>n.id===target);if(!n||(!n.left&&n.kind!=='food'))throw Error('Здесь уже расчищено');if(p.lastClear&&g.now-p.lastClear<550)throw Error('Дай действию закончиться');
   if(n.kind==='food'){
    n.initial??=6;if(!n.berryHoldAt||!n.berryLastAt||g.now-n.berryLastAt>1250){n.berryHoldAt=g.now;n.berryUprooting=false;n.berryUprootWork=0;}
    n.berryLastAt=g.now;
-   if(!n.berryUprooting&&g.now-n.berryHoldAt>=LIFE.berryUprootAfterMs){n.berryUprooting=true;n.berryUprootWork=0;return {message:'Начал выкорчёвывать куст · продолжай удерживать E'};}
-   if(n.berryUprooting){n.berryUprootWork=(n.berryUprootWork||0)+1;if(n.berryUprootWork>=LIFE.berryUprootWork){h.nodes=h.nodes.filter(x=>x.id!==n.id);return {message:'Куст выкорчеван · место свободно'};}return {message:'Выкорчёвывание · '+n.berryUprootWork+'/'+LIFE.berryUprootWork};}
-   if(!n.left)return {message:'Ягоды созревают. Удерживай E, чтобы выкорчевать куст'};
-   if(weight(p.bag)+ITEMS.food.weight>bagCapacity(p,g.c,g.now)+1e-8)throw Error('Освободи место в рюкзаке');mark('cleared');n.left--;p.bag.food++;if(n.left<n.initial&&!n.regrowAt)n.regrowAt=g.now+LIFE.berryRegrowMs;return {message:'Ягода +1 · '+n.left+' осталось. Продолжай удерживать E, чтобы выкорчевать куст'};
+   if(!n.berryUprooting&&g.now-n.berryHoldAt>=LIFE.berryUprootAfterMs){n.berryUprooting=true;n.berryUprootWork=0;p.lastClear=g.now;return {message:'Начал выкорчёвывать куст · продолжай удерживать E'};}
+   if(n.berryUprooting){n.berryUprootWork=(n.berryUprootWork||0)+1;p.lastClear=g.now;if(n.berryUprootWork>=LIFE.berryUprootWork){h.nodes=h.nodes.filter(x=>x.id!==n.id);return {message:'Куст выкорчеван · место свободно'};}return {message:'Выкорчёвывание · '+n.berryUprootWork+'/'+LIFE.berryUprootWork};}
+   if(!n.left){p.lastClear=g.now;return {message:'Ягоды созревают. Удерживай E, чтобы выкорчевать куст'};}
+   if(weight(p.bag)+ITEMS.food.weight>bagCapacity(p,g.c,g.now)+1e-8)throw Error('Освободи место в рюкзаке');p.lastClear=g.now;mark('cleared');n.left--;p.bag.food++;if(n.left<n.initial&&!n.regrowAt)n.regrowAt=g.now+LIFE.berryRegrowMs;return {message:'Ягода +1 · '+n.left+' осталось. Продолжай удерживать E, чтобы выкорчевать куст'};
   }
-  if(!n.left)throw Error('Здесь уже расчищено');const tool=n.kind==='wood'?'axe':n.kind==='stone'?'pick':null;if(tool&&(p.equipped!==tool||!p.tools[tool]))throw Error('Возьми подходящий исправный инструмент');if(weight(p.bag)+ITEMS[n.kind].weight>bagCapacity(p,g.c,g.now)+1e-8)throw Error('Освободи рюкзак');mark('cleared');n.left--;p.bag[n.kind]++;if(tool)p.tools[tool]--;if(scene(p)==='expedition'&&!l.completedAt&&h.nodes.filter(n=>['wood','stone'].includes(n.kind)).every(n=>n.left===0)){l.completedAt=g.now;l.completedBy=p.id;for(const plot of s.plots)if(['plot-7','plot-8'].includes(plot.id))plot.locked=false;}return {message:`Получено: ${ITEMS[n.kind].name}`};
+  if(!n.left)throw Error('Здесь уже расчищено');const tool=n.kind==='wood'?'axe':n.kind==='stone'?'pick':null;if(tool&&(p.equipped!==tool||!p.tools[tool]))throw Error('Возьми подходящий исправный инструмент');if(weight(p.bag)+ITEMS[n.kind].weight>bagCapacity(p,g.c,g.now)+1e-8)throw Error('Освободи рюкзак');p.lastClear=g.now;mark('cleared');n.left--;p.bag[n.kind]++;if(tool)p.tools[tool]--;if(scene(p)==='expedition'&&!l.completedAt&&h.nodes.filter(n=>['wood','stone'].includes(n.kind)).every(n=>n.left===0)){l.completedAt=g.now;l.completedBy=p.id;for(const plot of s.plots)if(['plot-7','plot-8'].includes(plot.id))plot.locked=false;}return {message:`Получено: ${ITEMS[n.kind].name}`};
  }
  if(type==='homeUse'&&target==='tent'){
   requireOwner(l,p);if(h.tent>=3){mark('entered');moveScene(g,p,'interior',7,12);return {message:'Внутри палатки: сундук и кровать'};}
