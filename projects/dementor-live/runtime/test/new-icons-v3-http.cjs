@@ -5,6 +5,17 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path'),os=require('node:os');
 const {spawn}=require('node:child_process');
 const root=path.resolve(__dirname,'..');
+// Release guard: a successful HTTP-only source test is insufficient if G7
+// disarms rollback before checking that the live catalog actually works.
+const safePublisher=fs.readFileSync(path.join(root,'deploy/publish-preserve-world.sh'),'utf8');
+const h0Index=safePublisher.indexOf('H0 protected verification:');
+const receiptIndex=safePublisher.indexOf('approved_sha=%s');
+const disarmIndex=safePublisher.indexOf('CUTOVER=0;STOPPED=0;trap - EXIT');
+assert.ok(h0Index>0 && receiptIndex>h0Index && disarmIndex>receiptIndex,
+ 'H0 manifest HTTP verification must precede receipt and rollback disarm');
+assert.match(safePublisher,/manifest-new-only\.json/,'safe release must verify live manifest HTTP');
+assert.match(safePublisher,/catalog\.items\.length!==42/,'safe release must validate 42 catalog entries');
+assert.match(safePublisher,/rolling back image and world/,'manifest failure must retain rollback behavior');
 const catalog=JSON.parse(fs.readFileSync(path.join(root,'public/assets/paper-icons-new-v3/manifest-new-only.json'),'utf8'));
 assert.equal(catalog.items.length,42,'approved 21–62 catalog must have all 42 entries');
 
