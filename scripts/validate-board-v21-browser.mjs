@@ -153,8 +153,15 @@ for(const viewport of [{width:390,height:844,label:'390'},{width:360,height:800,
     const browser=await engine.launch();
     for(const width of [360,390,414,430,560,768,1440]){
       const{ctx,page,errors}=await open(browser,'owner',{width,height:width===1440?900:844});
-      await page.locator('.dc-board-primary.is-visible button').waitFor({state:'visible',timeout:3000});
-      await page.locator('#openComposer').waitFor({state:'attached',timeout:3000});
+      // Board state and the primary action update on different async turns:
+      // wait for the OWNER handler, not an intermediate membership-gate button.
+      await page.waitForFunction(()=>{
+        const host=document.querySelector('.dc-board-primary.is-visible');
+        return document.documentElement.dataset.dcBoardUserState==='OWNER_ADMIN'
+          &&host?.dataset.access==='owner-admin'
+          &&host.querySelector('button')?.textContent.includes('СОЗДАТЬ')
+          &&!!document.getElementById('openComposer');
+      },null,{timeout:5000});
       await page.evaluate(()=>{
         // Remove a potentially available slot and open in the same task,
         // guaranteeing the existing #openComposer fallback instead.
