@@ -4,6 +4,7 @@ on:
     branches:
       - 'feature/dementor-live-land-mayor-feedback-*'
       - 'hotfix/dementor-live-rc4-saved-resident-recovery-2026-10-20'
+      - 'fix/dementor-live-v3-icon-static-http-20261020'
   pull_request:
     paths:
       - 'projects/dementor-live/runtime/**'

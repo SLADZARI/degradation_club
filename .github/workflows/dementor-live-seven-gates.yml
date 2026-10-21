@@ -6,6 +6,11 @@ on:
       - release/dementor-live-civic-p3-safe-upgrade-rc3-2026-10-20
       - release/dementor-live-2026-10-20-integrated-rc4
       - hotfix/dementor-live-rc4-saved-resident-recovery-2026-10-20
+      - 'fix/dementor-live-v3-icon-static-http-20261020'
+    paths:
+      - '.github/workflows/dementor-live-seven-gates.yml'
+      - 'projects/dementor-live/runtime/**'
+  pull_request:
     paths:
       - '.github/workflows/dementor-live-seven-gates.yml'
       - 'projects/dementor-live/runtime/**'

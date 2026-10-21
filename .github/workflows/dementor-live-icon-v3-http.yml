@@ -1,0 +1,58 @@
+name: Dementor Live - New-only Icon HTTP Contract
+on:
+  push:
+    branches:
+      - fix/dementor-live-v3-icon-static-http-20261020
+  pull_request:
+    paths:
+      - 'projects/dementor-live/runtime/test/new-icons-v3-http.cjs'
+      - 'projects/dementor-live/runtime/server.mjs'
+      - 'projects/dementor-live/runtime/deploy/Dockerfile'
+      - '.github/workflows/dementor-live-icon-v3-http.yml'
+permissions:
+  contents: read
+jobs:
+  isolated-http:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: projects/dementor-live/runtime
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install approved 20 v2 and 42 new-only v3 icon assets on disposable checkout
+        run: |
+          python3 icons-v2/install-v2.py . icons-v2
+          python3 tools/install-new-icons-v3.py .
+      - name: Inspect installer-generated v3 HTTP routing (no production)
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          lines=Path('server.mjs').read_text().splitlines()
+          k=next((i for i,x in enumerate(lines) if 'V3-NEW-ONLY STATIC ROUTE' in x),-1)
+          print('V3 routing marker line=',k+1)
+          if k>=0:
+            for i in range(max(0,k-3),min(len(lines),k+45)):
+              print(str(i+1)+': '+lines[i])
+          PY
+      - name: Verify source hashes and every HTTP GET without a production save
+        run: |
+          npm run check:icons
+          npm run check:icons-new
+          node test/new-icons-v3-http.cjs
+  docker-production-route:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    defaults:
+      run:
+        working-directory: projects/dementor-live/runtime
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build immutable production-shaped image
+        run: docker build -f deploy/Dockerfile -t dementor-live:icons-v3-http .
+      - name: Inspect installed bytes and test HTTP route in the actual built image
+        run: |
+          docker run --rm --entrypoint node dementor-live:icons-v3-http test/new-icons-v3-http.cjs
