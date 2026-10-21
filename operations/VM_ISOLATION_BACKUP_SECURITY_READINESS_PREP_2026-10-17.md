@@ -21,6 +21,103 @@ semanticMutationAuthorized: false
 **Verdict: PREP REPORT / LEAD-ACCEPTED AS DRAFT PLANNING INPUT; HOST READ-ONLY AFTER VERIFIED AT W12; STATIC MANIFEST FALSE-ALARM CORRECTED AT W13; STAGE1 RELEASE STILL NO-GO.**  
 **Production effect: NONE.** This report is not a Decision, Result, Gate, host approval or deploy authorization. It proposes no immediate change to existing services. Parent [#237](https://github.com/SLADZARI/degradation_club/issues/237) remains **BACKLOG/DEFERRED**; [#228](https://github.com/SLADZARI/degradation_club/issues/228) does not yet provide an accepted current stable migration baseline.
 
+## W14 · TLS renewal and MDAO no-drift — exact Architect/DevOps permission packet (2026-10-21)
+
+**STATUS: DOCUMENTED + LOCAL FIXTURE TESTED, NOT INSTALLED.** The latest [Lead W14 task](https://github.com/SLADZARI/degradation_club/issues/255#issuecomment-6314259056) permits preparation ONLY in existing Draft PR #257. Site-only [Draft #309](https://github.com/SLADZARI/degradation_club/pull/309) remains G4_APPROVAL_PENDING with implementationStartAuthorized=false. Cloud Auth, GitHub Pages, existing game and MDAO are unchanged. W13 static artifact 468/468 source-vs-VM byte parity accepted; do not rebuild or re-upload.
+
+### W14-A. KNOWN — live metadata checked at 2026-10-21 12:42–12:45 UTC (strict-known-hosts SSH, read only)
+
+- Actual Ubuntu Nginx 1.24.0 reports configuration syntax PASS and uses wildcard **include /etc/nginx/sites-enabled/*;**. Enabled files: default, dementor-live.conf, graylog.conf, monitoring.conf, n8n.conf. The 80 IPv4+IPv6 default is explicitly marked default_server; existing game owns its IP-Host :80. **n8n.conf is the only present 443 ssl vhost and therefore the current implicit 443 default**, with no explicit 443 default_server. No dementor.club named vhost currently exists.
+- **Critical Nginx ordering correction:** Earlier W9 site file candidate dementor.club.conf would sort BEFORE n8n.conf and might silently replace n8n as implicit 443 default. Use ONLY the proposed **zz-dementor.club.conf** filename and same enabled symlink: existing wildcard ordering loads it AFTER n8n. The actual post-install implicit default and unknown Host/SNI routing MUST still be tested. No global Nginx/default rewrite.
+- Actual VM certificate CN dementor.club, SAN **dementor.club + www.dementor.club**, validity **2026-10-17 17:14:07 UTC – 2027-01-15 17:14:06 UTC**. Existing VM paths are /etc/letsencrypt/live/dementor.club/fullchain.pem and privkey.pem. No key bytes read. No current Nginx Club HTTPS listener, so client-trusted VM SNI is NOT VERIFIED.
+- Certbot 2.9.0; existing renewal/dementor.club.conf is root-owned mode 0644, authenticator **manual**, preferred challenge **dns-01**, and BOTH authentication+cleanup hooks configured. Without reading scripts/credentials, safely parsed hook command metadata: Python3 invokes the same existing root-owned **0700** Python script (~6661 bytes) with different auth/cleanup arguments. certbot.timer is enabled and active; generic renewal-hooks/pre|deploy|post directories contain 0 files. **This does NOT prove noninteractive DNS renewal, cleanup or Nginx reload**.
+- Authoritative DNS still points apex to GitHub Pages A quartet 185.199.108/109/110/111.153 (TTL 600), apex AAAA is ABSENT; www CNAME sladzari.github.io (TTL 3600). Existing 443 listener has no verified IPv6: no AAAA or IPv6 443 addition is part of this change.
+- W12 read-only baseline: 4 vCPU, 7.6 GiB total / 6.7 GiB available RAM, 42G disk free; nginx/docker/gitlab-runner active, db-dev running; Live game Docker healthy and IP-Host /api/health HTTP 200; private Club preview 12 public routes HTTP 200 + two intentional 404. Three legacy MDAO vhost HEAD probes return **502 / 502 / 502**, matching prior observations. **This is not a MDAO service-health PASS**, only the observed response baseline.
+
+### W14-B. EXACT new-only Nginx diff for future approval — ZERO existing files changed
+
+Two planned changes ONLY: add /etc/nginx/sites-available/zz-dementor.club.conf as new mode 0644 file, and add /etc/nginx/sites-enabled/zz-dementor.club.conf as a NEW symlink to it. The new file will load after n8n.conf, with no default_server and IPv4 only. No upstream proxy, Docker, game route, auth or existing certificates modified. Existing Nginx config and MDAO files are NOT edited. **This is a literal review proposal, not a deploy command.**
+
+~~~diff
+diff --git a/etc/nginx/sites-available/zz-dementor.club.conf b/etc/nginx/sites-available/zz-dementor.club.conf
+new file mode 100644
+--- /dev/null
++++ b/etc/nginx/sites-available/zz-dementor.club.conf
+@@ -0,0 +1,29 @@
++# PROPOSAL ONLY; new site file, not installed.
++server {
++    listen 443 ssl;
++    server_name dementor.club;
++    root /srv/dementor/stage-a/releases/cde332779ab0e256dd1e498660d6fa651e91846e;
++    index index.html;
++    ssl_certificate /etc/letsencrypt/live/dementor.club/fullchain.pem;
++    ssl_certificate_key /etc/letsencrypt/live/dementor.club/privkey.pem;
++    location / {
++        try_files $uri $uri/ =404;
++    }
++    location ~ (^|/)\. {
++        return 404;
++    }
++}
++server {
++    listen 443 ssl;
++    server_name www.dementor.club;
++    ssl_certificate /etc/letsencrypt/live/dementor.club/fullchain.pem;
++    ssl_certificate_key /etc/letsencrypt/live/dementor.club/privkey.pem;
++    return 301 https://dementor.club$request_uri;
++}
++server {
++    listen 80;
++    server_name dementor.club www.dementor.club;
++    location / {
++        return 301 https://dementor.club$request_uri;
++    }
++}
+diff --git a/etc/nginx/sites-enabled/zz-dementor.club.conf b/etc/nginx/sites-enabled/zz-dementor.club.conf
+new file mode 120000
+--- /dev/null
++++ b/etc/nginx/sites-enabled/zz-dementor.club.conf
+@@ -0,0 +1 @@
++../sites-available/zz-dementor.club.conf
+~~~
+
+**LOCAL TEST ONLY:** Tested these same server/location/redirect rules in an isolated disposable Nginx fixture with ports 19443/19080, a throwaway self-signed SAN cert and synthetic default vhosts. After correcting ONLY the fixture temp-directory traversal permissions, nginx -t PASS, apex / and /projects/ HTTP 200, missing static/dotfile 404, www HTTPS and apex HTTP 301 to canonical apex, unknown Host on 80 and 443 stayed with synthetic existing defaults (418/418). Client checks used an explicitly trusted local test cert, not insecure -k. This does **NOT** validate live VM TLS SNI, site install, renewal or prod G6.
+
+**No HTTP-01 in this diff:** the Club dotfile-deny blocks /.well-known/acme-challenge on HTTPS; HTTP is redirect-only. Existing lineage uses DNS-01. An HTTP-01 switch would require a separate approved port-80 challenge webroot/location exception, safe dotfile negatives and an additional reviewed diff.
+
+### W14-C. VERIFIED PLAN for unattended TLS renewal (NOT RUN)
+
+**Preferred route: validate and automate the existing manual DNS-01 hooks, if safe and supported.** Kirill is the VM/Nginx/Certbot host custodian; the Club owner is the GoDaddy DNS/TXT custodian; Q-01 independently reviews redacted evidence. Prior to any rehearsal they must privately inspect the existing script (not publish secrets), confirm approved noninteractive provider API eligibility, credential custody outside Git/logs, least-privilege zone scope, TXT propagation and cleanup by exact record ID for BOTH _acme-challenge.dementor.club and _acme-challenge.www.dementor.club. Cleanup MUST NOT delete other concurrent values/TXT. Script existence is not a behavior PASS.
+
+| Exact action | Side effects and required permission | PASS/STOP criterion |
+| --- | --- | --- |
+| Read-only SAN/expiry/mode/timer/hook metadata | Allowed now; COMPLETED, no DNS action | Identified names and date; auto-renew status remains **NOT VERIFIED** |
+| Later scoped **certbot renew --cert-name dementor.club --dry-run** | **MUTATING despite dry-run**: staging ACME network calls, may create/delete REAL DNS TXT, execute external hook, write local logs/temp/state; requires **explicit Kirill host + Club DNS owner approval**, named TXT scope, time window, cleanup and failure rollback. Confirm staging ACME endpoint, not an unintended custom production endpoint. **NOT EXECUTED** | Both SAN validations noninteractive PASS, authoritative TXT propagation and only owned records cleaned up, no orphans, no MDAO/other cert changes; sanitized run/exit evidence |
+| Future cert success deploy handling | A deploy hook/automatic reload changes shared Nginx state: **separate Kirill+Club owner written permission**; certbot.timer alone NOT sufficient | Validated renewed certificate, nginx -t + **controlled reload only after authorized success**, MDAO/game baseline unchanged, externally trusted leaf/chain after reload |
+| Future pre-DNS site SNI after separately approved install | curl --resolve dementor.club:443:APPROVED_VM_IP https://dementor.club/ plus www variant; verify without -k, CA chain, SAN, HTML/404/redirect and callback shell; also test unknown SNI/default routing | Both names trusted, apex 200, www 301, no MDAO/IP game impact; no DNS cutover at this step |
+| Operational ownership | Owner-approved certificate expiry alert at 30/14/7 days before **2027-01-15**, named Kirill and Club owner, recovery runbook | Actual alert recipient and recovery path demonstrated; not merely timer enabled |
+
+**Alternative if DNS API/hooks cannot safely auto-renew:** retain explicit human-owned manual DNS-01 renewal with expiry monitoring as TEMPORARY documented exception only; label **MANUAL, NOT UNATTENDED PASS** and obtain separate owner risk decision before release. HTTP-01 is an alternate Change Proposal, **not** a behavior in the proposed site diff. Relevant vendor guidance: https://github.com/certbot/certbot/blob/main/certbot/docs/using.rst ; Nginx default/location behavior: https://docs.nginx.com/nginx/admin-guide/web-server/web-server/ .
+
+### W14-D. NO-MDAO / NO-LIVE DRIFT acceptance and permission matrix
+
+**Kirill/MDAO must first explicitly accept the legacy baseline.** Their three sites showed HTTP HEAD 502/502/502 both before and after game installation. Preserving those codes is only probe-level no-regression, **not proof that MDAO works**. Kirill must document accepted status or a meaningful existing health endpoint and owner before any new Club Nginx install; if missing, **STOP** instead of declaring PASS.
+
+| Protected check | BEFORE and AFTER required proof, metadata/redacted only | Hard STOP / rollback |
+| --- | --- | --- |
+| Nginx existing files/owners | Kirill records original enabled-site filenames, owner/mode and hashes (NOT their contents in public GitHub). AFTER exact same; **only two newly added Club items**; nginx -t PASS | Any change to default, Live, n8n, graylog, monitoring or global nginx.conf; any old file SHA change |
+| 80/443 default/host/SNI | Port 80 default IPv4+IPv6 unchanged, existing 443 implicit default remains n8n, Live IP Host and MDAO name mapping unchanged. New Club only explicit apex/www | New/default_server, implicit 443 drift, collision, 443 IPv6/AAAA surprise, wrong-site unknown Host |
+| Game and SSE | Live Docker healthy, GET /api/health with IP Host 200, same loopback 14173, world volume NAME unchanged; separate bounded SSE fixture if approved | Live IP / health failure, SSE intercepted by Club, unexpected restart/network/volume touch |
+| MDAO /db-dev /Runner | nginx/docker/gitlab-runner active; db-dev running on original port; existing volumes/mount names and listener map unchanged. Owner-approved MDAO 502 baseline and any meaningful health probe stable | Any unintended restart/port/mount/service/health change; no accepted MDAO baseline |
+| Resource/static/Cloud | Owner-approved minimum available memory/disk/inodes; current 468-file fixed source hash; same Cloud Auth/PKCE/Storage endpoints and no private leak | Reserve exceeded, static SHA difference, Auth/PKCE/role negative fail |
+| Recovery | Original GitHub Pages remains active/rollback-capable; save four apex A records and www CNAME before future DNS cutover; Kirill owner of site link/file revert and controlled reload | No safe two-item rollback, no tested Pages fallback, any protected service not stable |
+
+**SEQUENCE (PROPOSED):** (1) Kirill signs MDAO/protected service BEFORE baseline and accepts agreed 502 interpretation; Lead/Q-01 review W14 diff; (2) **SEPARATE Stage1 G4 implementation approval** from Club owner and **Kirill permission** for exactly two new site files, nginx -t and controlled reload, with no other edits; (3) if later authorized, Kirill alone installs exactly those two items, checks nginx -t and live host default/MDAO/IP health, then targeted SNI, with immediate site-only rollback (remove only new link/file and authorized reload) on deviation; (4) approve/test DNS-01 staging rehearsal separately with Club DNS owner, prove TLS renewal strategy and QA actors; (5) clean G6/G7 + explicit owner/host/DNS cutover permit, preserve Pages rollback, verify live G8. Stage2 Club Auth/Data is another Result.
+
+**NO-GO:** any unapproved existing vhost mutation/default change, MDAO owner baseline missing, game/SSE risk, failed/private role test, no trusted TLS+renewal decision, insufficient disk/RAM reserve, unapproved G4/G7. Static W13 parity PASS does not waive these.
+
+STATUS: W14 PLAN DELIVERED / exact NEW-ONLY diff; KNOWN: cert SAN+expiry, DNS hooks present, names/default and no AAAA; NOT VERIFIED: unattended DNS renew/TXT cleanup, client-trusted VM Club 443, Kirill signed 502 baseline, QA actors; REQUIRES PERMISSION: Kirill+owner site install/reload, Kirill+DNS owner DNS-mutating certbot rehearsal, later QA/Lead/owner production DNS approval. **PRODUCTION / VM / DNS / CLOUD / MDAO / LIVE EFFECT FROM W14 = NONE.**
+
 ## A-01/I-01 · W13 independent forensics of W12 static manifest ordering — 2026-10-21 08:58–08:59 UTC
 
 **STATUS: STATIC_BYTE_PARITY PASS (READ-ONLY RECHECK); W12 HASH ALARM ROOT CAUSE IDENTIFIED AS MANIFEST SORT ORDER.** The preceding W12 historical FAIL is retained unmodified as observed. After [Dev2's exact 468/468 file-level reconciliation](https://github.com/SLADZARI/degradation_club/issues/256#issuecomment-6312014541) and [A-01 recheck request](https://github.com/SLADZARI/degradation_club/issues/255#issuecomment-6312030083), Architect independently ran two **non-mutating, in-memory** hash calculations on the **same live existing release tree** using `MacBook-Pro-Zena.local`, already authorized strict-known-host SSH, `2026-10-21 08:58:34Z` and `08:59:06Z`. No site files, VM state, secrets, caches, source branch or services changed.
@@ -244,7 +341,7 @@ For BOTH: force safe Google/PKCE re-login with separately owned callback/issuer/
 
 ### W9-3. Minimal **separate** virtual-host proposal (NOT A CONFIG DEPLOYED)
 
-The following is a **literal candidate isolated site-only config proposal, not installed**. W9-6/7 owner evidence confirms `sites-enabled/*`, no observed conflicting named Dementor vhost, www-data index access and static root; W9-8/9 confirms actual apex+www certificate paths. Proposed new file `/etc/nginx/sites-available/dementor.club.conf`, proposed only-new symlink `/etc/nginx/sites-enabled/dementor.club.conf` for review in its **own approved frontend-hosting Result/G6/G7**. Reconfirm compiled Nginx `listen`/SNI/no-MDAO conflicts, IPv6, www redirect and exact rollback before any authorized file write or reload. **Do not edit existing MDAO/default files.**
+The following is a **literal candidate isolated site-only config proposal, not installed**. W9-6/7 owner evidence confirms `sites-enabled/*`, no observed conflicting named Dementor vhost, www-data index access and static root; W9-8/9 confirms actual apex+www certificate paths. **W14 CORRECTION:** use NEW `/etc/nginx/sites-available/zz-dementor.club.conf` and NEW symlink `/etc/nginx/sites-enabled/zz-dementor.club.conf` to preserve current n8n implicit 443 default for review in its **own approved frontend-hosting Result/G6/G7**. Reconfirm compiled Nginx `listen`/SNI/no-MDAO conflicts, IPv6, www redirect and exact rollback before any authorized file write or reload. **Do not edit existing MDAO/default files.**
 
 ```nginx
 # PROPOSAL ONLY — NEVER paste onto VM until separate owner/Kirill G6/G7 authorization.
