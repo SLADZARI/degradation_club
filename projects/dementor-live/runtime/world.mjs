@@ -26,7 +26,7 @@ export function createWorld(c=CONFIG, options={}) {
 const supplyBridge=(project,kind,quantity)=>{project.accepted[kind]+=quantity;project.stock[kind]+=quantity;};
 const newProject=()=>({stage:0,work:0,accepted:{wood:0,stone:0},stock:{wood:0,stone:0},consumed:{wood:0,stone:0},spent:0});
 export class Game {
-  constructor(state=createWorld(),c=CONFIG){ this.state=state;this.c=c;this.online=new Set();this.inputs=new Map();this.now=Date.now(); this.onChange=()=>{};this.dirty=false;
+  constructor(state=createWorld(),c=CONFIG){ this.state=state;this.c=state?.startingCity?{...c,expedition:{...c.expedition,gate:{...c.expedition.gate,x:7,y:18}}}:c;this.online=new Set();this.inputs=new Map();this.now=Date.now(); this.onChange=()=>{};this.dirty=false;
     state.forge ||= newProject();state.bridge ||= newProject();
     for(const [id,type,x,y,stock]of [['east-wood-1','wood',41,7,48],['east-wood-2','wood',44,10,48],['east-wood-3','wood',42,23,48],['east-wood-4','wood',45,26,48],['east-stone-1','stone',42,16,48],['east-stone-2','stone',45,20,48],['east-food','food',41,12,c.foodStock]])if(!state.resources.some(r=>r.id===id))state.resources.push({id,type,x,y,stock,initial:stock,regrowAt:0});
     state.warehouse ||= {stock:{wood:0,stone:0},municipal:{wood:0,stone:0},spent:0};
