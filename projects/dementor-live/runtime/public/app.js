@@ -323,9 +323,9 @@ function recordFogDiscovery(){
 }
 function fogMask(){
  const width=state.config.width,height=state.config.height;
- const corners=[[0,0],[view.w,0],[view.w,view.h],[0,view.h]].map(([x,y])=>worldPoint(x,y));
- const minX=Math.max(0,Math.floor(Math.min(...corners.map(p=>p.x))-1)),maxX=Math.min(width-1,Math.ceil(Math.max(...corners.map(p=>p.x))+1));
- const minY=Math.max(0,Math.floor(Math.min(...corners.map(p=>p.y))-1)),maxY=Math.min(height-1,Math.ceil(Math.max(...corners.map(p=>p.y))+1));
+ const half=(view.w/(4*ISO_COS)+view.h/2)/view.s+1;
+ const minX=Math.max(0,Math.floor(view.cx-half)),maxX=Math.min(width-1,Math.ceil(view.cx+half));
+ const minY=Math.max(0,Math.floor(view.cy-half)),maxY=Math.min(height-1,Math.ceil(view.cy+half));
  if(fogMaskPath&&fogMaskBuiltVersion===fogMaskVersion&&fogMaskWidth===width&&fogMaskHeight===height&&fogMaskMinX===minX&&fogMaskMaxX===maxX&&fogMaskMinY===minY&&fogMaskMaxY===maxY)return fogMaskPath;
  if(typeof Path2D!=='function')return null;
  const path=new Path2D(),pad=.0175;
