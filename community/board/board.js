@@ -245,7 +245,10 @@ async function publishFromForm(event){
     try{await refreshAll()}
     catch(refreshError){
       console.warn('[DC Board] publication confirmed; Board refresh failed',refreshError);
-      entryHost.innerHTML='<div class="dc-board-error" role="status">ПУБЛИКАЦИЯ СОХРАНЕНА. ДОСКА ПОКА НЕ ОБНОВИЛАСЬ. ОБНОВИТЕ СТРАНИЦУ.</div>';
+      entryHost.innerHTML='<div class="dc-board-error">ПУБЛИКАЦИЯ СОХРАНЕНА. ДОСКА ПОКА НЕ ОБНОВИЛАСЬ. ОБНОВИТЕ СТРАНИЦУ.</div>';
+      // The editor closes after a confirmed publish. Announce refresh failure
+      // through the existing visible Board toast, never inside its hidden form.
+      window.dispatchEvent(new CustomEvent('dc:board:postpublish-refresh-failed'));
     }
   }catch(error){
     submit.disabled=false;submit.textContent='ОПУБЛИКОВАТЬ →';state.textContent='НЕ ОПУБЛИКОВАНО';
