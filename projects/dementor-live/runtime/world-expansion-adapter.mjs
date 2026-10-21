@@ -7,6 +7,7 @@ import {losevAction,losevView} from './losev-courses.mjs';
 import {worldFootprints,blockedByRect} from './world-footprints.mjs';
 import {mountainMovement,onSummitTrail,summitPosition} from './mountain-trail.mjs';
 import {recoverBlockedSavedResidents} from './resident-recovery.mjs';
+import {MUNICIPAL_SITES,municipalBuilt} from './municipal-buildings.mjs';
 export {createWorld};
 export class Game extends CoreGame{
   constructor(state,c){
@@ -53,6 +54,7 @@ export class Game extends CoreGame{
       if(cmd.type==='homeClear'&&(p.scene||'city')!=='expedition')throw Error('Сначала войди в миссию расчистки.');
       if(cmd.type==='homeUse'&&cmd.target!=='mission-exit')throw Error('Сейчас доступен только выход с расчистки.');
     }
+    if(this.state.startingCity&&(cmd?.type==='worldUse'||cmd?.type==='touristBuy')){const site=MUNICIPAL_SITES[cmd.target];if(site&&!municipalBuilt(this.state,site.id))throw Error('Сначала построй этот городской объект в три этапа.');}
     const course=losevAction(this,p,cmd);if(course)return course;
     const task=civicAction(this,p,cmd);if(task)return task;
     const build=secondBridgeAction(this,p,cmd);if(build)return build;
@@ -73,7 +75,13 @@ export class Game extends CoreGame{
     }
     base.worldTravel=worldTravelView(this,p);
     if(actual==='city'){base.worldTravel.footprints=worldFootprints(this);base.worldTravel.summitElevation=summitPosition(p.x,p.y)?.elevation||0;}
-    if(this.state.startingCity&&!this.state.expedition?.completedAt){base.worldTravel.targets=[];base.worldTravel.booths=[];base.worldTravel.footprints=[];}
+    if(this.state.startingCity){
+      const intro=!this.state.expedition?.completedAt;
+      const constructionIds=new Set(['tourist-kiosk','university-site','robo-stadium-site','industry-site','museum-entry']);
+      base.worldTravel.targets=intro?[]:base.worldTravel.targets.filter(t=>constructionIds.has(t.id)?municipalBuilt(this.state,t.id):t.id!=='second-bridge'||this.state.secondBridgeProject?.stage>=2);
+      base.worldTravel.booths=intro||!municipalBuilt(this.state,'phone-square')?[]:base.worldTravel.booths.filter(t=>t.id==='phone-square');
+      base.worldTravel.footprints=(base.worldTravel.footprints||[]).filter(o=>{const id=String(o.id||'').replace(/^structure-/,'');return !constructionIds.has(id)&&id!=='phone-square'||municipalBuilt(this.state,id);});
+    }
     base.civicJobs=civicView(this,p);
     base.losevCourse=losevView(p,this.now);
     return base;
