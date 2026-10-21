@@ -11,7 +11,7 @@
   'city-forge','city-forge--stage-0','city-forge--stage-1','city-forge--stage-2',
   'city-seed-shop--stage-0','plot-garden-bed-empty','plot-garden-bed-seeded',
   'plot-garden-bed-hemp','plot-garden-bed-carrot','plot-garden-bed-ready',
-  'city-park-bench','city-garden-bench','city-mayor-tent',
+  'city-park-bench','city-garden-bench','city-mayor-tent','interior-chest',
   ...Array.from({length:8},(_,i)=>'plot-personal-tent-plot-'+(i+1))
  ]);
  const assets=new Map(),failed=new Set();
