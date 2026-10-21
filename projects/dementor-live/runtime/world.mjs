@@ -226,6 +226,7 @@ export class Game {
       const craft=type==='craftTool',spec=craft?c.toolMaking:c.toolShop;
       if(t.type!==(craft?'forge':'shop'))throw Error('Подойди к нужному зданию');
       if(craft&&s.forge.stage<c.forge.stages.length)throw Error('Сначала постройте и обустройте кузницу');
+      if(!craft&&s.startingCity&&!municipalBuilt(s,'tool-shop'))throw Error('Сначала постройте городской магазин инструмента');
       syncEquipment(p,c);if(p.toolItems.length>=12)throw Error('Рюкзак вмещает до 12 инструментов. Удали лишний.');
       if(craft){for(const [k,n]of Object.entries(spec.recipe))if(p.bag[k]<n)throw Error('Принеси личные материалы для изготовления');for(const [k,n]of Object.entries(spec.recipe))p.bag[k]-=n;}
       else{if(p.wallet<spec.price)throw Error(`Нужно ${spec.price} PAPER`);p.wallet-=spec.price;s.treasury+=spec.price;s.transactions.push({id:randomUUID(),player:p.id,amount:-spec.price,reason:'premium-tool',time:this.now});}
