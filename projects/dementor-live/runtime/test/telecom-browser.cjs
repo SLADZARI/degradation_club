@@ -3,6 +3,7 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),os=require('nod
 const root=path.resolve(__dirname,'..'),temp=fs.mkdtempSync(path.join(os.tmpdir(),'dementor-pager-browser-')),port=4199,base='http://127.0.0.1:'+port;
 const pause=ms=>new Promise(resolve=>setTimeout(resolve,ms));let server,browser;
 async function patch(player,changes){const r=await fetch(base+'/__test',{method:'POST',headers:{'Content-Type':'application/json','x-test-key':'local-integration-tests'},body:JSON.stringify({player,patch:changes})});assert.equal(r.status,200);return r.json();}
+async function patchWorld(world){const r=await fetch(base+'/__test',{method:'POST',headers:{'Content-Type':'application/json','x-test-key':'local-integration-tests'},body:JSON.stringify({world})});assert.equal(r.status,200);return r.json();}
 async function create(name,viewport){
  const page=await browser.newPage({viewport});
  await page.goto(base);await page.getByLabel('Как тебя зовут?').fill(name);
@@ -18,6 +19,10 @@ async function create(name,viewport){
  const a=await create('Отправитель',{width:1440,height:900}),b=await create('Получатель',{width:390,height:844});
  const sender=await a.evaluate(()=>me.id),recipient=await b.evaluate(()=>me.id),number=await b.evaluate(()=>state.telecom.number);
  assert.match(number,/^\d{6}$/);
+ // Browser scenario uses a genuinely available city payphone; game-side requirements stay enabled.
+ await patchWorld({startingCity:true,technologies:{payphones:true},municipalBuildings:{'phone-square':{stage:3}}});
+ const unownedListing=await a.evaluate(async()=>{const result=await act('pagerList',null,{listed:true});return result?.ok||false;});
+ assert.equal(unownedListing,false,'resident without pager cannot publish a number');
  for(const page of [a,b]){
   assert.equal(await page.evaluate(()=>state.telecom.hasPager),false,'fresh resident has not bought pager');
   await page.locator('#helpButton').click();
@@ -32,6 +37,7 @@ async function create(name,viewport){
  await b.waitForFunction(()=>state.telecom.hasPager);
  await b.getByRole('button',{name:'Опубликовать номер'}).click();
  await b.waitForFunction(()=>state.telecom.listed);
+ assert.equal(await b.evaluate((sender)=>state.telecom.directory.some(p=>p.id===sender),sender),false,'resident without pager stays out of phonebook');
  await b.locator('#cityPanel [data-close]').click();
  await a.waitForFunction(()=>Math.abs(me.x-10)<.02);
  await a.evaluate(()=>window.__openPayphone('phone-square'));
