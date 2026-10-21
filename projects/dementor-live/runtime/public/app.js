@@ -490,7 +490,7 @@ function drawTent(){paperTent({x:4,y:4,w:4,h:3});label('Временная мэ�
 function drawProject(){const pr=state?.project||{stage:0,work:0,accepted:{wood:0,stone:0}},o={x:14,y:10,w:10,h:8};let col=pr.stage===0?'#cfc8b419':pr.stage===1?'#d6d5c2':'#dedfce';const p=groundRect(o,col,pr.stage<3?'#aaa88a':'#b3baa0',pr.stage===0);
   if(pr.stage>0){const work=pr.stage>=2?1:pr.work/4;ctx.save();ctx.beginPath();ctx.rect(p.x,p.y,p.w,p.h*work);ctx.clip();for(let y=0;y<8;y++)for(let x=0;x<10;x++){const q=screen(14+x,10+y);rounded(q.x+1,q.y+1,view.s-2,view.s*.76-2,1,(x+y)%3?'#e6e4d1':'#d2d5c0','#c1c6ae66');}ctx.restore();}
   if(pr.stage<3){for(const[x,y]of [[14,10],[24,10],[14,18],[24,18]]){const a=screen(x,y);line(a.x,a.y-11,a.x,a.y+4,'#8d8b6c',3);}}
-  if(pr.stage>=2){paperBench(16,16);paperBench(22,16);}
+  if(pr.stage>=2&&!window.DLWorldArtG6?.enabled){paperBench(16,16);paperBench(22,16);}
   if(pr.stage===3){for(const[x,y]of [[15,11],[23,11],[15,17],[23,17]]){drawFood({x,y:y-.35,stock:0});const a=screen(x,y);paperBox(a.x-view.s*.35,a.y-view.s*.28,view.s*.7,view.s*.3,view.s*.2,-view.s*.13,'#a7ad8d','#869474','#c5cbae');}label('Наша площадь',19,9.1);}
   else label('Будущая площадь',19,9.05);
   if(pr.stage<3)paperOpenBox(15,11,'Материалы площади');const q=screen(18,14);ctx.beginPath();ctx.arc(q.x,q.y,view.s*.55,0,Math.PI*2);ctx.fillStyle='#84936b13';ctx.fill();ctx.fillStyle='#7e8d6666';ctx.font='18px Arial';ctx.textAlign='center';ctx.fillText(pr.stage===3?'✓':'⌑',q.x,q.y+5);
@@ -498,8 +498,12 @@ function drawProject(){const pr=state?.project||{stage:0,work:0,accepted:{wood:0
 }
 function paperOpenBox(x,y,title){const p=screen(x,y),s=view.s;shadow(p.x,p.y+4,s*.65,s*.2);paperBox(p.x-s*.4,p.y-s*.25,s*.8,s*.45,s*.3,-s*.2,'#b7aa85','#93896c','#665f48');poly([[p.x-s*.4,p.y-s*.25],[p.x-s*.7,p.y-s*.53],[p.x+s*.1,p.y-s*.53],[p.x+s*.4,p.y-s*.25]],'#d6c7a3','#93896c');poly([[p.x+s*.4,p.y-s*.25],[p.x+s*.7,p.y-s*.45],[p.x+s*.95,p.y-s*.65],[p.x+s*.7,p.y-s*.45]],'#c9b78f','#93896c');if(title)label(title,x,y+1,true);}
 function drawForge(){const stage=state?.forge.stage||0;
- if(stage<2){const p=groundRect({x:24,y:23,w:6,h:5},stage?'#c3b79b':'#d7d7bd15','#999078',!stage);if(stage)for(let i=0;i<6;i++)line(p.x+i*view.s,p.y,p.x+i*view.s,p.y+p.h,'#aaa18c');}
- else paperHouse({x:24,y:23,w:6,h:5},stage>=3?'forge':'construction');
+ const g6Id=window.DLWorldArtG6?.forgeArtId(stage,state?.config?.forge?.stages?.length);
+ const g6Rendered=!!g6Id&&window.DLWorldArtG6?.draw(ctx,g6Id,{x:24,y:23,w:6,h:5},screen,view.s);
+ if(!g6Rendered){
+  if(stage<2){const p=groundRect({x:24,y:23,w:6,h:5},stage?'#c3b79b':'#d7d7bd15','#999078',!stage);if(stage)for(let i=0;i<6;i++)line(p.x+i*view.s,p.y,p.x+i*view.s,p.y+p.h,'#aaa18c');}
+  else paperHouse({x:24,y:23,w:6,h:5},stage>=3?'forge':'construction');
+ }
  if(forgeActive()&&stage<3)paperOpenBox(24.5,24,'Материалы кузницы');
  label(stage>=3?'Наша кузница':forgeActive()?'Строим кузницу':'Будущая кузница',27,22,true);if(forgeActive())label(stage>=3?'Изготовить инструмент · E':'Работа · E',27,29.5,true);
 }
@@ -588,12 +592,16 @@ function render(time){positionWindows();ctx.clearRect(0,0,view.w,view.h);ctx.fil
    const entities=[
       ...(state?.plots||[]).map(plot=>({depth:plot.x+plot.w*.55+plot.y+plot.h*.56,draw:()=>drawPlot(plot,'props')})),
       ...(state?.forge?.stage>=2?[{depth:24+6+23+5,draw:drawForge}]:[]),
+      // QA benches share the player/entity z-sort; normal release still draws its original benches.
+      ...(state?.project?.stage>=2&&window.DLWorldArtG6?.enabled?
+       [{depth:16+16,draw:()=>{if(!window.DLWorldArtG6.drawGroundProp(ctx,'city-park-bench',16,16,screen,view.s,1.8))paperBench(16,16);}},
+        {depth:22+16,draw:()=>{if(!window.DLWorldArtG6.drawGroundProp(ctx,'city-garden-bench',22,16,screen,view.s,1.8))paperBench(22,16);}}]:[]),
       ...(typeof window.__worldEntities==='function'?window.__worldEntities():[]),
      {depth:4+4+4+3,draw:drawTent},
      {depth:22.7+1+2.6+2,draw:()=>paperHouse({x:22.7,y:1,w:2.6,h:2},'shop','city-tool-shop')},
      {depth:15.5+1.5+2.5+2.2,draw:()=>paperHouse({x:15.5,y:1.5,w:2.5,h:2.2},'garden-shop','city-garden-shop')},
      {depth:10.7+25+2.6+3,draw:()=>paperWarehouse({x:10.7,y:25,w:2.6,h:3})},
-     ...(state?.seedMarket?[{depth:21.8+7.3,draw:()=>paperHouse({x:21.8,y:5.3,w:2.5,h:2},state.seedMarket.stage>=state.config.seedMarket.stages.length?'shop':'construction',state.seedMarket.stage>=state.config.seedMarket.stages.length?'city-seed-shop':null)}]:[]),
+     ...(state?.seedMarket?[{depth:21.8+7.3,draw:()=>paperHouse({x:21.8,y:5.3,w:2.5,h:2},state.seedMarket.stage>=state.config.seedMarket.stages.length?'shop':'construction',window.DLWorldArtG6?.seedArtId(state.seedMarket.stage,state.config.seedMarket.stages.length)||null)}]:[]),
      ...resources.filter(o=>(o.stock>0||o.type==='food')&&!o.id.startsWith('forest-wood-')).map(o=>({depth:o.x+o.y+(o.rockSize?o.rockSize:0),draw:()=>o.type==='wood'?drawTree(o):o.type==='stone'?drawStone(o):drawFood(o)})),
      ...(state?.players||[]).filter(p=>(p.online||p.id===me?.id)&&sameScene(p)).map(p=>({depth:p.x+p.y,draw:()=>drawPlayer(p,time)}))
    ];entities.sort((a,b)=>a.depth-b.depth);for(const e of entities)e.draw();drawTerrainPlacementGhost();updateTerrainBar();
