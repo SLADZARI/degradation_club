@@ -1,0 +1,42 @@
+# Dementor Live · G6 isolated unique-house rendering · 2026-10-21
+**State:** BUILD / QA-DRAFT. **Source:** legacy PR #307 exact initial SHA `50bfaed3c270597fb53189650f6570237309df17`. **This branch:** `qa/dementor-live-iso30-g6-render-preview-20261021`. **Target:** existing source→target mapping in `SLADZARI/dementor_live` PR #27; do not cut over until verified import.
+
+## Implemented in the G6 preview branch
+- Strictly read-only, allowlisted routes `/__art-g6/{asset-id}.svg`, available **only** when the game is started with `--test` **AND** `DEMENTOR_ART_G6=1`. No route or JS injection in ordinary/prod launch.
+- Source is one of **54 existing individual ISO30 SVG candidates** from `assets-source/world-art-unique-houses/source/svg/`. Not a cutout from a sheet; no changes to files, hero, economy, CharacterId or world save schema.
+- Browser `world-art-g6.js` loads a whitelisted subset of 10 city structures. It computes actual nontransparent alpha bounds once per file and draws only for **QA**, with procedural fallback if loading is incomplete/blocked.
+- `?artG6=compare`: draw annotated candidate adjacent to existing procedural building without replacing its gameplay representation.
+- `?artG6=replace`: temporarily draw the candidate in the **existing shared entity depth queue**; only this test browser sees substitution.
+- Current mappings: tool shop, garden shop, completed seed shop, warehouse, tourist kiosk, museum gate, university preview, Robo stadium preview, industry preview, farlands gate. No art conversion into new world objects. For seed shop, only a **completed** construction can be swapped; incomplete builds continue displaying the existing stage.
+- **No** newly created houses, construction stages, plot ownership changes, collision changes, rights changes, inventory or paper payments. Approved 20 v2 UI icons and 17 terrain tiles untouched.
+
+## Reproducible temporary QA launch (Mac/operator ONLY, no live world)
+```bash
+cd /path/to/your/check-out/projects/dementor-live/runtime
+npm run test:art-g6
+# DO NOT point the state variable at the real production or local world.json:
+tmp_dir="$(mktemp -d)"
+DEMENTOR_PORT=4184 DEMENTOR_STATE="$tmp_dir/g6-world.json" DEMENTOR_ART_G6=1 node server.mjs --test
+```
+Open `http://127.0.0.1:4184/?artG6=compare`, then `?artG6=replace` in a separate tab/browser. A normal non-test launch must not enable G6. The test server saves only in the temporary directory. The SVG URL must be 404 when not started in test+flag mode. These are preview-only images; temporary appearance does not approve 54 assets.
+
+## Acceptance measures — distinguish intended from performed
+| Gate | Evidence required | Status |
+|---|---|---|
+| Source manifest 54/54 / SHA-256 / untrusted SVG markup blocked | `npm run test:art-g6` | TEST IMPLEMENTED; workflow outcome pending |
+| Default release unaffected | `--test` plus opt-in env gate, no save/geometry changes | CODE INSPECTION PASS; full regression pending |
+| 10 mapped existing world structures, seed-stage gate | Static mapping and snapshot reference | CODE INSPECTION PASS; real visual screenshots pending |
+| Exact artwork anchor/footprint in Cube Units | Compare 3 reference zooms against authoritative scene; doors/hitboxes anchored | NOT RUN |
+| Shared ISO30 z-sort and overlap | Test 2 clients with occluded character and props, camera pan | NOT RUN |
+| Grid local plots, eight tent variants | Real `homeVisual.tent=0..3`; no variant as new entity | NOT IMPLEMENTED in preview (deliberate) |
+| Beds/bench/chair crops and construction stages | Connect only to actual stages `forge.stage`, `seedMarket.stage`, `gardenProject.stage`, `home.tent` | NOT IMPLEMENTED; do not invent stages |
+| Chrome and physical iPhone Safari, FPS | Real screenshots at 32/64/128, scale + DPR, 2 independent players | NOT RUN |
+| Production switch | Art approval + exact SHA CI + safe backup/rehearsal + explicit owner GO | BLOCKED; NOT DEPLOYED |
+
+## Known blockers
+The source PNGs have differing transparent margins and shape proportions. Alpha cropping is QA convenience, not proof of correct `footprint_CU` or depth. The preview width is provisional; **do not merge the QA renderer into release without visual/CU measurements**. Interior/plot movement currently uses a different projection in portions of RC4; ISO30 parity requires its own code and player QA rather than hiding the defect by changing icons.
+
+The existing stage images for tool shop, warehouse and mayor tent remain concepts: these structures do not implement construction stages that can be safely inferred. Different styling for the 8 private tent plots is determined by `visual-variants.mjs`, without storing new fields, but these files are still candidate assets, not a new residential house feature.
+
+## Next
+Run `npm run test:art-g6` and full model regression on the **exact G6 PR SHA**; verify the QA routes through real HTTP on a disposable state; collect two-player and physical iPhone screenshots; measure exact sprite anchors/entry footprints; review all 54 drawings individually; extend only authentic stage/bed/furniture mapping; record G6 result in existing dedicated `dementor_live` handover PR #27. Do not merge source batch #307, #303, or RC4 based on source-only tests.
