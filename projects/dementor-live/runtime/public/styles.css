@@ -254,3 +254,28 @@ dialog:not(#welcome):not(#mayorIdea):not(#payphoneDialog),
  .terrain-product{padding-left:108px!important;min-height:100px}
  .terrain-preview{width:87px;height:55px}
 }
+
+/* Chest follows the backpack grid and remains usable on narrow screens. */
+.chest-panel{width:min(720px,calc(100vw - 24px))!important;max-height:88dvh!important}
+.chest-transfer-hint{margin:0 0 10px!important;font-size:12px!important}
+.chest-transfer-columns{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.chest-side{min-width:0}
+.chest-side h3{font-size:14px;margin:0 0 8px}
+.chest-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
+.chest-cell{position:relative;aspect-ratio:1;min-width:0;border:1px solid #c9c8b5;border-radius:9px;background:#f5f1e5;display:grid;place-items:center;padding:2px}
+.chest-cell.occupied{background:#e7e8da;cursor:grab;touch-action:manipulation}
+.chest-cell.occupied:active{cursor:grabbing}
+.chest-cell.selected{outline:2px solid #71855f}
+.chest-cell>span{font-size:20px;line-height:1}
+.chest-cell>b{position:absolute;right:3px;bottom:2px;font-size:9px;color:#52604b}
+.bag-cell>span{font-size:21px}
+@media(max-width:600px){
+ .chest-panel{padding:14px!important;max-height:90dvh!important}
+ .chest-transfer-columns{gap:8px}
+ .chest-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}
+ .chest-side h3{font-size:11px}
+ .chest-transfer-hint{font-size:10px!important;line-height:1.4}
+ .chest-cell>span{font-size:16px}
+ .bag-cell>span{font-size:16px}
+ .bag-cell{min-height:38px}
+}

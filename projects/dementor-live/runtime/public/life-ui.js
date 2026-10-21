@@ -2,7 +2,7 @@ let bagSelection=null;
 function sameScene(p){return (p.scene||'city')===(me.scene||'city')&&((me.scene||'city')==='city'||p.plotId===me.plotId);}
 function livingTargets(){return [...state.homeTargets,...state.drops,...state.players.filter(p=>p.id!==me.id&&p.online&&sameScene(p)).map(p=>({...p,type:'social'}))];}
 function lifePanel(mode,rows,row,canAct){
- const title=$('cityPanelTitle'),intro=$('cityPanelIntro'),note=$('cityPanelNote');note.textContent='Числа пробные. Все предметы, деньги и изменения сохраняются.';
+ const title=$('cityPanelTitle'),intro=$('cityPanelIntro'),note=$('cityPanelNote');$('cityPanel').classList.remove('chest-panel');delete $('cityPanel').dataset.mode;note.textContent='Числа пробные. Все предметы, деньги и изменения сохраняются.';
  const action=(type,target,extra={})=>()=>act(type,target,extra);
  const button=(text,click,disabled=false,id)=>({text,click,disabled,id});
  const itemName=k=>state.items[k]?.name||k;
@@ -14,7 +14,7 @@ function lifePanel(mode,rows,row,canAct){
   title.textContent='🎒 Рюкзак';intro.textContent=`Вес ${cargo().toFixed(1)} / ${state.config.capacity} · инструменты ${me.toolItems.length} / 12`;note.textContent='Выбери ячейку. Торговля — в «Жителях», семена — у городской лавки.';
   const emoji={wood:'🪵',stone:'🪨',food:'🫐',seed_hemp:'🌰',seed_carrot:'🫘',hemp:'🌿',carrot:'🥕',water:'💧'};
   const grid=document.createElement('div');grid.className='bag-grid';
-  for(const[k,def]of Object.entries(state.items)){const tile=document.createElement('button');tile.className='bag-cell'+(bagSelection===k?' chosen':'');tile.id='bag-item-'+k;tile.setAttribute('aria-label',`${def.name}: ${me.bag[k]||0}`);const glyph=document.createElement('span'),count=document.createElement('b');glyph.textContent=emoji[k];count.textContent=me.bag[k]||0;tile.append(glyph,count);tile.title=def.name;tile.onclick=()=>{bagSelection=k;updateCityPanels(true);};grid.append(tile);}rows.append(grid);
+  for(const[k,def]of Object.entries(state.items)){const tile=document.createElement('button');tile.className='bag-cell'+(bagSelection===k?' chosen':'');tile.id='bag-item-'+k;tile.setAttribute('aria-label',`${def.name}: ${me.bag[k]||0}`);const glyph=document.createElement('span'),count=document.createElement('b');glyph.textContent=emoji[k];count.textContent=me.bag[k]||0;tile.append(glyph,count);tile.title=def.name;tile.draggable=!!me.bag[k];tile.ondragstart=e=>{if(!me.bag[k]){e.preventDefault();return;}e.dataTransfer?.setData('text/dementor-item',k);};tile.onclick=()=>{bagSelection=k;updateCityPanels(true);};grid.append(tile);}rows.append(grid);
   const tools=document.createElement('div');tools.className='bag-grid tool-grid';
   for(const t of me.toolItems){const tile=document.createElement('button');tile.className='bag-cell'+(bagSelection===t.id?' chosen':'')+(me.activeTools[t.kind]===t.id?' equipped':'');tile.id='tool-item-'+t.id;tile.setAttribute('aria-label',`${toolNames[t.kind]} ${t.durability} из ${t.max}`);const glyph=document.createElement('span'),count=document.createElement('b');glyph.textContent=t.kind==='axe'?'🪓':'⛏️';count.textContent=`${t.durability}/${t.max}`;tile.append(glyph,count);tile.onclick=()=>{bagSelection=t.id;updateCityPanels(true);};tools.append(tile);}rows.append(tools);
   const tool=me.toolItems.find(t=>t.id===bagSelection);
@@ -72,7 +72,32 @@ function lifePanel(mode,rows,row,canAct){
  else if(t.id==='well')row('Вода из ручного источника','Источник: запас до 20 л, пополнение 1 л/мин. Переносимая ёмкость — 4 л.',[button('Набрать 1 л',action('homeWater',t.id),!canAct||!nearby(t.id),'home-water')]);
  else if(t.id==='bed')row('Отдых','Восстанавливает силы. Еду не заменяет.',[button('Отдохнуть',action('homeUse',t.id),!canAct,'home-rest')]);
  else if(t.id==='chest'){
-  if(!owner)row('Сундук закрыт','Доступен владельцу.');else for(const[k,def]of Object.entries(state.items))row((itemEmoji[k]||'')+' '+def.name,`В сундуке ${h.chest[k]} · в рюкзаке ${me.bag[k]}`,[button('Убрать 1',action('homeStore',t.id,{kind:k,quantity:1}),!canAct||!me.bag[k]),button('Убрать всё',action('homeStore',t.id,{kind:k,quantity:me.bag[k]}),!canAct||!me.bag[k]),button('Взять 1',action('homeStore',t.id,{kind:k,quantity:1,withdraw:true}),!canAct||!h.chest[k])]);note.textContent='Сундук: до 80 единиц веса. Изъятие проверяет свободное место в рюкзаке.';
+  if(!owner)row('Сундук закрыт','Доступен владельцу.');else{
+   const panel=$('cityPanel');panel.classList.add('chest-panel');panel.dataset.mode='chest';
+   const transfer=document.createElement('div');transfer.className='chest-transfer';
+   const hint=document.createElement('p');hint.className='chest-transfer-hint';hint.textContent='Перетащи предмет между рюкзаком и сундуком. На телефоне коснись предмета, затем свободной ячейки на другой стороне.';
+   const columns=document.createElement('div');columns.className='chest-transfer-columns';
+   let pending=null;
+   const send=(from,kind)=>{if(!kind||!canAct)return;const withdraw=from==='chest',amount=(withdraw?h.chest:me.bag)[kind]||0;if(!amount)return;act('homeStore',t.id,{kind,quantity:amount,withdraw});pending=null;};
+   const makeSide=(name,side,inventory)=>{
+    const section=document.createElement('section');section.className='chest-side chest-side-'+side;
+    const heading=document.createElement('h3');heading.textContent=name;section.append(heading);
+    const grid=document.createElement('div');grid.className='chest-grid';
+    const occupied=Object.keys(state.items).filter(k=>(inventory[k]||0)>0);
+    for(let i=0;i<20;i++){
+     const kind=occupied[i]||null,cell=document.createElement('button');cell.type='button';cell.className='chest-cell'+(kind?' occupied':'');cell.dataset.kind=kind||'';cell.setAttribute('aria-label',kind?((itemEmoji[kind]||'')+' '+itemName(kind)+' '+inventory[kind]):'Пустая ячейка');
+     if(kind){const glyph=document.createElement('span'),count=document.createElement('b');glyph.textContent=itemEmoji[kind]||'📦';count.textContent=inventory[kind];cell.append(glyph,count);cell.draggable=canAct;cell.ondragstart=e=>e.dataTransfer?.setData('application/x-dementor-chest',JSON.stringify({side,kind}));}
+     cell.onclick=()=>{if(!canAct)return;if(pending&&pending.side!==side){send(pending.side,pending.kind);return;}if(kind){pending={side,kind};cell.classList.add('selected');return;}if(pending&&pending.side!==side)send(pending.side,pending.kind);};
+     cell.ondragover=e=>{if(canAct)e.preventDefault();};
+     cell.ondrop=e=>{e.preventDefault();try{const value=JSON.parse(e.dataTransfer?.getData('application/x-dementor-chest')||'{}');if(value.side!==side)send(value.side,value.kind);}catch{}};
+     grid.append(cell);
+    }
+    section.append(grid);return section;
+   };
+   columns.append(makeSide('🎒 Рюкзак','bag',me.bag),makeSide('📦 Сундук','chest',h.chest||{}));
+   transfer.append(hint,columns);rows.append(transfer);
+   note.textContent='Сундук хранит до 80 единиц веса. Перенос проходит через сервер; вместимость рюкзака проверяется при изъятии.';
+  }
  }
  else if(t.id==='garden')row('Новая грядка',`Подготовлено ${h.beds.length} / 6. Сначала расчисти дикую растительность возле грядок.`,[button('Подготовить',action('homePrepare',t.id),!owner||!canAct||h.beds.length>=6,'home-prepare'),button('Вскопать рядом · лопата',action('homeDig','garden'),!owner||!canAct||!me.gardenTools?.shovel||h.soil?.length>=6,'home-dig')]);
  else if(h.nodes.some(n=>n.id===t.id))row(t.title,'Добыча конечна и сохраняется. Для дерева нужен топор, для камня — кирка.',[button('Добыть / расчистить',action('homeClear',t.id),!owner||!canAct||!t.left,'home-clear')]);
