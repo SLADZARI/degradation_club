@@ -18,7 +18,7 @@ const otherArtifact={id:'qa-artifact-other',author_profile_id:other,title:'ЧУ�
 const artifactRows=mode==='member-first'?[otherArtifact]:[ownArtifact,otherArtifact];
 const rowsFor=t=>t==='join_applications'?(application?[application]:[]):t==='dc_role_assignments'?(role?[{profile_id:user.id,role,status:'active'}]:[]):t==='profiles'?[{id:user.id,full_name:'QA',display_name:'QA'}]:t==='dc_system_memberships'?(member?[{profile_id:user.id,status:'active'}]:[]):t==='dc_artifacts'?artifactRows:t==='dc_member_public_profiles'?[{profile_id:user.id,display_name:'QA Owner',nickname:'qa',avatar_url:null,member_since:'2026-09-01'},{profile_id:other,display_name:'Other Member',nickname:'other',avatar_url:null,member_since:'2026-09-01'}]:t==='dc_artifact_reactions'?[]:t==='dc_artifact_responses'?[]:t==='dc_artifact_media'?[]:t==='dc_artifact_board_positions'?artifactRows.map((a,i)=>({artifact_id:a.id,board_id:'community',x:1200+i*480,y:900+i*160,rotation:0,size_class:'M',position_version:1})):[];
 const query=t=>{let rows=[...rowsFor(t)];const q={select(){return q},eq(k,v){rows=rows.filter(r=>r?.[k]===v);return q},neq(k,v){rows=rows.filter(r=>r?.[k]!==v);return q},in(k,values){rows=rows.filter(r=>values.includes(r?.[k]));return q},is(){return q},order(){return q},limit(n){rows=rows.slice(0,n);return q},range(){return q},insert(payload){globalThis.__QA_DB_WRITES__.push({op:'insert',table:t,payload});return q},upsert(payload){globalThis.__QA_DB_WRITES__.push({op:'upsert',table:t,payload});return q},update(payload){globalThis.__QA_DB_WRITES__.push({op:'update',table:t,payload});return q},delete(){globalThis.__QA_DB_WRITES__.push({op:'delete',table:t});return q},maybeSingle(){return Promise.resolve({data:rows[0]||null,error:null})},single(){return Promise.resolve({data:rows[0]||null,error:null})},then(resolve,reject){return Promise.resolve({data:rows,error:null}).then(resolve,reject)}};return q};
-export function createClient(){return{auth:{getSession:async()=>({data:{session}}),getUser:async()=>({data:{user:mode==='anonymous'?null:user}}),signOut:async()=>({}),onAuthStateChange:()=>({data:{subscription:{unsubscribe(){}}}})},from:query,rpc:async(name,args)=>{globalThis.__QA_RPC_CALLS__.push({name,args});if(name==='dc_member_entry_status_v1'){const incomplete=mode==='guest-incomplete';return{data:{membership_active:member,community_activation_state:mode==='member-first'?'FIRST_ARTIFACT_REQUIRED':member?'MEMBER_ACTIVATED':null,sphere_count:incomplete?4:9,sphere_gate_complete:!incomplete,artifact_slots_available:mode==='member-first'?1:0,artifact_slots_consuming:mode==='member'?1:0,published_artifact_count:mode==='member'?1:0},error:null}};if(name==='dc_guest_board_read_v1')return{data:[{artifact_id:'qa-artifact',artifact_type:'offer',title:'QA CARD',body:'Короткое описание карточки. Второй абзац.',published_at:'2026-09-05T10:00:00Z',author_display_name:'QA Member',reaction_count:0,guest_interest_count:0,my_guest_interest:false,board_x:1200,board_y:900,board_rotation:0,board_size_class:'M'}],error:null};if(name==='dc_guest_board_interest_toggle_v1')return{data:{active:true,count:1},error:null};if(name==='dc_close_artifact_v1')return{data:{artifact_id:args?.p_artifact_id,status:'archived'},error:null};return{data:null,error:null}},storage:{from:()=>({createSignedUrl:async()=>({data:{signedUrl:'https://example.invalid/x.webp'}}),upload:async()=>({data:{},error:null}),remove:async()=>({data:{},error:null})})},functions:{invoke:async()=>({data:{}})}}}`;
+export function createClient(){return{auth:{getSession:async()=>({data:{session}}),getUser:async()=>({data:{user:mode==='anonymous'?null:user}}),signOut:async()=>({}),onAuthStateChange:()=>({data:{subscription:{unsubscribe(){}}}})},from:query,rpc:async(name,args)=>{globalThis.__QA_RPC_CALLS__.push({name,args});if(name==='dc_member_entry_status_v1'){const incomplete=mode==='guest-incomplete';return{data:{membership_active:member,community_activation_state:mode==='member-first'?'FIRST_ARTIFACT_REQUIRED':member?'MEMBER_ACTIVATED':null,sphere_count:incomplete?4:9,sphere_gate_complete:!incomplete,artifact_slots_available:mode==='member-first'?1:0,artifact_slots_consuming:mode==='member'?1:0,published_artifact_count:mode==='member'?1:0},error:null}};if(name==='dc_guest_board_read_v1')return{data:[{artifact_id:'qa-artifact',artifact_type:'offer',title:'QA CARD',body:'Короткое описание карточки. Второй абзац.',published_at:'2026-09-05T10:00:00Z',author_display_name:'QA Member',reaction_count:0,guest_interest_count:0,my_guest_interest:false,board_x:1200,board_y:900,board_rotation:0,board_size_class:'M'}],error:null};if(name==='dc_guest_board_interest_toggle_v1')return{data:{active:true,count:1},error:null};if(name==='dc_close_artifact_v1')return{data:{artifact_id:args?.p_artifact_id,status:'archived'},error:null};if(name==='dc_create_artifact_draft_v1')return{data:'qa-synthetic-draft-id',error:null};if(name==='dc_publish_artifact_v1'&&globalThis.__QA_HOLD_PUBLISH__){return await new Promise(resolve=>{globalThis.__QA_RESOLVE_PUBLISH__=ok=>resolve(ok?{data:{artifact_id:args?.p_artifact_id},error:null}:{data:null,error:{message:'QA synthetic RPC rejection'}})})}return{data:null,error:null}},storage:{from:()=>({createSignedUrl:async()=>({data:{signedUrl:'https://example.invalid/x.webp'}}),upload:async()=>({data:{},error:null}),remove:async()=>({data:{},error:null})})},functions:{invoke:async()=>({data:{}})}}}`;
 
 async function open(browser,mode,viewport){const ctx=await browser.newContext({viewport});await ctx.addInitScript(m=>{globalThis.__QA_BOARD_MODE__=m;globalThis.__QA_RPC_CALLS__=[];globalThis.__QA_DB_WRITES__=[];try{localStorage.setItem('dc:board:tutorial:v21:qa-board-user:guest',JSON.stringify({done:true}));localStorage.setItem('dc:board:tutorial:v21:qa-board-user:member',JSON.stringify({done:true}));sessionStorage.setItem('dc_first_artifact_spotlight_dismissed_v1','1')}catch{}},mode);await ctx.route('https://cdn.jsdelivr.net/**',r=>r.request().url().includes('@supabase/supabase-js')?r.fulfill({status:200,contentType:'text/javascript',body:stub()}):r.abort());const page=await ctx.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));await page.goto(base+'/workspace/board/',{waitUntil:'domcontentloaded'});await page.locator('.dc-spatial-viewport').waitFor({state:'visible',timeout:5000});return{ctx,page,errors}}
 
@@ -241,6 +241,70 @@ for(const viewport of [{width:390,height:844,label:'390'},{width:360,height:800,
           `G6 ${engine.name} 390: invalid submit then Cancel shows false success or loses focus ${JSON.stringify(cancelAfterInvalid)}`);
       }
       expect(!errors.length,`G6 ${engine.name} ${width}: page errors ${errors.join(' | ')}`);
+      await ctx.close();
+    }
+    await browser.close();
+  }
+}
+
+/* Owner-approved G3 option A, synthetic-only: once a valid publish RPC starts,
+   Cancel/Escape cannot conceal it; success is acknowledged only after the
+   confirmed RPC result, and a failure restores editing/Cancel. */
+{
+  for(const engine of [
+    {name:'chromium',launch:()=>chromium.launch({headless:true})},
+    {name:'webkit',launch:()=>webkit.launch({headless:true})}
+  ]){
+    const browser=await engine.launch();
+    for(const outcome of ['success','failure']){
+      const{ctx,page,errors}=await open(browser,'owner',{width:390,height:844});
+      await page.waitForFunction(()=>document.documentElement.dataset.dcBoardUserState==='OWNER_ADMIN'&&!!document.getElementById('openComposer'),null,{timeout:5000});
+      await page.locator('.dc-board-primary.is-visible button').click();
+      await page.locator('#entrySection.is-composer-sheet-open').waitFor({state:'visible',timeout:3000});
+      await page.locator('#artifactType').selectOption('idea');
+      await page.locator('#artifactBody').fill('Synthetic-only publication, never a live Club write.');
+      await page.evaluate(()=>{globalThis.__QA_HOLD_PUBLISH__=true});
+      await page.locator('#artifactForm').evaluate(form=>form.dispatchEvent(new Event('submit',{bubbles:true,cancelable:true})));
+      await page.waitForFunction(()=>typeof globalThis.__QA_RESOLVE_PUBLISH__==='function',null,{timeout:4000});
+      await page.waitForFunction(()=>document.getElementById('cancelComposer')?.disabled===true,null,{timeout:2000});
+      const during=await page.evaluate(()=>({
+        modal:document.getElementById('entrySection')?.classList.contains('is-composer-sheet-open'),
+        cancelDisabled:document.getElementById('cancelComposer')?.disabled,
+        cancelText:document.getElementById('cancelComposer')?.textContent,
+        stateRole:document.getElementById('composerState')?.getAttribute('role'),
+        dataPending:document.querySelector('#artifactForm')?.dataset.publishInFlight,
+        rpcCount:globalThis.__QA_RPC_CALLS__.filter(r=>r.name==='dc_publish_artifact_v1').length
+      }));
+      expect(during.modal&&during.cancelDisabled&&during.cancelText?.includes('ОТПРАВЛЯЕМ')&&during.stateRole==='status'&&during.dataPending==='1'&&during.rpcCount===1,
+        `G6 ${engine.name}/${outcome}: invalid pending state ${JSON.stringify(during)}`);
+      await page.keyboard.press('Escape');
+      await page.locator('#artifactForm').evaluate(form=>form.dispatchEvent(new Event('submit',{bubbles:true,cancelable:true})));
+      const noDuplicate=await page.evaluate(()=>({
+        open:document.getElementById('entrySection')?.classList.contains('is-composer-sheet-open'),
+        rpcCount:globalThis.__QA_RPC_CALLS__.filter(r=>r.name==='dc_publish_artifact_v1').length,
+        toast:!!document.querySelector('.dc-board-toast.is-visible')
+      }));
+      expect(noDuplicate.open&&noDuplicate.rpcCount===1&&!noDuplicate.toast,
+        `G6 ${engine.name}/${outcome}: Escape/duplicate/early toast ${JSON.stringify(noDuplicate)}`);
+      await page.evaluate(ok=>globalThis.__QA_RESOLVE_PUBLISH__(ok),outcome==='success');
+      if(outcome==='success'){
+        await page.waitForFunction(()=>!!document.querySelector('.dc-board-toast.is-visible'),null,{timeout:4000});
+        await page.waitForFunction(()=>!document.getElementById('entrySection')?.classList.contains('is-composer-sheet-open'),null,{timeout:4000});
+        expect(await page.locator('.dc-board-toast.is-visible').count()===1,
+          `G6 ${engine.name}: success RPC did not produce exactly one toast`);
+      }else{
+        await page.waitForFunction(()=>document.getElementById('cancelComposer')?.disabled===false&&document.querySelector('#artifactForm button[type=submit]')?.disabled===false,null,{timeout:4000});
+        const failed=await page.evaluate(()=>({
+          state:document.getElementById('composerState')?.textContent,
+          pending:document.querySelector('#artifactForm')?.dataset.publishInFlight,
+          toast:!!document.querySelector('.dc-board-toast.is-visible')
+        }));
+        expect(failed.state==='НЕ ОПУБЛИКОВАНО'&&!failed.pending&&!failed.toast,
+          `G6 ${engine.name}: failed publish did not return to editable state ${JSON.stringify(failed)}`);
+        await page.locator('#cancelComposer').click();
+        await page.waitForFunction(()=>!document.getElementById('entrySection')?.classList.contains('is-composer-sheet-open'),null,{timeout:2500});
+      }
+      expect(!errors.length,`G6 ${engine.name}/${outcome}: page errors ${errors.join(' | ')}`);
       await ctx.close();
     }
     await browser.close();
