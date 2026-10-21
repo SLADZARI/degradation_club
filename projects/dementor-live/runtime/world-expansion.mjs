@@ -22,10 +22,15 @@ export const WORLD_CITY_TARGETS=[
 ];
 export const SECOND_BRIDGE={x:34,y:53,w:4,h:10};
 const forest=[];
-for(let y=47;y<77;y+=5)for(let x=3;x<33;x+=5){
-  // A real clearing winds through the forest, not a uniform wall.
-  if((x>=18&&x<=28&&y>=51&&y<=61)||(x>=27&&y<=65)||(x<13&&y>=56&&y<=66))continue;
-  if((x*7+y*3)%11<8)forest.push({x,y,w:2.4,h:2.4,biome:'forest'});
+for(let row=0,y=47;y<77;row++,y+=4.8)for(let col=0,x=3;x<33;col++,x+=4.8){
+  // Stable per-cell jitter breaks the visible grid while keeping repeatable collision geometry.
+  const seed=(row*73856093)^(col*19349663);
+  const jitterX=(((seed>>>0)%101)/100-.5)*1.05;
+  const jitterY=((((seed*83492791)>>>0)%101)/100-.5)*1.05;
+  const px=Math.round((x+jitterX)*10)/10,py=Math.round((y+jitterY)*10)/10;
+  // Leave a winding starting trail and a wider clearing around the combat approach.
+  if((px>=18&&px<=28&&py>=51&&py<=61)||(px>=27&&py<=65)||(px<13&&py>=56&&py<=66))continue;
+  if(((seed>>>8)%11)<9)forest.push({x:px,y:py,w:2.4,h:2.4,biome:'forest'});
 }
 // Forest beyond the factories and green region (kept clear of the main eastern path).
 for(const [x,y] of [[98,70],[104,74],[111,75],[127,73],[137,74]])forest.push({x,y,w:2.4,h:2.4,biome:'forest'});
