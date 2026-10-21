@@ -1,6 +1,7 @@
 import {test} from 'node:test';import assert from 'node:assert/strict';
 import {Game,createWorld} from '../world-expansion-adapter.mjs';
 import {FORESTRY,TREE_SPECIES,growthStage} from '../forestry.mjs';
+import {LIFE,lifeTargets} from '../life.mjs';
 let sequence=0;const command=(g,p,type,target=null,extra={})=>g.command(p,{type,target,requestId:'forest-'+(++sequence),...extra});
 test('five species, seeds and shovel purchase are persisted, no duplicate purchase',()=>{
  const g=new Game(createWorld()),p=g.join('A');p.x=23;p.y=7;p.wallet=40;g.state.seedMarket.stage=g.c.seedMarket.stages.length;
@@ -45,4 +46,18 @@ test('ownership and tool checks reject tree edits without loss',()=>{
  b.scene='plot';b.plotId=plot.id;b.x=s.x;b.y=s.y;b.bag.seed_tree_oak=1;
  assert.equal(command(g,b,'homeSowTree',s.id,{kind:'seed_tree_oak'}).ok,false);
  assert.equal(b.bag.seed_tree_oak,1);
+});
+
+test('berry bushes regrow, can be planted, and uprooting requires a long continuous hold',()=>{
+ const g=new Game(createWorld()),p=g.join('Berries'),plot=g.state.plots[0];plot.owner=p.id;p.scene='plot';p.plotId=plot.id;
+ const bush=plot.home.nodes.find(n=>n.kind==='food');p.x=bush.x;p.y=bush.y;
+ assert.equal(command(g,p,'homeClear',bush.id).ok,true);assert.equal(p.bag.food,1);assert.equal(bush.left,5);
+ g.tick(LIFE.berryRegrowMs+1);lifeTargets(g,p);assert.equal(bush.left,6,'a harvested berry grows back');
+ for(let i=0;i<5;i++){g.tick(600);assert.equal(command(g,p,'homeClear',bush.id).ok,true);}
+ assert.equal(bush.berryUprooting,true,'holding longer than the harvest starts uprooting');
+ for(let i=0;i<LIFE.berryUprootWork;i++){g.tick(600);assert.equal(command(g,p,'homeClear',bush.id).ok,true);}
+ assert.equal(plot.home.nodes.includes(bush),false,'the long action eventually removes the bush');
+ const soil={id:'test-soil',x:8,y:10};plot.home.soil.push(soil);p.bag.food=1;p.x=8;p.y=10;
+ assert.equal(command(g,p,'homeSowBerry',soil.id).ok,true);assert.equal(p.bag.food,0);assert.equal(plot.home.soil.includes(soil),false);
+ assert.equal(plot.home.nodes.some(n=>n.kind==='food'&&n.planted),true);
 });
