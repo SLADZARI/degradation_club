@@ -42,7 +42,7 @@ test('G6 art source endpoints are test-mode and env guarded; production is uncha
  assert.match(server,/const artG6Enabled=testMode&&process\.env\.DEMENTOR_ART_G6==='1'/);
  assert.match(server,/if\(!artG6Enabled\)\{res\.writeHead\(404\)/);
  assert.match(server,/manifest\.entries\.find\(/);
- assert.match(server,/srcRoot,'assets-source','world-art-unique-houses'/);
+ assert.match(server,/path\.join\(root,'assets-source','world-art-unique-houses'\)/);
  assert.doesNotMatch(server,/--reset-world|down -v|volume rm/);
  assert.match(overlay,/mode==='compare'\|\|mode==='replace'/);
  assert.match(overlay,/if\(!enabled\|\|!allowed\.has\(id\)/);
