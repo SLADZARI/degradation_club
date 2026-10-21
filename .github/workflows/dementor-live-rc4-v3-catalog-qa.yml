@@ -1,0 +1,44 @@
+name: Dementor Live RC4 V3 Catalog Hotfix QA
+on:
+  push:
+    branches:
+      - fix/dementor-live-rc4-v3-manifest-route-20261021
+  pull_request:
+    paths:
+      - projects/dementor-live/runtime/**
+      - .github/workflows/dementor-live-rc4-v3-catalog-qa.yml
+permissions:
+  contents: read
+jobs:
+  catalog-runtime:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: projects/dementor-live/runtime
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install exact approved art without production state
+        run: |
+          python3 icons-v2/install-v2.py . icons-v2
+          python3 tools/install-new-icons-v3.py .
+      - name: Prove exact catalog GET/HEAD and all v2/v3 hashes
+        run: |
+          npm run check:icons
+          npm run check:icons-new
+      - name: Validate syntax, no save migration
+        run: |
+          npm run check
+          node --check server.mjs
+          npm test
+          npm run test:persistence
+  candidate-image:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build disposable RC4 image without world volume
+        run: docker build -t dementor-live:rc4-v3-catalog-qa -f projects/dementor-live/runtime/deploy/Dockerfile projects/dementor-live/runtime
