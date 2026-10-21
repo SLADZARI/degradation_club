@@ -94,6 +94,8 @@ test('Fresh live world starts at the marked parcel and hides city services until
  assert.equal(g.state.plots.find(plot=>plot.id==='plot-1').locked,true);
  assert.equal(g.state.plots.find(plot=>plot.id==='plot-1').clearanceParcel,true);
  assert.deepEqual(g.rects().map(o=>o.id).sort(),['mayor-tent','work-board']);
+ assert.equal(g.walkable(23.4,2,p),true,'unbuilt tool shop must not block movement');
+ assert.equal(g.walkable(12,26,p),true,'unbuilt warehouse must not block movement');
  const view=g.snapshot(p);
  assert.equal(view.startingCity,true);
  assert.deepEqual(view.worldTravel.targets,[]);
@@ -121,5 +123,6 @@ test('Municipal phone opens only after three treasury-funded construction stages
  for(let i=0;i<4;i++){const result=command(g,p,'build',site.build.id);assert.equal(result.ok,true);g.tick(g.c.buildMs+1);}
  assert.equal(g.state.municipalBuildings['phone-square'].stage,3);
  assert.equal(g.snapshot(p).worldTravel.booths.some(x=>x.id==='phone-square'),true);
+ assert.equal(g.walkable(10.2,12.2,p),false,'built payphone occupies its real footprint');
  assert.ok(p.wallet>0,'municipality pays materials and work from treasury');
 });
