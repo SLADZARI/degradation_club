@@ -21,6 +21,53 @@ semanticMutationAuthorized: false
 **Verdict: PREP REPORT / LEAD-ACCEPTED AS DRAFT PLANNING INPUT; INFRASTRUCTURE UNVERIFIED.**  
 **Production effect: NONE.** This report is not a Decision, Result, Gate, host approval or deploy authorization. It proposes no immediate change to existing services. Parent [#237](https://github.com/SLADZARI/degradation_club/issues/237) remains **BACKLOG/DEFERRED**; [#228](https://github.com/SLADZARI/degradation_club/issues/228) does not yet provide an accepted current stable migration baseline.
 
+## A-01/I-01 · W12 ACTUAL trusted-SSH VM AFTER snapshot — 2026-10-21 08:37–08:41 UTC
+
+**EVIDENCE STATUS: HOST ACTUALLY VERIFIED (READ-ONLY, LIVE), NO DEPLOY / HOST WRITE.** Previously blocked host inspection now performed using EXISTING registered `MacBook-Pro-Zena.local` via Remote Desktop Commander + existing `~/.ssh/dementor_server` key and **pretrusted** `138.199.144.94` SSH host key with `BatchMode=yes`, `IdentitiesOnly=yes`, `StrictHostKeyChecking=yes`. Host identity verification succeeded, `date` returned live UTC times. Preexisting authorized SSH identity reports `root`; **no account creation, sudo escalation, key mutation or config write**. Read-only shell on host used `ss`, `nginx -t/-T` FILTERED directives only, service and container metadata, `stat`, `sha256sum`, `free/df`, `openssl x509`, `curl` HEAD/health GET status, and one **in-memory** Python SHA256 of existing static tree. No Cloud/DB/Storage/auth records, game save/world/music, secrets, PAT, private key bytes or protected `/data/*` were read.
+
+### W12-1. Fresh post-game VM and protected-service comparison
+
+| Surface | DIRECT observation at 2026-10-21 UTC | Status / caution |
+| --- | --- | --- |
+| VM CPU/RAM/swap | **4 vCPU**, **7.6 GiB total / 6.7 GiB MemAvailable**, **0 swap**; point-in-time load `0.22/0.12/0.10` | **CURRENT POINT-IN-TIME PASS for inventory only**; NOT 24–72h peak/capacity PASS or Stage2 Supabase sizing |
+| Filesystem/inodes | root ext4 **75G total / 31G used / 42G available / 43% used**, inodes **4,201,990 available / 14% used** | **MEASURED PASS** free-space count; off-host backup/restore headroom NOT VERIFIED |
+| systemd/Docker | `nginx`, `docker`, `gitlab-runner` all **active**, `nginx -t` **syntax PASS**; `db-dev` running; Docker `dementor-live-game-1` running **healthy** | **SERVICE STATE PASS** at inspection. DB clients/legacy data integrity/backups NOT VERIFIED. :32778 historical owner inquiry remains RESOLVED; live bind metadata observed but not re-escalated |
+| Listeners | public `0.0.0.0:80`, `[::]:80`, `0.0.0.0:443`; game **`127.0.0.1:14173`**, Club private preview **`127.0.0.1:18080`**; :32778 binds on both host stacks as previously reported | **BIND INVENTORY PASS**; no public new Club port. No `[::]:443` listener observed, so separate IPv6/TLS plan before adding an AAAA |
+| Nginx included sites | `default` owns port-80 default IPv4+IPv6; **`dementor-live.conf`** matches the IP Host on port-80 IPv4+IPv6; protected MDAO `graylog.conf`, `monitoring.conf`, `n8n.conf` remain enabled; n8n named HTTPS 443; selected effective `server_name` directives contain **NO `dementor.club` or `www.dementor.club`** | **NO EXISTING NAMED SITE COLLISION PASS (current config only)**. Does **not** prove future candidate `nginx -t`, SNI, SSL, default behavior, nginx include/add/reload or MDAO full I1–I8 |
+| Game IP and SSE boundary | Game Docker **healthy**, volume **`dementor-live-world` name present**, IP-Host `http://127.0.0.1/api/health` with Host set to VM IP = **HTTP 200**. Direct loopback `127.0.0.1:14173/api/health` returned **403** for both HEAD/GET without the IP Host (Host-dependent path); not used as evidence of game outage | **IP-HOST HEALTH PASS**, game process stays separate and loopback; no SSE/reconnect/world-data integrity test. No route/front-door change allowed |
+| MDAO vhost HTTP status | Read-only HEAD to 3 existing named MDAO vhosts yielded **502 / 502 / 502**. Oct18 game deployment owner report recorded the **same 502 pre- and post-game** | **NO CHANGE IN THESE THREE REPORTED HEAD CODES vs Oct18**, but MDAO service end-to-end **NOT HEALTHY/PASS** and no proof of total legacy no-drift; Kirill/MDAO own existing failures |
+| Club private preview | PID **2772007**, user **nobody**, Python3; `127.0.0.1:18080` HTTP HEAD returned 200 for 12 permitted static/public/Workspace/Board/Join/PKCE shell/SEO paths; missing asset and `/.git/config` both 404 | **STATIC LOOPBACK HTTP PASS**, with NO browser JS, Google login, role, private RLS, media or public HTTPS evidence |
+| Site files/permissions | Root `/srv/dementor/stage-a/releases/cde332779ab0e256dd1e498660d6fa651e91846e` **0755 root:root**, `index.html` **0644 root:root**, regular real file with SHA256 **`1f807b08e772ceae853cb7518f149b73024d5933de65f55af510003e4ffc0f30`**; no observed symlink escape of index | **ENTRY METADATA PASS**. Does not prove Nginx public read/config/route. Existing earlier `www-data` read PASS operator evidence only |
+| TLS | Owner-issued separate VM fullchain readable; X.509 CN `dementor.club`, SAN apex+www, issuer Let's Encrypt **YE2**, valid `2026-10-17 → 2027-01-15`. Renewal config contains both `manual_auth_hook` and `manual_cleanup_hook` entries, Certbot timer enabled | **CERT PRESENT + RENEWAL HOOK CONFIG PRESENT**. **UNATTENDED FUTURE RENEWAL NOT PROVED** (no `certbot renew --dry-run`, no ACME challenge run); **VM client-trusted HTTPS SNI NOT PROVED** because new site vhost not installed |
+
+### W12-2. Critical artifact parity discrepancy — **STATIC MANIFEST NOT MATCHING**
+
+**Direct in-memory hash with EXACT Dev2 documented canonical algorithm** (no files/manifests written on VM): sort existing 468 regular files by POSIX-relative path, each row `{"path":...,"bytes":...,"sha256":<file SHA256>}`, then hash UTF-8 canonical JSON `json.dumps({"sourceSHA": pinnedSHA, "files": rows}, separators=(',', ':'), ensure_ascii=False)`. Dev2 baseline and algorithm: [#256 evidence](https://github.com/SLADZARI/degradation_club/issues/256#issuecomment-6235450709).
+
+| Property | Dev2 clean local build `_site/` | Actual existing VM preview directory |
+| --- | --- | --- |
+| Pinned source claim | `cde332779ab0e256dd1e498660d6fa651e91846e` | Same **directory name/source claim**, not independent file-content identity |
+| File count | **468** | **468** |
+| Sum of file bytes | **17,425,725** | **17,425,725** |
+| Full SHA256 manifest | **`b2da2d55847be160dd1827d4fc2169f3d078f06c121ef6667ffcde51d1490c63`** | **`516af743538e7f854d6da75ff3f81619419abbd24d4c3e54a236bce446f205c7`** |
+| Exact file-level parity verdict | Accepted developer reference | **FAIL (hash mismatch)** |
+
+**Release consequence:** Matching file count and total size alone **DO NOT** prove immutable artifact parity. Verify the per-file difference against the source-of-truth clean build under Dev2's owned artifact acceptance and possible manifest-serialization discrepancy, without rewriting/rebuilding the current VM release or public production under #255. **HARD STOP** for using this existing VM artifact as the exact clean G7 RC until parity is explained and independently retested. This is an observed mismatch, **NOT** proof of tampering/compromise and not license to mutate VM. Lead/Dev2/Q-01 should classify and resolve under owning approved site Result/Gate.
+
+### W12-3. Final gate/evidence verdict
+
+```text
+STATUS: AFTER READ-ONLY HOST VERIFIED / CANDIDATE SITE RELEASE BLOCKED
+CHECKED: ssh strict host identity, dated process/service/ports, compiled nginx named map, static route/404, manifest algorithm, VM public cert metadata, MDAO historic HEAD statuses
+CHANGED: Draft #257 report only; VM/production/DNS/Cloud/database/game/MDAO NONE
+VERIFIED: 4 vCPU, 6.7 GiB available memory, 42G available disk, nginx/docker/runner active, db-dev running, Live IP Host health 200, private static routes/404, no Club named vhost collision, cert SAN+dates
+NOT VERIFIED: full MDAO no-drift/legacy health, public VM CA-trusted SNI, unattended renewal, 24–72h host capacity, off-VM restore, Auth/PKCE/RLS/CIRCLE/Storage actors and Stage2
+FAIL: pinned 468-file static artifact SHA256 manifest differs from clean reference despite equal count and size
+BLOCKERS: artifact content parity owner investigation; independently demonstrated TLS renewal; G4/#309 owner authority; Q-01 actor negatives and future G6/G7; full release/rollback approval
+NEXT: Dev2 investigate exact artifact hash/diff without modifying source VM; Q-01 classify fail; Lead+Kirill decide next G4/host steps; Architect makes proposed nginx new-only config readiness statement but DOES NOT install
+PRODUCTION EFFECT: NONE
+```
+
 ## A-01/I-01 · W11 post-game host audit readiness (2026-10-21)
 
 **AUTHORIZED SCOPE:** [Lead #255 latest](https://github.com/SLADZARI/degradation_club/issues/255#issuecomment-6301643536) = **one dated, sanitized READ-ONLY host-after snapshot** and exact new-only vhost collision delta in this Draft #257. No new Result, vhost install/reload, Docker, ACME/DNS rehearsal, Cloud export, production or game/MDAO mutation is permitted.
