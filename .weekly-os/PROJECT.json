@@ -7,12 +7,12 @@
     "projectStage": "BUILD",
     "gate": "G5_BUILD",
     "status": "APPROVED",
-    "version": "3.25",
-    "updated": "2026-10-21",
+    "version": "3.26",
+    "updated": "2026-10-22",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "3.24"
+    "supersedes": "3.25"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -26,7 +26,7 @@
     ".weekly-os/PROJECT.json",
     ".weekly-os/ARTIFACT_INDEX.json",
     ".weekly-os/APPROVED_STATE.json",
-    ".weekly-os/results/pre-vm-webui-gate-correctives-v1.v0.1.md",
+    ".weekly-os/results/pre-vm-webui-gate-correctives-v1.v0.2.md",
     ".weekly-os/results/portal-vm-site-hosting-stage1.v0.2.md",
     "operations/MP_DSL_LIFECYCLE_FIELD_MAPPING_DECISION_V1.md",
     "operations/FUENGIROLA_ACCESS_POLICY_DECISION_V1.md",
@@ -477,15 +477,16 @@
   },
   "currentResult": {
     "artifactId": "dementor-club.result.pre-vm-webui-gate-correctives-v1",
-    "version": "0.1",
-    "status": "ACTIVE",
+    "version": "0.2",
+    "status": "APPROVED",
     "workStatus": "ACTIVE",
-    "path": ".weekly-os/results/pre-vm-webui-gate-correctives-v1.v0.1.md",
+    "path": ".weekly-os/results/pre-vm-webui-gate-correctives-v1.v0.2.md",
     "gate": "G5_BUILD",
     "scope": [
       "Existing Board composer visual + Escape/Cancel focus",
       "P1 anonymous Board login visibility",
-      "P1 mobile Home H1 readability"
+      "P1 mobile Home H1 readability",
+      "P1: distinguish confirmed Board publish from later projection refresh failure without false unpublished status"
     ],
     "parentIssues": [
       126,
@@ -497,7 +498,7 @@
     "integrationBaseRef": "dementor-club-production",
     "integrationBaseCommit": "cde332779ab0e256dd1e498660d6fa651e91846e",
     "productionBaseCommit": "cde332779ab0e256dd1e498660d6fa651e91846e",
-    "g4Status": "PASS",
+    "g4Status": "PASS_LIMITED_CODE_ONLY_POSTCONFIRMED_EXTENSION",
     "g4Evidence": "https://github.com/SLADZARI/degradation_club/issues/237#issuecomment-6320105037",
     "implementationStartAuthorized": true,
     "schemaChangeImplementationAuthorized": false,
@@ -505,7 +506,8 @@
     "productionMergeAuthorized": false,
     "productionDeployAuthorized": false,
     "changeControlRequired": false,
-    "gateReadiness": "G5_BUILD_QA_PENDING"
+    "gateReadiness": "G5_BUILD_NEW_SHA_G6_PENDING",
+    "ownerD1ConditionalCodeGrant": "https://github.com/SLADZARI/degradation_club/issues/227#issuecomment-6326985199"
   },
   "waitingResults": [
     {
