@@ -15,6 +15,8 @@ import { combatRoot,createCombat,joinCombat,combatAction,combatView,advanceComba
 const root=path.dirname(fileURLToPath(import.meta.url));
 const version=JSON.parse(fs.readFileSync(path.join(root,'package.json'),'utf8')).version;
 const testMode=process.argv.includes('--test');
+// Optional read-only art QA: disabled on regular and production launches.
+const artG6Enabled=testMode&&process.env.DEMENTOR_ART_G6==='1';
 const port=Number(process.env.DEMENTOR_PORT||4173);
 const host=testMode?'127.0.0.1':(process.env.DEMENTOR_HOST||'0.0.0.0');
 const addresses=Object.values(os.networkInterfaces()).flat().filter(a=>a.family==='IPv4'&&!a.internal).map(a=>a.address);
@@ -177,6 +179,23 @@ const server=http.createServer(async(req,res)=>{
     if(url.pathname.startsWith('/music/')||url.pathname.startsWith('/custom-music/')){
       const track=game.musicCatalog.find(t=>t.url===url.pathname);if(!track){res.writeHead(404);res.end();return;}const dir=url.pathname.startsWith('/custom-music/')?musicDir:path.join(root,'public','music'),file=path.join(dir,decodeURIComponent(url.pathname.split('/').at(-1))),size=fs.statSync(file).size;const range=req.headers.range;let start=0,end=size-1,status=200;if(range){const m=/^bytes=(\d*)-(\d*)$/.exec(range);if(!m||(!m[1]&&!m[2])){res.writeHead(416,{'Content-Range':`bytes */${size}`});res.end();return;}if(!m[1]){start=Math.max(0,size-Number(m[2]));}else{start=Number(m[1]);if(m[2])end=Math.min(end,Number(m[2]));}if(!Number.isSafeInteger(start)||start>end||start>=size){res.writeHead(416,{'Content-Range':`bytes */${size}`});res.end();return;}status=206;res.setHeader('Content-Range',`bytes ${start}-${end}/${size}`);}res.writeHead(status,{'Content-Type':file.endsWith('.mp3')?'audio/mpeg':'audio/wav','Content-Length':end-start+1,'Accept-Ranges':'bytes','Cache-Control':'no-cache'});if(req.method==='HEAD'){res.end();return;}fs.createReadStream(file,{start,end}).pipe(res);return;
     }
+    // Art G6 sample images are served only in --test + explicit QA env, from a strict ID allowlist.
+    // These are original SVG sources, never the released UI icons or production art.
+    if(url.pathname.startsWith('/__art-g6/')){
+      if(!artG6Enabled){res.writeHead(404);res.end('Not found');return;}
+      const m=/^\/__art-g6\/([a-z0-9-]{1,80})\.svg$/.exec(url.pathname);
+      if(!m){res.writeHead(404);res.end('Not found');return;}
+      const srcRoot=path.join(root,'assets-source','world-art-unique-houses');
+      const manifest=JSON.parse(fs.readFileSync(path.join(srcRoot,'manifest.json'),'utf8'));
+      const entry=manifest.entries.find(x=>x.asset_id===m[1]&&x.svg==='source/svg/'+m[1]+'.svg');
+      if(!entry){res.writeHead(404);res.end('Not found');return;}
+      const svg=fs.readFileSync(path.join(srcRoot,'source','svg',m[1]+'.svg'),'utf8');
+      if(/<(?:script|foreignObject|image|filter)\b/i.test(svg)||/url\(|https?:\/\//i.test(svg.replace(/xmlns="http:\/\/www\.w3\.org\/2000\/svg"/g,''))){res.writeHead(422);res.end('Unsafe SVG');return;}
+      res.writeHead(200,{'Content-Type':'image/svg+xml; charset=utf-8','Cache-Control':'no-store',
+        'X-Content-Type-Options':'nosniff','Content-Security-Policy':"default-src 'none'; style-src 'none'; sandbox"});
+      if(req.method==='HEAD'){res.end();return;}
+      res.end(svg);return;
+    }
     // DL-TERRAIN-01 immutable, allowlisted assets; no arbitrary filesystem reads.
     const terrainFile=/^\/assets\/terrain\/(manifest\.json|dl-terrain-01-atlas-(?:128|256)-[a-f0-9]{12}\.(?:png|webp))$/.exec(url.pathname);
     if(terrainFile){
@@ -188,11 +207,11 @@ const server=http.createServer(async(req,res)=>{
       if(req.method==='HEAD'){res.end();return;}
       fs.createReadStream(filePath).pipe(res);return;
     }
-    const files={'/':'index.html','/app.js':'app.js','/life-ui.js':'life-ui.js','/plaza-ui.js':'plaza-ui.js','/city-ui.js':'city-ui.js','/estate-ui.js':'estate-ui.js','/telecom-ui.js':'telecom-ui.js','/admin-ui.js':'admin-ui.js','/civic-ui.js':'civic-ui.js','/world-ui.js':'world-ui.js','/world-ui-fixes.js':'world-ui-fixes.js','/world-quests.js':'world-quests.js','/styles.css':'styles.css','/terrain-01.js':'terrain-01.js','/combat':'combat.html','/combat.html':'combat.html','/combat.js':'combat.js','/combat.css':'combat.css','/manifest.webmanifest':'manifest.webmanifest'};
+    const files={'/':'index.html','/app.js':'app.js','/life-ui.js':'life-ui.js','/plaza-ui.js':'plaza-ui.js','/city-ui.js':'city-ui.js','/estate-ui.js':'estate-ui.js','/telecom-ui.js':'telecom-ui.js','/admin-ui.js':'admin-ui.js','/civic-ui.js':'civic-ui.js','/world-ui.js':'world-ui.js','/world-ui-fixes.js':'world-ui-fixes.js','/world-quests.js':'world-quests.js','/styles.css':'styles.css','/terrain-01.js':'terrain-01.js',...(artG6Enabled?{'/world-art-g6.js':'world-art-g6.js'}:{}),'/combat':'combat.html','/combat.html':'combat.html','/combat.js':'combat.js','/combat.css':'combat.css','/manifest.webmanifest':'manifest.webmanifest'};
     const file=files[url.pathname];if(!file){res.writeHead(404);res.end('Not found');return;}
     const types={html:'text/html; charset=utf-8',js:'text/javascript; charset=utf-8',css:'text/css; charset=utf-8',webmanifest:'application/manifest+json; charset=utf-8'};
     res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'self'");
-    res.writeHead(200,{'Content-Type':types[file.split('.').at(-1)],'Cache-Control':'no-cache'});res.end(file==='index.html'?fs.readFileSync(path.join(root,'public',file),'utf8').replace('</body>','<script src="/world-ui.js" defer></script><script src="/world-ui-fixes.js" defer></script><script src="/world-quests.js" defer></script><script src="/telecom-ui.js" defer></script><script src="/admin-ui.js" defer></script><script src="/civic-ui.js" defer></script></body>'):fs.readFileSync(path.join(root,'public',file)));
+    res.writeHead(200,{'Content-Type':types[file.split('.').at(-1)],'Cache-Control':'no-cache'});res.end(file==='index.html'?fs.readFileSync(path.join(root,'public',file),'utf8').replace('</body>','<script src="/world-ui.js" defer></script><script src="/world-ui-fixes.js" defer></script><script src="/world-quests.js" defer></script><script src="/telecom-ui.js" defer></script><script src="/admin-ui.js" defer></script><script src="/civic-ui.js" defer></script>${artG6Enabled?'<script src="/world-art-g6.js" defer></script>':''}</body>'):fs.readFileSync(path.join(root,'public',file)));
   }catch(e){json(res,400,{ok:false,message:e.message});}
 });
 let lastTick=Date.now();
