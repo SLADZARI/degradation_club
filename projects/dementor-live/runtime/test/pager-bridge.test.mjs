@@ -4,7 +4,7 @@ import {Game,createWorld} from '../world-expansion-adapter.mjs';
 import {SECOND_BRIDGE_PRICE} from '../second-bridge.mjs';
 let seq=0;const action=(g,p,type,target=null,extra={})=>g.command(p,{type,target,requestId:'phonebridge-'+(++seq),...extra});
 const networkAction=(n,p,type,target=null,extra={})=>n.command(p,{type,target,requestId:'phonebridge-'+(++seq),...extra});
-const legacyWorld=()=>{const w=createWorld(undefined,{startingCity:true});w.technologies={...w.technologies,payphones:true};w.municipalBuildings||={};w.municipalBuildings['phone-square']={stage:3};w.expedition.completedAt=1;return w;};
+const legacyWorld=()=>{const g=new Game(createWorld(undefined,{startingCity:true}));g.state.technologies.payphones=true;g.state.municipalBuildings['phone-square'].stage=3;g.state.expedition.completedAt=g.now;return g.state;};
 test('Every resident gets a stable unique 6-digit number; messages travel between cities and only recipient reads inbox',()=>{
  const n=new CityNetwork(legacyWorld()),a=n.origin.join('Отправитель'),b=n.origin.join('Получатель');
  n.snapshot(a);n.snapshot(b);b.pagerListed=true;assert.match(a.pagerNumber,/^\d{6}$/);assert.notEqual(a.pagerNumber,b.pagerNumber);

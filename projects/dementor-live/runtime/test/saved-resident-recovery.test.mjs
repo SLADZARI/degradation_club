@@ -15,12 +15,12 @@ test('Legacy residents at removed static payphone locations keep their saved coo
   assert.equal(q.wallet,p.wallet);assert.deepEqual(q.bag,p.bag);
   assert.equal(q.token,p.token);assert.deepEqual({x:q.x,y:q.y},{x:p.x,y:p.y});
  }
- assert.equal((upgraded.state.residentRelocations||[]).length,2);
- const notes=upgraded.state.residentRelocations;
- assert.deepEqual(new Set(notes.map(r=>JSON.stringify(r.from))),new Set([JSON.stringify({x:10,y:12}),JSON.stringify({x:10.1,y:12.2})]));
- assert.ok(upgraded.dirty,'startup migration must be persisted');
+ assert.equal((upgraded.state.residentRelocations||[]).length,0,'removed static phones require no relocation ledger');
+ const notes=upgraded.state.residentRelocations||[];
+  assert.deepEqual(notes,[]);
+ assert.equal(upgraded.dirty,false,'removed static phones do not rewrite saved coordinates');
  const reloaded=new Game(structuredClone(upgraded.state));
- assert.deepEqual(reloaded.state.residentRelocations,notes,'restart must never duplicate ledger');
+ assert.deepEqual(reloaded.state.residentRelocations||[],notes,'restart must never duplicate ledger');
  assert.equal(reloaded.dirty,false,'second cold start must not move player a second time');
 });
 test('RC4 valid saved residents are never moved or marked dirty',()=>{
