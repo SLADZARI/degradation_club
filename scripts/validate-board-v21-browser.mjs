@@ -270,7 +270,9 @@ for(const viewport of [{width:390,height:844,label:'390'},{width:360,height:800,
       await page.locator('#artifactType').selectOption('idea');
       await page.locator('#artifactBody').fill('Synthetic-only publication, never a live Club write.');
       await page.evaluate(()=>{globalThis.__QA_HOLD_PUBLISH__=true});
-      await page.locator('#artifactForm').evaluate(form=>form.dispatchEvent(new Event('submit',{bubbles:true,cancelable:true})));
+      // Regression for a *real* browser submit click. Synthetic submit dispatch
+      // previously hid the capture/microtask ordering bug that left Cancel active.
+      await page.locator('#artifactForm button[type=submit]').click();
       await page.waitForFunction(()=>typeof globalThis.__QA_RESOLVE_PUBLISH__==='function',null,{timeout:4000});
       await page.waitForFunction(()=>document.getElementById('cancelComposer')?.disabled===true,null,{timeout:2000});
       const during=await page.evaluate(()=>({
@@ -283,6 +285,9 @@ for(const viewport of [{width:390,height:844,label:'390'},{width:360,height:800,
       }));
       expect(during.modal&&during.cancelDisabled&&during.cancelText?.includes('ОТПРАВЛЯЕМ')&&during.stateRole==='status'&&during.dataPending==='1'&&during.rpcCount===1,
         `G6 ${engine.name}/${outcome}: invalid pending state ${JSON.stringify(during)}`);
+      // Even a direct click attempt on the disabled Cancel must not close a
+      // still-publishing sheet; Escape and duplicate submit must stay blocked.
+      await page.locator('#cancelComposer').evaluate(button=>button.click());
       await page.keyboard.press('Escape');
       await page.locator('#artifactForm').evaluate(form=>form.dispatchEvent(new Event('submit',{bubbles:true,cancelable:true})));
       const noDuplicate=await page.evaluate(()=>({
