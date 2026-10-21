@@ -115,6 +115,10 @@ test('Municipal phone opens only after three treasury-funded construction stages
  g.state.expedition.completedAt=g.now;g.state.plots.find(x=>x.id==='plot-1').locked=false;
  assert.equal(g.snapshot(p).worldTravel.booths.some(x=>x.id==='phone-square'),false);
  const hidden=command(g,p,'worldUse','phone-square');assert.equal(hidden.ok,false);
+ p.x=22.7;p.y=1;
+ assert.equal(command(g,p,'buyTool','tool-shop',{tool:'axe'}).ok,false,'unbuilt shop must reject direct purchase');
+ p.x=15;p.y=13;
+ assert.equal(command(g,p,'donate','donation-box',{kind:'wood',quantity:1}).ok,false,'plaza services remain closed until its project is complete');
  p.bag.wood=4;p.bag.stone=2;
  const site=MUNICIPAL_SITES['phone-square'];
  p.x=site.drop.x;p.y=site.drop.y;
