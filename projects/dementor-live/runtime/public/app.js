@@ -8,7 +8,7 @@ let view={w:innerWidth,h:innerHeight,s:28,cx:innerWidth<760?10:16,cy:innerWidth<
 const motionFrames=[];
 let lastWallet=null,lastChatSignature='';
 let seenChatIds=null,hoverWorld=null,placementKind=null,placementCell=null;
-let fogOwner=null,fogExplored=new Set(),fogSaveTimer=null,fogMaskPath=null,fogMaskVersion=0,fogMaskBuiltVersion=-1,fogMaskWidth=0,fogMaskHeight=0,fogScanX=NaN,fogScanY=NaN;
+let fogOwner=null,fogExplored=new Set(),fogSaveTimer=null,fogMaskPath=null,fogMaskVersion=0,fogMaskBuiltVersion=-1,fogMaskMinX=NaN,fogMaskMaxX=NaN,fogMaskMinY=NaN,fogMaskMaxY=NaN,fogMaskWidth=0,fogMaskHeight=0,fogScanX=NaN,fogScanY=NaN;
 function fogStorageKey(){return `dementor-fog-${state?.worldId||'legacy'}-${state?.cityNetwork?.current||'origin'}-${me?.id||''}`;}
 const colors=['#a97059','#6e8971','#65858f'];
 const names={wood:'Древесина',stone:'Камень',food:'Ягоды',seed_hemp:'Семена конопли',seed_carrot:'Семена моркови',hemp:'Конопля',carrot:'Морковь',water:'Вода'};
@@ -323,13 +323,17 @@ function recordFogDiscovery(){
 }
 function fogMask(){
  const width=state.config.width,height=state.config.height;
- if(fogMaskPath&&fogMaskBuiltVersion===fogMaskVersion&&fogMaskWidth===width&&fogMaskHeight===height)return fogMaskPath;
+ const corners=[[0,0],[view.w,0],[view.w,view.h],[0,view.h]].map(([x,y])=>worldPoint(x,y));
+ const minX=Math.max(0,Math.floor(Math.min(...corners.map(p=>p.x))-1)),maxX=Math.min(width-1,Math.ceil(Math.max(...corners.map(p=>p.x))+1));
+ const minY=Math.max(0,Math.floor(Math.min(...corners.map(p=>p.y))-1)),maxY=Math.min(height-1,Math.ceil(Math.max(...corners.map(p=>p.y))+1));
+ if(fogMaskPath&&fogMaskBuiltVersion===fogMaskVersion&&fogMaskWidth===width&&fogMaskHeight===height&&fogMaskMinX===minX&&fogMaskMaxX===maxX&&fogMaskMinY===minY&&fogMaskMaxY===maxY)return fogMaskPath;
  if(typeof Path2D!=='function')return null;
  const path=new Path2D(),pad=.0175;
- for(let y=0;y<height;y++)for(let x=0;x<width;x++)if(!fogExplored.has(x+','+y)){
+ for(let y=minY;y<=maxY;y++)for(let x=minX;x<=maxX;x++)if(!fogExplored.has(x+','+y)){
    path.moveTo(x-pad,y-pad);path.lineTo(x+1+pad,y-pad);path.lineTo(x+1+pad,y+1+pad);path.lineTo(x-pad,y+1+pad);path.closePath();
  }
  fogMaskPath=path;fogMaskWidth=width;fogMaskHeight=height;fogMaskBuiltVersion=fogMaskVersion;
+ fogMaskMinX=minX;fogMaskMaxX=maxX;fogMaskMinY=minY;fogMaskMaxY=maxY;
  return fogMaskPath;
 }
 function drawFogOfWar(){
