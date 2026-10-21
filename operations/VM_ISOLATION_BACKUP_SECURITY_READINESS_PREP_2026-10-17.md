@@ -21,6 +21,44 @@ semanticMutationAuthorized: false
 **Verdict: PREP REPORT / LEAD-ACCEPTED AS DRAFT PLANNING INPUT; HOST READ-ONLY AFTER VERIFIED AT W12; STATIC MANIFEST FALSE-ALARM CORRECTED AT W13; STAGE1 RELEASE STILL NO-GO.**  
 **Production effect: NONE.** This report is not a Decision, Result, Gate, host approval or deploy authorization. It proposes no immediate change to existing services. Parent [#237](https://github.com/SLADZARI/degradation_club/issues/237) remains **BACKLOG/DEFERRED**; [#228](https://github.com/SLADZARI/degradation_club/issues/228) does not yet provide an accepted current stable migration baseline.
 
+## W18 · Owner D1/manual TLS and sanitized pre-change VM snapshot — 2026-10-21
+
+**SCOPE OF OWNER DECISION (PLAN ONLY):** Dementor Club owner explicitly selected **D1** for a *future* controlled release: replace GitHub Pages A records on `dementor.club` with independently reverified VM IPv4, change `www.dementor.club` CNAME from `sladzari.github.io` to `dementor.club`, keep apex AAAA absent and do NOT enable VM IPv6 until separate tests. Canonical `dementor.club` URL, redirect `www` → apex, preserve all old Pages DNS records/custom-domain configuration for rollback. **D1 is the approved DNS strategy, not consent to execute a DNS change now.** The actual IP, current authoritative records/TTL and reverse rollback must be rechecked immediately before any later G7-approved cutover.
+
+**TLS temporary exception chosen by Club owner:** document **SUPERVISED MANUAL renewal**, with reminders at 30/14/7 days before 2027-01-15 certificate expiry. **DO NOT label as AUTO-RENEW PASS**: the existing `certbot.timer` is CURRENTLY ACTIVE and DNS-01 auth/cleanup hooks exist, but their end-to-end operation was not exercised. The manual exception does not itself stop or disable the timer; Kirill/host Certbot owner must separately reconcile the active timer with the manual-only plan **before the next renewal window**. Do NOT modify certbot.timer, install hooks, run `certbot renew --dry-run`, read provider credentials or create/delete `_acme-challenge` TXT without separate Kirill+DNS-owner authorization. Manual renewal also requires the later scoped permissions and controlled post-renew chain check/Nginx reload if necessary. Proposed Warsaw-time checkpoints: **2026-12-16, 2027-01-01, 2027-01-08** (30/14/7 days before notAfter 2027-01-15 17:14:06 UTC); an explicitly named human custodian and actual alert delivery must be confirmed.
+
+**DIRECT SANITIZED READ-ONLY HOST SNAPSHOT** at **2026-10-21T18:20:06+00:00**, through previously authorized trusted SSH from connected Mac. Only `systemctl is-active`, `docker ps --format` (names/status filtered), `ps -eo comm` (counts only), `ss -lntH` (port counts only), `os.statvfs`, `free -m`, and the five ALREADY ENABLED Nginx config SHA-256 fingerprints were read. No `nginx -T` config dump, Docker environment/inspect dump, secrets, logs, credentials, private media, `/data/*` traversal, or Cloud account data were collected. Snapshot was held in the caller process output and documented here; **no new file was written on VM**. Normal SSH auth/audit logging may occur independently.
+
+| Metadata (point-in-time only) | Actual observation |
+| --- | --- |
+| Services `nginx`, `docker`, `gitlab-runner`, `certbot.timer` | `active`, `active`, `active`, `active` |
+| Enabled site configs | `default`, `dementor-live.conf`, `graylog.conf`, `monitoring.conf`, `n8n.conf` (5 total) |
+| New Club site active? | **NO**; no `zz-dementor.club.conf` in sites-enabled |
+| Docker | 2 running containers, of which **Dementor Live = Up (healthy)**; 1 other container (details withheld) |
+| Processes (names only) | Nginx 5; dockerd 1; containerd 1; gitlab-runner 1; node 1; postgres 6; python3 2 |
+| Listening TCP port counts | 22×2, 53×2, 80×2, 443×1, 14173×1, 18080×1, 32778×2. These are **local listener observations**, NOT proof of external reachability or firewall status |
+| Filesystem at `/` and `/srv/dementor` | 41.03 GiB available; 4,188,561 free inodes on inspected filesystem |
+| Memory (`free -m`, same bounded followup) | total 7751 MiB; available 6841 MiB; a point-in-time figure, NOT peak usage |
+| Existing configuration SHA-256 | Listed below, computed only for five named config targets resolving **inside `/etc/nginx/`**. Fingerprints do NOT reveal config body or keys |
+
+```text
+default              ce0901350a021608139b5639cf4ccd7717bef8c3a9e4f79031eb46386b67b03f
+dementor-live.conf   6d3bb785eb757364ff1cb797d6d56518ad3f73009b58029da70862e8ddd2ff7b
+graylog.conf         4574f21408c4cc60b93343a0ee75091485583789dc6a7867929196eb7cc7d5d3
+monitoring.conf      c547a60bae6ade4735c30f5d0183af74266cb8223506ef3a9ae7a0c857f2ce18
+n8n.conf             f6eaeb722e748240f89bcde9f99612b2096c69fb9ee76a2c2307e356dd7d4064
+```
+
+**SAFETY AND NON-EQUIVALENCE:** This snapshot proves metadata visibility and config fingerprint at capture time, **not MDAO application health**, correct public TLS routing, future disk/memory peaks, externally open 32778, or that a future Nginx reload is harmless. `nginx -t` and isolated fixture PASS are **earlier separately scoped evidence**, not a new host-change trial. Existing graylog/monitoring/n8n HEAD 502 responses remain an **unaccepted functional-health signal** pending Kirill **K1/K2** with a meaningful safe endpoint/expected response. No restart, reload, container operation, VM site file writes, DNS record edits, ACME challenge or GitHub Pages production mutation occurred during this inventory.
+
+**CURRENT DECISION MATRIX:**
+- **D1 DNS PLAN = OWNER ACCEPTED**. *Execution rights = NOT GRANTED.* `www` including its inherited IPv6 must not be left on Pages when apex later switches.
+- **TLS RENEWAL = TEMPORARY MANUAL POLICY ACCEPTED WITH REMINDERS; AUTO RENEWAL = NOT VERIFIED**. Kirill to decide how active timer is managed and who can renew/restore. No Certbot/DNS side effect authorized.
+- **K1/K2 MDAO health criterion = AWAITING KIRILL**, including safe meaningful health probe and host rollback custodian; no MDAO service edits.
+- **New-only Nginx design = ACCEPTED FOR REVIEW**, exact two new Club namespace items only, no shared 443 default/Live/SSE/legacy drift. **Install / reload / DNS / public release = NOT AUTHORIZED; independent G6/G7/host GO required**.
+
+**NEXT:** Kirill identifies meaningful non-secret MDAO health criterion, cert renewal operator and a later separately approved installation window; DNS owner keeps rollback records and a manual renewal responsibility; Q-01 tests only consented authorized isolated fixtures; Lead does not merge/deploy/activate Stage1 while pre-VM Web/UI Result remains G5. **PRODUCTION/VM/Nginx/DNS/Cloud/MDAO/Live EFFECT FROM THIS RECORD: NONE.**
+
 ## W17 · Lead 6322170273 — Kirill/MDAO + DNS owner permission closure (2026-10-21)
 
 **STATUS: ARCHITECT REVIEW-READY / SIGNATURES MISSING / ZERO HOST WRITES.** The current authority is [Stage1 Result v0.2](https://github.com/SLADZARI/degradation_club/blob/dementor-club/.weekly-os/results/portal-vm-site-hosting-stage1.v0.2.md): APPROVED, G4_PASS, WAITING, implementationStartAuthorized=true **for isolated code/preparation only**, liveHostMutationAuthorized=false and productionDeployAuthorized=false. Active Web/UI Result/PR #308 has one integration branch and independent G6 pending; Stage1 has no active site branch. Earlier Draft Stage1 PR #309 was CLOSED/UNMERGED and superseded. [Lead exact #255 request](https://github.com/SLADZARI/degradation_club/issues/255#issuecomment-6322170273) does NOT grant a VM/DNS change.
