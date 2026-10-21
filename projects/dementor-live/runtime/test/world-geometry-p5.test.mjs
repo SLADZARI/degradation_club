@@ -27,7 +27,7 @@ test('Every world structure has a footprint; markers, public routes and existing
 test('Tier 2–5 rocks have finite, shrinking, persisted bounds; mining near perimeter works',()=>{
  const g=new Game(createWorld()),p=g.join('Каменотёс');g.connect(p);p.equipped='pick';p.tools.pick=48;
  for(let tier=2;tier<=5;tier++){
-  const r=g.target('tiered-rock-'+tier);assert.equal(r.rockSize,tier);assert.ok(r.stock>0&&r.stock<1000);
+  const r=g.target('tiered-rock-'+tier);assert.equal(r.rockSize,tier);assert.ok(r.stock>0&&r.stock<=250);
   const f=worldFootprints(g).find(o=>o.id===r.id);assert.ok(f);
   assert.equal(blockedByRect(r.x,r.y,.3,f),true);
   const oldSize=stoneSize(r),stock=r.stock;
