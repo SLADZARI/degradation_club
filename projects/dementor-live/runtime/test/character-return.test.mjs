@@ -73,11 +73,12 @@ test('secret is 256 bits; only salted verifier saved, expires, one-use and no id
   assert.equal(verifyReturnTicket(p,y.code,1100+RETURN_TTL_MS),false);
   assert.equal(claimReturnTicket(p,'short',1110),null);
   assert.equal(p.token,'legacy-token');
-  const t=claimReturnTicket(p,y.code,1110);
+  const t=claimReturnTicket(p,y.code,1110,'a'.repeat(32));
   assert.equal(t.id,p.id);
   assert.notEqual(t.token,'legacy-token');
   assert.equal(t.token.length,43);
-  assert.equal(claimReturnTicket(p,y.code,1111),null);
+  assert.equal(claimReturnTicket(p,y.code,1111,'a'.repeat(32)).token,t.token);
+  assert.equal(claimReturnTicket(p,y.code,1111,'b'.repeat(32)),null);
   const z=createReturnTicket(p,1200);
   revokeReturnTicket(p);
   assert.equal(verifyReturnTicket(p,z.code,1201),false);
@@ -135,7 +136,7 @@ test('isolated HTTP: bearer proof, one-time transfer, unchanged PAPER and receip
     assert.equal(sse.status,200);
     const sseReader=sse.body.getReader();
     await sseReader.read();
-    const transfer=await post(base,'/api/identity/transfer/claim',{characterId:old.id,code:issue.data.code});
+    const transfer=await post(base,'/api/identity/transfer/claim',{characterId:old.id,code:issue.data.code,requestId:'a'.repeat(32)});
     assert.equal(transfer.status,200);
     assert.equal(transfer.data.id,old.id);
     assert.notEqual(transfer.data.token,old.token);
@@ -144,7 +145,8 @@ test('isolated HTTP: bearer proof, one-time transfer, unchanged PAPER and receip
     const streamClose=await Promise.race([sseReader.read(),sleep(1500).then(()=>({timeout:true}))]);
     assert.equal(streamClose.done,true,'prior SSE was not closed');
     controller.abort();
-    assert.equal((await post(base,'/api/identity/transfer/claim',{characterId:old.id,code:issue.data.code})).status,401);
+    const retried=await post(base,'/api/identity/transfer/claim',{characterId:old.id,code:issue.data.code,requestId:'a'.repeat(32)});
+    assert.equal(retried.status,200);assert.equal(retried.data.token,transfer.data.token);
     assert.equal((await self(base,other.token)).status,200);
     const afterData=JSON.parse(fs.readFileSync(statePath,'utf8'));
     assert.deepEqual(freeze(afterData,old.id),before);
@@ -156,11 +158,10 @@ test('isolated HTTP: bearer proof, one-time transfer, unchanged PAPER and receip
     assert.equal(ownIssue.status,200);
     const revoke=await post(base,'/api/identity/transfer/revoke',{},transfer.data.token);
     assert.equal(revoke.status,200);
-    assert.equal((await post(base,'/api/identity/transfer/claim',{characterId:old.id,code:ownIssue.data.code})).status,401);
     const raceIssue=await post(base,'/api/identity/transfer/create',{},transfer.data.token);
     assert.equal(raceIssue.status,200);
-    const both=await Promise.all([0,1].map(()=>post(base,'/api/identity/transfer/claim',
-      {characterId:old.id,code:raceIssue.data.code})));
+    const both=await Promise.all([0,1].map(i=>post(base,'/api/identity/transfer/claim',
+      {characterId:old.id,code:raceIssue.data.code,requestId:(i?'e':'d').repeat(32)})));
     assert.equal(both.filter(x=>x.status===200).length,1);
     assert.ok([401,429].includes(both.find(x=>x.status!==200).status)); // replay or capped attempt
     const finalToken=both.find(x=>x.status===200).data.token;

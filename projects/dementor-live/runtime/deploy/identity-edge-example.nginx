@@ -1,0 +1,32 @@
+# CP-IDENTITY-01 / G3 DRAFT / REFERENCE ONLY - NOT INSTALLED OR AUTHORITATIVE.
+# Must be compared against the ACTUAL VM Nginx config by SRE #14; never pasted
+# into another virtual host, Modern Pilgrims, Club or global production unchanged.
+#
+# Inside nginx http{}: preserve true socket peer unless trusted proxies have
+# independently verified ranges. Do NOT use untrusted $http_x_forwarded_for.
+#
+# limit_req_zone $binary_remote_addr zone=dl_identity_ip:10m rate=6r/m;
+# log_format dl_identity_safe '$remote_addr [$time_iso8601] "$request_method $uri" $status $request_time';
+#
+# Inside Dementor Live HTTPS server{} after exact host/TLS/vhost validation:
+#
+# location ^~ /api/identity/ {
+#     client_max_body_size 4096;
+#     limit_req zone=dl_identity_ip burst=12 nodelay;
+#     limit_req_status 429;
+#     access_log /var/log/nginx/dementor_identity.log dl_identity_safe;
+#     proxy_set_header Host $http_host;
+#     proxy_set_header X-Real-IP $remote_addr;
+#     proxy_set_header X-Forwarded-Proto $scheme;
+#     proxy_pass http://127.0.0.1:14173;
+#     proxy_read_timeout 15s;
+# }
+#
+# Security acceptance requires independent test with multiple true clients,
+# a loopback-shared upstream, forged X-Forwarded-For, reload and restart;
+# refuse to enable DEMENTOR_IDENTITY_EDGE_ADMISSION=confirmed before evidence.
+# Backend per-CharacterId rate state survives the game server restart, but
+# nginx memory admission alone does not prove persistence after full nginx restart.
+# SSE must use an Authorization header when feature is enabled; reject query token.
+# Nginx logs and upstream access/error traces must never include $request_uri,
+# request body, Authorization, recoveryCode, code or token.
