@@ -3,6 +3,7 @@ import {Game,createWorld} from '../world-expansion-adapter.mjs';
 import {WORLD_SUMMIT_TRAIL,WORLD_DESERT,WORLD_CACTI,WORLD_OBSTACLES} from '../world-expansion.mjs';
 import {worldFootprints,stoneSize,blockedByRect,footprintConflicts,isoDepth} from '../world-footprints.mjs';
 import {mountainMovement,summitPosition} from '../mountain-trail.mjs';
+import {MUNICIPAL_SITES} from '../municipal-buildings.mjs';
 let counter=0;const command=(g,p,type,target,extra={})=>g.command(p,{type,target,requestId:'geometry-p5-'+(++counter),...extra});
 test('Every world structure has a footprint; markers, public routes and existing spawn still work',()=>{
  const g=new Game(createWorld()),p=g.join('Картограф');g.connect(p);
@@ -113,7 +114,7 @@ test('Municipal phone opens only after three treasury-funded construction stages
  assert.equal(g.snapshot(p).worldTravel.booths.some(x=>x.id==='phone-square'),false);
  const hidden=command(g,p,'worldUse','phone-square');assert.equal(hidden.ok,false);
  p.bag.wood=4;p.bag.stone=2;
- const site=Object.values((await import('../municipal-buildings.mjs')).MUNICIPAL_SITES).find(x=>x.id==='phone-square');
+ const site=MUNICIPAL_SITES['phone-square'];
  p.x=site.drop.x;p.y=site.drop.y;
  assert.equal(command(g,p,'deliver',site.drop.id).ok,true);
  p.x=site.build.x;p.y=site.build.y;
