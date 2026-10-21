@@ -37,21 +37,15 @@ try{
     await page.waitForTimeout(180);
     const ui=await page.evaluate(()=>{
       const rect=id=>{const r=document.getElementById(id).getBoundingClientRect();return {x:r.x,y:r.y,w:r.width,h:r.height,right:r.right,bottom:r.bottom};};
-      return {questCollapsed:document.getElementById('quest').classList.contains('collapsed'),quest:rect('quest'),vitals:rect('vitals'),map:rect('zoomIn'),inventory:rect('world'),plus:document.getElementById('zoomIn').getBoundingClientRect().width};
+      return {questCollapsed:document.getElementById('quest').classList.contains('collapsed'),quest:rect('quest'),vitals:rect('vitals'),inventory:rect('world'),zoomButtons:[document.getElementById('zoomIn'),document.getElementById('zoomOut')].filter(Boolean).length};
     });
     assert.equal(ui.questCollapsed,true,'Quest must default to collapsed');
     assert.ok(ui.quest.right+8<=ui.vitals.x,'Quest and vitals overlap');
-    assert.ok(ui.map.w>=38&&ui.map.x>=0&&ui.map.right<=width&&ui.map.bottom<height,'Zoom button is inaccessible');
+    assert.equal(ui.zoomButtons,0,'Separate plus/minus zoom controls should stay removed; use pinch or mouse wheel');
     assert.ok(ui.inventory.w>=width-2,'Canvas must fill the viewport');
     console.log('MOBILE HUD PASS',width,height);
   }
   await assertHud(390,844);
-  let zoom=await page.evaluate(()=>view.zoom);
-  await page.locator('#zoomIn').click();
-  assert.ok((await page.evaluate(()=>view.zoom))>zoom,'Zoom + failed');
-  zoom=await page.evaluate(()=>view.zoom);
-  await page.locator('#zoomOut').click();
-  assert.ok((await page.evaluate(()=>view.zoom))<zoom,'Zoom - failed');
   const pinch=await page.evaluate(()=>{
     const c=document.getElementById('world'),z=view.zoom;
     const fire=(name,id,x,y)=>c.dispatchEvent(new PointerEvent(name,{pointerId:id,pointerType:'touch',button:0,clientX:x,clientY:y,bubbles:true}));

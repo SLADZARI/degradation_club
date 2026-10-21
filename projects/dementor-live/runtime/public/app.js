@@ -8,6 +8,8 @@ let view={w:innerWidth,h:innerHeight,s:28,cx:innerWidth<760?10:16,cy:innerWidth<
 const motionFrames=[];
 let lastWallet=null,lastChatSignature='';
 let seenChatIds=null,hoverWorld=null,placementKind=null,placementCell=null;
+let fogOwner=null,fogExplored=new Set(),fogSaveTimer=null,fogMaskPath=null,fogMaskVersion=0,fogMaskBuiltVersion=-1,fogMaskMinX=NaN,fogMaskMaxX=NaN,fogMaskMinY=NaN,fogMaskMaxY=NaN,fogMaskWidth=0,fogMaskHeight=0,fogScanX=NaN,fogScanY=NaN;
+function fogStorageKey(){return `dementor-fog-${state?.worldId||'legacy'}-${state?.cityNetwork?.current||'origin'}-${me?.id||''}`;}
 const colors=['#a97059','#6e8971','#65858f'];
 const names={wood:'Древесина',stone:'Камень',food:'Ягоды',seed_hemp:'Семена конопли',seed_carrot:'Семена моркови',hemp:'Конопля',carrot:'Морковь',water:'Вода'};
 const toolNames={axe:'🪓 Топор',pick:'⛏️ Кирка'};
@@ -24,7 +26,7 @@ function connect(){stream?.close();motionFrames.length=0;stream=new EventSource(
  }
  next.landscape=d.tiles.length?{...next.landscape,tiles:prev.concat(d.tiles)}:state.landscape;delete next.landscapeDelta;
 }
-state=next;me=state.players.find(p=>p.id===state.me);if(lastScene!==state.scene+me.plotId+(state.cityNetwork?.current||'origin')){lastScene=state.scene+me.plotId+(state.cityNetwork?.current||'origin');resize();motionFrames.length=0;route=[];selected=null;context=null;if($('cityPanel').open)$('cityPanel').close();}motionFrames.push({at:performance.now(),players:new Map(state.players.map(p=>[p.id,{x:p.x,y:p.y,spirit:p.spirit}]))});if(motionFrames.length>20)motionFrames.shift();connected=true;updateUI();};stream.onerror=()=>{connected=false;$('connection').classList.add('offline');$('connection').lastChild.textContent='Нет связи';};}
+state=next;me=state.players.find(p=>p.id===state.me);recordFogDiscovery();if(lastScene!==state.scene+me.plotId+(state.cityNetwork?.current||'origin')){lastScene=state.scene+me.plotId+(state.cityNetwork?.current||'origin');resize();motionFrames.length=0;route=[];selected=null;context=null;if($('cityPanel').open)$('cityPanel').close();}motionFrames.push({at:performance.now(),players:new Map(state.players.map(p=>[p.id,{x:p.x,y:p.y,spirit:p.spirit}]))});if(motionFrames.length>20)motionFrames.shift();connected=true;updateUI();};stream.onerror=()=>{connected=false;$('connection').classList.add('offline');$('socialButton').textContent='Нет связи';};}
 $('joinForm').onsubmit=async e=>{e.preventDefault();const button=e.target.querySelector('button');button.disabled=true;try{const result=await api('join',{name:$('nameInput').value,gender:$('genderInput').value});if(!result.ok){$('joinError').textContent=result.message;return;}token=result.token;sessionStorage.setItem('dementor-token',token);$('welcome').close();connect();canvas.focus();}catch{$('joinError').textContent='Сервер недоступен. Проверь локальный запуск.';}finally{button.disabled=false;}};
 if(token)api('state').then(r=>{if(r.me)connect();else if(!$('welcome').open)$('welcome').showModal();}).catch(()=>$('welcome').showModal());else $('welcome').showModal();
 
@@ -64,9 +66,10 @@ function currentProject(){return bridgeActive()?state.bridge:forgeActive()?state
 function currentConfig(){return bridgeActive()?{...state.config,...state.config.bridge}:forgeActive()?{...state.config,...state.config.forge}:state.config;}
 function projectReady(p=currentProject(),c=currentConfig()){if(!state)return false;const s=c.stages[p.stage];return s&&p.stock.wood>=s.wood&&p.stock.stone>=s.stone;}
 function cargo(){return me?Object.entries(me.bag).reduce((n,[k,v])=>n+v*state.config.weights[k],0)+(me.delivery?.picked?me.delivery.quantity*state.config.weights[me.delivery.kind]:0):0;}
+function fogVisibleTargets(targets){if(!state?.startingCity||state.scene!=='city')return targets;return targets.filter(t=>['board','mayor','tools','mission','plot','social'].includes(t.type)||Math.hypot(t.x-me.x,t.y-me.y)<=10.5||fogExplored.has(Math.floor(t.x)+','+Math.floor(t.y)));}
 function allTargets(){if(!state||!me)return [];if(state.scene!=='city')return livingTargets();
-  if(state.startingCity&&!state.expedition?.completedAt)return [{id:'board',type:'board',x:3.2,y:8},{id:'mayor',type:'mayor',x:9,y:3},{id:'tools',type:'tools',x:9,y:6},...state.resources,...state.plots.filter(p=>p.id==='plot-1').map(p=>({...p,type:'mission',x:p.x+p.w/2,y:p.y+p.h/2,w:p.w,h:p.h})),...state.players.filter(p=>p.id!==me.id&&p.online&&sameScene(p)).map(p=>({...p,type:'social'}))];
-  if(state.startingCity){const finalAt={'tool-shop':[24,3],'landscape-shop':[16.7,4],warehouse:[12,24],'city-registry':[19,6],'combat-gate':[29,35]},municipal=(state.municipalSites||[]).flatMap(s=>s.built?(['shop','landscape','warehouse','city-registry','combat'].includes(s.type)?[{id:s.id,type:s.type,x:finalAt[s.id]?.[0]??s.x+s.w/2,y:finalAt[s.id]?.[1]??s.y+s.h/2,title:s.title}]:[]):[{...s.drop},{...s.build}]);return [{id:'board',type:'board',x:3.2,y:8},{id:'mayor',type:'mayor',x:9,y:3},{id:'tools',type:'tools',x:9,y:6},...(state.project.stage>=state.config.stages.length?(state.plaza?.config.objects||[]):[]),{id:'project',type:'project',x:15,y:11},{id:'build',type:'build',x:18,y:14},...(state.project.stage>=state.config.stages.length?(state.forge.stage>=state.config.forge.stages.length?[{id:'forge-use',type:'forge',x:27,y:29.5}]:[{id:'forge-drop',type:'project',x:24.5,y:24},{id:'forge-build',type:'build',x:27,y:26}]):[]),...(state.forge.stage>=state.config.forge.stages.length?(state.bridge.stage>=state.config.bridge.stages.length?[{id:'east-bank',type:'explore',x:40,y:13.5}]:[{id:'bridge-drop',type:'project',x:32.5,y:12.3},{id:'bridge-build',type:'build',x:32,y:13.5}]):[]),...(state.seedMarket.stage>=state.config.seedMarket.stages.length?[{id:'seed-shop',type:'seed-market',x:23,y:7}]:[{id:'seed-shop-drop',type:'project',x:22,y:9},{id:'seed-shop-build',type:'build',x:23,y:7}]),...(state.gardenProject.stage>=state.config.cityGarden.stages.length?[{id:'public-garden',type:'city-garden',x:28,y:9}]:[{id:'public-garden-drop',type:'project',x:26,y:9},{id:'public-garden-build',type:'build',x:28,y:9}]),...municipal,...(state.worldTravel?.targets||[]),...state.resources,...state.plots.map(p=>({...p,type:'plot',x:p.x+p.w/2,y:p.y-1})),...state.players.filter(p=>p.id!==me.id&&p.online&&sameScene(p)).map(p=>({...p,type:'social'}))];}
+  if(state.startingCity&&!state.expedition?.completedAt)return fogVisibleTargets([{id:'board',type:'board',x:3.2,y:8},{id:'mayor',type:'mayor',x:9,y:3},{id:'tools',type:'tools',x:9,y:6},...state.resources,...state.plots.filter(p=>p.id==='plot-1').map(p=>({...p,type:'mission',x:p.x+p.w/2,y:p.y+p.h/2,w:p.w,h:p.h})),...state.players.filter(p=>p.id!==me.id&&p.online&&sameScene(p)).map(p=>({...p,type:'social'}))]);
+  if(state.startingCity){const finalAt={'tool-shop':[24,3],'landscape-shop':[16.7,4],warehouse:[12,24],'city-registry':[19,6],'combat-gate':[29,35]},municipal=(state.municipalSites||[]).flatMap(s=>s.requiredTechnology&&!state.technologies?.[s.requiredTechnology]?[]:s.built?(['shop','landscape','warehouse','city-registry','combat','payphone'].includes(s.type)?[{id:s.id,type:s.type,x:finalAt[s.id]?.[0]??s.x+s.w/2,y:finalAt[s.id]?.[1]??s.y+s.h/2,title:s.title}]:[]):[{...s.drop},{...s.build}]);return fogVisibleTargets([{id:'board',type:'board',x:3.2,y:8},{id:'mayor',type:'mayor',x:9,y:3},{id:'tools',type:'tools',x:9,y:6},...(state.project.stage>=state.config.stages.length?(state.plaza?.config.objects||[]):[]),{id:'project',type:'project',x:15,y:11},{id:'build',type:'build',x:18,y:14},...(state.project.stage>=state.config.stages.length?(state.forge.stage>=state.config.forge.stages.length?[{id:'forge-use',type:'forge',x:27,y:29.5}]:[{id:'forge-drop',type:'project',x:24.5,y:24},{id:'forge-build',type:'build',x:27,y:26}]):[]),...(state.forge.stage>=state.config.forge.stages.length?(state.bridge.stage>=state.config.bridge.stages.length?[{id:'east-bank',type:'explore',x:40,y:13.5}]:[{id:'bridge-drop',type:'project',x:32.5,y:12.3},{id:'bridge-build',type:'build',x:32,y:13.5}]):[]),...(state.seedMarket.stage>=state.config.seedMarket.stages.length?[{id:'seed-shop',type:'seed-market',x:23,y:7}]:[{id:'seed-shop-drop',type:'project',x:22,y:9},{id:'seed-shop-build',type:'build',x:23,y:7}]),...(state.gardenProject.stage>=state.config.cityGarden.stages.length?[{id:'public-garden',type:'city-garden',x:28,y:9}]:[{id:'public-garden-drop',type:'project',x:26,y:9},{id:'public-garden-build',type:'build',x:28,y:9}]),...municipal,...(state.worldTravel?.targets||[]),...state.resources,...state.plots.map(p=>({...p,type:'plot',x:p.x+p.w/2,y:p.y-1})),...state.players.filter(p=>p.id!==me.id&&p.online&&sameScene(p)).map(p=>({...p,type:'social'}))]);}
   return [{id:'combat-gate',type:'combat',x:29,y:35},state.config.expedition.gate,...(bridgeOpen()?[{id:'east-bank',type:'explore',x:40,y:13.5}]:[]),...(bridgeActive()?[{id:'bridge-drop',type:'project',x:32.5,y:12.3},{id:'bridge-build',type:'build',x:32,y:13.5}]:[]),{id:'tool-shop',type:'shop',x:24,y:3},{id:'landscape-shop',type:'landscape',x:16.7,y:4},...(state.forge.stage>=state.config.forge.stages.length?[{id:'forge-use',type:'forge',x:27,y:29.5}]:[]),{id:'warehouse',type:'warehouse',x:12,y:24},...(state.seedMarket.stage>=state.config.seedMarket.stages.length?[{id:'seed-shop',type:'seed-market',x:23,y:7}]:[{id:'seed-shop-build',type:'build',x:23,y:7}]),{id:'seed-shop-drop',type:'project',x:22,y:9},...(state.gardenProject.stage>=state.config.cityGarden.stages.length?[{id:'public-garden',type:'city-garden',x:28,y:9}]:[{id:'public-garden-build',type:'build',x:28,y:9}]),{id:'public-garden-drop',type:'project',x:26,y:9},{id:'city-registry',type:'city-registry',x:19,y:6},{id:'board',type:'board',x:3.2,y:8},{id:'mayor',type:'mayor',x:9,y:3},{id:'tools',type:'tools',x:9,y:6},{id:'project',type:'project',x:15,y:11},{id:'build',type:'build',x:18,y:14},...(forgeActive()?[{id:'forge-drop',type:'project',x:24.5,y:24},{id:'forge-build',type:'build',x:27,y:26}]:[]),...(state.drops||[]),...state.resources,...(state.plaza?.config.objects||[]),...state.plots.map(p=>({...p,type:'plot',x:p.x+p.w/2,y:p.y-1})),...state.players.filter(p=>p.id!==me.id&&p.online&&sameScene(p)).map(p=>({...p,type:'social'}))];
 }
 function interaction(t){if(!t)return null;const type=t.type,isForge=t.id.startsWith('forge-'),isBridge=t.id.startsWith('bridge-'),isMarket=t.id.startsWith('seed-shop-'),isGarden=t.id.startsWith('public-garden-'),municipalId=t.id.match(/^municipal-(.+)-(?:drop|build)$/)?.[1],isMunicipal=!!municipalId,p=isMunicipal?state.municipalBuildings[municipalId]:isMarket?state.seedMarket:isGarden?state.gardenProject:isBridge?state.bridge:isForge?state.forge:state.project,c=isMunicipal?{...state.config,...state.municipalSites.find(s=>s.id===municipalId)}:isMarket?{...state.config,...state.config.seedMarket}:isGarden?{...state.config,...state.config.cityGarden}:isBridge?{...state.config,...state.config.bridge}:isForge?{...state.config,...state.config.forge}:state.config;
@@ -111,7 +114,7 @@ function updateContext(){if(!me)return;const near=allTargets().map(t=>{const siz
 function updateUI(){if(!me)return;renderQuick();
   const c=currentConfig(),p=currentProject(),totalWorks=c.stages.reduce((n,s)=>n+s.works,0),doneWorks=c.stages.slice(0,p.stage).reduce((n,s)=>n+s.works,0)+p.work;
   const progress=Math.round((p.accepted.wood+p.accepted.stone+doneWorks)/(c.need.wood+c.need.stone+totalWorks)*100);
-  const population=state.players.filter(p=>p.online).length;$('connection').classList.remove('offline');$('connection').lastChild.textContent=`Жители · ${population}`;
+  const population=state.players.filter(p=>p.online).length;$('connection').classList.remove('offline');$('socialButton').textContent=`Жители · ${population}`;
   $('game').classList.toggle('starving',!me.spirit&&me.hunger<state.config.slowBelow);$('game').classList.toggle('spirit-alert',!!me.spirit);
    $('playerName').textContent=me.name;$('playerPronoun').textContent=me.gender==='female'?'жительница':me.gender==='male'?'житель':'персонаж';$('avatarDot').style.background=colors[me.color];$('spiritLabel').textContent=me.spirit?'дух':'';if(lastWallet!==me.wallet){lastWallet=me.wallet;$('wallet').innerHTML=`${me.wallet} <small>PAPER</small>`;}
   for(const key of ['health','hunger','stamina']){$(key).value=me[key];$(key+'Value').textContent=Math.ceil(me[key]);}
@@ -124,8 +127,8 @@ function updateUI(){if(!me)return;renderQuick();
   if(me.delivery&&!me.spirit)task=me.delivery.picked?`Доставь городской груз: ${deliveryLabel(me.delivery)}.`:'Забери заказ на городском складе · между нижними участками.';
   $('task').textContent=forgeActive()?task.replaceAll('на площадь','к кузнице').replace('Площадь готова','Кузница готова'):task;
   $('axeDurability').textContent=me.tools.axe?`${me.tools.axe} / ${me.toolInfo.axe.max}`:'в мэрии';$('pickDurability').textContent=me.tools.pick?`${me.tools.pick} / ${me.toolInfo.pick.max}`:'в мэрии';$('axeButton').classList.toggle('selected',me.equipped==='axe');$('pickButton').classList.toggle('selected',me.equipped==='pick');
-  $('woodCount').querySelector('b').textContent=me.bag.wood;$('stoneCount').querySelector('b').textContent=me.bag.stone;$('foodCount').textContent=me.bag.food;$('cargo').textContent=`${Number(cargo().toFixed(1))} / ${c.capacity}`;$('cargo').parentElement.classList.toggle('full',cargo()>=c.capacity);$('eatButton').disabled=me.bag.food<1&&me.bag.carrot<1;
-  $('socialButton').textContent=state.trades.length?'Сделки · '+state.trades.length:'Жители';if(state.scene!=='city'){document.querySelector('#quest h1').textContent=state.scene==='interior'?'Твоя палатка':'Жизнь на участке';$('task').textContent='☷ Места участка · расчистка, палатка, вода и огород';$('stageTitle').textContent=`Палатка ${state.home.tent}/3 · грядки ${state.home.beds.length}/6`;$('projectPercent').textContent='';$('projectBar').style.width=`${(state.home.tent+state.home.beds.length)/9*100}%`;}$('worldNote').textContent=state.scene==='city'?'Пустое поле сегодня. Наш город — завтра.':'Выращивай своё. Делись с соседями.';const chatSignature=JSON.stringify(state.chat.slice(-4));if(lastChatSignature!==chatSignature){const newIds=new Set(state.chat.map(m=>m.id));if(seenChatIds&&state.chat.some(m=>!seenChatIds.has(m.id)&&m.player!==me.id))playNeighborChime();seenChatIds=newIds;lastChatSignature=chatSignature;const chat=$('chatMessages');chat.replaceChildren();for(const m of state.chat.slice(-4)){const div=document.createElement('div'),b=document.createElement('b');b.textContent=m.name;div.append(b,document.createTextNode(m.text));chat.append(div);}}
+  $('woodCount').querySelector('b').textContent=me.bag.wood;$('stoneCount').querySelector('b').textContent=me.bag.stone;$('foodCount').textContent=me.bag.food;$('eatButton').disabled=me.bag.food<1&&me.bag.carrot<1;
+  $('socialButton').textContent=state.trades.length?'Жители · сделки '+state.trades.length:`Жители · ${population}`;if(state.scene!=='city'){document.querySelector('#quest h1').textContent=state.scene==='interior'?'Твоя палатка':'Жизнь на участке';$('task').textContent='☷ Места участка · расчистка, палатка, вода и огород';$('stageTitle').textContent=`Палатка ${state.home.tent}/3 · грядки ${state.home.beds.length}/6`;$('projectPercent').textContent='';$('projectBar').style.width=`${(state.home.tent+state.home.beds.length)/9*100}%`;}$('worldNote').textContent=state.scene==='city'?'Пустое поле сегодня. Наш город — завтра.':'Выращивай своё. Делись с соседями.';const chatSignature=JSON.stringify(state.chat.slice(-4));if(lastChatSignature!==chatSignature){const newIds=new Set(state.chat.map(m=>m.id));if(seenChatIds&&state.chat.some(m=>!seenChatIds.has(m.id)&&m.player!==me.id))playNeighborChime();seenChatIds=newIds;lastChatSignature=chatSignature;const chat=$('chatMessages');chat.replaceChildren();for(const m of state.chat.slice(-4)){const div=document.createElement('div'),b=document.createElement('b');b.textContent=m.name;div.append(b,document.createTextNode(m.text));chat.append(div);}}
   if($('details').open){const details=$('projectDetails');details.replaceChildren();const rows=[['Древесина',`${p.accepted.wood} / ${c.need.wood} принято`],['Камень',`${p.accepted.stone} / ${c.need.stone} принято`],...c.stages.map((s,i)=>[s.title,i<p.stage?'Готово':i===p.stage?`${p.work} / ${s.works} работ`:'Следующий этап'])];
   for(const [name,value]of rows){const row=document.createElement('div');row.className='stage-row';const b=document.createElement('b'),span=document.createElement('span');b.textContent=name;span.textContent=value;row.append(b,span);details.append(row);}$('cityBudget').textContent=`Казна города · ${state.treasury} PAPER. Выплачено за текущий проект · ${p.spent} PAPER. Тестовые значения прототипа.`;}
   if(typeof updateQuestTracker==='function')updateQuestTracker();if(typeof syncCityMusic==='function')syncCityMusic();updateContext();updateCityPanels();
@@ -141,7 +144,7 @@ function navigateTo(id){
 function openCityPanel(mode){$('cityPanel').style.left='';$('cityPanel').style.top='';cityPanelMode=mode;cityPanelSignature='';keys.clear();holdAction=false;route=[];touchMove=null;api('input',{dx:0,dy:0}).catch(()=>{});updateCityPanels(true);$('cityPanel').dataset.mode=mode;if(!$('cityPanel').open)$('cityPanel').show();}
 function updateCityPanels(force=false){
   if(!me||!cityPanelMode||(!force&&!$('cityPanel').open))return;
-  const sig=cityPanelMode==='bag'?JSON.stringify([me.bag,me.terrainBag,me.toolItems,me.activeTools,me.delivery,me.spirit,!!me.job]):JSON.stringify([cityPanelMode,me.tools,me.toolInfo,me.wallet,me.bag,me.delivery,me.spirit,!!me.job,state.warehouse,state.courierOffers,state.project,state.forge,state.bridge,state.plaza,me.toolItems,me.activeTools,state.scene,state.home,state.trades,state.seedShop,state.seedMarket,state.gardenProject,state.publicGarden,state.materials,state.cityNetwork,state.thefts,state.players.map(p=>[p.id,p.name,p.online,sameScene(p),Math.hypot(p.x-me.x,p.y-me.y)<=state.config.actionRange]),state.landscape,me.terrainBag,state.plots,state.mayorMail,Math.floor(state.now/1000)*(cityPanelMode==='home'?1:0),nearby('warehouse'),nearby('board'),nearby('forge-use'),nearby('tool-shop')]);
+  const sig=cityPanelMode==='bag'?JSON.stringify([me.bag,me.terrainBag,me.toolItems,me.activeTools,me.delivery,me.spirit,!!me.job]):JSON.stringify([cityPanelMode,me.tools,me.toolInfo,me.wallet,me.bag,me.delivery,me.spirit,!!me.job,state.warehouse,state.courierOffers,state.project,state.forge,state.bridge,state.plaza,me.toolItems,me.activeTools,state.scene,state.home,state.trades,state.seedShop,state.seedMarket,state.gardenProject,state.publicGarden,state.materials,state.cityNetwork,state.thefts,state.players.map(p=>[p.id,p.name,p.online,sameScene(p),Math.hypot(p.x-me.x,p.y-me.y)<=state.config.actionRange]),state.landscape,me.terrainBag,state.plots,state.mayorMail,Math.floor(state.now/1000)*(cityPanelMode==='home'?1:0),nearby('warehouse'),nearby('board'),nearby('forge-use'),nearby('tool-shop'),nearby('mayor')]);
   if(!force&&$('cityPanel').contains(document.activeElement)&&['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName))return;if(!force&&sig===cityPanelSignature)return;cityPanelSignature=sig;
   $('cityPanel').classList.toggle('compact-bag',cityPanelMode==='bag');$('cityPanel').querySelector('.eyebrow').textContent=cityPanelMode==='bag'?'СНАРЯЖЕНИЕ':cityPanelMode==='social'?'ЖИТЕЛИ И СДЕЛКИ':'МИР И ХОЗЯЙСТВО';const rows=$('cityPanelRows');rows.replaceChildren();
   function row(title,description,buttons=[]){const el=document.createElement('section');el.className='city-row';const h=document.createElement('h3'),p=document.createElement('p');h.textContent=title;p.textContent=description;el.append(h,p);const actions=document.createElement('div');actions.className='city-actions';for(const b of buttons){const button=document.createElement('button');button.textContent=b.text;button.disabled=!!b.disabled;if(b.id)button.id=b.id;button.onclick=b.click;actions.append(button);}el.append(actions);rows.append(el);return el;}
@@ -154,7 +157,7 @@ function updateCityPanels(force=false){
       const title=({mission:'Выход · миссия расчистки',shop:'Магазин инструмента',forge:'Кузница · изготовление',warehouse:'Городской склад', 'seed-market':'Семенная лавка', 'city-garden':'Общий огород', 'city-registry':'Реестр городов',landscape:'Благоустройство',board:'Доска работ',mayor:'Мэрия · идеи',tools:'Бесплатные инструменты',explore:'Другой берег',project:t.id==='bridge-drop'?'Приёмка моста':t.id==='project'?'Приёмка площади':'Приёмка кузницы',build:t.id==='bridge-build'?'Стройка моста':t.id==='build'?'Стройка площади':'Стройка кузницы',wood:'Дерево',stone:'Камень',food:'Ягоды',plot:'Участок',pickup:'Вещи на земле',give:t.name,social:t.name})[t.type];
       const placeTitle=t.title||title||'Место города';const placeRow=row(placeTitle,t.stock!==undefined?`${t.x>state.config.river.x?'Другой берег':'Стартовый берег'} · запас: ${t.stock}`:'Выбери место для движения',[{id:'goto-'+t.id,text:t.x>=state.config.river.x&&!bridgeOpen()?'Нужен мост':'➤',disabled:t.x>=state.config.river.x&&!bridgeOpen(),click:()=>navigateTo(t.id)}]);placeRow.classList.add('place-row');placeRow.prepend(placeThumbnail(t));const go=placeRow.querySelector('button');go.setAttribute('aria-label','Идти: '+placeTitle);go.title='Идти: '+placeTitle;
     }
-    $('cityPanelNote').textContent='Масштаб меняется кнопками + и − или колесом мыши; привязка камеры сохраняется.';
+    $('cityPanelNote').textContent='На телефоне масштаб меняется двумя пальцами, на компьютере — колесом мыши. Камера следует за героем.';
   }else if(cityPanelMode==='shop'||cityPanelMode==='forge'){
     const craft=cityPanelMode==='forge',spec=craft?c.toolMaking:c.toolShop,target=craft?'forge-use':'tool-shop';
     $('cityPanelTitle').textContent=craft?'Инструменты кузницы':'Магазин инструмента';
@@ -179,18 +182,21 @@ function updateCityPanels(force=false){
     else row('Курьерские работы','Заказ берётся на доске у мэрии. Городской груз переносится на выбранное место назначения.',[{text:'Идти к доске',click:()=>navigateTo('board')}]);
     $('cityPanelNote').textContent=`В запасе мэрии: ${w.municipal.wood} древесины, ${w.municipal.stone} камня. Свободный бюджет склада: ${w.funds} PAPER. Бюджет незавершённых строек защищён. Слоты груза в пути сохраняются для его возврата.`;
   }else{
-    $('cityPanelTitle').textContent='Доска работ мэрии';$('cityPanelIntro').textContent='Актуальные работы города. Оплата за принятые материалы и выполненную работу — сразу; за курьерский заказ — после доставки.';
-    for(const [project,pc,label,drop,build]of [[state.project,c,'Площадь','project','build'],...(forgeActive()?[[state.forge,{...c,...c.forge},'Кузница','forge-drop','forge-build']]:[]),...(bridgeActive()?[[state.bridge,{...c,...c.bridge},'Мост','bridge-drop','bridge-build']]:[]),[state.seedMarket,{...c,...c.seedMarket},'Семенная лавка','seed-shop-drop','seed-shop-build'],[state.gardenProject,{...c,...c.cityGarden},'Общий огород','public-garden-drop','public-garden-build']]){
+    const clearingFirst=state.startingCity&&!state.expedition?.completedAt;
+    $('cityPanelTitle').textContent='Доска работ мэрии';$('cityPanelIntro').textContent=clearingFirst?'Сначала расчисти размеченный участок. Добытые в миссии материалы останутся у тебя и пригодятся на первой стройке. После расчистки откроется тот же участок для покупки.':'Оплата за принятые материалы и выполненную работу поступает сразу. Начни с городской площади; новые объекты откроются по мере строительства.';
+    if(clearingFirst){row('Первое задание · расчистка участка','Очисти участок plot-1 от препятствий. После этого здесь появится доступная стройка городской площади.',[{text:'Идти к участку',click:()=>navigateTo('plot-1')}]);row('Стартовые инструменты','Топор и кирка доступны у временной мэрии.',[{text:'Идти к инструментам',click:()=>navigateTo('tools')}]);}
+    else for(const [project,pc,label,drop,build]of [[state.project,c,'Площадь','project','build'],...(forgeActive()?[[state.forge,{...c,...c.forge},'Кузница','forge-drop','forge-build']]:[]),...(bridgeActive()?[[state.bridge,{...c,...c.bridge},'Мост','bridge-drop','bridge-build']]:[]),[state.seedMarket,{...c,...c.seedMarket},'Семенная лавка','seed-shop-drop','seed-shop-build'],[state.gardenProject,{...c,...c.cityGarden},'Общий огород','public-garden-drop','public-garden-build']]){
       const missing=['wood','stone'].filter(k=>pc.need[k]>project.accepted[k]);
       if(missing.length)row(`${label} · поставка материалов`,missing.map(k=>`${names[k]}: ещё ${pc.need[k]-project.accepted[k]} · ${pc.pay[k]} PAPER/шт.`).join(' / '),[{text:'Идти к приёмке',click:()=>navigateTo(drop)}]);
       if(project.stage<pc.stages.length)row(`${label} · ${pc.stages[project.stage].title}`,`${project.work} / ${pc.stages[project.stage].works} работ. Награда ${pc.pay.work} PAPER за работу. ${projectReady(project,pc)?'Материалы готовы.':'Сначала доставьте материалы этапа.'}`,[{text:'Идти на стройку',click:()=>navigateTo(build)}]);
     }
-    row('Склад · приёмка лишних ресурсов',`Древесина ${c.warehouse.pay.wood}, камень ${c.warehouse.pay.stone} PAPER/шт. Приёмка зависит от места и свободного бюджета.`,[{text:'Идти на склад',click:()=>navigateTo('warehouse')}]);
+    if(state.startingCity&&state.mayorLevel>=2){const research=state.phoneResearch||{};if(state.technologies?.payphones){row('Технология таксофонов изучена','Теперь можно строить городские таксофоны за счёт казны. Материалы и работа оплачиваются по этапам.',[]);for(const site of (state.municipalSites||[]).filter(s=>s.requiredTechnology==='payphones'&&!s.built)){const pr=site.project;row(site.title+' · поставка',`Принято: ${pr.accepted.wood}/${site.need.wood} древесины · ${pr.accepted.stone}/${site.need.stone} камня.`,[{text:'Идти к приёмке',click:()=>navigateTo(site.drop.id)}]);if(pr.stage<site.stages.length)row(site.title+' · '+site.stages[pr.stage].title,`${pr.work}/${site.stages[pr.stage].works} работ.`,[{text:'Идти на стройку',click:()=>navigateTo(site.build.id)}]);}}else if(research.startedAt)row('Исследование таксофонов',`Мэрия изучает технологию. Осталось ${Math.max(0,Math.ceil((research.endsAt-state.now)/1000))} секунд.`,[]);else row('Исследование таксофонов','Откроется в мэрии второго уровня. Продолжительность — 240 секунд.',[{text:'Начать исследование · 240 секунд',disabled:!nearby('mayor'),click:()=>act('researchPayphones','mayor')}]);}
+    if(!state.startingCity||municipalBuilt('warehouse'))row('Склад · приёмка лишних ресурсов',`Древесина ${c.warehouse.pay.wood}, камень ${c.warehouse.pay.stone} PAPER/шт. Приёмка зависит от места и свободного бюджета.`,[{text:'Идти на склад',click:()=>navigateTo('warehouse')}]);
     row('Баланс материалов',`🪵 ${state.materials.wood.total} · 🪨 ${state.materials.stone.total}. Склад, мэрия, строения и грузы учитываются отдельно.`,[{text:'Открыть склад',click:()=>openCityPanel('warehouse')}]);
     if(me.delivery){const d=me.delivery;row('Твой курьерский заказ',`${d.quantity} · ${names[d.kind]}. ${d.picked?'Доставь: '+deliveryLabel(d)+'.':'Забери на складе до истечения 5 минут с принятия.'} Награда ${d.reward} PAPER.`,[{text:d.picked?'Доставить груз':'Идти на склад',click:()=>navigateTo(d.picked?deliveryTarget(d):'warehouse')},{text:d.picked?'Вернуть груз на склад':'Отменить заказ',disabled:!canAct,click:()=>d.picked?navigateTo('warehouse'):act('courierCancel','board')}]);}
     else for(const offer of state.courierOffers)row(`Курьер · ${names[offer.kind]} со склада → ${deliveryLabel(offer)}`,`${offer.quantity} шт. · вес ${offer.quantity*c.weights[offer.kind]} · награда ${offer.reward} PAPER. Груз городской; повторно продать его нельзя.`,[{id:(offer.destination==='bridge'?'accept-bridge-':'accept-')+offer.kind,text:'Взять заказ',disabled:!canAct||!nearby('board'),click:()=>act('courierAccept','board',{kind:offer.kind,destination:offer.destination})}]);
     if(!me.delivery&&!state.courierOffers.length)row('Курьерских заказов сейчас нет','Они появятся при наличии материалов, потребности мэрии или моста и свободного бюджета.');
-    $('cityPanelNote').textContent='Один курьерский заказ на жителя. До получения груз резервируется на 5 минут. Полученный груз сохраняется при выходе; отмена с возвратом — на складе. Бесплатные инструменты — справа от палатки.';
+    $('cityPanelNote').textContent=clearingFirst?'Сейчас доступны только первые шаги. После расчистки доска откроет поставки и оплачиваемые работы на площади.':`Один курьерский заказ на жителя. До получения груз резервируется на 5 минут. Полученный груз сохраняется при выходе; отмена с возвратом — на складе.${state.startingCity&&!municipalBuilt('warehouse')?' Склад ещё не построен; стройка площади доступна первой.':' Бесплатные инструменты — у мэрии.'}`;
   }
 }
 $('bagButton').onclick=()=>{if(me)openCityPanel('bag');};
@@ -217,7 +223,7 @@ window.addEventListener('keydown',e=>{
   if(['INPUT','TEXTAREA','SELECT'].includes(document.activeElement?.tagName)){if(e.code==='Escape'){document.activeElement.blur();canvas.focus();}return;}
   if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space','KeyE'].includes(e.code))e.preventDefault();keys.add(e.code);
   if(['KeyW','KeyA','KeyS','KeyD','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code))route=[];
-  if(e.code==='KeyE'){holdAction=true;doContext();}if(e.repeat)return;if(/^Digit[1-6]$/.test(e.code))selectQuick(Number(e.code.slice(-1))-1);if(e.code==='KeyQ')placeQuick();if(e.code==='KeyF')act(me.bag.food?'eat':'eatCarrot');if(e.code==='Enter'){$('chatInput').focus();keys.clear();}if(e.code==='Escape'){if(placementKind){setPlacementKind(null);return;}document.querySelectorAll('dialog[open]').forEach(d=>d.close());route=[];selected=null;act('cancel');}
+  if(e.code==='KeyE'){holdAction=true;doContext();}if(e.repeat)return;if(/^Digit[1-6]$/.test(e.code))selectQuick(Number(e.code.slice(-1))-1);if(e.code==='Digit7'||e.code==='Numpad7')openCityPanel('bag');if(e.code==='KeyQ')placeQuick();if(e.code==='KeyF')act(me.bag.food?'eat':'eatCarrot');if(e.code==='Enter'){$('chatInput').focus();keys.clear();}if(e.code==='Escape'){if(placementKind){setPlacementKind(null);return;}document.querySelectorAll('dialog[open]').forEach(d=>d.close());route=[];selected=null;act('cancel');}
 });
 window.addEventListener('keyup',e=>{keys.delete(e.code);if(e.code==='KeyE')holdAction=false;});window.addEventListener('blur',()=>{keys.clear();holdAction=false;touchMove=null;route=[];if(token)api('input',{dx:0,dy:0}).catch(()=>{});});
 // Mobile city input: one analog pad left, no directional arrow buttons.
@@ -297,6 +303,50 @@ function screen(x,y){
 function worldPoint(x,y){
   const u=(x-view.w/2)/(view.s*ISO_COS),v=(y-view.h/2)/(view.s*.5);
   return {x:view.cx+(u+v)/2,y:view.cy+(v-u)/2};
+}
+function recordFogDiscovery(){
+ if(!me||!state?.startingCity||state.scene!=='city')return;
+ const storageKey=fogStorageKey();
+ if(fogOwner!==storageKey){
+   fogOwner=storageKey;
+   try{fogExplored=new Set(JSON.parse(localStorage.getItem(storageKey)||'[]'));}catch{fogExplored=new Set();}
+   fogMaskPath=null;fogMaskVersion++;fogMaskBuiltVersion=-1;fogScanX=NaN;fogScanY=NaN;
+ }
+ // The reveal scan need not run on every animation frame: grid coverage changes only after a small move.
+ if(Number.isFinite(fogScanX)&&Math.hypot(me.x-fogScanX,me.y-fogScanY)<.3)return;
+ fogScanX=me.x;fogScanY=me.y;
+ const radius=10.5,radiusSq=radius*radius,minX=Math.max(0,Math.floor(me.x-radius)),maxX=Math.min(state.config.width-1,Math.ceil(me.x+radius)),minY=Math.max(0,Math.floor(me.y-radius)),maxY=Math.min(state.config.height-1,Math.ceil(me.y+radius));let changed=false;
+ for(let y=minY;y<=maxY;y++)for(let x=minX;x<=maxX;x++){const dx=x+.5-me.x,dy=y+.5-me.y;if(dx*dx+dy*dy<=radiusSq){const key=x+','+y;if(!fogExplored.has(key)){fogExplored.add(key);changed=true;}}}
+ if(changed){
+   fogMaskPath=null;fogMaskVersion++;
+   if(!fogSaveTimer){const saveKey=fogOwner;fogSaveTimer=setTimeout(()=>{fogSaveTimer=null;if(fogOwner===saveKey)try{localStorage.setItem(saveKey,JSON.stringify([...fogExplored]));}catch{}},300);}
+ }
+}
+function fogMask(){
+ const width=state.config.width,height=state.config.height;
+ const half=(view.w/(4*ISO_COS)+view.h/2)/view.s+1;
+ const minX=Math.max(0,Math.floor(view.cx-half)),maxX=Math.min(width-1,Math.ceil(view.cx+half));
+ const minY=Math.max(0,Math.floor(view.cy-half)),maxY=Math.min(height-1,Math.ceil(view.cy+half));
+ if(fogMaskPath&&fogMaskBuiltVersion===fogMaskVersion&&fogMaskWidth===width&&fogMaskHeight===height&&fogMaskMinX===minX&&fogMaskMaxX===maxX&&fogMaskMinY===minY&&fogMaskMaxY===maxY)return fogMaskPath;
+ if(typeof Path2D!=='function')return null;
+ const path=new Path2D(),pad=.0175;
+ for(let y=minY;y<=maxY;y++)for(let x=minX;x<=maxX;x++)if(!fogExplored.has(x+','+y)){
+   path.moveTo(x-pad,y-pad);path.lineTo(x+1+pad,y-pad);path.lineTo(x+1+pad,y+1+pad);path.lineTo(x-pad,y+1+pad);path.closePath();
+ }
+ fogMaskPath=path;fogMaskWidth=width;fogMaskHeight=height;fogMaskBuiltVersion=fogMaskVersion;
+ fogMaskMinX=minX;fogMaskMaxX=maxX;fogMaskMinY=minY;fogMaskMaxY=maxY;
+ return fogMaskPath;
+}
+function drawFogOfWar(){
+ if(!me||!state?.startingCity||state.scene!=='city')return;
+ recordFogDiscovery();
+ const path=fogMask();if(!path)return;
+ // Cached world-space Path2D: camera movement only changes this affine transform.
+ const dpr=devicePixelRatio||1,k=view.s*ISO_COS,h=view.s*.5;
+ ctx.save();
+ ctx.setTransform(dpr*k,dpr*h,-dpr*k,dpr*h,dpr*(view.w/2+(view.cy-view.cx)*k),dpr*(view.h/2-(view.cx+view.cy)*h));
+ ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';ctx.fillStyle='#efebdf';ctx.fill(path);
+ ctx.restore();
 }
 function blocked(x,y){const c=state.config,r=.35;if(state.scene!=='city'){return x<r||y<r||x>16-r||y>16-r||(['plot','expedition'].includes(state.scene)&&(state.home.nodes.some(n=>n.left&&Math.hypot(x-n.x,y-n.y)<.63)||state.scene==='plot'&&state.home.plantedTrees?.some(t=>t.wateredAt&&state.now-t.wateredAt>=180000&&Math.hypot(x-t.x,y-t.y)<.6)));}if(x<r||y<r||x>c.width-r||y>c.height-r)return true;if(x+r>c.river.x&&x-r<c.river.x+c.river.w&&!(bridgeOpen()&&y-r>=c.bridge.y&&y+r<=c.bridge.y+c.bridge.h))return true;
   if((state.citySolids||[{x:4,y:4,w:4,h:3}]).some(o=>x+r>o.x&&x-r<o.x+o.w&&y+r>o.y&&y-r<o.y+o.h))return true;/* Extended solids checked by world-ui from authoritative footprints. */return state.resources.some(o=>o.stock>0&&o.type!=='food'&&Math.hypot(x-o.x,y-o.y)<.63);
@@ -400,11 +450,11 @@ function drawTerrainPlacementGhost(){
 }
 
 function zoom(value){if(!Number.isFinite(value)||value<=0)return;view.zoom=Math.max(.65,Math.min(2.5,view.zoom*value));resize();}
-$('zoomIn').onclick=()=>zoom(1.2);$('zoomOut').onclick=()=>zoom(1/1.2);$('centerButton').onclick=()=>{if(me)openCityPanel('places');};
+
 canvas.addEventListener('wheel',e=>{e.preventDefault();zoom(e.deltaY<0?1.08:1/1.08);},{passive:false});
 function resize(){const dpr=devicePixelRatio||1;view.w=innerWidth;view.h=innerHeight;canvas.width=view.w*dpr;canvas.height=view.h*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);view.s=Math.max(view.w<760?20:12,Math.min((view.w-50)/48,(view.h-80)/(32*.76)))*view.zoom*(state?.scene&&state.scene!=='city'?1.8:1);}
 window.addEventListener('resize',resize);resize();
-function poly(points,fill,stroke='#595d4b',width=1){ctx.beginPath();points.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y));ctx.closePath();if(fill){ctx.fillStyle=fill;ctx.fill();}if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=width;ctx.stroke();}}
+function poly(points,fill,stroke='#595d4b',width=1){ctx.beginPath();points.forEach((point,i)=>{const [x,y]=Array.isArray(point)?point:[point.x,point.y];i?ctx.lineTo(x,y):ctx.moveTo(x,y);});ctx.closePath();if(fill){ctx.fillStyle=fill;ctx.fill();}if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=width;ctx.stroke();}}
 function rounded(x,y,w,h,r,fill,stroke){ctx.beginPath();ctx.roundRect(x,y,w,h,r);if(fill){ctx.fillStyle=fill;ctx.fill();}if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=1;ctx.stroke();}}
 function line(x,y,x2,y2,color,width=1){ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x2,y2);ctx.strokeStyle=color;ctx.lineWidth=width;ctx.stroke();}
 function label(text,x,y,small=false){if(me&&Math.hypot(me.x-x,me.y-y)>3.1&&(!hoverWorld||Math.hypot(hoverWorld.x-x,hoverWorld.y-y)>1.4))return;const p=screen(x,y);ctx.font=`${small?9:10}px Paper, Arial`;const width=ctx.measureText(text).width;rounded(p.x-width/2-7,p.y-10,width+14,18,6,'#f6f3e5dc');ctx.textAlign='center';ctx.fillStyle=small?'#939781':'#6c7460';ctx.fillText(text,p.x,p.y+2);}
@@ -429,29 +479,33 @@ function paperWarehouse(o){const s=view.s,p=screen(o.x,o.y+o.h),w=o.w*s,y=p.y-s*
 }
 function drawToolSign(x,y){const p=screen(x,y),s=view.s;const a=p.x,b=p.y-s*.9;paperBox(a-s*.47,b,s*.94,s*.38,s*.10,-s*.07,'#85947d','#61745e','#aebba1');line(a-s*.27,b+s*.12,a-s*.05,b+s*.29,'#f7ebc9',2.5);poly([[a-s*.35,b+s*.08],[a-s*.16,b+s*.06],[a-s*.12,b+s*.17],[a-s*.33,b+s*.17]],'#e9e1ca','#f5eddb');line(a+s*.09,b+s*.12,a+s*.32,b+s*.29,'#f7ebc9',2.5);poly([[a+s*.16,b+s*.09],[a+s*.37,b+s*.09],[a+s*.40,b+s*.18],[a+s*.13,b+s*.18]],'#e9e1ca','#f5eddb');}
 function paperHouse(o,variant='warehouse'){
- const s=view.s,p=screen(o.x,o.y+o.h),w=o.w*s,h=Math.min(o.h*.76,2.1)*s,dx=s*.65,dy=-s*.45,y=p.y-h,peak=y-s*.75;
- shadow(p.x+w*.5+dx*.4,p.y+4,w*.63,s*.2);paperBox(p.x,y,w,h,dx,dy,variant==='forge'?'#bfad8c':'#d2c2a3','#aa9778','#e5d9bb');
- poly([[p.x-s*.12,y],[p.x+w*.45,peak],[p.x+w+s*.12,y]],'#d8c7a6','#7c8069');
- poly([[p.x+w*.45,peak],[p.x+w*.45+dx,peak+dy],[p.x+w+dx+s*.12,y+dy],[p.x+w+s*.12,y]],variant==='forge'?'#9b8270':'#b09a79','#7c8069');
- line(p.x+w*.45,peak,p.x+w*.45+dx,peak+dy,'#eee5cc',1);
- const doorw=Math.min(w*.26,s*.9),doorx=p.x+w*.45-doorw*.5;poly([[doorx,p.y-h*.62],[doorx+doorw,p.y-h*.62],[doorx+doorw,p.y],[doorx,p.y]],'#63705d','#7b806a');
- line(doorx+doorw*.5,p.y-h*.62,doorx+doorw*.5,p.y,'#a4ac8c');
- for(const rel of (variant==='shop'?[.73]:[.13,.73])){const wx=p.x+w*rel,wy=y+h*.24,ww=Math.min(s*.55,w*.15),wh=s*.42;paperBox(wx,wy,ww,wh,s*.06,-s*.04,'#8b9f91','#718575','#d2d8c2');line(wx+ww*.5,wy,wx+ww*.5,wy+wh,'#d8dfcb');}
- if(variant==='warehouse')for(let i=0;i<2;i++)paperBox(p.x+s*.12+i*s*.5,p.y-s*.35,s*.4,s*.35,s*.14,-s*.1,'#b6a07e','#978464','#d2be99');
- if(variant==='shop'){poly([[p.x+w*.04,y+h*.05],[p.x+w*.92,y+h*.05],[p.x+w*.98,y+h*.22],[p.x,y+h*.22]],'#98a487','#77846b');line(p.x+w*.2,y+h*.07,p.x+w*.2,y+h*.2,'#dfe3cd');line(p.x+w*.65,y+h*.07,p.x+w*.65,y+h*.2,'#dfe3cd');}
- if(variant==='forge'){paperBox(p.x+w*.75,peak-s*.5,s*.42,s*1.15,s*.25,-s*.16,'#a99980','#8e806b','#c9bda2');const q=screen(o.x+o.w*.65,o.y+o.h-.45);poly([[q.x-s*.18,q.y],[q.x,q.y-s*.45],[q.x+s*.18,q.y]],'#c89160','#9a785a');}
- if(variant==='museum'){
-  for(const i of [.16,.44,.74])paperBox(p.x+w*i,p.y-h*.7,s*.14,h*.7,s*.1,-s*.06,'#e4d4b7','#b6a88c','#f4e8cf');
-  poly([[p.x+w*.04,y-s*.05],[p.x+w*.5,y-s*.74],[p.x+w*.96,y-s*.05]],'#c8b596','#788573');
- }else if(variant==='arena'){
-  for(let i=0;i<3;i++)poly([[p.x+i*w/3,y],[p.x+(i+.5)*w/3,y-s*.54],[p.x+(i+1)*w/3,y]],i===1?'#c9aa7e':'#adb699','#798670');
-  for(const rel of [.18,.79])line(p.x+w*rel,y,p.x+w*rel,y-s*.83,'#7d806e',2);
- }else if(variant==='factory'){
-  paperBox(p.x+w*.72,peak-s*.91,s*.28,s*1.32,s*.16,-s*.1,'#ada28d','#877f6e','#d9cbb0');
-  paperBox(p.x+w*.42,peak-s*.52,s*.20,s*.83,s*.12,-s*.08,'#9a9f89','#77826e','#c0c9af');
- }else if(variant==='gate'){
-  for(const rel of [.04,.73])paperBox(p.x+w*rel,y-s*.60,w*.24,h+s*.6,s*.1,-s*.07,'#c2b294','#9c8b75','#ded1b4');
-  poly([[p.x+w*.25,y-s*.35],[p.x+w*.49,y-s*.84],[p.x+w*.73,y-s*.35]],'#9baf99','#7b8c7c');
+ const s=view.s,ground=[screen(o.x,o.y),screen(o.x+o.w,o.y),screen(o.x+o.w,o.y+o.h),screen(o.x,o.y+o.h)];
+ const wallH=Math.max(s*.58,Math.min(s*1.24,Math.min(o.w,o.h)*s*.43)),roofH=Math.max(s*.28,Math.min(s*.62,Math.min(o.w,o.h)*s*.22));
+ const up=(p,h)=>({x:p.x,y:p.y-h}),[a,b,c,d]=ground,[A,B,C,D]=ground.map(p=>up(p,wallH));
+ // Ground, walls and roof all use the same world-space corners as walk collision.
+ shadow((c.x+d.x)/2,c.y+3,s*Math.max(o.w,o.h)*.47,s*.19);
+ poly([a,b,c,d],'#c7bd9e','#96947c');
+ const wall=variant==='forge'?'#bfad8c':'#d2c2a3',side=variant==='forge'?'#a18c72':'#aa9778';
+ poly([a,b,B,A],wall,'#7b8069');poly([a,d,D,A],'#d9c9a8','#7b8069');
+ poly([b,c,C,B],side,'#7b8069');poly([d,c,C,D],wall,'#7b8069');
+ const ridgeStart=up(screen(o.x,o.y+o.h*.5),wallH+roofH),ridgeEnd=up(screen(o.x+o.w,o.y+o.h*.5),wallH+roofH);
+ poly([A,B,ridgeEnd,ridgeStart],variant==='forge'?'#9b8270':'#c5b08d','#736f5c');
+ poly([D,C,ridgeEnd,ridgeStart],variant==='forge'?'#876f60':'#ae9674','#736f5c');
+ poly([A,D,ridgeStart],'#e0d1b2','#7c8069');poly([B,C,ridgeEnd],'#d4c2a0','#7c8069');
+ line(ridgeStart.x,ridgeStart.y,ridgeEnd.x,ridgeEnd.y,'#eee5cc',1);
+ // Door and windows are projected onto the visible front wall plane.
+ const doorL=screen(o.x+o.w*.38,o.y+o.h),doorR=screen(o.x+o.w*.65,o.y+o.h),doorTopL=up(doorL,wallH*.67),doorTopR=up(doorR,wallH*.67);
+ poly([doorL,doorR,doorTopR,doorTopL],'#63705d','#7b806a');
+ const wx0=screen(o.x+o.w*.14,o.y+o.h),wx1=screen(o.x+o.w*.28,o.y+o.h),wy0=up(wx0,wallH*.58),wy1=up(wx1,wallH*.58),wy2=up(wx1,wallH*.83),wy3=up(wx0,wallH*.83);
+ poly([wy0,wy1,wy2,wy3],'#8b9f91','#718575');
+ const wx2=screen(o.x+o.w*.72,o.y+o.h),wx3=screen(o.x+o.w*.86,o.y+o.h),wy4=up(wx2,wallH*.58),wy5=up(wx3,wallH*.58),wy6=up(wx3,wallH*.83),wy7=up(wx2,wallH*.83);
+ poly([wy4,wy5,wy6,wy7],'#8b9f91','#718575');
+ if(variant==='shop'){
+  const e0=up(screen(o.x+o.w*.08,o.y+o.h),wallH*.9),e1=up(screen(o.x+o.w*.92,o.y+o.h),wallH*.9),f0=up(e0,s*.18),f1=up(e1,s*.18);
+  poly([e0,e1,f1,f0],'#98a487','#77846b');
+ }
+ if(variant==='warehouse')for(const xx of [o.x+o.w*.18,o.x+o.w*.56]){
+  const q=screen(xx,o.y+o.h*.77),z=s*.26,top=up(q,z);poly([[q.x-z*.42,q.y],[q.x,q.y-z*.22],[q.x+z*.42,q.y],[q.x,q.y+z*.22]],'#b6a07e','#978464');poly([[q.x-z*.42,q.y],[q.x,q.y+z*.22],[q.x,q.y-z*.72],[q.x-z*.42,q.y-z*.86]],'#b09a79','#89785f');poly([[q.x,q.y+z*.22],[q.x+z*.42,q.y],[q.x+z*.42,q.y-z*.86],[q.x,q.y-z*.72]],'#978464','#89785f');poly([top,{x:q.x+z*.42,y:q.y-z*.86},{x:q.x,y:q.y-z*.72},{x:q.x-z*.42,y:q.y-z*.86}],'#d2be99','#978464');
  }
 }
 function paperTent(o,stage=3){const s=view.s,p=screen(o.x,o.y+o.h),w=o.w*s*.8,dx=o.w*s*.2,dy=-o.h*s*.43,h=s*1.9;
@@ -541,17 +595,38 @@ function updateVisualPlayers(time){
     const a=left?.players.get(p.id)||p,b=right?.players.get(p.id)||a;
     const snap=a.spirit!==b.spirit||Math.hypot(b.x-a.x,b.y-a.y)>4;
     const x=snap?b.x:a.x+(b.x-a.x)*blend,y=snap?b.y:a.y+(b.y-a.y)*blend,old=visualPlayers.get(p.id);
-    const dx=x-(old?.x??x),dy=y-(old?.y??y),moving=!!old&&Math.hypot(dx,dy)>.0001;visualPlayers.set(p.id,{x,y,moving,dirX:moving?dx:(old?.dirX||0),dirY:moving?dy:(old?.dirY||0)});
+    const dx=x-(old?.x??x),dy=y-(old?.y??y),moving=!!old&&Math.hypot(dx,dy)>.0001;
+    const screenDX=(dx-dy)*ISO_COS,screenDY=(dx+dy)*.5;
+    let faceRight=old?.faceRight||false,backFacing=old?.backFacing||false;
+    if(moving){
+      // Keep the original pose for leftward motion; mirror only for a clear rightward run.
+      if(Math.abs(screenDX)>Math.abs(screenDY)*.72&&Math.abs(screenDX)>.012)faceRight=screenDX>0;
+      // Hysteresis keeps packet interpolation noise from flashing the face/back view.
+      if(screenDY<-.012&&Math.abs(screenDY)>Math.abs(screenDX)*.45)backFacing=true;
+      else if(screenDY>.006||Math.abs(screenDX)>Math.abs(screenDY)*1.6)backFacing=false;
+    }
+    visualPlayers.set(p.id,{x,y,moving,dirX:moving?dx:(old?.dirX||0),dirY:moving?dy:(old?.dirY||0),faceRight,backFacing});
   }
   for(const id of visualPlayers.keys())if(!visible.has(id))visualPlayers.delete(id);
 }
 function drawSpeechBubble(p,q,headY,s){const msg=[...(state?.chat||[])].reverse().find(m=>m.player===p.id&&state.now-m.at<6000);if(!msg)return;const words=msg.text.slice(0,110).split(/\s+/),lines=[];ctx.font='11px Arial';let row='';for(const word of words){const next=row?row+' '+word:word;if(ctx.measureText(next).width>153&&row){lines.push(row);row=word;}else row=next;}if(row)lines.push(row);const shown=lines.slice(0,3),w=Math.max(75,Math.min(178,...shown.map(l=>ctx.measureText(l).width+20))),h=shown.length*15+14,x=Math.max(7,Math.min(view.w-w-7,q.x-w/2)),y=Math.max(6,headY-s*.75-h);rounded(x,y,w,h,8,'#fffaf0','#c4bda9');poly([[q.x-6,y+h-1],[q.x+5,y+h-1],[q.x-2,y+h+8]],'#fffaf0','#c4bda9');ctx.fillStyle='#354337';ctx.textAlign='left';shown.forEach((v,i)=>ctx.fillText(v,x+10,y+17+i*15));}
+const handImages=new Map();
+function handImage(kind){
+ if(!kind||!window.DementorPaperIcons?.src)return null;
+ let image=handImages.get(kind);if(!image){image=new Image();image.src=window.DementorPaperIcons.src(kind);handImages.set(kind,image);}
+ return image.complete&&image.naturalWidth?image:null;
+}
+function selectedHandItem(){
+ if(!me)return null;const slot=quickSlots?.[quickIndex],tool=me.toolItems?.find(item=>item.id===slot);
+ if(tool)return tool.kind;if(state?.items?.[slot]&&me.bag?.[slot]>0)return slot;
+ return ['axe','pick'].includes(slot)&&me.tools?.[slot]>0?slot:null;
+}
 function drawPlayer(p,time){const v=visualPlayers.get(p.id)||p,moving=v.moving;
 const q=screen(v.x,v.y),s=view.s*.9,bob=moving?Math.sin(time*.015)*s*.05:0,body=colors[p.color];
-const screenDX=((v.dirX||0)-(v.dirY||0))*ISO_COS,faceLeft=moving&&screenDX<-.01,work=p.id===me?.id&&(!!me.job||time<handActionUntil);
+const mirror=!!v.faceRight,backFacing=!!v.backFacing,work=p.id===me?.id&&(!!me.job||time<handActionUntil);
 const blink=(time+(String(p.id).charCodeAt(0)||0)*137)%3300<135;
 shadow(q.x,q.y+3,s*.48,s*.14);ctx.save();if(p.spirit)ctx.globalAlpha=.6;
-if(faceLeft){ctx.translate(q.x,0);ctx.scale(-1,1);ctx.translate(-q.x,0);}
+if(mirror){ctx.translate(q.x,0);ctx.scale(-1,1);ctx.translate(-q.x,0);}
 const headY=q.y-s*1.55+bob;
 if(p.spirit){ctx.beginPath();ctx.ellipse(q.x,q.y-s*.6,s*.4,s*.6,0,0,Math.PI*2);ctx.fillStyle='#d9e2db';ctx.fill();ctx.strokeStyle='#9caea0';ctx.stroke();}
 else{
@@ -566,20 +641,18 @@ else{
 rounded(q.x-s*.32,headY,s*.64,s*.61,1,p.spirit?'#e4ece0':'#e8dab9','#374132');
 poly([[q.x-s*.32,headY],[q.x-s*.19,headY-s*.1],[q.x+s*.42,headY-s*.1],[q.x+s*.32,headY]],'#f5ecd5','#3e4837');
 poly([[q.x+s*.32,headY],[q.x+s*.42,headY-s*.1],[q.x+s*.42,headY+s*.5],[q.x+s*.32,headY+s*.61]],p.spirit?'#d8e4d6':'#ccbf9d','#3e4837');
-ctx.fillStyle='#364231';
-if(blink){ctx.fillRect(q.x-s*.13,headY+s*.31,s*.065,s*.025);ctx.fillRect(q.x+s*.13,headY+s*.31,s*.065,s*.025);}
-else{ctx.fillRect(q.x-s*.13,headY+s*.28,s*.065,s*.075);ctx.fillRect(q.x+s*.13,headY+s*.28,s*.065,s*.075);}
-if(p.id===me?.id&&!p.spirit&&!heldResource()&&me.tools[me.equipped]){
- const toolX=q.x+s*.48,toolY=q.y-s*.64+(work?Math.sin(time*.035)*s*.14:0);
- line(toolX,toolY+s*.22,toolX+s*.05,toolY-s*.25,'#927f5e',3);
- if(me.equipped==='axe')poly([[toolX-s*.05,toolY-s*.22],[toolX+s*.25,toolY-s*.33],[toolX+s*.31,toolY-s*.16],[toolX+s*.09,toolY-s*.1]],'#81917a','#4c5947');
- else{line(toolX-s*.1,toolY-s*.22,toolX+s*.22,toolY-s*.34,'#6c7b69',4);line(toolX+s*.1,toolY-s*.39,toolX+s*.34,toolY-s*.29,'#6c7b69',4);}
+
+if(backFacing&&!p.spirit){}else{
+ ctx.fillStyle='#364231';
+ if(blink){ctx.fillRect(q.x-s*.13,headY+s*.31,s*.065,s*.025);ctx.fillRect(q.x+s*.13,headY+s*.31,s*.065,s*.025);}
+ else{ctx.fillRect(q.x-s*.13,headY+s*.28,s*.065,s*.075);ctx.fillRect(q.x+s*.13,headY+s*.28,s*.065,s*.075);}
+}
+if(p.id===me?.id&&!p.spirit){
+ const kind=selectedHandItem(),image=handImage(kind);
+ if(image){const size=s*((kind==='wood'||kind==='stone')?.5:.56),handX=q.x+s*.46,handY=q.y-s*.64+(work?Math.sin(time*.035)*s*.14:0);
+  ctx.save();ctx.translate(handX,handY);ctx.drawImage(image,-size/2,-size/2,size,size);ctx.restore();}
 }
 ctx.restore();ctx.textAlign='center';ctx.font='9px Paper, Arial';ctx.fillStyle=p.id===me?.id?'#5b6b4e':'#818d74';ctx.fillText(p.id===me?.id?`${p.name} · ты`:p.name,q.x,headY-s*.35);
-if(p.id===me?.id&&heldResource()){
- const icon=(typeof itemEmoji!=='undefined'&&itemEmoji[heldResource()])||({wood:'🪵',stone:'🪨',carrot:'🥕',hemp:'🌿',food:'🫐',water:'💧'}[heldResource()])||'📦';
- ctx.save();ctx.font=`${Math.max(12,s*.42)}px Apple Color Emoji,Segoe UI Emoji,sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(icon,q.x+s*.43,q.y-s*.63);ctx.restore();
-}
 if(p.id===me?.id){ctx.beginPath();ctx.ellipse(q.x,q.y+3,s*.53,s*.21,0,0,Math.PI*2);ctx.strokeStyle='#8ca46999';ctx.lineWidth=1.5;ctx.stroke();}
 drawSpeechBubble(p,q,headY,s);
 }
@@ -616,7 +689,7 @@ function render(time){positionWindows();ctx.clearRect(0,0,view.w,view.h);ctx.fil
       ...(state?.plots||[]).map(plot=>({depth:plot.x+plot.w*.55+plot.y+plot.h*.56,draw:()=>drawPlot(plot,'props')})),
       ...(!stagedCity&&state?.forge?.stage>=2?[{depth:24+6+23+5,draw:drawForge}]:[]),
       ...(typeof window.__worldEntities==='function'?window.__worldEntities():[]),
-      {depth:4+4+4+3,draw:drawTent},
+      {depth:4+4+4+3,draw:()=>state?.startingCity&&state.mayorLevel>=2?paperHouse({x:4,y:4,w:4,h:3},'mayor'):drawTent()},
       ...(!stagedCity||municipalBuilt('tool-shop')?[{depth:22.7+1+2.6+2,draw:()=>paperHouse({x:22.7,y:1,w:2.6,h:2},'shop')}]:[]),
       ...(!stagedCity||municipalBuilt('landscape-shop')?[{depth:15.5+1.5+2.5+2.2,draw:()=>paperHouse({x:15.5,y:1.5,w:2.5,h:2.2},'garden-shop')}]:[]),
       ...(!stagedCity||municipalBuilt('warehouse')?[{depth:10.7+25+2.6+3,draw:()=>paperWarehouse({x:10.7,y:25,w:2.6,h:3})}]:[]),
@@ -624,10 +697,12 @@ function render(time){positionWindows();ctx.clearRect(0,0,view.w,view.h);ctx.fil
       ...(!emptyStart&&state?.seedMarket?.stage===2?[{depth:21.8+7.3,draw:()=>paperHouse({x:21.8,y:5.3,w:2.5,h:2},'construction')}]:[]),
       ...(!stagedCity||state?.seedMarket?.stage>=state?.config?.seedMarket?.stages?.length?[{depth:21.8+7.3,draw:()=>paperHouse({x:21.8,y:5.3,w:2.5,h:2},'shop')}]:[]),
       ...(state?.municipalSites||[]).filter(s=>!s.built&&!emptyStart&&(s.project?.stage===1||s.project?.stage===2)).map(s=>({depth:s.x+s.y+s.w+s.h,draw:()=>{if(s.project.stage===1)groundRect({x:s.x,y:s.y,w:s.w,h:s.h},'#d5c4a4','#a7ad89');else paperHouse({x:s.x,y:s.y,w:s.w,h:s.h},'construction');label(s.project.stage===1?'Площадка · '+s.title:'Коробка · '+s.title,s.x+s.w/2,s.y-.6,true);}})),
+      ...(state?.municipalSites||[]).filter(s=>s.requiredTechnology&&state.technologies?.[s.requiredTechnology]&&!s.built&&!emptyStart&&(s.project?.stage===1||s.project?.stage===2)).map(s=>({depth:s.x+s.y+s.w+s.h,draw:()=>{if(s.project.stage===1)groundRect({x:s.x,y:s.y,w:s.w,h:s.h},'#d5c4a4','#a7ad89');else paperHouse({x:s.x,y:s.y,w:s.w,h:s.h},'construction');label(s.project.stage===1?'Площадка · '+s.title:'Коробка · '+s.title,s.x+s.w/2,s.y-.6,true);}})),
+      ...(state?.municipalSites||[]).filter(s=>s.built&&s.type==='payphone'&&state.technologies?.payphones).map(s=>({depth:s.x+s.y+s.w+s.h,draw:()=>{const p=screen(s.x+s.w/2,s.y+s.h/2),z=view.s;shadow(p.x,p.y+3,z*.35,z*.12);paperBox(p.x-z*.24,p.y-z*.62,z*.48,z*.62,z*.15,-z*.10,'#aa9975','#81755f','#d0bd96');rounded(p.x-z*.13,p.y-z*.48,z*.26,z*.2,2,'#536b66','#384b45');line(p.x-z*.07,p.y-z*.18,p.x+z*.07,p.y-z*.18,'#f1e4c1',1.3);label(s.title,s.x+s.w/2,s.y-.4,true);}})),
       ...(state?.municipalSites||[]).filter(s=>s.built&&s.id==='field-toilet').map(s=>({depth:s.x+s.y+s.w+s.h,draw:()=>{paperHouse({x:s.x,y:s.y,w:s.w,h:s.h},'construction');label('Туалет',s.x+s.w/2,s.y-.6,true);}})),
       ...resources.filter(o=>(o.stock>0||o.type==='food')&&!o.id.startsWith('forest-wood-')).map(o=>({depth:o.x+o.y+(o.rockSize?o.rockSize:0),draw:()=>o.type==='wood'?drawTree(o):o.type==='stone'?drawStone(o):drawFood(o)})),
       ...(state?.players||[]).filter(p=>(p.online||p.id===me?.id)&&sameScene(p)).map(p=>({depth:p.x+p.y,draw:()=>drawPlayer(p,time)}))
-   ];entities.sort((a,b)=>a.depth-b.depth);for(const e of entities)e.draw();drawTerrainPlacementGhost();updateTerrainBar();
+   ];entities.sort((a,b)=>a.depth-b.depth);for(const e of entities)e.draw();drawFogOfWar();drawTerrainPlacementGhost();updateTerrainBar();
   if(route.length){const p=screen(route.at(-1).x,route.at(-1).y);ctx.beginPath();ctx.ellipse(p.x,p.y,7,4,0,0,Math.PI*2);ctx.strokeStyle='#82956a99';ctx.lineWidth=1.4;ctx.stroke();}
   if(context){const p=screen(context.x,context.y);ctx.beginPath();ctx.ellipse(p.x,p.y+4,view.s*.7,view.s*.25,0,0,Math.PI*2);ctx.strokeStyle='#82956999';ctx.lineWidth=1.5;ctx.stroke();}
   if(me?.job){const left=Math.max(0,me.job.ends-(state.now+80)),duration=me.job.ends-me.job.started;$('actionProgress').style.width=`${Math.min(100,(1-left/duration)*100)}%`;}else $('actionProgress').style.width='0';
@@ -636,6 +711,8 @@ function render(time){positionWindows();ctx.clearRect(0,0,view.w,view.h);ctx.fil
 requestAnimationFrame(render);
 
 $('socialButton').onclick=()=>{if(me)openCityPanel('social');};
+$('helpPlaces').onclick=()=>{if(me){$('help').close();openCityPanel('places');}};
+$('helpWorld').onclick=()=>$('worldOverview').scrollIntoView({behavior:'smooth',block:'start'});
 
 // Six local quick assignments belong to this resident and browser; inventory remains authoritative.
 const itemEmoji={wood:'🪵',stone:'🪨',food:'🫐',seed_hemp:'🌰',seed_carrot:'🫘',hemp:'🌿',carrot:'🥕',water:'💧',axe:'🪓',pick:'⛏️'};
@@ -648,7 +725,7 @@ function heldResource(){const k=quickSlots[quickIndex];return me&&state?.items[k
 function selectQuick(index){if(!me)return;quickIndex=index;saveQuick();const k=quickSlots[index],t=me.toolItems.find(t=>t.id===k);if(t)act('equipItem',t.id);else if(['axe','pick'].includes(k))act('equip',k);renderQuick();}
 function placeQuick(){const k=heldResource();if(k&&me.bag[k])act('drop',null,{kind:k,quantity:1});else toast('Выбери ресурс в нижней панели');}
 function renderQuick(){if(!me)return;if(quickOwner!==me.id){quickOwner=me.id;try{const saved=JSON.parse(localStorage.getItem('dementor-quick-'+me.id));if(saved&&Array.isArray(saved.slots)&&saved.slots.length===6){quickSlots=saved.slots.map(k=>typeof k==='string'?k:null);quickIndex=Number.isInteger(saved.index)&&saved.index>=0&&saved.index<6?saved.index:0;}}catch{}}
-const signature=JSON.stringify([quickSlots,quickIndex,me.bag,me.toolItems,me.tools]);if(signature===quickSignature)return;quickSignature=signature;quick.replaceChildren();quickSlots.forEach((k,i)=>{const t=me.toolItems.find(t=>t.id===k),kind=t?.kind||k,b=document.createElement('button');b.className='quick-slot'+(i===quickIndex?' selected':'');b.title=(names[k]||toolNames[k]||toolNames[t?.kind]||'Пустая ячейка')+' · '+(i+1);b.setAttribute('aria-label',b.title);const n=document.createElement('kbd'),g=document.createElement('span'),count=document.createElement('small');n.textContent=i+1;g.textContent=itemEmoji[kind]||'·';count.textContent=t?t.durability+'/'+t.max:state.items[k]?me.bag[k]||0:['axe','pick'].includes(k)?me.tools[k]||0:'';b.append(n,g,count);b.onclick=()=>selectQuick(i);b.ondragover=e=>e.preventDefault();b.ondrop=e=>{e.preventDefault();const value=e.dataTransfer?.getData('text/dementor-item');if(value&&state.items[value])assignQuick(i,value);};quick.append(b);});place.disabled=!heldResource()||!me.bag[heldResource()];}
+const signature=JSON.stringify([quickSlots,quickIndex,me.bag,me.toolItems,me.tools,state?.config?.capacity,cargo()]);if(signature===quickSignature)return;quickSignature=signature;quick.replaceChildren();quickSlots.forEach((k,i)=>{const t=me.toolItems.find(t=>t.id===k),kind=t?.kind||k,b=document.createElement('button');b.className='quick-slot'+(i===quickIndex?' selected':'');b.title=(names[k]||toolNames[k]||toolNames[t?.kind]||'Пустая ячейка')+' · '+(i+1);b.setAttribute('aria-label',b.title);const n=document.createElement('kbd'),g=document.createElement('span'),count=document.createElement('small');n.textContent=i+1;const iconSrc=kind&&window.DementorPaperIcons?.src?.(kind);if(iconSrc){const icon=document.createElement('img');icon.src=iconSrc;icon.alt='';icon.draggable=false;g.append(icon);}count.textContent=t?t.durability+'/'+t.max:state.items[k]?me.bag[k]||0:['axe','pick'].includes(k)?me.tools[k]||0:'';b.append(n,g,count);b.onclick=()=>selectQuick(i);b.ondragover=e=>e.preventDefault();b.ondrop=e=>{e.preventDefault();const value=e.dataTransfer?.getData('text/dementor-item');if(value&&state.items[value])assignQuick(i,value);};quick.append(b);});const backpack=document.createElement('button');backpack.type='button';backpack.className='quick-slot backpack-slot';backpack.title='Открыть рюкзак · вес '+Number(cargo().toFixed(1))+' / '+state.config.capacity;backpack.setAttribute('aria-label',backpack.title);const number=document.createElement('kbd'),glyph=document.createElement('span'),load=document.createElement('small');number.textContent='7';const iconSrc=window.DementorPaperIcons?.src?.('backpack');if(iconSrc){const icon=document.createElement('img');icon.src=iconSrc;icon.alt='';icon.draggable=false;glyph.append(icon);}const carried=Number(cargo().toFixed(1));load.textContent=carried+'/'+state.config.capacity;backpack.append(number,glyph,load);backpack.onclick=()=>{if(me)openCityPanel('bag');};quick.append(backpack);place.disabled=!heldResource()||!me.bag[heldResource()];}
 function positionWindows(){if(!me)return;const dock=$('actionDock');dock.hidden=!context;const target=context&&(visualPlayers.get(context.id)||context);if(innerWidth<760){dock.style.left='';dock.style.top='';}else if(target){const q=screen(target.x,target.y);dock.style.left=Math.max(8,Math.min(innerWidth-Math.min(300,innerWidth-16)-8,q.x-140))+'px';dock.style.top=Math.max(70,Math.min(innerHeight-200,q.y-115))+'px';}
 const panel=$('cityPanel');if(panel.open&&cityPanelMode==='resident'){const p=state.players.find(p=>p.id===selected);if(p){const q=screen(p.x,p.y),w=panel.offsetWidth;panel.style.left=Math.max(8,Math.min(innerWidth-w-8,q.x+35+w<innerWidth?q.x+35:q.x-w-35))+'px';panel.style.top=Math.max(70,Math.min(innerHeight-panel.offsetHeight-100,q.y-95))+'px';}}else {panel.style.left='';panel.style.top='';}}
 canvas.addEventListener('contextmenu',e=>{e.preventDefault();placeQuick();});

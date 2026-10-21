@@ -69,6 +69,7 @@ const server=http.createServer(async(req,res)=>{
       if(req.headers['x-test-key']!=='local-integration-tests'){json(res,403,{ok:false});return;}
       const data=await body(req);
       if(data.player){const p=game.state.players[data.player];if(!p)throw Error('No test player');Object.assign(p,data.patch||{});}
+      if(data.world)Object.assign(game.state,data.world);
       if(data.resources)for(const patch of data.resources)Object.assign(game.state.resources.find(r=>r.id===patch.id),patch);
       if(data.advanceMs)game.tick(data.advanceMs);
       game.changed();save();broadcast();json(res,200,{ok:true,state:game.state});return;

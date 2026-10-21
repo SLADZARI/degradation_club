@@ -21,26 +21,27 @@ export class Game extends CoreGame{
       if(!this.state.resources.some(r=>r.id===id))this.state.resources.push({id,type:'stone',x,y,stock:144,initial:144,regrowAt:0});
     }
     // Tiered stone deposits. Fixed IDs ensure cold restarts never restore depleted stock.
-    for(const [tier,x,y,stock] of [[2,105,69,12],[3,115,38,32],[4,121,70,72],[5,148,39,150]]){
-      const id='tiered-rock-'+tier;
+    for(const [id,tier,x,y,stock] of [['tiered-rock-2',2,105,69,12],['tiered-rock-3',3,115,38,32],['tiered-rock-4',4,121,70,72],['tiered-rock-5',5,148,39,150],['eastern-rock-small',2,103,55,18],['eastern-rock-medium',3,109,66,36]]){
       if(!this.state.resources.some(r=>r.id===id))this.state.resources.push({id,type:'stone',x,y,rockSize:tier,stock,initial:stock,regrowAt:0});
     }
     recoverBlockedSavedResidents(this);
   }
-  join(name,gender='unspecified'){const p=super.join(name,gender);initializeWorldTravel(this);return p;}
+  join(name,gender='unspecified'){const p=super.join(name,gender);initializeWorldTravel(this);this.startAtClearance(p);return p;}
+  startAtClearance(p){if(this.state.startingCity&&!this.state.expedition?.completedAt&&(p.scene||'city')!=='expedition'){p.scene='expedition';p.plotId='plot-1';p.missionReturn={x:8,y:8};p.x=8;p.y=14;}}
+  connect(p){this.startAtClearance(p);return super.connect(p);}
   target(id){return PHONE_BOOTHS.find(o=>o.id===id)||WORLD_CITY_TARGETS.find(o=>o.id===id)||Object.values(WORLD_SCENES)
     .flatMap(region=>[region.exit,region.main]).find(o=>o.id===id)||super.target(id);}
   movementBiome(p,input){return mountainMovement(p,input);}
   walkable(x,y,p=null){
     const scene=p?.scene||'city',r=.3,c=this.c;
-     if(PHONE_BOOTHS.some(b=>b.scene===scene&&Math.hypot(x-b.x,y-b.y)<.50))return false;
+     if(PHONE_BOOTHS.some(b=>b.scene===scene&&Math.hypot(x-b.x,y-b.y)<.50&&this.state.startingCity&&this.state.technologies?.payphones&&b.siteId&&municipalBuilt(this.state,b.siteId)))return false;
     if(WORLD_SCENES[scene])return !terrainBlocked(scene,x,y,r);
     if(scene==='city'){
       // A single physical catalogue is consumed by the server and sent to client.
-      let footprints=worldFootprints(this);
+      let footprints=worldFootprints(this).filter(o=>o.kind!=='payphone'||(()=>{const booth=PHONE_BOOTHS.find(b=>b.id===o.id);return !!booth&&!!this.state.startingCity&&!!this.state.technologies?.payphones&&!!booth.siteId&&municipalBuilt(this.state,booth.siteId);})());
       if(this.state.startingCity)footprints=footprints.filter(o=>{
         if(['forest','mountain','cactus','tree','stone'].includes(o.kind))return true;
-        if(o.kind==='payphone')return o.id==='phone-square'&&municipalBuilt(this.state,'phone-square');
+        if(o.kind==='payphone'){const booth=PHONE_BOOTHS.find(b=>b.id===o.id);return !!booth&&!!this.state.technologies?.payphones&&!!booth.siteId&&municipalBuilt(this.state,booth.siteId);}
         if(String(o.id||'').startsWith('structure-')){const id=o.id.slice('structure-'.length);if(MUNICIPAL_SITES[id])return municipalBuilt(this.state,id);if(id==='second-bridge-site')return this.state.secondBridgeProject?.stage>=2;if(['monument','jukebox','donation-board','theft-board'].includes(id))return this.state.project.stage>=this.c.stages.length;return false;}
         return true;
       });
@@ -56,10 +57,9 @@ export class Game extends CoreGame{
   action(p,cmd){
     const intro=this.state.startingCity&&!this.state.expedition?.completedAt;
     if(intro){
-      const allowed=new Set(['missionEnter','homeClear','homeUse','board','tools','equip','equipItem','mine','gather','pickup','drop']);
+      const allowed=new Set(['homeClear','board','tools','equip','equipItem','mine','gather','pickup','drop']);
       if(!allowed.has(cmd?.type))throw Error('Сначала расчисти стартовый участок. Городские объекты появятся по мере строительства.');
       if(cmd.type==='homeClear'&&(p.scene||'city')!=='expedition')throw Error('Сначала войди в миссию расчистки.');
-      if(cmd.type==='homeUse'&&cmd.target!=='mission-exit')throw Error('Сейчас доступен только выход с расчистки.');
     }
     if(this.state.startingCity&&!intro){
       const site=MUNICIPAL_SITES[cmd?.target];
@@ -90,15 +90,16 @@ export class Game extends CoreGame{
       const intro=!this.state.expedition?.completedAt;
       const constructionIds=new Set(['tourist-kiosk','university-site','robo-stadium-site','industry-site','museum-entry']);
       base.worldTravel.targets=intro?[]:base.worldTravel.targets.filter(t=>constructionIds.has(t.id)?municipalBuilt(this.state,t.id):t.id!=='second-bridge-site'||this.state.secondBridgeProject?.stage>=2);
-      base.worldTravel.booths=intro||!municipalBuilt(this.state,'phone-square')?[]:base.worldTravel.booths.filter(t=>t.id==='phone-square');
+      base.worldTravel.booths=intro||!this.state.technologies?.payphones?[]:base.worldTravel.booths.filter(t=>{const booth=PHONE_BOOTHS.find(b=>b.id===t.id);return !!booth?.siteId&&municipalBuilt(this.state,booth.siteId);});
       base.worldTravel.footprints=(base.worldTravel.footprints||[]).filter(o=>{
         if(intro)return ['forest','mountain','cactus','rock'].includes(o.kind);
         const id=String(o.id||'').replace(/^structure-/,'');
         if(id==='second-bridge-site')return this.state.secondBridgeProject?.stage>=2;
-        if(constructionIds.has(id)||id==='phone-square')return municipalBuilt(this.state,id);
+        if(constructionIds.has(id))return municipalBuilt(this.state,id);if(o.kind==='payphone'){const booth=PHONE_BOOTHS.find(b=>b.id===o.id);return !!booth&&!!this.state.technologies?.payphones&&!!booth.siteId&&municipalBuilt(this.state,booth.siteId);}
         return true;
       });
     }
+    base.worldTravel.footprints=(base.worldTravel.footprints||[]).filter(o=>{if(o.kind!=='payphone')return true;const booth=PHONE_BOOTHS.find(b=>b.id===o.id);return !!booth&&!!this.state.technologies?.payphones&&!!booth.siteId&&municipalBuilt(this.state,booth.siteId);});
     base.civicJobs=civicView(this,p);
     base.losevCourse=losevView(p,this.now);
     return base;

@@ -7,6 +7,7 @@ export const WORLD_SCENES={
 export const TOURIST_PRICES={map:10,shirt:16,souvenir:4};
 import {SECOND_BRIDGE_SITE} from './second-bridge.mjs';
 import {boothsForScene} from './telecom.mjs';
+import {municipalBuilt} from './municipal-buildings.mjs';
 export const WORLD_CITY_TARGETS=[
   SECOND_BRIDGE_SITE,
   {id:'tourist-kiosk',type:'tourist',x:25,y:38,title:'Туристический киоск · карты, майки, сувениры'},
@@ -30,7 +31,7 @@ for(let row=0,y=47;y<77;row++,y+=4.8)for(let col=0,x=3;x<33;col++,x+=4.8){
   const px=Math.round((x+jitterX)*10)/10,py=Math.round((y+jitterY)*10)/10;
   // Leave a winding starting trail and a wider clearing around the combat approach.
   if((px>=18&&px<=28&&py>=51&&py<=61)||(px>=27&&py<=65)||(px<13&&py>=56&&py<=66))continue;
-  if(((seed>>>8)%11)<9)forest.push({x:px,y:py,w:2.4,h:2.4,biome:'forest'});
+  if(((seed>>>8)%11)<10)forest.push({x:px,y:py,w:2.4,h:2.4,biome:'forest'});
 }
 // Forest beyond the factories and green region (kept clear of the main eastern path).
 for(const [x,y] of [[98,70],[104,74],[111,75],[127,73],[137,74]])forest.push({x,y,w:2.4,h:2.4,biome:'forest'});
@@ -125,8 +126,12 @@ export function worldTravelAction(g,p,cmd){
   throw Error('Этот объект пока не поддерживает действия');
 }
 export function worldTravelView(g,p){
-  return {scene:p.scene||'city',targets:worldObjects(p.scene||'city'),
-    booths:boothsForScene(p.scene||'city'),scenes:WORLD_SCENES,secondBridge:SECOND_BRIDGE,secondBridgeProject:g.state.secondBridgeProject,paths:WORLD_PATHS,
+  const scene=p.scene||'city';let booths=boothsForScene(scene);
+  booths=g.state.startingCity&&g.state.technologies?.payphones?booths.filter(b=>b.siteId&&municipalBuilt(g.state,b.siteId)):[];
+  const visibleBooths=new Set(booths.map(b=>b.id));
+  const targets=worldObjects(scene).filter(t=>t.type!=='payphone'||visibleBooths.has(t.id));
+  return {scene,targets,
+    booths,scenes:WORLD_SCENES,secondBridge:SECOND_BRIDGE,secondBridgeProject:g.state.secondBridgeProject,paths:WORLD_PATHS,
     obstacles:(p.scene||'city')==='city'?WORLD_OBSTACLES:[],desert:WORLD_DESERT,cacti:WORLD_CACTI,summitTrail:WORLD_SUMMIT_TRAIL,
     prices:TOURIST_PRICES,profile:p.worldTravel||{mapOwned:false,souvenirs:{shirt:0,souvenir:0},visited:['city']},
     worldWidth:g.c.width,worldHeight:g.c.height};

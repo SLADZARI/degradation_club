@@ -1,9 +1,29 @@
 {
-  "createdAt": "2026-10-18T12:01:49.268Z",
+  "createdAt": "2026-10-21T12:58:02.104Z",
   "scope": "this command runs syntax + model; HTTP/browser evidence comes from separately recorded matching-runtime runs",
-  "node": "v22.14.0",
-  "runtimeHash": "57167374ea9828cf7c7977dda1afa36823392e7acd6acb857c788a1fc07bc248",
+  "node": "v24.19.0",
+  "runtimeHash": "9ddba8a2af8661ca0bb793d2e44e5dd2797c084bec978adcd10d02f5b9325979",
   "steps": [
+    {
+      "kind": "syntax",
+      "file": "city-expansion.mjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "city-network.mjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "civic-earnings.mjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "combat-p0.mjs",
+      "pass": true
+    },
     {
       "kind": "syntax",
       "file": "config.mjs",
@@ -16,7 +36,52 @@
     },
     {
       "kind": "syntax",
+      "file": "estate.mjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "forestry.mjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "icons-v2/paper-icons.js",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "icons-v2/verify-paper-icons-v2.mjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "landscape.mjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
       "file": "life.mjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "losev-courses.mjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "mayor-ideas.mjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "mountain-trail.mjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "municipal-buildings.mjs",
       "pass": true
     },
     {
@@ -26,7 +91,37 @@
     },
     {
       "kind": "syntax",
+      "file": "public/admin-ui.js",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
       "file": "public/app.js",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "public/city-ui.js",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "public/civic-ui.js",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "public/combat.js",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "public/estate-ui.js",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "public/garden-visuals.js",
       "pass": true
     },
     {
@@ -36,12 +131,72 @@
     },
     {
       "kind": "syntax",
+      "file": "public/paper-icons-v3-registry.js",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
       "file": "public/plaza-ui.js",
       "pass": true
     },
     {
       "kind": "syntax",
+      "file": "public/telecom-ui.js",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "public/terrain-01.js",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "public/world-quests.js",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "public/world-ui-fixes.js",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "public/world-ui.js",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "qa-recorder.mjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "resident-recovery.mjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "resource-clearance.mjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "second-bridge.mjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
       "file": "server.mjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "telecom.mjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "terrain-delta.mjs",
       "pass": true
     },
     {
@@ -61,7 +216,52 @@
     },
     {
       "kind": "syntax",
+      "file": "test/cities-browser.cjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "test/city-economy.test.mjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "test/city-mobile-gameplay.cjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
       "file": "test/city.cjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "test/combat-browser.cjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "test/combat-feel.cjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "test/combat-http.test.mjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "test/combat-mobile-qa.cjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "test/combat-p0.test.mjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "test/combat-touch.test.mjs",
       "pass": true
     },
     {
@@ -76,12 +276,47 @@
     },
     {
       "kind": "syntax",
+      "file": "test/dynamic-footprint-evacuation.test.mjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "test/estate-mayor-ui.cjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "test/estate-mayor.test.mjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
       "file": "test/expansion.cjs",
       "pass": true
     },
     {
       "kind": "syntax",
+      "file": "test/forestry.test.mjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "test/garden-visuals.test.mjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "test/geometry-p5-browser.cjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
       "file": "test/integration.mjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "test/interface-world-polish.cjs",
       "pass": true
     },
     {
@@ -96,6 +331,11 @@
     },
     {
       "kind": "syntax",
+      "file": "test/landscape.test.mjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
       "file": "test/life.cjs",
       "pass": true
     },
@@ -106,7 +346,22 @@
     },
     {
       "kind": "syntax",
+      "file": "test/losev-courses.test.mjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "test/mobile.cjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
       "file": "test/model.test.mjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "test/pager-bridge.test.mjs",
       "pass": true
     },
     {
@@ -121,6 +376,21 @@
     },
     {
       "kind": "syntax",
+      "file": "test/persistence.cjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "test/playtest-actions.cjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "test/playtest-p4.test.mjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
       "file": "test/plaza.cjs",
       "pass": true
     },
@@ -131,7 +401,47 @@
     },
     {
       "kind": "syntax",
+      "file": "test/public-smoke.cjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "test/qa-recorder.test.mjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
       "file": "test/quests.cjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "test/rc2-cross-chain.test.mjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "test/saved-resident-recovery.test.mjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "test/telecom-browser.cjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "test/terrain-rc3-browser.cjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "test/terrain-rc3.test.mjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "test/terrain-renderer-rc3.test.cjs",
       "pass": true
     },
     {
@@ -141,12 +451,67 @@
     },
     {
       "kind": "syntax",
+      "file": "test/upgrade-audit.test.mjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "test/world-expansion.test.mjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "test/world-geometry-p5.test.mjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "test/world-passage.test.mjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "test/world-runtime-contract.test.mjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
       "file": "tools/pack.mjs",
       "pass": true
     },
     {
       "kind": "syntax",
+      "file": "tools/upgrade-audit.mjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "tools/verify-new-icons-v3.mjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "tools/verify-rc3-release.mjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
       "file": "tools/workspace.mjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "world-expansion-adapter.mjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "world-expansion.mjs",
+      "pass": true
+    },
+    {
+      "kind": "syntax",
+      "file": "world-footprints.mjs",
       "pass": true
     },
     {

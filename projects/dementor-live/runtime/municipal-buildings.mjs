@@ -8,7 +8,8 @@ const site=(id,title,type,x,y,w,h,dropX,dropY,buildX,buildY,parts)=>({
  id,title,type,x,y,w,h,drop:{id:'municipal-'+id+'-drop',type:'project',x:dropX,y:dropY},
  build:{id:'municipal-'+id+'-build',type:'build',x:buildX,y:buildY},
  need:{wood:parts.reduce((n,p)=>n+p[0],0),stone:parts.reduce((n,p)=>n+p[1],0)},
- stages:stages(...parts)
+ stages:stages(...parts),
+ ...(type==='payphone'?{requiredTechnology:'payphones'}:{})
 });
 export const MUNICIPAL_SITES=Object.freeze({
  'tool-shop':site('tool-shop','Магазин инструмента','shop',22.7,1,2.6,2,21,4,24,4,[[2,2],[3,2],[3,2]]),
@@ -16,6 +17,10 @@ export const MUNICIPAL_SITES=Object.freeze({
  warehouse:site('warehouse','Городской склад','warehouse',10.7,25,2.6,3,10,28,13,27,[[3,2],[5,3],[4,3]]),
  'city-registry':site('city-registry','Городской реестр','city-registry',18.7,5.7,.6,.6,17,7,20,7,[[2,1],[2,1],[2,2]]),
  'phone-square':site('phone-square','Таксофон площади','payphone',10,12,.8,.8,8.5,13.5,10,14,[[1,1],[2,1],[1,0]]),
+ 'phone-forest':site('phone-forest','Таксофон у леса','payphone',18,59,.8,.8,16,60,18,61,[[1,1],[2,1],[1,0]]),
+ 'phone-pass':site('phone-pass','Таксофон у перевала','payphone',52,57,.8,.8,50,59,53,59,[[1,1],[2,1],[1,0]]),
+ 'phone-museum':site('phone-museum','Таксофон у музея','payphone',94,59,.8,.8,92,61,95,61,[[1,1],[2,1],[1,0]]),
+ 'phone-farlands':site('phone-farlands','Таксофон дальних земель','payphone',139,58,.8,.8,137,60,140,60,[[1,1],[2,1],[1,0]]),
  'tourist-kiosk':site('tourist-kiosk','Туристический киоск','tourist',25,38,2.8,2.2,22,40,25,41,[[2,2],[3,2],[3,2]]),
  'university-site':site('university-site','Университет','world-preview',18,42,3,2.5,15,44,18,45,[[3,2],[5,3],[4,3]]),
  'robo-stadium-site':site('robo-stadium-site','Стадион Robo Games','world-preview',29,43,4,3,26,46,30,47,[[4,3],[6,4],[6,3]]),

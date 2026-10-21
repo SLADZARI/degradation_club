@@ -88,3 +88,17 @@ test('existing city warehouse, material accounting and discarded stones survive 
   assert.equal(recovered.state.drops.find(d=>d.id===pile.id).quantity,3);
   assert.equal(recovered.snapshot(same).materials.stone.total,before);
 });
+
+test('world identity isolates persistent fog and survives state reload',()=>{
+  const first=createWorld(),second=createWorld();
+  assert.ok(first.worldId);
+  assert.notEqual(first.worldId,second.worldId,'new worlds must not reuse browser discovery');
+  const g=new Game(first),p=g.join('Исследователь');
+  assert.equal(g.snapshot(p).worldId,first.worldId,'clients receive the stable world key');
+  const legacy=createWorld();delete legacy.worldId;
+  new Game(legacy);
+  const migratedId=legacy.worldId;
+  assert.ok(migratedId,'legacy saves receive a stable world identity');
+  new Game(JSON.parse(JSON.stringify(legacy)));
+  assert.equal(legacy.worldId,migratedId,'reload does not reset the migrated world identity');
+});

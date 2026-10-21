@@ -13,7 +13,7 @@ test('multiple plots per resident and in two cities survive travel and restore',
  assert.equal(g.state.plots.filter(t=>t.owner===p.id).length,2);
  assert.equal(g.state.plots[0].zoning,'residential');assert.equal(g.state.plots[1].landUse,'business');
  p.x=19;p.y=6;const created=network.command(p,{type:'createCity',name:'Второй город',requestId:'create-b'});assert.equal(created.ok,true);
- const cityId=created.id;assert.equal(network.command(p,{type:'travelCity',cityId,requestId:'go-city-b'}).ok,true);
+ const cityId=created.id,newCity=network.games.get(cityId);newCity.state.expedition.completedAt=newCity.now;newCity.state.plots.find(plot=>plot.id==='plot-1').locked=false;assert.equal(network.command(p,{type:'travelCity',cityId,requestId:'go-city-b'}).ok,true);
  const other=network.gameFor(p);at(p,other.state.plots[2]);assert.equal(action(other,p,'buy','plot-3',{landUse:'universal'}).ok,true);
  let snap=network.snapshot(p);assert.equal(snap.cityNetwork.estates.length,3);assert.equal(snap.players.find(x=>x.id===p.id).gender,'female');
  p.x=19;p.y=6;assert.equal(network.command(p,{type:'travelCity',cityId:'origin',requestId:'return-home'}).ok,true);

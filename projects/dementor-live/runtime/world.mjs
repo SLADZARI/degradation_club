@@ -12,6 +12,7 @@ import {bagCapacity} from './losev-courses.mjs';
 import {stoneSize} from './world-footprints.mjs';
 import {initMayor,mayorAction} from './mayor-ideas.mjs';
 import {MUNICIPAL_SITES,emptyMunicipalProject,municipalBuildingView,municipalBuilt} from './municipal-buildings.mjs';
+import {WORLD_STRUCTURE_FOOTPRINTS} from './world-footprints.mjs';
 
 const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
 const distance = (a,b) => Math.hypot(a.x-b.x,a.y-b.y);
@@ -19,7 +20,7 @@ export const loadWeight = (p,c=CONFIG) => Object.entries(p.bag).reduce((n,[k,v])
 export const projectBudget = c => c.need.wood*c.pay.wood+c.need.stone*c.pay.stone+c.stages.reduce((n,s)=>n+s.works*c.pay.work,0);
 export function createWorld(c=CONFIG, options={}) {
   const resource=(id,type,x,y,stock)=>({id,type,x,y,stock,initial:stock,regrowAt:0});
-  return { version:1, startingCity:options.startingCity===true, treasury:c.treasury, project:{stage:0,work:0,accepted:{wood:0,stone:0},stock:{wood:0,stone:0},consumed:{wood:0,stone:0},spent:0},
+  return { version:1, worldId:randomUUID(), startingCity:options.startingCity===true, treasury:c.treasury, project:{stage:0,work:0,accepted:{wood:0,stone:0},stock:{wood:0,stone:0},consumed:{wood:0,stone:0},spent:0},
     players:{}, plots:[{id:'plot-1',x:4,y:15,w:6,h:6,owner:null},{id:'plot-2',x:4,y:23,w:6,h:6,owner:null},{id:'plot-3',x:14,y:23,w:6,h:6,owner:null}],
     resources:[resource('wood-1','wood',14,5,40),resource('wood-2','wood',21,5,40),resource('wood-3','wood',28,6,40),resource('wood-4','wood',30,20,40),resource('stone-1','stone',12,20,40),resource('stone-2','stone',27,11,40),resource('stone-3','stone',30,27,40),resource('stone-4','stone',2,27,40),resource('food-1','food',8,10,c.foodStock),resource('food-2','food',3,10,c.foodStock),resource('food-3','food',25,20,c.foodStock)],
     chat:[], transactions:[], revision:0 };
@@ -27,8 +28,8 @@ export function createWorld(c=CONFIG, options={}) {
 const supplyBridge=(project,kind,quantity)=>{project.accepted[kind]+=quantity;project.stock[kind]+=quantity;};
 const newProject=()=>({stage:0,work:0,accepted:{wood:0,stone:0},stock:{wood:0,stone:0},consumed:{wood:0,stone:0},spent:0});
 export class Game {
-  constructor(state=createWorld(),c=CONFIG){ this.state=state;this.c=state?.startingCity?{...c,expedition:{...c.expedition,gate:{...c.expedition.gate,x:7,y:18}}}:c;this.online=new Set();this.inputs=new Map();this.now=Date.now(); this.onChange=()=>{};this.dirty=false;
-    state.forge ||= newProject();state.bridge ||= newProject();
+  constructor(state=createWorld(),c=CONFIG){ this.state=state;this.c=state?.startingCity?{...c,expedition:{...c.expedition,gate:{...c.expedition.gate,x:7,y:18}}}:c;this.online=new Set();this.inputs=new Map();this.now=Date.now(); this.onChange=()=>{};this.dirty=false;if(!state.worldId){state.worldId=randomUUID();this.dirty=true;}
+    state.forge ||= newProject();state.bridge ||= newProject();state.technologies ||= {};state.phoneResearch ||= {startedAt:0,endsAt:0,completedAt:0};state.mayorLevel ||= state.startingCity&&state.project.stage>=(c.stages.length)?2:1;
     state.municipalBuildings ||= {};
     for(const site of Object.values(MUNICIPAL_SITES)){if(!state.municipalBuildings[site.id]){const p=emptyMunicipalProject();if(!state.startingCity)p.stage=site.stages.length;state.municipalBuildings[site.id]=p;}}
     for(const [id,type,x,y,stock]of [['east-wood-1','wood',41,7,48],['east-wood-2','wood',44,10,48],['east-wood-3','wood',42,23,48],['east-wood-4','wood',45,26,48],['east-stone-1','stone',42,16,48],['east-stone-2','stone',45,20,48],['east-food','food',41,12,c.foodStock]])if(!state.resources.some(r=>r.id===id))state.resources.push({id,type,x,y,stock,initial:stock,regrowAt:0});
@@ -80,7 +81,7 @@ export class Game {
   auth(token){return Object.values(this.state.players).find(p=>p.token===token);}
   connect(p){this.online.add(p.id);this.inputs.set(p.id,{dx:0,dy:0,sprint:false,at:this.now});this.changed();}
   disconnect(p){this.online.delete(p.id);this.inputs.delete(p.id);p.job=null;this.changed();}
-  rects(){const s=this.state,footprints=[
+  rects(){const s=this.state,footprints=[...WORLD_STRUCTURE_FOOTPRINTS,
  {x:4,y:4,w:4,h:3,id:'mayor-tent'},
  {x:22.7,y:1,w:2.6,h:2,id:'tool-shop'},
  {x:15.5,y:1.5,w:2.5,h:2.2,id:'landscape-shop'},
@@ -107,7 +108,7 @@ export class Game {
   cityFunds(){
     // Keep unfinished construction funded before offering optional purchases and courier work.
     let reserved=this.deliveries().reduce((n,d)=>n+d.reward,0);
-    for(const [p,c]of [[this.state.project,this.c],[this.state.forge,{...this.c,...this.c.forge}],[this.state.bridge,{...this.c,...this.c.bridge}],[this.state.seedMarket,{...this.c,...this.c.seedMarket}],[this.state.gardenProject,{...this.c,...this.c.cityGarden}],...Object.values(MUNICIPAL_SITES).filter(site=>this.state.startingCity&&(this.state.municipalBuildings?.[site.id]?.stage||0)<site.stages.length).map(site=>[this.state.municipalBuildings[site.id],{...this.c,...site}])]){
+    for(const [p,c]of [[this.state.project,this.c],[this.state.forge,{...this.c,...this.c.forge}],[this.state.bridge,{...this.c,...this.c.bridge}],[this.state.seedMarket,{...this.c,...this.c.seedMarket}],[this.state.gardenProject,{...this.c,...this.c.cityGarden}],...Object.values(MUNICIPAL_SITES).filter(site=>this.state.startingCity&&(!site.requiredTechnology||this.state.technologies?.[site.requiredTechnology])&&(this.state.municipalBuildings?.[site.id]?.stage||0)<site.stages.length).map(site=>[this.state.municipalBuildings[site.id],{...this.c,...site}])]){
       for(const k of ['wood','stone'])reserved+=Math.max(0,c.need[k]-p.accepted[k])*c.pay[k];
       reserved+=c.stages.slice(p.stage).reduce((n,s)=>n+s.works,0)*c.pay.work-p.work*c.pay.work;
     }
@@ -195,8 +196,10 @@ export class Game {
     const discarded=cmd.type==='discardTool'?p.toolItems?.find(t=>t.id===target)?.ingredients:null;
     const equipmentResult=equipmentAction(p,cmd,this.c);if(equipmentResult){if(discarded){s.materialScrap||={wood:0,stone:0};for(const [kind,quantity]of Object.entries(discarded)){s.materialScrap[kind]+=quantity;recordMaterial(this,'tool-discard',kind,quantity,'tool','scrap',p.id);}}return equipmentResult;}
     const estateResult=estateAction(this,p,cmd);if(estateResult)return estateResult;const ideaResult=mayorAction(this,p,cmd);if(ideaResult)return ideaResult;const forestryResult=forestryAction(this,p,cmd);if(forestryResult)return forestryResult;const livingResult=lifeAction(this,p,cmd);if(livingResult)return livingResult;
+    const municipalId=String(target||'').match(/^municipal-(.+)-(?:drop|build)$/)?.[1],municipalSite=MUNICIPAL_SITES[municipalId];if(municipalSite?.requiredTechnology&&!s.technologies?.[municipalSite.requiredTechnology])throw Error('Сначала изучите технологию в мэрии второго уровня');
+    if(type==='researchPayphones'){if(scene(p)!=='city')throw Error('Исследование доступно только в городской мэрии');if(!s.startingCity||s.mayorLevel<2)throw Error('Сначала городская площадь должна открыть мэрию второго уровня');this.near(p,this.target('mayor'));if(s.technologies.payphones)throw Error('Технология уже изучена');if(s.phoneResearch.startedAt)throw Error('Исследование уже идёт');s.phoneResearch={startedAt:this.now,endsAt:this.now+this.c.phoneResearchMs,completedAt:0};return {message:'Исследование таксофонов началось · 240 секунд'};}
     const expansionResult=cityExpansionAction(this,p,cmd);if(expansionResult)return expansionResult;const landscapeResult=landscapeAction(this,p,cmd);if(landscapeResult)return landscapeResult;
-    if(scene(p)!=='city'&&!['chat','eat','give','equip','cancel','drop','pickup'].includes(type))throw Error('Это действие доступно в городе');
+    if(scene(p)!=='city'&&!['chat','eat','give','equip','tools','cancel','drop','pickup'].includes(type))throw Error('Это действие доступно в городе');
     const cityResult=this.cityAction(p,cmd);if(cityResult)return cityResult;
     if(type==='chat'){
       const text=String(cmd.text||'').trim().replace(/[<>\x00-\x1f]/g,'').slice(0,180);if(!text)throw Error('Напиши сообщение');if(this.now-p.lastMessage<600)throw Error('Небольшая пауза между сообщениями');p.lastMessage=this.now;
@@ -223,6 +226,7 @@ export class Game {
       const craft=type==='craftTool',spec=craft?c.toolMaking:c.toolShop;
       if(t.type!==(craft?'forge':'shop'))throw Error('Подойди к нужному зданию');
       if(craft&&s.forge.stage<c.forge.stages.length)throw Error('Сначала постройте и обустройте кузницу');
+      if(!craft&&s.startingCity&&!municipalBuilt(s,'tool-shop'))throw Error('Сначала постройте городской магазин инструмента');
       syncEquipment(p,c);if(p.toolItems.length>=12)throw Error('Рюкзак вмещает до 12 инструментов. Удали лишний.');
       if(craft){for(const [k,n]of Object.entries(spec.recipe))if(p.bag[k]<n)throw Error('Принеси личные материалы для изготовления');for(const [k,n]of Object.entries(spec.recipe))p.bag[k]-=n;}
       else{if(p.wallet<spec.price)throw Error(`Нужно ${spec.price} PAPER`);p.wallet-=spec.price;s.treasury+=spec.price;s.transactions.push({id:randomUUID(),player:p.id,amount:-spec.price,reason:'premium-tool',time:this.now});}
@@ -263,12 +267,12 @@ export class Game {
       t.stock--;p.bag[t.type]++;p.tools[tool]--;recordMaterial(this,'mine',t.type,1,'deposit','bag',p.id);
     }else if(job.kind==='build'){
       if(p.spirit||job.stage!==this.projectFor(job.target).stage)return;this.canBuild(job.target);const project=this.projectFor(job.target),stage=this.configFor(job.target).stages[project.stage];this.transfer(p,this.c.pay.work,'work');project.spent+=this.c.pay.work;project.work++;
-      if(project.work>=stage.works){for(const k of ['wood','stone']){project.stock[k]-=stage[k];project.consumed[k]+=stage[k];if(stage[k])recordMaterial(this,'structure-built',k,stage[k],job.target,'structure',p.id);}project.stage++;project.work=0;reconcileResourceClearance(this);}
+      if(project.work>=stage.works){for(const k of ['wood','stone']){project.stock[k]-=stage[k];project.consumed[k]+=stage[k];if(stage[k])recordMaterial(this,'structure-built',k,stage[k],job.target,'structure',p.id);}project.stage++;project.work=0;if(project===this.state.project&&this.state.startingCity&&project.stage>=this.c.stages.length)this.state.mayorLevel=2;reconcileResourceClearance(this);}
     }
     this.changed();
     }catch{ /* Another player may complete the same final unit first; no payment is made. */ }
   }
-  tick(ms){this.now+=ms;tickEstateLeases(this);for(const t of this.state.trades)if(t.status==='offered'&&t.expires<=this.now){t.status='expired';this.changed();}const dt=ms/1000,c=this.c;
+  tick(ms){this.now+=ms;tickEstateLeases(this);if(this.state.phoneResearch?.startedAt&&!this.state.phoneResearch.completedAt&&this.now>=this.state.phoneResearch.endsAt){this.state.phoneResearch.completedAt=this.state.phoneResearch.endsAt;this.state.technologies.payphones=true;this.changed();}for(const t of this.state.trades)if(t.status==='offered'&&t.expires<=this.now){t.status='expired';this.changed();}const dt=ms/1000,c=this.c;
     for(const p of Object.values(this.state.players))if(p.delivery&&!p.delivery.picked&&p.delivery.expiresAt<=this.now){p.delivery=null;this.changed();}
     for(const r of this.state.resources)if(r.type==='food'&&r.regrowAt&&this.now>=r.regrowAt){r.stock=Math.min(c.foodStock,r.stock+1);r.regrowAt=r.stock<c.foodStock?this.now+c.berryRegrowMs:0;this.changed();}
     for(const id of this.online){const p=this.state.players[id];if(!p)continue;
@@ -287,7 +291,7 @@ export class Game {
       if(p.job&&this.now>=p.job.ends)this.finish(p);
     }
   }
-  snapshot(p){syncEquipment(p,this.c);const s=this.state,c=this.c;return {plaza:plazaSnapshot(this,p),...lifeSnapshot(this,p),now:this.now,revision:s.revision,me:p.id,config:{...c,capacity:bagCapacity(p,c,this.now)},treasury:s.treasury,citySolids:this.rects(),landscape:s.landscape,landscapeShop:LANDSCAPE_SHOP,landscapeProducts:LANDSCAPE_PRODUCTS,treeSpecies:TREE_SPECIES,project:s.project,forge:s.forge,seedMarket:s.seedMarket,gardenProject:s.gardenProject,publicGarden:s.publicGarden,materials:cityMaterialReport(this),materialEvents:s.materialEvents.slice(-30),bridge:{...s.bridge,reserved:{wood:this.committed('wood',false,'bridge'),stone:this.committed('stone',false,'bridge')}},plots:s.plots.map(({home,...plot})=>({...plot,homeVisual:{tent:home?.tent||0,beds:home?.beds?.length||0,crops:home?.beds?.filter(b=>b.crop).length||0},publicAccess:!!plot.owner&&(!plot.lease||plot.lease.dueAt>this.now)&&(plot.landUse==='business'||!!home?.open)})),startingCity:!!s.startingCity,municipalBuildings:s.municipalBuildings,municipalSites:municipalBuildingView(s),mayorMail:s.mayorMail.filter(t=>t.player===p.id).slice(-10).map(t=>({id:t.id,text:t.text,at:t.at,reward:t.reward})),resources:s.resources,
+  snapshot(p){syncEquipment(p,this.c);const s=this.state,c=this.c;return {plaza:plazaSnapshot(this,p),...lifeSnapshot(this,p),mayorLevel:s.mayorLevel||1,technologies:s.technologies||{},phoneResearch:s.phoneResearch||{startedAt:0,endsAt:0,completedAt:0},now:this.now,revision:s.revision,worldId:s.worldId,me:p.id,config:{...c,capacity:bagCapacity(p,c,this.now)},treasury:s.treasury,citySolids:this.rects(),landscape:s.landscape,landscapeShop:LANDSCAPE_SHOP,landscapeProducts:LANDSCAPE_PRODUCTS,treeSpecies:TREE_SPECIES,project:s.project,forge:s.forge,seedMarket:s.seedMarket,gardenProject:s.gardenProject,publicGarden:s.publicGarden,materials:cityMaterialReport(this),materialEvents:s.materialEvents.slice(-30),bridge:{...s.bridge,reserved:{wood:this.committed('wood',false,'bridge'),stone:this.committed('stone',false,'bridge')}},plots:s.plots.map(({home,...plot})=>({...plot,homeVisual:{tent:home?.tent||0,beds:home?.beds?.length||0,crops:home?.beds?.filter(b=>b.crop).length||0},publicAccess:!!plot.owner&&(!plot.lease||plot.lease.dueAt>this.now)&&(plot.landUse==='business'||!!home?.open)})),startingCity:!!s.startingCity,municipalBuildings:s.municipalBuildings,municipalSites:municipalBuildingView(s),mayorMail:s.mayorMail.filter(t=>t.player===p.id).slice(-10).map(t=>({id:t.id,text:t.text,at:t.at,reward:t.reward})),resources:s.resources,
     warehouse:{...s.warehouse,free:{wood:this.warehouseFree('wood'),stone:this.warehouseFree('stone')},funds:this.cityFunds()},courierOffers:['mayor','bridge'].flatMap(destination=>['wood','stone'].map(k=>this.courierOffer(k,destination))).filter(Boolean),drops:s.drops.filter(d=>(d.scene||'city')===scene(p)&&(scene(p)==='city'||d.plotId===p.plotId)),
     players:Object.values(s.players).filter(o=>o.id===p.id||this.online.has(o.id)||s.plots.some(x=>x.owner===o.id)).map(o=>({id:o.id,name:o.name,gender:o.gender||'unspecified',x:o.x,y:o.y,scene:scene(o),plotId:o.plotId||null,color:o.color,online:this.online.has(o.id),spirit:o.spirit,...(o.id===p.id?{wallet:o.wallet,bag:o.bag,toolItems:o.toolItems,activeTools:o.activeTools,tools:o.tools,toolInfo:o.toolInfo,equipped:o.equipped,hunger:o.hunger,health:o.health,stamina:o.stamina,job:o.job,gardenTools:o.gardenTools,terrainBag:o.terrainBag,activeGameMs:o.activeGameMs||0,mayorFeedback:{lastRewardAt:o.mayorFeedback?.lastRewardAt||0},delivery:o.delivery||null}: {})})),
     chat:s.chat.filter(m=>this.now-m.at<600000&&(m.scene||'city')===scene(p)&&(scene(p)==='city'||m.plotId===p.plotId)&&distance(p,m)<=c.chatRange).slice(-15)};
