@@ -111,7 +111,11 @@ function drawHome(time){
    if(state.scene==='plot'&&window.DLWorldArtG6?.mode==='compare'&&g6Bed)
      window.DLWorldArtG6.drawGroundProp(ctx,g6Bed,b.x,b.y,screen,view.s,1.2);
    groundRect({x:b.x-.6,y:b.y-.6,w:1.2,h:1.2},'#b7a083','#8f8066');if(b.crop){const q=screen(b.x,b.y),ripe=b.watered&&state.now>=b.readyAt;const k=view.s*(ripe?.25:.13);if(b.crop==='hemp'){drawHempBush(b.x,b.y);}else if(b.crop==='carrot'){poly([[q.x-k*.5,q.y-k],[q.x+k*.5,q.y-k],[q.x,q.y+k]],'#c89362','#9a7857');poly([[q.x,q.y-k],[q.x-k,q.y-k*2],[q.x,q.y-k*1.7],[q.x+k,q.y-k*2]],'#8fa476','#73886a');}else{for(const side of [-1,1]){poly([[q.x,q.y],[q.x+side*k,q.y-k],[q.x+side*k*.9,q.y-k*1.7],[q.x,q.y-k*.8]],side<0?'#8ba678':'#a4b58c','#708966');}line(q.x,q.y,q.x,q.y-k*2,'#718466',1.5);}}label(b.crop?b.seedPlant?'На семена':b.watered?(state.now>=b.readyAt?'Созрело':'Растёт'):'Полей':'Грядка',b.x,b.y+1,true);}
- }else {const s=view.s,c=screen(3,5.5),b=screen(9,6);paperBox(c.x,c.y-s*.7,s*1.65,s*.7,s*.35,-s*.24,'#b29a75','#907d60','#d2bd96');line(c.x+s*.8,c.y-s*.7,c.x+s*.8,c.y,'#81765e',2);paperBox(b.x,b.y-s*.35,s*1.7,s*.35,s*.55,-s*.38,'#d1c7b1','#a99e86','#eee6d2');paperBox(b.x+s*.13,b.y-s*.5,s*.7,s*.15,s*.25,-s*.17,'#eee9d8','#bdb59e','#faf3df');label('Сундук',4,6,true);label('Кровать',10,7,true);}
+ }else {const s=view.s,c=screen(3,5.5),b=screen(9,6);paperBox(c.x,c.y-s*.7,s*1.65,s*.7,s*.35,-s*.24,'#b29a75','#907d60','#d2bd96');line(c.x+s*.8,c.y-s*.7,c.x+s*.8,c.y,'#81765e',2);paperBox(b.x,b.y-s*.35,s*1.7,s*.35,s*.55,-s*.38,'#d1c7b1','#a99e86','#eee6d2');paperBox(b.x+s*.13,b.y-s*.5,s*.7,s*.15,s*.25,-s*.17,'#eee9d8','#bdb59e','#faf3df');label('Сундук',4,6,true);label('Кровать',10,7,true);
+  // Real chest exists in the current interior; preview its art beside the old rendering only.
+  // This local scene still uses rectangular projection, so NO substitution until ISO30/controls G6.
+  if(window.DLWorldArtG6?.mode==='compare')window.DLWorldArtG6.drawGroundProp(ctx,'interior-chest',3.8,5.5,screen,view.s,1.4);
+ }
  for(const t of state.homeTargets.filter(t=>['mission-exit','plot-exit','home-exit','tent','well','garden'].includes(t.id)))label(t.title,t.x,t.y,true);
  for(const d of state.drops)label(`${names[d.kind]} × ${d.quantity}`,d.x,d.y,true);
  for(const p of state.players.filter(p=>(p.online||p.id===me.id)&&sameScene(p)))drawPlayer(p,time);
