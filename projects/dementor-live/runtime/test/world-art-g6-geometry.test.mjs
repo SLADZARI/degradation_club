@@ -22,8 +22,14 @@ test('CU footprint projects to exact 30-degree diamond with real southern foot a
   assert.ok(a);
   nearly(a.foot.x,project(shape.x+shape.w,shape.y+shape.h).x);
   nearly(a.foot.y,project(shape.x+shape.w,shape.y+shape.h).y);
-  nearly(a.left+a.width/2,a.foot.x);
-  nearly(a.top+a.height,a.foot.y);
+  // A 4×3 CU footprint has an offset southern vertex; center the art on its
+  // projected diamond, while preserving the southern-Y anchoring for visual height.
+  nearly(a.left+a.width/2,a.visualAnchor.x);
+  nearly(a.top+a.height,a.visualAnchor.y);
+  nearly(a.visualAnchor.x,(Math.min(...a.corners.map(p=>p.x))+Math.max(...a.corners.map(p=>p.x)))/2);
+  nearly(a.visualAnchor.y,a.foot.y);
+  nearly(a.horizontalOffset,a.visualAnchor.x-a.foot.x);
+  nearly(a.horizontalOffset,(shape.h-shape.w)*unit*cos/2);
   nearly(a.groundWidth,(shape.w+shape.h)*unit*cos);
   nearly(a.groundDepth,(shape.w+shape.h)*unit*.5);
   nearly(a.groundDepth/a.groundWidth,Math.tan(Math.PI/6));
@@ -35,6 +41,9 @@ test('CU geometry scales uniformly with zoom, preserving anchored foot position'
  const a=qa.footprintLayout(o,screen(20),20,bbox),b=qa.footprintLayout(o,screen(40),40,bbox);
  nearly(b.width/a.width,2);nearly(b.height/a.height,2);
  nearly(b.foot.x,2*a.foot.x);nearly(b.foot.y,2*a.foot.y);
+ nearly(b.visualAnchor.x,2*a.visualAnchor.x);
+ nearly(b.visualAnchor.y,2*a.visualAnchor.y);
+ nearly(b.horizontalOffset,2*a.horizontalOffset);
  assert.equal(qa.footprintLayout({...o,w:0},screen(20),20,bbox),null);
  assert.equal(qa.footprintLayout(o,screen(20),20,{w:0,h:20}),null);
 });
@@ -72,4 +81,21 @@ test('8 private-plot tent candidates mirror saved-game identity without rerollin
    assert.equal(qa.tentArtId(city,'plot-'+i,0),null);
   }
  }
+});
+
+test('Rectangular footprint correction is nonzero for asymmetric CU but vanishes for square CU',()=>{
+ const unit=28,cos=Math.sqrt(3)/2;
+ const screen=(x,y)=>({x:(x-y)*unit*cos+250,y:(x+y)*unit*.5+30});
+ const square=qa.footprintLayout({x:1,y:4,w:3,h:3},screen,unit,{w:170,h:190});
+ const long=qa.footprintLayout({x:1,y:4,w:6,h:2},screen,unit,{w:170,h:190});
+ nearly(square.horizontalOffset,0);
+ assert.ok(Math.abs(long.horizontalOffset)>40,'rectangular center correction must be measurable');
+ assert.equal(qa.footprintLayout({x:1,y:4,w:2,h:3},()=>({x:NaN,y:0}),unit,{w:170,h:190}),null);
+});
+test('Interior furniture preview is tied to a REAL chest and is compare-only',()=>{
+ const life=fs.readFileSync(path.join(root,'public','life-ui.js'),'utf8');
+ assert.match(source,/'interior-chest'/);
+ assert.match(life,/state\.scene==='interior'/);
+ assert.match(life,/DLWorldArtG6\?\.mode==='compare'\)window\.DLWorldArtG6\.drawGroundProp\(ctx,'interior-chest'/);
+ assert.doesNotMatch(life,/drawGroundProp\(ctx,'interior-chair/);
 });
