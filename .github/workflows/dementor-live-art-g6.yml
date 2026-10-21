@@ -9,6 +9,7 @@ on:
       - 'projects/dementor-live/runtime/test/world-art-g6.test.mjs'
       - 'projects/dementor-live/runtime/test/world-art-g6-http.test.mjs'
       - 'projects/dementor-live/runtime/test/world-art-g6-geometry.test.mjs'
+      - 'projects/dementor-live/runtime/test/world-art-g6-browser.cjs'
       - 'projects/dementor-live/runtime/assets-source/world-art-unique-houses/**'
       - '.github/workflows/dementor-live-art-g6.yml'
   workflow_dispatch:
@@ -34,3 +35,32 @@ jobs:
         run: |
           npm run check
           npm test
+
+  g6-two-player-browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Prepare isolated Chromium QA dependencies
+        working-directory: projects/dementor-live/runtime
+        run: |
+          npm install --no-save --package-lock=false playwright@1.58.2
+          npx playwright install --with-deps chromium
+      - name: Capture G6 compare and replacement with two independent clients
+        working-directory: projects/dementor-live/runtime
+        env:
+          ART_G6_SCREENSHOT_DIR: artifacts/g6
+        run: npm run test:art-g6:browser
+      - name: Upload G6 screenshots for human art/geometry review
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: G6-ISO30-visual-evidence
+          path: projects/dementor-live/runtime/artifacts/g6/
+          if-no-files-found: warn
+          retention-days: 14
