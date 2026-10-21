@@ -21,6 +21,57 @@ semanticMutationAuthorized: false
 **Verdict: PREP REPORT / LEAD-ACCEPTED AS DRAFT PLANNING INPUT; HOST READ-ONLY AFTER VERIFIED AT W12; STATIC MANIFEST FALSE-ALARM CORRECTED AT W13; STAGE1 RELEASE STILL NO-GO.**  
 **Production effect: NONE.** This report is not a Decision, Result, Gate, host approval or deploy authorization. It proposes no immediate change to existing services. Parent [#237](https://github.com/SLADZARI/degradation_club/issues/237) remains **BACKLOG/DEFERRED**; [#228](https://github.com/SLADZARI/degradation_club/issues/228) does not yet provide an accepted current stable migration baseline.
 
+## W17 · Lead 6322170273 — Kirill/MDAO + DNS owner permission closure (2026-10-21)
+
+**STATUS: ARCHITECT REVIEW-READY / SIGNATURES MISSING / ZERO HOST WRITES.** The current authority is [Stage1 Result v0.2](https://github.com/SLADZARI/degradation_club/blob/dementor-club/.weekly-os/results/portal-vm-site-hosting-stage1.v0.2.md): APPROVED, G4_PASS, WAITING, implementationStartAuthorized=true **for isolated code/preparation only**, liveHostMutationAuthorized=false and productionDeployAuthorized=false. Active Web/UI Result/PR #308 has one integration branch and independent G6 pending; Stage1 has no active site branch. Earlier Draft Stage1 PR #309 was CLOSED/UNMERGED and superseded. [Lead exact #255 request](https://github.com/SLADZARI/degradation_club/issues/255#issuecomment-6322170273) does NOT grant a VM/DNS change.
+
+**ALREADY ACCEPTED / DO NOT REPEAT:** W12 read-only host snapshot, W13 468/468 static byte parity, W14 certificate SAN/expiry and current Nginx include/listener map, isolated mock and literal new-only diff. W14 is the implementation *proposal*; this section only clarifies named owner decisions and guardrails. No new issue/Result, source rebuild, VM inventory, Nginx reload, ACME challenge or DNS change.
+
+### W17-A · Kirill no-regression baseline — answer K1 OR K2; no presumed consent
+
+Historical and current bounded MDAO HEAD codes are graylog.mdao.is=502, monitoring.mdao.is=502, n8n.g155333.ru=502. **UNCHANGED 502 is only a comparison observation, NOT a healthy MDAO verdict.** Kirill/MDAO service custodian must formally select:
+
+- **K1 ACCEPT LIMITED PROBE:** I acknowledge these three existing HEAD 502 responses and accept matching codes **for probe-level no-regression only**, together with the following SAFE independently meaningful service status/health checks and expected acceptable values: [Kirill to specify]; observation window and incident/rollback owner: [Kirill to specify]. No /data contents, db-dev data or protected volumes will be inspected by Club.
+- **K2 NOT ACCEPTED:** 502 cannot be accepted as sufficient evidence; I require a separately owned MDAO safe health criterion or repair before shared Nginx reload. **HOST CHANGE STOP** until Kirill supplies the criterion. Do not create an MDAO repair task within #255 by implication.
+
+Either reply MUST name the responsible host custodian and acknowledge protection of preexisting Nginx config hashes/owners/modes, default 80, implicit n8n default 443, MDAO/Live vhosts, Live IP/SSE, Docker/Runner/db-dev port and volume **metadata only**. The accepted baseline is not consent for changes. If there is no explicit K1/K2 response, MDAO baseline acceptance is **NOT VERIFIED**.
+
+### W17-B · Exactly permitted host change **AFTER SEPARATE WRITTEN AUTHORIZATION**
+
+**Host owner = Kirill; release/Club approval = Club owner + Lead Gate; those grants are DISTINCT.** Under an approved later window, exact scope:
+
+1. NEW regular file /etc/nginx/sites-available/zz-dementor.club.conf mode 0644 with exactly the W14-B reviewed blocks, only if currently absent. NEW symlink /etc/nginx/sites-enabled/zz-dementor.club.conf -> ../sites-available/zz-dementor.club.conf only if absent. **No other file may change.** The zz- lexical position preserves existing n8n as first implicit TLS 443 default under the verified sites-enabled/* include. Do not set default_server, [::]:443, new port or any proxy of game.
+2. Kirill captures BEFORE protected metadata (no /data traversal), applies ONLY the two new Club items, validates nginx -t and **only after PASS** performs ONE controlled Nginx reload under a host change grant. AFTER compare effective 80/443 default/SNI, three MDAO bounded HEAD codes plus Kirill's actual chosen health checks, db-dev/Runner/Docker state, Live IP Host GET /api/health 200 and SSE route. Any unexpected change = STOP.
+3. Separate pre-DNS CA-trusted HTTPS checks via curl --resolve for **both** dementor.club and www.dementor.club at reverified VM IPv4 (historically 138.199.144.94): apex 200, www 301, normal routes/404, certificate SAN/chain, existing n8n default & Live IP unchanged. **No curl -k** and no public DNS switch. This cannot be performed on a new site before the approved install/reload.
+4. **SITE-ONLY ROLLBACK if failed:** Kirill disables/removes ONLY the newly added enabled symlink, validates nginx -t, performs his controlled reverting reload, and removes the newly added file only after checking no other references. Reverify protected baseline and Game IP. No blanket restart, no edits to default/MDAO/Live/docker/Certbot, no /data touch. Do not use this rollback procedure unless the original grant covers the incident window.
+
+**STOP when:** named file/link already exists with unreviewed content, any existing vhost/default changes, unknown 443 Host/SNI now routes to Club, game IP/SSE is intercepted, MDAO no-regression criterion absent, CA-trusted TLS fails, QA privacy fails or required host/owner Gate is missing.
+
+### W17-C · Club DNS owner — BOTH hostnames plus IPv6 and ACME are separate decisions
+
+**Current public DNS baseline:** apex GitHub Pages A = 185.199.108.153, 185.199.109.153, 185.199.110.153, 185.199.111.153 (authoritative TTL 600), **NO apex AAAA**. The www CNAME = sladzari.github.io (TTL 3600) and that target can resolve to Pages **IPv4 and IPv6**. Changing only apex A leaves www on GitHub Pages. DNS owner must choose a two-name cutover and explicit rollback, not just an apex update.
+
+**Proposed owner choice D1 (PENDING, NOT A GRANT):** on a later signed G7 release after tested VM SNI, replace apex four A with revalidated VM IPv4 and change the **www CNAME** target from sladzari.github.io to dementor.club. Preserve NO apex AAAA and NO [::]:443 until independent IPv6 listener/firewall/cert/route QA. Account for non-atomic DNS operations and caches (TTL 600 apex / 3600 www). Test authoritative and recursive A/AAAA/CNAME and both HTTPS hostnames. Do not deactivate Pages prior to tested rollback.
+
+**Rollback D1:** DNS owner restores EXACT original four apex Pages A and original www CNAME sladzari.github.io, with no new AAAA. Re-test apex+www TLS/redirect after resolver caches; preserve original Pages custom domain and release workflow. Alternative D2 is permitted only with an owner-written exact A/CNAME/AAAA/two-SAN strategy and equivalent rollback, NOT an improvised `www` redirect.
+
+**Separate decision ACME1 (NOT YET AUTHORIZED):** the existing Certbot 2.9.0 manual dns-01 lineage contains root-owned Python auth+cleanup hooks, active certbot.timer and an apex+www SAN certificate valid until **2027-01-15 17:14:06 UTC**. These metadata are **NOT unattended-renewal PASS**. Certbot `renew --cert-name dementor.club --dry-run` may CREATE/DELETE **REAL** DNS TXT records at both _acme-challenge names, write logs and invoke provider APIs. Require explicit **Kirill VM/Certbot + Club DNS owner** written rehearsal window, allowed least-privilege TXT scope/credentials custody, provider API availability, idempotent cleanup of only owned records and recovery, plus redacted evidence. Future deploy hook/controlled reload is a SECOND host permission. If unavailable, record owner-approved supervised manual renewal/30-14-7 day alert as a temporary EXCEPTION, never an unattended PASS; HTTP-01 requires a distinct reviewed config Change Proposal.
+
+**Host changes, ACME rehearsal and public DNS release have THREE DIFFERENT grants.** The Stage1 code-only G4 does not grant any of them. The www/IPv6 DNS choice also does not authorize TLS hook actions.
+
+### W17-D · exact ownership and acceptance outcome
+
+| Item | Evidence | Current verdict | Next accountable |
+| --- | --- | --- | --- |
+| Limited Stage1 source work | canonical Result v0.2 G4_PASS/WAITING, Web/UI G5 in progress | **APPROVED code only**, no host source branch | Lead / Web/UI / Q-01 |
+| New-only Nginx diff / implicit 443 default | W14 two-item diff and local fixture PASS | **DESIGN PREPARED, NOT INSTALLED** | Kirill+Club owner host permission after QA/release Gate |
+| MDAO legacy 502 and meaningful health | historical 502/502/502, no healthy proof | **NOT VERIFIED/NO K1-K2 OWNER SIGNOFF** | Kirill/MDAO owner |
+| DNS A plus www CNAME and IPv6 | Pages both names today; www target includes AAAA | **D1 PROPOSED/NOT APPROVED** | Club DNS owner + later release Gate |
+| DNS-01 noninteractive rehearsal/cleanup | cert/hook/timer metadata only | **NOT VERIFIED; REAL TXT SIDE EFFECTS** | Club DNS owner + Kirill separately |
+| Live pre-DNS CA-trusted SNI / post-reload no-drift | New Club site not installed on VM | **NOT RUN** | Kirill+Q-01 after written host grant |
+| Production/G8 | independent Web/UI G6 and Auth/Storage actors pending | **NO-GO** | Lead / Q-01 / Club owner |
+
+**REQUEST IN EXISTING #255 ONLY:** Kirill reply K1 or K2 plus meaningful safe health baseline/rollback custodian and explicit future host-grant owner; Club DNS owner reply D1 or D2 and separate ACME1 permission choice. A-01 is ready to reconcile their actual answers into same Draft #257; until then classify as WAITING_FOR_SIGNOFF, not DONE. **PRODUCTION / VM / DNS / CLOUD / MDAO / LIVE EFFECT: NONE.**
 ## W14 · TLS renewal and MDAO no-drift — exact Architect/DevOps permission packet (2026-10-21)
 
 **STATUS: DOCUMENTED + LOCAL FIXTURE TESTED, NOT INSTALLED.** The latest [Lead W14 task](https://github.com/SLADZARI/degradation_club/issues/255#issuecomment-6314259056) permits preparation ONLY in existing Draft PR #257. Site-only [Draft #309](https://github.com/SLADZARI/degradation_club/pull/309) remains G4_APPROVAL_PENDING with implementationStartAuthorized=false. Cloud Auth, GitHub Pages, existing game and MDAO are unchanged. W13 static artifact 468/468 source-vs-VM byte parity accepted; do not rebuild or re-upload.
