@@ -28,13 +28,13 @@ export function ensureTelephoneDirectory(network){
    p.pagerNumber=String(network.data.telecom.nextNumber++);
    network.directoryDirty=true;g.changed();
   }
-  seen.add(p.pagerNumber);p.pagerInbox||=[];p.pagerOwns||=false;p.pagerReceipts||={};p.pagerBlocked||=[];p.pagerListed??=false;
+  seen.add(p.pagerNumber);p.pagerInbox||=[];p.pagerOwns||=false;p.pagerReceipts||={};p.pagerBlocked||=[];p.pagerListed??=false;if(!p.pagerOwns)p.pagerListed=false;
  }
 }
 export const NPC_NUMBERS=Object.freeze({museum:'500001',mayor:'500002'});
 export function publicSubscriberList(network,viewer=null){
  ensureTelephoneDirectory(network);
- const people=[...network.values()].flatMap(g=>Object.values(g.state.players).filter(p=>p.pagerListed||p.id===viewer?.id).map(p=>({id:p.id,name:p.name,number:p.pagerNumber,hasPager:!!p.pagerOwns,kind:'resident'})));
+ const people=[...network.values()].flatMap(g=>Object.values(g.state.players).filter(p=>!!p.pagerOwns&&!!p.pagerListed).map(p=>({id:p.id,name:p.name,number:p.pagerNumber,hasPager:!!p.pagerOwns,kind:'resident'})));
 const services=[{id:'npc-mayor',name:'Мэрия · поручения',number:NPC_NUMBERS.mayor,kind:'npc'},
  ...((viewer?.worldTravel?.visited||[]).includes('museum')?[{id:'npc-museum',name:'Музей смеха',number:NPC_NUMBERS.museum,kind:'npc'}]:[])];
 return [...services,...people].sort((a,b)=>a.name.localeCompare(b.name,'ru')).slice(0,500);
@@ -55,6 +55,7 @@ export function telecomAction(network,p,cmd){
  if(p.pagerReceipts?.[requestId])return p.pagerReceipts[requestId];
  let result;
  if(cmd.type==='pagerList'){
+  if(!p.pagerOwns)throw Error('Сначала купи пейджер');
   p.pagerListed=!!cmd.listed;
   result={message:p.pagerListed?'Номер добавлен в общий справочник':'Номер скрыт из общего справочника'};
  }else if(cmd.type==='pagerBlock'){
@@ -99,7 +100,7 @@ export function telecomAction(network,p,cmd){
   const recipient=publicSubscriberList(network,p).find(x=>x.number===toNumber&&x.kind==='resident');
   if(!recipient)throw Error('Абонент не найден');
   const target=network.findId(recipient.id);
-  if(!target||target.p.pagerBlocked?.includes(p.pagerNumber))throw Error('Абонент недоступен');
+  if(!target||!target.p.pagerOwns||target.p.pagerBlocked?.includes(p.pagerNumber))throw Error('Абонент недоступен');
   const raw=String(cmd.text||'').trim();
   if(!raw||raw.length>100)throw Error('Сообщение должно содержать от 1 до 100 символов');
   const message=cleanText(raw);if(!message)throw Error('Напиши сообщение');
