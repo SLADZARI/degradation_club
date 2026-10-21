@@ -7,12 +7,12 @@
     "projectStage": "BUILD",
     "gate": "G5_BUILD",
     "status": "APPROVED",
-    "version": "3.26",
-    "updated": "2026-10-21",
+    "version": "3.27",
+    "updated": "2026-10-22",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "3.25"
+    "supersedes": "3.26"
   },
   "currentArtifacts": [
     {
@@ -3829,17 +3829,17 @@
     {
       "artifactId": "dementor-club.result.pre-vm-webui-gate-correctives-v1",
       "documentType": "RESULT",
-      "currentVersion": "0.1",
-      "version": "0.1",
+      "currentVersion": "0.2",
+      "version": "0.2",
       "status": "APPROVED",
       "workStatus": "ACTIVE",
-      "location": ".weekly-os/results/pre-vm-webui-gate-correctives-v1.v0.1.md",
-      "path": ".weekly-os/results/pre-vm-webui-gate-correctives-v1.v0.1.md",
+      "location": ".weekly-os/results/pre-vm-webui-gate-correctives-v1.v0.2.md",
+      "path": ".weekly-os/results/pre-vm-webui-gate-correctives-v1.v0.2.md",
       "sourceSystem": "GIT",
       "authorityType": "IMPLEMENTATION_AUTHORITY",
-      "updated": "2026-10-21",
+      "updated": "2026-10-22",
       "canonicalProject": "dementor-club",
-      "canonicalLocation": ".weekly-os/results/pre-vm-webui-gate-correctives-v1.v0.1.md",
+      "canonicalLocation": ".weekly-os/results/pre-vm-webui-gate-correctives-v1.v0.2.md",
       "relation": "CURRENT_RESULT",
       "gate": "G5_BUILD",
       "projectStage": "BUILD",
@@ -3857,8 +3857,9 @@
       "liveDatabaseMutationAuthorized": false,
       "productionMergeAuthorized": false,
       "productionDeployAuthorized": false,
-      "g4Status": "PASS",
-      "g4Evidence": "https://github.com/SLADZARI/degradation_club/issues/237#issuecomment-6320105037"
+      "g4Status": "PASS_LIMITED_CODE_ONLY_POSTCONFIRMED_EXTENSION",
+      "g4Evidence": "https://github.com/SLADZARI/degradation_club/issues/237#issuecomment-6320105037",
+      "ownerD1ConditionalCodeGrant": "https://github.com/SLADZARI/degradation_club/issues/227#issuecomment-6326985199"
     },
     {
       "artifactId": "dementor-club.result.portal-vm-site-hosting-stage1",
