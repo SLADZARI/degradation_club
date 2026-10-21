@@ -9,6 +9,7 @@ const motionFrames=[];
 let lastWallet=null,lastChatSignature='';
 let seenChatIds=null,hoverWorld=null,placementKind=null,placementCell=null;
 let fogOwner=null,fogExplored=new Set(),fogSaveTimer=null;
+function fogStorageKey(){return `dementor-fog-${state?.worldId||'legacy'}-${state?.cityNetwork?.current||'origin'}-${me?.id||''}`;}
 const colors=['#a97059','#6e8971','#65858f'];
 const names={wood:'Древесина',stone:'Камень',food:'Ягоды',seed_hemp:'Семена конопли',seed_carrot:'Семена моркови',hemp:'Конопля',carrot:'Морковь',water:'Вода'};
 const toolNames={axe:'🪓 Топор',pick:'⛏️ Кирка'};
@@ -304,10 +305,10 @@ function worldPoint(x,y){
 }
 function recordFogDiscovery(){
  if(!me||!state?.startingCity||state.scene!=='city')return;
- if(fogOwner!==me.id){fogOwner=me.id;try{fogExplored=new Set(JSON.parse(localStorage.getItem('dementor-fog-'+me.id)||'[]'));}catch{fogExplored=new Set();}}
+ const storageKey=fogStorageKey();if(fogOwner!==storageKey){fogOwner=storageKey;try{fogExplored=new Set(JSON.parse(localStorage.getItem(storageKey)||'[]'));}catch{fogExplored=new Set();}}
  const radius=10.5,minX=Math.max(0,Math.floor(me.x-radius)),maxX=Math.min(state.config.width-1,Math.ceil(me.x+radius)),minY=Math.max(0,Math.floor(me.y-radius)),maxY=Math.min(state.config.height-1,Math.ceil(me.y+radius));let changed=false;
  for(let y=minY;y<=maxY;y++)for(let x=minX;x<=maxX;x++)if(Math.hypot(x+.5-me.x,y+.5-me.y)<=radius){const key=x+','+y;if(!fogExplored.has(key)){fogExplored.add(key);changed=true;}}
- if(changed&&!fogSaveTimer)fogSaveTimer=setTimeout(()=>{fogSaveTimer=null;if(fogOwner===me?.id)try{localStorage.setItem('dementor-fog-'+me.id,JSON.stringify([...fogExplored]));}catch{}},300);
+ if(changed&&!fogSaveTimer){const saveKey=fogOwner;fogSaveTimer=setTimeout(()=>{fogSaveTimer=null;if(fogOwner===saveKey)try{localStorage.setItem(saveKey,JSON.stringify([...fogExplored]));}catch{}},300);}
 }
 function drawFogOfWar(){
  if(!me||!state?.startingCity||state.scene!=='city')return;
