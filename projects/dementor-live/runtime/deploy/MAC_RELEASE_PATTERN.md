@@ -7,7 +7,7 @@ These tools live in the source-runtime [OPS PR #300](https://github.com/SLADZARI
 ## 1. Host authentication before any command
 
 - Mac operator must already have the **verified** server host key (fingerprint checked out-of-band via their hosting console) in `~/.ssh/known_hosts`. Both helpers use `StrictHostKeyChecking=yes`, a single `BatchMode`/public-key/IdentitiesOnly SSH attempt, and fail closed on a changed/unknown host. Never blindly accept new host keys or upload/private-copy the SSH key into Git.
-- The existing SSH identity path is `${DEMENTOR_SSH_KEY:-$HOME/Downloads/dementor_server}`; helper only verifies that the key exists/readable and does not chmod it.
+- **Verified 21 Oct 2026:** authorized Mac's actual SSH key is `~/.ssh/dementor_server` (ED25519 mode 0600), **not** the old Downloads-only assumption. The read-only audit and private backup-copy helpers first use explicit `DEMENTOR_SSH_KEY`, otherwise look for exact `~/.ssh/dementor_server` then historically allowed Downloads paths; they never probe arbitrary keys. The release helper already supported `.ssh` as one of its explicit candidates. Existing verified `known_hosts`, one public-key attempt, no key copying/chmod.
 - On an offline Mac or missing key/host verification, report `NOT VERIFIED`; do not guess credentials or retry using unrelated keys.
 
 ## 2. Read-only production attestation (operator only, with existing authorized VM access)
