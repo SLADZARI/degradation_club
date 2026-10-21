@@ -100,7 +100,7 @@ test('Fresh live world starts at the marked parcel and hides city services until
  assert.equal(view.startingCity,true);
  assert.deepEqual(view.worldTravel.targets,[]);
  assert.deepEqual(view.worldTravel.booths,[]);
- assert.deepEqual(view.worldTravel.footprints,[]);
+ assert.ok(!view.worldTravel.footprints.some(o=>o.kind==='building'||o.kind==='payphone'),'city structures stay hidden before clearing');\n assert.ok(view.worldTravel.footprints.some(o=>['forest','mountain','rock'].includes(o.kind)),'natural barriers remain visible and solid');
  const hidden=command(g,p,'touristBuy','tourist-kiosk',{kind:'shirt'});
  assert.equal(hidden.ok,false);
  p.x=g.c.expedition.gate.x;p.y=g.c.expedition.gate.y;
