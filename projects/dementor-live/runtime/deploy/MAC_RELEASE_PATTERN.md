@@ -2,7 +2,7 @@
 
 Status: **DRAFT operator procedure, NOT a production GO** · 2026-10-20
 
-These tools live in the source-runtime [OPS PR #300](https://github.com/SLADZARI/degradation_club/pull/300), remain independent of the frozen RC4 game build, and must not be confused with production proof. The current release helper is pinned to the **saved-resident hotfix** `a38a03e68fcec5ceac45c0c362436ee6d69d5c5d`. It is not a generic "latest" deploy.
+These tools live in the source-runtime [OPS PR #300](https://github.com/SLADZARI/degradation_club/pull/300), remain independent of the frozen RC4 game build, and must not be confused with production proof. The release helper now has **two deliberately pinned profiles**: historical `resident-recovery` (default, exact `a38a03e68fcec5ceac45c0c362436ee6d69d5c5d`) and explicitly selected **`h0-v3`** (exact `6d09e9828a549b6ce64a354c5f7bf0a29717a700`, includes six required CI runs). It is never a generic "latest" deploy.
 
 ## 1. Host authentication before any command
 
@@ -40,6 +40,34 @@ The owner/operator must provide a **separate, explicit SHA-specific G7 GO** and 
 ## 4. Staging/QA isolation before load testing
 
 Do not deploy a QA shard into the current production container or world volume. Prefer a separate staging VM; until hardware and CPU/RAM/disk parity are measured, reserve **no definitive concurrency figure**. Distinct Docker project, private test URL/port, disposable volume and credentials, bounded memory/CPU/PIDs, private logs, and a kill/expiry procedure must be approved under [QA-PANEL-01 #32](https://github.com/SLADZARI/dementor_live/issues/32) G3 and [PERF-01 #8](https://github.com/SLADZARI/dementor_live/issues/8). No load against public production IP.
+
+## H0-specific profile · 21 October 2026
+
+The owner-approved **H0 technical scope** is the new-only JSON manifest and save-preserving saved-resident parent. The H0 profile is **opt-in**, not the default, and it is not an authorization to publish.
+
+```bash
+# Operator Mac, reviewed OPS checkout, read-only VM audit only:
+bash deploy/mac-production-audit.sh
+
+# Separately: off-VM private backup restore from existing backup with
+# independently checked candidate checkout, never export the save:
+DEMENTOR_CANDIDATE_RUNTIME="/private/path/to/checked-out/rc4-h0/runtime" \
+DEMENTOR_CANDIDATE_SHA="6d09e9828a549b6ce64a354c5f7bf0a29717a700" \
+bash deploy/mac-private-backup-restore.sh
+```
+
+Only **after** all six exact-SHA CI runs conclude SUCCESS, the private off-VM restoration, two real clients and physical iPhone G6 have passed, and owner issues the **separate 40-character G7 GO** together with a no-players maintenance window, the authorized operator may use the H0 profile:
+
+```bash
+DEMENTOR_RELEASE_PROFILE=h0-v3 \
+DEMENTOR_GO_SHA="6d09e9828a549b6ce64a354c5f7bf0a29717a700" \
+DEMENTOR_NO_PLAYERS_GO=yes \
+bash deploy/mac-safe-release.sh
+```
+
+Without both GO variables, the helper must stop before VM filesystem or Docker writes. An already-deployed exact image+receipt exits read-only. The H0 candidate's protected publisher keeps rollback armed until the **running HTTP manifest** parses as JSON with exactly 42 records; if that validation fails, the publisher restores the previous game image AND frozen game world volume. Production `0.5.0-rc.4` string alone is **not** image identity. Keep this section updated with exact QA SHA if any source commit changes; never use stale run IDs.
+
+**Status at preparation:** CI jobs may still be pending; no VM SSH, real backup copy, restore or G7 GO executed by this document.
 
 ## 5. Gate / completion
 
