@@ -41,7 +41,7 @@ export function forestryAction(g,p,cmd){
  if(cmd.type==='homeSowBerry'){
   if(!soil||h.plantedTrees.some(t=>t.soilId===soil.id))throw Error('Нужно свободное вскопанное место');
   if(!p.bag.food)throw Error('Нужна ягода для посадки куста');
-  if(h.nodes.some(n=>Math.hypot(n.x-soil.x,n.y-soil.y)<1.2))throw Error('Рядом уже растёт куст');
+  if(h.nodes.some(n=>n.kind==='food'&&Math.hypot(n.x-soil.x,n.y-soil.y)<1.2))throw Error('Рядом уже растёт куст');
   p.bag.food--;h.soil=h.soil.filter(t=>t.id!==soil.id);h.nodes.push({id:plot.id+'-berry-'+randomUUID().slice(0,8),kind:'food',x:soil.x,y:soil.y,left:6,initial:6,planted:true});
   return {message:'Ягодный куст посажен. Он будет отрастать снова'};
  }
