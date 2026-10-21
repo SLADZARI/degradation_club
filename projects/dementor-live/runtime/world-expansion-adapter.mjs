@@ -17,7 +17,7 @@ export class Game extends CoreGame{
     }
     // Extra green forest is persisted like the previous Southern forests. No infinite wood.
     for(const [id,x,y] of [['mountain-stone-a',55,64],['mountain-stone-b',74,63],['mountain-stone-c',88,63]]){
-      if(!this.state.resources.some(r=>r.id===id))this.state.resources.push({id,type:'stone',x,y,stock:1000000,initial:1000000,regrowAt:0});
+      if(!this.state.resources.some(r=>r.id===id))this.state.resources.push({id,type:'stone',x,y,stock:144,initial:144,regrowAt:0});
     }
     // Tiered stone deposits. Fixed IDs ensure cold restarts never restore depleted stock.
     for(const [tier,x,y,stock] of [[2,105,69,12],[3,115,38,32],[4,121,70,72],[5,148,39,150]]){
