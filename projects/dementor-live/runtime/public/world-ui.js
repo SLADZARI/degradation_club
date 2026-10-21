@@ -237,9 +237,22 @@ function drawTravelScene(time){
   for(const p of state.players.filter(p=>(p.online||p.id===me.id)&&p.scene===state.scene))drawPlayer(p,time);
   requestAnimationFrame(render);
 }
+function drawPublicGarden(time){
+ if(state?.scene!=='city'||state.gardenProject.stage<state.config.cityGarden.stages.length||!state.publicGarden?.beds)return;
+ const centers=state.publicGarden.beds.map((_,i)=>({x:26.7+i*1.05,y:10.6}));
+ for(let i=0;i<state.publicGarden.beds.length;i++){
+  const bed=state.publicGarden.beds[i],c=centers[i];if(!c)continue;
+  const corners=[[c.x-.43,c.y-.30],[c.x+.43,c.y-.30],[c.x+.43,c.y+.30],[c.x-.43,c.y+.30]].map(([x,y])=>{const p=screen(x,y);return[p.x,p.y];});
+  poly(corners,!bed.crop?'#a58b65':bed.watered?'#514c3e':'#80694d',!bed.crop?'#85795f':bed.watered?'#394239':'#66543f',1);
+  for(const offset of [-.17,0,.17]){const a=screen(c.x-.34,c.y+offset),b=screen(c.x+.34,c.y+offset);line(a.x,a.y,b.x,b.y,bed.watered?'#706b58':'#9a805f',Math.max(1,view.s*.025));}
+  if(bed.watered){const p=screen(c.x-.26,c.y-.20);ctx.fillStyle='#aab5a044';ctx.beginPath();ctx.ellipse(p.x,p.y,view.s*.08,view.s*.035,-.2,0,Math.PI*2);ctx.fill();}
+  if(bed.crop)window.DLGardenVisuals?.draw(ctx,screen,view.s,bed,c.x-.6,c.y-.56,state.now,time);
+ }
+}
 render=function(time){
   if(isTravelScene()){drawTravelScene(time);return;}
   originalRender(time);
+  drawPublicGarden(time);
 };
 window.__worldGround=drawWorldGround;
 window.__worldEntities=worldEntities;

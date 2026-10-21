@@ -210,7 +210,7 @@ export class Game {
     const t=this.target(target);this.near(p,t);
     if(type==='gather'){
       if(t.type!=='food')throw Error('Здесь нет еды');if(t.stock<=0)throw Error('Ягоды скоро созреют');
-      if(p.spirit){t.stock--;if(!t.regrowAt)t.regrowAt=this.now+c.berryRegrowMs;this.restore(p);return {message:'Ягоды вернули тебе тело'};}
+      if(p.spirit){t.stock--;if(!t.regrowAt)t.regrowAt=this.now+c.berryRegrowMs;this.restore(p,'food',true);return {message:'Ягоды вернули тебе тело'};}
       if(loadWeight(p,c)+c.weights.food>bagCapacity(p,c,this.now))throw Error('Рюкзак полон — съешь еду или сдай материалы');
       return this.start(p,'gather',target,c.gatherMs);
     }
@@ -249,7 +249,7 @@ export class Game {
     }
     throw Error('Неизвестное действие');
   }
-  restore(p){p.spirit=false;p.hunger=clamp(p.hunger+this.c.foodRestore,0,100);p.health=100;p.stamina=100;}
+  restore(p,kind='food',revive=false){const amount=kind==='carrot'?60:25;p.spirit=false;p.hunger=clamp(p.hunger+(revive?this.c.foodRestore:amount),0,100);p.health=clamp(p.health+(revive?100:amount),0,100);p.stamina=clamp(p.stamina+(revive?100:amount),0,100);}
   canBuild(target){const p=this.projectFor(target),stage=this.configFor(target).stages[p.stage];if(!stage)throw Error('Стройка завершена');if(p.stock.wood<stage.wood||p.stock.stone<stage.stone)throw Error('Сначала доставьте материалы для этого этапа');}
   start(p,kind,target,ms){if(p.job)throw Error('Дождись текущего действия');p.job={kind,target,started:this.now,ends:this.now+ms,stage:this.projectFor(target).stage};return {message:kind==='build'?'Работаем…':kind==='mine'?'Добываем…':'Собираем…',started:true};}
   finish(p){const job=p.job;p.job=null;const t=this.target(job.target);try{this.near(p,t);
