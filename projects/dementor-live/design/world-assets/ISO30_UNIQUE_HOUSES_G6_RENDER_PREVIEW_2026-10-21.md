@@ -40,3 +40,17 @@ The existing stage images for tool shop, warehouse and mayor tent remain concept
 
 ## Next
 Run `npm run test:art-g6` and full model regression on the **exact G6 PR SHA**; verify the QA routes through real HTTP on a disposable state; collect two-player and physical iPhone screenshots; measure exact sprite anchors/entry footprints; review all 54 drawings individually; extend only authentic stage/bed/furniture mapping; record G6 result in existing dedicated `dementor_live` handover PR #27. Do not merge source batch #307, #303, or RC4 based on source-only tests.
+
+## G6 continuation — exact projected foot anchor, benches, authentic states (2026-10-21)
+
+**Build / QA ONLY** on existing [Draft PR #312](https://github.com/SLADZARI/degradation_club/pull/312). No separate approved release, no merge, no production activity. Preserve source PR #307 and RC4.
+
+Changes beyond the initial 10-building comparison:
+- `DLWorldArtG6.footprintLayout` derives the **projected ground diamond from four existing world corners** and uses the southern (+X,+Y) vertex as visual foot anchor. The width follows projected CU, never a sprite's alpha-defined collision. This is a deterministic **candidate placement**, not a confirmed artistic/collision calibration.
+- Forge has **real server stages 0/1/2/3** and corresponding three stage candidate SVG plus finished `city-forge`; seed-market has **only real stage 0/1** and does not display unused concept stages 1/2. Unknown stages return null and fall back to procedural Canvas.
+- In the city square, two existing benches use `drawGroundProp` inside the **shared entity z-sort** with players, only when QA art is enabled. The ordinary renderer remains intact.
+- For plot scenes, bed previews follow **actual `bed.crop, bed.watered, bed.readyAt`**. Because plot/interior screen projection currently differs from city ISO30, bed art is shown **comparison-only**, not substituted. The owner/permissions, crop stage, harvest and map are unchanged.
+- Eight completed personal tents use the exact deterministic algorithm from `visual-variants.mjs` based on existing cityId/plotId. **Only stage 3 completed** appears in `?artG6=compare`. Tent construction stages 0–2 continue procedural and do not become new buildings.
+- Geometry test `npm run test:art-g6:geometry` measures ISO30 footprint extent against `tan 30°`, anchor under multiple zooms, valid forge/seed transitions, bed crop variants and eight city-stable plot designs. In addition `test:art-g6`, `test:art-g6:http`, baseline `check`, `test` are required.
+
+**Still NOT RUN:** pixel-perfect sprite/door/footprint calibration from actual browser screenshots, interactive two-client player occlusion, Safari physical iPhone, performance/fps and plot/interior ISO30 parity. Ground and personal plot figures must not be marked APPROVED from mathematical tests alone. Full release remains blocked until owner art signoff and independent G7 evidence. The real world save and 20/17 protected approved image sets are untouched.
