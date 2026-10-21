@@ -1,5 +1,5 @@
 // Mutable PROTOTYPE parameters. These values do not amend the agreed GDD.
-export const CONFIG = {
+export const CONFIG = { phoneResearchMs:240000,
   bridge: { y:12,h:3,need:{wood:24,stone:16},stages:[
     {title:'Опоры моста',works:2,wood:0,stone:16},
     {title:'Настил переправы',works:3,wood:24,stone:0},

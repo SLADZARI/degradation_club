@@ -5,12 +5,12 @@ import {municipalBuilt} from './municipal-buildings.mjs';
 export const PAGER_PRICE=180;
 export const PAGE_FEE=1;
 export const PHONE_BOOTHS=Object.freeze([
- {id:'phone-square',type:'payphone',scene:'city',x:10,y:12,title:'Таксофон · городская площадь'},
+ {id:'phone-square',siteId:'phone-square',type:'payphone',scene:'city',x:10,y:12,title:'Таксофон · городская площадь'},
  {id:'phone-tourist',type:'payphone',scene:'city',x:25,y:42,title:'Таксофон · туристическая улица'},
- {id:'phone-forest',type:'payphone',scene:'city',x:18,y:59,title:'Таксофон · у леса'},
- {id:'phone-mountain',type:'payphone',scene:'city',x:52,y:57,title:'Таксофон · у перевала'},
- {id:'phone-museum-outside',type:'payphone',scene:'city',x:94,y:59,title:'Таксофон · возле музея'},
- {id:'phone-farlands-outside',type:'payphone',scene:'city',x:139,y:58,title:'Таксофон · дальние земли'},
+ {id:'phone-forest',siteId:'phone-forest',type:'payphone',scene:'city',x:18,y:59,title:'Таксофон · у леса'},
+ {id:'phone-mountain',siteId:'phone-pass',type:'payphone',scene:'city',x:52,y:57,title:'Таксофон · у перевала'},
+ {id:'phone-museum-outside',siteId:'phone-museum',type:'payphone',scene:'city',x:94,y:59,title:'Таксофон · возле музея'},
+ {id:'phone-farlands-outside',siteId:'phone-farlands',type:'payphone',scene:'city',x:139,y:58,title:'Таксофон · дальние земли'},
  {id:'phone-museum',type:'payphone',scene:'museum',x:3,y:11,title:'Таксофон · музей смеха'},
  {id:'phone-farlands',type:'payphone',scene:'farlands',x:4,y:16,title:'Таксофон · дальние земли'},
  {id:'phone-home',type:'payphone',scene:'plot',x:3,y:12,title:'Общий таксофон · участок'},
@@ -40,8 +40,7 @@ const services=[{id:'npc-mayor',name:'Мэрия · поручения',number:N
 return [...services,...people].sort((a,b)=>a.name.localeCompare(b.name,'ru')).slice(0,500);
 }
 export function telecomSnapshot(network,p){
- const game=network.findId(p.id)?.g;let booths=boothsForScene(p.scene);
- if(game?.state.startingCity)booths=game.state.expedition?.completedAt&&municipalBuilt(game.state,'phone-square')?booths.filter(b=>b.id==='phone-square'):[];
+ const game=network.findId(p.id)?.g;const booths=game?.state.startingCity&&game.state.technologies?.payphones?PHONE_BOOTHS.filter(b=>b.scene==='city'&&municipalBuilt(game.state,b.siteId)):[];
  return {number:p.pagerNumber,hasPager:!!p.pagerOwns,price:PAGER_PRICE,messageFee:PAGE_FEE,
   directory:publicSubscriberList(network,p),listed:!!p.pagerListed,blocked:p.pagerBlocked||[],
   inbox:p.pagerOwns?p.pagerInbox.slice(-80):[],
@@ -68,8 +67,8 @@ export function telecomAction(network,p,cmd){
   result={message:cmd.blocked?'Номер заблокирован':'Номер разблокирован'};
  }else if(cmd.type==='pagerDial'){
   const booth=PHONE_BOOTHS.find(b=>b.id===cmd.target);
-  if(!booth||booth.scene!==(p.scene||'city'))throw Error('Нужен таксофон');
-  if(g.state.startingCity&&(booth.id!=='phone-square'||!municipalBuilt(g.state,'phone-square')))throw Error('Сначала построй городской таксофон.');
+  if(!booth||booth.scene!==(p.scene||'city'))throw Error('Нужен таксофон');if(!g.state.startingCity||!g.state.technologies?.payphones||!booth.siteId||!municipalBuilt(g.state,booth.siteId))throw Error('Таксофон ещё не построен мэрией');
+  if(!g.state.startingCity||!g.state.technologies?.payphones||!booth.siteId||!municipalBuilt(g.state,booth.siteId))throw Error('Сначала изучите технологию и постройте таксофон мэрией.');
   g.near(p,booth);
   const number=String(cmd.number||'').trim();
   if(number===NPC_NUMBERS.museum&&(p.worldTravel?.visited||[]).includes('museum'))
@@ -94,7 +93,7 @@ export function telecomAction(network,p,cmd){
   m.readAt||=g.now;result={message:'Сообщение прочитано'};
  }else{
   const booth=PHONE_BOOTHS.find(b=>b.id===cmd.target);
-  if(!booth||booth.scene!==(p.scene||'city'))throw Error('Сначала найди таксофон в этой локации');
+  if(!booth||booth.scene!==(p.scene||'city'))throw Error('Сначала найди таксофон в этой локации');if(!g.state.startingCity||!g.state.technologies?.payphones||!booth.siteId||!municipalBuilt(g.state,booth.siteId))throw Error('Таксофон ещё не построен мэрией');
   g.near(p,booth);
   const toNumber=String(cmd.number||'').trim();
   if(!/^\d{6}$/.test(toNumber))throw Error('Введите шестизначный номер абонента');
