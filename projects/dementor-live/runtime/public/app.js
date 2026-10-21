@@ -568,6 +568,10 @@ const q=screen(v.x,v.y),s=view.s*.9;const bob=moving?Math.sin(time*.015)*s*.05:0
 }
 function render(time){positionWindows();ctx.clearRect(0,0,view.w,view.h);ctx.fillStyle='#efebdf';ctx.fillRect(0,0,view.w,view.h);
   updateVisualPlayers(time);if(me){const hero=visualPlayers.get(me.id)||me;view.cx=hero.x;view.cy=hero.y;}
+  // G6 test-only spectator camera: views existing structures without changing the hero position or world state.
+  if(state?.scene==='city'&&window.DLWorldArtG6?.camera){
+    view.cx=window.DLWorldArtG6.camera.x;view.cy=window.DLWorldArtG6.camera.y;
+  }
   if(state&&state.scene!=='city'){drawHome(time);requestAnimationFrame(render);return;}
   // Sparse paper grain; all world geometry below stays interactive and separate.
   ctx.fillStyle='#6b6f4b0a';for(let i=0;i<340;i++){const x=(i*137.23)%view.w,y=(i*211.71)%view.h;ctx.fillRect(x,y,1,1);}
