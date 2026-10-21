@@ -38,7 +38,7 @@
 /* P1-B / owner Web/UI G4: beat the pre-existing integrated-ink mobile 14.8vw rule.
    Keep complete first-line type in the existing mobile Hero without changing desktop. */
 @media(max-width:700px){
-  .dc-home .dc-hero .dc-hero__title{
+  .dc-home .dc-hero.dc-shell .dc-hero__title{
     font-size:clamp(32px,10.2vw,56px)!important;
     width:100%!important;
   }
