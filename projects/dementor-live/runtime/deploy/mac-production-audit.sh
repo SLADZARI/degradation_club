@@ -2,7 +2,13 @@
 # Read-only game VM attestation after G7 release, one known Mac key, one SSH attempt.
 set -Eeuo pipefail
 HOST="138.199.144.94"
-SSH_KEY="${DEMENTOR_SSH_KEY:-$HOME/Downloads/dementor_server}"
+# Reuse only the exact approved key filenames. Do not scan or try other identities.
+SSH_KEY="${DEMENTOR_SSH_KEY:-}"
+if [[ -z "$SSH_KEY" ]]; then
+  for candidate in "$HOME/.ssh/dementor_server" "$HOME/Downloads/dementor_server" "$HOME/Downloads/dementor_server.pem"; do
+    if [[ -f "$candidate" && ! -L "$candidate" ]]; then SSH_KEY="$candidate"; break; fi
+  done
+fi
 echo '=== Dementor Live production G7 / READ ONLY ==='
 if [[ ! -f "$SSH_KEY" ]]; then echo "STOP: key not found: $SSH_KEY" >&2; exit 1; fi
 if ! ssh-keygen -lf "$SSH_KEY" >/dev/null 2>&1; then echo 'STOP: key unreadable' >&2; exit 1; fi
