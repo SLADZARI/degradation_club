@@ -258,7 +258,13 @@ for(const viewport of [{width:390,height:844,label:'390'},{width:360,height:800,
     const browser=await engine.launch();
     for(const outcome of ['success','failure']){
       const{ctx,page,errors}=await open(browser,'owner',{width:390,height:844});
-      await page.waitForFunction(()=>document.documentElement.dataset.dcBoardUserState==='OWNER_ADMIN'&&!!document.getElementById('openComposer'),null,{timeout:5000});
+      await page.waitForFunction(()=>{
+        const host=document.querySelector('.dc-board-primary.is-visible');
+        return document.documentElement.dataset.dcBoardUserState==='OWNER_ADMIN'
+          &&host?.dataset.access==='owner-admin'
+          &&host.querySelector('button')?.textContent.includes('СОЗДАТЬ')
+          &&!!document.getElementById('openComposer');
+      },null,{timeout:5000});
       await page.locator('.dc-board-primary.is-visible button').click();
       await page.locator('#entrySection.is-composer-sheet-open').waitFor({state:'visible',timeout:3000});
       await page.locator('#artifactType').selectOption('idea');
