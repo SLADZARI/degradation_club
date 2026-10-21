@@ -12,13 +12,13 @@ await new Promise(r=>server.listen(0,'127.0.0.1',r));const base=`http://127.0.0.
 const stub=()=>`
 const mode=globalThis.__QA_BOARD_MODE__||'member';
 globalThis.__QA_RPC_CALLS__=globalThis.__QA_RPC_CALLS__||[];globalThis.__QA_DB_WRITES__=globalThis.__QA_DB_WRITES__||[];
-const member=['member-first','member','dementor'].includes(mode);const role=mode==='owner'?'owner_admin':mode==='dementor'?'dementor':null;const user={id:'qa-board-user',email:'qa@invalid',user_metadata:{full_name:'QA'}};const other='qa-member-other';const session={user};const application=mode==='applicant'?{id:'qa-app',profile_id:user.id,status:'reviewing',created_at:'2026-09-06T10:00:00Z'}:null;
+const member=['member-first','member','dementor'].includes(mode);const role=mode==='owner'?'owner_admin':mode==='dementor'?'dementor':null;const user={id:'qa-board-user',email:'qa@invalid',user_metadata:{full_name:'QA'}};const other='qa-member-other';const session=mode==='anonymous'?null:{user};const application=mode==='applicant'?{id:'qa-app',profile_id:user.id,status:'reviewing',created_at:'2026-09-06T10:00:00Z'}:null;
 const ownArtifact={id:'qa-artifact-own',author_profile_id:user.id,title:'МОЙ QA CARD',body:'Моя карточка для проверки.',external_url:null,status:'active',visibility:'community',starts_at:null,expires_at:null,published_at:'2026-09-05T11:00:00Z',created_at:'2026-09-05T10:55:00Z'};
 const otherArtifact={id:'qa-artifact-other',author_profile_id:other,title:'ЧУЖОЙ QA CARD',body:'Карточка другого участника для проверки реакций и admin moderation.',external_url:null,status:'active',visibility:'community',starts_at:null,expires_at:null,published_at:'2026-09-05T10:00:00Z',created_at:'2026-09-05T09:55:00Z'};
 const artifactRows=mode==='member-first'?[otherArtifact]:[ownArtifact,otherArtifact];
 const rowsFor=t=>t==='join_applications'?(application?[application]:[]):t==='dc_role_assignments'?(role?[{profile_id:user.id,role,status:'active'}]:[]):t==='profiles'?[{id:user.id,full_name:'QA',display_name:'QA'}]:t==='dc_system_memberships'?(member?[{profile_id:user.id,status:'active'}]:[]):t==='dc_artifacts'?artifactRows:t==='dc_member_public_profiles'?[{profile_id:user.id,display_name:'QA Owner',nickname:'qa',avatar_url:null,member_since:'2026-09-01'},{profile_id:other,display_name:'Other Member',nickname:'other',avatar_url:null,member_since:'2026-09-01'}]:t==='dc_artifact_reactions'?[]:t==='dc_artifact_responses'?[]:t==='dc_artifact_media'?[]:t==='dc_artifact_board_positions'?artifactRows.map((a,i)=>({artifact_id:a.id,board_id:'community',x:1200+i*480,y:900+i*160,rotation:0,size_class:'M',position_version:1})):[];
 const query=t=>{let rows=[...rowsFor(t)];const q={select(){return q},eq(k,v){rows=rows.filter(r=>r?.[k]===v);return q},neq(k,v){rows=rows.filter(r=>r?.[k]!==v);return q},in(k,values){rows=rows.filter(r=>values.includes(r?.[k]));return q},is(){return q},order(){return q},limit(n){rows=rows.slice(0,n);return q},range(){return q},insert(payload){globalThis.__QA_DB_WRITES__.push({op:'insert',table:t,payload});return q},upsert(payload){globalThis.__QA_DB_WRITES__.push({op:'upsert',table:t,payload});return q},update(payload){globalThis.__QA_DB_WRITES__.push({op:'update',table:t,payload});return q},delete(){globalThis.__QA_DB_WRITES__.push({op:'delete',table:t});return q},maybeSingle(){return Promise.resolve({data:rows[0]||null,error:null})},single(){return Promise.resolve({data:rows[0]||null,error:null})},then(resolve,reject){return Promise.resolve({data:rows,error:null}).then(resolve,reject)}};return q};
-export function createClient(){return{auth:{getSession:async()=>({data:{session}}),getUser:async()=>({data:{user}}),signOut:async()=>({}),onAuthStateChange:()=>({data:{subscription:{unsubscribe(){}}}})},from:query,rpc:async(name,args)=>{globalThis.__QA_RPC_CALLS__.push({name,args});if(name==='dc_member_entry_status_v1'){const incomplete=mode==='guest-incomplete';return{data:{membership_active:member,community_activation_state:mode==='member-first'?'FIRST_ARTIFACT_REQUIRED':member?'MEMBER_ACTIVATED':null,sphere_count:incomplete?4:9,sphere_gate_complete:!incomplete,artifact_slots_available:mode==='member-first'?1:0,artifact_slots_consuming:mode==='member'?1:0,published_artifact_count:mode==='member'?1:0},error:null}};if(name==='dc_guest_board_read_v1')return{data:[{artifact_id:'qa-artifact',artifact_type:'offer',title:'QA CARD',body:'Короткое описание карточки. Второй абзац.',published_at:'2026-09-05T10:00:00Z',author_display_name:'QA Member',reaction_count:0,guest_interest_count:0,my_guest_interest:false,board_x:1200,board_y:900,board_rotation:0,board_size_class:'M'}],error:null};if(name==='dc_guest_board_interest_toggle_v1')return{data:{active:true,count:1},error:null};if(name==='dc_close_artifact_v1')return{data:{artifact_id:args?.p_artifact_id,status:'archived'},error:null};return{data:null,error:null}},storage:{from:()=>({createSignedUrl:async()=>({data:{signedUrl:'https://example.invalid/x.webp'}}),upload:async()=>({data:{},error:null}),remove:async()=>({data:{},error:null})})},functions:{invoke:async()=>({data:{}})}}}`;
+export function createClient(){return{auth:{getSession:async()=>({data:{session}}),getUser:async()=>({data:{user:mode==='anonymous'?null:user}}),signOut:async()=>({}),onAuthStateChange:()=>({data:{subscription:{unsubscribe(){}}}})},from:query,rpc:async(name,args)=>{globalThis.__QA_RPC_CALLS__.push({name,args});if(name==='dc_member_entry_status_v1'){const incomplete=mode==='guest-incomplete';return{data:{membership_active:member,community_activation_state:mode==='member-first'?'FIRST_ARTIFACT_REQUIRED':member?'MEMBER_ACTIVATED':null,sphere_count:incomplete?4:9,sphere_gate_complete:!incomplete,artifact_slots_available:mode==='member-first'?1:0,artifact_slots_consuming:mode==='member'?1:0,published_artifact_count:mode==='member'?1:0},error:null}};if(name==='dc_guest_board_read_v1')return{data:[{artifact_id:'qa-artifact',artifact_type:'offer',title:'QA CARD',body:'Короткое описание карточки. Второй абзац.',published_at:'2026-09-05T10:00:00Z',author_display_name:'QA Member',reaction_count:0,guest_interest_count:0,my_guest_interest:false,board_x:1200,board_y:900,board_rotation:0,board_size_class:'M'}],error:null};if(name==='dc_guest_board_interest_toggle_v1')return{data:{active:true,count:1},error:null};if(name==='dc_close_artifact_v1')return{data:{artifact_id:args?.p_artifact_id,status:'archived'},error:null};return{data:null,error:null}},storage:{from:()=>({createSignedUrl:async()=>({data:{signedUrl:'https://example.invalid/x.webp'}}),upload:async()=>({data:{},error:null}),remove:async()=>({data:{},error:null})})},functions:{invoke:async()=>({data:{}})}}}`;
 
 async function open(browser,mode,viewport){const ctx=await browser.newContext({viewport});await ctx.addInitScript(m=>{globalThis.__QA_BOARD_MODE__=m;globalThis.__QA_RPC_CALLS__=[];globalThis.__QA_DB_WRITES__=[];try{localStorage.setItem('dc:board:tutorial:v21:qa-board-user:guest',JSON.stringify({done:true}));localStorage.setItem('dc:board:tutorial:v21:qa-board-user:member',JSON.stringify({done:true}));sessionStorage.setItem('dc_first_artifact_spotlight_dismissed_v1','1')}catch{}},mode);await ctx.route('https://cdn.jsdelivr.net/**',r=>r.request().url().includes('@supabase/supabase-js')?r.fulfill({status:200,contentType:'text/javascript',body:stub()}):r.abort());const page=await ctx.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));await page.goto(base+'/workspace/board/',{waitUntil:'domcontentloaded'});await page.locator('.dc-spatial-viewport').waitFor({state:'visible',timeout:5000});return{ctx,page,errors}}
 
@@ -82,4 +82,64 @@ for(const engine of [{name:'chromium',launch:()=>chromium.launch({headless:true}
 }
 
 for(const viewport of [{width:390,height:844,label:'390'},{width:360,height:800,label:'360'}]){const browser=await chromium.launch({headless:true});const{ctx,page,errors}=await open(browser,'member',viewport);await page.waitForFunction(()=>{const own=document.querySelector('.dc-spatial-world>.dc-notice[data-artifact="qa-artifact-own"]');const other=document.querySelector('.dc-spatial-world>.dc-notice[data-artifact="qa-artifact-other"]');return own?.dataset.sizeClass==='M'&&other?.dataset.sizeClass==='M'},{timeout:4000});const geo=await page.locator('.dc-spatial-viewport').evaluate(el=>{const r=el.getBoundingClientRect();return{top:r.top,bottom:r.bottom,height:r.height,iw:innerWidth,ih:innerHeight,scrollH:document.documentElement.scrollHeight,touch:getComputedStyle(el).touchAction}});expect(geo.height>=geo.ih-140,`mobile-${viewport.label}: Board does not own remaining screen below canonical two-row header ${JSON.stringify(geo)}`);expect(geo.top<=140,`mobile-${viewport.label}: canonical header consumes too much space ${JSON.stringify(geo)}`);expect(geo.scrollH<=geo.ih+2,`mobile-${viewport.label}: page scroll remains ${JSON.stringify(geo)}`);expect(geo.touch==='none',`mobile-${viewport.label}: touch-action ${geo.touch}`);expect(await page.locator('.dcw-live-banner').count()===1,`mobile-${viewport.label}: canonical LIVE banner missing`);expect((await page.locator('.dcw-brand').innerText()).replace(/\s+/g,' ').trim()==='DEMENTOR CLUB',`mobile-${viewport.label}: canonical brand collapsed`);const harmony=await page.evaluate(()=>{const nav=document.querySelector('.dcw-nav')?.getBoundingClientRect();const filters=document.querySelector('.dc-board-filters')?.getBoundingClientRect();return nav&&filters?{navBottom:nav.bottom,filterTop:filters.top}:null});expect(harmony&&harmony.filterTop>=harmony.navBottom+8,`mobile-${viewport.label}: Workspace nav collides with Board filters ${JSON.stringify(harmony)}`);const personal=await page.locator('[data-board-personal-host],.dc-board-personal-host').count();expect(personal===0,`mobile-${viewport.label}: personal card leaked`);const cards=await page.locator('.dc-spatial-world>.dc-notice,.dc-spatial-world>.dc-projection').evaluateAll(nodes=>nodes.map(node=>{const css=getComputedStyle(node);return{kind:node.classList.contains('dc-notice')?'notice':'projection',artifact:node.dataset.artifact||null,sizeClass:node.dataset.sizeClass||null,offsetWidth:node.offsetWidth,computedWidth:css.width,position:css.position,left:css.left,boxSizing:css.boxSizing}}));expect(cards.every(card=>card.offsetWidth<=viewport.width*.75),`mobile-${viewport.label}: layout card too wide ${JSON.stringify(cards)}`);expect(!errors.length,`mobile-${viewport.label}: ${errors.join(' | ')}`);await ctx.close();await browser.close()}
+
+/* Owner-approved G4 regression: existing anonymous gate, composer focus, and mobile H1.
+   No production credentials, Auth redirects, Cloud connections or submitted artifacts. */
+{
+  const browser=await chromium.launch({headless:true});
+  for(const width of [360,390,1440]){
+    const height=width===1440?900:844;
+    const{ctx,page,errors}=await open(browser,'owner',{width,height});
+    const opener=page.locator('.dc-board-primary.is-visible button');
+    await opener.waitFor({state:'visible',timeout:3000});
+    await opener.click();
+    await page.locator('#entrySection.is-composer-sheet-open').waitFor({state:'visible',timeout:3000});
+    await page.keyboard.press('Escape');
+    await page.waitForFunction(()=>!document.getElementById('entrySection')?.classList.contains('is-composer-sheet-open'));
+    await page.waitForTimeout(80);
+    const escapeFocus=await page.evaluate(()=>({isOpener:document.activeElement===document.querySelector('.dc-board-primary.is-visible button'),tag:document.activeElement?.tagName,writes:globalThis.__QA_DB_WRITES__?.length||0}));
+    expect(escapeFocus.isOpener,`G4 owner ${width}: Escape did not restore visible opener ${JSON.stringify(escapeFocus)}`);
+    await opener.click();
+    await page.locator('#entrySection.is-composer-sheet-open').waitFor({state:'visible',timeout:3000});
+    await page.locator('#cancelComposer').click();
+    await page.waitForFunction(()=>!document.getElementById('entrySection')?.classList.contains('is-composer-sheet-open'));
+    await page.waitForTimeout(80);
+    const cancelFocus=await page.evaluate(()=>document.activeElement===document.querySelector('.dc-board-primary.is-visible button'));
+    expect(cancelFocus,`G4 owner ${width}: Cancel did not restore visible opener`);
+    expect(!errors.length,`G4 owner ${width}: JS errors ${errors.join(' | ')}`);
+    await ctx.close();
+  }
+  for(const width of [360,390,1440]){
+    const{ctx,page,errors}=await open(browser,'anonymous',{width,height:width===1440?900:844});
+    await page.waitForFunction(()=>document.documentElement.dataset.dcBoardUserState==='UNAUTHENTICATED',{timeout:4000});
+    await page.locator('#boardLogin').waitFor({state:'visible',timeout:3500});
+    const state=await page.locator('#boardLogin').evaluate(el=>{
+      const gate=el.closest('.dc-first-gate'),entry=document.getElementById('entrySection'),r=el.getBoundingClientRect();
+      return{root:document.documentElement.dataset.dcBoardUserState,
+       display:getComputedStyle(gate).display,entryDisplay:getComputedStyle(entry).display,
+       width:r.width,top:r.top,bottom:r.bottom,viewport:innerHeight};
+    });
+    expect(state.root==='UNAUTHENTICATED'&&state.display!=='none'&&state.entryDisplay!=='none'&&state.width>60&&state.top>=0&&state.bottom<=state.viewport+2,`G4 anonymous ${width}: Google CTA obscured ${JSON.stringify(state)}`);
+    await page.locator('#boardLogin').focus();
+    expect(await page.evaluate(()=>document.activeElement?.id==='boardLogin'),`G4 anonymous ${width}: button not focusable`);
+    expect(!errors.length,`G4 anonymous ${width}: JS errors ${errors.join(' | ')}`);
+    await ctx.close();
+  }
+  for(const width of [360,390,414,430,560,1440]){
+    const ctx=await browser.newContext({viewport:{width,height:width===1440?900:844}});
+    const page=await ctx.newPage();await page.goto(base+'/',{waitUntil:'domcontentloaded'});
+    const measured=await page.locator('#hero-title').evaluate(el=>{
+      const first=el.firstChild;
+      const range=document.createRange();
+      range.setStart(first,0);range.setEnd(first,'САМОРАЗВИТИЕ'.length);
+      const word=range.getBoundingClientRect(),hero=el.closest('.dc-hero').getBoundingClientRect();
+      return{left:word.left,right:word.right,heroLeft:hero.left,heroRight:hero.right,viewport:innerWidth,font:parseFloat(getComputedStyle(el).fontSize)};
+    });
+    if(width<=700)expect(measured.left>=measured.heroLeft-2&&measured.right<=measured.heroRight+2,`G4 H1 ${width}: first word clipped ${JSON.stringify(measured)}`);
+    else expect(measured.font>=70,`G4 H1 desktop typography drift ${JSON.stringify(measured)}`);
+    await ctx.close();
+  }
+  await browser.close();
+}
+
 server.close();if(failures.length){console.error('BOARD V2.1 BROWSER QA BLOCKED');failures.forEach(x=>console.error('- '+x));process.exit(1)}console.log('Board browser QA PASS: guest gated create + member-first monotonic interactions + owner-admin canonical create/moderation/real movement + responsive fullscreen shell');

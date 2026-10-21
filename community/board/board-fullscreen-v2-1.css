@@ -52,3 +52,26 @@ html[data-board-artifact-open="1"] .dc-board-invitation-indicator{display:none}
     outline-offset:4px!important;
   }
 }
+
+
+/* P1-A / owner Web/UI G4: expose ONLY the existing unauthenticated Google CTA. */
+:root[data-dc-board-user-state="UNAUTHENTICATED"] .dcw-board-view #entrySection.dc-board-entry:not(.is-composer-sheet-open){
+  display:block!important;
+  pointer-events:none!important;
+}
+:root[data-dc-board-user-state="UNAUTHENTICATED"] .dcw-board-view #entrySection:not(.is-composer-sheet-open)>.dc-board-shell{
+  display:grid!important;place-items:center!important;padding:16px!important;
+}
+:root[data-dc-board-user-state="UNAUTHENTICATED"] .dcw-board-view #entrySection:not(.is-composer-sheet-open) #entryHost{
+  width:min(100%,560px)!important;height:auto!important;max-height:100%!important;overflow-y:auto!important;
+}
+:root[data-dc-board-user-state="UNAUTHENTICATED"] .dcw-board-view #entrySection:not(.is-composer-sheet-open) .dc-first-gate{
+  display:block!important;pointer-events:auto!important;background:#f8f5ed!important;
+  border:1px solid #111!important;padding:clamp(18px,3vw,32px)!important;box-shadow:6px 6px 0 #111;
+}
+:root[data-dc-board-user-state="UNAUTHENTICATED"] .dcw-board-view #boardLogin{
+  position:relative;pointer-events:auto!important;
+}
+@media(max-width:430px){
+  :root[data-dc-board-user-state="UNAUTHENTICATED"] .dcw-board-view #boardLogin{width:100%}
+}

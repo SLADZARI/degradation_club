@@ -57,9 +57,27 @@
     document.documentElement.classList.remove('dc-composer-sheet-open');
     requested=false;
     if(restoreFocus){
-      const target=document.querySelector('.dc-spatial-controls [data-slot]')||previouslyFocused;
-      try{target?.focus({preventScroll:true})}catch{target?.focus()}
+      // Restore the real opener, never a hidden spatial [data-slot].
+      // A replaced opener falls back to the visible canonical Board action.
+      const usable=el=>el instanceof HTMLElement&&el.isConnected&&!el.hidden
+        &&!el.matches(':disabled,[aria-disabled="true"]')
+        &&!el.closest('[hidden],[inert],[aria-hidden="true"]')
+        &&getComputedStyle(el).visibility!=='hidden'
+        &&getComputedStyle(el).display!=='none'
+        &&el.getClientRects().length>0;
+      const candidates=[
+        previouslyFocused,
+        document.querySelector('.dc-board-primary.is-visible button'),
+        document.querySelector('.dc-spatial-controls [data-slot]'),
+        document.querySelector('.dc-spatial-controls [data-mine]')
+      ];
+      for(const target of candidates){
+        if(!usable(target))continue;
+        try{target.focus({preventScroll:true})}catch{target.focus()}
+        if(document.activeElement===target)break;
+      }
     }
+    previouslyFocused=null;
   }
 
   function showToast(text='ПРИКОЛОЧЕНО'){
