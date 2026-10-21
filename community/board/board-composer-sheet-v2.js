@@ -103,7 +103,7 @@
     previouslyFocused=null;
   }
 
-  function showToast(text='ПРИКОЛОЧЕНО'){
+  function showToast(text='ПРИКОЛОЧЕНО',duration=1800){
     let toast=document.querySelector('[data-board-toast]');
     if(!toast){
       toast=document.createElement('div');
@@ -114,9 +114,10 @@
       document.body.appendChild(toast);
     }
     toast.textContent=text;
+    toast.classList.toggle('is-refresh-warning',duration>1800);
     toast.classList.add('is-visible');
     clearTimeout(toastTimer);
-    toastTimer=setTimeout(()=>toast.classList.remove('is-visible'),1800);
+    toastTimer=setTimeout(()=>toast.classList.remove('is-visible'),duration);
   }
 
   function focusPublishedArtifact(){
@@ -148,6 +149,12 @@
     publishConfirmed=true;
     showToast();
     focusPublishedArtifact();
+  });
+
+  // The publish RPC already succeeded; only the subsequent Board refresh failed.
+  // Existing toast is body-mounted and remains visible after Composer closes.
+  window.addEventListener('dc:board:postpublish-refresh-failed',()=>{
+    showToast('ПУБЛИКАЦИЯ СОХРАНЕНА. ДОСКА ПОКА НЕ ОБНОВИЛАСЬ. ОБНОВИТЕ СТРАНИЦУ.',8000);
   });
 
   function restorePublishControls(form){
