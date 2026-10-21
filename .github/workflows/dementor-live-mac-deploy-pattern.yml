@@ -1,0 +1,112 @@
+name: Dementor Live — Mac deploy pattern lint
+on:
+  push:
+    branches:
+      - ops/dementor-live-one-command-deploy-2026-10-20
+  pull_request:
+    paths:
+      - 'projects/dementor-live/runtime/deploy/mac-safe-release.sh'
+      - 'projects/dementor-live/runtime/deploy/mac-production-audit.sh'
+      - 'projects/dementor-live/runtime/deploy/MAC_RELEASE_PATTERN.md'
+      - '.github/workflows/dementor-live-mac-deploy-pattern.yml'
+permissions:
+  contents: read
+jobs:
+  syntax-and-no-prod-actions:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Shell syntax only — NEVER execute a production connection
+        run: |
+          bash -n projects/dementor-live/runtime/deploy/mac-private-backup-restore.sh
+          bash -n projects/dementor-live/runtime/deploy/mac-safe-release.sh
+          bash -n projects/dementor-live/runtime/deploy/mac-production-audit.sh
+          bash -n projects/dementor-live/runtime/deploy/publish-preserve-world.sh
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Synthetic private restore / archive security checks only (NO SSH)
+        run: |
+          python3 -m unittest discover -s projects/dementor-live/runtime/test -p 'test_qa_restore_extract.py' -v
+          node --check projects/dementor-live/runtime/tools/qa-restore-identity-audit.mjs
+          node --test projects/dementor-live/runtime/test/qa-private-restore.test.mjs
+      - name: Ensure fixed SSH identity, exact build and CI gates are present
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          s=Path('projects/dementor-live/runtime/deploy/mac-safe-release.sh').read_text()
+          assert '$HOME/Downloads/dementor_server' in s
+          assert '-o IdentitiesOnly=yes' in s
+          assert '-o BatchMode=yes' in s
+          assert '-o PasswordAuthentication=no' in s
+          assert '-o ConnectionAttempts=1' in s
+          assert 'publish-preserve-world.sh --dry-run' in s
+          assert 'publish-preserve-world.sh --apply' in s
+          assert 'a38a03e68fcec5ceac45c0c362436ee6d69d5c5d' in s
+          assert all(x in s for x in ['39473604439','39473604350','39473604513','39473604305','39473604530'])
+          # H0 is an explicit immutable profile; never replace old resident-recovery gate.
+          assert 'DEMENTOR_RELEASE_PROFILE' in s and 'resident-recovery' in s and 'h0-v3' in s
+          assert '6d09e9828a549b6ce64a354c5f7bf0a29717a700' in s
+          assert 'fix/dementor-live-v3-icon-static-http-20261020' in s
+          assert all(x in s for x in ['39564570805','39564570819','39564570767','39564570839','39564570774','39564570818'])
+          assert 'unknown release profile' in s
+          # Exact-SHA attestation must NOT mutate the VM unless explicit release
+          # and no-player approvals are both validated. This catches regressions
+          # where a dry run, git clone or docker build runs before owner GO.
+          remote=s.split("<<'SERVER'\n",1)[1].split("\nSERVER",1)[0]
+          split_token="echo 'GO accepted for exact SHA and player-free maintenance window'"
+          assert remote.count(split_token)==1
+          before_go,after_go=remote.split(split_token)
+          assert '[ "$OWNER_GO_SHA" = "$SHA" ]' in before_go
+          assert '[ "$NO_PLAYERS_GO" = "yes" ]' in before_go
+          assert before_go.index('[ "$OWNER_GO_SHA" = "$SHA" ]') < before_go.index('[ "$NO_PLAYERS_GO" = "yes" ]')
+          forbidden_before_go=['mkdir -p','git clone','docker build','docker run','docker tag','docker compose','--apply','--dry-run','rm -','chmod ','cp ','mv ','tar -']
+          for forbidden in forbidden_before_go:
+              assert forbidden not in before_go, f"VM mutation before owner GO: {forbidden}"
+          assert all(x in after_go for x in ['mkdir -p', 'git clone', 'docker run', 'publish-preserve-world.sh --dry-run','publish-preserve-world.sh --apply'])
+          assert 'StrictHostKeyChecking=yes' in s
+          assert 'StrictHostKeyChecking=accept-new' not in s
+          assert 'chmod 600 "$SSH_KEY"' not in s
+          assert s.count('ssh "${SSH_OPTS[@]}"') == 1
+          assert 'ALREADY DEPLOYED:' in s
+          assert 'OWNER_GO_SHA' in s and 'DEMENTOR_GO_SHA' in s
+          assert 'NO_PLAYERS_GO' in s and 'DEMENTOR_NO_PLAYERS_GO' in s
+          assert 'release-manifest.txt' in s
+          assert 'safe-20261020T180923Z-970882dee4/world.json' in s
+          assert '--mount "type=bind,source=$LAST_FROZEN_BACKUP,target=/readonly/world.json,readonly"' in s
+          assert 'down -v' not in s and '--reset-world' not in s
+          audit=Path('projects/dementor-live/runtime/deploy/mac-production-audit.sh').read_text()
+          assert '$HOME/Downloads/dementor_server' in audit
+          assert '$HOME/.ssh/dementor_server' in audit
+          assert audit.index('"$HOME/.ssh/dementor_server"') < audit.index('"$HOME/Downloads/dementor_server"')
+          assert 'IdentitiesOnly=yes' in audit and 'BatchMode=yes' in audit
+          assert 'ConnectionAttempts=1' in audit
+          assert audit.count('ssh "') == 1
+          assert 'release-manifest.txt' in audit and '/app/data/world.json' in audit
+          assert 'sha256sum' in audit and 'docker exec -i' in audit
+          assert 'StrictHostKeyChecking=yes' in audit
+          assert 'StrictHostKeyChecking=accept-new' not in audit
+          assert 'backup_files_present=yes' in audit and 'complete_backup=NOT_VERIFIED' in audit
+          assert 'archive_restore_on_copy=NOT_RUN' in audit
+          assert 'docker stats --no-stream' in audit and 'host_mem_available_kib' in audit
+          assert '-H "Host: $PUBLIC_HOST"' in audit
+          assert 'approved_sha_tag_matches_running_image' in audit
+          assert not any(x in audit for x in ('--apply','down -v','--reset-world','docker stop','docker compose up','docker tag','docker rm','rm -rf','docker volume rm'))
+          print('PASS: Mac G7 read-only SSH attestation with one key and no mutating commands')
+          restore=Path('projects/dementor-live/runtime/deploy/mac-private-backup-restore.sh').read_text()
+          assert 'StrictHostKeyChecking=yes' in restore
+          assert '$HOME/.ssh/dementor_server' in restore
+          assert '$HOME/Downloads/dementor_server' in restore
+          assert restore.index('"$HOME/.ssh/dementor_server"') < restore.index('"$HOME/Downloads/dementor_server"')
+          assert restore.count('ssh "${SSH_OPTS[@]}"') == 2
+          assert 'DEMENTOR_BACKUP_ID' in restore and 'DEMENTOR_QA_MAX_ARCHIVE_GIB' in restore
+          assert 'sha256' in restore and 'shasum -a 256' in restore
+          remote=restore.split("cat > \"$WORK/remote-readonly.sh\" <<'VM'\n",1)[1].split("\nVM\n",1)[0]
+          assert 'tar -cf -' in remote and 'sha256sum' in remote
+          for forbidden in ['docker ', 'systemctl ', 'service ', 'tar -xf','mkdir ', 'touch ', 'chmod ', 'rm -rf', '--apply', '--reset-world', 'down -v']:
+              assert forbidden not in remote, "VM copy must be strictly read-only: "+forbidden
+          assert 'qa-restore-extract.py' in restore
+          assert 'qa-restore-identity-audit.mjs' in restore
+          print('PASS: private off-VM source backup transport has no server mutations')
+          print('PASS: local Mac release pattern includes CI, one key, safe backup and no world-reset commands')
+          PY
