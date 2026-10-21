@@ -598,13 +598,13 @@ function render(time){positionWindows();ctx.clearRect(0,0,view.w,view.h);ctx.fil
   groundRect({x:c.river.x,y:0,w:c.river.w,h:c.height},'#becdc8','#96ada256');
   for(const bank of [c.river.x,c.river.x+c.river.w]){const a=screen(bank,0),b=screen(bank,c.height);line(a.x,a.y,b.x,b.y,'#96ada256',2);}
   for(let i=0;i<20;i++){const p=screen(34.5+(i%3)*.95,.8+i*1.6);line(p.x,p.y,p.x+view.s*.7,p.y,'#e6ede352',1);}
-  if(!emptyStart){drawBridge();if(typeof window.__worldGround==='function')window.__worldGround();label('Другой берег',42,3,true);}else if(typeof window.__worldGround==='function')window.__worldGround();
+  if(!emptyStart&&(!stagedCity||state.forge.stage>=state.config.forge.stages.length)){drawBridge();if(typeof window.__worldGround==='function')window.__worldGround();label('Другой берег',42,3,true);}else if(typeof window.__worldGround==='function')window.__worldGround();
   if(!state){for(const[x,y]of [[41,7],[44,10],[42,23],[45,26]])drawTree({x,y,stock:10});for(const[x,y]of [[42,16],[45,20]])drawStone({x,y,stock:10});}
   if(state?.expedition){const gate=state.config.expedition.gate;paperBoard(gate.x,gate.y,'Миссия · расчистка');}
   if(state&&(!stagedCity||municipalBuilt('combat-gate')))paperBoard(29,35,'⚔ Боевая зона');
   if(!emptyStart){drawProject();if((!stagedCity||state.project.stage>=state.config.stages.length)&&typeof drawPlaza==='function')drawPlaza();}else paperBoard(3.2,8,'Работы мэрии');
   if(state){for(const plot of state.plots)drawPlot(plot,'ground');}else for(const o of [{x:4,y:15,w:6,h:6},{x:4,y:23,w:6,h:6},{x:14,y:23,w:6,h:6}])drawPlot(o,'ground');
-  if((!stagedCity&&(state?.forge.stage||0)<2)||(stagedCity&&state?.forge.stage>0))drawForge();
+  if((!stagedCity&&(state?.forge.stage||0)<2)||(stagedCity&&state.project.stage>=state.config.stages.length))drawForge();
   if(emptyStart||stagedCity&&!municipalBuilt('tool-shop'))drawToolSign(9,6);else{drawToolSign(24,3);drawHempBush(16.7,3.3);label('Благоустройство',16.7,1,true);label('Магазин инструмента',24,.3,true);}
   if(state?.seedMarket&&!emptyStart){const stage=state.seedMarket.stage,total=state.config.seedMarket.stages.length;label(stage>=total?'Семенная лавка':stage===2?'Коробка лавки':stage===1?'Площадка лавки':'Участок лавки',23,4.9,true);}
   if(state?.gardenProject&&!emptyStart){const stage=state.gardenProject.stage,total=state.config.cityGarden.stages.length,built=stage>=total;groundRect({x:25.5,y:8.4,w:5.6,h:2.5},built?'#e0dfc6':stage>0?'#d5c4a4':'#eae5d7','#a7ad89',stage===0);if(stage>=2&&!built)groundRect({x:26,y:8.8,w:2,h:1.4},'#b7a083','#8d956f');label(built?'Городской огород':stage===2?'Короба огорода':stage===1?'Площадка огорода':'Участок огорода',28,8,true);if(built)for(const bed of state.publicGarden.beds){const x=26+(Number(bed.id.split('-').at(-1))%3)*1.6,y=9;groundRect({x,y,w:1.2,h:1},bed.crop?'#98a981':'#c4b49b','#8d956f');}}
