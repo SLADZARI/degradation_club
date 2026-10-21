@@ -9,6 +9,7 @@ import {createQARecorder} from './qa-recorder.mjs';
 import {scanMusic,audioDuration,PLAZA} from './plaza.mjs';
 import {createHash,timingSafeEqual} from 'node:crypto';
 import {packTerrainSse} from './terrain-delta.mjs';
+import {createReturnTicket,claimReturnTicket,verifyReturnTicket,retryReturnTicket,revokeReturnTicket,isCharacterId,isRecoveryRequestId,createRecoveryKit,beginRecovery,confirmRecovery,admitCharacterAttempt,ReturnAttemptLimiter} from './character-return.mjs';
 import { CONFIG } from './config.mjs';
 import { combatRoot,createCombat,joinCombat,combatAction,combatView,advanceCombat } from './combat-p0.mjs';
 
@@ -36,6 +37,10 @@ const network=new CityNetwork(state);
 const game=network.origin;
 const adminKey=String(process.env.DEMENTOR_QA_ADMIN_KEY||'');
 const adminAvailable=adminKey.length>=24&&(testMode||publicOrigin.startsWith('https://'));
+const identityFeatureOptIn=process.env.DEMENTOR_IDENTITY_TRANSFER_ENABLED==='1';
+const identityTransferEnabled=testMode||identityFeatureOptIn;
+const returnAttempts=new ReturnAttemptLimiter();
+let injectIdentitySaveFailure=testMode&&process.env.DEMENTOR_TEST_IDENTITY_SAVE_FAIL_ONCE==='1';
 const stateFor=p=>({...network.snapshot(p),qaMode:testMode,qaRecording:qaRecorder.enabled,qaAdminAvailable:adminAvailable});
 const musicDir=path.join(root,'data','music');fs.mkdirSync(musicDir,{recursive:true});
 function refreshMusic(){network.setMusic(scanMusic([[path.join(root,'public','music'),'/music/'],[musicDir,'/custom-music/']]));}
@@ -57,6 +62,59 @@ const terrainCursors=new WeakMap();
 function terrainEvent(snapshot,res){const packed=packTerrainSse(snapshot,terrainCursors.get(res));terrainCursors.set(res,packed.cursor);return `data: ${JSON.stringify(packed.snapshot)}\n\n`;}
 function broadcast(){for(const[id,set]of streams){const p=network.findId(id)?.p;if(!p)continue;const snapshot=stateFor(p);for(const res of set)res.write(terrainEvent(snapshot,res));}}
 function json(res,status,data){res.writeHead(status,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'});res.end(JSON.stringify(data));}
+// Sensitive identity actions are disabled by default and fail closed on non-HTTPS public hosts.
+function allowIdentityTransfer(req,res,url) {
+  if(!identityTransferEnabled||(!testMode&&(!publicOrigin.startsWith('https://')||process.env.DEMENTOR_IDENTITY_EDGE_ADMISSION!=='confirmed'))){
+    json(res,503,{ok:false,message:'Безопасный перенос персонажа на этом сервере пока недоступен'});return false;
+  }
+  const expected=publicOrigin||`http://${req.headers.host}`;
+  if(req.headers.origin!==expected || url.search!=='' ||
+      !/^application\/json(?:\s*;|$)/i.test(String(req.headers['content-type']||'')) ||
+      (req.headers['sec-fetch-site']&&!['same-origin','none'].includes(req.headers['sec-fetch-site']))){
+    json(res,403,{ok:false,message:'Запрос переноса запрещён'});return false;
+  }
+  res.setHeader('Referrer-Policy','no-referrer');
+  return true;
+}
+// No acknowledgement until the changed token / salted verifier is saved atomically.
+function commitIdentityChange(p,mutate){
+  const g=network.gameFor(p);
+  if(!g)throw Error('Житель не найден');
+  const protectedFields=['token','characterReturn','characterReturnReplay','characterRecovery',
+    'recoveryHandoff','identityAttempt'];
+  const before=new Map(protectedFields.map(k=>[k,Object.hasOwn(p,k)?structuredClone(p[k]):undefined]));
+  try{
+    const result=mutate();g.changed();
+    if(injectIdentitySaveFailure&&p.token!==before.get('token')){
+      injectIdentitySaveFailure=false;throw Error('Injected test-only save failure before rename');
+    }
+    save();return result;
+  }catch{
+    for(const [k,value] of before)if(value===undefined)delete p[k];else p[k]=value;
+    g.dirty=true; // Do not acknowledge a failed durable identity write.
+    throw Error('Безопасный перенос не удалось сохранить');
+  }
+}
+function commitIdentityChangeIfValid(p,code,requestId) {
+  const now=Date.now();
+  const replay=retryReturnTicket(p,code,requestId,now);
+  if(replay)return replay;
+  if(!verifyReturnTicket(p,code,now)||!isRecoveryRequestId(requestId))return null;
+  return commitIdentityChange(p,()=>claimReturnTicket(p,code,now,requestId));
+}
+function beginRecoveryIfValid(p,code,requestId) {
+  if(!isRecoveryRequestId(requestId))return null;
+  if(typeof code!=='string'||!/^[A-Za-z0-9_-]{43}$/.test(code))return null;
+  return commitIdentityChange(p,()=>beginRecovery(p,code,requestId));
+}
+function admitDurableCharacterClaim(p) {
+  if(!p)return true; // Unrecognized ID gets only the trusted reverse-proxy IP admission.
+  if(p.identityAttempt&&Date.now()<p.identityAttempt.until&&p.identityAttempt.count>=5)return false;
+  return commitIdentityChange(p,()=>admitCharacterAttempt(p));
+}
+function closeOldStreams(id) {
+  for(const client of streams.get(id)||[])client.end();
+}
 async function body(req){let text='';for await(const chunk of req){text+=chunk;if(text.length>4096)throw Error('Слишком большой запрос');}return JSON.parse(text||'{}');}
 const server=http.createServer(async(req,res)=>{
   try{
@@ -73,10 +131,83 @@ const server=http.createServer(async(req,res)=>{
       if(data.advanceMs)game.tick(data.advanceMs);
       game.changed();save();broadcast();json(res,200,{ok:true,state:game.state});return;
     }
-    if(url.pathname==='/api/join'&&req.method==='POST'){const d=await body(req);const p=game.join(d.name,d.gender);network.snapshot(p);qaRecorder.join(p,'origin');save();json(res,200,{ok:true,id:p.id,token:p.token});return;}
+    if(url.pathname==='/api/join'&&req.method==='POST'){
+      const d=await body(req);
+      // When secure onboarding is enabled, an old client MUST NOT silently create an
+      // unrecoverable new character without explicitly displaying/storing its rescue key.
+      if(identityFeatureOptIn){
+        if(!allowIdentityTransfer(req,res,url))return;
+        if(d.acceptRecoveryKit!==true){
+          json(res,428,{ok:false,message:'Перед созданием героя подтверди сохранение ключа восстановления'});return;
+        }
+      }
+      const p=game.join(d.name,d.gender),kit=identityFeatureOptIn?createRecoveryKit(p):null;
+      network.snapshot(p);qaRecorder.join(p,'origin');save();
+      json(res,200,{ok:true,id:p.id,token:p.token,...(kit||{})});return;
+    }
+    if((url.pathname.startsWith('/api/identity/transfer/')||url.pathname.startsWith('/api/identity/recovery/'))&&req.method!=='POST'){
+      json(res,405,{ok:false,message:'Требуется POST'});return;
+    }
+    if(url.pathname==='/api/identity/transfer/claim'||url.pathname==='/api/identity/recovery/claim'){
+      if(!allowIdentityTransfer(req,res,url))return;
+      const d=await body(req);
+      const id=isCharacterId(d.characterId)?d.characterId:null;
+      // Nginx admission must be verified before enabling public HTTPS.
+      // Ignore untrusted X-Forwarded-For; directly connected address is shared by a proxy.
+      if(!returnAttempts.admit('all-claims',2000)){
+        json(res,429,{ok:false,message:'Слишком много попыток. Повтори позже'});return;
+      }
+      const p=id?network.findId(id)?.p:null;
+      if(!admitDurableCharacterClaim(p)){
+        // Do not distinguish an existing CharacterId from a nonexistent public ID.
+        json(res,401,{ok:false,message:'Недействительный или истёкший код'});return;
+      }
+      const recovering=url.pathname==='/api/identity/recovery/claim';
+      const result=p?(recovering?(
+        beginRecoveryIfValid(p,d.recoveryCode,d.requestId)
+      ):commitIdentityChangeIfValid(p,d.code,d.requestId)):null;
+      if(!result){json(res,401,{ok:false,message:'Недействительный или истёкший код'});return;}
+      if(!result.replayed)closeOldStreams(p.id);
+      json(res,200,{ok:true,id:p.id,token:result.token,replayed:!!result.replayed,
+        ...(recovering?{confirmationRequired:true}:{})});return;
+    }
     if(url.pathname.startsWith('/api/')){
-      const token=req.headers.authorization?.replace(/^Bearer /,'')||url.searchParams.get('token');
+      // Ordinary endpoints never accept bearer credentials in a URL.
+      // Legacy EventSource query token is supported only while recovery is feature-OFF.
+      if(identityFeatureOptIn&&url.pathname==='/api/events'&&url.search){
+        json(res,403,{ok:false,message:'SSE requires Authorization header'});return;
+      }
+      const token=req.headers.authorization?.replace(/^Bearer /,'')||
+        (!identityFeatureOptIn&&url.pathname==='/api/events'?url.searchParams.get('token'):null);
       const p=network.findToken(token)?.p;if(!p){json(res,401,{ok:false,message:'Войди в мир заново'});return;}
+      if(url.pathname==='/api/identity/transfer/create'||url.pathname==='/api/identity/transfer/revoke'||
+         url.pathname==='/api/identity/recovery/enroll'||url.pathname==='/api/identity/recovery/confirm'){
+        if(!allowIdentityTransfer(req,res,url))return;
+        if(!/^Bearer [A-Za-z0-9_-]{30,80}$/.test(String(req.headers.authorization||''))){
+          json(res,401,{ok:false,message:'Требуется активная сессия'});return;
+        }
+        if(!returnAttempts.admit('issue:'+p.id,20)){
+          json(res,429,{ok:false,message:'Слишком много попыток. Повтори позже'});return;
+        }
+        const d=await body(req);
+        let result;
+        if(url.pathname==='/api/identity/recovery/enroll'){
+          if(d.acknowledgeSecureStorage!==true){
+            json(res,428,{ok:false,message:'Подтверди безопасное сохранение резервного ключа'});return;
+          }
+          result=commitIdentityChange(p,()=>createRecoveryKit(p));
+        }else if(url.pathname==='/api/identity/recovery/confirm'){
+          if(d.acknowledgeStoredToken!==true||!p.recoveryHandoff){
+            json(res,409,{ok:false,message:'Незавершённое восстановление не найдено'});return;
+          }
+          result=commitIdentityChange(p,()=>confirmRecovery(p));
+        }else{
+          const create=url.pathname.endsWith('/create');
+          result=commitIdentityChange(p,()=>create?createReturnTicket(p):(
+            revokeReturnTicket(p),{ok:true}));
+        }
+        json(res,200,{ok:true,...result});return;
+      }
       if(url.pathname==='/api/events'){
         res.writeHead(200,{'Content-Type':'text/event-stream','Cache-Control':'no-cache, no-transform','Connection':'keep-alive','X-Accel-Buffering':'no'});
         let set=streams.get(p.id);if(!set){set=new Set();streams.set(p.id,set);network.gameFor(p).connect(p);qaRecorder.connect(p,network.findId(p.id)?.cityId);}set.add(res);res.write(terrainEvent(stateFor(p),res));
