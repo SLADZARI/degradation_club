@@ -18,7 +18,7 @@ export const CONFIG = {
   toolMaking: { durability:48, recipe:{wood:2,stone:2} },
   toolShop: { durability:160, price:180 },
   warehouse: { capacity:80, pay:{wood:1,stone:1}, mayorNeed:{wood:12,stone:12}, courierBatch:6, courierPay:2, reservationMs:300000 },
-  expedition: {gate:{id:'frontier-gate',type:'mission',x:7,y:18}},
+  expedition: {gate:{id:'frontier-gate',type:'mission',x:31,y:35}},
   width: 160, height: 80, river: { x: 34, w: 4 },
   treasury: 1000, plotPrice: 120, capacity: 12,
   weights: { seed_tree_broadleaf:.1,seed_tree_round:.1,seed_tree_oak:.1,seed_tree_spruce:.1,seed_tree_small:.1,wood: 1, stone: 2, food: 1, seed_hemp:.1, seed_carrot:.1, hemp:1, carrot:1, water:1 },
