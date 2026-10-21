@@ -7,10 +7,28 @@ set -Eeuo pipefail
 REPO="SLADZARI/degradation_club"
 HOST="138.199.144.94"
 USER_NAME="root"
-RELEASE_BRANCH="hotfix/dementor-live-rc4-saved-resident-recovery-2026-10-20"
-EXACT_RELEASE_SHA="a38a03e68fcec5ceac45c0c362436ee6d69d5c5d"
+# Only enumerated exact-source profiles may be used. The default remains
+# the historical resident-recovery workflow; H0 requires explicit opt-in.
+RELEASE_PROFILE="${DEMENTOR_RELEASE_PROFILE:-resident-recovery}"
+case "$RELEASE_PROFILE" in
+  resident-recovery)
+    RELEASE_BRANCH="hotfix/dementor-live-rc4-saved-resident-recovery-2026-10-20"
+    EXACT_RELEASE_SHA="a38a03e68fcec5ceac45c0c362436ee6d69d5c5d"
+    RUNS=(39473604439 39473604350 39473604513 39473604305 39473604530)
+    ;;
+  h0-v3)
+    RELEASE_BRANCH="fix/dementor-live-v3-icon-static-http-20261020"
+    EXACT_RELEASE_SHA="6d09e9828a549b6ce64a354c5f7bf0a29717a700"
+    # Six required exact-SHA groups, including seven sequential gates. Fail
+    # closed if ANY workflow is pending, failed, or attached to another SHA.
+    RUNS=(39564570805 39564570819 39564570767 39564570839 39564570774 39564570818)
+    ;;
+  *)
+    echo "STOP: unknown release profile; only resident-recovery or h0-v3" >&2
+    exit 2
+    ;;
+esac
 EXPECTED_VERSION="0.5.0-rc.4"
-RUNS=(39473604439 39473604350 39473604513 39473604305 39473604530)
 
 info(){ printf '\n== %s ==\n' "$*"; }
 stop(){ printf '\nSTOP: %s\n' "$*" >&2; return 1; }
