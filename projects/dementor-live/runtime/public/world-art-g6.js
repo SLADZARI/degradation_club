@@ -15,6 +15,18 @@
   ...Array.from({length:8},(_,i)=>'plot-personal-tent-plot-'+(i+1))
  ]);
  const assets=new Map(),failed=new Set();
+ const cameraLocations=Object.freeze({
+  'tool-shop':Object.freeze({x:23.7,y:3.5}),
+  'forge':Object.freeze({x:27,y:25.5}),
+  'warehouse':Object.freeze({x:12,y:27.5}),
+  'garden-shop':Object.freeze({x:16.75,y:3.5})
+ });
+ const qaCamera=()=>{
+  if(!enabled)return null;
+  const name=new URLSearchParams(location.search).get('artG6Camera');
+  return Object.hasOwn(cameraLocations,name)?cameraLocations[name]:null;
+ };
+
  function getArt(id){
   if(!enabled||!allowed.has(id)||failed.has(id))return null;
   if(assets.has(id))return assets.get(id);
@@ -142,6 +154,6 @@
   requested:assets.size,failed:failed.size,
   mode
  });}
- window.DLWorldArtG6=Object.freeze({enabled,mode,draw,drawGroundProp,bedArtId,forgeArtId,seedArtId,footprintLayout,tentArtId,debugHealth,ids:Object.freeze([...allowed]),failed});
+ window.DLWorldArtG6=Object.freeze({enabled,mode,get camera(){return qaCamera();},draw,drawGroundProp,bedArtId,forgeArtId,seedArtId,footprintLayout,tentArtId,debugHealth,ids:Object.freeze([...allowed]),failed});
  if(enabled)console.info('Dementor G6 candidate art preview:',mode,'No gameplay state mutation.');
 })();
