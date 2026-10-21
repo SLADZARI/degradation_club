@@ -39,7 +39,8 @@
     "test:terrain-browser": "node test/terrain-rc3-browser.cjs",
     "check:icons-new": "node tools/verify-new-icons-v3.mjs",
     "test:art-g6": "node --test test/world-art-g6.test.mjs",
-    "test:art-g6:http": "node --test test/world-art-g6-http.test.mjs"
+    "test:art-g6:http": "node --test test/world-art-g6-http.test.mjs",
+    "test:art-g6:geometry": "node --test test/world-art-g6-geometry.test.mjs"
   },
   "engines": {
     "node": ">=22"
