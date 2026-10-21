@@ -91,7 +91,13 @@ export class Game extends CoreGame{
       const constructionIds=new Set(['tourist-kiosk','university-site','robo-stadium-site','industry-site','museum-entry']);
       base.worldTravel.targets=intro?[]:base.worldTravel.targets.filter(t=>constructionIds.has(t.id)?municipalBuilt(this.state,t.id):t.id!=='second-bridge-site'||this.state.secondBridgeProject?.stage>=2);
       base.worldTravel.booths=intro||!municipalBuilt(this.state,'phone-square')?[]:base.worldTravel.booths.filter(t=>t.id==='phone-square');
-      base.worldTravel.footprints=(base.worldTravel.footprints||[]).filter(o=>{const id=String(o.id||'').replace(/^structure-/,'');if(id==='second-bridge-site')return this.state.secondBridgeProject?.stage>=2;if(constructionIds.has(id)||id==='phone-square')return municipalBuilt(this.state,id);return true;});
+      base.worldTravel.footprints=(base.worldTravel.footprints||[]).filter(o=>{
+        if(intro)return ['forest','mountain','cactus','rock'].includes(o.kind);
+        const id=String(o.id||'').replace(/^structure-/,'');
+        if(id==='second-bridge-site')return this.state.secondBridgeProject?.stage>=2;
+        if(constructionIds.has(id)||id==='phone-square')return municipalBuilt(this.state,id);
+        return true;
+      });
     }
     base.civicJobs=civicView(this,p);
     base.losevCourse=losevView(p,this.now);
