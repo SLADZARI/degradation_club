@@ -10,6 +10,22 @@
   let previouslyFocused=null;
   let observer=null;
   let toastTimer=null;
+  let backgroundSnapshot=null;
+
+  // Only the existing Board wall and Workspace sidebar are outside the sheet.
+  // Preserve each previous inert value so cancelling cannot unlock prior guards.
+  function setModalBackgroundInert(lock){
+    if(lock){
+      if(backgroundSnapshot)return;
+      backgroundSnapshot=[...document.querySelectorAll('.dcw-board-view > .dc-board-wall,.dcw-sidebar')]
+        .map(node=>({node,wasInert:node.inert}));
+      backgroundSnapshot.forEach(({node})=>{node.inert=true});
+      return;
+    }
+    if(!backgroundSnapshot)return;
+    backgroundSnapshot.forEach(({node,wasInert})=>{if(node.isConnected)node.inert=wasInert});
+    backgroundSnapshot=null;
+  }
 
   function composer(){return entryHost.querySelector('.dc-composer')}
   function isOpen(){return entrySection.classList.contains('is-composer-sheet-open')}
@@ -34,8 +50,13 @@
   function openSheet(){
     const root=composer();
     if(!root)return false;
-    previouslyFocused=document.activeElement instanceof HTMLElement?document.activeElement:null;
+    if(isOpen()){requested=false;return true}
+    const focused=document.activeElement instanceof HTMLElement?document.activeElement:null;
+    // Programmatic #openComposer click (Safari fallback) may leave focus on BODY.
+    const validOpener=focused&&focused!==document.body&&focused.isConnected&&focused.getClientRects().length>0;
+    previouslyFocused=validOpener?focused:document.querySelector('.dc-board-primary.is-visible button');
     entrySection.classList.add('is-composer-sheet-open');
+    setModalBackgroundInert(true);
     entrySection.setAttribute('role','dialog');
     entrySection.setAttribute('aria-modal','true');
     entrySection.setAttribute('aria-label','Приколоть объявление на доску');
@@ -56,6 +77,7 @@
     entrySection.removeAttribute('aria-label');
     document.documentElement.classList.remove('dc-composer-sheet-open');
     requested=false;
+    setModalBackgroundInert(false);
     if(restoreFocus){
       // Restore the real opener, never a hidden spatial [data-slot].
       // A replaced opener falls back to the visible canonical Board action.
@@ -142,6 +164,13 @@
   }
 
   document.addEventListener('click',event=>{
+    // The full-screen primary action clicks the existing hidden #openComposer
+    // directly when [data-slot] is absent (e.g. Safari). Its normal handler
+    // renders the form; flag that explicit intent before the DOM mutation.
+    if(event.target.closest('#openComposer')&&!isOpen()){
+      requested=true;
+      return;
+    }
     const slot=event.target.closest('.dc-spatial-controls [data-slot]');
     if(slot){
       event.preventDefault();

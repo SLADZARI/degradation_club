@@ -142,4 +142,67 @@ for(const viewport of [{width:390,height:844,label:'390'},{width:360,height:800,
   await browser.close();
 }
 
+
+/* G6 regression from Q-01: WebKit no-slot fallback and true modal background inertness.
+   These browser cases use the existing isolated Board fixture; no live OAuth or writes. */
+{
+  for(const engine of [
+    {name:'chromium',launch:()=>chromium.launch({headless:true})},
+    {name:'webkit',launch:()=>webkit.launch({headless:true})}
+  ]){
+    const browser=await engine.launch();
+    for(const width of [360,390,414,430,560,768,1440]){
+      const{ctx,page,errors}=await open(browser,'owner',{width,height:width===1440?900:844});
+      await page.locator('.dc-board-primary.is-visible button').waitFor({state:'visible',timeout:3000});
+      await page.locator('#openComposer').waitFor({state:'attached',timeout:3000});
+      await page.evaluate(()=>{
+        // Remove a potentially available slot and open in the same task,
+        // guaranteeing the existing #openComposer fallback instead.
+        document.querySelector('.dc-spatial-controls [data-slot]')?.remove();
+        document.querySelector('.dc-board-primary.is-visible button')?.click();
+      });
+      await page.locator('#entrySection.is-composer-sheet-open').waitFor({state:'visible',timeout:4000});
+      const modal=await page.evaluate(()=>({
+        dialog:document.getElementById('entrySection')?.getAttribute('aria-modal'),
+        wallInert:document.querySelector('.dc-board-wall')?.inert,
+        sidebarInert:document.querySelector('.dcw-sidebar')?.inert,
+        backgroundFocused:document.activeElement?.closest?.('.dc-board-wall,.dcw-sidebar')!==null
+      }));
+      expect(modal.dialog==='true'&&modal.wallInert===true&&modal.sidebarInert===true,
+        `G6 ${engine.name} ${width}: invisible/no-slot sheet or live background ${JSON.stringify(modal)}`);
+      expect(!modal.backgroundFocused,
+        `G6 ${engine.name} ${width}: background retains keyboard focus`);
+      if(width===1440){
+        await page.evaluate(()=>{
+          const el=document.querySelector('.dc-board-filter');
+          if(el){window.__QA_MODAL_FILTER_CLICKS__=0;el.addEventListener('click',()=>{window.__QA_MODAL_FILTER_CLICKS__++})}
+        });
+        const filter=page.locator('.dc-board-filter').first();
+        if(await filter.count()){
+          const rect=await filter.boundingBox();
+          if(rect){
+            await page.mouse.click(rect.x+Math.min(rect.width/2,10),rect.y+rect.height/2);
+            const clicks=await page.evaluate(()=>window.__QA_MODAL_FILTER_CLICKS__||0);
+            expect(clicks===0,`G6 ${engine.name} ${width}: modal allowed background filter click ${clicks}`);
+          }
+        }
+      }
+      await page.keyboard.press('Escape');
+      await page.waitForFunction(()=>!document.getElementById('entrySection')?.classList.contains('is-composer-sheet-open'),null,{timeout:3000});
+      const restored=await page.evaluate(()=>({
+        wallInert:document.querySelector('.dc-board-wall')?.inert,
+        sidebarInert:document.querySelector('.dcw-sidebar')?.inert,
+        focusOnPrimary:document.activeElement===document.querySelector('.dc-board-primary.is-visible button')
+      }));
+      expect(restored.wallInert===false&&restored.sidebarInert===false,
+        `G6 ${engine.name} ${width}: inert background not restored ${JSON.stringify(restored)}`);
+      expect(restored.focusOnPrimary,
+        `G6 ${engine.name} ${width}: Escape did not return to visible opener ${JSON.stringify(restored)}`);
+      expect(!errors.length,`G6 ${engine.name} ${width}: page errors ${errors.join(' | ')}`);
+      await ctx.close();
+    }
+    await browser.close();
+  }
+}
+
 server.close();if(failures.length){console.error('BOARD V2.1 BROWSER QA BLOCKED');failures.forEach(x=>console.error('- '+x));process.exit(1)}console.log('Board browser QA PASS: guest gated create + member-first monotonic interactions + owner-admin canonical create/moderation/real movement + responsive fullscreen shell');
