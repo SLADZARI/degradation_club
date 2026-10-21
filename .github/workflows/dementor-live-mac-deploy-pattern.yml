@@ -77,6 +77,8 @@ jobs:
           assert 'down -v' not in s and '--reset-world' not in s
           audit=Path('projects/dementor-live/runtime/deploy/mac-production-audit.sh').read_text()
           assert '$HOME/Downloads/dementor_server' in audit
+          assert '$HOME/.ssh/dementor_server' in audit
+          assert audit.index('"$HOME/.ssh/dementor_server"') < audit.index('"$HOME/Downloads/dementor_server"')
           assert 'IdentitiesOnly=yes' in audit and 'BatchMode=yes' in audit
           assert 'ConnectionAttempts=1' in audit
           assert audit.count('ssh "') == 1
@@ -93,6 +95,9 @@ jobs:
           print('PASS: Mac G7 read-only SSH attestation with one key and no mutating commands')
           restore=Path('projects/dementor-live/runtime/deploy/mac-private-backup-restore.sh').read_text()
           assert 'StrictHostKeyChecking=yes' in restore
+          assert '$HOME/.ssh/dementor_server' in restore
+          assert '$HOME/Downloads/dementor_server' in restore
+          assert restore.index('"$HOME/.ssh/dementor_server"') < restore.index('"$HOME/Downloads/dementor_server"')
           assert restore.count('ssh "${SSH_OPTS[@]}"') == 2
           assert 'DEMENTOR_BACKUP_ID' in restore and 'DEMENTOR_QA_MAX_ARCHIVE_GIB' in restore
           assert 'sha256' in restore and 'shasum -a 256' in restore
