@@ -211,7 +211,7 @@ const server=http.createServer(async(req,res)=>{
     const file=files[url.pathname];if(!file){res.writeHead(404);res.end('Not found');return;}
     const types={html:'text/html; charset=utf-8',js:'text/javascript; charset=utf-8',css:'text/css; charset=utf-8',webmanifest:'application/manifest+json; charset=utf-8'};
     res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'self'");
-    res.writeHead(200,{'Content-Type':types[file.split('.').at(-1)],'Cache-Control':'no-cache'});res.end(file==='index.html'?fs.readFileSync(path.join(root,'public',file),'utf8').replace('</body>','<script src="/world-ui.js" defer></script><script src="/world-ui-fixes.js" defer></script><script src="/world-quests.js" defer></script><script src="/telecom-ui.js" defer></script><script src="/admin-ui.js" defer></script><script src="/civic-ui.js" defer></script>${artG6Enabled?'<script src="/world-art-g6.js" defer></script>':''}</body>'):fs.readFileSync(path.join(root,'public',file)));
+    res.writeHead(200,{'Content-Type':types[file.split('.').at(-1)],'Cache-Control':'no-cache'});res.end(file==='index.html'?fs.readFileSync(path.join(root,'public',file),'utf8').replace('</body>','<script src="/world-ui.js" defer></script><script src="/world-ui-fixes.js" defer></script><script src="/world-quests.js" defer></script><script src="/telecom-ui.js" defer></script><script src="/admin-ui.js" defer></script><script src="/civic-ui.js" defer></script>'+(artG6Enabled?'<script src="/world-art-g6.js" defer></script>':'')+'</body>'):fs.readFileSync(path.join(root,'public',file)));
   }catch(e){json(res,400,{ok:false,message:e.message});}
 });
 let lastTick=Date.now();
