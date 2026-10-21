@@ -51,8 +51,14 @@
   // Candidate proportions retain their own height; width is based on projected CU.
   const width=Math.max(.01,groundWidth*.92);
   const height=width*bbox.h/bbox.w;
-  const foot=corners[2]; // +X,+Y is the closest ground vertex in city ISO30.
-  return {left:foot.x-width/2,top:foot.y-height,width,height,foot,corners,groundWidth,groundDepth};
+  const foot=corners[2]; // South vertex: projected +X,+Y, retained for CU/debug evidence.
+  // Rectangular CU footprints have a south vertex horizontally OFFSET from the center
+  // of the projected diamond. Center the sprite on the footprint, not on that vertex.
+  // This is preliminary visual mapping; actual door pixels still require G6 screenshots.
+  const visualAnchor={x:(Math.min(...xs)+Math.max(...xs))/2,y:Math.max(...ys)};
+  const horizontalOffset=visualAnchor.x-foot.x;
+  return {left:visualAnchor.x-width/2,top:visualAnchor.y-height,width,height,
+    foot,visualAnchor,horizontalOffset,corners,groundWidth,groundDepth};
  }
  function bedArtId(bed,now){
   if(!bed?.crop)return 'plot-garden-bed-empty';
@@ -120,6 +126,11 @@
    ctx.closePath();ctx.stroke();ctx.setLineDash([]);
    ctx.beginPath();ctx.arc(layout.foot.x,layout.foot.y,4,0,Math.PI*2);
    ctx.fillStyle='#b34f39';ctx.fill();
+   ctx.beginPath();ctx.arc(layout.visualAnchor.x,layout.visualAnchor.y,3,0,Math.PI*2);
+   ctx.fillStyle='#296d95';ctx.fill();
+   ctx.beginPath();ctx.moveTo(layout.foot.x,layout.foot.y);
+   ctx.lineTo(layout.visualAnchor.x,layout.visualAnchor.y);
+   ctx.strokeStyle='#b34f39';ctx.setLineDash([2,3]);ctx.stroke();ctx.setLineDash([]);
    ctx.fillStyle='#53664b';ctx.font='11px sans-serif';
    ctx.fillText('G6 candidate · CU '+w+'×'+h,left,top-5);
   }
