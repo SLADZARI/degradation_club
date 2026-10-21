@@ -46,6 +46,13 @@ export class Game extends CoreGame{
     return super.walkable(x,y,p);
   }
   action(p,cmd){
+    const intro=this.state.startingCity&&!this.state.expedition?.completedAt;
+    if(intro){
+      const allowed=new Set(['missionEnter','homeClear','homeUse','board','tools','equip','equipItem','mine','gather','pickup','drop']);
+      if(!allowed.has(cmd?.type))throw Error('Сначала расчисти стартовый участок. Городские объекты появятся по мере строительства.');
+      if(cmd.type==='homeClear'&&(p.scene||'city')!=='expedition')throw Error('Сначала войди в миссию расчистки.');
+      if(cmd.type==='homeUse'&&cmd.target!=='mission-exit')throw Error('Сейчас доступен только выход с расчистки.');
+    }
     const course=losevAction(this,p,cmd);if(course)return course;
     const task=civicAction(this,p,cmd);if(task)return task;
     const build=secondBridgeAction(this,p,cmd);if(build)return build;
@@ -66,6 +73,7 @@ export class Game extends CoreGame{
     }
     base.worldTravel=worldTravelView(this,p);
     if(actual==='city'){base.worldTravel.footprints=worldFootprints(this);base.worldTravel.summitElevation=summitPosition(p.x,p.y)?.elevation||0;}
+    if(this.state.startingCity&&!this.state.expedition?.completedAt){base.worldTravel.targets=[];base.worldTravel.booths=[];base.worldTravel.footprints=[];}
     base.civicJobs=civicView(this,p);
     base.losevCourse=losevView(p,this.now);
     return base;
