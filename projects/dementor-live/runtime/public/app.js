@@ -199,8 +199,9 @@ function quickHomeAction(){
  const node=h.nodes?.find(n=>n.id===id&&n.left>0);
  if(node){act('homeClear',id);return true;}
  const bed=h.beds?.find(b=>b.id===id);
- if(bed?.crop&&!bed.watered){act('homeWater',id);return true;}
- if(bed?.crop&&bed.watered&&state.now>=bed.readyAt){act('homeHarvest',id);return true;}
+ if(bed?.crop&&!bed.watered&&h.owner===me.id){act('homeWater',id);return true;}
+ // Unauthorized visitors must open the home panel to choose the explicit steal action.
+ if(bed?.crop&&bed.watered&&state.now>=bed.readyAt&&(h.owner===me.id||h.permits?.[me.id]===true)){act('homeHarvest',id);return true;}
  return false;
 }
 function doContext(){if(!context||!context.enabled||me?.job||performance.now()-lastAction<(context.type==='homeClear'?570:180))return;lastAction=performance.now();if(context.type==='combat'){holdAction=false;location.href='/combat';return;}if(['mine','homeClear'].includes(context.type)&&heldResource()&&['wood','stone'].includes(state.home?.nodes.find(n=>n.id===context.id)?.kind||allTargets().find(t=>t.id===context.id)?.type)){holdAction=false;toast('Возьми топор или кирку в быстрой панели');return;}if(quickHomeAction())return;if(['board','warehouse','forge','shop','home','social','monument','jukebox','thefts','donation-box','donation-board','seeds','public-garden','city-registry','landscape','estate','mayor'].includes(context.type)){holdAction=false;if(context.type==='social')selected=context.id;openCityPanel(context.type==='social'?'resident':context.type);return;}act(context.type,context.id);}

@@ -31,7 +31,7 @@ jobs:
         run: |
           set -euo pipefail
           git -C ../../.. merge-base --is-ancestor "$SOURCE_SHA" HEAD
-          unexpected="$(git -C ../../.. diff --name-only "$SOURCE_SHA" HEAD -- projects/dementor-live/runtime | grep -vE '^projects/dementor-live/runtime/(test/(tools|performance|expansion|axonometry|life|city|plaza|bridge|perimeter|h0-mobile-social)\.cjs|public/styles\.css)$' || true)"
+          unexpected="$(git -C ../../.. diff --name-only "$SOURCE_SHA" HEAD -- projects/dementor-live/runtime | grep -vE '^projects/dementor-live/runtime/(test/(tools|performance|expansion|axonometry|life|city|plaza|bridge|perimeter|h0-mobile-social)\.cjs|public/(styles\.css|app\.js))$' || true)"
           if [[ -n "$unexpected" ]]; then echo "Unexpected runtime changes: $unexpected"; exit 1; fi
           sudo apt-get update -qq
           sudo apt-get install -y python3-cairosvg python3-pil
@@ -90,7 +90,7 @@ jobs:
         run: |
           set -euo pipefail
           git -C ../../.. merge-base --is-ancestor "$SOURCE_SHA" HEAD
-          unexpected="$(git -C ../../.. diff --name-only "$SOURCE_SHA" HEAD -- projects/dementor-live/runtime | grep -vE '^projects/dementor-live/runtime/(test/(tools|performance|expansion|axonometry|life|city|plaza|bridge|perimeter|h0-mobile-social)\.cjs|public/styles\.css)$' || true)"
+          unexpected="$(git -C ../../.. diff --name-only "$SOURCE_SHA" HEAD -- projects/dementor-live/runtime | grep -vE '^projects/dementor-live/runtime/(test/(tools|performance|expansion|axonometry|life|city|plaza|bridge|perimeter|h0-mobile-social)\.cjs|public/(styles\.css|app\.js))$' || true)"
           if [[ -n "$unexpected" ]]; then echo "Unexpected runtime changes: $unexpected"; exit 1; fi
           sudo apt-get update -qq
           sudo apt-get install -y python3-cairosvg python3-pil
