@@ -106,3 +106,19 @@ test('Fresh live world starts at the marked parcel and hides city services until
  assert.equal(p.scene,'expedition');
  assert.equal(p.plotId,'plot-1');
 });
+
+test('Municipal phone opens only after three treasury-funded construction stages',()=>{
+ const g=new Game(createWorld(undefined,{startingCity:true})),p=g.join('Городской строитель');g.connect(p);
+ g.state.expedition.completedAt=g.now;g.state.plots.find(x=>x.id==='plot-1').locked=false;
+ assert.equal(g.snapshot(p).worldTravel.booths.some(x=>x.id==='phone-square'),false);
+ const hidden=command(g,p,'worldUse','phone-square');assert.equal(hidden.ok,false);
+ p.bag.wood=4;p.bag.stone=2;
+ const site=Object.values((await import('../municipal-buildings.mjs')).MUNICIPAL_SITES).find(x=>x.id==='phone-square');
+ p.x=site.drop.x;p.y=site.drop.y;
+ assert.equal(command(g,p,'deliver',site.drop.id).ok,true);
+ p.x=site.build.x;p.y=site.build.y;
+ for(let i=0;i<4;i++){const result=command(g,p,'build',site.build.id);assert.equal(result.ok,true);g.tick(g.c.buildMs+1);}
+ assert.equal(g.state.municipalBuildings['phone-square'].stage,3);
+ assert.equal(g.snapshot(p).worldTravel.booths.some(x=>x.id==='phone-square'),true);
+ assert.ok(p.wallet>0,'municipality pays materials and work from treasury');
+});
