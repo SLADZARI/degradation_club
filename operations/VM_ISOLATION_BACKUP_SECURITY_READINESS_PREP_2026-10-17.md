@@ -5,7 +5,7 @@ documentType: REPORT
 projectStage: PLANNING
 status: DRAFT
 version: "0.1"
-updated: "2026-10-17"
+updated: "2026-10-22"
 owner: "A-01 Solution Architect / I-01 DevOps (issue #255; Lead review pending)"
 sourceSystem: GIT
 authorityType: REFERENCE
@@ -20,6 +20,16 @@ semanticMutationAuthorized: false
 
 **Verdict: PREP REPORT / LEAD-ACCEPTED AS DRAFT PLANNING INPUT; HOST READ-ONLY AFTER VERIFIED AT W12; STATIC MANIFEST FALSE-ALARM CORRECTED AT W13; STAGE1 RELEASE STILL NO-GO.**  
 **Production effect: NONE.** This report is not a Decision, Result, Gate, host approval or deploy authorization. It proposes no immediate change to existing services. Parent [#237](https://github.com/SLADZARI/degradation_club/issues/237) remains **BACKLOG/DEFERRED**; [#228](https://github.com/SLADZARI/degradation_club/issues/228) does not yet provide an accepted current stable migration baseline.
+
+## W29 · Kirill accepts current ALPHA unknown-SNI default HTTPS vhost — 2026-10-22 (owner-relayed)
+
+**STATUS: `DEFAULT_443_ALPHA_KIRILL_ACCEPTED_OWNER_RELAYED` (NARROW HOST-POLICY RISK DISPOSITION) / HOST/PRODUCTION G4+G8 STILL BLOCKED.** The Club owner explicitly relayed Kirill's confirmation that **ALPHA is acceptable as the current default HTTPS service**. Canonical owner-relayed [#255 acceptance record](https://github.com/SLADZARI/degradation_club/issues/255#issuecomment-6328901739) and linked [Game SRE #51 cross-project handoff](https://github.com/SLADZARI/dementor_live/issues/51#issuecomment-6328904244). This is **not** presented as a direct signed GitHub statement by Kirill, an approval to mutate the VM or a changed Game ownership boundary.
+
+**NEW read-only external verification from authorized Mac on 2026-10-22:** TLS no-SNI leaf at `138.199.144.94:443` = `CN=alpha.138.199.144.94.sslip.io`, expires `2027-01-19 19:26:45 GMT`. Named SNI leafs remain separated: `dementor.club` = Club CN (expires `2027-01-15 17:14:06 GMT`), `play.dementor.club` = play CN (expires `2027-01-19 21:48:55 GMT`), `alpha.dementor.club` = alpha CN (expires `2027-01-19 21:49:05 GMT`). This validates current cert routing at **TLS handshake tier**, not MDAO functional health, game identity, two real clients or certificate renewal automation. Prior W28 direct Nginx syntax, original four MDAO/default hashes and Club vhost no-drift proof below remain historically valid.
+
+**DECISION BOUNDARY:** leave current ALPHA implicit 443/default intact. There is no need to switch it back to n8n or rework shared/default Nginx solely to resolve default ownership. Game SRE owns future Game vhost changes; Kirill's confirmation resolves **this one host policy blocker**, not separate new vhost/reload rights. **Still STOP** on Club selfhost installation / account copy / DNS-OAuth switch / Certbot mutation, MDAO `/data/*`, production deploy, off-VM restore and Stage1 G8. Positive non-destructive MDAO canary or explicit coverage-limit signoff, named shared reload/rollback operator, representative ≥24h game+MDAO peak and encrypted off-VM DB+Storage timed restore with approved custodian remain required.
+
+`CHECKED=Owner-relayed Kirill statement + current exact no-SNI and named-SNI certificate subjects | CHANGED=Draft #257 docs-only chronology and GitHub #255/#51 evidence | VERIFIED=Existing default TLS identity + segregated named SNI | NOT VERIFIED=MDAO functional canary, 24h shared-host peak, independent restore, renewal, host/cutover G4 | NEXT=A-01/Game SRE/Kirill retain protection; resolve other blockers | PRODUCTION EFFECT=NONE`.
 
 ## W28 · Lead new Game ALPHA canonical-host correction, protected vhost NO-DRIFT · 2026-10-21 23:24–23:25 UTC
 
