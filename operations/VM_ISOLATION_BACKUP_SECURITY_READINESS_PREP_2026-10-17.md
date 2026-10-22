@@ -4,7 +4,7 @@ project: dementor-club
 documentType: REPORT
 projectStage: PLANNING
 status: DRAFT
-version: "0.3"
+version: "0.4"
 updated: "2026-10-23"
 owner: "A-01 Solution Architect / I-01 DevOps (issue #255; Lead review pending)"
 sourceSystem: GIT
@@ -17,6 +17,421 @@ semanticMutationAuthorized: false
 ---
 
 # #255 · Dementor VM isolation, backup and security readiness — read-only audit
+
+## W47 / SRE · Three independently capped mounts and scoped rollback runbook · 2026-10-23
+
+**STATUS:** `G3_3_MOUNT_SOURCE=COMPLETE` · `COMPOSE_MAC_STATIC=PASS` · `COMPOSE_VM_V2321_STATIC=PASS` · `MOUNT_GUARD_NEGATIVE=PASS` · `ACTUAL_VM_MOUNTS=NOT_RUN` · `RUNTIME_WAL_LINK=NOT_RUN` · `NEW_C_BACKUPS_C2_RESTORE=NOT_RUN` · `PHASE_HOST_G4=NOT_ISSUED` · `G7_PUBLIC_CUTOVER=NO_GO`. This **supersedes W46's one 10-GiB ext4 loop filesystem** without changing the historical report or the original Cloud. G3 source/reference only; no VM install, source export or permission expansion.
+
+**AUTHORITY / bounded scope:** Owner/Lead [#255 storage decision 6352861682](https://github.com/SLADZARI/degradation_club/issues/255#issuecomment-6352861682) and [W47 task 6353732232](https://github.com/SLADZARI/degradation_club/issues/255#issuecomment-6353732232) authorize the technical split of **4GiB PGDATA + 2GiB separate WAL + 4GiB private Storage = 10GiB hard persisted C ceiling**, and **≥16GiB host root free**; VM capacity, placement and Kirill's MDAO operation were accepted and need no repeat. **FIRST backup computer = Никитин Mac, SECOND = Женин Mac, physically distinct OWNER_ATTESTED**. Their current clean-C archive set/encryption/manifest/decrypt+restore is **NOT VERIFIED**; earlier SRE absence-of-external-disk statement is not a denial of two existing laptops. Owner's later [G4 preparation consent #228](https://github.com/SLADZARI/degradation_club/issues/228#issuecomment-6353495324) is **not** a named, independently authenticated HOST_INSTALL/DATA_EXPORT phase GO; [Q-01 #42](https://github.com/SLADZARI/degradation_club/issues/42#issuecomment-6353489870) proved fabricated G4 URL can pass structural `gatekeeper.py`. Do not run protected commands on a synthetic JSON `STRUCTURE_PASS`.
+
+### Three actual filesystem identity and capacity boundaries (future gated host operation)
+
+| Domain | Host mount and CONTAINER binding | New separate fully preallocated Club-only ext4 backing image, planned | Hard ceiling |
+| --- | --- | --- | ---: |
+| **PGDATA** and PG config | `/srv/dementor/club-backend/c-data/pgdata`; bind `pgdata/db:/var/lib/postgresql/data` and `pgdata/config:/etc/postgresql-custom` | `/srv/dementor/club-backend/loop-images/club-pgdata-4g.img` | **4,294,967,296 B** |
+| **WAL** | `/srv/dementor/club-backend/c-data/wal`; bind `wal/wal-data:/var/lib/postgresql/wal` and set `POSTGRES_INITDB_WALDIR=/var/lib/postgresql/wal` at FIRST init only | `/srv/dementor/club-backend/loop-images/club-wal-2g.img` | **2,147,483,648 B** |
+| **Private Storage** | `/srv/dementor/club-backend/c-data/storage`; bind `storage/objects:/var/lib/storage` | `/srv/dementor/club-backend/loop-images/club-storage-4g.img` | **4,294,967,296 B** |
+| **TOTAL C persistent data** | Three independent mountpoints / three different loop devices and ext4 filesystems on the existing host | Three separately bounded images; they are **not three physically distinct disks** | **10,737,418,240 B = 10 GiB** |
+
+Mount design: the host has ext4 root without activated project quota; use three new fully allocated loop-backed filesystems, without remounting root or touching `/data/*`, `db-dev`, game/MDAO volumes, ALPHA/BETA, DNS/443 or existing TLS. Each ext4 mount root contains `lost+found`, so bind empty **subdirectories** `pgdata/db` and `wal/wal-data` for PostgreSQL init. Future Kirill/authorized operator must ensure each backing filename is NEW (no overwrite), images are fully allocated before formatting, mount targets are empty/dedicated/permission-restricted, host remains **≥16GiB free after full 10GiB allocation plus Docker image/overlay/log overhead**, and a real authenticated HOST_INSTALL G4 exists. **No new loop image/mount was created by this G3 work.**
+
+**Real WAL behavior:** Supabase [docker/CONFIG.md](https://github.com/supabase/supabase/blob/master/docker/CONFIG.md) documents `POSTGRES_INITDB_WALDIR`; PostgreSQL [initdb --waldir](https://www.postgresql.org/docs/current/app-initdb.html) is for **first cluster creation**. A new DB cluster should create `PGDATA/pg_wal` as a symlink to `/var/lib/postgresql/wal`. Existing PGDATA must **never be silently reinitialized** or reassigned by just setting an env var. Before any G7, independent runtime proof must inspect `PG_VERSION`, **inside-container** `readlink /var/lib/postgresql/data/pg_wal`, `docker inspect Mounts`, actual distinct `stat` devices, `SHOW data_directory`, `pg_ls_waldir()`, and retained WAL/slot/archive settings. `max_wal_size` is a soft checkpoint target, NOT a hard WAL filesystem quota.
+
+### Actual five-service Compose (G3 source; NOT an executable production installation)
+
+Same immutable PG17, **GoTrue v2.197.0**, REST, Storage and Envoy image digests as W46. Only future loopback `127.0.0.1:18431:8000` is published; no host PostgreSQL/Auth/REST/Storage listener. Four long-syntax binds across THREE quota-enforced mounts use `bind.create_host_path: false`, an additional check but **not** sufficient mount identity proof (Compose [issue #13602](https://github.com/docker/compose/issues/13602)). W46 contains the previously verified Envoy trimmed configs: CDS SHA256 `033cbec93cc3f9b0375b8370558e068f8e78c2d7d6283a9ec3013d3287aeb754`, LDS SHA256 `b9e5319da576aa400ab7157b9d64462b73c5f3712592266a0d31bcbe4d0ec5ad`. When operator assembles full vendor assets, both matching configs and the same exact reviewed Compose SHA are required.
+
+**SHA256 `ffc5d53d02b5640bca14ec744d1a3694daf532053e2630c9fb87bc06933bf29f`, file `dc-club.compose.g3-3mount.yaml`:**
+
+```yaml
+---
+name: dc-club-backend
+services:
+  db:
+    image: supabase/postgres:17.6.1.136@sha256:f371b5f3f2ac0a05703f33d6e6134515fb2498cab708fb948a0aeb7481467c00
+    restart: 'no'
+    volumes:
+    - "./volumes/db/realtime.sql:/docker-entrypoint-initdb.d/migrations/99-realtime.sql:Z"
+    - "./volumes/db/webhooks.sql:/docker-entrypoint-initdb.d/init-scripts/98-webhooks.sql:Z"
+    - "./volumes/db/roles.sql:/docker-entrypoint-initdb.d/init-scripts/99-roles.sql:Z"
+    - "./volumes/db/jwt.sql:/docker-entrypoint-initdb.d/init-scripts/99-jwt.sql:Z"
+    - type: bind
+      source: "${CLUB_DATA_ROOT:?THREE_MOUNTS_REQUIRED}/pgdata/db"
+      target: "/var/lib/postgresql/data"
+      bind:
+        create_host_path: false
+      read_only: false
+    - "./volumes/db/_supabase.sql:/docker-entrypoint-initdb.d/migrations/97-_supabase.sql:Z"
+    - "./volumes/db/logs.sql:/docker-entrypoint-initdb.d/migrations/99-logs.sql:Z"
+    - "./volumes/db/pooler.sql:/docker-entrypoint-initdb.d/migrations/99-pooler.sql:Z"
+    - type: bind
+      source: "${CLUB_DATA_ROOT:?THREE_MOUNTS_REQUIRED}/pgdata/config"
+      target: "/etc/postgresql-custom"
+      bind:
+        create_host_path: false
+      read_only: false
+    - type: bind
+      source: "${CLUB_DATA_ROOT:?THREE_MOUNTS_REQUIRED}/wal/wal-data"
+      target: "/var/lib/postgresql/wal"
+      bind:
+        create_host_path: false
+      read_only: false
+    healthcheck:
+      test:
+      - CMD
+      - pg_isready
+      - "-U"
+      - postgres
+      - "-h"
+      - localhost
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    environment:
+      POSTGRES_HOST: "/var/run/postgresql"
+      PGPORT: "${POSTGRES_PORT}"
+      POSTGRES_PORT: "${POSTGRES_PORT}"
+      PGPASSWORD: "${POSTGRES_PASSWORD}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+      PGDATABASE: "${POSTGRES_DB}"
+      POSTGRES_DB: "${POSTGRES_DB}"
+      JWT_SECRET: "${JWT_SECRET}"
+      JWT_EXP: "${JWT_EXPIRY}"
+      POSTGRES_INITDB_WALDIR: "/var/lib/postgresql/wal"
+      PGDATA: "/var/lib/postgresql/data"
+    command:
+    - postgres
+    - "-c"
+    - config_file=/etc/postgresql/postgresql.conf
+    - "-c"
+    - log_min_messages=fatal
+    mem_limit: 1024m
+    cpus: 0.8
+    pids_limit: 128
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: '3'
+    networks:
+    - club_private
+  auth:
+    image: supabase/gotrue:v2.197.0@sha256:1736a63078f5922b198c4cbe50f80ab9a2d3b54fe8b7b6cfb2e9dc5dbbc12c6b
+    restart: 'no'
+    healthcheck:
+      test:
+      - CMD
+      - wget
+      - "--no-verbose"
+      - "--tries=1"
+      - "--spider"
+      - http://localhost:9999/health
+      timeout: 5s
+      interval: 5s
+      retries: 3
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      GOTRUE_API_HOST: 0.0.0.0
+      GOTRUE_API_PORT: 9999
+      API_EXTERNAL_URL: "${API_EXTERNAL_URL}"
+      GOTRUE_DB_DRIVER: postgres
+      GOTRUE_DB_DATABASE_URL: postgres://supabase_auth_admin:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
+      GOTRUE_SITE_URL: "${SITE_URL}"
+      GOTRUE_URI_ALLOW_LIST: "${ADDITIONAL_REDIRECT_URLS}"
+      GOTRUE_DISABLE_SIGNUP: "${DISABLE_SIGNUP}"
+      GOTRUE_JWT_ADMIN_ROLES: service_role
+      GOTRUE_JWT_AUD: authenticated
+      GOTRUE_JWT_DEFAULT_GROUP_NAME: authenticated
+      GOTRUE_JWT_EXP: "${JWT_EXPIRY}"
+      GOTRUE_JWT_SECRET: "${JWT_SECRET}"
+      GOTRUE_JWT_ISSUER: "${API_EXTERNAL_URL}"
+      GOTRUE_EXTERNAL_EMAIL_ENABLED: "${ENABLE_EMAIL_SIGNUP}"
+      GOTRUE_EXTERNAL_ANONYMOUS_USERS_ENABLED: "${ENABLE_ANONYMOUS_USERS}"
+      GOTRUE_MAILER_AUTOCONFIRM: "${ENABLE_EMAIL_AUTOCONFIRM}"
+      GOTRUE_SMTP_ADMIN_EMAIL: "${SMTP_ADMIN_EMAIL}"
+      GOTRUE_SMTP_HOST: "${SMTP_HOST}"
+      GOTRUE_SMTP_PORT: "${SMTP_PORT}"
+      GOTRUE_SMTP_USER: "${SMTP_USER}"
+      GOTRUE_SMTP_PASS: "${SMTP_PASS}"
+      GOTRUE_SMTP_SENDER_NAME: "${SMTP_SENDER_NAME}"
+      GOTRUE_MAILER_URLPATHS_INVITE: "${MAILER_URLPATHS_INVITE}"
+      GOTRUE_MAILER_URLPATHS_CONFIRMATION: "${MAILER_URLPATHS_CONFIRMATION}"
+      GOTRUE_MAILER_URLPATHS_RECOVERY: "${MAILER_URLPATHS_RECOVERY}"
+      GOTRUE_MAILER_URLPATHS_EMAIL_CHANGE: "${MAILER_URLPATHS_EMAIL_CHANGE}"
+      GOTRUE_EXTERNAL_PHONE_ENABLED: "${ENABLE_PHONE_SIGNUP}"
+      GOTRUE_SMS_AUTOCONFIRM: "${ENABLE_PHONE_AUTOCONFIRM}"
+      GOTRUE_EXTERNAL_GOOGLE_ENABLED: "${GOOGLE_ENABLED:-false}"
+      GOTRUE_EXTERNAL_GOOGLE_CLIENT_ID: "${GOOGLE_CLIENT_ID:-}"
+      GOTRUE_EXTERNAL_GOOGLE_SECRET: "${GOOGLE_SECRET:-}"
+      GOTRUE_EXTERNAL_GOOGLE_REDIRECT_URI: "${API_EXTERNAL_URL}/callback"
+    mem_limit: 256m
+    cpus: 0.35
+    pids_limit: 128
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: '3'
+    networks:
+    - club_private
+    - club_auth_egress
+  rest:
+    image: postgrest/postgrest:v14.12@sha256:54000f24847d01a2c2302e0041cf0618b875c57fb48507d743cfa9aaa50bf43c
+    restart: 'no'
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test:
+      - CMD
+      - postgrest
+      - "--ready"
+      interval: 5s
+      timeout: 5s
+      retries: 3
+    environment:
+      PGRST_DB_URI: postgres://authenticator:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
+      PGRST_DB_SCHEMAS: "${PGRST_DB_SCHEMAS}"
+      PGRST_DB_MAX_ROWS: "${PGRST_DB_MAX_ROWS:-1000}"
+      PGRST_DB_EXTRA_SEARCH_PATH: "${PGRST_DB_EXTRA_SEARCH_PATH:-public}"
+      PGRST_DB_ANON_ROLE: anon
+      PGRST_ADMIN_SERVER_PORT: 3001
+      PGRST_ADMIN_SERVER_HOST: localhost
+      PGRST_JWT_SECRET: "${JWT_JWKS:-${JWT_SECRET}}"
+      PGRST_DB_USE_LEGACY_GUCS: 'false'
+      PGRST_APP_SETTINGS_JWT_SECRET: "${JWT_SECRET}"
+      PGRST_APP_SETTINGS_JWT_EXP: "${JWT_EXPIRY}"
+    command:
+    - postgrest
+    mem_limit: 256m
+    cpus: 0.25
+    pids_limit: 128
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: '3'
+    networks:
+    - club_private
+  storage:
+    image: supabase/storage-api:v1.60.4@sha256:c8eb9858eafec891a97c27125470aaad54703c3f4eb4d55ca7f1bf6c6411febf
+    restart: 'no'
+    depends_on:
+      db:
+        condition: service_healthy
+      rest:
+        condition: service_started
+    healthcheck:
+      test:
+      - CMD
+      - wget
+      - "--no-verbose"
+      - "--tries=1"
+      - "--spider"
+      - http://storage:5000/status
+      timeout: 5s
+      interval: 5s
+      retries: 3
+      start_period: 10s
+    environment:
+      ANON_KEY: "${ANON_KEY}"
+      SERVICE_KEY: "${SERVICE_ROLE_KEY}"
+      POSTGREST_URL: http://rest:3000
+      AUTH_JWT_SECRET: "${JWT_SECRET}"
+      DATABASE_URL: postgres://supabase_storage_admin:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
+      STORAGE_PUBLIC_URL: "${SUPABASE_PUBLIC_URL}"
+      REQUEST_ALLOW_X_FORWARDED_PATH: 'true'
+      FILE_SIZE_LIMIT: 52428800
+      STORAGE_BACKEND: file
+      GLOBAL_S3_BUCKET: "${GLOBAL_S3_BUCKET}"
+      FILE_STORAGE_BACKEND_PATH: "/var/lib/storage"
+      TENANT_ID: "${STORAGE_TENANT_ID}"
+      REGION: "${REGION}"
+      ENABLE_IMAGE_TRANSFORMATION: 'false'
+      IMGPROXY_URL: ''
+      S3_PROTOCOL_ACCESS_KEY_ID: "${S3_PROTOCOL_ACCESS_KEY_ID}"
+      S3_PROTOCOL_ACCESS_KEY_SECRET: "${S3_PROTOCOL_ACCESS_KEY_SECRET}"
+    volumes:
+    - type: bind
+      source: "${CLUB_DATA_ROOT:?THREE_MOUNTS_REQUIRED}/storage/objects"
+      target: "/var/lib/storage"
+      bind:
+        create_host_path: false
+      read_only: false
+    mem_limit: 384m
+    cpus: 0.35
+    pids_limit: 128
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: '3'
+    networks:
+    - club_private
+  api-gw:
+    image: envoyproxy/envoy:v1.39.0@sha256:d59f7f5fa10cff6d5892b6c5e7df5c9297ddfb2c3683e33fbfb82da24de4fa66
+    restart: 'no'
+    volumes:
+    - "./volumes/api/envoy/envoy.yaml:/etc/envoy/envoy.yaml:ro"
+    - "./volumes/api/envoy/cds.yaml:/etc/envoy/cds.yaml:ro"
+    - "./volumes/api/envoy/lds.template.yaml:/etc/envoy/lds.template.yaml:ro"
+    - "./volumes/api/envoy/docker-entrypoint.sh:/docker-entrypoint.sh:ro"
+    depends_on:
+      auth:
+        condition: service_healthy
+      rest:
+        condition: service_healthy
+      storage:
+        condition: service_healthy
+    environment:
+      ANON_KEY: "${ANON_KEY}"
+      SERVICE_ROLE_KEY: "${SERVICE_ROLE_KEY}"
+      SUPABASE_PUBLISHABLE_KEY: "${SUPABASE_PUBLISHABLE_KEY:-}"
+      SUPABASE_SECRET_KEY: "${SUPABASE_SECRET_KEY:-}"
+      ANON_KEY_ASYMMETRIC: "${ANON_KEY_ASYMMETRIC:-}"
+      SERVICE_ROLE_KEY_ASYMMETRIC: "${SERVICE_ROLE_KEY_ASYMMETRIC:-}"
+      DASHBOARD_USERNAME: "${DASHBOARD_USERNAME}"
+      DASHBOARD_PASSWORD: "${DASHBOARD_PASSWORD}"
+    entrypoint:
+    - "/bin/sh"
+    - "/docker-entrypoint.sh"
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - timeout 1 bash -c '</dev/tcp/127.0.0.1/8000'
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks:
+    - club_private
+    - club_auth_egress
+    mem_limit: 128m
+    cpus: 0.25
+    pids_limit: 128
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: '3'
+    ports:
+    - 127.0.0.1:18431:8000/tcp
+networks:
+  club_private:
+    internal: true
+  club_auth_egress:
+    internal: false
+x-club-bounded-mounts:
+  pgdata:
+    mount: "${CLUB_DATA_ROOT:?THREE_MOUNTS_REQUIRED}/pgdata"
+    limit_gib: 4
+    backing: club-pgdata-4g.img
+  wal:
+    mount: "${CLUB_DATA_ROOT:?THREE_MOUNTS_REQUIRED}/wal"
+    limit_gib: 2
+    backing: club-wal-2g.img
+  storage:
+    mount: "${CLUB_DATA_ROOT:?THREE_MOUNTS_REQUIRED}/storage"
+    limit_gib: 4
+    backing: club-storage-4g.img
+```
+
+### Fail-closed three-mount host preflight (SOURCE only; no mounts created)
+
+**SHA256 `34170542ee5f83f6dd950460c66cf90ac301a398bb3729f6ab48d138031636dc`, file `dc-club-three-mount-preflight.g3.sh`**. Explicit `CLUB_CHECK_MODE=FIRST` requires fresh empty PGDATA+WAL; `EXISTING` requires PG_VERSION and WAL symlink, preventing accidental replay/overwrite. Each of the three must be a true ext4 mount with a distinct loop device, unique inode/dev, correct exact backing filename, actual full allocation and size, plus root reserve and safe child directory. This guard validates only host facts and is NOT a substitute for an independently authenticated scope/custodian/G4 decision.
+
+```bash
+#!/usr/bin/env bash
+# READ-ONLY preflight. It does not mount, initialize, download, back up or start containers.
+set -Eeuo pipefail
+stop() { printf 'CLUB_PREFLIGHT_DENY %s %s\n' "$1" "$2" >&2; exit "$1"; }
+canonical=/srv/dementor/club-backend/c-data
+backing=/srv/dementor/club-backend/loop-images
+reserve=17179869184
+[ "$CLUB_DATA_ROOT" = "$canonical" ] || stop 64 'club_root_not_exact'
+[ "$CLUB_CHECK_MODE" = FIRST ] || [ "$CLUB_CHECK_MODE" = EXISTING ] || stop 65 'explicit_mode_required'
+[ -d "$canonical" ] && [ ! -L "$canonical" ] || stop 66 'club_root_missing_or_symlink'
+[ -d "$backing" ] && [ ! -L "$backing" ] || stop 67 'backing_root_missing_or_symlink'
+seen_dev='|'
+seen_loop='|'
+for spec in 'pgdata:4294967296:club-pgdata-4g.img' 'wal:2147483648:club-wal-2g.img' 'storage:4294967296:club-storage-4g.img'; do
+  IFS=: read -r name expected file <<EOF
+$spec
+EOF
+  mounted="$canonical/$name"
+  [ -d "$mounted" ] && [ ! -L "$mounted" ] || stop 68 "mount_target_missing_or_symlink_$name"
+  mountpoint -q "$mounted" || stop 69 "not_a_mount_$name"
+  actual_target=$(findmnt -n -o TARGET -T "$mounted") || stop 70 "findmnt_target_$name"
+  [ "$actual_target" = "$mounted" ] || stop 71 "wrong_mount_target_$name"
+  fstype=$(findmnt -n -o FSTYPE -T "$mounted") || stop 72 "findmnt_fs_$name"
+  [ "$fstype" = ext4 ] || stop 73 "wrong_fs_$name"
+  source=$(findmnt -n -o SOURCE -T "$mounted") || stop 74 "findmnt_source_$name"
+  case "$source" in /dev/loop[0-9]*) ;; *) stop 75 "not_club_loop_$name" ;; esac
+  device=$(stat -Lc %d "$mounted") || stop 76 "stat_dev_$name"
+  case "$seen_dev" in *"|$device|"*) stop 77 "same_device_$name" ;; esac
+  seen_dev="$seen_dev$device|"
+  case "$seen_loop" in *"|$source|"*) stop 78 "same_loop_$name" ;; esac
+  seen_loop="$seen_loop$source|"
+  loop_backing=$(losetup -n -O BACK-FILE "$source" 2>/dev/null) || stop 79 "loop_without_backing_$name"
+  [ "$loop_backing" = "$backing/$file" ] || stop 80 "backing_identity_mismatch_$name"
+  [ -f "$loop_backing" ] && [ ! -L "$loop_backing" ] || stop 81 "backing_file_not_regular_$name"
+  actual_bytes=$(stat -Lc %s "$loop_backing") || stop 82 "backing_size_unavailable_$name"
+  [ "$actual_bytes" -eq "$expected" ] || stop 83 "wrong_size_$name"
+  allocated_blocks=$(stat -Lc %b "$loop_backing") || stop 84 "blocks_unavailable_$name"
+  [ "$((allocated_blocks * 512))" -ge "$expected" ] || stop 85 "sparse_file_$name"
+  opt=$(findmnt -n -o OPTIONS -T "$mounted") || stop 86 "options_unavailable_$name"
+  case ",$opt," in *,rw,*) ;; *) stop 87 "mount_not_rw_$name" ;; esac
+  printf 'MOUNT_CHECK_PASS %s %s %s\n' "$name" "$actual_bytes" "$source"
+done
+for sub in pgdata/db pgdata/config wal/wal-data storage/objects; do
+  item="$canonical/$sub"
+  [ -d "$item" ] && [ ! -L "$item" ] || stop 88 "required_subpath_missing_or_symlink_$sub"
+  # Parent mount must be exactly the intended bounded filesystem (no nested mount escape).
+  case "$sub" in pgdata/*) owner_mount="$canonical/pgdata" ;; wal/*) owner_mount="$canonical/wal" ;; storage/*) owner_mount="$canonical/storage" ;; esac
+  path_mount=$(findmnt -n -o TARGET -T "$item") || stop 89 "subpath_mount_unavailable_$sub"
+  [ "$path_mount" = "$owner_mount" ] || stop 90 "subpath_escape_$sub"
+done
+pgdir="$canonical/pgdata/db"
+waldir="$canonical/wal/wal-data"
+if [ "$CLUB_CHECK_MODE" = FIRST ]; then
+  [ ! -e "$pgdir/PG_VERSION" ] && [ ! -e "$pgdir/pg_wal" ] || stop 91 'first_init_existing_pg_cluster'
+  [ -z "$(ls -A "$pgdir")" ] && [ -z "$(ls -A "$waldir")" ] || stop 92 'first_init_not_empty'
+else
+  [ -f "$pgdir/PG_VERSION" ] || stop 93 'existing_mode_pg_version_missing'
+  [ -L "$pgdir/pg_wal" ] || stop 94 'existing_wal_not_symlink'
+  link_target=$(readlink "$pgdir/pg_wal") || stop 95 'wal_link_unreadable'
+  [ "$link_target" = /var/lib/postgresql/wal ] || stop 96 'wal_link_wrong_target'
+fi
+root_free=$(df -B1 --output=avail / | tail -n 1 | tr -d '[:space:]') || stop 97 'root_df_unavailable'
+[ "$root_free" -ge "$reserve" ] || stop 98 'host_reserve_below_16g'
+printf 'CLUB_3_MOUNT_PREFLIGHT_STATIC_PASS three_distinct_loop_ext4=YES postallocation_root_free_bytes=%s mode=%s\n' "$root_free" "$CLUB_CHECK_MODE"
+# Human-executed G4 authenticity & B01/Q01 proof is SEPARATE and mandatory before any real start.
+```
+
+### Actual offline/VM static checks (NO install and NO exports)
+
+- **Mac Docker Compose v5.1.0:** `config --quiet` PASS; JSON assertions PASS exactly 5 images/services, four Club binds, three separate mount prefixes, explicit WAL env, no short bind host-path auto-create, only Envoy loopback published. Missing `CLUB_DATA_ROOT` → negative PASS (config fails closed).
+- **VM Docker Compose v2.32.1:** exact YAML streamed over previously authorized SSH to `docker compose -p dc-club-backend -f - config --quiet`, complete **fake-only** environment; PASS exit 0, **0 warnings/errors**. No remote host file, mount or container modified.
+- **Guard:** Mac `bash -n` PASS; missing root/mount negative PASS. VM `bash -n` PASS and missing actual mount root read-only negative **exit 66 `club_root_missing_or_symlink` PASS**. Positive real three-mount test, real `initdb --waldir`, container startup/ENOSPC and C→C2 restore remain **NOT RUN**.
+
+### Risk-triggered rollback and recovery (owned; no new access rights)
+
+| Situation / checkpoint | SRE/operator response | Required acceptance before resumption |
+| --- | --- | --- |
+| **Before a real HOST_INSTALL G4** | STOP all provisioning, source export, Docker start and route changes. Owner G4 PREPARATION is not a human-authenticated host-install or data-extraction phase; maintain Cloud and game/MDAO state | Lead+Kirill scope/operator + independent Q01 authentic Gate, exact YAML SHA and 3-device preflight |
+| **Clean target G4: mount, `initdb`, Auth/REST/Storage or private-data QA FAIL** | Stop **only** new `dc-club-backend` containers. Isolate its new loopback listener. Preserve each of the three loop images and evidence until independently reviewed; no `down -v`, no volume reset, root quota/remount or WAL removal. Original Cloud stays serving the site | Verify correct WAL symlink+device, 11 Google provider→UUID→profile mappings, 27 Auth tables/271 columns/75 migration tags, 49 FK, exact 69 Cloud RPC/ACL, 16 Storage physical body SHA, negative RLS/Storage tests, backup C2 restore |
+| **PGDATA/WAL/Storage usage reaches 80%/90%; or VM free approaches 16GiB** | Warn at **80%**; at **90%** suspend nonessential uploads/release and freeze new target writes if necessary; investigate WAL slots/archive and disk budget. At <16GiB VM free STOP any new Club allocation. Never `rm pg_wal`, `pg_resetwal` or indiscriminate `docker prune`; retain encrypted recovery manifests. Any rebalancing must stay within total 10GiB and an approved host change | Only a repaired bounded C or independently clean-restored C2 after QA. A WAL-full PostgreSQL may halt; do not assume self-recovery |
+| **After G7 route switch but BEFORE any acknowledged target write** | With a separate owner rollback GO revert only scoped Club API/Google callback/issuer/client config to preserved Cloud configuration, maintain one active Telegram worker; require new sign-in as needed. Do not touch game worlds | Signed-in login→Board→action→reload, DC9 baseline, outsider private-media DENY, source Cloud unchanged |
+| **After G7 and real new DB/Storage writes** | **NEVER just flip DNS.** Stop new writes and Telegram sending, checkpoint target DB+object changes, privately reconcile/write-preserve acknowledged target changes to approved destination; independent Q01 confirms IDs/roles/private bytes, then owner G7 rollback GO and scoped routing revert | Signed dual-side delta+snapshot manifests (no PII in GitHub), 11 stable AccountIds, all acknowledged Board/Storage operations recovered, no duplicate outbound job |
+| **Recovery media and C2** | Existing *physically separate* Mac Никиты (first) and Женин Mac (second) are OWNER-ATTESTED, not newly inventoried here. Only after real DATA G4 create an **encrypted current clean-C** snapshot (DB+private Storage object bodies) with private UTC asOf, archive size/SHA256 and separate key custody on BOTH. Independently decrypt and RESTORE to new isolated C2, not the shared VM or current DEV volumes | Match source manifest/object checksums, Google UUIDs and grants/RLS negative tests; **present old Mac files ≠ current clean-C backup PASS**. Preserve original Cloud. Mixed MP/Robo/legacy Q requires separate rights |
+
+**Exact teardown if a scoped G4 rollback becomes necessary:** stop only `dc-club-backend`, verify no new DB writer/file descriptor, preserve backup and hashes; only with Kirill and Lead authorization unmount exactly the three verified Club mounts and detach each validated Club loop backing file. Never execute `docker compose down -v`, delete host/game volumes, remove encrypted backups automatically, change MDAO `/data/*`, restart ALPHA, or silently undo public OAuth/DNS. **A post-cutover rollback after writes requires data reconciliation before any routing change.**
+
+**ONE NEXT actual operator action:** Kirill/nominated SRE acknowledges and, only after real named operator HOST_INSTALL G4, provisions the three loop ext4 filesystems with 4/2/4 GiB ceilings, runs this preflight, boots the exact compatible PG17/GoTrue target, checks the WAL link/ENOSPC, and hands independent C2 restore to Q01/B01. The two-Mac hardware choice is closed; the missing evidence is **new clean C backup content/encryption and restore**, not hardware selection. **STAGE2_REAL_CLOUD_EXPORT** remains NO GO until Backend #228 authenticates an approved selective Club-only FK-closed path or all foreign data-controller permissions for off-VM full Q. Public G7 is separate.
+
+**CHECKPOINT:** asOf 2026-10-23, one-file reference/Draft PR #257. SHA and permalink recorded after update in Issue #255. **CHANGED:** G3 documentation/source only. **VERIFIED:** Mac/VM Compose parse and host negative guard. **NOT RUN:** three actual mounts, GoTrue/WAL runtime, Q/A export, clean-C first+second encrypted backup, C2 restore, production cutover. **PRODUCTION EFFECT: NONE.**
+
 
 ## W46 · Actual static Compose + isolated disk contour + first-backup physical check · 2026-10-23
 
