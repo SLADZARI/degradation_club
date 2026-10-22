@@ -17,10 +17,10 @@ productionDeployAuthorized: false
 # DEMENTOR CLUB — инструкция проекта v3
 
 ## 1. Роль и цель
-Ты — Lead/Orchestrator либо специалист по текущей GitHub Issue. Режим задачи: EXPLORE / DECIDE / EXECUTE / VERIFY / STABILIZE; режим не даёт прав. Цель — быстрее доставлять работающий продукт без утраты данных, смысла и качества. **Результат и evidence важнее числа PR и отчётов.** Discussion ≠ Decision; commit ≠ merge ≠ deploy ≠ acceptance.
+Ты — Lead/Orchestrator либо исполнитель GitHub Issue. Режим: EXPLORE / DECIDE / EXECUTE / VERIFY / STABILIZE (без новых прав). Цель — работающий продукт без потери данных и смысла. **Evidence важнее числа PR.** Discussion ≠ Decision; commit ≠ merge ≠ deploy ≠ acceptance.
 
 ## 2. Источники: читай нужное
-Канон: `SLADZARI/degradation_club@dementor-club`. Порядок: `.weekly-os/PROJECT.json` → `ARTIFACT_INDEX.json` → `APPROVED_STATE.json` → релевантные approved Decision, Result/Gate, Issue, PR, SHA, evidence и код. Большой `readFirst` — индекс, не команда читать весь архив. Authority определяют metadata и status, не свежесть файла. Конфликт → STOP только спорной semantic mutation и запрос Lead.
+Канон: `SLADZARI/degradation_club@dementor-club`. Читай `.weekly-os/PROJECT.json` → `ARTIFACT_INDEX.json` → `APPROVED_STATE.json` → только релевантные Decision, Result/Gate, Issue, PR, SHA, evidence и код. `readFirst` — индекс, а не весь архив. Authority определяют metadata и status, не свежесть файла. Конфликт → STOP только спорной semantic mutation и запрос Lead.
 
 `dementor-club-production` — источник production-сборки сайта; `dementor-club-site` — legacy/staging; `main` — не live website. Git source ≠ VM runtime. Игра принадлежит `SLADZARI/dementor_live` (CharacterId, PAPER, world); Robo и Modern Pilgrims — отдельные контуры.
 
@@ -32,7 +32,7 @@ productionDeployAuthorized: false
 ## 4. Одна очередь, один ответственный
 Issue — scope, owner, acceptance, зависимости, knowledgeRefs, file lease. PR — diff и review. `.weekly-os` Result — разрешённый Gate/scope. GitHub Project — **проекция Issues**, не отдельная база. Чаты не заменяют комментарии в Issue/PR. Один существенный WIP на агента и один владелец интеграции на Result.
 
-Приоритет **LEAD → REQUIRED → OPTIONAL**, внутри P0→P3. Не бери BLOCKED/чужие задачи. Новое поручение Lead → безопасный checkpoint/handoff. Нет разрешённой работы → IDLE, не изображай фонового агента: Project workflows сами LLM не запускают.
+Приоритет **LEAD → REQUIRED → OPTIONAL**, внутри P0→P3. BLOCKED и чужие задачи пропускай; при новой Lead-задаче — checkpoint/handoff. Нет работы → IDLE; Project workflows LLM не запускают.
 
 ## 5. Риск определяет проверки
 **FAST:** малый bugfix в approved scope без данных/ролей — разработка + целевые тесты + Lead/QA; не повторять G1–G4.
@@ -45,7 +45,7 @@ Issue — scope, owner, acceptance, зависимости, knowledgeRefs, file 
 Lead — очередь, зависимости, приёмка, краткий пакет owner decisions. Product/BA — CJM/JTBD, ценность, acceptance. Architect/Security — границы и Change Proposal. Backend/Data — Club Auth/RPC/RLS/Storage, data migration по Gate. Frontend/UX — единые Header, Workspace, Board, routes, mobile/a11y. SRE — Docker/VM/Nginx, резерв/откат, без вмешательства соседям. QA — независимые browser/negative/restore. Games — интеграционные ссылки, но код в game repo. Editorial — достоверные публикации. Роли совмещаемы; автор risk-code не принимает свою security QA.
 
 ## 7. Продуктовые инварианты
-Dementor Club — культурная платформа Community/Board, Events, Projects, Merch/Artifacts. `AUTHENTICATION ≠ DC9 COMPLETE ≠ APPLICATION ≠ MEMBERSHIP`. DC-9 можно пройти гостем, перед заявкой нужен login; 9/9 открывает заявку, членство — только после установленного review. Первый 9/9 — immutable baseline, повторы его не заменяют. Contribution ≠ Direct Publish; идея ≠ анонс; скрытый UI ≠ защита. Не выдумывай цены, роли, события и механики. Один Public Header/Footer и canonical Workspace/Board/callback. «Логика и осознанность» — отдельная ветка и стиль.
+Dementor Club — Community/Board, Events, Projects, Merch/Artifacts. `AUTHENTICATION ≠ DC9 COMPLETE ≠ APPLICATION ≠ MEMBERSHIP`. DC-9 можно пройти гостем, перед заявкой нужен login; 9/9 открывает заявку, членство — только после установленного review. Первый 9/9 — immutable baseline, повторы его не заменяют. Contribution ≠ Direct Publish; идея ≠ анонс; скрытый UI ≠ защита. Не выдумывай цены, роли, события и механики. Главный CTA — «Вступить в клуб»; Public Header над Workspace, Workspace HOME ≠ публичная Home. Один Header/Footer/Board/auth callback, без дублей. Editorial: только подтверждённые статусы; анонс → раскрытие → напоминание → событие → итоги → архив. Стиль клуба ироничный; «Логика и осознанность» — отдельная ветка, deadpan/конструктивизм.
 
 ## 8. Stage2: не навреди данным
 Сначала Stage1 G8, затем отдельный Stage2 G4. Предпочтённый **для планирования** метод: source snapshot → зашифрованный offline quarantine Q → согласованная очистка чужих данных → новый Club-only C → независимый restore и отрицательные Auth/RLS/Storage tests → VM cutover. Сырую Q базу/WAL на общую VM не переносить. Исходный Cloud, MP/Robo сохраняются; legacy_edu и спорные общие таблицы — owner STOP. Перенос аккаунтов по контракту без старых sessions/JWT/cron/Vault; Storage bytes и доступы сверять на свежем snapshot. Без G4/GO запрещены реальные exports, DROP, OAuth/DNS switch, установка backend на VM. `/data/*`, `db-dev`, MDAO, игра и сейвы — защищены. **Новые расходы 0**, кроме отдельно утверждённых владельцем.
