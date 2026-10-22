@@ -21,6 +21,90 @@ semanticMutationAuthorized: false
 **Verdict: PREP REPORT / LEAD-ACCEPTED AS DRAFT PLANNING INPUT; HOST READ-ONLY AFTER VERIFIED AT W12; STATIC MANIFEST FALSE-ALARM CORRECTED AT W13; STAGE1 RELEASE STILL NO-GO.**  
 **Production effect: NONE.** This report is not a Decision, Result, Gate, host approval or deploy authorization. It proposes no immediate change to existing services. Parent [#237](https://github.com/SLADZARI/degradation_club/issues/237) remains **BACKLOG/DEFERRED**; [#228](https://github.com/SLADZARI/degradation_club/issues/228) does not yet provide an accepted current stable migration baseline.
 
+## W33 · Measured full Cloud PG data size and safe offline encrypted recovery staging · 2026-10-22
+
+**LEAD TASK:** [#255 W33 exact scope](https://github.com/SLADZARI/degradation_club/issues/255#issuecomment-6329752219). Method [#228 clone-first owner G3 proposal](https://github.com/SLADZARI/degradation_club/issues/228#issuecomment-6329745318) supersedes a guess that every 49-FK edge needs a custom per-table row importer. **STATUS: PRECISE SOURCE SIZE ACCEPTED; OFFLINE QUARANTINE/RETENTION/RESTORE PROCEDURE PREPARED; NOT EXECUTED.** The older W32 large disk envelope is a **PROVISIONAL, NOT-MEASURED five-service runtime protection budget**, not the amount of Club data to migrate. No new service, branch/Result, VM write or real Cloud export authorized.
+
+### W33-A. Exact source scope; no invented multi-GB database
+
+**Backend's direct read-only PostgreSQL 17.6** `SELECT pg_database_size(current_database())` returned **29,371,539 bytes (28.011 MiB)** for the **ENTIRE mixed source PostgreSQL database** (Club + MP + Robo + Postgres system), not just DC. Source inventory: `public` 56 tables = **28 `dc_*` / 15 `mp_*` / 2 Robo / 11 unprefixed**; 11 `auth.users`, 11 Google identities and 11 `profiles`. Private `dc-community-artifacts` metadata lists **16 objects, declared file bodies 23,934,580 bytes (22.826 MiB)**. **Declared physical database + separately declared Storage bodies total 53,306,119 bytes (50.84 MiB) but this is NOT an actual backup archive size, PG restore size or confirmed Storage-body checksum.** Both `pg_database_size` and object metadata are point-in-time measurements; uncompressed text `COPY`/SQL, extension role/GoTrue setup, WAL, temp, logs, images, encrypted archives and future uploads can be larger. Do NOT use 507GiB or 12.5GiB as source data size: **507.47GiB was the Mac's FREE DISK, 12.5GiB is an unproven staging ceiling**. Physical self-hosted database and 5-service Docker image/volume sizes will be measured only after approved isolated test.
+
+### W33-B. Two approaches and selected G3 candidate, not data-export authority
+
+| Approach | Correctness and privacy characteristics | Status |
+| --- | --- | --- |
+| **A: selective Club-only per-table copy** | Least-privilege source read/filter and smaller sensitive-data exposure; requires source-faithful DDL/roles/RLS/RPC/GoTrue-owned tables, FK row ordering and identity mapping across approved shared `profiles`; overhead large relative to 28MiB source | Valid fallback if full mixed-copy custody/restore cannot be approved |
+| **B: one logical FULL mixed-source snapshot → encrypted OFF-VM private quarantine → offline source-faithful restore → approved MP/Robo/legacy pruning in COPY → Club-only encrypted sanitized target** | More faithfully preserves scoped FKs/functions/Auth system and avoids 49 manual row mappings; **temporarily handles unrelated MP/Robo PII, sessions/refresh tokens and privilege state**, with much stricter owner/custodian/expiry/crypto-erasure gates. Source Cloud NEVER pruned. **NO full mixed DB reaches shared VM** | **Preferred OWNER-PROPOSED G3 CANDIDATE; REAL SNAPSHOT/QUARANTINE NOT AUTHORIZED** |
+
+Full clone here is **logical application/user schema** using the current official Supabase CLI restore-from-platform flow, **NOT** raw copying a managed platform PGDATA data directory or blind `pg_dumpall` of every Cloud internal schema. Official flow exports **roles / schema / data** separately, with Supabase-specific reserved-role/schema filtering; source `auth.users`, policy/functions/trigger definitions are included by its documented scope, but complete fidelity for the **current actual** schemas/extensions must be validated before treating any snapshot as a clone. **Storage FILE BYTES, Edge function code, Google OAuth provider settings, JWT secrets and DNS are NOT exported by the database dump**. Guide: https://supabase.com/docs/guides/self-hosting/restore-from-platform . Before real copy B-01 verifies live CLI flags and the snapshot metadata manifest; source user rows, object data and secrets NEVER land in a public GitHub diff.
+
+### W33-C. Safest no-new-fee QUARANTINE location, independent restore and key custody (G3 proposal)
+
+**CANDIDATE destination: owner's connected Mac ONLY WITH WRITTEN DATA-CUSTODIAN APPROVAL**, not an already selected/authorized backup. Direct safe metadata check `2026-10-22 00:38 UTC`: `FileVault is On`, `hdiutil` and `diskutil` built in; `hdiutil create -help` supports **APFS, SPARSEBUNDLE, -encryption and -stdinpass**. Root free `534,218,436 KiB ≈509.5GiB` on latest check (prior snapshot 507.47GiB). These are **laptop spare storage**, never part of the Cloud 28MiB. Separate `age/gpg` encryption tool not present on previous check, and `psql/pg_dump` not verified installed; installing anything would be another change and was **NOT attempted**.
+
+**Least-exposure proposed location design, not mounted/executed:**
+1. After named Club+MP/Robo data owner consent, create a **private passphrase-protected AES-256 encrypted APFS sparsebundle** in a 0700 operator-owned folder on the Mac with a unique key NOT saved in repo, CLI args, shell history or on the Mac-only copy. A separate explicitly approved **isolated** restore environment must use bind-mounted PG/Storage data directories backed by the same encrypted mounted bundle, NOT unmanaged old `degradation_club`/B-01 Docker volumes. No published network ports, no email/Telegram/GoTrue Google outbound, no scheduled workers, explicit Docker storage/metadata leakage audit. FileVault helps disk-at-rest security but is **NOT** equivalent to independently recoverable encrypted archive+key escrow.
+2. Source export is a **read-only outbound Cloud logical snapshot** after *REAL DATA G4* with narrowly approved read credentials and finite UTC snapshot. Create 3 files inside the encrypted mounted bundle **only**, per official CLI syntax with placeholders; template (NEVER RUN under W33):
+   ```sh
+   supabase db dump --db-url "[OWNER_APPROVED_SOURCE_URL]" -f roles.sql --role-only
+   supabase db dump --db-url "[OWNER_APPROVED_SOURCE_URL]" -f schema.sql
+   supabase db dump --db-url "[OWNER_APPROVED_SOURCE_URL]" -f data.sql --use-copy --data-only
+   ```
+   **These are three distinct CLI read operations; consistency across them is NOT automatically one atomic cross-file snapshot.** Source application write interval and row/version reconciliation must be controlled by B-01; no live Cloud table mutation/freezing today. Source URL in examples is PLACEHOLDER ONLY: future operator MUST avoid real connection credentials in command-line history/process listings/logs and use an approved key/secret injection technique. Post-export inspect only private manifest: exact source PG version, expected schema/table count, auth 11 (approved fields), 49 FK catalogue+69 `dc_*` routines / 65 definers, `dc_*` table count, real dump file bytes, SHA256, restore tool+image versions; do not log member rows/PII or dump private SQL to GitHub.
+3. Copy source-snapshot backups into a **separately recipient-encrypted off-VM archive** with owner-held decrypt key and independently escrowed recovery key (e.g., vetted `age` recipient mode, **NOT INSTALLED/NOT EXECUTED**). Keep an encrypted first copy on Mac, and **an independent second encrypted copy on a separately approved external medium/provider** under a different custodian; Mac-only + FileVault is not a complete disaster recovery plan. No MP/Robo snapshot on VM, in browser uploads, repo, ordinary Google Drive share or Cloud target public volume. Transfer the 16 authenticated **Storage object bodies** separately only after policy+data G4, with private SHA/object bytes/ACL and signed URL negative tests; never pretend metadata bytes prove backup completeness.
+4. Create a **new disposable, network-isolated quarantine PostgreSQL/GoTrue runtime** matched to source PG17/GoTrue, **not** existing local B-01/Club Mac compose, old Cloud or VM `db-dev`. Before using any sensitive dump, require verified egress denial and disabled cron/pg_net/Telegram/mail/function outbound, ephemeral DB user, startup import and scope check; Supabase guide uses `psql --single-transaction --variable ON_ERROR_STOP=1` for restore. **The guide's example `SET session_replication_role=replica` suppresses triggers; if used in OFFLINE import only, restore constraints/triggers and independently re-enable/verify **every FK, RLS, grant and trigger** before declaring copy safe; NEVER run a blanket trigger disable against Cloud or live host. Run exact source 49 FK, 69 routines/65 definer owner/search_path/EXECUTE, auth UUID+Google subject, rows and CIRCLE/DC9/Storage checks. Evaluate 8 OWNER_DECISION_STOP FK and shared profile privacy fields before any prune. No `DROP ... CASCADE`; create one **reviewed migration/sanitization SQL allowlist with dry-run diff**, delete MP/Robo only in quarantine, assert no residual MP/Robo rows/roles/functions/tokens, no active worker.
+5. Export **sanitized Club-only** dataset from the quarantine to a SECOND **recipient-encrypted archive** and restore it to a *separate disposable* test target, check independent QA 31 negative actor cases/GoTrue/Storage/role/RPC and full bytes. **Only the sanitized encrypted payload may later be considered for VM transfer** after Stage1 G8 and separate host/data G4; it does NOT automatically authorize an issuer/DNS/worker switch. Freeze/delta/rollback handled by separate release Gate.
+
+**RETENTION / ERASURE CONTRACT TO APPROVE, NOT A POLICY YET:** owner to approve a short quarantine lease (proposed maximum **72 hours after successful sanitized-checkpoint receipt**, or earlier if requested; incident/legal requirement may override), least-privilege key custody, twice-signed inventory, and expiry alert. Clear attached sensitive containers/bind mounts/snapshots after approved retention; destroy **separately held temporary encryption keys** for cryptographic erasure and independently validate no dangling Docker volume/archive copies or unencrypted dumps. **`rm -rf` is NOT verified secure erasure on APFS/SSD snapshots**; do not claim secure deletion from ordinary file delete. Long-term retention of the **Club-only** encrypted backup and second independent copy requires a different owner-controlled retention class (propose 30 days after verified G8 only if accepted), recovery-key rotation and at least one end-to-end DECRYPT+RESTORE rehearsal. MP/Robo encrypted quarantine must NOT be retained with Club backups.
+
+### W33-D. Size evidence and reproducible **measurement-based** envelope (no guessed multi-GB minimum)
+
+| Item | Current measured data | Future proof before real Gate |
+| --- | --- | --- |
+| Mixed source PG physical | **29,371,539 B (28.011MiB)** including MP/Robo and system | Actual roles/schema/data **plain SQL export byte totals**, SHA, source rows/extension versions; relative sizes may exceed PG physical |
+| Club private Storage metadata | **16 objects; 23,934,580 B (22.826MiB)** | Real authenticated object **body** byte total, per-object SHA256/content type/ACL and failure/retry evidence; DB dump excludes bodies |
+| Backup/archive encrypted bytes | **NOT MEASURED** | Record actual size after encrypted packaging, key escrow, restore decrypt round trip |
+| Quarantine PGDATA and WAL/temporary usage | **NOT MEASURED** | Measure actual `du` inside future isolated, approved writable fixture during restore with peak and 2x observed margin; forbid root Docker spill and unintended host ports |
+| Sanitized Club-only PG/Storage & restore | **NOT MEASURED** | Independently encrypted **SECOND** snapshot & isolated second restore with actual size/manifest, Q-01 31-case G6, exclusion negatives |
+| Docker/Auth runtime itself | W32 five immutable image **compressed registry layers 713,766,910 B**, UNPACKED unknown | Runtime image/PG17+Auth+API/Storage network isolation on approved fake-only fixture; independent capacity/cgroup resource measuring |
+| Shared VM | Last verified ~**40.96GiB** free, >=16GiB existing-services protected reserve (PROPOSED) | Stage2 HOST G4=NO until host hard quota/mount safety, full representative concurrent overlap and off-VM independent restore; source 28MiB size does not override this |
+
+**Sizing formula for OFF-VM quarantined restore**, use REAL measurements once available, not static fixed 12.5GiB:
+```text
+LOCAL_QUARANTINE_PEAK_BYTES =
+  max_observed(roles.sql + schema.sql + data.sql
+               + decrypted source SQL during controlled import
+               + quarantine PGDATA/WAL/temp
+               + intermediate sanitized export
+               + quarantine Storage real bodies
+               + container image/overlay + encrypted backup archive)
+  + documented restore/retry headroom based on observed peak
+OWNER APPROVES ONLY WHEN: no default Docker/Cloud/MDAO/Game spill;
+  readable TWO separately encrypted copies; restored Club-only data
+  verified, temporary mixed-source dump retention and key custody signed.
+```
+This is intentionally more conservative than merely adding the `28MiB + 23MiB` data figures, but **does not claim tens of GiB actually required**. Keep W32 hard isolation and protected host Gate NO; if future Mac full quarantine is owner-approved, stage on Mac **off VM** first and send only reviewed Club-only clean dataset to target later. The baseline full-source dump is a sensitive **mixed MP/Robo** export, even if only 28MiB.
+
+### W33-E. Owner answers and exact acceptance
+
+**No repeated Kirill ALPHA default-443 ask:** already accepted as relayed in W29. **No repeat 49-FK enumeration:** Backend canonical #228. New minimally sufficient authority packet for Lead to route at the *right Gate*, not presume approval:
+
+1. **Club + MP/Robo owners:** specifically permit or deny *temporary encrypted full mixed source snapshot* of 56 public tables + Auth into MAC OFFLINE quarantine, approve 8 disputed legacy FK dispositions and `profiles.full_name/avatar_url` privacy, and designated **operator/custodian/key recovery actor**; if MP/Robo owner denies, fall back to A selective Club-only export (no full mixed snapshot).
+2. **Backup/recovery:** accept or reject Mac FileVault+dedicated encrypted APFS sparsebundle as TEMP OFF-VM stage and specify a SECOND independent encrypted backup destination/custodian; agree quarantine lease and verified cryptographic erasure plus independent decrypt+restore receipt. **No export until G4**.
+3. **Kirill shared-host:** name protected non-destructive MDAO positive canary and future shared Nginx reload/rollback operator, accept host disk isolation + representative 24h ALPHA+BETA+MDAO resource evidence. This does not block offline design on Mac but BLOCKS VM target G4.
+4. **Lead + QA:** resolve Stage1 G8 before Stage2 execution or approve explicit serial dependency exception, create one Stage2 Result/G4 scoped to fake-only first; independent Q-01 source-faithful 31-case QA with no MP/Robo/tokens/SMS/SMTP/worker leaks and original Cloud unaffected.
+
+```text
+STATUS: W33 EXACT_SOURCE_SIZING + OFF_VM_ENCRYPTED_QUARANTINE_PLAN COMPLETE / G3 ONLY
+CHECKED: Lead 6329752219 direct Cloud 29,371,539B source; B-01 49-FK/33-hash/31-case and clone-first proposal; official Supabase restore guide; owner Mac FileVault/readonly hdiutil syntax and free space from current mount
+CHANGED: same existing one-file Draft PR #257 report only; NO production code or G4 decision
+VERIFIED: all measured source and legacy capacity estimates properly separated; Mac built-in encrypted APFS sparsebundle option exists, NOT EXECUTED
+NOT VERIFIED: actual full logical dump byte size or consistency; sensitive mixed source consent, quarantine host isolation/credentials, second independent encrypted location, object bodies, off-VM restore, RPO/RTO, protected VM host G4 and Stage1 G8
+BLOCKERS: MP/Robo data custodian + Club owner approval, safe key/second-storage custody, 8 legacy FK/privacy choices, QA/restore and future VM host Gate
+NEXT: Lead obtains an explicit bounded owner data/quarantine/retention/second-copy decision after Stage1 G8 or serial exception; B-01 validates actual versioned dump semantics in fake-only isolated restore FIRST
+PRODUCTION / VM / MAC EXISTING CONTAINERS / CLOUD / DNS / MDAO / LIVE EFFECT: NONE
+```
+
 ## W32 · Exact five-service staging resource equation, actual registry layers, ext4 quota and off-VM candidate — 2026-10-22 00:15–00:17 UTC
 
 **DECISION: `HOST_TEST_G4_READY=NO` / `VM_HOST_DISK_ISOLATION=NOT_PROVEN` / `STAGE2_REAL_DATA_G4=NOT_AUTHORIZED`.** This responds to [Lead W32 #255](https://github.com/SLADZARI/degradation_club/issues/255#issuecomment-6329425915) using B-01's [measured Cloud source and bounded test-only caps](https://github.com/SLADZARI/degradation_club/issues/255#issuecomment-6329351681), and the already accepted [W31 VM read-only snapshot](https://github.com/SLADZARI/degradation_club/issues/255#issuecomment-6329204808). **Kirill's owner-relayed acceptance of CURRENT ALPHA implicit HTTPS :443 default is already closed at [W29](https://github.com/SLADZARI/degradation_club/issues/255#issuecomment-6328901739); do NOT reopen it.** This is another short read-only *decision evidence* update to the existing one-file DRAFT PR #257, not a new Compose or Result.
