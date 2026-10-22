@@ -4,8 +4,8 @@ project: dementor-club
 documentType: REPORT
 projectStage: PLANNING
 status: DRAFT
-version: "0.1"
-updated: "2026-10-22"
+version: "0.2"
+updated: "2026-10-23"
 owner: "A-01 Solution Architect / I-01 DevOps (issue #255; Lead review pending)"
 sourceSystem: GIT
 authorityType: REFERENCE
@@ -17,6 +17,45 @@ semanticMutationAuthorized: false
 ---
 
 # #255 · Dementor VM isolation, backup and security readiness — read-only audit
+
+## W45 / SRE · One-page same-VM Club-only isolated C receipt — 2026-10-23
+
+**ROLE/MODE:** SRE / VERIFY→G3 DESIGN, `#255` under [Lead W45](https://github.com/SLADZARI/degradation_club/issues/255#issuecomment-6352198495). This section **supersedes historical W24/W32 demands for extra stress tests and MDAO canaries**; historical evidence remains below. **No VM or Cloud deployment, backup creation, Docker pull, DNS or OAuth change.** Gate and security authority are not granted by this report.
+
+### A. Host receipt and operator/owner decision (already DONE; do not recheck)
+
+- **Direct authorized VM read-only receipt:** [#255 6352008220](https://github.com/SLADZARI/degradation_club/issues/255#issuecomment-6352008220), 2026-10-22 **21:44 UTC**: 4 logical CPUs, `MemAvailable=7,053,012 kB (~6.73 GiB)`, root free **43,856,678,912 B (~40.86 GiB)**, **4,181,300** inodes free; no swap. Host shared root volume for `/`, `/srv`, `/data`. ALPHA **stopped deliberately**, BETA **healthy**, `db-dev` running, no Club backend installed; 80/443 and 32778 already bound, game Beta 127.0.0.1:14173. Snapshot proves current resource state, NOT an automatically enforced future per-project cap.
+- **Accepted owner correction:** [#255 6352059981](https://github.com/SLADZARI/degradation_club/issues/255#issuecomment-6352059981). `HOST_CAPACITY_OWNER_ACCEPTED=YES`, `KIRILL_MDAO=OPERATOR_ATTESTED_OWNER_ACCEPTED`, `SIMULTANEOUS_LOAD=N/A_OWNER_WAIVED`. Kirill/Gabil VM placement already accepted. **Do not rerun 24h concurrency test, MDAO canary or placement ballot.**
+
+### B. EXACT five-service G3 target profile, non-operative until G4
+
+**Rechecked registry index digests 2026-10-23 from existing connected Mac** using **read-only `docker buildx imagetools inspect`** (no pulls/containers started); candidate versions are pinned, but Auth/schema/REST/Storage functional compatibility is **NOT RUN**.
+
+| Club-only component | Exact immutable Docker image (candidate) | Proposed hard max, NOT tested |
+| --- | --- | --- |
+| New Club PostgreSQL 17 | `supabase/postgres:17.6.1.136@sha256:f371b5f3f2ac0a05703f33d6e6134515fb2498cab708fb948a0aeb7481467c00` | **1024 MiB / 0.80 CPU** |
+| Auth / Google PKCE | `supabase/gotrue:v2.197.0@sha256:1736a63078f5922b198c4cbe50f80ab9a2d3b54fe8b7b6cfb2e9dc5dbbc12c6b` | **256 MiB / 0.35 CPU** |
+| REST/RPC | `postgrest/postgrest:v14.12@sha256:54000f24847d01a2c2302e0041cf0618b875c57fb48507d743cfa9aaa50bf43c` | **256 MiB / 0.25 CPU** |
+| Private Storage | `supabase/storage-api:v1.60.4@sha256:c8eb9858eafec891a97c27125470aaad54703c3f4eb4d55ca7f1bf6c6411febf` | **384 MiB / 0.35 CPU** |
+| Envoy API gateway (no Kong) | `envoyproxy/envoy:v1.39.0@sha256:d59f7f5fa10cff6d5892b6c5e7df5c9297ddfb2c3683e33fbfb82da24de4fa66` | **128 MiB / 0.25 CPU** |
+| **Proposed aggregate** | **Exactly five services, not full default Supabase stack** | **2048 MiB / 2.0 CPU** |
+
+**Deployment boundary / exact paths and ports:** future source+config at `/srv/dementor/club-backend/<approved-G4-SHA>/`, Compose project `dc-club-backend`, private bridge `dc-club-backend-internal`, **new** `127.0.0.1:18431` → gateway only if preflight `ss` shows unbound and Kirill accepts. DB 5432 / Auth 9999 / REST 3000 / Storage 5000 remain **internal only**, zero `0.0.0.0` or IPv6 wildcard exposure. New optional `api.dementor.club` hostname requires separate Kirill Nginx/TLS+DNS scoped authority and later owner public G7; before that gateway remains loopback-only and **does not alter** existing Club site, default 443/game or MDAO vhosts. New project mounts, UID, secrets and logs **never intersect** `/data/*`, `db-dev`, Club Stage1 site or game volumes. Envoy's upstream override currently depends on Studio; slim override must **actually remove dependency and validate config**, not merely delete Studio. Edge/Telegram runner OFF during migration; one separately approved worker at cutover only, never two active senders.
+
+**Actual isolation implementation requiring reviewed G4:** add explicit `mem_limit`, `cpus`, `pids_limit`, bounded `tmpfs` and Docker json-log `max-size/max-file` per container, and `read_only` for non-stateful filesystems after image compatibility verification. **Disk/WAL boundary is NOT delivered by `max_wal_size` alone or Compose named volumes.** Host uses shared root ext4 with project-quota capability **not proven enabled**; Kirill must approve one **preallocated and mounted bounded Club-C-only filesystem, candidate 10 GiB**, with both PGDATA/pg_wal and private Storage bytes INSIDE it; retain independently capped overlay/log/temp growth and a preflight + runtime **host root free ≥16 GiB** threshold. Bounded filesystem is **a proposal, not an installed mount**; actual boot, mount isolation, `docker compose config --quiet`, image readback and fail-closed ENOSPC/rollback checks remain **NOT RUN**. If hard cap cannot be implemented without shared-root or unrelated service mutation: **STOP CLUB INSTALL** and stay with zero-cost fake-only Mac plan under separate synthetic G4. No `docker system prune`, default full-stack `up`, new charges or host reconfiguration under this draft.
+
+**Exact rollback/kill-switch (future scoped operator only):** stop and remove **only** `dc-club-backend` containers/network, disable only its new private loopback route/vhost if provisioned, retain isolated Club-C data and off-VM encrypted manifest until independent QA; restore source Cloud as authoritative and do not reverse DNS/OAuth after acknowledged target writes without explicit reconciliation. Do not call `down -v`, delete bounded filesystem, touch existing Nginx default or alter game/MDAO. Operator = Kirill/nominated existing access; Lead controls G4, independent QA owns negative/restore acceptance and owner controls G7.
+
+### C. Backup custody and single binary Gate (no invented recovery PASS)
+
+- Owner-selected **SECOND** independent encrypted recovery carrier = **Женин Mac** (FileVault ON, ~509GiB free from prior check). `FIRST` source Q/operator backup **physical device and named custodian remain UNPROVEN**; an additional offline Mac device exists in Desktop Commander but is **not** proven an authorized independent FIRST carrier. Never call two directories on Женин Mac redundant media.
+- No encrypted **clean-C** export+off-VM first/second copies, key escrow or **decrypt+actual isolated C→C2 restore** was performed. Q mixed-MP/Robo/legacy_edu cannot be placed on shared VM or on unauthorized second Mac. Backend [#228 W45 decision](https://github.com/SLADZARI/degradation_club/issues/228#issuecomment-6352446126) separately governs `FULL_Q` all-custodian consent vs independently FK-closed `SELECTIVE_CLUB_A`; neither is authorized by this host receipt.
+- **BINARY:** `HOST_READONLY_CAPACITY_RECEIPT=PASS`, `HOST_CAPACITY_OWNER_ACCEPTED=YES`, `CONCURRENT_STRESS=N/A_OWNER_WAIVED`, `MDAO=KIRILL_OPERATOR_ATTESTED`, **`CLUB_ISOLATED_COMPOSE_READY=NO`** (exact image pins and layout delivered, but hard bounded FS, slim dependency-valid `compose config` and boot/rollback evidence NOT RUN), **`BACKUP_FIRST_PHYSICAL=NOT_PROVEN`**, **`C2_RESTORE=NOT_RUN`**, **`HOST_DATA_G4_ISSUED=NO`**, **`PUBLIC_CUTOVER_G7=NO`**.
+- **One SRE remaining handoff:** Kirill/assigned operator reviews the 10GiB bounded-root C design and exact new-only Compose, pins replacement when verified, proves first independent encrypted hardware+custodian **distinct from Женин Mac**, and once actual protected G4 is issued executes a bounded install plus actual clean C2 restore. Q01 independent security and Auth/Storage negatives happen in #42/#228. **Owner is not being asked for another capacity/MDAO/placement approval.**
+
+**CHECKPOINT:** asOf=2026-10-23; repo document-only Draft PR #257; no runtime SHA; registry digest read-only PASS for 5/5, exact C runtime NOT RUN. **CHANGED:** this one reference report only. **PRODUCTION EFFECT: NONE.**
+
+
 
 **Verdict: PREP REPORT / LEAD-ACCEPTED AS DRAFT PLANNING INPUT; HOST READ-ONLY AFTER VERIFIED AT W12; STATIC MANIFEST FALSE-ALARM CORRECTED AT W13; STAGE1 RELEASE STILL NO-GO.**  
 **Production effect: NONE.** This report is not a Decision, Result, Gate, host approval or deploy authorization. It proposes no immediate change to existing services. Parent [#237](https://github.com/SLADZARI/degradation_club/issues/237) remains **BACKLOG/DEFERRED**; [#228](https://github.com/SLADZARI/degradation_club/issues/228) does not yet provide an accepted current stable migration baseline.
