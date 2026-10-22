@@ -292,7 +292,7 @@ networks:
     internal: false
 ```
 
-**Vendor Envoy trim:** official index ships **7 CDS clusters and 21 route entries**, referencing absent functions/realtime/meta/studio. The locally applied deterministic transformation retained only auth, rest, storage clusters and routes; removed 9 disabled-service routes, added final default 404. **CDS SHA256** `033cbec93cc3f9b0375b8370558e068f8e78c2d7d6283a9ec3013d3287aeb754`; **LDS SHA256** `b9e5319da576aa400ab7157b9d64462b73c5f3712592266a0d31bcbe4d0ec5ad`. To reproduce AFTER extracting official pinned upstream assets, run this *offline-only* transformation:
+**Vendor Envoy trim, static only:** official 7 clusters/21 routes have dependencies on absent services; the verified transform retains auth/rest/storage (3 clusters), removes 9 disabled-service routes, adds last default-404 (13 routes). Output hashes: `cds.yaml` sha256 `033cbec93cc3f9b0375b8370558e068f8e78c2d7d6283a9ec3013d3287aeb754`; `lds.template.yaml` sha256 `b9e5319da576aa400ab7157b9d64462b73c5f3712592266a0d31bcbe4d0ec5ad`. Download vendor assets at `supabase/supabase@self-hosted/v0.7.2`, then the following produces the identical scoped replacement:
 
 ```ruby
 require 'yaml'
@@ -335,8 +335,44 @@ raise "MISSING_REQUIRED_ROUTE" unless %w[auth rest storage].all?{|name|assert_cl
 raise "MISSING_FAIL_CLOSED_FALLBACK" unless newroutes.last.dig('direct_response','status')==404 && newroutes.last.dig('match','prefix')=='/'
 orig_lds=File.read("#{dir}/lds.vendor-original.template.yaml")
 curr_lds=File.read(lds_file)
-dollar='
+dollar='$'
+placeholders=%w[ANON_KEY SERVICE_ROLE_KEY SUPABASE_PUBLISHABLE_KEY SUPABASE_SECRET_KEY ANON_KEY_ASYMMETRIC SERVICE_ROLE_KEY_ASYMMETRIC DASHBOARD_BASIC_AUTH]
+placeholders.each do |v|
+  ref="#{dollar}{#{v}}"
+  raise "TOKEN_DROPPED_#{v}" if orig_lds.include?(ref) && !curr_lds.include?(ref)
+end
+puts "ENVOY_TRIM_G3_PASS vendor_clusters=#{orig_clusters.length} active_clusters=#{allowed.join(',')} vendor_routes=#{original_routes} active_routes=#{newroutes.length} removed=#{removed.join(',')}"
+puts "ENVOY_TRIM_G3_HASHES cds=#{Digest::SHA256.file(cds_file).hexdigest} lds=#{Digest::SHA256.file(lds_file).hexdigest}"
+```
 
+**Actual static validation, with no service startup or real credentials:**
+- Mac Docker Compose **v5.1.0** `config --quiet` **PASS** on pinned candidate YAML and vendor filesystem assets; JSON assertions **PASS**: five image digests, internal dependencies, three binds inside planned Club-only C mount, no database/Auth/REST/Storage host listener, Envoy at **127.0.0.1:18431** only, CPU/Memory/pids/log bounds. Missing `CLUB_DATA_ROOT` causes immediate `config` **failure PASS**.
+- Official Envoy CDS+LDS YAML reparse and route/cluster referential integrity + fail-closed fallback **STATIC PASS**. Version-pin digest manifest unchanged.
+- Synthetic `API_EXTERNAL_URL=https://api.dementor.club/auth/v1` yields `https://api.dementor.club/auth/v1/callback` **PASS**, with Google disabled in example configuration; no OAuth origin/provider switch performed.
+- **Also parsed the same YAML directly on VM Docker Compose v2.32.1 via authorized SSH stdin**, `docker compose -p dc-club-backend -f - config --quiet`, using fake-only env variables: **PASS exit 0, zero warnings**. No remote file created, no container started or Docker state mutation.
+- **NOT RUN:** actual Envoy startup/secret substitution/authorization, PG17 init+GoTrue2.197 migration compatibility, real 11 Google identities, Cloud RLS/ACL/RPC and private Storage bytes, loop image allocation/mount ENOSPC tests, clean-C restore C2, release. Static Compose+parser success is **not** runtime readiness.
+
+**Fail-closed pre-start guard, operator-run ONLY AFTER authenticated host/data G4 (not executed):**
+```sh
+test "${CLUB_DATA_ROOT:-}" = "/srv/dementor/club-backend/c-data" || exit 64
+mountpoint -q "$CLUB_DATA_ROOT" || exit 65
+test "$(findmnt -no FSTYPE -T "$CLUB_DATA_ROOT")" = ext4 || exit 66
+test "$(findmnt -no SOURCE -T "$CLUB_DATA_ROOT")" != /dev/sda1 || exit 67
+test "$(df -B1 --output=avail / | tail -n 1 | tr -d ' ')" -ge 17179869184 || exit 68
+# Separate signed operator evidence must establish that the mounted filesystem
+# is the actual preallocated bounded Club image, not another shared filesystem.
+docker compose --env-file .env.example -f dc-club.compose.g3.yaml config --quiet
+```
+**WARNING:** operator must replace vendor example environment with private true production secrets after G4 and before G7; never launch `up` against `.env.example` or without proving a bounded mount. Before G4 this guard is a review-only example.
+
+**Independent first physical backup search, real inventory:**
+- `MacBook-Pro-Zena.local`, already owner-chosen **SECOND** recovery device, has FileVault ON and ~511GiB available. `diskutil list external physical` returned **zero external disks**; Docker disk images are virtual and do not count.
+- The other previously registered `Macbooks-MacBook-Pro.local` was **OFFLINE**, last seen ~104h earlier. A distinct registration/hostname is **not** evidence of a separate physical failure domain or accepted private data custody.
+- **FIRST_BACKUP_PHYSICAL=NOT_PROVEN**; no archive or real private objects downloaded or copied. Shortest zero-spend operator path: verify an already existing other Mac or removable disk (private device identity and separate encryption/recovery custodian), distinct from Женин Mac. Then only under a real approved protected data G4 produce encrypted Club-only C manifest+SHA, test independent decrypt+restore C2. No mixed MP/Robo/legacy_edu Q to shared VM or unauthorized media.
+
+**SRE decision vs external authority:** bounded 10GiB ext4 loop-backed Club-C state partition is the **SRE technical variant**, justified because shared root ext4 has no project quotas. It is **not yet mounted or accepted by Kirill as a new host operation**. The design caps C-mounted PGDATA/WAL/Storage only; overlay2 layers and Docker logs remain shared-root (bounded log rotation, runtime watch, host ≥16GiB). `CLUB_ISOLATED_COMPOSE_READY=NO` until actual G4-gated mount, boot and restore proof; `HOST_CAPACITY_OWNER_ACCEPTED=YES`, `CONCURRENT_LOAD=N/A_OWNER_WAIVED`, `MDAO=KIRILL_OPERATOR_ATTESTED`, `COMPOSE_G3_STATIC=PASS`, `FIRST_BACKUP=NOT_PROVEN`, `C2_RESTORE=NOT_RUN`, `HOST_DATA_G4=NOT_ISSUED`, `G7_PUBLIC_CUTOVER=NO`.
+
+**One next operator decision:** Kirill/nominated operator: acknowledge YES/NO for future bounded Club-only 10GiB mount+rollback and identify/attest the distinct FIRST encrypted device. Do not repeat owner VM placement/MDAO/performance approvals. Backend B-01 #228 and independent QA #42 own data authority/restore/security. **PRODUCTION EFFECT NONE.**
 
 
 ## W45 / SRE · One-page same-VM Club-only isolated C receipt — 2026-10-23
