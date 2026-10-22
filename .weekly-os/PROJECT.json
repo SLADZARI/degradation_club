@@ -7,12 +7,12 @@
     "projectStage": "BUILD",
     "gate": "G5_BUILD",
     "status": "APPROVED",
-    "version": "3.26",
+    "version": "3.27",
     "updated": "2026-10-22",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "3.25"
+    "supersedes": "3.26"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -477,16 +477,17 @@
   },
   "currentResult": {
     "artifactId": "dementor-club.result.pre-vm-webui-gate-correctives-v1",
-    "version": "0.2",
+    "version": "0.3",
     "status": "APPROVED",
     "workStatus": "ACTIVE",
-    "path": ".weekly-os/results/pre-vm-webui-gate-correctives-v1.v0.2.md",
+    "path": ".weekly-os/results/pre-vm-webui-gate-correctives-v1.v0.3.md",
     "gate": "G5_BUILD",
     "scope": [
       "Existing Board composer visual + Escape/Cancel focus",
       "P1 anonymous Board login visibility",
       "P1 mobile Home H1 readability",
-      "P1: distinguish confirmed Board publish from later projection refresh failure without false unpublished status"
+      "P1: distinguish confirmed Board publish from later projection refresh failure without false unpublished status",
+      "P0 WebKit: stable native first click for Owner/Member/Guest/Applicant in existing Board primary action, no permission changes"
     ],
     "parentIssues": [
       126,
@@ -498,7 +499,7 @@
     "integrationBaseRef": "dementor-club-production",
     "integrationBaseCommit": "cde332779ab0e256dd1e498660d6fa651e91846e",
     "productionBaseCommit": "cde332779ab0e256dd1e498660d6fa651e91846e",
-    "g4Status": "PASS_LIMITED_CODE_ONLY_POSTCONFIRMED_EXTENSION",
+    "g4Status": "PASS_LIMITED_CODE_ONLY_V03_WEBKIT",
     "g4Evidence": "https://github.com/SLADZARI/degradation_club/issues/237#issuecomment-6320105037",
     "implementationStartAuthorized": true,
     "schemaChangeImplementationAuthorized": false,
@@ -506,8 +507,9 @@
     "productionMergeAuthorized": false,
     "productionDeployAuthorized": false,
     "changeControlRequired": false,
-    "gateReadiness": "G5_BUILD_NEW_SHA_G6_PENDING",
-    "ownerD1ConditionalCodeGrant": "https://github.com/SLADZARI/degradation_club/issues/227#issuecomment-6326985199"
+    "gateReadiness": "G5_BUILD_NEW_V03_SOURCE_SHA_INDEPENDENT_G6_REQUIRED",
+    "ownerD1ConditionalCodeGrant": "https://github.com/SLADZARI/degradation_club/issues/227#issuecomment-6326985199",
+    "ownerG4DecisionV03": "https://github.com/SLADZARI/degradation_club/issues/126#issuecomment-6342046769"
   },
   "waitingResults": [
     {
