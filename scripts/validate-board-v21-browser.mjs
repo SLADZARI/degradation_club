@@ -143,6 +143,70 @@ for(const viewport of [{width:390,height:844,label:'390'},{width:360,height:800,
 }
 
 
+/* v0.3 owner-approved native pointer continuity (G5 developer fixture, NOT independent G6):
+   a 260ms real pointer press spans Board observer and guest CTA refresh.
+   Both existing action owners must NOT replace the button text child mid-press. */
+{
+  for(const engine of [
+    {name:'chromium',launch:()=>chromium.launch({headless:true})},
+    {name:'webkit',launch:()=>webkit.launch({headless:true})}
+  ]){
+    const browser=await engine.launch();
+    for(const role of ['owner','member-first','member','guest-incomplete','applicant']){
+      for(const width of [360,1440]){
+        const{ctx,page,errors}=await open(browser,role,{width,height:width===1440?900:844});
+        const expected=role==='owner'?'OWNER_ADMIN':role==='applicant'?'APPLICANT':
+          role==='guest-incomplete'?'AUTHENTICATED_GUEST_DC9_INCOMPLETE':'MEMBER';
+        await page.waitForFunction(roleName=>{
+          const host=document.querySelector('.dc-board-primary.is-visible');
+          if(!host?.querySelector('button'))return false;
+          const roleValue=document.documentElement.dataset.dcBoardUserState;
+          const expectedValue=roleName==='owner'?'OWNER_ADMIN':roleName==='applicant'?'APPLICANT':
+            roleName==='guest-incomplete'?'AUTHENTICATED_GUEST_DC9_INCOMPLETE':'MEMBER';
+          return roleValue===expectedValue && (roleName!=='owner'||host.dataset.access==='owner-admin');
+        },role,{timeout:5500});
+        await page.evaluate(()=>{
+          const btn=document.querySelector('.dc-board-primary.is-visible button');
+          window.__QA_HELD_POINTER__={down:0,up:0,click:0,during:0};
+          let held=false;
+          btn.addEventListener('pointerdown',e=>{if(e.isTrusted){held=true;window.__QA_HELD_POINTER__.down++}});
+          btn.addEventListener('pointerup',e=>{if(e.isTrusted){held=false;window.__QA_HELD_POINTER__.up++}});
+          btn.addEventListener('click',e=>{if(e.isTrusted)window.__QA_HELD_POINTER__.click++});
+          new MutationObserver(records=>{if(held&&records.some(r=>r.type==='childList'))window.__QA_HELD_POINTER__.during++})
+            .observe(btn,{childList:true,subtree:true});
+        });
+        const b=await page.locator('.dc-board-primary.is-visible button').boundingBox();
+        expect(!!b,`G5 pointer ${engine.name}/${role}/${width}: primary disappeared`);
+        if(b){
+          await page.mouse.move(b.x+b.width/2,b.y+b.height/2);
+          await page.mouse.down();
+          await page.evaluate(()=>{
+            const host=document.getElementById('boardHost');
+            if(host){const pulse=document.createElement('span');host.appendChild(pulse);pulse.remove()}
+            window.dispatchEvent(new CustomEvent('dc:board-spatial-ready'));
+          });
+          await page.waitForTimeout(260);
+          await page.mouse.up();
+          const proof=await page.evaluate(()=>({
+            ...window.__QA_HELD_POINTER__,
+            gate:document.documentElement.dataset.boardMembershipGate==='1',
+            modal:document.getElementById('entrySection')?.classList.contains('is-composer-sheet-open')===true,
+            overlay:document.documentElement.dataset.boardArtifactOpen==='1',
+            writes:globalThis.__QA_DB_WRITES__?.length||0
+          }));
+          const target=role==='owner'||role==='member-first'?proof.modal:
+            role==='member'?proof.overlay:proof.gate;
+          expect(proof.down===1&&proof.up===1&&proof.click===1&&proof.during===0&&target&&proof.writes===0,
+            `G5 pointer ${engine.name}/${role}/${width}: trusted click lost or role/gate drift ${JSON.stringify(proof)}`);
+        }
+        expect(!errors.length,`G5 pointer ${engine.name}/${role}/${width}: page errors ${errors.join(' | ')}`);
+        await ctx.close();
+      }
+    }
+    await browser.close();
+  }
+}
+
 /* G6 regression from Q-01: WebKit no-slot fallback and true modal background inertness.
    These browser cases use the existing isolated Board fixture; no live OAuth or writes. */
 {
