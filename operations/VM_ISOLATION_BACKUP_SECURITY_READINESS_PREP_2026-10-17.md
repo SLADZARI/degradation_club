@@ -21,6 +21,83 @@ semanticMutationAuthorized: false
 **Verdict: PREP REPORT / LEAD-ACCEPTED AS DRAFT PLANNING INPUT; HOST READ-ONLY AFTER VERIFIED AT W12; STATIC MANIFEST FALSE-ALARM CORRECTED AT W13; STAGE1 RELEASE STILL NO-GO.**  
 **Production effect: NONE.** This report is not a Decision, Result, Gate, host approval or deploy authorization. It proposes no immediate change to existing services. Parent [#237](https://github.com/SLADZARI/degradation_club/issues/237) remains **BACKLOG/DEFERRED**; [#228](https://github.com/SLADZARI/degradation_club/issues/228) does not yet provide an accepted current stable migration baseline.
 
+## W32 · Exact five-service staging resource equation, actual registry layers, ext4 quota and off-VM candidate — 2026-10-22 00:15–00:17 UTC
+
+**DECISION: `HOST_TEST_G4_READY=NO` / `VM_HOST_DISK_ISOLATION=NOT_PROVEN` / `STAGE2_REAL_DATA_G4=NOT_AUTHORIZED`.** This responds to [Lead W32 #255](https://github.com/SLADZARI/degradation_club/issues/255#issuecomment-6329425915) using B-01's [measured Cloud source and bounded test-only caps](https://github.com/SLADZARI/degradation_club/issues/255#issuecomment-6329351681), and the already accepted [W31 VM read-only snapshot](https://github.com/SLADZARI/degradation_club/issues/255#issuecomment-6329204808). **Kirill's owner-relayed acceptance of CURRENT ALPHA implicit HTTPS :443 default is already closed at [W29](https://github.com/SLADZARI/degradation_club/issues/255#issuecomment-6328901739); do NOT reopen it.** This is another short read-only *decision evidence* update to the existing one-file DRAFT PR #257, not a new Compose or Result.
+
+### W32-A. Measured host disk/isolation feasibility: an actual missing prerequisite
+
+**DIRECT read-only at `2026-10-22T00:15:48Z`** from existing trusted owner-Mac with pinned key and strict known_hosts: root/Club and Docker root both reside on **`/dev/sda1`, `ext4`, mount `rw,relatime`**. `tune2fs -l` feature set has **NO `project` and NO `quota` feature**; live mount has no `prjquota`/`usrquota`/`grpquota`. Legacy host has no `setquota`, `repquota` or `quota` tools. `docker info` driver **`overlay2`**, Cgroups **v2/systemd**, Docker root `/var/lib/docker`. This means **the recommended per-volume 4G PGDATA/WAL, 2G Storage and 6G scratch in W31 are numerical planning ceilings, NOT enforceable disk hard caps on current host**. Docker Compose `mem_limit`/CPU controls can be separately validated for containers; they do NOT impose persistent-volume disk quotas. PostgreSQL `max_wal_size=1GB` is a **checkpoint target not absolute WAL disk limit**.
+
+Read-only `df -kP /srv/dementor`: **42,946,184 KiB = 40.9567 GiB available**, 75GiB nominal filesystem, 43% used, **4,183,837 inodes available**. **No Club API on proposed :18431, no Club backend installed** per Lead W31. This point measurement is NOT a future free-space guarantee and must not be converted to installation approval.
+
+**Conditional isolation options requiring explicit Kirill+owner G4 (NOT implemented):** filesystem-sized, fully preallocated independent loopback ext4 mounts (one PGDATA+WAL, one private Storage, one restore scratch) with boot/systemd mount lifecycle, negative ENOSPC+WAL behavior tests, root/mount ownership and full site rollback; OR a dedicated volume/partition with verified filesystem quota support and host-level alerts. Both are **host changes** affecting shared disks and recovery; loopback preallocation reduces free disk immediately, and `overlay2` image writable layers/logs/unpacked images still remain on root unless separately bounded. `fallocate`/mount/resize/prjquota feature activation and Docker configuration are **NOT AUTHORIZED NOW**; never propose `docker system prune`/MDAO volumes `/data/*`/game cleanup. **Without independently verifiable hard disk ceilings+boot/recovery test, classify the shared host as `HOST_UNSAFE` for a new Club stage**, regardless of impressive idle RAM.
+
+### W32-B. Exact current-vs-required staging resource equation (TEST ONLY, fake identities, worker OFF)
+
+**B-01 five components; proposed CAP not enforced:** PG17 **768 MiB / 0.80 vCPU**, GoTrue **256 MiB / 0.20**, PostgREST **256 MiB / 0.20**, Storage API **512 MiB / 0.40**, gateway **256 MiB / 0.20** → summed proposed maximum **2048 MiB RAM and 1.80 vCPU**. No Studio, Analytics, Realtime, imgproxy, Telegram Edge/cron, external Google provider or real user/Storage copy. Memory cgroup v2 can *propose* strict `memory.max` and `pids.max`, but restart/OOM/failure semantics with this canonical schema are NOT TESTED; 1.8 CPU worth of quotas is not guaranteed latency isolation of ALPHA/BETA/MDAO on four shared cores. Source relation count ~2MB and declared 16 private Storage objects ~24MB are not a steady-state PGDATA/WAL/S3 footprint.
+
+**Image-size registry evidence, no image pulled/started:** on authorized Mac, `docker buildx imagetools inspect --raw` for five W24 pinned candidate upstream image tags followed **linux/amd64** manifest references and summed **compressed registry-layer sizes**:
+
+| Pinned candidate image | Compressed manifest layer bytes | Scope / remaining uncertainty |
+| --- | ---: | --- |
+| `supabase/postgres:17.6.1.136` | **367,203,535** (29 layers) | Compressed network layers, NOT actual root overlay2 usage |
+| `supabase/gotrue:v2.189.0` | **26,259,857** (6) | Target OAuth schema/Google identity compatibility NOT tested |
+| `postgrest/postgrest:v14.12` | **6,301,482** (1) | 69 source RPC/runtime definition parity NOT tested |
+| `supabase/storage-api:v1.60.4` | **244,025,276** (13) | Private object bytes and ACL parity NOT tested |
+| `envoyproxy/envoy:v1.39.0` | **69,976,760** (9) | Envoy override still needs removal of dangling Studio dependency before Compose test |
+| **SUM, no shared-layer dedup** | **713,766,910 bytes = 0.66475 GiB COMPRESSED** | **Expanded layers, cache and container writable layers NOT MEASURED. DO NOT BUDGET ONLY COMPRESSED.** |
+
+**Disk obligation formula in GiB**, all distinct from system already in use:
+```text
+D_required_total_additional = DB_PGDATA_PLUS_WAL(4)
+                            + PRIVATE_STORAGE(2)
+                            + ROTATED_LOGS(0.5)
+                            + INDEPENDENT_RESTORE_SCRATCH(6)
+                            + HOST_PROTECTED_EXISTING_FREE_RESERVE(16)
+                            + EXTRA_PEAK_GROWTH_BUFFER(8)
+                            + IMAGE_UNPACKED_AND_OVERLAY(I_actual)
+                            + OTHER_TMP_AND_WAL_OVERFLOW(T_actual)
+                         = 36.5 + I_actual + T_actual GiB
+VM_free_current         = 40.9567 GiB
+remaining_for_I_and_T   = 4.4567 GiB
+IMAGE_COMPRESSED_LOWER_SCOPE = 0.66475 GiB; I_actual UNKNOWN, T_actual UNKNOWN
+HOST_TEST_G4_READY      = NO (hard disk caps absent, 24h representative load absent, restore and authority absent)
+```
+This 36.5GiB requirement includes the protected existing-service free reserve (16) and an additional 8GiB future growth cushion; neither is an expendable staging allocation. **Do not treat compressed image bytes as a rigorous mathematical lower bound for deduplicated on-disk `I_actual`: registry data, shared already-downloaded layers and decompression may change actual incremental bytes either way.** Only a measured approved disposable image install and validated quota/cgroup/ENOSPC test could establish it.
+
+**Fail-closed future G4 proposal (NOT enforced):** if Kirill/Club owner ever authorize an isolated test, admit only after BEFORE `df` gives at least **16GiB protected reserve + 8GiB growth buffer** *after preallocating* all stage-specific disks, actual image layers and restore scratch. Abort and bounded rollback if any: root available below **24GiB**, host `MemAvailable` below **3GiB** for 5 min or **2GiB** at any instant; any `memory.events` `oom/oom_kill` increase, protected game/MDAO restart, SSH/Nginx readiness regression, protected game p95/SSE/save error exceeds explicitly recorded per-owner baseline, sustained CPU idle below **25%** or iowait above **10%** for 5 min; WAL/storage/temp exceeds proven quota; unintended host API/DB public bind. These are proposed conservative **STOP thresholds**, not claims of achieved uptime/availability. No one should automatically restart/migrate game or clean legacy images to recover capacity.
+
+**Representative ≥24h overlap availability:** historical `sar sa21` **138 × ten-minute samples** had minimum CPU interval mean idle 95.46% and sampled MemAvailable 6.39GiB, but ALPHA was too new for 24h concurrency. At current `00:15Z` only new `sa22` ~6.9KB with 00:10 samples; **impossible to certify 24h actual simultaneous ALPHA+BETA+MDAO workload with these records now**. A timer/interval alone cannot replace real session/SSE/iPhone/DB workload evidence. No paid daemon deployed or artificial/stress game traffic injected. Future Kirill-approved read-only `sar -u -r -q -d -n DEV`, `docker stats --no-stream`, cgroup `memory.events`, `df` and existing service logs **metadata/error-count only** at start/end can establish a qualified 24h record, with QA/Game documenting representative sessions. No monitoring service installed from this task.
+
+### W32-C. No-added-fee off-VM encrypted restore destination candidate and operations contract — NOT EXECUTED
+
+**READ-ONLY Mac feasibility:** connected owner Mac has `FileVault is On` and **532,120,976 KiB (~507.47GiB)** currently free, not an external drive. This is **a feasible potential off-VM storage destination by capacity** but **NOT a nominated custodian, approved real-account transfer or a proven independent failure domain**. Encryption *at rest* through FileVault **alone does not provide per-archive independently recoverable encrypted exports**. `openssl`, `tar`, `shasum` exist; **`age` and `gpg`, `pg_dump`, `pg_restore` are NOT installed on this Mac**, so no approved encryption and restore CLI workflow exists yet. No source Cloud secrets, SQL dumps, PII, image payloads or test data copied.
+
+**OWNER DECISION PACKET / exact gated operations in a dedicated future Result (not a command to execute now):**
+1. Club **data owner** names approved migration export operator, permitted tables/columns (including `profiles` privacy), exact 49 FK/four trigger/69-RPC + excluded MP/Robo and unknown empty tables dispositions, 11 Google account UUID/identity grant, a separate **backup custodian** and a key escrow/recovery custodian; Kirill approves protected VM destination/restore operator if it will touch VM. Mac alone is only a *candidate* recipient; recovery requires a separately held tested encrypted copy outside the VM and preferably outside the laptop.
+2. After explicit **DATA G4**, a compatible version-pinned `pg_dump`/approved allowlist extractor creates a **consistent, privileged, Club-only** database Auth/schema/RLS/RPC export and copies **actual** 16 private Storage bodies with content-type, path, exact size and SHA256 in owner-private manifest. Exclude Cloud sessions/refresh tokens/flow states, MP/Robo, JWT/OAuth secrets, prohibited schema and live Telegram sends. Freeze/catch up only at future separate cutover; do not naïvely use a complete mixed `pg_dumpall`.
+3. Before network transfer, the approved tool performs **recipient-key authenticated archive encryption** (`age` or separately vetted equivalent), storing only an **encrypted** archive on the owner-controlled Mac and separately approved second medium; `umask 077` and private directory plus off-Git key custody. Never run `openssl enc` ad-hoc with a shared passphrase. Record private archive SHA256, size, schema/row/object manifest, UTC snapshot sequence and key-unlock custodians separately from public PR.
+4. Restore to a **new** separately authorized disposable PG17/GoTrue/Storage network-isolated fixture (never existing B-01 or MP shared Supabase), with worker/Telegram/Google outbound paths disabled. Run schema/role/RLS/DEF grants and Auth provider UUID/identity mapping checks, per-object decrypted SHA equality, 49 FK validated, 28/69 function baseline comparisons and 9 actor positive/negative semantics. Add failure injection: partial archive, missing Storage object, expired fake JWT, incompatible GoTrue version. Preserve old Cloud as original MP/Robo and Club recovery fallback.
+5. Measure `RPO_actual = last_safe_source_write_UTC − last_included_restore_checkpoint_UTC` and `RTO_actual = restore_usable_UTC − incident_or_restore_start_UTC` under owner-defined tests, give PASS only after independent Q-01 acceptance. Targets `RPO ≤15min`, `RTO ≤120min` are **UNMEASURED PROPOSALS**, not availability promises. Account for writes accepted by target after cutover: reverse reconciliation and exactly one Telegram sender; no blind DNS rollback.
+
+**READ-ONLY verification commands for Kirill in his future authorized change window** (examples, NOT RUN by W32): `findmnt -no SOURCE,FSTYPE,OPTIONS -T /srv/dementor`; `df -kP /srv/dementor`; `ss -lnt`; `docker info --format '{{.Driver}} {{.DockerRootDir}}'`; `sar -u -r -q -f /var/log/sysstat/saYY`. **Future MUTATING restore/volume setup needs its own exact bounded Bash/Compose files, config dry validation and rollback review, not execution from this document.** No approval to create compressed backup, mount loop filesystem, enable ext4 quota, install `age`, export Cloud or modify MDAO, ALPHA/BETA and current Club site.
+
+### W32-D. Binary answer to Lead, shortest unblock route
+
+```text
+STATUS: W32_HOST_CAPACITY_MATH+FILESYSTEM_QUOTA+OFFVM_CANDIDATE_CHECKED
+HOST_TEST_G4_READY: NO
+HOST_UNSAFE_NOW: YES (no verified enforceable disk quotas, no mature 24h representative game+MDAO peak, no signed host/data Gate)
+CHECKED: ext4 root/mount/FS-feature flags and overlay2 driver; current 40.9567GiB free; five exact registry-layer compressed sizes; owner Mac encrypted-disk/free-space/tools availability; W31/W32 source sizing
+NEW EVIDENCE: project ext4 quota unavailable in current live mount; 713,766,910 bytes registry compressed; formula 36.5GiB + I_actual + T_actual; Mac FileVault ON with 507GiB free, but not approved backup custodian
+ACCEPTED: B-01 5-service/2GiB memory/12.5GiB test-only input; current ALPHA implicit 443 accepted by Kirill (W29); MDAO owner says required workflows work
+NOT VERIFIED: actual expanded images and enforceable isolated disk; simultaneous 24h real sessions/save/SSE/network-error rates; off-VM encrypted DB+Storage copy/restore & RPO/RTO; private key custody; signed Kirill positive MDAO canary or documented limitation and reload/rollback operator; Stage1 G8 and Stage2 host/data G4
+OWNER+PERMISSION: Lead/Club owner must approve separate Stage2 test-only Result and scope *after* Stage1 G8 or explicit dependency Decision; Kirill approves host quota/mount and rollback; data custodian approves export/recoverable encryption; Q-01/GAME acceptance separately
+NEXT: keep original VM running unchanged. Shortest safe fallback: retain already accepted B-01 synthetic-only Mac testing and, after a new source-faithful Result/G4, use isolated **localhost/internal-network Mac** fake-data fixture for full schema parity. No real Cloud copy or VM host install. Independently solve 24h load + owner-restorable encrypted backup + hard disk quotas before reevaluating VM test G4.
+PRODUCTION/VM/MAC EXISTING WORKLOADS/DNS/MDAO/LIVE/CLOUD EFFECT: NONE
+```
+
 ## W29 · Kirill accepts current ALPHA unknown-SNI default HTTPS vhost — 2026-10-22 (owner-relayed)
 
 **STATUS: `DEFAULT_443_ALPHA_KIRILL_ACCEPTED_OWNER_RELAYED` (NARROW HOST-POLICY RISK DISPOSITION) / HOST/PRODUCTION G4+G8 STILL BLOCKED.** The Club owner explicitly relayed Kirill's confirmation that **ALPHA is acceptable as the current default HTTPS service**. Canonical owner-relayed [#255 acceptance record](https://github.com/SLADZARI/degradation_club/issues/255#issuecomment-6328901739) and linked [Game SRE #51 cross-project handoff](https://github.com/SLADZARI/dementor_live/issues/51#issuecomment-6328904244). This is **not** presented as a direct signed GitHub statement by Kirill, an approval to mutate the VM or a changed Game ownership boundary.
