@@ -239,7 +239,17 @@ async function publishFromForm(event){
     }
     state.textContent='ПРИКАЛЫВАЕМ К ДОСКЕ';const published=await client.rpc('dc_publish_artifact_v1',{p_artifact_id:artifactId});if(published.error)throw published.error;
     window.dispatchEvent(new CustomEvent('dc:board:artifact-published',{detail:{artifactId}}));
-    ownDraft=null;ownDraftMedia=[];await refreshAll();
+    ownDraft=null;ownDraftMedia=[];
+    // A completed publish is irreversible from this client. A later projection
+    // refresh failure is not a publish failure and must never invite a retry.
+    try{await refreshAll()}
+    catch(refreshError){
+      console.warn('[DC Board] publication confirmed; Board refresh failed',refreshError);
+      entryHost.innerHTML='<div class="dc-board-error">ПУБЛИКАЦИЯ СОХРАНЕНА. ДОСКА ПОКА НЕ ОБНОВИЛАСЬ. ОБНОВИТЕ СТРАНИЦУ.</div>';
+      // The editor closes after a confirmed publish. Announce refresh failure
+      // through the existing visible Board toast, never inside its hidden form.
+      window.dispatchEvent(new CustomEvent('dc:board:postpublish-refresh-failed'));
+    }
   }catch(error){
     submit.disabled=false;submit.textContent='ОПУБЛИКОВАТЬ →';state.textContent='НЕ ОПУБЛИКОВАНО';
     if(uploadedPath){await client.storage.from(DC_ARTIFACT_BUCKET).remove([uploadedPath]).catch(()=>{});uploadedPath=null}
