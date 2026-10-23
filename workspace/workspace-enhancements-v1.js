@@ -8,7 +8,51 @@ if(cfg?.enabled&&root){
   if(user){
     const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
     const date=v=>{try{return new Intl.DateTimeFormat('ru-RU',{day:'2-digit',month:'2-digit',year:'numeric'}).format(new Date(v))}catch{return String(v||'—')}};
-    const ensureEnrollment=async(course_id,status)=>{const {data}=await client.from('course_enrollments').select('id,status').eq('profile_id',user.id).eq('course_id',course_id).order('created_at',{ascending:false}).limit(1);const existing=data?.[0];if(existing){if(existing.status!==status)await client.from('course_enrollments').update({status,updated_at:new Date().toISOString()}).eq('id',existing.id);return}await client.from('course_enrollments').insert({course_id,profile_id:user.id,email:user.email||'',full_name:user.user_metadata?.full_name||user.user_metadata?.name||null,status})};
+    const pendingEnrollmentIds=new Set();
+    const showEnrollmentSyncState=()=>{
+      let note=document.querySelector('[data-dcw-enrollment-deferred]');
+      if(!pendingEnrollmentIds.size){note?.remove();return;}
+      if(!note){
+        note=document.createElement('div');note.className='dcw-note';
+        note.dataset.dcwEnrollmentDeferred='1';note.setAttribute('role','status');
+        note.textContent='Синхронизация участия отложена. Локальный прогресс сохранён.';
+        root.parentElement?.insertBefore(note,root);
+      }
+    };
+    const enrollmentWithin=fetch=>{
+      let timer;
+      const request=Promise.resolve().then(fetch).then(
+        result=>result||{data:null,error:{code:'EMPTY_RESULT'}},
+        error=>({data:null,error})
+      );
+      const timeout=new Promise(resolve=>{timer=setTimeout(()=>resolve({data:null,error:{code:'QUERY_TIMEOUT'}}),6500);});
+      return Promise.race([request,timeout]).finally(()=>clearTimeout(timer));
+    };
+    const ensureEnrollment=async(course_id,status)=>{
+      const deferred=()=>{
+        pendingEnrollmentIds.add(course_id);
+        showEnrollmentSyncState();
+        return false;
+      };
+      try{
+        const read=await enrollmentWithin(()=>client.from('course_enrollments')
+          .select('id,status').eq('profile_id',user.id).eq('course_id',course_id)
+          .order('created_at',{ascending:false}).limit(1));
+        if(read.error||!Array.isArray(read.data))return deferred();
+        const existing=read.data[0];
+        if(existing?.status===status){
+          pendingEnrollmentIds.delete(course_id);showEnrollmentSyncState();return true;
+        }
+        const write=existing
+          ? await enrollmentWithin(()=>client.from('course_enrollments')
+              .update({status,updated_at:new Date().toISOString()}).eq('id',existing.id))
+          : await enrollmentWithin(()=>client.from('course_enrollments')
+              .insert({course_id,profile_id:user.id,email:user.email||'',
+                full_name:user.user_metadata?.full_name||user.user_metadata?.name||null,status}));
+        if(write.error)return deferred();
+        pendingEnrollmentIds.delete(course_id);showEnrollmentSyncState();return true;
+      }catch{return deferred();}
+    };
     const importLocal=async()=>{
       let valentin=null;try{valentin=JSON.parse(localStorage.getItem('dementor_dumai_course_stage1')||'null')}catch{}
       if(valentin?.dayResults?.day1){const d=valentin.dayResults.day1;await ensureEnrollment('dumai-s-opasnostyu',valentin.status==='completed'||valentin.completedAt?'completed':'in_progress');await client.from('dc_progress_signals').upsert({profile_id:user.id,source_type:'program',source_ref:'dumai-s-opasnostyu',stage_ref:'day1',degradation_level:null,level_label:`УВЕРЕННОСТЬ ${d.from}% → ${d.to}%`,payload:{metric:'confidence',from:d.from,to:d.to,delta:d.delta,title:d.title,explanation:d.explanation,details:d.details||{}}},{onConflict:'profile_id,source_type,source_ref,stage_ref'});if(valentin.status==='completed'||valentin.completedAt)await client.from('dc_program_certificates').upsert({profile_id:user.id,program_slug:'dumai-s-opasnostyu',certificate_type:'completion',certificate_title:'Сертификат повышенной подозрительности',certificate_code:`DC-DSP-${user.id.replace(/-/g,'').slice(0,12).toUpperCase()}`,result_json:{class:'Опасно думающий гражданин I класса',initial_confidence:valentin.initialConfidence,final_confidence:valentin.currentConfidence,final_decision:valentin.finalDecision||null,completed_at:valentin.completedAt||new Date().toISOString()}},{onConflict:'profile_id,program_slug,certificate_type'})}
