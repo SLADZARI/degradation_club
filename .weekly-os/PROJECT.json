@@ -7,12 +7,12 @@
     "projectStage": "BUILD",
     "gate": "G5_BUILD",
     "status": "APPROVED",
-    "version": "3.27",
-    "updated": "2026-10-22",
+    "version": "3.28",
+    "updated": "2026-10-23",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "3.26"
+    "supersedes": "3.27"
   },
   "projectId": "dementor-club",
   "projectName": "Dementor Club",
@@ -597,6 +597,21 @@
       "integrationBranch": null,
       "ownerG4Decision": "https://github.com/SLADZARI/degradation_club/issues/237#issuecomment-6320105037",
       "note": "Owner G4 approved limited isolated code but serial waiting behind Web/UI result; no VM/Nginx/DNS/Cloud authorization."
+    },
+    {
+      "artifactId": "dementor-club.result.workspace-auth-resilience-issue38",
+      "version": "0.1",
+      "status": "APPROVED",
+      "workStatus": "WAITING",
+      "path": ".weekly-os/results/workspace-auth-resilience-issue38.v0.1.md",
+      "gate": "G4_PASS",
+      "issue": 38,
+      "ownerDecisionRelay": "https://github.com/SLADZARI/degradation_club/issues/38#issuecomment-6361599466",
+      "plannedCandidateBranch": "fix/workspace-auth-resilience-issue38-20261023",
+      "implementationStartAuthorized": true,
+      "productionMergeAuthorized": false,
+      "productionDeployAuthorized": false,
+      "note": "Exactly two Workspace source-only files; QA-only candidate may be committed separately; PR308/v0.3 remains the sole current active integration. Independent exact-SHA G6 and serial Lead/G7 needed; no host/data/Cloud change."
     }
   ],
   "activeIntegrationBranch": "fix/board-composer-visual-stability-20261020",
