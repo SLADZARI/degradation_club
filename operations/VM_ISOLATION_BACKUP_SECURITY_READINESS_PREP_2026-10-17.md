@@ -4,7 +4,7 @@ project: dementor-club
 documentType: REPORT
 projectStage: PLANNING
 status: DRAFT
-version: "0.4"
+version: "0.4.1"
 updated: "2026-10-23"
 owner: "A-01 Solution Architect / I-01 DevOps (issue #255; Lead review pending)"
 sourceSystem: GIT
@@ -339,7 +339,7 @@ x-club-bounded-mounts:
 
 ### Fail-closed three-mount host preflight (SOURCE only; no mounts created)
 
-**SHA256 `34170542ee5f83f6dd950460c66cf90ac301a398bb3729f6ab48d138031636dc`, file `dc-club-three-mount-preflight.g3.sh`**. Explicit `CLUB_CHECK_MODE=FIRST` requires fresh empty PGDATA+WAL; `EXISTING` requires PG_VERSION and WAL symlink, preventing accidental replay/overwrite. Each of the three must be a true ext4 mount with a distinct loop device, unique inode/dev, correct exact backing filename, actual full allocation and size, plus root reserve and safe child directory. This guard validates only host facts and is NOT a substitute for an independently authenticated scope/custodian/G4 decision.
+**SHA256 `820eee32031c79bfa65b80e8b489cbd01ec442f04f6d684c4f98ccf802651de7`, file `dc-club-three-mount-preflight.g3.sh`**. Explicit `CLUB_CHECK_MODE=FIRST` requires fresh empty PGDATA+WAL; `EXISTING` requires PG_VERSION and WAL symlink, preventing accidental replay/overwrite. Each of the three must be a true ext4 mount with a distinct loop device, unique inode/dev, correct exact backing filename, actual full allocation and size, plus root reserve and safe child directory. This guard validates only host facts and is NOT a substitute for an independently authenticated scope/custodian/G4 decision.
 
 ```bash
 #!/usr/bin/env bash
@@ -396,7 +396,9 @@ pgdir="$canonical/pgdata/db"
 waldir="$canonical/wal/wal-data"
 if [ "$CLUB_CHECK_MODE" = FIRST ]; then
   [ ! -e "$pgdir/PG_VERSION" ] && [ ! -e "$pgdir/pg_wal" ] || stop 91 'first_init_existing_pg_cluster'
-  [ -z "$(ls -A "$pgdir")" ] && [ -z "$(ls -A "$waldir")" ] || stop 92 'first_init_not_empty'
+  pg_first_entry=$(find "$pgdir" -mindepth 1 -maxdepth 1 -print -quit) || stop 92 'pgdata_listing_failed'
+  wal_first_entry=$(find "$waldir" -mindepth 1 -maxdepth 1 -print -quit) || stop 92 'wal_listing_failed'
+  [ -z "$pg_first_entry" ] && [ -z "$wal_first_entry" ] || stop 92 'first_init_not_empty'
 else
   [ -f "$pgdir/PG_VERSION" ] || stop 93 'existing_mode_pg_version_missing'
   [ -L "$pgdir/pg_wal" ] || stop 94 'existing_wal_not_symlink'
@@ -414,6 +416,7 @@ printf 'CLUB_3_MOUNT_PREFLIGHT_STATIC_PASS three_distinct_loop_ext4=YES postallo
 - **Mac Docker Compose v5.1.0:** `config --quiet` PASS; JSON assertions PASS exactly 5 images/services, four Club binds, three separate mount prefixes, explicit WAL env, no short bind host-path auto-create, only Envoy loopback published. Missing `CLUB_DATA_ROOT` → negative PASS (config fails closed).
 - **VM Docker Compose v2.32.1:** exact YAML streamed over previously authorized SSH to `docker compose -p dc-club-backend -f - config --quiet`, complete **fake-only** environment; PASS exit 0, **0 warnings/errors**. No remote host file, mount or container modified.
 - **Guard:** Mac `bash -n` PASS; missing root/mount negative PASS. VM `bash -n` PASS and missing actual mount root read-only negative **exit 66 `club_root_missing_or_symlink` PASS**. Positive real three-mount test, real `initdb --waldir`, container startup/ENOSPC and C→C2 restore remain **NOT RUN**.
+- **W47.1 correction, 2026-10-23 (G3 only):** the original FIRST-mode `-z "$(ls -A ...)"` could incorrectly accept a nonempty directory with a newline-only filename (command substitution strips trailing newlines). Replaced it with status-checked `find` over PGDATA/WAL subdirectories. Independent sandbox check: empty directory PASS, dotfile DENY, newline-only filename DENY; Bash snippet syntax PASS. Original script SHA256 `34170542ee5f83f6dd950460c66cf90ac301a398bb3729f6ab48d138031636dc` is superseded by the new script SHA above. Existing Mac/VM full Compose config and positive mount/PG17 runtime were **not** rerun; both actual mount and WAL runtime remain **NOT RUN**. Preflight must be enforced by the named operator on every protected startup, not treated as optional documentation.
 
 ### Risk-triggered rollback and recovery (owned; no new access rights)
 
