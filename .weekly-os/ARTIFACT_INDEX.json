@@ -7,12 +7,12 @@
     "projectStage": "BUILD",
     "gate": "G5_BUILD",
     "status": "APPROVED",
-    "version": "3.29",
-    "updated": "2026-10-23",
+    "version": "3.30",
+    "updated": "2026-10-24",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "3.28"
+    "supersedes": "3.29"
   },
   "currentArtifacts": [
     {
@@ -3919,6 +3919,45 @@
       "productionDeployAuthorized": false,
       "note": "Owner authorized exactly two Workspace source paths for code-only G4. Isolated QA candidate may be prepared; current PR308 is sole active WebUI integration lane; #38 waits serial integration and independent G6. No Cloud/VM/data/production release.",
       "referencedBy": []
+    },
+    {
+      "artifactId": "dementor-club.result.board-pointer-no-gesture-v1",
+      "documentType": "RESULT",
+      "currentVersion": "0.1",
+      "status": "APPROVED",
+      "workStatus": "WAITING",
+      "location": ".weekly-os/results/board-pointer-no-gesture-v1.v0.1.md",
+      "path": ".weekly-os/results/board-pointer-no-gesture-v1.v0.1.md",
+      "sourceSystem": "GIT",
+      "authorityType": "IMPLEMENTATION_AUTHORITY",
+      "updated": "2026-10-24",
+      "canonicalProject": "dementor-club",
+      "canonicalLocation": ".weekly-os/results/board-pointer-no-gesture-v1.v0.1.md",
+      "relation": "WAITING_RESULT",
+      "gate": "G4_PASS",
+      "projectStage": "BUILD",
+      "parentIssues": [
+        126,
+        38,
+        42,
+        237
+      ],
+      "ownerDecisionRelay": "https://github.com/SLADZARI/degradation_club/issues/126#issuecomment-6377258855",
+      "implementationOwner": "F-01",
+      "independentQaOwner": "Q-01",
+      "integrationOwner": "Lead",
+      "activeIntegrationBranch": null,
+      "productionBaseCommit": "cde332779ab0e256dd1e498660d6fa651e91846e",
+      "sourceCandidatePreparationAuthorized": true,
+      "implementationStartAuthorized": true,
+      "activeIntegrationAuthorized": false,
+      "schemaChangeImplementationAuthorized": false,
+      "liveDatabaseMutationAuthorized": false,
+      "liveHostMutationAuthorized": false,
+      "productionMergeAuthorized": false,
+      "productionDeployAuthorized": false,
+      "g4Status": "PASS_LIMITED_CODE_ONLY_TWO_BOARD_DRAG_FILES",
+      "note": "Owner explicit project-chat G4 relay, exact two active Board drag JS. F01 isolated source candidate allowed; PR308 remains sole active WebUI lane. No source PR merge/deploy/Cloud/VM/data/public G7."
     }
   ],
   "referenceArtifacts": [
