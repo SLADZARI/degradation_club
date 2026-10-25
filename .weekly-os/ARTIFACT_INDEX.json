@@ -7,12 +7,12 @@
     "projectStage": "BUILD",
     "gate": "G5_BUILD",
     "status": "APPROVED",
-    "version": "3.31",
+    "version": "3.32",
     "updated": "2026-10-25",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "3.30"
+    "supersedes": "3.31"
   },
   "currentArtifacts": [
     {
@@ -3962,18 +3962,18 @@
     {
       "artifactId": "dementor-club.result.stage1-rc-qa-preview-24h-g4",
       "documentType": "RESULT",
-      "currentVersion": "0.2",
-      "version": "0.2",
+      "currentVersion": "0.3",
+      "version": "0.3",
       "status": "APPROVED",
-      "workStatus": "WAITING",
-      "location": ".weekly-os/results/stage1-rc-qa-preview-24h-g4.v0.2.md",
-      "path": ".weekly-os/results/stage1-rc-qa-preview-24h-g4.v0.2.md",
+      "workStatus": "CLOSED",
+      "location": ".weekly-os/results/stage1-rc-qa-preview-24h-g4.v0.3.md",
+      "path": ".weekly-os/results/stage1-rc-qa-preview-24h-g4.v0.3.md",
       "sourceSystem": "GIT",
       "authorityType": "IMPLEMENTATION_AUTHORITY",
       "updated": "2026-10-25",
       "canonicalProject": "dementor-club",
       "canonicalLocation": ".weekly-os/results/stage1-rc-qa-preview-24h-g4.v0.2.md",
-      "relation": "CLOSED_HOST_AUTH_CLEANUP_PENDING",
+      "relation": "CLOSED_OWNER_ATTESTED_AUTH_CLEANUP",
       "gate": "G4_PASS",
       "projectStage": "BUILD",
       "parentIssues": [
@@ -3987,7 +3987,7 @@
       "stageOnlyDnsTlsNginxMutationAuthorized": false,
       "productionMergeAuthorized": false,
       "productionDeployAuthorized": false,
-      "g4Status": "STAGE_HOST_CLOSED_AUTH_ALLOWLIST_CLEANUP_PENDING",
+      "g4Status": "STAGE_PREVIEW_CLOSED_OWNER_ATTESTED_AUTH_RULE_REMOVAL_NOT_INDEPENDENTLY_VERIFIED",
       "g4Evidence": "https://github.com/SLADZARI/degradation_club/issues/237#issuecomment-6391163452",
       "temporaryStageHostMutationAuthorized": false,
       "closeoutEvidence": "https://github.com/SLADZARI/degradation_club/issues/255#issuecomment-6398876421"
