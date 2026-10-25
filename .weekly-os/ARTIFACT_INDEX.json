@@ -7,12 +7,12 @@
     "projectStage": "BUILD",
     "gate": "G5_BUILD",
     "status": "APPROVED",
-    "version": "3.30",
-    "updated": "2026-10-24",
+    "version": "3.31",
+    "updated": "2026-10-25",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "3.29"
+    "supersedes": "3.30"
   },
   "currentArtifacts": [
     {
@@ -3962,18 +3962,18 @@
     {
       "artifactId": "dementor-club.result.stage1-rc-qa-preview-24h-g4",
       "documentType": "RESULT",
-      "currentVersion": "0.1",
-      "version": "0.1",
+      "currentVersion": "0.2",
+      "version": "0.2",
       "status": "APPROVED",
-      "workStatus": "ACTIVE",
-      "location": ".weekly-os/results/stage1-rc-qa-preview-24h-g4.v0.1.md",
-      "path": ".weekly-os/results/stage1-rc-qa-preview-24h-g4.v0.1.md",
+      "workStatus": "WAITING",
+      "location": ".weekly-os/results/stage1-rc-qa-preview-24h-g4.v0.2.md",
+      "path": ".weekly-os/results/stage1-rc-qa-preview-24h-g4.v0.2.md",
       "sourceSystem": "GIT",
       "authorityType": "IMPLEMENTATION_AUTHORITY",
       "updated": "2026-10-25",
       "canonicalProject": "dementor-club",
-      "canonicalLocation": ".weekly-os/results/stage1-rc-qa-preview-24h-g4.v0.1.md",
-      "relation": "PARALLEL_PROTECTED_QA_PREVIEW_ONLY",
+      "canonicalLocation": ".weekly-os/results/stage1-rc-qa-preview-24h-g4.v0.2.md",
+      "relation": "CLOSED_HOST_AUTH_CLEANUP_PENDING",
       "gate": "G4_PASS",
       "projectStage": "BUILD",
       "parentIssues": [
@@ -3983,12 +3983,14 @@
         42
       ],
       "activeIntegrationBranch": null,
-      "implementationStartAuthorized": true,
-      "stageOnlyDnsTlsNginxMutationAuthorized": true,
+      "implementationStartAuthorized": false,
+      "stageOnlyDnsTlsNginxMutationAuthorized": false,
       "productionMergeAuthorized": false,
       "productionDeployAuthorized": false,
-      "g4Status": "PASS_LIMITED_TEMPORARY_STAGE_PREVIEW_ONLY",
-      "g4Evidence": "https://github.com/SLADZARI/degradation_club/issues/237#issuecomment-6391163452"
+      "g4Status": "STAGE_HOST_CLOSED_AUTH_ALLOWLIST_CLEANUP_PENDING",
+      "g4Evidence": "https://github.com/SLADZARI/degradation_club/issues/237#issuecomment-6391163452",
+      "temporaryStageHostMutationAuthorized": false,
+      "closeoutEvidence": "https://github.com/SLADZARI/degradation_club/issues/255#issuecomment-6398876421"
     }
   ],
   "referenceArtifacts": [
