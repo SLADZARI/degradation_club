@@ -3972,9 +3972,9 @@
       "authorityType": "IMPLEMENTATION_AUTHORITY",
       "updated": "2026-10-25",
       "canonicalProject": "dementor-club",
-      "canonicalLocation": ".weekly-os/results/stage1-rc-qa-preview-24h-g4.v0.2.md",
+      "canonicalLocation": ".weekly-os/results/stage1-rc-qa-preview-24h-g4.v0.3.md",
       "relation": "CLOSED_OWNER_ATTESTED_AUTH_CLEANUP",
-      "gate": "G4_PASS",
+      "gate": "G8_CLEANUP",
       "projectStage": "BUILD",
       "parentIssues": [
         237,
