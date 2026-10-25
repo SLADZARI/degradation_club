@@ -3958,6 +3958,37 @@
       "productionDeployAuthorized": false,
       "g4Status": "PASS_LIMITED_CODE_ONLY_TWO_BOARD_DRAG_FILES",
       "note": "Owner explicit project-chat G4 relay, exact two active Board drag JS. F01 isolated source candidate allowed; PR308 remains sole active WebUI lane. No source PR merge/deploy/Cloud/VM/data/public G7."
+    },
+    {
+      "artifactId": "dementor-club.result.stage1-rc-qa-preview-24h-g4",
+      "documentType": "RESULT",
+      "currentVersion": "0.1",
+      "version": "0.1",
+      "status": "APPROVED",
+      "workStatus": "ACTIVE",
+      "location": ".weekly-os/results/stage1-rc-qa-preview-24h-g4.v0.1.md",
+      "path": ".weekly-os/results/stage1-rc-qa-preview-24h-g4.v0.1.md",
+      "sourceSystem": "GIT",
+      "authorityType": "IMPLEMENTATION_AUTHORITY",
+      "updated": "2026-10-25",
+      "canonicalProject": "dementor-club",
+      "canonicalLocation": ".weekly-os/results/stage1-rc-qa-preview-24h-g4.v0.1.md",
+      "relation": "PARALLEL_PROTECTED_QA_PREVIEW_ONLY",
+      "gate": "G4_PASS",
+      "projectStage": "BUILD",
+      "parentIssues": [
+        237,
+        255,
+        256,
+        42
+      ],
+      "activeIntegrationBranch": null,
+      "implementationStartAuthorized": true,
+      "stageOnlyDnsTlsNginxMutationAuthorized": true,
+      "productionMergeAuthorized": false,
+      "productionDeployAuthorized": false,
+      "g4Status": "PASS_LIMITED_TEMPORARY_STAGE_PREVIEW_ONLY",
+      "g4Evidence": "https://github.com/SLADZARI/degradation_club/issues/237#issuecomment-6391163452"
     }
   ],
   "referenceArtifacts": [
