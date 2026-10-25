@@ -7,12 +7,12 @@
     "projectStage": "BUILD",
     "gate": "G5_BUILD",
     "status": "APPROVED",
-    "version": "3.32",
+    "version": "3.33",
     "updated": "2026-10-25",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "3.31"
+    "supersedes": "3.32"
   },
   "currentArtifacts": [
     {
@@ -3860,7 +3860,14 @@
       "g4Status": "PASS_LIMITED_CODE_ONLY_V03_WEBKIT",
       "g4Evidence": "https://github.com/SLADZARI/degradation_club/issues/237#issuecomment-6320105037",
       "ownerD1ConditionalCodeGrant": "https://github.com/SLADZARI/degradation_club/issues/227#issuecomment-6326985199",
-      "ownerG4DecisionV03": "https://github.com/SLADZARI/degradation_club/issues/126#issuecomment-6342046769"
+      "ownerG4DecisionV03": "https://github.com/SLADZARI/degradation_club/issues/126#issuecomment-6342046769",
+      "g6ScopedStatus": "PASS_LOCAL_BROWSER_ONLY",
+      "g6ScopedSha": "a71eb033643d2c26f25db5a41a202f5a30433c59",
+      "g6ScopedEvidence": "https://github.com/SLADZARI/degradation_club/issues/126#issuecomment-6349694898",
+      "g6CombinedRcStatus": "PASS_SCOPED_BROWSER_MANIFEST_ONLY",
+      "g6CombinedRcEvidence": "https://github.com/SLADZARI/degradation_club/issues/42#issuecomment-6385386398",
+      "g6ProtectedStatus": "INCOMPLETE_BLOCKED_SIDE_EFFECT_FIXTURE",
+      "g7Status": "NO_GO"
     },
     {
       "artifactId": "dementor-club.result.portal-vm-site-hosting-stage1",
