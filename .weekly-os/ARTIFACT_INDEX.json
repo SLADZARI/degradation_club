@@ -7,12 +7,12 @@
     "projectStage": "BUILD",
     "gate": "G5_BUILD",
     "status": "APPROVED",
-    "version": "3.34",
-    "updated": "2026-10-25",
+    "version": "3.35",
+    "updated": "2026-10-26",
     "owner": "Modern Pilgrims",
     "sourceSystem": "GIT",
     "authorityType": "IMPLEMENTATION_AUTHORITY",
-    "supersedes": "3.33"
+    "supersedes": "3.34"
   },
   "currentArtifacts": [
     {
@@ -4040,6 +4040,46 @@
       "productionDeployAuthorized": false,
       "g4Status": "PASS_LIMITED_LOCAL_SYNTHETIC_QA_ONLY",
       "note": "Distinct local-only protected test authority, not PR/source implementation. PROJECT.currentResult remains WebUI v0.3 sole source integration. No Stage2 VM/Cloud migration permission; independent Q-01 mandatory."
+    },
+    {
+      "artifactId": "dementor-club.result.stage1-live-side-effect-preflight-g4",
+      "documentType": "RESULT",
+      "currentVersion": "0.1",
+      "version": "0.1",
+      "status": "APPROVED",
+      "workStatus": "WAITING_SRE_DESIGN_AND_PRIVATE_ACTOR_MAP",
+      "location": ".weekly-os/results/stage1-live-side-effect-preflight-g4.v0.1.md",
+      "path": ".weekly-os/results/stage1-live-side-effect-preflight-g4.v0.1.md",
+      "sourceSystem": "GIT",
+      "authorityType": "IMPLEMENTATION_AUTHORITY",
+      "updated": "2026-10-26",
+      "canonicalProject": "dementor-club",
+      "canonicalLocation": ".weekly-os/results/stage1-live-side-effect-preflight-g4.v0.1.md",
+      "relation": "SUPPORTING_LIMITED_PROTECTED_PREFLIGHT_RESULT_NOT_CURRENT_INTEGRATION",
+      "gate": "G4_PASS",
+      "projectStage": "BUILD",
+      "parentIssues": [
+        237,
+        255,
+        256,
+        42
+      ],
+      "ownerDecisionRelay": "https://github.com/SLADZARI/degradation_club/issues/237#issuecomment-6418034431",
+      "productionBaseCommit": "cde332779ab0e256dd1e498660d6fa651e91846e",
+      "implementationStartAuthorized": true,
+      "scopedLiveCloudReadOnlyPreflightAuthorized": true,
+      "scopedEncryptedAffectedRowRecoveryCopyAuthorized": true,
+      "protectedLiveBrowserOrAutoWriteExecutionAuthorized": false,
+      "activeIntegrationAuthorized": false,
+      "activeIntegrationBranch": null,
+      "schemaChangeImplementationAuthorized": false,
+      "liveDatabaseMutationAuthorized": false,
+      "liveHostMutationAuthorized": false,
+      "stage2CloudDataExportOrCutoverAuthorized": false,
+      "productionMergeAuthorized": false,
+      "productionDeployAuthorized": false,
+      "g4Status": "PASS_LIMITED_PROTECTED_PREFLIGHT_CONDITIONAL",
+      "note": "Conditional SRE design and private actor/Artifact map prerequisite; only source-scoped read-only Cloud affected-row baseline and encrypted least-scope recovery-copy with isolated restore. No live protected browser/automatic writes, no Stage2 migration. PROJECT.currentResult stays active WebUI PR308."
     }
   ],
   "referenceArtifacts": [
