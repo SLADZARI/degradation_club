@@ -1,7 +1,9 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import {artifactForbiddenReason, requireArtifactTarget} from './artifact-target-policy.mjs';
 import {normalizeCanonicalSocialHead,validateCanonicalSocialArtifact} from './social-head-v1.mjs';
 
+const target = requireArtifactTarget();
 const root = process.cwd();
 const out = path.join(root, '_site');
 const productionOrigin = 'https://dementor.club';
@@ -67,6 +69,7 @@ function shouldSkipFile(src, entryName) {
   if (entryName.toLowerCase().endsWith('.md')) return true;
   if (entryName.toLowerCase().endsWith('.example.html')) return true;
   if (rel === 'content/page-readiness.json') return true;
+  if (artifactForbiddenReason(rel, target, true)) return true;
   return false;
 }
 
@@ -76,6 +79,8 @@ function copyDir(src, dst) {
     if (src === root && skipTopLevel.has(entry.name)) continue;
     const from = path.join(src, entry.name);
     const to = path.join(dst, entry.name);
+    if (entry.isSymbolicLink()) throw new Error('Symlink source forbidden: ' + path.relative(root, from));
+    if (entry.isDirectory() && artifactForbiddenReason(path.relative(root, from), target, true)) continue;
     if (entry.isDirectory()) {
       copyDir(from, to);
       continue;
@@ -196,8 +201,10 @@ for (const rel of productionDependencies) copyProductionDependency(rel);
 for (const spec of productionProjections) copyProductionProjection(spec);
 injectProductionModules();
 hardenProductionRuntime();
-fs.writeFileSync(path.join(out, '.nojekyll'), '');
-fs.writeFileSync(path.join(out, 'CNAME'), 'dementor.club\n');
+if (target === 'PAGES_FALLBACK') {
+  fs.writeFileSync(path.join(out, '.nojekyll'), '');
+  fs.writeFileSync(path.join(out, 'CNAME'), 'dementor.club\n');
+}
 validateCanonicalSocialArtifact(out);
 
 console.log(`GitHub Pages production candidate ready for ${productionOrigin} at ${out}`);

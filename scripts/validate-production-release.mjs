@@ -1,6 +1,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import {artifactForbiddenReason, requireArtifactTarget} from './artifact-target-policy.mjs';
 
+const target = requireArtifactTarget();
 const root = process.cwd();
 const artifactRoot = path.join(root, '_site');
 const productionOrigin = 'https://dementor.club';
@@ -63,6 +65,24 @@ if (!fs.existsSync(artifactRoot)) {
 
 for (const rel of forbiddenArtifactPaths) {
   if (fs.existsSync(artifactPath(rel))) errors.push(`${rel}: internal/staging material must not exist in production artifact`);
+}
+
+function checkArtifactPolicy(dir) {
+  for (const entry of fs.readdirSync(dir, {withFileTypes:true})) {
+    const full = path.join(dir, entry.name);
+    const rel = path.relative(artifactRoot, full).replaceAll('\\','/');
+    if (entry.isSymbolicLink()) { errors.push(rel + ': symlink forbidden'); continue; }
+    const reason = artifactForbiddenReason(rel, target, false);
+    if (reason) errors.push(rel + ': ' + reason);
+    if (entry.isDirectory()) checkArtifactPolicy(full);
+    else if (!entry.isFile()) errors.push(rel + ': unsupported artifact node');
+  }
+}
+checkArtifactPolicy(artifactRoot);
+if (errors.length) {
+  console.error('PRODUCTION RELEASE BLOCKED');
+  for (const message of errors) console.error('- ' + message);
+  process.exit(1);
 }
 
 function collectFiles(dir, base = dir) {
@@ -332,8 +352,14 @@ if (!fs.existsSync(readinessPath)) {
 }
 
 const cnamePath = artifactPath('CNAME');
-if (!fs.existsSync(cnamePath) || fs.readFileSync(cnamePath, 'utf8').trim() !== 'dementor.club') {
-  errors.push('CNAME: production artifact must contain exactly dementor.club');
+const noJekyllPath = artifactPath('.nojekyll');
+if (target === 'PAGES_FALLBACK') {
+  if (!fs.existsSync(cnamePath) || fs.readFileSync(cnamePath, 'utf8').trim() !== 'dementor.club')
+    errors.push('CNAME: Pages fallback must contain exactly dementor.club');
+  if (!fs.existsSync(noJekyllPath)) errors.push('.nojekyll: missing Pages metadata');
+} else {
+  if (fs.existsSync(cnamePath)) errors.push('CNAME: forbidden VM metadata');
+  if (fs.existsSync(noJekyllPath)) errors.push('.nojekyll: forbidden VM metadata');
 }
 
 const robotsPath = artifactPath('robots.txt');
