@@ -92,10 +92,27 @@ function copyDir(src, dst) {
   }
 }
 
+function assertApprovedSourceRegularFile(rel) {
+  if (path.isAbsolute(rel)) throw new Error('Unsafe absolute approved source path');
+  const segments = rel.split('/');
+  if (segments.some(segment => !segment || segment === '.' || segment === '..' || segment.includes('\\'))) {
+    throw new Error('Unsafe approved source path');
+  }
+  let cursor = root;
+  for (const segment of segments) {
+    cursor = path.join(cursor, segment);
+    let stat;
+    try { stat = fs.lstatSync(cursor); }
+    catch { throw new Error('Approved source path missing: ' + rel); }
+    if (stat.isSymbolicLink()) throw new Error('Approved source symlink forbidden: ' + rel);
+  }
+  if (!fs.statSync(cursor).isFile()) throw new Error('Approved source is not regular file: ' + rel);
+}
+
 function copyProductionDependency(rel) {
   const from = path.join(root, rel);
   const to = path.join(out, rel);
-  if (!fs.existsSync(from) || !fs.statSync(from).isFile()) throw new Error(`Approved production dependency is missing: ${rel}`);
+  assertApprovedSourceRegularFile(rel);
   fs.mkdirSync(path.dirname(to), { recursive: true });
   const ext = path.extname(rel).toLowerCase();
   if (textExt.has(ext)) fs.writeFileSync(to, normalizeProductionText(fs.readFileSync(from, 'utf8'), ext));
@@ -105,7 +122,7 @@ function copyProductionDependency(rel) {
 function copyProductionProjection(spec) {
   const from = path.join(root, spec.from);
   const to = path.join(out, spec.to);
-  if (!fs.existsSync(from) || !fs.statSync(from).isFile()) throw new Error(`Approved production projection is missing: ${spec.from}`);
+  assertApprovedSourceRegularFile(spec.from);
   fs.mkdirSync(path.dirname(to), { recursive: true });
   const ext = path.extname(spec.from).toLowerCase();
   if (!textExt.has(ext)) { fs.copyFileSync(from, to); return; }
