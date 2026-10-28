@@ -68,7 +68,7 @@ jobs:
       - name: Validate Board public activity contract
         run: node scripts/validate-board-public-activity-contract.mjs
       - name: Build production candidate artifact
-        run: node scripts/build-pages.mjs
+        run: node scripts/build-pages.mjs --target=PAGES_FALLBACK
       - name: Validate Current Program v1 contract
         run: node scripts/validate-current-program-v1.mjs
       - name: Validate DSO Release Loop v1 contract
@@ -164,4 +164,4 @@ jobs:
       - name: Validate production route manifest
         run: node scripts/validate-route-manifest.mjs
       - name: Validate production artifact release gate
-        run: node scripts/validate-production-release.mjs
+        run: node scripts/validate-production-release.mjs --target=PAGES_FALLBACK

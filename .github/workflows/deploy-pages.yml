@@ -41,7 +41,7 @@ jobs:
         run: node scripts/validate-visual-contract.mjs
 
       - name: Build production Pages artifact
-        run: node scripts/build-pages.mjs
+        run: node scripts/build-pages.mjs --target=PAGES_FALLBACK
 
       - name: Validate canonical shell integration
         run: node scripts/validate-shell-contract.mjs
@@ -61,7 +61,7 @@ jobs:
         run: node scripts/validate-route-manifest.mjs
 
       - name: Validate production artifact and release gate
-        run: node scripts/validate-production-release.mjs
+        run: node scripts/validate-production-release.mjs --target=PAGES_FALLBACK
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
